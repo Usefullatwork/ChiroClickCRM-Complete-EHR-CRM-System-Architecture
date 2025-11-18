@@ -132,6 +132,7 @@ import pdfRoutes from './routes/pdf.js';
 import organizationRoutes from './routes/organizations.js';
 import userRoutes from './routes/users.js';
 import aiRoutes from './routes/ai.js';
+import trainingRoutes from './routes/training.js';
 
 // Mount routes
 app.use(`/api/${API_VERSION}/dashboard`, dashboardRoutes);
@@ -151,6 +152,7 @@ app.use(`/api/${API_VERSION}/pdf`, pdfRoutes);
 app.use(`/api/${API_VERSION}/organizations`, organizationRoutes);
 app.use(`/api/${API_VERSION}/users`, userRoutes);
 app.use(`/api/${API_VERSION}/ai`, aiRoutes);
+app.use(`/api/${API_VERSION}/training`, trainingRoutes);
 
 // ============================================================================
 // ERROR HANDLING

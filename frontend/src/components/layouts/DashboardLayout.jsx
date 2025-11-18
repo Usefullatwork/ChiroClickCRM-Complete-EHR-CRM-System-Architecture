@@ -7,6 +7,7 @@ import {
   MessageSquare,
   CheckCircle2,
   TrendingUp,
+  Upload,
   Settings
 } from 'lucide-react'
 
@@ -22,6 +23,7 @@ export default function DashboardLayout() {
     { name: 'Communications', href: '/communications', icon: MessageSquare },
     { name: 'Follow-ups', href: '/follow-ups', icon: CheckCircle2 },
     { name: 'KPI', href: '/kpi', icon: TrendingUp },
+    { name: 'Import', href: '/import', icon: Upload },
     { name: 'Settings', href: '/settings', icon: Settings },
   ]
 
