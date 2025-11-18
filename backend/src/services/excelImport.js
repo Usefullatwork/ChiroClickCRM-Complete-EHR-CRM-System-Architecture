@@ -46,14 +46,15 @@ const mapExcelRowToPatient = (row) => {
     return null;
   };
 
-  return {
-    solvit_id: findColumn(row, 'solvit_id', 'solvitid', 'solvit id', 'id', 'patient id'),
-    first_name: findColumn(row, 'first_name', 'firstname', 'fornavn', 'first name'),
-    last_name: findColumn(row, 'last_name', 'lastname', 'etternavn', 'last name', 'surname'),
+  // Map basic patient data
+  const patient = {
+    solvit_id: findColumn(row, 'pasient id', 'solvit_id', 'solvitid', 'solvit id', 'id', 'patient id'),
+    first_name: findColumn(row, 'for navn', 'fornavn', 'first_name', 'firstname', 'first name'),
+    last_name: findColumn(row, 'etter navn', 'etternavn', 'last_name', 'lastname', 'last name', 'surname'),
     date_of_birth: findColumn(row, 'date_of_birth', 'dateofbirth', 'birth_date', 'fødselsdato', 'dob', 'birthdate'),
     national_id: findColumn(row, 'national_id', 'nationalid', 'personnummer', 'ssn', 'fnr', 'fodselsnummer'),
-    phone: findColumn(row, 'phone', 'telefon', 'mobile', 'mobil', 'phone_number'),
-    email: findColumn(row, 'email', 'epost', 'e-post', 'e-mail'),
+    phone: findColumn(row, 'telefonnummer', 'phone', 'telefon', 'mobile', 'mobil', 'phone_number'),
+    email: findColumn(row, 'e-post', 'email', 'epost', 'e-mail'),
     address_street: findColumn(row, 'address_street', 'street', 'address', 'adresse', 'gateadresse'),
     address_postal_code: findColumn(row, 'address_postal_code', 'postal_code', 'postnummer', 'zip', 'postcode'),
     address_city: findColumn(row, 'address_city', 'city', 'by', 'poststed'),
@@ -61,8 +62,39 @@ const mapExcelRowToPatient = (row) => {
     emergency_contact_name: findColumn(row, 'emergency_contact_name', 'emergency_name', 'pårørende', 'next_of_kin'),
     emergency_contact_phone: findColumn(row, 'emergency_contact_phone', 'emergency_phone', 'pårørende_telefon'),
     category: findColumn(row, 'category', 'kategori', 'patient_category'),
-    notes: findColumn(row, 'notes', 'notater', 'comments', 'kommentarer')
+
+    // CRM fields from Excel
+    preferred_therapist: findColumn(row, 'pasient orginal terapaut', 'preferred_therapist', 'therapist', 'terapeut'),
+    preferred_contact_method: findColumn(row, 'ønsker kontakt på', 'preferred_contact', 'contact_method'),
+    patient_status: findColumn(row, 'pasient status', 'status'),
+    language: findColumn(row, 'språk', 'language', 'lang'),
+    main_problem: findColumn(row, 'hovedproblem', 'main_problem', 'chief_complaint', 'problem'),
+    treatment_type: findColumn(row, 'behandlingstype', 'treatment_type', 'treatment'),
+    general_notes: findColumn(row, 'generelle notater', 'general_notes', 'notes', 'notater', 'comments'),
+    should_be_followed_up: findColumn(row, 'burde vært fulgt opp', 'follow_up_date', 'should_follow_up'),
+    last_visit_date: findColumn(row, 'siste besøk dato', 'last_visit', 'last_appointment'),
+    referral_source: findColumn(row, 'henvisningskilde', 'referral_source', 'referral'),
   };
+
+  // Normalize status
+  if (patient.patient_status === 'Inaktiv') patient.status = 'INACTIVE';
+  else if (patient.patient_status === 'Ferdig') patient.status = 'FINISHED';
+  else if (patient.patient_status) patient.status = 'ACTIVE';
+
+  // Normalize language
+  if (patient.language === 'Norsk') patient.language = 'NO';
+  else if (patient.language === 'Engelsk') patient.language = 'EN';
+
+  // Normalize treatment type
+  if (patient.treatment_type === 'Kiropraktor') patient.treatment_type = 'KIROPRAKTOR';
+  else if (patient.treatment_type === 'Nevrobehandling') patient.treatment_type = 'NEVROBEHANDLING';
+  else if (patient.treatment_type === 'Muskelbehandling') patient.treatment_type = 'MUSKELBEHANDLING';
+
+  // Normalize contact method
+  if (patient.preferred_contact_method === 'Melding') patient.preferred_contact_method = 'SMS';
+  else if (patient.preferred_contact_method?.includes('BARN')) patient.preferred_contact_method = 'NO_CONTACT';
+
+  return patient;
 };
 
 /**

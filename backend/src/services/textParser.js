@@ -157,7 +157,7 @@ export const extractPatientFromText = (text) => {
 
 /**
  * Parse table-formatted patient list (like the Solvit export)
- * Format: Patient ID | First Name | Last Name | Last Appointment | Contact
+ * Format: Patient ID | First Name | Last Name | Last Visit | Email | Phone | Therapist | Contact Method | Status | Language | Main Problem | Treatment Type | Notes | Follow Up Date
  */
 export const parsePatientTable = (text) => {
   const lines = text.split('\n').map(line => line.trim()).filter(line => line);
@@ -169,7 +169,7 @@ export const parsePatientTable = (text) => {
 
   for (const line of dataLines) {
     // Split by tabs or multiple spaces
-    const columns = line.split(/\t+|\s{2,}/);
+    const columns = line.split(/\t+/);
 
     if (columns.length >= 3) {
       const patient = {
@@ -177,21 +177,35 @@ export const parsePatientTable = (text) => {
         first_name: columns[1]?.trim() || null,
         last_name: columns[2]?.trim() || null,
         last_visit_date: columns[3] ? parseNorwegianDate(columns[3].trim()) : null,
-        contact_info: columns[4]?.trim() || null
+        email: columns[4]?.trim() || null,
+        phone: columns[5] ? parseNorwegianPhone(columns[5].trim()) : null,
+        preferred_therapist: columns[6]?.trim() || null,
+        preferred_contact_method: columns[7]?.trim() || null,
+        patient_status: columns[8]?.trim() || null,
+        language: columns[9]?.trim() || null,
+        main_problem: columns[10]?.trim() || null,
+        treatment_type: columns[11]?.trim() || null,
+        general_notes: columns[12]?.trim() || null,
+        should_be_followed_up: columns[13] ? parseNorwegianDate(columns[13].trim()) : null
       };
 
-      // Try to parse contact info
-      if (patient.contact_info) {
-        const phone = parseNorwegianPhone(patient.contact_info);
-        if (phone) {
-          patient.phone = phone;
-        }
+      // Normalize status values
+      if (patient.patient_status === 'Inaktiv') patient.status = 'INACTIVE';
+      else if (patient.patient_status === 'Ferdig') patient.status = 'FINISHED';
+      else patient.status = 'ACTIVE';
 
-        const emailMatch = patient.contact_info.match(/([^\s@]+@[^\s@]+\.[^\s@]+)/);
-        if (emailMatch) {
-          patient.email = emailMatch[1];
-        }
-      }
+      // Normalize language
+      if (patient.language === 'Norsk') patient.language = 'NO';
+      else if (patient.language === 'Engelsk') patient.language = 'EN';
+
+      // Normalize treatment type
+      if (patient.treatment_type === 'Kiropraktor') patient.treatment_type = 'KIROPRAKTOR';
+      else if (patient.treatment_type === 'Nevrobehandling') patient.treatment_type = 'NEVROBEHANDLING';
+      else if (patient.treatment_type === 'Muskelbehandling') patient.treatment_type = 'MUSKELBEHANDLING';
+
+      // Normalize contact method
+      if (patient.preferred_contact_method === 'Melding') patient.preferred_contact_method = 'SMS';
+      else if (patient.preferred_contact_method?.includes('BARN')) patient.preferred_contact_method = 'NO_CONTACT';
 
       patients.push(patient);
     }
