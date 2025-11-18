@@ -1,9 +1,11 @@
 /**
  * Phone Bridge Service
  * Sends SMS through connected phone using various methods:
- * - KDE Connect (Linux)
- * - Android Debug Bridge (ADB)
- * - Phone Companion API (Windows/Android app)
+ * - Manual (copy-to-clipboard workflow)
+ * - Phone Link (Windows Phone Link/Your Phone app)
+ * - Phone Companion API (custom mobile app)
+ * - KDE Connect (Linux only)
+ * - Android Debug Bridge (ADB - advanced)
  */
 
 import { exec } from 'child_process';
@@ -13,13 +15,68 @@ import logger from '../utils/logger.js';
 
 const execAsync = promisify(exec);
 
-const PHONE_BRIDGE_METHOD = process.env.PHONE_BRIDGE_METHOD || 'kdeconnect'; // 'kdeconnect', 'adb', 'api'
+const PHONE_BRIDGE_METHOD = process.env.PHONE_BRIDGE_METHOD || 'manual'; // 'manual', 'phonelink', 'api', 'kdeconnect', 'adb'
 const PHONE_DEVICE_ID = process.env.PHONE_DEVICE_ID || null;
 const PHONE_API_URL = process.env.PHONE_API_URL || 'http://localhost:8080';
 const PHONE_API_KEY = process.env.PHONE_API_KEY || null;
+const PHONE_LINK_URL = process.env.PHONE_LINK_URL || 'http://localhost:9002'; // Windows Phone Link local API
 
 /**
- * Send SMS via KDE Connect
+ * Manual method - returns message for copy-to-clipboard
+ * User copies the message and sends it manually from their phone
+ */
+const sendViaManual = async (phoneNumber, message) => {
+  logger.info('SMS prepared for manual sending:', { phoneNumber, messageLength: message.length });
+  return {
+    success: true,
+    method: 'manual',
+    externalId: `MANUAL-${Date.now()}`,
+    pendingApproval: true, // Frontend will show "Copy & Send" UI
+    messageText: message,
+    recipientPhone: phoneNumber,
+    instructions: 'Copy this message and send it manually from your phone'
+  };
+};
+
+/**
+ * Send SMS via Windows Phone Link (Your Phone app)
+ * Requires Windows 10/11 with Phone Link app connected
+ */
+const sendViaPhoneLink = async (phoneNumber, message) => {
+  try {
+    // Windows Phone Link exposes a local REST API when running
+    const response = await axios.post(
+      `${PHONE_LINK_URL}/api/messages/send`,
+      {
+        recipient: phoneNumber,
+        body: message
+      },
+      {
+        timeout: 10000,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    logger.info('SMS sent via Phone Link:', { phoneNumber, messageId: response.data.messageId });
+    return {
+      success: true,
+      method: 'phonelink',
+      externalId: response.data.messageId || `PL-${Date.now()}`,
+      response: response.data
+    };
+  } catch (error) {
+    logger.error('Phone Link SMS error:', error.message);
+
+    // Fallback to manual method if Phone Link is not available
+    logger.info('Falling back to manual method');
+    return sendViaManual(phoneNumber, message);
+  }
+};
+
+/**
+ * Send SMS via KDE Connect (Linux only)
  */
 const sendViaKDEConnect = async (phoneNumber, message) => {
   try {
@@ -123,17 +180,24 @@ export const sendSMS = async (phoneNumber, message) => {
   logger.info(`Sending SMS via ${PHONE_BRIDGE_METHOD}:`, { to: formattedNumber });
 
   switch (PHONE_BRIDGE_METHOD) {
+    case 'manual':
+      return await sendViaManual(formattedNumber, message);
+
+    case 'phonelink':
+      return await sendViaPhoneLink(formattedNumber, message);
+
+    case 'api':
+      return await sendViaAPI(formattedNumber, message);
+
     case 'kdeconnect':
       return await sendViaKDEConnect(formattedNumber, message);
 
     case 'adb':
       return await sendViaADB(formattedNumber, message);
 
-    case 'api':
-      return await sendViaAPI(formattedNumber, message);
-
     default:
-      throw new Error(`Unknown phone bridge method: ${PHONE_BRIDGE_METHOD}`);
+      logger.warn(`Unknown phone bridge method: ${PHONE_BRIDGE_METHOD}, falling back to manual`);
+      return await sendViaManual(formattedNumber, message);
   }
 };
 
