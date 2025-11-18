@@ -106,7 +106,8 @@ app.get(`/api/${API_VERSION}`, (req, res) => {
       kpi: `/api/${API_VERSION}/kpi`,
       outcomes: `/api/${API_VERSION}/outcomes`,
       gdpr: `/api/${API_VERSION}/gdpr`,
-      pdf: `/api/${API_VERSION}/pdf`
+      pdf: `/api/${API_VERSION}/pdf`,
+      ai: `/api/${API_VERSION}/ai`
     }
   });
 });
@@ -124,9 +125,9 @@ import financialRoutes from './routes/financial.js';
 import outcomeRoutes from './routes/outcomes.js';
 import gdprRoutes from './routes/gdpr.js';
 import pdfRoutes from './routes/pdf.js';
-// import organizationRoutes from './routes/organizations.js';
-// import userRoutes from './routes/users.js';
-// import templateRoutes from './routes/templates.js';
+import organizationRoutes from './routes/organizations.js';
+import userRoutes from './routes/users.js';
+import aiRoutes from './routes/ai.js';
 
 // Mount routes
 app.use(`/api/${API_VERSION}/patients`, patientRoutes);
@@ -141,9 +142,9 @@ app.use(`/api/${API_VERSION}/financial`, financialRoutes);
 app.use(`/api/${API_VERSION}/outcomes`, outcomeRoutes);
 app.use(`/api/${API_VERSION}/gdpr`, gdprRoutes);
 app.use(`/api/${API_VERSION}/pdf`, pdfRoutes);
-// app.use(`/api/${API_VERSION}/organizations`, organizationRoutes);
-// app.use(`/api/${API_VERSION}/users`, userRoutes);
-// app.use(`/api/${API_VERSION}/templates`, templateRoutes);
+app.use(`/api/${API_VERSION}/organizations`, organizationRoutes);
+app.use(`/api/${API_VERSION}/users`, userRoutes);
+app.use(`/api/${API_VERSION}/ai`, aiRoutes);
 
 // ============================================================================
 // ERROR HANDLING
