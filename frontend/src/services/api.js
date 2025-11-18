@@ -168,6 +168,12 @@ export const kpiAPI = {
   getMonthly: (month, year) => apiClient.get('/kpi/monthly', { params: { month, year } }),
   getPatientRetention: () => apiClient.get('/kpi/retention'),
   getRebookingRate: () => apiClient.get('/kpi/rebooking-rate'),
+  getTopDiagnoses: (limit) => apiClient.get('/kpi/top-diagnoses', { params: { limit } }),
+  // Detailed KPI tracking
+  getDetailedKPIs: (startDate, endDate) => apiClient.get('/kpi/detailed', { params: { startDate, endDate } }),
+  getCategoryBreakdown: (startDate, endDate) => apiClient.get('/kpi/category-breakdown', { params: { startDate, endDate } }),
+  getGeographicDistribution: (startDate, endDate) => apiClient.get('/kpi/geographic', { params: { startDate, endDate } }),
+  importData: (data) => apiClient.post('/kpi/import', { data }),
 }
 
 // Diagnosis Codes
