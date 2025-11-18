@@ -108,10 +108,10 @@ app.get(`/api/${API_VERSION}`, (req, res) => {
   });
 });
 
-// Import and mount API routes (will be created in next steps)
+// Import and mount API routes
+import patientRoutes from './routes/patients.js';
 // import organizationRoutes from './routes/organizations.js';
 // import userRoutes from './routes/users.js';
-// import patientRoutes from './routes/patients.js';
 // import encounterRoutes from './routes/encounters.js';
 // import appointmentRoutes from './routes/appointments.js';
 // import communicationRoutes from './routes/communications.js';
@@ -122,9 +122,10 @@ app.get(`/api/${API_VERSION}`, (req, res) => {
 // import treatmentRoutes from './routes/treatments.js';
 // import kpiRoutes from './routes/kpi.js';
 
+// Mount routes
+app.use(`/api/${API_VERSION}/patients`, patientRoutes);
 // app.use(`/api/${API_VERSION}/organizations`, organizationRoutes);
 // app.use(`/api/${API_VERSION}/users`, userRoutes);
-// app.use(`/api/${API_VERSION}/patients`, patientRoutes);
 // app.use(`/api/${API_VERSION}/encounters`, encounterRoutes);
 // app.use(`/api/${API_VERSION}/appointments`, appointmentRoutes);
 // app.use(`/api/${API_VERSION}/communications`, communicationRoutes);
