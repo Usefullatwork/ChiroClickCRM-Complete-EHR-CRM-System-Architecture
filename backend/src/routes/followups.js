@@ -52,6 +52,26 @@ router.get('/stats',
 );
 
 /**
+ * @route   GET /api/v1/followups/patients/needingFollowUp
+ * @desc    Get patients needing follow-up based on should_be_followed_up field
+ * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ */
+router.get('/patients/needingFollowUp',
+  requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  followUpController.getPatientsNeedingFollowUp
+);
+
+/**
+ * @route   POST /api/v1/followups/patients/:patientId/contacted
+ * @desc    Mark patient as contacted for follow-up
+ * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ */
+router.post('/patients/:patientId/contacted',
+  requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  followUpController.markPatientAsContacted
+);
+
+/**
  * @route   GET /api/v1/followups/:id
  * @desc    Get follow-up by ID
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)

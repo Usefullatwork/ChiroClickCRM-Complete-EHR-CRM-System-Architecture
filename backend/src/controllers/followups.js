@@ -156,6 +156,45 @@ export const getStats = async (req, res) => {
   }
 };
 
+export const getPatientsNeedingFollowUp = async (req, res) => {
+  try {
+    const { organizationId } = req;
+    const patients = await followUpService.getPatientsNeedingFollowUp(organizationId);
+    res.json({ success: true, data: patients });
+  } catch (error) {
+    logger.error('Error in getPatientsNeedingFollowUp controller:', error);
+    res.status(500).json({ success: false, error: 'Failed to get patients needing follow-up' });
+  }
+};
+
+export const markPatientAsContacted = async (req, res) => {
+  try {
+    const { organizationId, user } = req;
+    const { patientId } = req.params;
+    const { method } = req.body;
+
+    const patient = await followUpService.markPatientAsContacted(organizationId, patientId, method);
+
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'UPDATE',
+      resourceType: 'PATIENT',
+      resourceId: patientId,
+      changes: { follow_up_contacted: method },
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent')
+    });
+
+    res.json({ success: true, data: patient });
+  } catch (error) {
+    logger.error('Error in markPatientAsContacted controller:', error);
+    res.status(500).json({ success: false, error: 'Failed to mark patient as contacted' });
+  }
+};
+
 export default {
   getFollowUps,
   getFollowUp,
@@ -164,5 +203,7 @@ export default {
   completeFollowUp,
   getOverdue,
   getUpcoming,
-  getStats
+  getStats,
+  getPatientsNeedingFollowUp,
+  markPatientAsContacted
 };

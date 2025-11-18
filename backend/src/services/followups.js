@@ -319,6 +319,60 @@ export const getFollowUpStats = async (organizationId) => {
 };
 
 /**
+ * Get patients who need follow-up (based on should_be_followed_up field)
+ */
+export const getPatientsNeedingFollowUp = async (organizationId) => {
+  const result = await query(
+    `SELECT
+      p.id,
+      p.solvit_id,
+      p.first_name,
+      p.last_name,
+      p.phone,
+      p.email,
+      p.should_be_followed_up as follow_up_date,
+      p.main_problem,
+      p.last_visit_date,
+      p.preferred_contact_method,
+      p.language,
+      u.first_name || ' ' || u.last_name as preferred_therapist_name
+    FROM patients p
+    LEFT JOIN users u ON u.id = p.preferred_therapist_id
+    WHERE p.organization_id = $1
+      AND p.should_be_followed_up IS NOT NULL
+      AND p.should_be_followed_up <= CURRENT_DATE + INTERVAL '7 days'
+      AND p.status = 'ACTIVE'
+    ORDER BY p.should_be_followed_up ASC`,
+    [organizationId]
+  );
+
+  return result.rows;
+};
+
+/**
+ * Mark patient as contacted for follow-up
+ */
+export const markPatientAsContacted = async (organizationId, patientId, method = 'SMS') => {
+  const result = await query(
+    `UPDATE patients
+    SET
+      should_be_followed_up = NULL,
+      needs_feedback = false,
+      updated_at = NOW()
+    WHERE id = $1 AND organization_id = $2
+    RETURNING *`,
+    [patientId, organizationId]
+  );
+
+  if (result.rows.length === 0) {
+    throw new Error('Patient not found');
+  }
+
+  logger.info(`Patient ${patientId} marked as contacted via ${method}`);
+  return result.rows[0];
+};
+
+/**
  * Auto-create follow-ups based on encounter
  * Called after encounter is created/signed
  */
@@ -368,5 +422,7 @@ export default {
   getOverdueFollowUps,
   getUpcomingFollowUps,
   getFollowUpStats,
+  getPatientsNeedingFollowUp,
+  markPatientAsContacted,
   autoCreateFollowUps
 };

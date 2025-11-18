@@ -10,6 +10,7 @@ import Communications from './pages/Communications'
 import FollowUps from './pages/FollowUps'
 import KPI from './pages/KPI'
 import Import from './pages/Import'
+import Training from './pages/Training'
 import Settings from './pages/Settings'
 import NotFound from './pages/NotFound'
 
@@ -40,6 +41,7 @@ function App() {
         <Route path="follow-ups" element={<FollowUps />} />
         <Route path="kpi" element={<KPI />} />
         <Route path="import" element={<Import />} />
+        <Route path="training" element={<Training />} />
         <Route path="settings" element={<Settings />} />
       </Route>
 

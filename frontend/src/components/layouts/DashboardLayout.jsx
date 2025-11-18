@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   TrendingUp,
   Upload,
+  Brain,
   Settings
 } from 'lucide-react'
 
@@ -24,6 +25,7 @@ export default function DashboardLayout() {
     { name: 'Follow-ups', href: '/follow-ups', icon: CheckCircle2 },
     { name: 'KPI', href: '/kpi', icon: TrendingUp },
     { name: 'Import', href: '/import', icon: Upload },
+    { name: 'AI Training', href: '/training', icon: Brain },
     { name: 'Settings', href: '/settings', icon: Settings },
   ]
 
