@@ -1,10 +1,13 @@
 /**
  * Communications Service
  * SMS and Email communications with tracking
+ * Uses local phone bridge for SMS and Outlook for email
  */
 
 import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
+import * as phoneBridge from './phoneBridge.js';
+import * as outlookBridge from './outlookBridge.js';
 
 /**
  * Get all communications
@@ -87,13 +90,14 @@ export const getAllCommunications = async (organizationId, options = {}) => {
 };
 
 /**
- * Send SMS (Telnyx integration placeholder)
+ * Send SMS via connected phone (KDE Connect, ADB, or Phone API)
  */
 export const sendSMS = async (organizationId, smsData, userId) => {
   try {
-    // TODO: Integrate with Telnyx API
-    // For now, just log the communication
+    // Send SMS through phone bridge
+    const sendResult = await phoneBridge.sendSMS(smsData.recipient_phone, smsData.content);
 
+    // Log communication in database
     const result = await query(
       `INSERT INTO communications (
         organization_id,
@@ -105,9 +109,10 @@ export const sendSMS = async (organizationId, smsData, userId) => {
         sent_by,
         recipient_phone,
         sent_at,
+        delivered_at,
         external_id,
         cost_amount
-      ) VALUES ($1, $2, 'SMS', 'OUTBOUND', $3, $4, $5, $6, NOW(), $7, $8)
+      ) VALUES ($1, $2, 'SMS', 'OUTBOUND', $3, $4, $5, $6, NOW(), NOW(), $7, $8)
       RETURNING *`,
       [
         organizationId,
@@ -116,31 +121,68 @@ export const sendSMS = async (organizationId, smsData, userId) => {
         smsData.content,
         userId,
         smsData.recipient_phone,
-        `TELNYX-${Date.now()}`, // Mock external ID
-        0.007 // Telnyx cost per SMS
+        sendResult.externalId,
+        0 // No cost for local phone
       ]
     );
 
-    logger.info('SMS logged:', {
+    logger.info('SMS sent via phone bridge:', {
       organizationId,
       patientId: smsData.patient_id,
-      phone: smsData.recipient_phone
+      phone: smsData.recipient_phone,
+      method: sendResult.method
     });
 
-    return result.rows[0];
+    return {
+      ...result.rows[0],
+      sendMethod: sendResult.method
+    };
   } catch (error) {
     logger.error('Error sending SMS:', error);
+
+    // Log failed attempt
+    await query(
+      `INSERT INTO communications (
+        organization_id,
+        patient_id,
+        type,
+        direction,
+        content,
+        sent_by,
+        recipient_phone,
+        sent_at,
+        failed_at,
+        failure_reason
+      ) VALUES ($1, $2, 'SMS', 'OUTBOUND', $3, $4, $5, NOW(), NOW(), $6)`,
+      [
+        organizationId,
+        smsData.patient_id,
+        smsData.content,
+        userId,
+        smsData.recipient_phone,
+        error.message
+      ]
+    );
+
     throw error;
   }
 };
 
 /**
- * Send Email (SMTP placeholder)
+ * Send Email via Outlook
  */
 export const sendEmail = async (organizationId, emailData, userId) => {
   try {
-    // TODO: Integrate with SMTP/SendGrid
+    // Send email through Outlook
+    const sendResult = await outlookBridge.sendEmail({
+      to: emailData.recipient_email,
+      subject: emailData.subject,
+      body: emailData.content,
+      cc: emailData.cc || null,
+      bcc: emailData.bcc || null
+    });
 
+    // Log communication in database
     const result = await query(
       `INSERT INTO communications (
         organization_id,
@@ -152,8 +194,10 @@ export const sendEmail = async (organizationId, emailData, userId) => {
         content,
         sent_by,
         recipient_email,
-        sent_at
-      ) VALUES ($1, $2, 'EMAIL', 'OUTBOUND', $3, $4, $5, $6, $7, NOW())
+        sent_at,
+        delivered_at,
+        external_id
+      ) VALUES ($1, $2, 'EMAIL', 'OUTBOUND', $3, $4, $5, $6, $7, NOW(), NOW(), $8)
       RETURNING *`,
       [
         organizationId,
@@ -162,19 +206,50 @@ export const sendEmail = async (organizationId, emailData, userId) => {
         emailData.subject,
         emailData.content,
         userId,
-        emailData.recipient_email
+        emailData.recipient_email,
+        sendResult.messageId
       ]
     );
 
-    logger.info('Email logged:', {
+    logger.info('Email sent via Outlook:', {
       organizationId,
       patientId: emailData.patient_id,
       email: emailData.recipient_email
     });
 
-    return result.rows[0];
+    return {
+      ...result.rows[0],
+      sendMethod: 'outlook'
+    };
   } catch (error) {
     logger.error('Error sending email:', error);
+
+    // Log failed attempt
+    await query(
+      `INSERT INTO communications (
+        organization_id,
+        patient_id,
+        type,
+        direction,
+        subject,
+        content,
+        sent_by,
+        recipient_email,
+        sent_at,
+        failed_at,
+        failure_reason
+      ) VALUES ($1, $2, 'EMAIL', 'OUTBOUND', $3, $4, $5, $6, NOW(), NOW(), $7)`,
+      [
+        organizationId,
+        emailData.patient_id,
+        emailData.subject,
+        emailData.content,
+        userId,
+        emailData.recipient_email,
+        error.message
+      ]
+    );
+
     throw error;
   }
 };
@@ -250,6 +325,7 @@ export const getCommunicationStats = async (organizationId, startDate, endDate) 
         type,
         COUNT(*) as total,
         COUNT(*) FILTER (WHERE delivered_at IS NOT NULL) as delivered,
+        COUNT(*) FILTER (WHERE failed_at IS NOT NULL) as failed,
         COUNT(*) FILTER (WHERE opened_at IS NOT NULL) as opened,
         COUNT(*) FILTER (WHERE clicked_at IS NOT NULL) as clicked,
         COUNT(*) FILTER (WHERE resulted_in_booking = true) as resulted_in_booking
@@ -267,11 +343,35 @@ export const getCommunicationStats = async (organizationId, startDate, endDate) 
   }
 };
 
+/**
+ * Check phone and email connectivity
+ */
+export const checkConnectivity = async () => {
+  try {
+    const phoneStatus = await phoneBridge.checkPhoneConnection();
+    const emailStatus = await outlookBridge.checkConnection();
+
+    return {
+      phone: phoneStatus,
+      email: emailStatus,
+      overall: phoneStatus.connected && emailStatus.connected
+    };
+  } catch (error) {
+    logger.error('Error checking connectivity:', error);
+    return {
+      phone: { connected: false, error: 'Check failed' },
+      email: { connected: false, error: 'Check failed' },
+      overall: false
+    };
+  }
+};
+
 export default {
   getAllCommunications,
   sendSMS,
   sendEmail,
   getTemplates,
   createTemplate,
-  getCommunicationStats
+  getCommunicationStats,
+  checkConnectivity
 };

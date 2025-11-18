@@ -44,7 +44,14 @@ services:
       ENCRYPTION_KEY: ${ENCRYPTION_KEY}
       OLLAMA_BASE_URL: http://ollama:11434
       AI_PROVIDER: ${AI_PROVIDER:-ollama}
-      AI_MODEL: ${AI_MODEL:-llama2}
+      AI_MODEL: ${AI_MODEL:-gemini-3-pro-preview:7b}
+      PHONE_BRIDGE_METHOD: ${PHONE_BRIDGE_METHOD:-kdeconnect}
+      PHONE_DEVICE_ID: ${PHONE_DEVICE_ID}
+      PHONE_API_URL: ${PHONE_API_URL}
+      OUTLOOK_CLIENT_ID: ${OUTLOOK_CLIENT_ID}
+      OUTLOOK_CLIENT_SECRET: ${OUTLOOK_CLIENT_SECRET}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       TELNYX_API_KEY: ${TELNYX_API_KEY}
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
     ports:
@@ -66,7 +73,7 @@ services:
       timeout: 10s
       retries: 3
 
-  # Ollama AI Service (Local LLM)
+  # Ollama AI Service (Local LLM) - Gemini 3 Pro Preview 7B
   ollama:
     image: ollama/ollama:latest
     container_name: chiroclickcrm-ollama
@@ -79,14 +86,18 @@ services:
     restart: unless-stopped
     deploy:
       resources:
+        limits:
+          memory: 16G
         reservations:
+          memory: 8G
           devices:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-    # If no GPU available, comment out the deploy section above
+    # If no GPU available, comment out the devices section only (keep memory limits)
+    # Gemini 3 Pro Preview 7B requires minimum 8GB RAM, recommended 16GB
 
-  # Ollama Model Loader (downloads model on first run)
+  # Ollama Model Loader (downloads Gemini 3 Pro Preview 7B on first run)
   ollama-setup:
     image: ollama/ollama:latest
     container_name: chiroclickcrm-ollama-setup
@@ -97,8 +108,8 @@ services:
       -c "
       echo 'Waiting for Ollama service...' &&
       sleep 10 &&
-      ollama pull ${AI_MODEL:-llama2} &&
-      echo 'Model ${AI_MODEL:-llama2} downloaded successfully'
+      ollama pull ${AI_MODEL:-gemini-3-pro-preview:7b} &&
+      echo 'Model ${AI_MODEL:-gemini-3-pro-preview:7b} downloaded successfully'
       "
     networks:
       - chiroclickcrm-network

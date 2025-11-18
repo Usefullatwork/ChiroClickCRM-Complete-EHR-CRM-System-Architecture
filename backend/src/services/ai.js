@@ -2,6 +2,9 @@
  * AI Service
  * Intelligent clinical assistance using Ollama (local) or Claude API
  * Features: SOAP note suggestions, spell checking, clinical reasoning, diagnosis suggestions
+ *
+ * Default model: Gemini 3 Pro Preview 7B (gemini-3-pro-preview:7b)
+ * Requires: Minimum 8GB RAM, recommended 16GB for optimal performance
  */
 
 import axios from 'axios';
@@ -11,7 +14,7 @@ import { query } from '../config/database.js';
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
 const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY || null;
 const AI_PROVIDER = process.env.AI_PROVIDER || 'ollama'; // 'ollama' or 'claude'
-const AI_MODEL = process.env.AI_MODEL || 'llama2'; // or 'claude-3-5-sonnet-20241022'
+const AI_MODEL = process.env.AI_MODEL || 'gemini-3-pro-preview:7b'; // Default: Gemini 3 Pro Preview 7B (8GB+ RAM)
 
 /**
  * Generate AI completion using selected provider
