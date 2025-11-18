@@ -110,30 +110,30 @@ app.get(`/api/${API_VERSION}`, (req, res) => {
 
 // Import and mount API routes
 import patientRoutes from './routes/patients.js';
+import encounterRoutes from './routes/encounters.js';
+import diagnosisRoutes from './routes/diagnosis.js';
+import treatmentRoutes from './routes/treatments.js';
 // import organizationRoutes from './routes/organizations.js';
 // import userRoutes from './routes/users.js';
-// import encounterRoutes from './routes/encounters.js';
 // import appointmentRoutes from './routes/appointments.js';
 // import communicationRoutes from './routes/communications.js';
 // import followUpRoutes from './routes/followups.js';
 // import financialRoutes from './routes/financial.js';
 // import templateRoutes from './routes/templates.js';
-// import diagnosisRoutes from './routes/diagnosis.js';
-// import treatmentRoutes from './routes/treatments.js';
 // import kpiRoutes from './routes/kpi.js';
 
 // Mount routes
 app.use(`/api/${API_VERSION}/patients`, patientRoutes);
+app.use(`/api/${API_VERSION}/encounters`, encounterRoutes);
+app.use(`/api/${API_VERSION}/diagnosis`, diagnosisRoutes);
+app.use(`/api/${API_VERSION}/treatments`, treatmentRoutes);
 // app.use(`/api/${API_VERSION}/organizations`, organizationRoutes);
 // app.use(`/api/${API_VERSION}/users`, userRoutes);
-// app.use(`/api/${API_VERSION}/encounters`, encounterRoutes);
 // app.use(`/api/${API_VERSION}/appointments`, appointmentRoutes);
 // app.use(`/api/${API_VERSION}/communications`, communicationRoutes);
 // app.use(`/api/${API_VERSION}/followups`, followUpRoutes);
 // app.use(`/api/${API_VERSION}/financial`, financialRoutes);
 // app.use(`/api/${API_VERSION}/templates`, templateRoutes);
-// app.use(`/api/${API_VERSION}/diagnosis`, diagnosisRoutes);
-// app.use(`/api/${API_VERSION}/treatments`, treatmentRoutes);
 // app.use(`/api/${API_VERSION}/kpi`, kpiRoutes);
 
 // ============================================================================
