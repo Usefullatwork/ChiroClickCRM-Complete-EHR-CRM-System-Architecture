@@ -99,9 +99,44 @@ export const getStats = async (req, res) => {
   }
 };
 
+/**
+ * Cancel appointment
+ */
+export const cancelAppointment = async (req, res) => {
+  try {
+    const { organizationId, userId } = req;
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    const appointment = await appointmentService.cancelAppointment(
+      organizationId,
+      id,
+      reason || 'No reason provided',
+      userId
+    );
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        error: 'Appointment not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: appointment,
+      message: 'Appointment cancelled successfully'
+    });
+  } catch (error) {
+    logger.error('Error in cancelAppointment controller:', error);
+    res.status(500).json({ error: 'Failed to cancel appointment' });
+  }
+};
+
 export default {
   getAppointments,
   createAppointment,
   updateStatus,
+  cancelAppointment,
   getStats
 };

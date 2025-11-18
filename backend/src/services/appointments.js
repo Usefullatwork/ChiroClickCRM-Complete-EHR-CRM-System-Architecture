@@ -170,6 +170,41 @@ export const updateAppointmentStatus = async (organizationId, appointmentId, sta
 };
 
 /**
+ * Cancel appointment
+ */
+export const cancelAppointment = async (organizationId, appointmentId, reason, userId) => {
+  try {
+    const result = await query(
+      `UPDATE appointments
+       SET status = 'CANCELLED',
+           cancellation_reason = $3,
+           cancelled_at = NOW(),
+           cancelled_by = $4,
+           updated_at = NOW()
+       WHERE organization_id = $1 AND id = $2
+       RETURNING *`,
+      [organizationId, appointmentId, reason, userId]
+    );
+
+    if (result.rows.length === 0) {
+      return null;
+    }
+
+    logger.info('Appointment cancelled:', {
+      organizationId,
+      appointmentId,
+      reason,
+      cancelledBy: userId
+    });
+
+    return result.rows[0];
+  } catch (error) {
+    logger.error('Error cancelling appointment:', error);
+    throw error;
+  }
+};
+
+/**
  * Get appointment statistics
  */
 export const getAppointmentStats = async (organizationId, startDate, endDate) => {
@@ -198,5 +233,6 @@ export default {
   getAllAppointments,
   createAppointment,
   updateAppointmentStatus,
+  cancelAppointment,
   getAppointmentStats
 };

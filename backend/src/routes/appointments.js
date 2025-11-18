@@ -42,6 +42,16 @@ router.patch('/:id/status',
 );
 
 /**
+ * @route   POST /api/v1/appointments/:id/cancel
+ * @desc    Cancel appointment with reason
+ * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ */
+router.post('/:id/cancel',
+  requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  appointmentController.cancelAppointment
+);
+
+/**
  * @route   GET /api/v1/appointments/stats
  * @desc    Get appointment statistics
  * @access  Private (ADMIN, PRACTITIONER)

@@ -153,6 +153,13 @@ export const financialAPI = {
   generateInvoice: (id) => apiClient.post(`/financial/${id}/invoice`),
 }
 
+// Dashboard
+export const dashboardAPI = {
+  getStats: () => apiClient.get('/dashboard/stats'),
+  getTodayAppointments: () => apiClient.get('/dashboard/appointments/today'),
+  getPendingTasks: () => apiClient.get('/dashboard/tasks/pending'),
+}
+
 // KPI Dashboard
 export const kpiAPI = {
   getDashboard: (params) => apiClient.get('/kpi/dashboard', { params }),

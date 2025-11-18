@@ -5,64 +5,47 @@ import {
   Users,
   CheckCircle2,
   TrendingUp,
-  Plus,
   FileText,
   MessageSquare,
   Clock,
-  ArrowRight
+  ArrowRight,
+  X
 } from 'lucide-react'
 import { formatDate, formatTime } from '../lib/utils'
+import { dashboardAPI, appointmentsAPI } from '../services/api'
 
 export default function Dashboard() {
   const navigate = useNavigate()
 
-  // Fetch dashboard stats
-  const { data: stats } = useQuery({
+  // Fetch dashboard stats from real API
+  const { data: statsResponse, isLoading: statsLoading } = useQuery({
     queryKey: ['dashboard-stats'],
-    queryFn: async () => {
-      // TODO: Replace with actual API call
-      return {
-        todayAppointments: 12,
-        activePatients: 347,
-        pendingFollowUps: 23,
-        monthRevenue: 125000
-      }
-    }
+    queryFn: () => dashboardAPI.getStats(),
   })
 
-  // Fetch today's appointments
-  const { data: appointments } = useQuery({
+  // Fetch today's appointments from real API
+  const { data: appointmentsResponse, isLoading: appointmentsLoading, refetch: refetchAppointments } = useQuery({
     queryKey: ['today-appointments'],
-    queryFn: async () => {
-      // TODO: Replace with actual API call
-      return [
-        {
-          id: 1,
-          time: '09:00',
-          patientName: 'Ola Nordmann',
-          patientId: 123,
-          type: 'Follow-up',
-          status: 'CONFIRMED'
-        },
-        {
-          id: 2,
-          time: '10:00',
-          patientName: 'Kari Hansen',
-          patientId: 124,
-          type: 'Initial Consultation',
-          status: 'CONFIRMED'
-        },
-        {
-          id: 3,
-          time: '11:30',
-          patientName: 'Per Olsen',
-          patientId: 125,
-          type: 'Treatment',
-          status: 'PENDING'
-        }
-      ]
-    }
+    queryFn: () => dashboardAPI.getTodayAppointments(),
   })
+
+  const stats = statsResponse?.data
+  const appointments = appointmentsResponse?.data?.appointments || []
+
+  // Handle appointment cancellation
+  const handleCancelAppointment = async (appointmentId, patientName) => {
+    if (!confirm(`Cancel appointment for ${patientName}?`)) return
+
+    const reason = prompt('Cancellation reason (optional):')
+
+    try {
+      await appointmentsAPI.cancel(appointmentId, reason || 'Cancelled by practitioner')
+      refetchAppointments()
+    } catch (error) {
+      alert('Failed to cancel appointment. Please try again.')
+      console.error('Cancel error:', error)
+    }
+  }
 
   // Quick actions
   const quickActions = [
@@ -164,32 +147,59 @@ export default function Dashboard() {
               </button>
             </div>
             <div className="divide-y divide-gray-100">
-              {appointments && appointments.length > 0 ? (
+              {appointmentsLoading ? (
+                <div className="px-5 py-12 text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                  <p className="text-sm text-gray-500 mt-3">Loading appointments...</p>
+                </div>
+              ) : appointments && appointments.length > 0 ? (
                 appointments.map((apt) => (
                   <div
                     key={apt.id}
-                    className="px-5 py-4 hover:bg-gray-50 cursor-pointer transition-colors"
-                    onClick={() => navigate(`/patients/${apt.patientId}`)}
+                    className="px-5 py-4 hover:bg-gray-50 transition-colors group"
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
+                      <div
+                        className="flex items-center gap-4 flex-1 cursor-pointer"
+                        onClick={() => navigate(`/patients/${apt.patient_id}`)}
+                      >
                         <div className="text-center">
-                          <div className="text-sm font-semibold text-gray-900">{apt.time}</div>
-                          <div className="text-xs text-gray-500">30 min</div>
+                          <div className="text-sm font-semibold text-gray-900">
+                            {new Date(apt.start_time).toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                          <div className="text-xs text-gray-500">{apt.duration_minutes || 30} min</div>
                         </div>
                         <div className="h-10 w-px bg-gray-200" />
                         <div>
-                          <p className="text-sm font-medium text-gray-900">{apt.patientName}</p>
-                          <p className="text-xs text-gray-500">{apt.type}</p>
+                          <p className="text-sm font-medium text-gray-900">{apt.patient_name}</p>
+                          <p className="text-xs text-gray-500">{apt.appointment_type || 'Appointment'}</p>
                         </div>
                       </div>
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        apt.status === 'CONFIRMED'
-                          ? 'bg-green-50 text-green-700'
-                          : 'bg-yellow-50 text-yellow-700'
-                      }`}>
-                        {apt.status}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          apt.status === 'CONFIRMED'
+                            ? 'bg-green-50 text-green-700'
+                            : apt.status === 'PENDING'
+                            ? 'bg-yellow-50 text-yellow-700'
+                            : apt.status === 'CANCELLED'
+                            ? 'bg-red-50 text-red-700'
+                            : 'bg-gray-50 text-gray-700'
+                        }`}>
+                          {apt.status}
+                        </span>
+                        {apt.status !== 'CANCELLED' && apt.status !== 'COMPLETED' && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleCancelAppointment(apt.id, apt.patient_name)
+                            }}
+                            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-red-50 text-red-600 transition-opacity"
+                            title="Cancel appointment"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))

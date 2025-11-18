@@ -92,6 +92,7 @@ app.get(`/api/${API_VERSION}`, (req, res) => {
     documentation: '/api/docs',
     endpoints: {
       health: '/health',
+      dashboard: `/api/${API_VERSION}/dashboard`,
       organizations: `/api/${API_VERSION}/organizations`,
       users: `/api/${API_VERSION}/users`,
       patients: `/api/${API_VERSION}/patients`,
@@ -113,6 +114,7 @@ app.get(`/api/${API_VERSION}`, (req, res) => {
 });
 
 // Import and mount API routes
+import dashboardRoutes from './routes/dashboard.js';
 import patientRoutes from './routes/patients.js';
 import encounterRoutes from './routes/encounters.js';
 import diagnosisRoutes from './routes/diagnosis.js';
@@ -130,6 +132,7 @@ import userRoutes from './routes/users.js';
 import aiRoutes from './routes/ai.js';
 
 // Mount routes
+app.use(`/api/${API_VERSION}/dashboard`, dashboardRoutes);
 app.use(`/api/${API_VERSION}/patients`, patientRoutes);
 app.use(`/api/${API_VERSION}/encounters`, encounterRoutes);
 app.use(`/api/${API_VERSION}/diagnosis`, diagnosisRoutes);
