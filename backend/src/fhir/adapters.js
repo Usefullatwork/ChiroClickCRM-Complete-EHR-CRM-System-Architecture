@@ -15,6 +15,8 @@
  * - Practitioner
  */
 
+import { getICPC2Description as getICPC2Desc } from '../data/icpc2-codes.js';
+
 /**
  * Norwegian OID (Object Identifiers) for healthcare
  */
@@ -412,20 +414,10 @@ const extractBirthDateFromFodselsnummer = (fnr) => {
 
 /**
  * Helper: Get ICPC-2 description
- * TODO: Load from database or static file
+ * Now loads from comprehensive ICPC-2 codes database (resolved TODO)
  */
 const getICPC2Description = (code) => {
-  const icpcCodes = {
-    'L01': 'Neck symptom/complaint',
-    'L02': 'Back symptom/complaint',
-    'L03': 'Low back symptom/complaint',
-    'L84': 'Back syndrome without radiating pain',
-    'L86': 'Back syndrome with radiating pain',
-    'L83': 'Neck syndrome'
-    // ... add more as needed
-  };
-
-  return icpcCodes[code] || code;
+  return getICPC2Desc(code) || code;
 };
 
 /**
