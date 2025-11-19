@@ -33,6 +33,31 @@ export function formatDate(date, format = 'short') {
 }
 
 /**
+ * Format time to Norwegian format
+ */
+export function formatTime(time, format = 'short') {
+  if (!time) return '-';
+
+  const t = new Date(time);
+
+  if (format === 'short') {
+    return t.toLocaleTimeString('no-NO', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  if (format === 'long') {
+    return t.toLocaleTimeString('no-NO');
+  }
+
+  return t.toLocaleTimeString('no-NO', {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+/**
  * Format currency (Norwegian Kroner)
  */
 export function formatCurrency(amount) {

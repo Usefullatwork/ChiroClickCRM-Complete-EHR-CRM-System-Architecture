@@ -141,6 +141,8 @@ export const followUpsAPI = {
   update: (id, data) => apiClient.patch(`/followups/${id}`, data),
   complete: (id, notes) => apiClient.post(`/followups/${id}/complete`, { notes }),
   skip: (id, reason) => apiClient.post(`/followups/${id}/skip`, { reason }),
+  getPatientsNeedingFollowUp: () => apiClient.get('/followups/patients/needingFollowUp'),
+  markPatientAsContacted: (patientId, method) => apiClient.post(`/followups/patients/${patientId}/contacted`, { method }),
 }
 
 // Financial

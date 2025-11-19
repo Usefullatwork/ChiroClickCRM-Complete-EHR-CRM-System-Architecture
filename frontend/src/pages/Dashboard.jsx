@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import {
   Calendar,
@@ -9,13 +9,15 @@ import {
   MessageSquare,
   Clock,
   ArrowRight,
-  X
+  X,
+  Phone
 } from 'lucide-react'
 import { formatDate, formatTime } from '../lib/utils'
-import { dashboardAPI, appointmentsAPI } from '../services/api'
+import { dashboardAPI, appointmentsAPI, followUpsAPI } from '../services/api'
 
 export default function Dashboard() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   // Fetch dashboard stats from real API
   const { data: statsResponse, isLoading: statsLoading } = useQuery({
@@ -29,8 +31,15 @@ export default function Dashboard() {
     queryFn: () => dashboardAPI.getTodayAppointments(),
   })
 
+  // Fetch patients needing follow-up
+  const { data: followUpPatientsResponse, isLoading: followUpLoading } = useQuery({
+    queryKey: ['patients-needing-followup'],
+    queryFn: () => followUpsAPI.getPatientsNeedingFollowUp(),
+  })
+
   const stats = statsResponse?.data
   const appointments = appointmentsResponse?.data?.appointments || []
+  const followUpPatients = followUpPatientsResponse?.data || []
 
   // Handle appointment cancellation
   const handleCancelAppointment = async (appointmentId, patientName) => {
@@ -45,6 +54,20 @@ export default function Dashboard() {
       alert('Failed to cancel appointment. Please try again.')
       console.error('Cancel error:', error)
     }
+  }
+
+  // Mark patient as contacted for follow-up
+  const markContactedMutation = useMutation({
+    mutationFn: ({ patientId, method }) => followUpsAPI.markPatientAsContacted(patientId, method),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['patients-needing-followup'])
+      queryClient.invalidateQueries(['dashboard-stats'])
+    }
+  })
+
+  const handleMarkContacted = (patient, method) => {
+    if (!confirm(`Mark ${patient.first_name} ${patient.last_name} as contacted?`)) return
+    markContactedMutation.mutate({ patientId: patient.id, method })
   }
 
   // Quick actions
@@ -241,16 +264,68 @@ export default function Dashboard() {
           {/* Pending Follow-ups */}
           <div className="bg-white rounded-lg border border-gray-200 mt-6">
             <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Pending Tasks</h2>
-              <span className="text-sm text-gray-500">{stats?.pendingFollowUps || 0}</span>
-            </div>
-            <div className="p-4">
+              <h2 className="text-lg font-semibold text-gray-900">Patients Needing Follow-up</h2>
               <button
                 onClick={() => navigate('/follow-ups')}
-                className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-600 hover:border-gray-400 hover:text-gray-700 transition-colors"
+                className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
               >
-                View all follow-ups
+                View all
+                <ArrowRight className="w-4 h-4" />
               </button>
+            </div>
+            <div className="divide-y divide-gray-100">
+              {followUpLoading ? (
+                <div className="px-5 py-8 text-center">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
+                </div>
+              ) : followUpPatients && followUpPatients.length > 0 ? (
+                followUpPatients.slice(0, 5).map((patient) => {
+                  const followUpDate = new Date(patient.follow_up_date)
+                  const isOverdue = followUpDate < new Date()
+
+                  return (
+                    <div key={patient.id} className="px-5 py-3 hover:bg-gray-50 transition-colors">
+                      <div className="flex items-start justify-between gap-3">
+                        <div
+                          className="flex-1 cursor-pointer min-w-0"
+                          onClick={() => navigate(`/patients/${patient.id}`)}
+                        >
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {patient.first_name} {patient.last_name}
+                          </p>
+                          <p className="text-xs text-gray-500 truncate mt-0.5">
+                            {patient.main_problem || 'No problem specified'}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className={`text-xs font-medium ${isOverdue ? 'text-red-600' : 'text-gray-600'}`}>
+                              {isOverdue ? 'Overdue: ' : 'Due: '}
+                              {followUpDate.toLocaleDateString('no-NO', { month: 'short', day: 'numeric' })}
+                            </span>
+                            {patient.preferred_contact_method && (
+                              <span className="text-xs text-gray-400">
+                                • {patient.preferred_contact_method}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleMarkContacted(patient, patient.preferred_contact_method || 'SMS')}
+                          disabled={markContactedMutation.isPending}
+                          className="flex-shrink-0 px-2 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50 rounded transition-colors disabled:opacity-50"
+                          title="Mark as contacted"
+                        >
+                          <CheckCircle2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })
+              ) : (
+                <div className="px-5 py-8 text-center">
+                  <CheckCircle2 className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                  <p className="text-sm text-gray-500">No patients need follow-up</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
