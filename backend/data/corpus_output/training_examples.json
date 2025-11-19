@@ -1,0 +1,220 @@
+[
+  {
+    "prompt": "Hvordan dokumenterer du bvm behandling?",
+    "response": "V interscapulær mm bvm, slipper bra",
+    "metadata": {
+      "type": "technique_documentation",
+      "technique": "bvm",
+      "noteId": "note_4"
+    }
+  },
+  {
+    "prompt": "Hvordan dokumenterer du ims behandling?",
+    "response": "Bilat trapz ims, Pasienten samtykker til nålebehandling",
+    "metadata": {
+      "type": "technique_documentation",
+      "technique": "ims",
+      "noteId": "note_4"
+    }
+  },
+  {
+    "prompt": "Hvordan dokumenterer du hvla behandling?",
+    "response": "T6 hvla, slipper bra",
+    "metadata": {
+      "type": "technique_documentation",
+      "technique": "hvla",
+      "noteId": "note_4"
+    }
+  },
+  {
+    "prompt": "Hvordan dokumenterer du bvm behandling?",
+    "response": "V paraspinal lumbal mm bvm, slipper bra",
+    "metadata": {
+      "type": "technique_documentation",
+      "technique": "bvm",
+      "noteId": "note_6"
+    }
+  },
+  {
+    "prompt": "Hvordan dokumenterer du hvla behandling?",
+    "response": "T10 lett hvla, slipper bra",
+    "metadata": {
+      "type": "technique_documentation",
+      "technique": "hvla",
+      "noteId": "note_6"
+    }
+  },
+  {
+    "prompt": "Skriv et komplett journalnotat for følgende presentasjon:\n\nKommer akutt idag på anbefaling fra turntrener og hjelpetrener da hun har akutt kink i nakken. Det startet på fredag med vondt i ryggen interscapulært. Søndag var hun på trening, slår hjul og gjør mye...",
+    "response": "Journalnotat: Akutt Nakke/Rygg Behandling\nBehandling: Cervical traksjon, god effekt, ror muskler noe. H trapz inhib og lett bvm, slipper bra. Bilat paraspinal cervical mm bvm, slipper bra. C2 v gapping, slipper bra. C3 h lett hvla, slipper bra. T5 hvla, slipper bra. T11 hvla, slipper bra. Snakker med mor på tlf i morgen og onsdag, mulig oppfølging onsdag.\n\nKonklusjon (08.01.2024): Smerten skyldes trolig overbelastning av h trapz og låsning i øvre nakke. Bør bli raskt bra. Anbefalt varme og ispose, samt ikke trening på noen dager. Vi ser an fortløpende behov for behandling.\n\nAnamnese: Kommer akutt idag på anbefaling fra turntrener og hjelpetrener da hun har akutt kink i nakken. Det startet på fredag med vondt i ryggen interscapulært. Søndag var hun på trening, slår hjul og gjør mye der hun jobber med utstrakte hender. Kjente noe under et hopp i nakken, men var ikke umiddelbart vondt. Når hun våknet idag var hun veldig vond. Hun har hodet i avvergestilling mot høyre og klarer ikke løfte ",
+    "metadata": {
+      "type": "full_note",
+      "regions": [
+        "cervical",
+        "thoracal",
+        "kne"
+      ],
+      "techniques": [
+        "bvm",
+        "hvla",
+        "inhib",
+        "traksjon",
+        "gapping"
+      ],
+      "noteId": "note_8"
+    }
+  },
+  {
+    "prompt": "Hvordan dokumenterer du bvm behandling?",
+    "response": "H trapz inhib og lett bvm, slipper bra",
+    "metadata": {
+      "type": "technique_documentation",
+      "technique": "bvm",
+      "noteId": "note_8"
+    }
+  },
+  {
+    "prompt": "Hvordan dokumenterer du hvla behandling?",
+    "response": "C3 h lett hvla, slipper bra",
+    "metadata": {
+      "type": "technique_documentation",
+      "technique": "hvla",
+      "noteId": "note_8"
+    }
+  },
+  {
+    "prompt": "Hvordan dokumenterer du inhib behandling?",
+    "response": "H trapz inhib og lett bvm, slipper bra",
+    "metadata": {
+      "type": "technique_documentation",
+      "technique": "inhib",
+      "noteId": "note_8"
+    }
+  },
+  {
+    "prompt": "Hvordan dokumenterer du traksjon behandling?",
+    "response": "Cervical traksjon, god effekt, ror muskler noe",
+    "metadata": {
+      "type": "technique_documentation",
+      "technique": "traksjon",
+      "noteId": "note_8"
+    }
+  },
+  {
+    "prompt": "Hvordan dokumenterer du gapping behandling?",
+    "response": "C2 v gapping, slipper bra",
+    "metadata": {
+      "type": "technique_documentation",
+      "technique": "gapping",
+      "noteId": "note_8"
+    }
+  },
+  {
+    "prompt": "Hvordan dokumenterer du bvm behandling?",
+    "response": "Bilat trapz bvm, slipper bra",
+    "metadata": {
+      "type": "technique_documentation",
+      "technique": "bvm",
+      "noteId": "note_10"
+    }
+  },
+  {
+    "prompt": "Hvordan dokumenterer du tgp behandling?",
+    "response": "Bilat sternocleido tgp, slipper bra",
+    "metadata": {
+      "type": "technique_documentation",
+      "technique": "tgp",
+      "noteId": "note_10"
+    }
+  },
+  {
+    "prompt": "Hvordan dokumenterer du inhib behandling?",
+    "response": "Bilat pec minor inhib, slipper bra",
+    "metadata": {
+      "type": "technique_documentation",
+      "technique": "inhib",
+      "noteId": "note_10"
+    }
+  },
+  {
+    "prompt": "Hvordan dokumenterer du bvm behandling?",
+    "response": "H ant delt bvm, ganske ømt, slipper bra",
+    "metadata": {
+      "type": "technique_documentation",
+      "technique": "bvm",
+      "noteId": "note_11"
+    }
+  },
+  {
+    "prompt": "Hvordan dokumenterer du ims behandling?",
+    "response": "H coracobrachialis bvm og ims, trigger sterke og kjente smerter",
+    "metadata": {
+      "type": "technique_documentation",
+      "technique": "ims",
+      "noteId": "note_11"
+    }
+  },
+  {
+    "prompt": "Hvordan dokumenterer du hvla behandling?",
+    "response": "Behandling utført (bvm, tgp, inhib, hvla C4/C5)",
+    "metadata": {
+      "type": "technique_documentation",
+      "technique": "hvla",
+      "noteId": "note_11"
+    }
+  },
+  {
+    "prompt": "Hvordan dokumenterer du tgp behandling?",
+    "response": "H pec minor tgp, veldig vondt, spesielt inn mot proc",
+    "metadata": {
+      "type": "technique_documentation",
+      "technique": "tgp",
+      "noteId": "note_11"
+    }
+  },
+  {
+    "prompt": "Hvordan dokumenterer du inhib behandling?",
+    "response": "Behandling utført (bvm, tgp, inhib, hvla C4/C5)",
+    "metadata": {
+      "type": "technique_documentation",
+      "technique": "inhib",
+      "noteId": "note_11"
+    }
+  },
+  {
+    "prompt": "Hvordan dokumenterer du bvm behandling?",
+    "response": "bvm og hvla",
+    "metadata": {
+      "type": "technique_documentation",
+      "technique": "bvm",
+      "noteId": "note_14"
+    }
+  },
+  {
+    "prompt": "Hvordan dokumenterer du hvla behandling?",
+    "response": "bvm og hvla",
+    "metadata": {
+      "type": "technique_documentation",
+      "technique": "hvla",
+      "noteId": "note_14"
+    }
+  },
+  {
+    "prompt": "Hvordan dokumenterer du ims behandling?",
+    "response": "Bilat solar plexus inhib, trapz ims, lateral cervical mm ims, sub oc ims, masseter ims",
+    "metadata": {
+      "type": "technique_documentation",
+      "technique": "ims",
+      "noteId": "note_16"
+    }
+  },
+  {
+    "prompt": "Hvordan dokumenterer du inhib behandling?",
+    "response": "Bilat solar plexus inhib, trapz ims, lateral cervical mm ims, sub oc ims, masseter ims",
+    "metadata": {
+      "type": "technique_documentation",
+      "technique": "inhib",
+      "noteId": "note_16"
+    }
+  }
+]
