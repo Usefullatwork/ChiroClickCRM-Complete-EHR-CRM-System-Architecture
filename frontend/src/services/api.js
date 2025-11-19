@@ -207,5 +207,19 @@ export const usersAPI = {
   getAll: () => apiClient.get('/users'),
 }
 
+// Clinical Templates
+export const templatesAPI = {
+  getAll: (params) => apiClient.get('/templates', { params }),
+  getByCategory: (language = 'NO') => apiClient.get('/templates/by-category', { params: { language } }),
+  getById: (id) => apiClient.get(`/templates/${id}`),
+  create: (data) => apiClient.post('/templates', data),
+  update: (id, data) => apiClient.patch(`/templates/${id}`, data),
+  delete: (id) => apiClient.delete(`/templates/${id}`),
+  toggleFavorite: (id) => apiClient.post(`/templates/${id}/favorite`),
+  incrementUsage: (id) => apiClient.post(`/templates/${id}/use`),
+  getCategories: (language = 'NO') => apiClient.get('/templates/categories', { params: { language } }),
+  search: (query, language = 'NO') => apiClient.get('/templates/search', { params: { q: query, language } }),
+}
+
 // Export default API client
 export default apiClient

@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { encountersAPI, patientsAPI, diagnosisAPI, treatmentsAPI } from '../services/api';
 import { formatDate } from '../lib/utils';
-import { Save, FileText, AlertTriangle, CheckCircle, Brain, X, Sparkles } from 'lucide-react';
+import { Save, FileText, AlertTriangle, CheckCircle, Brain, X, Sparkles, BookOpen } from 'lucide-react';
+import TemplatePicker from '../components/TemplatePicker';
 
 export default function ClinicalEncounter() {
   const { patientId, encounterId } = useParams();
@@ -14,6 +15,9 @@ export default function ClinicalEncounter() {
   const [showAIAssistant, setShowAIAssistant] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const [showTemplatePicker, setShowTemplatePicker] = useState(false);
+  const [activeField, setActiveField] = useState(null);
+  const textAreaRefs = useRef({});
 
   // Form state - SOAP format
   const [encounterData, setEncounterData] = useState({
@@ -215,6 +219,64 @@ export default function ClinicalEncounter() {
     return suggestions;
   };
 
+  const handleTemplateSelect = (templateText) => {
+    if (!activeField) {
+      // If no field is active, just append to the current section's history
+      const section = activeTab;
+      if (section === 'subjective') {
+        setEncounterData(prev => ({
+          ...prev,
+          subjective: {
+            ...prev.subjective,
+            history: (prev.subjective.history || '') + '\n' + templateText
+          }
+        }));
+      } else if (section === 'objective') {
+        setEncounterData(prev => ({
+          ...prev,
+          objective: {
+            ...prev.objective,
+            observation: (prev.objective.observation || '') + '\n' + templateText
+          }
+        }));
+      }
+      return;
+    }
+
+    // Insert template at cursor position
+    const [section, field] = activeField.split('.');
+    const currentValue = encounterData[section][field] || '';
+    const textarea = textAreaRefs.current[activeField];
+
+    if (textarea) {
+      const cursorPos = textarea.selectionStart;
+      const newValue = currentValue.slice(0, cursorPos) + templateText + currentValue.slice(cursorPos);
+
+      setEncounterData(prev => ({
+        ...prev,
+        [section]: {
+          ...prev[section],
+          [field]: newValue
+        }
+      }));
+
+      // Set cursor position after inserted text
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(cursorPos + templateText.length, cursorPos + templateText.length);
+      }, 0);
+    } else {
+      // Fallback: append to end
+      setEncounterData(prev => ({
+        ...prev,
+        [section]: {
+          ...prev[section],
+          [field]: currentValue + '\n' + templateText
+        }
+      }));
+    }
+  };
+
   const tabs = [
     { id: 'subjective', label: 'S - Subjective', icon: '💬' },
     { id: 'objective', label: 'O - Objective', icon: '🔍' },
@@ -368,8 +430,10 @@ export default function ClinicalEncounter() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">History / Anamnesis</label>
                 <textarea
+                  ref={(el) => textAreaRefs.current['subjective.history'] = el}
                   value={encounterData.subjective.history}
                   onChange={(e) => updateField('subjective', 'history', e.target.value)}
+                  onFocus={() => setActiveField('subjective.history')}
                   rows={3}
                   placeholder="Patient's description of symptoms, when they started, etc."
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -744,6 +808,25 @@ export default function ClinicalEncounter() {
           </div>
         </div>
       )}
+
+      {/* Template Picker Floating Button */}
+      {!showTemplatePicker && !showAIAssistant && (
+        <button
+          onClick={() => setShowTemplatePicker(true)}
+          className="fixed bottom-6 left-6 w-14 h-14 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 transition-all flex items-center justify-center group"
+          title="Kliniske Maler"
+        >
+          <BookOpen className="w-6 h-6" />
+        </button>
+      )}
+
+      {/* Template Picker Sidebar */}
+      <TemplatePicker
+        isOpen={showTemplatePicker}
+        onClose={() => setShowTemplatePicker(false)}
+        onSelectTemplate={handleTemplateSelect}
+        soapSection={activeTab}
+      />
     </div>
   );
 }
