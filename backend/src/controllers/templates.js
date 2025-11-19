@@ -324,6 +324,97 @@ export const getPhrasesByRegion = async (req, res) => {
   }
 };
 
+/**
+ * Get red flags library
+ * GET /api/v1/templates/red-flags
+ */
+export const getRedFlags = async (req, res) => {
+  try {
+    const filters = {
+      pathologyCategory: req.query.pathologyCategory,
+      bodyRegion: req.query.bodyRegion,
+      significanceLevel: req.query.significanceLevel,
+      language: req.query.language || 'NO'
+    };
+
+    const redFlags = await templateService.getRedFlags(filters);
+    res.json(redFlags);
+  } catch (error) {
+    logger.error('Error in getRedFlags controller:', error);
+    res.status(500).json({ error: 'Failed to retrieve red flags' });
+  }
+};
+
+/**
+ * Screen patient for red flags
+ * POST /api/v1/templates/red-flags/screen
+ */
+export const screenRedFlags = async (req, res) => {
+  try {
+    const { patientData, symptoms, findings } = req.body;
+
+    const screening = await templateService.screenRedFlags(patientData, symptoms, findings);
+    res.json(screening);
+  } catch (error) {
+    logger.error('Error in screenRedFlags controller:', error);
+    res.status(500).json({ error: 'Failed to screen red flags' });
+  }
+};
+
+/**
+ * Get test clusters
+ * GET /api/v1/templates/test-clusters
+ */
+export const getTestClusters = async (req, res) => {
+  try {
+    const filters = {
+      bodyRegion: req.query.bodyRegion,
+      language: req.query.language || 'NO'
+    };
+
+    const clusters = await templateService.getTestClusters(filters);
+    res.json(clusters);
+  } catch (error) {
+    logger.error('Error in getTestClusters controller:', error);
+    res.status(500).json({ error: 'Failed to retrieve test clusters' });
+  }
+};
+
+/**
+ * Get test cluster by condition
+ * GET /api/v1/templates/test-clusters/:condition
+ */
+export const getTestClusterByCondition = async (req, res) => {
+  try {
+    const { condition } = req.params;
+    const language = req.query.language || 'NO';
+
+    const cluster = await templateService.getTestClusterByCondition(condition, language);
+    res.json(cluster);
+  } catch (error) {
+    logger.error('Error in getTestClusterByCondition controller:', error);
+    res.status(error.message === 'Cluster not found' ? 404 : 500).json({
+      error: error.message || 'Failed to retrieve test cluster'
+    });
+  }
+};
+
+/**
+ * Get FMS templates
+ * GET /api/v1/templates/fms
+ */
+export const getFMSTemplates = async (req, res) => {
+  try {
+    const language = req.query.language || 'NO';
+
+    const fmsTemplates = await templateService.getFMSTemplates(language);
+    res.json(fmsTemplates);
+  } catch (error) {
+    logger.error('Error in getFMSTemplates controller:', error);
+    res.status(500).json({ error: 'Failed to retrieve FMS templates' });
+  }
+};
+
 export default {
   getAllTemplates,
   getTemplatesByCategory,
@@ -341,5 +432,10 @@ export default {
   addFavorite,
   removeFavorite,
   getPhrases,
-  getPhrasesByRegion
+  getPhrasesByRegion,
+  getRedFlags,
+  screenRedFlags,
+  getTestClusters,
+  getTestClusterByCondition,
+  getFMSTemplates
 };

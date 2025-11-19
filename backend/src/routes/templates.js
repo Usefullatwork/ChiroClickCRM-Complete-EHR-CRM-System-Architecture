@@ -66,4 +66,22 @@ router.get('/phrases', templateController.getPhrases);
 // GET /api/v1/templates/phrases/byregion/:region
 router.get('/phrases/byregion/:region', templateController.getPhrasesByRegion);
 
+// Red Flags Screening
+// GET /api/v1/templates/red-flags
+router.get('/red-flags', templateController.getRedFlags);
+
+// GET /api/v1/templates/red-flags/screen
+router.post('/red-flags/screen', templateController.screenRedFlags);
+
+// Test Clusters
+// GET /api/v1/templates/test-clusters
+router.get('/test-clusters', templateController.getTestClusters);
+
+// GET /api/v1/templates/test-clusters/:condition
+router.get('/test-clusters/:condition', templateController.getTestClusterByCondition);
+
+// Functional Movement Screen
+// GET /api/v1/templates/fms
+router.get('/fms', templateController.getFMSTemplates);
+
 export default router;
