@@ -1,0 +1,241 @@
+=================================================================
+EKSEMPEL KLINISKE NOTATER FOR AI-TRENING
+=================================================================
+
+Dette er et eksempel på hvordan du formaterer dine kliniske notater
+for å få best mulig resultat fra AI-treningssystemet.
+
+Systemet gjenkjenner automatisk:
+- Pasient/Eksempel-overskrifter
+- Anamnese, Undersøkelse, Behandling, Konklusjon, Oppfølging seksjoner
+- Positive (+) og negative (-) funn
+- Anatomiske regioner og patologier
+
+=================================================================
+KATEGORI 1: KORSRYGG & BEKKEN
+=================================================================
+
+Pasient 1 (Akutt Lumbago):
+
+Anamnese: Akutt vondt i korsryggen for 3 dager siden etter tunge løft. Smerte lokalisert i LS overgang, noe mer mot høyre. Ingen utstråling i u.eks. Smerte ved host/nys. Forverres av å sitte lenge, stivner til. Lindres av bevegelse. Tidligere episoder, men lenge siden.
+
+Undersøkelse:
+Inspeksjon: Avvergestilling.
+ROM: Nedsatt og smertefull ekstensjon og fleksjon.
+Palp: Hypomob. og palp.øm L2-L5, hø PI ilium. Økt tonus bilat. QL, ES, gl.med.
+O/N: (-)SLR, (+)Kemps ve side for lokal smerte.
+
+Behandling: Leddjustering L5 PL, L4 PR (PBpushpull). Trp bilat. gl.max, piri, gl.med og QL. Råd om bevegelse og variasjon.
+
+Konklusjon: Fasettleddsdysfunksjon og myalgier.
+
+Oppfølging: God bedring. Mindre smerte. Kan sitte lengre. Fortsetter øvelser.
+
+---
+
+Pasient 2 (Bekkenleddsmerter - Gravid):
+
+Anamnese: Gravid uke 26. Smerter i hø setet, går rundt hofta/lysken, stråler av og på i post. lår til kne. Svikter i hofta ved bæring. Ilinger nedover. Smerter ved snu seg i seng.
+
+Undersøkelse:
+Inspeksjon: Hø skulder/glut.fold lavere.
+Palp: Hypomob. og palp.øm hø IS ledd. Økt tonus hø piriformis, gl.med., gl.min.
+O/N: (+)P4 test hø side, (-)ASLR, (-)lateral kompresjon.
+
+Behandling: Leddjustering hø PI ilium (dpx2). Trp hø piri, gl.med, gl.min. Øvelser: Jane Fonda, seteløft, tøye due-stilling.
+
+Konklusjon: Bekkenleddsdysfunksjon og myofascielle smerter relatert til svangerskap.
+
+Oppfølging: God bedring etter behandling. Kan gå lengre uten smerte. Fortsetter med øvelser daglig.
+
+---
+
+Pasient 3 (Isjias):
+
+Anamnese: Langvarige plager, akutt forverring. Smerte LS overgang fra midtlinje og ut lateralt, stråling ned i bakside lår/legg bilat., verst hø. Vanskelig med forflytning og fleksjon. Ingen ridebukse parestesier.
+
+Undersøkelse:
+Inspeksjon: Beveger seg sakte, unngår fleksjon.
+ROM: Svært nedsatt alle plan. Lat.fleks 10-20 gr.
+Palp: Hypomob L4/L5. Økt tonus piri, gl.med.
+O/N: (-)SLR men stram hamstring. Sensibilitet lett nedsatt hø S1 dermatome.
+
+Behandling: Cox traksjon L4/5, L5/S1 u/cuffs. Leddmob. og vibrasjon L5, L4. Trp gl.med, piri.
+
+Konklusjon: Skivelidelse med radierende smerte, uten klar radikulopati. Henvisning MR v/manglende bedring.
+
+Oppfølging: Gradvis bedring over 4 uker. Mindre utstråling. Forbedret fleksjon.
+
+=================================================================
+KATEGORI 2: NAKKE & HODE
+=================================================================
+
+Pasient 1 (Tensjonshodepine):
+
+Anamnese: Vondt i nakke/skuldre og hodepine siden jul. Stressrelatert. Hodepinen brer seg fra occipitalt til panne (bånd). Verst ved brå bevegelser eller statisk arbeid.
+
+Undersøkelse:
+ROM: Nedsatt rotasjon og lat.fleks.
+Palp: Hypomob. og palp.øm C2, C4, øvre torakalt. Økt tonus subocc. (stråler frontalt), øv.traps, lev.scap.
+O/N: (-)Spurling's, (-)Axial komp.
+
+Behandling: Leddjustering T5, T3, C4, C2. Trp/bvm subocc., øv.traps. Traksjon nakke. Råd om mikropauser og stressmestring.
+
+Konklusjon: Tensjonshodepine og cervikal myalgi.
+
+Oppfølging: God bedring. Mindre hodepine. Gjør øvelser daglig. Bedre arbeidsholdning.
+
+---
+
+Pasient 2 (Akutt Torticollis):
+
+Anamnese: 11 år gammel gutt, våknet med akutt smerte ve side nakke. Avvergestilling. Ingen utstråling/hodepine. Hoppet trampoline dagen før.
+
+Undersøkelse:
+Inspeksjon: Holder hodet i hø lat.fleks.
+ROM: Svært redusert rot/lat.fleks mot venstre.
+Palp: Svært øm ve øv.traps, lev.scap. Ikke mulig å palpere ledd pga smerte.
+
+Behandling: Forsiktig mobilisering. Trp/bvm ve øv.traps. Info om ufarlig tilstand. Varme/bevegelse.
+
+Konklusjon: Akutt torticollis (kink).
+
+Oppfølging: Bedring etter 2 dager. Full ROM etter 5 dager.
+
+---
+
+Pasient 3 (TMD - Kjeve):
+
+Anamnese: Smerter i kjeve, klikking, spenninger. Våkner med stiv kjeve (gnissing/pressing). Stressrelatert.
+
+Undersøkelse:
+Palp: Økt tonus og ømhet masseter, temporalis, pterygoideus lat/med.
+Funksjon: S-bevegelse ved gap.
+
+Behandling: Intraoral beh. pterygoideus lat/med. Trp masseter/temporalis. Leddmob C1-C2. Øvelser: Avspenning tunge/kjeve.
+
+Konklusjon: TMD (Temporomandibular dysfunksjon).
+
+Oppfølging: Mye bedre. Mindre smerte ved tygging. Fortsetter avspenningsøvelser.
+
+=================================================================
+KATEGORI 3: SKULDER & ARM
+=================================================================
+
+Pasient 1 (Frozen Shoulder):
+
+Anamnese: Smerter hø overarm/skulder i 2 mnd. Ingen traume. Gradvis stivere. Smerte ved brå bevegelser. Nattlige smerter, kan ikke ligge på skulder.
+
+Undersøkelse:
+AROM: Fleks 100gr, Abd 45gr. Ut.rot 0gr (stopp). Inn.rot til L5. Kapsulært mønster.
+
+Behandling: Trp infraspinatus, teres min, interscap. Mob scapula. Info om forløp. Henvisning til MR/Kortison vurderes.
+
+Konklusjon: Adhesiv kapsulitt.
+
+Oppfølging: Langsom bedring over 6 måneder. Gradvis økt ROM.
+
+---
+
+Pasient 2 (Tennisalbue):
+
+Anamnese: Smerter lat. side albue 5-6 mnd. Jobb som kjøkkenassistent, mye løft/griping.
+
+Undersøkelse:
+Palp: Distinkt ømhet lat. epikondyl ext.seneutspring. Ingen hevelse.
+Kraft: Smerte v/test ECRL/ECRB.
+Lengde: Strekksmerter extensorer.
+
+Behandling: Bvm extensorer. ESWT (Trykkbølge) 2000 skudd, 10Hz. Øvelser: Eksentrisk håndleddsekst., tøying.
+
+Konklusjon: Lateral epikondylitt (tennisalbue).
+
+Oppfølging: God bedring etter 4 behandlinger. Mindre smerte. Fortsetter øvelser.
+
+=================================================================
+KATEGORI 4: VERTIGO (SVIMMELHET)
+=================================================================
+
+Pasient 1 (BPPV):
+
+Anamnese: Akutt rotatorisk svimmelhet ved å snu seg i sengen (hø side) og se opp. Varighet <30 sek. Ingen nystagmus i ro.
+
+Undersøkelse:
+Dix-Hallpike: Positiv hø side (rotatorisk geotrop nystagmus + svimmelhet, latenstid 5 sek).
+Pagnini: Neg.
+Nevro: U.a.
+
+Behandling: Epleys manøver hø side. Råd om å sove med hevet hode.
+
+Konklusjon: BPPV canalithiasis bakre buegang høyre.
+
+Oppfølging: Bedring umiddelbart etter behandling. Ingen svimmelhet ved oppfølging.
+
+---
+
+Pasient 2 (Cervikogen svimmelhet):
+
+Anamnese: Nautisk svimmelhet (båtdekk), ustø. Konstant, ikke anfall. Mye stiv i nakke/øvre rygg. Stress.
+
+Undersøkelse:
+Vertigo tester (Dix-Hallpike/HINTS): Negativ.
+Palp: Svært stramme subocc. mm (reproduserer ubehag/trykk), øv.traps. Hypomob C1-C2.
+
+Behandling: Trp subocc, paraspinal mm. Traksjon. Leddjustering øvre cervikal. Balanseøvelser.
+
+Konklusjon: Cervikogen svimmelhet.
+
+Oppfølging: Gradvis bedring. Mindre svimmelhet. Bedre med balanseøvelser.
+
+=================================================================
+KATEGORI 5: FOT & ANKEL
+=================================================================
+
+Pasient 1 (Plantar Fascitt):
+
+Anamnese: Smerter under hæl, verst om morgenen og etter start på aktivitet. Hatt i 6 mnd.
+
+Undersøkelse:
+Palp: Ømhet ved feste for plantar fascie calcaneus medialt.
+
+Behandling: ESWT (Trykkbølge) 2000 skudd, 10Hz. Leddjustering talus/navicularis. Øvelser: Tåhev (high load), tøye gastroc/soleus.
+
+Konklusjon: Plantar fascitt.
+
+Oppfølging: God bedring etter 6 behandlinger. Mindre morgensmerter.
+
+=================================================================
+FORMATERING TIPS:
+=================================================================
+
+1. BRUK TYDELIGE OVERSKRIFTER:
+   - "Pasient X (Tilstand):" eller "Eksempel X:"
+   - "Kategori X:" for å gruppere liknende cases
+
+2. INKLUDER ALLE SEKSJONER:
+   - Anamnese: Symptomer, debut, forverring/lindring
+   - Undersøkelse: Inspeksjon, ROM, Palpasjon, O/N tester
+   - Behandling: Leddjustering, Trp/bvm, Øvelser, Råd
+   - Konklusjon: Diagnose
+   - Oppfølging: Resultat (viktig for læring!)
+
+3. BRUK STANDARDFORKORTELSER:
+   - Trp = Triggerpunktsbehandling
+   - bvm = Bløtvevsbehandling
+   - ART = Active Release Technique
+   - bilat. = bilateralt
+   - hø/ve = høyre/venstre
+   - palp.øm = palpasjonsøm
+   - hypomob. = hypomobil
+   - (+) = Positiv test
+   - (-) = Negativ test
+
+4. ANONYMISER DATA:
+   - Fjern navn, fødselsnummer, datoer
+   - Bruk "Pasient X" eller generiske beskrivelser
+
+5. INKLUDER OPPFØLGING:
+   - Dette er KRITISK for at AI-en skal lære hva som fungerer!
+   - Beskriv utfall: "God bedring", "Ingen endring", "Verre"
+
+=================================================================
