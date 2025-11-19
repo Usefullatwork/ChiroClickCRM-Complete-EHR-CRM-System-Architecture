@@ -23,6 +23,7 @@ import {
   Calendar
 } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
+import InvoiceModal from '../components/InvoiceModal'
 
 export default function Financial() {
   const queryClient = useQueryClient()
@@ -39,6 +40,7 @@ export default function Financial() {
   })
 
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [selectedInvoiceTransaction, setSelectedInvoiceTransaction] = useState(null)
 
   // Fetch financial summary
   const { data: summaryData } = useQuery({
@@ -438,18 +440,27 @@ export default function Financial() {
                         {transaction.invoice_number || '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        {transaction.payment_status === 'PENDING' && (
+                        <div className="flex items-center gap-3">
                           <button
-                            onClick={() => updatePaymentMutation.mutate({
-                              id: transaction.id,
-                              status: 'PAID'
-                            })}
-                            disabled={updatePaymentMutation.isPending}
-                            className="text-green-600 hover:text-green-900 font-medium disabled:opacity-50"
+                            onClick={() => setSelectedInvoiceTransaction(transaction)}
+                            className="text-blue-600 hover:text-blue-900 font-medium"
+                            title="Generate Invoice PDF"
                           >
-                            Mark Paid
+                            <FileText className="w-4 h-4" />
                           </button>
-                        )}
+                          {transaction.payment_status === 'PENDING' && (
+                            <button
+                              onClick={() => updatePaymentMutation.mutate({
+                                id: transaction.id,
+                                status: 'PAID'
+                              })}
+                              disabled={updatePaymentMutation.isPending}
+                              className="text-green-600 hover:text-green-900 font-medium disabled:opacity-50"
+                            >
+                              Mark Paid
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -502,6 +513,14 @@ export default function Financial() {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Invoice Generation Modal */}
+      {selectedInvoiceTransaction && (
+        <InvoiceModal
+          transaction={selectedInvoiceTransaction}
+          onClose={() => setSelectedInvoiceTransaction(null)}
+        />
       )}
     </div>
   )

@@ -7,6 +7,7 @@ import NewPatient from './pages/NewPatient'
 import PatientDetail from './pages/PatientDetail'
 import ClinicalEncounter from './pages/ClinicalEncounter'
 import Appointments from './pages/Appointments'
+import NewAppointment from './pages/NewAppointment'
 import Communications from './pages/Communications'
 import FollowUps from './pages/FollowUps'
 import Financial from './pages/Financial'
@@ -40,6 +41,7 @@ function App() {
         <Route path="patients/:patientId/encounter" element={<ClinicalEncounter />} />
         <Route path="patients/:patientId/encounter/:encounterId" element={<ClinicalEncounter />} />
         <Route path="appointments" element={<Appointments />} />
+        <Route path="appointments/new" element={<NewAppointment />} />
         <Route path="communications" element={<Communications />} />
         <Route path="follow-ups" element={<FollowUps />} />
         <Route path="financial" element={<Financial />} />

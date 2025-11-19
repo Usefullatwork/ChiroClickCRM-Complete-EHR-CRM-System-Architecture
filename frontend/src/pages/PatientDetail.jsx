@@ -20,10 +20,12 @@ import {
   Clock,
   AlertCircle,
   MessageSquare,
-  Globe
+  Globe,
+  Shield
 } from 'lucide-react'
 import { patientsAPI, encountersAPI, appointmentsAPI } from '../services/api'
 import { formatDate, formatPhone, calculateAge } from '../lib/utils'
+import GDPRExportModal from '../components/GDPRExportModal'
 
 export default function PatientDetail() {
   const { id } = useParams()
@@ -31,6 +33,7 @@ export default function PatientDetail() {
   const queryClient = useQueryClient()
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({})
+  const [showGDPRModal, setShowGDPRModal] = useState(false)
 
   // Fetch patient data
   const { data: patientResponse, isLoading } = useQuery({
@@ -128,6 +131,14 @@ export default function PatientDetail() {
             </>
           ) : (
             <>
+              <button
+                onClick={() => setShowGDPRModal(true)}
+                className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                title="Export Patient Data (GDPR)"
+              >
+                <Shield className="w-4 h-4" />
+                Export Data
+              </button>
               <button
                 onClick={() => setIsEditing(true)}
                 className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
@@ -443,6 +454,14 @@ export default function PatientDetail() {
           </div>
         </div>
       </div>
+
+      {/* GDPR Export Modal */}
+      {showGDPRModal && (
+        <GDPRExportModal
+          patient={patient}
+          onClose={() => setShowGDPRModal(false)}
+        />
+      )}
     </div>
   )
 }

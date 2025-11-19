@@ -226,5 +226,23 @@ export const templatesAPI = {
   search: (query, language = 'NO') => apiClient.get('/templates/search', { params: { q: query, language } }),
 }
 
+// PDF Generation
+export const pdfAPI = {
+  generateInvoice: (financialMetricId) => apiClient.post(`/pdf/invoice/${financialMetricId}`),
+  generatePatientLetter: (encounterId, letterType) => apiClient.post(`/pdf/letter/${encounterId}`, { letterType }),
+}
+
+// GDPR
+export const gdprAPI = {
+  getRequests: () => apiClient.get('/gdpr/requests'),
+  createRequest: (data) => apiClient.post('/gdpr/requests', data),
+  updateRequestStatus: (requestId, data) => apiClient.patch(`/gdpr/requests/${requestId}/status`, data),
+  exportPatientData: (patientId) => apiClient.get(`/gdpr/patient/${patientId}/data-access`),
+  exportDataPortability: (patientId) => apiClient.get(`/gdpr/patient/${patientId}/data-portability`),
+  processErasure: (requestId) => apiClient.post(`/gdpr/requests/${requestId}/erasure`),
+  updateConsent: (patientId, data) => apiClient.patch(`/gdpr/patient/${patientId}/consent`, data),
+  getConsentAudit: (patientId) => apiClient.get(`/gdpr/patient/${patientId}/consent-audit`),
+}
+
 // Export default API client
 export default apiClient
