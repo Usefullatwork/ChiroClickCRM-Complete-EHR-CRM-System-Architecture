@@ -111,4 +111,34 @@ router.post('/parse-entry',
   trainingController.parseJournalEntry
 );
 
+/**
+ * @route   POST /api/v1/training/sigrun-journals
+ * @desc    Process Sigrun's journals and create training dataset
+ * @access  Private (ADMIN only)
+ */
+router.post('/sigrun-journals',
+  requireRole(['ADMIN']),
+  trainingController.processSigrunJournals
+);
+
+/**
+ * @route   POST /api/v1/training/combined-journals
+ * @desc    Process journals with auto-detection or specific practitioner
+ * @access  Private (ADMIN only)
+ */
+router.post('/combined-journals',
+  requireRole(['ADMIN']),
+  trainingController.processCombinedJournals
+);
+
+/**
+ * @route   POST /api/v1/training/detect-style
+ * @desc    Detect practitioner style from journal text
+ * @access  Private (ADMIN only)
+ */
+router.post('/detect-style',
+  requireRole(['ADMIN']),
+  trainingController.detectPractitionerStyle
+);
+
 export default router;

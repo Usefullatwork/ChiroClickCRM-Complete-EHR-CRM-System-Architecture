@@ -1,17 +1,26 @@
-# Sindre Journal Training System
+# Multi-Practitioner Journal Training System
 
 ## Overview
 
-This system processes Norwegian chiropractic journals (specifically Sindre's format) to create AI training data. It extracts structured information from clinical notes and creates training examples for AI models.
+This system processes Norwegian chiropractic journals from multiple practitioners to create AI training data. It extracts structured information from clinical notes and creates training examples for AI models.
+
+The system supports two different journal styles:
+- **Sindre's Format**: Formal structured notes with full section labels (Anamnese, Undersøkelse, Behandling)
+- **Sigrun's Format**: Abbreviated lowercase notes with shorthand (beh:, cx mob, tp)
 
 ## Features
 
+- **Multi-Practitioner Support**: Parse journals from Sindre and Sigrun with different writing styles
+- **Auto-Detection**: Automatically detect which practitioner wrote the notes
 - **Parse Journal Entries**: Extract Anamnese, Undersøkelse, Behandling, and Notat sections
-- **Extract Treatment Techniques**: Identify SMT, EMT, IMS, and other treatment modalities
+- **Extract Treatment Techniques**: Identify SMT, EMT, IMS, mobilizations, trigger points, and other modalities
 - **Extract Examination Findings**: Parse examination tests and results
 - **Extract Symptoms**: Identify symptom patterns and locations from patient histories
 - **Follow-up Pattern Recognition**: Detect when imaging, follow-up appointments, or exercises are recommended
 - **Medical Terminology Dictionary**: Comprehensive Norwegian chiropractic terminology with English translations
+- **Batch Processing**: Command-line tool for processing large journal files
+- **Multiple Export Formats**: JSONL (Ollama), JSON, CSV
+- **GDPR Anonymization**: Remove PII from training data
 
 ## Architecture
 
@@ -19,13 +28,16 @@ This system processes Norwegian chiropractic journals (specifically Sindre's for
 backend/
 ├── src/
 │   ├── services/
-│   │   └── sindreJournalParser.js    # Main parser service
+│   │   ├── sindreJournalParser.js    # Sindre's formal format parser
+│   │   └── sigrunJournalParser.js    # Sigrun's abbreviated format parser
 │   ├── controllers/
 │   │   └── training.js                # API endpoints
 │   └── routes/
 │       └── training.js                # Route definitions
 └── scripts/
-    └── testSindreJournalParser.js    # Test suite
+    ├── testSindreJournalParser.js    # Sindre parser test suite
+    ├── testSigrunJournalParser.js    # Sigrun parser test suite
+    └── processBatchJournals.js       # Batch processing CLI tool
 ```
 
 ## API Endpoints
@@ -197,6 +209,217 @@ Parse and extract structured data from a single journal entry.
   }
 }
 ```
+
+### 5. Process Sigrun Journals
+
+**POST** `/api/v1/training/sigrun-journals`
+
+Create training dataset from Sigrun's abbreviated journal text.
+
+**Request Body:**
+```json
+{
+  "journalsText": "Anamnese bedre. klart bedre i nakke... beh: cx mob supine. c2 prs..."
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "examples": [...],
+    "practitioner": "Sigrun",
+    "statistics": {
+      "total_entries": 50,
+      "total_examples": 150,
+      "example_types": {
+        "followup_to_treatment": 50,
+        "treatment_extraction_sigrun": 50,
+        "progress_assessment": 50
+      }
+    }
+  }
+}
+```
+
+### 6. Process Combined Journals
+
+**POST** `/api/v1/training/combined-journals`
+
+Process journals with auto-detection or specific practitioner selection.
+
+**Request Body:**
+```json
+{
+  "journalsText": "Mixed journal text...",
+  "practitioner": "auto"  // Options: "auto", "sindre", "sigrun", "both"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "examples": [...],
+    "practitioners": ["Sindre", "Sigrun"],  // When practitioner="both"
+    "statistics": {
+      "total_entries": 200,
+      "total_examples": 600,
+      "by_practitioner": {
+        "sindre": {...},
+        "sigrun": {...}
+      }
+    }
+  }
+}
+```
+
+### 7. Detect Practitioner Style
+
+**POST** `/api/v1/training/detect-style`
+
+Auto-detect which practitioner wrote the journal text.
+
+**Request Body:**
+```json
+{
+  "journalsText": "beh: cx mob supine..."
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "practitioner": "Sigrun",
+    "confidence": 0.8
+  }
+}
+```
+
+## Batch Processing (Command Line)
+
+The batch processing script allows you to process large journal files from the command line.
+
+### Usage
+
+```bash
+node scripts/processBatchJournals.js [OPTIONS]
+```
+
+### Options
+
+- `-i, --input <path>`: Input file or directory (required)
+- `-o, --output <path>`: Output file path (default: training_data)
+- `-p, --practitioner <type>`: Practitioner: auto, sindre, sigrun, both (default: auto)
+- `-f, --format <format>`: Output format: jsonl, json, csv, all (default: jsonl)
+- `-a, --anonymize`: Anonymize PII data (GDPR compliant)
+- `-v, --verbose`: Verbose output
+- `--no-stats`: Don't show statistics
+- `-h, --help`: Show help
+
+### Examples
+
+```bash
+# Process single file with auto-detection
+node scripts/processBatchJournals.js -i journals.txt
+
+# Process Sindre's journals, export as JSONL for Ollama
+node scripts/processBatchJournals.js -i sindre.txt -p sindre -f jsonl
+
+# Process directory of files, anonymize, all formats
+node scripts/processBatchJournals.js -i ./journals/ -f all -a
+
+# Process both practitioners separately
+node scripts/processBatchJournals.js -i journals.txt -p both -o combined
+
+# Verbose output with statistics
+node scripts/processBatchJournals.js -i journals.txt -p auto -v
+```
+
+### Output Formats
+
+**JSONL Format** (for Ollama training)
+```jsonl
+{"prompt":"...", "response":"...", "type":"anamnese_to_examination"}
+{"prompt":"...", "response":"...", "type":"clinical_reasoning_to_treatment"}
+```
+
+**JSON Format** (with metadata)
+```json
+{
+  "examples": [...],
+  "metadata": {
+    "total": 450,
+    "generated_at": "2024-01-08T...",
+    "statistics": {...}
+  }
+}
+```
+
+**CSV Format** (for analysis)
+```csv
+type,practitioner,prompt,response,metadata
+anamnese_to_examination,Sindre,"...","...","{}"
+```
+
+### Anonymization
+
+When the `--anonymize` flag is used, the system removes all PII:
+- Names → `[NAVN]`
+- Addresses → `[ADRESSE]`
+- Phone numbers → `[TELEFON]`
+- National IDs → `[PERSONNUMMER]`
+- Dates generalized to month/year only
+
+## Sigrun's Journal Format
+
+Sigrun uses an abbreviated, lowercase note-taking style that differs from Sindre's formal format.
+
+### Common Abbreviations
+
+**Treatment Patterns:**
+- `beh:` or `beh` - Behandling (treatment)
+- `cx mob` - Cervical mobilization
+- `tx mob` - Thoracic mobilization
+- `lx mob` - Lumbar mobilization
+- `tp` - Trigger point
+- `trp` - Trigger point
+- `mass` - Massasje (massage)
+- `tøy` - Tøying/stretching
+- `rep` - Repeterer/samme behandling
+- `som sist` - Same treatment as last time
+
+**Position/Location:**
+- `supine` - Ryggleie (supine position)
+- `prone` - Mageleie (prone position)
+- `side` - Sideleie (side position)
+- `bilat` - Bilateral
+- `ve` - Venstre (left)
+- `hø` - Høyre (right)
+
+**Assessment Phrases:**
+- `bedre` - Better
+- `mye bedre` - Much better
+- `klart bedre` - Clearly better
+- `som sist` - Same as last time
+- `fortsatt` - Still/continues
+- `mindre vondt` - Less pain
+
+### Example Sigrun Entry
+
+```
+Anamnese bedre. klart bedre i nakke siden sist.
+
+beh: cx mob supine. c2 prs. t5 p. is-ledd ve. tp øvre traps bilat.
+```
+
+This translates to:
+- **Anamnese**: Better. Clearly better in neck since last time.
+- **Treatment**: Cervical mobilization in supine position. C2 posterior-right-sidebending. T5 posterior. Sacroiliac joint left. Trigger points upper trapezius bilateral.
 
 ## Medical Terminology Reference
 
@@ -444,14 +667,23 @@ Based on test data:
 - **Training Examples**: 3-5 examples per journal entry
 - **Vocabulary Size**: 100+ anatomical terms, 30+ examination tests
 
+## Completed Features
+
+1. ✓ **Sigrun's Journal Format**: Parser for Sigrun's abbreviated journal style
+2. ✓ **Multi-practitioner Learning**: Combine patterns from multiple practitioners
+3. ✓ **Batch Processing**: Command-line tool for processing large files
+4. ✓ **Multiple Export Formats**: JSONL, JSON, CSV support
+5. ✓ **GDPR Anonymization**: PII removal for training data
+6. ✓ **Auto-Detection**: Automatic practitioner style detection
+
 ## Future Enhancements
 
-1. **Sigrun's Journal Format**: Add parser for Sigrun's journal style
-2. **Multi-practitioner Learning**: Combine patterns from multiple practitioners
-3. **ICPC-2 Code Prediction**: Automatic diagnosis code suggestion
-4. **Treatment Protocol Patterns**: Learn common treatment sequences
-5. **Outcome Tracking**: Link treatments to patient outcomes
-6. **Voice-to-Text Integration**: Process voice-recorded journals
+1. **ICPC-2 Code Prediction**: Automatic diagnosis code suggestion
+2. **Treatment Protocol Patterns**: Learn common treatment sequences
+3. **Outcome Tracking**: Link treatments to patient outcomes over time
+4. **Voice-to-Text Integration**: Process voice-recorded journals
+5. **Clinical Decision Support**: Real-time treatment suggestions during patient encounters
+6. **Multi-language Support**: Expand to other Norwegian dialects and languages
 
 ## Troubleshooting
 
@@ -473,9 +705,22 @@ Based on test data:
 
 To add new terminology or patterns:
 
+**For Sindre's parser:**
 1. Edit `ANATOMICAL_ABBREVIATIONS`, `TREATMENT_ABBREVIATIONS`, or `EXAMINATION_TESTS` in `sindreJournalParser.js`
 2. Add test cases in `testSindreJournalParser.js`
 3. Run tests: `node scripts/testSindreJournalParser.js`
+
+**For Sigrun's parser:**
+1. Edit `SIGRUN_TREATMENT_PATTERNS` or `SIGRUN_ASSESSMENT_PATTERNS` in `sigrunJournalParser.js`
+2. Add test cases in `testSigrunJournalParser.js`
+3. Run tests: `node scripts/testSigrunJournalParser.js`
+
+**Running all tests:**
+```bash
+cd backend
+node scripts/testSindreJournalParser.js
+node scripts/testSigrunJournalParser.js
+```
 
 ## License
 
