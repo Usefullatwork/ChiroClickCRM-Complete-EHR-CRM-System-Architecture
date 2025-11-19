@@ -149,10 +149,15 @@ export const followUpsAPI = {
 export const financialAPI = {
   getAll: (params) => apiClient.get('/financial', { params }),
   getById: (id) => apiClient.get(`/financial/${id}`),
-  getByPatient: (patientId) => apiClient.get(`/patients/${patientId}/financial`),
+  getByPatient: (patientId) => apiClient.get(`/financial/patient/${patientId}`),
   create: (data) => apiClient.post('/financial', data),
-  recordPayment: (id, data) => apiClient.post(`/financial/${id}/payment`, data),
-  generateInvoice: (id) => apiClient.post(`/financial/${id}/invoice`),
+  updatePaymentStatus: (id, data) => apiClient.patch(`/financial/${id}/payment-status`, data),
+  getSummary: (params) => apiClient.get('/financial/summary', { params }),
+  getRevenueByCode: (params) => apiClient.get('/financial/revenue-by-code', { params }),
+  getPaymentMethods: (params) => apiClient.get('/financial/payment-methods', { params }),
+  getOutstanding: (params) => apiClient.get('/financial/outstanding', { params }),
+  getDailyRevenueChart: (params) => apiClient.get('/financial/chart/daily-revenue', { params }),
+  generateInvoiceNumber: () => apiClient.get('/financial/invoice-number'),
 }
 
 // Dashboard
