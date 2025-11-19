@@ -10,10 +10,23 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
+import session from 'express-session';
 import 'express-async-errors';
 
 import { healthCheck } from './config/database.js';
 import logger from './utils/logger.js';
+import {
+  csrfProtection,
+  sendCsrfToken,
+  securityHeaders,
+  sanitizeInput,
+  requireHTTPS,
+  secureSession
+} from './middleware/security.js';
+import {
+  errorHandler,
+  notFoundHandler
+} from './middleware/errorHandler.js';
 
 // Load environment variables
 dotenv.config();
@@ -27,8 +40,11 @@ const API_VERSION = process.env.API_VERSION || 'v1';
 // MIDDLEWARE
 // ============================================================================
 
-// Security headers
-app.use(helmet());
+// HTTPS redirect in production
+app.use(requireHTTPS);
+
+// Enhanced security headers (replaces basic helmet)
+app.use(securityHeaders);
 
 // CORS configuration
 app.use(cors({
@@ -41,6 +57,26 @@ app.use(cors({
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Session management (required for CSRF and 2FA)
+app.use(session(secureSession));
+
+// CSRF Protection (must come after session)
+// Note: Exclude health check and public endpoints from CSRF
+app.use((req, res, next) => {
+  // Skip CSRF for health check and public endpoints
+  const publicPaths = ['/health', '/api/v1/auth/login', '/api/v1/auth/register'];
+  if (publicPaths.some(path => req.path.startsWith(path))) {
+    return next();
+  }
+  csrfProtection(req, res, next);
+});
+
+// Send CSRF token to client
+app.use(sendCsrfToken);
+
+// Input sanitization (prevent XSS)
+app.use(sanitizeInput);
 
 // Compression
 app.use(compression());
@@ -160,35 +196,11 @@ app.use(`/api/${API_VERSION}/templates`, templateRoutes);
 // ERROR HANDLING
 // ============================================================================
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    error: 'Not Found',
-    message: `Cannot ${req.method} ${req.path}`,
-    path: req.path
-  });
-});
+// 404 handler (must come BEFORE errorHandler)
+app.use(notFoundHandler);
 
-// Global error handler
-app.use((err, req, res, next) => {
-  logger.error('Unhandled error:', {
-    error: err.message,
-    stack: err.stack,
-    path: req.path,
-    method: req.method
-  });
-
-  // Don't leak error details in production
-  const message = process.env.NODE_ENV === 'production'
-    ? 'Internal server error'
-    : err.message;
-
-  res.status(err.status || 500).json({
-    error: err.name || 'Error',
-    message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-  });
-});
+// Global error handler (must be LAST middleware)
+app.use(errorHandler);
 
 // ============================================================================
 // SERVER STARTUP

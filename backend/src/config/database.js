@@ -24,7 +24,9 @@ const poolConfig = {
 // Enable SSL in production
 if (process.env.NODE_ENV === 'production' || process.env.DB_SSL === 'true') {
   poolConfig.ssl = {
-    rejectUnauthorized: false
+    rejectUnauthorized: true, // ✅ CRITICAL: Always verify SSL certificates in production
+    // If using self-signed certificates (NOT recommended for production):
+    // ca: fs.readFileSync('/path/to/server-certificates/root.crt').toString(),
   };
 }
 
