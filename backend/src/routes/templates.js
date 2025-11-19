@@ -42,4 +42,28 @@ router.post('/:id/favorite', templateController.toggleFavorite);
 // POST /api/v1/templates/:id/use
 router.post('/:id/use', templateController.incrementUsage);
 
+// Orthopedic Test Library
+// GET /api/v1/templates/tests/library
+router.get('/tests/library', templateController.getTestsLibrary);
+
+// GET /api/v1/templates/tests/:code
+router.get('/tests/:code', templateController.getTestByCode);
+
+// User Preferences
+// GET /api/v1/templates/preferences
+router.get('/preferences/user', templateController.getUserPreferences);
+
+// POST /api/v1/templates/preferences/favorites/:templateId
+router.post('/preferences/favorites/:templateId', templateController.addFavorite);
+
+// DELETE /api/v1/templates/preferences/favorites/:templateId
+router.delete('/preferences/favorites/:templateId', templateController.removeFavorite);
+
+// Template Phrases
+// GET /api/v1/templates/phrases
+router.get('/phrases', templateController.getPhrases);
+
+// GET /api/v1/templates/phrases/byregion/:region
+router.get('/phrases/byregion/:region', templateController.getPhrasesByRegion);
+
 export default router;
