@@ -4,11 +4,13 @@ import { useQuery } from '@tanstack/react-query';
 import { patientsAPI } from '../services/api';
 import { formatDate, formatPhone, calculateAge, getStatusColor, debounce } from '../lib/utils';
 import { Search, Plus, Filter, Download, Upload } from 'lucide-react';
+import AdvancedPatientSearch from '../components/AdvancedPatientSearch';
 
 export default function Patients() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const [filters, setFilters] = useState({
     status: '',
     category: '',
@@ -68,6 +70,13 @@ export default function Patients() {
         </div>
 
         <div className="flex gap-3">
+          <button
+            className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+            onClick={() => setShowAdvancedSearch(true)}
+          >
+            <Filter size={20} />
+            Advanced Search
+          </button>
           <button
             className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
             onClick={() => {/* TODO: Export functionality */}}
@@ -329,6 +338,13 @@ export default function Patients() {
             </div>
           )}
         </>
+      )}
+
+      {/* Advanced Search Modal */}
+      {showAdvancedSearch && (
+        <AdvancedPatientSearch
+          onClose={() => setShowAdvancedSearch(false)}
+        />
       )}
     </div>
   );
