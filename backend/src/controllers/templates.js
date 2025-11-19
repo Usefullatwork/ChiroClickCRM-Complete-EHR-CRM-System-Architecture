@@ -194,6 +194,227 @@ export const searchTemplates = async (req, res) => {
   }
 };
 
+/**
+ * Get orthopedic tests library
+ * GET /api/v1/templates/tests/library
+ */
+export const getTestsLibrary = async (req, res) => {
+  try {
+    const filters = {
+      testCategory: req.query.testCategory,
+      bodyRegion: req.query.bodyRegion,
+      system: req.query.system,
+      search: req.query.search,
+      language: req.query.language || 'NO'
+    };
+
+    const tests = await templateService.getTestsLibrary(filters);
+    res.json(tests);
+  } catch (error) {
+    logger.error('Error in getTestsLibrary controller:', error);
+    res.status(500).json({ error: 'Failed to retrieve tests library' });
+  }
+};
+
+/**
+ * Get specific orthopedic test by code
+ * GET /api/v1/templates/tests/:code
+ */
+export const getTestByCode = async (req, res) => {
+  try {
+    const { code } = req.params;
+    const language = req.query.language || 'NO';
+
+    const test = await templateService.getTestByCode(code, language);
+    res.json(test);
+  } catch (error) {
+    logger.error('Error in getTestByCode controller:', error);
+    res.status(error.message === 'Test not found' ? 404 : 500).json({
+      error: error.message || 'Failed to retrieve test'
+    });
+  }
+};
+
+/**
+ * Get user template preferences
+ * GET /api/v1/templates/preferences/user
+ */
+export const getUserPreferences = async (req, res) => {
+  try {
+    const { userId, organizationId } = req.user;
+
+    const preferences = await templateService.getUserPreferences(userId, organizationId);
+    res.json(preferences);
+  } catch (error) {
+    logger.error('Error in getUserPreferences controller:', error);
+    res.status(500).json({ error: 'Failed to retrieve user preferences' });
+  }
+};
+
+/**
+ * Add template to favorites
+ * POST /api/v1/templates/preferences/favorites/:templateId
+ */
+export const addFavorite = async (req, res) => {
+  try {
+    const { userId, organizationId } = req.user;
+    const { templateId } = req.params;
+
+    await templateService.addFavoriteTemplate(userId, organizationId, templateId);
+    res.json({ message: 'Template added to favorites' });
+  } catch (error) {
+    logger.error('Error in addFavorite controller:', error);
+    res.status(500).json({ error: 'Failed to add favorite' });
+  }
+};
+
+/**
+ * Remove template from favorites
+ * DELETE /api/v1/templates/preferences/favorites/:templateId
+ */
+export const removeFavorite = async (req, res) => {
+  try {
+    const { userId, organizationId } = req.user;
+    const { templateId } = req.params;
+
+    await templateService.removeFavoriteTemplate(userId, organizationId, templateId);
+    res.json({ message: 'Template removed from favorites' });
+  } catch (error) {
+    logger.error('Error in removeFavorite controller:', error);
+    res.status(500).json({ error: 'Failed to remove favorite' });
+  }
+};
+
+/**
+ * Get clinical phrases
+ * GET /api/v1/templates/phrases
+ */
+export const getPhrases = async (req, res) => {
+  try {
+    const { organizationId } = req.user;
+    const options = {
+      category: req.query.category,
+      language: req.query.language || 'NO',
+      search: req.query.search
+    };
+
+    const phrases = await templateService.getPhrases(organizationId, options);
+    res.json(phrases);
+  } catch (error) {
+    logger.error('Error in getPhrases controller:', error);
+    res.status(500).json({ error: 'Failed to retrieve phrases' });
+  }
+};
+
+/**
+ * Get phrases by body region
+ * GET /api/v1/templates/phrases/byregion/:region
+ */
+export const getPhrasesByRegion = async (req, res) => {
+  try {
+    const { organizationId } = req.user;
+    const { region } = req.params;
+    const language = req.query.language || 'NO';
+
+    const phrases = await templateService.getPhrasesByRegion(organizationId, region, language);
+    res.json(phrases);
+  } catch (error) {
+    logger.error('Error in getPhrasesByRegion controller:', error);
+    res.status(500).json({ error: 'Failed to retrieve phrases' });
+  }
+};
+
+/**
+ * Get red flags library
+ * GET /api/v1/templates/red-flags
+ */
+export const getRedFlags = async (req, res) => {
+  try {
+    const filters = {
+      pathologyCategory: req.query.pathologyCategory,
+      bodyRegion: req.query.bodyRegion,
+      significanceLevel: req.query.significanceLevel,
+      language: req.query.language || 'NO'
+    };
+
+    const redFlags = await templateService.getRedFlags(filters);
+    res.json(redFlags);
+  } catch (error) {
+    logger.error('Error in getRedFlags controller:', error);
+    res.status(500).json({ error: 'Failed to retrieve red flags' });
+  }
+};
+
+/**
+ * Screen patient for red flags
+ * POST /api/v1/templates/red-flags/screen
+ */
+export const screenRedFlags = async (req, res) => {
+  try {
+    const { patientData, symptoms, findings } = req.body;
+
+    const screening = await templateService.screenRedFlags(patientData, symptoms, findings);
+    res.json(screening);
+  } catch (error) {
+    logger.error('Error in screenRedFlags controller:', error);
+    res.status(500).json({ error: 'Failed to screen red flags' });
+  }
+};
+
+/**
+ * Get test clusters
+ * GET /api/v1/templates/test-clusters
+ */
+export const getTestClusters = async (req, res) => {
+  try {
+    const filters = {
+      bodyRegion: req.query.bodyRegion,
+      language: req.query.language || 'NO'
+    };
+
+    const clusters = await templateService.getTestClusters(filters);
+    res.json(clusters);
+  } catch (error) {
+    logger.error('Error in getTestClusters controller:', error);
+    res.status(500).json({ error: 'Failed to retrieve test clusters' });
+  }
+};
+
+/**
+ * Get test cluster by condition
+ * GET /api/v1/templates/test-clusters/:condition
+ */
+export const getTestClusterByCondition = async (req, res) => {
+  try {
+    const { condition } = req.params;
+    const language = req.query.language || 'NO';
+
+    const cluster = await templateService.getTestClusterByCondition(condition, language);
+    res.json(cluster);
+  } catch (error) {
+    logger.error('Error in getTestClusterByCondition controller:', error);
+    res.status(error.message === 'Cluster not found' ? 404 : 500).json({
+      error: error.message || 'Failed to retrieve test cluster'
+    });
+  }
+};
+
+/**
+ * Get FMS templates
+ * GET /api/v1/templates/fms
+ */
+export const getFMSTemplates = async (req, res) => {
+  try {
+    const language = req.query.language || 'NO';
+
+    const fmsTemplates = await templateService.getFMSTemplates(language);
+    res.json(fmsTemplates);
+  } catch (error) {
+    logger.error('Error in getFMSTemplates controller:', error);
+    res.status(500).json({ error: 'Failed to retrieve FMS templates' });
+  }
+};
+
 export default {
   getAllTemplates,
   getTemplatesByCategory,
@@ -204,5 +425,17 @@ export default {
   toggleFavorite,
   incrementUsage,
   getCategories,
-  searchTemplates
+  searchTemplates,
+  getTestsLibrary,
+  getTestByCode,
+  getUserPreferences,
+  addFavorite,
+  removeFavorite,
+  getPhrases,
+  getPhrasesByRegion,
+  getRedFlags,
+  screenRedFlags,
+  getTestClusters,
+  getTestClusterByCondition,
+  getFMSTemplates
 };

@@ -210,15 +210,29 @@ export const usersAPI = {
 // Clinical Templates
 export const templatesAPI = {
   getAll: (params) => apiClient.get('/templates', { params }),
-  getByCategory: (language = 'NO') => apiClient.get('/templates/by-category', { params: { language } }),
+  getByCategory: (params) => apiClient.get('/templates/by-category', { params }),
   getById: (id) => apiClient.get(`/templates/${id}`),
   create: (data) => apiClient.post('/templates', data),
   update: (id, data) => apiClient.patch(`/templates/${id}`, data),
   delete: (id) => apiClient.delete(`/templates/${id}`),
   toggleFavorite: (id) => apiClient.post(`/templates/${id}/favorite`),
+  trackUsage: (id, data) => apiClient.post(`/templates/${id}/use`, data),
   incrementUsage: (id) => apiClient.post(`/templates/${id}/use`),
-  getCategories: (language = 'NO') => apiClient.get('/templates/categories', { params: { language } }),
+  getCategories: (params) => apiClient.get('/templates/categories', { params }),
   search: (query, language = 'NO') => apiClient.get('/templates/search', { params: { q: query, language } }),
+
+  // Orthopedic Tests Library
+  getTestsLibrary: (params) => apiClient.get('/templates/tests/library', { params }),
+  getTestByCode: (code, language = 'NO') => apiClient.get(`/templates/tests/${code}`, { params: { language } }),
+
+  // User Preferences
+  getUserPreferences: () => apiClient.get('/templates/preferences/user'),
+  addFavorite: (templateId) => apiClient.post(`/templates/preferences/favorites/${templateId}`),
+  removeFavorite: (templateId) => apiClient.delete(`/templates/preferences/favorites/${templateId}`),
+
+  // Clinical Phrases
+  getPhrases: (params) => apiClient.get('/templates/phrases', { params }),
+  getPhrasesByRegion: (region, language = 'NO') => apiClient.get(`/templates/phrases/byregion/${region}`, { params: { language } }),
 }
 
 // Export default API client
