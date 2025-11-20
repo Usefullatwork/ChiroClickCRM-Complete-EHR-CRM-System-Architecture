@@ -318,13 +318,13 @@ export const learnFromOutcome = async (encounterId, outcomeData) => {
 };
 
 /**
- * Organize and structure old journal notes using AI
- * Converts unstructured text into structured clinical data + SOAP format
+ * Organize and structure old journal notes using AI with actionable items extraction
+ * Converts unstructured text into structured clinical data + SOAP format + tasks
  */
 export const organizeOldJournalNotes = async (noteContent, patientContext = {}) => {
   const systemPrompt = `Du er en erfaren kiropraktor-assistent som er ekspert på å organisere og strukturere gamle journalnotater.
 
-Din oppgave er å analysere ustrukturerte journalnotater og strukturere dem i et klinisk format.
+Din oppgave er å analysere ustrukturerte journalnotater og strukturere dem i et klinisk format MED utdrag av HANDLINGSOPPGAVER.
 
 STEG 1: Analyser og ekstraher informasjon
 - Identifiser datoer (konsultasjonsdato, symptomstart, etc.)
@@ -334,31 +334,35 @@ STEG 1: Analyser og ekstraher informasjon
 - Ekstraher behandling og tiltak
 - Finn oppfølging og plan
 
-STEG 2: Organiser i SOAP-format
-Subjektivt (S):
-- Hovedplage og symptombeskrivelse
-- Sykehistorie og debut
-- Forverrende/lindrende faktorer
-- Tidligere behandling
+STEG 2: Ekstraher HANDLINGSOPPGAVER (VIKTIG!)
+Identifiser alle oppgaver som må følges opp:
+- Oppfølgingsavtaler som skal bookes
+- Telefonsamtaler som må gjøres
+- Brev/epikrise som skal sendes
+- Resepter som skal fornyes
+- Henvisninger som trengs
+- Prøvesvar som må følges opp
+- Påminnelser til pasient
 
-Objektivt (O):
-- Observasjon og inspeksjon
-- Palpasjonsfunn
-- Bevegelighet (ROM)
-- Ortopediske tester og resultater
-- Målinger (VAS, etc.)
+For hver oppgave, identifiser:
+- Type (FOLLOW_UP, CALL_PATIENT, SEND_NOTE, PRESCRIPTION, REFERRAL, TEST_RESULT, REMINDER)
+- Tittel og beskrivelse
+- Tidsfrist hvis nevnt
+- Prioritet (LOW, MEDIUM, HIGH, URGENT)
+- Original tekst fra notatet
 
-Vurdering (Assessment - A):
-- Klinisk resonnement
-- Differensialdiagnoser
-- Prognosevurdering
-- Diagnosekoder
+STEG 3: Ekstraher KOMMUNIKASJONSHISTORIKK
+Finn tidligere kommunikasjon nevnt i notatet:
+- Telefonsamtaler (dato, innhold)
+- SMS/e-poster sendt/mottatt
+- Brev/epikriser sendt
+- Personlig kontakt
 
-Plan (P):
-- Behandling utført/planlagt
-- Hjemmeøvelser og egentrening
-- Råd til pasient
-- Oppfølging
+STEG 4: Organiser i SOAP-format
+[samme som før]
+
+STEG 5: Identifiser MANGLENDE INFORMASJON
+Hva mangler for fullstendig klinisk dokumentasjon?
 
 Svar i JSON-format:
 {
@@ -397,10 +401,45 @@ Svar i JSON-format:
       "follow_up": "..."
     }
   },
+  "actionable_items": [
+    {
+      "type": "FOLLOW_UP",
+      "title": "Book oppfølging om 2 uker",
+      "description": "Pasient skal komme tilbake for kontroll",
+      "due_date": "YYYY-MM-DD",
+      "priority": "MEDIUM",
+      "original_text": "Kommer tilbake om 2 uker for kontroll"
+    },
+    {
+      "type": "CALL_PATIENT",
+      "title": "Ring pasient for sjekk",
+      "description": "Følge opp hvordan det går etter behandling",
+      "due_date": "YYYY-MM-DD",
+      "priority": "LOW",
+      "original_text": "Skal ringes om 1 uke"
+    }
+  ],
+  "communication_history": [
+    {
+      "type": "PHONE_CALL",
+      "date": "YYYY-MM-DD",
+      "direction": "OUTGOING",
+      "subject": "Oppfølging",
+      "content": "Ringte pasient ang. viderehenvising",
+      "original_text": "Ringte pasient 12.01"
+    }
+  ],
+  "missing_information": [
+    {
+      "field": "diagnosis_code",
+      "importance": "HIGH",
+      "can_be_inferred": true
+    }
+  ],
+  "tags": ["urgent", "referral_needed", "requires_callback"],
   "suggested_encounter_type": "FOLLOWUP",
   "suggested_date": "YYYY-MM-DD",
   "confidence_score": 0.85,
-  "missing_information": ["..."],
   "notes": "Eventuelle merknader om noteringen"
 }`;
 
@@ -414,7 +453,9 @@ Gammel journalnotat som skal struktureres:
 ${noteContent}
 ---
 
-Analyser og strukturer dette notatet i henhold til instruksjonene. Svar kun med JSON.`;
+Analyser og strukturer dette notatet i henhold til instruksjonene.
+VIKTIG: Identifiser ALLE handlingsoppgaver som må følges opp!
+Svar kun med JSON.`;
 
   try {
     const response = await generateCompletion(prompt, systemPrompt, {
@@ -446,6 +487,10 @@ Analyser og strukturer dette notatet i henhold til instruksjonene. Svar kun med 
           assessment: {},
           plan: {}
         },
+        actionable_items: [],
+        communication_history: [],
+        missing_information: [],
+        tags: [],
         confidence_score: 0.3,
         notes: 'Kunne ikke fullstendig strukturere notatet automatisk. Manuell gjennomgang anbefales.'
       };

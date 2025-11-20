@@ -146,6 +146,8 @@ export const processNoteWithAI = async (noteId, patientContext = {}) => {
     const aiResult = await organizeOldJournalNotes(note.original_content, patientContext);
 
     if (aiResult.success) {
+      const organizedData = aiResult.organizedData;
+
       // Update note with AI results
       await query(
         `UPDATE imported_journal_notes
@@ -157,21 +159,91 @@ export const processNoteWithAI = async (noteId, patientContext = {}) => {
              ai_confidence_score = $6,
              ai_model_used = $7,
              ai_processing_date = NOW(),
-             processing_status = 'completed'
+             processing_status = 'completed',
+             tags = $9,
+             has_follow_up_needed = $10,
+             communication_history_extracted = $11
          WHERE id = $8`,
         [
-          JSON.stringify(aiResult.organizedData.structured_data || {}),
-          JSON.stringify(aiResult.organizedData.soap || {}),
-          aiResult.organizedData.suggested_date || null,
-          aiResult.organizedData.suggested_encounter_type || 'FOLLOWUP',
-          aiResult.organizedData.structured_data?.diagnoses || null,
-          aiResult.organizedData.confidence_score || 0.5,
+          JSON.stringify(organizedData.structured_data || {}),
+          JSON.stringify(organizedData.soap || {}),
+          organizedData.suggested_date || null,
+          organizedData.suggested_encounter_type || 'FOLLOWUP',
+          organizedData.structured_data?.diagnoses || null,
+          organizedData.confidence_score || 0.5,
           aiResult.model,
-          noteId
+          noteId,
+          organizedData.tags || [],
+          (organizedData.actionable_items || []).some(item => item.type === 'FOLLOW_UP'),
+          (organizedData.communication_history || []).length > 0
         ]
       );
 
-      // Get updated note
+      // Save actionable items
+      if (organizedData.actionable_items && organizedData.actionable_items.length > 0) {
+        for (const item of organizedData.actionable_items) {
+          await query(
+            `INSERT INTO old_note_actionable_items
+             (note_id, patient_id, organization_id, item_type, title, description,
+              due_date, priority, original_text, ai_confidence, status)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'PENDING')`,
+            [
+              noteId,
+              note.patient_id,
+              note.organization_id,
+              item.type,
+              item.title,
+              item.description || null,
+              item.due_date || null,
+              item.priority || 'MEDIUM',
+              item.original_text || null,
+              organizedData.confidence_score || 0.5
+            ]
+          );
+        }
+      }
+
+      // Save communication history
+      if (organizedData.communication_history && organizedData.communication_history.length > 0) {
+        for (const comm of organizedData.communication_history) {
+          await query(
+            `INSERT INTO old_note_communications
+             (note_id, patient_id, organization_id, communication_type, communication_date,
+              subject, content, direction, original_text)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+            [
+              noteId,
+              note.patient_id,
+              note.organization_id,
+              comm.type,
+              comm.date || null,
+              comm.subject || null,
+              comm.content || null,
+              comm.direction || 'OUTGOING',
+              comm.original_text || null
+            ]
+          );
+        }
+      }
+
+      // Save missing information
+      if (organizedData.missing_information && organizedData.missing_information.length > 0) {
+        for (const missing of organizedData.missing_information) {
+          await query(
+            `INSERT INTO old_note_missing_info
+             (note_id, missing_field, importance, can_be_inferred)
+             VALUES ($1, $2, $3, $4)`,
+            [
+              noteId,
+              missing.field,
+              missing.importance || 'MEDIUM',
+              missing.can_be_inferred || false
+            ]
+          );
+        }
+      }
+
+      // Get updated note with counts
       const updatedResult = await query(
         `SELECT * FROM imported_journal_notes WHERE id = $1`,
         [noteId]
@@ -180,7 +252,9 @@ export const processNoteWithAI = async (noteId, patientContext = {}) => {
       return {
         success: true,
         note: updatedResult.rows[0],
-        aiResult
+        aiResult,
+        actionableItemsCount: organizedData.actionable_items?.length || 0,
+        communicationHistoryCount: organizedData.communication_history?.length || 0
       };
 
     } else {
@@ -515,6 +589,250 @@ export const updateNoteSoapData = async (noteId, organizationId, soapData) => {
   return result.rows[0];
 };
 
+/**
+ * Get all actionable items for a note
+ */
+export const getActionableItemsByNote = async (noteId, organizationId) => {
+  const result = await query(
+    `SELECT * FROM old_note_actionable_items
+     WHERE note_id = $1 AND organization_id = $2
+     ORDER BY
+       CASE priority
+         WHEN 'URGENT' THEN 1
+         WHEN 'HIGH' THEN 2
+         WHEN 'MEDIUM' THEN 3
+         WHEN 'LOW' THEN 4
+       END,
+       due_date NULLS LAST,
+       created_at ASC`,
+    [noteId, organizationId]
+  );
+
+  return result.rows;
+};
+
+/**
+ * Get all actionable items for a patient
+ */
+export const getActionableItemsByPatient = async (patientId, organizationId, filters = {}) => {
+  const { status, itemType, includeCompleted = false } = filters;
+
+  let whereClause = 'WHERE patient_id = $1 AND organization_id = $2';
+  const params = [patientId, organizationId];
+  let paramCount = 2;
+
+  if (!includeCompleted) {
+    whereClause += ' AND completed = false';
+  }
+
+  if (status) {
+    paramCount++;
+    whereClause += ` AND status = $${paramCount}`;
+    params.push(status);
+  }
+
+  if (itemType) {
+    paramCount++;
+    whereClause += ` AND item_type = $${paramCount}`;
+    params.push(itemType);
+  }
+
+  const result = await query(
+    `SELECT ai.*, n.original_filename, n.suggested_encounter_date
+     FROM old_note_actionable_items ai
+     LEFT JOIN imported_journal_notes n ON ai.note_id = n.id
+     ${whereClause}
+     ORDER BY
+       completed ASC,
+       CASE priority
+         WHEN 'URGENT' THEN 1
+         WHEN 'HIGH' THEN 2
+         WHEN 'MEDIUM' THEN 3
+         WHEN 'LOW' THEN 4
+       END,
+       due_date NULLS LAST,
+       created_at ASC`,
+    params
+  );
+
+  return result.rows;
+};
+
+/**
+ * Update actionable item status
+ */
+export const updateActionableItemStatus = async (itemId, status, userId = null) => {
+  const result = await query(
+    `UPDATE old_note_actionable_items
+     SET status = $1, updated_at = NOW()
+     WHERE id = $2
+     RETURNING *`,
+    [status, itemId]
+  );
+
+  if (result.rows.length === 0) {
+    throw new Error('Actionable item not found');
+  }
+
+  return result.rows[0];
+};
+
+/**
+ * Complete an actionable item (checkbox)
+ */
+export const completeActionableItem = async (itemId, userId, notes = null) => {
+  const result = await query(
+    `UPDATE old_note_actionable_items
+     SET completed = true,
+         completed_at = NOW(),
+         completed_by = $1,
+         status = 'COMPLETED',
+         notes = COALESCE($2, notes),
+         updated_at = NOW()
+     WHERE id = $3
+     RETURNING *`,
+    [userId, notes, itemId]
+  );
+
+  if (result.rows.length === 0) {
+    throw new Error('Actionable item not found');
+  }
+
+  logger.info(`Completed actionable item ${itemId} by user ${userId}`);
+  return result.rows[0];
+};
+
+/**
+ * Uncomplete an actionable item (uncheck)
+ */
+export const uncompleteActionableItem = async (itemId) => {
+  const result = await query(
+    `UPDATE old_note_actionable_items
+     SET completed = false,
+         completed_at = NULL,
+         completed_by = NULL,
+         status = 'PENDING',
+         updated_at = NOW()
+     WHERE id = $1
+     RETURNING *`,
+    [itemId]
+  );
+
+  if (result.rows.length === 0) {
+    throw new Error('Actionable item not found');
+  }
+
+  return result.rows[0];
+};
+
+/**
+ * Assign actionable item to user
+ */
+export const assignActionableItem = async (itemId, userId) => {
+  const result = await query(
+    `UPDATE old_note_actionable_items
+     SET assigned_to = $1, updated_at = NOW()
+     WHERE id = $2
+     RETURNING *`,
+    [userId, itemId]
+  );
+
+  if (result.rows.length === 0) {
+    throw new Error('Actionable item not found');
+  }
+
+  return result.rows[0];
+};
+
+/**
+ * Delete an actionable item
+ */
+export const deleteActionableItem = async (itemId) => {
+  await query(
+    `DELETE FROM old_note_actionable_items WHERE id = $1`,
+    [itemId]
+  );
+
+  return { success: true };
+};
+
+/**
+ * Get communication history for a note
+ */
+export const getCommunicationHistoryByNote = async (noteId, organizationId) => {
+  const result = await query(
+    `SELECT * FROM old_note_communications
+     WHERE note_id = $1 AND organization_id = $2
+     ORDER BY communication_date DESC NULLS LAST, created_at DESC`,
+    [noteId, organizationId]
+  );
+
+  return result.rows;
+};
+
+/**
+ * Get communication history for a patient
+ */
+export const getCommunicationHistoryByPatient = async (patientId, organizationId) => {
+  const result = await query(
+    `SELECT c.*, n.original_filename
+     FROM old_note_communications c
+     LEFT JOIN imported_journal_notes n ON c.note_id = n.id
+     WHERE c.patient_id = $1 AND c.organization_id = $2
+     ORDER BY c.communication_date DESC NULLS LAST, c.created_at DESC`,
+    [patientId, organizationId]
+  );
+
+  return result.rows;
+};
+
+/**
+ * Create follow-up from actionable item
+ */
+export const createFollowUpFromActionableItem = async (itemId, userId) => {
+  // Get the actionable item
+  const itemResult = await query(
+    `SELECT * FROM old_note_actionable_items WHERE id = $1`,
+    [itemId]
+  );
+
+  if (itemResult.rows.length === 0) {
+    throw new Error('Actionable item not found');
+  }
+
+  const item = itemResult.rows[0];
+
+  // Create follow-up entry
+  const followUpResult = await query(
+    `INSERT INTO follow_ups
+     (patient_id, organization_id, follow_up_date, reason, priority, status, created_by)
+     VALUES ($1, $2, $3, $4, $5, 'PENDING', $6)
+     RETURNING *`,
+    [
+      item.patient_id,
+      item.organization_id,
+      item.due_date || new Date(),
+      item.description || item.title,
+      item.priority,
+      userId
+    ]
+  );
+
+  const followUp = followUpResult.rows[0];
+
+  // Link actionable item to follow-up
+  await query(
+    `UPDATE old_note_actionable_items
+     SET followup_id = $1, updated_at = NOW()
+     WHERE id = $2`,
+    [followUp.id, itemId]
+  );
+
+  logger.info(`Created follow-up ${followUp.id} from actionable item ${itemId}`);
+
+  return followUp;
+};
+
 export default {
   createBatch,
   importJournalNote,
@@ -527,5 +845,15 @@ export default {
   convertToEncounter,
   getBatchInfo,
   deleteImportedNote,
-  updateNoteSoapData
+  updateNoteSoapData,
+  getActionableItemsByNote,
+  getActionableItemsByPatient,
+  updateActionableItemStatus,
+  completeActionableItem,
+  uncompleteActionableItem,
+  assignActionableItem,
+  deleteActionableItem,
+  getCommunicationHistoryByNote,
+  getCommunicationHistoryByPatient,
+  createFollowUpFromActionableItem
 };

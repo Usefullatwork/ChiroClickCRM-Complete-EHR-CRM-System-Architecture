@@ -15,7 +15,17 @@ import {
   convertToEncounter,
   getBatchInfo,
   deleteImportedNote,
-  updateNoteSoapData
+  updateNoteSoapData,
+  getActionableItemsByNote,
+  getActionableItemsByPatient,
+  updateActionableItemStatus,
+  completeActionableItem,
+  uncompleteActionableItem,
+  assignActionableItem,
+  deleteActionableItem,
+  getCommunicationHistoryByNote,
+  getCommunicationHistoryByPatient,
+  createFollowUpFromActionableItem
 } from '../services/oldNotes.js';
 import { query } from '../config/database.js';
 
@@ -399,6 +409,183 @@ export const processBatch = async (req, res) => {
   }
 };
 
+/**
+ * Get actionable items for a note
+ */
+export const getActionableItems = async (req, res) => {
+  try {
+    const { noteId } = req.params;
+    const organizationId = req.user.organization_id;
+
+    const items = await getActionableItemsByNote(noteId, organizationId);
+    res.json(items);
+
+  } catch (error) {
+    logger.error('Get actionable items error:', error);
+    res.status(500).json({ error: 'Failed to retrieve actionable items' });
+  }
+};
+
+/**
+ * Get all actionable items for a patient
+ */
+export const getPatientActionableItems = async (req, res) => {
+  try {
+    const { patientId } = req.params;
+    const organizationId = req.user.organization_id;
+    const { status, itemType, includeCompleted } = req.query;
+
+    const filters = {
+      status,
+      itemType,
+      includeCompleted: includeCompleted === 'true'
+    };
+
+    const items = await getActionableItemsByPatient(patientId, organizationId, filters);
+    res.json(items);
+
+  } catch (error) {
+    logger.error('Get patient actionable items error:', error);
+    res.status(500).json({ error: 'Failed to retrieve actionable items' });
+  }
+};
+
+/**
+ * Complete an actionable item (check the box)
+ */
+export const completeItem = async (req, res) => {
+  try {
+    const { itemId } = req.params;
+    const { notes } = req.body;
+    const userId = req.user.id;
+
+    const item = await completeActionableItem(itemId, userId, notes);
+    res.json(item);
+
+  } catch (error) {
+    logger.error('Complete item error:', error);
+    res.status(500).json({ error: 'Failed to complete item' });
+  }
+};
+
+/**
+ * Uncomplete an actionable item (uncheck the box)
+ */
+export const uncompleteItem = async (req, res) => {
+  try {
+    const { itemId } = req.params;
+
+    const item = await uncompleteActionableItem(itemId);
+    res.json(item);
+
+  } catch (error) {
+    logger.error('Uncomplete item error:', error);
+    res.status(500).json({ error: 'Failed to uncomplete item' });
+  }
+};
+
+/**
+ * Update item status
+ */
+export const updateItemStatus = async (req, res) => {
+  try {
+    const { itemId } = req.params;
+    const { status } = req.body;
+    const userId = req.user.id;
+
+    const item = await updateActionableItemStatus(itemId, status, userId);
+    res.json(item);
+
+  } catch (error) {
+    logger.error('Update item status error:', error);
+    res.status(500).json({ error: 'Failed to update item status' });
+  }
+};
+
+/**
+ * Assign item to user
+ */
+export const assignItem = async (req, res) => {
+  try {
+    const { itemId } = req.params;
+    const { userId } = req.body;
+
+    const item = await assignActionableItem(itemId, userId);
+    res.json(item);
+
+  } catch (error) {
+    logger.error('Assign item error:', error);
+    res.status(500).json({ error: 'Failed to assign item' });
+  }
+};
+
+/**
+ * Delete actionable item
+ */
+export const deleteItem = async (req, res) => {
+  try {
+    const { itemId } = req.params;
+
+    await deleteActionableItem(itemId);
+    res.json({ success: true });
+
+  } catch (error) {
+    logger.error('Delete item error:', error);
+    res.status(500).json({ error: 'Failed to delete item' });
+  }
+};
+
+/**
+ * Get communication history for a note
+ */
+export const getCommunicationHistory = async (req, res) => {
+  try {
+    const { noteId } = req.params;
+    const organizationId = req.user.organization_id;
+
+    const history = await getCommunicationHistoryByNote(noteId, organizationId);
+    res.json(history);
+
+  } catch (error) {
+    logger.error('Get communication history error:', error);
+    res.status(500).json({ error: 'Failed to retrieve communication history' });
+  }
+};
+
+/**
+ * Get communication history for a patient
+ */
+export const getPatientCommunicationHistory = async (req, res) => {
+  try {
+    const { patientId } = req.params;
+    const organizationId = req.user.organization_id;
+
+    const history = await getCommunicationHistoryByPatient(patientId, organizationId);
+    res.json(history);
+
+  } catch (error) {
+    logger.error('Get patient communication history error:', error);
+    res.status(500).json({ error: 'Failed to retrieve communication history' });
+  }
+};
+
+/**
+ * Create follow-up from actionable item
+ */
+export const createFollowUpFromItem = async (req, res) => {
+  try {
+    const { itemId } = req.params;
+    const userId = req.user.id;
+
+    const followUp = await createFollowUpFromActionableItem(itemId, userId);
+    res.json(followUp);
+
+  } catch (error) {
+    logger.error('Create follow-up from item error:', error);
+    res.status(500).json({ error: 'Failed to create follow-up' });
+  }
+};
+
 export default {
   uploadNote,
   uploadMultipleNotes,
@@ -410,5 +597,15 @@ export default {
   getBatch,
   deleteNote,
   updateSoapData,
-  processBatch
+  processBatch,
+  getActionableItems,
+  getPatientActionableItems,
+  completeItem,
+  uncompleteItem,
+  updateItemStatus,
+  assignItem,
+  deleteItem,
+  getCommunicationHistory,
+  getPatientCommunicationHistory,
+  createFollowUpFromItem
 };
