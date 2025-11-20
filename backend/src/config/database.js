@@ -6,6 +6,7 @@
 import pkg from 'pg';
 const { Pool } = pkg;
 import dotenv from 'dotenv';
+import fs from 'fs';
 
 dotenv.config();
 
@@ -21,11 +22,17 @@ const poolConfig = {
   connectionTimeoutMillis: 10000,
 };
 
-// Enable SSL in production
+// Enable SSL in production with proper certificate validation
 if (process.env.NODE_ENV === 'production' || process.env.DB_SSL === 'true') {
   poolConfig.ssl = {
-    rejectUnauthorized: false
+    rejectUnauthorized: true,
+    // Optional: Load custom certificates if provided
+    ca: process.env.DB_SSL_CA ? fs.readFileSync(process.env.DB_SSL_CA) : undefined,
+    key: process.env.DB_SSL_KEY ? fs.readFileSync(process.env.DB_SSL_KEY) : undefined,
+    cert: process.env.DB_SSL_CERT ? fs.readFileSync(process.env.DB_SSL_CERT) : undefined
   };
+
+  console.log('✓ Database SSL enabled with certificate validation');
 }
 
 // Create connection pool

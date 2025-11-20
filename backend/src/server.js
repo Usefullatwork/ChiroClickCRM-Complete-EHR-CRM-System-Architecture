@@ -10,6 +10,8 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
+import { doubleCsrf } from 'csrf-csrf';
 import 'express-async-errors';
 
 import { healthCheck } from './config/database.js';
@@ -35,12 +37,33 @@ app.use(cors({
   origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Organization-Id']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Organization-Id', 'X-CSRF-Token']
 }));
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Cookie parser (required for CSRF)
+app.use(cookieParser());
+
+// CSRF Protection
+const {
+  generateToken,
+  doubleCsrfProtection,
+} = doubleCsrf({
+  getSecret: () => process.env.CSRF_SECRET || 'your-csrf-secret-change-in-production',
+  cookieName: '__Host-csrf-token',
+  cookieOptions: {
+    sameSite: 'strict',
+    path: '/',
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+  },
+  size: 64,
+  ignoredMethods: ['GET', 'HEAD', 'OPTIONS'],
+  getTokenFromRequest: (req) => req.headers['x-csrf-token'],
+});
 
 // Compression
 app.use(compression());
@@ -66,6 +89,9 @@ const limiter = rateLimit({
 });
 app.use(`/api/${API_VERSION}`, limiter);
 
+// Apply CSRF protection to all API routes (except GET requests)
+app.use(`/api/${API_VERSION}`, doubleCsrfProtection);
+
 // ============================================================================
 // ROUTES
 // ============================================================================
@@ -82,6 +108,12 @@ app.get('/health', async (req, res) => {
     version: API_VERSION,
     database: dbHealthy ? 'connected' : 'disconnected'
   });
+});
+
+// CSRF Token endpoint (must be called before any POST/PUT/PATCH/DELETE requests)
+app.get(`/api/${API_VERSION}/csrf-token`, (req, res) => {
+  const csrfToken = generateToken(req, res);
+  res.json({ csrfToken });
 });
 
 // API root
