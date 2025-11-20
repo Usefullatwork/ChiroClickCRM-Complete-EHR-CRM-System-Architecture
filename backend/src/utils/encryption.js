@@ -101,9 +101,46 @@ export const hash = (text) => {
 };
 
 /**
+ * Validate Norwegian fødselsnummer checksum using Modulo 11 algorithm
+ * @param {string} fodselsnummer - 11-digit Norwegian ID
+ * @returns {boolean} True if checksum is valid
+ */
+export const validateFodselsnummerChecksum = (fodselsnummer) => {
+  if (!fodselsnummer || fodselsnummer.length !== 11) {
+    return false;
+  }
+
+  // Weights for first control digit (position 10)
+  const weights1 = [3, 7, 6, 1, 8, 9, 4, 5, 2];
+  // Weights for second control digit (position 11)
+  const weights2 = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
+
+  const digits = fodselsnummer.split('').map(Number);
+
+  // Calculate first control digit
+  const sum1 = digits.slice(0, 9).reduce((sum, digit, i) =>
+    sum + digit * weights1[i], 0
+  );
+  let checksum1 = 11 - (sum1 % 11);
+  if (checksum1 === 11) checksum1 = 0;
+  if (checksum1 === 10) return false; // Invalid - cannot be 10
+
+  // Calculate second control digit
+  const sum2 = digits.slice(0, 10).reduce((sum, digit, i) =>
+    sum + digit * weights2[i], 0
+  );
+  let checksum2 = 11 - (sum2 % 11);
+  if (checksum2 === 11) checksum2 = 0;
+  if (checksum2 === 10) return false; // Invalid - cannot be 10
+
+  // Validate both checksums match
+  return digits[9] === checksum1 && digits[10] === checksum2;
+};
+
+/**
  * Validate Norwegian fødselsnummer (11 digits)
  * @param {string} fodselsnummer - Norwegian personal ID
- * @returns {boolean} True if valid format
+ * @returns {boolean} True if valid format and checksum
  */
 export const validateFodselsnummer = (fodselsnummer) => {
   if (!fodselsnummer) return false;
@@ -126,8 +163,10 @@ export const validateFodselsnummer = (fodselsnummer) => {
     return false;
   }
 
-  // TODO: Implement full checksum validation (Modulo 11 algorithm)
-  // For now, we just validate format
+  // Validate Modulo 11 checksum
+  if (!validateFodselsnummerChecksum(cleaned)) {
+    return false;
+  }
 
   return true;
 };

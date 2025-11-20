@@ -15,7 +15,32 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, // Required for CSRF cookies
 })
+
+// CSRF Token Management
+let csrfToken = null
+
+/**
+ * Initialize CSRF protection by fetching token
+ * Should be called when app starts
+ */
+export const initializeCSRF = async () => {
+  try {
+    const response = await apiClient.get('/csrf-token')
+    csrfToken = response.data.csrfToken
+
+    // Add CSRF token to all requests
+    apiClient.defaults.headers.common['X-CSRF-Token'] = csrfToken
+
+    console.log('✓ CSRF protection initialized')
+  } catch (error) {
+    console.error('Failed to fetch CSRF token:', error)
+  }
+}
+
+// Refresh CSRF token periodically (every 30 minutes)
+setInterval(initializeCSRF, 30 * 60 * 1000)
 
 // Request interceptor - Add auth token and organization ID
 apiClient.interceptors.request.use(
