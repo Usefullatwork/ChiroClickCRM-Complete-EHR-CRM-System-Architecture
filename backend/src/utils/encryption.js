@@ -6,6 +6,7 @@
 
 import crypto from 'crypto';
 import dotenv from 'dotenv';
+import logger from './logger.js';
 
 dotenv.config();
 
@@ -14,8 +15,9 @@ const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
 
 // Validate encryption key
 if (!ENCRYPTION_KEY || ENCRYPTION_KEY.length !== 32) {
-  console.error('⚠️  WARNING: ENCRYPTION_KEY must be exactly 32 characters long');
-  console.error('⚠️  Please set a proper ENCRYPTION_KEY in your .env file');
+  logger.error('⚠️  WARNING: ENCRYPTION_KEY must be exactly 32 characters long');
+  logger.error('⚠️  Please set a proper ENCRYPTION_KEY in your .env file');
+  throw new Error('Invalid ENCRYPTION_KEY configuration');
 }
 
 /**
@@ -44,7 +46,7 @@ export const encrypt = (text) => {
     // Return IV + encrypted data (IV is needed for decryption)
     return iv.toString('hex') + ':' + encrypted;
   } catch (error) {
-    console.error('Encryption error:', error);
+    logger.error('Encryption error:', error);
     throw new Error('Failed to encrypt data');
   }
 };
@@ -80,7 +82,7 @@ export const decrypt = (encryptedText) => {
 
     return decrypted;
   } catch (error) {
-    console.error('Decryption error:', error);
+    logger.error('Decryption error:', error);
     throw new Error('Failed to decrypt data');
   }
 };
@@ -98,6 +100,49 @@ export const hash = (text) => {
     .createHash('sha256')
     .update(text)
     .digest('hex');
+};
+
+/**
+ * Validate Norwegian fødselsnummer checksum (Modulo 11)
+ * @param {string} fodselsnummer - Cleaned 11-digit fødselsnummer
+ * @returns {boolean} True if checksum is valid
+ */
+const validateFodselsnummerChecksum = (fodselsnummer) => {
+  // Weights for first check digit (K1)
+  const weights1 = [3, 7, 6, 1, 8, 9, 4, 5, 2];
+  // Weights for second check digit (K2)
+  const weights2 = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
+
+  // Calculate K1 (check digit 1)
+  let sum1 = 0;
+  for (let i = 0; i < 9; i++) {
+    sum1 += parseInt(fodselsnummer[i]) * weights1[i];
+  }
+  const k1 = 11 - (sum1 % 11);
+  const expectedK1 = k1 === 11 ? 0 : k1;
+
+  if (parseInt(fodselsnummer[9]) !== expectedK1) {
+    return false;
+  }
+
+  // Calculate K2 (check digit 2)
+  let sum2 = 0;
+  for (let i = 0; i < 10; i++) {
+    sum2 += parseInt(fodselsnummer[i]) * weights2[i];
+  }
+  const k2 = 11 - (sum2 % 11);
+  const expectedK2 = k2 === 11 ? 0 : k2;
+
+  if (parseInt(fodselsnummer[10]) !== expectedK2) {
+    return false;
+  }
+
+  // Special case: if either checksum equals 10, the number is invalid
+  if (k1 === 10 || k2 === 10) {
+    return false;
+  }
+
+  return true;
 };
 
 /**
@@ -126,10 +171,9 @@ export const validateFodselsnummer = (fodselsnummer) => {
     return false;
   }
 
-  // TODO: Implement full checksum validation (Modulo 11 algorithm)
-  // For now, we just validate format
-
-  return true;
+  // Implement Modulo 11 checksum validation
+  // Norwegian fødselsnummer uses two check digits (K1 at pos 9, K2 at pos 10)
+  return validateFodselsnummerChecksum(cleaned);
 };
 
 /**

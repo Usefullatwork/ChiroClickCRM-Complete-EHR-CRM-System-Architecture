@@ -6,6 +6,7 @@
 import pkg from 'pg';
 const { Pool } = pkg;
 import dotenv from 'dotenv';
+import logger from '../utils/logger.js';
 
 dotenv.config();
 
@@ -33,13 +34,13 @@ const pool = new Pool(poolConfig);
 
 // Connection error handling
 pool.on('error', (err, client) => {
-  console.error('Unexpected error on idle client', err);
+  logger.error('Unexpected error on idle client', { error: err.message, stack: err.stack });
   process.exit(-1);
 });
 
 // Test connection
 pool.on('connect', () => {
-  console.log('✓ Database connected successfully');
+  logger.info('✓ Database connected successfully');
 });
 
 /**
@@ -56,7 +57,7 @@ export const query = async (text, params) => {
 
     // Log slow queries (>1000ms)
     if (duration > 1000) {
-      console.warn('Slow query detected:', {
+      logger.warn('Slow query detected', {
         text: text.substring(0, 100),
         duration: `${duration}ms`,
         rows: res.rowCount
@@ -65,9 +66,10 @@ export const query = async (text, params) => {
 
     return res;
   } catch (error) {
-    console.error('Database query error:', {
+    logger.error('Database query error', {
       error: error.message,
-      query: text.substring(0, 100)
+      query: text.substring(0, 100),
+      stack: error.stack
     });
     throw error;
   }
@@ -112,7 +114,7 @@ export const healthCheck = async () => {
     const result = await query('SELECT NOW()');
     return result.rows.length > 0;
   } catch (error) {
-    console.error('Database health check failed:', error);
+    logger.error('Database health check failed', { error: error.message });
     return false;
   }
 };
@@ -122,7 +124,7 @@ export const healthCheck = async () => {
  */
 export const closePool = async () => {
   await pool.end();
-  console.log('✓ Database pool closed');
+  logger.info('✓ Database pool closed');
 };
 
 export default {
