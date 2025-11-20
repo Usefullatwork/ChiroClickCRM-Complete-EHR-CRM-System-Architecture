@@ -20,10 +20,12 @@ import {
   Clock,
   AlertCircle,
   MessageSquare,
-  Globe
+  Globe,
+  Upload
 } from 'lucide-react'
 import { patientsAPI, encountersAPI, appointmentsAPI } from '../services/api'
 import { formatDate, formatPhone, calculateAge } from '../lib/utils'
+import OldNotesImporter from '../components/OldNotesImporter'
 
 export default function PatientDetail() {
   const { id } = useParams()
@@ -31,6 +33,7 @@ export default function PatientDetail() {
   const queryClient = useQueryClient()
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({})
+  const [showOldNotesImporter, setShowOldNotesImporter] = useState(false)
 
   // Fetch patient data
   const { data: patientResponse, isLoading } = useQuery({
@@ -134,6 +137,13 @@ export default function PatientDetail() {
               >
                 <Edit className="w-4 h-4" />
                 Edit
+              </button>
+              <button
+                onClick={() => setShowOldNotesImporter(true)}
+                className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                <Upload className="w-4 h-4" />
+                Import Old Notes
               </button>
               <button
                 onClick={() => navigate(`/patients/${id}/encounter`)}
@@ -443,6 +453,14 @@ export default function PatientDetail() {
           </div>
         </div>
       </div>
+
+      {/* Old Notes Importer Modal */}
+      {showOldNotesImporter && (
+        <OldNotesImporter
+          patientId={id}
+          onClose={() => setShowOldNotesImporter(false)}
+        />
+      )}
     </div>
   )
 }

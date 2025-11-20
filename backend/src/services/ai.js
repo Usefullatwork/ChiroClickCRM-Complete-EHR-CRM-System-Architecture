@@ -318,6 +318,247 @@ export const learnFromOutcome = async (encounterId, outcomeData) => {
 };
 
 /**
+ * Organize and structure old journal notes using AI
+ * Converts unstructured text into structured clinical data + SOAP format
+ */
+export const organizeOldJournalNotes = async (noteContent, patientContext = {}) => {
+  const systemPrompt = `Du er en erfaren kiropraktor-assistent som er ekspert på å organisere og strukturere gamle journalnotater.
+
+Din oppgave er å analysere ustrukturerte journalnotater og strukturere dem i et klinisk format.
+
+STEG 1: Analyser og ekstraher informasjon
+- Identifiser datoer (konsultasjonsdato, symptomstart, etc.)
+- Ekstraher symptomer, plager og sykehistorie
+- Finn objektive funn, undersøkelser og tester
+- Identifiser diagnoser (ICPC-2/ICD-10 koder hvis nevnt)
+- Ekstraher behandling og tiltak
+- Finn oppfølging og plan
+
+STEG 2: Organiser i SOAP-format
+Subjektivt (S):
+- Hovedplage og symptombeskrivelse
+- Sykehistorie og debut
+- Forverrende/lindrende faktorer
+- Tidligere behandling
+
+Objektivt (O):
+- Observasjon og inspeksjon
+- Palpasjonsfunn
+- Bevegelighet (ROM)
+- Ortopediske tester og resultater
+- Målinger (VAS, etc.)
+
+Vurdering (Assessment - A):
+- Klinisk resonnement
+- Differensialdiagnoser
+- Prognosevurdering
+- Diagnosekoder
+
+Plan (P):
+- Behandling utført/planlagt
+- Hjemmeøvelser og egentrening
+- Råd til pasient
+- Oppfølging
+
+Svar i JSON-format:
+{
+  "structured_data": {
+    "dates": ["YYYY-MM-DD"],
+    "chief_complaints": ["..."],
+    "symptoms": ["..."],
+    "findings": ["..."],
+    "diagnoses": ["..."],
+    "treatments": ["..."],
+    "follow_up": "..."
+  },
+  "soap": {
+    "subjective": {
+      "chief_complaint": "...",
+      "history": "...",
+      "aggravating_factors": "...",
+      "relieving_factors": "..."
+    },
+    "objective": {
+      "observation": "...",
+      "palpation": "...",
+      "rom": "...",
+      "ortho_tests": "...",
+      "measurements": {}
+    },
+    "assessment": {
+      "clinical_reasoning": "...",
+      "differential_diagnoses": ["..."],
+      "prognosis": "..."
+    },
+    "plan": {
+      "treatment": "...",
+      "home_exercises": "...",
+      "advice": "...",
+      "follow_up": "..."
+    }
+  },
+  "suggested_encounter_type": "FOLLOWUP",
+  "suggested_date": "YYYY-MM-DD",
+  "confidence_score": 0.85,
+  "missing_information": ["..."],
+  "notes": "Eventuelle merknader om noteringen"
+}`;
+
+  const prompt = `Pasientkontekst:
+Navn: ${patientContext.first_name || ''} ${patientContext.last_name || ''}
+Alder: ${patientContext.age || 'ukjent'}
+${patientContext.medical_history ? `Sykehistorie: ${patientContext.medical_history}` : ''}
+
+Gammel journalnotat som skal struktureres:
+---
+${noteContent}
+---
+
+Analyser og strukturer dette notatet i henhold til instruksjonene. Svar kun med JSON.`;
+
+  try {
+    const response = await generateCompletion(prompt, systemPrompt, {
+      maxTokens: 2000,
+      temperature: 0.4 // Lower temperature for more consistent structured output
+    });
+
+    // Parse JSON response
+    let organizedData;
+    try {
+      // Try to extract JSON from response (sometimes wrapped in markdown code blocks)
+      const jsonMatch = response.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        organizedData = JSON.parse(jsonMatch[0]);
+      } else {
+        organizedData = JSON.parse(response);
+      }
+    } catch (parseError) {
+      logger.error('JSON parse error in organizeOldJournalNotes:', parseError);
+      // Return fallback structure with raw text
+      organizedData = {
+        structured_data: {
+          raw_content: noteContent,
+          parsing_error: true
+        },
+        soap: {
+          subjective: { chief_complaint: noteContent.substring(0, 500) },
+          objective: {},
+          assessment: {},
+          plan: {}
+        },
+        confidence_score: 0.3,
+        notes: 'Kunne ikke fullstendig strukturere notatet automatisk. Manuell gjennomgang anbefales.'
+      };
+    }
+
+    return {
+      success: true,
+      organizedData,
+      rawResponse: response,
+      model: AI_MODEL,
+      provider: AI_PROVIDER
+    };
+
+  } catch (error) {
+    logger.error('Organize old journal notes error:', error);
+    return {
+      success: false,
+      error: error.message,
+      organizedData: null
+    };
+  }
+};
+
+/**
+ * Batch organize multiple old journal notes
+ * Useful for importing multiple notes at once
+ */
+export const organizeMultipleNotes = async (notes, patientContext = {}) => {
+  const results = [];
+
+  for (const note of notes) {
+    try {
+      const result = await organizeOldJournalNotes(note.content, patientContext);
+      results.push({
+        noteId: note.id || null,
+        filename: note.filename || null,
+        ...result
+      });
+
+      // Add small delay to avoid overwhelming the AI service
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } catch (error) {
+      results.push({
+        noteId: note.id || null,
+        filename: note.filename || null,
+        success: false,
+        error: error.message
+      });
+    }
+  }
+
+  return {
+    totalNotes: notes.length,
+    successfullyProcessed: results.filter(r => r.success).length,
+    results
+  };
+};
+
+/**
+ * Refine and merge multiple organized notes into a single comprehensive entry
+ * Useful when a patient has multiple old notes that should be consolidated
+ */
+export const mergeOrganizedNotes = async (organizedNotes, patientContext = {}) => {
+  const systemPrompt = `Du er en erfaren kiropraktor-assistent. Din oppgave er å samle og konsolidere flere journalnotater til én omfattende, kronologisk journalpost.
+
+Prinsipper:
+- Behold all viktig klinisk informasjon
+- Organiser kronologisk (eldst først)
+- Identifiser utviklingstrender (bedring/forverring)
+- Fjern duplikater
+- Lag et samlet klinisk bilde
+
+Svar i SOAP-format på norsk, med tydelig tidslinje.`;
+
+  const notesText = organizedNotes.map((note, index) =>
+    `=== Notat ${index + 1} (${note.suggested_date || 'ukjent dato'}) ===\n${JSON.stringify(note.soap, null, 2)}`
+  ).join('\n\n');
+
+  const prompt = `Pasientkontekst:
+Navn: ${patientContext.first_name || ''} ${patientContext.last_name || ''}
+
+Følgende notater skal konsolideres:
+${notesText}
+
+Lag ett samlet, kronologisk SOAP-notat som fanger hele pasienthistorikken.`;
+
+  try {
+    const merged = await generateCompletion(prompt, systemPrompt, {
+      maxTokens: 2000,
+      temperature: 0.5
+    });
+
+    return {
+      success: true,
+      mergedNote: merged.trim(),
+      sourceNotesCount: organizedNotes.length,
+      dateRange: {
+        earliest: organizedNotes.reduce((min, n) =>
+          !min || (n.suggested_date && n.suggested_date < min) ? n.suggested_date : min, null),
+        latest: organizedNotes.reduce((max, n) =>
+          !max || (n.suggested_date && n.suggested_date > max) ? n.suggested_date : max, null)
+      }
+    };
+  } catch (error) {
+    logger.error('Merge organized notes error:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+};
+
+/**
  * Get AI service status
  */
 export const getAIStatus = async () => {
@@ -359,5 +600,8 @@ export default {
   analyzeRedFlags,
   generateClinicalSummary,
   learnFromOutcome,
+  organizeOldJournalNotes,
+  organizeMultipleNotes,
+  mergeOrganizedNotes,
   getAIStatus
 };
