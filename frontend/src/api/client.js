@@ -343,6 +343,107 @@ export const api = {
       const response = await axiosInstance.get(`/audit/patient/${patientId}`);
       return response.data;
     }
+  },
+
+  /**
+   * Analytics API
+   * KPI metrics, reports, and business intelligence
+   */
+  analytics: {
+    /**
+     * Get KPI metrics for a time range
+     * @param {object} params - { timeRange: 'month'|'year', year, month? }
+     */
+    async getKPIs(params) {
+      const response = await axiosInstance.get('/analytics/kpis', { params });
+      return response.data;
+    },
+
+    /**
+     * Get patient metrics for charting
+     * @param {object} params - { timeRange: 'month'|'year', year, month? }
+     */
+    async getPatientMetrics(params) {
+      const response = await axiosInstance.get('/analytics/patient-metrics', { params });
+      return response.data;
+    },
+
+    /**
+     * Get reactivation opportunities
+     * Returns patients who haven't visited in 60-90 days
+     */
+    async getReactivationOpportunities() {
+      const response = await axiosInstance.get('/analytics/reactivation-opportunities');
+      return response.data;
+    },
+
+    /**
+     * Get message statistics
+     * @param {object} dateRange - { startDate, endDate }
+     */
+    async getMessageStats(dateRange) {
+      const response = await axiosInstance.get('/analytics/message-stats', {
+        params: dateRange
+      });
+      return response.data;
+    },
+
+    /**
+     * Get appointment analytics
+     * @param {object} params - { year, month? }
+     */
+    async getAppointmentAnalytics(params) {
+      const response = await axiosInstance.get('/analytics/appointments', { params });
+      return response.data;
+    },
+
+    /**
+     * Get practitioner performance metrics
+     * @param {object} params - { year, month?, practitionerId? }
+     */
+    async getPractitionerMetrics(params) {
+      const response = await axiosInstance.get('/analytics/practitioner-metrics', { params });
+      return response.data;
+    },
+
+    /**
+     * Send KPI report via email
+     * @param {object} data - { recipients, subject, message, kpiData, dateRange, timeRange }
+     */
+    async sendKPIReport(data) {
+      const response = await axiosInstance.post('/analytics/send-report', data);
+      return response.data;
+    },
+
+    /**
+     * Export KPI data to CSV
+     * @param {object} params - { year, month?, timeRange }
+     */
+    async exportKPIData(params) {
+      const response = await axiosInstance.get('/analytics/export', {
+        params,
+        responseType: 'blob'
+      });
+      return response.data;
+    },
+
+    /**
+     * Get dashboard summary
+     * High-level overview for main dashboard
+     */
+    async getDashboardSummary() {
+      const response = await axiosInstance.get('/analytics/dashboard-summary');
+      return response.data;
+    },
+
+    /**
+     * Get retention cohort analysis
+     * @param {object} params - { year }
+     */
+    async getRetentionCohorts(params) {
+      const response = await axiosInstance.get('/analytics/retention-cohorts', { params });
+      return response.data;
+    }
   }
 };
 
