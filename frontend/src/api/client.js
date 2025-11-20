@@ -443,6 +443,26 @@ export const api = {
     async getRetentionCohorts(params) {
       const response = await axiosInstance.get('/analytics/retention-cohorts', { params });
       return response.data;
+    },
+
+    /**
+     * Get weekend differential analytics
+     * Returns Saturday vs. weekday breakdown with geographic correlation
+     * @param {object} params - { timeRange: 'month'|'year', year, month? }
+     */
+    async getWeekendDifferentials(params) {
+      const response = await axiosInstance.get('/analytics/weekend-differentials', { params });
+      return response.data;
+    },
+
+    /**
+     * Get Saturday visit details
+     * Returns list of all Saturday visits with patient location data
+     * @param {object} params - { year, month }
+     */
+    async getSaturdayVisits(params) {
+      const response = await axiosInstance.get('/analytics/saturday-visits', { params });
+      return response.data;
     }
   }
 };

@@ -9,7 +9,8 @@ import {
   Mail,
   Download,
   Filter,
-  BarChart3
+  BarChart3,
+  MapPin
 } from 'lucide-react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
@@ -17,6 +18,7 @@ import { Badge } from '../ui/Badge';
 import { useKPIs, usePatientMetrics } from '../../hooks/useAnalytics';
 import { KPIChart } from './KPIChart';
 import { EmailReportModal } from './EmailReportModal';
+import { WeekendDifferentialAnalysis } from './WeekendDifferentialAnalysis';
 
 /**
  * KPI Dashboard Component
@@ -27,12 +29,14 @@ import { EmailReportModal } from './EmailReportModal';
  * - Messages sent
  * - Active patients
  * - Appointment statistics
+ * - Weekend differential analysis (Saturday vs. weekday, Oslo vs. non-Oslo)
  *
  * Features:
  * - Monthly/yearly filtering
  * - Trend comparisons
  * - Chart visualizations
  * - Email reports to clinic leads
+ * - Weekend/geographic segmentation
  */
 export const KPIDashboard = () => {
   const [timeRange, setTimeRange] = useState('month'); // 'month' or 'year'
@@ -44,6 +48,7 @@ export const KPIDashboard = () => {
     };
   });
   const [showEmailModal, setShowEmailModal] = useState(false);
+  const [viewMode, setViewMode] = useState('standard'); // 'standard' or 'weekend'
 
   // Fetch KPI data
   const { data: kpis, isLoading } = useKPIs(timeRange, selectedDate);
@@ -164,55 +169,91 @@ export const KPIDashboard = () => {
         </div>
       </div>
 
-      {/* Time range selector */}
+      {/* View Mode & Time Range Selector */}
       <Card>
         <Card.Body>
-          <div className="flex items-center justify-between">
+          <div className="space-y-4">
+            {/* View Mode Toggle */}
             <div className="flex items-center gap-2">
-              <Filter size={18} className="text-slate-400" />
-              <span className="text-sm font-medium text-slate-700">View:</span>
+              <BarChart3 size={18} className="text-slate-400" />
+              <span className="text-sm font-medium text-slate-700">Analytics View:</span>
               <div className="flex gap-2">
                 <Button
-                  variant={timeRange === 'month' ? 'primary' : 'outline'}
+                  variant={viewMode === 'standard' ? 'primary' : 'outline'}
                   size="sm"
-                  onClick={() => setTimeRange('month')}
+                  onClick={() => setViewMode('standard')}
                 >
-                  Monthly
+                  Standard KPIs
                 </Button>
                 <Button
-                  variant={timeRange === 'year' ? 'primary' : 'outline'}
+                  variant={viewMode === 'weekend' ? 'primary' : 'outline'}
                   size="sm"
-                  onClick={() => setTimeRange('year')}
+                  onClick={() => setViewMode('weekend')}
+                  icon={MapPin}
                 >
-                  Yearly
+                  Weekend Differential
                 </Button>
               </div>
             </div>
 
-            {/* Date navigator */}
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => timeRange === 'month' ? handleMonthChange(-1) : handleYearChange(-1)}
-              >
-                ← Previous
-              </Button>
-              <span className="text-lg font-semibold text-slate-900 min-w-[180px] text-center">
-                {formatDateRange()}
-              </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => timeRange === 'month' ? handleMonthChange(1) : handleYearChange(1)}
-              >
-                Next →
-              </Button>
+            {/* Time Range & Date Navigator */}
+            <div className="flex items-center justify-between pt-3 border-t border-slate-200">
+              <div className="flex items-center gap-2">
+                <Filter size={18} className="text-slate-400" />
+                <span className="text-sm font-medium text-slate-700">Time Range:</span>
+                <div className="flex gap-2">
+                  <Button
+                    variant={timeRange === 'month' ? 'primary' : 'outline'}
+                    size="sm"
+                    onClick={() => setTimeRange('month')}
+                  >
+                    Monthly
+                  </Button>
+                  <Button
+                    variant={timeRange === 'year' ? 'primary' : 'outline'}
+                    size="sm"
+                    onClick={() => setTimeRange('year')}
+                  >
+                    Yearly
+                  </Button>
+                </div>
+              </div>
+
+              {/* Date navigator */}
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => timeRange === 'month' ? handleMonthChange(-1) : handleYearChange(-1)}
+                >
+                  ← Previous
+                </Button>
+                <span className="text-lg font-semibold text-slate-900 min-w-[180px] text-center">
+                  {formatDateRange()}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => timeRange === 'month' ? handleMonthChange(1) : handleYearChange(1)}
+                >
+                  Next →
+                </Button>
+              </div>
             </div>
           </div>
         </Card.Body>
       </Card>
 
+      {/* Conditional Content Based on View Mode */}
+      {viewMode === 'weekend' ? (
+        /* Weekend Differential Analysis */
+        <WeekendDifferentialAnalysis
+          timeRange={timeRange}
+          selectedDate={selectedDate}
+        />
+      ) : (
+        /* Standard KPI View */
+        <>
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total Visits */}
@@ -468,6 +509,8 @@ export const KPIDashboard = () => {
             </Card.Body>
           </Card>
         </div>
+      )}
+        </>
       )}
 
       {/* Email Report Modal */}

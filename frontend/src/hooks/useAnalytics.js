@@ -263,3 +263,63 @@ export const useRetentionCohorts = (year) => {
     }
   );
 };
+
+/**
+ * Fetch weekend differential analytics
+ *
+ * Returns analysis of Saturday visits and geographic correlation
+ * Key metrics:
+ * - Weekday vs. Saturday visit breakdown
+ * - Oslo vs. non-Oslo patient distribution
+ * - Saturday + non-Oslo correlation
+ * - PVA differentials (weekday PVA vs. Saturday PVA)
+ *
+ * @param {string} timeRange - 'month' or 'year'
+ * @param {object} selectedDate - { year, month }
+ * @returns {object} Query result with weekend differential data
+ */
+export const useWeekendDifferentials = (timeRange, selectedDate) => {
+  return useQuery(
+    ['weekend-differentials', timeRange, selectedDate.year, selectedDate.month],
+    async () => {
+      const params = {
+        timeRange,
+        year: selectedDate.year
+      };
+
+      if (timeRange === 'month') {
+        params.month = selectedDate.month;
+      }
+
+      const response = await api.analytics.getWeekendDifferentials(params);
+      return response;
+    },
+    {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      enabled: !!selectedDate.year
+    }
+  );
+};
+
+/**
+ * Fetch Saturday visit details for correlation analysis
+ *
+ * Returns list of all Saturday visits with patient location data
+ * for detailed analysis and email reports
+ *
+ * @param {object} params - { year, month }
+ * @returns {object} Query result with Saturday visit list
+ */
+export const useSaturdayVisits = (params) => {
+  return useQuery(
+    ['saturday-visits', params.year, params.month],
+    async () => {
+      const response = await api.analytics.getSaturdayVisits(params);
+      return response;
+    },
+    {
+      staleTime: 10 * 60 * 1000, // 10 minutes
+      enabled: !!params.year
+    }
+  );
+};
