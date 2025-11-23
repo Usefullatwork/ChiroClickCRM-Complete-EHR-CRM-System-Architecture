@@ -122,6 +122,13 @@ CREATE TABLE patients (
   total_visits INTEGER DEFAULT 0,
   lifetime_value DECIMAL(10,2) DEFAULT 0,
 
+  -- CRM follow-up tracking
+  should_be_followed_up DATE, -- Date when patient should be contacted for follow-up
+  main_problem TEXT, -- Primary complaint or diagnosis
+  preferred_contact_method VARCHAR(10) CHECK (preferred_contact_method IN ('SMS', 'EMAIL', 'PHONE')),
+  needs_feedback BOOLEAN DEFAULT false, -- Flag for patients needing outcome feedback
+  preferred_therapist_id UUID REFERENCES users(id), -- Preferred practitioner
+
   -- Notes
   internal_notes TEXT, -- Staff-only notes
 
@@ -310,9 +317,11 @@ CREATE TABLE follow_ups (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
   patient_id UUID REFERENCES patients(id) ON DELETE CASCADE,
+  encounter_id UUID REFERENCES clinical_encounters(id) ON DELETE SET NULL,
 
   -- Task details
-  type VARCHAR(30) CHECK (type IN ('RECALL_3M', 'RECALL_6M', 'BIRTHDAY', 'CHECK_IN', 'INSURANCE_EXPIRING', 'OUTCOME_MEASURE', 'CUSTOM')) NOT NULL,
+  follow_up_type VARCHAR(30) CHECK (follow_up_type IN ('RECALL_3M', 'RECALL_6M', 'BIRTHDAY', 'CHECK_IN', 'INSURANCE_EXPIRING', 'OUTCOME_MEASURE', 'APPOINTMENT', 'CUSTOM')) NOT NULL,
+  reason TEXT,
   priority VARCHAR(10) CHECK (priority IN ('HIGH', 'MEDIUM', 'LOW')) DEFAULT 'MEDIUM',
   due_date DATE NOT NULL,
 
@@ -381,6 +390,9 @@ CREATE TABLE financial_metrics (
   -- Invoice
   invoice_number VARCHAR(50),
   invoice_sent_at TIMESTAMP,
+
+  -- Notes
+  notes TEXT, -- Additional notes for this financial transaction
 
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
@@ -554,6 +566,8 @@ CREATE INDEX idx_patients_status ON patients(status);
 CREATE INDEX idx_patients_category ON patients(category);
 CREATE INDEX idx_patients_name ON patients(last_name, first_name);
 CREATE INDEX idx_patients_last_visit ON patients(last_visit_date);
+CREATE INDEX idx_patients_should_be_followed_up ON patients(should_be_followed_up) WHERE should_be_followed_up IS NOT NULL;
+CREATE INDEX idx_patients_preferred_therapist_id ON patients(preferred_therapist_id);
 
 -- Clinical Encounters
 CREATE INDEX idx_encounters_organization_id ON clinical_encounters(organization_id);

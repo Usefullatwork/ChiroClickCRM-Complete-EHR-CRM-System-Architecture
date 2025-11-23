@@ -167,7 +167,7 @@ export const updatePaymentStatus = async (organizationId, metricId, updateData) 
   const {
     payment_status,
     payment_method = null,
-    payment_date = null,
+    paid_at = null,
     notes = null
   } = updateData;
 
@@ -181,9 +181,9 @@ export const updatePaymentStatus = async (organizationId, metricId, updateData) 
     paramIndex++;
   }
 
-  if (payment_date !== null) {
-    updates.push(`payment_date = $${paramIndex}`);
-    params.push(payment_date);
+  if (paid_at !== null) {
+    updates.push(`paid_at = $${paramIndex}`);
+    params.push(paid_at);
     paramIndex++;
   }
 

@@ -85,14 +85,19 @@ export const getClient = async () => {
 /**
  * Transaction helper
  * @param {function} callback - Function containing transaction logic
+ * @param {object} options - Transaction options (isolationLevel)
  * @returns {Promise<any>} Transaction result
  */
-export const transaction = async (callback) => {
+export const transaction = async (callback, options = {}) => {
   const client = await pool.connect();
+  const isolationLevel = options.isolationLevel || 'READ COMMITTED';
 
   try {
-    await client.query('BEGIN');
+    // Start transaction with specified isolation level
+    await client.query(`BEGIN ISOLATION LEVEL ${isolationLevel}`);
+
     const result = await callback(client);
+
     await client.query('COMMIT');
     return result;
   } catch (error) {
@@ -100,6 +105,25 @@ export const transaction = async (callback) => {
     throw error;
   } finally {
     client.release();
+  }
+};
+
+/**
+ * Savepoint helper for nested transactions
+ * @param {object} client - Database client from transaction
+ * @param {string} name - Savepoint name
+ * @param {function} callback - Function containing savepoint logic
+ * @returns {Promise<any>} Savepoint result
+ */
+export const savepoint = async (client, name, callback) => {
+  try {
+    await client.query(`SAVEPOINT ${name}`);
+    const result = await callback(client);
+    await client.query(`RELEASE SAVEPOINT ${name}`);
+    return result;
+  } catch (error) {
+    await client.query(`ROLLBACK TO SAVEPOINT ${name}`);
+    throw error;
   }
 };
 
@@ -129,6 +153,7 @@ export default {
   query,
   getClient,
   transaction,
+  savepoint,
   healthCheck,
   closePool
 };

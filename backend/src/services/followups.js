@@ -334,7 +334,7 @@ export const getPatientsNeedingFollowUp = async (organizationId) => {
       p.main_problem,
       p.last_visit_date,
       p.preferred_contact_method,
-      p.language,
+      p.preferred_language,
       u.first_name || ' ' || u.last_name as preferred_therapist_name
     FROM patients p
     LEFT JOIN users u ON u.id = p.preferred_therapist_id
