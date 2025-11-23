@@ -7,7 +7,9 @@ import { Save, FileText, AlertTriangle, CheckCircle, Brain, X, Sparkles, BookOpe
 import TemplatePicker from '../components/TemplatePicker';
 import ExaminationProtocolPicker from '../components/ExaminationProtocolPicker';
 import StructuredExaminationForm from '../components/StructuredExaminationForm';
+import BatchExaminationForm from '../components/BatchExaminationForm';
 import ExaminationFindingsList from '../components/ExaminationFindingsList';
+import ExaminationHistory from '../components/ExaminationHistory';
 import RedFlagAlerts from '../components/RedFlagAlerts';
 
 export default function ClinicalEncounter() {
@@ -26,6 +28,7 @@ export default function ClinicalEncounter() {
   // Examination system state
   const [showExaminationPicker, setShowExaminationPicker] = useState(false);
   const [showExaminationForm, setShowExaminationForm] = useState(false);
+  const [showBatchExaminationForm, setShowBatchExaminationForm] = useState(false);
   const [selectedProtocol, setSelectedProtocol] = useState(null);
 
   // Form state - SOAP format
@@ -550,11 +553,18 @@ export default function ClinicalEncounter() {
                     </div>
                     <div className="flex gap-2">
                       <button
+                        onClick={() => setShowBatchExaminationForm(true)}
+                        className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-colors shadow-md"
+                      >
+                        <Sparkles className="w-4 h-4" />
+                        Hurtigregistrering
+                      </button>
+                      <button
                         onClick={() => setShowExaminationPicker(true)}
                         className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
                       >
                         <ClipboardList className="w-4 h-4" />
-                        Legg til undersøkelse
+                        Enkelttest
                       </button>
                       <button
                         onClick={generateExaminationSummary}
@@ -567,6 +577,14 @@ export default function ClinicalEncounter() {
                   </div>
 
                   <ExaminationFindingsList encounterId={encounterId} />
+
+                  {/* Examination History / Progress Tracking */}
+                  <div className="mt-4">
+                    <ExaminationHistory
+                      patientId={patientId}
+                      currentEncounterId={encounterId}
+                    />
+                  </div>
                 </div>
               )}
 
@@ -942,6 +960,14 @@ export default function ClinicalEncounter() {
           setShowExaminationForm(false);
           setSelectedProtocol(null);
         }}
+      />
+
+      {/* Batch Examination Form */}
+      <BatchExaminationForm
+        encounterId={encounterId}
+        chiefComplaint={encounterData.subjective?.chief_complaint}
+        isOpen={showBatchExaminationForm}
+        onClose={() => setShowBatchExaminationForm(false)}
       />
     </div>
   );

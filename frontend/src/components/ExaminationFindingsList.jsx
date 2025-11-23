@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { examinationsAPI } from '../services/api';
-import { Edit2, Trash2, AlertTriangle, CheckCircle, XCircle, HelpCircle, FileText } from 'lucide-react';
+import { Edit2, Trash2, AlertTriangle, CheckCircle, XCircle, HelpCircle, FileText, Filter, Copy, Download } from 'lucide-react';
 import StructuredExaminationForm from './StructuredExaminationForm';
 
 export default function ExaminationFindingsList({ encounterId }) {
@@ -9,6 +9,9 @@ export default function ExaminationFindingsList({ encounterId }) {
   const [editingFinding, setEditingFinding] = useState(null);
   const [showEditForm, setShowEditForm] = useState(false);
   const [expandedRegions, setExpandedRegions] = useState({});
+  const [filterResult, setFilterResult] = useState('all');
+  const [filterRegion, setFilterRegion] = useState('all');
+  const [showFilters, setShowFilters] = useState(false);
 
   // Fetch findings for this encounter
   const { data: findings, isLoading } = useQuery({
@@ -93,6 +96,50 @@ export default function ExaminationFindingsList({ encounterId }) {
     );
   };
 
+  const copyFindingToClipboard = (finding) => {
+    const text = `${finding.test_name}: ${getResultText(finding.result)}${
+      finding.findings_text ? ` - ${finding.findings_text}` : ''
+    }`;
+    navigator.clipboard.writeText(text);
+    alert('Funn kopiert til utklippstavle');
+  };
+
+  const exportFindings = () => {
+    if (!findings?.data || findings.data.length === 0) return;
+
+    const text = findings.data
+      .map(f => `${f.body_region} - ${f.test_name}: ${getResultText(f.result)}${
+        f.findings_text ? ` - ${f.findings_text}` : ''
+      }`)
+      .join('\n');
+
+    navigator.clipboard.writeText(text);
+    alert('Alle funn kopiert til utklippstavle');
+  };
+
+  const filterFindings = (findingsData) => {
+    if (!findingsData) return {};
+
+    return Object.entries(findingsData).reduce((acc, [region, regionFindings]) => {
+      // Filter by region
+      if (filterRegion !== 'all' && region !== filterRegion) {
+        return acc;
+      }
+
+      // Filter by result
+      const filtered = regionFindings.filter(finding => {
+        if (filterResult === 'all') return true;
+        return finding.result === filterResult;
+      });
+
+      if (filtered.length > 0) {
+        acc[region] = filtered;
+      }
+
+      return acc;
+    }, {});
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -121,17 +168,79 @@ export default function ExaminationFindingsList({ encounterId }) {
     return acc;
   }, {});
 
+  // Apply filters
+  const filteredFindings = filterFindings(findingsByRegion);
+  const filteredCount = Object.values(filteredFindings).reduce((sum, arr) => sum + arr.length, 0);
+
+  // Get unique regions for filter
+  const availableRegions = Object.keys(findingsByRegion);
+
   return (
     <>
       <div className="space-y-4">
+        {/* Header with Actions */}
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-gray-900">
-            Undersøkelsesfunn ({findings.data.length})
+            Undersøkelsesfunn ({filteredCount} av {findings.data.length})
           </h3>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <Filter className="w-3.5 h-3.5" />
+              Filtrer
+            </button>
+            <button
+              onClick={exportFindings}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <Download className="w-3.5 h-3.5" />
+              Eksporter
+            </button>
+          </div>
         </div>
 
+        {/* Filters */}
+        {showFilters && (
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-2">
+                  Filtrer etter resultat
+                </label>
+                <select
+                  value={filterResult}
+                  onChange={(e) => setFilterResult(e.target.value)}
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">Alle resultater</option>
+                  <option value="positive">Kun positive</option>
+                  <option value="negative">Kun negative</option>
+                  <option value="equivocal">Kun uklare</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-2">
+                  Filtrer etter region
+                </label>
+                <select
+                  value={filterRegion}
+                  onChange={(e) => setFilterRegion(e.target.value)}
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">Alle regioner</option>
+                  {availableRegions.map(region => (
+                    <option key={region} value={region}>{region}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="space-y-3">
-          {Object.entries(findingsByRegion).map(([region, regionFindings]) => (
+          {Object.entries(filteredFindings).map(([region, regionFindings]) => (
             <div key={region} className="border border-gray-200 rounded-lg overflow-hidden">
               {/* Region Header */}
               <button
@@ -226,6 +335,13 @@ export default function ExaminationFindingsList({ encounterId }) {
 
                         {/* Actions */}
                         <div className="flex gap-1 flex-shrink-0">
+                          <button
+                            onClick={() => copyFindingToClipboard(finding)}
+                            className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                            title="Kopier"
+                          >
+                            <Copy className="w-4 h-4" />
+                          </button>
                           <button
                             onClick={() => handleEdit(finding)}
                             className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
