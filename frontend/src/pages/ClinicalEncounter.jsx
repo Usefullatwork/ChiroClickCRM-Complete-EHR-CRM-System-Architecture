@@ -1,10 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { encountersAPI, patientsAPI, diagnosisAPI, treatmentsAPI } from '../services/api';
+import { encountersAPI, patientsAPI, diagnosisAPI, treatmentsAPI, examinationsAPI } from '../services/api';
 import { formatDate } from '../lib/utils';
-import { Save, FileText, AlertTriangle, CheckCircle, Brain, X, Sparkles, BookOpen } from 'lucide-react';
+import { Save, FileText, AlertTriangle, CheckCircle, Brain, X, Sparkles, BookOpen, Stethoscope, ClipboardList } from 'lucide-react';
 import TemplatePicker from '../components/TemplatePicker';
+import ExaminationProtocolPicker from '../components/ExaminationProtocolPicker';
+import StructuredExaminationForm from '../components/StructuredExaminationForm';
+import ExaminationFindingsList from '../components/ExaminationFindingsList';
+import RedFlagAlerts from '../components/RedFlagAlerts';
 
 export default function ClinicalEncounter() {
   const { patientId, encounterId } = useParams();
@@ -18,6 +22,11 @@ export default function ClinicalEncounter() {
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
   const [activeField, setActiveField] = useState(null);
   const textAreaRefs = useRef({});
+
+  // Examination system state
+  const [showExaminationPicker, setShowExaminationPicker] = useState(false);
+  const [showExaminationForm, setShowExaminationForm] = useState(false);
+  const [selectedProtocol, setSelectedProtocol] = useState(null);
 
   // Form state - SOAP format
   const [encounterData, setEncounterData] = useState({
@@ -277,6 +286,41 @@ export default function ClinicalEncounter() {
     }
   };
 
+  const handleProtocolSelect = (protocol) => {
+    setSelectedProtocol(protocol);
+    setShowExaminationPicker(false);
+    setShowExaminationForm(true);
+  };
+
+  const generateExaminationSummary = async () => {
+    if (!encounterId) {
+      alert('Please save the encounter first');
+      return;
+    }
+
+    try {
+      const response = await examinationsAPI.getExaminationSummary(encounterId);
+      const summary = response.data.summary;
+
+      if (summary) {
+        // Insert summary into objective ortho_tests field
+        setEncounterData(prev => ({
+          ...prev,
+          objective: {
+            ...prev.objective,
+            ortho_tests: summary
+          }
+        }));
+        alert('Examination summary generated and inserted into Orthopedic Tests field');
+      } else {
+        alert('No examination findings to summarize');
+      }
+    } catch (error) {
+      console.error('Error generating examination summary:', error);
+      alert('Failed to generate examination summary');
+    }
+  };
+
   const tabs = [
     { id: 'subjective', label: 'S - Subjective', icon: '💬' },
     { id: 'objective', label: 'O - Objective', icon: '🔍' },
@@ -314,6 +358,13 @@ export default function ClinicalEncounter() {
             </button>
           </div>
         </div>
+
+        {/* Red Flag Alerts from Examination System */}
+        {encounterId && (
+          <div className="mb-4">
+            <RedFlagAlerts encounterId={encounterId} />
+          </div>
+        )}
 
         {/* Alerts */}
         {redFlagAlerts.length > 0 && (
@@ -488,7 +539,54 @@ export default function ClinicalEncounter() {
 
           {/* Objective Tab */}
           {activeTab === 'objective' && (
-            <div className="space-y-4">
+            <div className="space-y-6">
+              {/* Structured Examination Section */}
+              {encounterId && (
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <Stethoscope className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-sm font-semibold text-gray-900">Strukturert undersøkelse</h3>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setShowExaminationPicker(true)}
+                        className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        <ClipboardList className="w-4 h-4" />
+                        Legg til undersøkelse
+                      </button>
+                      <button
+                        onClick={generateExaminationSummary}
+                        className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-700 bg-white border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors"
+                      >
+                        <FileText className="w-4 h-4" />
+                        Generer oppsummering
+                      </button>
+                    </div>
+                  </div>
+
+                  <ExaminationFindingsList encounterId={encounterId} />
+                </div>
+              )}
+
+              {!encounterId && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium text-yellow-900">Lagre konsultasjonen først</p>
+                      <p className="text-xs text-yellow-700 mt-1">
+                        Du må lagre konsultasjonen før du kan bruke strukturert undersøkelse
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="h-px bg-gray-200"></div>
+
+              {/* Traditional Fields */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Observation</label>
                 <textarea
@@ -826,6 +924,24 @@ export default function ClinicalEncounter() {
         onClose={() => setShowTemplatePicker(false)}
         onSelectTemplate={handleTemplateSelect}
         soapSection={activeTab}
+      />
+
+      {/* Examination Protocol Picker */}
+      <ExaminationProtocolPicker
+        isOpen={showExaminationPicker}
+        onClose={() => setShowExaminationPicker(false)}
+        onSelectProtocol={handleProtocolSelect}
+      />
+
+      {/* Examination Form */}
+      <StructuredExaminationForm
+        protocol={selectedProtocol}
+        encounterId={encounterId}
+        isOpen={showExaminationForm}
+        onClose={() => {
+          setShowExaminationForm(false);
+          setSelectedProtocol(null);
+        }}
       />
     </div>
   );
