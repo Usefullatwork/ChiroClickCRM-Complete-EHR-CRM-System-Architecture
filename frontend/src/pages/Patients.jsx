@@ -56,6 +56,49 @@ export default function Patients() {
     }));
   };
 
+  const handleExport = () => {
+    if (!patients || patients.length === 0) {
+      alert('No patients to export');
+      return;
+    }
+
+    // Create CSV content
+    const headers = ['ID', 'First Name', 'Last Name', 'Email', 'Phone', 'Date of Birth', 'Status', 'Category', 'Total Visits', 'Last Visit'];
+    const csvRows = [headers.join(',')];
+
+    patients.forEach(patient => {
+      const row = [
+        patient.solvit_id || '',
+        patient.first_name || '',
+        patient.last_name || '',
+        patient.email || '',
+        patient.phone || '',
+        patient.date_of_birth || '',
+        patient.status || '',
+        patient.category || '',
+        patient.total_visits || 0,
+        patient.last_visit_date || ''
+      ];
+      csvRows.push(row.map(field => `"${field}"`).join(','));
+    });
+
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', `patients_export_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleImport = () => {
+    navigate('/import');
+  };
+
   return (
     <div className="p-6">
       {/* Header */}
@@ -70,14 +113,14 @@ export default function Patients() {
         <div className="flex gap-3">
           <button
             className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-            onClick={() => {/* TODO: Export functionality */}}
+            onClick={handleExport}
           >
             <Download size={20} />
             Export
           </button>
           <button
             className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-            onClick={() => {/* TODO: Import functionality */}}
+            onClick={handleImport}
           >
             <Upload size={20} />
             Import

@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { followUpsAPI, patientsAPI } from '../services/api'
 import { formatDate, formatPhone } from '../lib/utils'
+import toast from '../utils/toast'
 
 export default function FollowUps() {
   const navigate = useNavigate()
@@ -64,7 +65,7 @@ export default function FollowUps() {
       queryClient.invalidateQueries(['dashboard-stats'])
     },
     onError: (error) => {
-      alert(`Failed to complete follow-up: ${error.response?.data?.message || error.message}`)
+      toast.error(`Failed to complete follow-up: ${error.response?.data?.message || error.message}`)
     },
   })
 
@@ -75,7 +76,7 @@ export default function FollowUps() {
       queryClient.invalidateQueries(['followups'])
     },
     onError: (error) => {
-      alert(`Failed to skip follow-up: ${error.response?.data?.message || error.message}`)
+      toast.error(`Failed to skip follow-up: ${error.response?.data?.message || error.message}`)
     },
   })
 

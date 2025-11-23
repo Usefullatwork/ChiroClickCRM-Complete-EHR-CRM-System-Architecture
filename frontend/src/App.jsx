@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react'
+import { Toaster } from 'sonner'
 import DashboardLayout from './components/layouts/DashboardLayout'
 import Dashboard from './pages/Dashboard'
 import Patients from './pages/Patients'
@@ -16,7 +17,9 @@ import NotFound from './pages/NotFound'
 
 function App() {
   return (
-    <Routes>
+    <>
+      <Toaster position="top-right" richColors closeButton />
+      <Routes>
       {/* Protected Routes */}
       <Route
         path="/"
@@ -48,6 +51,7 @@ function App() {
       {/* 404 */}
       <Route path="*" element={<NotFound />} />
     </Routes>
+    </>
   )
 }
 

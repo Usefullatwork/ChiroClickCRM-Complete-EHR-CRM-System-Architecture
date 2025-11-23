@@ -6,7 +6,14 @@
 import express from 'express';
 import * as patientController from '../controllers/patients.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
-import { validate, createPatientSchema, updatePatientSchema } from '../middleware/validator.js';
+import { validate } from '../middleware/validation.js';
+import {
+  createPatientSchema,
+  updatePatientSchema,
+  getPatientSchema,
+  deletePatientSchema,
+  searchPatientsSchema
+} from '../validators/patient.validators.js';
 
 const router = express.Router();
 
@@ -26,7 +33,7 @@ router.get('/', patientController.getPatients);
  * @desc    Search patients by name, email, phone, or SolvIt ID
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.get('/search', patientController.searchPatients);
+router.get('/search', validate(searchPatientsSchema), patientController.searchPatients);
 
 /**
  * @route   GET /api/v1/patients/follow-up/needed
@@ -44,7 +51,7 @@ router.get(
  * @desc    Get patient by ID
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.get('/:id', patientController.getPatient);
+router.get('/:id', validate(getPatientSchema), patientController.getPatient);
 
 /**
  * @route   GET /api/v1/patients/:id/statistics
@@ -87,6 +94,7 @@ router.patch(
 router.delete(
   '/:id',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(deletePatientSchema),
   patientController.deletePatient
 );
 

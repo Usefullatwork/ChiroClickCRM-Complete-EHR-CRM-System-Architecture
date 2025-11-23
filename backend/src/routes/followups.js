@@ -5,6 +5,13 @@
 import express from 'express';
 import * as followUpController from '../controllers/followups.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
+import { validate } from '../middleware/validation.js';
+import {
+  createFollowUpSchema,
+  updateFollowUpSchema,
+  completeFollowUpSchema,
+  getFollowUpsSchema
+} from '../validators/followup.validators.js';
 
 const router = express.Router();
 
@@ -18,6 +25,7 @@ router.use(requireOrganization);
  */
 router.get('/',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  validate(getFollowUpsSchema),
   followUpController.getFollowUps
 );
 
@@ -88,6 +96,7 @@ router.get('/:id',
  */
 router.post('/',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  validate(createFollowUpSchema),
   followUpController.createFollowUp
 );
 
@@ -98,6 +107,7 @@ router.post('/',
  */
 router.patch('/:id',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  validate(updateFollowUpSchema),
   followUpController.updateFollowUp
 );
 
@@ -108,6 +118,7 @@ router.patch('/:id',
  */
 router.post('/:id/complete',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  validate(completeFollowUpSchema),
   followUpController.completeFollowUp
 );
 

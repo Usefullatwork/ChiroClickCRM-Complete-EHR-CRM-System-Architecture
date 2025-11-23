@@ -28,9 +28,13 @@ apiClient.interceptors.request.use(
 
     // Get organization ID from localStorage or state
     const organizationId = localStorage.getItem('organizationId')
-    if (organizationId) {
-      config.headers['X-Organization-Id'] = organizationId
+    if (!organizationId) {
+      // Organization ID is required for all API calls
+      console.error('Organization ID is missing. Please select an organization.')
+      return Promise.reject(new Error('Organization ID is required. Please select an organization in settings.'))
     }
+
+    config.headers['X-Organization-Id'] = organizationId
 
     return config
   },

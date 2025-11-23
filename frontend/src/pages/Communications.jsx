@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { communicationsAPI, patientsAPI } from '../services/api'
 import { formatDate, formatPhone } from '../lib/utils'
+import toast from '../utils/toast'
 
 export default function Communications() {
   const queryClient = useQueryClient()
@@ -105,21 +106,21 @@ export default function Communications() {
       setMessage('')
       setSelectedPatient(null)
       setSelectedTemplate(null)
-      alert(`${messageType.toUpperCase()} logged successfully! Copy the message and send manually.`)
+      toast.success(`${messageType.toUpperCase()} logged successfully! Copy the message and send manually.`)
     },
     onError: (error) => {
-      alert(`Failed to log ${messageType}: ${error.response?.data?.message || error.message}`)
+      toast.error(`Failed to log ${messageType}: ${error.response?.data?.message || error.message}`)
     },
   })
 
   const handleSend = () => {
     if (!selectedPatient) {
-      alert('Please select a patient')
+      toast.warning('Please select a patient')
       return
     }
 
     if (!message.trim()) {
-      alert('Please enter a message')
+      toast.warning('Please enter a message')
       return
     }
 

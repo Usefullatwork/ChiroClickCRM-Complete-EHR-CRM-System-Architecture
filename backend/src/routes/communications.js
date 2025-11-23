@@ -5,6 +5,7 @@
 import express from 'express';
 import * as communicationController from '../controllers/communications.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
+import { smsLimiter, emailLimiter, perPatientLimiter } from '../middleware/rateLimiting.js';
 
 const router = express.Router();
 
@@ -28,6 +29,8 @@ router.get('/',
  */
 router.post('/sms',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  smsLimiter, // 10 SMS per hour per user
+  perPatientLimiter, // 3 messages per patient per day
   communicationController.sendSMS
 );
 
@@ -38,6 +41,8 @@ router.post('/sms',
  */
 router.post('/email',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  emailLimiter, // 20 emails per hour per user
+  perPatientLimiter, // 3 messages per patient per day
   communicationController.sendEmail
 );
 
