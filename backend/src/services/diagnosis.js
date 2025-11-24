@@ -212,36 +212,31 @@ export const getDiagnosisStatistics = async (organizationId, options = {}) => {
 
     params.push(limit);
 
-    // Get most common ICPC-2 codes
+    // Get most common ICPC-2 codes with descriptions in ONE query
     const icpc2Result = await query(
       `SELECT
-        unnest(icpc_codes) as code,
-        COUNT(*) as count
-      FROM clinical_encounters ce
-      ${whereClause}
-        AND icpc_codes IS NOT NULL
-        AND array_length(icpc_codes, 1) > 0
-      GROUP BY code
-      ORDER BY count DESC
+        code_usage.code,
+        code_usage.count,
+        dc.description_no as description
+      FROM (
+        SELECT
+          unnest(icpc_codes) as code,
+          COUNT(*) as count
+        FROM clinical_encounters ce
+        ${whereClause}
+          AND icpc_codes IS NOT NULL
+          AND array_length(icpc_codes, 1) > 0
+        GROUP BY code
+      ) code_usage
+      LEFT JOIN diagnosis_codes dc ON dc.code = code_usage.code
+      ORDER BY code_usage.count DESC
       LIMIT $${paramIndex}`,
       params
     );
 
-    // Get descriptions for the codes
-    const icpc2Codes = icpc2Result.rows;
-    for (const item of icpc2Codes) {
-      const codeResult = await query(
-        'SELECT description_no FROM diagnosis_codes WHERE code = $1',
-        [item.code]
-      );
-      if (codeResult.rows.length > 0) {
-        item.description = codeResult.rows[0].description_no;
-      }
-    }
-
     return {
-      topDiagnoses: icpc2Codes,
-      totalEncounters: icpc2Codes.reduce((sum, item) => sum + parseInt(item.count), 0)
+      topDiagnoses: icpc2Result.rows,
+      totalEncounters: icpc2Result.rows.reduce((sum, item) => sum + parseInt(item.count), 0)
     };
   } catch (error) {
     logger.error('Error getting diagnosis statistics:', error);

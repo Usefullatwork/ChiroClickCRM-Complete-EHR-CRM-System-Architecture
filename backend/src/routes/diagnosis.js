@@ -5,6 +5,13 @@
 import express from 'express';
 import * as diagnosisController from '../controllers/diagnosis.js';
 import { requireAuth, requireOrganization } from '../middleware/auth.js';
+import { validate } from '../middleware/validation.js';
+import {
+  searchDiagnosisCodesSchema,
+  getCommonDiagnosisCodesSchema,
+  getDiagnosisStatisticsSchema,
+  getDiagnosisCodeSchema
+} from '../validators/diagnosis.validators.js';
 
 const router = express.Router();
 
@@ -16,14 +23,20 @@ router.use(requireOrganization);
  * @desc    Search diagnosis codes
  * @access  Private
  */
-router.get('/search', diagnosisController.searchDiagnosisCodes);
+router.get('/search',
+  validate(searchDiagnosisCodesSchema),
+  diagnosisController.searchDiagnosisCodes
+);
 
 /**
  * @route   GET /api/v1/diagnosis/common
  * @desc    Get commonly used diagnosis codes
  * @access  Private
  */
-router.get('/common', diagnosisController.getCommonDiagnosisCodes);
+router.get('/common',
+  validate(getCommonDiagnosisCodesSchema),
+  diagnosisController.getCommonDiagnosisCodes
+);
 
 /**
  * @route   GET /api/v1/diagnosis/chiropractic
@@ -37,13 +50,19 @@ router.get('/chiropractic', diagnosisController.getChiropracticCodes);
  * @desc    Get diagnosis statistics for organization
  * @access  Private
  */
-router.get('/statistics', diagnosisController.getDiagnosisStatistics);
+router.get('/statistics',
+  validate(getDiagnosisStatisticsSchema),
+  diagnosisController.getDiagnosisStatistics
+);
 
 /**
  * @route   GET /api/v1/diagnosis/:code
  * @desc    Get specific diagnosis code
  * @access  Private
  */
-router.get('/:code', diagnosisController.getDiagnosisCode);
+router.get('/:code',
+  validate(getDiagnosisCodeSchema),
+  diagnosisController.getDiagnosisCode
+);
 
 export default router;

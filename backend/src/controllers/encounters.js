@@ -6,6 +6,7 @@
 import * as encounterService from '../services/encounters.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
+import { NotFoundError, BusinessLogicError } from '../utils/errors.js';
 
 /**
  * Get all encounters
@@ -62,10 +63,7 @@ export const getEncounter = async (req, res) => {
     const encounter = await encounterService.getEncounterById(organizationId, id);
 
     if (!encounter) {
-      return res.status(404).json({
-        error: 'Not Found',
-        message: 'Encounter not found'
-      });
+      throw new NotFoundError('Encounter', id);
     }
 
     // Check for red flags
@@ -93,6 +91,11 @@ export const getEncounter = async (req, res) => {
       clinicalWarnings: warnings
     });
   } catch (error) {
+    // Re-throw custom errors to be handled by centralized error handler
+    if (error.isOperational) {
+      throw error;
+    }
+
     logger.error('Error in getEncounter controller:', error);
     res.status(500).json({
       error: 'Internal Server Error',
@@ -192,10 +195,7 @@ export const updateEncounter = async (req, res) => {
     );
 
     if (!updatedEncounter) {
-      return res.status(404).json({
-        error: 'Not Found',
-        message: 'Encounter not found'
-      });
+      throw new NotFoundError('Encounter', id);
     }
 
     // Log audit
@@ -214,11 +214,9 @@ export const updateEncounter = async (req, res) => {
 
     res.json(updatedEncounter);
   } catch (error) {
-    if (error.message.includes('Cannot update signed encounter')) {
-      return res.status(400).json({
-        error: 'Bad Request',
-        message: error.message
-      });
+    // Re-throw custom errors to be handled by centralized error handler
+    if (error.isOperational) {
+      throw error;
     }
 
     logger.error('Error in updateEncounter controller:', error);

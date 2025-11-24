@@ -5,6 +5,7 @@
 
 import { query, transaction } from '../config/database.js';
 import logger from '../utils/logger.js';
+import { BusinessLogicError } from '../utils/errors.js';
 
 /**
  * Get all encounters with filters
@@ -237,7 +238,7 @@ export const updateEncounter = async (organizationId, encounterId, encounterData
     }
 
     if (existingResult.rows[0].signed_at) {
-      throw new Error('Cannot update signed encounter. Create an amendment instead.');
+      throw new BusinessLogicError('Cannot update signed encounter. Create an amendment instead.');
     }
 
     // Build UPDATE clause
