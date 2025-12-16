@@ -110,7 +110,8 @@ app.get(`/api/${API_VERSION}`, (req, res) => {
       outcomes: `/api/${API_VERSION}/outcomes`,
       gdpr: `/api/${API_VERSION}/gdpr`,
       pdf: `/api/${API_VERSION}/pdf`,
-      ai: `/api/${API_VERSION}/ai`
+      ai: `/api/${API_VERSION}/ai`,
+      search: `/api/${API_VERSION}/search`
     }
   });
 });
@@ -136,6 +137,7 @@ import aiRoutes from './routes/ai.js';
 import trainingRoutes from './routes/training.js';
 import templateRoutes from './routes/templates.js';
 import docsRoutes from './routes/docs.js';
+import searchRoutes from './routes/search.js';
 
 // Mount routes
 app.use(`/api/${API_VERSION}/dashboard`, dashboardRoutes);
@@ -157,6 +159,7 @@ app.use(`/api/${API_VERSION}/users`, userRoutes);
 app.use(`/api/${API_VERSION}/ai`, aiRoutes);
 app.use(`/api/${API_VERSION}/training`, trainingRoutes);
 app.use(`/api/${API_VERSION}/templates`, templateRoutes);
+app.use(`/api/${API_VERSION}/search`, searchRoutes);
 
 // API Documentation (no auth required)
 app.use('/api/docs', docsRoutes);
@@ -226,8 +229,11 @@ const gracefulShutdown = async (signal) => {
 
     try {
       const { closePool } = await import('./config/database.js');
+      const { closeRedis } = await import('./config/redis.js');
       await closePool();
       logger.info('Database connections closed');
+      await closeRedis();
+      logger.info('Redis connections closed');
       process.exit(0);
     } catch (error) {
       logger.error('Error during shutdown:', error);
