@@ -21,10 +21,17 @@ const poolConfig = {
   connectionTimeoutMillis: 10000,
 };
 
-// Enable SSL in production
+// Enable SSL in production with proper certificate validation
 if (process.env.NODE_ENV === 'production' || process.env.DB_SSL === 'true') {
   poolConfig.ssl = {
-    rejectUnauthorized: false
+    // Enable proper certificate validation in production
+    // Set DB_SSL_REJECT_UNAUTHORIZED=false only for self-signed certs in development
+    rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false',
+    // Optional: Custom CA certificate for self-hosted databases
+    ...(process.env.DB_SSL_CA && { ca: process.env.DB_SSL_CA }),
+    // Optional: Client certificate authentication
+    ...(process.env.DB_SSL_CERT && { cert: process.env.DB_SSL_CERT }),
+    ...(process.env.DB_SSL_KEY && { key: process.env.DB_SSL_KEY }),
   };
 }
 

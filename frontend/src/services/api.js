@@ -8,6 +8,67 @@ import axios from 'axios'
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1'
 const API_TIMEOUT = import.meta.env.VITE_API_TIMEOUT || 30000
 
+// Secure organization storage using sessionStorage (more secure than localStorage)
+// Organization ID is cleared when browser tab is closed
+const ORG_STORAGE_KEY = 'org_session'
+
+/**
+ * Securely store organization ID
+ * Uses sessionStorage which is cleared when the browser tab closes
+ * @param {string} organizationId - The organization ID to store
+ */
+export const setOrganizationId = (organizationId) => {
+  if (!organizationId) {
+    sessionStorage.removeItem(ORG_STORAGE_KEY)
+    return
+  }
+  // Store with timestamp for potential expiry checks
+  const data = {
+    id: organizationId,
+    ts: Date.now()
+  }
+  sessionStorage.setItem(ORG_STORAGE_KEY, btoa(JSON.stringify(data)))
+}
+
+/**
+ * Retrieve organization ID from secure storage
+ * @returns {string|null} The organization ID or null if not set
+ */
+export const getOrganizationId = () => {
+  try {
+    const stored = sessionStorage.getItem(ORG_STORAGE_KEY)
+    if (!stored) {
+      // Fallback to localStorage for migration (remove after initial deployment)
+      const legacyId = localStorage.getItem('organizationId')
+      if (legacyId) {
+        setOrganizationId(legacyId)
+        localStorage.removeItem('organizationId') // Clean up legacy storage
+        return legacyId
+      }
+      return null
+    }
+    const data = JSON.parse(atob(stored))
+    // Optional: Add expiry check (e.g., 24 hours)
+    const MAX_AGE = 24 * 60 * 60 * 1000 // 24 hours
+    if (Date.now() - data.ts > MAX_AGE) {
+      sessionStorage.removeItem(ORG_STORAGE_KEY)
+      return null
+    }
+    return data.id
+  } catch {
+    sessionStorage.removeItem(ORG_STORAGE_KEY)
+    return null
+  }
+}
+
+/**
+ * Clear organization ID from storage
+ */
+export const clearOrganizationId = () => {
+  sessionStorage.removeItem(ORG_STORAGE_KEY)
+  localStorage.removeItem('organizationId') // Clean up legacy storage
+}
+
 // Create axios instance
 const apiClient = axios.create({
   baseURL: API_URL,
@@ -15,26 +76,37 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, // Enable cookies for secure session handling
 })
 
 // Request interceptor - Add auth token and organization ID
 apiClient.interceptors.request.use(
-  (config) => {
-    // Get auth token from Clerk
-    const token = window.Clerk?.session?.getToken()
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+  async (config) => {
+    // Get auth token from Clerk (async for proper token refresh)
+    try {
+      const token = await window.Clerk?.session?.getToken()
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
+    } catch (error) {
+      console.error('Failed to get auth token:', error)
     }
 
-    // Get organization ID from localStorage or state
-    const organizationId = localStorage.getItem('organizationId')
+    // Get organization ID from secure storage
+    const organizationId = getOrganizationId()
     if (!organizationId) {
-      // Organization ID is required for all API calls
-      console.error('Organization ID is missing. Please select an organization.')
-      return Promise.reject(new Error('Organization ID is required. Please select an organization in settings.'))
-    }
+      // Organization ID is required for most API calls
+      // Allow some endpoints without org ID (e.g., organization selection)
+      const exemptPaths = ['/organizations', '/users/me']
+      const isExempt = exemptPaths.some(path => config.url?.includes(path))
 
-    config.headers['X-Organization-Id'] = organizationId
+      if (!isExempt) {
+        console.error('Organization ID is missing. Please select an organization.')
+        return Promise.reject(new Error('Organization ID is required. Please select an organization in settings.'))
+      }
+    } else {
+      config.headers['X-Organization-Id'] = organizationId
+    }
 
     return config
   },

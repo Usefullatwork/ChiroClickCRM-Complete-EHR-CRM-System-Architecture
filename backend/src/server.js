@@ -14,6 +14,7 @@ import 'express-async-errors';
 
 import { healthCheck } from './config/database.js';
 import logger from './utils/logger.js';
+import { scheduleKeyRotation, createKeyRotationTable } from './utils/keyRotation.js';
 
 // Load environment variables
 dotenv.config();
@@ -134,6 +135,7 @@ import userRoutes from './routes/users.js';
 import aiRoutes from './routes/ai.js';
 import trainingRoutes from './routes/training.js';
 import templateRoutes from './routes/templates.js';
+import docsRoutes from './routes/docs.js';
 
 // Mount routes
 app.use(`/api/${API_VERSION}/dashboard`, dashboardRoutes);
@@ -155,6 +157,9 @@ app.use(`/api/${API_VERSION}/users`, userRoutes);
 app.use(`/api/${API_VERSION}/ai`, aiRoutes);
 app.use(`/api/${API_VERSION}/training`, trainingRoutes);
 app.use(`/api/${API_VERSION}/templates`, templateRoutes);
+
+// API Documentation (no auth required)
+app.use('/api/docs', docsRoutes);
 
 // ============================================================================
 // ERROR HANDLING
@@ -194,13 +199,22 @@ app.use((err, req, res, next) => {
 // SERVER STARTUP
 // ============================================================================
 
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, async () => {
   logger.info(`🚀 ChiroClickCRM API Server started`);
   logger.info(`📍 Environment: ${process.env.NODE_ENV}`);
   logger.info(`📍 Port: ${PORT}`);
   logger.info(`📍 API Version: ${API_VERSION}`);
   logger.info(`📍 Health: http://localhost:${PORT}/health`);
   logger.info(`📍 API Root: http://localhost:${PORT}/api/${API_VERSION}`);
+
+  // Initialize encryption key rotation
+  try {
+    await createKeyRotationTable();
+    scheduleKeyRotation();
+    logger.info('🔐 Encryption key rotation scheduler initialized');
+  } catch (error) {
+    logger.warn('⚠️  Key rotation initialization skipped (table may not exist yet):', error.message);
+  }
 });
 
 // Graceful shutdown

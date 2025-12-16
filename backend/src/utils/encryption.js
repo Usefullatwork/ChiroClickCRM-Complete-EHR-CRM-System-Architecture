@@ -102,8 +102,9 @@ export const hash = (text) => {
 
 /**
  * Validate Norwegian fødselsnummer (11 digits)
+ * Implements full Modulo 11 checksum validation
  * @param {string} fodselsnummer - Norwegian personal ID
- * @returns {boolean} True if valid format
+ * @returns {boolean} True if valid format and checksum
  */
 export const validateFodselsnummer = (fodselsnummer) => {
   if (!fodselsnummer) return false;
@@ -119,17 +120,83 @@ export const validateFodselsnummer = (fodselsnummer) => {
   // Extract date parts (DDMMYY)
   const day = parseInt(cleaned.substring(0, 2));
   const month = parseInt(cleaned.substring(2, 4));
-  const year = parseInt(cleaned.substring(4, 6));
 
-  // Basic date validation
-  if (day < 1 || day > 31 || month < 1 || month > 12) {
+  // Basic date validation (accounting for D-numbers where day += 40)
+  const actualDay = day > 40 ? day - 40 : day;
+  if (actualDay < 1 || actualDay > 31 || month < 1 || month > 12) {
     return false;
   }
 
-  // TODO: Implement full checksum validation (Modulo 11 algorithm)
-  // For now, we just validate format
+  // Modulo 11 checksum validation
+  // First check digit (position 10) - weights: 3, 7, 6, 1, 8, 9, 4, 5, 2
+  const weights1 = [3, 7, 6, 1, 8, 9, 4, 5, 2];
+  let sum1 = 0;
+  for (let i = 0; i < 9; i++) {
+    sum1 += parseInt(cleaned[i]) * weights1[i];
+  }
+  const remainder1 = sum1 % 11;
+  const checkDigit1 = remainder1 === 0 ? 0 : 11 - remainder1;
+
+  // If remainder results in 10, the fødselsnummer is invalid
+  if (checkDigit1 === 10) {
+    return false;
+  }
+
+  if (parseInt(cleaned[9]) !== checkDigit1) {
+    return false;
+  }
+
+  // Second check digit (position 11) - weights: 5, 4, 3, 2, 7, 6, 5, 4, 3, 2
+  const weights2 = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
+  let sum2 = 0;
+  for (let i = 0; i < 10; i++) {
+    sum2 += parseInt(cleaned[i]) * weights2[i];
+  }
+  const remainder2 = sum2 % 11;
+  const checkDigit2 = remainder2 === 0 ? 0 : 11 - remainder2;
+
+  // If remainder results in 10, the fødselsnummer is invalid
+  if (checkDigit2 === 10) {
+    return false;
+  }
+
+  if (parseInt(cleaned[10]) !== checkDigit2) {
+    return false;
+  }
 
   return true;
+};
+
+/**
+ * Determine the century from fødselsnummer individual number
+ * @param {string} fodselsnummer - Norwegian personal ID
+ * @returns {number|null} Full 4-digit birth year or null if invalid
+ */
+export const getBirthYearFromFodselsnummer = (fodselsnummer) => {
+  if (!validateFodselsnummer(fodselsnummer)) return null;
+
+  const cleaned = fodselsnummer.replace(/[\s-]/g, '');
+  const yearDigits = parseInt(cleaned.substring(4, 6));
+  const individualNumber = parseInt(cleaned.substring(6, 9));
+
+  // Determine century based on individual number range
+  // 000-499: 1900-1999
+  // 500-749: 1854-1899 (historical) or 2000-2039
+  // 750-899: 1854-1899 (historical) or 2000-2039
+  // 900-999: 1940-1999
+
+  let century;
+  if (individualNumber >= 0 && individualNumber <= 499) {
+    century = 1900;
+  } else if (individualNumber >= 500 && individualNumber <= 749) {
+    century = yearDigits >= 54 ? 1800 : 2000;
+  } else if (individualNumber >= 750 && individualNumber <= 899) {
+    century = yearDigits >= 54 ? 1800 : 2000;
+  } else {
+    century = yearDigits >= 40 ? 1900 : 2000;
+  }
+
+  return century + yearDigits;
 };
 
 /**
@@ -155,5 +222,6 @@ export default {
   decrypt,
   hash,
   validateFodselsnummer,
+  getBirthYearFromFodselsnummer,
   maskSensitive
 };
