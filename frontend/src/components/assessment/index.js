@@ -122,3 +122,25 @@ export {
   generatePlanNarrative as generatePrintPlan,
   generateSpinalNarrative
 } from './PrintPreview';
+
+// =============================================================================
+// INTERNATIONALIZATION (English & Norwegian)
+// =============================================================================
+
+// Translations for all assessment components
+export {
+  TRANSLATIONS,
+  t,
+  createTranslator,
+  getSection,
+  DEFAULT_LANGUAGE,
+  AVAILABLE_LANGUAGES
+} from './translations';
+
+// Bilingual macro content
+export {
+  MACRO_CONTENT,
+  getMacroContent,
+  getCategoryMacros,
+  buildMacroMatrix
+} from './macroContent';

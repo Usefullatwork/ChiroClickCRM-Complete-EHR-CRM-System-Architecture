@@ -3,9 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { encountersAPI, patientsAPI, diagnosisAPI } from '../services/api';
 import {
-  Save, AlertTriangle, Brain, X, Sparkles,
+  Save, AlertTriangle, Brain, X, Sparkles, Globe,
   BookOpen, ChevronLeft, ChevronRight, Settings, Eye, Edit3,
-  FileText, Printer, Copy
+  FileText, Printer, Copy, Shield, Grid, Command
 } from 'lucide-react';
 import TemplatePicker from '../components/TemplatePicker';
 
@@ -27,6 +27,20 @@ import {
   BodyChart,
   BodyChartGallery,
   TemplateLibrary,
+  // Phase 1 Components
+  SALTButton,
+  MacroMatrix,
+  SlashCommandTextArea,
+  SlashCommandReference,
+  CompliancePanel,
+  ComplianceIndicator,
+  PrintPreview,
+  // Translations (EN/NO)
+  t,
+  createTranslator,
+  AVAILABLE_LANGUAGES,
+  getMacroContent,
+  // Options
   PAIN_QUALITY_OPTIONS,
   AGGRAVATING_FACTORS_OPTIONS,
   RELIEVING_FACTORS_OPTIONS,
@@ -68,6 +82,15 @@ export default function EasyAssessment() {
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
   const [showBodyChart, setShowBodyChart] = useState(false);
   const [showTemplateLibrary, setShowTemplateLibrary] = useState(false);
+  // Phase 1 states
+  const [language, setLanguage] = useState('en'); // 'en' | 'no'
+  const [showMacroMatrix, setShowMacroMatrix] = useState(false);
+  const [showCompliancePanel, setShowCompliancePanel] = useState(false);
+  const [showPrintPreview, setShowPrintPreview] = useState(false);
+  const [showSlashReference, setShowSlashReference] = useState(false);
+  const [macroFavorites, setMacroFavorites] = useState([]);
+  // Create translator function bound to current language
+  const tr = createTranslator(language);
 
   // Form state - SOAP format with quick-select arrays
   const [encounterData, setEncounterData] = useState({
@@ -175,7 +198,9 @@ export default function EasyAssessment() {
     enabled: !!patientId
   });
 
-  // Set current visit number based on existing encounters
+  // Set current visit number and get previous encounter for SALT
+  const previousEncounter = patientEncounters?.data?.encounters?.[0] || null;
+
   useEffect(() => {
     if (patientEncounters?.data?.encounters) {
       setCurrentVisitNumber(patientEncounters.data.encounters.length + 1);
@@ -274,6 +299,55 @@ export default function EasyAssessment() {
       ...prev,
       icpc_codes: prev.icpc_codes.filter(c => c !== code)
     }));
+  };
+
+  // SALT handler - apply cloned data from previous encounter
+  const handleSALTApply = (clonedData) => {
+    setEncounterData(prev => ({
+      ...prev,
+      ...clonedData,
+      subjective: { ...prev.subjective, ...clonedData.subjective },
+      objective: { ...prev.objective, ...clonedData.objective },
+      plan: { ...prev.plan, ...clonedData.plan }
+    }));
+  };
+
+  // Macro insert handler - insert macro text into current field
+  const handleMacroInsert = (text, targetField = 'current') => {
+    // Insert based on active tab
+    if (activeTab === 'subjective') {
+      updateField('subjective', 'chief_complaint',
+        (encounterData.subjective.chief_complaint ? encounterData.subjective.chief_complaint + ' ' : '') + text
+      );
+    } else if (activeTab === 'objective') {
+      updateField('objective', 'observation',
+        (encounterData.objective.observation ? encounterData.objective.observation + ' ' : '') + text
+      );
+    } else if (activeTab === 'assessment') {
+      updateField('assessment', 'clinical_reasoning',
+        (encounterData.assessment.clinical_reasoning ? encounterData.assessment.clinical_reasoning + ' ' : '') + text
+      );
+    } else if (activeTab === 'plan') {
+      updateField('plan', 'treatment',
+        (encounterData.plan.treatment ? encounterData.plan.treatment + ' ' : '') + text
+      );
+    }
+    setShowMacroMatrix(false);
+  };
+
+  // Compliance auto-fix handler
+  const handleComplianceAutoFix = (issue) => {
+    if (issue.suggestion && issue.section) {
+      if (issue.section === 'objective') {
+        updateField('objective', 'palpation',
+          (encounterData.objective.palpation ? encounterData.objective.palpation + ' ' : '') + issue.suggestion
+        );
+      } else if (issue.section === 'plan') {
+        updateField('plan', 'treatment',
+          (encounterData.plan.treatment ? encounterData.plan.treatment + ' ' : '') + issue.suggestion
+        );
+      }
+    }
   };
 
   // Generate ChiroTouch-style narrative
@@ -384,6 +458,39 @@ export default function EasyAssessment() {
             </div>
 
             <div className="flex items-center gap-2">
+              {/* Language Selector */}
+              <div className="relative">
+                <button
+                  onClick={() => setLanguage(language === 'en' ? 'no' : 'en')}
+                  className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
+                  title={language === 'en' ? 'Switch to Norwegian' : 'Bytt til Engelsk'}
+                >
+                  <Globe className="w-4 h-4" />
+                  {language === 'en' ? '🇬🇧 EN' : '🇳🇴 NO'}
+                </button>
+              </div>
+
+              {/* SALT Button */}
+              <SALTButton
+                previousEncounter={previousEncounter}
+                onApply={handleSALTApply}
+              />
+
+              {/* Compliance Indicator */}
+              <ComplianceIndicator
+                encounterData={encounterData}
+                onClick={() => setShowCompliancePanel(true)}
+              />
+
+              {/* Macro Matrix Button */}
+              <button
+                onClick={() => setShowMacroMatrix(true)}
+                className="flex items-center gap-1 px-3 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                title={language === 'en' ? 'Macro Matrix' : 'Makromatrise'}
+              >
+                <Grid className="w-4 h-4" />
+              </button>
+
               {/* View Mode Toggle */}
               <div className="inline-flex rounded-lg border border-gray-300 bg-white p-0.5">
                 <button
@@ -392,7 +499,7 @@ export default function EasyAssessment() {
                     viewMode === 'easy' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
-                  Easy
+                  {language === 'en' ? 'Easy' : 'Enkel'}
                 </button>
                 <button
                   onClick={() => setViewMode('detailed')}
@@ -400,7 +507,7 @@ export default function EasyAssessment() {
                     viewMode === 'detailed' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
-                  Detailed
+                  {language === 'en' ? 'Detailed' : 'Detaljert'}
                 </button>
                 <button
                   onClick={() => setViewMode('preview')}
@@ -408,16 +515,25 @@ export default function EasyAssessment() {
                     viewMode === 'preview' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
-                  Preview
+                  {language === 'en' ? 'Preview' : 'Forhåndsvisning'}
                 </button>
               </div>
+
+              {/* Print Preview */}
+              <button
+                onClick={() => setShowPrintPreview(true)}
+                className="flex items-center gap-1 px-3 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                title={language === 'en' ? 'Print Preview' : 'Forhåndsvisning'}
+              >
+                <Printer className="w-4 h-4" />
+              </button>
 
               <button
                 onClick={copyToClipboard}
                 className="flex items-center gap-1 px-3 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
               >
                 <Copy className="w-4 h-4" />
-                {copiedToClipboard ? 'Copied!' : 'Copy'}
+                {copiedToClipboard ? (language === 'en' ? 'Copied!' : 'Kopiert!') : (language === 'en' ? 'Copy' : 'Kopier')}
               </button>
 
               <button
@@ -1143,19 +1259,117 @@ export default function EasyAssessment() {
         </div>
       )}
 
+      {/* Macro Matrix Modal */}
+      {showMacroMatrix && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold">
+                {language === 'en' ? 'Macro Matrix - Quick Insert' : 'Makromatrise - Hurtiginnsetting'}
+              </h3>
+              <button
+                onClick={() => setShowMacroMatrix(false)}
+                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="overflow-y-auto max-h-[75vh] p-4">
+              <MacroMatrix
+                onInsert={handleMacroInsert}
+                targetField={activeTab}
+                favorites={macroFavorites}
+                onFavoritesChange={setMacroFavorites}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Compliance Panel Modal */}
+      {showCompliancePanel && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Shield className="w-5 h-5" />
+                {language === 'en' ? 'Compliance Check' : 'Samsvarskontroll'}
+              </h3>
+              <button
+                onClick={() => setShowCompliancePanel(false)}
+                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="overflow-y-auto max-h-[75vh]">
+              <CompliancePanel
+                encounterData={encounterData}
+                onApplyAutoInsert={handleComplianceAutoFix}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Print Preview Modal */}
+      <PrintPreview
+        encounterData={encounterData}
+        patientData={patient?.data}
+        practiceInfo={{
+          name: 'ChiroClick Clinic',
+          address: 'Healthcare Center, Medical District',
+          phone: '+47 XXX XX XXX',
+          provider: language === 'en' ? 'Provider Name, DC' : 'Behandler, DC',
+          credentials: language === 'en' ? 'Doctor of Chiropractic' : 'Kiropraktor'
+        }}
+        isOpen={showPrintPreview}
+        onClose={() => setShowPrintPreview(false)}
+      />
+
+      {/* Slash Command Reference Modal */}
+      {showSlashReference && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Command className="w-5 h-5" />
+                {language === 'en' ? 'Slash Commands' : 'Skråstrek-kommandoer'}
+              </h3>
+              <button
+                onClick={() => setShowSlashReference(false)}
+                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="overflow-y-auto max-h-[70vh]">
+              <SlashCommandReference />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Floating Action Buttons */}
       <div className="fixed bottom-6 right-6 flex flex-col gap-3">
         <button
+          onClick={() => setShowSlashReference(true)}
+          className="w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 flex items-center justify-center"
+          title={language === 'en' ? 'Slash Commands Reference' : 'Kommandoreferanse'}
+        >
+          <Command className="w-5 h-5" />
+        </button>
+        <button
           onClick={() => setShowTemplateLibrary(true)}
           className="w-12 h-12 bg-purple-600 text-white rounded-full shadow-lg hover:bg-purple-700 flex items-center justify-center"
-          title="Template Library"
+          title={language === 'en' ? 'Template Library' : 'Malbibliotek'}
         >
           <Sparkles className="w-5 h-5" />
         </button>
         <button
           onClick={() => setShowTemplatePicker(true)}
           className="w-12 h-12 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 flex items-center justify-center"
-          title="Quick Templates"
+          title={language === 'en' ? 'Quick Templates' : 'Hurtigmaler'}
         >
           <BookOpen className="w-5 h-5" />
         </button>
