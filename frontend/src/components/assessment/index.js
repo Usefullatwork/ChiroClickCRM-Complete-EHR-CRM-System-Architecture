@@ -1,6 +1,7 @@
 // Assessment Components - Easy-to-use clinical assessment interface
 // Inspired by Jane App, DrChrono, and ChiroTouch
 
+// Quick checkbox grids for findings
 export { default as QuickCheckboxGrid } from './QuickCheckboxGrid';
 export {
   PAIN_QUALITY_OPTIONS,
@@ -15,6 +16,7 @@ export {
   EXERCISE_OPTIONS
 } from './QuickCheckboxGrid';
 
+// Smart text inputs with phrase macros
 export { default as SmartTextInput } from './SmartTextInput';
 export {
   CHIEF_COMPLAINT_PHRASES,
@@ -25,8 +27,31 @@ export {
   ADVICE_PHRASES
 } from './SmartTextInput';
 
+// Body diagram for pain location
 export { default as BodyDiagram, QuickRegionSelect } from './BodyDiagram';
 
+// Spine diagram with vertebra-level subluxation markers
+export { default as SpineDiagram, QuickVertebraSelect } from './SpineDiagram';
+
+// VAS Pain Scale
 export { default as VASPainScale, VASComparisonDisplay } from './VASPainScale';
 
+// Outcome assessments (ODI, NDI, PSFS)
 export { default as OutcomeAssessment, QUESTIONNAIRE_TYPES } from './OutcomeAssessment';
+
+// Problem list panel
+export { default as ProblemList, ProblemListCompact } from './ProblemList';
+
+// Treatment plan tracker
+export { default as TreatmentPlanTracker, VisitCounter } from './TreatmentPlanTracker';
+
+// Narrative generator
+export {
+  default as NarrativeGenerator,
+  generateSubjectiveNarrative,
+  generateObjectiveNarrative,
+  generateAssessmentNarrative,
+  generatePlanNarrative,
+  generateFullNarrative,
+  generateEncounterSummary
+} from './NarrativeGenerator';

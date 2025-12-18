@@ -1,22 +1,29 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { encountersAPI, patientsAPI, diagnosisAPI, treatmentsAPI } from '../services/api';
+import { encountersAPI, patientsAPI, diagnosisAPI } from '../services/api';
 import {
-  Save, FileText, AlertTriangle, CheckCircle, Brain, X, Sparkles,
-  BookOpen, ChevronLeft, ChevronRight, Settings, Eye, Edit3
+  Save, AlertTriangle, Brain, X, Sparkles,
+  BookOpen, ChevronLeft, ChevronRight, Settings, Eye, Edit3,
+  FileText, Printer, Copy
 } from 'lucide-react';
 import TemplatePicker from '../components/TemplatePicker';
 
-// Import new assessment components
+// Import all assessment components
 import {
   QuickCheckboxGrid,
   SmartTextInput,
   BodyDiagram,
   QuickRegionSelect,
+  SpineDiagram,
   VASPainScale,
   VASComparisonDisplay,
   OutcomeAssessment,
+  ProblemList,
+  TreatmentPlanTracker,
+  VisitCounter,
+  generateFullNarrative,
+  generateEncounterSummary,
   PAIN_QUALITY_OPTIONS,
   AGGRAVATING_FACTORS_OPTIONS,
   RELIEVING_FACTORS_OPTIONS,
@@ -37,19 +44,13 @@ import {
 } from '../components/assessment';
 
 /**
- * EasyAssessment - Enhanced Clinical Encounter Interface
+ * EasyAssessment - ChiroTouch-Style Clinical Encounter Interface
  *
- * Inspired by industry leaders:
- * - Jane App: Smart Options, Phrases, customizable templates
- * - DrChrono: Customizable forms, template library, single data entry
- * - ChiroTouch: 15-second SOAP notes, macros, checkbox-based assessments
- *
- * Features:
- * - Quick-select checkboxes for common findings
- * - Visual body diagram for pain location
- * - Smart text inputs with phrase macros
- * - VAS pain scale with visual feedback
- * - Outcome assessment questionnaires
+ * Now includes:
+ * - Detailed spine diagram with vertebra-level subluxation markers
+ * - Problem list panel with chronic conditions
+ * - Treatment plan tracker with visit progress
+ * - Auto-generated ChiroTouch-style narratives
  */
 export default function EasyAssessment() {
   const { patientId, encounterId } = useParams();
@@ -58,12 +59,10 @@ export default function EasyAssessment() {
   const [viewMode, setViewMode] = useState('easy'); // 'easy' | 'detailed' | 'preview'
   const [redFlagAlerts, setRedFlagAlerts] = useState([]);
   const [clinicalWarnings, setClinicalWarnings] = useState([]);
-  const [showAIAssistant, setShowAIAssistant] = useState(false);
-  const [aiSuggestions, setAiSuggestions] = useState(null);
-  const [aiLoading, setAiLoading] = useState(false);
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
   const [showOutcomeAssessment, setShowOutcomeAssessment] = useState(false);
   const [outcomeType, setOutcomeType] = useState('ODI');
+  const [copiedToClipboard, setCopiedToClipboard] = useState(false);
 
   // Form state - SOAP format with quick-select arrays
   const [encounterData, setEncounterData] = useState({
@@ -105,6 +104,9 @@ export default function EasyAssessment() {
     ortho_tests_selected: [],
     neuro_tests_selected: [],
 
+    // NEW: Spinal findings (ChiroTouch style)
+    spinal_findings: {},
+
     // Assessment section
     assessment: {
       clinical_reasoning: '',
@@ -141,12 +143,33 @@ export default function EasyAssessment() {
     }
   });
 
+  // NEW: Problem list state
+  const [problems, setProblems] = useState([]);
+
+  // NEW: Treatment plan state
+  const [treatmentPlan, setTreatmentPlan] = useState(null);
+  const [currentVisitNumber, setCurrentVisitNumber] = useState(1);
+
   // Fetch patient data
   const { data: patient } = useQuery({
     queryKey: ['patient', patientId],
     queryFn: () => patientsAPI.getById(patientId),
     enabled: !!patientId
   });
+
+  // Fetch patient's encounters to determine visit number
+  const { data: patientEncounters } = useQuery({
+    queryKey: ['patient-encounters', patientId],
+    queryFn: () => encountersAPI.getByPatient(patientId),
+    enabled: !!patientId
+  });
+
+  // Set current visit number based on existing encounters
+  useEffect(() => {
+    if (patientEncounters?.data?.encounters) {
+      setCurrentVisitNumber(patientEncounters.data.encounters.length + 1);
+    }
+  }, [patientEncounters]);
 
   // Fetch encounter if editing
   const { data: existingEncounter } = useQuery({
@@ -165,6 +188,12 @@ export default function EasyAssessment() {
       }));
       setRedFlagAlerts(existingEncounter.data.redFlagAlerts || []);
       setClinicalWarnings(existingEncounter.data.clinicalWarnings || []);
+      if (existingEncounter.data.problems) {
+        setProblems(existingEncounter.data.problems);
+      }
+      if (existingEncounter.data.treatmentPlan) {
+        setTreatmentPlan(existingEncounter.data.treatmentPlan);
+      }
     }
   }, [existingEncounter]);
 
@@ -177,78 +206,27 @@ export default function EasyAssessment() {
   // Save encounter mutation
   const saveMutation = useMutation({
     mutationFn: (data) => {
-      // Merge quick-select data into text fields before saving
-      const mergedData = mergeQuickSelectIntoText(data);
+      const saveData = {
+        ...data,
+        problems,
+        treatmentPlan,
+        generated_narrative: generateNarrativeText()
+      };
       if (encounterId) {
-        return encountersAPI.update(encounterId, mergedData);
+        return encountersAPI.update(encounterId, saveData);
       }
-      return encountersAPI.create(mergedData);
+      return encountersAPI.create(saveData);
     },
     onSuccess: (response) => {
       alert('Encounter saved successfully!');
       if (!encounterId && response?.data?.id) {
-        navigate(`/patients/${patientId}/encounter/${response.data.id}`);
+        navigate(`/patients/${patientId}/easy-assessment/${response.data.id}`);
       }
     },
     onError: (error) => {
       alert(`Error saving encounter: ${error.message}`);
     }
   });
-
-  // Merge quick-select arrays into text descriptions
-  const mergeQuickSelectIntoText = (data) => {
-    const merged = { ...data };
-
-    // Helper to convert selected values to text
-    const selectedToText = (selected, options) => {
-      if (!selected || selected.length === 0) return '';
-      const allItems = Object.values(options).flat();
-      return selected.map(val => {
-        const item = allItems.find(i => i.value === val);
-        return item?.label || val;
-      }).join(', ');
-    };
-
-    // Merge subjective
-    const painQualityText = selectedToText(data.pain_qualities, PAIN_QUALITY_OPTIONS);
-    const aggravatingText = selectedToText(data.aggravating_factors_selected, AGGRAVATING_FACTORS_OPTIONS);
-    const relievingText = selectedToText(data.relieving_factors_selected, RELIEVING_FACTORS_OPTIONS);
-
-    merged.subjective = {
-      ...data.subjective,
-      pain_description: [data.subjective.pain_description, painQualityText].filter(Boolean).join('. '),
-      aggravating_factors: [data.subjective.aggravating_factors, aggravatingText].filter(Boolean).join('. '),
-      relieving_factors: [data.subjective.relieving_factors, relievingText].filter(Boolean).join('. ')
-    };
-
-    // Merge objective
-    const observationText = selectedToText(data.observation_findings, OBSERVATION_FINDINGS_OPTIONS);
-    const palpationText = selectedToText(data.palpation_findings, PALPATION_FINDINGS_OPTIONS);
-    const romText = selectedToText(data.rom_findings, ROM_FINDINGS_OPTIONS);
-    const orthoText = selectedToText(data.ortho_tests_selected, ORTHO_TESTS_OPTIONS);
-    const neuroText = selectedToText(data.neuro_tests_selected, NEURO_TESTS_OPTIONS);
-
-    merged.objective = {
-      ...data.objective,
-      observation: [data.objective.observation, observationText].filter(Boolean).join('. '),
-      palpation: [data.objective.palpation, palpationText].filter(Boolean).join('. '),
-      rom: [data.objective.rom, romText].filter(Boolean).join('. '),
-      ortho_tests: [data.objective.ortho_tests, orthoText].filter(Boolean).join('. '),
-      neuro_tests: [data.objective.neuro_tests, neuroText].filter(Boolean).join('. ')
-    };
-
-    // Merge plan
-    const treatmentText = selectedToText(data.treatments_selected, TREATMENT_OPTIONS);
-    const exerciseText = selectedToText(data.exercises_selected, EXERCISE_OPTIONS);
-
-    merged.plan = {
-      ...data.plan,
-      treatment: [data.plan.treatment, treatmentText].filter(Boolean).join('. '),
-      exercises: [data.plan.exercises, exerciseText].filter(Boolean).join('. ')
-    };
-
-    return merged;
-  };
 
   const handleSave = () => {
     saveMutation.mutate(encounterData);
@@ -287,7 +265,56 @@ export default function EasyAssessment() {
     }));
   };
 
-  // Navigate between tabs
+  // Generate ChiroTouch-style narrative
+  const generateNarrativeText = () => {
+    const narratives = generateFullNarrative({
+      ...encounterData,
+      ...encounterData.subjective,
+      ...encounterData.objective,
+      ...encounterData.assessment,
+      ...encounterData.plan
+    });
+
+    const totalVisits = treatmentPlan?.phases?.reduce((sum, p) => sum + p.totalVisits, 0) || 0;
+    const summary = generateEncounterSummary(
+      { ...encounterData, ...encounterData.subjective },
+      currentVisitNumber,
+      totalVisits
+    );
+
+    let text = '';
+
+    if (summary) {
+      text += `${summary}\n\n`;
+    }
+
+    text += 'SUBJECTIVE\n';
+    text += narratives.subjective.join('\n') || 'No subjective findings documented.';
+    text += '\n\n';
+
+    text += 'OBJECTIVE\n';
+    text += 'Daily Objective Findings:\n';
+    text += narratives.objective.join('\n') || 'No objective findings documented.';
+    text += '\n\n';
+
+    text += 'ASSESSMENT\n';
+    text += narratives.assessment.join('\n') || 'No assessment documented.';
+    text += '\n\n';
+
+    text += 'PLAN\n';
+    text += narratives.plan.join('\n') || 'No plan documented.';
+
+    return text;
+  };
+
+  const copyToClipboard = () => {
+    const text = generateNarrativeText();
+    navigator.clipboard.writeText(text);
+    setCopiedToClipboard(true);
+    setTimeout(() => setCopiedToClipboard(false), 2000);
+  };
+
+  // Tab navigation
   const tabs = [
     { id: 'subjective', label: 'Subjective', icon: '💬', color: 'green' },
     { id: 'objective', label: 'Objective', icon: '🔍', color: 'blue' },
@@ -300,56 +327,18 @@ export default function EasyAssessment() {
   const canGoForward = currentTabIndex < tabs.length - 1;
 
   const goToNextTab = () => {
-    if (canGoForward) {
-      setActiveTab(tabs[currentTabIndex + 1].id);
-    }
+    if (canGoForward) setActiveTab(tabs[currentTabIndex + 1].id);
   };
 
   const goToPrevTab = () => {
-    if (canGoBack) {
-      setActiveTab(tabs[currentTabIndex - 1].id);
-    }
-  };
-
-  // Generate preview text
-  const generatePreviewText = () => {
-    const merged = mergeQuickSelectIntoText(encounterData);
-    return `
-SUBJECTIVE
-Chief Complaint: ${merged.subjective.chief_complaint || 'Not documented'}
-History: ${merged.subjective.history || 'Not documented'}
-Onset: ${merged.subjective.onset || 'Not documented'}
-Pain Description: ${merged.subjective.pain_description || 'Not documented'}
-Aggravating Factors: ${merged.subjective.aggravating_factors || 'Not documented'}
-Relieving Factors: ${merged.subjective.relieving_factors || 'Not documented'}
-
-OBJECTIVE
-Observation: ${merged.objective.observation || 'Not documented'}
-Palpation: ${merged.objective.palpation || 'Not documented'}
-ROM: ${merged.objective.rom || 'Not documented'}
-Orthopedic Tests: ${merged.objective.ortho_tests || 'Not documented'}
-Neurological Tests: ${merged.objective.neuro_tests || 'Not documented'}
-
-ASSESSMENT
-Diagnosis: ${encounterData.icpc_codes.join(', ') || 'Not documented'}
-Clinical Reasoning: ${merged.assessment.clinical_reasoning || 'Not documented'}
-Prognosis: ${merged.assessment.prognosis || 'Not documented'}
-
-PLAN
-Treatment: ${merged.plan.treatment || 'Not documented'}
-Exercises: ${merged.plan.exercises || 'Not documented'}
-Advice: ${merged.plan.advice || 'Not documented'}
-Follow-up: ${merged.plan.follow_up || 'Not documented'}
-
-VAS Pain: ${encounterData.vas_pain_start ?? 'N/A'}/10 → ${encounterData.vas_pain_end ?? 'N/A'}/10
-    `.trim();
+    if (canGoBack) setActiveTab(tabs[currentTabIndex - 1].id);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 py-3">
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
+        <div className="max-w-full mx-auto px-4 py-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
@@ -359,57 +348,66 @@ VAS Pain: ${encounterData.vas_pain_start ?? 'N/A'}/10 → ${encounterData.vas_pa
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Easy Assessment</h1>
-                {patient?.data && (
-                  <p className="text-sm text-gray-500">
-                    {patient.data.first_name} {patient.data.last_name}
-                    {patient.data.date_of_birth && (
-                      <span className="ml-2">
-                        (Age: {Math.floor((new Date() - new Date(patient.data.date_of_birth)) / 31557600000)})
-                      </span>
-                    )}
-                  </p>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-lg font-bold text-gray-900">
+                    {patient?.data?.first_name} {patient?.data?.last_name}
+                  </h1>
+                  {patient?.data?.date_of_birth && (
+                    <span className="text-sm text-gray-500">
+                      {Math.floor((new Date() - new Date(patient.data.date_of_birth)) / 31557600000)} yrs old
+                    </span>
+                  )}
+                  <span className="px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800 rounded">
+                    Active
+                  </span>
+                </div>
+                {/* Visit Counter */}
+                {treatmentPlan && (
+                  <VisitCounter
+                    currentVisit={currentVisitNumber}
+                    totalVisits={treatmentPlan.phases?.reduce((sum, p) => sum + p.totalVisits, 0) || 0}
+                    className="mt-1"
+                  />
                 )}
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               {/* View Mode Toggle */}
               <div className="inline-flex rounded-lg border border-gray-300 bg-white p-0.5">
                 <button
                   onClick={() => setViewMode('easy')}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors flex items-center gap-1 ${
-                    viewMode === 'easy'
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-600 hover:bg-gray-100'
+                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                    viewMode === 'easy' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
-                  <Settings className="w-4 h-4" />
                   Easy
                 </button>
                 <button
                   onClick={() => setViewMode('detailed')}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors flex items-center gap-1 ${
-                    viewMode === 'detailed'
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-600 hover:bg-gray-100'
+                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                    viewMode === 'detailed' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
-                  <Edit3 className="w-4 h-4" />
                   Detailed
                 </button>
                 <button
                   onClick={() => setViewMode('preview')}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors flex items-center gap-1 ${
-                    viewMode === 'preview'
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-600 hover:bg-gray-100'
+                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                    viewMode === 'preview' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
-                  <Eye className="w-4 h-4" />
                   Preview
                 </button>
               </div>
+
+              <button
+                onClick={copyToClipboard}
+                className="flex items-center gap-1 px-3 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+              >
+                <Copy className="w-4 h-4" />
+                {copiedToClipboard ? 'Copied!' : 'Copy'}
+              </button>
 
               <button
                 onClick={handleSave}
@@ -424,157 +422,179 @@ VAS Pain: ${encounterData.vas_pain_start ?? 'N/A'}/10 → ${encounterData.vas_pa
         </div>
       </div>
 
-      {/* Alerts */}
-      {(redFlagAlerts.length > 0 || clinicalWarnings.length > 0) && (
-        <div className="max-w-7xl mx-auto px-4 py-3 space-y-2">
-          {redFlagAlerts.length > 0 && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
-              <AlertTriangle className="text-red-600 w-5 h-5 flex-shrink-0 mt-0.5" />
-              <div>
-                <span className="font-medium text-red-800">Red Flags: </span>
-                <span className="text-red-700">{redFlagAlerts.join(', ')}</span>
-              </div>
-            </div>
-          )}
-          {clinicalWarnings.length > 0 && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 flex items-start gap-2">
-              <AlertTriangle className="text-yellow-600 w-5 h-5 flex-shrink-0 mt-0.5" />
-              <div>
-                <span className="font-medium text-yellow-800">Warnings: </span>
-                <span className="text-yellow-700">{clinicalWarnings.join(', ')}</span>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+      {/* Main Layout - ChiroTouch Style 3-Column */}
+      <div className="flex h-[calc(100vh-64px)]">
+        {/* Left Sidebar - Problem List */}
+        <div className="w-72 bg-white border-r border-gray-200 overflow-y-auto flex-shrink-0">
+          <ProblemList
+            problems={problems}
+            onChange={setProblems}
+            patientName={`${patient?.data?.first_name || ''} ${patient?.data?.last_name || ''}`}
+            className="rounded-none border-0"
+          />
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Encounter Metadata Bar */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Date</label>
-              <input
-                type="date"
-                value={encounterData.encounter_date}
-                onChange={(e) => setEncounterData(prev => ({ ...prev, encounter_date: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Type</label>
-              <select
-                value={encounterData.encounter_type}
-                onChange={(e) => setEncounterData(prev => ({ ...prev, encounter_type: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="INITIAL">Initial Visit</option>
-                <option value="FOLLOWUP">Follow-up</option>
-                <option value="REEXAM">Re-examination</option>
-                <option value="EMERGENCY">Emergency</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Duration (min)</label>
-              <input
-                type="number"
-                value={encounterData.duration_minutes}
-                onChange={(e) => setEncounterData(prev => ({ ...prev, duration_minutes: parseInt(e.target.value) }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <VASPainScale
-                value={encounterData.vas_pain_start}
-                onChange={(val) => setEncounterData(prev => ({ ...prev, vas_pain_start: val }))}
-                label="Pain Start"
-                showFaces={false}
-                showDescription={false}
-                className="border-0 p-0"
-              />
-            </div>
-            <div>
-              <VASPainScale
-                value={encounterData.vas_pain_end}
-                onChange={(val) => setEncounterData(prev => ({ ...prev, vas_pain_end: val }))}
-                label="Pain End"
-                showFaces={false}
-                showDescription={false}
-                className="border-0 p-0"
-              />
-            </div>
-          </div>
+          <TreatmentPlanTracker
+            plan={treatmentPlan}
+            currentVisit={currentVisitNumber}
+            onChange={setTreatmentPlan}
+            className="rounded-none border-0 border-t"
+          />
         </div>
 
-        {/* Preview Mode */}
-        {viewMode === 'preview' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold mb-4">SOAP Note Preview</h2>
-            <pre className="whitespace-pre-wrap font-mono text-sm bg-gray-50 p-4 rounded-lg">
-              {generatePreviewText()}
-            </pre>
+        {/* Main Content Area */}
+        <div className="flex-1 overflow-y-auto">
+          {/* Alerts */}
+          {(redFlagAlerts.length > 0 || clinicalWarnings.length > 0) && (
+            <div className="px-4 py-2 space-y-2 bg-gray-50">
+              {redFlagAlerts.length > 0 && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-2 flex items-start gap-2">
+                  <AlertTriangle className="text-red-600 w-4 h-4 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-red-700">{redFlagAlerts.join(', ')}</span>
+                </div>
+              )}
+              {clinicalWarnings.length > 0 && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-2 flex items-start gap-2">
+                  <AlertTriangle className="text-yellow-600 w-4 h-4 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-yellow-700">{clinicalWarnings.join(', ')}</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Metadata Bar */}
+          <div className="bg-white border-b border-gray-200 px-4 py-3">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                <label className="text-xs font-medium text-gray-500">Date:</label>
+                <input
+                  type="date"
+                  value={encounterData.encounter_date}
+                  onChange={(e) => setEncounterData(prev => ({ ...prev, encounter_date: e.target.value }))}
+                  className="px-2 py-1 text-sm border border-gray-300 rounded"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-xs font-medium text-gray-500">Type:</label>
+                <select
+                  value={encounterData.encounter_type}
+                  onChange={(e) => setEncounterData(prev => ({ ...prev, encounter_type: e.target.value }))}
+                  className="px-2 py-1 text-sm border border-gray-300 rounded"
+                >
+                  <option value="INITIAL">Initial</option>
+                  <option value="FOLLOWUP">Follow-up</option>
+                  <option value="REEXAM">Re-exam</option>
+                  <option value="EMERGENCY">Emergency</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-xs font-medium text-gray-500">Duration:</label>
+                <input
+                  type="number"
+                  value={encounterData.duration_minutes}
+                  onChange={(e) => setEncounterData(prev => ({ ...prev, duration_minutes: parseInt(e.target.value) }))}
+                  className="w-16 px-2 py-1 text-sm border border-gray-300 rounded"
+                />
+                <span className="text-xs text-gray-500">min</span>
+              </div>
+              <div className="flex-1"></div>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <label className="text-xs font-medium text-gray-500">VAS Start:</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="10"
+                    value={encounterData.vas_pain_start ?? ''}
+                    onChange={(e) => setEncounterData(prev => ({ ...prev, vas_pain_start: e.target.value ? parseInt(e.target.value) : null }))}
+                    className="w-14 px-2 py-1 text-sm border border-gray-300 rounded text-center"
+                    placeholder="0-10"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="text-xs font-medium text-gray-500">VAS End:</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="10"
+                    value={encounterData.vas_pain_end ?? ''}
+                    onChange={(e) => setEncounterData(prev => ({ ...prev, vas_pain_end: e.target.value ? parseInt(e.target.value) : null }))}
+                    className="w-14 px-2 py-1 text-sm border border-gray-300 rounded text-center"
+                    placeholder="0-10"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
-        )}
 
-        {/* Easy/Detailed Mode */}
-        {viewMode !== 'preview' && (
-          <>
-            {/* Tab Navigation */}
-            <div className="flex items-center justify-between mb-6">
-              <button
-                onClick={goToPrevTab}
-                disabled={!canGoBack}
-                className={`flex items-center gap-1 px-3 py-2 rounded-lg font-medium ${
-                  canGoBack
-                    ? 'text-gray-700 hover:bg-gray-100'
-                    : 'text-gray-300 cursor-not-allowed'
-                }`}
-              >
-                <ChevronLeft className="w-4 h-4" />
-                Back
-              </button>
-
-              <div className="flex gap-2">
-                {tabs.map((tab, index) => (
+          {/* Preview Mode */}
+          {viewMode === 'preview' && (
+            <div className="p-4">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold">Chart Notes</h2>
                   <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                      activeTab === tab.id
-                        ? `bg-${tab.color}-100 text-${tab.color}-800 border-2 border-${tab.color}-300`
-                        : 'text-gray-600 hover:bg-gray-100'
-                    }`}
+                    onClick={copyToClipboard}
+                    className="flex items-center gap-1 px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded"
                   >
-                    <span>{tab.icon}</span>
-                    <span className="hidden sm:inline">{tab.label}</span>
-                    {index < currentTabIndex && (
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                    )}
+                    <Copy className="w-4 h-4" />
+                    {copiedToClipboard ? 'Copied!' : 'Copy to Clipboard'}
                   </button>
-                ))}
+                </div>
+                <pre className="whitespace-pre-wrap font-sans text-sm bg-gray-50 p-4 rounded-lg leading-relaxed">
+                  {generateNarrativeText()}
+                </pre>
+              </div>
+            </div>
+          )}
+
+          {/* Easy/Detailed Mode */}
+          {viewMode !== 'preview' && (
+            <div className="p-4">
+              {/* Tab Navigation */}
+              <div className="flex items-center justify-between mb-4">
+                <button
+                  onClick={goToPrevTab}
+                  disabled={!canGoBack}
+                  className={`flex items-center gap-1 px-3 py-2 rounded-lg font-medium ${
+                    canGoBack ? 'text-gray-700 hover:bg-gray-200' : 'text-gray-300 cursor-not-allowed'
+                  }`}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Back
+                </button>
+
+                <div className="flex gap-1 bg-white rounded-lg p-1 shadow-sm">
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                        activeTab === tab.id
+                          ? 'bg-blue-600 text-white shadow'
+                          : 'text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      <span>{tab.icon}</span>
+                      <span>{tab.label}</span>
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={goToNextTab}
+                  disabled={!canGoForward}
+                  className={`flex items-center gap-1 px-3 py-2 rounded-lg font-medium ${
+                    canGoForward ? 'text-gray-700 hover:bg-gray-200' : 'text-gray-300 cursor-not-allowed'
+                  }`}
+                >
+                  Next
+                  <ChevronRight className="w-4 h-4" />
+                </button>
               </div>
 
-              <button
-                onClick={goToNextTab}
-                disabled={!canGoForward}
-                className={`flex items-center gap-1 px-3 py-2 rounded-lg font-medium ${
-                  canGoForward
-                    ? 'text-gray-700 hover:bg-gray-100'
-                    : 'text-gray-300 cursor-not-allowed'
-                }`}
-              >
-                Next
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Tab Content */}
-            <div className="space-y-6">
               {/* SUBJECTIVE TAB */}
               {activeTab === 'subjective' && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Left Column - Main inputs */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                   <div className="lg:col-span-2 space-y-4">
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                       <SmartTextInput
@@ -590,7 +610,7 @@ VAS Pain: ${encounterData.vas_pain_start ?? 'N/A'}/10 → ${encounterData.vas_pa
 
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                       <SmartTextInput
-                        label="History / How it started"
+                        label="History"
                         value={encounterData.subjective.history}
                         onChange={(val) => updateField('subjective', 'history', val)}
                         placeholder="Describe how the problem developed..."
@@ -599,40 +619,37 @@ VAS Pain: ${encounterData.vas_pain_start ?? 'N/A'}/10 → ${encounterData.vas_pa
                       />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                        <SmartTextInput
-                          label="Onset"
-                          value={encounterData.subjective.onset}
-                          onChange={(val) => updateField('subjective', 'onset', val)}
-                          placeholder="When did it start?"
-                          quickPhrases={ONSET_PHRASES}
-                          rows={2}
-                        />
-                      </div>
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                      <SmartTextInput
+                        label="Onset"
+                        value={encounterData.subjective.onset}
+                        onChange={(val) => updateField('subjective', 'onset', val)}
+                        placeholder="When did it start?"
+                        quickPhrases={ONSET_PHRASES}
+                        rows={1}
+                      />
                     </div>
 
                     {viewMode === 'easy' && (
                       <>
                         <QuickCheckboxGrid
-                          title="Pain Quality (click to select)"
+                          title="Pain Quality"
                           categories={PAIN_QUALITY_OPTIONS}
                           selectedValues={encounterData.pain_qualities}
                           onChange={(vals) => updateQuickSelect('pain_qualities', vals)}
                           columns={3}
                         />
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-4">
                           <QuickCheckboxGrid
-                            title="What makes it worse?"
+                            title="Aggravating Factors"
                             categories={AGGRAVATING_FACTORS_OPTIONS}
                             selectedValues={encounterData.aggravating_factors_selected}
                             onChange={(vals) => updateQuickSelect('aggravating_factors_selected', vals)}
                             columns={2}
                           />
-
                           <QuickCheckboxGrid
-                            title="What makes it better?"
+                            title="Relieving Factors"
                             categories={RELIEVING_FACTORS_OPTIONS}
                             selectedValues={encounterData.relieving_factors_selected}
                             onChange={(vals) => updateQuickSelect('relieving_factors_selected', vals)}
@@ -641,169 +658,128 @@ VAS Pain: ${encounterData.vas_pain_start ?? 'N/A'}/10 → ${encounterData.vas_pa
                         </div>
                       </>
                     )}
-
-                    {viewMode === 'detailed' && (
-                      <>
-                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                          <SmartTextInput
-                            label="Pain Description"
-                            value={encounterData.subjective.pain_description}
-                            onChange={(val) => updateField('subjective', 'pain_description', val)}
-                            placeholder="Describe the pain quality..."
-                            rows={2}
-                          />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                            <SmartTextInput
-                              label="Aggravating Factors"
-                              value={encounterData.subjective.aggravating_factors}
-                              onChange={(val) => updateField('subjective', 'aggravating_factors', val)}
-                              placeholder="What makes it worse?"
-                              rows={2}
-                            />
-                          </div>
-                          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                            <SmartTextInput
-                              label="Relieving Factors"
-                              value={encounterData.subjective.relieving_factors}
-                              onChange={(val) => updateField('subjective', 'relieving_factors', val)}
-                              placeholder="What makes it better?"
-                              rows={2}
-                            />
-                          </div>
-                        </div>
-                      </>
-                    )}
                   </div>
 
-                  {/* Right Column - Pain location */}
                   <div className="space-y-4">
                     <BodyDiagram
                       selectedRegions={encounterData.pain_locations}
                       onChange={(vals) => updateQuickSelect('pain_locations', vals)}
                     />
-
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">Quick Select Regions</h4>
-                      <QuickRegionSelect
-                        selectedRegions={encounterData.pain_locations}
-                        onChange={(vals) => updateQuickSelect('pain_locations', vals)}
-                      />
-                    </div>
+                    <QuickRegionSelect
+                      selectedRegions={encounterData.pain_locations}
+                      onChange={(vals) => updateQuickSelect('pain_locations', vals)}
+                    />
                   </div>
                 </div>
               )}
 
               {/* OBJECTIVE TAB */}
               {activeTab === 'objective' && (
-                <div className="space-y-6">
-                  {viewMode === 'easy' ? (
-                    <>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <QuickCheckboxGrid
-                          title="Observation Findings"
-                          categories={OBSERVATION_FINDINGS_OPTIONS}
-                          selectedValues={encounterData.observation_findings}
-                          onChange={(vals) => updateQuickSelect('observation_findings', vals)}
-                          columns={2}
-                        />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <div className="lg:col-span-2 space-y-4">
+                    {viewMode === 'easy' ? (
+                      <>
+                        <div className="grid grid-cols-2 gap-4">
+                          <QuickCheckboxGrid
+                            title="Observation"
+                            categories={OBSERVATION_FINDINGS_OPTIONS}
+                            selectedValues={encounterData.observation_findings}
+                            onChange={(vals) => updateQuickSelect('observation_findings', vals)}
+                            columns={2}
+                          />
+                          <QuickCheckboxGrid
+                            title="Palpation"
+                            categories={PALPATION_FINDINGS_OPTIONS}
+                            selectedValues={encounterData.palpation_findings}
+                            onChange={(vals) => updateQuickSelect('palpation_findings', vals)}
+                            columns={2}
+                          />
+                        </div>
 
                         <QuickCheckboxGrid
-                          title="Palpation Findings"
-                          categories={PALPATION_FINDINGS_OPTIONS}
-                          selectedValues={encounterData.palpation_findings}
-                          onChange={(vals) => updateQuickSelect('palpation_findings', vals)}
-                          columns={2}
-                        />
-                      </div>
-
-                      <QuickCheckboxGrid
-                        title="Range of Motion"
-                        categories={ROM_FINDINGS_OPTIONS}
-                        selectedValues={encounterData.rom_findings}
-                        onChange={(vals) => updateQuickSelect('rom_findings', vals)}
-                        columns={3}
-                      />
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <QuickCheckboxGrid
-                          title="Orthopedic Tests"
-                          categories={ORTHO_TESTS_OPTIONS}
-                          selectedValues={encounterData.ortho_tests_selected}
-                          onChange={(vals) => updateQuickSelect('ortho_tests_selected', vals)}
-                          columns={2}
+                          title="Range of Motion"
+                          categories={ROM_FINDINGS_OPTIONS}
+                          selectedValues={encounterData.rom_findings}
+                          onChange={(vals) => updateQuickSelect('rom_findings', vals)}
+                          columns={3}
                         />
 
-                        <QuickCheckboxGrid
-                          title="Neurological Tests"
-                          categories={NEURO_TESTS_OPTIONS}
-                          selectedValues={encounterData.neuro_tests_selected}
-                          onChange={(vals) => updateQuickSelect('neuro_tests_selected', vals)}
-                          columns={2}
-                        />
+                        <div className="grid grid-cols-2 gap-4">
+                          <QuickCheckboxGrid
+                            title="Orthopedic Tests"
+                            categories={ORTHO_TESTS_OPTIONS}
+                            selectedValues={encounterData.ortho_tests_selected}
+                            onChange={(vals) => updateQuickSelect('ortho_tests_selected', vals)}
+                            columns={2}
+                          />
+                          <QuickCheckboxGrid
+                            title="Neurological"
+                            categories={NEURO_TESTS_OPTIONS}
+                            selectedValues={encounterData.neuro_tests_selected}
+                            onChange={(vals) => updateQuickSelect('neuro_tests_selected', vals)}
+                            columns={2}
+                          />
+                        </div>
+                      </>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                          <SmartTextInput
+                            label="Observation"
+                            value={encounterData.objective.observation}
+                            onChange={(val) => updateField('objective', 'observation', val)}
+                            placeholder="Visual observations, gait, posture..."
+                            rows={3}
+                          />
+                        </div>
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                          <SmartTextInput
+                            label="Palpation"
+                            value={encounterData.objective.palpation}
+                            onChange={(val) => updateField('objective', 'palpation', val)}
+                            placeholder="Tenderness, muscle tension..."
+                            rows={3}
+                          />
+                        </div>
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                          <SmartTextInput
+                            label="Range of Motion"
+                            value={encounterData.objective.rom}
+                            onChange={(val) => updateField('objective', 'rom', val)}
+                            placeholder="ROM findings..."
+                            rows={3}
+                          />
+                        </div>
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                          <SmartTextInput
+                            label="Orthopedic Tests"
+                            value={encounterData.objective.ortho_tests}
+                            onChange={(val) => updateField('objective', 'ortho_tests', val)}
+                            placeholder="Test results..."
+                            rows={3}
+                          />
+                        </div>
                       </div>
-                    </>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                        <SmartTextInput
-                          label="Observation"
-                          value={encounterData.objective.observation}
-                          onChange={(val) => updateField('objective', 'observation', val)}
-                          placeholder="Visual observations, gait, posture..."
-                          rows={3}
-                        />
-                      </div>
-                      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                        <SmartTextInput
-                          label="Palpation"
-                          value={encounterData.objective.palpation}
-                          onChange={(val) => updateField('objective', 'palpation', val)}
-                          placeholder="Tenderness, muscle tension, trigger points..."
-                          rows={3}
-                        />
-                      </div>
-                      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                        <SmartTextInput
-                          label="Range of Motion"
-                          value={encounterData.objective.rom}
-                          onChange={(val) => updateField('objective', 'rom', val)}
-                          placeholder="ROM findings..."
-                          rows={3}
-                        />
-                      </div>
-                      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                        <SmartTextInput
-                          label="Orthopedic Tests"
-                          value={encounterData.objective.ortho_tests}
-                          onChange={(val) => updateField('objective', 'ortho_tests', val)}
-                          placeholder="SLR, Kemp's, etc..."
-                          rows={3}
-                        />
-                      </div>
-                      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                        <SmartTextInput
-                          label="Neurological Tests"
-                          value={encounterData.objective.neuro_tests}
-                          onChange={(val) => updateField('objective', 'neuro_tests', val)}
-                          placeholder="Reflexes, sensation, motor strength..."
-                          rows={3}
-                        />
-                      </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
+
+                  {/* Spine Diagram */}
+                  <div>
+                    <SpineDiagram
+                      findings={encounterData.spinal_findings}
+                      onChange={(findings) => updateQuickSelect('spinal_findings', findings)}
+                    />
+                  </div>
                 </div>
               )}
 
               {/* ASSESSMENT TAB */}
               {activeTab === 'assessment' && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                   <div className="lg:col-span-2 space-y-4">
-                    {/* Diagnosis Selection */}
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Diagnosis (ICPC-2)
+                        Diagnosis (ICPC-2 / ICD-10)
                       </label>
                       <select
                         onChange={(e) => {
@@ -812,9 +788,9 @@ VAS Pain: ${encounterData.vas_pain_start ?? 'N/A'}/10 → ${encounterData.vas_pa
                             e.target.value = '';
                           }
                         }}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
                       >
-                        <option value="">Select a diagnosis...</option>
+                        <option value="">Select diagnosis...</option>
                         {commonDiagnoses?.data?.map(code => (
                           <option key={code.code} value={code.code}>
                             {code.code} - {code.description_no || code.description_en}
@@ -825,15 +801,10 @@ VAS Pain: ${encounterData.vas_pain_start ?? 'N/A'}/10 → ${encounterData.vas_pa
                         {encounterData.icpc_codes.map(code => (
                           <span
                             key={code}
-                            className="inline-flex items-center gap-2 px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm"
+                            className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm"
                           >
                             {code}
-                            <button
-                              onClick={() => removeDiagnosisCode(code)}
-                              className="text-purple-600 hover:text-purple-800"
-                            >
-                              ×
-                            </button>
+                            <button onClick={() => removeDiagnosisCode(code)} className="hover:text-purple-600">×</button>
                           </span>
                         ))}
                       </div>
@@ -844,7 +815,7 @@ VAS Pain: ${encounterData.vas_pain_start ?? 'N/A'}/10 → ${encounterData.vas_pa
                         label="Clinical Reasoning"
                         value={encounterData.assessment.clinical_reasoning}
                         onChange={(val) => updateField('assessment', 'clinical_reasoning', val)}
-                        placeholder="Your clinical reasoning for the diagnosis..."
+                        placeholder="Your clinical reasoning..."
                         quickPhrases={CLINICAL_REASONING_PHRASES}
                         rows={4}
                       />
@@ -872,7 +843,6 @@ VAS Pain: ${encounterData.vas_pain_start ?? 'N/A'}/10 → ${encounterData.vas_pa
                     </div>
                   </div>
 
-                  {/* Outcome Assessment Panel */}
                   <div className="space-y-4">
                     <VASComparisonDisplay
                       startValue={encounterData.vas_pain_start}
@@ -881,7 +851,7 @@ VAS Pain: ${encounterData.vas_pain_start ?? 'N/A'}/10 → ${encounterData.vas_pa
 
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                       <h4 className="text-sm font-medium text-gray-700 mb-3">Outcome Assessment</h4>
-                      <div className="flex gap-2 mb-3">
+                      <div className="grid grid-cols-3 gap-2">
                         {Object.values(QUESTIONNAIRE_TYPES).map(type => (
                           <button
                             key={type}
@@ -889,20 +859,12 @@ VAS Pain: ${encounterData.vas_pain_start ?? 'N/A'}/10 → ${encounterData.vas_pa
                               setOutcomeType(type);
                               setShowOutcomeAssessment(true);
                             }}
-                            className="flex-1 px-3 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+                            className="px-2 py-2 text-xs font-medium bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
                           >
                             {type}
                           </button>
                         ))}
                       </div>
-                      {encounterData.outcome_assessment?.score && (
-                        <div className="bg-green-50 p-3 rounded-lg">
-                          <div className="text-sm text-green-800">
-                            <strong>{encounterData.outcome_assessment.type}:</strong>{' '}
-                            {encounterData.outcome_assessment.score}%
-                          </div>
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>
@@ -910,75 +872,65 @@ VAS Pain: ${encounterData.vas_pain_start ?? 'N/A'}/10 → ${encounterData.vas_pa
 
               {/* PLAN TAB */}
               {activeTab === 'plan' && (
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {viewMode === 'easy' ? (
                     <>
                       <QuickCheckboxGrid
-                        title="Treatment Performed (click to select)"
+                        title="Treatment Performed"
                         categories={TREATMENT_OPTIONS}
                         selectedValues={encounterData.treatments_selected}
                         onChange={(vals) => updateQuickSelect('treatments_selected', vals)}
-                        columns={3}
+                        columns={4}
                       />
 
-                      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                        <SmartTextInput
-                          label="Additional Treatment Notes"
-                          value={encounterData.plan.treatment}
-                          onChange={(val) => updateField('plan', 'treatment', val)}
-                          placeholder="Any additional treatment details..."
-                          rows={2}
-                        />
-                      </div>
-
                       <QuickCheckboxGrid
-                        title="Home Exercises Prescribed"
+                        title="Home Exercises"
                         categories={EXERCISE_OPTIONS}
                         selectedValues={encounterData.exercises_selected}
                         onChange={(vals) => updateQuickSelect('exercises_selected', vals)}
-                        columns={3}
+                        columns={4}
                       />
                     </>
                   ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
                       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                         <SmartTextInput
-                          label="Treatment Performed"
+                          label="Treatment"
                           value={encounterData.plan.treatment}
                           onChange={(val) => updateField('plan', 'treatment', val)}
-                          placeholder="Treatment techniques used..."
+                          placeholder="Treatment performed..."
                           rows={4}
                         />
                       </div>
                       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                         <SmartTextInput
-                          label="Home Exercises"
+                          label="Exercises"
                           value={encounterData.plan.exercises}
                           onChange={(val) => updateField('plan', 'exercises', val)}
-                          placeholder="Exercises prescribed..."
+                          placeholder="Home exercises..."
                           rows={4}
                         />
                       </div>
                     </div>
                   )}
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                       <SmartTextInput
                         label="Advice"
                         value={encounterData.plan.advice}
                         onChange={(val) => updateField('plan', 'advice', val)}
-                        placeholder="Patient advice and education..."
+                        placeholder="Patient education..."
                         quickPhrases={ADVICE_PHRASES}
                         rows={3}
                       />
                     </div>
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                       <SmartTextInput
-                        label="Follow-up Plan"
+                        label="Follow-up"
                         value={encounterData.plan.follow_up}
                         onChange={(val) => updateField('plan', 'follow_up', val)}
-                        placeholder="Next appointment, treatment frequency..."
+                        placeholder="Next appointment..."
                         quickPhrases={FOLLOW_UP_PHRASES}
                         rows={3}
                       />
@@ -987,8 +939,25 @@ VAS Pain: ${encounterData.vas_pain_start ?? 'N/A'}/10 → ${encounterData.vas_pa
                 </div>
               )}
             </div>
-          </>
-        )}
+          )}
+        </div>
+
+        {/* Right Sidebar - Chart Notes Preview */}
+        <div className="w-80 bg-white border-l border-gray-200 overflow-y-auto flex-shrink-0">
+          <div className="p-4 bg-gray-50 border-b border-gray-200">
+            <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              Chart Notes
+            </h3>
+          </div>
+          <div className="p-4">
+            <div className="prose prose-sm max-w-none">
+              <pre className="whitespace-pre-wrap font-sans text-xs text-gray-700 leading-relaxed">
+                {generateNarrativeText()}
+              </pre>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Outcome Assessment Modal */}
@@ -996,7 +965,7 @@ VAS Pain: ${encounterData.vas_pain_start ?? 'N/A'}/10 → ${encounterData.vas_pa
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold">Outcome Assessment - {outcomeType}</h3>
+              <h3 className="text-lg font-semibold">{outcomeType} Assessment</h3>
               <button
                 onClick={() => setShowOutcomeAssessment(false)}
                 className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
@@ -1009,63 +978,33 @@ VAS Pain: ${encounterData.vas_pain_start ?? 'N/A'}/10 → ${encounterData.vas_pa
                 type={outcomeType}
                 responses={encounterData.outcome_assessment?.responses || {}}
                 onChange={(responses) => {
-                  const questions = outcomeType === 'ODI' ? 6 : outcomeType === 'NDI' ? 6 : 3;
                   const answered = Object.keys(responses).length;
                   const total = Object.values(responses).reduce((sum, val) => sum + val, 0);
                   const percentage = answered > 0 ? Math.round((total / (answered * 5)) * 100) : null;
-
                   setEncounterData(prev => ({
                     ...prev,
-                    outcome_assessment: {
-                      type: outcomeType,
-                      responses,
-                      score: percentage
-                    }
+                    outcome_assessment: { type: outcomeType, responses, score: percentage }
                   }));
                 }}
               />
             </div>
-            <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
+            <div className="px-6 py-4 border-t border-gray-200 flex justify-end">
               <button
                 onClick={() => setShowOutcomeAssessment(false)}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
               >
-                Close
+                Done
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* AI Assistant Button */}
-      {!showAIAssistant && (
-        <button
-          onClick={() => setShowAIAssistant(true)}
-          className="fixed bottom-6 right-6 w-14 h-14 bg-purple-600 text-white rounded-full shadow-lg hover:bg-purple-700 transition-all flex items-center justify-center"
-          title="AI Clinical Assistant"
-        >
-          <Brain className="w-6 h-6" />
-          <Sparkles className="w-3 h-3 absolute -top-1 -right-1 text-yellow-300" />
-        </button>
-      )}
-
-      {/* Template Picker Button */}
-      {!showTemplatePicker && !showAIAssistant && (
-        <button
-          onClick={() => setShowTemplatePicker(true)}
-          className="fixed bottom-6 left-6 w-14 h-14 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 transition-all flex items-center justify-center"
-          title="Clinical Templates"
-        >
-          <BookOpen className="w-6 h-6" />
-        </button>
-      )}
-
-      {/* Template Picker Sidebar */}
+      {/* Template Picker */}
       <TemplatePicker
         isOpen={showTemplatePicker}
         onClose={() => setShowTemplatePicker(false)}
         onSelectTemplate={(text) => {
-          // Insert into appropriate field based on active tab
           if (activeTab === 'subjective') {
             updateField('subjective', 'history', encounterData.subjective.history + '\n' + text);
           } else if (activeTab === 'objective') {
@@ -1078,6 +1017,17 @@ VAS Pain: ${encounterData.vas_pain_start ?? 'N/A'}/10 → ${encounterData.vas_pa
         }}
         soapSection={activeTab}
       />
+
+      {/* Floating Template Button */}
+      {!showTemplatePicker && (
+        <button
+          onClick={() => setShowTemplatePicker(true)}
+          className="fixed bottom-6 right-6 w-12 h-12 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 flex items-center justify-center"
+          title="Templates"
+        >
+          <BookOpen className="w-5 h-5" />
+        </button>
+      )}
     </div>
   );
 }
