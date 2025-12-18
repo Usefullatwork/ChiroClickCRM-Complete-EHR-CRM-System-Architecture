@@ -136,6 +136,13 @@ export default function PatientDetail() {
                 Edit
               </button>
               <button
+                onClick={() => navigate(`/patients/${id}/easy-assessment`)}
+                className="flex items-center gap-2 px-4 py-2 text-white bg-purple-600 rounded-lg hover:bg-purple-700"
+              >
+                <FileText className="w-4 h-4" />
+                Easy Assessment
+              </button>
+              <button
                 onClick={() => navigate(`/patients/${id}/encounter`)}
                 className="flex items-center gap-2 px-4 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700"
               >

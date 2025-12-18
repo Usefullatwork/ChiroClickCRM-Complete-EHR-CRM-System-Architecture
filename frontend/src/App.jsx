@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard'
 import Patients from './pages/Patients'
 import PatientDetail from './pages/PatientDetail'
 import ClinicalEncounter from './pages/ClinicalEncounter'
+import EasyAssessment from './pages/EasyAssessment'
 import Appointments from './pages/Appointments'
 import Communications from './pages/Communications'
 import FollowUps from './pages/FollowUps'
@@ -39,6 +40,8 @@ function App() {
         <Route path="patients/:id" element={<PatientDetail />} />
         <Route path="patients/:patientId/encounter" element={<ClinicalEncounter />} />
         <Route path="patients/:patientId/encounter/:encounterId" element={<ClinicalEncounter />} />
+        <Route path="patients/:patientId/easy-assessment" element={<EasyAssessment />} />
+        <Route path="patients/:patientId/easy-assessment/:encounterId" element={<EasyAssessment />} />
         <Route path="appointments" element={<Appointments />} />
         <Route path="communications" element={<Communications />} />
         <Route path="follow-ups" element={<FollowUps />} />
