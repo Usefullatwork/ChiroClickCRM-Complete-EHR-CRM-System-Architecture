@@ -24,6 +24,9 @@ import {
   VisitCounter,
   generateFullNarrative,
   generateEncounterSummary,
+  BodyChart,
+  BodyChartGallery,
+  TemplateLibrary,
   PAIN_QUALITY_OPTIONS,
   AGGRAVATING_FACTORS_OPTIONS,
   RELIEVING_FACTORS_OPTIONS,
@@ -63,6 +66,8 @@ export default function EasyAssessment() {
   const [showOutcomeAssessment, setShowOutcomeAssessment] = useState(false);
   const [outcomeType, setOutcomeType] = useState('ODI');
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
+  const [showBodyChart, setShowBodyChart] = useState(false);
+  const [showTemplateLibrary, setShowTemplateLibrary] = useState(false);
 
   // Form state - SOAP format with quick-select arrays
   const [encounterData, setEncounterData] = useState({
@@ -140,6 +145,12 @@ export default function EasyAssessment() {
       type: null,
       responses: {},
       score: null
+    },
+
+    // Body Chart annotations (Jane App style)
+    body_chart: {
+      annotations: [],
+      markers: []
     }
   });
 
@@ -661,6 +672,25 @@ export default function EasyAssessment() {
                   </div>
 
                   <div className="space-y-4">
+                    {/* Body Chart Gallery Preview */}
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium text-gray-900">Body Chart</h4>
+                        <button
+                          onClick={() => setShowBodyChart(true)}
+                          className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        >
+                          Open Full Chart
+                        </button>
+                      </div>
+                      <BodyChartGallery
+                        markers={encounterData.body_chart?.markers || []}
+                        annotations={encounterData.body_chart?.annotations || []}
+                        onViewSelect={() => setShowBodyChart(true)}
+                      />
+                    </div>
+
+                    {/* Quick Region Select (fallback) */}
                     <BodyDiagram
                       selectedRegions={encounterData.pain_locations}
                       onChange={(vals) => updateQuickSelect('pain_locations', vals)}
@@ -1018,16 +1048,118 @@ export default function EasyAssessment() {
         soapSection={activeTab}
       />
 
-      {/* Floating Template Button */}
-      {!showTemplatePicker && (
+      {/* Body Chart Modal */}
+      {showBodyChart && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold">Body Chart - Annotate Pain Locations</h3>
+              <button
+                onClick={() => setShowBodyChart(false)}
+                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="overflow-y-auto max-h-[70vh]">
+              <BodyChart
+                initialView="front"
+                initialAnnotations={encounterData.body_chart?.annotations || []}
+                initialMarkers={encounterData.body_chart?.markers || []}
+                onSave={({ annotations, markers }) => {
+                  setEncounterData(prev => ({
+                    ...prev,
+                    body_chart: { annotations, markers }
+                  }));
+                  setShowBodyChart(false);
+                }}
+                showToolbar={true}
+                height={450}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Template Library Modal (Jane App Style) */}
+      {showTemplateLibrary && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold">Chart Template Library</h3>
+              <button
+                onClick={() => setShowTemplateLibrary(false)}
+                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="overflow-y-auto max-h-[75vh]">
+              <TemplateLibrary
+                embedded={true}
+                showHeader={false}
+                onSelectTemplate={(template) => {
+                  // Insert template content based on current tab
+                  if (activeTab === 'subjective') {
+                    if (template.content?.subjective) {
+                      updateField('subjective', 'chief_complaint',
+                        (encounterData.subjective.chief_complaint ? encounterData.subjective.chief_complaint + '\n' : '') +
+                        template.content.subjective
+                      );
+                    }
+                    if (template.content?.history) {
+                      updateField('subjective', 'history',
+                        (encounterData.subjective.history ? encounterData.subjective.history + '\n' : '') +
+                        template.content.history
+                      );
+                    }
+                  } else if (activeTab === 'objective') {
+                    if (template.content?.objective) {
+                      updateField('objective', 'observation',
+                        (encounterData.objective.observation ? encounterData.objective.observation + '\n' : '') +
+                        template.content.objective
+                      );
+                    }
+                  } else if (activeTab === 'assessment') {
+                    if (template.content?.assessment) {
+                      updateField('assessment', 'clinical_reasoning',
+                        (encounterData.assessment.clinical_reasoning ? encounterData.assessment.clinical_reasoning + '\n' : '') +
+                        template.content.assessment
+                      );
+                    }
+                  } else if (activeTab === 'plan') {
+                    if (template.content?.plan) {
+                      updateField('plan', 'treatment',
+                        (encounterData.plan.treatment ? encounterData.plan.treatment + '\n' : '') +
+                        template.content.plan
+                      );
+                    }
+                  }
+                  setShowTemplateLibrary(false);
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Action Buttons */}
+      <div className="fixed bottom-6 right-6 flex flex-col gap-3">
+        <button
+          onClick={() => setShowTemplateLibrary(true)}
+          className="w-12 h-12 bg-purple-600 text-white rounded-full shadow-lg hover:bg-purple-700 flex items-center justify-center"
+          title="Template Library"
+        >
+          <Sparkles className="w-5 h-5" />
+        </button>
         <button
           onClick={() => setShowTemplatePicker(true)}
-          className="fixed bottom-6 right-6 w-12 h-12 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 flex items-center justify-center"
-          title="Templates"
+          className="w-12 h-12 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 flex items-center justify-center"
+          title="Quick Templates"
         >
           <BookOpen className="w-5 h-5" />
         </button>
-      )}
+      </div>
     </div>
   );
 }

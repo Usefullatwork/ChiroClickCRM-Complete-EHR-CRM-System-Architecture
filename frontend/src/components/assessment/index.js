@@ -55,3 +55,20 @@ export {
   generateFullNarrative,
   generateEncounterSummary
 } from './NarrativeGenerator';
+
+// Interactive Body Chart with drawing tools (Jane App style)
+export {
+  default as BodyChart,
+  BodyChartCompact,
+  BodyChartGallery,
+  BODY_VIEWS,
+  CHART_COLORS
+} from './BodyChart';
+
+// Template Library with discipline categories (Jane App style)
+export {
+  default as TemplateLibrary,
+  TemplateLibraryCompact,
+  DISCIPLINES,
+  TEMPLATE_DATABASE
+} from './TemplateLibrary';
