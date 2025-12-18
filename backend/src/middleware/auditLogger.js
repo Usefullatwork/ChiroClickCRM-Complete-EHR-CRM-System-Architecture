@@ -25,7 +25,12 @@ const SENSITIVE_RESOURCES = [
   'clinical_encounters',
   'communications',
   'financial_metrics',
-  'gdpr_requests'
+  'gdpr_requests',
+  'billing',
+  'claims',
+  'episodes',
+  'auth',
+  'care_episodes'
 ];
 
 /**
@@ -46,11 +51,17 @@ const getResourceType = (path) => {
     'followups': 'FOLLOW_UP',
     'follow-ups': 'FOLLOW_UP',
     'financial': 'FINANCIAL_METRIC',
+    'billing': 'BILLING',
+    'claims': 'CLAIM',
+    'episodes': 'CARE_EPISODE',
     'encounters': 'CLINICAL_ENCOUNTER',
     'templates': 'MESSAGE_TEMPLATE',
     'users': 'USER',
     'organizations': 'ORGANIZATION',
-    'gdpr': 'GDPR_REQUEST'
+    'gdpr': 'GDPR_REQUEST',
+    'auth': 'AUTH',
+    'outcomes': 'OUTCOME_MEASURE',
+    'treatments': 'TREATMENT_PLAN'
   };
 
   return resourceMap[resource] || resource.toUpperCase();
@@ -66,6 +77,8 @@ const getResourceId = (req) => {
   if (req.params.id) return req.params.id;
   if (req.params.patientId) return req.params.patientId;
   if (req.params.encounterId) return req.params.encounterId;
+  if (req.params.episodeId) return req.params.episodeId;
+  if (req.params.claimId) return req.params.claimId;
 
   // Try body for POST requests
   if (req.method === 'POST' && req.body?.id) return req.body.id;
@@ -232,8 +245,85 @@ export const auditBulkOperation = async (req, action, resourceType, resourceIds,
   }
 };
 
+/**
+ * Audit authentication events
+ * @param {Object} params - Auth event parameters
+ */
+export const auditAuthEvent = async ({
+  action, // 'LOGIN', 'LOGOUT', 'LOGIN_FAILED', 'PASSWORD_CHANGE', 'PASSWORD_RESET', 'REGISTER'
+  userId = null,
+  userEmail,
+  organizationId = null,
+  success = true,
+  ipAddress,
+  userAgent,
+  metadata = {}
+}) => {
+  try {
+    await logAudit({
+      organizationId,
+      userId,
+      userEmail,
+      userRole: null,
+      action: `AUTH_${action}`,
+      resourceType: 'AUTH',
+      resourceId: userId,
+      changes: null,
+      reason: null,
+      ipAddress,
+      userAgent,
+      metadata: {
+        success,
+        ...metadata
+      }
+    });
+  } catch (error) {
+    logger.error('Auth audit logging failed', {
+      error: error.message,
+      action,
+      userEmail
+    });
+  }
+};
+
+/**
+ * Audit billing/claim events
+ * @param {Object} req - Express request
+ * @param {string} action - Action type
+ * @param {Object} details - Event details
+ */
+export const auditBillingEvent = async (req, action, details = {}) => {
+  try {
+    await logAudit({
+      organizationId: req.organizationId,
+      userId: req.user?.id,
+      userEmail: req.user?.email,
+      userRole: req.user?.role,
+      action: `BILLING_${action}`,
+      resourceType: details.resourceType || 'CLAIM',
+      resourceId: details.resourceId,
+      changes: details.changes || null,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+      metadata: {
+        claimNumber: details.claimNumber,
+        amount: details.amount,
+        modifier: details.modifier,
+        ...details.metadata
+      }
+    });
+  } catch (error) {
+    logger.error('Billing audit logging failed', {
+      error: error.message,
+      action
+    });
+  }
+};
+
 export default {
   auditLogger,
   auditSensitiveAccess,
-  auditBulkOperation
+  auditBulkOperation,
+  auditAuthEvent,
+  auditBillingEvent
 };
