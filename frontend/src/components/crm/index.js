@@ -24,3 +24,10 @@ export {
   RECALL_TYPES,
   MESSAGE_TEMPLATES,
 } from './RecallManager';
+
+// Two-Way SMS Communication
+export {
+  default as SMSConversation,
+  UnreadBadge,
+  ConversationPreview,
+} from './SMSConversation';

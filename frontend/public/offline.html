@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline - ChiroClick CRM</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+    .icon {
+      width: 80px;
+      height: 80px;
+      background: #fef3c7;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 40px;
+    }
+    h1 {
+      color: #1e3a8a;
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+    p {
+      color: #64748b;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .retry-btn {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .retry-btn:hover {
+      background: #1d4ed8;
+    }
+    .status {
+      margin-top: 24px;
+      padding: 12px;
+      background: #f1f5f9;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #475569;
+    }
+    .status.online {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .lang-switch {
+      margin-top: 20px;
+      font-size: 14px;
+    }
+    .lang-switch button {
+      background: none;
+      border: none;
+      color: #2563eb;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">📡</div>
+
+    <!-- English Version -->
+    <div id="content-en">
+      <h1>You're Offline</h1>
+      <p>
+        It looks like you've lost your internet connection.
+        Don't worry - any work you've saved will sync automatically when you're back online.
+      </p>
+      <button class="retry-btn" onclick="checkConnection()">
+        Try Again
+      </button>
+      <div id="status-en" class="status">
+        Waiting for connection...
+      </div>
+    </div>
+
+    <!-- Norwegian Version -->
+    <div id="content-no" class="hidden">
+      <h1>Du er frakoblet</h1>
+      <p>
+        Det ser ut som du har mistet internettforbindelsen.
+        Ikke bekymre deg - alt arbeid du har lagret vil synkroniseres automatisk når du er tilbake online.
+      </p>
+      <button class="retry-btn" onclick="checkConnection()">
+        Prøv igjen
+      </button>
+      <div id="status-no" class="status">
+        Venter på tilkobling...
+      </div>
+    </div>
+
+    <div class="lang-switch">
+      <button onclick="setLang('en')">English</button> |
+      <button onclick="setLang('no')">Norsk</button>
+    </div>
+  </div>
+
+  <script>
+    // Language preference
+    let currentLang = localStorage.getItem('chiroclick_lang') || 'en';
+
+    function setLang(lang) {
+      currentLang = lang;
+      localStorage.setItem('chiroclick_lang', lang);
+      document.getElementById('content-en').classList.toggle('hidden', lang !== 'en');
+      document.getElementById('content-no').classList.toggle('hidden', lang !== 'no');
+    }
+
+    // Initialize language
+    setLang(currentLang);
+
+    // Check connection
+    function checkConnection() {
+      const statusEn = document.getElementById('status-en');
+      const statusNo = document.getElementById('status-no');
+
+      statusEn.textContent = 'Checking connection...';
+      statusNo.textContent = 'Sjekker tilkobling...';
+
+      fetch('/', { method: 'HEAD', cache: 'no-store' })
+        .then(() => {
+          statusEn.textContent = 'Connection restored! Redirecting...';
+          statusNo.textContent = 'Tilkobling gjenopprettet! Omdirigerer...';
+          statusEn.classList.add('online');
+          statusNo.classList.add('online');
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        })
+        .catch(() => {
+          statusEn.textContent = 'Still offline. Please check your connection.';
+          statusNo.textContent = 'Fortsatt frakoblet. Sjekk tilkoblingen din.';
+          statusEn.classList.remove('online');
+          statusNo.classList.remove('online');
+        });
+    }
+
+    // Auto-check when online event fires
+    window.addEventListener('online', () => {
+      checkConnection();
+    });
+
+    // Initial check
+    if (navigator.onLine) {
+      checkConnection();
+    }
+  </script>
+</body>
+</html>
