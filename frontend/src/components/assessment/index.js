@@ -72,3 +72,53 @@ export {
   DISCIPLINES,
   TEMPLATE_DATABASE
 } from './TemplateLibrary';
+
+// =============================================================================
+// PHASE 1: "15-Second Note" Engine Components
+// =============================================================================
+
+// SALT - Same As Last Treatment (ChiroTouch style)
+export {
+  default as SALTButton,
+  SALTButtonCompact
+} from './SALTButton';
+
+// Hot Button Macro Matrix (ChiroTouch style)
+export {
+  default as MacroMatrix,
+  MacroMatrixInline,
+  DEFAULT_MACROS
+} from './MacroMatrix';
+
+// Slash Commands text expansion (Jane App style)
+export {
+  default as SlashCommandTextArea,
+  useSlashCommands,
+  SlashCommandMenu,
+  SlashCommandReference,
+  DEFAULT_COMMANDS
+} from './SlashCommands';
+
+// =============================================================================
+// COMPLIANCE & DOCUMENTATION ENGINE
+// =============================================================================
+
+// Compliance Engine with conditional logic gates
+export {
+  default as CompliancePanel,
+  ComplianceIndicator,
+  checkCompliance,
+  TREATMENT_QUALIFIERS,
+  DIAGNOSIS_TREATMENT_RULES,
+  RED_FLAGS
+} from './ComplianceEngine';
+
+// Print Preview with narrative formatting (Attorney Test)
+export {
+  default as PrintPreview,
+  generateSubjectiveNarrative as generatePrintSubjective,
+  generateObjectiveNarrative as generatePrintObjective,
+  generateAssessmentNarrative as generatePrintAssessment,
+  generatePlanNarrative as generatePrintPlan,
+  generateSpinalNarrative
+} from './PrintPreview';
