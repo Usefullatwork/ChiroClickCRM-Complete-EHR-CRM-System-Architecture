@@ -144,3 +144,27 @@ export {
   getCategoryMacros,
   buildMacroMatrix
 } from './macroContent';
+
+// =============================================================================
+// PHASE 2: LOCAL AI INTEGRATION (Ollama)
+// =============================================================================
+
+// Intake-to-Subjective Parser (Rheo-style)
+export {
+  default as IntakeParser,
+  IntakeParserButton,
+  IntakeParserInline
+} from './IntakeParser';
+
+// AI Scribe - Voice-to-Note (Ambient Documentation)
+export {
+  default as AIScribe,
+  AIScribeButton,
+  AIScribeCompact
+} from './AIScribe';
+
+// AI Settings Panel
+export {
+  default as AISettings,
+  AIStatusIndicator
+} from './AISettings';

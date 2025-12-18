@@ -5,7 +5,7 @@ import { encountersAPI, patientsAPI, diagnosisAPI } from '../services/api';
 import {
   Save, AlertTriangle, Brain, X, Sparkles, Globe,
   BookOpen, ChevronLeft, ChevronRight, Settings, Eye, Edit3,
-  FileText, Printer, Copy, Shield, Grid, Command
+  FileText, Printer, Copy, Shield, Grid, Command, Mic, Cpu
 } from 'lucide-react';
 import TemplatePicker from '../components/TemplatePicker';
 
@@ -40,6 +40,13 @@ import {
   createTranslator,
   AVAILABLE_LANGUAGES,
   getMacroContent,
+  // Phase 2 AI Components
+  IntakeParser,
+  IntakeParserButton,
+  AIScribe,
+  AIScribeButton,
+  AISettings,
+  AIStatusIndicator,
   // Options
   PAIN_QUALITY_OPTIONS,
   AGGRAVATING_FACTORS_OPTIONS,
@@ -89,6 +96,10 @@ export default function EasyAssessment() {
   const [showPrintPreview, setShowPrintPreview] = useState(false);
   const [showSlashReference, setShowSlashReference] = useState(false);
   const [macroFavorites, setMacroFavorites] = useState([]);
+  // Phase 2 AI states
+  const [showAIScribe, setShowAIScribe] = useState(false);
+  const [showAISettings, setShowAISettings] = useState(false);
+  const [showIntakeParser, setShowIntakeParser] = useState(false);
   // Create translator function bound to current language
   const tr = createTranslator(language);
 
@@ -476,6 +487,28 @@ export default function EasyAssessment() {
                 onApply={handleSALTApply}
               />
 
+              {/* AI Status & Controls */}
+              <div className="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
+                <AIStatusIndicator
+                  language={language}
+                  onClick={() => setShowAISettings(true)}
+                />
+                <button
+                  onClick={() => setShowAIScribe(true)}
+                  className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100"
+                  title={language === 'en' ? 'AI Voice Scribe' : 'AI Stemmeskriver'}
+                >
+                  <Mic className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setShowAISettings(true)}
+                  className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                  title={language === 'en' ? 'AI Settings' : 'AI-innstillinger'}
+                >
+                  <Cpu className="w-4 h-4" />
+                </button>
+              </div>
+
               {/* Compliance Indicator */}
               <ComplianceIndicator
                 encounterData={encounterData}
@@ -723,6 +756,30 @@ export default function EasyAssessment() {
               {activeTab === 'subjective' && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                   <div className="lg:col-span-2 space-y-4">
+                    {/* AI Generate from Intake Button */}
+                    <div className="flex items-center justify-between bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-3 border border-purple-100">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-5 h-5 text-purple-500" />
+                        <span className="text-sm text-purple-700">
+                          {language === 'en' ? 'Generate Subjective from patient intake' : 'Generer Subjektiv fra pasientopptak'}
+                        </span>
+                      </div>
+                      <IntakeParserButton
+                        intakeData={{
+                          chiefComplaint: encounterData.subjective.chief_complaint,
+                          painLevel: encounterData.vas_pain_start,
+                          location: encounterData.pain_locations,
+                          painQuality: encounterData.pain_qualities,
+                          aggravatingFactors: encounterData.aggravating_factors_selected,
+                          relievingFactors: encounterData.relieving_factors_selected,
+                        }}
+                        language={language}
+                        onGenerate={(narrative, source) => {
+                          updateField('subjective', 'chief_complaint', narrative);
+                        }}
+                      />
+                    </div>
+
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                       <SmartTextInput
                         label="Chief Complaint"
@@ -1346,6 +1403,87 @@ export default function EasyAssessment() {
             <div className="overflow-y-auto max-h-[70vh]">
               <SlashCommandReference />
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Scribe Modal */}
+      {showAIScribe && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Mic className="w-5 h-5 text-blue-500" />
+                {language === 'en' ? 'AI Voice Scribe' : 'AI Stemmeskriver'}
+              </h3>
+              <button
+                onClick={() => setShowAIScribe(false)}
+                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="overflow-y-auto max-h-[75vh]">
+              <AIScribe
+                language={language}
+                onApplySOAP={(sections) => {
+                  if (sections.subjective) {
+                    updateField('subjective', 'chief_complaint',
+                      (encounterData.subjective.chief_complaint ? encounterData.subjective.chief_complaint + '\n' : '') + sections.subjective
+                    );
+                  }
+                  if (sections.objective) {
+                    updateField('objective', 'observation',
+                      (encounterData.objective.observation ? encounterData.objective.observation + '\n' : '') + sections.objective
+                    );
+                  }
+                  if (sections.assessment) {
+                    updateField('assessment', 'clinical_reasoning',
+                      (encounterData.assessment.clinical_reasoning ? encounterData.assessment.clinical_reasoning + '\n' : '') + sections.assessment
+                    );
+                  }
+                  if (sections.plan) {
+                    updateField('plan', 'treatment',
+                      (encounterData.plan.treatment ? encounterData.plan.treatment + '\n' : '') + sections.plan
+                    );
+                  }
+                  setShowAIScribe(false);
+                }}
+                onApplyTranscript={(transcript) => {
+                  // Insert transcript based on active tab
+                  if (activeTab === 'subjective') {
+                    updateField('subjective', 'chief_complaint',
+                      (encounterData.subjective.chief_complaint ? encounterData.subjective.chief_complaint + '\n' : '') + transcript
+                    );
+                  } else if (activeTab === 'objective') {
+                    updateField('objective', 'observation',
+                      (encounterData.objective.observation ? encounterData.objective.observation + '\n' : '') + transcript
+                    );
+                  } else if (activeTab === 'assessment') {
+                    updateField('assessment', 'clinical_reasoning',
+                      (encounterData.assessment.clinical_reasoning ? encounterData.assessment.clinical_reasoning + '\n' : '') + transcript
+                    );
+                  } else if (activeTab === 'plan') {
+                    updateField('plan', 'treatment',
+                      (encounterData.plan.treatment ? encounterData.plan.treatment + '\n' : '') + transcript
+                    );
+                  }
+                  setShowAIScribe(false);
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Settings Modal */}
+      {showAISettings && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="max-w-2xl w-full">
+            <AISettings
+              language={language}
+              onClose={() => setShowAISettings(false)}
+            />
           </div>
         </div>
       )}
