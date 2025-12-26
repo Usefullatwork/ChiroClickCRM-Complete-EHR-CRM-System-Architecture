@@ -3,12 +3,33 @@
  */
 
 import Joi from 'joi';
+import { validatePhoneNumber } from '../utils/phoneValidation.js';
 
 // UUID validation pattern
 const uuidSchema = Joi.string().uuid();
 
 // Date validation (YYYY-MM-DD format)
 const dateSchema = Joi.date().iso();
+
+/**
+ * Custom phone number validation
+ * Validates phone numbers with country code support
+ * Norwegian (+47, 8 digits) is the default
+ */
+const phoneSchema = Joi.string().max(20).custom((value, helpers) => {
+  if (!value) return value; // Allow empty/null
+
+  const result = validatePhoneNumber(value);
+
+  if (!result.valid) {
+    return helpers.error('phone.invalid', { message: result.error });
+  }
+
+  // Return the formatted E.164 number for storage
+  return result.fullNumber;
+}, 'Phone number validation').messages({
+  'phone.invalid': '{{#message}}'
+});
 
 /**
  * Create patient validation
@@ -22,9 +43,13 @@ export const createPatientSchema = {
     date_of_birth: dateSchema.required(),
     gender: Joi.string().valid('MALE', 'FEMALE', 'OTHER'),
     email: Joi.string().email().max(255),
-    phone: Joi.string().max(20),
+    phone: phoneSchema, // Validates Norwegian 8-digit or international format
     address: Joi.object(),
-    emergency_contact: Joi.object(),
+    emergency_contact: Joi.object({
+      name: Joi.string().max(200),
+      phone: phoneSchema, // Also validate emergency contact phone
+      relationship: Joi.string().max(100)
+    }),
     red_flags: Joi.array().items(Joi.string()),
     contraindications: Joi.array().items(Joi.string()),
     allergies: Joi.array().items(Joi.string()),
@@ -60,9 +85,13 @@ export const updatePatientSchema = {
     date_of_birth: dateSchema,
     gender: Joi.string().valid('MALE', 'FEMALE', 'OTHER'),
     email: Joi.string().email().max(255),
-    phone: Joi.string().max(20),
+    phone: phoneSchema, // Validates Norwegian 8-digit or international format
     address: Joi.object(),
-    emergency_contact: Joi.object(),
+    emergency_contact: Joi.object({
+      name: Joi.string().max(200),
+      phone: phoneSchema,
+      relationship: Joi.string().max(100)
+    }),
     red_flags: Joi.array().items(Joi.string()),
     contraindications: Joi.array().items(Joi.string()),
     allergies: Joi.array().items(Joi.string()),
