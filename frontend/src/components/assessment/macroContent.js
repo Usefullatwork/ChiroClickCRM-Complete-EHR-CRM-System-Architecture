@@ -305,6 +305,260 @@ export const MACRO_CONTENT = {
   },
 
   // ===========================================================================
+  // CHIROPRACTIC LISTINGS / VERTEBRAL LISTINGS
+  // Multiple listing systems for documenting subluxations and adjustments
+  // ===========================================================================
+  listings: {
+    // === CERVICAL SPINE ===
+    cervical: {
+      // Rotation Restrictions
+      c1RightRotRestriction: {
+        en: 'C1: Right rotation restriction. Motion listing: R Rot Rest. Adjustment direction: Left rotation mobilization to restore normal ROM.',
+        no: 'C1: Høyre rotasjonsrestriksjon. Bevegelsesfunn: H Rot Rest. Justeringsretning: Venstre rotasjonsmobilisering for å gjenopprette normalt bevegelsesutslag.'
+      },
+      c1LeftRotRestriction: {
+        en: 'C1: Left rotation restriction. Motion listing: L Rot Rest. Adjustment direction: Right rotation mobilization to restore normal ROM.',
+        no: 'C1: Venstre rotasjonsrestriksjon. Bevegelsesfunn: V Rot Rest. Justeringsretning: Høyre rotasjonsmobilisering for å gjenopprette normalt bevegelsesutslag.'
+      },
+      c2RightRotRestriction: {
+        en: 'C2: Right rotation restriction. Motion: R Rot Rest | Medicare: L Rot Malposition | National: LP | Gonstead: PR | Orthogonal: +θy.',
+        no: 'C2: Høyre rotasjonsrestriksjon. Bevegelse: H Rot Rest | Medicare: V Rot Malposisjon | National: LP | Gonstead: PR | Ortogonal: +θy.'
+      },
+      c2LeftRotRestriction: {
+        en: 'C2: Left rotation restriction. Motion: L Rot Rest | Medicare: R Rot Malposition | National: RP | Gonstead: PL | Orthogonal: -θy.',
+        no: 'C2: Venstre rotasjonsrestriksjon. Bevegelse: V Rot Rest | Medicare: H Rot Malposisjon | National: RP | Gonstead: PL | Ortogonal: -θy.'
+      },
+      // C2-C7 combined patterns
+      cervicalRightRotRestriction: {
+        en: 'Cervical right rotation restriction identified. Motion: R Rot Rest | Medicare: L Rot Malposition | National: LP (Left Post. Body) | Gonstead: PR (Post. Right SP) | Orthogonal: +θy malposition | Osteopathic: L rotation lesion.',
+        no: 'Cervikal høyre rotasjonsrestriksjon identifisert. Bevegelse: H Rot Rest | Medicare: V Rot Malposisjon | National: LP (Venstre Post. Corpus) | Gonstead: PR (Post. Høyre SP) | Ortogonal: +θy malposisjon | Osteopatisk: V rotasjonslesjon.'
+      },
+      cervicalLeftRotRestriction: {
+        en: 'Cervical left rotation restriction identified. Motion: L Rot Rest | Medicare: R Rot Malposition | National: RP (Right Post. Body) | Gonstead: PL (Post. Left SP) | Orthogonal: -θy malposition | Osteopathic: R rotation lesion.',
+        no: 'Cervikal venstre rotasjonsrestriksjon identifisert. Bevegelse: V Rot Rest | Medicare: H Rot Malposisjon | National: RP (Høyre Post. Corpus) | Gonstead: PL (Post. Venstre SP) | Ortogonal: -θy malposisjon | Osteopatisk: H rotasjonslesjon.'
+      },
+      // Lateral Flexion Restrictions
+      cervicalRightLatFlexRestriction: {
+        en: 'Cervical right lateral flexion restriction. Motion: R Lat Flex Rest | Medicare: L Lat Flex Malposition | National: LI (Left Inf. Body) | Orthogonal: -θz malposition | Osteopathic: L side-bending lesion.',
+        no: 'Cervikal høyre lateralfleksjon restriksjon. Bevegelse: H Lat Flex Rest | Medicare: V Lat Flex Malposisjon | National: LI (Venstre Inf. Corpus) | Ortogonal: -θz malposisjon | Osteopatisk: V sidebøyningslesjon.'
+      },
+      cervicalLeftLatFlexRestriction: {
+        en: 'Cervical left lateral flexion restriction. Motion: L Lat Flex Rest | Medicare: R Lat Flex Malposition | National: RI (Right Inf. Body) | Orthogonal: +θz malposition | Osteopathic: R side-bending lesion.',
+        no: 'Cervikal venstre lateralfleksjon restriksjon. Bevegelse: V Lat Flex Rest | Medicare: H Lat Flex Malposisjon | National: RI (Høyre Inf. Corpus) | Ortogonal: +θz malposisjon | Osteopatisk: H sidebøyningslesjon.'
+      },
+      // Combined Patterns - Type I (NSR)
+      cervicalRightRotRightLatFlex: {
+        en: 'Cervical R rotation R lateral flexion restriction (coupled motion). Motion: R Rot R Lat Flex Rest | Medicare: L Rot L Lat Flex Mal | National: LPI (L Post Inf Body) | Gonstead: PRS (Post R Sup SP) | Orthogonal: +θy, -θz | Osteopathic: Csp NNSR.',
+        no: 'Cervikal H rotasjon H lateralfleksjon restriksjon (koblet bevegelse). Bevegelse: H Rot H Lat Flex Rest | Medicare: V Rot V Lat Flex Mal | National: LPI (V Post Inf Corpus) | Gonstead: PRS (Post H Sup SP) | Ortogonal: +θy, -θz | Osteopatisk: Csp NNSR.'
+      },
+      cervicalLeftRotLeftLatFlex: {
+        en: 'Cervical L rotation L lateral flexion restriction (coupled motion). Motion: L Rot L Lat Flex Rest | Medicare: R Rot R Lat Flex Mal | National: RPI (R Post Inf Body) | Gonstead: PLS (Post L Sup SP) | Orthogonal: -θy, +θz | Osteopathic: Csp NNSL.',
+        no: 'Cervikal V rotasjon V lateralfleksjon restriksjon (koblet bevegelse). Bevegelse: V Rot V Lat Flex Rest | Medicare: H Rot H Lat Flex Mal | National: RPI (H Post Inf Corpus) | Gonstead: PLS (Post V Sup SP) | Ortogonal: -θy, +θz | Osteopatisk: Csp NNSL.'
+      },
+      // Extension/Flexion Restrictions
+      cervicalExtensionRestriction: {
+        en: 'Cervical extension restriction (common in upper cervical). Motion: Extension Rest | Medicare: Flexion Malposition | National: AI (Ant Inf Body) | Orthogonal: +θx malposition.',
+        no: 'Cervikal ekstensjonsrestriksjon (vanlig i øvre cervical). Bevegelse: Ekstensjon Rest | Medicare: Fleksjon Malposisjon | National: AI (Ant Inf Corpus) | Ortogonal: +θx malposisjon.'
+      },
+      cervicalFlexionRestriction: {
+        en: 'Cervical flexion restriction. Motion: Flexion Rest | Medicare: Extension Malposition | National: PI (Post Inf Body) | Gonstead: P (Post SP) | Orthogonal: -θx malposition.',
+        no: 'Cervikal fleksjonsrestriksjon. Bevegelse: Fleksjon Rest | Medicare: Ekstensjon Malposisjon | National: PI (Post Inf Corpus) | Gonstead: P (Post SP) | Ortogonal: -θx malposisjon.'
+      }
+    },
+
+    // === THORACIC SPINE ===
+    thoracic: {
+      // Rotation Restrictions
+      thoracicRightRotRestriction: {
+        en: 'Thoracic right rotation restriction. Motion: R Rot Rest | Medicare: L Rot Malposition | National: LP | Gonstead: PR | Orthogonal: +θy | Osteopathic: L rotation lesion.',
+        no: 'Torakal høyre rotasjonsrestriksjon. Bevegelse: H Rot Rest | Medicare: V Rot Malposisjon | National: LP | Gonstead: PR | Ortogonal: +θy | Osteopatisk: V rotasjonslesjon.'
+      },
+      thoracicLeftRotRestriction: {
+        en: 'Thoracic left rotation restriction. Motion: L Rot Rest | Medicare: R Rot Malposition | National: RP | Gonstead: PL | Orthogonal: -θy | Osteopathic: R rotation lesion.',
+        no: 'Torakal venstre rotasjonsrestriksjon. Bevegelse: V Rot Rest | Medicare: H Rot Malposisjon | National: RP | Gonstead: PL | Ortogonal: -θy | Osteopatisk: H rotasjonslesjon.'
+      },
+      // Extension Restriction - Very common in thoracic
+      thoracicExtensionRestriction: {
+        en: 'Thoracic extension restriction (very common finding). Motion: Extension Rest | Medicare: Flexion Malposition | National: AI | Orthogonal: +θx. Note: Extension restrictions are extremely common in the thoracic spine.',
+        no: 'Torakal ekstensjonsrestriksjon (svært vanlig funn). Bevegelse: Ekstensjon Rest | Medicare: Fleksjon Malposisjon | National: AI | Ortogonal: +θx. Merk: Ekstensjonsrestriksjoner er svært vanlige i torakalcolumna.'
+      },
+      thoracicFlexionRestriction: {
+        en: 'Thoracic flexion restriction. Motion: Flexion Rest | Medicare: Extension Malposition | National: PI | Gonstead: P | Orthogonal: -θx.',
+        no: 'Torakal fleksjonsrestriksjon. Bevegelse: Fleksjon Rest | Medicare: Ekstensjon Malposisjon | National: PI | Gonstead: P | Ortogonal: -θx.'
+      },
+      // Lateral Flexion
+      thoracicRightLatFlexRestriction: {
+        en: 'Thoracic right lateral flexion restriction. Motion: R Lat Flex Rest | Medicare: L Lat Flex Mal | National: LI | Orthogonal: -θz | Osteopathic: L side-bending lesion.',
+        no: 'Torakal høyre lateralfleksjon restriksjon. Bevegelse: H Lat Flex Rest | Medicare: V Lat Flex Mal | National: LI | Ortogonal: -θz | Osteopatisk: V sidebøyningslesjon.'
+      },
+      thoracicLeftLatFlexRestriction: {
+        en: 'Thoracic left lateral flexion restriction. Motion: L Lat Flex Rest | Medicare: R Lat Flex Mal | National: RI | Orthogonal: +θz | Osteopathic: R side-bending lesion.',
+        no: 'Torakal venstre lateralfleksjon restriksjon. Bevegelse: V Lat Flex Rest | Medicare: H Lat Flex Mal | National: RI | Ortogonal: +θz | Osteopatisk: H sidebøyningslesjon.'
+      },
+      // Type I (NSR) - Neutral, Sidebending, Rotation opposite
+      thoracicNSR: {
+        en: 'Thoracic Type I dysfunction (group curve). Motion: R Rot L Lat Flex Rest | Medicare: L Rot R Lat Flex Mal | National: LPS (L Post Sup) | Gonstead: PRI (Post R Inf SP) | Orthogonal: +θy, +θz | Osteopathic: NSR (Neutral, Sidebent R, Rotated L).',
+        no: 'Torakal Type I dysfunksjon (gruppekurve). Bevegelse: H Rot V Lat Flex Rest | National: LPS (V Post Sup) | Gonstead: PRI (Post H Inf SP) | Ortogonal: +θy, +θz | Osteopatisk: NSR (Nøytral, Sidebøyd H, Rotert V).'
+      },
+      thoracicNSL: {
+        en: 'Thoracic Type I dysfunction (group curve). Motion: L Rot R Lat Flex Rest | Medicare: R Rot L Lat Flex Mal | National: RPS (R Post Sup) | Gonstead: PLI (Post L Inf SP) | Orthogonal: -θy, -θz | Osteopathic: NSL.',
+        no: 'Torakal Type I dysfunksjon (gruppekurve). Bevegelse: V Rot H Lat Flex Rest | National: RPS (H Post Sup) | Gonstead: PLI (Post V Inf SP) | Ortogonal: -θy, -θz | Osteopatisk: NSL.'
+      },
+      // Type II (ERS/FRS) - Non-neutral
+      thoracicNNRS: {
+        en: 'Thoracic Type II dysfunction (single segment). Motion: R Rot R Lat Flex Rest | Medicare: L Rot L Lat Flex Mal | National: LPI | Gonstead: PRS | Orthogonal: +θy, -θz | Osteopathic: NNRS or ERSR/FRSR.',
+        no: 'Torakal Type II dysfunksjon (enkeltsegment). Bevegelse: H Rot H Lat Flex Rest | National: LPI | Gonstead: PRS | Ortogonal: +θy, -θz | Osteopatisk: NNRS eller ERSR/FRSR.'
+      }
+    },
+
+    // === LUMBAR SPINE ===
+    lumbar: {
+      // Rotation Restrictions
+      lumbarRightRotRestriction: {
+        en: 'Lumbar right rotation restriction. Motion: R Rot Rest | Medicare: L Rot Malposition | National: LP | Gonstead: PR | Orthogonal: +θy | Osteopathic: L rotation lesion.',
+        no: 'Lumbal høyre rotasjonsrestriksjon. Bevegelse: H Rot Rest | Medicare: V Rot Malposisjon | National: LP | Gonstead: PR | Ortogonal: +θy | Osteopatisk: V rotasjonslesjon.'
+      },
+      lumbarLeftRotRestriction: {
+        en: 'Lumbar left rotation restriction. Motion: L Rot Rest | Medicare: R Rot Malposition | National: RP | Gonstead: PL | Orthogonal: -θy | Osteopathic: R rotation lesion.',
+        no: 'Lumbal venstre rotasjonsrestriksjon. Bevegelse: V Rot Rest | Medicare: H Rot Malposisjon | National: RP | Gonstead: PL | Ortogonal: -θy | Osteopatisk: H rotasjonslesjon.'
+      },
+      // Flexion/Extension
+      lumbarExtensionRestriction: {
+        en: 'Lumbar extension restriction. Motion: Extension Rest | Medicare: Flexion Malposition | National: AI | Orthogonal: +θx.',
+        no: 'Lumbal ekstensjonsrestriksjon. Bevegelse: Ekstensjon Rest | Medicare: Fleksjon Malposisjon | National: AI | Ortogonal: +θx.'
+      },
+      lumbarFlexionRestriction: {
+        en: 'Lumbar flexion restriction. Motion: Flexion Rest | Medicare: Extension Malposition | National: PI | Gonstead: P | Orthogonal: -θx.',
+        no: 'Lumbal fleksjonsrestriksjon. Bevegelse: Fleksjon Rest | Medicare: Ekstensjon Malposisjon | National: PI | Gonstead: P | Ortogonal: -θx.'
+      },
+      // Lateral Flexion
+      lumbarRightLatFlexRestriction: {
+        en: 'Lumbar right lateral flexion restriction. Motion: R Lat Flex Rest | Medicare: L Lat Flex Mal | National: LI | Orthogonal: -θz | Osteopathic: L side-bending lesion.',
+        no: 'Lumbal høyre lateralfleksjon restriksjon. Bevegelse: H Lat Flex Rest | Medicare: V Lat Flex Mal | National: LI | Ortogonal: -θz | Osteopatisk: V sidebøyningslesjon.'
+      },
+      lumbarLeftLatFlexRestriction: {
+        en: 'Lumbar left lateral flexion restriction. Motion: L Lat Flex Rest | Medicare: R Lat Flex Mal | National: RI | Orthogonal: +θz | Osteopathic: R side-bending lesion.',
+        no: 'Lumbal venstre lateralfleksjon restriksjon. Bevegelse: V Lat Flex Rest | Medicare: H Lat Flex Mal | National: RI | Ortogonal: +θz | Osteopatisk: H sidebøyningslesjon.'
+      },
+      // Type II - Lumbar (coupled motion opposite to thoracic)
+      lumbarNNRS: {
+        en: 'Lumbar Type II dysfunction (non-neutral). Motion: R Rot R Lat Flex Rest | Medicare: L Rot L Lat Flex Mal | National: LPI | Gonstead: PRS | Orthogonal: +θy, -θz | Osteopathic: NNRS (ERSR or FRSR).',
+        no: 'Lumbal Type II dysfunksjon (ikke-nøytral). Bevegelse: H Rot H Lat Flex Rest | National: LPI | Gonstead: PRS | Ortogonal: +θy, -θz | Osteopatisk: NNRS (ERSR eller FRSR).'
+      },
+      lumbarNNSL: {
+        en: 'Lumbar Type II dysfunction (non-neutral). Motion: L Rot L Lat Flex Rest | Medicare: R Rot R Lat Flex Mal | National: RPI | Gonstead: PLS | Orthogonal: -θy, +θz | Osteopathic: NNSL (ERSL or FRSL).',
+        no: 'Lumbal Type II dysfunksjon (ikke-nøytral). Bevegelse: V Rot V Lat Flex Rest | National: RPI | Gonstead: PLS | Ortogonal: -θy, +θz | Osteopatisk: NNSL (ERSL eller FRSL).'
+      },
+      // Type I (NSR) - Lumbar
+      lumbarNSR: {
+        en: 'Lumbar Type I dysfunction (group curve). Motion: R Rot L Lat Flex Rest | Medicare: L Rot R Lat Flex Mal | National: LPS | Gonstead: PRI | Orthogonal: +θy, +θz | Osteopathic: NSR.',
+        no: 'Lumbal Type I dysfunksjon (gruppekurve). Bevegelse: H Rot V Lat Flex Rest | National: LPS | Gonstead: PRI | Ortogonal: +θy, +θz | Osteopatisk: NSR.'
+      },
+      lumbarNSL: {
+        en: 'Lumbar Type I dysfunction (group curve). Motion: L Rot R Lat Flex Rest | Medicare: R Rot L Lat Flex Mal | National: RPS | Gonstead: PLI | Orthogonal: -θy, -θz | Osteopathic: NSL.',
+        no: 'Lumbal Type I dysfunksjon (gruppekurve). Bevegelse: V Rot H Lat Flex Rest | National: RPS | Gonstead: PLI | Ortogonal: -θy, -θz | Osteopatisk: NSL.'
+      },
+      // Translation (Listhesis)
+      lumbarAnterolisthesis: {
+        en: 'Lumbar anterolisthesis detected. Motion: Posterior Rest | Medicare: Anterolisthesis | National: A (Anterior Body) | Orthogonal: +z malposition.',
+        no: 'Lumbal anterolistese oppdaget. Bevegelse: Posterior Rest | Medicare: Anterolistese | National: A (Anterior Corpus) | Ortogonal: +z malposisjon.'
+      },
+      lumbarRetrolisthesis: {
+        en: 'Lumbar retrolisthesis detected. Motion: Anterior Rest | Medicare: Retrolisthesis | National: P (Posterior Body) | Gonstead: P | Orthogonal: -z malposition.',
+        no: 'Lumbal retrolistese oppdaget. Bevegelse: Anterior Rest | Medicare: Retrolistese | National: P (Posterior Corpus) | Gonstead: P | Ortogonal: -z malposisjon.'
+      },
+      lumbarRightLatListhesis: {
+        en: 'Lumbar right lateral listhesis. Motion: L Lateral Rest | Medicare: R Lateral Listhesis | National: RL (Right Lateral Body) | Orthogonal: -x malposition.',
+        no: 'Lumbal høyre laterallistese. Bevegelse: V Lateral Rest | Medicare: H Lateral Listese | National: RL (Høyre Lateral Corpus) | Ortogonal: -x malposisjon.'
+      },
+      lumbarLeftLatListhesis: {
+        en: 'Lumbar left lateral listhesis. Motion: R Lateral Rest | Medicare: L Lateral Listhesis | National: LL (Left Lateral Body) | Orthogonal: +x malposition.',
+        no: 'Lumbal venstre laterallistese. Bevegelse: H Lateral Rest | Medicare: V Lateral Listese | National: LL (Venstre Lateral Corpus) | Ortogonal: +x malposisjon.'
+      }
+    },
+
+    // === SACRUM/PELVIS ===
+    sacrum: {
+      sacrumRightRotation: {
+        en: 'Right sacral rotation on left oblique axis (R on L). Sacral base anterior right. Motion restriction: Left rotation, right unilateral flexion.',
+        no: 'Høyre sakral rotasjon på venstre skrå akse (H på V). Sakralbasis anterior høyre. Bevegelsesrestriksjon: Venstre rotasjon, høyre unilateral fleksjon.'
+      },
+      sacrumLeftRotation: {
+        en: 'Left sacral rotation on right oblique axis (L on R). Sacral base anterior left. Motion restriction: Right rotation, left unilateral flexion.',
+        no: 'Venstre sakral rotasjon på høyre skrå akse (V på H). Sakralbasis anterior venstre. Bevegelsesrestriksjon: Høyre rotasjon, venstre unilateral fleksjon.'
+      },
+      sacrumBilateralFlexion: {
+        en: 'Bilateral sacral flexion. Sacral base anterior bilaterally. Commonly associated with lumbar hyperlordosis. Motion restriction: Bilateral extension (nutation).',
+        no: 'Bilateral sakral fleksjon. Sakralbasis anterior bilateralt. Ofte assosiert med lumbal hyperlordose. Bevegelsesrestriksjon: Bilateral ekstensjon (nutasjon).'
+      },
+      sacrumBilateralExtension: {
+        en: 'Bilateral sacral extension. Sacral base posterior bilaterally. Commonly associated with flat back posture. Motion restriction: Bilateral flexion (counter-nutation).',
+        no: 'Bilateral sakral ekstensjon. Sakralbasis posterior bilateralt. Ofte assosiert med flat rygg holdning. Bevegelsesrestriksjon: Bilateral fleksjon (kontra-nutasjon).'
+      },
+      sacrumUnilateralFlexion: {
+        en: 'Unilateral sacral flexion (sacral shear). Inferior sacral sulcus depth indicates side of dysfunction. Motion restriction on affected side.',
+        no: 'Unilateral sakral fleksjon (sakral forskyvning). Inferior sakral sulkusdybde indikerer side med dysfunksjon. Bevegelsesrestriksjon på affisert side.'
+      },
+      siRightPosterior: {
+        en: 'Right ilium posterior (PI ilium). Motion: Right anterior restriction | National: Right PI | Gonstead: PI-R. Associated with apparent short leg on right.',
+        no: 'Høyre ilium posterior (PI ilium). Bevegelse: Høyre anterior restriksjon | National: Høyre PI | Gonstead: PI-H. Assosiert med tilsynelatende kort ben på høyre side.'
+      },
+      siLeftPosterior: {
+        en: 'Left ilium posterior (PI ilium). Motion: Left anterior restriction | National: Left PI | Gonstead: PI-L. Associated with apparent short leg on left.',
+        no: 'Venstre ilium posterior (PI ilium). Bevegelse: Venstre anterior restriksjon | National: Venstre PI | Gonstead: PI-V. Assosiert med tilsynelatende kort ben på venstre side.'
+      },
+      siRightAnterior: {
+        en: 'Right ilium anterior (AS ilium). Motion: Right posterior restriction | National: Right AS | Gonstead: AS-R. Associated with apparent long leg on right.',
+        no: 'Høyre ilium anterior (AS ilium). Bevegelse: Høyre posterior restriksjon | National: Høyre AS | Gonstead: AS-H. Assosiert med tilsynelatende langt ben på høyre side.'
+      },
+      siLeftAnterior: {
+        en: 'Left ilium anterior (AS ilium). Motion: Left posterior restriction | National: Left AS | Gonstead: AS-L. Associated with apparent long leg on left.',
+        no: 'Venstre ilium anterior (AS ilium). Bevegelse: Venstre posterior restriksjon | National: Venstre AS | Gonstead: AS-V. Assosiert med tilsynelatende langt ben på venstre side.'
+      },
+      siInflare: {
+        en: 'Ilium inflare. ASIS moves medially. Motion restriction: Outflare. Associated with SI joint compression.',
+        no: 'Ilium inflare. ASIS beveger seg medialt. Bevegelsesrestriksjon: Utflare. Assosiert med SI-ledd kompresjon.'
+      },
+      siOutflare: {
+        en: 'Ilium outflare. ASIS moves laterally. Motion restriction: Inflare. Associated with SI joint gapping.',
+        no: 'Ilium utflare. ASIS beveger seg lateralt. Bevegelsesrestriksjon: Inflare. Assosiert med SI-ledd gaping.'
+      }
+    },
+
+    // === LISTING SYSTEM REFERENCE ===
+    reference: {
+      motionPalpation: {
+        en: 'Motion Palpation: Identifies direction of motion restriction. Adjustment corrects by mobilizing in direction of restriction. Focus on RESTORING MOTION, not bone position.',
+        no: 'Bevegelsespalpasjon: Identifiserer retning for bevegelsesrestriksjon. Justering korrigerer ved å mobilisere i retning av restriksjon. Fokus på Å GJENOPPRETTE BEVEGELSE, ikke benstilling.'
+      },
+      medicareSystem: {
+        en: 'Medicare/Static Listing: Describes position of superior vertebra relative to inferior (bone out of place model). Lists the MALPOSITION, not the restriction.',
+        no: 'Medicare/Statisk Listing: Beskriver posisjon av øvre vertebra i forhold til nedre (ben ute av stilling modell). Lister MALPOSISJONEN, ikke restriksjonen.'
+      },
+      nationalSystem: {
+        en: 'National/Diversified: Lists vertebral BODY position. LP=Left Posterior, RP=Right Posterior, LI=Left Inferior, RI=Right Inferior, PI=Posterior Inferior, AI=Anterior Inferior.',
+        no: 'National/Diversified: Lister vertebral CORPUS posisjon. LP=Venstre Posterior, RP=Høyre Posterior, LI=Venstre Inferior, RI=Høyre Inferior, PI=Posterior Inferior, AI=Anterior Inferior.'
+      },
+      gonsteadSystem: {
+        en: 'Gonstead: Lists SPINOUS PROCESS position. PR=Posterior Right, PL=Posterior Left, PRS=Posterior Right Superior, PLS=Posterior Left Superior, PRI=Posterior Right Inferior, PLI=Posterior Left Inferior, P=Posterior.',
+        no: 'Gonstead: Lister SPINOUS PROCESS posisjon. PR=Posterior Høyre, PL=Posterior Venstre, PRS=Posterior Høyre Superior, PLS=Posterior Venstre Superior, PRI=Posterior Høyre Inferior, PLI=Posterior Venstre Inferior, P=Posterior.'
+      },
+      orthogonalSystem: {
+        en: 'Orthogonal/Coordinate System: Uses XYZ coordinates. +θy=R rotation mal, -θy=L rotation mal, +θz=L lat flex mal, -θz=R lat flex mal, +θx=flexion mal, -θx=extension mal, +x=L translation, -x=R translation, +z=anterior translation, -z=posterior translation.',
+        no: 'Ortogonalt/Koordinatsystem: Bruker XYZ koordinater. +θy=H rotasjons mal, -θy=V rotasjons mal, +θz=V lat flex mal, -θz=H lat flex mal, +θx=fleksjons mal, -θx=ekstensjons mal, +x=V translasjon, -x=H translasjon, +z=anterior translasjon, -z=posterior translasjon.'
+      },
+      osteopathicSystem: {
+        en: 'Osteopathic: NSR/NSL=Type I (Neutral group curve, rotation opposite sidebend). ERSR/FRSR=Type II (single segment, rotation same side as sidebend). ERS=Extended-Rotated-Sidebent, FRS=Flexed-Rotated-Sidebent. NN=Non-neutral, N=Neutral.',
+        no: 'Osteopatisk: NSR/NSL=Type I (Nøytral gruppekurve, rotasjon motsatt sidebøyning). ERSR/FRSR=Type II (enkeltsegment, rotasjon samme side som sidebøyning). ERS=Ekstendert-Rotert-Sidebøyd, FRS=Flektert-Rotert-Sidebøyd. NN=Ikke-nøytral, N=Nøytral.'
+      },
+      clinicalNote: {
+        en: 'CLINICAL NOTE: Do NOT rely solely on static palpation and SP position. Anatomical variation in spinous processes requires combined assessment using AROM, PROM, and end-feel evaluation for accurate diagnosis. Bone shape, muscles, fascia, and ligaments can all alter vertebral motion.',
+        no: 'KLINISK MERKNAD: IKKE stol kun på statisk palpasjon og SP posisjon. Anatomisk variasjon i spinøse prosesser krever kombinert vurdering med AROM, PROM og end-feel evaluering for nøyaktig diagnose. Benform, muskler, fascia og ligamenter kan alle påvirke vertebral bevegelse.'
+      }
+    }
+  },
+
+  // ===========================================================================
   // ASSESSMENT / VURDERING
   // ===========================================================================
   assessment: {
