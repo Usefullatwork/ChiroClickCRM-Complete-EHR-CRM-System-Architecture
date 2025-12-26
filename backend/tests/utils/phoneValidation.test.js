@@ -13,6 +13,10 @@ import {
   getSupportedCountryCodes,
   getCountryByISO,
   isMobileNumber,
+  validatePhoneLenient,
+  validatePhoneWithOptions,
+  normalizePhoneForSearch,
+  createSearchablePhoneVariants,
   COUNTRY_CODES
 } from '../../src/utils/phoneValidation.js';
 
@@ -385,6 +389,172 @@ describe('Phone Validation Utility', () => {
       expect(COUNTRY_CODES['+45']).toBeDefined(); // Denmark
       expect(COUNTRY_CODES['+358']).toBeDefined(); // Finland
       expect(COUNTRY_CODES['+354']).toBeDefined(); // Iceland
+    });
+  });
+
+  describe('validatePhoneLenient', () => {
+    it('should accept phone with 7+ digits', () => {
+      const result = validatePhoneLenient('1234567');
+      expect(result.valid).toBe(true);
+      expect(result.mode).toBe('lenient');
+    });
+
+    it('should reject phone with less than 7 digits', () => {
+      const result = validatePhoneLenient('123456');
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain('at least 7');
+    });
+
+    it('should reject phone with more than 15 digits', () => {
+      const result = validatePhoneLenient('1234567890123456');
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain('at most 15');
+    });
+
+    it('should add default country code when not provided', () => {
+      const result = validatePhoneLenient('12345678');
+      expect(result.fullNumber).toBe('+4712345678');
+    });
+
+    it('should preserve existing country code', () => {
+      const result = validatePhoneLenient('+4612345678');
+      expect(result.fullNumber).toBe('+4612345678');
+    });
+
+    it('should reject empty input', () => {
+      const result = validatePhoneLenient('');
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain('required');
+    });
+
+    it('should accept numbers with different formatting', () => {
+      const result = validatePhoneLenient('+47 123 45 678');
+      expect(result.valid).toBe(true);
+    });
+  });
+
+  describe('validatePhoneWithOptions', () => {
+    describe('mode: strict', () => {
+      it('should validate Norwegian numbers strictly', () => {
+        const result = validatePhoneWithOptions('41234567', { mode: 'strict' });
+        expect(result.valid).toBe(true);
+        expect(result.country).toBe('Norway');
+      });
+
+      it('should reject invalid Norwegian numbers', () => {
+        const result = validatePhoneWithOptions('1234567', { mode: 'strict' });
+        expect(result.valid).toBe(false);
+      });
+    });
+
+    describe('mode: lenient', () => {
+      it('should accept any 7-15 digit number', () => {
+        const result = validatePhoneWithOptions('1234567', { mode: 'lenient' });
+        expect(result.valid).toBe(true);
+        expect(result.mode).toBe('lenient');
+      });
+
+      it('should accept international format', () => {
+        const result = validatePhoneWithOptions('+1234567890', { mode: 'lenient' });
+        expect(result.valid).toBe(true);
+      });
+    });
+
+    describe('mode: format-only', () => {
+      it('should accept any non-empty input', () => {
+        const result = validatePhoneWithOptions('123', { mode: 'format-only' });
+        expect(result.valid).toBe(true);
+        expect(result.mode).toBe('format-only');
+      });
+
+      it('should add default country code', () => {
+        const result = validatePhoneWithOptions('12345', { mode: 'format-only' });
+        expect(result.formatted).toBe('+4712345');
+      });
+
+      it('should reject empty input', () => {
+        const result = validatePhoneWithOptions('', { mode: 'format-only' });
+        expect(result.valid).toBe(false);
+      });
+
+      it('should preserve existing country code', () => {
+        const result = validatePhoneWithOptions('+46123', { mode: 'format-only' });
+        expect(result.formatted).toBe('+46123');
+      });
+    });
+
+    describe('default options', () => {
+      it('should use default mode when not specified', () => {
+        const result = validatePhoneWithOptions('41234567');
+        expect(result.valid).toBe(true);
+      });
+
+      it('should allow overriding default country code', () => {
+        const result = validatePhoneWithOptions('701234567', {
+          mode: 'strict',
+          defaultCountryCode: '+46'
+        });
+        expect(result.countryCode).toBe('+46');
+      });
+    });
+  });
+
+  describe('normalizePhoneForSearch', () => {
+    it('should remove all non-digit characters', () => {
+      expect(normalizePhoneForSearch('+47 123 45 678')).toBe('4712345678');
+    });
+
+    it('should remove dashes and parentheses', () => {
+      expect(normalizePhoneForSearch('(123) 456-7890')).toBe('1234567890');
+    });
+
+    it('should handle empty input', () => {
+      expect(normalizePhoneForSearch('')).toBe('');
+      expect(normalizePhoneForSearch(null)).toBe('');
+      expect(normalizePhoneForSearch(undefined)).toBe('');
+    });
+
+    it('should preserve only digits', () => {
+      expect(normalizePhoneForSearch('abc123def456')).toBe('123456');
+    });
+  });
+
+  describe('createSearchablePhoneVariants', () => {
+    it('should create all variant formats', () => {
+      const result = createSearchablePhoneVariants('+4741234567');
+      expect(result).toHaveProperty('e164');
+      expect(result).toHaveProperty('national');
+      expect(result).toHaveProperty('digits');
+      expect(result).toHaveProperty('formatted');
+    });
+
+    it('should normalize Norwegian number correctly', () => {
+      const result = createSearchablePhoneVariants('41234567');
+      expect(result.e164).toBe('+4741234567');
+      expect(result.digits).toBe('4741234567');
+    });
+
+    it('should extract national number', () => {
+      const result = createSearchablePhoneVariants('+4741234567');
+      expect(result.national).toBe('41234567');
+    });
+
+    it('should handle invalid input gracefully', () => {
+      const result = createSearchablePhoneVariants('');
+      expect(result.e164).toBe('');
+      expect(result.national).toBe('');
+      expect(result.digits).toBe('');
+    });
+
+    it('should handle null input', () => {
+      const result = createSearchablePhoneVariants(null);
+      expect(result).toHaveProperty('e164');
+      expect(result).toHaveProperty('digits');
+    });
+
+    it('should preserve formatted version', () => {
+      const result = createSearchablePhoneVariants('+47 412 34 567');
+      expect(result.formatted).toBeDefined();
     });
   });
 });
