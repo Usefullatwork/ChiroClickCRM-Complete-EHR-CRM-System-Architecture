@@ -3313,6 +3313,2297 @@ export const ORTHO_EXAM_CLUSTERS = {
         redFlag: true
       }
     ]
+  },
+
+  // ============================================================================
+  // VBI / STROKE SCREENING (from textbook Head & Neck section)
+  // ============================================================================
+
+  VBI_STROKE: {
+    id: 'VBI_STROKE',
+    name: { no: 'VBI / Slag Screening (5Ds & 3Ns)', en: 'VBI / Stroke Screening (5Ds & 3Ns)' },
+    region: 'CERVICAL',
+    description: {
+      no: 'Vertebrobasilær insuffisiens screening - 5 Ds og 3 Ns',
+      en: 'Vertebrobasilar insufficiency screening - 5 Ds and 3 Ns'
+    },
+    redFlagCluster: true,
+    urgency: 'IMMEDIATE',
+    diagnosticCriteria: {
+      threshold: 2,
+      total: 8,
+      interpretation: {
+        no: '≥2 positive tegn = AKUTT HENVISNING til legevakt/sykehus',
+        en: '≥2 positive signs = IMMEDIATE REFERRAL to emergency'
+      }
+    },
+    tests: [
+      {
+        id: 'dizziness',
+        name: { no: 'Dizziness/Vertigo', en: 'Dizziness/Vertigo' },
+        procedure: {
+          no: 'Spør om svimmelhet, vertigo eller ustøhet.',
+          en: 'Ask about dizziness, vertigo or unsteadiness.'
+        },
+        positive: {
+          no: 'Nyoppstått svimmelhet eller vertigo',
+          en: 'New onset dizziness or vertigo'
+        },
+        redFlag: true
+      },
+      {
+        id: 'drop_attacks',
+        name: { no: 'Drop Attacks', en: 'Drop Attacks' },
+        procedure: {
+          no: 'Spør om plutselige fall eller tap av bevissthet.',
+          en: 'Ask about sudden falls or loss of consciousness.'
+        },
+        positive: {
+          no: 'Synkope eller plutselig bensvakhet',
+          en: 'Syncope or sudden leg weakness'
+        },
+        redFlag: true
+      },
+      {
+        id: 'diplopia',
+        name: { no: 'Diplopi', en: 'Diplopia' },
+        procedure: {
+          no: 'Spør om dobbeltsyn eller synsforstyrrelser.',
+          en: 'Ask about double vision or visual disturbances.'
+        },
+        positive: {
+          no: 'Dobbeltsyn, tåkesyn eller lysglimt',
+          en: 'Double vision, foggy vision or light flashes'
+        },
+        redFlag: true
+      },
+      {
+        id: 'dysarthria',
+        name: { no: 'Dysartri', en: 'Dysarthria' },
+        procedure: {
+          no: 'Vurder taleevne og artikulasjon.',
+          en: 'Assess speech ability and articulation.'
+        },
+        positive: {
+          no: 'Utydelig tale eller vanskeligheter med artikulasjon',
+          en: 'Slurred speech or difficulty with articulation'
+        },
+        redFlag: true
+      },
+      {
+        id: 'dysphagia',
+        name: { no: 'Dysfagi', en: 'Dysphagia' },
+        procedure: {
+          no: 'Spør om svelgevansker eller heshet.',
+          en: 'Ask about swallowing difficulties or hoarseness.'
+        },
+        positive: {
+          no: 'Svelgevansker eller heshet',
+          en: 'Swallowing difficulties or hoarseness'
+        },
+        redFlag: true
+      },
+      {
+        id: 'ataxia',
+        name: { no: 'Ataksi', en: 'Ataxia' },
+        procedure: {
+          no: 'Vurder koordinasjon og gangfunksjon (Romberg, fingernesetest).',
+          en: 'Assess coordination and gait (Romberg, finger-nose test).'
+        },
+        positive: {
+          no: 'Ustø gange, dårlig koordinasjon',
+          en: 'Unsteady gait, poor coordination'
+        },
+        redFlag: true
+      },
+      {
+        id: 'nausea_vbi',
+        name: { no: 'Kvalme/Oppkast', en: 'Nausea/Vomiting' },
+        procedure: {
+          no: 'Spør om kvalme eller oppkast relatert til posisjonsendring.',
+          en: 'Ask about nausea or vomiting related to position change.'
+        },
+        positive: {
+          no: 'Kvalme eller oppkast med hodebevegelse',
+          en: 'Nausea or vomiting with head movement'
+        },
+        redFlag: true
+      },
+      {
+        id: 'numbness_facial',
+        name: { no: 'Ansikts Nummenhet', en: 'Facial Numbness' },
+        procedure: {
+          no: 'Test sensibilitet i ansikt unilateralt.',
+          en: 'Test facial sensation unilaterally.'
+        },
+        positive: {
+          no: 'Ensidig nummenhet eller parestesier i ansikt',
+          en: 'Unilateral numbness or paresthesias in face'
+        },
+        redFlag: true
+      },
+      {
+        id: 'nystagmus',
+        name: { no: 'Nystagmus', en: 'Nystagmus' },
+        procedure: {
+          no: 'Observer øyebevegelser ved blikkfølging.',
+          en: 'Observe eye movements during gaze tracking.'
+        },
+        positive: {
+          no: 'Spontan nystagmus eller vertikal nystagmus',
+          en: 'Spontaneous nystagmus or vertical nystagmus'
+        },
+        redFlag: true
+      }
+    ]
+  },
+
+  // ============================================================================
+  // TMJ DYSFUNCTION (from textbook TMJ Syndrome section)
+  // ============================================================================
+
+  TMJ_DYSFUNCTION: {
+    id: 'TMJ_DYSFUNCTION',
+    name: { no: 'TMJ Dysfunksjon', en: 'TMJ Dysfunction' },
+    region: 'CERVICAL',
+    description: {
+      no: 'Temporomandibulær leddsdysfunksjon',
+      en: 'Temporomandibular joint dysfunction'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 6,
+      interpretation: {
+        no: '≥3 positive tester indikerer TMJ dysfunksjon',
+        en: '≥3 positive tests indicate TMJ dysfunction'
+      }
+    },
+    tests: [
+      {
+        id: 'three_knuckle',
+        name: { no: '3-Knoke Test', en: '3-Knuckle Test' },
+        procedure: {
+          no: 'Pasient forsøker å sette 3 knoker mellom tennene. Normal åpning ~40mm.',
+          en: 'Patient attempts to place 3 knuckles between teeth. Normal opening ~40mm.'
+        },
+        positive: {
+          no: 'Redusert åpning (<40mm eller <3 knoker)',
+          en: 'Reduced opening (<40mm or <3 knuckles)'
+        },
+        sensitivity: 0.85,
+        specificity: 0.72
+      },
+      {
+        id: 'tmj_palpation',
+        name: { no: 'TMJ Palpasjon', en: 'TMJ Palpation' },
+        procedure: {
+          no: 'Palper TMJ lateralt og via ekstern gehørgang under åpning/lukking.',
+          en: 'Palpate TMJ laterally and via external auditory meatus during opening/closing.'
+        },
+        positive: {
+          no: 'Ømhet ved palpasjon',
+          en: 'Tenderness on palpation'
+        },
+        sensitivity: 0.80,
+        specificity: 0.65
+      },
+      {
+        id: 'tmj_sounds',
+        name: { no: 'TMJ Lyder', en: 'TMJ Sounds' },
+        procedure: {
+          no: 'Auskultasjon/palpasjon av TMJ under åpning/lukking.',
+          en: 'Auscultation/palpation of TMJ during opening/closing.'
+        },
+        positive: {
+          no: 'Klikking, knasing eller krepitasjon',
+          en: 'Clicking, grinding or crepitation'
+        },
+        sensitivity: 0.75,
+        specificity: 0.70
+      },
+      {
+        id: 'jaw_deviation',
+        name: { no: 'Kjeve Deviasjon', en: 'Jaw Deviation' },
+        procedure: {
+          no: 'Observer mandibulær bevegelse under åpning.',
+          en: 'Observe mandibular movement during opening.'
+        },
+        positive: {
+          no: 'Lateral deviasjon ved åpning',
+          en: 'Lateral deviation on opening'
+        },
+        sensitivity: 0.68,
+        specificity: 0.82
+      },
+      {
+        id: 'masseter_palpation',
+        name: { no: 'Masseter Palpasjon', en: 'Masseter Palpation' },
+        procedure: {
+          no: 'Palper masseter og temporalis muskler.',
+          en: 'Palpate masseter and temporalis muscles.'
+        },
+        positive: {
+          no: 'Ømhet, triggerpunkter eller hypertoni',
+          en: 'Tenderness, trigger points or hypertonicity'
+        },
+        sensitivity: 0.88,
+        specificity: 0.55
+      },
+      {
+        id: 'pterygoid_palpation',
+        name: { no: 'Pterygoid Palpasjon (Intraoral)', en: 'Pterygoid Palpation (Intraoral)' },
+        procedure: {
+          no: 'Intraoral palpasjon av medial pterygoid.',
+          en: 'Intraoral palpation of medial pterygoid.'
+        },
+        positive: {
+          no: 'Ømhet eller myospasme',
+          en: 'Tenderness or myospasm'
+        },
+        sensitivity: 0.78,
+        specificity: 0.75
+      }
+    ]
+  },
+
+  // ============================================================================
+  // BPPV / VESTIBULAR (from textbook BPV section)
+  // ============================================================================
+
+  BPPV_VESTIBULAR: {
+    id: 'BPPV_VESTIBULAR',
+    name: { no: 'BPPV / Vestibulær Dysfunksjon', en: 'BPPV / Vestibular Dysfunction' },
+    region: 'CERVICAL',
+    description: {
+      no: 'Benign paroksysmal posisjonsvertigo og vestibulær testing',
+      en: 'Benign paroxysmal positional vertigo and vestibular testing'
+    },
+    diagnosticCriteria: {
+      threshold: 1,
+      total: 4,
+      interpretation: {
+        no: 'Positiv Dix-Hallpike = BPPV diagnose. Behandle med Epley/Semont.',
+        en: 'Positive Dix-Hallpike = BPPV diagnosis. Treat with Epley/Semont.'
+      }
+    },
+    tests: [
+      {
+        id: 'dix_hallpike',
+        name: { no: 'Dix-Hallpike Manøver', en: 'Dix-Hallpike Maneuver' },
+        procedure: {
+          no: 'Sittende pasient. Roter hode 45° til siden. Legg raskt tilbake med hodet under horisontalen. Hold 30 sek. Observer øyne for nystagmus.',
+          en: 'Seated patient. Rotate head 45° to side. Quickly lower to supine with head below horizontal. Hold 30 sec. Observe eyes for nystagmus.'
+        },
+        positive: {
+          no: 'Rotatorisk nystagmus med latens (2-40 sek), utmattbar. Vertigo.',
+          en: 'Rotatory nystagmus with latency (2-40 sec), fatigable. Vertigo.'
+        },
+        sensitivity: 0.79,
+        specificity: 0.75,
+        clinicalNote: {
+          no: 'Nystagmus mot affisert side. Behandle med Epley eller Semont manøver.',
+          en: 'Nystagmus toward affected side. Treat with Epley or Semont maneuver.'
+        }
+      },
+      {
+        id: 'head_impulse',
+        name: { no: 'Head Impulse Test (HIT)', en: 'Head Impulse Test (HIT)' },
+        procedure: {
+          no: 'Pasient fikserer på din nese. Raske, små hode-rotasjoner. Observer for korrigerende sakkader.',
+          en: 'Patient fixates on your nose. Quick, small head rotations. Observe for corrective saccades.'
+        },
+        positive: {
+          no: 'Korrigerende sakkade etter hodebevegelse = perifer vestibulær lesjon',
+          en: 'Corrective saccade after head movement = peripheral vestibular lesion'
+        },
+        sensitivity: 0.84,
+        specificity: 0.82,
+        clinicalNote: {
+          no: 'Del av HINTS protokoll. Normal HIT + spontan nystagmus = sentral årsak.',
+          en: 'Part of HINTS protocol. Normal HIT + spontaneous nystagmus = central cause.'
+        }
+      },
+      {
+        id: 'romberg',
+        name: { no: 'Romberg Test', en: 'Romberg Test' },
+        procedure: {
+          no: 'Stående med føttene sammen, armer krysset. Øyne lukket i 30 sek.',
+          en: 'Standing with feet together, arms crossed. Eyes closed for 30 sec.'
+        },
+        positive: {
+          no: 'Tap av balanse eller svaing med lukkede øyne',
+          en: 'Loss of balance or sway with eyes closed'
+        },
+        sensitivity: 0.68,
+        specificity: 0.70
+      },
+      {
+        id: 'unterberger',
+        name: { no: 'Unterberger/Fukuda Test', en: 'Unterberger/Fukuda Test' },
+        procedure: {
+          no: 'March på stedet med lukkede øyne, 50 steg. Observer rotasjon.',
+          en: 'March in place with eyes closed, 50 steps. Observe rotation.'
+        },
+        positive: {
+          no: 'Rotasjon >45° til en side indikerer vestibulær hypofunction',
+          en: 'Rotation >45° to one side indicates vestibular hypofunction'
+        },
+        sensitivity: 0.63,
+        specificity: 0.75
+      }
+    ]
+  },
+
+  // ============================================================================
+  // CONCUSSION SCREENING (from textbook Concussion section)
+  // ============================================================================
+
+  CONCUSSION: {
+    id: 'CONCUSSION',
+    name: { no: 'Hjernerystelse Screening', en: 'Concussion Screening' },
+    region: 'NEUROLOGICAL',
+    description: {
+      no: 'Hjernerystelse/mild traumatisk hjerneskade vurdering',
+      en: 'Concussion/mild traumatic brain injury assessment'
+    },
+    redFlagCluster: true,
+    urgency: 'URGENT',
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 8,
+      interpretation: {
+        no: '≥3 positive tegn etter hodetraume = hjernerystelse. IKKE returner til aktivitet.',
+        en: '≥3 positive signs after head trauma = concussion. DO NOT return to activity.'
+      }
+    },
+    tests: [
+      {
+        id: 'loc',
+        name: { no: 'Bevissthetstap (LOC)', en: 'Loss of Consciousness (LOC)' },
+        procedure: {
+          no: 'Spør om tap av bevissthet etter traume.',
+          en: 'Ask about loss of consciousness after trauma.'
+        },
+        positive: {
+          no: 'Enhver periode med bevissthetstap',
+          en: 'Any period of loss of consciousness'
+        },
+        redFlag: true
+      },
+      {
+        id: 'amnesia',
+        name: { no: 'Amnesi', en: 'Amnesia' },
+        procedure: {
+          no: 'Test retrograd (før skade) og anterograd (etter skade) hukommelse.',
+          en: 'Test retrograde (before injury) and anterograde (after injury) memory.'
+        },
+        positive: {
+          no: 'Hukommelsestap for hendelsen eller etterfølgende',
+          en: 'Memory loss for the event or subsequent'
+        },
+        redFlag: true
+      },
+      {
+        id: 'confusion',
+        name: { no: 'Forvirring/Desorientering', en: 'Confusion/Disorientation' },
+        procedure: {
+          no: 'Spør om tid, sted, person, situasjon.',
+          en: 'Ask about time, place, person, situation.'
+        },
+        positive: {
+          no: 'Forvirring om tid, sted eller hendelser',
+          en: 'Confusion about time, place or events'
+        },
+        redFlag: true
+      },
+      {
+        id: 'headache_post',
+        name: { no: 'Hodepine', en: 'Headache' },
+        procedure: {
+          no: 'Spør om hodepine etter traume.',
+          en: 'Ask about headache after trauma.'
+        },
+        positive: {
+          no: 'Vedvarende eller forverrende hodepine',
+          en: 'Persistent or worsening headache'
+        },
+        redFlag: true
+      },
+      {
+        id: 'nausea_vomiting',
+        name: { no: 'Kvalme/Oppkast', en: 'Nausea/Vomiting' },
+        procedure: {
+          no: 'Spør om kvalme eller oppkast etter traume.',
+          en: 'Ask about nausea or vomiting after trauma.'
+        },
+        positive: {
+          no: 'Vedvarende oppkast = alvorlig rødt flagg',
+          en: 'Persistent vomiting = serious red flag'
+        },
+        redFlag: true
+      },
+      {
+        id: 'balance_test',
+        name: { no: 'Balansetest', en: 'Balance Test' },
+        procedure: {
+          no: 'BESS test eller Romberg med lukkkede øyne.',
+          en: 'BESS test or Romberg with eyes closed.'
+        },
+        positive: {
+          no: 'Ustøhet eller tap av balanse',
+          en: 'Unsteadiness or loss of balance'
+        }
+      },
+      {
+        id: 'concentration',
+        name: { no: 'Konsentrasjon', en: 'Concentration' },
+        procedure: {
+          no: 'Tell baklengs fra 100, månedens dager baklengs.',
+          en: 'Count backwards from 100, months of year backwards.'
+        },
+        positive: {
+          no: 'Vanskeligheter med konsentrasjon/fokus',
+          en: 'Difficulty with concentration/focus'
+        }
+      },
+      {
+        id: 'gcs',
+        name: { no: 'Glasgow Coma Scale', en: 'Glasgow Coma Scale' },
+        procedure: {
+          no: 'Vurder øye-åpning (4), verbal respons (5), motorisk respons (6). Total 3-15.',
+          en: 'Assess eye opening (4), verbal response (5), motor response (6). Total 3-15.'
+        },
+        positive: {
+          no: 'GCS <15 = hjernerystelse. GCS <13 = moderat/alvorlig TBI',
+          en: 'GCS <15 = concussion. GCS <13 = moderate/severe TBI'
+        },
+        redFlag: true,
+        grading: {
+          mild: '13-15',
+          moderate: '9-12',
+          severe: '3-8'
+        }
+      }
+    ]
+  },
+
+  // ============================================================================
+  // UPPER CERVICAL INSTABILITY (from textbook C1-C2 Instability section)
+  // ============================================================================
+
+  UPPER_CERVICAL_INSTABILITY: {
+    id: 'UPPER_CERVICAL_INSTABILITY',
+    name: { no: 'Øvre Cervikal Instabilitet', en: 'Upper Cervical Instability' },
+    region: 'CERVICAL',
+    description: {
+      no: 'C0-C1-C2 instabilitet og ligamentær integritet',
+      en: 'C0-C1-C2 instability and ligamentous integrity'
+    },
+    redFlagCluster: true,
+    urgency: 'URGENT',
+    diagnosticCriteria: {
+      threshold: 1,
+      total: 4,
+      interpretation: {
+        no: 'Positiv test = KONTRAINDIKASJON for cervikal manipulasjon. Bildediagnostikk.',
+        en: 'Positive test = CONTRAINDICATION for cervical manipulation. Imaging required.'
+      }
+    },
+    tests: [
+      {
+        id: 'sharp_purser',
+        name: { no: 'Sharp-Purser Test', en: 'Sharp-Purser Test' },
+        procedure: {
+          no: 'Sittende. Stabiliser C2 spinosus med en hånd. Flekter cervikalcolumna, trykk posteriort på pannen.',
+          en: 'Sitting. Stabilize C2 spinous with one hand. Flex cervical spine, push posteriorly on forehead.'
+        },
+        positive: {
+          no: 'Glidebevegelse eller klunk = C1-C2 instabilitet (transversalt ligament)',
+          en: 'Sliding motion or clunk = C1-C2 instability (transverse ligament)'
+        },
+        sensitivity: 0.88,
+        specificity: 0.96,
+        redFlag: true,
+        clinicalNote: {
+          no: 'Brukes ved RA eller mistanke om odontoid skade.',
+          en: 'Used in RA or suspected odontoid injury.'
+        }
+      },
+      {
+        id: 'alar_ligament',
+        name: { no: 'Alar Ligament Stress Test', en: 'Alar Ligament Stress Test' },
+        procedure: {
+          no: 'Stabiliser C2 spinosus. Lateral fleksjon av hode. Normal: minimal bevegelse.',
+          en: 'Stabilize C2 spinous. Lateral flexion of head. Normal: minimal movement.'
+        },
+        positive: {
+          no: 'Overdreven lateralfleksjon >8-10° uten C2 bevegelse = alar lig. ruptur',
+          en: 'Excessive lateral flexion >8-10° without C2 movement = alar lig. rupture'
+        },
+        sensitivity: 0.82,
+        specificity: 0.90,
+        redFlag: true
+      },
+      {
+        id: 'transverse_ligament',
+        name: { no: 'Transversalt Ligament Stress Test', en: 'Transverse Ligament Stress Test' },
+        procedure: {
+          no: 'Ryggliggende. Flektert posisjon. Anteroposterior kraft på C1.',
+          en: 'Supine. Flexed position. Anteroposterior force on C1.'
+        },
+        positive: {
+          no: 'Gaping følelse eller soft endfeel = ligament insuffisiens',
+          en: 'Gaping sensation or soft end-feel = ligament insufficiency'
+        },
+        sensitivity: 0.70,
+        specificity: 0.95,
+        redFlag: true
+      },
+      {
+        id: 'lateral_shear',
+        name: { no: 'Lateral Shear Test', en: 'Lateral Shear Test' },
+        procedure: {
+          no: 'Ryggliggende. Lateral translasjon kraft på C1 relativt til C2.',
+          en: 'Supine. Lateral translation force on C1 relative to C2.'
+        },
+        positive: {
+          no: 'Overdreven bevegelse eller reprodusert symptom',
+          en: 'Excessive motion or reproduced symptoms'
+        },
+        sensitivity: 0.65,
+        specificity: 0.88,
+        redFlag: true
+      }
+    ]
+  },
+
+  // ============================================================================
+  // CERVICOGENIC HEADACHE (from textbook Headache section)
+  // ============================================================================
+
+  CERVICOGENIC_HEADACHE: {
+    id: 'CERVICOGENIC_HEADACHE',
+    name: { no: 'Cervikogen Hodepine', en: 'Cervicogenic Headache' },
+    region: 'CERVICAL',
+    description: {
+      no: 'Hodepine fra cervikal opprinnelse (C1-C3)',
+      en: 'Headache of cervical origin (C1-C3)'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 6,
+      interpretation: {
+        no: '≥3 positive kriterier indikerer cervikogen hodepine',
+        en: '≥3 positive criteria indicate cervicogenic headache'
+      }
+    },
+    tests: [
+      {
+        id: 'unilateral_pain',
+        name: { no: 'Unilateral Smerte', en: 'Unilateral Pain' },
+        procedure: {
+          no: 'Vurder om hodepine er ensidig og ikke skifter side.',
+          en: 'Assess if headache is unilateral and does not shift sides.'
+        },
+        positive: {
+          no: 'Konstant ensidig hodepine',
+          en: 'Constant unilateral headache'
+        }
+      },
+      {
+        id: 'neck_movement_trigger',
+        name: { no: 'Nakkebevegelse Trigger', en: 'Neck Movement Trigger' },
+        procedure: {
+          no: 'Vurder om hodepine provoseres av nakkebevegelser eller stillinger.',
+          en: 'Assess if headache is provoked by neck movements or positions.'
+        },
+        positive: {
+          no: 'Hodepine forverres med spesifikke nakkebevegelser/stillinger',
+          en: 'Headache worsens with specific neck movements/positions'
+        }
+      },
+      {
+        id: 'cervical_rom_limited',
+        name: { no: 'Redusert Cervikal ROM', en: 'Reduced Cervical ROM' },
+        procedure: {
+          no: 'Test aktiv cervikal ROM. Observer for reduksjon.',
+          en: 'Test active cervical ROM. Observe for reduction.'
+        },
+        positive: {
+          no: 'Redusert ROM spesielt i ekstensjon og rotasjon',
+          en: 'Reduced ROM especially in extension and rotation'
+        },
+        sensitivity: 0.78,
+        specificity: 0.72
+      },
+      {
+        id: 'upper_cervical_palpation',
+        name: { no: 'Øvre Cervikal Palpasjon', en: 'Upper Cervical Palpation' },
+        procedure: {
+          no: 'Palper C0-C3 region, suboccipitale muskler.',
+          en: 'Palpate C0-C3 region, suboccipital muscles.'
+        },
+        positive: {
+          no: 'Ømhet eller triggerpunkter som reproduserer hodepine',
+          en: 'Tenderness or trigger points that reproduce headache'
+        },
+        sensitivity: 0.85,
+        specificity: 0.65
+      },
+      {
+        id: 'flexion_rotation_test',
+        name: { no: 'Fleksjon-Rotasjon Test', en: 'Flexion-Rotation Test' },
+        procedure: {
+          no: 'Full cervikal fleksjon (lås nedre C-sp). Roter til hver side. Normal >44°.',
+          en: 'Full cervical flexion (lock lower C-sp). Rotate each side. Normal >44°.'
+        },
+        positive: {
+          no: 'Rotasjon <32° = C1-C2 restriksjon/dysfunksjon',
+          en: 'Rotation <32° = C1-C2 restriction/dysfunction'
+        },
+        sensitivity: 0.91,
+        specificity: 0.90
+      },
+      {
+        id: 'no_autonomic',
+        name: { no: 'Ingen Autonom Aktivering', en: 'No Autonomic Activation' },
+        procedure: {
+          no: 'Vurder fravær av tåreflod, nasal tetthet, øyeinjeksjon.',
+          en: 'Assess absence of tearing, nasal congestion, eye injection.'
+        },
+        positive: {
+          no: 'Ingen eller minimal autonom aktivering (skiller fra cluster)',
+          en: 'No or minimal autonomic activation (differentiates from cluster)'
+        }
+      }
+    ]
+  },
+
+  // ============================================================================
+  // THORACIC / RIB DYSFUNCTION (from textbook T-spine & Ribs section)
+  // ============================================================================
+
+  THORACIC_RIB: {
+    id: 'THORACIC_RIB',
+    name: { no: 'Thorax / Ribben Dysfunksjon', en: 'Thoracic / Rib Dysfunction' },
+    region: 'LUMBAR',
+    description: {
+      no: 'Thorakalkolumna og costovertebralledd dysfunksjon',
+      en: 'Thoracic spine and costovertebral joint dysfunction'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 6,
+      interpretation: {
+        no: '≥3 positive funn indikerer thorakal/ribben dysfunksjon',
+        en: '≥3 positive findings indicate thoracic/rib dysfunction'
+      }
+    },
+    tests: [
+      {
+        id: 'rib_spring',
+        name: { no: 'Ribben Spring Test', en: 'Rib Spring Test' },
+        procedure: {
+          no: 'Mageleie. Press anteriort på ribben. Vurder bevegelse og smerte.',
+          en: 'Prone. Press anteriorly on rib. Assess movement and pain.'
+        },
+        positive: {
+          no: 'Smerte eller redusert fjæring vs. kontralateral',
+          en: 'Pain or reduced springing vs. contralateral'
+        },
+        sensitivity: 0.72,
+        specificity: 0.78
+      },
+      {
+        id: 'first_rib_test',
+        name: { no: '1. Ribben Test', en: 'First Rib Test' },
+        procedure: {
+          no: 'Palper 1. ribben i supraklavikulær region. Sammenlign høyde bilateralt.',
+          en: 'Palpate 1st rib in supraclavicular region. Compare height bilaterally.'
+        },
+        positive: {
+          no: 'Asymmetri i høyde, ømhet, restriksjon',
+          en: 'Asymmetry in height, tenderness, restriction'
+        },
+        sensitivity: 0.68,
+        specificity: 0.75
+      },
+      {
+        id: 'thoracic_spring',
+        name: { no: 'Thorakal Spring Test', en: 'Thoracic Spring Test' },
+        procedure: {
+          no: 'Mageleie. PA press på thorakal spinosus. Vurder joint play.',
+          en: 'Prone. PA pressure on thoracic spinous. Assess joint play.'
+        },
+        positive: {
+          no: 'Hypomobilitet eller smerte ved spesifikt segment',
+          en: 'Hypomobility or pain at specific segment'
+        },
+        sensitivity: 0.75,
+        specificity: 0.70
+      },
+      {
+        id: 'rib_compression',
+        name: { no: 'Ribben Kompresjon', en: 'Rib Compression' },
+        procedure: {
+          no: 'Anteroposterior og lateral kompresjon av thorax.',
+          en: 'Anteroposterior and lateral compression of thorax.'
+        },
+        positive: {
+          no: 'Lokalisert smerte = mulig fraktur eller dysfunksjon',
+          en: 'Localized pain = possible fracture or dysfunction'
+        },
+        sensitivity: 0.82,
+        specificity: 0.65,
+        redFlagCondition: 'Rib fracture'
+      },
+      {
+        id: 'deep_breath_pain',
+        name: { no: 'Dyp Pust Smerte', en: 'Deep Breath Pain' },
+        procedure: {
+          no: 'Pasient tar dyp innånding. Vurder smerte lokalisering.',
+          en: 'Patient takes deep inspiration. Assess pain location.'
+        },
+        positive: {
+          no: 'Lokal thorakal/ribben smerte ved inspirasjon',
+          en: 'Local thoracic/rib pain on inspiration'
+        }
+      },
+      {
+        id: 'scapular_winging',
+        name: { no: 'Scapula Winging', en: 'Scapula Winging' },
+        procedure: {
+          no: 'Pasient presser mot vegg. Observer scapula.',
+          en: 'Patient pushes against wall. Observe scapula.'
+        },
+        positive: {
+          no: 'Scapula løfter fra thorax = serratus anterior svakhet (n. thoracicus longus)',
+          en: 'Scapula lifts from thorax = serratus anterior weakness (long thoracic n.)'
+        }
+      }
+    ]
+  },
+
+  // ============================================================================
+  // LUMBAR RADICULOPATHY (from textbook L-spine section)
+  // ============================================================================
+
+  LUMBAR_RADICULOPATHY: {
+    id: 'LUMBAR_RADICULOPATHY',
+    name: { no: 'Lumbal Radikulopati', en: 'Lumbar Radiculopathy' },
+    region: 'LUMBAR',
+    description: {
+      no: 'Nerverot kompresjon i lumbalkolumna',
+      en: 'Nerve root compression in lumbar spine'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 6,
+      interpretation: {
+        no: '≥3 positive tester indikerer lumbal radikulopati',
+        en: '≥3 positive tests indicate lumbar radiculopathy'
+      }
+    },
+    tests: [
+      {
+        id: 'slr',
+        name: { no: 'Straight Leg Raise (SLR/Lasègue)', en: 'Straight Leg Raise (SLR/Lasègue)' },
+        procedure: {
+          no: 'Ryggliggende. Passiv heving av strakt ben. Positiv mellom 30-70°.',
+          en: 'Supine. Passive raising of straight leg. Positive between 30-70°.'
+        },
+        positive: {
+          no: 'Radierende smerte ned benet (ikke bare hamstring strekk)',
+          en: 'Radiating pain down leg (not just hamstring stretch)'
+        },
+        sensitivity: 0.91,
+        specificity: 0.26
+      },
+      {
+        id: 'crossed_slr',
+        name: { no: 'Krysset SLR (Fajersztajn)', en: 'Crossed SLR (Fajersztajn)' },
+        procedure: {
+          no: 'SLR av det uaffiserte benet reproduserer symptomer i det affiserte.',
+          en: 'SLR of unaffected leg reproduces symptoms in affected leg.'
+        },
+        positive: {
+          no: 'Symptomer i motsatt ben',
+          en: 'Symptoms in opposite leg'
+        },
+        sensitivity: 0.29,
+        specificity: 0.88
+      },
+      {
+        id: 'slump',
+        name: { no: 'Slump Test', en: 'Slump Test' },
+        procedure: {
+          no: 'Sittende. Flekter thorakal, så cervikalkolumna. Ekstender kne, dorsalflek ankel.',
+          en: 'Sitting. Flex thoracic, then cervical spine. Extend knee, dorsiflex ankle.'
+        },
+        positive: {
+          no: 'Radierende smerte. Lindres med cervikalekstensjn.',
+          en: 'Radiating pain. Relieved with cervical extension.'
+        },
+        sensitivity: 0.84,
+        specificity: 0.83
+      },
+      {
+        id: 'bowstring',
+        name: { no: 'Bowstring Sign (Cram Test)', en: 'Bowstring Sign (Cram Test)' },
+        procedure: {
+          no: 'SLR til symptomer, senk litt. Press på popliteafossa.',
+          en: 'SLR to symptoms, lower slightly. Press on popliteal fossa.'
+        },
+        positive: {
+          no: 'Symptomer reproduseres',
+          en: 'Symptoms reproduced'
+        },
+        sensitivity: 0.40,
+        specificity: 0.90
+      },
+      {
+        id: 'femoral_nerve_stretch',
+        name: { no: 'Femoral Nerve Stretch', en: 'Femoral Nerve Stretch' },
+        procedure: {
+          no: 'Mageleie. Flekter kne, ekstender hofte (reverse SLR).',
+          en: 'Prone. Flex knee, extend hip (reverse SLR).'
+        },
+        positive: {
+          no: 'Smerte i anterior lår = L2-L4 radikulopati',
+          en: 'Pain in anterior thigh = L2-L4 radiculopathy'
+        },
+        sensitivity: 0.50,
+        specificity: 0.75
+      },
+      {
+        id: 'ankle_reflex',
+        name: { no: 'Redusert Akillesrefleks', en: 'Reduced Achilles Reflex' },
+        procedure: {
+          no: 'Test akillesrefleks. Sammenlign bilateralt.',
+          en: 'Test Achilles reflex. Compare bilaterally.'
+        },
+        positive: {
+          no: 'Redusert/absent refleks = S1 radikulopati',
+          en: 'Reduced/absent reflex = S1 radiculopathy'
+        },
+        sensitivity: 0.50,
+        specificity: 0.85
+      }
+    ]
+  },
+
+  // ============================================================================
+  // THORACIC SPINE & RIB ADDITIONS (from Vizniak Orthopedic Conditions)
+  // ============================================================================
+
+  SCOLIOSIS: {
+    id: 'SCOLIOSIS',
+    name: { no: 'Skoliose Screening', en: 'Scoliosis Screening' },
+    region: 'THORACIC',
+    description: {
+      no: 'Lateral kurvatur av ryggraden med rotasjonskomponent',
+      en: 'Lateral curvature of spine with rotational component'
+    },
+    diagnosticCriteria: {
+      threshold: 2,
+      total: 4,
+      interpretation: {
+        no: '≥2 positive funn = henvisning til røntgen/spesialist. Cobb vinkel >10° bekrefter diagnose.',
+        en: '≥2 positive findings = referral for x-ray/specialist. Cobb angle >10° confirms diagnosis.'
+      }
+    },
+    tests: [
+      {
+        id: 'adams_forward_bend',
+        name: { no: "Adam's Forward Bend Test", en: "Adam's Forward Bend Test" },
+        procedure: {
+          no: 'Pasient bøyer seg fremover med strakte knær, armer hengende. Observer ryggen bakfra.',
+          en: 'Patient bends forward with straight knees, arms hanging. Observe back from behind.'
+        },
+        positive: {
+          no: 'Ribbeforhøyning (rib hump) eller lumbal prominens på én side',
+          en: 'Rib hump or lumbar prominence on one side'
+        },
+        sensitivity: 0.84,
+        specificity: 0.93,
+        clinicalNote: {
+          no: 'Gullstandard screening. Bruk skoliometer - >5° ATR indikerer henvisning.',
+          en: 'Gold standard screening. Use scoliometer - >5° ATR indicates referral.'
+        }
+      },
+      {
+        id: 'shoulder_height_asymmetry',
+        name: { no: 'Skulderhøyde Asymmetri', en: 'Shoulder Height Asymmetry' },
+        procedure: {
+          no: 'Observer skulderhøyde bakfra i stående stilling.',
+          en: 'Observe shoulder height from behind in standing position.'
+        },
+        positive: {
+          no: 'Merkbar høydeforskjell mellom skuldrene',
+          en: 'Notable height difference between shoulders'
+        }
+      },
+      {
+        id: 'scapular_asymmetry',
+        name: { no: 'Scapula Asymmetri', en: 'Scapular Asymmetry' },
+        procedure: {
+          no: 'Observer scapulaposisjon - én mer prominent eller vinging.',
+          en: 'Observe scapula position - one more prominent or winging.'
+        },
+        positive: {
+          no: 'Asymmetrisk scapulaposisjon',
+          en: 'Asymmetric scapula position'
+        }
+      },
+      {
+        id: 'waist_crease_asymmetry',
+        name: { no: 'Midje/Flanke Asymmetri', en: 'Waist Crease Asymmetry' },
+        procedure: {
+          no: 'Observer avstand mellom arm og midje på hver side.',
+          en: 'Observe distance between arm and waist on each side.'
+        },
+        positive: {
+          no: 'Ulik avstand/vinkel mellom arm og midje',
+          en: 'Unequal distance/angle between arm and waist'
+        }
+      }
+    ]
+  },
+
+  SCHEUERMANN: {
+    id: 'SCHEUERMANN',
+    name: { no: "Scheuermann's Sykdom", en: "Scheuermann's Disease" },
+    region: 'THORACIC',
+    description: {
+      no: 'Strukturell kyfose hos ungdom med vertebral wedging',
+      en: 'Structural kyphosis in adolescents with vertebral wedging'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 5,
+      interpretation: {
+        no: '≥3 positive funn + alder 12-17 = røntgen anbefalt. Diagnostiske kriterier: ≥3 påfølgende virvler med ≥5° wedging.',
+        en: '≥3 positive findings + age 12-17 = x-ray recommended. Diagnostic criteria: ≥3 consecutive vertebrae with ≥5° wedging.'
+      }
+    },
+    tests: [
+      {
+        id: 'fixed_kyphosis',
+        name: { no: 'Fiksert Kyfose', en: 'Fixed Kyphosis' },
+        procedure: {
+          no: 'Observér thorakal kyfose. Test om den korrigeres med ekstensjon eller mageleie.',
+          en: 'Observe thoracic kyphosis. Test if it corrects with extension or prone position.'
+        },
+        positive: {
+          no: 'Kyfose som IKKE korrigeres (strukturell vs. postural)',
+          en: 'Kyphosis that does NOT correct (structural vs. postural)'
+        },
+        clinicalNote: {
+          no: 'Postural kyfose korrigeres, Scheuermann korrigeres ikke.',
+          en: 'Postural kyphosis corrects, Scheuermann does not.'
+        }
+      },
+      {
+        id: 'thoracic_pain_adolescent',
+        name: { no: 'Thorakal Smerte (Ungdom)', en: 'Thoracic Pain (Adolescent)' },
+        procedure: {
+          no: 'Anamnese: midtrygg/inter-scapulær smerte hos ungdom 12-17 år.',
+          en: 'History: mid-back/inter-scapular pain in adolescent 12-17 years.'
+        },
+        positive: {
+          no: 'Vedvarende thorakal smerte, verre med aktivitet',
+          en: 'Persistent thoracic pain, worse with activity'
+        }
+      },
+      {
+        id: 'tight_hamstrings',
+        name: { no: 'Stramme Hamstrings', en: 'Tight Hamstrings' },
+        procedure: {
+          no: 'SLR eller 90-90 hamstring test.',
+          en: 'SLR or 90-90 hamstring test.'
+        },
+        positive: {
+          no: 'Markant hamstring stramhet (vanlig ved Scheuermann)',
+          en: 'Marked hamstring tightness (common in Scheuermann)'
+        }
+      },
+      {
+        id: 'limited_thoracic_extension',
+        name: { no: 'Begrenset Thorakal Ekstensjon', en: 'Limited Thoracic Extension' },
+        procedure: {
+          no: 'Aktiv thorakal ekstensjon i sittende eller stående.',
+          en: 'Active thoracic extension in sitting or standing.'
+        },
+        positive: {
+          no: 'Sterkt begrenset ekstensjon sammenlignet med normalt',
+          en: 'Severely limited extension compared to normal'
+        }
+      },
+      {
+        id: 'apex_tenderness',
+        name: { no: 'Apex Ømhet', en: 'Apex Tenderness' },
+        procedure: {
+          no: 'Palpér spinøse prosesser ved kyfosens apex (T7-T9 typisk).',
+          en: 'Palpate spinous processes at kyphosis apex (T7-T9 typical).'
+        },
+        positive: {
+          no: 'Lokal ømhet ved apex av kyfosen',
+          en: 'Local tenderness at apex of kyphosis'
+        }
+      }
+    ]
+  },
+
+  COSTOCHONDRITIS: {
+    id: 'COSTOCHONDRITIS',
+    name: { no: 'Costochondritt', en: 'Costochondritis' },
+    region: 'THORACIC',
+    description: {
+      no: 'Inflammasjon av costochondrale ledd - vanlig årsak til brystsmerter',
+      en: 'Inflammation of costochondral joints - common cause of chest pain'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 5,
+      interpretation: {
+        no: '≥3 positive = sannsynlig costochondritt. VIKTIG: Utelukk kardiale årsaker først!',
+        en: '≥3 positive = probable costochondritis. IMPORTANT: Rule out cardiac causes first!'
+      }
+    },
+    tests: [
+      {
+        id: 'costochondral_tenderness',
+        name: { no: 'Costochondral Ømhet', en: 'Costochondral Tenderness' },
+        procedure: {
+          no: 'Palpér costochondrale ledd (ribben 2-5 ved sternum).',
+          en: 'Palpate costochondral junctions (ribs 2-5 at sternum).'
+        },
+        positive: {
+          no: 'Reproduksjon av pasientens brystsmerte med palpasjon',
+          en: 'Reproduction of patient\'s chest pain with palpation'
+        },
+        sensitivity: 0.77,
+        specificity: 0.68,
+        clinicalNote: {
+          no: 'Tietze syndrom = costochondritt + synlig hevelse',
+          en: 'Tietze syndrome = costochondritis + visible swelling'
+        }
+      },
+      {
+        id: 'crowing_rooster',
+        name: { no: 'Crowing Rooster Manøver', en: 'Crowing Rooster Maneuver' },
+        procedure: {
+          no: 'Pasient plasserer hender bak hodet, ekstenderer nakke og presser albuer bakover.',
+          en: 'Patient places hands behind head, extends neck and presses elbows backward.'
+        },
+        positive: {
+          no: 'Reproduksjon av brystsmerte',
+          en: 'Reproduction of chest pain'
+        }
+      },
+      {
+        id: 'chest_compression',
+        name: { no: 'Brystkompresjon', en: 'Chest Compression' },
+        procedure: {
+          no: 'Lateral kompresjon av brystkassen (hands på sidene).',
+          en: 'Lateral compression of chest cage (hands on sides).'
+        },
+        positive: {
+          no: 'Smerte ved costochondrale ledd (ikke diffus)',
+          en: 'Pain at costochondral joints (not diffuse)'
+        }
+      },
+      {
+        id: 'deep_breath_pain',
+        name: { no: 'Smerte ved Dyp Inspirasjon', en: 'Pain with Deep Inspiration' },
+        procedure: {
+          no: 'Be pasient ta dyp innånding.',
+          en: 'Ask patient to take deep breath.'
+        },
+        positive: {
+          no: 'Lokalisert sternal/parasternal smerte (ikke diffus brystsmerte)',
+          en: 'Localized sternal/parasternal pain (not diffuse chest pain)'
+        }
+      },
+      {
+        id: 'cough_sneeze_pain',
+        name: { no: 'Smerte ved Hoste/Nysing', en: 'Pain with Cough/Sneeze' },
+        procedure: {
+          no: 'Anamnese: Forverres smerten ved hoste eller nysing?',
+          en: 'History: Does pain worsen with coughing or sneezing?'
+        },
+        positive: {
+          no: 'Ja, lokalisert til costochondrale områder',
+          en: 'Yes, localized to costochondral areas'
+        }
+      }
+    ]
+  },
+
+  POSTURAL_SYNDROME: {
+    id: 'POSTURAL_SYNDROME',
+    name: { no: 'Posturalt Syndrom (Upper/Lower Cross)', en: 'Postural Syndrome (Upper/Lower Cross)' },
+    region: 'THORACIC',
+    description: {
+      no: 'Muskelubalanse med karakteristiske mønstere - Upper og Lower Cross Syndrom',
+      en: 'Muscle imbalance with characteristic patterns - Upper and Lower Cross Syndrome'
+    },
+    diagnosticCriteria: {
+      threshold: 4,
+      total: 8,
+      interpretation: {
+        no: '≥4 positive funn = posturalt syndrom. Identifiser hovedmønster for behandlingsplan.',
+        en: '≥4 positive findings = postural syndrome. Identify main pattern for treatment plan.'
+      }
+    },
+    tests: [
+      {
+        id: 'forward_head_posture',
+        name: { no: 'Forward Head Posture', en: 'Forward Head Posture' },
+        procedure: {
+          no: 'Observer hodeposisjon fra siden - øre skal være over skulder.',
+          en: 'Observe head position from side - ear should be over shoulder.'
+        },
+        positive: {
+          no: 'Øret er anteriort for skulderleddet',
+          en: 'Ear is anterior to shoulder joint'
+        },
+        clinicalNote: {
+          no: 'Upper Cross: Stramme øvre trapezius, levator, pectoralis + svake dype nakkefleksorer, lower trap',
+          en: 'Upper Cross: Tight upper trapezius, levator, pectoralis + weak deep neck flexors, lower trap'
+        }
+      },
+      {
+        id: 'rounded_shoulders',
+        name: { no: 'Protraherte Skuldre', en: 'Rounded Shoulders' },
+        procedure: {
+          no: 'Observer skulderposisjon - skal hender peke fremover eller bakover?',
+          en: 'Observe shoulder position - do hands point forward or backward?'
+        },
+        positive: {
+          no: 'Tydelig protraksjon av skuldre, hender peker fremover',
+          en: 'Clear protraction of shoulders, hands point forward'
+        }
+      },
+      {
+        id: 'increased_thoracic_kyphosis',
+        name: { no: 'Økt Thorakal Kyfose', en: 'Increased Thoracic Kyphosis' },
+        procedure: {
+          no: 'Observer thorakalkolumna fra siden.',
+          en: 'Observe thoracic spine from the side.'
+        },
+        positive: {
+          no: 'Hyperkyfose som korrigeres ved aktiv holdningskorreksjon',
+          en: 'Hyperkyphosis that corrects with active postural correction'
+        }
+      },
+      {
+        id: 'lumbar_hyperlordosis',
+        name: { no: 'Lumbal Hyperlordose', en: 'Lumbar Hyperlordosis' },
+        procedure: {
+          no: 'Observer lumbalkolumna fra siden.',
+          en: 'Observe lumbar spine from side.'
+        },
+        positive: {
+          no: 'Økt lumbal lordose (anterior pelvic tilt)',
+          en: 'Increased lumbar lordosis (anterior pelvic tilt)'
+        },
+        clinicalNote: {
+          no: 'Lower Cross: Stramme hoftefleksorer, erector spinae + svake glutealer, abdominale',
+          en: 'Lower Cross: Tight hip flexors, erector spinae + weak gluteals, abdominals'
+        }
+      },
+      {
+        id: 'tight_hip_flexors',
+        name: { no: 'Stramme Hoftefleksorer (Thomas)', en: 'Tight Hip Flexors (Thomas)' },
+        procedure: {
+          no: 'Thomas test: Ryggliggende, trekk ett kne til brystet, observer motstående lår.',
+          en: 'Thomas test: Supine, pull one knee to chest, observe opposite thigh.'
+        },
+        positive: {
+          no: 'Motstående lår hever seg fra benken',
+          en: 'Opposite thigh rises from table'
+        },
+        sensitivity: 0.89,
+        specificity: 0.92
+      },
+      {
+        id: 'weak_deep_neck_flexors',
+        name: { no: 'Svake Dype Nakkefleksorer', en: 'Weak Deep Neck Flexors' },
+        procedure: {
+          no: 'Ryggliggende, be pasient løfte hodet. Observer hakeposisjon.',
+          en: 'Supine, ask patient to lift head. Observe chin position.'
+        },
+        positive: {
+          no: 'Haken peker opp istedenfor å trekkes inn (chin poke)',
+          en: 'Chin points up instead of tucking in (chin poke)'
+        }
+      },
+      {
+        id: 'weak_glutes',
+        name: { no: 'Svake Glutealer', en: 'Weak Gluteals' },
+        procedure: {
+          no: 'Mageleie, hofteekstensjon. Palper aktiveringssekvens.',
+          en: 'Prone, hip extension. Palpate activation sequence.'
+        },
+        positive: {
+          no: 'Hamstrings/erector aktiveres før gluteus maximus',
+          en: 'Hamstrings/erector activate before gluteus maximus'
+        }
+      },
+      {
+        id: 'tight_pectorals',
+        name: { no: 'Stramme Pectoralis', en: 'Tight Pectorals' },
+        procedure: {
+          no: 'Ryggliggende, armer ut til 90°. Skal underarmer hvile på benken?',
+          en: 'Supine, arms out at 90°. Should forearms rest on table?'
+        },
+        positive: {
+          no: 'Underarmer hviler ikke på benken (pec minor/major stramhet)',
+          en: 'Forearms do not rest on table (pec minor/major tightness)'
+        }
+      }
+    ]
+  },
+
+  MYOCARDIAL_INFARCTION_SCREEN: {
+    id: 'MYOCARDIAL_INFARCTION_SCREEN',
+    name: { no: 'Hjerteinfarkt Røde Flagg', en: 'Myocardial Infarction Red Flags' },
+    region: 'THORACIC',
+    description: {
+      no: 'KRITISK: Røde flagg for kardial årsak til brystsmerte',
+      en: 'CRITICAL: Red flags for cardiac cause of chest pain'
+    },
+    redFlagCluster: true,
+    urgency: 'IMMEDIATE',
+    diagnosticCriteria: {
+      threshold: 2,
+      total: 6,
+      interpretation: {
+        no: '≥2 positive = UMIDDELBAR KARDIAL EVALUERING. Ring 113!',
+        en: '≥2 positive = IMMEDIATE CARDIAC EVALUATION. Call emergency services!'
+      }
+    },
+    tests: [
+      {
+        id: 'crushing_substernal_pain',
+        name: { no: 'Knusende Substernal Smerte', en: 'Crushing Substernal Pain' },
+        procedure: {
+          no: 'Beskriv smerten: knusende, pressende, tung følelse på brystet?',
+          en: 'Describe pain: crushing, pressure, heavy feeling on chest?'
+        },
+        positive: {
+          no: 'Ja, substernal trykk/knusing som "elefant på brystet"',
+          en: 'Yes, substernal pressure/crushing like "elephant on chest"'
+        },
+        redFlag: true,
+        redFlagCondition: 'Cardinal symptom of MI - immediate evaluation'
+      },
+      {
+        id: 'left_arm_jaw_radiation',
+        name: { no: 'Utstråling til Venstre Arm/Kjeve', en: 'Left Arm/Jaw Radiation' },
+        procedure: {
+          no: 'Stråler smerten til venstre arm, kjeve, nakke eller rygg?',
+          en: 'Does pain radiate to left arm, jaw, neck or back?'
+        },
+        positive: {
+          no: 'Ja, klassisk utstrålingsmønster',
+          en: 'Yes, classic radiation pattern'
+        },
+        redFlag: true
+      },
+      {
+        id: 'associated_symptoms',
+        name: { no: 'Assosierte Symptomer', en: 'Associated Symptoms' },
+        procedure: {
+          no: 'Kvalme, svette, dyspné, svimmelhet?',
+          en: 'Nausea, sweating, dyspnea, lightheadedness?'
+        },
+        positive: {
+          no: 'Ett eller flere av disse symptomene tilstede',
+          en: 'One or more of these symptoms present'
+        },
+        redFlag: true
+      },
+      {
+        id: 'exertional_onset',
+        name: { no: 'Anstrengelsesutløst', en: 'Exertional Onset' },
+        procedure: {
+          no: 'Startet smerten under eller rett etter fysisk anstrengelse?',
+          en: 'Did pain start during or right after physical exertion?'
+        },
+        positive: {
+          no: 'Ja, klar sammenheng med anstrengelse',
+          en: 'Yes, clear relationship with exertion'
+        },
+        redFlag: true
+      },
+      {
+        id: 'risk_factors_present',
+        name: { no: 'Kardiale Risikofaktorer', en: 'Cardiac Risk Factors' },
+        procedure: {
+          no: 'Alder >50, diabetes, hypertensjon, røyking, familiehistorie, hyperkolesterolemi?',
+          en: 'Age >50, diabetes, hypertension, smoking, family history, hypercholesterolemia?'
+        },
+        positive: {
+          no: '≥2 risikofaktorer tilstede',
+          en: '≥2 risk factors present'
+        },
+        redFlag: true
+      },
+      {
+        id: 'pain_not_reproducible',
+        name: { no: 'Smerte Ikke Reproduserbar', en: 'Pain Not Reproducible' },
+        procedure: {
+          no: 'Kan brystsmerten reproduseres med palpasjon eller bevegelse?',
+          en: 'Can chest pain be reproduced with palpation or movement?'
+        },
+        positive: {
+          no: 'NEI - smerten kan ikke reproduseres mekanisk',
+          en: 'NO - pain cannot be reproduced mechanically'
+        },
+        clinicalNote: {
+          no: 'Hvis smerte KAN reproduseres = mindre sannsynlig kardial årsak',
+          en: 'If pain CAN be reproduced = less likely cardiac cause'
+        }
+      }
+    ]
+  },
+
+  // ============================================================================
+  // LUMBAR & PELVIS ADDITIONS
+  // ============================================================================
+
+  LEG_LENGTH_INEQUALITY: {
+    id: 'LEG_LENGTH_INEQUALITY',
+    name: { no: 'Benlengdeforskjell', en: 'Leg Length Inequality' },
+    region: 'LUMBAR_PELVIS',
+    description: {
+      no: 'Anatomisk eller funksjonell benlengdeforskjell',
+      en: 'Anatomical or functional leg length discrepancy'
+    },
+    diagnosticCriteria: {
+      threshold: 2,
+      total: 4,
+      interpretation: {
+        no: '≥2 positive = sannsynlig LLI. Differensier anatomisk vs. funksjonell.',
+        en: '≥2 positive = probable LLI. Differentiate anatomical vs. functional.'
+      }
+    },
+    tests: [
+      {
+        id: 'standing_iliac_crest',
+        name: { no: 'Stående Crista Iliaca Høyde', en: 'Standing Iliac Crest Height' },
+        procedure: {
+          no: 'Palper crista iliaca bilateralt i stående stilling.',
+          en: 'Palpate iliac crests bilaterally in standing position.'
+        },
+        positive: {
+          no: 'Ulik høyde på crista iliaca',
+          en: 'Unequal iliac crest height'
+        },
+        clinicalNote: {
+          no: 'Bruk blokker under kort ben til crista er jevn for å estimere forskjell.',
+          en: 'Use blocks under short leg until crests level to estimate difference.'
+        }
+      },
+      {
+        id: 'supine_malleoli',
+        name: { no: 'Ryggliggende Malleoli Sammenligning', en: 'Supine Malleoli Comparison' },
+        procedure: {
+          no: 'Ryggliggende, hold begge ankler og sammenlign mediale malleoli.',
+          en: 'Supine, hold both ankles and compare medial malleoli.'
+        },
+        positive: {
+          no: 'Ulik lengde observert',
+          en: 'Unequal length observed'
+        }
+      },
+      {
+        id: 'tape_measure_asis_malleolus',
+        name: { no: 'ASIS til Malleolus Måling', en: 'ASIS to Malleolus Measurement' },
+        procedure: {
+          no: 'Mål fra ASIS til medial malleolus bilateralt med målebånd.',
+          en: 'Measure from ASIS to medial malleolus bilaterally with tape measure.'
+        },
+        positive: {
+          no: 'Forskjell >1 cm = klinisk signifikant',
+          en: 'Difference >1 cm = clinically significant'
+        }
+      },
+      {
+        id: 'functional_vs_anatomical',
+        name: { no: 'Funksjonell vs. Anatomisk Test', en: 'Functional vs. Anatomical Test' },
+        procedure: {
+          no: 'Sammenlign stående vs. sittende. Funksjonell LLI forsvinner i sittende.',
+          en: 'Compare standing vs. sitting. Functional LLI disappears in sitting.'
+        },
+        positive: {
+          no: 'Forskjell i stående som IKKE er tilstede i sittende = funksjonell',
+          en: 'Difference in standing that is NOT present in sitting = functional'
+        },
+        clinicalNote: {
+          no: 'Funksjonell: SI-dysfunksjon, muskelubalanse. Anatomisk: Benstrukturforskjell.',
+          en: 'Functional: SI dysfunction, muscle imbalance. Anatomical: Bone structure difference.'
+        }
+      }
+    ]
+  },
+
+  SPONDYLOLISTHESIS: {
+    id: 'SPONDYLOLISTHESIS',
+    name: { no: 'Spondylolistese', en: 'Spondylolisthesis' },
+    region: 'LUMBAR_PELVIS',
+    description: {
+      no: 'Anterior glidning av en virvel over den nedenfor - oftest L5 over S1',
+      en: 'Anterior slippage of one vertebra over the one below - most often L5 over S1'
+    },
+    redFlagCluster: false,
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 5,
+      interpretation: {
+        no: '≥3 positive = sannsynlig spondylolistese. Røntgen bekrefter. Grad I-IV (Meyerding).',
+        en: '≥3 positive = probable spondylolisthesis. X-ray confirms. Grade I-IV (Meyerding).'
+      }
+    },
+    tests: [
+      {
+        id: 'step_off_deformity',
+        name: { no: 'Step-Off Deformitet', en: 'Step-Off Deformity' },
+        procedure: {
+          no: 'Palper spinøse prosesser. Kjenn etter "trapp" der en virvel glir frem.',
+          en: 'Palpate spinous processes. Feel for "step" where one vertebra slips forward.'
+        },
+        positive: {
+          no: 'Palpabel step-off, oftest L4-L5 eller L5-S1',
+          en: 'Palpable step-off, most often L4-L5 or L5-S1'
+        }
+      },
+      {
+        id: 'hyperlordosis_spondy',
+        name: { no: 'Kompensatorisk Hyperlordose', en: 'Compensatory Hyperlordosis' },
+        procedure: {
+          no: 'Observer lumbal lordose i stående.',
+          en: 'Observe lumbar lordosis in standing.'
+        },
+        positive: {
+          no: 'Økt lumbal lordose som kompensasjon for glidning',
+          en: 'Increased lumbar lordosis as compensation for slippage'
+        }
+      },
+      {
+        id: 'tight_hamstrings_spondy',
+        name: { no: 'Stramme Hamstrings', en: 'Tight Hamstrings' },
+        procedure: {
+          no: 'SLR for hamstringlengde (ikke radikulopati).',
+          en: 'SLR for hamstring length (not radiculopathy).'
+        },
+        positive: {
+          no: 'Markant hamstring stramhet (reflex beskyttelse)',
+          en: 'Marked hamstring tightness (reflex protection)'
+        },
+        clinicalNote: {
+          no: 'Stramme hamstrings er vanlig kompensatorisk funn.',
+          en: 'Tight hamstrings are a common compensatory finding.'
+        }
+      },
+      {
+        id: 'extension_pain',
+        name: { no: 'Smerte med Ekstensjon', en: 'Pain with Extension' },
+        procedure: {
+          no: 'Aktiv lumbal ekstensjon i stående.',
+          en: 'Active lumbar extension in standing.'
+        },
+        positive: {
+          no: 'Lumbal smerte forverres med ekstensjon',
+          en: 'Lumbar pain worsens with extension'
+        }
+      },
+      {
+        id: 'one_leg_hyperextension',
+        name: { no: 'Ett-Bens Hyperekstensjon (Stork)', en: 'One-Leg Hyperextension (Stork)' },
+        procedure: {
+          no: 'Stående på ett ben, ekstender lumbal mot samme side.',
+          en: 'Standing on one leg, extend lumbar toward same side.'
+        },
+        positive: {
+          no: 'Smerte i lumbal, mulig radikulær komponent',
+          en: 'Pain in lumbar, possible radicular component'
+        },
+        sensitivity: 0.73,
+        specificity: 0.84,
+        clinicalNote: {
+          no: 'Også kjent som Stork test - stresser pars interarticularis.',
+          en: 'Also known as Stork test - stresses pars interarticularis.'
+        }
+      }
+    ]
+  },
+
+  // ============================================================================
+  // SHOULDER ADDITIONS
+  // ============================================================================
+
+  ADHESIVE_CAPSULITIS: {
+    id: 'ADHESIVE_CAPSULITIS',
+    name: { no: 'Adhesiv Kapsulitt (Frozen Shoulder)', en: 'Adhesive Capsulitis (Frozen Shoulder)' },
+    region: 'SHOULDER',
+    description: {
+      no: 'Progressiv stivhet med kapsulært mønster: ER > ABD > IR',
+      en: 'Progressive stiffness with capsular pattern: ER > ABD > IR'
+    },
+    diagnosticCriteria: {
+      threshold: 4,
+      total: 6,
+      interpretation: {
+        no: '≥4 positive = sannsynlig frozen shoulder. Tre stadier: freezing, frozen, thawing.',
+        en: '≥4 positive = probable frozen shoulder. Three stages: freezing, frozen, thawing.'
+      }
+    },
+    tests: [
+      {
+        id: 'capsular_pattern',
+        name: { no: 'Kapsulært Mønster', en: 'Capsular Pattern' },
+        procedure: {
+          no: 'Test PROM: Utadrotasjon, abduksjon, innadrotasjon. Alle begrenset?',
+          en: 'Test PROM: External rotation, abduction, internal rotation. All limited?'
+        },
+        positive: {
+          no: 'Begrensning i kapsulært mønster: ER > ABD > IR',
+          en: 'Limitation in capsular pattern: ER > ABD > IR'
+        },
+        clinicalNote: {
+          no: 'Hvis bare én retning begrenset = sannsynligvis IKKE frozen shoulder.',
+          en: 'If only one direction limited = probably NOT frozen shoulder.'
+        }
+      },
+      {
+        id: 'passive_er_loss',
+        name: { no: 'Passiv ER Tap >50%', en: 'Passive ER Loss >50%' },
+        procedure: {
+          no: 'Sammenlign passiv utadrotasjon bilateralt med albue ved siden.',
+          en: 'Compare passive external rotation bilaterally with elbow at side.'
+        },
+        positive: {
+          no: '>50% tap av ER sammenlignet med frisk side',
+          en: '>50% loss of ER compared to unaffected side'
+        }
+      },
+      {
+        id: 'global_stiffness',
+        name: { no: 'Global Stivhet (Alle Retninger)', en: 'Global Stiffness (All Directions)' },
+        procedure: {
+          no: 'Test AROM og PROM i alle retninger.',
+          en: 'Test AROM and PROM in all directions.'
+        },
+        positive: {
+          no: 'Begrenset bevegelse i ALLE retninger, ikke bare én',
+          en: 'Limited motion in ALL directions, not just one'
+        }
+      },
+      {
+        id: 'night_pain_frozen',
+        name: { no: 'Nattesmerte', en: 'Night Pain' },
+        procedure: {
+          no: 'Anamnese: Vekkes du av skuldersmerte om natten?',
+          en: 'History: Do you wake up with shoulder pain at night?'
+        },
+        positive: {
+          no: 'Ja, spesielt ved ligge på affisert side',
+          en: 'Yes, especially when lying on affected side'
+        }
+      },
+      {
+        id: 'insidious_onset',
+        name: { no: 'Snikende Debut', en: 'Insidious Onset' },
+        procedure: {
+          no: 'Anamnese: Gradvis debut uten spesifikk skade?',
+          en: 'History: Gradual onset without specific injury?'
+        },
+        positive: {
+          no: 'Ja, ingen spesifikk traumatisk hendelse',
+          en: 'Yes, no specific traumatic event'
+        }
+      },
+      {
+        id: 'diabetes_risk',
+        name: { no: 'Diabetes/Risikofaktorer', en: 'Diabetes/Risk Factors' },
+        procedure: {
+          no: 'Diabetes, thyroid-sykdom, 40-60 år, kvinne?',
+          en: 'Diabetes, thyroid disease, 40-60 years, female?'
+        },
+        positive: {
+          no: 'En eller flere risikofaktorer tilstede',
+          en: 'One or more risk factors present'
+        },
+        clinicalNote: {
+          no: 'Diabetes gir 2-4x økt risiko for frozen shoulder.',
+          en: 'Diabetes gives 2-4x increased risk for frozen shoulder.'
+        }
+      }
+    ]
+  },
+
+  AC_SPRAIN: {
+    id: 'AC_SPRAIN',
+    name: { no: 'AC-Leddspreng', en: 'AC Joint Sprain' },
+    region: 'SHOULDER',
+    description: {
+      no: 'Skade på acromioclavicular-leddet - Rockwood klassifikasjon I-VI',
+      en: 'Injury to acromioclavicular joint - Rockwood classification I-VI'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 5,
+      interpretation: {
+        no: '≥3 positive = sannsynlig AC-skade. Gradering I-VI basert på kliniske/radiologiske funn.',
+        en: '≥3 positive = probable AC injury. Grading I-VI based on clinical/radiological findings.'
+      }
+    },
+    tests: [
+      {
+        id: 'ac_palpation',
+        name: { no: 'AC-Ledd Palpasjon', en: 'AC Joint Palpation' },
+        procedure: {
+          no: 'Direkte palpasjon over AC-leddet.',
+          en: 'Direct palpation over AC joint.'
+        },
+        positive: {
+          no: 'Lokal ømhet og mulig step-off/hevelse',
+          en: 'Local tenderness and possible step-off/swelling'
+        },
+        sensitivity: 0.96,
+        specificity: 0.10
+      },
+      {
+        id: 'cross_body_adduction',
+        name: { no: 'Cross-Body Adduksjon', en: 'Cross-Body Adduction' },
+        procedure: {
+          no: 'Passiv horisontal adduksjon av armen over kroppen.',
+          en: 'Passive horizontal adduction of arm across body.'
+        },
+        positive: {
+          no: 'Smerte lokalisert til AC-leddet',
+          en: 'Pain localized to AC joint'
+        },
+        sensitivity: 0.77,
+        specificity: 0.79
+      },
+      {
+        id: 'piano_key_sign',
+        name: { no: 'Piano Key Sign', en: 'Piano Key Sign' },
+        procedure: {
+          no: 'Press ned på distale clavicula. Observer om den "spretter" opp.',
+          en: 'Press down on distal clavicle. Observe if it "springs" back up.'
+        },
+        positive: {
+          no: 'Clavicula spretter opp som en pianotast = Type III+',
+          en: 'Clavicle springs up like piano key = Type III+'
+        },
+        clinicalNote: {
+          no: 'Type III+: Komplett ruptur av AC og CC ligamenter.',
+          en: 'Type III+: Complete rupture of AC and CC ligaments.'
+        }
+      },
+      {
+        id: 'trauma_history_ac',
+        name: { no: 'Traumehistorie', en: 'Trauma History' },
+        procedure: {
+          no: 'Fall på skulderen eller direkte traume mot AC-området?',
+          en: 'Fall on shoulder or direct trauma to AC area?'
+        },
+        positive: {
+          no: 'Ja, typisk fall på utstrakt arm eller direkte slag',
+          en: 'Yes, typical fall on outstretched arm or direct blow'
+        }
+      },
+      {
+        id: 'active_compression_ac',
+        name: { no: "O'Brien's Active Compression", en: "O'Brien's Active Compression" },
+        procedure: {
+          no: "Arm 90° fleksjon, 10° adduksjon, tommel ned. Motstand. Sammenlign med tommel opp.",
+          en: "Arm 90° flexion, 10° adduction, thumb down. Resist. Compare with thumb up."
+        },
+        positive: {
+          no: 'Smerte med tommel ned som lindres med tommel opp = AC patologi',
+          en: 'Pain with thumb down that improves with thumb up = AC pathology'
+        },
+        sensitivity: 0.90,
+        specificity: 0.85
+      }
+    ]
+  },
+
+  BICIPITAL_TENDINOPATHY: {
+    id: 'BICIPITAL_TENDINOPATHY',
+    name: { no: 'Bicepstendinopati', en: 'Bicipital Tendinopathy' },
+    region: 'SHOULDER',
+    description: {
+      no: 'Patologi i lange bicepssenens originasjon/forløp i bicipitalgropen',
+      en: 'Pathology of long head biceps tendon origin/course in bicipital groove'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 5,
+      interpretation: {
+        no: '≥3 positive = sannsynlig bicepstendinopati. Ofte assosiert med rotator cuff patologi.',
+        en: '≥3 positive = probable biceps tendinopathy. Often associated with rotator cuff pathology.'
+      }
+    },
+    tests: [
+      {
+        id: 'bicipital_groove_tenderness',
+        name: { no: 'Bicipital Groove Ømhet', en: 'Bicipital Groove Tenderness' },
+        procedure: {
+          no: 'Palper bicipitalgropen med skulder i 10° innadrotasjon.',
+          en: 'Palpate bicipital groove with shoulder in 10° internal rotation.'
+        },
+        positive: {
+          no: 'Direkte ømhet over lange bicepssenen i gropen',
+          en: 'Direct tenderness over long head biceps tendon in groove'
+        },
+        sensitivity: 0.53,
+        specificity: 0.54
+      },
+      {
+        id: 'speed_test',
+        name: { no: "Speed's Test", en: "Speed's Test" },
+        procedure: {
+          no: 'Arm 90° fleksjon, supinert underarm, strakt albue. Motstand mot fleksjon.',
+          en: 'Arm 90° flexion, supinated forearm, extended elbow. Resist flexion.'
+        },
+        positive: {
+          no: 'Smerte i bicipitalgropen',
+          en: 'Pain in bicipital groove'
+        },
+        sensitivity: 0.32,
+        specificity: 0.75
+      },
+      {
+        id: 'yergason_test',
+        name: { no: "Yergason's Test", en: "Yergason's Test" },
+        procedure: {
+          no: 'Albue 90° fleksjon, pronert underarm. Motstand mot supinasjon og utadrotasjon.',
+          en: 'Elbow 90° flexion, pronated forearm. Resist supination and external rotation.'
+        },
+        positive: {
+          no: 'Smerte i bicipitalgropen',
+          en: 'Pain in bicipital groove'
+        },
+        sensitivity: 0.43,
+        specificity: 0.79
+      },
+      {
+        id: 'anterior_shoulder_pain',
+        name: { no: 'Anterior Skuldersmerte', en: 'Anterior Shoulder Pain' },
+        procedure: {
+          no: 'Anamnese: Smerte foran på skulderen, spesielt med overhead-aktiviteter?',
+          en: 'History: Pain in front of shoulder, especially with overhead activities?'
+        },
+        positive: {
+          no: 'Ja, klassisk lokalisasjon anterior',
+          en: 'Yes, classic anterior location'
+        }
+      },
+      {
+        id: 'popeye_deformity',
+        name: { no: 'Popeye Deformitet', en: 'Popeye Deformity' },
+        procedure: {
+          no: 'Inspeksjon av overarmens kontur. Sammenlign bilateralt.',
+          en: 'Inspection of upper arm contour. Compare bilaterally.'
+        },
+        positive: {
+          no: 'Synlig "ball" i distale overarm = ruptur av lange bicepssene',
+          en: 'Visible "ball" in distal upper arm = rupture of long head biceps'
+        },
+        clinicalNote: {
+          no: 'Ved ruptur: Akutt smerte, deretter ofte mindre smerter men kosmisk deformitet.',
+          en: 'With rupture: Acute pain, then often less pain but cosmetic deformity.'
+        }
+      }
+    ]
+  },
+
+  // ============================================================================
+  // ELBOW ADDITIONS
+  // ============================================================================
+
+  CUBITAL_TUNNEL: {
+    id: 'CUBITAL_TUNNEL',
+    name: { no: 'Kubitaltunnel Syndrom', en: 'Cubital Tunnel Syndrome' },
+    region: 'ELBOW_FOREARM',
+    description: {
+      no: 'Kompresjon av ulnarisnerven ved albuen - nest vanligste kompresjonsneuropati',
+      en: 'Compression of ulnar nerve at elbow - second most common compression neuropathy'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 5,
+      interpretation: {
+        no: '≥3 positive = sannsynlig kubitaltunnel syndrom. Vurder EMG ved vedvarende symptomer.',
+        en: '≥3 positive = probable cubital tunnel syndrome. Consider EMG for persistent symptoms.'
+      }
+    },
+    tests: [
+      {
+        id: 'tinel_elbow',
+        name: { no: "Tinel's ved Albue", en: "Tinel's at Elbow" },
+        procedure: {
+          no: 'Perkuter over ulnarisnerven i sulcus ulnaris (bak mediale epicondyl).',
+          en: 'Percuss over ulnar nerve in ulnar groove (behind medial epicondyle).'
+        },
+        positive: {
+          no: 'Utstråling av parestesier til 4. og 5. finger',
+          en: 'Radiation of paresthesias to 4th and 5th fingers'
+        },
+        sensitivity: 0.70,
+        specificity: 0.98
+      },
+      {
+        id: 'elbow_flexion_test',
+        name: { no: 'Albuefleksjonstest', en: 'Elbow Flexion Test' },
+        procedure: {
+          no: 'Maksimal albuefleksjon med ekstendert håndledd i 3 minutter.',
+          en: 'Maximum elbow flexion with extended wrist for 3 minutes.'
+        },
+        positive: {
+          no: 'Parestesier i ulnar distribusjon (4. og 5. finger)',
+          en: 'Paresthesias in ulnar distribution (4th and 5th fingers)'
+        },
+        sensitivity: 0.75,
+        specificity: 0.99,
+        clinicalNote: {
+          no: 'Mest sensitive test for kubitaltunnel syndrom.',
+          en: 'Most sensitive test for cubital tunnel syndrome.'
+        }
+      },
+      {
+        id: 'froment_sign',
+        name: { no: "Froment's Sign", en: "Froment's Sign" },
+        procedure: {
+          no: 'Be pasient holde papir mellom tommel og pekefinger. Trekk i papiret.',
+          en: 'Ask patient to hold paper between thumb and index finger. Pull on paper.'
+        },
+        positive: {
+          no: 'Pasient flekterer IP-ledd for å kompensere for svak adductor pollicis',
+          en: 'Patient flexes IP joint to compensate for weak adductor pollicis'
+        },
+        clinicalNote: {
+          no: 'Indikerer ulnarisnerve svakhet.',
+          en: 'Indicates ulnar nerve weakness.'
+        }
+      },
+      {
+        id: 'sensory_loss_ulnar',
+        name: { no: 'Sensorisk Tap Ulnart', en: 'Sensory Loss Ulnar' },
+        procedure: {
+          no: 'Test lett berøring på palmar og dorsal side av 4. og 5. finger.',
+          en: 'Test light touch on palmar and dorsal side of 4th and 5th fingers.'
+        },
+        positive: {
+          no: 'Redusert sensibilitet i ulnar distribusjon',
+          en: 'Reduced sensation in ulnar distribution'
+        }
+      },
+      {
+        id: 'interossei_weakness',
+        name: { no: 'Interossei Svakhet', en: 'Interossei Weakness' },
+        procedure: {
+          no: 'Test finger abduksjon og adduksjon mot motstand.',
+          en: 'Test finger abduction and adduction against resistance.'
+        },
+        positive: {
+          no: 'Svakhet i finger spreading/sammenklemming',
+          en: 'Weakness in finger spreading/squeezing'
+        }
+      }
+    ]
+  },
+
+  // ============================================================================
+  // WRIST & HAND ADDITIONS
+  // ============================================================================
+
+  SCAPHOID_FRACTURE: {
+    id: 'SCAPHOID_FRACTURE',
+    name: { no: 'Scaphoid Fraktur Screening', en: 'Scaphoid Fracture Screening' },
+    region: 'WRIST_HAND',
+    description: {
+      no: 'Screening for scaphoid fraktur - ofte mist på initial røntgen',
+      en: 'Screening for scaphoid fracture - often missed on initial x-ray'
+    },
+    redFlagCluster: true,
+    diagnosticCriteria: {
+      threshold: 2,
+      total: 4,
+      interpretation: {
+        no: '≥2 positive = høy mistenke. Immobiliser og repeter røntgen om 10-14 dager, eller MR.',
+        en: '≥2 positive = high suspicion. Immobilize and repeat x-ray in 10-14 days, or MRI.'
+      }
+    },
+    tests: [
+      {
+        id: 'anatomical_snuffbox',
+        name: { no: 'Anatomisk Snusboks Ømhet', en: 'Anatomical Snuffbox Tenderness' },
+        procedure: {
+          no: 'Palper i anatomisk snusboks (mellom EPL og EPB) med håndledd i ulnardeviasjon.',
+          en: 'Palpate in anatomical snuffbox (between EPL and EPB) with wrist in ulnar deviation.'
+        },
+        positive: {
+          no: 'Ømhet over scaphoid',
+          en: 'Tenderness over scaphoid'
+        },
+        sensitivity: 0.90,
+        specificity: 0.40,
+        clinicalNote: {
+          no: 'Høy sensitivitet men lav spesifisitet - god til å utelukke.',
+          en: 'High sensitivity but low specificity - good for ruling out.'
+        }
+      },
+      {
+        id: 'scaphoid_tubercle',
+        name: { no: 'Scaphoid Tuberkel Ømhet', en: 'Scaphoid Tubercle Tenderness' },
+        procedure: {
+          no: 'Palper scaphoid tuberkel volart (ved thenareminensen).',
+          en: 'Palpate scaphoid tubercle on volar side (at thenar eminence).'
+        },
+        positive: {
+          no: 'Ømhet over scaphoid tuberkel',
+          en: 'Tenderness over scaphoid tubercle'
+        },
+        sensitivity: 0.87,
+        specificity: 0.57
+      },
+      {
+        id: 'thumb_axial_compression',
+        name: { no: 'Tommel Aksial Kompresjon', en: 'Thumb Axial Compression' },
+        procedure: {
+          no: 'Aksial kompresjon langs tommelens lengdeakse.',
+          en: 'Axial compression along the longitudinal axis of the thumb.'
+        },
+        positive: {
+          no: 'Smerte i håndleddet/scaphoid',
+          en: 'Pain in wrist/scaphoid area'
+        },
+        sensitivity: 0.80,
+        specificity: 0.48
+      },
+      {
+        id: 'foosh_history',
+        name: { no: 'FOOSH Mekanisme', en: 'FOOSH Mechanism' },
+        procedure: {
+          no: 'Anamnese: Fall On OutStretched Hand?',
+          en: 'History: Fall On OutStretched Hand?'
+        },
+        positive: {
+          no: 'Ja, klassisk skadevmekanisme',
+          en: 'Yes, classic injury mechanism'
+        },
+        redFlag: true,
+        redFlagCondition: 'High risk mechanism for scaphoid fracture'
+      }
+    ]
+  },
+
+  CARPAL_INSTABILITY: {
+    id: 'CARPAL_INSTABILITY',
+    name: { no: 'Karpal Instabilitet', en: 'Carpal Instability' },
+    region: 'WRIST_HAND',
+    description: {
+      no: 'Ligamentær instabilitet mellom karpalbein - SL, LT eller midkarpal',
+      en: 'Ligamentous instability between carpal bones - SL, LT or midcarpal'
+    },
+    diagnosticCriteria: {
+      threshold: 2,
+      total: 4,
+      interpretation: {
+        no: '≥2 positive = sannsynlig karpal instabilitet. MR eller artroskopi for bekreftelse.',
+        en: '≥2 positive = probable carpal instability. MRI or arthroscopy for confirmation.'
+      }
+    },
+    tests: [
+      {
+        id: 'watson_shift',
+        name: { no: 'Watson Scaphoid Shift', en: 'Watson Scaphoid Shift' },
+        procedure: {
+          no: 'Press på scaphoid tuberkel, beveg håndledd fra ulnar til radial deviasjon.',
+          en: 'Press on scaphoid tubercle, move wrist from ulnar to radial deviation.'
+        },
+        positive: {
+          no: 'Smertefullt klikk eller subluksasjon av scaphoid',
+          en: 'Painful click or subluxation of scaphoid'
+        },
+        sensitivity: 0.69,
+        specificity: 0.66,
+        clinicalNote: {
+          no: 'Test for scapholunær instabilitet. Sammenlign med frisk side!',
+          en: 'Test for scapholunate instability. Compare with unaffected side!'
+        }
+      },
+      {
+        id: 'ballottement_lt',
+        name: { no: 'Lunotriquetral Ballottement', en: 'Lunotriquetral Ballottement' },
+        procedure: {
+          no: 'Stabiliser lunatum, flytt triquetrum dorsalt og volart.',
+          en: 'Stabilize lunate, move triquetrum dorsally and volarly.'
+        },
+        positive: {
+          no: 'Smerte, krepitasjon eller økt bevegelse',
+          en: 'Pain, crepitus or increased movement'
+        }
+      },
+      {
+        id: 'midcarpal_shift',
+        name: { no: 'Midkarpal Shift Test', en: 'Midcarpal Shift Test' },
+        procedure: {
+          no: 'Aksial kompresjon med ulnardeviasjon fra nøytral.',
+          en: 'Axial compression with ulnar deviation from neutral.'
+        },
+        positive: {
+          no: 'Smertefullt "clunk" ved midkarpal rekke',
+          en: 'Painful "clunk" at midcarpal row'
+        }
+      },
+      {
+        id: 'dorsal_wrist_pain',
+        name: { no: 'Dorsal Håndleddssmerte', en: 'Dorsal Wrist Pain' },
+        procedure: {
+          no: 'Anamnese: Smerte dorsalt på håndleddet, spesielt med belastning?',
+          en: 'History: Pain on dorsal wrist, especially with loading?'
+        },
+        positive: {
+          no: 'Ja, typisk lokalisasjon for ligamentær patologi',
+          en: 'Yes, typical location for ligamentous pathology'
+        }
+      }
+    ]
+  },
+
+  GAMEKEEPER_THUMB: {
+    id: 'GAMEKEEPER_THUMB',
+    name: { no: "Gamekeeper's Thumb (UCL Tommel)", en: "Gamekeeper's Thumb (UCL Thumb)" },
+    region: 'WRIST_HAND',
+    description: {
+      no: 'Skade på ulnar collateral ligament i tommelens MCP-ledd',
+      en: 'Injury to ulnar collateral ligament of thumb MCP joint'
+    },
+    diagnosticCriteria: {
+      threshold: 2,
+      total: 3,
+      interpretation: {
+        no: '≥2 positive = sannsynlig UCL skade. >30° valgus laksitet eller uten endepunkt = kirurgisk vurdering.',
+        en: '≥2 positive = probable UCL injury. >30° valgus laxity or no endpoint = surgical evaluation.'
+      }
+    },
+    tests: [
+      {
+        id: 'ucl_valgus_stress',
+        name: { no: 'UCL Valgus Stress Test', en: 'UCL Valgus Stress Test' },
+        procedure: {
+          no: 'Stabiliser 1. metacarpal, appliser valgus stress på MCP-leddet (30° og 0° fleksjon).',
+          en: 'Stabilize 1st metacarpal, apply valgus stress to MCP joint (30° and 0° flexion).'
+        },
+        positive: {
+          no: '>30° åpning eller intet endepunkt. Sammenlign med frisk side.',
+          en: '>30° opening or no endpoint. Compare with unaffected side.'
+        },
+        sensitivity: 0.83,
+        specificity: 0.81,
+        clinicalNote: {
+          no: 'Stener lesjon: Adductor aponeurose interponerer - krever kirurgi.',
+          en: 'Stener lesion: Adductor aponeurosis interposes - requires surgery.'
+        }
+      },
+      {
+        id: 'ucl_palpation',
+        name: { no: 'UCL Palpasjon', en: 'UCL Palpation' },
+        procedure: {
+          no: 'Palper over ulnar side av tommelens MCP-ledd.',
+          en: 'Palpate over ulnar side of thumb MCP joint.'
+        },
+        positive: {
+          no: 'Lokal ømhet og mulig hevelse over UCL',
+          en: 'Local tenderness and possible swelling over UCL'
+        }
+      },
+      {
+        id: 'ski_pole_history',
+        name: { no: 'Skistav/Valgustrauma Historie', en: 'Ski Pole/Valgus Trauma History' },
+        procedure: {
+          no: 'Fall med skistav, ballkast som treffer tommelen, eller annen valgusmekanisme?',
+          en: 'Fall with ski pole, ball hitting thumb, or other valgus mechanism?'
+        },
+        positive: {
+          no: 'Ja, klassisk skadevmekanisme for UCL',
+          en: 'Yes, classic injury mechanism for UCL'
+        }
+      }
+    ]
+  },
+
+  // ============================================================================
+  // HIP ADDITIONS (from new textbook content)
+  // ============================================================================
+
+  PIRIFORMIS_SYNDROME: {
+    id: 'PIRIFORMIS_SYNDROME',
+    name: { no: 'Piriformis Syndrom', en: 'Piriformis Syndrome' },
+    region: 'HIP',
+    description: {
+      no: 'Kompresjon/irritasjon av iskiasnerven av piriformis - pseudoischias',
+      en: 'Compression/irritation of sciatic nerve by piriformis - pseudosciatica'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 5,
+      interpretation: {
+        no: '≥3 positive = sannsynlig piriformis syndrom. Differensier fra lumbal radikulopati.',
+        en: '≥3 positive = probable piriformis syndrome. Differentiate from lumbar radiculopathy.'
+      }
+    },
+    tests: [
+      {
+        id: 'freiberg_test',
+        name: { no: "Freiberg's Manøver", en: "Freiberg's Maneuver" },
+        procedure: {
+          no: 'Ryggliggende. Forcefu horisontal adduksjon av flektert hofte.',
+          en: 'Supine. Forceful horizontal adduction of flexed hip.'
+        },
+        positive: {
+          no: 'Smerte i glutealregionen (strekker piriformis)',
+          en: 'Pain in gluteal region (stretches piriformis)'
+        },
+        sensitivity: 0.65,
+        specificity: 0.78
+      },
+      {
+        id: 'pace_test',
+        name: { no: 'PACE Test', en: 'PACE Test' },
+        procedure: {
+          no: 'Sittende. Motstand mot abduksjon og utadrotasjon av hofte.',
+          en: 'Sitting. Resist abduction and external rotation of hip.'
+        },
+        positive: {
+          no: 'Smerte og svakhet i gluteal region',
+          en: 'Pain and weakness in gluteal region'
+        }
+      },
+      {
+        id: 'hibbs_test',
+        name: { no: "Hibb's Test", en: "Hibb's Test" },
+        procedure: {
+          no: 'Mageleie, kne 90° fleksjon. Stabiliser bekken, dytt ankelen lateralt (innadrotasjon av hofte).',
+          en: 'Prone, knee 90° flexion. Stabilize pelvis, push ankle laterally (internal rotation of hip).'
+        },
+        positive: {
+          no: 'Smerte i glutealregionen',
+          en: 'Pain in gluteal region'
+        }
+      },
+      {
+        id: 'piriformis_palpation',
+        name: { no: 'Piriformis Palpasjon', en: 'Piriformis Palpation' },
+        procedure: {
+          no: 'Dyp palpasjon av piriformis (mellom PSIS og greater trochanter).',
+          en: 'Deep palpation of piriformis (between PSIS and greater trochanter).'
+        },
+        positive: {
+          no: 'Ømhet og reproduksjon av symptomer',
+          en: 'Tenderness and reproduction of symptoms'
+        }
+      },
+      {
+        id: 'lumbar_rom_normal',
+        name: { no: 'Normal Lumbal ROM', en: 'Normal Lumbar ROM' },
+        procedure: {
+          no: 'Vurder lumbal ROM - skal være normal ved piriformis syndrom.',
+          en: 'Assess lumbar ROM - should be normal in piriformis syndrome.'
+        },
+        positive: {
+          no: 'Normal lumbal ROM (hjelper differensiere fra lumbal radikulopati)',
+          en: 'Normal lumbar ROM (helps differentiate from lumbar radiculopathy)'
+        }
+      }
+    ]
+  },
+
+  HIP_DJD: {
+    id: 'HIP_DJD',
+    name: { no: 'Hofte Osteoartrose', en: 'Hip Osteoarthritis' },
+    region: 'HIP',
+    description: {
+      no: 'Degenerativ leddsykdom i hofteleddet',
+      en: 'Degenerative joint disease of the hip'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 5,
+      interpretation: {
+        no: '≥3 positive = sannsynlig hofte OA. ACR kriterier: hofte smerte + 2 av 3 (ESR<20, osteofytter rx, leddspaltereduksjon).',
+        en: '≥3 positive = probable hip OA. ACR criteria: hip pain + 2 of 3 (ESR<20, osteophytes xr, joint space narrowing).'
+      }
+    },
+    tests: [
+      {
+        id: 'hip_scour',
+        name: { no: 'Scour Test (Quadrant)', en: 'Scour Test (Quadrant)' },
+        procedure: {
+          no: 'Flekter hofte og kne til 90°, aksial kompresjon og sirkelbevegelse.',
+          en: 'Flex hip and knee to 90°, axial compression and circular motion.'
+        },
+        positive: {
+          no: 'Smerte og/eller krepitasjon i hofteleddet',
+          en: 'Pain and/or crepitus in hip joint'
+        },
+        sensitivity: 0.62,
+        specificity: 0.75
+      },
+      {
+        id: 'patrick_faber',
+        name: { no: "Patrick's (FABER) Test", en: "Patrick's (FABER) Test" },
+        procedure: {
+          no: 'Fleksjon, Abduksjon, Ekstern Rotasjon av hofte.',
+          en: 'Flexion, Abduction, External Rotation of hip.'
+        },
+        positive: {
+          no: 'Smerte i lyske/hofte (ikke SI-leddet)',
+          en: 'Pain in groin/hip (not SI joint)'
+        },
+        sensitivity: 0.57,
+        specificity: 0.71
+      },
+      {
+        id: 'capsular_pattern_hip',
+        name: { no: 'Kapsulært Mønster', en: 'Capsular Pattern' },
+        procedure: {
+          no: 'Test PROM: IR > EXT > ABD begrenset.',
+          en: 'Test PROM: IR > EXT > ABD limited.'
+        },
+        positive: {
+          no: 'Begrensning i kapsulært mønster',
+          en: 'Limitation in capsular pattern'
+        }
+      },
+      {
+        id: 'morning_stiffness_hip',
+        name: { no: 'Morgenstivhet <30 min', en: 'Morning Stiffness <30 min' },
+        procedure: {
+          no: 'Anamnese: Stivhet om morgenen som varer <30 minutter?',
+          en: 'History: Stiffness in morning lasting <30 minutes?'
+        },
+        positive: {
+          no: 'Ja (<30 min = OA, >30 min = inflammatorisk)',
+          en: 'Yes (<30 min = OA, >30 min = inflammatory)'
+        }
+      },
+      {
+        id: 'age_over_50',
+        name: { no: 'Alder >50 år', en: 'Age >50 years' },
+        procedure: { no: 'Pasientens alder.', en: "Patient's age." },
+        positive: { no: 'Alder over 50 år', en: 'Age over 50 years' }
+      }
+    ]
   }
 };
 
