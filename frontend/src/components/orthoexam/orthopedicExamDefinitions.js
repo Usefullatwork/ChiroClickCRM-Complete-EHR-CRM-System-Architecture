@@ -5604,6 +5604,550 @@ export const ORTHO_EXAM_CLUSTERS = {
         positive: { no: 'Alder over 50 år', en: 'Age over 50 years' }
       }
     ]
+  },
+
+  // ============================================================================
+  // PERIPHERAL NERVE INJURY CLUSTERS (from Vizniak Peripheral Neuro)
+  // ============================================================================
+
+  RADIAL_NERVE_INJURY: {
+    id: 'RADIAL_NERVE_INJURY',
+    name: { no: 'Radialisnerve Skade', en: 'Radial Nerve Injury' },
+    region: 'UPPER_EXTREMITY',
+    description: {
+      no: 'Skade på radialisnerven - triangulært rom, radial groove, eller albue',
+      en: 'Radial nerve injury - triangular space, radial groove, or elbow'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 5,
+      interpretation: {
+        no: '≥3 positive = sannsynlig radialisnerve patologi. Lokaliser nivå basert på funn.',
+        en: '≥3 positive = probable radial nerve pathology. Localize level based on findings.'
+      }
+    },
+    tests: [
+      {
+        id: 'wrist_drop',
+        name: { no: 'Wrist Drop', en: 'Wrist Drop' },
+        procedure: {
+          no: 'Be pasient ekstendere håndleddet mot tyngdekraften.',
+          en: 'Ask patient to extend wrist against gravity.'
+        },
+        positive: {
+          no: 'Manglende evne til håndleddsekstensjon',
+          en: 'Inability to extend wrist'
+        },
+        clinicalNote: {
+          no: 'Klassisk tegn på høy radialisskade.',
+          en: 'Classic sign of high radial nerve injury.'
+        }
+      },
+      {
+        id: 'finger_extension_weakness',
+        name: { no: 'Svak Fingerekstensjon', en: 'Weak Finger Extension' },
+        procedure: {
+          no: 'Test MCP-ledd ekstensjon mot motstand.',
+          en: 'Test MCP joint extension against resistance.'
+        },
+        positive: {
+          no: 'Svakhet i fingerekstensjon',
+          en: 'Weakness in finger extension'
+        }
+      },
+      {
+        id: 'triceps_weakness',
+        name: { no: 'Triceps Svakhet', en: 'Triceps Weakness' },
+        procedure: {
+          no: 'Test albueekstensjon mot motstand.',
+          en: 'Test elbow extension against resistance.'
+        },
+        positive: {
+          no: 'Svakhet = høy lesjon (triangulært rom)',
+          en: 'Weakness = high lesion (triangular space)'
+        },
+        clinicalNote: {
+          no: 'Hvis triceps er sterk men wrist drop = radial groove skade.',
+          en: 'If triceps is strong but wrist drop = radial groove injury.'
+        }
+      },
+      {
+        id: 'triceps_reflex_radial',
+        name: { no: 'Tricepsrefleks', en: 'Triceps Reflex' },
+        procedure: {
+          no: 'Test tricepsrefleks med reflekshammer.',
+          en: 'Test triceps reflex with reflex hammer.'
+        },
+        positive: {
+          no: 'Redusert eller fraværende tricepsrefleks',
+          en: 'Reduced or absent triceps reflex'
+        }
+      },
+      {
+        id: 'sensory_loss_radial',
+        name: { no: 'Sensorisk Tap (Radial)', en: 'Sensory Loss (Radial)' },
+        procedure: {
+          no: 'Test sensibilitet over posterior arm, underarm, og dorsal hånd (lateral 3½ fingre til DIP).',
+          en: 'Test sensation over posterior arm, forearm, and dorsal hand (lateral 3½ fingers to DIP).'
+        },
+        positive: {
+          no: 'Redusert sensibilitet i radial distribusjon',
+          en: 'Reduced sensation in radial distribution'
+        }
+      }
+    ]
+  },
+
+  MEDIAN_NERVE_INJURY: {
+    id: 'MEDIAN_NERVE_INJURY',
+    name: { no: 'Medianusnerve Skade', en: 'Median Nerve Injury' },
+    region: 'UPPER_EXTREMITY',
+    description: {
+      no: 'Skade på medianusnerven - albue, pronator teres, eller håndledd',
+      en: 'Median nerve injury - elbow, pronator teres, or wrist'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 6,
+      interpretation: {
+        no: '≥3 positive = sannsynlig medianusnerve patologi.',
+        en: '≥3 positive = probable median nerve pathology.'
+      }
+    },
+    tests: [
+      {
+        id: 'ape_hand_deformity',
+        name: { no: 'Ape Hand Deformitet', en: 'Ape Hand Deformity' },
+        procedure: {
+          no: 'Inspeksjon av thenareminensen. Sammenlign bilateralt.',
+          en: 'Inspection of thenar eminence. Compare bilaterally.'
+        },
+        positive: {
+          no: 'Atrofi av thenareminensen',
+          en: 'Atrophy of thenar eminence'
+        },
+        clinicalNote: {
+          no: 'Tommelen ligger i samme plan som de andre fingrene.',
+          en: 'Thumb lies in same plane as other fingers.'
+        }
+      },
+      {
+        id: 'thumb_opposition_weakness',
+        name: { no: 'Svak Tommelopposisjon', en: 'Weak Thumb Opposition' },
+        procedure: {
+          no: 'Be pasient berøre lillefingertuppens base med tommeltuppens palmarside.',
+          en: 'Ask patient to touch base of little finger tip with palmar side of thumb tip.'
+        },
+        positive: {
+          no: 'Svakhet eller manglende evne til opposisjon',
+          en: 'Weakness or inability to perform opposition'
+        }
+      },
+      {
+        id: 'pronator_weakness',
+        name: { no: 'Svak Pronasjon', en: 'Weak Pronation' },
+        procedure: {
+          no: 'Test underarmspronasjon mot motstand.',
+          en: 'Test forearm pronation against resistance.'
+        },
+        positive: {
+          no: 'Svakhet i pronasjon = høy lesjon (albue/pronator teres)',
+          en: 'Weakness in pronation = high lesion (elbow/pronator teres)'
+        }
+      },
+      {
+        id: 'wrist_flexion_weakness_median',
+        name: { no: 'Svak Håndleddsfleksjon (Radial)', en: 'Weak Wrist Flexion (Radial)' },
+        procedure: {
+          no: 'Test håndleddsfleksjon med radial deviasjon (FCR).',
+          en: 'Test wrist flexion with radial deviation (FCR).'
+        },
+        positive: {
+          no: 'Svakhet i radial håndleddsfleksjon',
+          en: 'Weakness in radial wrist flexion'
+        }
+      },
+      {
+        id: 'sensory_loss_median',
+        name: { no: 'Sensorisk Tap (Median)', en: 'Sensory Loss (Median)' },
+        procedure: {
+          no: 'Test sensibilitet over palmar overflate av lateral 3½ fingre inkludert posterior DIP.',
+          en: 'Test sensation over palmar surface of lateral 3½ fingers including posterior DIPs.'
+        },
+        positive: {
+          no: 'Redusert sensibilitet i median distribusjon',
+          en: 'Reduced sensation in median distribution'
+        },
+        clinicalNote: {
+          no: 'CTS: sparer håndflaten. Høy lesjon: inkluderer håndflaten.',
+          en: 'CTS: spares palm. High lesion: includes palm.'
+        }
+      },
+      {
+        id: 'ok_sign_test',
+        name: { no: 'OK-Tegn Test', en: 'OK Sign Test' },
+        procedure: {
+          no: 'Be pasient lage "OK" tegn med tommel og pekefinger.',
+          en: 'Ask patient to make "OK" sign with thumb and index finger.'
+        },
+        positive: {
+          no: 'Manglende evne til å lage rund sirkel (FPL/FDP svakhet)',
+          en: 'Inability to make round circle (FPL/FDP weakness)'
+        }
+      }
+    ]
+  },
+
+  ULNAR_NERVE_INJURY: {
+    id: 'ULNAR_NERVE_INJURY',
+    name: { no: 'Ulnarisnerve Skade', en: 'Ulnar Nerve Injury' },
+    region: 'UPPER_EXTREMITY',
+    description: {
+      no: 'Skade på ulnarisnerven - kubitaltunnel eller Guyons kanal',
+      en: 'Ulnar nerve injury - cubital tunnel or Guyon\'s canal'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 6,
+      interpretation: {
+        no: '≥3 positive = sannsynlig ulnarisnerve patologi.',
+        en: '≥3 positive = probable ulnar nerve pathology.'
+      }
+    },
+    tests: [
+      {
+        id: 'claw_hand_deformity',
+        name: { no: 'Kløhånd Deformitet', en: 'Claw Hand Deformity' },
+        procedure: {
+          no: 'Inspeksjon av hånd i hvile. MCP hyperekstensjon, IP fleksjon av 4. og 5. finger.',
+          en: 'Inspection of hand at rest. MCP hyperextension, IP flexion of 4th and 5th fingers.'
+        },
+        positive: {
+          no: 'Kløhånd deformitet (ulnar paradox: verre ved lav lesjon)',
+          en: 'Claw hand deformity (ulnar paradox: worse with low lesion)'
+        }
+      },
+      {
+        id: 'froment_sign',
+        name: { no: "Froment's Sign", en: "Froment's Sign" },
+        procedure: {
+          no: 'Be pasient holde papir mellom tommel og pekefinger. Trekk i papiret.',
+          en: 'Ask patient to hold paper between thumb and index finger. Pull on paper.'
+        },
+        positive: {
+          no: 'Fleksjon av tommelens IP-ledd for å kompensere for svak adductor pollicis',
+          en: 'Flexion of thumb IP joint to compensate for weak adductor pollicis'
+        },
+        sensitivity: 0.82,
+        specificity: 0.89
+      },
+      {
+        id: 'wartenberg_sign',
+        name: { no: "Wartenberg's Sign", en: "Wartenberg's Sign" },
+        procedure: {
+          no: 'Be pasient addusere fingrene. Observer lillefinger.',
+          en: 'Ask patient to adduct fingers. Observe little finger.'
+        },
+        positive: {
+          no: 'Lillefinger forblir abdusert (svak 3. palmar interosseus)',
+          en: 'Little finger remains abducted (weak 3rd palmar interosseous)'
+        }
+      },
+      {
+        id: 'interossei_weakness',
+        name: { no: 'Interossei Svakhet', en: 'Interossei Weakness' },
+        procedure: {
+          no: 'Test finger abduksjon og adduksjon mot motstand.',
+          en: 'Test finger abduction and adduction against resistance.'
+        },
+        positive: {
+          no: 'Svakhet i finger spreading/sammenklemming',
+          en: 'Weakness in finger spreading/squeezing'
+        }
+      },
+      {
+        id: 'hypothenar_atrophy',
+        name: { no: 'Hypothenar Atrofi', en: 'Hypothenar Atrophy' },
+        procedure: {
+          no: 'Inspeksjon av hypothenareminensen. Sammenlign bilateralt.',
+          en: 'Inspection of hypothenar eminence. Compare bilaterally.'
+        },
+        positive: {
+          no: 'Synlig atrofi av hypothenarmuskulatur',
+          en: 'Visible atrophy of hypothenar muscles'
+        }
+      },
+      {
+        id: 'sensory_loss_ulnar',
+        name: { no: 'Sensorisk Tap (Ulnar)', en: 'Sensory Loss (Ulnar)' },
+        procedure: {
+          no: 'Test sensibilitet over medial 1½ finger (palmar og dorsal).',
+          en: 'Test sensation over medial 1½ fingers (palmar and dorsal).'
+        },
+        positive: {
+          no: 'Redusert sensibilitet i ulnar distribusjon',
+          en: 'Reduced sensation in ulnar distribution'
+        }
+      }
+    ]
+  },
+
+  COMMON_PERONEAL_INJURY: {
+    id: 'COMMON_PERONEAL_INJURY',
+    name: { no: 'Peroneusnerve Skade', en: 'Common Peroneal Nerve Injury' },
+    region: 'LOWER_EXTREMITY',
+    description: {
+      no: 'Skade på n. peroneus communis ved fibulahodet - vanligste nerveentrapment i underekstremitet',
+      en: 'Common peroneal nerve injury at fibular head - most common nerve entrapment in lower extremity'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 5,
+      interpretation: {
+        no: '≥3 positive = sannsynlig peroneus skade. Vanlige årsaker: krysset ben, fibulabrudd, stramme støvler.',
+        en: '≥3 positive = probable peroneal injury. Common causes: crossed legs, fibular fracture, tight boots.'
+      }
+    },
+    tests: [
+      {
+        id: 'foot_drop',
+        name: { no: 'Foot Drop', en: 'Foot Drop' },
+        procedure: {
+          no: 'Observer gange. Be pasient dorsiflektere foten.',
+          en: 'Observe gait. Ask patient to dorsiflex foot.'
+        },
+        positive: {
+          no: 'Manglende evne til dorsifleksjon, steppage gait',
+          en: 'Inability to dorsiflex, steppage gait'
+        },
+        clinicalNote: {
+          no: 'Steppage gait: løfter kneet høyt for å unngå å dra foten.',
+          en: 'Steppage gait: lifts knee high to avoid dragging foot.'
+        }
+      },
+      {
+        id: 'tibialis_anterior_weakness',
+        name: { no: 'Tibialis Anterior Svakhet', en: 'Tibialis Anterior Weakness' },
+        procedure: {
+          no: 'Test ankel dorsifleksjon mot motstand.',
+          en: 'Test ankle dorsiflexion against resistance.'
+        },
+        positive: {
+          no: 'Svakhet i dorsifleksjon (L4-L5)',
+          en: 'Weakness in dorsiflexion (L4-L5)'
+        }
+      },
+      {
+        id: 'toe_extension_weakness',
+        name: { no: 'Svak Tåekstensjon', en: 'Weak Toe Extension' },
+        procedure: {
+          no: 'Test EHL og EDL mot motstand.',
+          en: 'Test EHL and EDL against resistance.'
+        },
+        positive: {
+          no: 'Svakhet i tåekstensjon',
+          en: 'Weakness in toe extension'
+        }
+      },
+      {
+        id: 'eversion_weakness',
+        name: { no: 'Svak Eversjon', en: 'Weak Eversion' },
+        procedure: {
+          no: 'Test ankel eversjon mot motstand (peroneus longus/brevis).',
+          en: 'Test ankle eversion against resistance (peroneus longus/brevis).'
+        },
+        positive: {
+          no: 'Svakhet i eversjon (superfisiell gren)',
+          en: 'Weakness in eversion (superficial branch)'
+        }
+      },
+      {
+        id: 'sensory_loss_peroneal',
+        name: { no: 'Sensorisk Tap (Peroneal)', en: 'Sensory Loss (Peroneal)' },
+        procedure: {
+          no: 'Test sensibilitet over lateral legg og fotrygg.',
+          en: 'Test sensation over lateral leg and dorsum of foot.'
+        },
+        positive: {
+          no: 'Redusert sensibilitet i peroneal distribusjon',
+          en: 'Reduced sensation in peroneal distribution'
+        },
+        clinicalNote: {
+          no: 'Dyp gren: kun 1.-2. tå webspace. Superfisiell: lateral legg og fotrygg.',
+          en: 'Deep branch: only 1st-2nd toe webspace. Superficial: lateral leg and dorsum.'
+        }
+      }
+    ]
+  },
+
+  MERALGIA_PARESTHETICA: {
+    id: 'MERALGIA_PARESTHETICA',
+    name: { no: 'Meralgia Paresthetica', en: 'Meralgia Paresthetica' },
+    region: 'LOWER_EXTREMITY',
+    description: {
+      no: 'Entrapment av n. cutaneus femoris lateralis ved inguinalligamentet',
+      en: 'Entrapment of lateral femoral cutaneous nerve at inguinal ligament'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 4,
+      interpretation: {
+        no: '≥3 positive = sannsynlig meralgia paresthetica. Vanlige årsaker: stramme belter, fedme, graviditet.',
+        en: '≥3 positive = probable meralgia paresthetica. Common causes: tight belts, obesity, pregnancy.'
+      }
+    },
+    tests: [
+      {
+        id: 'lateral_thigh_paresthesia',
+        name: { no: 'Anterolateral Lår Parestesi', en: 'Anterolateral Thigh Paresthesia' },
+        procedure: {
+          no: 'Anamnese: brennende, stikkende følelse på utsiden av låret?',
+          en: 'History: burning, tingling sensation on outer thigh?'
+        },
+        positive: {
+          no: 'Ja, typisk lokalisasjon for LFCN',
+          en: 'Yes, typical location for LFCN'
+        }
+      },
+      {
+        id: 'sensory_only_deficit',
+        name: { no: 'Kun Sensorisk Tap', en: 'Sensory Only Deficit' },
+        procedure: {
+          no: 'Test sensibilitet over anterolateral lår. Test motorstyrke.',
+          en: 'Test sensation over anterolateral thigh. Test motor strength.'
+        },
+        positive: {
+          no: 'Redusert sensibilitet MEN normal motorstyrke',
+          en: 'Reduced sensation BUT normal motor strength'
+        },
+        clinicalNote: {
+          no: 'LFCN er kun sensorisk - ingen motortap.',
+          en: 'LFCN is sensory only - no motor loss.'
+        }
+      },
+      {
+        id: 'tight_clothing_history',
+        name: { no: 'Stramme Klær/Belter', en: 'Tight Clothing/Belts' },
+        procedure: {
+          no: 'Anamnese: bruker stramme bukser, verktøybelter, eller politiuniform?',
+          en: 'History: wears tight pants, tool belts, or police uniform?'
+        },
+        positive: {
+          no: 'Ja, eller andre risikofaktorer (fedme, graviditet)',
+          en: 'Yes, or other risk factors (obesity, pregnancy)'
+        }
+      },
+      {
+        id: 'asis_tenderness',
+        name: { no: 'ASIS Ømhet', en: 'ASIS Tenderness' },
+        procedure: {
+          no: 'Palpér 1-2 cm medialt for ASIS der LFCN passerer under inguinalligamentet.',
+          en: 'Palpate 1-2 cm medial to ASIS where LFCN passes under inguinal ligament.'
+        },
+        positive: {
+          no: 'Ømhet og reproduksjon av parestesier',
+          en: 'Tenderness and reproduction of paresthesias'
+        }
+      }
+    ]
+  },
+
+  BRACHIAL_PLEXUS_LESION: {
+    id: 'BRACHIAL_PLEXUS_LESION',
+    name: { no: 'Brachial Plexus Lesjon', en: 'Brachial Plexus Lesion' },
+    region: 'UPPER_EXTREMITY',
+    description: {
+      no: 'Skade på brachialplexus - øvre (Erb-Duchenne) eller nedre (Klumpke)',
+      en: 'Brachial plexus injury - upper (Erb-Duchenne) or lower (Klumpke)'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 6,
+      interpretation: {
+        no: '≥3 positive = sannsynlig plexus lesjon. Differensier øvre vs. nedre basert på mønster.',
+        en: '≥3 positive = probable plexus lesion. Differentiate upper vs. lower based on pattern.'
+      }
+    },
+    tests: [
+      {
+        id: 'waiters_tip_posture',
+        name: { no: "Waiter's Tip Postur", en: "Waiter's Tip Posture" },
+        procedure: {
+          no: 'Observer armposisjon. Skulder innadrotert, albue ekstendert, underarm pronert?',
+          en: 'Observe arm position. Shoulder internally rotated, elbow extended, forearm pronated?'
+        },
+        positive: {
+          no: "Ja, klassisk 'waiter's tip' = øvre plexus (C5-C6, Erb)",
+          en: "Yes, classic 'waiter's tip' = upper plexus (C5-C6, Erb)"
+        },
+        clinicalNote: {
+          no: 'Vanlig etter motorsykkelulykker eller fødselsskade.',
+          en: 'Common after motorcycle accidents or birth injury.'
+        }
+      },
+      {
+        id: 'deltoid_biceps_weakness',
+        name: { no: 'Deltoid/Biceps Svakhet', en: 'Deltoid/Biceps Weakness' },
+        procedure: {
+          no: 'Test skulderabduksjon og albuefleksjon.',
+          en: 'Test shoulder abduction and elbow flexion.'
+        },
+        positive: {
+          no: 'Svakhet i begge = øvre plexus (C5-C6)',
+          en: 'Weakness in both = upper plexus (C5-C6)'
+        }
+      },
+      {
+        id: 'claw_hand_plexus',
+        name: { no: 'Kløhånd (Plexus)', en: 'Claw Hand (Plexus)' },
+        procedure: {
+          no: 'Inspeksjon av hånd. MCP hyperekstensjon med IP fleksjon?',
+          en: 'Inspection of hand. MCP hyperextension with IP flexion?'
+        },
+        positive: {
+          no: 'Kløhånd = nedre plexus (C8-T1, Klumpke)',
+          en: 'Claw hand = lower plexus (C8-T1, Klumpke)'
+        }
+      },
+      {
+        id: 'intrinsic_hand_weakness',
+        name: { no: 'Intrinsik Håndmuskel Svakhet', en: 'Intrinsic Hand Muscle Weakness' },
+        procedure: {
+          no: 'Test interossei, thenar, og hypothenar muskler.',
+          en: 'Test interossei, thenar, and hypothenar muscles.'
+        },
+        positive: {
+          no: 'Generell svakhet i intrinsikk muskler = nedre plexus',
+          en: 'General weakness in intrinsic muscles = lower plexus'
+        }
+      },
+      {
+        id: 'horner_syndrome',
+        name: { no: 'Horners Syndrom', en: 'Horner Syndrome' },
+        procedure: {
+          no: 'Observer for ptose, miose, og anhydrose på samme side.',
+          en: 'Observe for ptosis, miosis, and anhydrosis on same side.'
+        },
+        positive: {
+          no: 'Tilstede = nedre plexus med T1 involvering',
+          en: 'Present = lower plexus with T1 involvement'
+        },
+        redFlag: true,
+        redFlagCondition: 'Indicates T1 root avulsion - severe injury'
+      },
+      {
+        id: 'trauma_mechanism',
+        name: { no: 'Traumemekanisme', en: 'Trauma Mechanism' },
+        procedure: {
+          no: 'Fall fra motorsykkel/hest, fødselstrauma, eller arm trukket opp?',
+          en: 'Fall from motorcycle/horse, birth trauma, or arm pulled upward?'
+        },
+        positive: {
+          no: 'Ja, typisk skadevmekanisme for plexusskade',
+          en: 'Yes, typical injury mechanism for plexus injury'
+        }
+      }
+    ]
   }
 };
 
