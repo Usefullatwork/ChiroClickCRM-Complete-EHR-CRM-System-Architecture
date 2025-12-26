@@ -14,6 +14,8 @@ import 'express-async-errors';
 
 import { healthCheck } from './config/database.js';
 import logger from './utils/logger.js';
+import { csrfProtection } from './middleware/csrf.js';
+import cookieParser from 'cookie-parser';
 
 // Load environment variables
 dotenv.config();
@@ -41,6 +43,15 @@ app.use(cors({
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Cookie parser (required for CSRF)
+app.use(cookieParser());
+
+// CSRF Protection (Double Submit Cookie pattern)
+if (process.env.NODE_ENV === 'production' || process.env.CSRF_ENABLED === 'true') {
+  app.use(csrfProtection());
+  logger.info('✓ CSRF protection enabled');
+}
 
 // Compression
 app.use(compression());
