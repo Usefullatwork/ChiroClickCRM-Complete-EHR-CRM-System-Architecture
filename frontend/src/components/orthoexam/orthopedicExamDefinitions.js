@@ -6901,6 +6901,310 @@ export const ORTHO_EXAM_CLUSTERS = {
         }
       }
     ]
+  },
+
+  // ============================================================================
+  // MORTON'S NEUROMA (Interdigital Nerve Entrapment)
+  // ============================================================================
+
+  MORTONS_NEUROMA: {
+    id: 'MORTONS_NEUROMA',
+    name: { no: "Morton's Nevrom", en: "Morton's Neuroma" },
+    region: 'LOWER_EXTREMITY',
+    description: {
+      no: 'Interdigital nerve entrapment - oftest 3. webspace (mellom 3. og 4. metatars)',
+      en: 'Interdigital nerve entrapment - most commonly 3rd webspace (between 3rd and 4th metatarsals)'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 5,
+      interpretation: {
+        no: '≥3 positive = sannsynlig Morton\'s nevrom. Ultralyd bekrefter diagnosen.',
+        en: '≥3 positive = probable Morton\'s neuroma. Ultrasound confirms diagnosis.'
+      }
+    },
+    tests: [
+      {
+        id: 'webspace_pain',
+        name: { no: 'Webspace Smerte', en: 'Webspace Pain' },
+        procedure: {
+          no: 'Anamnese: brennende smerte i forfot mellom tær, verst ved gåing med trange sko.',
+          en: 'History: burning pain in forefoot between toes, worse with walking in tight shoes.'
+        },
+        positive: {
+          no: 'Ja, klassisk presentasjon',
+          en: 'Yes, classic presentation'
+        },
+        clinicalNote: {
+          no: 'Ofte lettet ved å ta av sko og massere foten.',
+          en: 'Often relieved by removing shoes and massaging foot.'
+        }
+      },
+      {
+        id: 'mulders_click',
+        name: { no: "Mulder's Klikk", en: "Mulder's Click" },
+        procedure: {
+          no: 'Komprimer metatarshodene lateralt med én hånd. Trykk plantart/dorsalt i webspace med andre hånd.',
+          en: 'Compress metatarsal heads laterally with one hand. Press plantarly/dorsally in webspace with other hand.'
+        },
+        positive: {
+          no: 'Hørbar eller palpabel klikk med smerte = nevrom',
+          en: 'Audible or palpable click with pain = neuroma'
+        },
+        sensitivity: 0.62,
+        specificity: 0.95
+      },
+      {
+        id: 'webspace_tenderness',
+        name: { no: 'Webspace Ømhet', en: 'Webspace Tenderness' },
+        procedure: {
+          no: 'Direkte palpasjon i webspace (vanligvis 3. webspace).',
+          en: 'Direct palpation in webspace (usually 3rd webspace).'
+        },
+        positive: {
+          no: 'Lokal ømhet som reproduserer pasientens smerte',
+          en: 'Local tenderness reproducing patient\'s pain'
+        },
+        sensitivity: 0.85,
+        specificity: 0.70
+      },
+      {
+        id: 'toe_numbness',
+        name: { no: 'Tånummenhet', en: 'Toe Numbness' },
+        procedure: {
+          no: 'Anamnese og sensorisk testing av adjacent tær.',
+          en: 'History and sensory testing of adjacent toes.'
+        },
+        positive: {
+          no: 'Nummenhet eller parestesier i de affiserte tærne',
+          en: 'Numbness or paresthesias in affected toes'
+        }
+      },
+      {
+        id: 'metatarsal_squeeze',
+        name: { no: 'Metatarsal Squeeze Test', en: 'Metatarsal Squeeze Test' },
+        procedure: {
+          no: 'Komprimer alle metatarshodene sammen.',
+          en: 'Compress all metatarsal heads together.'
+        },
+        positive: {
+          no: 'Reproduserer webspace smerte og parestesier',
+          en: 'Reproduces webspace pain and paresthesias'
+        },
+        sensitivity: 0.71,
+        specificity: 0.75
+      }
+    ]
+  },
+
+  // ============================================================================
+  // LUMBAR/SACRAL PLEXUS LESION (Trauma Screening)
+  // ============================================================================
+
+  LUMBOSACRAL_PLEXUS_LESION: {
+    id: 'LUMBOSACRAL_PLEXUS_LESION',
+    name: { no: 'Lumbosakral Plexus Lesjon', en: 'Lumbosacral Plexus Lesion' },
+    region: 'LOWER_EXTREMITY',
+    description: {
+      no: 'Skade på lumbal (L1-L4) eller sakral (L4-S3) plexus - ofte trauma eller malignitet',
+      en: 'Injury to lumbar (L1-L4) or sacral (L4-S3) plexus - often trauma or malignancy'
+    },
+    redFlagCluster: true,
+    urgency: 'URGENT',
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 6,
+      interpretation: {
+        no: '≥3 positive = sannsynlig plexopati. MR og EMG nødvendig. Ekskluder malignitet.',
+        en: '≥3 positive = probable plexopathy. MRI and EMG needed. Exclude malignancy.'
+      }
+    },
+    tests: [
+      {
+        id: 'multimyotome_weakness',
+        name: { no: 'Multimyotom Svakhet', en: 'Multi-myotome Weakness' },
+        procedure: {
+          no: 'Test styrke i flere myotomer som ikke passer én nerve/rot.',
+          en: 'Test strength in multiple myotomes not fitting single nerve/root.'
+        },
+        positive: {
+          no: 'Svakhet i >2 myotomer som ikke følger én rot/nerve',
+          en: 'Weakness in >2 myotomes not following single root/nerve'
+        },
+        clinicalNote: {
+          no: 'Lumbal plexus: hoftefleksjon, kne ekstensjon. Sakral: kneflex, ankel, tå.',
+          en: 'Lumbar plexus: hip flexion, knee extension. Sacral: knee flex, ankle, toe.'
+        }
+      },
+      {
+        id: 'multidermatome_sensory',
+        name: { no: 'Multidermatomalt Sensorisk Tap', en: 'Multi-dermatomal Sensory Loss' },
+        procedure: {
+          no: 'Kartlegg sensorisk tap. Sammenlign med dermatomer og perifere nerver.',
+          en: 'Map sensory loss. Compare with dermatomes and peripheral nerves.'
+        },
+        positive: {
+          no: 'Sensorisk tap i >2 dermatomer eller plexusmønster',
+          en: 'Sensory loss in >2 dermatomes or plexus pattern'
+        }
+      },
+      {
+        id: 'absent_reflexes_plexus',
+        name: { no: 'Fraværende Reflekser', en: 'Absent Reflexes' },
+        procedure: {
+          no: 'Test patella (L3-4) og akillesrefleks (S1).',
+          en: 'Test patellar (L3-4) and Achilles reflex (S1).'
+        },
+        positive: {
+          no: 'Fraværende reflekser i plexusdistribusjon',
+          en: 'Absent reflexes in plexus distribution'
+        }
+      },
+      {
+        id: 'pelvic_mass',
+        name: { no: 'Bekkensmerte/Masse', en: 'Pelvic Pain/Mass' },
+        procedure: {
+          no: 'Anamnese om bekken/abdominal smerte. Palper for masse.',
+          en: 'History of pelvic/abdominal pain. Palpate for mass.'
+        },
+        positive: {
+          no: 'Smerter eller masse som kan komprimere plexus',
+          en: 'Pain or mass that could compress plexus'
+        },
+        redFlag: true,
+        redFlagCondition: {
+          no: 'Mulig malignitet som komprimerer plexus',
+          en: 'Possible malignancy compressing plexus'
+        }
+      },
+      {
+        id: 'trauma_history_plexus',
+        name: { no: 'Trauma Anamnese', en: 'Trauma History' },
+        procedure: {
+          no: 'Anamnese om bekkentraume, hofteoperasjon, eller antikoagulasjon.',
+          en: 'History of pelvic trauma, hip surgery, or anticoagulation.'
+        },
+        positive: {
+          no: 'Signifikant bekkentraume, kirurgi, eller hematom-risiko',
+          en: 'Significant pelvic trauma, surgery, or hematoma risk'
+        },
+        clinicalNote: {
+          no: 'Iliopsoas hematom hos antikoagulerte kan komprimere lumbal plexus.',
+          en: 'Iliopsoas hematoma in anticoagulated patients can compress lumbar plexus.'
+        }
+      },
+      {
+        id: 'bowel_bladder_plexus',
+        name: { no: 'Blære/Tarm Dysfunksjon', en: 'Bowel/Bladder Dysfunction' },
+        procedure: {
+          no: 'Anamnese om vannlating/avføringsendringer.',
+          en: 'History of urinary/bowel changes.'
+        },
+        positive: {
+          no: 'Inkontinens, retensjon, eller obstipasjon',
+          en: 'Incontinence, retention, or constipation'
+        },
+        redFlag: true,
+        redFlagCondition: {
+          no: 'Mulig sakral plexus eller cauda equina involvering',
+          en: 'Possible sacral plexus or cauda equina involvement'
+        }
+      }
+    ]
+  },
+
+  // ============================================================================
+  // SCAPULOCOSTAL SYNDROME (Scapular Dyskinesis)
+  // ============================================================================
+
+  SCAPULOCOSTAL_SYNDROME: {
+    id: 'SCAPULOCOSTAL_SYNDROME',
+    name: { no: 'Scapulocostal Syndrom', en: 'Scapulocostal Syndrome' },
+    region: 'THORACIC',
+    description: {
+      no: 'Dysfunksjon i scapulothorakale bevegelse med smerte og dyskinesi',
+      en: 'Dysfunction of scapulothoracic movement with pain and dyskinesis'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 5,
+      interpretation: {
+        no: '≥3 positive = sannsynlig scapulocostal syndrom. Vurder postural korreksjon og stabiliseringsøvelser.',
+        en: '≥3 positive = probable scapulocostal syndrome. Consider postural correction and stabilization exercises.'
+      }
+    },
+    tests: [
+      {
+        id: 'medial_scapular_pain',
+        name: { no: 'Medial Skapulær Smerte', en: 'Medial Scapular Pain' },
+        procedure: {
+          no: 'Anamnese og palpasjon: smerte langs medial skapulabord?',
+          en: 'History and palpation: pain along medial scapular border?'
+        },
+        positive: {
+          no: 'Ja, typisk lokalisert til medial scapula og interscapulær region',
+          en: 'Yes, typically localized to medial scapula and interscapular region'
+        }
+      },
+      {
+        id: 'scapular_dyskinesis',
+        name: { no: 'Skapulær Dyskinesi', en: 'Scapular Dyskinesis' },
+        procedure: {
+          no: 'Observer scapula under aktiv skulderfleksjon/abduksjon (fra bak). Legg merke til asymmetri.',
+          en: 'Observe scapula during active shoulder flexion/abduction (from behind). Note asymmetry.'
+        },
+        positive: {
+          no: 'Winging, tipping, eller asymmetrisk bevegelse av scapula',
+          en: 'Winging, tipping, or asymmetric scapular movement'
+        },
+        clinicalNote: {
+          no: 'Type I: inferior vinkel. Type II: medial bord. Type III: øvre kant prominens.',
+          en: 'Type I: inferior angle. Type II: medial border. Type III: superior border prominence.'
+        }
+      },
+      {
+        id: 'rhomboid_trigger_points',
+        name: { no: 'Rhomboid Triggerpunkter', en: 'Rhomboid Trigger Points' },
+        procedure: {
+          no: 'Palper rhomboideus major/minor mellom scapula og ryggsøyle.',
+          en: 'Palpate rhomboid major/minor between scapula and spine.'
+        },
+        positive: {
+          no: 'Triggerpunkter med referert smerte til scapula',
+          en: 'Trigger points with referred pain to scapula'
+        }
+      },
+      {
+        id: 'levator_scapulae_tenderness',
+        name: { no: 'Levator Scapulae Ømhet', en: 'Levator Scapulae Tenderness' },
+        procedure: {
+          no: 'Palper levator scapulae ved øvre mediale skapulavinkel.',
+          en: 'Palpate levator scapulae at superior medial scapular angle.'
+        },
+        positive: {
+          no: 'Lokal ømhet, ofte med referert smerte til nakke/hode',
+          en: 'Local tenderness, often with referred pain to neck/head'
+        }
+      },
+      {
+        id: 'scapular_retraction_relief',
+        name: { no: 'Scapular Retraksjonstest', en: 'Scapular Retraction Test' },
+        procedure: {
+          no: 'Manuelt retrahér scapula. Gjenta skulder impingement-test.',
+          en: 'Manually retract scapula. Repeat shoulder impingement test.'
+        },
+        positive: {
+          no: 'Symptomer lindres når scapula manuelt stabiliseres',
+          en: 'Symptoms relieved when scapula is manually stabilized'
+        },
+        sensitivity: 0.78,
+        specificity: 0.74,
+        clinicalNote: {
+          no: 'Indikerer at scapulær stabilitet bidrar til skulderpatologi.',
+          en: 'Indicates scapular stability contributes to shoulder pathology.'
+        }
+      }
+    ]
   }
 };
 
