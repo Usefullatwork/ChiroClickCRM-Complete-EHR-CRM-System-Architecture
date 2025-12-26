@@ -19,6 +19,7 @@ import {
 
 // Body region icons and colors
 const REGION_CONFIG = {
+  CERVICAL: { icon: '🦴', color: 'rose', label: { no: 'Cervikal', en: 'Cervical' } },
   SHOULDER: { icon: '🦾', color: 'blue', label: { no: 'Skulder', en: 'Shoulder' } },
   ELBOW: { icon: '💪', color: 'indigo', label: { no: 'Albue', en: 'Elbow' } },
   WRIST_HAND: { icon: '✋', color: 'violet', label: { no: 'Håndledd/Hånd', en: 'Wrist/Hand' } },
@@ -26,7 +27,9 @@ const REGION_CONFIG = {
   KNEE: { icon: '🦿', color: 'teal', label: { no: 'Kne', en: 'Knee' } },
   ANKLE_FOOT: { icon: '🦶', color: 'cyan', label: { no: 'Ankel/Fot', en: 'Ankle/Foot' } },
   LUMBAR: { icon: '🔙', color: 'amber', label: { no: 'Lumbal', en: 'Lumbar' } },
-  SACROILIAC: { icon: '🔘', color: 'orange', label: { no: 'SI-ledd', en: 'Sacroiliac' } }
+  SACROILIAC: { icon: '🔘', color: 'orange', label: { no: 'SI-ledd', en: 'Sacroiliac' } },
+  FUNCTIONAL: { icon: '🏃', color: 'green', label: { no: 'Funksjonell', en: 'Functional' } },
+  NEUROLOGICAL: { icon: '🧠', color: 'purple', label: { no: 'Nevrologisk', en: 'Neurological' } }
 };
 
 // ============================================================================

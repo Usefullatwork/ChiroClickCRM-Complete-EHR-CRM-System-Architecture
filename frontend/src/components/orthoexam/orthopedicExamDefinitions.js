@@ -1935,6 +1935,1296 @@ export const ORTHO_EXAM_CLUSTERS = {
   },
 
   // ============================================================================
+  // CERVICAL SPINE CLUSTERS (from Protocol v2.0)
+  // ============================================================================
+
+  CERVICAL_RADICULOPATHY: {
+    id: 'CERVICAL_RADICULOPATHY',
+    name: { no: "Cervikal Radikulopati (Wainner's Cluster)", en: "Cervical Radiculopathy (Wainner's Cluster)" },
+    region: 'CERVICAL',
+    description: {
+      no: 'Nerverotaffeksjon cervikalt - 4 test klynge med høy diagnostisk nøyaktighet',
+      en: 'Cervical nerve root involvement - 4 test cluster with high diagnostic accuracy'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 4,
+      interpretation: {
+        no: '3/4 positive = LR+ 6.1, 4/4 positive = LR+ 30.3 (99% sannsynlighet)',
+        en: '3/4 positive = LR+ 6.1, 4/4 positive = LR+ 30.3 (99% probability)'
+      }
+    },
+    tests: [
+      {
+        id: 'ultt_a',
+        name: { no: 'ULTT A (Medianus)', en: 'ULTT A (Median Nerve)' },
+        procedure: {
+          no: 'Ryggliggende. Skulder depresjon, abduksjon 110°, supinasjon, håndledds/fingerekstensjon, albueekstensjon, cervikal sidebøy bort.',
+          en: 'Supine. Shoulder depression, abduction 110°, supination, wrist/finger extension, elbow extension, cervical sidebend away.'
+        },
+        positive: {
+          no: 'Reproduksjon av symptomer, redusert ROM vs. frisk side',
+          en: 'Reproduction of symptoms, reduced ROM vs. unaffected side'
+        },
+        sensitivity: 0.97,
+        specificity: 0.22,
+        clinicalNote: {
+          no: 'Høy sensitivitet - negativ test utelukker radikulopati',
+          en: 'High sensitivity - negative test rules out radiculopathy'
+        }
+      },
+      {
+        id: 'spurling_a',
+        name: { no: "Spurling's Test A", en: "Spurling's Test A" },
+        procedure: {
+          no: 'Sittende. Cervikal ekstensjon, sidebøy og rotasjon mot affisert side, aksial kompresjon.',
+          en: 'Seated. Cervical extension, sidebend and rotation to affected side, axial compression.'
+        },
+        positive: {
+          no: 'Reproduksjon av radierende armsmerter',
+          en: 'Reproduction of radiating arm pain'
+        },
+        sensitivity: 0.50,
+        specificity: 0.86,
+        clinicalNote: {
+          no: 'Høy spesifisitet - positiv test bekrefter radikulopati',
+          en: 'High specificity - positive test confirms radiculopathy'
+        }
+      },
+      {
+        id: 'cervical_distraction',
+        name: { no: 'Distraksjonstest', en: 'Distraction Test' },
+        procedure: {
+          no: 'Ryggliggende. Løft hodet med aksial distraksjon.',
+          en: 'Supine. Lift head with axial distraction.'
+        },
+        positive: {
+          no: 'Lindring av symptomer',
+          en: 'Relief of symptoms'
+        },
+        sensitivity: 0.44,
+        specificity: 0.90,
+        clinicalNote: {
+          no: 'Høy spesifisitet - lindring er positivt funn',
+          en: 'High specificity - relief is positive finding'
+        }
+      },
+      {
+        id: 'rotation_rom',
+        name: { no: 'Rotasjon < 60°', en: 'Rotation < 60°' },
+        procedure: {
+          no: 'Aktiv cervikal rotasjon til affisert side.',
+          en: 'Active cervical rotation to affected side.'
+        },
+        positive: {
+          no: 'ROM < 60° til affisert side',
+          en: 'ROM < 60° to affected side'
+        },
+        sensitivity: 0.64,
+        specificity: 0.69
+      }
+    ]
+  },
+
+  CERVICAL_SCREENING: {
+    id: 'CERVICAL_SCREENING',
+    name: { no: 'Canadian C-Spine Rule (CCR)', en: 'Canadian C-Spine Rule (CCR)' },
+    region: 'CERVICAL',
+    description: {
+      no: 'Screening for cervikalfraktur etter traume - sensitivitet 99-100%',
+      en: 'Screening for cervical fracture after trauma - sensitivity 99-100%'
+    },
+    redFlagCluster: true,
+    diagnosticCriteria: {
+      threshold: 1,
+      total: 3,
+      interpretation: {
+        no: 'Høyrisiko = Bildediagnostikk påkrevd. Lavrisiko + kan rotere 45° = Ingen røntgen',
+        en: 'High risk = Imaging required. Low risk + can rotate 45° = No X-ray needed'
+      }
+    },
+    tests: [
+      {
+        id: 'ccr_high_risk',
+        name: { no: 'Høyrisikofaktorer', en: 'High Risk Factors' },
+        procedure: {
+          no: 'Alder ≥65 ELLER farlig mekanisme (fall >1m, bilulykke >100km/t) ELLER parestesier i ekstremiteter',
+          en: 'Age ≥65 OR dangerous mechanism (fall >1m, MVA >100km/h) OR paresthesias in extremities'
+        },
+        positive: {
+          no: 'En eller flere høyrisikofaktorer tilstede',
+          en: 'One or more high risk factors present'
+        },
+        redFlag: true,
+        redFlagCondition: 'Cervical imaging required'
+      },
+      {
+        id: 'ccr_low_risk',
+        name: { no: 'Lavrisikofaktorer', en: 'Low Risk Factors' },
+        procedure: {
+          no: 'Enkel påkjørsel bakfra, sittende i mottak, oppegående, forsinket smerte, ingen midtlinjeømhet',
+          en: 'Simple rear-end collision, sitting in ED, ambulatory, delayed pain onset, no midline tenderness'
+        },
+        positive: {
+          no: 'Lavrisikofaktorer tilstede (tillater ROM-testing)',
+          en: 'Low risk factors present (allows ROM testing)'
+        },
+        sensitivity: 0.99,
+        specificity: 0.45
+      },
+      {
+        id: 'ccr_rotation_test',
+        name: { no: 'Kan rotere 45° bilateralt?', en: 'Can rotate 45° bilaterally?' },
+        procedure: {
+          no: 'Aktiv cervikal rotasjon 45° til venstre og høyre.',
+          en: 'Active cervical rotation 45° to left and right.'
+        },
+        positive: {
+          no: 'Kan IKKE rotere 45° = Bildediagnostikk',
+          en: 'CANNOT rotate 45° = Imaging needed'
+        },
+        sensitivity: 0.99,
+        specificity: 0.45
+      }
+    ]
+  },
+
+  THORACIC_OUTLET: {
+    id: 'THORACIC_OUTLET',
+    name: { no: 'Thoracic Outlet Syndrom (TOS)', en: 'Thoracic Outlet Syndrome (TOS)' },
+    region: 'CERVICAL',
+    description: {
+      no: 'Kompresjon av neurovaskulære strukturer - kombiner tester for bedre nøyaktighet',
+      en: 'Compression of neurovascular structures - combine tests for better accuracy'
+    },
+    diagnosticCriteria: {
+      threshold: 2,
+      total: 3,
+      interpretation: {
+        no: '≥2 positive tester styrker TOS diagnose (Adson alene har lav validitet)',
+        en: '≥2 positive tests strengthen TOS diagnosis (Adson alone has low validity)'
+      }
+    },
+    tests: [
+      {
+        id: 'adson',
+        name: { no: "Adson's Test", en: "Adson's Test" },
+        procedure: {
+          no: 'Sittende, arm i lett abduksjon. Roter hodet mot affisert side, ekstender nakke, dyp inspirasjon. Palper radialispuls.',
+          en: 'Seated, arm slightly abducted. Rotate head to affected side, extend neck, deep inspiration. Palpate radial pulse.'
+        },
+        positive: {
+          no: 'Redusert/fraværende puls og/eller symptomreproduksjon',
+          en: 'Diminished/absent pulse and/or symptom reproduction'
+        },
+        sensitivity: 0.79,
+        specificity: 0.74,
+        clinicalNote: {
+          no: 'Mange falske positive - ikke bruk alene',
+          en: 'Many false positives - do not use alone'
+        }
+      },
+      {
+        id: 'roos',
+        name: { no: 'Roos Test (EAST)', en: 'Roos Test (EAST)' },
+        procedure: {
+          no: 'Sittende, skulder 90° abduksjon + utadrotasjon, albue 90°. Åpne og lukk hendene i 3 minutter.',
+          en: 'Seated, shoulder 90° abduction + external rotation, elbow 90°. Open and close hands for 3 minutes.'
+        },
+        positive: {
+          no: 'Symptomreproduksjon, tretthet, eller kan ikke fullføre',
+          en: 'Symptom reproduction, fatigue, or unable to complete'
+        },
+        sensitivity: 0.84,
+        specificity: 0.30
+      },
+      {
+        id: 'wright',
+        name: { no: "Wright's Test", en: "Wright's Test" },
+        procedure: {
+          no: 'Sittende, skulder 90° abduksjon + full utadrotasjon. Palper radialispuls.',
+          en: 'Seated, shoulder 90° abduction + full external rotation. Palpate radial pulse.'
+        },
+        positive: {
+          no: 'Redusert puls og/eller symptomreproduksjon',
+          en: 'Diminished pulse and/or symptom reproduction'
+        },
+        sensitivity: 0.70,
+        specificity: 0.53
+      }
+    ]
+  },
+
+  ARM_SQUEEZE: {
+    id: 'ARM_SQUEEZE',
+    name: { no: 'Arm Squeeze Test (DDx)', en: 'Arm Squeeze Test (DDx)' },
+    region: 'CERVICAL',
+    description: {
+      no: 'Differensialdiagnose: Skulder vs. Nakke',
+      en: 'Differential diagnosis: Shoulder vs. Neck'
+    },
+    diagnosticCriteria: {
+      threshold: 1,
+      total: 1,
+      interpretation: {
+        no: 'Smerte ved klem på overarm (men ikke skulderbevegelse) = cervikal radikulopati C5-T1',
+        en: 'Pain with arm squeeze (but not shoulder movement) = cervical radiculopathy C5-T1'
+      }
+    },
+    tests: [
+      {
+        id: 'arm_squeeze',
+        name: { no: 'Arm Squeeze Test', en: 'Arm Squeeze Test' },
+        procedure: {
+          no: 'Klem på midtre del av overarmen bilateralt.',
+          en: 'Squeeze middle portion of upper arm bilaterally.'
+        },
+        positive: {
+          no: 'Smerte ved klem (sammenlign med skuldertester)',
+          en: 'Pain with squeeze (compare with shoulder tests)'
+        },
+        sensitivity: 0.96,
+        specificity: 0.91
+      }
+    ]
+  },
+
+  // ============================================================================
+  // LUMBAR ADDITIONS (from Protocol v2.0)
+  // ============================================================================
+
+  LUMBAR_STENOSIS: {
+    id: 'LUMBAR_STENOSIS',
+    name: { no: "Spinal Stenose (Cook's Cluster)", en: "Spinal Stenosis (Cook's Cluster)" },
+    region: 'LUMBAR',
+    description: {
+      no: 'Skille stenose fra diskusprolaps',
+      en: 'Differentiate stenosis from disc herniation'
+    },
+    diagnosticCriteria: {
+      threshold: 4,
+      total: 5,
+      interpretation: {
+        no: '4/5 positive = LR+ 4.6, Spesifisitet 98%',
+        en: '4/5 positive = LR+ 4.6, Specificity 98%'
+      }
+    },
+    tests: [
+      {
+        id: 'bilateral_symptoms',
+        name: { no: 'Bilaterale symptomer', en: 'Bilateral Symptoms' },
+        procedure: {
+          no: 'Anamnese: Symptomer i begge ben?',
+          en: 'History: Symptoms in both legs?'
+        },
+        positive: {
+          no: 'Symptomer i begge underekstremiteter',
+          en: 'Symptoms in both lower extremities'
+        }
+      },
+      {
+        id: 'leg_more_than_back',
+        name: { no: 'Leggsmerter > Ryggsmerter', en: 'Leg Pain > Back Pain' },
+        procedure: {
+          no: 'Anamnese: Er leggsmerter verre enn ryggsmerter?',
+          en: 'History: Is leg pain worse than back pain?'
+        },
+        positive: {
+          no: 'Leggsmerter dominerer',
+          en: 'Leg pain predominates'
+        }
+      },
+      {
+        id: 'pain_with_standing',
+        name: { no: 'Smerte ved gange/ståing', en: 'Pain with Walking/Standing' },
+        procedure: {
+          no: 'Anamnese: Forverres symptomer ved gange eller lengre ståing?',
+          en: 'History: Do symptoms worsen with walking or prolonged standing?'
+        },
+        positive: {
+          no: 'Neurogen klaudikasjon ved belastning',
+          en: 'Neurogenic claudication with loading'
+        }
+      },
+      {
+        id: 'relief_with_sitting',
+        name: { no: 'Lindring ved sitting', en: 'Relief with Sitting' },
+        procedure: {
+          no: 'Anamnese: Lindres symptomer ved sitting (fleksjon)?',
+          en: 'History: Do symptoms improve with sitting (flexion)?'
+        },
+        positive: {
+          no: 'Fleksjon åpner spinalkanalen og gir lindring',
+          en: 'Flexion opens spinal canal providing relief'
+        }
+      },
+      {
+        id: 'age_over_48',
+        name: { no: 'Alder > 48 år', en: 'Age > 48 years' },
+        procedure: {
+          no: 'Pasientens alder.',
+          en: "Patient's age."
+        },
+        positive: {
+          no: 'Alder over 48 år',
+          en: 'Age over 48 years'
+        }
+      }
+    ]
+  },
+
+  LUMBAR_INSTABILITY: {
+    id: 'LUMBAR_INSTABILITY',
+    name: { no: 'Lumbal Instabilitet', en: 'Lumbar Instability' },
+    region: 'LUMBAR',
+    description: {
+      no: 'Funksjonell vs. strukturell instabilitet',
+      en: 'Functional vs. structural instability'
+    },
+    diagnosticCriteria: {
+      threshold: 1,
+      total: 2,
+      interpretation: {
+        no: 'PIT positiv = funksjonell instabilitet (respons på trening). Passiv ekstensjon = strukturell.',
+        en: 'PIT positive = functional instability (responds to training). Passive extension = structural.'
+      }
+    },
+    tests: [
+      {
+        id: 'prone_instability',
+        name: { no: 'Prone Instability Test (PIT)', en: 'Prone Instability Test (PIT)' },
+        procedure: {
+          no: 'Mageliggende over bordkant. Trykk på smertefullt segment i hvile, deretter med løftede ben (muskelaktivering).',
+          en: 'Prone over table edge. Press on painful segment at rest, then with legs lifted (muscle activation).'
+        },
+        positive: {
+          no: 'Smerte i hvile som forsvinner med muskelaktivering',
+          en: 'Pain at rest that disappears with muscle activation'
+        },
+        sensitivity: 0.72,
+        specificity: 0.58,
+        clinicalNote: {
+          no: 'Indikerer funksjonell instabilitet - god respons på stabiliseringstrening',
+          en: 'Indicates functional instability - good response to stabilization training'
+        }
+      },
+      {
+        id: 'passive_lumbar_extension',
+        name: { no: 'Passiv Lumbal Ekstensjon', en: 'Passive Lumbar Extension' },
+        procedure: {
+          no: 'Mageliggende, løft begge ben passivt. Observer for smerte/sviktfølelse.',
+          en: 'Prone, lift both legs passively. Observe for pain/giving way sensation.'
+        },
+        positive: {
+          no: 'Smerte eller følelse av strukturell svikt',
+          en: 'Pain or sensation of structural giving way'
+        },
+        clinicalNote: {
+          no: 'Indikerer strukturell instabilitet',
+          en: 'Indicates structural instability'
+        }
+      }
+    ]
+  },
+
+  // ============================================================================
+  // ANKLE ADDITIONS (from Protocol v2.0 + Additional Tests)
+  // ============================================================================
+
+  ANKLE_SYNDESMOSE: {
+    id: 'ANKLE_SYNDESMOSE',
+    name: { no: 'Syndesmose ("High Ankle Sprain")', en: 'Syndesmosis ("High Ankle Sprain")' },
+    region: 'ANKLE_FOOT',
+    description: {
+      no: 'Skade på tibiofibulare ligamenter',
+      en: 'Injury to tibiofibular ligaments'
+    },
+    diagnosticCriteria: {
+      threshold: 2,
+      total: 3,
+      interpretation: {
+        no: '≥2 positive tester indikerer syndesmosskade',
+        en: '≥2 positive tests indicate syndesmosis injury'
+      }
+    },
+    tests: [
+      {
+        id: 'squeeze_test',
+        name: { no: 'Squeeze Test', en: 'Squeeze Test' },
+        procedure: {
+          no: 'Komprimer tibia og fibula på midt-legg nivå.',
+          en: 'Compress tibia and fibula at mid-calf level.'
+        },
+        positive: {
+          no: 'Smerte distalt i syndesmosen',
+          en: 'Pain distally in syndesmosis'
+        },
+        sensitivity: 0.30,
+        specificity: 0.94
+      },
+      {
+        id: 'kleiger',
+        name: { no: "Kleiger's Test (External Rotation)", en: "Kleiger's Test (External Rotation)" },
+        procedure: {
+          no: 'Sittende, kne 90°, fot i nøytral. Utadroter foten mens tibia stabiliseres.',
+          en: 'Seated, knee 90°, foot neutral. Externally rotate foot while stabilizing tibia.'
+        },
+        positive: {
+          no: 'Smerte i syndesmosen',
+          en: 'Pain in syndesmosis'
+        },
+        sensitivity: 0.71,
+        specificity: 0.63
+      },
+      {
+        id: 'cotton_test',
+        name: { no: 'Cotton Test', en: 'Cotton Test' },
+        procedure: {
+          no: 'Stabiliser tibia, beveg talus lateralt.',
+          en: 'Stabilize tibia, move talus laterally.'
+        },
+        positive: {
+          no: 'Økt lateral bevegelse vs. kontralateral side',
+          en: 'Increased lateral movement vs. contralateral side'
+        },
+        sensitivity: 0.64,
+        specificity: 0.82
+      }
+    ]
+  },
+
+  TARSAL_TUNNEL: {
+    id: 'TARSAL_TUNNEL',
+    name: { no: 'Tarsal Tunnel Syndrom', en: 'Tarsal Tunnel Syndrome' },
+    region: 'ANKLE_FOOT',
+    description: {
+      no: 'N. tibialis posterior kompresjon',
+      en: 'Posterior tibial nerve compression'
+    },
+    diagnosticCriteria: {
+      threshold: 2,
+      total: 3,
+      interpretation: {
+        no: '≥2 positive tester indikerer tarsal tunnel syndrom',
+        en: '≥2 positive tests indicate tarsal tunnel syndrome'
+      }
+    },
+    tests: [
+      {
+        id: 'tinel_foot',
+        name: { no: "Tinel's Foot Sign", en: "Tinel's Foot Sign" },
+        procedure: {
+          no: 'Perkuter over n. tibialis posterior bak mediale malleol.',
+          en: 'Tap over posterior tibial nerve behind medial malleolus.'
+        },
+        positive: {
+          no: 'Tingling eller parestesi distalt',
+          en: 'Tingling or paresthesia distally'
+        },
+        sensitivity: 0.58,
+        specificity: 0.93
+      },
+      {
+        id: 'dorsiflexion_eversion',
+        name: { no: 'Dorsifleksjon-Eversjon', en: 'Dorsiflexion-Eversion' },
+        procedure: {
+          no: 'Maksimal dorsifleksjon + eversjon i 30 sekunder.',
+          en: 'Maximum dorsiflexion + eversion for 30 seconds.'
+        },
+        positive: {
+          no: 'Reproduksjon av symptomer',
+          en: 'Reproduction of symptoms'
+        },
+        sensitivity: 0.81,
+        specificity: 0.85
+      },
+      {
+        id: 'tarsal_compression',
+        name: { no: 'Tarsal Tunnel Kompresjon', en: 'Tarsal Tunnel Compression' },
+        procedure: {
+          no: 'Direkte press over tarsal tunnel i 30 sekunder.',
+          en: 'Direct pressure over tarsal tunnel for 30 seconds.'
+        },
+        positive: {
+          no: 'Parestesi i fotsåle',
+          en: 'Paresthesia in sole of foot'
+        },
+        sensitivity: 0.86,
+        specificity: 0.88
+      }
+    ]
+  },
+
+  METATARSAL_PATHOLOGY: {
+    id: 'METATARSAL_PATHOLOGY',
+    name: { no: 'Metatarsal Patologi', en: 'Metatarsal Pathology' },
+    region: 'ANKLE_FOOT',
+    description: {
+      no: "Morton's neurom, metatarsalgi",
+      en: "Morton's neuroma, metatarsalgia"
+    },
+    diagnosticCriteria: {
+      threshold: 2,
+      total: 3,
+      interpretation: {
+        no: '≥2 positive tester indikerer metatarsal patologi',
+        en: '≥2 positive tests indicate metatarsal pathology'
+      }
+    },
+    tests: [
+      {
+        id: 'morton_test',
+        name: { no: "Morton's Test", en: "Morton's Test" },
+        procedure: {
+          no: 'Grip rundt metatarsalhodene og komprimer dem sammen.',
+          en: 'Grasp around metatarsal heads and compress them together.'
+        },
+        positive: {
+          no: 'Skarp smerte eller klikk (Mulder\'s click)',
+          en: 'Sharp pain or click (Mulder\'s click)'
+        },
+        sensitivity: 0.62,
+        specificity: 0.95
+      },
+      {
+        id: 'strunsky',
+        name: { no: "Strunsky's Sign", en: "Strunsky's Sign" },
+        procedure: {
+          no: 'Grip tærne og flekter dem passivt.',
+          en: 'Grasp toes and flex them passively.'
+        },
+        positive: {
+          no: 'Smerte eller verkende følelse',
+          en: 'Pain or aching sensation'
+        },
+        sensitivity: 0.85,
+        specificity: 0.70
+      },
+      {
+        id: 'metatarsal_palpation',
+        name: { no: 'Metatarsalhode Palpasjon', en: 'Metatarsal Head Palpation' },
+        procedure: {
+          no: 'Palper hvert metatarsalhode med vektbæring fremover.',
+          en: 'Palpate each metatarsal head with weight bearing forward.'
+        },
+        positive: {
+          no: 'Lokal ømhet',
+          en: 'Local tenderness'
+        },
+        sensitivity: 0.90,
+        specificity: 0.55
+      }
+    ]
+  },
+
+  VASCULAR_LOWER: {
+    id: 'VASCULAR_LOWER',
+    name: { no: 'Vaskulær Undersøkelse (Underekstremitet)', en: 'Vascular Assessment (Lower Extremity)' },
+    region: 'ANKLE_FOOT',
+    description: {
+      no: 'Vaskulære problemer - trombose, arteriell okklusjon',
+      en: 'Vascular problems - thrombosis, arterial occlusion'
+    },
+    redFlagCluster: true,
+    diagnosticCriteria: {
+      threshold: 1,
+      total: 3,
+      interpretation: {
+        no: 'Positiv vaskulær test = umiddelbar medisinsk vurdering',
+        en: 'Positive vascular test = immediate medical evaluation'
+      }
+    },
+    tests: [
+      {
+        id: 'homan',
+        name: { no: "Homan's Sign", en: "Homan's Sign" },
+        procedure: {
+          no: 'Ryggliggende, kne ekstendert. Løft ben 30-50°, dorsiflecter fot og klem leggmuskel.',
+          en: 'Supine, knee extended. Elevate leg 30-50°, dorsiflex foot and squeeze calf.'
+        },
+        positive: {
+          no: 'Dyp smerte i bakre legg',
+          en: 'Deep pain in posterior leg'
+        },
+        sensitivity: 0.48,
+        specificity: 0.41,
+        redFlag: true,
+        redFlagCondition: 'Possible deep vein thrombosis (DVT) - urgent referral',
+        clinicalNote: {
+          no: 'Lav spesifisitet - ikke bruk alene. Kombiner med klinisk vurdering.',
+          en: 'Low specificity - do not use alone. Combine with clinical assessment.'
+        }
+      },
+      {
+        id: 'buerger',
+        name: { no: "Buerger's Test", en: "Buerger's Test" },
+        procedure: {
+          no: 'Ryggliggende, løft strakt ben 45° i 3 minutter. Deretter sitt med ben hengende over bordkant.',
+          en: 'Supine, raise straight leg 45° for 3 minutes. Then sit with legs hanging over table edge.'
+        },
+        positive: {
+          no: 'Foten blekner og vener kollapser elevat ELLER rødcyanose og venetyngde tar 1-2 min',
+          en: 'Foot blanches and veins collapse elevated OR reddish cyanosis and venous engorgement takes 1-2 min'
+        },
+        redFlag: true,
+        redFlagCondition: 'Peripheral arterial disease - vascular referral'
+      },
+      {
+        id: 'claudication_test',
+        name: { no: 'Klaudikasjonstest', en: 'Claudication Test' },
+        procedure: {
+          no: 'Gå i 1 minutt med 2 skritt per sekund. Noter tid til symptomer.',
+          en: 'Walk for 1 minute at 2 steps per second. Note time to symptoms.'
+        },
+        positive: {
+          no: 'Verkende smerte eller fargeendring i huden',
+          en: 'Aching pain or skin color change'
+        },
+        redFlag: true,
+        redFlagCondition: 'Arterial occlusion - vascular evaluation needed'
+      }
+    ]
+  },
+
+  FOOT_STRUCTURAL: {
+    id: 'FOOT_STRUCTURAL',
+    name: { no: 'Fot Strukturelle Tester', en: 'Foot Structural Tests' },
+    region: 'ANKLE_FOOT',
+    description: {
+      no: 'Pronasjon, frakturer, Achilles integritet',
+      en: 'Pronation, fractures, Achilles integrity'
+    },
+    diagnosticCriteria: {
+      threshold: 1,
+      total: 4,
+      interpretation: {
+        no: 'Positiv test indikerer spesifikk patologi',
+        en: 'Positive test indicates specific pathology'
+      }
+    },
+    tests: [
+      {
+        id: 'helbing',
+        name: { no: "Helbing's Sign", en: "Helbing's Sign" },
+        procedure: {
+          no: 'Observer Achillessenen bakfra ved belastning.',
+          en: 'Observe Achilles tendon from behind with weight bearing.'
+        },
+        positive: {
+          no: 'Medial bøyning av Achillessenen',
+          en: 'Medial bowing of Achilles tendon'
+        },
+        clinicalNote: {
+          no: 'Indikerer overdreven pronasjon (pes planus)',
+          en: 'Indicates excessive pronation (pes planus)'
+        }
+      },
+      {
+        id: 'hoffa_foot',
+        name: { no: "Hoffa's Test (Fot)", en: "Hoffa's Test (Foot)" },
+        procedure: {
+          no: 'Mageliggende med føtter over bordkant. Palper Achillessenen.',
+          en: 'Prone with feet over table edge. Palpate Achilles tendon.'
+        },
+        positive: {
+          no: 'Tap av integritet eller fot henger i dorsifleksjon vs. motsatt side',
+          en: 'Loss of integrity or foot hangs in dorsiflexion vs. opposite side'
+        },
+        redFlag: true,
+        redFlagCondition: 'Calcaneal fracture at Achilles insertion'
+      },
+      {
+        id: 'keen',
+        name: { no: "Keen's Sign", en: "Keen's Sign" },
+        procedure: {
+          no: 'Mål omkrets av legg ved malleolnivå bilateralt.',
+          en: 'Measure calf circumference at malleolar level bilaterally.'
+        },
+        positive: {
+          no: 'Økt omkrets på affisert side (uten åpenbar hevelse)',
+          en: 'Increased circumference on affected side (without obvious swelling)'
+        },
+        redFlag: true,
+        redFlagCondition: 'Suspect fibula fracture'
+      },
+      {
+        id: 'duchenne',
+        name: { no: "Duchenne's Test", en: "Duchenne's Test" },
+        procedure: {
+          no: 'Press på 1. metatarsalhode mens pasient plantarflekterer foten.',
+          en: 'Press on 1st metatarsal head while patient plantar flexes foot.'
+        },
+        positive: {
+          no: 'Mediale fot går i dorsifleksjon mens lateral er i plantarfleksjon',
+          en: 'Medial foot goes into dorsiflexion while lateral is in plantar flexion'
+        },
+        clinicalNote: {
+          no: 'Superficial peroneal nerve entrapment - ofte ved midt-legg',
+          en: 'Superficial peroneal nerve entrapment - often at mid-calf'
+        }
+      }
+    ]
+  },
+
+  // ============================================================================
+  // KNEE ADDITIONS
+  // ============================================================================
+
+  KNEE_OTTAWA: {
+    id: 'KNEE_OTTAWA',
+    name: { no: 'Ottawa Knee Rules', en: 'Ottawa Knee Rules' },
+    region: 'KNEE',
+    description: {
+      no: 'Røntgenindikasjon etter akutt knetraume',
+      en: 'X-ray indication after acute knee trauma'
+    },
+    redFlagCluster: true,
+    diagnosticCriteria: {
+      threshold: 1,
+      total: 4,
+      interpretation: {
+        no: 'En eller flere positive = Røntgen indisert',
+        en: 'One or more positive = X-ray indicated'
+      }
+    },
+    tests: [
+      {
+        id: 'age_55_plus',
+        name: { no: 'Alder ≥ 55 år', en: 'Age ≥ 55 years' },
+        procedure: { no: 'Pasientens alder.', en: "Patient's age." },
+        positive: { no: 'Alder 55 eller eldre', en: 'Age 55 or older' },
+        redFlag: true
+      },
+      {
+        id: 'patella_tenderness',
+        name: { no: 'Isolert Patella Ømhet', en: 'Isolated Patella Tenderness' },
+        procedure: {
+          no: 'Palper patella - isolert ømhet uten annen ømhet.',
+          en: 'Palpate patella - isolated tenderness without other tenderness.'
+        },
+        positive: { no: 'Isolert ømhet på patella', en: 'Isolated patella tenderness' },
+        redFlag: true
+      },
+      {
+        id: 'fibula_head_tenderness',
+        name: { no: 'Fibulahode Ømhet', en: 'Fibula Head Tenderness' },
+        procedure: {
+          no: 'Palper fibulahodet.',
+          en: 'Palpate fibula head.'
+        },
+        positive: { no: 'Ømhet over fibulahodet', en: 'Tenderness over fibula head' },
+        redFlag: true
+      },
+      {
+        id: 'unable_flex_90',
+        name: { no: 'Kan ikke flektere 90°', en: 'Unable to flex 90°' },
+        procedure: {
+          no: 'Be pasient flektere kne til 90°.',
+          en: 'Ask patient to flex knee to 90°.'
+        },
+        positive: { no: 'Kan ikke oppnå 90° fleksjon', en: 'Cannot achieve 90° flexion' },
+        redFlag: true
+      },
+      {
+        id: 'unable_bear_weight',
+        name: { no: 'Kan ikke belaste', en: 'Unable to Bear Weight' },
+        procedure: {
+          no: 'Be pasient ta 4 skritt (rett etter skade og nå).',
+          en: 'Ask patient to take 4 steps (immediately after injury and now).'
+        },
+        positive: { no: 'Kunne ikke ta 4 skritt', en: 'Unable to take 4 steps' },
+        redFlag: true
+      }
+    ]
+  },
+
+  KNEE_ADDITIONAL: {
+    id: 'KNEE_ADDITIONAL',
+    name: { no: 'Kne Tilleggstester', en: 'Knee Additional Tests' },
+    region: 'KNEE',
+    description: {
+      no: 'Supplerende knetester',
+      en: 'Supplementary knee tests'
+    },
+    diagnosticCriteria: {
+      threshold: 1,
+      total: 3,
+      interpretation: {
+        no: 'Positiv test indikerer spesifikk patologi',
+        en: 'Positive test indicates specific pathology'
+      }
+    },
+    tests: [
+      {
+        id: 'lever_sign',
+        name: { no: "Lever Sign (Lelli's)", en: "Lever Sign (Lelli's)" },
+        procedure: {
+          no: 'Ryggliggende. Plasser knyttneve under proksimale legg og press ned på distale lår.',
+          en: 'Supine. Place fist under proximal calf and press down on distal thigh.'
+        },
+        positive: {
+          no: 'Hælen løfter seg IKKE fra bordet (ACL ruptur)',
+          en: 'Heel does NOT lift from table (ACL rupture)'
+        },
+        sensitivity: 0.94,
+        specificity: 0.97,
+        clinicalNote: {
+          no: 'Nyere test med høy nøyaktighet for ACL',
+          en: 'Newer test with high accuracy for ACL'
+        }
+      },
+      {
+        id: 'dreyer',
+        name: { no: "Dreyer's Sign", en: "Dreyer's Sign" },
+        procedure: {
+          no: 'Pasient kan ikke løfte benet. Grip over patella og komprimer quadriceps. Be pasient løfte benet.',
+          en: 'Patient cannot raise leg. Grip above patella and compress quadriceps. Ask patient to raise leg.'
+        },
+        positive: {
+          no: 'Evne til å løfte benet indikerer mulig patellafraktur',
+          en: 'Ability to raise leg indicates possible patellar fracture'
+        },
+        redFlag: true,
+        redFlagCondition: 'Possible patellar fracture'
+      },
+      {
+        id: 'bounce_home',
+        name: { no: 'Bounce Home Test', en: 'Bounce Home Test' },
+        procedure: {
+          no: 'Ryggliggende med kne flektert. Hold hælen og la benet falle til ekstensjon.',
+          en: 'Supine with knee flexed. Hold heel and let leg drop to extension.'
+        },
+        positive: {
+          no: 'Ufullstendig ekstensjon eller gummiert endefølelse',
+          en: 'Incomplete extension or rubbery end feel'
+        },
+        clinicalNote: {
+          no: 'Indikerer meniskskade eller intraartikulær patologi',
+          en: 'Indicates meniscal injury or intra-articular pathology'
+        }
+      }
+    ]
+  },
+
+  // ============================================================================
+  // HIP ADDITIONS
+  // ============================================================================
+
+  HIP_STRESS_FRACTURE: {
+    id: 'HIP_STRESS_FRACTURE',
+    name: { no: 'Stressfraktur (Femur/Lårhals)', en: 'Stress Fracture (Femur/Femoral Neck)' },
+    region: 'HIP',
+    description: {
+      no: 'Stressfraktur hos idrettsutøvere',
+      en: 'Stress fracture in athletes'
+    },
+    redFlagCluster: true,
+    diagnosticCriteria: {
+      threshold: 1,
+      total: 2,
+      interpretation: {
+        no: 'Positiv test = MR anbefalt for bekreftelse',
+        en: 'Positive test = MRI recommended for confirmation'
+      }
+    },
+    tests: [
+      {
+        id: 'fulcrum',
+        name: { no: 'Fulcrum Test', en: 'Fulcrum Test' },
+        procedure: {
+          no: 'Sittende. Plasser underarm under låret som vektstang og press ned på kneet.',
+          en: 'Seated. Place forearm under thigh as fulcrum and press down on knee.'
+        },
+        positive: {
+          no: 'Skarp smerte i lår/hofte',
+          en: 'Sharp pain in thigh/hip'
+        },
+        sensitivity: 0.93,
+        specificity: 0.75,
+        redFlag: true,
+        redFlagCondition: 'Suspect femoral stress fracture - restrict activity, order MRI'
+      },
+      {
+        id: 'hop_test_stress',
+        name: { no: 'Single Leg Hop (Stress)', en: 'Single Leg Hop (Stress)' },
+        procedure: {
+          no: 'Hopp på ett ben 10 ganger.',
+          en: 'Hop on one leg 10 times.'
+        },
+        positive: {
+          no: 'Smerte i hofte/lår som forverres ved hopping',
+          en: 'Pain in hip/thigh that worsens with hopping'
+        },
+        redFlag: true
+      }
+    ]
+  },
+
+  // ============================================================================
+  // WRIST ADDITIONS
+  // ============================================================================
+
+  CTS_CPR: {
+    id: 'CTS_CPR',
+    name: { no: "Karpaltunnel CPR (Wainner)", en: "Carpal Tunnel CPR (Wainner)" },
+    region: 'WRIST_HAND',
+    description: {
+      no: 'Klinisk prediksjon for karpaltunnel - mer presist enn enkelt tester',
+      en: 'Clinical prediction for carpal tunnel - more accurate than single tests'
+    },
+    diagnosticCriteria: {
+      threshold: 4,
+      total: 5,
+      interpretation: {
+        no: '4/5 positive = høy sannsynlighet CTS. 5/5 = LR+ 18.3',
+        en: '4/5 positive = high probability CTS. 5/5 = LR+ 18.3'
+      }
+    },
+    tests: [
+      {
+        id: 'flick_sign',
+        name: { no: 'Flick Sign', en: 'Flick Sign' },
+        procedure: {
+          no: 'Anamnese: Rister du hendene for å få lindring om natten?',
+          en: 'History: Do you shake your hands for relief at night?'
+        },
+        positive: {
+          no: 'Risting av hendene gir lindring',
+          en: 'Shaking hands provides relief'
+        },
+        sensitivity: 0.93,
+        specificity: 0.96
+      },
+      {
+        id: 'wrist_ratio',
+        name: { no: 'Wrist-Ratio Index > 0.67', en: 'Wrist-Ratio Index > 0.67' },
+        procedure: {
+          no: 'Mål håndleddets dybde/bredde. Dybde ÷ Bredde > 0.67',
+          en: 'Measure wrist depth/width. Depth ÷ Width > 0.67'
+        },
+        positive: {
+          no: 'Ratio over 0.67 (tykt/smalt håndledd)',
+          en: 'Ratio above 0.67 (thick/narrow wrist)'
+        }
+      },
+      {
+        id: 'sss_score',
+        name: { no: 'Symptom Severity Score > 1.9', en: 'Symptom Severity Score > 1.9' },
+        procedure: {
+          no: 'Bruk Boston Carpal Tunnel Questionnaire.',
+          en: 'Use Boston Carpal Tunnel Questionnaire.'
+        },
+        positive: {
+          no: 'Score over 1.9',
+          en: 'Score above 1.9'
+        }
+      },
+      {
+        id: 'thumb_sensation',
+        name: { no: 'Redusert Tommelfølelse', en: 'Reduced Thumb Sensation' },
+        procedure: {
+          no: 'Test lett berøring på tommelens palmarside.',
+          en: 'Test light touch on palmar aspect of thumb.'
+        },
+        positive: {
+          no: 'Redusert sensibilitet vs. 5. finger',
+          en: 'Reduced sensation vs. 5th finger'
+        }
+      },
+      {
+        id: 'age_over_45',
+        name: { no: 'Alder > 45 år', en: 'Age > 45 years' },
+        procedure: { no: 'Pasientens alder.', en: "Patient's age." },
+        positive: { no: 'Alder over 45 år', en: 'Age over 45 years' }
+      }
+    ]
+  },
+
+  SL_INSTABILITY: {
+    id: 'SL_INSTABILITY',
+    name: { no: 'Scapholunær Instabilitet', en: 'Scapholunate Instability' },
+    region: 'WRIST_HAND',
+    description: {
+      no: 'SL ligamentskade',
+      en: 'SL ligament injury'
+    },
+    diagnosticCriteria: {
+      threshold: 1,
+      total: 2,
+      interpretation: {
+        no: 'Watson positiv = SL instabilitet (sammenlign med frisk side)',
+        en: 'Watson positive = SL instability (compare with unaffected side)'
+      }
+    },
+    tests: [
+      {
+        id: 'watson',
+        name: { no: 'Watson Scaphoid Shift Test', en: 'Watson Scaphoid Shift Test' },
+        procedure: {
+          no: 'Press på scaphoid tuberkel mens håndleddet beveger seg fra ulnar til radial deviasjon.',
+          en: 'Press on scaphoid tubercle while wrist moves from ulnar to radial deviation.'
+        },
+        positive: {
+          no: 'Smerte, klikk eller subluksasjon av scaphoid',
+          en: 'Pain, click or subluxation of scaphoid'
+        },
+        sensitivity: 0.69,
+        specificity: 0.66,
+        clinicalNote: {
+          no: 'Moderat verdi - sammenlign alltid med frisk side. LR- 0.25 for å utelukke.',
+          en: 'Moderate value - always compare with unaffected side. LR- 0.25 to rule out.'
+        }
+      },
+      {
+        id: 'sl_palpation',
+        name: { no: 'SL Intervall Palpasjon', en: 'SL Interval Palpation' },
+        procedure: {
+          no: 'Palper SL intervallet dorsalt (ca 1 cm distalt for Lister\'s tuberkel).',
+          en: 'Palpate SL interval dorsally (approx 1 cm distal to Lister\'s tubercle).'
+        },
+        positive: {
+          no: 'Lokal ømhet',
+          en: 'Local tenderness'
+        },
+        sensitivity: 0.82,
+        specificity: 0.55
+      }
+    ]
+  },
+
+  // ============================================================================
+  // FUNCTIONAL TESTING (from Protocol v2.0)
+  // ============================================================================
+
+  FUNCTIONAL_LOWER: {
+    id: 'FUNCTIONAL_LOWER',
+    name: { no: 'Funksjonell Testing (Underekstremitet)', en: 'Functional Testing (Lower Extremity)' },
+    region: 'FUNCTIONAL',
+    description: {
+      no: 'Return to Sport tester - LSI > 90% er målet',
+      en: 'Return to Sport tests - LSI > 90% is the goal'
+    },
+    diagnosticCriteria: {
+      threshold: 4,
+      total: 5,
+      interpretation: {
+        no: 'LSI > 90% på alle tester = klar for idrett',
+        en: 'LSI > 90% on all tests = ready for sport'
+      }
+    },
+    tests: [
+      {
+        id: 'single_leg_hop',
+        name: { no: 'Single Leg Hop', en: 'Single Leg Hop' },
+        procedure: {
+          no: 'Hopp så langt som mulig på ett ben. Mål distanse. Beregn LSI (affisert/frisk × 100).',
+          en: 'Hop as far as possible on one leg. Measure distance. Calculate LSI (affected/unaffected × 100).'
+        },
+        positive: {
+          no: 'LSI < 90%',
+          en: 'LSI < 90%'
+        }
+      },
+      {
+        id: 'triple_hop',
+        name: { no: 'Triple Hop', en: 'Triple Hop' },
+        procedure: {
+          no: '3 påfølgende hopp på ett ben. Mål total distanse.',
+          en: '3 consecutive hops on one leg. Measure total distance.'
+        },
+        positive: {
+          no: 'LSI < 90%',
+          en: 'LSI < 90%'
+        }
+      },
+      {
+        id: 'crossover_hop',
+        name: { no: 'Crossover Hop', en: 'Crossover Hop' },
+        procedure: {
+          no: '3 hopp over en linje (sideveis).',
+          en: '3 hops crossing a line (laterally).'
+        },
+        positive: {
+          no: 'LSI < 90%',
+          en: 'LSI < 90%'
+        }
+      },
+      {
+        id: 'timed_hop_6m',
+        name: { no: '6m Timed Hop', en: '6m Timed Hop' },
+        procedure: {
+          no: 'Hopp 6 meter på ett ben så raskt som mulig. Mål tid.',
+          en: 'Hop 6 meters on one leg as fast as possible. Measure time.'
+        },
+        positive: {
+          no: 'LSI < 90%',
+          en: 'LSI < 90%'
+        }
+      },
+      {
+        id: 'step_down',
+        name: { no: 'Step Down Test', en: 'Step Down Test' },
+        procedure: {
+          no: 'Stå på 20cm trinn. Senk deg ned på ett ben til motsatt hæl berører gulvet. Observer knekontroll.',
+          en: 'Stand on 20cm step. Lower on one leg until opposite heel touches floor. Observe knee control.'
+        },
+        positive: {
+          no: 'Valguskollaps, bekkendropp, eller dårlig kontroll',
+          en: 'Valgus collapse, pelvic drop, or poor control'
+        },
+        clinicalNote: {
+          no: 'Kvalitativ vurdering av knekontroll og bekkenstabilitet',
+          en: 'Qualitative assessment of knee control and pelvic stability'
+        }
+      }
+    ]
+  },
+
+  FUNCTIONAL_UPPER: {
+    id: 'FUNCTIONAL_UPPER',
+    name: { no: 'Funksjonell Testing (Overekstremitet)', en: 'Functional Testing (Upper Extremity)' },
+    region: 'FUNCTIONAL',
+    description: {
+      no: 'Return to Sport tester for skulder/arm',
+      en: 'Return to Sport tests for shoulder/arm'
+    },
+    diagnosticCriteria: {
+      threshold: 2,
+      total: 2,
+      interpretation: {
+        no: 'Begge tester normale = klar for idrett',
+        en: 'Both tests normal = ready for sport'
+      }
+    },
+    tests: [
+      {
+        id: 'ckcuest',
+        name: { no: 'CKCUEST', en: 'CKCUEST' },
+        procedure: {
+          no: 'Push-up posisjon. Touch motsatt hånd alternerende i 15 sek. Tell touches.',
+          en: 'Push-up position. Touch opposite hand alternating for 15 sec. Count touches.'
+        },
+        positive: {
+          no: '< 21 touches (menn) eller < 18 touches (kvinner)',
+          en: '< 21 touches (men) or < 18 touches (women)'
+        },
+        clinicalNote: {
+          no: 'Måler stabilitet og utholdenhet',
+          en: 'Measures stability and endurance'
+        }
+      },
+      {
+        id: 'seated_shot_put',
+        name: { no: 'Seated Shot Put', en: 'Seated Shot Put' },
+        procedure: {
+          no: 'Sittende, kast 3kg medisinball unilateralt. Mål distanse.',
+          en: 'Seated, throw 3kg medicine ball unilaterally. Measure distance.'
+        },
+        positive: {
+          no: 'LSI < 90% vs. frisk side',
+          en: 'LSI < 90% vs. unaffected side'
+        },
+        clinicalNote: {
+          no: 'Måler eksplosiv kraft',
+          en: 'Measures explosive power'
+        }
+      }
+    ]
+  },
+
+  // ============================================================================
+  // HEADACHE RED FLAGS (SNOOP)
+  // ============================================================================
+
+  HEADACHE_SNOOP: {
+    id: 'HEADACHE_SNOOP',
+    name: { no: 'Hodepine Røde Flagg (SNOOP)', en: 'Headache Red Flags (SNOOP)' },
+    region: 'NEUROLOGICAL',
+    description: {
+      no: 'Indikasjon for bildediagnostikk ved hodepine',
+      en: 'Indication for imaging in headache'
+    },
+    redFlagCluster: true,
+    urgency: 'URGENT',
+    diagnosticCriteria: {
+      threshold: 1,
+      total: 5,
+      interpretation: {
+        no: 'En eller flere positive = bildediagnostikk/henvisning',
+        en: 'One or more positive = imaging/referral'
+      }
+    },
+    tests: [
+      {
+        id: 'systemic',
+        name: { no: 'Systemiske symptomer', en: 'Systemic Symptoms' },
+        procedure: {
+          no: 'Anamnese: Feber, vekttap, malaise?',
+          en: 'History: Fever, weight loss, malaise?'
+        },
+        positive: {
+          no: 'Tilstedeværelse av systemiske symptomer',
+          en: 'Presence of systemic symptoms'
+        },
+        redFlag: true
+      },
+      {
+        id: 'neurologic',
+        name: { no: 'Nevrologiske tegn', en: 'Neurologic Signs' },
+        procedure: {
+          no: 'Forvirring, bevissthetstap, fokale utfall?',
+          en: 'Confusion, loss of consciousness, focal deficits?'
+        },
+        positive: {
+          no: 'Tilstedeværelse av nevrologiske tegn',
+          en: 'Presence of neurologic signs'
+        },
+        redFlag: true
+      },
+      {
+        id: 'onset_sudden',
+        name: { no: 'Plutselig innsettende', en: 'Sudden Onset' },
+        procedure: {
+          no: '"Tordenskrall" hodepine - verste hodepine i livet som når max på sekunder.',
+          en: '"Thunderclap" headache - worst headache of life reaching max in seconds.'
+        },
+        positive: {
+          no: 'Plutselig, voldsom hodepine',
+          en: 'Sudden, severe headache'
+        },
+        redFlag: true,
+        redFlagCondition: 'Possible subarachnoid hemorrhage - EMERGENCY'
+      },
+      {
+        id: 'older_age',
+        name: { no: 'Ny hodepine > 50 år', en: 'New headache > 50 years' },
+        procedure: {
+          no: 'Ny type hodepine hos pasient over 50 år.',
+          en: 'New type headache in patient over 50 years.'
+        },
+        positive: {
+          no: 'Første hodepine av denne typen etter 50 år',
+          en: 'First headache of this type after 50 years'
+        },
+        redFlag: true
+      },
+      {
+        id: 'pattern_change',
+        name: { no: 'Endret mønster', en: 'Pattern Change' },
+        procedure: {
+          no: 'Progressivt forverrende eller endret karakter av kjent hodepine.',
+          en: 'Progressively worsening or changed character of known headache.'
+        },
+        positive: {
+          no: 'Endret karakter eller progressiv forverring',
+          en: 'Changed character or progressive worsening'
+        },
+        redFlag: true
+      }
+    ]
+  },
+
+  // ============================================================================
   // RED FLAG CLUSTERS
   // ============================================================================
 
