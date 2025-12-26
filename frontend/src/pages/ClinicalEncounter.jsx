@@ -3,8 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { encountersAPI, patientsAPI, diagnosisAPI, treatmentsAPI } from '../services/api';
 import { formatDate } from '../lib/utils';
-import { Save, FileText, AlertTriangle, CheckCircle, Brain, X, Sparkles, BookOpen } from 'lucide-react';
+import { Save, FileText, AlertTriangle, CheckCircle, Brain, X, Sparkles, BookOpen, Activity, ChevronDown, ChevronUp, Bone } from 'lucide-react';
 import TemplatePicker from '../components/TemplatePicker';
+import { NeurologicalExamCompact } from '../components/neuroexam';
+import { OrthopedicExamCompact } from '../components/orthoexam';
 
 export default function ClinicalEncounter() {
   const { patientId, encounterId } = useParams();
@@ -18,6 +20,10 @@ export default function ClinicalEncounter() {
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
   const [activeField, setActiveField] = useState(null);
   const textAreaRefs = useRef({});
+  const [showNeuroExam, setShowNeuroExam] = useState(false);
+  const [neuroExamData, setNeuroExamData] = useState(null);
+  const [showOrthoExam, setShowOrthoExam] = useState(false);
+  const [orthoExamData, setOrthoExamData] = useState(null);
 
   // Form state - SOAP format
   const [encounterData, setEncounterData] = useState({
@@ -217,6 +223,36 @@ export default function ClinicalEncounter() {
     }
 
     return suggestions;
+  };
+
+  const handleNeuroExamChange = (examData) => {
+    setNeuroExamData(examData);
+    // Auto-populate neuro_tests field with generated narrative
+    if (examData?.narrative) {
+      updateField('objective', 'neuro_tests', examData.narrative);
+    }
+    // Add any red flag alerts
+    if (examData?.redFlags?.length > 0) {
+      const neuroRedFlags = examData.redFlags.map(rf =>
+        `NEURO RED FLAG: ${rf.description} - ${rf.action}`
+      );
+      setRedFlagAlerts(prev => [...prev.filter(a => !a.startsWith('NEURO RED FLAG:')), ...neuroRedFlags]);
+    }
+  };
+
+  const handleOrthoExamChange = (examData) => {
+    setOrthoExamData(examData);
+    // Auto-populate ortho_tests field with generated narrative
+    if (examData?.narrative) {
+      updateField('objective', 'ortho_tests', examData.narrative);
+    }
+    // Add any red flag alerts
+    if (examData?.redFlags?.length > 0) {
+      const orthoRedFlags = examData.redFlags.map(rf =>
+        `ORTHO RED FLAG: ${rf.testName?.no || rf.clusterName?.no} - ${rf.action}`
+      );
+      setRedFlagAlerts(prev => [...prev.filter(a => !a.startsWith('ORTHO RED FLAG:')), ...orthoRedFlags]);
+    }
   };
 
   const handleTemplateSelect = (templateText) => {
@@ -519,27 +555,112 @@ export default function ClinicalEncounter() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Orthopedic Tests</label>
-                  <textarea
-                    value={encounterData.objective.ortho_tests}
-                    onChange={(e) => updateField('objective', 'ortho_tests', e.target.value)}
-                    rows={3}
-                    placeholder="e.g., SLR negative, Kemp's positive on right"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Neurological Tests</label>
-                  <textarea
-                    value={encounterData.objective.neuro_tests}
-                    onChange={(e) => updateField('objective', 'neuro_tests', e.target.value)}
-                    rows={3}
-                    placeholder="e.g., Reflexes intact, sensation normal"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
+              {/* Orthopedic Examination Panel */}
+              <div className="border border-blue-200 rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setShowOrthoExam(!showOrthoExam)}
+                  className="w-full flex items-center justify-between px-4 py-3 bg-blue-50 hover:bg-blue-100 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <Bone className="w-5 h-5 text-blue-600" />
+                    <span className="font-medium text-blue-900">Orthopedic Examination</span>
+                    {orthoExamData?.clusterScores && (
+                      <span className="text-xs bg-blue-200 text-blue-800 px-2 py-0.5 rounded-full">
+                        {Object.keys(orthoExamData.clusterScores).length} clusters tested
+                      </span>
+                    )}
+                    {orthoExamData?.redFlags?.length > 0 && (
+                      <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full animate-pulse">
+                        {orthoExamData.redFlags.length} red flag(s)
+                      </span>
+                    )}
+                  </div>
+                  {showOrthoExam ? (
+                    <ChevronUp className="w-5 h-5 text-blue-600" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-blue-600" />
+                  )}
+                </button>
+                {showOrthoExam && (
+                  <div className="p-4 bg-white">
+                    <OrthopedicExamCompact
+                      patientId={patientId}
+                      encounterId={encounterId}
+                      onExamChange={handleOrthoExamChange}
+                      initialData={orthoExamData}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Orthopedic Tests Summary
+                  {orthoExamData?.narrative && (
+                    <span className="text-xs text-green-600 ml-2">(Auto-generated from exam)</span>
+                  )}
+                </label>
+                <textarea
+                  value={encounterData.objective.ortho_tests}
+                  onChange={(e) => updateField('objective', 'ortho_tests', e.target.value)}
+                  rows={4}
+                  placeholder="e.g., SLR negative, Kemp's positive on right - or use the Orthopedic Examination panel above"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* Neurological Examination Panel */}
+              <div className="border border-purple-200 rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setShowNeuroExam(!showNeuroExam)}
+                  className="w-full flex items-center justify-between px-4 py-3 bg-purple-50 hover:bg-purple-100 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <Activity className="w-5 h-5 text-purple-600" />
+                    <span className="font-medium text-purple-900">Neurological Examination</span>
+                    {neuroExamData?.clusterScores && (
+                      <span className="text-xs bg-purple-200 text-purple-800 px-2 py-0.5 rounded-full">
+                        {Object.keys(neuroExamData.clusterScores).length} clusters tested
+                      </span>
+                    )}
+                    {neuroExamData?.redFlags?.length > 0 && (
+                      <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full animate-pulse">
+                        {neuroExamData.redFlags.length} red flag(s)
+                      </span>
+                    )}
+                  </div>
+                  {showNeuroExam ? (
+                    <ChevronUp className="w-5 h-5 text-purple-600" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-purple-600" />
+                  )}
+                </button>
+                {showNeuroExam && (
+                  <div className="p-4 bg-white">
+                    <NeurologicalExamCompact
+                      patientId={patientId}
+                      encounterId={encounterId}
+                      onExamChange={handleNeuroExamChange}
+                      initialData={neuroExamData}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Neurological Tests Summary
+                  {neuroExamData?.narrative && (
+                    <span className="text-xs text-green-600 ml-2">(Auto-generated from exam)</span>
+                  )}
+                </label>
+                <textarea
+                  value={encounterData.objective.neuro_tests}
+                  onChange={(e) => updateField('objective', 'neuro_tests', e.target.value)}
+                  rows={4}
+                  placeholder="e.g., Reflexes intact, sensation normal - or use the Neurological Examination panel above"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
               </div>
             </div>
           )}

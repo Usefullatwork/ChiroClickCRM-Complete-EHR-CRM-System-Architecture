@@ -109,7 +109,8 @@ app.get(`/api/${API_VERSION}`, (req, res) => {
       outcomes: `/api/${API_VERSION}/outcomes`,
       gdpr: `/api/${API_VERSION}/gdpr`,
       pdf: `/api/${API_VERSION}/pdf`,
-      ai: `/api/${API_VERSION}/ai`
+      ai: `/api/${API_VERSION}/ai`,
+      neuroexam: `/api/${API_VERSION}/neuroexam`
     }
   });
 });
@@ -134,6 +135,7 @@ import userRoutes from './routes/users.js';
 import aiRoutes from './routes/ai.js';
 import trainingRoutes from './routes/training.js';
 import templateRoutes from './routes/templates.js';
+import neuroexamRoutes from './routes/neuroexam.js';
 
 // Mount routes
 app.use(`/api/${API_VERSION}/dashboard`, dashboardRoutes);
@@ -155,6 +157,7 @@ app.use(`/api/${API_VERSION}/users`, userRoutes);
 app.use(`/api/${API_VERSION}/ai`, aiRoutes);
 app.use(`/api/${API_VERSION}/training`, trainingRoutes);
 app.use(`/api/${API_VERSION}/templates`, templateRoutes);
+app.use(`/api/${API_VERSION}/neuroexam`, neuroexamRoutes);
 
 // ============================================================================
 // ERROR HANDLING
