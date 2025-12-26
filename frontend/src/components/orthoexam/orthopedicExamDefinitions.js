@@ -6148,6 +6148,759 @@ export const ORTHO_EXAM_CLUSTERS = {
         }
       }
     ]
+  },
+
+  // ============================================================================
+  // ADDITIONAL PERIPHERAL NERVE CLUSTERS
+  // ============================================================================
+
+  SCIATIC_NERVE_INJURY: {
+    id: 'SCIATIC_NERVE_INJURY',
+    name: { no: 'Iskiasnerve Skade', en: 'Sciatic Nerve Injury' },
+    region: 'LOWER_EXTREMITY',
+    description: {
+      no: 'Skade på n. ischiadicus - fra glutealregion til poplitea',
+      en: 'Sciatic nerve injury - from gluteal region to popliteal fossa'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 6,
+      interpretation: {
+        no: '≥3 positive = sannsynlig iskiasskade. Differensier fra lumbal radikulopati og piriformis.',
+        en: '≥3 positive = probable sciatic injury. Differentiate from lumbar radiculopathy and piriformis.'
+      }
+    },
+    tests: [
+      {
+        id: 'combined_foot_drop_plantar',
+        name: { no: 'Kombinert Foot Drop + Plantarfleksjon Svakhet', en: 'Combined Foot Drop + Plantar Flexion Weakness' },
+        procedure: {
+          no: 'Test både dorsifleksjon OG plantarfleksjon av ankel.',
+          en: 'Test both dorsiflexion AND plantar flexion of ankle.'
+        },
+        positive: {
+          no: 'Svakhet i begge retninger (både tibial og peroneal komponenter)',
+          en: 'Weakness in both directions (both tibial and peroneal components)'
+        },
+        clinicalNote: {
+          no: 'Isolert foot drop = peroneal. Kombinert = høyere iskiasskade.',
+          en: 'Isolated foot drop = peroneal. Combined = higher sciatic injury.'
+        }
+      },
+      {
+        id: 'hamstring_weakness',
+        name: { no: 'Hamstring Svakhet', en: 'Hamstring Weakness' },
+        procedure: {
+          no: 'Test knefleksjon mot motstand i mageleie.',
+          en: 'Test knee flexion against resistance in prone.'
+        },
+        positive: {
+          no: 'Svakhet i knefleksjon (semimembranosus, semitendinosus, biceps femoris)',
+          en: 'Weakness in knee flexion (semimembranosus, semitendinosus, biceps femoris)'
+        }
+      },
+      {
+        id: 'sensory_loss_posterior_leg',
+        name: { no: 'Sensorisk Tap Posterior Lår/Legg', en: 'Sensory Loss Posterior Thigh/Leg' },
+        procedure: {
+          no: 'Test sensibilitet over posterior lår, legg, og hele foten.',
+          en: 'Test sensation over posterior thigh, leg, and entire foot.'
+        },
+        positive: {
+          no: 'Redusert sensibilitet i iskias distribusjon',
+          en: 'Reduced sensation in sciatic distribution'
+        }
+      },
+      {
+        id: 'achilles_reflex_absent',
+        name: { no: 'Akillesrefleks Fraværende', en: 'Achilles Reflex Absent' },
+        procedure: {
+          no: 'Test akillesrefleks bilateralt.',
+          en: 'Test Achilles reflex bilaterally.'
+        },
+        positive: {
+          no: 'Fraværende eller markant redusert akillesrefleks',
+          en: 'Absent or markedly reduced Achilles reflex'
+        }
+      },
+      {
+        id: 'trauma_gluteal_region',
+        name: { no: 'Traume til Glutealregion', en: 'Trauma to Gluteal Region' },
+        procedure: {
+          no: 'Historie: intramuskulær injeksjon, hoftebrudd, hofteluksasjon, eller direkte traume?',
+          en: 'History: intramuscular injection, hip fracture, hip dislocation, or direct trauma?'
+        },
+        positive: {
+          no: 'Ja, typisk mekanisme for iskiasskade',
+          en: 'Yes, typical mechanism for sciatic injury'
+        }
+      },
+      {
+        id: 'slr_positive_sciatic',
+        name: { no: 'SLR Positiv', en: 'SLR Positive' },
+        procedure: {
+          no: 'Straight Leg Raise test.',
+          en: 'Straight Leg Raise test.'
+        },
+        positive: {
+          no: 'Radierende smerte langs iskias forløp',
+          en: 'Radiating pain along sciatic course'
+        },
+        clinicalNote: {
+          no: 'Differensier fra lumbal diskusprolaps med nevrologisk undersøkelse.',
+          en: 'Differentiate from lumbar disc herniation with neurological exam.'
+        }
+      }
+    ]
+  },
+
+  AXILLARY_NERVE_INJURY: {
+    id: 'AXILLARY_NERVE_INJURY',
+    name: { no: 'Axillarisnerve Skade', en: 'Axillary Nerve Injury' },
+    region: 'UPPER_EXTREMITY',
+    description: {
+      no: 'Skade på n. axillaris i quadrangulært rom - ofte ved skulderluksasjon',
+      en: 'Axillary nerve injury in quadrangular space - often with shoulder dislocation'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 4,
+      interpretation: {
+        no: '≥3 positive = sannsynlig axillarisskade. Vanlig komplikasjon ved anterior skulderluksasjon.',
+        en: '≥3 positive = probable axillary injury. Common complication of anterior shoulder dislocation.'
+      }
+    },
+    tests: [
+      {
+        id: 'deltoid_weakness',
+        name: { no: 'Deltoid Svakhet', en: 'Deltoid Weakness' },
+        procedure: {
+          no: 'Test skulderabduksjon mot motstand (0-90°).',
+          en: 'Test shoulder abduction against resistance (0-90°).'
+        },
+        positive: {
+          no: 'Markant svakhet i skulderabduksjon',
+          en: 'Marked weakness in shoulder abduction'
+        }
+      },
+      {
+        id: 'deltoid_atrophy',
+        name: { no: 'Deltoid Atrofi', en: 'Deltoid Atrophy' },
+        procedure: {
+          no: 'Inspeksjon av skulderkontur. Sammenlign bilateralt.',
+          en: 'Inspection of shoulder contour. Compare bilaterally.'
+        },
+        positive: {
+          no: 'Flat skulderkontur, synlig atrofi av deltoid',
+          en: 'Flat shoulder contour, visible deltoid atrophy'
+        }
+      },
+      {
+        id: 'regimental_badge_sensory',
+        name: { no: 'Regimental Badge Sensorisk Tap', en: 'Regimental Badge Sensory Loss' },
+        procedure: {
+          no: 'Test sensibilitet over lateral skulder (regimental badge area).',
+          en: 'Test sensation over lateral shoulder (regimental badge area).'
+        },
+        positive: {
+          no: 'Redusert sensibilitet over lateral skulder',
+          en: 'Reduced sensation over lateral shoulder'
+        },
+        clinicalNote: {
+          no: 'Patognomonisk for axillarisskade.',
+          en: 'Pathognomonic for axillary nerve injury.'
+        }
+      },
+      {
+        id: 'shoulder_dislocation_history',
+        name: { no: 'Skulderluksasjon i Anamnesen', en: 'Shoulder Dislocation History' },
+        procedure: {
+          no: 'Historie: nylig skulderluksasjon, humerusfraktur, eller direkte traume?',
+          en: 'History: recent shoulder dislocation, humeral fracture, or direct trauma?'
+        },
+        positive: {
+          no: 'Ja, typisk skadevmekanisme',
+          en: 'Yes, typical injury mechanism'
+        }
+      }
+    ]
+  },
+
+  FEMORAL_NERVE_INJURY: {
+    id: 'FEMORAL_NERVE_INJURY',
+    name: { no: 'Femoralnerve Skade', en: 'Femoral Nerve Injury' },
+    region: 'LOWER_EXTREMITY',
+    description: {
+      no: 'Skade på n. femoralis - hoftefleksjon og kneekstensjon affisert',
+      en: 'Femoral nerve injury - hip flexion and knee extension affected'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 5,
+      interpretation: {
+        no: '≥3 positive = sannsynlig femoralnerve skade.',
+        en: '≥3 positive = probable femoral nerve injury.'
+      }
+    },
+    tests: [
+      {
+        id: 'quadriceps_weakness',
+        name: { no: 'Quadriceps Svakhet', en: 'Quadriceps Weakness' },
+        procedure: {
+          no: 'Test kneekstensjon mot motstand i sittende.',
+          en: 'Test knee extension against resistance while seated.'
+        },
+        positive: {
+          no: 'Markant svakhet i kneekstensjon',
+          en: 'Marked weakness in knee extension'
+        }
+      },
+      {
+        id: 'knee_buckling',
+        name: { no: 'Kne Gir Etter', en: 'Knee Buckling' },
+        procedure: {
+          no: 'Observer gange. Spør om kneet gir etter ved trapper.',
+          en: 'Observe gait. Ask if knee buckles on stairs.'
+        },
+        positive: {
+          no: 'Kneet gir etter, spesielt ved trapper',
+          en: 'Knee gives way, especially on stairs'
+        }
+      },
+      {
+        id: 'patellar_reflex_absent',
+        name: { no: 'Patellarrefleks Fraværende', en: 'Patellar Reflex Absent' },
+        procedure: {
+          no: 'Test patellarrefleks (L4).',
+          en: 'Test patellar reflex (L4).'
+        },
+        positive: {
+          no: 'Fraværende eller markant redusert patellarrefleks',
+          en: 'Absent or markedly reduced patellar reflex'
+        }
+      },
+      {
+        id: 'sensory_loss_anterior_thigh',
+        name: { no: 'Sensorisk Tap Anterior Lår', en: 'Sensory Loss Anterior Thigh' },
+        procedure: {
+          no: 'Test sensibilitet over anterior lår og medial legg (saphenous).',
+          en: 'Test sensation over anterior thigh and medial leg (saphenous).'
+        },
+        positive: {
+          no: 'Redusert sensibilitet i femoral/saphenous distribusjon',
+          en: 'Reduced sensation in femoral/saphenous distribution'
+        }
+      },
+      {
+        id: 'hip_flexion_weakness',
+        name: { no: 'Hoftefleksjon Svakhet', en: 'Hip Flexion Weakness' },
+        procedure: {
+          no: 'Test hoftefleksjon mot motstand (iliopsoas).',
+          en: 'Test hip flexion against resistance (iliopsoas).'
+        },
+        positive: {
+          no: 'Svakhet i hoftefleksjon',
+          en: 'Weakness in hip flexion'
+        }
+      }
+    ]
+  },
+
+  TIBIAL_NERVE_INJURY: {
+    id: 'TIBIAL_NERVE_INJURY',
+    name: { no: 'Tibialnerve Skade', en: 'Tibial Nerve Injury' },
+    region: 'LOWER_EXTREMITY',
+    description: {
+      no: 'Skade på n. tibialis - plantarfleksjon og fotsensibilitet affisert',
+      en: 'Tibial nerve injury - plantar flexion and foot sensation affected'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 5,
+      interpretation: {
+        no: '≥3 positive = sannsynlig tibialnerve skade.',
+        en: '≥3 positive = probable tibial nerve injury.'
+      }
+    },
+    tests: [
+      {
+        id: 'plantar_flexion_weakness',
+        name: { no: 'Plantarfleksjon Svakhet', en: 'Plantar Flexion Weakness' },
+        procedure: {
+          no: 'Test ankel plantarfleksjon mot motstand. Be pasient gå på tå.',
+          en: 'Test ankle plantar flexion against resistance. Ask patient to walk on toes.'
+        },
+        positive: {
+          no: 'Svakhet i plantarfleksjon, kan ikke gå på tå',
+          en: 'Weakness in plantar flexion, cannot walk on toes'
+        }
+      },
+      {
+        id: 'toe_flexion_weakness',
+        name: { no: 'Tåfleksjon Svakhet', en: 'Toe Flexion Weakness' },
+        procedure: {
+          no: 'Test fleksjon av tærne mot motstand.',
+          en: 'Test toe flexion against resistance.'
+        },
+        positive: {
+          no: 'Svakhet i tåfleksjon (FDL, FHL)',
+          en: 'Weakness in toe flexion (FDL, FHL)'
+        }
+      },
+      {
+        id: 'sensory_loss_sole',
+        name: { no: 'Sensorisk Tap Fotsåle', en: 'Sensory Loss Sole of Foot' },
+        procedure: {
+          no: 'Test sensibilitet over fotsålen (medial og lateral plantar).',
+          en: 'Test sensation over sole of foot (medial and lateral plantar).'
+        },
+        positive: {
+          no: 'Redusert sensibilitet over fotsålen',
+          en: 'Reduced sensation over sole of foot'
+        }
+      },
+      {
+        id: 'achilles_reflex_tibial',
+        name: { no: 'Akillesrefleks', en: 'Achilles Reflex' },
+        procedure: {
+          no: 'Test akillesrefleks.',
+          en: 'Test Achilles reflex.'
+        },
+        positive: {
+          no: 'Fraværende eller redusert akillesrefleks',
+          en: 'Absent or reduced Achilles reflex'
+        }
+      },
+      {
+        id: 'intrinsic_foot_weakness',
+        name: { no: 'Intrinsikk Fotmuskel Svakhet', en: 'Intrinsic Foot Muscle Weakness' },
+        procedure: {
+          no: 'Test tå abduksjon og adduksjon.',
+          en: 'Test toe abduction and adduction.'
+        },
+        positive: {
+          no: 'Svakhet og mulig atrofi av intrinsikk fotmuskler',
+          en: 'Weakness and possible atrophy of intrinsic foot muscles'
+        }
+      }
+    ]
+  },
+
+  // ============================================================================
+  // ADDITIONAL ELBOW CLUSTERS
+  // ============================================================================
+
+  OLECRANON_BURSITIS: {
+    id: 'OLECRANON_BURSITIS',
+    name: { no: 'Olecranon Bursitt', en: 'Olecranon Bursitis' },
+    region: 'ELBOW_FOREARM',
+    description: {
+      no: 'Inflammasjon av bursa over olecranon - "student elbow"',
+      en: 'Inflammation of bursa over olecranon - "student elbow"'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 4,
+      interpretation: {
+        no: '≥3 positive = sannsynlig olecranon bursitt. Utelukk septisk bursitt!',
+        en: '≥3 positive = probable olecranon bursitis. Rule out septic bursitis!'
+      }
+    },
+    tests: [
+      {
+        id: 'olecranon_swelling',
+        name: { no: 'Olecranon Hevelse', en: 'Olecranon Swelling' },
+        procedure: {
+          no: 'Inspeksjon av posterior albue. Sammenlign bilateralt.',
+          en: 'Inspection of posterior elbow. Compare bilaterally.'
+        },
+        positive: {
+          no: 'Synlig, avgrenset hevelse over olecranon',
+          en: 'Visible, localized swelling over olecranon'
+        }
+      },
+      {
+        id: 'fluctuant_mass',
+        name: { no: 'Fluktuerend Masse', en: 'Fluctuant Mass' },
+        procedure: {
+          no: 'Palpér hevelsen over olecranon.',
+          en: 'Palpate swelling over olecranon.'
+        },
+        positive: {
+          no: 'Myk, fluktuerend masse (væskefylt)',
+          en: 'Soft, fluctuant mass (fluid-filled)'
+        }
+      },
+      {
+        id: 'rom_preserved',
+        name: { no: 'ROM Bevart', en: 'ROM Preserved' },
+        procedure: {
+          no: 'Test albue ROM - fleksjon og ekstensjon.',
+          en: 'Test elbow ROM - flexion and extension.'
+        },
+        positive: {
+          no: 'Full ROM bevart (bursa er ekstraartikulær)',
+          en: 'Full ROM preserved (bursa is extra-articular)'
+        },
+        clinicalNote: {
+          no: 'Bevart ROM differensierer fra intraartikulær patologi.',
+          en: 'Preserved ROM differentiates from intra-articular pathology.'
+        }
+      },
+      {
+        id: 'septic_signs',
+        name: { no: 'Septiske Tegn (Rødt Flagg)', en: 'Septic Signs (Red Flag)' },
+        procedure: {
+          no: 'Erythem, varme, feber, eller åpen sår?',
+          en: 'Erythema, warmth, fever, or open wound?'
+        },
+        positive: {
+          no: 'Tilstede = mulig septisk bursitt, krever aspirasjon',
+          en: 'Present = possible septic bursitis, requires aspiration'
+        },
+        redFlag: true,
+        redFlagCondition: 'Suspect septic bursitis - aspiration and culture needed'
+      }
+    ]
+  },
+
+  ELBOW_OCD: {
+    id: 'ELBOW_OCD',
+    name: { no: 'Osteochondritis Dissecans (Albue)', en: 'Osteochondritis Dissecans (Elbow)' },
+    region: 'ELBOW_FOREARM',
+    description: {
+      no: 'OCD av capitellum - vanlig hos unge kastere og gymnaster',
+      en: 'OCD of capitellum - common in young throwers and gymnasts'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 5,
+      interpretation: {
+        no: '≥3 positive hos ung atlet = MR anbefalt. Tidlig diagnose viktig for prognose.',
+        en: '≥3 positive in young athlete = MRI recommended. Early diagnosis important for prognosis.'
+      }
+    },
+    tests: [
+      {
+        id: 'lateral_elbow_pain',
+        name: { no: 'Lateral Albuesmerte', en: 'Lateral Elbow Pain' },
+        procedure: {
+          no: 'Anamnese: smerte over lateral albue, spesielt ved aktivitet?',
+          en: 'History: pain over lateral elbow, especially with activity?'
+        },
+        positive: {
+          no: 'Ja, lokalisert til capitellum/radiocapitellar ledd',
+          en: 'Yes, localized to capitellum/radiocapitellar joint'
+        }
+      },
+      {
+        id: 'loss_of_extension',
+        name: { no: 'Tap av Full Ekstensjon', en: 'Loss of Full Extension' },
+        procedure: {
+          no: 'Test albue ROM. Sammenlign bilateralt.',
+          en: 'Test elbow ROM. Compare bilaterally.'
+        },
+        positive: {
+          no: 'Manglende full ekstensjon (fleksjons kontraktur)',
+          en: 'Lacking full extension (flexion contracture)'
+        }
+      },
+      {
+        id: 'mechanical_symptoms_elbow',
+        name: { no: 'Mekaniske Symptomer', en: 'Mechanical Symptoms' },
+        procedure: {
+          no: 'Anamnese: låsing, klikking, eller catching i albuen?',
+          en: 'History: locking, clicking, or catching in elbow?'
+        },
+        positive: {
+          no: 'Ja = mulig løs kropp',
+          en: 'Yes = possible loose body'
+        }
+      },
+      {
+        id: 'radiocapitellar_tenderness',
+        name: { no: 'Radiocapitellar Ømhet', en: 'Radiocapitellar Tenderness' },
+        procedure: {
+          no: 'Palpér radiocapitellare leddet med albue i 90° fleksjon.',
+          en: 'Palpate radiocapitellar joint with elbow in 90° flexion.'
+        },
+        positive: {
+          no: 'Lokal ømhet over capitellum',
+          en: 'Local tenderness over capitellum'
+        }
+      },
+      {
+        id: 'young_overhead_athlete',
+        name: { no: 'Ung Overhead Atlet', en: 'Young Overhead Athlete' },
+        procedure: {
+          no: 'Alder 10-16, kaster (baseball), gymnast, eller tennis?',
+          en: 'Age 10-16, thrower (baseball), gymnast, or tennis?'
+        },
+        positive: {
+          no: 'Ja, typisk demografi for OCD',
+          en: 'Yes, typical demographics for OCD'
+        }
+      }
+    ]
+  },
+
+  // ============================================================================
+  // ADDITIONAL WRIST/HAND CLUSTERS
+  // ============================================================================
+
+  KIENBOCK_LUNATE: {
+    id: 'KIENBOCK_LUNATE',
+    name: { no: "Kienböck's Sykdom / Lunatum Patologi", en: "Kienböck's Disease / Lunate Pathology" },
+    region: 'WRIST_HAND',
+    description: {
+      no: 'Avaskulær nekrose av lunatum - progressiv håndleddssmerte',
+      en: 'Avascular necrosis of lunate - progressive wrist pain'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 5,
+      interpretation: {
+        no: '≥3 positive = MR/CT anbefalt. Lichtman staging for behandlingsvalg.',
+        en: '≥3 positive = MRI/CT recommended. Lichtman staging for treatment decisions.'
+      }
+    },
+    tests: [
+      {
+        id: 'dorsal_wrist_pain_lunate',
+        name: { no: 'Dorsal Sentral Håndleddssmerte', en: 'Dorsal Central Wrist Pain' },
+        procedure: {
+          no: 'Anamnese: snikende smerte dorsalt sentralt på håndleddet?',
+          en: 'History: insidious pain dorsally central on wrist?'
+        },
+        positive: {
+          no: 'Ja, gradvis debut uten spesifikt traume',
+          en: 'Yes, gradual onset without specific trauma'
+        }
+      },
+      {
+        id: 'lunate_tenderness',
+        name: { no: 'Lunatum Ømhet', en: 'Lunate Tenderness' },
+        procedure: {
+          no: 'Palpér lunatum dorsalt (i linje med 3. metacarpal, proksimalt for capitatum).',
+          en: 'Palpate lunate dorsally (in line with 3rd metacarpal, proximal to capitate).'
+        },
+        positive: {
+          no: 'Lokal ømhet over lunatum',
+          en: 'Local tenderness over lunate'
+        }
+      },
+      {
+        id: 'decreased_grip_strength',
+        name: { no: 'Redusert Gripestyrke', en: 'Decreased Grip Strength' },
+        procedure: {
+          no: 'Test gripestyrke med dynamometer. Sammenlign bilateralt.',
+          en: 'Test grip strength with dynamometer. Compare bilaterally.'
+        },
+        positive: {
+          no: 'Markant redusert gripestyrke',
+          en: 'Markedly reduced grip strength'
+        }
+      },
+      {
+        id: 'wrist_rom_limited',
+        name: { no: 'Begrenset Håndledds ROM', en: 'Limited Wrist ROM' },
+        procedure: {
+          no: 'Test håndledds fleksjon/ekstensjon.',
+          en: 'Test wrist flexion/extension.'
+        },
+        positive: {
+          no: 'Begrenset ROM, spesielt ekstensjon',
+          en: 'Limited ROM, especially extension'
+        }
+      },
+      {
+        id: 'ulnar_minus_variance',
+        name: { no: 'Ulna Minus Varians', en: 'Ulna Minus Variance' },
+        procedure: {
+          no: 'Kort ulna relativt til radius (ses på røntgen).',
+          en: 'Short ulna relative to radius (seen on x-ray).'
+        },
+        positive: {
+          no: 'Ulna minus = risikofaktor for Kienböck',
+          en: 'Ulna minus = risk factor for Kienböck'
+        },
+        clinicalNote: {
+          no: 'Økt belastning på lunatum ved kort ulna.',
+          en: 'Increased load on lunate with short ulna.'
+        }
+      }
+    ]
+  },
+
+  // ============================================================================
+  // ADDITIONAL SHOULDER CLUSTERS
+  // ============================================================================
+
+  GLENOHUMERAL_ARTHRITIS: {
+    id: 'GLENOHUMERAL_ARTHRITIS',
+    name: { no: 'Glenohumeral Artrose', en: 'Glenohumeral Arthritis' },
+    region: 'SHOULDER',
+    description: {
+      no: 'Degenerativ leddsykdom i glenohumeralleddet',
+      en: 'Degenerative joint disease of glenohumeral joint'
+    },
+    diagnosticCriteria: {
+      threshold: 4,
+      total: 6,
+      interpretation: {
+        no: '≥4 positive = sannsynlig GH artrose. Røntgen bekrefter.',
+        en: '≥4 positive = probable GH arthritis. X-ray confirms.'
+      }
+    },
+    tests: [
+      {
+        id: 'glenohumeral_crepitus',
+        name: { no: 'Glenohumeral Krepitasjon', en: 'Glenohumeral Crepitus' },
+        procedure: {
+          no: 'Palpér GH-leddet under passiv ROM.',
+          en: 'Palpate GH joint during passive ROM.'
+        },
+        positive: {
+          no: 'Palpabel/hørbar krepitasjon',
+          en: 'Palpable/audible crepitus'
+        }
+      },
+      {
+        id: 'global_rom_loss_shoulder',
+        name: { no: 'Global ROM Tap', en: 'Global ROM Loss' },
+        procedure: {
+          no: 'Test AROM og PROM i alle retninger.',
+          en: 'Test AROM and PROM in all directions.'
+        },
+        positive: {
+          no: 'Begrenset bevegelse i alle retninger, kapsulært mønster',
+          en: 'Limited motion in all directions, capsular pattern'
+        }
+      },
+      {
+        id: 'posterior_joint_line_tenderness',
+        name: { no: 'Posterior Leddlinje Ømhet', en: 'Posterior Joint Line Tenderness' },
+        procedure: {
+          no: 'Palpér posterior GH-leddlinje.',
+          en: 'Palpate posterior GH joint line.'
+        },
+        positive: {
+          no: 'Ømhet over posterior leddspalte',
+          en: 'Tenderness over posterior joint line'
+        }
+      },
+      {
+        id: 'age_over_60_shoulder',
+        name: { no: 'Alder >60 år', en: 'Age >60 years' },
+        procedure: { no: 'Pasientens alder.', en: "Patient's age." },
+        positive: { no: 'Alder over 60 år', en: 'Age over 60 years' }
+      },
+      {
+        id: 'gradual_onset_shoulder',
+        name: { no: 'Gradvis Debut', en: 'Gradual Onset' },
+        procedure: {
+          no: 'Anamnese: gradvis økende stivhet og smerte over måneder/år?',
+          en: 'History: gradually increasing stiffness and pain over months/years?'
+        },
+        positive: {
+          no: 'Ja, typisk for degenerativ prosess',
+          en: 'Yes, typical for degenerative process'
+        }
+      },
+      {
+        id: 'night_pain_oa',
+        name: { no: 'Nattesmerte', en: 'Night Pain' },
+        procedure: {
+          no: 'Anamnese: smerte om natten, spesielt ved ligge på affisert side?',
+          en: 'History: pain at night, especially when lying on affected side?'
+        },
+        positive: {
+          no: 'Ja, forstyrrer søvn',
+          en: 'Yes, disturbs sleep'
+        }
+      }
+    ]
+  },
+
+  CALCIFIC_TENDINOPATHY: {
+    id: 'CALCIFIC_TENDINOPATHY',
+    name: { no: 'Kalsifiserende Tendinopati', en: 'Calcific Tendinopathy' },
+    region: 'SHOULDER',
+    description: {
+      no: 'Kalsiumavleiring i rotator cuff sener - oftest supraspinatus',
+      en: 'Calcium deposit in rotator cuff tendons - most often supraspinatus'
+    },
+    diagnosticCriteria: {
+      threshold: 3,
+      total: 5,
+      interpretation: {
+        no: '≥3 positive = røntgen anbefalt. Behandling avhenger av fase (formativ, resorptiv).',
+        en: '≥3 positive = x-ray recommended. Treatment depends on phase (formative, resorptive).'
+      }
+    },
+    tests: [
+      {
+        id: 'acute_severe_pain',
+        name: { no: 'Akutt Intens Smerte', en: 'Acute Severe Pain' },
+        procedure: {
+          no: 'Anamnese: plutselig intens skuldersmerte uten traume?',
+          en: 'History: sudden intense shoulder pain without trauma?'
+        },
+        positive: {
+          no: 'Ja, spesielt om natten (resorptiv fase)',
+          en: 'Yes, especially at night (resorptive phase)'
+        },
+        clinicalNote: {
+          no: 'Resorptiv fase: akutt, intens smerte. Formativ: kronisk, mild smerte.',
+          en: 'Resorptive phase: acute, intense pain. Formative: chronic, mild pain.'
+        }
+      },
+      {
+        id: 'supraspinatus_tenderness',
+        name: { no: 'Supraspinatus Ømhet', en: 'Supraspinatus Tenderness' },
+        procedure: {
+          no: 'Palpér supraspinatus sene anteriort til acromion.',
+          en: 'Palpate supraspinatus tendon anterior to acromion.'
+        },
+        positive: {
+          no: 'Lokal ømhet over supraspinatus insertasjon',
+          en: 'Local tenderness over supraspinatus insertion'
+        }
+      },
+      {
+        id: 'painful_arc_calcific',
+        name: { no: 'Painful Arc', en: 'Painful Arc' },
+        procedure: {
+          no: 'Aktiv abduksjon gjennom full ROM.',
+          en: 'Active abduction through full ROM.'
+        },
+        positive: {
+          no: 'Smerte mellom 60-120° (subacromial impingement)',
+          en: 'Pain between 60-120° (subacromial impingement)'
+        }
+      },
+      {
+        id: 'limited_abduction_acute',
+        name: { no: 'Begrenset Abduksjon (Akutt)', en: 'Limited Abduction (Acute)' },
+        procedure: {
+          no: 'Test aktiv skulderabduksjon.',
+          en: 'Test active shoulder abduction.'
+        },
+        positive: {
+          no: 'Sterkt begrenset pga smerte i akutt fase',
+          en: 'Severely limited due to pain in acute phase'
+        }
+      },
+      {
+        id: 'age_40_60',
+        name: { no: 'Alder 40-60 år', en: 'Age 40-60 years' },
+        procedure: { no: 'Pasientens alder.', en: "Patient's age." },
+        positive: {
+          no: 'Alder 40-60, kvinne > mann',
+          en: 'Age 40-60, female > male'
+        }
+      }
+    ]
   }
 };
 
