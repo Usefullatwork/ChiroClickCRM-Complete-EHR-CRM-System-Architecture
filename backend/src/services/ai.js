@@ -3,7 +3,10 @@
  * Intelligent clinical assistance using Ollama (local) or Claude API
  * Features: SOAP note suggestions, spell checking, clinical reasoning, diagnosis suggestions
  *
- * Default model: Gemini 3 Pro Preview 7B (gemini-3-pro-preview:7b)
+ * Language-aware model selection:
+ * - Norwegian (NO): Viking 7B (akx/viking-7b) - Optimized for Scandinavian languages
+ * - English (EN): Gemini 3 Pro Preview 7B or other multilingual model
+ *
  * Requires: Minimum 8GB RAM, recommended 16GB for optimal performance
  */
 
@@ -14,24 +17,63 @@ import { query } from '../config/database.js';
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
 const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY || null;
 const AI_PROVIDER = process.env.AI_PROVIDER || 'ollama'; // 'ollama' or 'claude'
-const AI_MODEL = process.env.AI_MODEL || 'gemini-3-pro-preview:7b'; // Default: Gemini 3 Pro Preview 7B (8GB+ RAM)
+
+// Language-aware model configuration
+const AI_MODEL_NO = process.env.AI_MODEL_NO || 'akx/viking-7b'; // Norwegian-optimized model (Nordic languages)
+const AI_MODEL_EN = process.env.AI_MODEL_EN || 'gemini-3-pro-preview:7b'; // English/multilingual model
+const AI_MODEL = process.env.AI_MODEL || AI_MODEL_EN; // Default fallback model
+const DEFAULT_LANGUAGE = process.env.DEFAULT_LANGUAGE || 'NO';
+
+/**
+ * Get the appropriate model for the specified language
+ * @param {string} language - Language code ('NO', 'EN', etc.)
+ * @returns {string} Model name for Ollama or Claude
+ */
+const getModelForLanguage = (language = DEFAULT_LANGUAGE) => {
+  const lang = (language || DEFAULT_LANGUAGE).toUpperCase();
+
+  switch (lang) {
+    case 'NO':
+    case 'NB': // Norwegian Bokmål
+    case 'NN': // Norwegian Nynorsk
+    case 'SV': // Swedish
+    case 'DA': // Danish
+    case 'FI': // Finnish
+    case 'IS': // Icelandic
+      return AI_MODEL_NO; // Viking 7B is optimized for Nordic languages
+    case 'EN':
+    case 'EN-US':
+    case 'EN-GB':
+      return AI_MODEL_EN;
+    default:
+      return AI_MODEL; // Fallback to default
+  }
+};
 
 /**
  * Generate AI completion using selected provider
+ * @param {string} prompt - The user prompt
+ * @param {string} systemPrompt - System prompt for context
+ * @param {object} options - Options including maxTokens, temperature, and language
  */
 const generateCompletion = async (prompt, systemPrompt = null, options = {}) => {
-  const { maxTokens = 500, temperature = 0.7 } = options;
+  const { maxTokens = 500, temperature = 0.7, language = DEFAULT_LANGUAGE } = options;
+
+  // Select appropriate model based on language
+  const model = getModelForLanguage(language);
 
   try {
     if (AI_PROVIDER === 'claude' && CLAUDE_API_KEY) {
-      // Use Claude API
+      // Use Claude API (Claude handles multiple languages well)
       const response = await axios.post(
         'https://api.anthropic.com/v1/messages',
         {
-          model: AI_MODEL,
+          model: AI_MODEL, // Claude uses same model for all languages
           max_tokens: maxTokens,
           temperature,
-          system: systemPrompt || 'You are a helpful clinical assistant for chiropractors in Norway.',
+          system: systemPrompt || (language === 'NO'
+            ? 'Du er en hjelpsom klinisk assistent for kiropraktorer i Norge.'
+            : 'You are a helpful clinical assistant for chiropractors.'),
           messages: [{ role: 'user', content: prompt }]
         },
         {
@@ -45,11 +87,13 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
 
       return response.data.content[0].text;
     } else {
-      // Use Ollama (local)
+      // Use Ollama (local) with language-specific model
+      logger.info(`Using AI model: ${model} for language: ${language}`);
+
       const response = await axios.post(
         `${OLLAMA_BASE_URL}/api/generate`,
         {
-          model: AI_MODEL,
+          model: model, // Language-specific model
           prompt: systemPrompt ? `${systemPrompt}\n\n${prompt}` : prompt,
           stream: false,
           options: {
@@ -63,86 +107,147 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
       return response.data.response;
     }
   } catch (error) {
-    logger.error('AI completion error:', error.message);
+    logger.error(`AI completion error (model: ${model}, language: ${language}):`, error.message);
     throw new Error('AI service unavailable');
   }
 };
 
 /**
- * Spell check and grammar correction for Norwegian clinical notes
+ * Spell check and grammar correction for clinical notes
+ * Supports Norwegian and English based on language parameter
+ * @param {string} text - Text to check
+ * @param {string} language - Language code ('NO' for Norwegian, 'EN' for English)
  */
-export const spellCheckNorwegian = async (text) => {
-  const systemPrompt = `Du er en norsk språkassistent som er spesialisert på kiropraktisk medisinsk terminologi.
-Korriger stavefeil og grammatiske feil i den følgende kliniske teksten.
-Behold alle medisinske fagtermer. Svar kun med den korrigerte teksten uten forklaringer.`;
+export const spellCheck = async (text, language = 'NO') => {
+  const isNorwegian = language.toUpperCase().startsWith('N');
 
-  const prompt = `Korriger følgende tekst:\n\n${text}`;
+  const systemPrompt = isNorwegian
+    ? `Du er en norsk språkassistent som er spesialisert på kiropraktisk medisinsk terminologi.
+Korriger stavefeil og grammatiske feil i den følgende kliniske teksten.
+Behold alle medisinske fagtermer. Svar kun med den korrigerte teksten uten forklaringer.`
+    : `You are an English language assistant specialized in chiropractic medical terminology.
+Correct spelling and grammatical errors in the following clinical text.
+Preserve all medical terms. Reply only with the corrected text without explanations.`;
+
+  const prompt = isNorwegian
+    ? `Korriger følgende tekst:\n\n${text}`
+    : `Correct the following text:\n\n${text}`;
 
   try {
-    const correctedText = await generateCompletion(prompt, systemPrompt, { maxTokens: 1000, temperature: 0.3 });
+    const correctedText = await generateCompletion(prompt, systemPrompt, {
+      maxTokens: 1000,
+      temperature: 0.3,
+      language
+    });
 
     return {
       original: text,
       corrected: correctedText.trim(),
-      hasChanges: text.trim() !== correctedText.trim()
+      hasChanges: text.trim() !== correctedText.trim(),
+      language
     };
   } catch (error) {
     logger.error('Spell check error:', error);
-    return { original: text, corrected: text, hasChanges: false, error: error.message };
+    return { original: text, corrected: text, hasChanges: false, error: error.message, language };
   }
 };
 
+// Backwards compatibility alias
+export const spellCheckNorwegian = (text) => spellCheck(text, 'NO');
+
 /**
  * Generate SOAP note suggestions based on symptoms
+ * @param {string} chiefComplaint - Patient's main complaint
+ * @param {string} section - SOAP section ('subjective', 'objective', 'assessment', 'plan')
+ * @param {string} language - Language code ('NO' for Norwegian, 'EN' for English)
  */
-export const generateSOAPSuggestions = async (chiefComplaint, section = 'subjective') => {
+export const generateSOAPSuggestions = async (chiefComplaint, section = 'subjective', language = 'NO') => {
+  const isNorwegian = language.toUpperCase().startsWith('N');
   let systemPrompt;
   let prompt;
 
-  switch (section) {
-    case 'subjective':
-      systemPrompt = `Du er en erfaren kiropraktor i Norge. Generer relevante subjektive funn basert på pasientens hovedplage.
-      Inkluder: sykehistorie, debut, smertebeskrivelse, forverrende/lindrende faktorer.
-      Skriv på norsk i punktform.`;
-      prompt = `Hovedplage: ${chiefComplaint}\n\nGenerer subjektive funn:`;
-      break;
+  const prompts = {
+    subjective: {
+      NO: {
+        system: `Du er en erfaren kiropraktor i Norge. Generer relevante subjektive funn basert på pasientens hovedplage.
+        Inkluder: sykehistorie, debut, smertebeskrivelse, forverrende/lindrende faktorer.
+        Skriv på norsk i punktform.`,
+        user: `Hovedplage: ${chiefComplaint}\n\nGenerer subjektive funn:`
+      },
+      EN: {
+        system: `You are an experienced chiropractor. Generate relevant subjective findings based on the patient's chief complaint.
+        Include: history, onset, pain description, aggravating/relieving factors.
+        Write in bullet points.`,
+        user: `Chief complaint: ${chiefComplaint}\n\nGenerate subjective findings:`
+      }
+    },
+    objective: {
+      NO: {
+        system: `Du er en erfaren kiropraktor. Generer relevante objektive funn og tester basert på pasientens hovedplage.
+        Inkluder: observasjon, palpasjon, bevegelighet (ROM), ortopediske tester.
+        Skriv på norsk i punktform.`,
+        user: `Hovedplage: ${chiefComplaint}\n\nGenerer objektive funn:`
+      },
+      EN: {
+        system: `You are an experienced chiropractor. Generate relevant objective findings and tests based on the patient's chief complaint.
+        Include: observation, palpation, range of motion (ROM), orthopedic tests.
+        Write in bullet points.`,
+        user: `Chief complaint: ${chiefComplaint}\n\nGenerate objective findings:`
+      }
+    },
+    assessment: {
+      NO: {
+        system: `Du er en erfaren kiropraktor. Generer klinisk vurdering basert på pasientens hovedplage.
+        Inkluder: differensialdiagnose, prognose, klinisk resonnement.
+        Skriv på norsk.`,
+        user: `Hovedplage: ${chiefComplaint}\n\nGenerer vurdering:`
+      },
+      EN: {
+        system: `You are an experienced chiropractor. Generate clinical assessment based on the patient's chief complaint.
+        Include: differential diagnosis, prognosis, clinical reasoning.`,
+        user: `Chief complaint: ${chiefComplaint}\n\nGenerate assessment:`
+      }
+    },
+    plan: {
+      NO: {
+        system: `Du er en erfaren kiropraktor. Generer behandlingsplan basert på pasientens hovedplage.
+        Inkluder: behandling, øvelser, råd, oppfølging.
+        Skriv på norsk i punktform.`,
+        user: `Hovedplage: ${chiefComplaint}\n\nGenerer plan:`
+      },
+      EN: {
+        system: `You are an experienced chiropractor. Generate treatment plan based on the patient's chief complaint.
+        Include: treatment, exercises, advice, follow-up.
+        Write in bullet points.`,
+        user: `Chief complaint: ${chiefComplaint}\n\nGenerate plan:`
+      }
+    }
+  };
 
-    case 'objective':
-      systemPrompt = `Du er en erfaren kiropraktor. Generer relevante objektive funn og tester basert på pasientens hovedplage.
-      Inkluder: observasjon, palpasjon, bevegelighet (ROM), ortopediske tester.
-      Skriv på norsk i punktform.`;
-      prompt = `Hovedplage: ${chiefComplaint}\n\nGenerer objektive funn:`;
-      break;
-
-    case 'assessment':
-      systemPrompt = `Du er en erfaren kiropraktor. Generer klinisk vurdering basert på pasientens hovedplage.
-      Inkluder: differensialdiagnose, prognose, klinisk resonnement.
-      Skriv på norsk.`;
-      prompt = `Hovedplage: ${chiefComplaint}\n\nGenerer vurdering:`;
-      break;
-
-    case 'plan':
-      systemPrompt = `Du er en erfaren kiropraktor. Generer behandlingsplan basert på pasientens hovedplage.
-      Inkluder: behandling, øvelser, råd, oppfølging.
-      Skriv på norsk i punktform.`;
-      prompt = `Hovedplage: ${chiefComplaint}\n\nGenerer plan:`;
-      break;
-
-    default:
-      throw new Error('Invalid section');
+  if (!prompts[section]) {
+    throw new Error('Invalid section');
   }
 
+  const langKey = isNorwegian ? 'NO' : 'EN';
+  systemPrompt = prompts[section][langKey].system;
+  prompt = prompts[section][langKey].user;
+
   try {
-    const suggestion = await generateCompletion(prompt, systemPrompt, { maxTokens: 400, temperature = 0.8 });
+    const suggestion = await generateCompletion(prompt, systemPrompt, {
+      maxTokens: 400,
+      temperature: 0.8,
+      language
+    });
 
     return {
       section,
       chiefComplaint,
-      suggestion: suggestion.trim()
+      suggestion: suggestion.trim(),
+      language
     };
   } catch (error) {
     logger.error('SOAP suggestion error:', error);
-    return { section, chiefComplaint, suggestion: '', error: error.message };
+    return { section, chiefComplaint, suggestion: '', error: error.message, language };
   }
 };
 
@@ -318,23 +423,51 @@ export const learnFromOutcome = async (encounterId, outcomeData) => {
 };
 
 /**
- * Get AI service status
+ * Get AI service status with language-specific model info
  */
 export const getAIStatus = async () => {
   try {
     if (AI_PROVIDER === 'ollama') {
       const response = await axios.get(`${OLLAMA_BASE_URL}/api/tags`, { timeout: 5000 });
+      const availableModels = response.data.models?.map(m => m.name) || [];
+
+      // Check if language-specific models are available
+      const norwegianModelAvailable = availableModels.some(m =>
+        m.includes(AI_MODEL_NO) || m === AI_MODEL_NO
+      );
+      const englishModelAvailable = availableModels.some(m =>
+        m.includes(AI_MODEL_EN) || m === AI_MODEL_EN
+      );
+
       return {
         provider: 'ollama',
         available: true,
-        model: AI_MODEL,
-        models: response.data.models?.map(m => m.name) || []
+        defaultLanguage: DEFAULT_LANGUAGE,
+        models: {
+          norwegian: {
+            model: AI_MODEL_NO,
+            available: norwegianModelAvailable,
+            description: 'Viking 7B - Optimized for Norwegian and Nordic languages'
+          },
+          english: {
+            model: AI_MODEL_EN,
+            available: englishModelAvailable,
+            description: 'Multilingual model for English and other languages'
+          }
+        },
+        allModels: availableModels,
+        pullCommands: {
+          norwegian: `ollama pull ${AI_MODEL_NO}`,
+          english: `ollama pull ${AI_MODEL_EN}`
+        }
       };
     } else if (AI_PROVIDER === 'claude' && CLAUDE_API_KEY) {
       return {
         provider: 'claude',
         available: true,
-        model: AI_MODEL
+        model: AI_MODEL,
+        supportsMultipleLanguages: true,
+        note: 'Claude API handles Norwegian and English with the same model'
       };
     } else {
       return {
@@ -353,11 +486,13 @@ export const getAIStatus = async () => {
 };
 
 export default {
-  spellCheckNorwegian,
+  spellCheck,
+  spellCheckNorwegian, // Backwards compatibility
   generateSOAPSuggestions,
   suggestDiagnosisCodes,
   analyzeRedFlags,
   generateClinicalSummary,
   learnFromOutcome,
-  getAIStatus
+  getAIStatus,
+  getModelForLanguage // Expose for testing
 };

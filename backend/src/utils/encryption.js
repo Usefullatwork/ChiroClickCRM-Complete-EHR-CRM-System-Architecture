@@ -101,9 +101,9 @@ export const hash = (text) => {
 };
 
 /**
- * Validate Norwegian fødselsnummer (11 digits)
+ * Validate Norwegian fødselsnummer (11 digits) with full Modulus 11 checksum
  * @param {string} fodselsnummer - Norwegian personal ID
- * @returns {boolean} True if valid format
+ * @returns {boolean} True if valid
  */
 export const validateFodselsnummer = (fodselsnummer) => {
   if (!fodselsnummer) return false;
@@ -116,20 +116,118 @@ export const validateFodselsnummer = (fodselsnummer) => {
     return false;
   }
 
+  // Extract digits as array of numbers
+  const digits = cleaned.split('').map(d => parseInt(d, 10));
+
   // Extract date parts (DDMMYY)
   const day = parseInt(cleaned.substring(0, 2));
   const month = parseInt(cleaned.substring(2, 4));
-  const year = parseInt(cleaned.substring(4, 6));
 
-  // Basic date validation
-  if (day < 1 || day > 31 || month < 1 || month > 12) {
+  // Basic date validation (day 1-31, month 1-12)
+  // Note: D-numbers add 40 to day, H-numbers add 40 to month
+  const isDNumber = day > 40 && day <= 71;
+  const isHNumber = month > 40 && month <= 52;
+
+  const actualDay = isDNumber ? day - 40 : day;
+  const actualMonth = isHNumber ? month - 40 : month;
+
+  if (actualDay < 1 || actualDay > 31 || actualMonth < 1 || actualMonth > 12) {
     return false;
   }
 
-  // TODO: Implement full checksum validation (Modulo 11 algorithm)
-  // For now, we just validate format
+  // Modulus 11 validation - Control digit 1 (k1)
+  // Weights for first control digit: 3, 7, 6, 1, 8, 9, 4, 5, 2
+  const weights1 = [3, 7, 6, 1, 8, 9, 4, 5, 2];
+  let sum1 = 0;
+  for (let i = 0; i < 9; i++) {
+    sum1 += digits[i] * weights1[i];
+  }
+
+  let k1 = 11 - (sum1 % 11);
+  if (k1 === 11) k1 = 0;
+  if (k1 === 10) return false; // Invalid number
+
+  // Check first control digit
+  if (k1 !== digits[9]) {
+    return false;
+  }
+
+  // Modulus 11 validation - Control digit 2 (k2)
+  // Weights for second control digit: 5, 4, 3, 2, 7, 6, 5, 4, 3, 2
+  const weights2 = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
+  let sum2 = 0;
+  for (let i = 0; i < 10; i++) {
+    sum2 += digits[i] * weights2[i];
+  }
+
+  let k2 = 11 - (sum2 % 11);
+  if (k2 === 11) k2 = 0;
+  if (k2 === 10) return false; // Invalid number
+
+  // Check second control digit
+  if (k2 !== digits[10]) {
+    return false;
+  }
 
   return true;
+};
+
+/**
+ * Extract information from a valid fødselsnummer
+ * @param {string} fodselsnummer - Norwegian personal ID
+ * @returns {object|null} Extracted info or null if invalid
+ */
+export const parseFodselsnummer = (fodselsnummer) => {
+  if (!validateFodselsnummer(fodselsnummer)) {
+    return null;
+  }
+
+  const cleaned = fodselsnummer.replace(/[\s-]/g, '');
+
+  let day = parseInt(cleaned.substring(0, 2));
+  let month = parseInt(cleaned.substring(2, 4));
+  const yearPart = parseInt(cleaned.substring(4, 6));
+  const individualNumber = parseInt(cleaned.substring(6, 9));
+
+  // Detect D-number (temporary ID for foreigners) - day += 40
+  const isDNumber = day > 40;
+  if (isDNumber) day -= 40;
+
+  // Detect H-number (auxiliary number) - month += 40
+  const isHNumber = month > 40;
+  if (isHNumber) month -= 40;
+
+  // Determine century based on individual number
+  // 000-499: 1900-1999
+  // 500-749: 1854-1899 or 2000-2039
+  // 750-899: 1854-1899 or 2000-2039
+  // 900-999: 1940-1999
+  let century;
+  if (individualNumber < 500) {
+    century = yearPart < 40 ? 2000 : 1900;
+  } else if (individualNumber < 750) {
+    century = yearPart < 40 ? 2000 : 1800;
+  } else if (individualNumber < 900) {
+    century = yearPart < 40 ? 2000 : 1800;
+  } else {
+    century = 1900; // 900-999 only valid for 1940-1999
+  }
+
+  const fullYear = century + yearPart;
+
+  // Gender: odd individual number = male, even = female
+  const isMale = individualNumber % 2 === 1;
+
+  return {
+    birthDate: new Date(fullYear, month - 1, day),
+    day,
+    month,
+    year: fullYear,
+    gender: isMale ? 'MALE' : 'FEMALE',
+    isDNumber,
+    isHNumber,
+    individualNumber
+  };
 };
 
 /**
@@ -155,5 +253,6 @@ export default {
   decrypt,
   hash,
   validateFodselsnummer,
+  parseFodselsnummer,
   maskSensitive
 };
