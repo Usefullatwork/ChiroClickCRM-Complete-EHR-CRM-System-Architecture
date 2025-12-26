@@ -10,12 +10,15 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
+import session from 'express-session';
 import 'express-async-errors';
 
 import { healthCheck } from './config/database.js';
 import logger from './utils/logger.js';
 import { csrfProtection } from './middleware/csrf.js';
 import cookieParser from 'cookie-parser';
+import { secrets } from './utils/vault.js';
+import { redis, cache } from './utils/redis.js';
 
 // Load environment variables
 dotenv.config();
@@ -46,6 +49,31 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Cookie parser (required for CSRF)
 app.use(cookieParser());
+
+// Session middleware (required for HelseID OAuth flow)
+const sessionConfig = {
+  secret: process.env.SESSION_SECRET || process.env.JWT_SECRET || 'chiroclickcrm-session-secret',
+  resave: false,
+  saveUninitialized: false,
+  name: 'chiroclickcrm.sid',
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: 'lax'
+  }
+};
+
+// Use Redis for session storage if available
+if (redis.isConnected) {
+  const RedisStore = (await import('connect-redis')).default;
+  sessionConfig.store = new RedisStore({ client: redis.client });
+  logger.info('✓ Session store: Redis');
+} else {
+  logger.info('✓ Session store: Memory (development only)');
+}
+
+app.use(session(sessionConfig));
 
 // CSRF Protection (Double Submit Cookie pattern)
 if (process.env.NODE_ENV === 'production' || process.env.CSRF_ENABLED === 'true') {
@@ -84,14 +112,22 @@ app.use(`/api/${API_VERSION}`, limiter);
 // Health check endpoint
 app.get('/health', async (req, res) => {
   const dbHealthy = await healthCheck();
+  const redisHealthy = redis.isConnected;
+  const vaultHealth = await secrets.healthCheck();
 
-  res.status(dbHealthy ? 200 : 503).json({
-    status: dbHealthy ? 'healthy' : 'unhealthy',
+  const allHealthy = dbHealthy && (redisHealthy || !process.env.REDIS_ENABLED);
+
+  res.status(allHealthy ? 200 : 503).json({
+    status: allHealthy ? 'healthy' : 'unhealthy',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     environment: process.env.NODE_ENV,
     version: API_VERSION,
-    database: dbHealthy ? 'connected' : 'disconnected'
+    services: {
+      database: dbHealthy ? 'connected' : 'disconnected',
+      redis: redisHealthy ? 'connected' : 'disconnected',
+      vault: vaultHealth.healthy ? 'connected' : (vaultHealth.mode === 'environment' ? 'env-fallback' : 'disconnected')
+    }
   });
 });
 
@@ -120,7 +156,8 @@ app.get(`/api/${API_VERSION}`, (req, res) => {
       outcomes: `/api/${API_VERSION}/outcomes`,
       gdpr: `/api/${API_VERSION}/gdpr`,
       pdf: `/api/${API_VERSION}/pdf`,
-      ai: `/api/${API_VERSION}/ai`
+      ai: `/api/${API_VERSION}/ai`,
+      helseid: `/api/${API_VERSION}/auth/helseid`
     }
   });
 });
@@ -145,6 +182,7 @@ import userRoutes from './routes/users.js';
 import aiRoutes from './routes/ai.js';
 import trainingRoutes from './routes/training.js';
 import templateRoutes from './routes/templates.js';
+import helseIdRoutes from './routes/helseId.js';
 
 // Mount routes
 app.use(`/api/${API_VERSION}/dashboard`, dashboardRoutes);
@@ -166,6 +204,7 @@ app.use(`/api/${API_VERSION}/users`, userRoutes);
 app.use(`/api/${API_VERSION}/ai`, aiRoutes);
 app.use(`/api/${API_VERSION}/training`, trainingRoutes);
 app.use(`/api/${API_VERSION}/templates`, templateRoutes);
+app.use(`/api/${API_VERSION}/auth/helseid`, helseIdRoutes);
 
 // ============================================================================
 // ERROR HANDLING
@@ -205,6 +244,9 @@ app.use((err, req, res, next) => {
 // SERVER STARTUP
 // ============================================================================
 
+// Initialize secrets manager
+await secrets.initialize();
+
 const server = app.listen(PORT, () => {
   logger.info(`🚀 ChiroClickCRM API Server started`);
   logger.info(`📍 Environment: ${process.env.NODE_ENV}`);
@@ -212,6 +254,7 @@ const server = app.listen(PORT, () => {
   logger.info(`📍 API Version: ${API_VERSION}`);
   logger.info(`📍 Health: http://localhost:${PORT}/health`);
   logger.info(`📍 API Root: http://localhost:${PORT}/api/${API_VERSION}`);
+  logger.info(`📍 Redis: ${redis.isConnected ? 'connected' : 'not configured'}`);
 });
 
 // Graceful shutdown
@@ -222,9 +265,17 @@ const gracefulShutdown = async (signal) => {
     logger.info('HTTP server closed');
 
     try {
+      // Close database connections
       const { closePool } = await import('./config/database.js');
       await closePool();
       logger.info('Database connections closed');
+
+      // Close Redis connection
+      if (redis.isConnected) {
+        await redis.disconnect();
+        logger.info('Redis connection closed');
+      }
+
       process.exit(0);
     } catch (error) {
       logger.error('Error during shutdown:', error);

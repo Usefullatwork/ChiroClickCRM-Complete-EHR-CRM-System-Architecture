@@ -1,12 +1,14 @@
 {
   "name": "ChiroClick CRM",
   "short_name": "ChiroClick",
-  "description": "Complete EHR/CRM System for Chiropractic Practices",
+  "description": "Komplett EHR/CRM-system for kiropraktorpraksis - Norsk pasientjournal og praksisadministrasjon",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2563eb",
-  "orientation": "portrait-primary",
+  "orientation": "any",
+  "scope": "/",
+  "lang": "nb-NO",
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
