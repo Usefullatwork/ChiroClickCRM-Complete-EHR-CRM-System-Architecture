@@ -246,7 +246,7 @@ export const deletePatient = async (req, res) => {
 };
 
 /**
- * Search patients
+ * Search patients (quick search)
  * GET /api/v1/patients/search
  */
 export const searchPatients = async (req, res) => {
@@ -273,6 +273,52 @@ export const searchPatients = async (req, res) => {
     res.status(500).json({
       error: 'Internal Server Error',
       message: 'Failed to search patients'
+    });
+  }
+};
+
+/**
+ * Advanced patient search with filters
+ * GET /api/v1/patients/search/advanced
+ * Supports: name, phone, email, DOB (exact/range), visit dates, status, category
+ */
+export const advancedSearchPatients = async (req, res) => {
+  try {
+    const { organizationId, user } = req;
+
+    // All query params are passed as filters (already validated by Joi schema)
+    const filters = req.query;
+
+    const result = await patientService.advancedSearchPatients(
+      organizationId,
+      filters
+    );
+
+    // Log audit for advanced search
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'SEARCH',
+      resourceType: 'PATIENT',
+      resourceId: null,
+      details: {
+        search_type: 'advanced',
+        filters_used: Object.keys(filters).filter(k => filters[k] !== undefined),
+        results_count: result.patients.length,
+        total_matches: result.pagination.total
+      },
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent')
+    });
+
+    res.json(result);
+  } catch (error) {
+    logger.error('Error in advancedSearchPatients controller:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: 'Failed to perform advanced search'
     });
   }
 };
@@ -329,6 +375,7 @@ export default {
   updatePatient,
   deletePatient,
   searchPatients,
+  advancedSearchPatients,
   getPatientStatistics,
   getPatientsNeedingFollowUp
 };

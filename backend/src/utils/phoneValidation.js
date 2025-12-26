@@ -1,10 +1,18 @@
 /**
  * Phone Number Validation Utility
  * Supports Norwegian (+47) as default and international country codes
+ *
+ * Validation Modes:
+ * - 'strict': Full validation with country code rules (default)
+ * - 'lenient': Accept any number with 7-15 digits
+ * - 'format-only': Just clean and format, no validation
  */
 
 // Default country code from environment or Norway
 const DEFAULT_COUNTRY_CODE = process.env.DEFAULT_COUNTRY_CODE || '+47';
+
+// Validation mode from environment
+const PHONE_VALIDATION_MODE = process.env.PHONE_VALIDATION_MODE || 'strict';
 
 /**
  * Country code configurations with validation rules
@@ -283,15 +291,169 @@ export const isMobileNumber = (phone) => {
   return config.mobilePrefix.some(prefix => firstDigits.startsWith(prefix));
 };
 
+/**
+ * Lenient phone validation - accepts any number with 7-15 digits
+ * Use when strict validation is too restrictive
+ * @param {string} phone - Phone number
+ * @param {string} defaultCountryCode - Default country code
+ * @returns {{ valid: boolean, error?: string, formatted?: string }}
+ */
+export const validatePhoneLenient = (phone, defaultCountryCode = DEFAULT_COUNTRY_CODE) => {
+  if (!phone) {
+    return { valid: false, error: 'Phone number is required' };
+  }
+
+  const cleaned = cleanPhoneNumber(phone);
+
+  // Extract just digits
+  const digitsOnly = cleaned.replace(/\D/g, '');
+
+  // Must have between 7 and 15 digits (ITU-T E.164 standard)
+  if (digitsOnly.length < 7) {
+    return {
+      valid: false,
+      error: 'Phone number must have at least 7 digits'
+    };
+  }
+
+  if (digitsOnly.length > 15) {
+    return {
+      valid: false,
+      error: 'Phone number must have at most 15 digits'
+    };
+  }
+
+  // Format with country code if not present
+  let fullNumber;
+  if (cleaned.startsWith('+')) {
+    fullNumber = cleaned;
+  } else {
+    fullNumber = `${defaultCountryCode}${digitsOnly}`;
+  }
+
+  return {
+    valid: true,
+    formatted: fullNumber,
+    fullNumber,
+    digitsOnly,
+    mode: 'lenient'
+  };
+};
+
+/**
+ * Validate phone with configurable mode
+ * @param {string} phone - Phone number
+ * @param {object} options - Validation options
+ * @param {string} options.mode - 'strict', 'lenient', or 'format-only'
+ * @param {string} options.defaultCountryCode - Default country code
+ * @returns {{ valid: boolean, error?: string, formatted?: string }}
+ */
+export const validatePhoneWithOptions = (phone, options = {}) => {
+  const {
+    mode = PHONE_VALIDATION_MODE,
+    defaultCountryCode = DEFAULT_COUNTRY_CODE
+  } = options;
+
+  switch (mode) {
+    case 'format-only':
+      // Just clean and format, always valid if non-empty
+      if (!phone) {
+        return { valid: false, error: 'Phone number is required' };
+      }
+      const cleaned = cleanPhoneNumber(phone);
+      return {
+        valid: true,
+        formatted: cleaned.startsWith('+') ? cleaned : `${defaultCountryCode}${cleaned}`,
+        fullNumber: cleaned.startsWith('+') ? cleaned : `${defaultCountryCode}${cleaned}`,
+        mode: 'format-only'
+      };
+
+    case 'lenient':
+      return validatePhoneLenient(phone, defaultCountryCode);
+
+    case 'strict':
+    default:
+      return validatePhoneNumber(phone, defaultCountryCode);
+  }
+};
+
+/**
+ * Normalize phone number for database search
+ * Removes all non-digit characters for consistent searching
+ * @param {string} phone - Phone number
+ * @returns {string} Normalized phone number (digits only)
+ */
+export const normalizePhoneForSearch = (phone) => {
+  if (!phone) return '';
+  return phone.replace(/\D/g, '');
+};
+
+/**
+ * Create searchable phone variants for database indexing
+ * Returns multiple formats to enable flexible searching
+ * @param {string} phone - Phone number
+ * @returns {{ e164: string, national: string, digits: string, formatted: string }}
+ */
+export const createSearchablePhoneVariants = (phone) => {
+  const result = validatePhoneWithOptions(phone, { mode: 'lenient' });
+
+  if (!result.valid) {
+    const cleaned = cleanPhoneNumber(phone || '');
+    return {
+      e164: '',
+      national: cleaned,
+      digits: cleaned.replace(/\D/g, ''),
+      formatted: phone || ''
+    };
+  }
+
+  const digits = result.fullNumber.replace(/\D/g, '');
+  const nationalDigits = digits.replace(/^47/, ''); // Remove Norwegian prefix
+
+  return {
+    e164: result.fullNumber,
+    national: nationalDigits,
+    digits: digits,
+    formatted: result.formatted
+  };
+};
+
+/**
+ * Search for phone number in a list
+ * Matches partial numbers and different formats
+ * @param {string} searchQuery - Phone number to search for
+ * @param {string[]} phoneNumbers - List of phone numbers to search in
+ * @returns {string[]} Matching phone numbers
+ */
+export const searchPhoneNumbers = (searchQuery, phoneNumbers) => {
+  if (!searchQuery || !phoneNumbers?.length) return [];
+
+  const queryDigits = normalizePhoneForSearch(searchQuery);
+
+  if (queryDigits.length < 3) return []; // Require at least 3 digits
+
+  return phoneNumbers.filter(phone => {
+    const phoneDigits = normalizePhoneForSearch(phone);
+    // Match if query digits appear anywhere in the phone number
+    return phoneDigits.includes(queryDigits) || queryDigits.includes(phoneDigits);
+  });
+};
+
 export default {
   COUNTRY_CODES,
   DEFAULT_COUNTRY_CODE,
+  PHONE_VALIDATION_MODE,
   cleanPhoneNumber,
   extractCountryCode,
   validateNorwegianPhone,
   validatePhoneNumber,
+  validatePhoneLenient,
+  validatePhoneWithOptions,
   formatPhoneNumber,
   getSupportedCountryCodes,
   getCountryByISO,
-  isMobileNumber
+  isMobileNumber,
+  normalizePhoneForSearch,
+  createSearchablePhoneVariants,
+  searchPhoneNumbers
 };

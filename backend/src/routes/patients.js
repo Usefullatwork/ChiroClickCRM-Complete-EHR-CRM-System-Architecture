@@ -30,10 +30,20 @@ router.get('/', patientController.getPatients);
 
 /**
  * @route   GET /api/v1/patients/search
- * @desc    Search patients by name, email, phone, or SolvIt ID
+ * @desc    Quick search patients by name, email, phone, or SolvIt ID
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.get('/search', validate(searchPatientsSchema), patientController.searchPatients);
+router.get('/search', patientController.searchPatients);
+
+/**
+ * @route   GET /api/v1/patients/search/advanced
+ * @desc    Advanced patient search with multiple filters
+ *          Supports: name, phone, email, date of birth (exact/range),
+ *          last visit date range, first visit date range, status, category,
+ *          therapist, follow-up filters, sorting, and pagination
+ * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ */
+router.get('/search/advanced', validate(searchPatientsSchema), patientController.advancedSearchPatients);
 
 /**
  * @route   GET /api/v1/patients/follow-up/needed

@@ -231,6 +231,179 @@ export const parseFodselsnummer = (fodselsnummer) => {
 };
 
 /**
+ * Validate fødselsnummer against a provided date of birth
+ * Cross-validates that the DOB in the fødselsnummer matches the provided DOB
+ * @param {string} fodselsnummer - Norwegian personal ID (11 digits)
+ * @param {Date|string} dateOfBirth - Date of birth to validate against
+ * @returns {{ valid: boolean, error?: string, parsed?: object }}
+ */
+export const validateFodselsnummerWithDOB = (fodselsnummer, dateOfBirth) => {
+  // First validate the fødselsnummer itself
+  if (!validateFodselsnummer(fodselsnummer)) {
+    return {
+      valid: false,
+      error: 'Invalid fødselsnummer format or checksum'
+    };
+  }
+
+  // Parse the fødselsnummer to extract DOB
+  const parsed = parseFodselsnummer(fodselsnummer);
+  if (!parsed) {
+    return {
+      valid: false,
+      error: 'Could not parse fødselsnummer'
+    };
+  }
+
+  // Convert provided DOB to Date object if string
+  let providedDOB;
+  if (typeof dateOfBirth === 'string') {
+    providedDOB = new Date(dateOfBirth);
+  } else if (dateOfBirth instanceof Date) {
+    providedDOB = dateOfBirth;
+  } else {
+    return {
+      valid: false,
+      error: 'Invalid date of birth format'
+    };
+  }
+
+  // Check if date is valid
+  if (isNaN(providedDOB.getTime())) {
+    return {
+      valid: false,
+      error: 'Invalid date of birth'
+    };
+  }
+
+  // Compare dates (day, month, year)
+  const fnrDay = parsed.day;
+  const fnrMonth = parsed.month;
+  const fnrYear = parsed.year;
+
+  const dobDay = providedDOB.getDate();
+  const dobMonth = providedDOB.getMonth() + 1; // JavaScript months are 0-indexed
+  const dobYear = providedDOB.getFullYear();
+
+  if (fnrDay !== dobDay || fnrMonth !== dobMonth || fnrYear !== dobYear) {
+    return {
+      valid: false,
+      error: `Date of birth mismatch: Fødselsnummer indicates ${fnrDay.toString().padStart(2, '0')}.${fnrMonth.toString().padStart(2, '0')}.${fnrYear}, but provided date is ${dobDay.toString().padStart(2, '0')}.${dobMonth.toString().padStart(2, '0')}.${dobYear}`,
+      parsed,
+      providedDOB: { day: dobDay, month: dobMonth, year: dobYear },
+      fodselsnummerDOB: { day: fnrDay, month: fnrMonth, year: fnrYear }
+    };
+  }
+
+  return {
+    valid: true,
+    parsed,
+    message: 'Fødselsnummer and date of birth match'
+  };
+};
+
+/**
+ * Validate fødselsnummer against gender
+ * @param {string} fodselsnummer - Norwegian personal ID (11 digits)
+ * @param {string} gender - Gender to validate ('MALE', 'FEMALE', 'OTHER')
+ * @returns {{ valid: boolean, error?: string }}
+ */
+export const validateFodselsnummerWithGender = (fodselsnummer, gender) => {
+  const parsed = parseFodselsnummer(fodselsnummer);
+  if (!parsed) {
+    return {
+      valid: false,
+      error: 'Invalid fødselsnummer'
+    };
+  }
+
+  // 'OTHER' gender always passes validation
+  if (gender === 'OTHER') {
+    return { valid: true, parsed };
+  }
+
+  const fnrGender = parsed.gender;
+  const providedGender = gender?.toUpperCase();
+
+  if (fnrGender !== providedGender) {
+    return {
+      valid: false,
+      error: `Gender mismatch: Fødselsnummer indicates ${fnrGender}, but provided gender is ${providedGender}`,
+      parsed,
+      fodselsnummerGender: fnrGender,
+      providedGender
+    };
+  }
+
+  return {
+    valid: true,
+    parsed,
+    message: 'Fødselsnummer and gender match'
+  };
+};
+
+/**
+ * Full patient identity validation
+ * Validates fødselsnummer, DOB, and optionally gender
+ * @param {object} patientData - Patient data with fodselsnummer, dateOfBirth, and optionally gender
+ * @returns {{ valid: boolean, errors: string[], warnings: string[], parsed?: object }}
+ */
+export const validatePatientIdentity = (patientData) => {
+  const { fodselsnummer, dateOfBirth, gender } = patientData;
+  const errors = [];
+  const warnings = [];
+  let parsed = null;
+
+  // Validate fødselsnummer format
+  if (!fodselsnummer) {
+    // Fødselsnummer is optional in some cases
+    warnings.push('No fødselsnummer provided');
+    return { valid: true, errors, warnings, parsed };
+  }
+
+  if (!validateFodselsnummer(fodselsnummer)) {
+    errors.push('Invalid fødselsnummer format or checksum');
+    return { valid: false, errors, warnings, parsed };
+  }
+
+  parsed = parseFodselsnummer(fodselsnummer);
+
+  // D-number warning
+  if (parsed.isDNumber) {
+    warnings.push('This is a D-number (temporary ID for foreigners)');
+  }
+
+  // H-number warning
+  if (parsed.isHNumber) {
+    warnings.push('This is an H-number (auxiliary number)');
+  }
+
+  // Validate DOB if provided
+  if (dateOfBirth) {
+    const dobResult = validateFodselsnummerWithDOB(fodselsnummer, dateOfBirth);
+    if (!dobResult.valid) {
+      errors.push(dobResult.error);
+    }
+  }
+
+  // Validate gender if provided
+  if (gender && gender !== 'OTHER') {
+    const genderResult = validateFodselsnummerWithGender(fodselsnummer, gender);
+    if (!genderResult.valid) {
+      // Gender mismatch is a warning, not an error (could be transgender, etc.)
+      warnings.push(genderResult.error);
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings,
+    parsed
+  };
+};
+
+/**
  * Mask sensitive data for logging/display
  * @param {string} text - Sensitive text
  * @param {number} visibleChars - Number of characters to show at start
@@ -254,5 +427,8 @@ export default {
   hash,
   validateFodselsnummer,
   parseFodselsnummer,
+  validateFodselsnummerWithDOB,
+  validateFodselsnummerWithGender,
+  validatePatientIdentity,
   maskSensitive
 };
