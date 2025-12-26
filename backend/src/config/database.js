@@ -6,6 +6,7 @@
 import pkg from 'pg';
 const { Pool } = pkg;
 import dotenv from 'dotenv';
+import fs from 'fs';
 
 dotenv.config();
 
@@ -21,11 +22,44 @@ const poolConfig = {
   connectionTimeoutMillis: 10000,
 };
 
-// Enable SSL in production
-if (process.env.NODE_ENV === 'production' || process.env.DB_SSL === 'true') {
-  poolConfig.ssl = {
-    rejectUnauthorized: false
+// Configure SSL for database connections
+// In production: require verified SSL with CA certificate
+// In development: optionally enable SSL without strict verification
+if (process.env.NODE_ENV === 'production') {
+  const sslConfig = {
+    rejectUnauthorized: true
   };
+
+  // Load CA certificate if provided for full certificate chain verification
+  if (process.env.SSL_CA_PATH) {
+    try {
+      sslConfig.ca = fs.readFileSync(process.env.SSL_CA_PATH).toString();
+      console.log('✓ SSL CA certificate loaded from:', process.env.SSL_CA_PATH);
+    } catch (error) {
+      console.error('⚠ Failed to load SSL CA certificate:', error.message);
+      console.error('  Ensure SSL_CA_PATH environment variable points to a valid certificate file');
+      process.exit(1);
+    }
+  } else {
+    console.warn('⚠ SSL_CA_PATH not set - using system CA certificates');
+    console.warn('  For enhanced security, set SSL_CA_PATH to your database CA certificate');
+  }
+
+  poolConfig.ssl = sslConfig;
+} else if (process.env.DB_SSL === 'true') {
+  // Development/staging SSL - less strict for testing
+  poolConfig.ssl = {
+    rejectUnauthorized: process.env.SSL_REJECT_UNAUTHORIZED !== 'false'
+  };
+
+  // Optionally load CA cert in non-production if provided
+  if (process.env.SSL_CA_PATH) {
+    try {
+      poolConfig.ssl.ca = fs.readFileSync(process.env.SSL_CA_PATH).toString();
+    } catch (error) {
+      console.warn('⚠ Could not load SSL CA certificate:', error.message);
+    }
+  }
 }
 
 // Create connection pool
