@@ -5,6 +5,7 @@
 
 import { query, transaction } from '../config/database.js';
 import logger from '../utils/logger.js';
+import { scanForRedFlags, calculateRiskScore, generateAlert, RED_FLAG_RULES } from './redFlagEngine.js';
 
 /**
  * Get all encounters with filters
@@ -428,53 +429,134 @@ export const getPatientEncounterHistory = async (organizationId, patientId) => {
 
 /**
  * Check for clinical red flags
+ * Uses the comprehensive red flag engine for clinical safety
  */
 export const checkRedFlags = async (patientId, encounterData) => {
   try {
     // Get patient data
     const patientResult = await query(
-      `SELECT red_flags, contraindications, current_medications, date_of_birth
+      `SELECT red_flags, contraindications, current_medications, date_of_birth, medical_history
        FROM patients WHERE id = $1`,
       [patientId]
     );
 
     if (patientResult.rows.length === 0) {
-      return { alerts: [], warnings: [] };
+      return { alerts: [], warnings: [], riskScore: 0, riskLevel: 'LOW' };
     }
 
     const patient = patientResult.rows[0];
     const alerts = [];
     const warnings = [];
 
-    // Check patient age
-    const age = Math.floor((new Date() - new Date(patient.date_of_birth)) / 31557600000);
-    if (age < 18) {
-      warnings.push('Patient is under 18 years old');
-    }
-    if (age > 75) {
-      warnings.push('Patient is over 75 years old - consider age-related contraindications');
+    // Calculate patient age
+    const age = patient.date_of_birth
+      ? Math.floor((new Date() - new Date(patient.date_of_birth)) / 31557600000)
+      : null;
+
+    // Build clinical text from encounter data for red flag scanning
+    const clinicalText = [
+      encounterData?.subjective?.chief_complaint || '',
+      encounterData?.subjective?.history || '',
+      encounterData?.objective?.observation || '',
+      encounterData?.objective?.palpation || '',
+      encounterData?.objective?.ortho_tests || '',
+      encounterData?.objective?.neuro_tests || '',
+      encounterData?.assessment?.clinical_reasoning || ''
+    ].filter(Boolean).join(' ');
+
+    // Build context for red flag engine
+    const context = {
+      age,
+      medications: patient.current_medications || [],
+      medicalHistory: patient.medical_history || '',
+      knownRedFlags: patient.red_flags || [],
+      contraindications: patient.contraindications || []
+    };
+
+    // Use red flag engine for comprehensive scanning
+    const detectedFlags = scanForRedFlags(clinicalText, context);
+    const riskScore = calculateRiskScore(detectedFlags, context);
+
+    // Generate alert message if flags detected
+    if (detectedFlags.length > 0) {
+      const alertInfo = generateAlert(detectedFlags, riskScore, 'no');
+
+      // Convert detected flags to alerts/warnings
+      for (const flag of detectedFlags) {
+        if (flag.severity === 'CRITICAL') {
+          alerts.push({
+            type: 'CRITICAL',
+            category: flag.category,
+            message: flag.message || `Kritisk rødt flagg: ${flag.category}`,
+            action: flag.action || 'IMMEDIATE_REFERRAL'
+          });
+        } else if (flag.severity === 'HIGH') {
+          alerts.push({
+            type: 'HIGH',
+            category: flag.category,
+            message: flag.message || `Høyrisikovarsel: ${flag.category}`,
+            action: flag.action || 'MEDICAL_EVALUATION'
+          });
+        } else {
+          warnings.push({
+            type: flag.severity || 'MODERATE',
+            category: flag.category,
+            message: flag.message || `Advarsel: ${flag.category}`
+          });
+        }
+      }
     }
 
-    // Check red flags
+    // Age-related warnings
+    if (age !== null) {
+      if (age < 18) {
+        warnings.push({
+          type: 'AGE',
+          message: 'Pasient under 18 år - vurder pediatrisk protokoll'
+        });
+      }
+      if (age > 75) {
+        warnings.push({
+          type: 'AGE',
+          message: 'Pasient over 75 år - vurder aldersrelaterte kontraindikasjoner'
+        });
+      }
+    }
+
+    // Existing patient red flags
     if (patient.red_flags && patient.red_flags.length > 0) {
       for (const flag of patient.red_flags) {
-        alerts.push(`Red flag: ${flag}`);
+        if (!alerts.some(a => a.message?.includes(flag))) {
+          alerts.push({
+            type: 'PATIENT_HISTORY',
+            message: `Kjent rødt flagg: ${flag}`
+          });
+        }
       }
     }
 
-    // Check contraindications
+    // Existing contraindications
     if (patient.contraindications && patient.contraindications.length > 0) {
       for (const contraindication of patient.contraindications) {
-        alerts.push(`Contraindication: ${contraindication}`);
+        alerts.push({
+          type: 'CONTRAINDICATION',
+          message: `Kontraindikasjon: ${contraindication}`
+        });
       }
     }
 
-    // Check medications (anticoagulants are particularly important)
+    // Medication warnings (anticoagulants require special attention)
     if (patient.current_medications && patient.current_medications.length > 0) {
-      const anticoagulants = ['Warfarin', 'Aspirin', 'Xarelto', 'Eliquis', 'Pradaxa'];
+      const anticoagulants = ['warfarin', 'aspirin', 'xarelto', 'eliquis', 'pradaxa', 'marevan'];
       for (const med of patient.current_medications) {
-        if (anticoagulants.some(ac => med.toLowerCase().includes(ac.toLowerCase()))) {
-          warnings.push(`Patient on anticoagulant: ${med} - use caution with manipulation`);
+        if (anticoagulants.some(ac => med.toLowerCase().includes(ac))) {
+          if (!warnings.some(w => w.message?.toLowerCase().includes(med.toLowerCase()))) {
+            warnings.push({
+              type: 'MEDICATION',
+              message: `Pasient på antikoagulant: ${med} - vær forsiktig med manipulasjon`,
+              contraindications: ['HVLA']
+            });
+          }
         }
       }
     }
@@ -489,10 +571,27 @@ export const checkRedFlags = async (patientId, encounterData) => {
     );
 
     if (parseInt(visitsResult.rows[0].recent_visits) > 6) {
-      warnings.push('Patient has had >6 visits in the last 30 days - consider referral if no improvement');
+      warnings.push({
+        type: 'VISIT_FREQUENCY',
+        message: 'Pasient har hatt >6 besøk siste 30 dager - vurder henvisning hvis ingen bedring'
+      });
     }
 
-    return { alerts, warnings };
+    // Determine risk level
+    let riskLevel = 'LOW';
+    if (riskScore >= 80) riskLevel = 'CRITICAL';
+    else if (riskScore >= 50) riskLevel = 'HIGH';
+    else if (riskScore >= 25) riskLevel = 'MODERATE';
+
+    return {
+      alerts,
+      warnings,
+      riskScore,
+      riskLevel,
+      detectedFlags,
+      canProceedWithTreatment: riskLevel !== 'CRITICAL',
+      requiresReview: riskLevel === 'HIGH' || riskLevel === 'CRITICAL'
+    };
   } catch (error) {
     logger.error('Error checking red flags:', error);
     throw error;

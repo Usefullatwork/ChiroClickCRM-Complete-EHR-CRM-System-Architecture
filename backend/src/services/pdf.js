@@ -1,15 +1,216 @@
 /**
  * PDF Generation Service
  * Generates PDF documents for letters, reports, and invoices
- * NOTE: Requires pdf-lib or pdfkit package
+ *
+ * PDF Generation Options:
+ * 1. Native PDF (recommended): Install pdf-lib with `npm install pdf-lib`
+ * 2. HTML fallback: Returns HTML for client-side conversion using browser print
+ *
+ * The service automatically detects pdf-lib and uses it when available.
  */
 
 import logger from '../utils/logger.js';
 import { query } from '../config/database.js';
 
+// Try to dynamically import pdf-lib for native PDF generation
+let PDFDocument = null;
+let rgb = null;
+let StandardFonts = null;
+let pdfLibAvailable = false;
+
+// Check for pdf-lib availability at runtime
+const initPdfLib = async () => {
+  if (pdfLibAvailable) return true;
+  try {
+    const pdfLib = await import('pdf-lib');
+    PDFDocument = pdfLib.PDFDocument;
+    rgb = pdfLib.rgb;
+    StandardFonts = pdfLib.StandardFonts;
+    pdfLibAvailable = true;
+    logger.info('pdf-lib loaded - native PDF generation enabled');
+    return true;
+  } catch (e) {
+    logger.debug('pdf-lib not installed - using HTML fallback');
+    return false;
+  }
+};
+
+/**
+ * Generate native PDF from structured data using pdf-lib
+ * @param {Object} data - Document data
+ * @param {string} documentType - Type of document
+ * @returns {Buffer|null} - PDF buffer or null if pdf-lib unavailable
+ */
+const generateNativePDF = async (data, documentType) => {
+  await initPdfLib();
+  if (!pdfLibAvailable) return null;
+
+  try {
+    const pdfDoc = await PDFDocument.create();
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+    let page = pdfDoc.addPage([595, 842]); // A4 size
+    const { width, height } = page.getSize();
+    let yPosition = height - 50;
+    const leftMargin = 50;
+    const lineHeight = 16;
+    const maxWidth = width - 100;
+
+    // Helper to add text with automatic page breaks
+    const addText = (text, options = {}) => {
+      const fontSize = options.fontSize || 11;
+      const isBold = options.bold || false;
+      const selectedFont = isBold ? boldFont : font;
+
+      if (yPosition < 60) {
+        page = pdfDoc.addPage([595, 842]);
+        yPosition = height - 50;
+      }
+
+      // Handle special characters (Norwegian)
+      const safeText = (text || '').replace(/[æøåÆØÅ]/g, char => {
+        const map = { 'æ': 'ae', 'ø': 'o', 'å': 'a', 'Æ': 'AE', 'Ø': 'O', 'Å': 'A' };
+        return map[char] || char;
+      });
+
+      page.drawText(safeText, {
+        x: options.x || leftMargin,
+        y: yPosition,
+        size: fontSize,
+        font: selectedFont,
+        color: rgb(0, 0, 0)
+      });
+      yPosition -= options.lineHeight || lineHeight;
+    };
+
+    const addSpace = (lines = 1) => {
+      yPosition -= lineHeight * lines;
+    };
+
+    // Wrap long text
+    const addWrappedText = (text, options = {}) => {
+      if (!text) return;
+      const words = text.split(' ');
+      let line = '';
+      const maxChars = 85;
+
+      for (const word of words) {
+        if (line.length + word.length > maxChars) {
+          addText(line, options);
+          line = word + ' ';
+        } else {
+          line += word + ' ';
+        }
+      }
+      if (line.trim()) addText(line.trim(), options);
+    };
+
+    // Document titles
+    const titles = {
+      'SICK_LEAVE': 'Sykefravaersattest',
+      'REFERRAL': 'Henvisning',
+      'TREATMENT_SUMMARY': 'Behandlingssammendrag',
+      'INVOICE': 'Faktura'
+    };
+
+    // Header
+    addText(data.clinic_name || 'ChiroClick Clinic', { fontSize: 16, bold: true });
+    addText(data.clinic_address || '', { fontSize: 10 });
+    addSpace();
+
+    // Title
+    addText(titles[documentType] || documentType, { fontSize: 18, bold: true });
+    addText(`Dato: ${new Date().toLocaleDateString('nb-NO')}`, { fontSize: 10 });
+    addSpace();
+
+    // Patient info
+    addText('Pasientinformasjon:', { bold: true, fontSize: 12 });
+    addText(`Navn: ${data.first_name || ''} ${data.last_name || ''}`);
+    if (data.date_of_birth) {
+      addText(`Fodselsdato: ${new Date(data.date_of_birth).toLocaleDateString('nb-NO')}`);
+    }
+    if (data.address) {
+      addText(`Adresse: ${data.address}, ${data.postal_code || ''} ${data.city || ''}`);
+    }
+    addSpace();
+
+    // Content based on type
+    if (documentType === 'SICK_LEAVE' || documentType === 'REFERRAL' || documentType === 'TREATMENT_SUMMARY') {
+      // Diagnosis codes
+      if (data.icpc_codes && data.icpc_codes.length > 0) {
+        addText('Diagnosekode(r):', { bold: true });
+        addText(data.icpc_codes.join(', '));
+        addSpace();
+      }
+
+      // SOAP sections for treatment summary
+      if (documentType === 'TREATMENT_SUMMARY') {
+        if (data.subjective?.chief_complaint) {
+          addText('SUBJEKTIVT (S):', { bold: true, fontSize: 12 });
+          addText(`Hovedplage: ${data.subjective.chief_complaint}`);
+          if (data.subjective.history) addWrappedText(`Sykehistorie: ${data.subjective.history}`);
+          addSpace();
+        }
+
+        if (data.objective) {
+          addText('OBJEKTIVT (O):', { bold: true, fontSize: 12 });
+          if (data.objective.observation) addText(`Observasjon: ${data.objective.observation}`);
+          if (data.objective.palpation) addWrappedText(`Palpasjon: ${data.objective.palpation}`);
+          if (data.objective.rom) addText(`ROM: ${data.objective.rom}`);
+          addSpace();
+        }
+      }
+
+      // Assessment
+      if (data.assessment?.clinical_reasoning) {
+        addText('Vurdering:', { bold: true, fontSize: 12 });
+        addWrappedText(data.assessment.clinical_reasoning);
+        addSpace();
+      }
+
+      // Plan
+      if (data.plan?.advice || data.plan?.treatment) {
+        addText('Plan:', { bold: true, fontSize: 12 });
+        if (data.plan.treatment) addWrappedText(`Behandling: ${data.plan.treatment}`);
+        if (data.plan.advice) addWrappedText(`Rad: ${data.plan.advice}`);
+        if (data.plan.follow_up) addText(`Oppfolging: ${data.plan.follow_up}`);
+        addSpace();
+      }
+
+      // VAS scores
+      if (data.vas_pain_start !== null && data.vas_pain_start !== undefined) {
+        addText('Smertevurdering:', { bold: true });
+        addText(`VAS ved start: ${data.vas_pain_start}/10`);
+        if (data.vas_pain_end !== null && data.vas_pain_end !== undefined) {
+          addText(`VAS ved slutt: ${data.vas_pain_end}/10`);
+        }
+        addSpace();
+      }
+    }
+
+    // Signature
+    addSpace(2);
+    addText('Med vennlig hilsen,');
+    addSpace(2);
+    addText(data.practitioner_name || 'Behandler', { bold: true });
+    addText('Kiropraktor');
+    if (data.hpr_number) {
+      addText(`HPR-nummer: ${data.hpr_number}`);
+    }
+
+    const pdfBytes = await pdfDoc.save();
+    logger.info(`Generated native PDF for ${documentType}`);
+    return Buffer.from(pdfBytes);
+  } catch (error) {
+    logger.error('Error generating native PDF:', error);
+    return null;
+  }
+};
+
 /**
  * Generate patient letter (sykefraværsattest, henvisning, etc.)
- * This is a placeholder - in production would use pdf-lib or pdfkit
+ * Uses native PDF generation when pdf-lib is available, falls back to HTML
  */
 export const generatePatientLetter = async (organizationId, encounterId, letterType) => {
   try {
@@ -41,7 +242,21 @@ export const generatePatientLetter = async (organizationId, encounterId, letterT
 
     const data = encounterResult.rows[0];
 
-    // Generate letter content based on type
+    // Try native PDF generation first
+    const pdfBuffer = await generateNativePDF(data, letterType);
+    if (pdfBuffer) {
+      logger.info(`Generated native PDF ${letterType} letter for encounter ${encounterId}`);
+      return {
+        pdf: pdfBuffer,
+        contentType: 'application/pdf',
+        filename: `${letterType}_${data.last_name}_${new Date().toISOString().split('T')[0]}.pdf`,
+        encounter_id: encounterId,
+        letter_type: letterType,
+        format: 'pdf'
+      };
+    }
+
+    // Fallback to HTML generation
     let letterContent;
     switch (letterType) {
       case 'SICK_LEAVE':
@@ -57,8 +272,7 @@ export const generatePatientLetter = async (organizationId, encounterId, letterT
         throw new Error(`Unknown letter type: ${letterType}`);
     }
 
-    // TODO: Convert to PDF using pdf-lib or pdfkit
-    // For now, return HTML that can be converted to PDF client-side
+    // HTML fallback - can be converted to PDF client-side using browser print
     const html = `
       <!DOCTYPE html>
       <html>
@@ -81,13 +295,15 @@ export const generatePatientLetter = async (organizationId, encounterId, letterT
       </html>
     `;
 
-    logger.info(`Generated ${letterType} letter for encounter ${encounterId}`);
+    logger.info(`Generated HTML ${letterType} letter for encounter ${encounterId}`);
 
     return {
       html,
+      contentType: 'text/html',
       filename: `${letterType}_${data.last_name}_${new Date().toISOString().split('T')[0]}.pdf`,
       encounter_id: encounterId,
-      letter_type: letterType
+      letter_type: letterType,
+      format: 'html'
     };
   } catch (error) {
     logger.error('Error generating patient letter:', error);
