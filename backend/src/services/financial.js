@@ -343,6 +343,43 @@ export const generateInvoiceNumber = async (organizationId) => {
 };
 
 /**
+ * Record payment for a financial metric
+ */
+export const recordPayment = async (organizationId, metricId, paymentData) => {
+  const { amount, payment_method, notes, recorded_by } = paymentData;
+
+  const result = await query(
+    `UPDATE financial_metrics
+    SET
+      payment_status = 'PAID',
+      payment_method = COALESCE($3, payment_method),
+      paid_at = NOW(),
+      paid_amount = COALESCE(paid_amount, 0) + $4,
+      notes = CASE WHEN $5 != '' THEN COALESCE(notes, '') || E'\n' || $5 ELSE notes END,
+      updated_at = NOW()
+    WHERE id = $1 AND organization_id = $2
+    RETURNING *`,
+    [metricId, organizationId, payment_method, amount, notes || '']
+  );
+
+  if (result.rows.length === 0) {
+    throw new Error('Financial metric not found');
+  }
+
+  logger.info(`Payment recorded for metric ${metricId}: ${amount}`);
+  return result.rows[0];
+};
+
+/**
+ * Generate invoice PDF using the PDF service
+ */
+export const generateInvoicePDF = async (organizationId, metricId) => {
+  // Import dynamically to avoid circular dependencies
+  const pdfService = await import('./pdf.js');
+  return pdfService.generateInvoice(organizationId, metricId);
+};
+
+/**
  * Get daily revenue chart data
  */
 export const getDailyRevenueChart = async (organizationId, startDate, endDate) => {
@@ -371,6 +408,8 @@ export default {
   getFinancialMetricById,
   createFinancialMetric,
   updatePaymentStatus,
+  recordPayment,
+  generateInvoicePDF,
   getRevenueSummary,
   getRevenueByTreatmentCode,
   getPaymentMethodBreakdown,

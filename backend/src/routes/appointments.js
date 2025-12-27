@@ -61,4 +61,44 @@ router.get('/stats',
   appointmentController.getStats
 );
 
+/**
+ * @route   GET /api/v1/appointments/:id
+ * @desc    Get appointment by ID
+ * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ */
+router.get('/:id',
+  requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  appointmentController.getAppointmentById
+);
+
+/**
+ * @route   PATCH /api/v1/appointments/:id
+ * @desc    Update appointment
+ * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ */
+router.patch('/:id',
+  requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  appointmentController.updateAppointment
+);
+
+/**
+ * @route   POST /api/v1/appointments/:id/confirm
+ * @desc    Confirm appointment
+ * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ */
+router.post('/:id/confirm',
+  requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  appointmentController.confirmAppointment
+);
+
+/**
+ * @route   POST /api/v1/appointments/:id/check-in
+ * @desc    Check in patient for appointment
+ * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ */
+router.post('/:id/check-in',
+  requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  appointmentController.checkInAppointment
+);
+
 export default router;

@@ -122,4 +122,14 @@ router.post('/:id/complete',
   followUpController.completeFollowUp
 );
 
+/**
+ * @route   POST /api/v1/followups/:id/skip
+ * @desc    Skip follow-up with reason
+ * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ */
+router.post('/:id/skip',
+  requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  followUpController.skipFollowUp
+);
+
 export default router;

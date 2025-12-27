@@ -130,6 +130,86 @@ export const getGeographicDistribution = async (req, res) => {
 };
 
 /**
+ * Get daily KPIs for a specific date
+ */
+export const getDailyKPIs = async (req, res) => {
+  try {
+    const { organizationId } = req;
+    const { date } = req.query;
+
+    const targetDate = date ? new Date(date) : new Date();
+    const startOfDay = new Date(targetDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(targetDate.setHours(23, 59, 59, 999));
+
+    const kpis = await kpiService.getDashboardKPIs(organizationId, startOfDay, endOfDay);
+
+    res.json({
+      success: true,
+      date: startOfDay.toISOString().split('T')[0],
+      data: kpis
+    });
+  } catch (error) {
+    logger.error('Error in getDailyKPIs controller:', error);
+    res.status(500).json({ error: 'Failed to get daily KPIs' });
+  }
+};
+
+/**
+ * Get weekly KPIs
+ */
+export const getWeeklyKPIs = async (req, res) => {
+  try {
+    const { organizationId } = req;
+    const { startDate } = req.query;
+
+    const start = startDate ? new Date(startDate) : new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const end = new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    const kpis = await kpiService.getDashboardKPIs(organizationId, start, end);
+
+    res.json({
+      success: true,
+      startDate: start.toISOString().split('T')[0],
+      endDate: end.toISOString().split('T')[0],
+      data: kpis
+    });
+  } catch (error) {
+    logger.error('Error in getWeeklyKPIs controller:', error);
+    res.status(500).json({ error: 'Failed to get weekly KPIs' });
+  }
+};
+
+/**
+ * Get monthly KPIs
+ */
+export const getMonthlyKPIs = async (req, res) => {
+  try {
+    const { organizationId } = req;
+    const { month, year } = req.query;
+
+    const targetYear = parseInt(year) || new Date().getFullYear();
+    const targetMonth = parseInt(month) || new Date().getMonth() + 1;
+
+    const start = new Date(targetYear, targetMonth - 1, 1);
+    const end = new Date(targetYear, targetMonth, 0, 23, 59, 59, 999);
+
+    const kpis = await kpiService.getDashboardKPIs(organizationId, start, end);
+
+    res.json({
+      success: true,
+      year: targetYear,
+      month: targetMonth,
+      startDate: start.toISOString().split('T')[0],
+      endDate: end.toISOString().split('T')[0],
+      data: kpis
+    });
+  } catch (error) {
+    logger.error('Error in getMonthlyKPIs controller:', error);
+    res.status(500).json({ error: 'Failed to get monthly KPIs' });
+  }
+};
+
+/**
  * Import KPI data from Excel
  */
 export const importKPIData = async (req, res) => {
@@ -165,5 +245,8 @@ export default {
   getDetailedKPIs,
   getCategoryBreakdown,
   getGeographicDistribution,
-  importKPIData
+  importKPIData,
+  getDailyKPIs,
+  getWeeklyKPIs,
+  getMonthlyKPIs
 };

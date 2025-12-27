@@ -6,6 +6,97 @@ import * as organizationService from '../services/organizations.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 
+export const getCurrentOrganization = async (req, res) => {
+  try {
+    const { organizationId } = req;
+
+    if (!organizationId) {
+      return res.status(404).json({ error: 'No organization associated with user' });
+    }
+
+    const organization = await organizationService.getOrganizationById(organizationId);
+
+    if (!organization) {
+      return res.status(404).json({ error: 'Organization not found' });
+    }
+
+    res.json(organization);
+  } catch (error) {
+    logger.error('Error in getCurrentOrganization controller:', error);
+    res.status(500).json({ error: 'Failed to retrieve organization' });
+  }
+};
+
+export const updateCurrentOrganization = async (req, res) => {
+  try {
+    const { organizationId, user } = req;
+
+    const organization = await organizationService.updateOrganization(organizationId, req.body);
+
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'UPDATE',
+      resourceType: 'ORGANIZATION',
+      resourceId: organizationId,
+      changes: req.body,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent')
+    });
+
+    res.json(organization);
+  } catch (error) {
+    logger.error('Error in updateCurrentOrganization controller:', error);
+    res.status(500).json({ error: 'Failed to update organization' });
+  }
+};
+
+export const getCurrentOrganizationUsers = async (req, res) => {
+  try {
+    const { organizationId } = req;
+    const users = await organizationService.getOrganizationUsers(organizationId);
+    res.json(users);
+  } catch (error) {
+    logger.error('Error in getCurrentOrganizationUsers controller:', error);
+    res.status(500).json({ error: 'Failed to retrieve organization users' });
+  }
+};
+
+export const inviteUser = async (req, res) => {
+  try {
+    const { organizationId, user } = req;
+    const { email, role, first_name, last_name } = req.body;
+
+    const invitation = await organizationService.inviteUser(organizationId, {
+      email,
+      role: role || 'ASSISTANT',
+      first_name,
+      last_name,
+      invited_by: user.id
+    });
+
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'CREATE',
+      resourceType: 'INVITATION',
+      resourceId: invitation.id,
+      details: { invited_email: email, role },
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent')
+    });
+
+    res.status(201).json({ success: true, data: invitation, message: 'Invitation sent' });
+  } catch (error) {
+    logger.error('Error in inviteUser controller:', error);
+    res.status(500).json({ error: 'Failed to invite user' });
+  }
+};
+
 export const getOrganizations = async (req, res) => {
   try {
     const options = {
@@ -151,6 +242,10 @@ export const checkOrganizationLimits = async (req, res) => {
 };
 
 export default {
+  getCurrentOrganization,
+  updateCurrentOrganization,
+  getCurrentOrganizationUsers,
+  inviteUser,
   getOrganizations,
   getOrganization,
   createOrganization,

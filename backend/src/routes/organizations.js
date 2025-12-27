@@ -11,6 +11,45 @@ const router = express.Router();
 router.use(requireAuth);
 
 /**
+ * @route   GET /api/v1/organizations/current
+ * @desc    Get current user's organization
+ * @access  Private (All authenticated users)
+ */
+router.get('/current',
+  organizationController.getCurrentOrganization
+);
+
+/**
+ * @route   PATCH /api/v1/organizations/current
+ * @desc    Update current organization
+ * @access  Private (ADMIN)
+ */
+router.patch('/current',
+  requireRole(['ADMIN']),
+  organizationController.updateCurrentOrganization
+);
+
+/**
+ * @route   GET /api/v1/organizations/current/users
+ * @desc    Get users in current organization
+ * @access  Private (ADMIN, PRACTITIONER)
+ */
+router.get('/current/users',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  organizationController.getCurrentOrganizationUsers
+);
+
+/**
+ * @route   POST /api/v1/organizations/current/invite
+ * @desc    Invite user to current organization
+ * @access  Private (ADMIN)
+ */
+router.post('/current/invite',
+  requireRole(['ADMIN']),
+  organizationController.inviteUser
+);
+
+/**
  * @route   GET /api/v1/organizations
  * @desc    Get all organizations
  * @access  Private (ADMIN only - super admin)

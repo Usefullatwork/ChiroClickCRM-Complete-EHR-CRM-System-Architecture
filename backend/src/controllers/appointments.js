@@ -6,6 +6,24 @@ import * as appointmentService from '../services/appointments.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 
+export const getAppointmentById = async (req, res) => {
+  try {
+    const { organizationId } = req;
+    const { id } = req.params;
+
+    const appointment = await appointmentService.getAppointmentById(organizationId, id);
+
+    if (!appointment) {
+      return res.status(404).json({ error: 'Appointment not found' });
+    }
+
+    res.json(appointment);
+  } catch (error) {
+    logger.error('Error in getAppointmentById controller:', error);
+    res.status(500).json({ error: 'Failed to retrieve appointment' });
+  }
+};
+
 export const getAppointments = async (req, res) => {
   try {
     const { organizationId } = req;
@@ -48,6 +66,72 @@ export const createAppointment = async (req, res) => {
   } catch (error) {
     logger.error('Error in createAppointment controller:', error);
     res.status(500).json({ error: 'Failed to create appointment' });
+  }
+};
+
+export const updateAppointment = async (req, res) => {
+  try {
+    const { organizationId, user } = req;
+    const { id } = req.params;
+
+    const appointment = await appointmentService.updateAppointment(organizationId, id, req.body);
+
+    if (!appointment) {
+      return res.status(404).json({ error: 'Appointment not found' });
+    }
+
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'UPDATE',
+      resourceType: 'APPOINTMENT',
+      resourceId: id,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent')
+    });
+
+    res.json(appointment);
+  } catch (error) {
+    logger.error('Error in updateAppointment controller:', error);
+    res.status(500).json({ error: 'Failed to update appointment' });
+  }
+};
+
+export const confirmAppointment = async (req, res) => {
+  try {
+    const { organizationId, user } = req;
+    const { id } = req.params;
+
+    const appointment = await appointmentService.confirmAppointment(organizationId, id, user.id);
+
+    if (!appointment) {
+      return res.status(404).json({ error: 'Appointment not found' });
+    }
+
+    res.json({ success: true, data: appointment, message: 'Appointment confirmed' });
+  } catch (error) {
+    logger.error('Error in confirmAppointment controller:', error);
+    res.status(500).json({ error: 'Failed to confirm appointment' });
+  }
+};
+
+export const checkInAppointment = async (req, res) => {
+  try {
+    const { organizationId } = req;
+    const { id } = req.params;
+
+    const appointment = await appointmentService.checkInAppointment(organizationId, id);
+
+    if (!appointment) {
+      return res.status(404).json({ error: 'Appointment not found' });
+    }
+
+    res.json({ success: true, data: appointment, message: 'Patient checked in' });
+  } catch (error) {
+    logger.error('Error in checkInAppointment controller:', error);
+    res.status(500).json({ error: 'Failed to check in appointment' });
   }
 };
 
@@ -134,9 +218,13 @@ export const cancelAppointment = async (req, res) => {
 };
 
 export default {
+  getAppointmentById,
   getAppointments,
   createAppointment,
+  updateAppointment,
   updateStatus,
+  confirmAppointment,
+  checkInAppointment,
   cancelAppointment,
   getStats
 };

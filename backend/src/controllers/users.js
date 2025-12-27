@@ -6,6 +6,62 @@ import * as userService from '../services/users.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 
+export const getCurrentUser = async (req, res) => {
+  try {
+    const { organizationId, user } = req;
+
+    if (!user || !user.id) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    const fullUser = await userService.getUserById(organizationId, user.id);
+
+    if (!fullUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json(fullUser);
+  } catch (error) {
+    logger.error('Error in getCurrentUser controller:', error);
+    res.status(500).json({ error: 'Failed to retrieve user profile' });
+  }
+};
+
+export const updateCurrentUser = async (req, res) => {
+  try {
+    const { organizationId, user } = req;
+
+    // Only allow updating certain fields for self-update
+    const allowedFields = ['first_name', 'last_name', 'phone', 'preferred_language', 'preferences'];
+    const filteredBody = {};
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        filteredBody[field] = req.body[field];
+      }
+    }
+
+    const updatedUser = await userService.updateUser(organizationId, user.id, filteredBody);
+
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'UPDATE',
+      resourceType: 'USER',
+      resourceId: user.id,
+      changes: filteredBody,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent')
+    });
+
+    res.json(updatedUser);
+  } catch (error) {
+    logger.error('Error in updateCurrentUser controller:', error);
+    res.status(500).json({ error: 'Failed to update user profile' });
+  }
+};
+
 export const getUsers = async (req, res) => {
   try {
     const { organizationId } = req;
@@ -188,6 +244,8 @@ export const getPractitioners = async (req, res) => {
 };
 
 export default {
+  getCurrentUser,
+  updateCurrentUser,
   getUsers,
   getUser,
   createUser,
