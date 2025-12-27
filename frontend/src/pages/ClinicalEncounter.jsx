@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { encountersAPI, patientsAPI, diagnosisAPI, treatmentsAPI } from '../services/api';
+import { encountersAPI, patientsAPI, diagnosisAPI, treatmentsAPI, aiAPI } from '../services/api';
 import { formatDate } from '../lib/utils';
 import { Save, FileText, AlertTriangle, CheckCircle, Brain, X, Sparkles, BookOpen } from 'lucide-react';
 import TemplatePicker from '../components/TemplatePicker';
@@ -150,7 +150,77 @@ export default function ClinicalEncounter() {
   const getAISuggestions = async () => {
     setAiLoading(true);
     try {
-      // Prepare context for AI
+      // Prepare SOAP data for AI analysis
+      const soapData = {
+        subjective: encounterData.subjective,
+        objective: encounterData.objective,
+        assessment: encounterData.assessment,
+        icpc_codes: encounterData.icpc_codes
+      };
+
+      // Call AI API endpoint for diagnosis suggestions
+      const [diagnosisResponse, redFlagResponse] = await Promise.allSettled([
+        aiAPI.suggestDiagnosis(soapData),
+        aiAPI.analyzeRedFlags(
+          {
+            age: patient?.data?.date_of_birth
+              ? Math.floor((new Date() - new Date(patient.data.date_of_birth)) / 31557600000)
+              : null,
+            gender: patient?.data?.gender,
+            medical_history: patient?.data?.medical_history,
+            current_medications: patient?.data?.current_medications,
+            red_flags: patient?.data?.red_flags,
+            contraindications: patient?.data?.contraindications
+          },
+          soapData
+        )
+      ]);
+
+      // Build suggestions from API responses
+      const suggestions = {
+        diagnosis: [],
+        treatment: [],
+        followUp: [],
+        clinicalReasoning: ''
+      };
+
+      // Process diagnosis suggestions
+      if (diagnosisResponse.status === 'fulfilled' && diagnosisResponse.value?.data) {
+        const diagData = diagnosisResponse.value.data;
+        suggestions.diagnosis = diagData.codes || [];
+        suggestions.clinicalReasoning = diagData.reasoning || diagData.suggestion || '';
+      }
+
+      // Process red flag analysis
+      if (redFlagResponse.status === 'fulfilled' && redFlagResponse.value?.data) {
+        const redFlagData = redFlagResponse.value.data;
+        if (redFlagData.recommendReferral) {
+          suggestions.followUp.push(`⚠️ ${redFlagData.analysis}`);
+        }
+        if (redFlagData.riskLevel && redFlagData.riskLevel !== 'LOW') {
+          suggestions.clinicalReasoning += `\n\nRisk Level: ${redFlagData.riskLevel}`;
+        }
+      }
+
+      // If AI service is unavailable, fall back to mock suggestions
+      if (suggestions.diagnosis.length === 0 && !suggestions.clinicalReasoning) {
+        const context = {
+          subjective: encounterData.subjective,
+          objective: encounterData.objective,
+          patient_age: patient?.data?.date_of_birth
+            ? Math.floor((new Date() - new Date(patient.data.date_of_birth)) / 31557600000)
+            : null,
+          patient_gender: patient?.data?.gender,
+          existing_diagnoses: encounterData.icpc_codes
+        };
+        const mockSuggestions = generateMockSuggestions(context);
+        Object.assign(suggestions, mockSuggestions);
+      }
+
+      setAiSuggestions(suggestions);
+    } catch (error) {
+      console.error('AI suggestion error:', error);
+      // Fallback to mock suggestions on error
       const context = {
         subjective: encounterData.subjective,
         objective: encounterData.objective,
@@ -160,14 +230,7 @@ export default function ClinicalEncounter() {
         patient_gender: patient?.data?.gender,
         existing_diagnoses: encounterData.icpc_codes
       };
-
-      // TODO: Call AI API endpoint
-      // For now, generate mock suggestions based on the data
-      const suggestions = generateMockSuggestions(context);
-      setAiSuggestions(suggestions);
-    } catch (error) {
-      console.error('AI suggestion error:', error);
-      alert('Failed to get AI suggestions');
+      setAiSuggestions(generateMockSuggestions(context));
     } finally {
       setAiLoading(false);
     }

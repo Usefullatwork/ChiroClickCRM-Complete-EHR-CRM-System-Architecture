@@ -1,11 +1,74 @@
 /**
  * PDF Generation Service
  * Generates PDF documents for letters, reports, and invoices
- * NOTE: Requires pdf-lib or pdfkit package
+ * Uses puppeteer for HTML-to-PDF conversion (headless Chrome)
  */
 
 import logger from '../utils/logger.js';
 import { query } from '../config/database.js';
+
+/**
+ * Convert HTML content to PDF buffer
+ * Uses server-side rendering approach with inline styles
+ * @param {string} html - The HTML content to convert
+ * @param {Object} options - PDF options (format, margins, etc.)
+ * @returns {Promise<Buffer>} - PDF buffer
+ */
+export const convertHtmlToPdf = async (html, options = {}) => {
+  const {
+    format = 'A4',
+    margin = { top: '20mm', right: '20mm', bottom: '20mm', left: '20mm' },
+    printBackground = true,
+    landscape = false
+  } = options;
+
+  try {
+    // Dynamic import to handle optional dependency
+    let puppeteer;
+    try {
+      puppeteer = (await import('puppeteer')).default;
+    } catch (importError) {
+      // Fallback: Return HTML with PDF conversion instructions
+      logger.warn('Puppeteer not installed. Returning HTML for client-side PDF generation.');
+      return {
+        type: 'html',
+        content: html,
+        instructions: 'Use window.print() or a client-side library like jspdf/html2pdf'
+      };
+    }
+
+    const browser = await puppeteer.launch({
+      headless: 'new',
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+
+    const pdfBuffer = await page.pdf({
+      format,
+      margin,
+      printBackground,
+      landscape
+    });
+
+    await browser.close();
+
+    return {
+      type: 'pdf',
+      buffer: pdfBuffer,
+      contentType: 'application/pdf'
+    };
+  } catch (error) {
+    logger.error('PDF generation error:', error);
+    // Fallback to HTML
+    return {
+      type: 'html',
+      content: html,
+      error: error.message
+    };
+  }
+};
 
 /**
  * Generate patient letter (sykefraværsattest, henvisning, etc.)
@@ -57,8 +120,7 @@ export const generatePatientLetter = async (organizationId, encounterId, letterT
         throw new Error(`Unknown letter type: ${letterType}`);
     }
 
-    // TODO: Convert to PDF using pdf-lib or pdfkit
-    // For now, return HTML that can be converted to PDF client-side
+    // Generate PDF from HTML using puppeteer (with fallback to HTML)
     const html = `
       <!DOCTYPE html>
       <html>
@@ -83,8 +145,12 @@ export const generatePatientLetter = async (organizationId, encounterId, letterT
 
     logger.info(`Generated ${letterType} letter for encounter ${encounterId}`);
 
+    // Convert HTML to PDF
+    const pdfResult = await convertHtmlToPdf(html);
+
     return {
-      html,
+      ...pdfResult,
+      html, // Always include HTML for fallback
       filename: `${letterType}_${data.last_name}_${new Date().toISOString().split('T')[0]}.pdf`,
       encounter_id: encounterId,
       letter_type: letterType
@@ -372,8 +438,12 @@ export const generateInvoice = async (organizationId, financialMetricId) => {
 
     logger.info(`Generated invoice for financial metric ${financialMetricId}`);
 
+    // Convert HTML to PDF
+    const pdfResult = await convertHtmlToPdf(html);
+
     return {
-      html,
+      ...pdfResult,
+      html, // Always include HTML for fallback
       filename: `Faktura_${data.invoice_number}_${data.last_name}.pdf`,
       invoice_number: data.invoice_number
     };
@@ -384,6 +454,7 @@ export const generateInvoice = async (organizationId, financialMetricId) => {
 };
 
 export default {
+  convertHtmlToPdf,
   generatePatientLetter,
   generateInvoice
 };

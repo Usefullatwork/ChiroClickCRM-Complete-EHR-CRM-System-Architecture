@@ -225,5 +225,26 @@ export const templatesAPI = {
   search: (query, language = 'NO') => apiClient.get('/templates/search', { params: { q: query, language } }),
 }
 
+// AI Clinical Assistant
+export const aiAPI = {
+  // Get AI service status
+  getStatus: () => apiClient.get('/ai/status'),
+  // Generate SOAP note suggestions
+  generateSuggestions: (chiefComplaint, section = 'subjective') =>
+    apiClient.post('/ai/soap-suggestions', { chiefComplaint, section }),
+  // Suggest diagnosis codes based on clinical data
+  suggestDiagnosis: (soapData) =>
+    apiClient.post('/ai/suggest-diagnosis', soapData),
+  // Analyze for red flags
+  analyzeRedFlags: (patientData, soapData) =>
+    apiClient.post('/ai/analyze-red-flags', { patientData, soapData }),
+  // Generate clinical summary
+  generateSummary: (encounter) =>
+    apiClient.post('/ai/generate-summary', encounter),
+  // Spell check Norwegian text
+  spellCheck: (text) =>
+    apiClient.post('/ai/spell-check', { text }),
+}
+
 // Export default API client
 export default apiClient

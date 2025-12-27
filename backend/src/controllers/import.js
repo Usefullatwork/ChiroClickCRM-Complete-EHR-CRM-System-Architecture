@@ -5,6 +5,7 @@
 
 import * as excelImportService from '../services/excelImport.js';
 import * as textParserService from '../services/textParser.js';
+import * as patientsService from '../services/patients.js';
 import logger from '../utils/logger.js';
 
 /**
@@ -127,8 +128,20 @@ export const importPatientsFromText = async (req, res) => {
           continue;
         }
 
-        // Import to database (reuse existing patient service)
-        // TODO: Call patient service create method
+        // Import to database using patient service
+        await patientsService.createPatient(organizationId, {
+          first_name: patient.first_name,
+          last_name: patient.last_name,
+          date_of_birth: patient.date_of_birth || null,
+          gender: patient.gender || null,
+          email: patient.email || null,
+          phone: patient.phone || null,
+          address: patient.address || null,
+          personal_number: patient.personal_number || null,
+          referral_source: 'TEXT_IMPORT',
+          consent_data_storage: true,
+          consent_date: new Date()
+        });
         results.imported++;
       } catch (error) {
         logger.error(`Error importing patient ${i + 1}:`, error);
