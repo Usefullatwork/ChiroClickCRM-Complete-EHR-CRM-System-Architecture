@@ -7,12 +7,7 @@ import * as excelImportService from '../services/excelImport.js';
 import * as textParserService from '../services/textParser.js';
 import * as patientService from '../services/patients.js';
 import { query } from '../config/database.js';
-import {
-  validateFodselsnummer,
-  validateFodselsnummerDetailed,
-  extractBirthDateFromFodselsnummer,
-  extractGenderFromFodselsnummer
-} from '../utils/encryption.js';
+import { validateFodselsnummerDetailed } from '../utils/encryption.js';
 import logger from '../utils/logger.js';
 
 /**
