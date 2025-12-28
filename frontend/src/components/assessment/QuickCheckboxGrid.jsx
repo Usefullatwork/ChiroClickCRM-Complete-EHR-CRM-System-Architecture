@@ -438,3 +438,397 @@ export const EXERCISE_OPTIONS = {
     { value: 'heat_at_home', label: 'Heat application at home' },
   ]
 };
+
+// ============================================================================
+// SHOULDER & ARM ASSESSMENT OPTIONS
+// ============================================================================
+
+export const SHOULDER_ROM_OPTIONS = {
+  'Active ROM': [
+    { value: 'sh_flex_normal', label: 'Flexion 180° normal' },
+    { value: 'sh_flex_reduced', label: 'Flexion reduced' },
+    { value: 'sh_ext_normal', label: 'Extension 50° normal' },
+    { value: 'sh_ext_reduced', label: 'Extension reduced' },
+    { value: 'sh_abd_normal', label: 'Abduction 180° normal' },
+    { value: 'sh_abd_reduced', label: 'Abduction reduced' },
+    { value: 'sh_add_normal', label: 'Adduction 35° normal' },
+    { value: 'sh_er_normal', label: 'External rotation 80° normal' },
+    { value: 'sh_er_reduced', label: 'External rotation reduced' },
+    { value: 'sh_ir_normal', label: 'Internal rotation 90° normal' },
+    { value: 'sh_ir_reduced', label: 'Internal rotation reduced' },
+    { value: 'sh_hadd_normal', label: 'Horizontal adduction 130° normal' },
+    { value: 'sh_habd_normal', label: 'Horizontal abduction 30° normal' },
+  ],
+  'Scapulohumeral Rhythm': [
+    { value: 'sh_rhythm_normal', label: 'Normal 2:1 rhythm' },
+    { value: 'sh_rhythm_altered', label: 'Altered rhythm' },
+    { value: 'sh_hiking', label: 'Shoulder hiking present' },
+    { value: 'sh_winging', label: 'Scapular winging present' },
+  ],
+  'Pain Response': [
+    { value: 'sh_painful_arc', label: 'Painful arc 60-120°' },
+    { value: 'sh_pain_end_range', label: 'Pain at end range' },
+    { value: 'sh_pain_throughout', label: 'Pain throughout range' },
+    { value: 'sh_crepitus', label: 'Crepitus with motion' },
+  ]
+};
+
+export const SHOULDER_IMPINGEMENT_OPTIONS = {
+  'Impingement Tests': [
+    { value: 'hawkins_neg', label: "Hawkins-Kennedy negative" },
+    { value: 'hawkins_pos', label: "Hawkins-Kennedy POSITIVE" },
+    { value: 'neer_neg', label: "Neer's test negative" },
+    { value: 'neer_pos', label: "Neer's test POSITIVE" },
+    { value: 'painful_arc_neg', label: "Painful arc negative" },
+    { value: 'painful_arc_pos', label: "Painful arc POSITIVE (60-120°)" },
+    { value: 'cross_body_neg', label: "Cross-body adduction negative" },
+    { value: 'cross_body_pos', label: "Cross-body adduction POSITIVE" },
+  ],
+  'Clinical Findings': [
+    { value: 'imp_lateral_pain', label: 'Lateral shoulder pain' },
+    { value: 'imp_overhead_pain', label: 'Pain with overhead activities' },
+    { value: 'imp_night_pain', label: 'Night pain present' },
+    { value: 'imp_weakness', label: 'Weakness with abduction' },
+  ]
+};
+
+export const SHOULDER_ROTATOR_CUFF_OPTIONS = {
+  'Supraspinatus Tests': [
+    { value: 'empty_can_neg', label: "Empty Can/Jobe's negative" },
+    { value: 'empty_can_pos', label: "Empty Can/Jobe's POSITIVE" },
+    { value: 'full_can_neg', label: "Full Can test negative" },
+    { value: 'full_can_pos', label: "Full Can test POSITIVE" },
+    { value: 'drop_arm_neg', label: "Codman's Arm Drop negative" },
+    { value: 'drop_arm_pos', label: "Codman's Arm Drop POSITIVE" },
+  ],
+  'Subscapularis Tests': [
+    { value: 'lift_off_neg', label: "Lift-Off test negative" },
+    { value: 'lift_off_pos', label: "Lift-Off test POSITIVE" },
+    { value: 'bear_hug_neg', label: "Bear-Hug test negative" },
+    { value: 'bear_hug_pos', label: "Bear-Hug test POSITIVE" },
+    { value: 'ir_lag_neg', label: "Internal rotation lag negative" },
+    { value: 'ir_lag_pos', label: "Internal rotation lag POSITIVE" },
+    { value: 'napoleon_neg', label: "Napoleon/Belly press negative" },
+    { value: 'napoleon_pos', label: "Napoleon/Belly press POSITIVE" },
+  ],
+  'Infraspinatus/Teres Minor': [
+    { value: 'er_lag_neg', label: "External rotation lag negative" },
+    { value: 'er_lag_pos', label: "External rotation lag POSITIVE" },
+    { value: 'hornblower_neg', label: "Hornblower's sign negative" },
+    { value: 'hornblower_pos', label: "Hornblower's sign POSITIVE" },
+    { value: 'resist_er_normal', label: "Resisted ER normal strength" },
+    { value: 'resist_er_weak', label: "Resisted ER weak/painful" },
+  ]
+};
+
+export const SHOULDER_INSTABILITY_OPTIONS = {
+  'Anterior Instability': [
+    { value: 'ant_appr_neg', label: "Anterior apprehension negative" },
+    { value: 'ant_appr_pos', label: "Anterior apprehension POSITIVE" },
+    { value: 'relocation_neg', label: "Relocation test negative" },
+    { value: 'relocation_pos', label: "Relocation test POSITIVE" },
+    { value: 'release_neg', label: "Release maneuver negative" },
+    { value: 'release_pos', label: "Release maneuver POSITIVE" },
+    { value: 'load_shift_ant_neg', label: "Load & Shift anterior negative" },
+    { value: 'load_shift_ant_pos', label: "Load & Shift anterior POSITIVE" },
+  ],
+  'Posterior Instability': [
+    { value: 'post_appr_neg', label: "Posterior apprehension negative" },
+    { value: 'post_appr_pos', label: "Posterior apprehension POSITIVE" },
+    { value: 'load_shift_post_neg', label: "Load & Shift posterior negative" },
+    { value: 'load_shift_post_pos', label: "Load & Shift posterior POSITIVE" },
+    { value: 'norwood_neg', label: "Norwood's drawer negative" },
+    { value: 'norwood_pos', label: "Norwood's drawer POSITIVE" },
+  ],
+  'Inferior Instability': [
+    { value: 'sulcus_neg', label: "Sulcus sign negative" },
+    { value: 'sulcus_pos', label: "Sulcus sign POSITIVE" },
+    { value: 'feagin_neg', label: "Feagin's test negative" },
+    { value: 'feagin_pos', label: "Feagin's test POSITIVE" },
+  ]
+};
+
+export const SHOULDER_LABRAL_OPTIONS = {
+  'SLAP Lesion Tests': [
+    { value: 'obrien_neg', label: "O'Brien's test negative" },
+    { value: 'obrien_pos', label: "O'Brien's test POSITIVE" },
+    { value: 'clunk_neg', label: "Clunk test negative" },
+    { value: 'clunk_pos', label: "Clunk test POSITIVE" },
+    { value: 'crank_neg', label: "Crank test negative" },
+    { value: 'crank_pos', label: "Crank test POSITIVE" },
+    { value: 'biceps_load_neg', label: "Biceps Load Test II negative" },
+    { value: 'biceps_load_pos', label: "Biceps Load Test II POSITIVE" },
+    { value: 'passive_comp_neg', label: "Passive compression negative" },
+    { value: 'passive_comp_pos', label: "Passive compression POSITIVE" },
+  ],
+  'Clinical Findings': [
+    { value: 'labral_clicking', label: 'Clicking with motion' },
+    { value: 'labral_catching', label: 'Catching/locking sensation' },
+    { value: 'labral_instability', label: 'Sense of instability' },
+    { value: 'labral_overhead_pain', label: 'Pain with overhead activities' },
+  ]
+};
+
+export const SHOULDER_BICEPS_OPTIONS = {
+  'Biceps Tendon Tests': [
+    { value: 'speed_neg', label: "Speed's test negative" },
+    { value: 'speed_pos', label: "Speed's test POSITIVE" },
+    { value: 'yergason_neg', label: "Yergason's test negative" },
+    { value: 'yergason_pos', label: "Yergason's test POSITIVE" },
+    { value: 'hyperext_neg', label: "Hyperextension test negative" },
+    { value: 'hyperext_pos', label: "Hyperextension test POSITIVE" },
+  ],
+  'Clinical Findings': [
+    { value: 'biceps_groove_tender', label: 'Bicipital groove tenderness' },
+    { value: 'biceps_snapping', label: 'Snapping/clicking present' },
+    { value: 'biceps_anterior_pain', label: 'Anterior shoulder pain' },
+  ]
+};
+
+export const SHOULDER_AC_JOINT_OPTIONS = {
+  'AC Joint Tests': [
+    { value: 'ac_shear_neg', label: "AC shear test negative" },
+    { value: 'ac_shear_pos', label: "AC shear test POSITIVE" },
+    { value: 'piano_key_neg', label: "Piano key sign negative" },
+    { value: 'piano_key_pos', label: "Piano key sign POSITIVE" },
+    { value: 'horiz_add_neg', label: "Horizontal adduction negative" },
+    { value: 'horiz_add_pos', label: "Horizontal adduction POSITIVE" },
+    { value: 'ac_ext_neg', label: "AC resisted extension negative" },
+    { value: 'ac_ext_pos', label: "AC resisted extension POSITIVE" },
+  ],
+  'Classification': [
+    { value: 'ac_type_1', label: 'Type 1 - AC capsule only' },
+    { value: 'ac_type_2', label: 'Type 2 - Partial CC ligament' },
+    { value: 'ac_type_3', label: 'Type 3 - Complete separation' },
+  ],
+  'Clinical Findings': [
+    { value: 'ac_step_defect', label: 'Step defect visible' },
+    { value: 'ac_tenderness', label: 'AC joint tenderness' },
+    { value: 'ac_swelling', label: 'AC joint swelling' },
+  ]
+};
+
+export const SHOULDER_FROZEN_OPTIONS = {
+  'ROM Pattern (Capsular)': [
+    { value: 'frozen_er_limited', label: 'External rotation limited (most)' },
+    { value: 'frozen_abd_limited', label: 'Abduction limited' },
+    { value: 'frozen_ir_limited', label: 'Internal rotation limited' },
+    { value: 'frozen_flex_limited', label: 'Flexion limited (least)' },
+    { value: 'frozen_capsular_pattern', label: 'Capsular pattern confirmed' },
+  ],
+  'Stage Assessment': [
+    { value: 'frozen_painful_stage', label: 'Painful stage (early)' },
+    { value: 'frozen_frozen_stage', label: 'Frozen stage (restricted ROM)' },
+    { value: 'frozen_thawing_stage', label: 'Thawing stage (improving)' },
+  ],
+  'Functional Limitations': [
+    { value: 'frozen_overhead_limit', label: 'Unable to reach overhead' },
+    { value: 'frozen_back_limit', label: 'Unable to reach behind back' },
+    { value: 'frozen_dressing', label: 'Difficulty dressing' },
+    { value: 'frozen_sleep', label: 'Sleep disruption' },
+  ]
+};
+
+// ============================================================================
+// ELBOW & FOREARM ASSESSMENT OPTIONS
+// ============================================================================
+
+export const ELBOW_ROM_OPTIONS = {
+  'Active ROM': [
+    { value: 'elb_flex_normal', label: 'Flexion 150° normal' },
+    { value: 'elb_flex_reduced', label: 'Flexion reduced' },
+    { value: 'elb_ext_normal', label: 'Extension 0° normal' },
+    { value: 'elb_ext_reduced', label: 'Extension reduced' },
+    { value: 'elb_pron_normal', label: 'Pronation 90° normal' },
+    { value: 'elb_pron_reduced', label: 'Pronation reduced' },
+    { value: 'elb_sup_normal', label: 'Supination 90° normal' },
+    { value: 'elb_sup_reduced', label: 'Supination reduced' },
+  ],
+  'Carrying Angle': [
+    { value: 'elb_angle_normal', label: 'Carrying angle normal (5-15°)' },
+    { value: 'elb_cubitus_valgus', label: 'Cubitus valgus (>15°)' },
+    { value: 'elb_cubitus_varus', label: 'Cubitus varus (<5°)' },
+  ],
+  'End Feel': [
+    { value: 'elb_endfeel_normal', label: 'Normal end feel' },
+    { value: 'elb_endfeel_boggy', label: 'Boggy (joint effusion)' },
+    { value: 'elb_endfeel_myospasm', label: 'Myospasm' },
+    { value: 'elb_endfeel_springy', label: 'Springy block (loose body)' },
+  ]
+};
+
+export const ELBOW_LATERAL_EPICONDYLITIS_OPTIONS = {
+  'Lateral Epicondylitis Tests': [
+    { value: 'cozen_neg', label: "Cozen's test negative" },
+    { value: 'cozen_pos', label: "Cozen's test POSITIVE" },
+    { value: 'mill_neg', label: "Mill's test negative" },
+    { value: 'mill_pos', label: "Mill's test POSITIVE" },
+    { value: 'mid_finger_ext_neg', label: "Middle finger extension negative" },
+    { value: 'mid_finger_ext_pos', label: "Middle finger extension POSITIVE" },
+    { value: 'book_test_neg', label: "Book test negative" },
+    { value: 'book_test_pos', label: "Book test POSITIVE" },
+    { value: 'resist_sup_neg', label: "Resisted supination negative" },
+    { value: 'resist_sup_pos', label: "Resisted supination POSITIVE" },
+  ],
+  'Clinical Findings': [
+    { value: 'lat_epic_tender', label: 'Lateral epicondyle tenderness' },
+    { value: 'lat_epic_ecrb_tender', label: 'ECRB origin tenderness' },
+    { value: 'lat_epic_grip_weak', label: 'Grip strength decreased' },
+    { value: 'lat_epic_ext_pain', label: 'Pain with wrist extension' },
+  ]
+};
+
+export const ELBOW_MEDIAL_EPICONDYLITIS_OPTIONS = {
+  'Medial Epicondylitis Tests': [
+    { value: 'rev_cozen_neg', label: "Reverse Cozen's negative" },
+    { value: 'rev_cozen_pos', label: "Reverse Cozen's POSITIVE" },
+    { value: 'rev_mill_neg', label: "Reverse Mill's negative" },
+    { value: 'rev_mill_pos', label: "Reverse Mill's POSITIVE" },
+    { value: 'valgus_stress_neg', label: "Valgus stress test negative" },
+    { value: 'valgus_stress_pos', label: "Valgus stress test POSITIVE" },
+  ],
+  'Clinical Findings': [
+    { value: 'med_epic_tender', label: 'Medial epicondyle tenderness' },
+    { value: 'med_epic_flexor_tender', label: 'Common flexor tendon tender' },
+    { value: 'med_epic_grip_weak', label: 'Grip strength decreased' },
+    { value: 'med_epic_flex_pain', label: 'Pain with wrist flexion' },
+    { value: 'med_epic_4th_5th_tingling', label: '4th/5th finger tingling' },
+  ]
+};
+
+export const ELBOW_STABILITY_OPTIONS = {
+  'Ligament Stability': [
+    { value: 'valgus_0_neg', label: 'Valgus stress 0° negative' },
+    { value: 'valgus_0_pos', label: 'Valgus stress 0° POSITIVE' },
+    { value: 'valgus_30_neg', label: 'Valgus stress 30° negative' },
+    { value: 'valgus_30_pos', label: 'Valgus stress 30° POSITIVE (UCL)' },
+    { value: 'varus_0_neg', label: 'Varus stress 0° negative' },
+    { value: 'varus_0_pos', label: 'Varus stress 0° POSITIVE' },
+    { value: 'varus_30_neg', label: 'Varus stress 30° negative' },
+    { value: 'varus_30_pos', label: 'Varus stress 30° POSITIVE (LCL)' },
+  ],
+  'UCL Specific': [
+    { value: 'moving_valgus_neg', label: 'Moving valgus stress negative' },
+    { value: 'moving_valgus_pos', label: 'Moving valgus stress POSITIVE' },
+    { value: 'milking_maneuver_neg', label: 'Milking maneuver negative' },
+    { value: 'milking_maneuver_pos', label: 'Milking maneuver POSITIVE' },
+  ],
+  'UCL Grading': [
+    { value: 'ucl_grade_1', label: 'Grade I - slight stretch' },
+    { value: 'ucl_grade_2', label: 'Grade II - partial tear' },
+    { value: 'ucl_grade_3', label: 'Grade III - full rupture' },
+  ]
+};
+
+export const ELBOW_CUBITAL_TUNNEL_OPTIONS = {
+  'Cubital Tunnel Tests': [
+    { value: 'elbow_flex_test_neg', label: 'Elbow flexion test negative' },
+    { value: 'elbow_flex_test_pos', label: 'Elbow flexion test POSITIVE' },
+    { value: 'froment_neg', label: "Froment's sign negative" },
+    { value: 'froment_pos', label: "Froment's sign POSITIVE" },
+    { value: 'tinel_elbow_neg', label: "Tinel's at elbow negative" },
+    { value: 'tinel_elbow_pos', label: "Tinel's at elbow POSITIVE" },
+    { value: 'pressure_provoc_neg', label: 'Pressure provocation negative' },
+    { value: 'pressure_provoc_pos', label: 'Pressure provocation POSITIVE' },
+    { value: 'wartenberg_neg', label: 'Wartenberg sign negative' },
+    { value: 'wartenberg_pos', label: 'Wartenberg sign POSITIVE' },
+  ],
+  'Clinical Findings': [
+    { value: 'cubital_4th_5th_numb', label: '4th/5th finger numbness' },
+    { value: 'cubital_medial_hand_numb', label: 'Medial hand numbness' },
+    { value: 'cubital_intrinsic_weak', label: 'Intrinsic hand weakness' },
+    { value: 'cubital_grip_weak', label: 'Grip weakness' },
+    { value: 'cubital_claw_hand', label: 'Claw/bishop hand deformity' },
+    { value: 'cubital_atrophy', label: 'Intrinsic muscle atrophy' },
+  ]
+};
+
+export const ELBOW_BURSITIS_OPTIONS = {
+  'Olecranon Bursitis Findings': [
+    { value: 'bursa_swelling', label: 'Focal olecranon swelling' },
+    { value: 'bursa_goose_egg', label: 'Goose egg appearance' },
+    { value: 'bursa_tender', label: 'Tender to palpation' },
+    { value: 'bursa_warm_red', label: 'Warm & red (suspect infection)' },
+    { value: 'bursa_fluctuant', label: 'Fluctuant swelling' },
+    { value: 'bursa_rom_limited', label: 'ROM limited at end flexion' },
+    { value: 'bursa_trauma_hx', label: 'History of trauma present' },
+  ],
+  'Differential Considerations': [
+    { value: 'bursa_septic_suspect', label: 'Suspect septic bursitis' },
+    { value: 'bursa_gout_suspect', label: 'Suspect gouty arthritis' },
+    { value: 'bursa_ra_suspect', label: 'Suspect rheumatoid arthritis' },
+    { value: 'bursa_simple', label: 'Simple traumatic bursitis' },
+  ]
+};
+
+export const SHOULDER_TREATMENT_OPTIONS = {
+  'Manual Therapy': [
+    { value: 'sh_tx_soft_tissue', label: 'Soft tissue release' },
+    { value: 'sh_tx_mfr', label: 'Myofascial release' },
+    { value: 'sh_tx_trigger_pt', label: 'Trigger point therapy' },
+    { value: 'sh_tx_cross_friction', label: 'Cross-friction massage' },
+    { value: 'sh_tx_pin_stretch', label: 'Pin & stretch techniques' },
+    { value: 'sh_tx_gh_mob', label: 'GH joint mobilization' },
+    { value: 'sh_tx_ac_mob', label: 'AC joint mobilization' },
+    { value: 'sh_tx_sc_mob', label: 'SC joint mobilization' },
+    { value: 'sh_tx_scapula_mob', label: 'Scapular mobilization' },
+    { value: 'sh_tx_cspine_manip', label: 'Cervical spine manipulation' },
+    { value: 'sh_tx_tspine_manip', label: 'Thoracic spine manipulation' },
+  ],
+  'Modalities': [
+    { value: 'sh_tx_ultrasound', label: 'Ultrasound therapy' },
+    { value: 'sh_tx_tens', label: 'TENS' },
+    { value: 'sh_tx_ifc', label: 'Interferential current' },
+    { value: 'sh_tx_laser', label: 'Low-level laser therapy' },
+    { value: 'sh_tx_ice', label: 'Cryotherapy' },
+    { value: 'sh_tx_heat', label: 'Heat therapy' },
+  ],
+  'Exercise Prescription': [
+    { value: 'sh_ex_pendulum', label: 'Pendulum exercises (Codman)' },
+    { value: 'sh_ex_prom', label: 'Passive ROM exercises' },
+    { value: 'sh_ex_aarom', label: 'Active-assisted ROM' },
+    { value: 'sh_ex_isometric', label: 'Isometric strengthening' },
+    { value: 'sh_ex_rotator_cuff', label: 'Rotator cuff exercises' },
+    { value: 'sh_ex_scap_stab', label: 'Scapular stabilization' },
+    { value: 'sh_ex_wall_slides', label: 'Wall slides' },
+    { value: 'sh_ex_doorway', label: 'Doorway stretches' },
+    { value: 'sh_ex_ityw', label: 'Prone I-T-Y-W exercises' },
+    { value: 'sh_ex_brugger', label: "Brügger's exercises" },
+  ]
+};
+
+export const ELBOW_TREATMENT_OPTIONS = {
+  'Manual Therapy': [
+    { value: 'elb_tx_soft_tissue', label: 'Soft tissue release' },
+    { value: 'elb_tx_trigger_pt', label: 'Trigger point therapy' },
+    { value: 'elb_tx_cross_friction', label: 'Cross-friction massage' },
+    { value: 'elb_tx_ice_massage', label: 'Ice massage' },
+    { value: 'elb_tx_elbow_mob', label: 'Elbow joint mobilization' },
+    { value: 'elb_tx_wrist_mob', label: 'Wrist mobilization' },
+    { value: 'elb_tx_cspine_manip', label: 'Cervical spine manipulation' },
+    { value: 'elb_tx_tspine_manip', label: 'Thoracic spine manipulation' },
+  ],
+  'Modalities': [
+    { value: 'elb_tx_ultrasound', label: 'Therapeutic ultrasound' },
+    { value: 'elb_tx_iontophoresis', label: 'Iontophoresis with NSAIDs' },
+    { value: 'elb_tx_laser', label: 'Low-level laser (904nm)' },
+    { value: 'elb_tx_tens', label: 'TENS' },
+    { value: 'elb_tx_ice', label: 'Cryotherapy' },
+    { value: 'elb_tx_heat', label: 'Heat therapy' },
+  ],
+  'Bracing/Support': [
+    { value: 'elb_counterforce', label: 'Counterforce brace/strap' },
+    { value: 'elb_wrist_brace', label: 'Wrist extension brace' },
+    { value: 'elb_sling', label: 'Sling (short-term)' },
+  ],
+  'Exercise Prescription': [
+    { value: 'elb_ex_wrist_curls', label: 'Wrist curls' },
+    { value: 'elb_ex_rev_curls', label: 'Reverse wrist curls' },
+    { value: 'elb_ex_pronation_sup', label: 'Pronation/supination' },
+    { value: 'elb_ex_finger_ext', label: 'Finger extension exercises' },
+    { value: 'elb_ex_grip', label: 'Grip strengthening' },
+    { value: 'elb_ex_eccentric', label: 'Eccentric exercises' },
+    { value: 'elb_ex_ext_stretch', label: 'Wrist extensor stretch' },
+    { value: 'elb_ex_flex_stretch', label: 'Wrist flexor stretch' },
+  ]
+};
