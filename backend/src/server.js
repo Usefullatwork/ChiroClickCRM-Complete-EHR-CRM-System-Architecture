@@ -14,6 +14,7 @@ import 'express-async-errors';
 
 import { healthCheck } from './config/database.js';
 import logger from './utils/logger.js';
+import { scheduleKeyRotation, createKeyRotationTable } from './utils/keyRotation.js';
 
 // Load environment variables
 dotenv.config();
@@ -110,7 +111,8 @@ app.get(`/api/${API_VERSION}`, (req, res) => {
       gdpr: `/api/${API_VERSION}/gdpr`,
       pdf: `/api/${API_VERSION}/pdf`,
       ai: `/api/${API_VERSION}/ai`,
-      neuroexam: `/api/${API_VERSION}/neuroexam`
+      neuroexam: `/api/${API_VERSION}/neuroexam`,
+      search: `/api/${API_VERSION}/search`
     }
   });
 });
@@ -136,6 +138,8 @@ import aiRoutes from './routes/ai.js';
 import trainingRoutes from './routes/training.js';
 import templateRoutes from './routes/templates.js';
 import neuroexamRoutes from './routes/neuroexam.js';
+import docsRoutes from './routes/docs.js';
+import searchRoutes from './routes/search.js';
 
 // Mount routes
 app.use(`/api/${API_VERSION}/dashboard`, dashboardRoutes);
@@ -158,6 +162,10 @@ app.use(`/api/${API_VERSION}/ai`, aiRoutes);
 app.use(`/api/${API_VERSION}/training`, trainingRoutes);
 app.use(`/api/${API_VERSION}/templates`, templateRoutes);
 app.use(`/api/${API_VERSION}/neuroexam`, neuroexamRoutes);
+app.use(`/api/${API_VERSION}/search`, searchRoutes);
+
+// API Documentation (no auth required)
+app.use('/api/docs', docsRoutes);
 
 // ============================================================================
 // ERROR HANDLING
@@ -197,13 +205,22 @@ app.use((err, req, res, next) => {
 // SERVER STARTUP
 // ============================================================================
 
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, async () => {
   logger.info(`🚀 ChiroClickCRM API Server started`);
   logger.info(`📍 Environment: ${process.env.NODE_ENV}`);
   logger.info(`📍 Port: ${PORT}`);
   logger.info(`📍 API Version: ${API_VERSION}`);
   logger.info(`📍 Health: http://localhost:${PORT}/health`);
   logger.info(`📍 API Root: http://localhost:${PORT}/api/${API_VERSION}`);
+
+  // Initialize encryption key rotation
+  try {
+    await createKeyRotationTable();
+    scheduleKeyRotation();
+    logger.info('🔐 Encryption key rotation scheduler initialized');
+  } catch (error) {
+    logger.warn('⚠️  Key rotation initialization skipped (table may not exist yet):', error.message);
+  }
 });
 
 // Graceful shutdown
@@ -215,8 +232,11 @@ const gracefulShutdown = async (signal) => {
 
     try {
       const { closePool } = await import('./config/database.js');
+      const { closeRedis } = await import('./config/redis.js');
       await closePool();
       logger.info('Database connections closed');
+      await closeRedis();
+      logger.info('Redis connections closed');
       process.exit(0);
     } catch (error) {
       logger.error('Error during shutdown:', error);

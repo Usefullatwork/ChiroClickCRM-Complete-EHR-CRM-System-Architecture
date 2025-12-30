@@ -54,6 +54,8 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       TELNYX_API_KEY: ${TELNYX_API_KEY}
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+      REDIS_URL: redis://redis:6379
+      REDIS_ENABLED: ${REDIS_ENABLED:-true}
     ports:
       - "3000:3000"
     depends_on:
@@ -155,7 +157,7 @@ services:
     profiles:
       - production
 
-  # Redis (for caching and sessions - optional)
+  # Redis (for caching and sessions)
   redis:
     image: redis:7-alpine
     container_name: chiroclickcrm-redis
@@ -167,8 +169,11 @@ services:
       - chiroclickcrm-network
     restart: unless-stopped
     command: redis-server --appendonly yes
-    profiles:
-      - production
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
