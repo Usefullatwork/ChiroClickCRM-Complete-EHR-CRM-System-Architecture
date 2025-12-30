@@ -91,4 +91,34 @@ router.post('/import',
   kpiController.importKPIData
 );
 
+/**
+ * @route   GET /api/v1/kpi/daily
+ * @desc    Get daily KPIs for a specific date
+ * @access  Private (ADMIN, PRACTITIONER)
+ */
+router.get('/daily',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  kpiController.getDailyKPIs
+);
+
+/**
+ * @route   GET /api/v1/kpi/weekly
+ * @desc    Get weekly KPIs for a date range
+ * @access  Private (ADMIN, PRACTITIONER)
+ */
+router.get('/weekly',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  kpiController.getWeeklyKPIs
+);
+
+/**
+ * @route   GET /api/v1/kpi/monthly
+ * @desc    Get monthly KPIs for a specific month
+ * @access  Private (ADMIN, PRACTITIONER)
+ */
+router.get('/monthly',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  kpiController.getMonthlyKPIs
+);
+
 export default router;

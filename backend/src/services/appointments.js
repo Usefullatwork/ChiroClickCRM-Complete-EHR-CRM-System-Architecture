@@ -7,6 +7,122 @@ import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
 
 /**
+ * Get appointment by ID
+ */
+export const getAppointmentById = async (organizationId, appointmentId) => {
+  try {
+    const result = await query(
+      `SELECT
+        a.*,
+        p.first_name || ' ' || p.last_name as patient_name,
+        p.phone as patient_phone,
+        p.email as patient_email,
+        u.first_name || ' ' || u.last_name as practitioner_name
+      FROM appointments a
+      JOIN patients p ON p.id = a.patient_id
+      LEFT JOIN users u ON u.id = a.practitioner_id
+      WHERE a.organization_id = $1 AND a.id = $2`,
+      [organizationId, appointmentId]
+    );
+
+    return result.rows.length > 0 ? result.rows[0] : null;
+  } catch (error) {
+    logger.error('Error getting appointment by ID:', error);
+    throw error;
+  }
+};
+
+/**
+ * Update appointment
+ */
+export const updateAppointment = async (organizationId, appointmentId, updateData) => {
+  try {
+    const allowedFields = [
+      'patient_id', 'practitioner_id', 'start_time', 'end_time',
+      'appointment_type', 'status', 'patient_notes', 'recurring_pattern', 'recurring_end_date'
+    ];
+
+    const updateFields = [];
+    const params = [organizationId, appointmentId];
+    let paramIndex = 3;
+
+    for (const field of allowedFields) {
+      if (updateData[field] !== undefined) {
+        updateFields.push(`${field} = $${paramIndex}`);
+        params.push(updateData[field]);
+        paramIndex++;
+      }
+    }
+
+    if (updateFields.length === 0) {
+      throw new Error('No fields to update');
+    }
+
+    const result = await query(
+      `UPDATE appointments
+       SET ${updateFields.join(', ')}, updated_at = NOW()
+       WHERE organization_id = $1 AND id = $2
+       RETURNING *`,
+      params
+    );
+
+    if (result.rows.length === 0) return null;
+
+    logger.info('Appointment updated:', { organizationId, appointmentId });
+    return result.rows[0];
+  } catch (error) {
+    logger.error('Error updating appointment:', error);
+    throw error;
+  }
+};
+
+/**
+ * Confirm appointment
+ */
+export const confirmAppointment = async (organizationId, appointmentId, userId) => {
+  try {
+    const result = await query(
+      `UPDATE appointments
+       SET status = 'CONFIRMED', confirmed_at = NOW(), confirmed_by = $3, updated_at = NOW()
+       WHERE organization_id = $1 AND id = $2
+       RETURNING *`,
+      [organizationId, appointmentId, userId]
+    );
+
+    if (result.rows.length === 0) return null;
+
+    logger.info('Appointment confirmed:', { organizationId, appointmentId, confirmedBy: userId });
+    return result.rows[0];
+  } catch (error) {
+    logger.error('Error confirming appointment:', error);
+    throw error;
+  }
+};
+
+/**
+ * Check in appointment
+ */
+export const checkInAppointment = async (organizationId, appointmentId) => {
+  try {
+    const result = await query(
+      `UPDATE appointments
+       SET status = 'CHECKED_IN', checked_in_at = NOW(), updated_at = NOW()
+       WHERE organization_id = $1 AND id = $2
+       RETURNING *`,
+      [organizationId, appointmentId]
+    );
+
+    if (result.rows.length === 0) return null;
+
+    logger.info('Appointment checked in:', { organizationId, appointmentId });
+    return result.rows[0];
+  } catch (error) {
+    logger.error('Error checking in appointment:', error);
+    throw error;
+  }
+};
+
+/**
  * Get all appointments
  */
 export const getAllAppointments = async (organizationId, options = {}) => {
@@ -230,9 +346,13 @@ export const getAppointmentStats = async (organizationId, startDate, endDate) =>
 };
 
 export default {
+  getAppointmentById,
   getAllAppointments,
   createAppointment,
+  updateAppointment,
   updateAppointmentStatus,
+  confirmAppointment,
+  checkInAppointment,
   cancelAppointment,
   getAppointmentStats
 };

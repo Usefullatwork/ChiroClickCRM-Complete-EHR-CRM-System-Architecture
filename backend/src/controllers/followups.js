@@ -122,6 +122,34 @@ export const completeFollowUp = async (req, res) => {
   }
 };
 
+export const skipFollowUp = async (req, res) => {
+  try {
+    const { organizationId, user } = req;
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    const followUp = await followUpService.skipFollowUp(organizationId, id, reason || '');
+
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'UPDATE',
+      resourceType: 'FOLLOWUP',
+      resourceId: id,
+      changes: { status: 'SKIPPED', reason },
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent')
+    });
+
+    res.json({ success: true, data: followUp, message: 'Follow-up skipped' });
+  } catch (error) {
+    logger.error('Error in skipFollowUp controller:', error);
+    res.status(500).json({ error: 'Failed to skip follow-up' });
+  }
+};
+
 export const getOverdue = async (req, res) => {
   try {
     const { organizationId } = req;
@@ -201,6 +229,7 @@ export default {
   createFollowUp,
   updateFollowUp,
   completeFollowUp,
+  skipFollowUp,
   getOverdue,
   getUpcoming,
   getStats,

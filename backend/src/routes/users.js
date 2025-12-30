@@ -12,6 +12,24 @@ router.use(requireAuth);
 router.use(requireOrganization);
 
 /**
+ * @route   GET /api/v1/users/me
+ * @desc    Get current user profile
+ * @access  Private (All authenticated users)
+ */
+router.get('/me',
+  userController.getCurrentUser
+);
+
+/**
+ * @route   PATCH /api/v1/users/me
+ * @desc    Update current user profile
+ * @access  Private (All authenticated users)
+ */
+router.patch('/me',
+  userController.updateCurrentUser
+);
+
+/**
  * @route   GET /api/v1/users
  * @desc    Get all users in organization
  * @access  Private (ADMIN, PRACTITIONER)

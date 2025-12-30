@@ -250,6 +250,33 @@ export const completeFollowUp = async (organizationId, followUpId, completionNot
 };
 
 /**
+ * Skip follow-up with reason
+ */
+export const skipFollowUp = async (organizationId, followUpId, reason = '') => {
+  const result = await query(
+    `UPDATE follow_ups
+    SET
+      status = 'SKIPPED',
+      skipped_at = NOW(),
+      notes = CASE
+        WHEN $3 != '' THEN notes || E'\n\n' || 'Skipped: ' || $3
+        ELSE notes
+      END,
+      updated_at = NOW()
+    WHERE id = $1 AND organization_id = $2
+    RETURNING *`,
+    [followUpId, organizationId, reason]
+  );
+
+  if (result.rows.length === 0) {
+    throw new Error('Follow-up not found');
+  }
+
+  logger.info(`Follow-up skipped: ${followUpId}, reason: ${reason}`);
+  return result.rows[0];
+};
+
+/**
  * Get overdue follow-ups
  */
 export const getOverdueFollowUps = async (organizationId) => {
@@ -419,6 +446,7 @@ export default {
   createFollowUp,
   updateFollowUp,
   completeFollowUp,
+  skipFollowUp,
   getOverdueFollowUps,
   getUpcomingFollowUps,
   getFollowUpStats,

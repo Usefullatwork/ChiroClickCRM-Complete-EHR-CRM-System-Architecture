@@ -24,10 +24,15 @@ router.post('/spell-check',
 
 /**
  * @route   POST /api/v1/ai/soap-suggestion
+ * @route   POST /api/v1/ai/soap-suggestions (alias)
  * @desc    Generate SOAP note suggestions based on chief complaint
  * @access  Private (ADMIN, PRACTITIONER)
  */
 router.post('/soap-suggestion',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  aiController.generateSOAPSuggestion
+);
+router.post('/soap-suggestions',
   requireRole(['ADMIN', 'PRACTITIONER']),
   aiController.generateSOAPSuggestion
 );
@@ -54,10 +59,15 @@ router.post('/analyze-red-flags',
 
 /**
  * @route   POST /api/v1/ai/clinical-summary
+ * @route   POST /api/v1/ai/generate-summary (alias)
  * @desc    Generate clinical summary from encounter
  * @access  Private (ADMIN, PRACTITIONER)
  */
 router.post('/clinical-summary',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  aiController.generateClinicalSummary
+);
+router.post('/generate-summary',
   requireRole(['ADMIN', 'PRACTITIONER']),
   aiController.generateClinicalSummary
 );

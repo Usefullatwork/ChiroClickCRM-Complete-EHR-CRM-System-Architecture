@@ -204,11 +204,72 @@ export const getDailyRevenueChart = async (req, res) => {
   }
 };
 
+export const recordPayment = async (req, res) => {
+  try {
+    const { organizationId, user } = req;
+    const { id } = req.params;
+    const { amount, payment_method, notes } = req.body;
+
+    const metric = await financialService.recordPayment(organizationId, id, {
+      amount,
+      payment_method,
+      notes,
+      recorded_by: user.id
+    });
+
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'UPDATE',
+      resourceType: 'FINANCIAL_METRIC',
+      resourceId: id,
+      changes: { payment_recorded: amount },
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent')
+    });
+
+    res.json({ success: true, data: metric, message: 'Payment recorded' });
+  } catch (error) {
+    logger.error('Error in recordPayment controller:', error);
+    res.status(500).json({ error: 'Failed to record payment' });
+  }
+};
+
+export const generateInvoice = async (req, res) => {
+  try {
+    const { organizationId } = req;
+    const { id } = req.params;
+
+    const invoice = await financialService.generateInvoicePDF(organizationId, id);
+
+    if (invoice.type === 'pdf' && invoice.buffer) {
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="${invoice.filename}"`);
+      return res.send(invoice.buffer);
+    }
+
+    // Fallback to HTML response
+    res.json({
+      success: true,
+      html: invoice.html,
+      filename: invoice.filename,
+      invoice_number: invoice.invoice_number
+    });
+  } catch (error) {
+    logger.error('Error in generateInvoice controller:', error);
+    res.status(500).json({ error: 'Failed to generate invoice' });
+  }
+};
+
 export default {
   getFinancialMetrics,
   getFinancialMetric,
   createFinancialMetric,
   updatePaymentStatus,
+  recordPayment,
+  generateInvoice,
   getRevenueSummary,
   getRevenueByTreatmentCode,
   getPaymentMethodBreakdown,

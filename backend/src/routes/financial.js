@@ -128,4 +128,24 @@ router.patch('/:id/payment-status',
   financialController.updatePaymentStatus
 );
 
+/**
+ * @route   POST /api/v1/financial/:id/payment
+ * @desc    Record payment for financial metric
+ * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ */
+router.post('/:id/payment',
+  requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  financialController.recordPayment
+);
+
+/**
+ * @route   POST /api/v1/financial/:id/invoice
+ * @desc    Generate invoice PDF for financial metric
+ * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ */
+router.post('/:id/invoice',
+  requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  financialController.generateInvoice
+);
+
 export default router;
