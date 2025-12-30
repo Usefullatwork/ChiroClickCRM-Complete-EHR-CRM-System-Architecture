@@ -1,19 +1,159 @@
 /**
  * PDF Generation Service
  * Generates PDF documents for letters, reports, and invoices
- * NOTE: Requires pdf-lib or pdfkit package
+ * Uses pdfkit for server-side PDF generation
  */
 
+import PDFDocument from 'pdfkit';
 import logger from '../utils/logger.js';
 import { query } from '../config/database.js';
 
+// Norwegian date formatter
+const formatDateNO = (date) => {
+  if (!date) return 'N/A';
+  const d = new Date(date);
+  return d.toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric' });
+};
+
+// Format currency in Norwegian style
+const formatCurrencyNO = (amount) => {
+  if (amount === null || amount === undefined) return '0 kr';
+  return `${Number(amount).toLocaleString('no-NO')} kr`;
+};
+
+/**
+ * Create a new PDF document with standard settings
+ * @returns {PDFDocument} Configured PDF document
+ */
+const createPDFDocument = () => {
+  return new PDFDocument({
+    size: 'A4',
+    margins: { top: 50, bottom: 50, left: 50, right: 50 },
+    info: {
+      Title: 'ChiroClick Document',
+      Author: 'ChiroClick EHR',
+      Creator: 'ChiroClick PDF Service'
+    }
+  });
+};
+
+/**
+ * Convert PDF document stream to buffer
+ * @param {PDFDocument} doc - PDF document
+ * @returns {Promise<Buffer>} PDF as buffer
+ */
+const pdfToBuffer = (doc) => {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    doc.on('data', chunk => chunks.push(chunk));
+    doc.on('end', () => resolve(Buffer.concat(chunks)));
+    doc.on('error', reject);
+    doc.end();
+  });
+};
+
+/**
+ * Draw document header with clinic info
+ * @param {PDFDocument} doc - PDF document
+ * @param {Object} data - Document data
+ * @param {string} title - Document title
+ */
+const drawHeader = (doc, data, title) => {
+  // Title
+  doc.fontSize(20).font('Helvetica-Bold').text(title, { align: 'center' });
+  doc.moveDown(0.5);
+
+  // Horizontal line
+  doc.moveTo(50, doc.y).lineTo(545, doc.y).stroke();
+  doc.moveDown(0.5);
+
+  // Clinic info (right aligned)
+  const startY = doc.y;
+  doc.fontSize(10).font('Helvetica');
+  doc.text(data.clinic_name || 'Klinikk', { align: 'right' });
+  doc.text(data.clinic_address || '', { align: 'right' });
+  if (data.clinic_phone) doc.text(`Tlf: ${data.clinic_phone}`, { align: 'right' });
+  if (data.org_number) doc.text(`Org.nr: ${data.org_number}`, { align: 'right' });
+  doc.moveDown(0.5);
+
+  // Date
+  doc.text(`Dato: ${formatDateNO(new Date())}`, { align: 'right' });
+  doc.moveDown(1.5);
+};
+
+/**
+ * Draw patient info box
+ * @param {PDFDocument} doc - PDF document
+ * @param {Object} data - Patient data
+ */
+const drawPatientInfo = (doc, data) => {
+  const boxTop = doc.y;
+
+  // Background box
+  doc.rect(50, boxTop, 495, 70).fill('#f5f5f5');
+
+  // Patient info text
+  doc.fillColor('#000000').fontSize(10).font('Helvetica-Bold');
+  doc.text('Pasientinformasjon:', 60, boxTop + 10);
+  doc.font('Helvetica');
+  doc.text(`Navn: ${data.first_name || ''} ${data.last_name || ''}`, 60, boxTop + 25);
+  doc.text(`Fødselsdato: ${formatDateNO(data.date_of_birth)}`, 60, boxTop + 40);
+
+  const address = [data.address, data.postal_code, data.city].filter(Boolean).join(', ');
+  if (address) {
+    doc.text(`Adresse: ${address}`, 60, boxTop + 55);
+  }
+
+  doc.y = boxTop + 80;
+  doc.moveDown(1);
+};
+
+/**
+ * Draw section header
+ * @param {PDFDocument} doc - PDF document
+ * @param {string} title - Section title
+ */
+const drawSectionHeader = (doc, title) => {
+  doc.fontSize(12).font('Helvetica-Bold').fillColor('#333333');
+  doc.text(title);
+  doc.moveDown(0.3);
+  doc.font('Helvetica').fontSize(10).fillColor('#000000');
+};
+
+/**
+ * Draw signature section
+ * @param {PDFDocument} doc - PDF document
+ * @param {Object} data - Practitioner data
+ */
+const drawSignature = (doc, data) => {
+  doc.moveDown(2);
+  doc.fontSize(10).font('Helvetica');
+  doc.text('Med vennlig hilsen,');
+  doc.moveDown(2);
+
+  // Signature line
+  doc.moveTo(50, doc.y).lineTo(200, doc.y).stroke();
+  doc.moveDown(0.5);
+
+  doc.font('Helvetica-Bold');
+  doc.text(data.practitioner_name || 'Behandler');
+  doc.font('Helvetica');
+  doc.text('Kiropraktor');
+  if (data.hpr_number) {
+    doc.text(`HPR-nummer: ${data.hpr_number}`);
+  }
+};
+
 /**
  * Generate patient letter (sykefraværsattest, henvisning, etc.)
- * This is a placeholder - in production would use pdf-lib or pdfkit
+ * @param {string} organizationId - Organization ID
+ * @param {string} encounterId - Encounter ID
+ * @param {string} letterType - Letter type (SICK_LEAVE, REFERRAL, TREATMENT_SUMMARY)
+ * @returns {Promise<Object>} PDF buffer and metadata
  */
 export const generatePatientLetter = async (organizationId, encounterId, letterType) => {
   try {
-    // Get encounter data
+    // Get encounter data with all related information
     const encounterResult = await query(
       `SELECT
         ce.*,
@@ -25,6 +165,8 @@ export const generatePatientLetter = async (organizationId, encounterId, letterT
         p.city,
         o.name as clinic_name,
         o.address as clinic_address,
+        o.phone as clinic_phone,
+        o.org_number,
         u.first_name || ' ' || u.last_name as practitioner_name,
         u.hpr_number
       FROM clinical_encounters ce
@@ -40,51 +182,34 @@ export const generatePatientLetter = async (organizationId, encounterId, letterT
     }
 
     const data = encounterResult.rows[0];
+    const doc = createPDFDocument();
 
-    // Generate letter content based on type
-    let letterContent;
+    // Generate letter based on type
     switch (letterType) {
       case 'SICK_LEAVE':
-        letterContent = generateSickLeaveLetter(data);
+        generateSickLeavePDF(doc, data);
         break;
       case 'REFERRAL':
-        letterContent = generateReferralLetter(data);
+        generateReferralPDF(doc, data);
         break;
       case 'TREATMENT_SUMMARY':
-        letterContent = generateTreatmentSummary(data);
+        generateTreatmentSummaryPDF(doc, data);
         break;
       default:
         throw new Error(`Unknown letter type: ${letterType}`);
     }
 
-    // TODO: Convert to PDF using pdf-lib or pdfkit
-    // For now, return HTML that can be converted to PDF client-side
-    const html = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="UTF-8">
-        <style>
-          body { font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 40px; }
-          .header { border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
-          .clinic-info { font-size: 10pt; color: #666; }
-          .patient-info { background: #f5f5f5; padding: 15px; margin: 20px 0; }
-          .content { margin: 30px 0; }
-          .signature { margin-top: 60px; }
-          h1 { font-size: 18pt; margin-bottom: 10px; }
-          h2 { font-size: 14pt; margin-top: 30px; margin-bottom: 10px; }
-        </style>
-      </head>
-      <body>
-        ${letterContent}
-      </body>
-      </html>
-    `;
+    // Convert to buffer
+    const pdfBuffer = await pdfToBuffer(doc);
 
-    logger.info(`Generated ${letterType} letter for encounter ${encounterId}`);
+    logger.info(`Generated ${letterType} PDF for encounter ${encounterId}`, {
+      size: pdfBuffer.length,
+      type: letterType
+    });
 
     return {
-      html,
+      buffer: pdfBuffer,
+      contentType: 'application/pdf',
       filename: `${letterType}_${data.last_name}_${new Date().toISOString().split('T')[0]}.pdf`,
       encounter_id: encounterId,
       letter_type: letterType
@@ -96,172 +221,211 @@ export const generatePatientLetter = async (organizationId, encounterId, letterT
 };
 
 /**
- * Generate sick leave letter (Sykefraværsattest)
+ * Generate sick leave letter PDF (Sykefraværsattest)
+ * @param {PDFDocument} doc - PDF document
+ * @param {Object} data - Encounter data
  */
-function generateSickLeaveLetter(data) {
-  const today = new Date().toLocaleDateString('no-NO');
+function generateSickLeavePDF(doc, data) {
+  drawHeader(doc, data, 'Sykefraværsattest');
+  drawPatientInfo(doc, data);
 
-  return `
-    <div class="header">
-      <h1>Sykefraværsattest</h1>
-      <div class="clinic-info">
-        <strong>${data.clinic_name}</strong><br>
-        ${data.clinic_address}<br>
-        Dato: ${today}
-      </div>
-    </div>
+  // Diagnosis
+  drawSectionHeader(doc, 'Diagnosekode(r):');
+  const icpcCodes = data.icpc_codes ? data.icpc_codes.join(', ') : 'Ikke spesifisert';
+  doc.text(icpcCodes);
+  doc.moveDown(1);
 
-    <div class="patient-info">
-      <strong>Pasientinformasjon:</strong><br>
-      Navn: ${data.first_name} ${data.last_name}<br>
-      Fødselsdato: ${new Date(data.date_of_birth).toLocaleDateString('no-NO')}<br>
-      Adresse: ${data.address}, ${data.postal_code} ${data.city}
-    </div>
+  // Assessment
+  drawSectionHeader(doc, 'Vurdering:');
+  const assessment = data.assessment?.clinical_reasoning || 'Kiropraktisk vurdering utført.';
+  doc.text(assessment, { align: 'justify' });
+  doc.moveDown(1);
 
-    <div class="content">
-      <h2>Diagnosekode(r):</h2>
-      <p>${data.icpc_codes ? data.icpc_codes.join(', ') : 'Ikke spesifisert'}</p>
+  // Recommendation
+  drawSectionHeader(doc, 'Anbefaling:');
+  const advice = data.plan?.advice || 'Pasienten anbefales å følge behandlingsplanen.';
+  doc.text(advice, { align: 'justify' });
+  doc.moveDown(1);
 
-      <h2>Vurdering:</h2>
-      <p>${data.assessment?.clinical_reasoning || 'Kiropraktisk vurdering utført.'}</p>
+  // Sick leave period if applicable
+  if (data.sick_leave_start || data.sick_leave_end) {
+    drawSectionHeader(doc, 'Sykefraværsperiode:');
+    const period = `${formatDateNO(data.sick_leave_start)} - ${formatDateNO(data.sick_leave_end)}`;
+    doc.text(period);
+    doc.moveDown(1);
+  }
 
-      <h2>Anbefaling:</h2>
-      <p>${data.plan?.advice || 'Pasienten anbefales å følge behandlingsplanen.'}</p>
-    </div>
+  // Percentage if applicable
+  if (data.sick_leave_percentage) {
+    drawSectionHeader(doc, 'Sykefraværsgrad:');
+    doc.text(`${data.sick_leave_percentage}%`);
+    doc.moveDown(1);
+  }
 
-    <div class="signature">
-      <p>Med vennlig hilsen,</p>
-      <br><br>
-      <p>
-        <strong>${data.practitioner_name}</strong><br>
-        Kiropraktor<br>
-        HPR-nummer: ${data.hpr_number || 'N/A'}
-      </p>
-    </div>
-  `;
+  drawSignature(doc, data);
 }
 
 /**
- * Generate referral letter (Henvisning)
+ * Generate referral letter PDF (Henvisning)
+ * @param {PDFDocument} doc - PDF document
+ * @param {Object} data - Encounter data
  */
-function generateReferralLetter(data) {
-  const today = new Date().toLocaleDateString('no-NO');
+function generateReferralPDF(doc, data) {
+  drawHeader(doc, data, 'Henvisning');
+  drawPatientInfo(doc, data);
 
-  return `
-    <div class="header">
-      <h1>Henvisning</h1>
-      <div class="clinic-info">
-        <strong>${data.clinic_name}</strong><br>
-        ${data.clinic_address}<br>
-        Dato: ${today}
-      </div>
-    </div>
+  // Referral recipient
+  drawSectionHeader(doc, 'Henvisning til:');
+  const referralTo = data.plan?.referrals || '[Spesialist/Instans]';
+  doc.text(referralTo);
+  doc.moveDown(1);
 
-    <div class="patient-info">
-      <strong>Pasientinformasjon:</strong><br>
-      Navn: ${data.first_name} ${data.last_name}<br>
-      Fødselsdato: ${new Date(data.date_of_birth).toLocaleDateString('no-NO')}<br>
-      Adresse: ${data.address}, ${data.postal_code} ${data.city}
-    </div>
+  // History
+  drawSectionHeader(doc, 'Sykehistorie:');
+  const history = data.subjective?.history || 'Se pasientjournal.';
+  doc.text(history, { align: 'justify' });
+  doc.moveDown(1);
 
-    <div class="content">
-      <h2>Henvisning til:</h2>
-      <p>${data.plan?.referrals || '[Spesialist/Instans]'}</p>
+  // Findings
+  drawSectionHeader(doc, 'Funn:');
+  if (data.objective?.observation) {
+    doc.font('Helvetica-Bold').text('Observasjon: ', { continued: true });
+    doc.font('Helvetica').text(data.objective.observation);
+  }
+  if (data.objective?.palpation) {
+    doc.font('Helvetica-Bold').text('Palpasjon: ', { continued: true });
+    doc.font('Helvetica').text(data.objective.palpation);
+  }
+  if (data.objective?.ortho_tests) {
+    doc.font('Helvetica-Bold').text('Ortopediske tester: ', { continued: true });
+    doc.font('Helvetica').text(data.objective.ortho_tests);
+  }
+  if (data.objective?.neuro_tests) {
+    doc.font('Helvetica-Bold').text('Nevrologiske tester: ', { continued: true });
+    doc.font('Helvetica').text(data.objective.neuro_tests);
+  }
+  doc.moveDown(1);
 
-      <h2>Sykehistorie:</h2>
-      <p>${data.subjective?.history || 'Se pasientjournal.'}</p>
+  // Assessment
+  drawSectionHeader(doc, 'Vurdering:');
+  const assessment = data.assessment?.clinical_reasoning || 'Kiropraktisk vurdering utført.';
+  doc.text(assessment, { align: 'justify' });
+  doc.moveDown(1);
 
-      <h2>Funn:</h2>
-      <p><strong>Observasjon:</strong> ${data.objective?.observation || 'N/A'}</p>
-      <p><strong>Palpasjon:</strong> ${data.objective?.palpation || 'N/A'}</p>
-      <p><strong>Ortopediske tester:</strong> ${data.objective?.ortho_tests || 'N/A'}</p>
+  // Diagnosis codes
+  drawSectionHeader(doc, 'Diagnosekode(r):');
+  const icpcCodes = data.icpc_codes ? data.icpc_codes.join(', ') : 'Ikke spesifisert';
+  doc.text(icpcCodes);
+  doc.moveDown(1);
 
-      <h2>Vurdering:</h2>
-      <p>${data.assessment?.clinical_reasoning || 'Kiropraktisk vurdering utført.'}</p>
+  // Reason for referral
+  drawSectionHeader(doc, 'Grunnen til henvisning:');
+  doc.text('Pasienten henvises for videre utredning og behandling.', { align: 'justify' });
 
-      <h2>Diagnosekode(r):</h2>
-      <p>${data.icpc_codes ? data.icpc_codes.join(', ') : 'Ikke spesifisert'}</p>
-
-      <h2>Grunnen til henvisning:</h2>
-      <p>Pasienten henvises for videre utredning og behandling.</p>
-    </div>
-
-    <div class="signature">
-      <p>Med vennlig hilsen,</p>
-      <br><br>
-      <p>
-        <strong>${data.practitioner_name}</strong><br>
-        Kiropraktor<br>
-        HPR-nummer: ${data.hpr_number || 'N/A'}
-      </p>
-    </div>
-  `;
+  drawSignature(doc, data);
 }
 
 /**
- * Generate treatment summary
+ * Generate treatment summary PDF
+ * @param {PDFDocument} doc - PDF document
+ * @param {Object} data - Encounter data
  */
-function generateTreatmentSummary(data) {
-  const today = new Date().toLocaleDateString('no-NO');
+function generateTreatmentSummaryPDF(doc, data) {
+  drawHeader(doc, data, 'Behandlingssammendrag');
+  drawPatientInfo(doc, data);
 
-  return `
-    <div class="header">
-      <h1>Behandlingssammendrag</h1>
-      <div class="clinic-info">
-        <strong>${data.clinic_name}</strong><br>
-        ${data.clinic_address}<br>
-        Dato: ${today}
-      </div>
-    </div>
+  // SUBJECTIVE
+  drawSectionHeader(doc, 'SUBJEKTIVT (S):');
+  if (data.subjective?.chief_complaint) {
+    doc.font('Helvetica-Bold').text('Hovedplage: ', { continued: true });
+    doc.font('Helvetica').text(data.subjective.chief_complaint);
+  }
+  if (data.subjective?.history) {
+    doc.font('Helvetica-Bold').text('Sykehistorie: ', { continued: true });
+    doc.font('Helvetica').text(data.subjective.history);
+  }
+  if (data.subjective?.pain_description) {
+    doc.font('Helvetica-Bold').text('Smertebeskrivelse: ', { continued: true });
+    doc.font('Helvetica').text(data.subjective.pain_description);
+  }
+  doc.moveDown(1);
 
-    <div class="patient-info">
-      <strong>Pasientinformasjon:</strong><br>
-      Navn: ${data.first_name} ${data.last_name}<br>
-      Fødselsdato: ${new Date(data.date_of_birth).toLocaleDateString('no-NO')}
-    </div>
+  // OBJECTIVE
+  drawSectionHeader(doc, 'OBJEKTIVT (O):');
+  if (data.objective?.observation) {
+    doc.font('Helvetica-Bold').text('Observasjon: ', { continued: true });
+    doc.font('Helvetica').text(data.objective.observation);
+  }
+  if (data.objective?.palpation) {
+    doc.font('Helvetica-Bold').text('Palpasjon: ', { continued: true });
+    doc.font('Helvetica').text(data.objective.palpation);
+  }
+  if (data.objective?.rom) {
+    doc.font('Helvetica-Bold').text('Bevegelighet (ROM): ', { continued: true });
+    doc.font('Helvetica').text(data.objective.rom);
+  }
+  if (data.objective?.ortho_tests) {
+    doc.font('Helvetica-Bold').text('Ortopediske tester: ', { continued: true });
+    doc.font('Helvetica').text(data.objective.ortho_tests);
+  }
+  if (data.objective?.neuro_tests) {
+    doc.font('Helvetica-Bold').text('Nevrologiske tester: ', { continued: true });
+    doc.font('Helvetica').text(data.objective.neuro_tests);
+  }
+  doc.moveDown(1);
 
-    <div class="content">
-      <h2>SUBJEKTIVT (S):</h2>
-      <p><strong>Hovedplage:</strong> ${data.subjective?.chief_complaint || 'N/A'}</p>
-      <p><strong>Sykehistorie:</strong> ${data.subjective?.history || 'N/A'}</p>
-      <p><strong>Smertebeskrivelse:</strong> ${data.subjective?.pain_description || 'N/A'}</p>
+  // ASSESSMENT
+  drawSectionHeader(doc, 'VURDERING (A):');
+  if (data.assessment?.clinical_reasoning) {
+    doc.text(data.assessment.clinical_reasoning, { align: 'justify' });
+  }
+  if (data.icpc_codes && data.icpc_codes.length > 0) {
+    doc.font('Helvetica-Bold').text('Diagnosekode(r): ', { continued: true });
+    doc.font('Helvetica').text(data.icpc_codes.join(', '));
+  }
+  if (data.assessment?.prognosis) {
+    doc.font('Helvetica-Bold').text('Prognose: ', { continued: true });
+    doc.font('Helvetica').text(data.assessment.prognosis);
+  }
+  doc.moveDown(1);
 
-      <h2>OBJEKTIVT (O):</h2>
-      <p><strong>Observasjon:</strong> ${data.objective?.observation || 'N/A'}</p>
-      <p><strong>Palpasjon:</strong> ${data.objective?.palpation || 'N/A'}</p>
-      <p><strong>Bevegelighet (ROM):</strong> ${data.objective?.rom || 'N/A'}</p>
-      <p><strong>Ortopediske tester:</strong> ${data.objective?.ortho_tests || 'N/A'}</p>
+  // PLAN
+  drawSectionHeader(doc, 'PLAN (P):');
+  if (data.plan?.treatment) {
+    doc.font('Helvetica-Bold').text('Behandling: ', { continued: true });
+    doc.font('Helvetica').text(data.plan.treatment);
+  }
+  if (data.plan?.exercises) {
+    doc.font('Helvetica-Bold').text('Øvelser: ', { continued: true });
+    doc.font('Helvetica').text(data.plan.exercises);
+  }
+  if (data.plan?.advice) {
+    doc.font('Helvetica-Bold').text('Råd: ', { continued: true });
+    doc.font('Helvetica').text(data.plan.advice);
+  }
+  if (data.plan?.follow_up) {
+    doc.font('Helvetica-Bold').text('Oppfølging: ', { continued: true });
+    doc.font('Helvetica').text(data.plan.follow_up);
+  }
+  doc.moveDown(1);
 
-      <h2>VURDERING (A):</h2>
-      <p>${data.assessment?.clinical_reasoning || 'Kiropraktisk vurdering utført.'}</p>
-      <p><strong>Diagnosekode(r):</strong> ${data.icpc_codes ? data.icpc_codes.join(', ') : 'N/A'}</p>
-      <p><strong>Prognose:</strong> ${data.assessment?.prognosis || 'N/A'}</p>
+  // Pain assessment
+  if (data.vas_pain_start !== null && data.vas_pain_start !== undefined) {
+    drawSectionHeader(doc, 'Smertevurdering (VAS):');
+    doc.text(`VAS ved start: ${data.vas_pain_start}/10`);
+    if (data.vas_pain_end !== null && data.vas_pain_end !== undefined) {
+      doc.text(`VAS ved slutt: ${data.vas_pain_end}/10`);
+    }
+  }
 
-      <h2>PLAN (P):</h2>
-      <p><strong>Behandling:</strong> ${data.plan?.treatment || 'N/A'}</p>
-      <p><strong>Øvelser:</strong> ${data.plan?.exercises || 'N/A'}</p>
-      <p><strong>Råd:</strong> ${data.plan?.advice || 'N/A'}</p>
-      <p><strong>Oppfølging:</strong> ${data.plan?.follow_up || 'N/A'}</p>
-
-      ${data.vas_pain_start !== null ? `
-        <h2>Smertevurdering:</h2>
-        <p>VAS ved start: ${data.vas_pain_start}/10</p>
-        ${data.vas_pain_end !== null ? `<p>VAS ved slutt: ${data.vas_pain_end}/10</p>` : ''}
-      ` : ''}
-    </div>
-
-    <div class="signature">
-      <p>
-        <strong>${data.practitioner_name}</strong><br>
-        Kiropraktor<br>
-        HPR-nummer: ${data.hpr_number || 'N/A'}
-      </p>
-    </div>
-  `;
+  drawSignature(doc, data);
 }
 
 /**
  * Generate invoice PDF
+ * @param {string} organizationId - Organization ID
+ * @param {string} financialMetricId - Financial metric ID
+ * @returns {Promise<Object>} PDF buffer and metadata
  */
 export const generateInvoice = async (organizationId, financialMetricId) => {
   try {
@@ -290,91 +454,123 @@ export const generateInvoice = async (organizationId, financialMetricId) => {
     }
 
     const data = result.rows[0];
+    const doc = createPDFDocument();
+
+    // Header with clinic info
+    doc.fontSize(18).font('Helvetica-Bold').text(data.clinic_name || 'Klinikk', { align: 'left' });
+    doc.fontSize(10).font('Helvetica');
+    doc.text(data.clinic_address || '');
+    if (data.clinic_phone) doc.text(`Tlf: ${data.clinic_phone}`);
+    if (data.org_number) doc.text(`Org.nr: ${data.org_number}`);
+
+    // Invoice title and number (right side)
+    doc.fontSize(24).font('Helvetica-Bold');
+    doc.text('FAKTURA', 400, 50, { width: 145, align: 'right' });
+    doc.fontSize(10).font('Helvetica');
+    doc.text(`Nr: ${data.invoice_number || 'N/A'}`, 400, 80, { width: 145, align: 'right' });
+    doc.text(`Dato: ${formatDateNO(data.created_at)}`, 400, 95, { width: 145, align: 'right' });
+
+    // Horizontal line
+    doc.y = 130;
+    doc.moveTo(50, doc.y).lineTo(545, doc.y).stroke();
+    doc.moveDown(1);
+
+    // Patient info
+    doc.fontSize(10).font('Helvetica-Bold').text('Faktureres til:');
+    doc.font('Helvetica');
+    doc.text(`${data.first_name || ''} ${data.last_name || ''}`);
+    if (data.address) doc.text(data.address);
+    if (data.postal_code || data.city) doc.text(`${data.postal_code || ''} ${data.city || ''}`);
+    doc.moveDown(1.5);
+
+    // Treatment codes table
     const treatmentCodes = typeof data.treatment_codes === 'string'
       ? JSON.parse(data.treatment_codes)
-      : data.treatment_codes;
+      : data.treatment_codes || [];
 
-    const html = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="UTF-8">
-        <style>
-          body { font-family: Arial, sans-serif; font-size: 11pt; max-width: 800px; margin: 0 auto; padding: 40px; }
-          .header { display: flex; justify-content: space-between; border-bottom: 3px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
-          .invoice-number { font-size: 20pt; font-weight: bold; color: #333; }
-          table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-          th { background: #f0f0f0; padding: 10px; text-align: left; border-bottom: 2px solid #333; }
-          td { padding: 10px; border-bottom: 1px solid #ddd; }
-          .total { font-size: 14pt; font-weight: bold; text-align: right; margin-top: 20px; }
-          .footer { margin-top: 60px; font-size: 9pt; color: #666; text-align: center; }
-        </style>
-      </head>
-      <body>
-        <div class="header">
-          <div>
-            <h1>${data.clinic_name}</h1>
-            <p>${data.clinic_address}</p>
-            <p>Tlf: ${data.clinic_phone}</p>
-            <p>Org.nr: ${data.org_number}</p>
-          </div>
-          <div>
-            <div class="invoice-number">FAKTURA</div>
-            <p>Nr: ${data.invoice_number}</p>
-            <p>Dato: ${new Date(data.created_at).toLocaleDateString('no-NO')}</p>
-          </div>
-        </div>
+    // Table header
+    const tableTop = doc.y;
+    doc.rect(50, tableTop, 495, 25).fill('#f0f0f0');
+    doc.fillColor('#000000').fontSize(10).font('Helvetica-Bold');
+    doc.text('Takst', 60, tableTop + 7);
+    doc.text('Beskrivelse', 150, tableTop + 7);
+    doc.text('Beløp', 450, tableTop + 7, { width: 85, align: 'right' });
 
-        <div style="margin-bottom: 30px;">
-          <strong>Pasient:</strong><br>
-          ${data.first_name} ${data.last_name}<br>
-          ${data.address}<br>
-          ${data.postal_code} ${data.city}
-        </div>
+    // Table rows
+    let rowY = tableTop + 25;
+    doc.font('Helvetica');
 
-        <table>
-          <thead>
-            <tr>
-              <th>Takst</th>
-              <th>Beskrivelse</th>
-              <th style="text-align: right;">Beløp</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${Array.isArray(treatmentCodes) ? treatmentCodes.map(code => `
-              <tr>
-                <td>${code.code || code}</td>
-                <td>${code.description || ''}</td>
-                <td style="text-align: right;">${code.price ? `${code.price} kr` : ''}</td>
-              </tr>
-            `).join('') : '<tr><td colspan="3">Ingen takster</td></tr>'}
-          </tbody>
-        </table>
+    if (Array.isArray(treatmentCodes) && treatmentCodes.length > 0) {
+      treatmentCodes.forEach((code, index) => {
+        const rowHeight = 20;
+        if (index % 2 === 0) {
+          doc.rect(50, rowY, 495, rowHeight).fill('#fafafa');
+        }
+        doc.fillColor('#000000');
+        doc.text(code.code || code, 60, rowY + 5);
+        doc.text(code.description || '', 150, rowY + 5, { width: 280 });
+        if (code.price) {
+          doc.text(formatCurrencyNO(code.price), 450, rowY + 5, { width: 85, align: 'right' });
+        }
+        rowY += rowHeight;
+      });
+    } else {
+      doc.text('Ingen takster', 60, rowY + 5);
+      rowY += 20;
+    }
 
-        <div class="total">
-          <p>Bruttobeløp: ${data.gross_amount} kr</p>
-          <p>Egenandel refusjon: ${data.insurance_amount} kr</p>
-          <p style="font-size: 16pt; color: #333;">Å betale: ${data.patient_amount} kr</p>
-        </div>
+    // Bottom line
+    doc.moveTo(50, rowY).lineTo(545, rowY).stroke();
+    doc.moveDown(1);
+    doc.y = rowY + 20;
 
-        <div style="margin-top: 40px;">
-          <p><strong>Betalingsinformasjon:</strong></p>
-          <p>Vennligst betal innen 14 dager.</p>
-          <p>Status: ${data.payment_status === 'PAID' ? 'BETALT' : data.payment_status === 'PENDING' ? 'UBETALT' : 'KANSELLERT'}</p>
-        </div>
+    // Totals
+    doc.fontSize(11);
+    doc.text(`Bruttobeløp: ${formatCurrencyNO(data.gross_amount)}`, { align: 'right' });
+    doc.text(`Egenandel refusjon: ${formatCurrencyNO(data.insurance_amount)}`, { align: 'right' });
+    doc.moveDown(0.5);
+    doc.fontSize(14).font('Helvetica-Bold');
+    doc.text(`Å betale: ${formatCurrencyNO(data.patient_amount)}`, { align: 'right' });
+    doc.moveDown(1.5);
 
-        <div class="footer">
-          <p>${data.clinic_name} | ${data.clinic_address} | Tlf: ${data.clinic_phone} | ${data.clinic_email}</p>
-        </div>
-      </body>
-      </html>
-    `;
+    // Payment info
+    doc.fontSize(10).font('Helvetica');
+    doc.font('Helvetica-Bold').text('Betalingsinformasjon:');
+    doc.font('Helvetica');
+    doc.text('Vennligst betal innen 14 dager.');
+    doc.moveDown(0.5);
 
-    logger.info(`Generated invoice for financial metric ${financialMetricId}`);
+    const statusMap = {
+      'PAID': 'BETALT',
+      'PENDING': 'UBETALT',
+      'CANCELLED': 'KANSELLERT'
+    };
+    const statusText = statusMap[data.payment_status] || data.payment_status;
+    doc.font('Helvetica-Bold').text(`Status: ${statusText}`);
+
+    // Footer
+    const footerY = doc.page.height - 50;
+    doc.fontSize(8).font('Helvetica').fillColor('#666666');
+    const footerText = [
+      data.clinic_name,
+      data.clinic_address,
+      data.clinic_phone ? `Tlf: ${data.clinic_phone}` : null,
+      data.clinic_email
+    ].filter(Boolean).join(' | ');
+    doc.text(footerText, 50, footerY, { align: 'center', width: 495 });
+
+    // Convert to buffer
+    const pdfBuffer = await pdfToBuffer(doc);
+
+    logger.info(`Generated invoice PDF for financial metric ${financialMetricId}`, {
+      size: pdfBuffer.length,
+      invoiceNumber: data.invoice_number
+    });
 
     return {
-      html,
-      filename: `Faktura_${data.invoice_number}_${data.last_name}.pdf`,
+      buffer: pdfBuffer,
+      contentType: 'application/pdf',
+      filename: `Faktura_${data.invoice_number || 'unknown'}_${data.last_name || 'patient'}.pdf`,
       invoice_number: data.invoice_number
     };
   } catch (error) {
@@ -383,7 +579,65 @@ export const generateInvoice = async (organizationId, financialMetricId) => {
   }
 };
 
+/**
+ * Generate a simple text-based PDF (for custom letters)
+ * @param {Object} options - PDF options
+ * @param {string} options.title - Document title
+ * @param {string} options.content - Main content
+ * @param {Object} options.clinic - Clinic info
+ * @param {Object} options.patient - Patient info (optional)
+ * @returns {Promise<Object>} PDF buffer and metadata
+ */
+export const generateCustomPDF = async (options) => {
+  try {
+    const { title, content, clinic = {}, patient = null, practitioner = null } = options;
+
+    const doc = createPDFDocument();
+
+    // Header
+    doc.fontSize(20).font('Helvetica-Bold').text(title || 'Dokument', { align: 'center' });
+    doc.moveDown(0.5);
+    doc.moveTo(50, doc.y).lineTo(545, doc.y).stroke();
+    doc.moveDown(1);
+
+    // Clinic info
+    if (clinic.name) {
+      doc.fontSize(10).font('Helvetica');
+      doc.text(clinic.name, { align: 'right' });
+      if (clinic.address) doc.text(clinic.address, { align: 'right' });
+      doc.text(`Dato: ${formatDateNO(new Date())}`, { align: 'right' });
+      doc.moveDown(1);
+    }
+
+    // Patient info
+    if (patient) {
+      drawPatientInfo(doc, patient);
+    }
+
+    // Main content
+    doc.fontSize(11).font('Helvetica');
+    doc.text(content || '', { align: 'justify' });
+
+    // Signature
+    if (practitioner) {
+      drawSignature(doc, practitioner);
+    }
+
+    const pdfBuffer = await pdfToBuffer(doc);
+
+    return {
+      buffer: pdfBuffer,
+      contentType: 'application/pdf',
+      filename: `${title || 'document'}_${formatDateNO(new Date()).replace(/\./g, '-')}.pdf`
+    };
+  } catch (error) {
+    logger.error('Error generating custom PDF:', error);
+    throw error;
+  }
+};
+
 export default {
   generatePatientLetter,
-  generateInvoice
+  generateInvoice,
+  generateCustomPDF
 };
