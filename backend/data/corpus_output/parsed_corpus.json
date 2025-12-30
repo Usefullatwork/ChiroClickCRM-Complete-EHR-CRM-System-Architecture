@@ -1,0 +1,688 @@
+{
+  "totalNotes": 16,
+  "notes": [
+    {
+      "metadata": {},
+      "sections": {},
+      "raw": "JOURNALDATA: SAMMENSATT KORPUS\nNotater for trening til AI og bygging av template modeller og forståelse i undersøkelser og behandlings notater",
+      "type": "mixed",
+      "regions": [],
+      "techniques": [],
+      "commonPhrases": {
+        "positive_findings": [],
+        "negative_findings": [],
+        "treatment_outcomes": [],
+        "patient_responses": []
+      },
+      "id": "note_1"
+    },
+    {
+      "metadata": {
+        "date": "12.01.2024"
+      },
+      "sections": {},
+      "raw": "Journalnotat: Cervical og Thoracal Plager (Oppfølging)\nDato: 12.01.2024\nBehandling: Bedre. V interscapulær mm bvm, slipper bra. Bilat trapz ims, Pasienten samtykker til nålebehandling. Området som skal penetreres med nål desinfeseres nøye før teknikken utføres. V lats bvm, slipper bra. V lats ims, Pasienten samtykker til nålebehandling. Området som skal penetreres med nål desinfeseres nøye før teknikken utføres. V trapz bvm, slipper bra. T4 hvla, slipper bra. T6 hvla, slipper bra. Ser om en uke.",
+      "type": "behandling",
+      "regions": [
+        "cervical",
+        "thoracal"
+      ],
+      "techniques": [
+        "bvm",
+        "ims",
+        "hvla"
+      ],
+      "commonPhrases": {
+        "positive_findings": [],
+        "negative_findings": [],
+        "treatment_outcomes": [
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "bedre"
+        ],
+        "patient_responses": [
+          "pasienten samtykker",
+          "pasienten samtykker"
+        ]
+      },
+      "id": "note_2"
+    },
+    {
+      "metadata": {
+        "date": "05.01.2024"
+      },
+      "sections": {
+        "cervical": "",
+        "observasjon": "ua\n\nArom/Prom: ua",
+        "arom_prom": "ua",
+        "palpasjon": "palpasjon av v trapz, interscapulær mm trigger kjent smerte i v ux. Også anspent i rotatorcuff infraspinatus og noe i nakke.",
+        "reflekser": "Biceps: ua, Triceps: ua, Brachioradial: ua\n\nIsometriske tester: Biceps: ua, Triceps: ua, Pronasjon: ua, Supinasjon: ua, Fingerabduksjon: ua\n\nSensibilitet ox: ua\n\nHoffmans test: ua",
+        "isometriske_tester": "Biceps: ua, Triceps: ua, Pronasjon: ua, Supinasjon: ua, Fingerabduksjon: ua\n\nSensibilitet ox: ua\n\nHoffmans test: ua"
+      },
+      "raw": "Journalnotat: Cervical Undersøkelse\nDato: 05.01.2024\nUndersøkelse: Cervical undersøkelse:\n\nObservasjon: ua\n\nArom/Prom: ua\n\nSpurling: ua\n\nReflekser: Biceps: ua, Triceps: ua, Brachioradial: ua\n\nIsometriske tester: Biceps: ua, Triceps: ua, Pronasjon: ua, Supinasjon: ua, Fingerabduksjon: ua\n\nSensibilitet ox: ua\n\nHoffmans test: ua\n\nPalpasjon: palpasjon av v trapz, interscapulær mm trigger kjent smerte i v ux. Også anspent i rotatorcuff infraspinatus og noe i nakke.",
+      "type": "undersøkelse",
+      "regions": [
+        "cervical"
+      ],
+      "techniques": [],
+      "commonPhrases": {
+        "positive_findings": [
+          "trigger kjent smerte"
+        ],
+        "negative_findings": [
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua"
+        ],
+        "treatment_outcomes": [],
+        "patient_responses": []
+      },
+      "id": "note_3"
+    },
+    {
+      "metadata": {
+        "date": "02.01.2024"
+      },
+      "sections": {
+        "behandling": "V interscapulær mm bvm, slipper bra. Bilat trapz ims, Pasienten samtykker til nålebehandling. Området som skal penetreres med nål desinfeseres nøye før teknikken utføres. V lats bvm, slipper bra. V lats ims, Pasienten samtykker til nålebehandling. Området som skal penetreres med nål desinfeseres nøye før teknikken utføres. V trapz bvm, slipper bra. T6 hvla, slipper bra. T4 hvla, slipper bra. Ser fredag og neste fredag.",
+        "konklusjon": "Plagene skyldes sannsynligvis overbelastning over tid fra jobb, uten å trene for å tåle jobben. Deler opp i to faser hvor første fase er å få han smertefri fra denne omgangen med smerte. Så blir det langsiktig tenkning. Første fase 2-5 beh, andre fase bør fysio inn og han bør få litt veiledet trening. Snakker om at han kan lage seg noe utstyr i smia si f.eks."
+      },
+      "raw": "Journalnotat: Behandling Rygg/Skulder\nDato: 02.01.2024\nBehandling: V interscapulær mm bvm, slipper bra. Bilat trapz ims, Pasienten samtykker til nålebehandling. Området som skal penetreres med nål desinfeseres nøye før teknikken utføres. V lats bvm, slipper bra. V lats ims, Pasienten samtykker til nålebehandling. Området som skal penetreres med nål desinfeseres nøye før teknikken utføres. V trapz bvm, slipper bra. T6 hvla, slipper bra. T4 hvla, slipper bra. Ser fredag og neste fredag.\n\nKonklusjon: Plagene skyldes sannsynligvis overbelastning over tid fra jobb, uten å trene for å tåle jobben. Deler opp i to faser hvor første fase er å få han smertefri fra denne omgangen med smerte. Så blir det langsiktig tenkning. Første fase 2-5 beh, andre fase bør fysio inn og han bør få litt veiledet trening. Snakker om at han kan lage seg noe utstyr i smia si f.eks.\n\nAnamnese: Han oppsøker i dag klinikken på grunn av stråling ned i venstre arm, som gjør ganske vondt. Smerter kommer fra midten av skulderbladet og stråler ut i armen. For to uker siden, mandag før julaften, kom disse smertene akutt. Gjennom uken ble de verre, og julaften var han på akutt kiropraktikk i Vika. Han kjenner også smerten i thoracolumbale overgangen. Disse plagene debuterte da han skulle bære en sekk med ved. Han har hatt plager siden han var omtrent fjorten år gammel, med hyppige låsninger her og der. Tidligere har han gått til Halle på Stabekk av og til for behandling. Han jobber som smed og driver en smie på Bekkestua, noe som innebærer mye tunge løft og arbeid med rekkverk. Han trener lite slik det er nå, men har stang i smia og noe vekter. Ingen medisiner er nevnt i notatet. Anbefaler nå 2-4 behandlinger tett for å ta den værste tensjonen, så starter vi med tverrfaglig behandling med fysioterapi. Snakker om tilrettelegging for trening på jobb, og å følge opp med fysioterapi og osteopati over tid.",
+      "type": "anamnese",
+      "regions": [
+        "cervical",
+        "thoracal",
+        "lumbal",
+        "skulder"
+      ],
+      "techniques": [
+        "bvm",
+        "ims",
+        "hvla"
+      ],
+      "commonPhrases": {
+        "positive_findings": [
+          "vondt",
+          "smerter"
+        ],
+        "negative_findings": [],
+        "treatment_outcomes": [
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra"
+        ],
+        "patient_responses": [
+          "pasienten samtykker",
+          "pasienten samtykker"
+        ]
+      },
+      "id": "note_4"
+    },
+    {
+      "metadata": {
+        "date": "02.01.2024"
+      },
+      "sections": {
+        "undersøkelse": "Cervical: Spurling: ua. Reflekser ox: ua. Sensibilitet ox: ua. Ingen krafttap i ox. Lumbal: Kemp: ua. Slump: ua. Reflekser ux: ua. Sensibilitet ux: ua. Palpasjon: palpasjonsøm høyre ekstensor antebrachi, biceps brachi, h ant delt, h trapz, h interscapulær mm, h ql og h sete.",
+        "lumbal": "Kemp: ua. Slump: ua. Reflekser ux: ua. Sensibilitet ux: ua. Palpasjon: palpasjonsøm høyre ekstensor antebrachi, biceps brachi, h ant delt, h trapz, h interscapulær mm, h ql og h sete.",
+        "palpasjon": "palpasjonsøm høyre ekstensor antebrachi, biceps brachi, h ant delt, h trapz, h interscapulær mm, h ql og h sete."
+      },
+      "raw": "Journalnotat: Cervical og Lumbal Undersøkelse\nDato: 02.01.2024\nUndersøkelse: Cervical: Spurling: ua. Reflekser ox: ua. Sensibilitet ox: ua. Ingen krafttap i ox. Lumbal: Kemp: ua. Slump: ua. Reflekser ux: ua. Sensibilitet ux: ua. Palpasjon: palpasjonsøm høyre ekstensor antebrachi, biceps brachi, h ant delt, h trapz, h interscapulær mm, h ql og h sete.\n\nBehandling: H sete mm bvm, slipper bra. H paraspinal lumbal mm bvm, slipper bra. H ql inhib og bvm, slipper bra. H interscapulær mm bvm, slipper bra. H trapz bvm, slipper bra. H biceps bvm, slipper bra. H ekstensor mm bvm, slipper bra. T3 hvla, slipper ok. H lunatum hvla, slipper bra. H scaphoideum hvla, slipper bra. H caput radi hvla, slipper bra. Ser mandag.",
+      "type": "undersøkelse",
+      "regions": [
+        "cervical",
+        "thoracal",
+        "lumbal"
+      ],
+      "techniques": [
+        "bvm",
+        "hvla",
+        "inhib"
+      ],
+      "commonPhrases": {
+        "positive_findings": [
+          "palpasjonsøm"
+        ],
+        "negative_findings": [
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua"
+        ],
+        "treatment_outcomes": [
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper ok",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra"
+        ],
+        "patient_responses": []
+      },
+      "id": "note_5"
+    },
+    {
+      "metadata": {
+        "date": "03.01.2024"
+      },
+      "sections": {
+        "behandling": "V paraspinal lumbal mm bvm, slipper bra. V paraspinal thoracal mm bvm, slipper bra. V nedre trapz bvm, slipper bra. T10 lett hvla, slipper bra. L2 v hvla, lett trykk, slipper bra. Viser jeffersons curl og sidebøy med samme prinsipp. Ser om en uke.",
+        "konklusjon": "Tester ukentlig behandling i januar, og annenhver uke i februar. Hun oppfordres til å gjøre øvelser daglig selv, da vil hun trenge færre behandlinger.",
+        "lumbal": "ua",
+        "observasjon": "ua\n\nArom/Prom: ua",
+        "arom_prom": "ua",
+        "palpasjon": "palpasjon av ryggstrekkerne av øvre lumbal og nedre thorax trigger kjent smerte, også svært hyperton i nedre trapz.",
+        "isometriske_tester": "Hoftefleksjon: ua, Hofteekstensjon: ua, Kneekstensjon: ua, Knefleksjon: ua, Plantarfleksjon: ua, Dorsalfleksjon: ua, Hallux ekstensjon: ua\n\nBalanse og styrke i beina: Oppleves normalt\n\nSensibilitet Sete og ux: ua"
+      },
+      "raw": "Journalnotat: Thoracolumbal Behandling\nBehandling: V paraspinal lumbal mm bvm, slipper bra. V paraspinal thoracal mm bvm, slipper bra. V nedre trapz bvm, slipper bra. T10 lett hvla, slipper bra. L2 v hvla, lett trykk, slipper bra. Viser jeffersons curl og sidebøy med samme prinsipp. Ser om en uke.\n\nUndersøkelse (Lumbalcolumna):\nDato: 03.01.2024\n\nObservasjon: ua\n\nArom/Prom: ua\n\nKemp: noe vondt v side øvre lumbal, ingen radierende smerter\n\nSlump: ua\n\nLasegue/SLR: ua\n\nTå/hæl gange: ua\n\nReflekser ux: Patella: ua, Achilles: ua\n\nIsometriske tester: Hoftefleksjon: ua, Hofteekstensjon: ua, Kneekstensjon: ua, Knefleksjon: ua, Plantarfleksjon: ua, Dorsalfleksjon: ua, Hallux ekstensjon: ua\n\nBalanse og styrke i beina: Oppleves normalt\n\nSensibilitet Sete og ux: ua\n\nBabinsky: ikke utført\n\nKlonus: ikke utført\n\nVentral lumbal provokasjon av nedre lumbal: ua\n\nPalpasjon: palpasjon av ryggstrekkerne av øvre lumbal og nedre thorax trigger kjent smerte, også svært hyperton i nedre trapz.\n\nKonklusjon: Tester ukentlig behandling i januar, og annenhver uke i februar. Hun oppfordres til å gjøre øvelser daglig selv, da vil hun trenge færre behandlinger.\n\nAnamnese: Hun oppsøker i dag klinikken på grunn av smerte og stivhet i venstre lumbal og thoracolumbale overgang. Hun er ganske anspent i dette området nå og har vært det en stund. For halvannet år siden opplevde hun en overbelastning da hun skulle trimme 300 trær på kort tid. Siden da har smertene gradvis blitt verre, og de ble spesielt smertefulle noen uker etter overbelastningen. Hun oppsøkte behandling for dette et par måneder senere. Hun ønsker i første omgang å fokusere på ryggen. I tillegg begynte venstre skulder å gjøre vondt for omtrent en måned siden. Dette skjedde mens hun var i et varmt basseng, der hun ikke støtte hardt på noe, men bare svømte rolig. Hun fikk smerte i skulderen i et svømmetak, og siden da har smertene gradvis blitt verre. Ingen medisiner.",
+      "type": "anamnese",
+      "regions": [
+        "thoracal",
+        "lumbal",
+        "skulder",
+        "hofte",
+        "kne",
+        "fot"
+      ],
+      "techniques": [
+        "bvm",
+        "hvla"
+      ],
+      "commonPhrases": {
+        "positive_findings": [
+          "vondt",
+          "smerter",
+          "hyperton",
+          "vondt",
+          "trigger kjent smerte"
+        ],
+        "negative_findings": [
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua"
+        ],
+        "treatment_outcomes": [
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra"
+        ],
+        "patient_responses": []
+      },
+      "id": "note_6"
+    },
+    {
+      "metadata": {},
+      "sections": {
+        "undersøkelse": "Cervical undersøkelse:\n\nObservasjon: noe elevert skulder høyre side, synlig god muskelfylde og hypertonisitet i trapz bilat, spesielt h side.\n\nArom/Prom: kjenner det strammer litt i ytterstilling i rot og fleks.\n\nSpurling: ua\n\nReflekser: Biceps: ua, Triceps: ua, Brachioradial: ua\n\nIsometriske tester: Biceps: ua, Triceps: ua, Pronasjon: ua, Supinasjon: ua, Fingerabduksjon: ua\n\nSensibilitet ox: ua\n\nHoffmans test: ua\n\nPalpasjon: palpasjon av h trapz og lev sca trigger kjent smerte han har hatt de siste dagene. Er også hyperton interscapulært og noe leddrestriksjon thoracalt fra TL overgang og opp til h 1 ribbe.",
+        "konklusjon": "Trolig en akutt smerte i et triggerpunkt, usikker årsak, bør bli raskt bra.",
+        "cervical": "",
+        "observasjon": "noe elevert skulder høyre side, synlig god muskelfylde og hypertonisitet i trapz bilat, spesielt h side.\n\nArom/Prom: kjenner det strammer litt i ytterstilling i rot og fleks.",
+        "arom_prom": "kjenner det strammer litt i ytterstilling i rot og fleks.",
+        "palpasjon": "palpasjon av h trapz og lev sca trigger kjent smerte han har hatt de siste dagene. Er også hyperton interscapulært og noe leddrestriksjon thoracalt fra TL overgang og opp til h 1 ribbe.\n\nBehandling (05.01.2024): H trapz ims, Pasienten samtykker til nålebehandling. Området som skal penetreres med nål desinfeseres nøye før teknikken utføres. H lev sca bvm, slipper bra. Bilat interscapulær mm bvm, slipper bra. H infraspintus bvm, slipper bra. H 1 ribbe hvla, slipper bra. T4 hvla, slipper bra. T6 h hvla, slipper bra. L1 h hvla, slipper bra. T1 h hvla, slipper bra. T2 v hvla, slipper bra. C7 h hvla, slipper bra. Snakker om styrketrening og at han må ha fokus på retraksjon og depresjon av skulderen og aktive skulderblader under trekk og nedtrekk øvelser. Booker selv over helgen ved behov, reiser tilbake til Trondheim i midten av neste uke.",
+        "reflekser": "Biceps: ua, Triceps: ua, Brachioradial: ua\n\nIsometriske tester: Biceps: ua, Triceps: ua, Pronasjon: ua, Supinasjon: ua, Fingerabduksjon: ua\n\nSensibilitet ox: ua\n\nHoffmans test: ua",
+        "isometriske_tester": "Biceps: ua, Triceps: ua, Pronasjon: ua, Supinasjon: ua, Fingerabduksjon: ua\n\nSensibilitet ox: ua\n\nHoffmans test: ua"
+      },
+      "raw": "Journalnotat: Cervical Undersøkelse og Behandling\nUndersøkelse: Cervical undersøkelse:\n\nObservasjon: noe elevert skulder høyre side, synlig god muskelfylde og hypertonisitet i trapz bilat, spesielt h side.\n\nArom/Prom: kjenner det strammer litt i ytterstilling i rot og fleks.\n\nSpurling: ua\n\nReflekser: Biceps: ua, Triceps: ua, Brachioradial: ua\n\nIsometriske tester: Biceps: ua, Triceps: ua, Pronasjon: ua, Supinasjon: ua, Fingerabduksjon: ua\n\nSensibilitet ox: ua\n\nHoffmans test: ua\n\nPalpasjon: palpasjon av h trapz og lev sca trigger kjent smerte han har hatt de siste dagene. Er også hyperton interscapulært og noe leddrestriksjon thoracalt fra TL overgang og opp til h 1 ribbe.\n\nBehandling (05.01.2024): H trapz ims, Pasienten samtykker til nålebehandling. Området som skal penetreres med nål desinfeseres nøye før teknikken utføres. H lev sca bvm, slipper bra. Bilat interscapulær mm bvm, slipper bra. H infraspintus bvm, slipper bra. H 1 ribbe hvla, slipper bra. T4 hvla, slipper bra. T6 h hvla, slipper bra. L1 h hvla, slipper bra. T1 h hvla, slipper bra. T2 v hvla, slipper bra. C7 h hvla, slipper bra. Snakker om styrketrening og at han må ha fokus på retraksjon og depresjon av skulderen og aktive skulderblader under trekk og nedtrekk øvelser. Booker selv over helgen ved behov, reiser tilbake til Trondheim i midten av neste uke.\n\nKonklusjon: Trolig en akutt smerte i et triggerpunkt, usikker årsak, bør bli raskt bra.\n\nAnamnese: Han oppsøker i dag klinikk på grunn av smerter han har opplevd i nakken og ryggen i to dager. Han hadde litt vondt i nakken og ryggen forrige dagen, som ble litt verre i går. Han måtte avbryte treningen etter to sett med benkpress, da han kjente at det ikke gikk og smertene ble verre i løpet av dagen. Smertene samlet seg i et punkt bak ved høyre skulderblad, og han merker det godt når han beveger på høyre skulder og nakken. Tilstanden virket noe bedre i dag. Han har god bevegelighet i nakken, men det gjør vondt i ytterstillingene av rotasjon og fleksjon. Dette er første gang han har opplevd disse plagene. Han har fått kommentarer om at han har blitt litt skjevere i ryggen. Han er usikker på hva som kan ha utløst plagene, men spekulerer på om det kan være på grunn av en mykere seng hjemme. Han studerer kybernetikk og robotikk ved NTNU. Det er ingen strålende smerter, prikking eller parestesier i overekstremitetene, men han kjenner det ut i skulderleddet, og litt når han tar hele armen over hodet. Han trener styrketrening tre ganger i uken, og har holdt på med dette i to måneder. Pasienten tar ingen medisiner.",
+      "type": "anamnese",
+      "regions": [
+        "cervical",
+        "thoracal",
+        "lumbal",
+        "skulder"
+      ],
+      "techniques": [
+        "bvm",
+        "ims",
+        "hvla",
+        "tgp"
+      ],
+      "commonPhrases": {
+        "positive_findings": [
+          "hyperton",
+          "smerter",
+          "vondt",
+          "vondt",
+          "smerter",
+          "trigger kjent smerte"
+        ],
+        "negative_findings": [
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua"
+        ],
+        "treatment_outcomes": [
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "bedre"
+        ],
+        "patient_responses": [
+          "pasienten samtykker"
+        ]
+      },
+      "id": "note_7"
+    },
+    {
+      "metadata": {},
+      "sections": {
+        "anamnese": "Kommer akutt idag på anbefaling fra turntrener og hjelpetrener da hun har akutt kink i nakken. Det startet på fredag med vondt i ryggen interscapulært. Søndag var hun på trening, slår hjul og gjør mye der hun jobber med utstrakte hender. Kjente noe under et hopp i nakken, men var ikke umiddelbart vondt. Når hun våknet idag var hun veldig vond. Hun har hodet i avvergestilling mot høyre og klarer ikke løfte armen over hodet. Merker selv hun er hoven på høyre side i nakken. Klarer nesten ikke rotere eller sidebøye. Måtte avbryte turntrening istad pga dette. Har ikke hatt dette tidligere. Ingen strålende smerter, prikking eller parestesier i ox.",
+        "behandling": "Cervical traksjon, god effekt, ror muskler noe. H trapz inhib og lett bvm, slipper bra. Bilat paraspinal cervical mm bvm, slipper bra. C2 v gapping, slipper bra. C3 h lett hvla, slipper bra. T5 hvla, slipper bra. T11 hvla, slipper bra. Snakker med mor på tlf i morgen og onsdag, mulig oppfølging onsdag.",
+        "cervical": "",
+        "observasjon": "hodet i sidebøy mot høyre og litt rotasjon mot venstre, synlig affisert av smerte. Gråter når hun tar av seg jakken og legger seg ned på benken.\n\nArom/Prom: svært nedsatt i alle retninger.",
+        "arom_prom": "svært nedsatt i alle retninger.",
+        "palpasjon": "svært palpasjonsøm høyre trapz, og øm i resten av nakken totalt sett. Tydelig i spasme.",
+        "reflekser": "ua (Biceps, Triceps, Brachioradial).\n\nIsometriske tester: ua.\n\nSensibilitet ox: ua.\n\nHoffmans test: ua.",
+        "isometriske_tester": "ua.\n\nSensibilitet ox: ua.\n\nHoffmans test: ua."
+      },
+      "raw": "Journalnotat: Akutt Nakke/Rygg Behandling\nBehandling: Cervical traksjon, god effekt, ror muskler noe. H trapz inhib og lett bvm, slipper bra. Bilat paraspinal cervical mm bvm, slipper bra. C2 v gapping, slipper bra. C3 h lett hvla, slipper bra. T5 hvla, slipper bra. T11 hvla, slipper bra. Snakker med mor på tlf i morgen og onsdag, mulig oppfølging onsdag.\n\nKonklusjon (08.01.2024): Smerten skyldes trolig overbelastning av h trapz og låsning i øvre nakke. Bør bli raskt bra. Anbefalt varme og ispose, samt ikke trening på noen dager. Vi ser an fortløpende behov for behandling.\n\nAnamnese: Kommer akutt idag på anbefaling fra turntrener og hjelpetrener da hun har akutt kink i nakken. Det startet på fredag med vondt i ryggen interscapulært. Søndag var hun på trening, slår hjul og gjør mye der hun jobber med utstrakte hender. Kjente noe under et hopp i nakken, men var ikke umiddelbart vondt. Når hun våknet idag var hun veldig vond. Hun har hodet i avvergestilling mot høyre og klarer ikke løfte armen over hodet. Merker selv hun er hoven på høyre side i nakken. Klarer nesten ikke rotere eller sidebøye. Måtte avbryte turntrening istad pga dette. Har ikke hatt dette tidligere. Ingen strålende smerter, prikking eller parestesier i ox.\n\nUndersøkelse: Cervical undersøkelse:\n\nObservasjon: hodet i sidebøy mot høyre og litt rotasjon mot venstre, synlig affisert av smerte. Gråter når hun tar av seg jakken og legger seg ned på benken.\n\nArom/Prom: svært nedsatt i alle retninger.\n\nSpurling: ikke mulig å utføre.\n\nReflekser: ua (Biceps, Triceps, Brachioradial).\n\nIsometriske tester: ua.\n\nSensibilitet ox: ua.\n\nHoffmans test: ua.\n\nPalpasjon: svært palpasjonsøm høyre trapz, og øm i resten av nakken totalt sett. Tydelig i spasme.",
+      "type": "anamnese",
+      "regions": [
+        "cervical",
+        "thoracal",
+        "kne"
+      ],
+      "techniques": [
+        "bvm",
+        "hvla",
+        "inhib",
+        "traksjon",
+        "gapping"
+      ],
+      "commonPhrases": {
+        "positive_findings": [
+          "vondt",
+          "vondt",
+          "smerter",
+          "palpasjonsøm"
+        ],
+        "negative_findings": [
+          "ua",
+          "ua",
+          "ua",
+          "ua"
+        ],
+        "treatment_outcomes": [
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra"
+        ],
+        "patient_responses": []
+      },
+      "id": "note_8"
+    },
+    {
+      "metadata": {
+        "date": "22.02.2024"
+      },
+      "sections": {
+        "anamnese": "Kommer i klinikk idag for kostveiledning for irritabel tarm, er henvist fra kvinnehelsesenter. Plager med magen, løs avføring og øm mage etter måltider. Prøvd lowfoodmap diet uten suksess. Usikker varighet, men siden mai, forverret siste mnd. Ofte magesmerter, vanskelig å lokalisere. Reagerer på melkeprodukter og olivenolje (diare/øm mage). Har mye kramper og vondt i magen. Lite matlyst, ofte kvalm. Gjærbakst og alkohol er triggere. Forverring før reise til Tanzania i fjor (var forstoppet der i 3 mnd, brukte laksoral/mikrolaks). Nå løs avføring. Tidligere plager fra tenårene (også vaginisme). Mye stress i hverdagen (jobb/studier), som påvirker magen. Spiser lite frokost/lunsj, mye middag. Diare ofte etter middag. Analyse av kostdagbok:\n\nFettmalabsorpsjon? (olivenolje).\n\nMeieriprodukter kuttet, men spiser brunost.\n\nStress, angst, søvnfaktorer?"
+      },
+      "raw": "Journalnotat: Kostveiledning / IBS / Irritabel Tarm\nDato: 22.02.2024\nAnamnese: Kommer i klinikk idag for kostveiledning for irritabel tarm, er henvist fra kvinnehelsesenter. Plager med magen, løs avføring og øm mage etter måltider. Prøvd lowfoodmap diet uten suksess. Usikker varighet, men siden mai, forverret siste mnd. Ofte magesmerter, vanskelig å lokalisere. Reagerer på melkeprodukter og olivenolje (diare/øm mage). Har mye kramper og vondt i magen. Lite matlyst, ofte kvalm. Gjærbakst og alkohol er triggere. Forverring før reise til Tanzania i fjor (var forstoppet der i 3 mnd, brukte laksoral/mikrolaks). Nå løs avføring. Tidligere plager fra tenårene (også vaginisme). Mye stress i hverdagen (jobb/studier), som påvirker magen. Spiser lite frokost/lunsj, mye middag. Diare ofte etter middag. Analyse av kostdagbok:\n\nFettmalabsorpsjon? (olivenolje).\n\nMeieriprodukter kuttet, men spiser brunost.\n\nStress, angst, søvnfaktorer?\n\nBehandling/Tiltak: Føler god effekt av tidligere råd, fastere avføring (1 gang pr dag). Merker avocado. Spiser laktosefritt. Tiltak:\n\nFinn halspastiller uten sukkeralkoholer (unngå sorbitol, mannitol etc., velg Stevia).\n\nHold deg symptomfri og noter erfaringer i dagbok.\n\nStresstest på laktose (2, 4, 6-8 dl melk over 3 dager).\n\nFruktaner: kutt ut (spesielt løk og korn).\n\nPolyoler: kutt tyggis/pastiller.\n\nMåltidsrytme: Øk frokost med 50-100%, solid lunsj, mellommåltid for å redusere middagsmengde. Test en uke.\n\nStressmestring: Bøker/podcast/psykolog.\n\nLegebesøk: Utelukk cøliaki og sjekk fetmalabsorpsjon (oljete avføring).\n\nKost- og symptomdagbok inkludert stressnivå.\n\nSer om fire uker.",
+      "type": "anamnese",
+      "regions": [],
+      "techniques": [],
+      "commonPhrases": {
+        "positive_findings": [
+          "vondt"
+        ],
+        "negative_findings": [],
+        "treatment_outcomes": [],
+        "patient_responses": []
+      },
+      "id": "note_9"
+    },
+    {
+      "metadata": {
+        "date": "08.02.2024"
+      },
+      "sections": {
+        "undersøkelse": "Cervical undersøkelse:\n\nObservasjon: synlig hyperton med holdning i form av upper crossed syndrom.\n\nArom/Prom: nakken er ok i bev, stiv i alle retninger. Når jeg forsøker å få henne til å retrahere hodet får hun ikke kontakt med fremre halsmuskler, og klarer kun ekstensjon. Det samme ved retraksjon og depressjon av skuldrene, det er liten aktivering.\n\nSpurling: ua. Reflekser: ua. Isometriske tester: ua. Sensibilitet ox: ua. Hoffmans test: ua.\n\nPalpasjon: hun er svært hyperton og palpasjonsøm interscapulært trapz, lat og paraspinal cx, samt sub oc mm. Sternocleido mm svært ømt.",
+        "behandling": "Hadde ganske vondt etter behandlingen i et par dager etter sist, men etter det ble hun veldig mye bedre. Sitter også en del nederst i korsryggen. Bilat trapz bvm, slipper bra. Bilat pec minor inhib, slipper bra. Bilat sternocleido tgp, slipper bra. Bilat paraspinal cervical mm bvm, slipper bra. Bilat suboccipital mm bvm, slipper bra. Diskuterer strategier for trening, tester trening med Andreas. Anbefaler 10 klipp før avgjørelse om fast. Ser om en uke.\n\nDato: 01.02.2024\nBehandling: Litt øm etter sist, synes hun har blitt litt lettere i nakke og skuldre. Ved fleksjonsøvelser har hun kjent noe ut i skulderen. Bilat trapz bvm, slipper bra. Bilat pec minor inhib, slipper bra. Bilat sternocleido tgp, slipper bra. Bilat paraspinal cervical mm bvm, slipper bra. Bilat suboccipital mm bvm, slipper bra. Ser om en uke.\n\nDato: 18.01.2024",
+        "cervical": "",
+        "observasjon": "synlig hyperton med holdning i form av upper crossed syndrom.\n\nArom/Prom: nakken er ok i bev, stiv i alle retninger. Når jeg forsøker å få henne til å retrahere hodet får hun ikke kontakt med fremre halsmuskler, og klarer kun ekstensjon. Det samme ved retraksjon og depressjon av skuldrene, det er liten aktivering.",
+        "arom_prom": "nakken er ok i bev, stiv i alle retninger. Når jeg forsøker å få henne til å retrahere hodet får hun ikke kontakt med fremre halsmuskler, og klarer kun ekstensjon. Det samme ved retraksjon og depressjon av skuldrene, det er liten aktivering.",
+        "palpasjon": "hun er svært hyperton og palpasjonsøm interscapulært trapz, lat og paraspinal cx, samt sub oc mm. Sternocleido mm svært ømt.\n\nKonklusjon (11.01.2024): Dette er en tydelig psykosomatisk case der det er forespeilet ukentlig oppfølging over tid, og det er helt avhengig av oppfølging fra henne selv. Både med styrkeøvelser og intervaller. Blir enige om at hun skal gjøre noe hver dag. Hun skal også starte hos Psykolog, anbefaler Morten MN. Ser ukentlig fremover. På sikt muligens trene med fysio.\n\nAnamnese (11.01.2024): Hun oppsøker i dag klinikken på grunn av angst og stress, som hun har slitt med av og på gjennom livet. Disse plagene har forverret seg under pandemien. Hun føler at stresset påvirker nakken og skuldrene, og beskriver en anspent følelse som trekker seg opp i trapeziusmusklene. To uker etter mottak av første vaksinedose opplevde hun en forverring, og ble \"helt rar\" i hele kroppen. Hun tror selv at vaksinen kan ha vært en utløsende faktor. Tilstanden har bedret seg noe, og hun er nå i stand til å gå i en butikk. Det er ingen rapporter om strålende smerter, prikking eller parestesier i overekstremitetene (ox). Hun har ikke vært hos en psykolog og har heller ikke vurdert det. Hun nevner ikke at hun har trent, men vi snakker om \"fire ganger fire\" som en god mulighet da hun lufter hunden daglig. Pasienten tar Escitalopram 10 mg, men ingen andre medisiner.\n\nBehandling (11.01.2024): Snakker om helhetlig behandling, både med osteopati, psykolog og øvelser. Hun ønsker først å teste øvelser med meg. Jeg viser skulderretraksjon og hoderetraksjon, hun har store problemer med å få til dette. Bilat trapz bvm, slipper bra. Bilat pec minor inhib, slipper bra. Bilat sternocleido tgp, slipper bra. Bilat paraspinal cervical mm bvm, slipper bra. Bilat suboccipital mm bvm, slipper bra. Anbefaler myworkoutgo.",
+        "reflekser": "ua. Isometriske tester: ua. Sensibilitet ox: ua. Hoffmans test: ua.",
+        "isometriske_tester": "ua. Sensibilitet ox: ua. Hoffmans test: ua."
+      },
+      "raw": "Journalnotat: Nakke/Skulder - Psykosomatisk\nDato: 08.02.2024\nBehandling: Hadde ganske vondt etter behandlingen i et par dager etter sist, men etter det ble hun veldig mye bedre. Sitter også en del nederst i korsryggen. Bilat trapz bvm, slipper bra. Bilat pec minor inhib, slipper bra. Bilat sternocleido tgp, slipper bra. Bilat paraspinal cervical mm bvm, slipper bra. Bilat suboccipital mm bvm, slipper bra. Diskuterer strategier for trening, tester trening med Andreas. Anbefaler 10 klipp før avgjørelse om fast. Ser om en uke.\n\nDato: 01.02.2024\nBehandling: Litt øm etter sist, synes hun har blitt litt lettere i nakke og skuldre. Ved fleksjonsøvelser har hun kjent noe ut i skulderen. Bilat trapz bvm, slipper bra. Bilat pec minor inhib, slipper bra. Bilat sternocleido tgp, slipper bra. Bilat paraspinal cervical mm bvm, slipper bra. Bilat suboccipital mm bvm, slipper bra. Ser om en uke.\n\nDato: 18.01.2024\nUndersøkelse: Cervical undersøkelse:\n\nObservasjon: synlig hyperton med holdning i form av upper crossed syndrom.\n\nArom/Prom: nakken er ok i bev, stiv i alle retninger. Når jeg forsøker å få henne til å retrahere hodet får hun ikke kontakt med fremre halsmuskler, og klarer kun ekstensjon. Det samme ved retraksjon og depressjon av skuldrene, det er liten aktivering.\n\nSpurling: ua. Reflekser: ua. Isometriske tester: ua. Sensibilitet ox: ua. Hoffmans test: ua.\n\nPalpasjon: hun er svært hyperton og palpasjonsøm interscapulært trapz, lat og paraspinal cx, samt sub oc mm. Sternocleido mm svært ømt.\n\nKonklusjon (11.01.2024): Dette er en tydelig psykosomatisk case der det er forespeilet ukentlig oppfølging over tid, og det er helt avhengig av oppfølging fra henne selv. Både med styrkeøvelser og intervaller. Blir enige om at hun skal gjøre noe hver dag. Hun skal også starte hos Psykolog, anbefaler Morten MN. Ser ukentlig fremover. På sikt muligens trene med fysio.\n\nAnamnese (11.01.2024): Hun oppsøker i dag klinikken på grunn av angst og stress, som hun har slitt med av og på gjennom livet. Disse plagene har forverret seg under pandemien. Hun føler at stresset påvirker nakken og skuldrene, og beskriver en anspent følelse som trekker seg opp i trapeziusmusklene. To uker etter mottak av første vaksinedose opplevde hun en forverring, og ble \"helt rar\" i hele kroppen. Hun tror selv at vaksinen kan ha vært en utløsende faktor. Tilstanden har bedret seg noe, og hun er nå i stand til å gå i en butikk. Det er ingen rapporter om strålende smerter, prikking eller parestesier i overekstremitetene (ox). Hun har ikke vært hos en psykolog og har heller ikke vurdert det. Hun nevner ikke at hun har trent, men vi snakker om \"fire ganger fire\" som en god mulighet da hun lufter hunden daglig. Pasienten tar Escitalopram 10 mg, men ingen andre medisiner.\n\nBehandling (11.01.2024): Snakker om helhetlig behandling, både med osteopati, psykolog og øvelser. Hun ønsker først å teste øvelser med meg. Jeg viser skulderretraksjon og hoderetraksjon, hun har store problemer med å få til dette. Bilat trapz bvm, slipper bra. Bilat pec minor inhib, slipper bra. Bilat sternocleido tgp, slipper bra. Bilat paraspinal cervical mm bvm, slipper bra. Bilat suboccipital mm bvm, slipper bra. Anbefaler myworkoutgo.",
+      "type": "undersøkelse",
+      "regions": [
+        "cervical",
+        "lumbal",
+        "skulder"
+      ],
+      "techniques": [
+        "bvm",
+        "tgp",
+        "inhib"
+      ],
+      "commonPhrases": {
+        "positive_findings": [
+          "vondt",
+          "hyperton",
+          "hyperton",
+          "palpasjonsøm",
+          "smerter"
+        ],
+        "negative_findings": [
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua"
+        ],
+        "treatment_outcomes": [
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "mye bedre"
+        ],
+        "patient_responses": []
+      },
+      "id": "note_10"
+    },
+    {
+      "metadata": {},
+      "sections": {
+        "behandling": "Status quo, kanskje en liten bedring, men mye det samme. H ant delt bvm, ganske ømt, slipper bra. H pec minor tgp, veldig vondt, spesielt inn mot proc. coracoideus - slipper ok. H trapz bvm, slipper bra. H supraspinatus bvm, slipper bra. H coracobrachialis bvm og ims, trigger sterke og kjente smerter. Setter inn til Arne for øvelser.\n\nBehandling (02.02.2024): Fortsatt vondt i skulderen, spesielt når hun skal flytte dyna f.eks. i ytterstilling, kan kjenne som om skulderen skal litt ut av ledd. Hjelper om hun trykker litt inn på fremsiden på smerten mens hun gjør bevegelsen. Vi snakker om instabilitet i skulderen. Ber henne teste in og utrot med strikk i tillegg til flies og arnoldpress. Behandling utført (bvm, tgp, inhib, hvla C4/C5). Ser om en uke.\n\nBehandling (15.01.2024): Øm etter sist, følte jeg traff noe. Mild hp etter sist. H ant delt bvm, ganske ømt, slipper bra. H pec minor tgp, veldig vondt (proc. coracoideus). H trapz bvm, slipper bra. H supraspinatus bvm, slipper bra. H inhib i fossa supraclavicularis. H paraspinal cervical mm bvm. Bilat suboccipital mm bvm. H temporalis bvm. H C4 hvla. V C5 hvla. Trener på gym hjemme og ønsker øvelser som er litt \"kule\". Viser pec flies og arnoldpress, anbefaler å starte med 2 kg og fokusere på teknikk og øke gradvis.",
+        "isometriske_tester": "ua."
+      },
+      "raw": "Journalnotat: Skulderproblematikk (Pec Minor / Rotator Cuff)\nBehandling: Status quo, kanskje en liten bedring, men mye det samme. H ant delt bvm, ganske ømt, slipper bra. H pec minor tgp, veldig vondt, spesielt inn mot proc. coracoideus - slipper ok. H trapz bvm, slipper bra. H supraspinatus bvm, slipper bra. H coracobrachialis bvm og ims, trigger sterke og kjente smerter. Setter inn til Arne for øvelser.\n\nBehandling (02.02.2024): Fortsatt vondt i skulderen, spesielt når hun skal flytte dyna f.eks. i ytterstilling, kan kjenne som om skulderen skal litt ut av ledd. Hjelper om hun trykker litt inn på fremsiden på smerten mens hun gjør bevegelsen. Vi snakker om instabilitet i skulderen. Ber henne teste in og utrot med strikk i tillegg til flies og arnoldpress. Behandling utført (bvm, tgp, inhib, hvla C4/C5). Ser om en uke.\n\nBehandling (15.01.2024): Øm etter sist, følte jeg traff noe. Mild hp etter sist. H ant delt bvm, ganske ømt, slipper bra. H pec minor tgp, veldig vondt (proc. coracoideus). H trapz bvm, slipper bra. H supraspinatus bvm, slipper bra. H inhib i fossa supraclavicularis. H paraspinal cervical mm bvm. Bilat suboccipital mm bvm. H temporalis bvm. H C4 hvla. V C5 hvla. Trener på gym hjemme og ønsker øvelser som er litt \"kule\". Viser pec flies og arnoldpress, anbefaler å starte med 2 kg og fokusere på teknikk og øke gradvis.\n\nKonklusjon (11.01.2024): Smerten sitter trolig i pec minor og fremre del av rot cuff, 3-8 beh, mulig med hjelp fra fysio.\n\nAnamnese (11.01.2024): Kommer med plager i en lengre periode, tror det startet i juli i fjor. Har hatt plager i høyre skulder. Har vært hos fysio (mistanke biceps overbelastning), hvile gjorde det verre. Å løfte armen rett frem med strak arm gjør vondt. Pushups gjør vondt. Føler skulderen hemmer henne i trening/aktivitet. Liker cardiotimer hvor hun løfter hendene over hodet, men får smerter etterpå. Har en datter på to år, bærer en del. Spilte tennis i fjor sommer. Har lymfødem (medfødt primær), bruker kompresjonsstrømper. Innlagt på sykehus for noen mnder siden med rosen. Har migrene (2 anfall pr mnd), setter seg i skuldre og nakke. Jobber på kontor (kvalitetssjef dagligvare).\n\nUndersøkelse (10.01.2024): Skulder: Neer: ua. Hawkins: ua. Full can: ua. Empty can: ua. Load shift test: ua. Sulcus sign: ua. Krank test: ua. Apprehension test: ua. AC-ledd kompresjonstest: ua. Crossover test: ua. Isometriske tester: ua.",
+      "type": "behandling",
+      "regions": [
+        "cervical",
+        "skulder"
+      ],
+      "techniques": [
+        "bvm",
+        "ims",
+        "hvla",
+        "tgp",
+        "inhib"
+      ],
+      "commonPhrases": {
+        "positive_findings": [
+          "vondt",
+          "smerter",
+          "vondt",
+          "vondt",
+          "vondt",
+          "vondt",
+          "smerter"
+        ],
+        "negative_findings": [
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua",
+          "ua"
+        ],
+        "treatment_outcomes": [
+          "slipper bra",
+          "slipper ok",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "bedring"
+        ],
+        "patient_responses": []
+      },
+      "id": "note_11"
+    },
+    {
+      "metadata": {},
+      "sections": {},
+      "raw": "Journalnotat: Stressrelatert Nakke/Thorax (Rettsak)\nBehandling (10.06.2024): Det er endel av det samme som tidligere hvor det er mye spenninger ifbm. saken som kommer opp. Kjenner det i hø skulderbladområde. Er 40% sykemeldt om dagen. Beh: Leddkorrigering C4 PL, C5 PR, T5, T7. Slipper bra. Traksjon Cx med TrP bilat. Subocc friksjoner bilat. Paraspinal mm. Cx. Friksjoner bilat. interscap. mm. TrP bilat. SCM. TrP hø infra/teres.\n\nBehandling (24.05.2024): Går litt bedre, men setter seg en del. Rettsak om ca 6 uker, og merker det stresser henne en del. Har 40 % sykmelding nå for overskudd. H levator scapulae bvm, slipper bra. H interscapulær mm bvm, slipper bra. T1 h hvla. C6 h hvla. T5 hvla. Booker selv ved behov.\n\nBehandling (06.05.2024): Beh: Leddkorrigering C4 PL, C5 PR, T5, T7. Traksjon Cx med TrP bilat. Subocc friksjoner. Paraspinal mm Cx. Friksjoner interscap. TrP bilat SCM, øvre trap og hø infra/teres. Viser Brugger ekstensjonsøvelser.\n\nBehandling (05.04.2024): Sitter mest h side nå inn mot lev sca og interscapulær mm. Peker også i området som kan tilsvare serraturs post sup, snakker om dette og mulig kobling til stress. Behandling: bvm og hvla (T1, C6, T5).\n\nBehandling (27.03.2024): Mye av det samme, HP følelse og spenninger i skulderbue mm og Cx. Rettssak i juni så dette har nok en del av årsaken. Beh: Leddkorrigering C4, C5, T5, T7. Traksjon Cx med TrP.\n\nBehandling (11.03.2024): H side interscapulær mm og ribber stiv, vondt. Natt til fredag våknet hun med kink i øvre thorax. Tror det er generelt mye, hektisk hverdag. Har også merket det ut i høyre arm, langs triceps og over radius. Jobber som juridisk ansvarlig i Ringnes. Behandling: H interscapulær mm bvm, lev sca tgp, trapz bvm, infraspinatus tgp, ekstensor mm bvm. Hvla: caput radi, scaphoideum, T1.",
+      "type": "behandling",
+      "regions": [
+        "cervical",
+        "thoracal",
+        "skulder",
+        "kne"
+      ],
+      "techniques": [
+        "bvm",
+        "hvla",
+        "tgp",
+        "traksjon"
+      ],
+      "commonPhrases": {
+        "positive_findings": [
+          "vondt"
+        ],
+        "negative_findings": [],
+        "treatment_outcomes": [
+          "slipper bra",
+          "slipper bra",
+          "slipper bra",
+          "bedre"
+        ],
+        "patient_responses": []
+      },
+      "id": "note_12"
+    },
+    {
+      "metadata": {
+        "date": "19.01.2024"
+      },
+      "sections": {
+        "anamnese": "Kommer for veiledning rundt ernæring og idrett. Aktiv TKD utøver, landslaget, skal til EM i Polen (april). Påmeldt i -55 kg, veier nå 49,5 kg. Trener sparring 1 gang/uke, styrke 4 ganger/uke. Samlinger/leire kan ha opp til 3 økter om dagen. Kostholdsanalyse: Spiser lite til frokost (yoghurt/frokostblanding). Lunsj: Brød/frukt. Middag: Vanlig sunn middag (fisk/kjøtt/pasta). Kvelds: Restemat/egg."
+      },
+      "raw": "Journalnotat: Kostveiledning Idrett (TKD)\nDato: 19.01.2024\nAnamnese: Kommer for veiledning rundt ernæring og idrett. Aktiv TKD utøver, landslaget, skal til EM i Polen (april). Påmeldt i -55 kg, veier nå 49,5 kg. Trener sparring 1 gang/uke, styrke 4 ganger/uke. Samlinger/leire kan ha opp til 3 økter om dagen. Kostholdsanalyse: Spiser lite til frokost (yoghurt/frokostblanding). Lunsj: Brød/frukt. Middag: Vanlig sunn middag (fisk/kjøtt/pasta). Kvelds: Restemat/egg.\n\nBehandling/Tiltak: Sendt mail med oppsummering:\n\nAnbefaler PT Martin Thiblin for idrettsspesifikt program.\n\nLast ned MyFitnessPal for å bli kjent med energiinntak.\n\nAnbefalt inntak: 2900 kcal pr dag (fordelt på frokost, lunsj, middag, kvelds, mellommåltid). Proteinmål > 100g/dag.\n\nFrokostforslag: AXA gull, yoghurt, olivenolje, nøtter, melk.\n\nLeir/samlinger: Øk inntak med 800-1000 kcal.\n\nHusholdningssaft og salt under lange økter (>60 min).\n\nVeiing daglig for trendanalyse (ønsker gradvis muskeløkning). Ser om 4-6 uker.",
+      "type": "anamnese",
+      "regions": [],
+      "techniques": [],
+      "commonPhrases": {
+        "positive_findings": [],
+        "negative_findings": [],
+        "treatment_outcomes": [],
+        "patient_responses": []
+      },
+      "id": "note_13"
+    },
+    {
+      "metadata": {},
+      "sections": {
+        "behandling": "bvm og hvla.\n\nBehandling (11.03.2024): Øresusen er litt bedre. Hodet kjennes fortsatt ut som om hun er ør i perioder. Kjent lite spenninger nå, kun i CT overgangen. Behandling: Bilat paraspinal cervical mm bvm, suboccipital mm bvm, temporalis bvm, ptergyideus med intern bvm, masseter bvm. Hvla: C3 v, C2 h, T1 h, T2 h.\n\nBehandling (26.02.2024): Øresusen er bedre. Synes det er vanskelig å finne balansen mellom hvile og jobb. Var litt svimmel igår igjen. Behandling som over."
+      },
+      "raw": "Journalnotat: Tinnitus og Kjeve/Nakke\nBehandling (17.06.2024): Holder seg bra, men merker hun er anspent i øvre nakke. Ofte rar i øynene når hun er sliten og stiv i nakken. Bilat paraspinal cervical mm bvm, bilat paraspinal thoracal mm bvm. Hvla: T8, T5, T1 v, T2 h. Bilat masseter bvm.\n\nBehandling (28.05.2024): Går mye bedre nå. Kjenner mest i ct overgang og bilat kjeve nå. Tinnitus også betydelig bedre. Behandling som over.\n\nBehandling (30.04.2024): Føler seg en del bedre i hodet og nakken. Fortsatt periodevis øresus, lurer på om det kan være andre årsaker (hovne muslinger? - ta opp med ØNH, snakker om conchadiatermi). Behandling: bvm og hvla.\n\nBehandling (11.03.2024): Øresusen er litt bedre. Hodet kjennes fortsatt ut som om hun er ør i perioder. Kjent lite spenninger nå, kun i CT overgangen. Behandling: Bilat paraspinal cervical mm bvm, suboccipital mm bvm, temporalis bvm, ptergyideus med intern bvm, masseter bvm. Hvla: C3 v, C2 h, T1 h, T2 h.\n\nBehandling (26.02.2024): Øresusen er bedre. Synes det er vanskelig å finne balansen mellom hvile og jobb. Var litt svimmel igår igjen. Behandling som over.\n\nAnamnese (25.01.2024): Oppsøkte klinikken pga utmattelse, tretthet, svimmelhet og øresus siden oktober. Øresus (konstant suselyd) kommer og går. Synet føles rart etter sykdom i oktober. Fastlege mistenker reaktiv hypoglykemi (ikke bekreftet). Stresstung jobb som etterforsker i politiet, nylig sykmeldt. Diagnostisert med IBS, gluten/melk intolerant. Vekttap (ned i 48 kg, nå 51 kg). Ofte løs mage. Undersøkelse: Svært palpasjonsøm og hyperton i paraspinal cervical mm og sub oc mm bilat (trigger sus i hodet). Pterygoideus med trigger øresus.",
+      "type": "undersøkelse",
+      "regions": [
+        "cervical",
+        "thoracal"
+      ],
+      "techniques": [
+        "bvm",
+        "hvla"
+      ],
+      "commonPhrases": {
+        "positive_findings": [
+          "palpasjonsøm",
+          "hyperton"
+        ],
+        "negative_findings": [],
+        "treatment_outcomes": [
+          "mye bedre",
+          "bedre",
+          "bedre",
+          "bedre",
+          "bedre"
+        ],
+        "patient_responses": []
+      },
+      "id": "note_14"
+    },
+    {
+      "metadata": {},
+      "sections": {
+        "palpasjon": "svært hypertone og vond i adduktorene.\n\nAnamnese (02.02.2024): Oppsøker klinikken pga smerter i hoftene (ca halvt år). Kommer ofte etter fotball/dans. Særlig i lyskene når hun går, noen ganger utsiden av hoftene. Etter fotballtrening kan hun gå saktere pga smerte (stramt skrå oppover mot lyskene). Kneppelyder fra hoftene. Trener 4 dager i uken."
+      },
+      "raw": "Journalnotat: Hofte/Adduktor Smerter (Fotball/Dans)\nBehandling (24.04.2024): Går stadig bedre, vondt av og til. Kjenner det ved copenhagen adduction (opp til 6 på NSR). Forklarer at hun kan gjøre øvelsen, men færre reps. Bilat adduktor mm bvm (ganske ømt), bilat glut min bvm. L5 h hvla.\n\nBehandling (20.03.2024): Går mye bedre, gjort øvelser. Bilat adduktor mm bvm, bilat glut min bvm, h si ledd hvla, L5 v hvla.\n\nBehandling (09.02.2024): Øm etter sist. Forsøkt strikk i adduksjon. Snakker om optimalisering av øvelsen. Samme behandling.\n\nUndersøkelse (05.02.2024): Hofte: Faber: kommer lengre ned på venstre enn høyre, begge trigger kjent smerte i ytterstilling i lysken og inn langs pubis. Palpasjon: svært hypertone og vond i adduktorene.\n\nAnamnese (02.02.2024): Oppsøker klinikken pga smerter i hoftene (ca halvt år). Kommer ofte etter fotball/dans. Særlig i lyskene når hun går, noen ganger utsiden av hoftene. Etter fotballtrening kan hun gå saktere pga smerte (stramt skrå oppover mot lyskene). Kneppelyder fra hoftene. Trener 4 dager i uken.",
+      "type": "mixed",
+      "regions": [
+        "cervical",
+        "lumbal",
+        "sacrum",
+        "hofte",
+        "kne",
+        "fot"
+      ],
+      "techniques": [
+        "bvm",
+        "hvla"
+      ],
+      "commonPhrases": {
+        "positive_findings": [
+          "smerter",
+          "vondt",
+          "smerter",
+          "trigger kjent smerte"
+        ],
+        "negative_findings": [],
+        "treatment_outcomes": [
+          "bedre",
+          "mye bedre"
+        ],
+        "patient_responses": []
+      },
+      "id": "note_15"
+    },
+    {
+      "metadata": {},
+      "sections": {
+        "behandling": "Bilat solar plexus inhib, trapz ims, lateral cervical mm ims, sub oc ims, masseter ims."
+      },
+      "raw": "Journalnotat: Ansiktssmerter/Panne (Spenningshodepine)\nBehandling (02.05.2024): Går bra. Fortsatt en del spenninger i ansikt og nakke. Behandling hjulpet, men litt igjen. Kjenner det i pannen når han strekker halsen, masserer kjeven/øvre nakke. Kjenner det over os nasala og sutura frontonasale. Utelukket bihulebetennelse (ØNH). Anspent øyenbryn ved stress. Mobilisering sutura frontonasale, bilat n. supraorbitalis inhib, m frontalis bvm, temporalis bvm, masseter ims (samtykke gitt), suboccipital bvm, C2 h hvla, C3 v hvla, sternocleido bvm.\n\nBehandling (14.02.2024): Bedre, mindre trykk i hodet. Fortsatt stiv. Bilat trapz ims, lateral cervical mm ims (samtykke gitt). Bvm: paraspinal cervical, suboccipital, sternocleido (trigger symptomer i panne). Hvla: C1, C2 h. Masseter ims.\n\nBehandling (09.02.2024): Mye av ballongfølelsen og presset har blitt bedre. Kjenner det fortsatt, også i ansiktet. Sidebøy trigger nakke/hode. Suboc mm trigger opp i hodet. Behandling: Bilat solar plexus inhib, trapz ims, lateral cervical mm ims, sub oc ims, masseter ims.\n\nKonklusjon (30.01.2024): Trolig spenninger som gir han plagene i hodet, bekreftes av at palpasjon av myoser reproduserer kjente symptomer. Psykosomatisk komponent sannsynlig.\n\nAnamnese (30.01.2024): Oppsøkte klinikken pga triggere/spenninger i nakken som stråler frontalt og rett over nesen (press). Føles som en ballong i pannen når han lukker øynene og puster inn. Stiv i trapz og thorax. Utelukket bihulebetennelse (CT). Historie med angst og OCD (behandlet hos psykolog). Trener regelmessig (sykkel, jogg, styrke). Ingen strålende smerter i ox.",
+      "type": "behandling",
+      "regions": [
+        "cervical",
+        "thoracal"
+      ],
+      "techniques": [
+        "bvm",
+        "ims",
+        "hvla",
+        "inhib",
+        "mobilisering"
+      ],
+      "commonPhrases": {
+        "positive_findings": [
+          "smerter"
+        ],
+        "negative_findings": [],
+        "treatment_outcomes": [
+          "bedre",
+          "bedre"
+        ],
+        "patient_responses": []
+      },
+      "id": "note_16"
+    }
+  ],
+  "statistics": {
+    "noteTypes": {
+      "mixed": 2,
+      "behandling": 4,
+      "undersøkelse": 4,
+      "anamnese": 6
+    },
+    "regions": {
+      "cervical": 12,
+      "thoracal": 9,
+      "lumbal": 6,
+      "skulder": 6,
+      "hofte": 2,
+      "kne": 4,
+      "fot": 2,
+      "sacrum": 1
+    },
+    "techniques": {
+      "bvm": 12,
+      "ims": 5,
+      "hvla": 11,
+      "inhib": 5,
+      "tgp": 4,
+      "traksjon": 2,
+      "gapping": 1,
+      "mobilisering": 1
+    },
+    "totalSections": 49
+  }
+}
