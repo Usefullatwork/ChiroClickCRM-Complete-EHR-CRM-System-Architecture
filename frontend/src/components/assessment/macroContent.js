@@ -332,6 +332,187 @@ export const MACRO_CONTENT = {
       en: 'Prognosis is good with continued conservative care and patient compliance with treatment recommendations.',
       no: 'Prognose er god med fortsatt konservativ behandling og pasientens etterlevelse av behandlingsanbefalinger.'
     }
+  },
+
+  // ===========================================================================
+  // SYSTEMIC CONDITIONS / SYSTEMISKE TILSTANDER
+  // ===========================================================================
+  systemics: {
+    // Red Flags
+    redFlagsNegative: {
+      en: 'Systemic red flags screening negative. No signs of serious underlying pathology identified.',
+      no: 'Systemiske røde flagg screening negativ. Ingen tegn på alvorlig underliggende patologi identifisert.'
+    },
+    redFlagsPositive: {
+      en: 'Red flag findings identified requiring further investigation and/or referral.',
+      no: 'Røde flagg-funn identifisert som krever videre undersøkelse og/eller henvisning.'
+    },
+
+    // Vital Signs
+    vitalsNormal: {
+      en: 'Vital signs within normal limits: Temperature, pulse, respiration, and blood pressure all normal.',
+      no: 'Vitale tegn innenfor normalgrensene: Temperatur, puls, respirasjon og blodtrykk alle normale.'
+    },
+    vitalsAbnormal: {
+      en: 'Abnormal vital signs noted requiring monitoring and possible referral.',
+      no: 'Unormale vitale tegn observert som krever overvåking og mulig henvisning.'
+    },
+    hypertensionNoted: {
+      en: 'Elevated blood pressure noted. Patient advised regarding lifestyle modifications and follow-up with primary care.',
+      no: 'Forhøyet blodtrykk observert. Pasienten informert om livsstilsendringer og oppfølging hos fastlege.'
+    },
+
+    // Neurological
+    neuroIntact: {
+      en: 'Neurological examination intact. Cranial nerves II-XII grossly intact. DTRs symmetric. Sensory and motor function normal.',
+      no: 'Nevrologisk undersøkelse intakt. Hjernenerver II-XII grovt intakte. Dype senereflekser symmetriske. Sensorisk og motorisk funksjon normal.'
+    },
+    neuroDeficit: {
+      en: 'Neurological deficit identified. Further evaluation and specialist referral indicated.',
+      no: 'Nevrologisk underskudd identifisert. Videre evaluering og spesialisthenvisning indisert.'
+    },
+
+    // Cardiovascular
+    cardiovascularNormal: {
+      en: 'Cardiovascular examination normal. Heart sounds regular without murmurs. Peripheral pulses intact.',
+      no: 'Kardiovaskulær undersøkelse normal. Hjertelyder regelmessige uten bilyder. Perifere pulser intakte.'
+    },
+    cardiovascularAbnormal: {
+      en: 'Cardiovascular abnormality noted. Referral to cardiology recommended.',
+      no: 'Kardiovaskulær abnormitet observert. Henvisning til kardiologi anbefalt.'
+    },
+
+    // Respiratory
+    respiratoryNormal: {
+      en: 'Respiratory examination normal. Breath sounds clear bilaterally. No wheezes, crackles, or rhonchi.',
+      no: 'Respiratorisk undersøkelse normal. Respirasjonslyder klare bilateralt. Ingen pipelyder, knatrelyder eller rhonchi.'
+    },
+
+    // Abdominal
+    abdominalNormal: {
+      en: 'Abdominal examination normal. Soft, non-tender. Bowel sounds present. No organomegaly.',
+      no: 'Abdominal undersøkelse normal. Myk, ikke-øm. Tarmlyder tilstede. Ingen organomegali.'
+    },
+    aaaSuspected: {
+      en: 'Widened aortic pulsation palpated. Possible abdominal aortic aneurysm. Urgent vascular ultrasound and surgical consultation indicated.',
+      no: 'Utvidet aortapulsasjon palperes. Mulig abdominalt aortaaneurisme. Akutt vaskulær ultralyd og kirurgisk konsultasjon indisert.'
+    },
+
+    // Inflammatory Arthritis
+    inflammatoryBackPain: {
+      en: 'Clinical features consistent with inflammatory back pain: insidious onset, morning stiffness >30 minutes, improvement with exercise, age <40. Consider inflammatory spondyloarthropathy.',
+      no: 'Kliniske funn forenlig med inflammatorisk ryggsmerte: gradvis debut, morgenstivhet >30 minutter, bedring med trening, alder <40. Vurder inflammatorisk spondyloartropati.'
+    },
+    ankylosingSpondylitisConsider: {
+      en: 'Clinical presentation raises concern for ankylosing spondylitis. Recommend HLA-B27 testing and rheumatology referral.',
+      no: 'Klinisk presentasjon gir mistanke om Bekhterevs sykdom. Anbefaler HLA-B27-testing og revmatologihenvisning.'
+    },
+    rheumatoidArthritisConsider: {
+      en: 'Symmetric polyarthritis with morning stiffness suggestive of rheumatoid arthritis. Recommend RF, anti-CCP testing and rheumatology referral.',
+      no: 'Symmetrisk polyartritt med morgenstivhet tyder på revmatoid artritt. Anbefaler RF, anti-CCP testing og revmatologihenvisning.'
+    },
+    psoriaticArthritisConsider: {
+      en: 'Arthritis in context of psoriasis with nail changes and/or dactylitis. Clinical picture consistent with psoriatic arthritis.',
+      no: 'Artritt i kontekst av psoriasis med negleforandringer og/eller daktylitt. Klinisk bilde forenlig med psoriasisartritt.'
+    },
+    goutSuspected: {
+      en: 'Acute monoarticular arthritis with erythema, warmth, and exquisite tenderness. Clinical presentation consistent with acute gouty arthritis. Consider joint aspiration to confirm.',
+      no: 'Akutt monoartikulær artritt med erytem, varme og uttalt ømhet. Klinisk presentasjon forenlig med akutt urinsyregikt. Vurder leddpunksjon for bekreftelse.'
+    },
+
+    // Degenerative
+    osteoarthritisConfirmed: {
+      en: 'Clinical and radiographic findings consistent with osteoarthritis. Crepitus, reduced ROM, and joint space narrowing noted.',
+      no: 'Kliniske og røntgenfunn forenlig med artrose. Krepitasjon, redusert bevegelsesutslag og leddspalteinnsnevring observert.'
+    },
+    osteoporosisRisk: {
+      en: 'Multiple risk factors for osteoporosis identified. Recommend DEXA scan for bone density assessment.',
+      no: 'Flere risikofaktorer for osteoporose identifisert. Anbefaler DEXA-skanning for beintetthetssvurdering.'
+    },
+
+    // Metabolic
+    diabetesScreeningPositive: {
+      en: 'Risk factors for diabetes mellitus identified. Recommend fasting glucose and HbA1c testing.',
+      no: 'Risikofaktorer for diabetes mellitus identifisert. Anbefaler fastende glukose og HbA1c-testing.'
+    },
+    diabeticNeuropathy: {
+      en: 'Stocking-glove distribution sensory loss consistent with diabetic peripheral neuropathy. Recommend optimization of glycemic control.',
+      no: 'Sensorisk tap i strømpe-hanske-distribusjon forenlig med diabetisk perifer nevropati. Anbefaler optimalisering av glykemisk kontroll.'
+    },
+    dyslipidemiaRisk: {
+      en: 'Cardiovascular risk factors present. Recommend lipid panel screening.',
+      no: 'Kardiovaskulære risikofaktorer tilstede. Anbefaler lipidpanel-screening.'
+    },
+
+    // Pain Syndromes
+    fibromyalgiaConsider: {
+      en: 'Widespread pain with multiple tender points (≥11/18), fatigue, and sleep disturbance. Clinical picture consistent with fibromyalgia syndrome.',
+      no: 'Utbredt smerte med flere ømme punkter (≥11/18), fatigue og søvnforstyrrelser. Klinisk bilde forenlig med fibromyalgisyndrom.'
+    },
+    cfsConsider: {
+      en: 'Prolonged fatigue >6 months with cognitive difficulties and post-exertional malaise. Consider chronic fatigue syndrome after excluding other causes.',
+      no: 'Langvarig fatigue >6 måneder med kognitive vansker og forverring etter anstrengelse. Vurder kronisk utmattelsessyndrom etter å ha utelukket andre årsaker.'
+    },
+    crpsConsider: {
+      en: 'Regional pain with autonomic changes, allodynia, and hyperalgesia disproportionate to inciting event. Clinical features suggestive of complex regional pain syndrome.',
+      no: 'Regional smerte med autonome forandringer, allodyni og hyperalgesi uforholdsmessig til utløsende hendelse. Kliniske funn tyder på komplekst regionalt smertesyndrom.'
+    },
+
+    // Mental Health
+    depressionScreenPositive: {
+      en: 'Positive depression screening. Recommend mental health referral for comprehensive evaluation and treatment.',
+      no: 'Positiv depresjonscreening. Anbefaler henvisning til psykisk helsevern for omfattende evaluering og behandling.'
+    },
+    anxietyNoted: {
+      en: 'Signs of anxiety observed. Consider impact on pain perception and recommend appropriate support.',
+      no: 'Tegn på angst observert. Vurder innvirkning på smerteopplevelse og anbefal passende støtte.'
+    },
+    mentalHealthReferral: {
+      en: 'Mental health concerns identified. Referral to appropriate mental health professional recommended.',
+      no: 'Psykisk helse bekymringer identifisert. Henvisning til passende psykisk helsepersonell anbefalt.'
+    },
+
+    // Cognitive
+    cognitiveDecline: {
+      en: 'Signs of cognitive decline noted. Recommend comprehensive cognitive assessment and appropriate referral.',
+      no: 'Tegn på kognitiv svekkelse observert. Anbefaler omfattende kognitiv vurdering og passende henvisning.'
+    },
+    mmseAbnormal: {
+      en: 'Mini-Mental Status Examination score suggests cognitive impairment. Neurology/geriatric referral recommended.',
+      no: 'Mini-Mental Status Examination-poengsum tyder på kognitiv svekkelse. Nevrologi/geriatrisk henvisning anbefalt.'
+    },
+
+    // Autoimmune
+    lupusSuspected: {
+      en: 'Clinical features suggestive of systemic lupus erythematosus: malar rash, photosensitivity, oral ulcers, and arthritis. Recommend ANA, anti-dsDNA testing and rheumatology referral.',
+      no: 'Kliniske funn tyder på systemisk lupus erythematosus: sommerfuglutslett, lysfølsomhet, munnsår og artritt. Anbefaler ANA, anti-dsDNA testing og revmatologihenvisning.'
+    },
+
+    // Referrals
+    rheumatologyReferral: {
+      en: 'Inflammatory arthritis suspected. Rheumatology referral initiated for further evaluation and disease-modifying therapy consideration.',
+      no: 'Inflammatorisk artritt mistenkt. Revmatologihenvisning igangsatt for videre evaluering og vurdering av sykdomsmodifiserende terapi.'
+    },
+    neurologyReferral: {
+      en: 'Neurological findings warrant further evaluation. Neurology referral recommended.',
+      no: 'Nevrologiske funn krever videre evaluering. Nevrologihenvisning anbefalt.'
+    },
+    cardiologyReferral: {
+      en: 'Cardiovascular concerns identified. Cardiology referral recommended for comprehensive evaluation.',
+      no: 'Kardiovaskulære bekymringer identifisert. Kardiologihenvisning anbefalt for omfattende evaluering.'
+    },
+    endocrinologyReferral: {
+      en: 'Endocrine abnormality suspected. Endocrinology referral recommended.',
+      no: 'Endokrin abnormitet mistenkt. Endokrinologihenvisning anbefalt.'
+    },
+    psychiatryReferral: {
+      en: 'Psychiatric evaluation indicated. Referral to psychiatry initiated.',
+      no: 'Psykiatrisk evaluering indisert. Henvisning til psykiatri igangsatt.'
+    },
+    emergencyReferral: {
+      en: 'Findings concerning for serious pathology. Immediate emergency department evaluation recommended.',
+      no: 'Funn som gir mistanke om alvorlig patologi. Umiddelbar legevaktevaluering anbefalt.'
+    }
   }
 };
 
