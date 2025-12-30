@@ -10,6 +10,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
 import 'express-async-errors';
 
 import { healthCheck } from './config/database.js';
@@ -42,6 +43,9 @@ app.use(cors({
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Cookie parsing (for session auth)
+app.use(cookieParser());
 
 // Compression
 app.use(compression());
@@ -93,6 +97,7 @@ app.get(`/api/${API_VERSION}`, (req, res) => {
     documentation: '/api/docs',
     endpoints: {
       health: '/health',
+      auth: `/api/${API_VERSION}/auth`,
       dashboard: `/api/${API_VERSION}/dashboard`,
       import: `/api/${API_VERSION}/import`,
       organizations: `/api/${API_VERSION}/organizations`,
@@ -103,6 +108,7 @@ app.get(`/api/${API_VERSION}`, (req, res) => {
       communications: `/api/${API_VERSION}/communications`,
       followups: `/api/${API_VERSION}/followups`,
       financial: `/api/${API_VERSION}/financial`,
+      billing: `/api/${API_VERSION}/billing`,
       templates: `/api/${API_VERSION}/templates`,
       diagnosis: `/api/${API_VERSION}/diagnosis`,
       treatments: `/api/${API_VERSION}/treatments`,
@@ -118,6 +124,7 @@ app.get(`/api/${API_VERSION}`, (req, res) => {
 });
 
 // Import and mount API routes
+import authRoutes from './routes/auth.js';
 import dashboardRoutes from './routes/dashboard.js';
 import importRoutes from './routes/import.js';
 import patientRoutes from './routes/patients.js';
@@ -129,6 +136,7 @@ import communicationRoutes from './routes/communications.js';
 import kpiRoutes from './routes/kpi.js';
 import followUpRoutes from './routes/followups.js';
 import financialRoutes from './routes/financial.js';
+import billingRoutes from './routes/billing.js';
 import outcomeRoutes from './routes/outcomes.js';
 import gdprRoutes from './routes/gdpr.js';
 import pdfRoutes from './routes/pdf.js';
@@ -142,6 +150,7 @@ import docsRoutes from './routes/docs.js';
 import searchRoutes from './routes/search.js';
 
 // Mount routes
+app.use(`/api/${API_VERSION}/auth`, authRoutes);
 app.use(`/api/${API_VERSION}/dashboard`, dashboardRoutes);
 app.use(`/api/${API_VERSION}/import`, importRoutes);
 app.use(`/api/${API_VERSION}/patients`, patientRoutes);
@@ -153,6 +162,7 @@ app.use(`/api/${API_VERSION}/communications`, communicationRoutes);
 app.use(`/api/${API_VERSION}/kpi`, kpiRoutes);
 app.use(`/api/${API_VERSION}/followups`, followUpRoutes);
 app.use(`/api/${API_VERSION}/financial`, financialRoutes);
+app.use(`/api/${API_VERSION}/billing`, billingRoutes);
 app.use(`/api/${API_VERSION}/outcomes`, outcomeRoutes);
 app.use(`/api/${API_VERSION}/gdpr`, gdprRoutes);
 app.use(`/api/${API_VERSION}/pdf`, pdfRoutes);

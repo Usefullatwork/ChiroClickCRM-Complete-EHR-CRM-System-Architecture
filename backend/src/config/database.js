@@ -158,11 +158,54 @@ export const closePool = async () => {
   logger.info('✓ Database pool closed');
 };
 
+/**
+ * Set tenant context for Row-Level Security (RLS)
+ * Must be called before queries on RLS-enabled tables
+ * @param {string} organizationId - The organization UUID
+ */
+export const setTenantContext = async (organizationId) => {
+  if (!organizationId) {
+    throw new Error('Organization ID required for tenant context');
+  }
+  await query(`SET app.current_tenant = $1`, [organizationId]);
+};
+
+/**
+ * Clear tenant context
+ * Should be called after request completes
+ */
+export const clearTenantContext = async () => {
+  await query(`RESET app.current_tenant`);
+};
+
+/**
+ * Execute query with tenant context
+ * Automatically sets and clears tenant context
+ * @param {string} organizationId - The organization UUID
+ * @param {string} text - SQL query
+ * @param {array} params - Query parameters
+ * @returns {Promise<object>} Query result
+ */
+export const queryWithTenant = async (organizationId, text, params = []) => {
+  const client = await pool.connect();
+  try {
+    await client.query(`SET app.current_tenant = $1`, [organizationId]);
+    const result = await client.query(text, params);
+    return result;
+  } finally {
+    await client.query(`RESET app.current_tenant`);
+    client.release();
+  }
+};
+
 export default {
   query,
   getClient,
   transaction,
   savepoint,
   healthCheck,
-  closePool
+  closePool,
+  setTenantContext,
+  clearTenantContext,
+  queryWithTenant
 };
