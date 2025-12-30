@@ -1,0 +1,37 @@
+{
+  "name": "chiroclickcrm",
+  "version": "2.0.0",
+  "description": "Norwegian-compliant EHR-CRM-PMS for chiropractic practices",
+  "private": true,
+  "scripts": {
+    "prepare": "husky install",
+    "backend": "cd backend && npm run dev",
+    "frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "test": "cd backend && npm test",
+    "lint": "concurrently \"cd backend && npm run lint\" \"cd frontend && npm run lint\"",
+    "format": "concurrently \"cd backend && npm run format\" \"cd frontend && npm run format\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0"
+  },
+  "lint-staged": {
+    "backend/**/*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "frontend/**/*.{js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

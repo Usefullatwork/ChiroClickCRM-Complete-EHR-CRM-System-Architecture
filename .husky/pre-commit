@@ -1,0 +1,30 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running pre-commit checks..."
+
+# Run lint-staged
+npx lint-staged
+
+# Check for console.log statements
+echo "🔍 Checking for console.log statements..."
+if git diff --cached --name-only | grep -E '\.(js|jsx|ts|tsx)$' | xargs grep -n "console\.\(log\|warn\|error\|debug\)" 2>/dev/null; then
+  echo "❌ Found console statements. Please use logger instead."
+  echo "   Use: import logger from './utils/logger.js'; logger.info(...)"
+  exit 1
+fi
+
+# Check for TODO without JIRA ticket
+echo "🔍 Checking for untracked TODOs..."
+if git diff --cached --name-only | grep -E '\.(js|jsx|ts|tsx)$' | xargs grep -n "TODO" | grep -v "TODO\[" 2>/dev/null; then
+  echo "⚠️  Found TODOs without ticket reference. Format: TODO[JIRA-123]: description"
+fi
+
+# Check for sensitive data patterns
+echo "🔍 Checking for potential secrets..."
+if git diff --cached --name-only | xargs grep -E "(password|secret|api_key|private_key|token)\s*=\s*['\"]" 2>/dev/null; then
+  echo "❌ Potential secrets found in staged files!"
+  exit 1
+fi
+
+echo "✅ Pre-commit checks passed!"
