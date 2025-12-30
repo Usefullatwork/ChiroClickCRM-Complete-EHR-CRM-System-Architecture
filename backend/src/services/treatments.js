@@ -174,34 +174,31 @@ export const getTreatmentStatistics = async (organizationId, options = {}) => {
 
     params.push(limit);
 
+    // Get treatment statistics with descriptions in ONE query
     const result = await query(
       `SELECT
-        unnest(service_codes) as code,
-        COUNT(*) as count,
-        SUM(gross_amount) as total_revenue
-      FROM financial_metrics fm
-      ${whereClause}
-        AND service_codes IS NOT NULL
-        AND array_length(service_codes, 1) > 0
-      GROUP BY code
-      ORDER BY count DESC
+        code_usage.code,
+        code_usage.count,
+        code_usage.total_revenue,
+        tc.description
+      FROM (
+        SELECT
+          unnest(service_codes) as code,
+          COUNT(*) as count,
+          SUM(gross_amount) as total_revenue
+        FROM financial_metrics fm
+        ${whereClause}
+          AND service_codes IS NOT NULL
+          AND array_length(service_codes, 1) > 0
+        GROUP BY code
+      ) code_usage
+      LEFT JOIN treatment_codes tc ON tc.code = code_usage.code
+      ORDER BY code_usage.count DESC
       LIMIT $${paramIndex}`,
       params
     );
 
-    // Get descriptions for the codes
-    const treatments = result.rows;
-    for (const item of treatments) {
-      const codeResult = await query(
-        'SELECT description FROM treatment_codes WHERE code = $1',
-        [item.code]
-      );
-      if (codeResult.rows.length > 0) {
-        item.description = codeResult.rows[0].description;
-      }
-    }
-
-    return treatments;
+    return result.rows;
   } catch (error) {
     logger.error('Error getting treatment statistics:', error);
     throw error;

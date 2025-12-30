@@ -5,7 +5,15 @@
 import express from 'express';
 import * as encounterController from '../controllers/encounters.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
-import { validate, createEncounterSchema } from '../middleware/validator.js';
+import { validate } from '../middleware/validation.js';
+import {
+  createEncounterSchema,
+  updateEncounterSchema,
+  getEncountersSchema,
+  getEncounterSchema,
+  signEncounterSchema,
+  generateNoteSchema
+} from '../validators/encounter.validators.js';
 
 const router = express.Router();
 
@@ -19,6 +27,7 @@ router.use(requireOrganization);
  */
 router.get('/',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(getEncountersSchema),
   encounterController.getEncounters
 );
 
@@ -29,6 +38,7 @@ router.get('/',
  */
 router.get('/:id',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(getEncounterSchema),
   encounterController.getEncounter
 );
 
@@ -50,6 +60,7 @@ router.post('/',
  */
 router.patch('/:id',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(updateEncounterSchema),
   encounterController.updateEncounter
 );
 
@@ -60,6 +71,7 @@ router.patch('/:id',
  */
 router.post('/:id/sign',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(signEncounterSchema),
   encounterController.signEncounter
 );
 
@@ -70,6 +82,7 @@ router.post('/:id/sign',
  */
 router.post('/:id/generate-note',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(generateNoteSchema),
   encounterController.generateNote
 );
 
