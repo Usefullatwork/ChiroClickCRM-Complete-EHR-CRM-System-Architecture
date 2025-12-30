@@ -4,11 +4,15 @@ import {
   LayoutDashboard,
   Users,
   Calendar,
+  CalendarDays,
   MessageSquare,
   CheckCircle2,
+  DollarSign,
   TrendingUp,
   Upload,
   Brain,
+  Shield,
+  BookOpen,
   Settings
 } from 'lucide-react'
 
@@ -20,12 +24,16 @@ export default function DashboardLayout() {
   const navigation = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
     { name: 'Patients', href: '/patients', icon: Users },
+    { name: 'Calendar', href: '/calendar', icon: CalendarDays },
     { name: 'Appointments', href: '/appointments', icon: Calendar },
     { name: 'Communications', href: '/communications', icon: MessageSquare },
     { name: 'Follow-ups', href: '/follow-ups', icon: CheckCircle2 },
+    { name: 'Financial', href: '/financial', icon: DollarSign },
     { name: 'KPI', href: '/kpi', icon: TrendingUp },
+    { name: 'Templates', href: '/templates', icon: BookOpen },
     { name: 'Import', href: '/import', icon: Upload },
     { name: 'AI Training', href: '/training', icon: Brain },
+    { name: 'Audit Logs', href: '/audit-logs', icon: Shield },
     { name: 'Settings', href: '/settings', icon: Settings },
   ]
 

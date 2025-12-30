@@ -225,10 +225,15 @@ export const followUpsAPI = {
 export const financialAPI = {
   getAll: (params) => apiClient.get('/financial', { params }),
   getById: (id) => apiClient.get(`/financial/${id}`),
-  getByPatient: (patientId) => apiClient.get(`/patients/${patientId}/financial`),
+  getByPatient: (patientId) => apiClient.get(`/financial/patient/${patientId}`),
   create: (data) => apiClient.post('/financial', data),
-  recordPayment: (id, data) => apiClient.post(`/financial/${id}/payment`, data),
-  generateInvoice: (id) => apiClient.post(`/financial/${id}/invoice`),
+  updatePaymentStatus: (id, data) => apiClient.patch(`/financial/${id}/payment-status`, data),
+  getSummary: (params) => apiClient.get('/financial/summary', { params }),
+  getRevenueByCode: (params) => apiClient.get('/financial/revenue-by-code', { params }),
+  getPaymentMethods: (params) => apiClient.get('/financial/payment-methods', { params }),
+  getOutstanding: (params) => apiClient.get('/financial/outstanding', { params }),
+  getDailyRevenueChart: (params) => apiClient.get('/financial/chart/daily-revenue', { params }),
+  generateInvoiceNumber: () => apiClient.get('/financial/invoice-number'),
 }
 
 // Dashboard
@@ -340,6 +345,24 @@ export const examinationsAPI = {
   getTemplateSetById: (id) => apiClient.get(`/examinations/template-sets/${id}`),
   createTemplateSet: (data) => apiClient.post('/examinations/template-sets', data),
   incrementTemplateSetUsage: (id) => apiClient.post(`/examinations/template-sets/${id}/use`),
+}
+
+// PDF Generation
+export const pdfAPI = {
+  generateInvoice: (financialMetricId) => apiClient.post(`/pdf/invoice/${financialMetricId}`),
+  generatePatientLetter: (encounterId, letterType) => apiClient.post(`/pdf/letter/${encounterId}`, { letterType }),
+}
+
+// GDPR
+export const gdprAPI = {
+  getRequests: () => apiClient.get('/gdpr/requests'),
+  createRequest: (data) => apiClient.post('/gdpr/requests', data),
+  updateRequestStatus: (requestId, data) => apiClient.patch(`/gdpr/requests/${requestId}/status`, data),
+  exportPatientData: (patientId) => apiClient.get(`/gdpr/patient/${patientId}/data-access`),
+  exportDataPortability: (patientId) => apiClient.get(`/gdpr/patient/${patientId}/data-portability`),
+  processErasure: (requestId) => apiClient.post(`/gdpr/requests/${requestId}/erasure`),
+  updateConsent: (patientId, data) => apiClient.patch(`/gdpr/patient/${patientId}/consent`, data),
+  getConsentAudit: (patientId) => apiClient.get(`/gdpr/patient/${patientId}/consent-audit`),
 }
 
 // Export default API client
