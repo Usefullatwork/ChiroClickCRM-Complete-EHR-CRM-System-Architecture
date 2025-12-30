@@ -1,0 +1,761 @@
+{
+  "training_dataset_format": "Clinical Notes AI Training Data v1.0",
+  "description": "Structured training examples from Sigrun's clinical practice",
+  "abbreviation_dictionary": {
+    "norwegian_to_english": {
+      "beh": "behandling (treatment)",
+      "tp": "trigger point",
+      "nåler": "dry needling",
+      "bilat": "bilateral",
+      "hø": "høyre (right)",
+      "v": "venstre (left)",
+      "cx": "cervical",
+      "tx": "thoracic",
+      "lx": "lumbar",
+      "ua": "uten anmerkning (unremarkable/within normal limits)",
+      "palpøm": "palpation tenderness",
+      "es": "erector spinae",
+      "glut med": "gluteus medius",
+      "mob": "mobilization",
+      "prs": "posterior right superior",
+      "pls": "posterior left superior",
+      "pr": "posterior right",
+      "pl": "posterior left",
+      "scm": "sternocleidomastoid",
+      "isledd": "SI joint (sacroiliac joint)",
+      "PIR": "Post-Isometric Relaxation"
+    }
+  },
+  "training_examples": [
+    {
+      "example_id": "001",
+      "scenario": "Acute Lower Back Pain - Initial Visit",
+      "raw_note": "Fått en låsning i nedre korsrygg. Ingen stråling ned i bena. Smerten sitter sentralt. Klarer ikke bøye seg fremover.",
+      "structured_data": {
+        "session_metadata": {
+          "date": "2024-03-08",
+          "practitioner": "Sigrun Låg Kleiv",
+          "session_type": "initial",
+          "visit_number": 1,
+          "patient_age_group": "adult",
+          "special_population": "none"
+        },
+        "subjective": {
+          "chief_complaint": "Acute lower back lock/restriction",
+          "pain_location": ["central_lower_lumbar"],
+          "pain_radiation": "none",
+          "pain_level": null,
+          "onset": "acute",
+          "duration": "recent",
+          "aggravating_factors": ["forward_flexion"],
+          "relieving_factors": [],
+          "functional_limitations": ["cannot_bend_forward"],
+          "previous_episodes": false,
+          "current_medications": []
+        },
+        "objective": {
+          "observation": {
+            "gait": "normal",
+            "posture": null
+          },
+          "palpation": {
+            "findings": ["central_lumbar_tenderness"],
+            "muscle_spasm": ["erector_spinae"]
+          },
+          "range_of_motion": {
+            "lumbar_flexion": "severely_restricted",
+            "lumbar_extension": null,
+            "lateral_flexion": null
+          },
+          "neurological": {
+            "lower_extremity_strength": "5/5_bilateral",
+            "reflexes": "2+_bilateral",
+            "sensation": "intact",
+            "slr": "negative_bilateral"
+          },
+          "orthopedic_tests": {
+            "slr": "negative",
+            "kemps": null,
+            "valsalva": null
+          }
+        },
+        "assessment": {
+          "primary_diagnosis": "acute_lumbar_facet_restriction",
+          "icd10": "M99.03",
+          "severity": "moderate",
+          "red_flags": "none_identified",
+          "clinical_reasoning": "Acute onset, central pain, no radiation, normal neuro = likely facet restriction",
+          "contraindications": "none",
+          "prognosis": "good"
+        },
+        "treatment": {
+          "manual_therapy": [
+            {
+              "technique": "SMT",
+              "location": "L5",
+              "direction": "bilateral",
+              "force": "moderate"
+            },
+            {
+              "technique": "mobilization",
+              "location": "lumbar_spine",
+              "position": "prone"
+            }
+          ],
+          "soft_tissue": [
+            {
+              "technique": "trigger_point",
+              "muscle": "erector_spinae",
+              "side": "bilateral"
+            },
+            {
+              "technique": "trigger_point",
+              "muscle": "gluteus_medius",
+              "side": "bilateral"
+            }
+          ],
+          "modalities": [],
+          "exercises": ["gentle_lumbar_mobility"],
+          "education": ["activity_modification", "ice_heat_advice"]
+        },
+        "plan": {
+          "next_visit": "2-3_days",
+          "expected_visits": "3-5",
+          "home_care": ["ice_15_min_hourly", "avoid_forward_flexion", "gentle_walking"],
+          "referral": null,
+          "imaging": null,
+          "work_status": "modified_duties"
+        },
+        "outcomes": null
+      },
+      "ai_learning_points": {
+        "pattern": "acute_facet_restriction",
+        "key_differentiators": ["no_radiation", "acute_onset", "flexion_restriction"],
+        "treatment_rationale": "SMT to restricted segment, soft tissue to spasm",
+        "expected_response": "rapid_improvement_2-3_visits",
+        "red_flags_ruled_out": ["cauda_equina", "fracture", "disc_herniation"]
+      }
+    },
+    {
+      "example_id": "002",
+      "scenario": "Pregnancy-Related Pelvic Pain",
+      "raw_note": "er i uke 26. Har smerter i symfysen. Begynte for ca 3 uker siden, kommet gradvis. sitter mest på v side",
+      "structured_data": {
+        "session_metadata": {
+          "date": "2024-03-18",
+          "practitioner": "Sigrun Låg Kleiv",
+          "session_type": "initial",
+          "visit_number": 1,
+          "patient_age_group": "adult",
+          "special_population": "pregnant"
+        },
+        "pregnancy_specific": {
+          "gestational_age_weeks": 26,
+          "trimester": "second",
+          "gravida": null,
+          "para": null,
+          "pregnancy_complications": "none_stated",
+          "previous_pregnancy_msk_issues": false
+        },
+        "subjective": {
+          "chief_complaint": "Symphysis pubis pain",
+          "pain_location": ["symphysis_pubis", "left_groin"],
+          "pain_radiation": "none",
+          "pain_level": null,
+          "onset": "gradual",
+          "duration": "3_weeks",
+          "progression": "worsening",
+          "aggravating_factors": ["walking", "stairs", "rolling_in_bed"],
+          "relieving_factors": ["rest"],
+          "functional_limitations": ["difficulty_walking", "sleep_disturbance"],
+          "work_impact": true
+        },
+        "objective": {
+          "observation": {
+            "gait": "antalgic",
+            "posture": "pregnant_lordosis"
+          },
+          "palpation": {
+            "symphysis_tenderness": "moderate",
+            "side": "left_predominant"
+          },
+          "special_tests": {
+            "aslr": "positive_bilateral",
+            "p4_test": "positive_left",
+            "modified_trendelenburg": null
+          },
+          "neurological": "not_indicated_pregnancy"
+        },
+        "assessment": {
+          "primary_diagnosis": "symphysis_pubis_dysfunction_pregnancy",
+          "icd10": "O26.89",
+          "severity": "moderate",
+          "gestational_age": 26,
+          "red_flags": "none",
+          "obstetric_concerns": "none",
+          "prognosis": "fair_will_likely_need_care_through_pregnancy"
+        },
+        "treatment": {
+          "positioning": "side_lying_throughout",
+          "manual_therapy": [
+            {
+              "technique": "gentle_mobilization",
+              "location": "SI_joint",
+              "side": "bilateral",
+              "force": "grade_1-2_only"
+            },
+            {
+              "technique": "PIR",
+              "muscle": "adductors",
+              "side": "bilateral"
+            },
+            {
+              "technique": "PIR",
+              "muscle": "psoas",
+              "side": "bilateral"
+            }
+          ],
+          "soft_tissue": [
+            {
+              "technique": "trigger_point",
+              "muscle": "gluteus_medius",
+              "side": "bilateral"
+            }
+          ],
+          "contraindications_avoided": [
+            "no_high_velocity_manipulation_to_pelvis",
+            "no_prone_positioning",
+            "no_prolonged_supine"
+          ],
+          "devices": "pelvic_support_belt_fitted",
+          "exercises": ["pelvic_tilts", "gentle_hip_mobility", "kegels"],
+          "education": [
+            "sleep_positioning_with_pillow",
+            "activity_pacing",
+            "transfer_techniques",
+            "when_to_contact_OB"
+          ]
+        },
+        "plan": {
+          "frequency": "weekly_through_pregnancy",
+          "next_visit": "1_week",
+          "work_status": "assess_for_sick_leave",
+          "coordination": "may_contact_OB_if_needed",
+          "postpartum_plan": "reassess_after_delivery"
+        }
+      },
+      "ai_learning_points": {
+        "pattern": "pregnancy_pelvic_girdle_pain",
+        "special_considerations": [
+          "pregnancy_safe_techniques_only",
+          "side_lying_positioning",
+          "no_high_velocity_to_pelvis_lumbar",
+          "coordinate_with_OB_care",
+          "pelvic_support_belt_essential"
+        ],
+        "treatment_modifications": "gentle_techniques_only",
+        "expected_duration": "likely_through_remainder_of_pregnancy",
+        "postpartum_consideration": "reassess_6-8_weeks_postpartum"
+      }
+    },
+    {
+      "example_id": "003",
+      "scenario": "Cervicogenic Headache with Arm Symptoms",
+      "raw_note": "gått og murret litt en stund i nakke. i går og i dag var det veldig vondt. hatt hodepine hø side. kjenner litt ned i armen",
+      "structured_data": {
+        "session_metadata": {
+          "date": "2024-05-28",
+          "practitioner": "Sigrun Låg Kleiv",
+          "session_type": "initial",
+          "visit_number": 1,
+          "patient_age_group": "adult",
+          "special_population": "none"
+        },
+        "subjective": {
+          "chief_complaint": "Neck pain with headache and arm symptoms",
+          "pain_locations": ["neck", "right_head", "right_arm"],
+          "headache_characteristics": {
+            "location": "right_sided",
+            "onset": "neck_pain_first",
+            "quality": null,
+            "associated_symptoms": ["neck_stiffness"]
+          },
+          "arm_symptoms": {
+            "side": "right",
+            "quality": "numbness_tingling",
+            "distribution": "not_specified",
+            "weakness": false
+          },
+          "duration": "gradual_onset_acute_worsening",
+          "aggravating_factors": ["neck_movements"],
+          "functional_impact": ["work_difficulty"]
+        },
+        "objective": {
+          "observation": {
+            "posture": "forward_head_posture",
+            "shoulder_level": null
+          },
+          "range_of_motion": {
+            "cervical_rotation": "reduced_bilateral",
+            "cervical_lateral_flexion": "reduced_bilateral",
+            "cervical_flexion": "reduced"
+          },
+          "palpation": {
+            "suboccipital_tension": "bilateral_moderate",
+            "upper_trapezius": "bilateral_trigger_points",
+            "cervical_segments": "C1-C2_restricted"
+          },
+          "neurological": {
+            "upper_extremity_reflexes": "2+_bilateral",
+            "motor_strength": "5/5_C5-C7_bilateral",
+            "sensation": "intact",
+            "spurlings": "negative"
+          },
+          "special_tests": {
+            "spurlings": "negative",
+            "shoulder_abduction_relief": null,
+            "cervical_distraction": null
+          }
+        },
+        "assessment": {
+          "primary_diagnosis": "cervicogenic_headache",
+          "secondary_diagnosis": "cervical_radiculopathy_rule_out",
+          "icd10": "M53.1",
+          "severity": "moderate",
+          "red_flags": "none",
+          "differential_diagnosis": [
+            "cervicogenic_headache_most_likely",
+            "tension_headache",
+            "mild_radiculopathy_possible",
+            "migraine_less_likely"
+          ],
+          "clinical_reasoning": "Headache starts from neck, unilateral, associated with neck restriction and upper cervical dysfunction = cervicogenic. Arm symptoms without weakness or positive neuro tests = likely referred pain, but monitor.",
+          "imaging_needed": "not_initially_will_reassess"
+        },
+        "treatment": {
+          "manual_therapy": [
+            {
+              "technique": "SMT",
+              "location": "C2",
+              "direction": "PRS",
+              "force": "moderate"
+            },
+            {
+              "technique": "SMT",
+              "location": "C5",
+              "direction": "bilateral",
+              "force": "moderate"
+            },
+            {
+              "technique": "mobilization",
+              "location": "cervical",
+              "position": "supine"
+            }
+          ],
+          "soft_tissue": [
+            {
+              "technique": "suboccipital_release",
+              "side": "bilateral"
+            },
+            {
+              "technique": "trigger_point",
+              "muscle": "upper_trapezius",
+              "side": "bilateral"
+            },
+            {
+              "technique": "dry_needling",
+              "muscle": "upper_trapezius",
+              "side": "bilateral"
+            }
+          ],
+          "exercises": ["cervical_retraction", "chin_tucks", "shoulder_blade_squeezes"],
+          "education": ["ergonomics", "posture", "heat_application"]
+        },
+        "plan": {
+          "next_visit": "3-4_days",
+          "frequency": "twice_weekly_initially",
+          "monitoring": [
+            "track_arm_symptoms_closely",
+            "if_arm_symptoms_worsen_or_weakness_develops_refer_imaging"
+          ],
+          "imaging_criteria": "if_no_improvement_in_2_weeks_or_neurological_progression",
+          "expected_visits": "6-8"
+        }
+      },
+      "ai_learning_points": {
+        "pattern": "cervicogenic_headache_with_arm_symptoms",
+        "key_differentiators": [
+          "headache_starts_in_neck",
+          "unilateral",
+          "associated_neck_restriction",
+          "upper_cervical_dysfunction"
+        ],
+        "red_flags_to_monitor": [
+          "progressive_arm_weakness",
+          "worsening_neurological_symptoms",
+          "severe_unrelenting_headache"
+        ],
+        "treatment_approach": "address_cervical_dysfunction_monitor_arm_symptoms",
+        "when_to_escalate": [
+          "arm_symptoms_worsen",
+          "weakness_develops",
+          "no_improvement_2_weeks"
+        ]
+      }
+    },
+    {
+      "example_id": "004",
+      "scenario": "Follow-up Visit - Improving",
+      "raw_note": "går mye bedre. løsner fint. kommer til uken",
+      "structured_data": {
+        "session_metadata": {
+          "date": "2024-06-20",
+          "practitioner": "Sigrun Låg Kleiv",
+          "session_type": "follow_up",
+          "visit_number": 4,
+          "days_since_initial": 14
+        },
+        "subjective": {
+          "global_assessment": "much_better",
+          "pain_level_change": "improved",
+          "functional_status": "improved",
+          "compliance": "good",
+          "new_concerns": "none"
+        },
+        "objective": {
+          "key_findings": "improved_mobility",
+          "palpation": "reduced_tenderness",
+          "comparison": "notable_improvement_from_initial"
+        },
+        "treatment": {
+          "note": "Same treatment approach continued",
+          "response": "positive_releasing_well"
+        },
+        "assessment": {
+          "progress": "excellent",
+          "response_to_treatment": "responding_well",
+          "plan_modification": "none_continue_current_approach"
+        },
+        "plan": {
+          "next_visit": "1_week",
+          "frequency": "weekly_maintenance",
+          "expected_total_visits": "2-3_more",
+          "transition_plan": "then_as_needed"
+        }
+      },
+      "ai_learning_points": {
+        "progress_indicator": "positive_response",
+        "treatment_effectiveness": "current_approach_working",
+        "visit_frequency_adjustment": "can_space_out_visits",
+        "discharge_planning": "approaching_discharge_in_2-3_visits"
+      }
+    },
+    {
+      "example_id": "005",
+      "scenario": "Follow-up Visit - Not Improving / Plateau",
+      "raw_note": "opplever ingen bedring. har fortsatt mye smerter. henviser MR",
+      "structured_data": {
+        "session_metadata": {
+          "date": "2024-11-21",
+          "practitioner": "Sigrun Låg Kleiv",
+          "session_type": "follow_up",
+          "visit_number": 6,
+          "days_since_initial": 42
+        },
+        "subjective": {
+          "global_assessment": "no_improvement",
+          "pain_level": "unchanged_high",
+          "functional_status": "no_improvement",
+          "compliance": "good",
+          "frustration_level": "high"
+        },
+        "objective": {
+          "findings": "persistent_restrictions",
+          "comparison": "no_significant_change_from_initial"
+        },
+        "assessment": {
+          "progress": "none",
+          "response_to_treatment": "poor_response_conservative_care",
+          "clinical_reasoning": "Six visits over 6 weeks with no improvement despite good compliance suggests need for imaging to rule out other pathology",
+          "red_flags_reassessment": "none_but_lack_of_improvement_concerning"
+        },
+        "plan": {
+          "imaging_ordered": {
+            "type": "MRI",
+            "region": "cervical_spine",
+            "indication": "persistent_pain_not_responding_to_conservative_care",
+            "urgency": "routine"
+          },
+          "treatment_modification": "continue_supportive_care_pending_imaging",
+          "next_visit": "after_MRI_results",
+          "possible_referral": "may_refer_to_specialist_based_on_findings"
+        }
+      },
+      "ai_learning_points": {
+        "pattern": "treatment_resistant_case",
+        "escalation_trigger": "no_improvement_after_6_visits_6_weeks",
+        "appropriate_action": "order_imaging",
+        "clinical_reasoning": "rule_out_structural_pathology_when_conservative_care_fails",
+        "communication": "explain_rationale_to_patient"
+      }
+    },
+    {
+      "example_id": "006",
+      "scenario": "Sick Leave Documentation",
+      "raw_note": "veldig vondt i korsryggen. Kan ikke jobbe. SM 100% 1 uke",
+      "structured_data": {
+        "session_metadata": {
+          "date": "2024-01-15",
+          "practitioner": "Sigrun Låg Kleiv",
+          "session_type": "acute",
+          "visit_number": 1
+        },
+        "subjective": {
+          "pain_level": "severe",
+          "functional_limitation": "cannot_work",
+          "occupation": "office_work",
+          "work_demands": "prolonged_sitting"
+        },
+        "assessment": {
+          "work_capacity": "unable_to_perform_job_duties",
+          "prognosis": "expect_improvement_within_1_week",
+          "sick_leave_justified": true
+        },
+        "sick_leave": {
+          "percentage": 100,
+          "duration_days": 7,
+          "start_date": "2024-01-15",
+          "end_date": "2024-01-21",
+          "icd10_code": "M54.5",
+          "diagnosis_text": "Low back pain",
+          "work_capacity_assessment": "Cannot sit for prolonged periods required for office work. Expect rapid improvement with conservative treatment.",
+          "follow_up_plan": "Reassess work capacity in 1 week"
+        },
+        "plan": {
+          "treatment_intensity": "2-3_visits_first_week",
+          "work_return_plan": "reassess_after_1_week",
+          "potential_modified_duties": "may_need_modified_schedule_initially"
+        }
+      },
+      "ai_learning_points": {
+        "sick_leave_criteria": [
+          "functional_limitation_prevents_work",
+          "reasonable_expectation_of_improvement",
+          "specific_work_demands_affected"
+        ],
+        "documentation_requirements": [
+          "clear_functional_limitation",
+          "expected_duration",
+          "plan_for_reassessment"
+        ],
+        "typical_duration": "acute_LBP_usually_1_week_initially"
+      }
+    }
+  ],
+  "common_patterns_library": {
+    "acute_lumbar_facet": {
+      "typical_presentation": {
+        "onset": "acute",
+        "location": "unilateral_or_central_lumbar",
+        "radiation": "none_or_minimal_to_gluteal",
+        "aggravating": ["forward_flexion", "rotation"],
+        "neurological": "intact"
+      },
+      "typical_findings": {
+        "palpation": "segmental_tenderness_L4_or_L5",
+        "rom": "reduced_flexion_and_or_rotation",
+        "muscle": "paraspinal_spasm",
+        "tests": "positive_Kemps_negative_SLR"
+      },
+      "treatment_approach": {
+        "primary": "SMT_to_restricted_level",
+        "adjunct": "soft_tissue_paraspinals_gluteals",
+        "exercises": "gentle_mobility_core_stability",
+        "prognosis": "good_expect_2-5_visits"
+      }
+    },
+    "disc_herniation_with_radiculopathy": {
+      "typical_presentation": {
+        "onset": "acute_or_gradual",
+        "location": "lumbar_with_leg_radiation",
+        "radiation": "below_knee_dermatomal",
+        "aggravating": ["sitting", "valsalva", "forward_flexion"],
+        "neurological": "may_have_weakness_reflex_changes"
+      },
+      "typical_findings": {
+        "slr": "positive_affected_side",
+        "neurological": "may_show_dermatomal_sensory_loss_weakness_reflex_changes",
+        "rom": "limited_flexion",
+        "special_tests": "positive_slump_test"
+      },
+      "treatment_approach": {
+        "caution": "avoid_aggressive_flexion_based_techniques",
+        "appropriate": [
+          "gentle_extension_based_mobilization",
+          "soft_tissue_work",
+          "nerve_flossing",
+          "education"
+        ],
+        "red_flags": ["progressive_weakness", "cauda_equina_symptoms"],
+        "imaging": "MRI_if_severe_or_not_improving",
+        "prognosis": "variable_may_need_8-12_weeks"
+      }
+    },
+    "pregnancy_pelvic_pain": {
+      "typical_presentation": {
+        "onset": "second_or_third_trimester",
+        "location": "symphysis_pubis_SI_joints_groin",
+        "aggravating": ["walking", "stairs", "rolling_in_bed", "weight_bearing"],
+        "risk_factors": ["multiparous", "previous_pelvic_pain", "physically_demanding_work"]
+      },
+      "typical_findings": {
+        "aslr": "positive",
+        "p4_test": "positive",
+        "symphysis_tenderness": "present",
+        "gait": "antalgic"
+      },
+      "treatment_modifications": {
+        "positioning": "side_lying_no_prolonged_supine",
+        "techniques": "gentle_mobilization_only_no_HVLA_to_pelvis_lumbar",
+        "devices": "pelvic_support_belt_essential",
+        "exercises": "pregnancy_safe_pelvic_stability",
+        "education": [
+          "sleep_positioning",
+          "activity_pacing",
+          "transfer_techniques"
+        ],
+        "coordination": "may_need_to_communicate_with_OB",
+        "work": "often_requires_modified_duties_or_sick_leave",
+        "prognosis": "symptoms_likely_continue_through_pregnancy_reassess_postpartum"
+      }
+    },
+    "cervicogenic_headache": {
+      "typical_presentation": {
+        "headache_characteristics": {
+          "location": "unilateral_starting_neck_or_suboccipital",
+          "onset": "from_neck",
+          "triggers": ["neck_movements", "sustained_postures"],
+          "associated": "neck_stiffness"
+        }
+      },
+      "typical_findings": {
+        "upper_cervical_restriction": "C1-C2_often_involved",
+        "muscle_tension": "suboccipital_upper_trapezius",
+        "rom": "reduced_cervical_rotation",
+        "neurological": "intact"
+      },
+      "treatment_approach": {
+        "primary": "upper_cervical_SMT_C1-C2",
+        "soft_tissue": "suboccipital_release_trapezius_TP",
+        "exercises": "cervical_retraction_posture",
+        "education": "ergonomics_posture",
+        "differential": "rule_out_migraine_tension_headache",
+        "prognosis": "good_with_appropriate_treatment"
+      }
+    },
+    "plantar_fasciitis": {
+      "typical_presentation": {
+        "location": "plantar_heel_pain",
+        "timing": "worst_first_steps_morning",
+        "aggravating": ["prolonged_standing", "walking", "running"],
+        "relieving": ["rest", "after_warming_up"]
+      },
+      "typical_findings": {
+        "palpation": "tenderness_medial_calcaneal_tuberosity",
+        "dorsiflexion": "may_be_limited_tight_calf",
+        "windlass_test": "positive"
+      },
+      "treatment_approach": {
+        "manual": [
+          "plantar_fascia_release",
+          "calf_stretching",
+          "foot_mobilization"
+        ],
+        "adjunct": "dry_needling_gastrocnemius_soleus",
+        "exercises": [
+          "calf_stretching",
+          "plantar_fascia_stretching",
+          "toe_curls"
+        ],
+        "education": [
+          "footwear_assessment",
+          "activity_modification",
+          "ice_massage"
+        ],
+        "prognosis": "good_but_may_take_several_weeks"
+      }
+    }
+  },
+  "safety_assessment_templates": {
+    "lumbar_spine": "No motor weakness, neurological findings in lower extremities, or other indication of pathology in lumbar spine. Patient denies cauda equina symptoms. Local spinal dysfunction, no contraindications to treatment and expect rapid pain relief. Will continuously assess need for radiological examination or specialist referral if symptoms change.",
+    "cervical_spine": "No motor weakness, neurological findings in upper extremities, or other indication of pathology in cervical spine. Local spinal dysfunction, no contraindications to treatment and expect rapid pain relief. Will continuously assess need for radiological examination or specialist referral if symptoms change.",
+    "pregnancy": "Pregnancy-appropriate examination and treatment techniques used. No contraindications to gentle manual therapy identified. Patient instructed to report any obstetric concerns (bleeding, contractions, decreased fetal movement) to obstetric care provider immediately. Will continuously monitor symptom progression and functional status."
+  },
+  "clinical_decision_rules": {
+    "when_to_order_imaging": {
+      "immediate_mri": [
+        "suspected_cauda_equina",
+        "progressive_neurological_deficit",
+        "history_of_cancer_with_new_spinal_pain",
+        "suspected_infection_fever_unexplained_weight_loss"
+      ],
+      "mri_within_2_weeks": [
+        "severe_radiculopathy_not_improving",
+        "significant_trauma_with_persistent_pain"
+      ],
+      "mri_if_not_improving_6_weeks": [
+        "persistent_radicular_symptoms",
+        "no_response_to_conservative_care"
+      ],
+      "xray_considerations": [
+        "suspected_fracture",
+        "screening_for_structural_abnormalities",
+        "pre_manipulation_screening_elderly"
+      ]
+    },
+    "when_to_refer": {
+      "urgent_referral": [
+        "suspected_cauda_equina",
+        "progressive_motor_weakness",
+        "suspected_fracture",
+        "suspected_infection_tumor",
+        "severe_unremitting_pain_not_responsive"
+      ],
+      "routine_referral": [
+        "no_improvement_after_6-8_weeks_appropriate_care",
+        "patient_requests_second_opinion",
+        "complex_case_needing_interdisciplinary_approach",
+        "consideration_for_injections_or_surgery"
+      ],
+      "refer_to_physician_for_medication": [
+        "severe_pain_needing_stronger_pain_management",
+        "inflammatory_condition_may_benefit_from_NSAIDs",
+        "muscle_spasm_may_benefit_from_muscle_relaxants"
+      ]
+    },
+    "sick_leave_guidelines": {
+      "acute_lumbar_pain": "typically_3-7_days_initially",
+      "disc_herniation_severe": "may_need_2-4_weeks",
+      "pregnancy_pelvic_pain": "variable_may_need_partial_or_full_through_pregnancy",
+      "cervical_whiplash": "variable_based_on_severity",
+      "assessment_required": [
+        "functional_capacity_for_specific_job",
+        "expected_recovery_timeline",
+        "possibility_of_modified_duties"
+      ]
+    }
+  },
+  "metadata_tags_schema": {
+    "body_region": ["cervical", "thoracic", "lumbar", "pelvis", "upper_extremity", "lower_extremity"],
+    "presentation_type": ["acute", "subacute", "chronic", "acute_on_chronic", "recurrent"],
+    "severity": ["mild", "moderate", "severe"],
+    "neurological_involvement": ["none", "radiculopathy", "myelopathy", "peripheral_nerve"],
+    "special_population": ["pregnant", "postpartum", "pediatric", "elderly", "athlete", "none"],
+    "treatment_response": ["excellent", "good", "fair", "poor", "plateau", "worsening"],
+    "red_flags": ["present", "absent", "monitoring"],
+    "imaging_status": ["not_needed", "ordered", "completed", "normal", "abnormal"],
+    "referral_status": ["not_needed", "considered", "made", "pending"],
+    "work_status": ["working", "modified_duties", "sick_leave", "not_applicable"],
+    "outcome": ["recovered", "improved", "unchanged", "worse", "ongoing_care"]
+  }
+}

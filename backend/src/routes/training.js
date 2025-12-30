@@ -71,4 +71,74 @@ router.post('/train',
   trainingController.trainModel
 );
 
+/**
+ * @route   POST /api/v1/training/sindre-journals
+ * @desc    Process Sindre's journals and create training dataset
+ * @access  Private (ADMIN only)
+ */
+router.post('/sindre-journals',
+  requireRole(['ADMIN']),
+  trainingController.processSindreJournals
+);
+
+/**
+ * @route   GET /api/v1/training/terminology
+ * @desc    Get medical terminology dictionary
+ * @access  Private (ADMIN only)
+ */
+router.get('/terminology',
+  requireRole(['ADMIN']),
+  trainingController.getMedicalTerminology
+);
+
+/**
+ * @route   POST /api/v1/training/follow-ups
+ * @desc    Extract follow-up patterns from journals
+ * @access  Private (ADMIN only)
+ */
+router.post('/follow-ups',
+  requireRole(['ADMIN']),
+  trainingController.extractFollowUps
+);
+
+/**
+ * @route   POST /api/v1/training/parse-entry
+ * @desc    Parse individual journal entry
+ * @access  Private (ADMIN only)
+ */
+router.post('/parse-entry',
+  requireRole(['ADMIN']),
+  trainingController.parseJournalEntry
+);
+
+/**
+ * @route   POST /api/v1/training/sigrun-journals
+ * @desc    Process Sigrun's journals and create training dataset
+ * @access  Private (ADMIN only)
+ */
+router.post('/sigrun-journals',
+  requireRole(['ADMIN']),
+  trainingController.processSigrunJournals
+);
+
+/**
+ * @route   POST /api/v1/training/combined-journals
+ * @desc    Process journals with auto-detection or specific practitioner
+ * @access  Private (ADMIN only)
+ */
+router.post('/combined-journals',
+  requireRole(['ADMIN']),
+  trainingController.processCombinedJournals
+);
+
+/**
+ * @route   POST /api/v1/training/detect-style
+ * @desc    Detect practitioner style from journal text
+ * @access  Private (ADMIN only)
+ */
+router.post('/detect-style',
+  requireRole(['ADMIN']),
+  trainingController.detectPractitionerStyle
+);
+
 export default router;
