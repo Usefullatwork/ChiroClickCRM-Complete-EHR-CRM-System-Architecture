@@ -311,5 +311,36 @@ export const templatesAPI = {
   getPhrasesByRegion: (region, language = 'NO') => apiClient.get(`/templates/phrases/byregion/${region}`, { params: { language } }),
 }
 
+// Structured Examinations
+export const examinationsAPI = {
+  // Protocols
+  getBodyRegions: (language = 'NO') => apiClient.get('/examinations/protocols/body-regions', { params: { language } }),
+  getCategories: (language = 'NO') => apiClient.get('/examinations/protocols/categories', { params: { language } }),
+  getAllProtocols: (params) => apiClient.get('/examinations/protocols', { params }),
+  getProtocolById: (id) => apiClient.get(`/examinations/protocols/${id}`),
+  searchProtocols: (query, language = 'NO', limit = 50) => apiClient.get('/examinations/protocols/search', { params: { query, language, limit } }),
+  getProtocolsByRegion: (region, language = 'NO') => apiClient.get(`/examinations/protocols/by-region/${region}`, { params: { language } }),
+  getProtocolsByCategory: (category, language = 'NO') => apiClient.get(`/examinations/protocols/by-category/${category}`, { params: { language } }),
+
+  // Findings
+  getFindingsByEncounter: (encounterId) => apiClient.get(`/examinations/findings/encounter/${encounterId}`),
+  getFindingById: (id) => apiClient.get(`/examinations/findings/${id}`),
+  createFinding: (data) => apiClient.post('/examinations/findings', data),
+  createBatchFindings: (findings) => apiClient.post('/examinations/findings/batch', { findings }),
+  updateFinding: (id, data) => apiClient.patch(`/examinations/findings/${id}`, data),
+  deleteFinding: (id) => apiClient.delete(`/examinations/findings/${id}`),
+
+  // Summaries & Red Flags
+  getExaminationSummary: (encounterId) => apiClient.get(`/examinations/summary/${encounterId}`),
+  getRedFlags: (encounterId) => apiClient.get(`/examinations/red-flags/${encounterId}`),
+
+  // Template Sets
+  getAllTemplateSets: (language = 'NO') => apiClient.get('/examinations/template-sets', { params: { language } }),
+  getTemplateSetsByComplaint: (complaint, language = 'NO') => apiClient.get(`/examinations/template-sets/by-complaint/${complaint}`, { params: { language } }),
+  getTemplateSetById: (id) => apiClient.get(`/examinations/template-sets/${id}`),
+  createTemplateSet: (data) => apiClient.post('/examinations/template-sets', data),
+  incrementTemplateSetUsage: (id) => apiClient.post(`/examinations/template-sets/${id}/use`),
+}
+
 // Export default API client
 export default apiClient
