@@ -10,6 +10,7 @@
 import axios from 'axios';
 import logger from '../utils/logger.js';
 import { query } from '../config/database.js';
+import { validateClinicalContent, checkRedFlagsInContent, checkMedicationWarnings } from './clinicalValidation.js';
 
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
 const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY || null;
@@ -133,7 +134,7 @@ export const generateSOAPSuggestions = async (chiefComplaint, section = 'subject
   }
 
   try {
-    const suggestion = await generateCompletion(prompt, systemPrompt, { maxTokens: 400, temperature = 0.8 });
+    const suggestion = await generateCompletion(prompt, systemPrompt, { maxTokens: 400, temperature: 0.8 });
 
     return {
       section,
@@ -202,8 +203,48 @@ Foreslå ICPC-2 koder:`;
 
 /**
  * Analyze red flags and suggest clinical actions
+ * Combines rule-based clinical validation with AI analysis
  */
 export const analyzeRedFlags = async (patientData, soapData) => {
+  // First, use rule-based clinical validation for deterministic checks
+  const clinicalContent = [
+    soapData.subjective?.chief_complaint || '',
+    soapData.subjective?.history || '',
+    soapData.objective?.observation || '',
+    soapData.objective?.ortho_tests || '',
+    soapData.assessment?.clinical_reasoning || ''
+  ].join(' ');
+
+  // Rule-based red flag detection
+  const redFlagsDetected = checkRedFlagsInContent(clinicalContent);
+  const medicationWarnings = checkMedicationWarnings(patientData.current_medications || []);
+
+  // Comprehensive validation with patient context
+  const validationResult = await validateClinicalContent(clinicalContent, {
+    patient: patientData
+  });
+
+  // If critical flags detected by rules, return immediately
+  if (validationResult.riskLevel === 'CRITICAL') {
+    logger.warn('CRITICAL red flags detected by clinical validation', {
+      flags: redFlagsDetected.map(f => f.flag),
+      patient: patientData.id
+    });
+
+    return {
+      analysis: 'KRITISKE RØDE FLAGG OPPDAGET. ' +
+        redFlagsDetected.filter(f => f.severity === 'CRITICAL').map(f => f.message).join(' '),
+      riskLevel: 'CRITICAL',
+      canTreat: false,
+      recommendReferral: true,
+      detectedFlags: redFlagsDetected,
+      medicationWarnings,
+      requiresImmediateAction: true,
+      source: 'clinical_validation'
+    };
+  }
+
+  // For non-critical cases, augment with AI analysis
   const systemPrompt = `Du er en kiropraktor-sikkerhetsassistent. Analyser pasientdata og kliniske funn for røde flagg.
 
 Røde flagg inkluderer:
@@ -226,32 +267,51 @@ Kliniske funn:
 ${soapData.subjective?.chief_complaint || ''}
 ${soapData.objective?.ortho_tests || ''}
 
+${redFlagsDetected.length > 0 ? `MERK: Følgende røde flagg ble oppdaget automatisk: ${redFlagsDetected.map(f => f.flag).join(', ')}` : ''}
+
 Analyser røde flagg og gi anbefaling:`;
 
   try {
     const analysis = await generateCompletion(prompt, systemPrompt, { maxTokens: 400, temperature: 0.4 });
 
-    // Determine risk level based on keywords
-    const lowercaseAnalysis = analysis.toLowerCase();
-    let riskLevel = 'LOW';
+    // Combine AI analysis with rule-based detection
+    let riskLevel = validationResult.riskLevel;
 
+    // AI can upgrade but not downgrade risk level
+    const lowercaseAnalysis = analysis.toLowerCase();
     if (lowercaseAnalysis.includes('akutt henvisning') || lowercaseAnalysis.includes('øyeblikkelig') || lowercaseAnalysis.includes('cauda equina')) {
       riskLevel = 'CRITICAL';
-    } else if (lowercaseAnalysis.includes('henvise') || lowercaseAnalysis.includes('lege') || lowercaseAnalysis.includes('utredning')) {
+    } else if (riskLevel !== 'CRITICAL' && (lowercaseAnalysis.includes('henvise') || lowercaseAnalysis.includes('lege') || lowercaseAnalysis.includes('utredning'))) {
       riskLevel = 'HIGH';
-    } else if (lowercaseAnalysis.includes('forsiktig') || lowercaseAnalysis.includes('overvåke')) {
-      riskLevel = 'MODERATE';
     }
 
     return {
       analysis: analysis.trim(),
       riskLevel,
       canTreat: riskLevel === 'LOW' || riskLevel === 'MODERATE',
-      recommendReferral: riskLevel === 'HIGH' || riskLevel === 'CRITICAL'
+      recommendReferral: riskLevel === 'HIGH' || riskLevel === 'CRITICAL',
+      detectedFlags: redFlagsDetected,
+      medicationWarnings,
+      confidence: validationResult.confidence,
+      source: 'combined'
     };
   } catch (error) {
     logger.error('Red flag analysis error:', error);
-    return { analysis: '', riskLevel: 'UNKNOWN', canTreat: false, error: error.message };
+
+    // Fall back to rule-based results if AI fails
+    return {
+      analysis: redFlagsDetected.length > 0
+        ? `Automatisk oppdagede røde flagg: ${redFlagsDetected.map(f => f.message).join('; ')}`
+        : 'AI-analyse utilgjengelig. Vennligst gjennomgå manuelt.',
+      riskLevel: validationResult.riskLevel,
+      canTreat: !validationResult.hasRedFlags,
+      recommendReferral: validationResult.requiresReview,
+      detectedFlags: redFlagsDetected,
+      medicationWarnings,
+      confidence: validationResult.confidence,
+      source: 'clinical_validation_only',
+      error: error.message
+    };
   }
 };
 
