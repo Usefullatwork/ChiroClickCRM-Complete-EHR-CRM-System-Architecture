@@ -4,6 +4,7 @@
 
 import express from 'express';
 import * as encounterController from '../controllers/encounters.js';
+import * as amendmentController from '../controllers/amendments.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
 import {
@@ -84,6 +85,50 @@ router.post('/:id/generate-note',
   requireRole(['ADMIN', 'PRACTITIONER']),
   validate(generateNoteSchema),
   encounterController.generateNote
+);
+
+// ==========================================
+// AMENDMENT ROUTES (for signed encounters)
+// ==========================================
+
+/**
+ * @route   GET /api/v1/encounters/:encounterId/amendments
+ * @desc    Get all amendments for an encounter
+ * @access  Private (ADMIN, PRACTITIONER)
+ */
+router.get('/:encounterId/amendments',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  amendmentController.getAmendments
+);
+
+/**
+ * @route   POST /api/v1/encounters/:encounterId/amendments
+ * @desc    Create amendment for signed encounter
+ * @access  Private (ADMIN, PRACTITIONER)
+ */
+router.post('/:encounterId/amendments',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  amendmentController.createAmendment
+);
+
+/**
+ * @route   POST /api/v1/encounters/:encounterId/amendments/:amendmentId/sign
+ * @desc    Sign an amendment
+ * @access  Private (ADMIN, PRACTITIONER)
+ */
+router.post('/:encounterId/amendments/:amendmentId/sign',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  amendmentController.signAmendment
+);
+
+/**
+ * @route   DELETE /api/v1/encounters/:encounterId/amendments/:amendmentId
+ * @desc    Delete unsigned amendment
+ * @access  Private (ADMIN, PRACTITIONER)
+ */
+router.delete('/:encounterId/amendments/:amendmentId',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  amendmentController.deleteAmendment
 );
 
 export default router;
