@@ -1,5 +1,4 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { UserButton, useUser, useOrganization } from '@clerk/clerk-react'
 import {
   LayoutDashboard,
   Users,
@@ -13,13 +12,28 @@ import {
   Brain,
   Shield,
   BookOpen,
-  Settings
+  Settings,
+  User
 } from 'lucide-react'
+
+// Mock user for development
+const devUser = {
+  firstName: 'Mads',
+  lastName: 'Admin',
+  fullName: 'Mads Admin',
+  imageUrl: null
+}
+
+const devOrganization = {
+  name: 'ChiroClick Demo Clinic'
+}
 
 export default function DashboardLayout() {
   const location = useLocation()
-  const { user } = useUser()
-  const { organization } = useOrganization()
+
+  // In dev mode without Clerk, use mock data
+  const user = devUser
+  const organization = devOrganization
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
@@ -85,10 +99,12 @@ export default function DashboardLayout() {
           {/* User Profile */}
           <div className="p-4 border-t border-gray-200">
             <div className="flex items-center gap-3">
-              <UserButton afterSignOutUrl="/" />
+              <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
+                <User className="w-5 h-5 text-white" />
+              </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">
-                  {user?.fullName || user?.primaryEmailAddress?.emailAddress}
+                  {user?.fullName || user?.firstName || 'Mads Admin'}
                 </p>
                 <p className="text-xs text-gray-500">Practitioner</p>
               </div>
