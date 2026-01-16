@@ -12,11 +12,45 @@ import {
   User,
   Filter,
   Mail,
-  Smartphone
+  Smartphone,
+  Calendar,
+  Stethoscope,
+  RefreshCw,
+  CreditCard,
+  Heart,
+  AlertTriangle,
+  Star,
+  ChevronDown
 } from 'lucide-react'
 import { communicationsAPI, patientsAPI } from '../services/api'
 import { formatDate, formatPhone } from '../lib/utils'
 import toast from '../utils/toast'
+import {
+  TONES,
+  CATEGORIES,
+  TEMPLATES,
+  EMAIL_TEMPLATES,
+  getTemplatesByCategory,
+  getTemplatesByTone,
+  substituteVariables
+} from '../data/communicationTemplates'
+
+// Icon map for categories
+const categoryIcons = {
+  appointments: Calendar,
+  clinical: Stethoscope,
+  recalls: RefreshCw,
+  billing: CreditCard,
+  engagement: Heart,
+  urgent: AlertTriangle
+}
+
+// Get user's preferred language (would come from settings in production)
+const getLanguage = () => {
+  // Check for Norwegian browser language or use 'no' for Norwegian, 'en' for English
+  const browserLang = navigator.language || 'en'
+  return browserLang.startsWith('no') || browserLang.startsWith('nb') || browserLang.startsWith('nn') ? 'no' : 'en'
+}
 
 export default function Communications() {
   const queryClient = useQueryClient()
@@ -29,6 +63,15 @@ export default function Communications() {
   const [showPatientSearch, setShowPatientSearch] = useState(false)
   const [copied, setCopied] = useState(false)
   const [historyFilter, setHistoryFilter] = useState('')
+
+  // New state for template browser
+  const [selectedCategory, setSelectedCategory] = useState('all')
+  const [selectedTone, setSelectedTone] = useState('direct')
+  const [language, setLanguage] = useState(getLanguage())
+  const [favoriteTemplates, setFavoriteTemplates] = useState(() => {
+    const saved = localStorage.getItem('favoriteTemplates')
+    return saved ? JSON.parse(saved) : []
+  })
 
   // Fetch templates
   const { data: templatesResponse } = useQuery({
@@ -66,7 +109,55 @@ export default function Communications() {
   const remainingChars = maxSmsLength - message.length
   const smsCount = Math.ceil(message.length / maxSmsLength) || 1
 
-  // Apply template
+  // Get filtered templates based on category and tone
+  const getFilteredTemplates = () => {
+    let templateList = messageType === 'email' ? EMAIL_TEMPLATES : TEMPLATES
+
+    // Filter by category
+    if (selectedCategory !== 'all') {
+      templateList = templateList.filter(t => t.category === selectedCategory)
+    }
+
+    // Filter by tone
+    templateList = templateList.filter(t => t.tone === selectedTone)
+
+    return templateList
+  }
+
+  // Toggle favorite template
+  const toggleFavorite = (templateId) => {
+    const newFavorites = favoriteTemplates.includes(templateId)
+      ? favoriteTemplates.filter(id => id !== templateId)
+      : [...favoriteTemplates, templateId]
+    setFavoriteTemplates(newFavorites)
+    localStorage.setItem('favoriteTemplates', JSON.stringify(newFavorites))
+  }
+
+  // Apply template from new system
+  const applyLocalTemplate = (template) => {
+    setSelectedTemplate(template)
+
+    // Get content in selected language
+    const content = messageType === 'email'
+      ? template.body?.[language] || template.body?.en || ''
+      : template.content?.[language] || template.content?.en || ''
+
+    // Prepare variables from patient data
+    const variables = {}
+    if (selectedPatient) {
+      variables.firstName = selectedPatient.first_name
+      variables.lastName = selectedPatient.last_name
+      variables.fullName = `${selectedPatient.first_name} ${selectedPatient.last_name}`
+      variables.phone = formatPhone(selectedPatient.phone) || ''
+      variables.email = selectedPatient.email || ''
+    }
+
+    // Substitute variables
+    const finalContent = substituteVariables(content, variables)
+    setMessage(finalContent)
+  }
+
+  // Apply template (legacy API templates)
   const applyTemplate = (template) => {
     setSelectedTemplate(template)
     let content = template.content
@@ -361,17 +452,170 @@ export default function Communications() {
             </div>
           </div>
 
-          {/* Templates Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h3 className="text-sm font-medium text-gray-900 mb-4 flex items-center gap-2">
+          {/* Templates Sidebar - Enhanced */}
+          <div className="lg:col-span-1 space-y-4">
+            {/* Tone Selector */}
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                {language === 'no' ? 'Tone' : 'Tone'}
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {Object.values(TONES).map((tone) => (
+                  <button
+                    key={tone.id}
+                    onClick={() => setSelectedTone(tone.id)}
+                    className={`px-3 py-2 text-xs font-medium rounded-lg border transition-colors ${
+                      selectedTone === tone.id
+                        ? 'border-blue-600 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                    title={tone.description[language]}
+                  >
+                    {tone.name[language]}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Language Toggle */}
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                {language === 'no' ? 'Språk' : 'Language'}
+              </label>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setLanguage('no')}
+                  className={`flex-1 px-3 py-2 text-xs font-medium rounded-lg border transition-colors ${
+                    language === 'no'
+                      ? 'border-blue-600 bg-blue-50 text-blue-700'
+                      : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                  }`}
+                >
+                  🇳🇴 Norsk
+                </button>
+                <button
+                  onClick={() => setLanguage('en')}
+                  className={`flex-1 px-3 py-2 text-xs font-medium rounded-lg border transition-colors ${
+                    language === 'en'
+                      ? 'border-blue-600 bg-blue-50 text-blue-700'
+                      : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                  }`}
+                >
+                  🇬🇧 English
+                </button>
+              </div>
+            </div>
+
+            {/* Category Filter */}
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                {language === 'no' ? 'Kategori' : 'Category'}
+              </label>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setSelectedCategory('all')}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
+                    selectedCategory === 'all'
+                      ? 'border-blue-600 bg-blue-50 text-blue-700'
+                      : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                  }`}
+                >
+                  {language === 'no' ? 'Alle' : 'All'}
+                </button>
+                {Object.values(CATEGORIES).map((cat) => {
+                  const IconComponent = categoryIcons[cat.id] || FileText
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => setSelectedCategory(cat.id)}
+                      className={`flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
+                        selectedCategory === cat.id
+                          ? 'border-blue-600 bg-blue-50 text-blue-700'
+                          : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                      }`}
+                    >
+                      <IconComponent className="w-3 h-3" />
+                      {cat.name[language]}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Template List */}
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
                 <FileText className="w-4 h-4" />
-                Message Templates
+                {language === 'no' ? 'Maler' : 'Templates'}
+                <span className="text-xs text-gray-400">
+                  ({getFilteredTemplates().length})
+                </span>
               </h3>
 
-              <div className="space-y-2">
-                {templates.length > 0 ? (
-                  templates
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {getFilteredTemplates().length > 0 ? (
+                  getFilteredTemplates().map((template) => {
+                    const isFavorite = favoriteTemplates.includes(template.id)
+                    const displayContent = messageType === 'email'
+                      ? template.subject?.[language] || template.subject?.en || ''
+                      : template.content?.[language] || template.content?.en || ''
+
+                    return (
+                      <div
+                        key={template.id}
+                        className={`relative p-3 rounded-lg border transition-colors cursor-pointer ${
+                          selectedTemplate?.id === template.id
+                            ? 'border-blue-600 bg-blue-50'
+                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        }`}
+                        onClick={() => applyLocalTemplate(template)}
+                      >
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            toggleFavorite(template.id)
+                          }}
+                          className="absolute top-2 right-2 p-1 hover:bg-gray-100 rounded"
+                        >
+                          <Star
+                            className={`w-4 h-4 ${
+                              isFavorite ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+                            }`}
+                          />
+                        </button>
+                        <div className="pr-6">
+                          <div className="font-medium text-sm text-gray-900">
+                            {template.name[language]}
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1 line-clamp-2">
+                            {displayContent}
+                          </div>
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
+                              {CATEGORIES[template.category]?.name[language]}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })
+                ) : (
+                  <div className="text-center py-6 text-sm text-gray-500">
+                    {language === 'no' ? 'Ingen maler funnet' : 'No templates found'}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Legacy API Templates (if any) */}
+            {templates.length > 0 && (
+              <div className="bg-white rounded-lg border border-gray-200 p-4">
+                <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  {language === 'no' ? 'Egendefinerte Maler' : 'Custom Templates'}
+                </h3>
+                <div className="space-y-2">
+                  {templates
                     .filter(t => !messageType || t.type === messageType.toUpperCase())
                     .map((template) => (
                       <button
@@ -390,14 +634,10 @@ export default function Communications() {
                           {template.content}
                         </div>
                       </button>
-                    ))
-                ) : (
-                  <div className="text-center py-6 text-sm text-gray-500">
-                    No templates available
-                  </div>
-                )}
+                    ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       )}
