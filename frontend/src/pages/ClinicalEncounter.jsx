@@ -33,11 +33,47 @@ import {
   BookOpen,
   Bone,
   Loader2,
-  Lock
+  Lock,
+  Ruler,
+  PersonStanding,
+  ClipboardList,
+  Target,
+  Settings
 } from 'lucide-react';
 import TemplatePicker from '../components/TemplatePicker';
 import { NeurologicalExamCompact } from '../components/neuroexam';
 import { OrthopedicExamCompact } from '../components/orthoexam';
+import { usePatientIntake } from '../hooks/usePatientIntake';
+import { useClinicalPreferences, NOTATION_METHODS } from '../hooks';
+import {
+  ExaminationProtocol,
+  ClusterTestPanel,
+  BodyDiagram,
+  ROMTable,
+  RegionalExamination,
+  VisualROMSelector,
+  ManualMuscleTesting,
+  CranialNervePanel,
+  SensoryExamination,
+  PainAssessmentPanel,
+  DeepTendonReflexPanel,
+  CoordinationTestPanel,
+  NerveTensionTests,
+  HeadacheAssessment,
+  TissueAbnormalityMarkers,
+  BodyChartPanel,
+  AnatomicalBodyChart,
+  ActivatorMethodPanel,
+  FacialLinesChart,
+  // Bilateral body diagrams
+  LowerExtremityDiagram,
+  UpperExtremityDiagram,
+  RegionalBodyDiagram
+} from '../components/examination';
+import NeurologicalExam from '../components/examination/NeurologicalExam';
+import OutcomeMeasures, { OutcomeMeasureSelector } from '../components/examination/OutcomeMeasures';
+import { ExercisePanel } from '../components/exercises';
+import QuickPalpationSpine from '../components/clinical/QuickPalpationSpine';
 
 // --- STATIC DATA ---
 const taksterNorwegian = [
@@ -173,12 +209,17 @@ export default function ClinicalEncounter() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const textAreaRefs = useRef({});
+  const palpationRef = useRef(null);
 
   // UI State
   const [showAIAssistant, setShowAIAssistant] = useState(false);
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
   const [showNeuroExam, setShowNeuroExam] = useState(false);
   const [showOrthoExam, setShowOrthoExam] = useState(false);
+  const [showExamProtocol, setShowExamProtocol] = useState(false);
+  const [showClusterTests, setShowClusterTests] = useState(false);
+  const [showBodyDiagram, setShowBodyDiagram] = useState(false);
+  const [showROMTable, setShowROMTable] = useState(false);
   const [activeField, setActiveField] = useState(null);
   const [diagnosisSearch, setDiagnosisSearch] = useState("");
   const [showDiagnosisDropdown, setShowDiagnosisDropdown] = useState(false);
@@ -190,7 +231,53 @@ export default function ClinicalEncounter() {
   const [aiLoading, setAiLoading] = useState(false);
   const [neuroExamData, setNeuroExamData] = useState(null);
   const [orthoExamData, setOrthoExamData] = useState(null);
-  
+  const [examProtocolData, setExamProtocolData] = useState({});
+  const [clusterTestData, setClusterTestData] = useState({});
+  const [bodyDiagramMarkers, setBodyDiagramMarkers] = useState([]);
+  const [romTableData, setRomTableData] = useState({});
+  const [showNeurologicalExam, setShowNeurologicalExam] = useState(false);
+  const [neurologicalExamData, setNeurologicalExamData] = useState({});
+  const [showOutcomeMeasures, setShowOutcomeMeasures] = useState(false);
+  const [outcomeMeasureType, setOutcomeMeasureType] = useState('ndi');
+  const [outcomeMeasureData, setOutcomeMeasureData] = useState({});
+  const [showRegionalExam, setShowRegionalExam] = useState(false);
+  const [regionalExamData, setRegionalExamData] = useState({});
+  const [showExercisePanel, setShowExercisePanel] = useState(false);
+
+  // New Examination Components State
+  const [showMMT, setShowMMT] = useState(false);
+  const [mmtData, setMmtData] = useState({});
+  const [showCranialNerves, setShowCranialNerves] = useState(false);
+  const [cranialNerveData, setCranialNerveData] = useState({});
+  const [showSensoryExam, setShowSensoryExam] = useState(false);
+  const [sensoryExamData, setSensoryExamData] = useState({});
+  const [showPainAssessment, setShowPainAssessment] = useState(false);
+  const [painAssessmentData, setPainAssessmentData] = useState({});
+  const [showDTR, setShowDTR] = useState(false);
+  const [dtrData, setDtrData] = useState({});
+  const [showCoordination, setShowCoordination] = useState(false);
+  const [coordinationData, setCoordinationData] = useState({});
+  const [showNerveTension, setShowNerveTension] = useState(false);
+  const [nerveTensionData, setNerveTensionData] = useState({});
+  const [showRegionalDiagrams, setShowRegionalDiagrams] = useState(false);
+  const [regionalDiagramData, setRegionalDiagramData] = useState({});
+  const [selectedRegion, setSelectedRegion] = useState('shoulder');
+  const [showHeadacheAssessment, setShowHeadacheAssessment] = useState(false);
+  const [headacheData, setHeadacheData] = useState({});
+  const [showTissueMarkers, setShowTissueMarkers] = useState(false);
+  const [tissueMarkerData, setTissueMarkerData] = useState({});
+
+  // Clinical Preferences (notation method selection)
+  const {
+    preferences: clinicalPrefs,
+    currentNotationMethod,
+    getNotationName,
+    isVisualNotation,
+    language: clinicalLang
+  } = useClinicalPreferences();
+  const [notationData, setNotationData] = useState({ markers: [], selectedPoints: [] });
+  const [notationNarrative, setNotationNarrative] = useState('');
+
   // Amendment State (for signed encounters)
   const [showAmendmentForm, setShowAmendmentForm] = useState(false);
   const [amendmentContent, setAmendmentContent] = useState('');
@@ -208,6 +295,7 @@ export default function ClinicalEncounter() {
 
   // Treatment State
   const [selectedTakster, setSelectedTakster] = useState(['l214']);
+  const [showTakster, setShowTakster] = useState(false); // Hidden by default for students/limited users
 
   // Form State - SOAP format
   const [encounterData, setEncounterData] = useState({
@@ -257,6 +345,36 @@ export default function ClinicalEncounter() {
     queryFn: () => patientsAPI.getById(patientId),
     enabled: !!patientId
   });
+
+  // Fetch kiosk intake data if patient checked in via kiosk
+  // This will pre-populate the subjective section
+  const appointmentId = patient?.currentAppointmentId || null;
+  const {
+    intake: kioskIntake,
+    subjectiveNarrative: kioskSubjective,
+    hasIntake: hasKioskIntake
+  } = usePatientIntake(appointmentId);
+
+  // Track if we've applied kiosk data (to avoid overwriting user edits)
+  const [kioskDataApplied, setKioskDataApplied] = useState(false);
+
+  // Pre-populate from kiosk check-in data
+  useEffect(() => {
+    if (hasKioskIntake && kioskSubjective && !kioskDataApplied && !encounterId) {
+      setEncounterData(prev => ({
+        ...prev,
+        subjective: {
+          ...prev.subjective,
+          chief_complaint: kioskSubjective
+        },
+        vas_pain_start: kioskIntake?.painLevel ?? prev.vas_pain_start
+      }));
+      setKioskDataApplied(true);
+
+      // Show notification to user
+      console.log('📋 Pre-populated from patient kiosk check-in');
+    }
+  }, [hasKioskIntake, kioskSubjective, kioskIntake, kioskDataApplied, encounterId]);
 
   // Fetch encounter if editing
   const { data: existingEncounter } = useQuery({
@@ -875,6 +993,29 @@ export default function ClinicalEncounter() {
     updateField(section, field, currentValue + (currentValue ? '\n' : '') + templateText);
   };
 
+  // Handler for spine quick-click text insertion (palpation only)
+  const handleSpineTextInsert = (text) => {
+    const currentValue = encounterData.objective.palpation || '';
+    // Append text with proper spacing
+    const newValue = currentValue + (currentValue && !currentValue.endsWith(' ') ? ' ' : '') + text;
+    setEncounterData(prev => ({
+      ...prev,
+      objective: { ...prev.objective, palpation: newValue }
+    }));
+    setAutoSaveStatus('unsaved');
+    // Optionally refocus the palpation textarea
+    if (palpationRef.current) {
+      palpationRef.current.focus();
+      // Move cursor to end
+      setTimeout(() => {
+        if (palpationRef.current) {
+          palpationRef.current.selectionStart = palpationRef.current.value.length;
+          palpationRef.current.selectionEnd = palpationRef.current.value.length;
+        }
+      }, 0);
+    }
+  };
+
   // Computed values
   const totalPrice = taksterNorwegian
     .filter(t => selectedTakster.includes(t.id))
@@ -910,6 +1051,16 @@ export default function ClinicalEncounter() {
   // ═══════════════════════════════════════════════════════════════════
   return (
     <div className="flex h-screen bg-slate-50 text-slate-900 overflow-hidden font-sans">
+      {/* Quick Palpation Spine Sidebar - Always visible right side */}
+      <div className="fixed right-0 top-0 w-44 h-full z-20 shadow-lg">
+        <QuickPalpationSpine
+          onInsertText={handleSpineTextInsert}
+          disabled={isSigned}
+        />
+      </div>
+
+      {/* Main content wrapper with right margin to accommodate spine sidebar */}
+      <div className="flex flex-1 mr-44">
 
       {/* ═══════════════════════════════════════════════════════════════════
           1. LEFT SIDEBAR - PATIENT CONTEXT & SAFETY
@@ -1320,6 +1471,7 @@ export default function ClinicalEncounter() {
                     className="min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-500 resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
                   />
                   <textarea
+                    ref={palpationRef}
                     placeholder="Palpasjon (ømhet, spenninger)... (bruk .palp for makro)"
                     value={encounterData.objective.palpation}
                     onChange={(e) => {
@@ -1418,6 +1570,590 @@ export default function ClinicalEncounter() {
                   disabled={isSigned}
                   className="w-full min-h-[60px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-500 resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
                 />
+
+                {/* ROM Table Panel - Visual Region Selector */}
+                <div className="border border-teal-200 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setShowROMTable(!showROMTable)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-teal-50 hover:bg-teal-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Ruler className="w-5 h-5 text-teal-600" />
+                      <span className="font-medium text-teal-900">Leddutslag (ROM)</span>
+                      {Object.keys(romTableData).length > 0 && (
+                        <span className="text-xs bg-teal-200 text-teal-800 px-2 py-0.5 rounded-full">
+                          {Object.keys(romTableData).length} regioner
+                        </span>
+                      )}
+                    </div>
+                    {showROMTable ? <ChevronUp className="w-5 h-5 text-teal-600" /> : <ChevronDown className="w-5 h-5 text-teal-600" />}
+                  </button>
+                  {showROMTable && (
+                    <div className="p-4 bg-white">
+                      <VisualROMSelector
+                        values={romTableData}
+                        onChange={setRomTableData}
+                        readOnly={isSigned}
+                        onGenerateReport={(report) => {
+                          updateField('objective', 'rom', encounterData.objective.rom + (encounterData.objective.rom ? '\n\n' : '') + report);
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Body Diagram Panel */}
+                <div className="border border-rose-200 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setShowBodyDiagram(!showBodyDiagram)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-rose-50 hover:bg-rose-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <PersonStanding className="w-5 h-5 text-rose-600" />
+                      <span className="font-medium text-rose-900">Smertekart & Vevsmarkering</span>
+                      {bodyDiagramMarkers.length > 0 && (
+                        <span className="text-xs bg-rose-200 text-rose-800 px-2 py-0.5 rounded-full">
+                          {bodyDiagramMarkers.length} markeringer
+                        </span>
+                      )}
+                    </div>
+                    {showBodyDiagram ? <ChevronUp className="w-5 h-5 text-rose-600" /> : <ChevronDown className="w-5 h-5 text-rose-600" />}
+                  </button>
+                  {showBodyDiagram && (
+                    <div className="p-4 bg-white">
+                      <BodyDiagram
+                        markers={bodyDiagramMarkers}
+                        onChange={setBodyDiagramMarkers}
+                        lang="no"
+                        view="posterior"
+                        readOnly={isSigned}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Examination Protocol Panel */}
+                <div className="border border-orange-200 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setShowExamProtocol(!showExamProtocol)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-orange-50 hover:bg-orange-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <ClipboardList className="w-5 h-5 text-orange-600" />
+                      <span className="font-medium text-orange-900">Undersøkelsesprotokoll</span>
+                      {Object.keys(examProtocolData).length > 0 && (
+                        <span className="text-xs bg-orange-200 text-orange-800 px-2 py-0.5 rounded-full">
+                          {Object.keys(examProtocolData).length} funn
+                        </span>
+                      )}
+                    </div>
+                    {showExamProtocol ? <ChevronUp className="w-5 h-5 text-orange-600" /> : <ChevronDown className="w-5 h-5 text-orange-600" />}
+                  </button>
+                  {showExamProtocol && (
+                    <div className="p-4 bg-white">
+                      <ExaminationProtocol
+                        values={examProtocolData}
+                        onChange={setExamProtocolData}
+                        lang="no"
+                        readOnly={isSigned}
+                        onGenerateNarrative={(narrative) => {
+                          updateField('objective', 'palpation', encounterData.objective.palpation + (encounterData.objective.palpation ? '\n' : '') + narrative);
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Cluster Tests Panel */}
+                <div className="border border-red-200 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setShowClusterTests(!showClusterTests)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-red-50 hover:bg-red-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Target className="w-5 h-5 text-red-600" />
+                      <span className="font-medium text-red-900">Diagnostiske Klyngetester</span>
+                      {Object.keys(clusterTestData).length > 0 && (
+                        <span className="text-xs bg-red-200 text-red-800 px-2 py-0.5 rounded-full">
+                          {Object.keys(clusterTestData).length} tester
+                        </span>
+                      )}
+                    </div>
+                    {showClusterTests ? <ChevronUp className="w-5 h-5 text-red-600" /> : <ChevronDown className="w-5 h-5 text-red-600" />}
+                  </button>
+                  {showClusterTests && (
+                    <div className="p-4 bg-white">
+                      <ClusterTestPanel
+                        values={clusterTestData}
+                        onChange={setClusterTestData}
+                        lang="no"
+                        readOnly={isSigned}
+                        onGenerateReport={(report) => {
+                          updateField('objective', 'ortho_tests', encounterData.objective.ortho_tests + (encounterData.objective.ortho_tests ? '\n\n' : '') + report);
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Regional Examination Panel */}
+                <div className="border border-teal-200 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setShowRegionalExam(!showRegionalExam)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-teal-50 hover:bg-teal-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <PersonStanding className="w-5 h-5 text-teal-600" />
+                      <span className="font-medium text-teal-900">Regional undersøkelse</span>
+                      {Object.keys(regionalExamData).length > 0 && (
+                        <span className="text-xs bg-teal-200 text-teal-800 px-2 py-0.5 rounded-full">
+                          Data registrert
+                        </span>
+                      )}
+                    </div>
+                    {showRegionalExam ? <ChevronUp className="w-5 h-5 text-teal-600" /> : <ChevronDown className="w-5 h-5 text-teal-600" />}
+                  </button>
+                  {showRegionalExam && (
+                    <div className="p-4 bg-white">
+                      <RegionalExamination
+                        values={regionalExamData}
+                        onChange={setRegionalExamData}
+                        readOnly={isSigned}
+                        onGenerateReport={(report) => {
+                          updateField('objective', 'ortho_tests', encounterData.objective.ortho_tests + (encounterData.objective.ortho_tests ? '\n\n' : '') + report);
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Neurological Exam Panel */}
+                <div className="border border-purple-200 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setShowNeurologicalExam(!showNeurologicalExam)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-purple-50 hover:bg-purple-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Brain className="w-5 h-5 text-purple-600" />
+                      <span className="font-medium text-purple-900">Nevrologisk undersøkelse</span>
+                      {Object.keys(neurologicalExamData).length > 0 && (
+                        <span className="text-xs bg-purple-200 text-purple-800 px-2 py-0.5 rounded-full">
+                          Data registrert
+                        </span>
+                      )}
+                    </div>
+                    {showNeurologicalExam ? <ChevronUp className="w-5 h-5 text-purple-600" /> : <ChevronDown className="w-5 h-5 text-purple-600" />}
+                  </button>
+                  {showNeurologicalExam && (
+                    <div className="p-4 bg-white">
+                      <NeurologicalExam
+                        values={neurologicalExamData}
+                        onChange={setNeurologicalExamData}
+                        lang="no"
+                        readOnly={isSigned}
+                        onGenerateReport={(report) => {
+                          updateField('objective', 'neuro_tests', encounterData.objective.neuro_tests + (encounterData.objective.neuro_tests ? '\n\n' : '') + report);
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Outcome Measures Panel */}
+                <div className="border border-indigo-200 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setShowOutcomeMeasures(!showOutcomeMeasures)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-indigo-50 hover:bg-indigo-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <ClipboardList className="w-5 h-5 text-indigo-600" />
+                      <span className="font-medium text-indigo-900">Utfallsmål (NDI/ODI)</span>
+                      {Object.keys(outcomeMeasureData).length > 0 && (
+                        <span className="text-xs bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded-full">
+                          {outcomeMeasureType.toUpperCase()} registrert
+                        </span>
+                      )}
+                    </div>
+                    {showOutcomeMeasures ? <ChevronUp className="w-5 h-5 text-indigo-600" /> : <ChevronDown className="w-5 h-5 text-indigo-600" />}
+                  </button>
+                  {showOutcomeMeasures && (
+                    <div className="p-4 bg-white space-y-4">
+                      <OutcomeMeasureSelector
+                        value={outcomeMeasureType}
+                        onChange={setOutcomeMeasureType}
+                        lang="no"
+                      />
+                      <OutcomeMeasures
+                        type={outcomeMeasureType}
+                        values={outcomeMeasureData[outcomeMeasureType] || {}}
+                        onChange={(values) => setOutcomeMeasureData(prev => ({
+                          ...prev,
+                          [outcomeMeasureType]: values
+                        }))}
+                        lang="no"
+                        readOnly={isSigned}
+                        onComplete={(result) => {
+                          updateField('assessment', 'clinical_reasoning',
+                            encounterData.assessment.clinical_reasoning +
+                            (encounterData.assessment.clinical_reasoning ? '\n\n' : '') +
+                            `${result.type.toUpperCase()}: ${result.score} poeng (${result.percentage}%)`
+                          );
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Manual Muscle Testing Panel */}
+                <div className="border border-blue-200 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setShowMMT(!showMMT)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-blue-50 hover:bg-blue-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Activity className="w-5 h-5 text-blue-600" />
+                      <span className="font-medium text-blue-900">Manuell Muskeltesting (MMT)</span>
+                      {Object.keys(mmtData).length > 0 && (
+                        <span className="text-xs bg-blue-200 text-blue-800 px-2 py-0.5 rounded-full">
+                          Data registrert
+                        </span>
+                      )}
+                    </div>
+                    {showMMT ? <ChevronUp className="w-5 h-5 text-blue-600" /> : <ChevronDown className="w-5 h-5 text-blue-600" />}
+                  </button>
+                  {showMMT && (
+                    <div className="p-4 bg-white">
+                      <ManualMuscleTesting
+                        values={mmtData}
+                        onChange={setMmtData}
+                        lang="no"
+                        readOnly={isSigned}
+                        onGenerateNarrative={(narrative) => {
+                          updateField('objective', 'neuro_tests', encounterData.objective.neuro_tests + (encounterData.objective.neuro_tests ? '\n\n' : '') + narrative);
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Deep Tendon Reflexes Panel */}
+                <div className="border border-green-200 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setShowDTR(!showDTR)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-green-50 hover:bg-green-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Activity className="w-5 h-5 text-green-600" />
+                      <span className="font-medium text-green-900">Dype Senereflekser (DTR)</span>
+                      {Object.keys(dtrData).length > 0 && (
+                        <span className="text-xs bg-green-200 text-green-800 px-2 py-0.5 rounded-full">
+                          Data registrert
+                        </span>
+                      )}
+                    </div>
+                    {showDTR ? <ChevronUp className="w-5 h-5 text-green-600" /> : <ChevronDown className="w-5 h-5 text-green-600" />}
+                  </button>
+                  {showDTR && (
+                    <div className="p-4 bg-white">
+                      <DeepTendonReflexPanel
+                        values={dtrData}
+                        onChange={setDtrData}
+                        lang="no"
+                        readOnly={isSigned}
+                        onGenerateNarrative={(narrative) => {
+                          updateField('objective', 'neuro_tests', encounterData.objective.neuro_tests + (encounterData.objective.neuro_tests ? '\n\n' : '') + narrative);
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Sensory Examination Panel */}
+                <div className="border border-amber-200 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setShowSensoryExam(!showSensoryExam)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-amber-50 hover:bg-amber-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Activity className="w-5 h-5 text-amber-600" />
+                      <span className="font-medium text-amber-900">Sensibilitetsundersøkelse</span>
+                      {Object.keys(sensoryExamData).length > 0 && (
+                        <span className="text-xs bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full">
+                          Data registrert
+                        </span>
+                      )}
+                    </div>
+                    {showSensoryExam ? <ChevronUp className="w-5 h-5 text-amber-600" /> : <ChevronDown className="w-5 h-5 text-amber-600" />}
+                  </button>
+                  {showSensoryExam && (
+                    <div className="p-4 bg-white">
+                      <SensoryExamination
+                        values={sensoryExamData}
+                        onChange={setSensoryExamData}
+                        lang="no"
+                        readOnly={isSigned}
+                        onGenerateNarrative={(narrative) => {
+                          updateField('objective', 'neuro_tests', encounterData.objective.neuro_tests + (encounterData.objective.neuro_tests ? '\n\n' : '') + narrative);
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Cranial Nerve Panel */}
+                <div className="border border-violet-200 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setShowCranialNerves(!showCranialNerves)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-violet-50 hover:bg-violet-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Brain className="w-5 h-5 text-violet-600" />
+                      <span className="font-medium text-violet-900">Hjernenerver (CN I-XII)</span>
+                      {Object.keys(cranialNerveData).length > 0 && (
+                        <span className="text-xs bg-violet-200 text-violet-800 px-2 py-0.5 rounded-full">
+                          Data registrert
+                        </span>
+                      )}
+                    </div>
+                    {showCranialNerves ? <ChevronUp className="w-5 h-5 text-violet-600" /> : <ChevronDown className="w-5 h-5 text-violet-600" />}
+                  </button>
+                  {showCranialNerves && (
+                    <div className="p-4 bg-white">
+                      <CranialNervePanel
+                        values={cranialNerveData}
+                        onChange={setCranialNerveData}
+                        lang="no"
+                        readOnly={isSigned}
+                        onGenerateNarrative={(narrative) => {
+                          updateField('objective', 'neuro_tests', encounterData.objective.neuro_tests + (encounterData.objective.neuro_tests ? '\n\n' : '') + narrative);
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Coordination Tests Panel */}
+                <div className="border border-indigo-200 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setShowCoordination(!showCoordination)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-indigo-50 hover:bg-indigo-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Activity className="w-5 h-5 text-indigo-600" />
+                      <span className="font-medium text-indigo-900">Koordinasjonstester</span>
+                      {Object.keys(coordinationData).length > 0 && (
+                        <span className="text-xs bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded-full">
+                          Data registrert
+                        </span>
+                      )}
+                    </div>
+                    {showCoordination ? <ChevronUp className="w-5 h-5 text-indigo-600" /> : <ChevronDown className="w-5 h-5 text-indigo-600" />}
+                  </button>
+                  {showCoordination && (
+                    <div className="p-4 bg-white">
+                      <CoordinationTestPanel
+                        values={coordinationData}
+                        onChange={setCoordinationData}
+                        lang="no"
+                        readOnly={isSigned}
+                        onGenerateNarrative={(narrative) => {
+                          updateField('objective', 'neuro_tests', encounterData.objective.neuro_tests + (encounterData.objective.neuro_tests ? '\n\n' : '') + narrative);
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Nerve Tension Tests Panel */}
+                <div className="border border-orange-200 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setShowNerveTension(!showNerveTension)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-orange-50 hover:bg-orange-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Activity className="w-5 h-5 text-orange-600" />
+                      <span className="font-medium text-orange-900">Nervestrekkstester</span>
+                      {Object.keys(nerveTensionData).length > 0 && (
+                        <span className="text-xs bg-orange-200 text-orange-800 px-2 py-0.5 rounded-full">
+                          Data registrert
+                        </span>
+                      )}
+                    </div>
+                    {showNerveTension ? <ChevronUp className="w-5 h-5 text-orange-600" /> : <ChevronDown className="w-5 h-5 text-orange-600" />}
+                  </button>
+                  {showNerveTension && (
+                    <div className="p-4 bg-white">
+                      <NerveTensionTests
+                        values={nerveTensionData}
+                        onChange={setNerveTensionData}
+                        lang="no"
+                        readOnly={isSigned}
+                        onGenerateNarrative={(narrative) => {
+                          updateField('objective', 'neuro_tests', encounterData.objective.neuro_tests + (encounterData.objective.neuro_tests ? '\n\n' : '') + narrative);
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Regional Body Diagrams - Bilateral Joint Examination */}
+                <div className="border border-amber-200 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setShowRegionalDiagrams(!showRegionalDiagrams)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-amber-50 hover:bg-amber-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Activity className="w-5 h-5 text-amber-600" />
+                      <span className="font-medium text-amber-900">Leddundersøkelse (Bilateral)</span>
+                      {Object.keys(regionalDiagramData).length > 0 && (
+                        <span className="text-xs bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full">
+                          {Object.keys(regionalDiagramData).length} markering(er)
+                        </span>
+                      )}
+                    </div>
+                    {showRegionalDiagrams ? <ChevronUp className="w-5 h-5 text-amber-600" /> : <ChevronDown className="w-5 h-5 text-amber-600" />}
+                  </button>
+                  {showRegionalDiagrams && (
+                    <div className="p-4 bg-white">
+                      <p className="text-sm text-gray-600 mb-3">
+                        Velg region og marker funn på venstre og høyre side.
+                      </p>
+
+                      {/* Region selector */}
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {['shoulder', 'knee', 'ankle', 'wrist', 'elbow', 'cervical', 'lumbar', 'hip', 'head'].map(region => (
+                          <button
+                            key={region}
+                            onClick={() => setSelectedRegion(region)}
+                            className={`px-3 py-1.5 text-sm rounded-lg transition-colors
+                                       ${selectedRegion === region
+                                         ? 'bg-amber-600 text-white'
+                                         : 'bg-gray-100 text-gray-700 hover:bg-amber-100'}`}
+                          >
+                            {region === 'shoulder' ? 'Skulder' :
+                             region === 'knee' ? 'Kne' :
+                             region === 'ankle' ? 'Ankel' :
+                             region === 'wrist' ? 'Håndledd' :
+                             region === 'elbow' ? 'Albue' :
+                             region === 'cervical' ? 'Nakke' :
+                             region === 'lumbar' ? 'Korsrygg' :
+                             region === 'hip' ? 'Hofte' : 'Hode/TMJ'}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Selected region diagram */}
+                      <RegionalBodyDiagram
+                        region={selectedRegion}
+                        side="bilateral"
+                        markers={regionalDiagramData[selectedRegion] || []}
+                        onChange={(markers) => setRegionalDiagramData(prev => ({
+                          ...prev,
+                          [selectedRegion]: markers
+                        }))}
+                        lang="no"
+                        readOnly={isSigned}
+                        compact={false}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Pain Assessment Panel */}
+                <div className="border border-red-200 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setShowPainAssessment(!showPainAssessment)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-red-50 hover:bg-red-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Target className="w-5 h-5 text-red-600" />
+                      <span className="font-medium text-red-900">Smertevurdering</span>
+                      {Object.keys(painAssessmentData).length > 0 && (
+                        <span className="text-xs bg-red-200 text-red-800 px-2 py-0.5 rounded-full">
+                          Data registrert
+                        </span>
+                      )}
+                    </div>
+                    {showPainAssessment ? <ChevronUp className="w-5 h-5 text-red-600" /> : <ChevronDown className="w-5 h-5 text-red-600" />}
+                  </button>
+                  {showPainAssessment && (
+                    <div className="p-4 bg-white">
+                      <PainAssessmentPanel
+                        values={painAssessmentData}
+                        onChange={setPainAssessmentData}
+                        lang="no"
+                        readOnly={isSigned}
+                        onGenerateNarrative={(narrative) => {
+                          updateField('subjective', 'pain_description', encounterData.subjective.pain_description + (encounterData.subjective.pain_description ? '\n\n' : '') + narrative);
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Headache Assessment Panel */}
+                <div className="border border-pink-200 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setShowHeadacheAssessment(!showHeadacheAssessment)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-pink-50 hover:bg-pink-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Brain className="w-5 h-5 text-pink-600" />
+                      <span className="font-medium text-pink-900">Hodepineutredning</span>
+                      {Object.keys(headacheData).length > 0 && (
+                        <span className="text-xs bg-pink-200 text-pink-800 px-2 py-0.5 rounded-full">
+                          Data registrert
+                        </span>
+                      )}
+                    </div>
+                    {showHeadacheAssessment ? <ChevronUp className="w-5 h-5 text-pink-600" /> : <ChevronDown className="w-5 h-5 text-pink-600" />}
+                  </button>
+                  {showHeadacheAssessment && (
+                    <div className="p-4 bg-white">
+                      <HeadacheAssessment
+                        values={headacheData}
+                        onChange={setHeadacheData}
+                        lang="no"
+                        readOnly={isSigned}
+                        onGenerateNarrative={(narrative) => {
+                          updateField('subjective', 'chief_complaint', encounterData.subjective.chief_complaint + (encounterData.subjective.chief_complaint ? '\n\n' : '') + narrative);
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Tissue Abnormality Markers Panel */}
+                <div className="border border-cyan-200 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setShowTissueMarkers(!showTissueMarkers)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-cyan-50 hover:bg-cyan-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Target className="w-5 h-5 text-cyan-600" />
+                      <span className="font-medium text-cyan-900">Vevsabnormaliteter</span>
+                      {Object.keys(tissueMarkerData).length > 0 && (
+                        <span className="text-xs bg-cyan-200 text-cyan-800 px-2 py-0.5 rounded-full">
+                          Data registrert
+                        </span>
+                      )}
+                    </div>
+                    {showTissueMarkers ? <ChevronUp className="w-5 h-5 text-cyan-600" /> : <ChevronDown className="w-5 h-5 text-cyan-600" />}
+                  </button>
+                  {showTissueMarkers && (
+                    <div className="p-4 bg-white">
+                      <TissueAbnormalityMarkers
+                        values={tissueMarkerData}
+                        onChange={setTissueMarkerData}
+                        lang="no"
+                        readOnly={isSigned}
+                        onGenerateNarrative={(narrative) => {
+                          updateField('objective', 'palpation', encounterData.objective.palpation + (encounterData.objective.palpation ? '\n\n' : '') + narrative);
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
 
                 {!isSigned && (
                   <div className="flex flex-wrap gap-1.5">
@@ -1556,75 +2292,200 @@ export default function ClinicalEncounter() {
                 </div>
               </div>
               <div className="p-4 space-y-4">
-                {/* Treatment Performed */}
-                <textarea
-                  ref={(el) => textAreaRefs.current['plan.treatment'] = el}
-                  placeholder="Utført behandling... (bruk .hvla for makro)"
-                  className="w-full min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
-                  value={encounterData.plan.treatment}
-                  onChange={(e) => {
-                    if (!handleTextInputWithMacros(e, 'plan', 'treatment')) {
-                      updateField('plan', 'treatment', e.target.value);
+                {/* Treatment Notation Method Indicator */}
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-slate-700">Behandlingsnotasjon:</span>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-medium">
+                      <Target className="h-3 w-3" />
+                      {getNotationName()}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => navigate('/settings')}
+                    className="text-xs text-slate-500 hover:text-slate-700 flex items-center gap-1"
+                  >
+                    <Settings className="h-3 w-3" />
+                    Endre i innstillinger
+                  </button>
+                </div>
+
+                {/* Treatment Performed - Conditional Rendering Based on Notation Method */}
+                {isVisualNotation ? (
+                  <div className="border border-slate-200 rounded-lg overflow-hidden">
+                    {currentNotationMethod.id === 'body_chart' && (
+                      <BodyChartPanel
+                        value={notationData}
+                        onChange={setNotationData}
+                        onGenerateNarrative={(narrative) => {
+                          setNotationNarrative(narrative);
+                          updateField('plan', 'treatment', narrative);
+                        }}
+                        lang={clinicalLang}
+                        readOnly={isSigned}
+                      />
+                    )}
+                    {currentNotationMethod.id === 'anatomical_chart' && (
+                      <AnatomicalBodyChart
+                        value={notationData}
+                        onChange={setNotationData}
+                        onGenerateNarrative={(narrative) => {
+                          setNotationNarrative(narrative);
+                          updateField('plan', 'treatment', narrative);
+                        }}
+                        lang={clinicalLang}
+                        showDermatomes={clinicalPrefs.showDermatomes}
+                        showTriggerPoints={clinicalPrefs.showTriggerPoints}
+                        readOnly={isSigned}
+                      />
+                    )}
+                    {currentNotationMethod.id === 'activator_protocol' && (
+                      <ActivatorMethodPanel
+                        value={notationData}
+                        onChange={setNotationData}
+                        onGenerateNarrative={(narrative) => {
+                          setNotationNarrative(narrative);
+                          updateField('plan', 'treatment', narrative);
+                        }}
+                        lang={clinicalLang}
+                        readOnly={isSigned}
+                      />
+                    )}
+                    {currentNotationMethod.id === 'facial_lines' && (
+                      <FacialLinesChart
+                        value={notationData}
+                        onChange={setNotationData}
+                        onGenerateNarrative={(narrative) => {
+                          setNotationNarrative(narrative);
+                          updateField('plan', 'treatment', narrative);
+                        }}
+                        lang={clinicalLang}
+                        readOnly={isSigned}
+                      />
+                    )}
+                  </div>
+                ) : (
+                  <textarea
+                    ref={(el) => textAreaRefs.current['plan.treatment'] = el}
+                    placeholder={
+                      currentNotationMethod.id === 'segment_listing' ? 'Segmentlisting: f.eks. C5 PRS, T4-T6 anterior, L5 PLI...' :
+                      currentNotationMethod.id === 'gonstead_listing' ? 'Gonstead: f.eks. Atlas ASLA, C2 PRSA, L5 PLI-M...' :
+                      currentNotationMethod.id === 'diversified_notation' ? 'Diversifisert: beskriv manipulasjoner og mobiliseringer...' :
+                      currentNotationMethod.id === 'soap_narrative' ? 'SOAP narrativ: beskriv behandlingen i detalj...' :
+                      'Utført behandling... (bruk .hvla for makro)'
                     }
-                  }}
-                  onFocus={() => setActiveField('plan.treatment')}
-                  disabled={isSigned}
-                />
+                    className="w-full min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
+                    value={encounterData.plan.treatment}
+                    onChange={(e) => {
+                      if (!handleTextInputWithMacros(e, 'plan', 'treatment')) {
+                        updateField('plan', 'treatment', e.target.value);
+                      }
+                    }}
+                    onFocus={() => setActiveField('plan.treatment')}
+                    disabled={isSigned}
+                  />
+                )}
 
-                {/* Takster Selection */}
-                <div>
-                  <h4 className="text-sm font-medium text-slate-700 mb-3">Takster (behandlingskoder)</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {taksterNorwegian.map((takst) => (
-                      <button
-                        key={takst.id}
-                        onClick={() => toggleTakst(takst.id)}
-                        disabled={isSigned}
-                        className={`
-                          flex items-center justify-between p-3 rounded-lg border-2 text-left transition-all
-                          ${selectedTakster.includes(takst.id)
-                            ? 'border-purple-500 bg-purple-50'
-                            : 'border-slate-200 bg-white hover:border-slate-300'}
-                          ${isSigned ? 'opacity-60 cursor-not-allowed' : ''}
-                        `}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className={`
-                            h-5 w-5 rounded flex items-center justify-center
-                            ${selectedTakster.includes(takst.id)
-                              ? 'bg-purple-600 text-white'
-                              : 'border-2 border-slate-300'}
-                          `}>
-                            {selectedTakster.includes(takst.id) && <Check className="h-3 w-3" />}
-                          </div>
-                          <div>
-                            <p className="font-semibold text-slate-800">{takst.code}</p>
-                            <p className="text-xs text-slate-500">{takst.name}</p>
-                          </div>
-                        </div>
-                        <span className="text-sm font-medium text-slate-600">{takst.price} kr</span>
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="mt-3 flex justify-end">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-100 text-purple-800">
-                      <span className="text-sm">Totalt:</span>
-                      <span className="font-bold">{totalPrice} kr</span>
+                {/* Takster Selection - Toggle to show/hide for practitioners */}
+                <div className="border border-purple-200 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setShowTakster(!showTakster)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-purple-50 hover:bg-purple-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-5 h-5 text-purple-600" />
+                      <span className="font-medium text-purple-900">Takster (behandlingskoder)</span>
+                      <span className="text-xs text-purple-600">(Kun for behandlere)</span>
                     </div>
-                  </div>
+                    {showTakster ? <ChevronUp className="w-5 h-5 text-purple-600" /> : <ChevronDown className="w-5 h-5 text-purple-600" />}
+                  </button>
+
+                  {showTakster && (
+                    <div className="p-4 bg-white">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {taksterNorwegian.map((takst) => (
+                          <button
+                            key={takst.id}
+                            onClick={() => toggleTakst(takst.id)}
+                            disabled={isSigned}
+                            className={`
+                              flex items-center justify-between p-3 rounded-lg border-2 text-left transition-all
+                              ${selectedTakster.includes(takst.id)
+                                ? 'border-purple-500 bg-purple-50'
+                                : 'border-slate-200 bg-white hover:border-slate-300'}
+                              ${isSigned ? 'opacity-60 cursor-not-allowed' : ''}
+                            `}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className={`
+                                h-5 w-5 rounded flex items-center justify-center
+                                ${selectedTakster.includes(takst.id)
+                                  ? 'bg-purple-600 text-white'
+                                  : 'border-2 border-slate-300'}
+                              `}>
+                                {selectedTakster.includes(takst.id) && <Check className="h-3 w-3" />}
+                              </div>
+                              <div>
+                                <p className="font-semibold text-slate-800">{takst.code}</p>
+                                <p className="text-xs text-slate-500">{takst.name}</p>
+                              </div>
+                            </div>
+                            <span className="text-sm font-medium text-slate-600">{takst.price} kr</span>
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="mt-3 flex justify-end">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-100 text-purple-800">
+                          <span className="text-sm">Totalt:</span>
+                          <span className="font-bold">{totalPrice} kr</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Exercises & Advice */}
-                <textarea
-                  ref={(el) => textAreaRefs.current['plan.exercises'] = el}
-                  placeholder="Hjemmeøvelser og råd..."
-                  className="w-full min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
-                  value={encounterData.plan.exercises}
-                  onChange={(e) => updateField('plan', 'exercises', e.target.value)}
-                  onFocus={() => setActiveField('plan.exercises')}
-                  disabled={isSigned}
-                />
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-slate-700">Hjemmeøvelser</span>
+                    <button
+                      onClick={() => setShowExercisePanel(!showExercisePanel)}
+                      disabled={isSigned}
+                      className="px-3 py-1.5 text-xs font-medium rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                    >
+                      <Activity className="w-3.5 h-3.5" />
+                      {showExercisePanel ? 'Skjul øvelsesbibliotek' : 'Velg fra bibliotek'}
+                    </button>
+                  </div>
+
+                  {showExercisePanel && (
+                    <div className="border border-green-200 rounded-lg overflow-hidden">
+                      <ExercisePanel
+                        patientId={patientId}
+                        encounterId={encounterId}
+                        onExercisesChange={(exercises) => {
+                          // Update the exercises text field with selected exercises
+                          const exerciseText = exercises.map(e =>
+                            `${e.name_no || e.name_en}: ${e.sets || 3}x${e.reps || 10}, ${e.frequency || 'daglig'}`
+                          ).join('\n');
+                          updateField('plan', 'exercises', exerciseText);
+                        }}
+                        compact={true}
+                      />
+                    </div>
+                  )}
+
+                  <textarea
+                    ref={(el) => textAreaRefs.current['plan.exercises'] = el}
+                    placeholder="Hjemmeøvelser og råd... (eller velg fra biblioteket over)"
+                    className="w-full min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
+                    value={encounterData.plan.exercises}
+                    onChange={(e) => updateField('plan', 'exercises', e.target.value)}
+                    onFocus={() => setActiveField('plan.exercises')}
+                    disabled={isSigned}
+                  />
+                </div>
 
                 {/* Follow-up */}
                 <div className="flex items-center gap-4 pt-3 border-t border-slate-100">
@@ -1943,6 +2804,8 @@ export default function ClinicalEncounter() {
         </div>
       )}
 
+
+      </div>{/* End of main content wrapper with margin */}
 
       {/* ═══════════════════════════════════════════════════════════════════
           TEMPLATE PICKER SIDEBAR

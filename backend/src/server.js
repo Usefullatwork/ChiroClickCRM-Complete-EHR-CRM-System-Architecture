@@ -16,13 +16,18 @@ import 'express-async-errors';
 import { healthCheck } from './config/database.js';
 import logger from './utils/logger.js';
 import { scheduleKeyRotation, createKeyRotationTable } from './utils/keyRotation.js';
+import { initializeScheduler, shutdownScheduler } from './jobs/scheduler.js';
 
 // Load environment variables
-dotenv.config();
+const result = dotenv.config();
+if (result.error) {
+  console.error('DOTENV Error:', result.error);
+}
 
 // Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 3000;
+console.log('Configured PORT:', PORT);
 const API_VERSION = process.env.API_VERSION || 'v1';
 
 // ============================================================================
@@ -32,9 +37,13 @@ const API_VERSION = process.env.API_VERSION || 'v1';
 // Security headers
 app.use(helmet());
 
-// CORS configuration
+// CORS configuration - supports multiple origins
+const corsOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
+  .split(',')
+  .map(origin => origin.trim());
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: corsOrigins.length === 1 ? corsOrigins[0] : corsOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Organization-Id']
@@ -118,7 +127,16 @@ app.get(`/api/${API_VERSION}`, (req, res) => {
       pdf: `/api/${API_VERSION}/pdf`,
       ai: `/api/${API_VERSION}/ai`,
       neuroexam: `/api/${API_VERSION}/neuroexam`,
-      search: `/api/${API_VERSION}/search`
+      search: `/api/${API_VERSION}/search`,
+      kiosk: `/api/${API_VERSION}/kiosk`,
+      crm: `/api/${API_VERSION}/crm`,
+      exercises: `/api/${API_VERSION}/exercises`,
+      portal: `/api/${API_VERSION}/portal`,
+      patientPortal: `/api/${API_VERSION}/patient-portal`,
+      autoAccept: `/api/${API_VERSION}/auto-accept`,
+      scheduler: `/api/${API_VERSION}/scheduler`,
+      notifications: `/api/${API_VERSION}/notifications`,
+      spineTemplates: `/api/${API_VERSION}/spine-templates`
     }
   });
 });
@@ -148,6 +166,18 @@ import templateRoutes from './routes/templates.js';
 import neuroexamRoutes from './routes/neuroexam.js';
 import docsRoutes from './routes/docs.js';
 import searchRoutes from './routes/search.js';
+import kioskRoutes from './routes/kiosk.js';
+import crmRoutes from './routes/crm.js';
+import bulkCommunicationRoutes from './routes/bulkCommunication.js';
+import automationsRoutes from './routes/automations.js';
+import exerciseRoutes from './routes/exercises.js';
+import portalRoutes from './routes/portal.js';
+import patientPortalRoutes from './routes/patientPortal.js';
+import autoAcceptRoutes from './routes/autoAccept.js';
+import schedulerRoutes from './routes/scheduler.js';
+import progressRoutes from './routes/progress.js';
+import notificationRoutes from './routes/notifications.js';
+import spineTemplatesRoutes from './routes/spineTemplates.js';
 
 // Mount routes
 app.use(`/api/${API_VERSION}/auth`, authRoutes);
@@ -173,6 +203,20 @@ app.use(`/api/${API_VERSION}/training`, trainingRoutes);
 app.use(`/api/${API_VERSION}/templates`, templateRoutes);
 app.use(`/api/${API_VERSION}/neuroexam`, neuroexamRoutes);
 app.use(`/api/${API_VERSION}/search`, searchRoutes);
+app.use(`/api/${API_VERSION}/kiosk`, kioskRoutes);
+app.use(`/api/${API_VERSION}/crm`, crmRoutes);
+app.use(`/api/${API_VERSION}/bulk-communications`, bulkCommunicationRoutes);
+app.use(`/api/${API_VERSION}/automations`, automationsRoutes);
+app.use(`/api/${API_VERSION}/exercises`, exerciseRoutes);
+app.use(`/api/${API_VERSION}/auto-accept`, autoAcceptRoutes);
+app.use(`/api/${API_VERSION}/scheduler`, schedulerRoutes);
+app.use(`/api/${API_VERSION}/progress`, progressRoutes);
+app.use(`/api/${API_VERSION}/notifications`, notificationRoutes);
+app.use(`/api/${API_VERSION}/spine-templates`, spineTemplatesRoutes);
+
+// Portal routes (public - no auth required for patient access)
+app.use(`/api/${API_VERSION}/portal`, portalRoutes);
+app.use(`/api/${API_VERSION}/patient-portal`, patientPortalRoutes);
 
 // API Documentation (no auth required)
 app.use('/api/docs', docsRoutes);
@@ -215,27 +259,57 @@ app.use((err, req, res, next) => {
 // SERVER STARTUP
 // ============================================================================
 
-const server = app.listen(PORT, async () => {
-  logger.info(`🚀 ChiroClickCRM API Server started`);
-  logger.info(`📍 Environment: ${process.env.NODE_ENV}`);
-  logger.info(`📍 Port: ${PORT}`);
-  logger.info(`📍 API Version: ${API_VERSION}`);
-  logger.info(`📍 Health: http://localhost:${PORT}/health`);
-  logger.info(`📍 API Root: http://localhost:${PORT}/api/${API_VERSION}`);
+let server;
+console.log('Checking NODE_ENV:', process.env.NODE_ENV);
 
-  // Initialize encryption key rotation
+if (process.env.NODE_ENV !== 'test') {
+  console.log('Starting app.listen...');
   try {
-    await createKeyRotationTable();
-    scheduleKeyRotation();
-    logger.info('🔐 Encryption key rotation scheduler initialized');
-  } catch (error) {
-    logger.warn('⚠️  Key rotation initialization skipped (table may not exist yet):', error.message);
+    server = app.listen(PORT, async () => {
+      console.log('Inside app.listen callback');
+      logger.info(`🚀 ChiroClickCRM API Server started`);
+      logger.info(`📍 Environment: ${process.env.NODE_ENV}`);
+      logger.info(`📍 Port: ${PORT}`);
+      logger.info(`📍 API Version: ${API_VERSION}`);
+      logger.info(`📍 Health: http://localhost:${PORT}/health`);
+      logger.info(`📍 API Root: http://localhost:${PORT}/api/${API_VERSION}`);
+
+      // Initialize encryption key rotation
+      try {
+        await createKeyRotationTable();
+        scheduleKeyRotation();
+        logger.info('🔐 Encryption key rotation scheduler initialized');
+      } catch (error) {
+        logger.warn('⚠️  Key rotation initialization skipped (table may not exist yet):', error.message);
+      }
+
+      // Initialize job scheduler for automated communications and workflows
+      try {
+        const schedulerResult = await initializeScheduler();
+        logger.info(`📅 Job scheduler initialized (${schedulerResult.jobCount} jobs, timezone: ${schedulerResult.timezone})`);
+      } catch (error) {
+        logger.warn('⚠️  Job scheduler initialization skipped:', error.message);
+      }
+    });
+    server.on('error', (e) => {
+      console.error('SERVER ERROR EVENT:', e);
+    });
+  } catch (err) {
+    console.error('SYNCHRONOUS APP.LISTEN ERROR:', err);
   }
-});
+}
 
 // Graceful shutdown
 const gracefulShutdown = async (signal) => {
   logger.info(`\n${signal} received, shutting down gracefully...`);
+
+  // Stop scheduled jobs first
+  try {
+    shutdownScheduler();
+    logger.info('Job scheduler stopped');
+  } catch (error) {
+    logger.warn('Error stopping scheduler:', error.message);
+  }
 
   server.close(async () => {
     logger.info('HTTP server closed');

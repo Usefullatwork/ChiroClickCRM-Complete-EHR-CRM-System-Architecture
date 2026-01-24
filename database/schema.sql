@@ -763,4 +763,40 @@ COMMENT ON TABLE gdpr_requests IS 'Patient data requests (access, erasure, porta
 -- GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO chiroclickcrm_app;
 -- GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO chiroclickcrm_app;
 
+-- ============================================================================
+-- SPINE TEXT TEMPLATES (Quick-Click Palpation Documentation)
+-- ============================================================================
+
+-- Spine text templates for quick palpation documentation
+CREATE TABLE spine_text_templates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+  segment VARCHAR(10) NOT NULL,           -- C0, C1, C2, T1, L5, SI-L, SI-R, etc.
+  direction VARCHAR(20) NOT NULL,         -- left, right, bilateral, posterior, anterior, superior, inferior
+  finding_type VARCHAR(30) DEFAULT 'palpation', -- palpation, restriction, subluxation, adjustment
+  text_template TEXT NOT NULL,            -- The text to insert
+  language VARCHAR(5) DEFAULT 'NO',       -- NO, EN
+  is_default BOOLEAN DEFAULT false,       -- System default vs user custom
+  sort_order INT DEFAULT 0,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW(),
+  UNIQUE(organization_id, segment, direction, finding_type, language)
+);
+
+-- Index for quick lookups
+CREATE INDEX idx_spine_templates_org ON spine_text_templates(organization_id);
+CREATE INDEX idx_spine_templates_segment ON spine_text_templates(segment);
+CREATE INDEX idx_spine_templates_default ON spine_text_templates(is_default) WHERE is_default = true;
+
+-- Update timestamp trigger
+CREATE TRIGGER update_spine_text_templates_updated_at
+  BEFORE UPDATE ON spine_text_templates
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+COMMENT ON TABLE spine_text_templates IS 'Pre-programmed text templates for quick spine palpation documentation';
+
+-- ============================================================================
+-- COMPLETION
+-- ============================================================================
+
 COMMENT ON SCHEMA public IS 'ChiroClickCRM v1.0 - Complete EHR-CRM Schema - Norwegian-compliant';

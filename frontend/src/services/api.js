@@ -30,6 +30,9 @@ export const setOrganizationId = (organizationId) => {
   sessionStorage.setItem(ORG_STORAGE_KEY, btoa(JSON.stringify(data)))
 }
 
+// Default organization ID for development mode
+const DEV_ORGANIZATION_ID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'
+
 /**
  * Retrieve organization ID from secure storage
  * @returns {string|null} The organization ID or null if not set
@@ -44,6 +47,10 @@ export const getOrganizationId = () => {
         setOrganizationId(legacyId)
         localStorage.removeItem('organizationId') // Clean up legacy storage
         return legacyId
+      }
+      // Use default organization ID in development mode
+      if (import.meta.env.DEV) {
+        return DEV_ORGANIZATION_ID
       }
       return null
     }
@@ -67,6 +74,18 @@ export const getOrganizationId = () => {
 export const clearOrganizationId = () => {
   sessionStorage.removeItem(ORG_STORAGE_KEY)
   localStorage.removeItem('organizationId') // Clean up legacy storage
+}
+
+/**
+ * Initialize CSRF protection
+ * Fetches CSRF token from the server and stores it for subsequent requests
+ * Note: Currently a no-op as backend uses JWT/Clerk auth instead of CSRF tokens
+ */
+export const initializeCSRF = async () => {
+  // CSRF is not needed when using JWT/Bearer token authentication
+  // This is a placeholder for future CSRF implementation if needed
+  console.log('API client initialized')
+  return true
 }
 
 // Create axios instance
@@ -185,6 +204,11 @@ export const encountersAPI = {
   update: (id, data) => apiClient.patch(`/encounters/${id}`, data),
   sign: (id) => apiClient.post(`/encounters/${id}/sign`),
   generateNote: (id) => apiClient.post(`/encounters/${id}/generate-note`),
+  // Amendments for signed encounters
+  getAmendments: (encounterId) => apiClient.get(`/encounters/${encounterId}/amendments`),
+  createAmendment: (encounterId, data) => apiClient.post(`/encounters/${encounterId}/amendments`, data),
+  signAmendment: (encounterId, amendmentId) => apiClient.post(`/encounters/${encounterId}/amendments/${amendmentId}/sign`),
+  deleteAmendment: (encounterId, amendmentId) => apiClient.delete(`/encounters/${encounterId}/amendments/${amendmentId}`),
 }
 
 // Appointments
@@ -365,6 +389,83 @@ export const gdprAPI = {
   getConsentAudit: (patientId) => apiClient.get(`/gdpr/patient/${patientId}/consent-audit`),
 }
 
+// CRM - Customer Relationship Management
+export const crmAPI = {
+  // Overview
+  getOverview: () => apiClient.get('/crm/overview'),
+
+  // Leads
+  getLeads: (params) => apiClient.get('/crm/leads', { params }),
+  getLead: (id) => apiClient.get(`/crm/leads/${id}`),
+  createLead: (data) => apiClient.post('/crm/leads', data),
+  updateLead: (id, data) => apiClient.put(`/crm/leads/${id}`, data),
+  convertLead: (id, data) => apiClient.post(`/crm/leads/${id}/convert`, data),
+  getLeadPipeline: () => apiClient.get('/crm/leads/pipeline'),
+
+  // Patient Lifecycle
+  getLifecycleStats: () => apiClient.get('/crm/lifecycle/stats'),
+  getPatientsByLifecycle: (params) => apiClient.get('/crm/lifecycle', { params }),
+  updatePatientLifecycle: (patientId, data) => apiClient.put(`/crm/lifecycle/${patientId}`, data),
+
+  // Referrals
+  getReferrals: (params) => apiClient.get('/crm/referrals', { params }),
+  createReferral: (data) => apiClient.post('/crm/referrals', data),
+  updateReferral: (id, data) => apiClient.put(`/crm/referrals/${id}`, data),
+  getReferralStats: () => apiClient.get('/crm/referrals/stats'),
+
+  // Surveys
+  getSurveys: () => apiClient.get('/crm/surveys'),
+  createSurvey: (data) => apiClient.post('/crm/surveys', data),
+  getSurveyResponses: (surveyId, params) => apiClient.get(`/crm/surveys/${surveyId}/responses`, { params }),
+  getNPSStats: (period) => apiClient.get('/crm/surveys/nps/stats', { params: { period } }),
+
+  // Communications
+  getCommunications: (params) => apiClient.get('/crm/communications', { params }),
+  logCommunication: (data) => apiClient.post('/crm/communications', data),
+
+  // Campaigns
+  getCampaigns: (params) => apiClient.get('/crm/campaigns', { params }),
+  getCampaign: (id) => apiClient.get(`/crm/campaigns/${id}`),
+  createCampaign: (data) => apiClient.post('/crm/campaigns', data),
+  updateCampaign: (id, data) => apiClient.put(`/crm/campaigns/${id}`, data),
+  launchCampaign: (id) => apiClient.post(`/crm/campaigns/${id}/launch`),
+  getCampaignStats: (id) => apiClient.get(`/crm/campaigns/${id}/stats`),
+
+  // Workflows
+  getWorkflows: () => apiClient.get('/crm/workflows'),
+  getWorkflow: (id) => apiClient.get(`/crm/workflows/${id}`),
+  createWorkflow: (data) => apiClient.post('/crm/workflows', data),
+  updateWorkflow: (id, data) => apiClient.put(`/crm/workflows/${id}`, data),
+  toggleWorkflow: (id) => apiClient.post(`/crm/workflows/${id}/toggle`),
+
+  // Retention
+  getRetentionDashboard: (period) => apiClient.get('/crm/retention', { params: { period } }),
+  getChurnAnalysis: () => apiClient.get('/crm/retention/churn'),
+  getCohortRetention: (months) => apiClient.get('/crm/retention/cohorts', { params: { months } }),
+
+  // Waitlist
+  getWaitlist: (params) => apiClient.get('/crm/waitlist', { params }),
+  addToWaitlist: (data) => apiClient.post('/crm/waitlist', data),
+  updateWaitlistEntry: (id, data) => apiClient.put(`/crm/waitlist/${id}`, data),
+  notifyWaitlist: (data) => apiClient.post('/crm/waitlist/notify', data),
+
+  // Settings
+  getSettings: () => apiClient.get('/crm/settings'),
+  updateSettings: (data) => apiClient.put('/crm/settings', data),
+}
+
+// Authentication
+export const authAPI = {
+  login: (credentials) => apiClient.post('/auth/login', credentials),
+  devLogin: () => apiClient.post('/auth/dev-login'),
+  register: (data) => apiClient.post('/auth/register', data),
+  logout: () => apiClient.post('/auth/logout'),
+  getCurrentUser: () => apiClient.get('/auth/me'),
+  verifyEmail: (token) => apiClient.post('/auth/verify-email', { token }),
+  requestPasswordReset: (email) => apiClient.post('/auth/forgot-password', { email }),
+  resetPassword: (token, password) => apiClient.post('/auth/reset-password', { token, password }),
+}
+
 // AI Clinical Assistant
 export const aiAPI = {
   // Get AI service status
@@ -384,6 +485,226 @@ export const aiAPI = {
   // Spell check Norwegian text
   spellCheck: (text) =>
     apiClient.post('/ai/spell-check', { text }),
+}
+
+// AI Feedback & Learning
+export const aiFeedbackAPI = {
+  // Submit feedback on AI suggestion
+  submitFeedback: (data) => apiClient.post('/ai/feedback', data),
+  // Get user's feedback history
+  getMyFeedback: (params) => apiClient.get('/ai/feedback/me', { params }),
+  // Get user's feedback stats
+  getMyStats: () => apiClient.get('/ai/feedback/me/stats'),
+  // Get overall AI performance metrics (admin)
+  getPerformanceMetrics: (params) => apiClient.get('/ai/performance', { params }),
+  // Get suggestions needing review (admin)
+  getSuggestionsNeedingReview: (limit) => apiClient.get('/ai/suggestions/review', { params: { limit } }),
+  // Get common corrections (admin)
+  getCommonCorrections: (params) => apiClient.get('/ai/corrections/common', { params }),
+  // Trigger manual retraining (admin)
+  triggerRetraining: () => apiClient.post('/ai/retraining/trigger'),
+  // Get retraining status
+  getRetrainingStatus: () => apiClient.get('/ai/retraining/status'),
+  // Get retraining history
+  getRetrainingHistory: () => apiClient.get('/ai/retraining/history'),
+  // Rollback to previous model
+  rollbackModel: (versionId) => apiClient.post(`/ai/model/rollback/${versionId}`),
+  // Export feedback for training
+  exportFeedback: (format = 'jsonl') => apiClient.get('/ai/feedback/export', { params: { format } }),
+}
+
+// Data Import
+export const importAPI = {
+  // Excel import
+  downloadTemplate: () => apiClient.get('/import/patients/template', { responseType: 'blob' }),
+  importExcel: (file, options = {}) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    Object.entries(options).forEach(([key, value]) => formData.append(key, value))
+    return apiClient.post('/import/patients/excel', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+  },
+
+  // Text import
+  parseText: (text) => apiClient.post('/import/patients/parse-text', { text }),
+  importFromText: (patients, options = {}) => apiClient.post('/import/patients/from-text', { patients, ...options }),
+
+  // CSV import
+  parseCSV: (file, options = {}) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    Object.entries(options).forEach(([key, value]) => formData.append(key, String(value)))
+    return apiClient.post('/import/patients/csv/parse', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+  },
+  importCSV: (file, mappings, options = {}) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('mappings', JSON.stringify(mappings))
+    Object.entries(options).forEach(([key, value]) => formData.append(key, String(value)))
+    return apiClient.post('/import/patients/csv', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+  },
+
+  // vCard import/export
+  parseVCard: (file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return apiClient.post('/import/patients/vcard/parse', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+  },
+  importVCard: (file, options = {}) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    Object.entries(options).forEach(([key, value]) => formData.append(key, String(value)))
+    return apiClient.post('/import/patients/vcard', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+  },
+  exportVCard: (patientIds = []) => apiClient.post('/import/patients/vcard/export', { patientIds }, { responseType: 'blob' }),
+
+  // Google Contacts
+  importGoogleContacts: (contacts, options = {}) => apiClient.post('/import/patients/google', { contacts, ...options }),
+
+  // Mapping templates
+  getMappingTemplates: () => apiClient.get('/import/mapping-templates'),
+  saveMappingTemplate: (name, mappings) => apiClient.post('/import/mapping-templates', { name, mappings }),
+}
+
+// Bulk Communications
+export const bulkCommunicationsAPI = {
+  // Queue bulk communications
+  queueBulk: (data) => apiClient.post('/communications/bulk-send', data),
+  // Get batch status
+  getBatchStatus: (batchId) => apiClient.get(`/communications/queue/status/${batchId}`),
+  // Cancel a batch
+  cancelBatch: (batchId) => apiClient.post(`/communications/queue/cancel/${batchId}`),
+  // Get pending queue items
+  getPendingQueue: (params) => apiClient.get('/communications/queue/pending', { params }),
+  // Preview personalized messages
+  previewBulk: (data) => apiClient.post('/communications/bulk-preview', data),
+}
+
+// Billing API - Norwegian Healthcare Invoicing
+export const billingAPI = {
+  // Takst Codes
+  getTakstCodes: () => apiClient.get('/billing/takst-codes'),
+  getTakstCode: (code) => apiClient.get(`/billing/takst-codes/${code}`),
+  calculateTotals: (data) => apiClient.post('/billing/calculate', data),
+
+  // Invoices
+  getInvoices: (params) => apiClient.get('/billing/invoices', { params }),
+  getInvoice: (id) => apiClient.get(`/billing/invoices/${id}`),
+  createInvoice: (data) => apiClient.post('/billing/invoices', data),
+  updateInvoice: (id, data) => apiClient.patch(`/billing/invoices/${id}`, data),
+  finalizeInvoice: (id) => apiClient.post(`/billing/invoices/${id}/finalize`),
+  cancelInvoice: (id, data) => apiClient.post(`/billing/invoices/${id}/cancel`, data),
+  getInvoiceHTML: (id) => apiClient.get(`/billing/invoices/${id}/html`),
+  getStatistics: (params) => apiClient.get('/billing/invoices/statistics', { params }),
+  generateInvoiceNumber: () => apiClient.get('/billing/invoices/number'),
+  updateOverdueInvoices: () => apiClient.post('/billing/invoices/update-overdue'),
+
+  // Payments
+  getInvoicePayments: (invoiceId) => apiClient.get(`/billing/invoices/${invoiceId}/payments`),
+  recordPayment: (invoiceId, data) => apiClient.post(`/billing/invoices/${invoiceId}/payments`, data),
+
+  // HELFO Reports
+  getHelfoReport: (params) => apiClient.get('/billing/helfo-report', { params }),
+}
+
+// Analytics Dashboard
+export const analyticsAPI = {
+  // Comprehensive dashboard data
+  getDashboard: (params) => apiClient.get('/analytics/dashboard', { params }),
+  // Patient statistics
+  getPatientStats: () => apiClient.get('/analytics/patients'),
+  // Appointment statistics
+  getAppointmentStats: () => apiClient.get('/analytics/appointments'),
+  // Revenue statistics
+  getRevenueStats: (params) => apiClient.get('/analytics/revenue', { params }),
+  // Top prescribed exercises
+  getTopExercises: (limit = 10) => apiClient.get('/analytics/exercises/top', { params: { limit } }),
+  // Exercise compliance statistics
+  getExerciseCompliance: () => apiClient.get('/analytics/exercises/compliance'),
+  // Patient volume trends
+  getPatientTrends: () => apiClient.get('/analytics/trends/patients'),
+  // Export to CSV
+  exportCSV: (type, params) => apiClient.get(`/analytics/export/${type}`, {
+    params,
+    responseType: 'blob'
+  }),
+}
+
+// Progress Tracking / Fremgangssporing
+export const progressAPI = {
+  // Patient progress analytics
+  getPatientStats: (patientId, params) => apiClient.get(`/progress/patient/${patientId}/stats`, { params }),
+  getWeeklyCompliance: (patientId, weeks = 12) => apiClient.get(`/progress/patient/${patientId}/weekly`, { params: { weeks } }),
+  getDailyProgress: (patientId, months = 3) => apiClient.get(`/progress/patient/${patientId}/daily`, { params: { months } }),
+  getPainHistory: (patientId, days = 90) => apiClient.get(`/progress/patient/${patientId}/pain`, { params: { days } }),
+  logPainEntry: (patientId, painLevel, notes) => apiClient.post(`/progress/patient/${patientId}/pain`, { painLevel, notes }),
+
+  // Therapist/Clinic analytics
+  getAllPatientsCompliance: (params) => apiClient.get('/progress/compliance', { params }),
+  getClinicOverview: () => apiClient.get('/progress/overview'),
+}
+
+// Workflow Automation
+export const automationsAPI = {
+  // Workflows CRUD
+  getWorkflows: (params) => apiClient.get('/automations/workflows', { params }),
+  getWorkflow: (id) => apiClient.get(`/automations/workflows/${id}`),
+  createWorkflow: (data) => apiClient.post('/automations/workflows', data),
+  updateWorkflow: (id, data) => apiClient.put(`/automations/workflows/${id}`, data),
+  deleteWorkflow: (id) => apiClient.delete(`/automations/workflows/${id}`),
+  toggleWorkflow: (id) => apiClient.post(`/automations/workflows/${id}/toggle`),
+
+  // Execution history
+  getWorkflowExecutions: (workflowId, params) => apiClient.get(`/automations/workflows/${workflowId}/executions`, { params }),
+  getExecutions: (params) => apiClient.get('/automations/executions', { params }),
+
+  // Testing
+  testWorkflow: (data) => apiClient.post('/automations/workflows/test', data),
+
+  // Configuration
+  getTriggers: () => apiClient.get('/automations/triggers'),
+  getActions: () => apiClient.get('/automations/actions'),
+
+  // Statistics
+  getStats: () => apiClient.get('/automations/stats'),
+
+  // Manual processing (admin)
+  processAutomations: () => apiClient.post('/automations/process'),
+  processTimeTriggers: () => apiClient.post('/automations/process-time-triggers'),
+}
+
+// Spine Templates (Quick-Click Palpation)
+export const spineTemplatesAPI = {
+  // Get all templates (with org customizations merged with defaults)
+  getAll: (params) => apiClient.get('/spine-templates', { params }),
+  // Get templates grouped by segment (for UI)
+  getGrouped: (language = 'NO') => apiClient.get('/spine-templates/grouped', { params: { language } }),
+  // Get available segments
+  getSegments: () => apiClient.get('/spine-templates/segments'),
+  // Get available directions
+  getDirections: () => apiClient.get('/spine-templates/directions'),
+  // Get specific template by segment and direction
+  getBySegmentDirection: (segment, direction, params) =>
+    apiClient.get(`/spine-templates/${segment}/${direction}`, { params }),
+  // Create/update custom template
+  create: (data) => apiClient.post('/spine-templates', data),
+  // Bulk update templates
+  bulkUpdate: (templates) => apiClient.post('/spine-templates/bulk', { templates }),
+  // Update single template
+  update: (id, data) => apiClient.patch(`/spine-templates/${id}`, data),
+  // Delete custom template (revert to default)
+  delete: (id) => apiClient.delete(`/spine-templates/${id}`),
+  // Reset all to defaults
+  resetToDefaults: (language = 'NO') => apiClient.post('/spine-templates/reset', null, { params: { language } }),
 }
 
 // Export default API client
