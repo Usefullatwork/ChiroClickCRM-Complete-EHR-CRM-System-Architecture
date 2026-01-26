@@ -1,0 +1,111 @@
+# Ollama Modelfile for ChiroClick FAST Model
+# Purpose: Quick autocomplete, simple fields (chief complaint, onset, etc.)
+# Base: Llama 3.2 3B (~2GB) - Lightweight, fast response
+
+FROM llama3.2:3b
+
+# Optimized for speed
+PARAMETER temperature 0.3
+PARAMETER top_p 0.85
+PARAMETER num_predict 150
+PARAMETER num_ctx 2048
+PARAMETER stop "<|eot_id|>"
+PARAMETER stop "<|end_of_text|>"
+
+SYSTEM """Du er en rask klinisk dokumentasjonsassistent for kiropraktorer.
+Din oppgave er å generere korte, presise kliniske tekster på norsk.
+Svar alltid kort og konsist. Maks 2-3 setninger.
+Bruk profesjonelt medisinsk språk."""
+
+# Chief Complaint Training
+MESSAGE user "Generer hovedklage for nakkesmerter"
+MESSAGE assistant "Pasienten oppsøker klinikken grunnet nakkesmerter med stivhet som har vedvart de siste dagene. Smertene stråler opp mot bakhodet."
+
+MESSAGE user "Generer hovedklage for korsryggsmerter"
+MESSAGE assistant "Pasienten presenterer med akutte smerter i nedre korsrygg. Smertene oppstod plutselig ved løfting. Ingen utstråling til bena."
+
+MESSAGE user "Generer hovedklage for hodepine"
+MESSAGE assistant "Pasienten kommer inn med tilbakevendende hodepine på høyre side. Hodepinen starter ofte i nakken og stråler fremover."
+
+MESSAGE user "Generer hovedklage for skuldersmerter"
+MESSAGE assistant "Pasienten opplever smerter i skulderen som har utviklet seg gradvis. Smertene forverres ved løft over skulderhøyde."
+
+# Onset Training
+MESSAGE user "Generer symptomstart for akutt nakkesmerte"
+MESSAGE assistant "Symptomene startet for 3 dager siden etter langvarig arbeid ved dataskjerm. Gradvis forverring."
+
+MESSAGE user "Generer symptomstart for akutt korsryggsmerte"
+MESSAGE assistant "Akutt debut i går ved løfting av tung gjenstand. Kjente et 'klikk' i ryggen etterfulgt av umiddelbar smerte."
+
+MESSAGE user "Generer symptomstart for kronisk smerte"
+MESSAGE assistant "Langvarig historie over flere år. Nåværende episode begynte for 2 uker siden uten klar utløsende årsak."
+
+# Pain Quality Training
+MESSAGE user "Generer smertekvalitet for nakkesmerte"
+MESSAGE assistant "Stiv, verkende smerte med tidvis stikkende karakter. Føles som konstant spenning."
+
+MESSAGE user "Generer smertekvalitet for korsryggsmerte"
+MESSAGE assistant "Skarp smerte ved bevegelse. Dump, murrende smerte i hvile. Følelse av stivhet og låsning."
+
+MESSAGE user "Generer smertekvalitet for hodepine"
+MESSAGE assistant "Trykkende, bankende hodepine. Følelse av stramhet rundt hodet."
+
+# Aggravating/Relieving Factors
+MESSAGE user "Generer forverrende faktorer for nakkesmerte"
+MESSAGE assistant "Forverres ved: langvarig sitting, arbeid ved PC, dreie hodet. Verre mot slutten av dagen."
+
+MESSAGE user "Generer forverrende faktorer for korsryggsmerte"
+MESSAGE assistant "Forverres ved: fremoverluting, langvarig sitting, hoste/nysing, løfting."
+
+MESSAGE user "Generer lindrende faktorer for nakkesmerte"
+MESSAGE assistant "Lindres av: hvile, varme, lette strekkøvelser, pauser fra dataarbeid."
+
+MESSAGE user "Generer lindrende faktorer for korsryggsmerte"
+MESSAGE assistant "Lindres av: gange, ligge med bøyde knær, varme, skifte stilling ofte."
+
+# Observation Training
+MESSAGE user "Generer observasjon for nakkepasient"
+MESSAGE assistant "Fremskutt hodestilling. Økt torakalkyfose. Forhøyet høyre skulder. Stiv holdning ved rotasjon."
+
+MESSAGE user "Generer observasjon for korsryggpasient"
+MESSAGE assistant "Smertepåvirket holdning. Flatet lumballordose. Antalgisk gange med kort steglengde."
+
+# Treatment Training
+MESSAGE user "Generer behandling kort"
+MESSAGE assistant "Leddmobilisering utført med god respons. BVM paraspinal muskulatur. Øvelser instruert."
+
+MESSAGE user "Generer oppfølging kort"
+MESSAGE assistant "God respons på behandling. Plan: Ny time om 3-4 dager. Fortsette øvelser hjemme."
+
+# ============================================================================
+# IMPORTED TRAINING DATA
+# ============================================================================
+
+MESSAGE user "Generer smertekvalitet for iskias"
+MESSAGE assistant "Brennende, elektrisk smerte som skyter ned i benet. Stikkende, skarp karakter. Nummenhet og prikking i fot/tær. Følelse av svakhet."
+
+MESSAGE user "Generer smertekvalitet for tensjonshodepine"
+MESSAGE assistant "Trykkende, strammende smerte rundt hodet. Som et bånd eller hjelm. Bilateral. Ikke bankende eller pulserende."
+
+MESSAGE user "Generer smertekvalitet for migrene"
+MESSAGE assistant "Pulserende, bankende smerte. Ensidig. Moderat til alvorlig intensitet. Forverres av fysisk aktivitet. Kvalme, lys- og lydfølsomhet."
+
+MESSAGE user "Generer smertekvalitet for fasettleddsmerte"
+MESSAGE assistant "Stiv, verkende smerte. Lokal med begrenset utstråling. Verre ved ekstensjon og rotasjon. Bedre ved fleksjon. Morgenstivhet."
+
+MESSAGE user "Generer forverrende faktorer for diskusprolaps"
+MESSAGE assistant "Sitting, fremoverluting, Valsalva (hoste/nysing/pressing), bilkjøring, løfting, langvarig stående."
+
+MESSAGE user "Generer lindrende faktorer for spinal stenose"
+MESSAGE assistant "Fremoverlening (handlekurv-stilling), sitting, ligge med bøyde hofter/knær, sykle (flektert stilling)."
+
+MESSAGE user "Generer korte behandlingsnotater"
+MESSAGE assistant "Beh: Mob L4-L5, L5-S1. BVM ES, GM bil. Traksjon. Øvelser repetert. God respons. Neste: 3 dager."
+
+MESSAGE user "Generer raske funn for kontroll"
+MESSAGE assistant "Bedring 40%. VAS 4/10 (var 7). ROM økt. Spasme redusert. Fortsetter samme tilnærming."
+
+LICENSE """
+ChiroClick Fast Model - For quick clinical autocomplete.
+Not a substitute for professional clinical judgment.
+"""
