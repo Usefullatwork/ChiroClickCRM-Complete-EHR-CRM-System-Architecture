@@ -474,6 +474,71 @@ MESSAGE assistant "NEVROLOGISK UNDERSØKELSE - UNDEREKSTREMITET:
 □ Anal tonus
 □ Bilateral svakhet"
 
+# LETTERS TRAINING
+
+MESSAGE user "Når skal jeg skrive henvisning til hodepineutredning?"
+MESSAGE assistant "INDIKASJONER FOR HENVISNING TIL HODEPINEUTREDNING:
+
+**Akutt/Umiddelbart:**
+- Thunderclap hodepine (plutselig, intens)
+- Hodepine med feber og nakkestivhet
+- Nyoppstått hodepine med nevrologiske utfall
+- Hodepine etter traume med røde flagg
+
+**Innen 2-4 uker:**
+- Kronisk hodepine >15 dager/måned i >3 måneder
+- Hodepine som ikke responderer på konservativ behandling
+- Migrene med aura som endrer karakter
+- Betydelig funksjonsnedsettelse (skole/arbeid)
+
+**Vurder henvisning ved:**
+- Overforbruk av smertestillende
+- Behov for profylaktisk behandling
+- Diagnostisk usikkerhet
+- Ung pasient med langvarig problematikk
+
+**Inkluder i henvisningen:**
+- Hodepinedagbok (frekvens, intensitet, varighet)
+- Tidligere behandling og effekt
+- Medisinbruk
+- VNG-funn hvis utført
+- Relevante traumer"
+
+MESSAGE user "Hva skal inkluderes i medisinsk erklæring for eksamen?"
+MESSAGE assistant "INNHOLD I MEDISINSK ERKLÆRING FOR EKSAMEN:
+
+**Obligatorisk informasjon:**
+1. Pasientidentifikasjon (navn, fødselsnummer)
+2. Dato for erklæringen
+3. Behandlingsperiode
+4. Klar konklusjon om eksamensdyktighet
+
+**Medisinsk dokumentasjon:**
+- Diagnose (gjerne med ICD-10 kode)
+- Symptombeskrivelse
+- Funksjonsnedsettelse beskrevet konkret
+- Behandling gitt og effekt
+
+**Funksjonsevne må beskrives:**
+- Kognitiv kapasitet (konsentrasjon, utholdenhet)
+- Fysisk kapasitet hvis relevant
+- Spesifikk påvirkning på studieforberedelse
+
+**Viktige formuleringer:**
+- \"Pasienten er av medisinske årsaker ikke i stand til...\"
+- \"Det foreligger [X]% studieufør\"
+- \"Helsetilstanden er uforenlig med gjennomføring av eksamen\"
+
+**Unngå:**
+- Vage formuleringer
+- Kun symptombeskrivelse uten funksjonsvurdering
+- Manglende konklusjon
+
+**Avsender:**
+- Navn, tittel, HPR-nummer
+- Kontaktinformasjon
+- Klinikknavn"
+
 LICENSE """
 ChiroClick Medical Model - For clinical reasoning and diagnosis support.
 Always verify AI suggestions with clinical judgment.

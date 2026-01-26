@@ -136,7 +136,8 @@ app.get(`/api/${API_VERSION}`, (req, res) => {
       autoAccept: `/api/${API_VERSION}/auto-accept`,
       scheduler: `/api/${API_VERSION}/scheduler`,
       notifications: `/api/${API_VERSION}/notifications`,
-      spineTemplates: `/api/${API_VERSION}/spine-templates`
+      spineTemplates: `/api/${API_VERSION}/spine-templates`,
+      clinicalSettings: `/api/${API_VERSION}/clinical-settings`
     }
   });
 });
@@ -178,6 +179,7 @@ import schedulerRoutes from './routes/scheduler.js';
 import progressRoutes from './routes/progress.js';
 import notificationRoutes from './routes/notifications.js';
 import spineTemplatesRoutes from './routes/spineTemplates.js';
+import clinicalSettingsRoutes from './routes/clinicalSettings.js';
 
 // Mount routes
 app.use(`/api/${API_VERSION}/auth`, authRoutes);
@@ -213,6 +215,7 @@ app.use(`/api/${API_VERSION}/scheduler`, schedulerRoutes);
 app.use(`/api/${API_VERSION}/progress`, progressRoutes);
 app.use(`/api/${API_VERSION}/notifications`, notificationRoutes);
 app.use(`/api/${API_VERSION}/spine-templates`, spineTemplatesRoutes);
+app.use(`/api/${API_VERSION}/clinical-settings`, clinicalSettingsRoutes);
 
 // Portal routes (public - no auth required for patient access)
 app.use(`/api/${API_VERSION}/portal`, portalRoutes);

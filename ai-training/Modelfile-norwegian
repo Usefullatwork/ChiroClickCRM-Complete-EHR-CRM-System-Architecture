@@ -403,6 +403,348 @@ Har du spørsmål? Ring oss på [telefon].
 God bedring!
 [Klinikk]"
 
+# LETTERS TRAINING
+
+MESSAGE user "Skriv henvisning til hodepineutredning for ungdom"
+MESSAGE assistant "HENVISNING TIL HODEPINEUTREDNING
+
+Dato: [Dato]
+Angående: [Pasientnavn] - [Fødselsnummer]
+Fra: [Kiropraktor], Kiropraktor (HPR: [HPR-nummer])
+[Klinikknavn]
+
+Henvisning til: Hodepine/migreneutredning
+
+Henviser denne pasienten for vurdering av langvarig hodepineproblematikk.
+
+Sykehistorie:
+Hodepine over flere år. Pasienten rapporterer kun få dager per måned uten hodepine. Lokalisasjon primært [område]. Forverres av folkemengder, stress og fokuskrevende aktiviteter. Foretrekker rolige, mørke rom. Betydelig funksjonsnedsettelse med utmattelse etter skoledagen/arbeidsdagen.
+
+Tidligere traumer:
+[Eventuelle relevante traumer, f.eks. idrettsskader]
+
+Tilleggssymptomer:
+- [Symptom 1]
+- [Symptom 2]
+- [Symptom 3]
+
+Utført utredning hos oss:
+VNG-undersøkelse viser:
+- [Funn 1]
+- [Funn 2]
+- [Funn 3]
+
+Medisinering:
+[Nåværende medisinbruk]
+
+Anbefaling:
+På bakgrunn av langvarig hodepineproblematikk med betydelig funksjonsnedsettelse, anbefaler jeg videre utredning med tanke på migrene/hodepinediagnostikk og behandlingsalternativer.
+
+Med vennlig hilsen
+[Kiropraktor]
+Kiropraktor"
+
+MESSAGE user "Skriv behandlingsoppsummering for akutt rygg"
+MESSAGE assistant "BEHANDLINGSOPPSUMMERING
+
+Dato: [Dato]
+Pasient: [Navn] - [Fødselsnummer]
+Fra: [Kiropraktor], Kiropraktor (HPR: [HPR-nummer])
+
+Akutt ryggepisode - [side] side
+
+Hendelse:
+Pasienten kom til akutt undersøkelse etter å ha [aktivitet] ca. kl. [tidspunkt]. Ved [aktiviteten] hørte pasienten en knekkelyd etterfulgt av ekstrem smerte i [område].
+
+Symptomer ved ankomst:
+- Intense smerter [område] med utstråling til [utstråling]
+- Stikkende og strålende smertekarakter
+- Betydelig gangvansker med antalgisk gangmønster
+- Smerte forverres i [stilling]
+
+Kliniske funn:
+- Kemp-test positiv [side]
+- Slump og SLR negative (ingen nerverotsaffeksjon)
+- Muskelstyrke 5/5 i underekstremiteter
+- Betydelig palpasjonsøm: [muskler]
+
+Behandling utført:
+- SMT: [segmenter og teknikk]
+- Muskelbehandling: [teknikker]
+- Mobilisering og øvelser: [øvelser]
+
+Respons på behandling:
+Pasienten viste god bedring med betydelig forbedret gangfunksjon. Fortsatt noe smerter, men vesentlig redusert intensitet.
+
+Videre plan:
+Oppfølging ved behov. Hjemmeøvelser som instruert.
+
+Med vennlig hilsen
+[Kiropraktor]
+Kiropraktor
+[Klinikknavn]"
+
+MESSAGE user "Skriv erklæring for frys av treningsmedlemskap"
+MESSAGE assistant "ERKLÆRING
+
+Dato: [Dato]
+Angående: [Pasientnavn] - [Fødselsnummer]
+Til: [Treningssenter]
+
+Vedrørende: Medisinsk grunnlag for frys/oppsigelse av medlemskap
+
+Pasienten har nedsatt funksjon i [kroppsdel] etter [årsak/operasjon].
+
+Undertegnede bekrefter at [Pasientnavn] på grunn av [diagnose/tilstand] ikke kan trene/belaste [kroppsdel] i en periode på [varighet].
+
+På medisinsk grunnlag anbefales det derfor at medlemskapet fryses/sies opp i denne perioden.
+
+Ta kontakt ved behov for ytterligere informasjon.
+
+Med vennlig hilsen
+[Kiropraktor]
+Kiropraktor
+HPR: [HPR-nummer]
+[Klinikknavn]
+[Adresse]"
+
+MESSAGE user "Skriv henvisning til migrenestudie"
+MESSAGE assistant "HENVISNING AV PASIENT TIL MIGRENESTUDIE - KRONISK MIGRENE
+
+Viser til pasient [Navn] (f. [Fødselsnummer]) som er en mulig kandidat for deltakelse i deres studie på migrenemedisin.
+
+Hovedproblem og bakgrunn:
+Pasienten har opplevd en markant og vedvarende forverring av sin migrene- og hodepinetilstand [siden/etter hendelse]. Siden [tidspunkt] har pasienten loggført et gjennomsnitt på [antall] dager med hodepine per måned. Dette er nøye dokumentert i hodepinedagbok. Den høye frekvensen medfører betydelige utfordringer med å utføre dagliglivets aktiviteter (ADL).
+
+Behandlingshistorikk:
+For medikamentell behandling og oppfølging fra lege, henvises det til pasientens egen journal fra fastlegen.
+
+Pasienten har over lengre tid mottatt jevnlig behandling hos kiropraktor for muskel- og skjelettplager, primært i nakke, brystrygg og skuldre. Manuell behandling (leddjustering, mobilisering og bløtvevsbehandling) har vist seg å ha en lindrende effekt i startfasen av et migreneanfall, men har ikke ført til en reduksjon i den totale frekvensen av hodepinedager.
+
+Sammendrag av journal:
+- Gjentakende funn av leddrestriksjoner i hele columna
+- Betydelig muskulær hypertonisitet, spesielt i suboccipital-, trapezius-, SCM- og rhomboidmuskulatur
+- [Eventuelle andre relevante funn]
+
+Vurdering:
+Pasienten har en svært høy sykdomsbyrde med kronisk migrene. Den manuelle behandlingen gir kun symptomatisk, kortvarig lindring og er ikke tilstrekkelig for å kontrollere tilstanden.
+
+Mvh
+[Kiropraktor]
+Kiropraktor
+HPR-nummer [HPR]
+[Klinikknavn]
+Mobil: [Telefon]
+Epost: [Epost]"
+
+MESSAGE user "Skriv medisinsk erklæring for utsatt eksamen"
+MESSAGE assistant "MEDISINSK ERKLÆRING / DOKUMENTASJON VEDRØRENDE GYLDIG FRAVÆR VED EKSAMEN
+
+Pasient: [Navn]
+Fødselsnummer: [Fødselsnummer]
+Gjelder: Dokumentasjon på sykdom ved eksamen
+Til: [Universitet/Høyskole] / Eksamenskontoret
+
+Det bekreftes at [Navn] er under utredning, behandling og medisinsk oppfølging ved vår klinikk. [Hun/Han] har vært til aktiv behandling i perioden [startdato] – dags dato ([dato]).
+
+Vurdering og konklusjon:
+Det bekreftes herved at pasienten av medisinske årsaker ikke er i stand til å gjennomføre eksamen [dato].
+
+Pasientens helsetilstand er per dags dato uforenlig med gjennomføring av eksamen. Det foreligger full (100%) studieufør på eksamenstidspunktet.
+
+Bakgrunn og sykehistorie:
+[Beskrivelse av pasientens tilstand, f.eks.:
+Pasienten ble akutt syk med vedvarende ustøhet og svimmelhet, mistenkt utløst av en vestibulær nevritt. Våre undersøkelser har bekreftet diagnosen Benign Paroksysmal Posisjonsvertigo (BPPV/krystallsyke) samt følgetilstander etter den forutgående sykdomsperioden.]
+
+Funksjonsevne:
+Pasienten er fortsatt under rehabilitering. Tilstanden preges av:
+- Kognitiv utmattelse og konsentrasjonsvansker
+- Symptomtrykk ved stress og fokus over tid
+
+På bakgrunn av dette vurderes det som medisinsk nødvendig at pasienten avstår fra eksamen for å ivareta helsen og sikre videre rehabilitering.
+
+Med vennlig hilsen,
+[Kiropraktor]
+Kiropraktor | HPR-nummer: [HPR]
+[Klinikknavn]
+Mobil: [Telefon] | E-post: [Epost]
+Dato: [Dato]"
+
+MESSAGE user "Skriv erklæring om svimmelhet til arbeidsgiver/NAV"
+MESSAGE assistant "ERKLÆRING – STATUS VEDRØRENDE SVIMMELHET
+
+Dato: [Dato]
+Til: [Mottaker]
+Gjelder: [Pasientnavn], Fødselsnummer: [Fødselsnummer]
+
+[Pasientnavn] er i et aktivt utrednings- og behandlingsforløp ved vår klinikk for svimmelhet og balanseplager. [Hun/Han] har vært fulgt opp her siden [måned/år].
+
+Bakgrunn og status:
+Pasientens kroniske svimmelhet (beskrevet som nautisk, \"brisen\", \"hjernetåke\") debuterte [tidspunkt]. Ifølge pasientens anamnese startet dette [årsak/omstendighet], og har forverret seg ved stress.
+
+Gjentatte undersøkelser har vist en sammensatt problematikk med både en underliggende balanseforstyrrelse (påvist ved VNG) og tilbakevendende krystallsyke (BPPV).
+
+Status per [dato]:
+Pasienten er i rehabilitering og har hatt god progresjon, men dagens undersøkelse viser fortsatt:
+- Aktiv Krystallsyke (BPPV): Kliniske tester (Dix-Hallpike) er positive
+- Balanse/Syn: Funksjonelle tester viser nedsatt utholdenhet ved fokusering og lett ustøhet ved balansetesting
+
+Vurdering:
+Pasienten er under aktiv behandling for krystallsyken og følger et rehabiliteringsprogram for å stabilisere balansesystemet.
+
+Funksjonsnivået er i bedring. Min faglige vurdering er at [hun/han] kan forsøke å gjenoppta aktivt arbeid, men at det bør være mulighet for å modifisere oppgavene dersom symptomene skulle forverre seg, da tilstanden (BPPV) kan være uforutsigbar.
+
+Denne erklæringen er ment som en objektiv statusrapport som grunnlag for videre vurdering av funksjonsevne.
+
+Med vennlig hilsen
+[Kiropraktor]
+Kiropraktor
+HPR-nummer [HPR]
+[Klinikknavn]
+Mobil: [Telefon]
+Epost: [Epost]"
+
+MESSAGE user "Skriv notat om hjernerystelse og BPPV"
+MESSAGE assistant "KLINISK NOTAT - HJERNERYSTELSE OG BPPV
+
+Dato: [Dato]
+Pasient: [Navn]
+
+Pasienten er undersøkt for vedvarende svimmelhet, hodepine og ustøhet etter [hendelse], hvor [hun/han] pådro seg en hjernerystelse etter et slag mot [side] side av hodet.
+
+Symptomer:
+Pasienten beskriver bevegelsesutløst svimmelhet, generell ustøhet ved gange og vansker med å fokusere blikket. [Hun/Han] opplever hodepine som et \"belte over pannen\", samt smerter i kjeve, nakke og skulder.
+
+Kliniske funn og vurdering:
+Undersøkelsen avdekker funn som tyder på en kombinasjon av en perifer og en sentral årsak til symptomene:
+
+Perifer vestibulopati (BPPV):
+Supine Roll Test var positiv med en kraftig [retning]-rettet horisontal nystagmus, noe som bekrefter diagnosen BPPV i [side] horisontale buegang.
+
+Sentralvestibulær påvirkning (etter hjernerystelse):
+VNG-testing og klinisk undersøkelse viste flere tegn på sentral påvirkning:
+- Sakkader og pursuits: Begge testene viste \"overshoots\" og korrigerende sakkader
+- Blikkhold (Gaze) og Headshake-test: Provoserte nystagmus
+
+Disse funnene er forenlige med en post-commotio tilstand.
+
+Konklusjon og plan:
+Pasienten har en BPPV i den horisontale buegangen, i tillegg til en sentralvestibulær dysfunksjon som følge av hjernerystelsen.
+
+Det er satt i gang følgende tiltak:
+1. Behandling for BPPV: Reposisjoneringsmanøver tilpasset horisontal buegang
+2. Vestibulær rehabilitering (VRT): Pasienten starter med lette VRT-øvelser for gaze stability. Dette er første steg i en progressiv oppfølging.
+
+Målet er å gradvis forbedre sentralvestibulær funksjon, noe som vil bli monitorert ved fremtidig VNG-retesting.
+
+Pasienten vil bli fulgt opp for videre behandling og justering av øvelser.
+
+Vennlig hilsen,
+[Kiropraktor] – kiropraktor
+HPR: [HPR]"
+
+MESSAGE user "Skriv henvisning til tannlege for kjeveproblemer"
+MESSAGE assistant "HENVISNING TIL TANNLEGE - KJEVEPROBLEMATIKK
+
+Pasient: [Navn] – f. [Fødselsnummer]
+
+Etter behandling over flere måneder virker det som om pasientens symptomer primært kommer fra muskulatur i kjeveområdet. Anbefaler tannlegevurdering med tanke på bittskinne og eventuell botox-behandling.
+
+Sykehistorie og behandlingsforløp:
+Pasienten ble opprinnelig henvist for [opprinnelig årsak]. Gjennom hele behandlingsperioden har det vært et gjennomgående problem med muskulære spenninger i kjeveområdet, som har blitt mer tydelig som en sentral komponent i symptombildet.
+
+Hovedsymptomer kjeve:
+- Våkner med stiv og øm kjeve (pågående problem over tid)
+- Muskulære spenninger i kjeveområdet, særlig på nattestid
+- Hodepine og nakkesmerter sekundært til kjeveleddsmuskulatur
+- Symptomer tyder på nattlig tanngnissing/klemming (bruksisme)
+
+Behandling gitt:
+Pasienten har mottatt følgende behandling hos undertegnede:
+
+For kjeve-relaterte problemer:
+- Trigger point behandling av masseter og pterygoid muskulatur
+- Intern release av pterygoid
+- Kjeve PIR (Post Isometric Relaxation)
+- Behandling av sekundære spenninger i nakke og skuldre
+
+Pasienten har hatt god respons på myofascial behandling av kjevemuskulaturen, noe som støtter diagnosen om primært muskulær problematikk.
+
+Anbefalinger for videre utredning/behandling:
+1. Bittskinne: Vurdering og tilpasning av okklusjonsskinne for nattbruk
+2. Tannstatus: Kontroll for eventuelle tannskader som følge av bruksisme
+3. Botox-behandling: Vurdering av botulinum toksin i masseter og eventuelt temporalis muskulatur
+4. Okklusjonsanalyse: For å identifisere eventuelle bidragsfaktorer
+
+Med vennlig hilsen
+[Kiropraktor]
+Kiropraktor
+HPR: [HPR]
+[Klinikknavn]"
+
+MESSAGE user "Skriv erklæring om redusert studieevne"
+MESSAGE assistant "ERKLÆRING / DOKUMENTASJON VEDRØRENDE EKSAMEN OG STUDIEEVNE
+
+Pasient: [Navn]
+Fødselsnummer: [Fødselsnummer]
+Gjelder: Dokumentasjon på redusert studieevne i eksamensforberedende periode
+Til: [Universitet/Høyskole] / Eksamenskontoret
+
+Det bekreftes at [Navn] er under medisinsk oppfølging ved vår klinikk. [Hun/Han] har vært til aktiv behandling i perioden [startdato] – dags dato ([dato]).
+
+Medisinsk vurdering:
+Det bekreftes at pasientens studieprogresjon og eksamensforberedelser har blitt vesentlig hindret av dokumentert sykdom.
+
+Selv om [hun/han] medisinsk sett er frisk nok til å møte til eksamen nå, stiller [hun/han] med et handikap grunnet manglende forberedelsestid forårsaket av sykdommen. Dersom [hun/han] ikke består eller ser seg nødt til å avbryte, skyldes dette etter min vurdering etterslep fra sykdomsperioden, og det bør legges til rette for at [hun/han] får mulighet til å ta eksamen på nytt.
+
+Sykehistorie:
+[Beskrivelse av sykdomsforløpet]
+
+Behandling og status:
+Pasienten er under [type] rehabilitering. [Hun/Han] har respondert godt på behandling og er per dags dato i klar bedring. [Hun/Han] er sterkt motivert for å forsøke å gjennomføre kommende eksamen(er).
+
+Konsekvenser for studieforberedelser:
+Selv om pasienten nå er bedre, har [hun/han] gjennomgått et langt sykdomsforløp gjennom store deler av semesteret. Tilstanden har vært preget av:
+- Kognitiv utmattelse: Konsentrasjonsvansker (\"hjernetåke\")
+- Svimmelhet ved stress og fokus
+- Manglende lesekapasitet: Sterkt redusert evne til å tilegne seg pensum
+
+Med vennlig hilsen,
+[Kiropraktor]
+Kiropraktor - HPR-nummer: [HPR]
+[Klinikknavn]
+Mobil: [Telefon] - E-post: [Epost]
+Dato: [Dato]"
+
+MESSAGE user "Skriv dialogmelding til lege om medisinering"
+MESSAGE assistant "DIALOGMELDING TIL FASTLEGE
+
+Dato: [Dato]
+Til: Fastlege for [Pasientnavn]
+Fra: [Kiropraktor], Kiropraktor
+Angående: [Pasientnavn], f. [Fødselsnummer]
+
+Emne: Forespørsel om medikamentell vurdering
+
+Pasienten er i behandling hos undertegnede for [diagnose/tilstand].
+
+[Beskriv klinisk situasjon og funn]
+
+Med bakgrunn i ovennevnte ønsker jeg å forhøre meg om følgende:
+
+1. [Spørsmål om medisinering]
+2. [Eventuelt spørsmål 2]
+
+Jeg er tilgjengelig for dialog dersom det er ønskelig.
+
+Med vennlig hilsen
+[Kiropraktor]
+Kiropraktor
+HPR: [HPR]
+[Klinikknavn]
+Tlf: [Telefon]
+E-post: [Epost]"
+
 LICENSE """
 ChiroClick Norwegian Model - For Norwegian clinical narrative generation.
 Generates professional Norwegian medical documentation.

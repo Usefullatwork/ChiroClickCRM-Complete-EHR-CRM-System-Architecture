@@ -707,6 +707,27 @@ export const spineTemplatesAPI = {
   resetToDefaults: (language = 'NO') => apiClient.post('/spine-templates/reset', null, { params: { language } }),
 }
 
+// Clinical Settings API
+export const clinicalSettingsAPI = {
+  // Get all clinical settings
+  getAll: () => apiClient.get('/clinical-settings'),
+  // Get default settings reference
+  getDefaults: () => apiClient.get('/clinical-settings/defaults'),
+  // Update clinical settings (partial update)
+  update: (settings) => apiClient.patch('/clinical-settings', settings),
+  // Update specific section
+  updateSection: (section, data) => apiClient.patch(`/clinical-settings/${section}`, data),
+  // Reset all to defaults
+  reset: () => apiClient.post('/clinical-settings/reset'),
+  // Adjustment notation
+  getAdjustmentTemplates: () => apiClient.get('/clinical-settings/adjustment/templates'),
+  setAdjustmentStyle: (style) => apiClient.put('/clinical-settings/adjustment/style', { style }),
+  // Test settings
+  updateTestSettings: (testType, settings) => apiClient.patch(`/clinical-settings/tests/${testType}`, settings),
+  // Letter settings
+  updateLetterSettings: (settings) => apiClient.patch('/clinical-settings/letters', settings),
+}
+
 // AI Service
 export const aiAPI = {
   getStatus: () => apiClient.get('/ai/status'),

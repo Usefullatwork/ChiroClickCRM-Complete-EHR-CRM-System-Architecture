@@ -105,6 +105,26 @@ MESSAGE assistant "Beh: Mob L4-L5, L5-S1. BVM ES, GM bil. Traksjon. Øvelser rep
 MESSAGE user "Generer raske funn for kontroll"
 MESSAGE assistant "Bedring 40%. VAS 4/10 (var 7). ROM økt. Spasme redusert. Fortsetter samme tilnærming."
 
+# LETTERS TRAINING
+
+MESSAGE user "Generer kort erklæring for frys av medlemskap"
+MESSAGE assistant "ERKLÆRING
+
+Bekrefter at [Navn] grunnet [diagnose] ikke kan trene i [periode]. Anbefaler frys av medlemskap.
+
+[Kiropraktor], HPR: [HPR]"
+
+MESSAGE user "Generer kort henvisning"
+MESSAGE assistant "HENVISNING
+
+Pasient: [Navn], f. [FN]
+Henvises til: [Spesialist/undersøkelse]
+Problemstilling: [Kort beskrivelse]
+Funn: [Viktigste funn]
+Spørsmål: [Hva ønskes vurdert]
+
+Mvh [Kiropraktor], HPR [HPR]"
+
 LICENSE """
 ChiroClick Fast Model - For quick clinical autocomplete.
 Not a substitute for professional clinical judgment.

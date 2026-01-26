@@ -34,7 +34,7 @@ import {
   RotateCcw,
   Target
 } from 'lucide-react'
-import { organizationAPI, usersAPI, spineTemplatesAPI } from '../services/api'
+import { organizationAPI, usersAPI, spineTemplatesAPI, clinicalSettingsAPI } from '../services/api'
 import { formatDate } from '../lib/utils'
 import AISettings from '../components/AISettings'
 import SchedulerDecisions from '../components/scheduler/SchedulerDecisions'
@@ -369,19 +369,85 @@ export default function Settings() {
   const [editMode, setEditMode] = useState(false)
   const [formData, setFormData] = useState({})
 
-  // Clinical preferences state
-  const [clinicalPrefs, setClinicalPrefs] = useState(() => {
-    const saved = localStorage.getItem('chiroclick_clinical_prefs')
-    return saved ? JSON.parse(saved) : DEFAULT_CLINICAL_PREFS
+  // ============================================
+  // CLINICAL SETTINGS (Backend-powered)
+  // ============================================
+
+  // Fetch clinical settings from backend
+  const { data: clinicalSettingsResponse, isLoading: clinicalSettingsLoading } = useQuery({
+    queryKey: ['clinical-settings'],
+    queryFn: () => clinicalSettingsAPI.getAll(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
-  // Save clinical preferences to localStorage
-  useEffect(() => {
-    localStorage.setItem('chiroclick_clinical_prefs', JSON.stringify(clinicalPrefs))
-  }, [clinicalPrefs])
+  // Get clinical settings with defaults
+  const clinicalSettings = clinicalSettingsResponse?.data || DEFAULT_CLINICAL_PREFS
 
+  // For backwards compatibility, map to the old clinicalPrefs structure
+  const clinicalPrefs = {
+    adjustmentNotation: clinicalSettings.adjustment?.style || 'segment_listing',
+    language: clinicalSettings.display?.language || 'no',
+    showDermatomes: clinicalSettings.display?.showDermatomes ?? true,
+    showTriggerPoints: clinicalSettings.display?.showTriggerPoints ?? true,
+    autoGenerateNarrative: clinicalSettings.display?.autoGenerateNarrative ?? true,
+    defaultView: clinicalSettings.display?.defaultView || 'front',
+    // Extended settings
+    gonsteadSettings: clinicalSettings.adjustment?.gonstead || {},
+    diversifiedSettings: clinicalSettings.adjustment?.diversified || {},
+    testSettings: clinicalSettings.tests || {},
+    letterSettings: clinicalSettings.letters || {},
+    soapSettings: clinicalSettings.soap || {},
+  }
+
+  // Update clinical settings mutation
+  const updateClinicalSettingsMutation = useMutation({
+    mutationFn: (updates) => clinicalSettingsAPI.update(updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['clinical-settings'])
+    },
+    onError: (error) => {
+      console.error('Failed to update clinical settings:', error)
+    },
+  })
+
+  // Reset clinical settings mutation
+  const resetClinicalSettingsMutation = useMutation({
+    mutationFn: () => clinicalSettingsAPI.reset(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['clinical-settings'])
+      alert(lang === 'no' ? 'Kliniske innstillinger tilbakestilt' : 'Clinical settings reset to defaults')
+    },
+    onError: (error) => {
+      alert(`Failed to reset settings: ${error.response?.data?.message || error.message}`)
+    },
+  })
+
+  // Handle clinical preference change - updates backend
   const handleClinicalPrefChange = (key, value) => {
-    setClinicalPrefs(prev => ({ ...prev, [key]: value }))
+    // Map the key to the correct nested structure
+    let updates = {}
+    if (key === 'adjustmentNotation') {
+      updates = { adjustment: { style: value } }
+    } else if (key === 'language') {
+      updates = { display: { language: value } }
+    } else if (key === 'showDermatomes' || key === 'showTriggerPoints' || key === 'autoGenerateNarrative' || key === 'defaultView') {
+      updates = { display: { [key]: value } }
+    } else {
+      updates = { [key]: value }
+    }
+    updateClinicalSettingsMutation.mutate(updates)
+  }
+
+  // Handle nested settings updates
+  const handleNestedSettingsChange = (section, subsection, key, value) => {
+    const updates = {
+      [section]: {
+        [subsection]: {
+          [key]: value
+        }
+      }
+    }
+    updateClinicalSettingsMutation.mutate(updates)
   }
 
   const lang = clinicalPrefs.language || 'no'
@@ -1248,6 +1314,16 @@ export default function Settings() {
       {/* Clinical Settings Tab */}
       {activeTab === 'clinical' && (
         <div className="space-y-6">
+          {/* Loading state */}
+          {clinicalSettingsLoading && (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-teal-600" />
+              <span className="ml-3 text-gray-600">
+                {lang === 'no' ? 'Laster innstillinger...' : 'Loading settings...'}
+              </span>
+            </div>
+          )}
+
           {/* Adjustment Notation Method */}
           <div className="bg-white rounded-lg border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200">
@@ -1304,6 +1380,374 @@ export default function Settings() {
                     </div>
                   </label>
                 ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Gonstead Settings - Show when Gonstead is selected */}
+          {clinicalPrefs.adjustmentNotation === 'gonstead_listing' && (
+            <div className="bg-white rounded-lg border-2 border-amber-200">
+              <div className="px-6 py-4 border-b border-amber-200 bg-amber-50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+                    <Activity className="w-5 h-5 text-amber-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      {lang === 'no' ? 'Gonstead Innstillinger' : 'Gonstead Settings'}
+                    </h2>
+                    <p className="text-sm text-gray-600">
+                      {lang === 'no'
+                        ? 'Tilpass Gonstead-listingnotasjon'
+                        : 'Customize Gonstead listing notation'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 space-y-4">
+                {/* Full notation toggle */}
+                <div className="flex items-center justify-between py-3 border-b border-gray-100">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      {lang === 'no' ? 'Full notasjon' : 'Full Notation'}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {lang === 'no'
+                        ? 'Bruk full notasjon (f.eks. "C5 PRS-SP" vs "PRS")'
+                        : 'Use full notation (e.g., "C5 PRS-SP" vs "PRS")'}
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={clinicalPrefs.gonsteadSettings?.useFullNotation ?? true}
+                      onChange={(e) => handleNestedSettingsChange('adjustment', 'gonstead', 'useFullNotation', e.target.checked)}
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                  </label>
+                </div>
+
+                {/* Include direction toggle */}
+                <div className="flex items-center justify-between py-3 border-b border-gray-100">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      {lang === 'no' ? 'Inkluder retning' : 'Include Direction'}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {lang === 'no'
+                        ? 'Inkluder retningsbeskrivelse i listingen'
+                        : 'Include direction description in listing'}
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={clinicalPrefs.gonsteadSettings?.includeDirection ?? true}
+                      onChange={(e) => handleNestedSettingsChange('adjustment', 'gonstead', 'includeDirection', e.target.checked)}
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                  </label>
+                </div>
+
+                {/* Gonstead listings reference */}
+                <div className="mt-4 p-4 bg-amber-50 rounded-lg border border-amber-200">
+                  <p className="text-sm font-medium text-amber-900 mb-2">
+                    {lang === 'no' ? 'Gonstead Listing Referanse:' : 'Gonstead Listing Reference:'}
+                  </p>
+                  <div className="grid grid-cols-2 gap-4 text-xs text-amber-800">
+                    <div>
+                      <p className="font-semibold mb-1">{lang === 'no' ? 'Posterior Rotasjon' : 'Posterior Rotation'}:</p>
+                      <ul className="space-y-0.5">
+                        <li><code className="bg-amber-100 px-1 rounded">PR</code> - Posterior Right</li>
+                        <li><code className="bg-amber-100 px-1 rounded">PL</code> - Posterior Left</li>
+                        <li><code className="bg-amber-100 px-1 rounded">PRS</code> - Posterior Right Superior</li>
+                        <li><code className="bg-amber-100 px-1 rounded">PLS</code> - Posterior Left Superior</li>
+                        <li><code className="bg-amber-100 px-1 rounded">PRI</code> - Posterior Right Inferior</li>
+                        <li><code className="bg-amber-100 px-1 rounded">PLI</code> - Posterior Left Inferior</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <p className="font-semibold mb-1">{lang === 'no' ? 'Sakrum/Bekken' : 'Sacrum/Pelvis'}:</p>
+                      <ul className="space-y-0.5">
+                        <li><code className="bg-amber-100 px-1 rounded">AS</code> - Anterior Superior</li>
+                        <li><code className="bg-amber-100 px-1 rounded">AI</code> - Anterior Inferior</li>
+                        <li><code className="bg-amber-100 px-1 rounded">PI</code> - Posterior Inferior</li>
+                        <li><code className="bg-amber-100 px-1 rounded">IN</code> - Inflare</li>
+                        <li><code className="bg-amber-100 px-1 rounded">EX</code> - Outflare</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Diversified Settings - Show when Diversified is selected */}
+          {clinicalPrefs.adjustmentNotation === 'diversified_notation' && (
+            <div className="bg-white rounded-lg border-2 border-indigo-200">
+              <div className="px-6 py-4 border-b border-indigo-200 bg-indigo-50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
+                    <Activity className="w-5 h-5 text-indigo-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      {lang === 'no' ? 'Diversifisert Innstillinger' : 'Diversified Settings'}
+                    </h2>
+                    <p className="text-sm text-gray-600">
+                      {lang === 'no'
+                        ? 'Tilpass diversifisert teknikk-dokumentasjon'
+                        : 'Customize diversified technique documentation'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 space-y-4">
+                {/* Anatomical terms toggle */}
+                <div className="flex items-center justify-between py-3 border-b border-gray-100">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      {lang === 'no' ? 'Anatomiske termer' : 'Anatomical Terms'}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {lang === 'no'
+                        ? 'Bruk full anatomisk terminologi'
+                        : 'Use full anatomical terminology'}
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={clinicalPrefs.diversifiedSettings?.useAnatomicalTerms ?? true}
+                      onChange={(e) => handleNestedSettingsChange('adjustment', 'diversified', 'useAnatomicalTerms', e.target.checked)}
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-500"></div>
+                  </label>
+                </div>
+
+                {/* Include restriction type */}
+                <div className="flex items-center justify-between py-3 border-b border-gray-100">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      {lang === 'no' ? 'Inkluder restriksjonstype' : 'Include Restriction Type'}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {lang === 'no'
+                        ? 'Spesifiser type bevegelsesrestriksjon'
+                        : 'Specify type of motion restriction'}
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={clinicalPrefs.diversifiedSettings?.includeRestriction ?? true}
+                      onChange={(e) => handleNestedSettingsChange('adjustment', 'diversified', 'includeRestriction', e.target.checked)}
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-500"></div>
+                  </label>
+                </div>
+
+                {/* Diversified terminology reference */}
+                <div className="mt-4 p-4 bg-indigo-50 rounded-lg border border-indigo-200">
+                  <p className="text-sm font-medium text-indigo-900 mb-2">
+                    {lang === 'no' ? 'Diversifisert Terminologi:' : 'Diversified Terminology:'}
+                  </p>
+                  <div className="grid grid-cols-2 gap-4 text-xs text-indigo-800">
+                    <div>
+                      <p className="font-semibold mb-1">{lang === 'no' ? 'Restriksjonstyper' : 'Restriction Types'}:</p>
+                      <ul className="space-y-0.5">
+                        <li><code className="bg-indigo-100 px-1 rounded">Hypomobil</code> - {lang === 'no' ? 'Redusert bevegelse' : 'Reduced motion'}</li>
+                        <li><code className="bg-indigo-100 px-1 rounded">Fiksasjon</code> - {lang === 'no' ? 'Låst segment' : 'Locked segment'}</li>
+                        <li><code className="bg-indigo-100 px-1 rounded">Subluksasjon</code> - {lang === 'no' ? 'Dysfunksjon' : 'Dysfunction'}</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <p className="font-semibold mb-1">{lang === 'no' ? 'Bevegelsesretninger' : 'Motion Directions'}:</p>
+                      <ul className="space-y-0.5">
+                        <li><code className="bg-indigo-100 px-1 rounded">Fleksjon</code> / <code className="bg-indigo-100 px-1 rounded">Ekstensjon</code></li>
+                        <li><code className="bg-indigo-100 px-1 rounded">Lateral fleksjon</code> (H/V)</li>
+                        <li><code className="bg-indigo-100 px-1 rounded">Rotasjon</code> (H/V)</li>
+                        <li><code className="bg-indigo-100 px-1 rounded">Kombinert</code></li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Test Documentation Settings */}
+          <div className="bg-white rounded-lg border border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-rose-100 flex items-center justify-center">
+                  <Activity className="w-5 h-5 text-rose-600" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    {lang === 'no' ? 'Testdokumentasjon' : 'Test Documentation'}
+                  </h2>
+                  <p className="text-sm text-gray-500">
+                    {lang === 'no'
+                      ? 'Innstillinger for kliniske tester og undersøkelser'
+                      : 'Settings for clinical tests and examinations'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Orthopedic Test Format */}
+              <div>
+                <p className="text-sm font-medium text-gray-900 mb-3">
+                  {lang === 'no' ? 'Ortopediske tester - Resultatformat' : 'Orthopedic Tests - Result Format'}
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  {[
+                    { id: 'plus_minus', label: '+/-', desc: lang === 'no' ? 'Pluss/minus' : 'Plus/minus' },
+                    { id: 'pos_neg', label: 'Pos/Neg', desc: lang === 'no' ? 'Positiv/negativ' : 'Positive/negative' },
+                    { id: 'numeric', label: '0-3', desc: lang === 'no' ? 'Numerisk skala' : 'Numeric scale' },
+                    { id: 'descriptive', label: lang === 'no' ? 'Beskrivende' : 'Descriptive', desc: lang === 'no' ? 'Full tekst' : 'Full text' },
+                  ].map(format => (
+                    <label
+                      key={format.id}
+                      className={`p-3 rounded-lg border-2 cursor-pointer text-center transition-all ${
+                        (clinicalPrefs.testSettings?.orthopedic?.resultFormat || 'plus_minus') === format.id
+                          ? 'border-rose-500 bg-rose-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="orthoResultFormat"
+                        value={format.id}
+                        className="sr-only"
+                        checked={(clinicalPrefs.testSettings?.orthopedic?.resultFormat || 'plus_minus') === format.id}
+                        onChange={(e) => handleNestedSettingsChange('tests', 'orthopedic', 'resultFormat', e.target.value)}
+                      />
+                      <p className="font-medium text-gray-900">{format.label}</p>
+                      <p className="text-xs text-gray-500">{format.desc}</p>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Neurological Test Format */}
+              <div>
+                <p className="text-sm font-medium text-gray-900 mb-3">
+                  {lang === 'no' ? 'Refleksgradering' : 'Reflex Grading'}
+                </p>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { id: 'numeric', label: '0-4', desc: lang === 'no' ? 'Standard numerisk' : 'Standard numeric' },
+                    { id: 'plus_minus', label: '+/++/+++', desc: lang === 'no' ? 'Pluss-system' : 'Plus system' },
+                    { id: 'descriptive', label: lang === 'no' ? 'Beskrivende' : 'Descriptive', desc: lang === 'no' ? 'Absent/normal/hyperaktiv' : 'Absent/normal/hyperactive' },
+                  ].map(format => (
+                    <label
+                      key={format.id}
+                      className={`p-3 rounded-lg border-2 cursor-pointer text-center transition-all ${
+                        (clinicalPrefs.testSettings?.neurological?.reflexGrading || 'numeric') === format.id
+                          ? 'border-rose-500 bg-rose-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="reflexGrading"
+                        value={format.id}
+                        className="sr-only"
+                        checked={(clinicalPrefs.testSettings?.neurological?.reflexGrading || 'numeric') === format.id}
+                        onChange={(e) => handleNestedSettingsChange('tests', 'neurological', 'reflexGrading', e.target.value)}
+                      />
+                      <p className="font-medium text-gray-900">{format.label}</p>
+                      <p className="text-xs text-gray-500">{format.desc}</p>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* ROM Format */}
+              <div>
+                <p className="text-sm font-medium text-gray-900 mb-3">
+                  {lang === 'no' ? 'Bevegelighet (ROM) - Format' : 'Range of Motion (ROM) - Format'}
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  {[
+                    { id: 'degrees', label: lang === 'no' ? 'Grader' : 'Degrees', desc: '45°, 90°' },
+                    { id: 'percentage', label: '%', desc: '50%, 75%' },
+                    { id: 'descriptive', label: lang === 'no' ? 'Beskrivende' : 'Descriptive', desc: lang === 'no' ? 'Normal/redusert' : 'Normal/reduced' },
+                    { id: 'aga', label: 'AGA', desc: lang === 'no' ? 'AGA-skala' : 'AGA scale' },
+                  ].map(format => (
+                    <label
+                      key={format.id}
+                      className={`p-3 rounded-lg border-2 cursor-pointer text-center transition-all ${
+                        (clinicalPrefs.testSettings?.rom?.format || 'degrees') === format.id
+                          ? 'border-rose-500 bg-rose-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="romFormat"
+                        value={format.id}
+                        className="sr-only"
+                        checked={(clinicalPrefs.testSettings?.rom?.format || 'degrees') === format.id}
+                        onChange={(e) => handleNestedSettingsChange('tests', 'rom', 'format', e.target.value)}
+                      />
+                      <p className="font-medium text-gray-900">{format.label}</p>
+                      <p className="text-xs text-gray-500">{format.desc}</p>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Additional test options */}
+              <div className="space-y-3 pt-4 border-t border-gray-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      {lang === 'no' ? 'Inkluder normalverdier' : 'Include Normal Values'}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {lang === 'no' ? 'Vis referanseverdier ved ROM' : 'Show reference values for ROM'}
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={clinicalPrefs.testSettings?.rom?.includeNormal ?? true}
+                      onChange={(e) => handleNestedSettingsChange('tests', 'rom', 'includeNormal', e.target.checked)}
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-rose-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-500"></div>
+                  </label>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      {lang === 'no' ? 'Inkluder dermatomer' : 'Include Dermatomes'}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {lang === 'no' ? 'Vis dermatomreferanse i nevrologiske tester' : 'Show dermatome reference in neuro tests'}
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={clinicalPrefs.testSettings?.neurological?.includeDermatomes ?? true}
+                      onChange={(e) => handleNestedSettingsChange('tests', 'neurological', 'includeDermatomes', e.target.checked)}
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-rose-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-500"></div>
+                  </label>
+                </div>
               </div>
             </div>
           </div>
@@ -1470,24 +1914,64 @@ export default function Settings() {
           {/* Spine Templates (Quick Palpation) */}
           <SpineTemplatesEditor lang={lang} />
 
-          {/* Current Selection Summary */}
+          {/* Current Settings Summary */}
           <div className="bg-teal-50 rounded-lg border border-teal-200 p-4">
-            <div className="flex items-start gap-3">
-              <Check className="w-5 h-5 text-teal-600 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-teal-900">
-                  {lang === 'no' ? 'Aktiv notasjonsmetode' : 'Active Notation Method'}
-                </p>
-                <p className="text-sm text-teal-700 mt-1">
-                  {ADJUSTMENT_NOTATION_METHODS.find(m => m.id === clinicalPrefs.adjustmentNotation)?.name[lang] ||
-                   ADJUSTMENT_NOTATION_METHODS.find(m => m.id === clinicalPrefs.adjustmentNotation)?.name.en}
-                </p>
-                <p className="text-xs text-teal-600 mt-2">
-                  {lang === 'no'
-                    ? 'Denne metoden vil brukes som standard i kliniske notater.'
-                    : 'This method will be used as default in clinical notes.'}
-                </p>
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-teal-600 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-teal-900">
+                    {lang === 'no' ? 'Aktive innstillinger' : 'Active Settings'}
+                  </p>
+                  <div className="mt-2 space-y-1">
+                    <p className="text-sm text-teal-700">
+                      <span className="font-medium">{lang === 'no' ? 'Notasjon:' : 'Notation:'}</span>{' '}
+                      {ADJUSTMENT_NOTATION_METHODS.find(m => m.id === clinicalPrefs.adjustmentNotation)?.name[lang] ||
+                       ADJUSTMENT_NOTATION_METHODS.find(m => m.id === clinicalPrefs.adjustmentNotation)?.name.en}
+                    </p>
+                    <p className="text-sm text-teal-700">
+                      <span className="font-medium">{lang === 'no' ? 'Ortopediske tester:' : 'Ortho tests:'}</span>{' '}
+                      {clinicalPrefs.testSettings?.orthopedic?.resultFormat === 'plus_minus' ? '+/-' :
+                       clinicalPrefs.testSettings?.orthopedic?.resultFormat === 'pos_neg' ? 'Pos/Neg' :
+                       clinicalPrefs.testSettings?.orthopedic?.resultFormat === 'numeric' ? '0-3' : lang === 'no' ? 'Beskrivende' : 'Descriptive'}
+                    </p>
+                    <p className="text-sm text-teal-700">
+                      <span className="font-medium">{lang === 'no' ? 'ROM:' : 'ROM:'}</span>{' '}
+                      {clinicalPrefs.testSettings?.rom?.format === 'degrees' ? (lang === 'no' ? 'Grader' : 'Degrees') :
+                       clinicalPrefs.testSettings?.rom?.format === 'percentage' ? '%' :
+                       clinicalPrefs.testSettings?.rom?.format === 'aga' ? 'AGA' : lang === 'no' ? 'Beskrivende' : 'Descriptive'}
+                    </p>
+                  </div>
+                  <p className="text-xs text-teal-600 mt-3">
+                    {updateClinicalSettingsMutation.isPending ? (
+                      <span className="flex items-center gap-1">
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        {lang === 'no' ? 'Lagrer...' : 'Saving...'}
+                      </span>
+                    ) : (
+                      lang === 'no'
+                        ? 'Innstillingene synkroniseres automatisk til serveren.'
+                        : 'Settings are automatically synced to the server.'
+                    )}
+                  </p>
+                </div>
               </div>
+
+              {/* Reset Button */}
+              <button
+                onClick={() => {
+                  if (confirm(lang === 'no'
+                    ? 'Tilbakestille alle kliniske innstillinger til standard?'
+                    : 'Reset all clinical settings to defaults?')) {
+                    resetClinicalSettingsMutation.mutate()
+                  }
+                }}
+                disabled={resetClinicalSettingsMutation.isPending}
+                className="px-3 py-1.5 text-sm border border-teal-300 rounded-lg text-teal-700 hover:bg-teal-100 flex items-center gap-1.5 transition-colors disabled:opacity-50"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                {lang === 'no' ? 'Tilbakestill' : 'Reset'}
+              </button>
             </div>
           </div>
         </div>
