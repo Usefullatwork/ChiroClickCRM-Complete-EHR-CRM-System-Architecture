@@ -4,7 +4,10 @@
  */
 
 import * as aiService from '../services/ai.js';
+import { generateCompletionStream, getModelForField, buildFieldPrompt } from '../services/ai.js';
 import logger from '../utils/logger.js';
+import cache, { CacheKeys } from '../utils/cache.js';
+import crypto from 'crypto';
 
 export const spellCheck = async (req, res) => {
   try {
@@ -116,6 +119,96 @@ export const getAIStatus = async (req, res) => {
   }
 };
 
+/**
+ * Generate field text with streaming SSE response
+ * Supports inline AI generation for individual SOAP fields
+ */
+export const generateFieldStream = async (req, res) => {
+  try {
+    const { fieldType, context = {}, language = 'no' } = req.body;
+
+    if (!fieldType) {
+      return res.status(400).json({ error: 'fieldType is required' });
+    }
+
+    // Generate cache key based on field type and context
+    const contextHash = crypto
+      .createHash('md5')
+      .update(JSON.stringify({ fieldType, context, language }))
+      .digest('hex')
+      .slice(0, 12);
+    const cacheKey = `ai:field:${fieldType}:${language}:${contextHash}`;
+
+    // Check cache first for non-streaming quick response
+    const cached = cache.get(cacheKey);
+    if (cached) {
+      logger.debug('AI field cache hit', { fieldType, cacheKey });
+      // For cached responses, send as regular JSON
+      return res.json({ text: cached, cached: true, fieldType });
+    }
+
+    // Set up SSE headers for streaming
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
+
+    // Build prompt and get appropriate model
+    const prompt = buildFieldPrompt(fieldType, context, language);
+    const model = getModelForField(fieldType);
+
+    logger.debug('AI field stream start', { fieldType, model, language });
+
+    let fullText = '';
+
+    try {
+      for await (const chunk of generateCompletionStream(prompt, { model })) {
+        fullText += chunk;
+        // Send SSE formatted data
+        res.write(`data: ${JSON.stringify({ text: chunk })}\n\n`);
+      }
+
+      // Cache the complete response for 1 hour
+      cache.set(cacheKey, fullText.trim(), 3600);
+
+      // Send completion signal
+      res.write(`data: ${JSON.stringify({ done: true, fullText: fullText.trim() })}\n\n`);
+      res.write('data: [DONE]\n\n');
+      res.end();
+
+      logger.debug('AI field stream complete', { fieldType, length: fullText.length });
+    } catch (streamError) {
+      logger.error('AI field stream error:', streamError);
+      res.write(`data: ${JSON.stringify({ error: streamError.message })}\n\n`);
+      res.end();
+    }
+  } catch (error) {
+    logger.error('Error in generateFieldStream controller:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ error: error.message || 'Field generation failed' });
+    }
+  }
+};
+
+/**
+ * Generate field text without streaming (for non-SSE clients)
+ */
+export const generateField = async (req, res) => {
+  try {
+    const { fieldType, context = {}, language = 'no' } = req.body;
+
+    if (!fieldType) {
+      return res.status(400).json({ error: 'fieldType is required' });
+    }
+
+    const result = await aiService.generateFieldText(fieldType, context, language);
+    res.json(result);
+  } catch (error) {
+    logger.error('Error in generateField controller:', error);
+    res.status(500).json({ error: error.message || 'Field generation failed' });
+  }
+};
+
 export default {
   spellCheck,
   generateSOAPSuggestion,
@@ -123,5 +216,7 @@ export default {
   analyzeRedFlags,
   generateClinicalSummary,
   recordOutcomeFeedback,
-  getAIStatus
+  getAIStatus,
+  generateFieldStream,
+  generateField
 };

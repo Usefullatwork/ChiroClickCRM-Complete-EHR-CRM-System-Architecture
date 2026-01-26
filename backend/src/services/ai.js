@@ -17,6 +17,182 @@ const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY || null;
 const AI_PROVIDER = process.env.AI_PROVIDER || 'ollama'; // 'ollama' or 'claude'
 const AI_MODEL = process.env.AI_MODEL || 'gemini-3-pro-preview:7b'; // Default: Gemini 3 Pro Preview 7B (8GB+ RAM)
 
+// Multi-model configuration for field-specific routing
+const AI_MODELS = {
+  fast: process.env.AI_MODEL_FAST || 'chiro-fast:3b',         // 3B model for quick fields
+  norwegian: process.env.AI_MODEL_NORWEGIAN || 'chiro-no:7b', // 7B Norwegian-tuned model
+  medical: process.env.AI_MODEL_MEDICAL || 'chiro-medical:4b' // 4B clinical reasoning model
+};
+
+// Field-to-model mapping for optimal performance
+const FIELD_MODEL_MAP = {
+  // Fast model (3B) - simple, quick fields
+  chief_complaint: 'fast',
+  onset: 'fast',
+  observation: 'fast',
+  rom: 'fast',
+  treatment: 'fast',
+  follow_up: 'fast',
+  exercises: 'fast',
+  advice: 'fast',
+
+  // Norwegian model (7B) - narrative fields requiring fluent Norwegian
+  history: 'norwegian',
+  subjective_summary: 'norwegian',
+
+  // Medical model (4B) - clinical reasoning fields
+  palpation: 'medical',
+  clinical_reasoning: 'medical',
+  assessment: 'medical',
+  diagnosis: 'medical',
+  differential_diagnosis: 'medical',
+  prognosis: 'medical'
+};
+
+/**
+ * Get the appropriate model for a given field type
+ */
+export const getModelForField = (fieldType) => {
+  const category = FIELD_MODEL_MAP[fieldType] || 'fast';
+  return AI_MODELS[category];
+};
+
+/**
+ * Build field-specific prompt for inline AI generation
+ */
+const buildFieldPrompt = (fieldType, context, language = 'no') => {
+  const isNorwegian = language === 'no';
+  const patientContext = [];
+
+  if (context.patientAge) {
+    patientContext.push(isNorwegian ? `Pasient: ${context.patientAge} år` : `Patient: ${context.patientAge} years old`);
+  }
+  if (context.patientGender) {
+    const genderText = isNorwegian
+      ? (context.patientGender === 'male' ? 'mann' : context.patientGender === 'female' ? 'kvinne' : context.patientGender)
+      : context.patientGender;
+    patientContext.push(isNorwegian ? `Kjønn: ${genderText}` : `Gender: ${genderText}`);
+  }
+  if (context.chiefComplaint) {
+    patientContext.push(isNorwegian ? `Hovedplage: ${context.chiefComplaint}` : `Chief complaint: ${context.chiefComplaint}`);
+  }
+  if (context.painLocations?.length > 0) {
+    patientContext.push(isNorwegian ? `Smertested: ${context.painLocations.join(', ')}` : `Pain locations: ${context.painLocations.join(', ')}`);
+  }
+
+  const contextStr = patientContext.length > 0 ? patientContext.join('\n') : '';
+
+  const prompts = {
+    no: {
+      chief_complaint: `Du er en erfaren kiropraktor i Norge. Basert på følgende kontekst, skriv en kort og presis beskrivelse av pasientens hovedplage (1-2 setninger).\n\n${contextStr}\n\nSvar direkte uten forklaringer:`,
+      onset: `Du er en erfaren kiropraktor. Beskriv debut av symptomene kort og presist basert på konteksten.\n\n${contextStr}\n\nSvar direkte:`,
+      history: `Du er en erfaren kiropraktor. Skriv en kort sykehistorie basert på konteksten. Inkluder relevant tidligere behandling og sykdomsforløp.\n\n${contextStr}\n\nSvar direkte:`,
+      observation: `Du er en erfaren kiropraktor. Beskriv forventede observasjonsfunn basert på konteksten (holdning, ganglag, generelt inntrykk).\n\n${contextStr}\n\nSvar direkte:`,
+      palpation: `Du er en erfaren kiropraktor. Beskriv forventede palpasjonsfunn basert på konteksten (muskeltonus, triggerpunkter, leddstivhet).\n\n${contextStr}\n\nSvar direkte:`,
+      rom: `Du er en erfaren kiropraktor. Beskriv forventede bevegelighetsutfall (ROM) basert på konteksten.\n\n${contextStr}\n\nSvar direkte:`,
+      clinical_reasoning: `Du er en erfaren kiropraktor. Skriv en klinisk vurdering med resonnement basert på konteksten. Inkluder tentativ diagnose og begrunnelse.\n\n${contextStr}\n\nSvar direkte:`,
+      differential_diagnosis: `Du er en erfaren kiropraktor. List relevante differensialdiagnoser basert på konteksten.\n\n${contextStr}\n\nSvar direkte:`,
+      prognosis: `Du er en erfaren kiropraktor. Beskriv forventet prognose basert på konteksten.\n\n${contextStr}\n\nSvar direkte:`,
+      treatment: `Du er en erfaren kiropraktor. Beskriv anbefalt behandling basert på konteksten.\n\n${contextStr}\n\nSvar direkte:`,
+      exercises: `Du er en erfaren kiropraktor. List egnede hjemmeøvelser basert på konteksten.\n\n${contextStr}\n\nSvar direkte:`,
+      advice: `Du er en erfaren kiropraktor. Gi pasientråd basert på konteksten.\n\n${contextStr}\n\nSvar direkte:`,
+      follow_up: `Du er en erfaren kiropraktor. Beskriv anbefalt oppfølging basert på konteksten.\n\n${contextStr}\n\nSvar direkte:`
+    },
+    en: {
+      chief_complaint: `You are an experienced chiropractor. Based on the following context, write a brief and precise description of the patient's chief complaint (1-2 sentences).\n\n${contextStr}\n\nRespond directly without explanations:`,
+      onset: `You are an experienced chiropractor. Briefly describe the onset of symptoms based on the context.\n\n${contextStr}\n\nRespond directly:`,
+      history: `You are an experienced chiropractor. Write a brief history based on the context. Include relevant previous treatment and disease progression.\n\n${contextStr}\n\nRespond directly:`,
+      observation: `You are an experienced chiropractor. Describe expected observation findings based on the context (posture, gait, general impression).\n\n${contextStr}\n\nRespond directly:`,
+      palpation: `You are an experienced chiropractor. Describe expected palpation findings based on the context (muscle tone, trigger points, joint stiffness).\n\n${contextStr}\n\nRespond directly:`,
+      rom: `You are an experienced chiropractor. Describe expected range of motion findings based on the context.\n\n${contextStr}\n\nRespond directly:`,
+      clinical_reasoning: `You are an experienced chiropractor. Write a clinical assessment with reasoning based on the context. Include tentative diagnosis and justification.\n\n${contextStr}\n\nRespond directly:`,
+      differential_diagnosis: `You are an experienced chiropractor. List relevant differential diagnoses based on the context.\n\n${contextStr}\n\nRespond directly:`,
+      prognosis: `You are an experienced chiropractor. Describe expected prognosis based on the context.\n\n${contextStr}\n\nRespond directly:`,
+      treatment: `You are an experienced chiropractor. Describe recommended treatment based on the context.\n\n${contextStr}\n\nRespond directly:`,
+      exercises: `You are an experienced chiropractor. List appropriate home exercises based on the context.\n\n${contextStr}\n\nRespond directly:`,
+      advice: `You are an experienced chiropractor. Provide patient advice based on the context.\n\n${contextStr}\n\nRespond directly:`,
+      follow_up: `You are an experienced chiropractor. Describe recommended follow-up based on the context.\n\n${contextStr}\n\nRespond directly:`
+    }
+  };
+
+  const langPrompts = prompts[language] || prompts.no;
+  return langPrompts[fieldType] || langPrompts.chief_complaint;
+};
+
+/**
+ * Generate AI completion with streaming (async generator)
+ * Yields text chunks as they arrive from Ollama
+ */
+export async function* generateCompletionStream(prompt, options = {}) {
+  const { model = AI_MODELS.fast, maxTokens = 300, temperature = 0.5 } = options;
+
+  try {
+    const response = await fetch(`${OLLAMA_BASE_URL}/api/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model,
+        prompt,
+        stream: true,
+        options: {
+          temperature,
+          num_predict: maxTokens
+        }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Ollama API error: ${response.status}`);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value, { stream: true });
+      // Parse NDJSON lines (each line is a separate JSON object)
+      for (const line of chunk.split('\n').filter(Boolean)) {
+        try {
+          const data = JSON.parse(line);
+          if (data.response) {
+            yield data.response;
+          }
+          if (data.done) {
+            return;
+          }
+        } catch (parseError) {
+          // Skip malformed JSON lines
+          logger.debug('Skipping malformed JSON in stream:', line);
+        }
+      }
+    }
+  } catch (error) {
+    logger.error('Streaming completion error:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Generate field text with caching support
+ */
+export const generateFieldText = async (fieldType, context, language = 'no') => {
+  const prompt = buildFieldPrompt(fieldType, context, language);
+  const model = getModelForField(fieldType);
+
+  let text = '';
+  for await (const chunk of generateCompletionStream(prompt, { model })) {
+    text += chunk;
+  }
+
+  return { text: text.trim(), model, fieldType };
+};
+
+// Export buildFieldPrompt for controller use
+export { buildFieldPrompt };
+
 /**
  * Generate AI completion using selected provider
  */
@@ -708,5 +884,10 @@ export default {
   organizeOldJournalNotes,
   organizeMultipleNotes,
   mergeOrganizedNotes,
-  getAIStatus
+  getAIStatus,
+  // Streaming and field-specific generation
+  generateCompletionStream,
+  generateFieldText,
+  getModelForField,
+  buildFieldPrompt
 };

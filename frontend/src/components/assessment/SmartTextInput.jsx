@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Clock, Zap, ChevronDown } from 'lucide-react';
+import InlineAIButton from './InlineAIButton';
 
 /**
  * SmartTextInput - Enhanced text input with quick-select phrases
@@ -21,7 +22,13 @@ export default function SmartTextInput({
   rows = 3,
   className = '',
   required = false,
-  showQuickPhrases = true
+  showQuickPhrases = true,
+  // AI generation props
+  aiEnabled = false,
+  aiFieldType = null,
+  aiContext = {},
+  aiAvailable = true,
+  language = 'no'
 }) {
   const [isFocused, setIsFocused] = useState(false);
   const [showPhraseDropdown, setShowPhraseDropdown] = useState(false);
@@ -72,12 +79,29 @@ export default function SmartTextInput({
 
   return (
     <div className={`space-y-2 ${className}`}>
-      {/* Label */}
+      {/* Label with AI Button */}
       {label && (
-        <label className="block text-sm font-medium text-gray-700">
-          {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
-        </label>
+        <div className="flex items-center justify-between">
+          <label className="block text-sm font-medium text-gray-700">
+            {label}
+            {required && <span className="text-red-500 ml-1">*</span>}
+          </label>
+          {aiEnabled && aiFieldType && (
+            <InlineAIButton
+              fieldType={aiFieldType}
+              context={aiContext}
+              language={language}
+              disabled={!aiAvailable}
+              onTextGenerated={(text) => {
+                // Append generated text to existing value with proper spacing
+                const newValue = value
+                  ? `${value}${value.endsWith(' ') || value.endsWith('\n') ? '' : ' '}${text}`
+                  : text;
+                onChange(newValue);
+              }}
+            />
+          )}
+        </div>
       )}
 
       {/* Quick Phrases Bar */}

@@ -707,5 +707,25 @@ export const spineTemplatesAPI = {
   resetToDefaults: (language = 'NO') => apiClient.post('/spine-templates/reset', null, { params: { language } }),
 }
 
+// AI Service
+export const aiAPI = {
+  getStatus: () => apiClient.get('/ai/status'),
+  spellCheck: (text) => apiClient.post('/ai/spell-check', { text }),
+  generateSOAPSuggestion: (chiefComplaint, section) =>
+    apiClient.post('/ai/soap-suggestion', { chiefComplaint, section }),
+  suggestDiagnosis: (soapData) => apiClient.post('/ai/suggest-diagnosis', { soapData }),
+  analyzeRedFlags: (patientData, soapData) =>
+    apiClient.post('/ai/analyze-red-flags', { patientData, soapData }),
+  generateClinicalSummary: (encounter) =>
+    apiClient.post('/ai/clinical-summary', { encounter }),
+  generateField: (fieldType, context, language) =>
+    apiClient.post('/ai/generate-field', { fieldType, context, language }),
+  // Streaming endpoint - uses fetch directly for SSE support
+  getStreamUrl: () => `${API_URL}/ai/generate-field-stream`,
+}
+
+// Export API URL for streaming endpoints
+export { API_URL }
+
 // Export default API client
 export default apiClient

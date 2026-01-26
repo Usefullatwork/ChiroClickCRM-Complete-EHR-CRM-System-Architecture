@@ -92,4 +92,26 @@ router.get('/status',
   aiController.getAIStatus
 );
 
+/**
+ * @route   POST /api/v1/ai/generate-field-stream
+ * @desc    Generate field text with streaming SSE response
+ * @access  Private (ADMIN, PRACTITIONER)
+ * @body    { fieldType: string, context?: object, language?: 'en' | 'no' }
+ */
+router.post('/generate-field-stream',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  aiController.generateFieldStream
+);
+
+/**
+ * @route   POST /api/v1/ai/generate-field
+ * @desc    Generate field text (non-streaming)
+ * @access  Private (ADMIN, PRACTITIONER)
+ * @body    { fieldType: string, context?: object, language?: 'en' | 'no' }
+ */
+router.post('/generate-field',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  aiController.generateField
+);
+
 export default router;
