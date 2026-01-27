@@ -169,3 +169,147 @@ A clickable spine segment system for rapid palpation documentation:
 - [ ] Quick-tap mode: double-tap segment for default direction
 - [ ] Favorites: pin frequently used segment+direction combos
 - [ ] AI suggestion: highlight likely segments based on chief complaint
+
+---
+
+## Session 2026-01-27: Database & Frontend Fixes
+
+### Database Schema Applied
+The following were added to make auth work:
+```sql
+-- Run these if starting fresh:
+ALTER TABLE users ADD COLUMN password_hash VARCHAR(255);
+ALTER TABLE users ADD COLUMN failed_login_attempts INTEGER DEFAULT 0;
+ALTER TABLE users ADD COLUMN locked_until TIMESTAMP;
+ALTER TABLE users ADD COLUMN email_verified BOOLEAN DEFAULT false;
+
+CREATE TABLE sessions (
+  id VARCHAR(64) PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES users(id),
+  expires_at TIMESTAMP NOT NULL,
+  ip_address VARCHAR(45),
+  user_agent TEXT,
+  fresh BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE scheduled_job_logs (
+  id SERIAL PRIMARY KEY,
+  job_name VARCHAR(100) NOT NULL,
+  job_id VARCHAR(100),
+  status VARCHAR(20) NOT NULL,
+  started_at TIMESTAMP DEFAULT NOW(),
+  completed_at TIMESTAMP,
+  error_message TEXT
+);
+
+-- Auth functions
+CREATE OR REPLACE FUNCTION record_successful_login(user_uuid UUID)
+RETURNS void AS $$ UPDATE users SET failed_login_attempts = 0, locked_until = NULL WHERE id = user_uuid; $$ LANGUAGE SQL;
+
+CREATE OR REPLACE FUNCTION record_failed_login(user_uuid UUID)
+RETURNS void AS $$ UPDATE users SET failed_login_attempts = failed_login_attempts + 1 WHERE id = user_uuid; $$ LANGUAGE SQL;
+```
+
+Migration file: `database/migrations/005_complete_auth_schema.sql`
+Demo users seed: `database/seeds/demo-users.sql`
+
+### Test Credentials
+| Email | Password | Role |
+|-------|----------|------|
+| admin@chiroclickcrm.no | admin123 | ADMIN |
+| kiropraktor@chiroclickcrm.no | admin123 | PRACTITIONER |
+
+### Frontend Dev Mode
+The frontend can run WITHOUT Clerk by using a placeholder key in `.env`:
+```env
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_key_here
+```
+- `main.jsx` - Detects placeholder key and skips ClerkProvider
+- `App.jsx` - Renders without SignedIn/SignedOut wrappers in dev mode
+- `api.js` - Skips 401 redirect to /sign-in in dev mode
+
+### Stub Components Created
+These are placeholders to prevent import errors:
+| Component | Path |
+|-----------|------|
+| AISettings | `frontend/src/components/AISettings.jsx` |
+| SchedulerDecisions | `frontend/src/components/scheduler/SchedulerDecisions.jsx` |
+| AppointmentImporter | `frontend/src/components/scheduler/AppointmentImporter.jsx` |
+| TodaysMessages | `frontend/src/components/scheduler/TodaysMessages.jsx` |
+| ExaminationComponents | `frontend/src/components/examination/index.jsx` |
+| ExercisePanel | `frontend/src/components/exercises/index.jsx` |
+
+### Stub Backend Routes Created
+| Route | Path |
+|-------|------|
+| scheduler | `backend/src/routes/scheduler.js` |
+| kiosk | `backend/src/routes/kiosk.js` |
+| crm | `backend/src/routes/crm.js` |
+| automations | `backend/src/routes/automations.js` |
+| bulkCommunication | `backend/src/routes/bulkCommunication.js` |
+| exercises | `backend/src/routes/exercises.js` |
+| notifications | `backend/src/routes/notifications.js` |
+| patientPortal | `backend/src/routes/patientPortal.js` |
+
+### Clinical Settings System (NEW)
+Full backend API for clinical documentation preferences:
+
+**Files:**
+- `backend/src/services/clinicalSettings.js` - Settings service with defaults
+- `backend/src/controllers/clinicalSettings.js` - CRUD controller
+- `backend/src/routes/clinicalSettings.js` - API routes
+
+**API Endpoints:**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /clinical-settings | Get org settings |
+| GET | /clinical-settings/defaults | Get default values |
+| PATCH | /clinical-settings | Update settings |
+| PUT | /clinical-settings/adjustment/style | Set Gonstead/Diversified |
+| POST | /clinical-settings/reset | Reset to defaults |
+
+**Settings Structure:**
+```javascript
+{
+  adjustment: {
+    style: 'gonstead' | 'diversified' | 'segment_listing',
+    gonstead: { useFullNotation, includeDirection, listings },
+    diversified: { useAnatomicalTerms, includeRestriction, terminology }
+  },
+  tests: {
+    orthopedic: { resultFormat: 'plus_minus' | 'pos_neg' | 'numeric' },
+    neurological: { reflexGrading: 'numeric' | 'plus_system' },
+    rom: { format: 'degrees' | 'percent' | 'descriptive' }
+  }
+}
+```
+
+### Letter Templates Added to AI Training
+14 Norwegian letter templates added to `ai-training/letters-training.jsonl`:
+- Headache referral letters
+- Exam declarations (studieattester)
+- Insurance reports
+- Referrals to neurologist, orthopedist, physiotherapy
+
+### Common Issues & Fixes
+| Issue | Fix |
+|-------|-----|
+| `useKeyboardShortcuts.js` parse error | File contains JSX - renamed to `.jsx` |
+| Duplicate `aiAPI` export | Remove first declaration at line ~470 in api.js |
+| Duplicate hook exports | Don't export both `default as X` and `X` |
+| Missing index.js for directory imports | Create `index.js` that re-exports from `index.jsx` |
+| 401 redirect loop in dev | Check `import.meta.env.DEV` before redirecting |
+
+### Running the System
+```bash
+# Docker (backend + db + redis)
+docker-compose up -d
+
+# Frontend (separate terminal)
+cd frontend && npm run dev
+
+# Access
+# Frontend: http://localhost:5173
+# Backend: http://localhost:3000
+```
