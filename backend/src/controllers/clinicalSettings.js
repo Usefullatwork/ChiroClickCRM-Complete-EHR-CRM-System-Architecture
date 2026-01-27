@@ -11,7 +11,7 @@ import logger from '../utils/logger.js';
  */
 export const getClinicalSettings = async (req, res) => {
   try {
-    const organizationId = req.user?.organization_id;
+    const organizationId = req.user?.organizationId;
 
     if (!organizationId) {
       return res.status(400).json({
@@ -41,7 +41,7 @@ export const getClinicalSettings = async (req, res) => {
  */
 export const updateClinicalSettings = async (req, res) => {
   try {
-    const organizationId = req.user?.organization_id;
+    const organizationId = req.user?.organizationId;
     const updates = req.body;
 
     if (!organizationId) {
@@ -76,7 +76,7 @@ export const updateClinicalSettings = async (req, res) => {
  */
 export const updateClinicalSettingsSection = async (req, res) => {
   try {
-    const organizationId = req.user?.organization_id;
+    const organizationId = req.user?.organizationId;
     const { section } = req.params;
     const sectionData = req.body;
 
@@ -120,7 +120,7 @@ export const updateClinicalSettingsSection = async (req, res) => {
  */
 export const resetClinicalSettings = async (req, res) => {
   try {
-    const organizationId = req.user?.organization_id;
+    const organizationId = req.user?.organizationId;
 
     if (!organizationId) {
       return res.status(400).json({
@@ -161,7 +161,7 @@ export const getDefaultClinicalSettings = async (req, res) => {
  */
 export const getAdjustmentNotationTemplates = async (req, res) => {
   try {
-    const organizationId = req.user?.organization_id;
+    const organizationId = req.user?.organizationId;
 
     if (!organizationId) {
       return res.status(400).json({
@@ -193,7 +193,7 @@ export const getAdjustmentNotationTemplates = async (req, res) => {
  */
 export const setAdjustmentStyle = async (req, res) => {
   try {
-    const organizationId = req.user?.organization_id;
+    const organizationId = req.user?.organizationId;
     const { style } = req.body;
 
     if (!organizationId) {
@@ -236,7 +236,7 @@ export const setAdjustmentStyle = async (req, res) => {
  */
 export const updateTestSettings = async (req, res) => {
   try {
-    const organizationId = req.user?.organization_id;
+    const organizationId = req.user?.organizationId;
     const { testType } = req.params;
     const testSettings = req.body;
 
@@ -280,7 +280,7 @@ export const updateTestSettings = async (req, res) => {
  */
 export const updateLetterSettings = async (req, res) => {
   try {
-    const organizationId = req.user?.organization_id;
+    const organizationId = req.user?.organizationId;
     const letterSettings = req.body;
 
     if (!organizationId) {
