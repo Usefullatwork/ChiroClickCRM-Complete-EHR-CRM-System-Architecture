@@ -21,7 +21,8 @@ export const spellCheck = async (req, res) => {
     res.json(result);
   } catch (error) {
     logger.error('Error in spellCheck controller:', error);
-    res.status(500).json({ error: error.message || 'Spell check failed' });
+    // Return graceful fallback instead of 500
+    res.json({ original: req.body.text, corrected: req.body.text, hasChanges: false, aiAvailable: false, error: error.message });
   }
 };
 
@@ -41,7 +42,8 @@ export const generateSOAPSuggestion = async (req, res) => {
     res.json(result);
   } catch (error) {
     logger.error('Error in generateSOAPSuggestion controller:', error);
-    res.status(500).json({ error: error.message || 'SOAP suggestion failed' });
+    // Return graceful fallback instead of 500
+    res.json({ section: req.body.section, chiefComplaint: req.body.chiefComplaint, suggestion: '', aiAvailable: false, error: error.message });
   }
 };
 
@@ -57,7 +59,8 @@ export const suggestDiagnosis = async (req, res) => {
     res.json(result);
   } catch (error) {
     logger.error('Error in suggestDiagnosis controller:', error);
-    res.status(500).json({ error: error.message || 'Diagnosis suggestion failed' });
+    // Return graceful fallback instead of 500
+    res.json({ suggestion: '', codes: [], reasoning: '', aiAvailable: false, error: error.message });
   }
 };
 
@@ -73,7 +76,17 @@ export const analyzeRedFlags = async (req, res) => {
     res.json(result);
   } catch (error) {
     logger.error('Error in analyzeRedFlags controller:', error);
-    res.status(500).json({ error: error.message || 'Red flag analysis failed' });
+    // Return graceful fallback instead of 500
+    res.json({
+      analysis: 'Analyse utilgjengelig. Vennligst gjennomgå manuelt.',
+      riskLevel: 'UNKNOWN',
+      canTreat: true,
+      recommendReferral: false,
+      detectedFlags: [],
+      medicationWarnings: [],
+      aiAvailable: false,
+      error: error.message
+    });
   }
 };
 
@@ -89,7 +102,8 @@ export const generateClinicalSummary = async (req, res) => {
     res.json(result);
   } catch (error) {
     logger.error('Error in generateClinicalSummary controller:', error);
-    res.status(500).json({ error: error.message || 'Clinical summary generation failed' });
+    // Return graceful fallback instead of 500
+    res.json({ summary: '', encounterId: req.body.encounter?.id, aiAvailable: false, error: error.message });
   }
 };
 
@@ -105,7 +119,8 @@ export const recordOutcomeFeedback = async (req, res) => {
     res.json(result);
   } catch (error) {
     logger.error('Error in recordOutcomeFeedback controller:', error);
-    res.status(500).json({ error: error.message || 'Outcome feedback recording failed' });
+    // Return graceful fallback instead of 500
+    res.json({ success: false, error: error.message });
   }
 };
 
@@ -115,7 +130,8 @@ export const getAIStatus = async (req, res) => {
     res.json(status);
   } catch (error) {
     logger.error('Error in getAIStatus controller:', error);
-    res.status(500).json({ error: 'Failed to get AI status' });
+    // Return graceful fallback instead of 500
+    res.json({ provider: 'unknown', available: false, enabled: false, error: error.message });
   }
 };
 
