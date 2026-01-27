@@ -67,3 +67,6 @@ backup/
 *.xlsx
 *.csv
 exports/
+
+# AI model cache (large binary files)
+ai-training/models-cache/

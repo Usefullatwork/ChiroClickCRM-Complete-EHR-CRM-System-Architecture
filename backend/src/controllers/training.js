@@ -6,7 +6,114 @@
 import * as ollamaTraining from '../services/ollamaTraining.js';
 import * as sindreJournalParser from '../services/sindreJournalParser.js';
 import * as sigrunJournalParser from '../services/sigrunJournalParser.js';
+import * as trainingService from '../services/training.js';
 import logger from '../utils/logger.js';
+
+// ============================================================================
+// MODEL MANAGEMENT (new endpoints)
+// ============================================================================
+
+/**
+ * Get current model status
+ */
+export const getModelStatus = async (req, res) => {
+  try {
+    const status = await trainingService.getStatus();
+    res.json({ success: true, data: status });
+  } catch (error) {
+    logger.error('Error getting model status:', error);
+    res.status(500).json({ success: false, error: 'Failed to get model status' });
+  }
+};
+
+/**
+ * Get training data file listing
+ */
+export const getTrainingData = async (req, res) => {
+  try {
+    const data = trainingService.getTrainingData();
+    res.json({ success: true, data });
+  } catch (error) {
+    logger.error('Error getting training data:', error);
+    res.status(500).json({ success: false, error: 'Failed to get training data' });
+  }
+};
+
+/**
+ * Add new JSONL examples
+ */
+export const addExamples = async (req, res) => {
+  try {
+    const { jsonlContent, targetFile } = req.body;
+    if (!jsonlContent) {
+      return res.status(400).json({ success: false, error: 'Missing jsonlContent' });
+    }
+    const result = trainingService.addExamples(jsonlContent, targetFile);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error('Error adding examples:', error);
+    res.status(500).json({ success: false, error: 'Failed to add examples' });
+  }
+};
+
+/**
+ * Rebuild Modelfiles and re-create Ollama models
+ */
+export const rebuildModels = async (req, res) => {
+  try {
+    logger.info('Starting model rebuild...');
+    const result = await trainingService.rebuild();
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error('Error rebuilding models:', error);
+    res.status(500).json({ success: false, error: 'Failed to rebuild models' });
+  }
+};
+
+/**
+ * Backup models to project folder
+ */
+export const backupModels = async (req, res) => {
+  try {
+    const result = await trainingService.backup();
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error('Error backing up models:', error);
+    res.status(500).json({ success: false, error: 'Failed to backup models' });
+  }
+};
+
+/**
+ * Restore models from backup
+ */
+export const restoreModels = async (req, res) => {
+  try {
+    const result = await trainingService.restore();
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error('Error restoring models:', error);
+    res.status(500).json({ success: false, error: 'Failed to restore models' });
+  }
+};
+
+/**
+ * Test a model with a prompt
+ */
+export const testModel = async (req, res) => {
+  try {
+    const { model } = req.params;
+    const { prompt } = req.query;
+    const result = await trainingService.testModel(model, prompt);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error('Error testing model:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+// ============================================================================
+// LEGACY PIPELINE
+// ============================================================================
 
 /**
  * Run full training pipeline
@@ -429,6 +536,13 @@ export const detectPractitionerStyle = async (req, res) => {
 };
 
 export default {
+  getModelStatus,
+  getTrainingData,
+  addExamples,
+  rebuildModels,
+  backupModels,
+  restoreModels,
+  testModel,
   runTrainingPipeline,
   fetchDocuments,
   parseDocuments,

@@ -1,10 +1,10 @@
 /**
  * Training Management Page
- * Manage AI model training pipeline
+ * Manage AI model training pipeline and model lifecycle
  */
 
 import { useState } from 'react'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Brain,
   FolderOpen,
@@ -17,109 +17,79 @@ import {
   XCircle,
   Clock,
   AlertCircle,
-  Download
+  Download,
+  Upload,
+  RefreshCw,
+  HardDrive,
+  TestTube,
+  Plus,
+  Server
 } from 'lucide-react'
-import apiClient from '../services/api'
+import { trainingAPI } from '../services/api'
 import { useTranslation } from '../i18n'
 
 export default function Training() {
   const { t } = useTranslation('common')
-  const [googleDriveFolderId, setGoogleDriveFolderId] = useState('')
-  const [modelName, setModelName] = useState('')
-  const [temperature, setTemperature] = useState(0.7)
-  const [systemPrompt, setSystemPrompt] = useState('Du er en erfaren norsk kiropraktor som hjelper med journalføring og klinisk vurdering. Dine svar er profesjonelle, presise og basert på klinisk erfaring.')
-  const [pipelineResults, setPipelineResults] = useState(null)
+  const queryClient = useQueryClient()
+  const [newExamples, setNewExamples] = useState('')
+  const [testPrompt, setTestPrompt] = useState('')
+  const [selectedTestModel, setSelectedTestModel] = useState('chiro-no')
+  const [testResult, setTestResult] = useState(null)
 
-  // Run full training pipeline
-  const runPipelineMutation = useMutation({
-    mutationFn: async (data) => {
-      const response = await apiClient.post('/training/pipeline', data)
-      return response.data
+  // Queries
+  const statusQuery = useQuery({
+    queryKey: ['training-status'],
+    queryFn: async () => {
+      const res = await trainingAPI.getStatus()
+      return res.data.data
     },
-    onSuccess: (data) => {
-      setPipelineResults(data.data)
-    }
+    refetchInterval: 30000,
   })
 
-  // Individual step mutations
-  const fetchDocsMutation = useMutation({
-    mutationFn: async (folderId) => {
-      const response = await apiClient.post('/training/fetch', { folderId })
-      return response.data
-    }
+  const dataQuery = useQuery({
+    queryKey: ['training-data'],
+    queryFn: async () => {
+      const res = await trainingAPI.getData()
+      return res.data.data
+    },
   })
 
-  const parseMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiClient.post('/training/parse')
-      return response.data
-    }
+  // Mutations
+  const rebuildMutation = useMutation({
+    mutationFn: () => trainingAPI.rebuild(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['training-status'] })
+    },
   })
 
-  const anonymizeMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiClient.post('/training/anonymize')
-      return response.data
-    }
+  const backupMutation = useMutation({
+    mutationFn: () => trainingAPI.backup(),
   })
 
-  const datasetMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiClient.post('/training/dataset')
-      return response.data
-    }
+  const restoreMutation = useMutation({
+    mutationFn: () => trainingAPI.restore(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['training-status'] })
+    },
   })
 
-  const trainMutation = useMutation({
-    mutationFn: async (modelName) => {
-      const response = await apiClient.post('/training/train', { modelName })
-      return response.data
-    }
+  const addExamplesMutation = useMutation({
+    mutationFn: (jsonlContent) => trainingAPI.addExamples(jsonlContent),
+    onSuccess: () => {
+      setNewExamples('')
+      queryClient.invalidateQueries({ queryKey: ['training-data'] })
+    },
   })
 
-  const handleRunFullPipeline = () => {
-    if (!googleDriveFolderId || !modelName) {
-      alert(t('provideFolderAndModel'))
-      return
-    }
+  const testMutation = useMutation({
+    mutationFn: ({ model, prompt }) => trainingAPI.testModel(model, prompt),
+    onSuccess: (res) => {
+      setTestResult(res.data.data)
+    },
+  })
 
-    runPipelineMutation.mutate({
-      googleDriveFolderId,
-      modelName,
-      options: {
-        temperature,
-        systemPrompt
-      }
-    })
-  }
-
-  const handleRunStep = (step) => {
-    switch (step) {
-      case 'fetch':
-        if (!googleDriveFolderId) {
-          alert(t('provideFolderId'))
-          return
-        }
-        fetchDocsMutation.mutate(googleDriveFolderId)
-        break
-      case 'parse':
-        parseMutation.mutate()
-        break
-      case 'anonymize':
-        anonymizeMutation.mutate()
-        break
-      case 'dataset':
-        datasetMutation.mutate()
-        break
-      case 'train':
-        if (!modelName) {
-          alert(t('provideModelName'))
-          return
-        }
-        trainMutation.mutate(modelName)
-        break
-    }
-  }
+  const status = statusQuery.data
+  const trainingData = dataQuery.data
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -127,286 +97,296 @@ export default function Training() {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <Brain className="w-8 h-8 text-blue-600" />
-          <h1 className="text-3xl font-bold">{t('aiTrainingPipeline')}</h1>
+          <h1 className="text-3xl font-bold">AI Model Management</h1>
         </div>
         <p className="text-gray-600">
-          {t('trainCustomModel')}
+          Administrer AI-modeller, treningsdata og modellbygging for ChiroClick.
         </p>
       </div>
 
-      {/* Configuration */}
+      {/* Model Status */}
       <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-xl font-bold mb-4">{t('configuration')}</h2>
-
-        <div className="space-y-4">
-          {/* Google Drive Folder ID */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('googleDriveFolderId')}
-            </label>
-            <input
-              type="text"
-              value={googleDriveFolderId}
-              onChange={(e) => setGoogleDriveFolderId(e.target.value)}
-              placeholder={t('folderIdPlaceholder')}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              {t('folderIdHint')}
-            </p>
-          </div>
-
-          {/* Model Name */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('modelName')}
-            </label>
-            <input
-              type="text"
-              value={modelName}
-              onChange={(e) => setModelName(e.target.value)}
-              placeholder="chiroclickcrm-custom"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              {t('modelNameHint')}
-            </p>
-          </div>
-
-          {/* Temperature */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('temperature')}: {temperature}
-            </label>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.1"
-              value={temperature}
-              onChange={(e) => setTemperature(parseFloat(e.target.value))}
-              className="w-full"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              {t('temperatureHint')}
-            </p>
-          </div>
-
-          {/* System Prompt */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('systemPrompt')}
-            </label>
-            <textarea
-              value={systemPrompt}
-              onChange={(e) => setSystemPrompt(e.target.value)}
-              rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            <Server className="w-5 h-5" />
+            Modellstatus
+          </h2>
+          <button
+            onClick={() => statusQuery.refetch()}
+            className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+          >
+            <RefreshCw className={`w-4 h-4 inline mr-1 ${statusQuery.isFetching ? 'animate-spin' : ''}`} />
+            Oppdater
+          </button>
         </div>
 
-        {/* Run Pipeline Button */}
-        <div className="mt-6">
-          <button
-            onClick={handleRunFullPipeline}
-            disabled={runPipelineMutation.isPending}
-            className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed font-medium flex items-center justify-center gap-2"
+        {statusQuery.isLoading ? (
+          <div className="text-gray-500">Laster...</div>
+        ) : statusQuery.isError ? (
+          <div className="text-red-500">Feil ved henting av status</div>
+        ) : (
+          <>
+            <div className="flex items-center gap-2 mb-4">
+              <div className={`w-3 h-3 rounded-full ${status?.ollamaRunning ? 'bg-green-500' : 'bg-red-500'}`} />
+              <span className="text-sm">
+                Ollama: {status?.ollamaRunning ? 'Kjører' : 'Ikke tilgjengelig'}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {status?.models && Object.entries(status.models).map(([name, info]) => (
+                <div
+                  key={name}
+                  className={`border rounded-lg p-3 ${info.exists ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    {info.exists ? (
+                      <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    ) : (
+                      <XCircle className="w-4 h-4 text-red-600" />
+                    )}
+                    <span className="font-medium text-sm">{name}</span>
+                  </div>
+                  <p className="text-xs text-gray-600">
+                    {info.exists ? (info.size || 'Installert') : 'Mangler'}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {status?.missingModels > 0 && (
+              <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  <AlertCircle className="w-4 h-4 inline mr-1" />
+                  {status.missingModels} modell(er) mangler. Bruk &quot;Rebuild&quot; eller &quot;Restore&quot; nedenfor.
+                </p>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {/* Rebuild */}
+        <ActionCard
+          icon={<RefreshCw className="w-5 h-5" />}
+          title="Rebuild Models"
+          description="Regenerer Modelfiles fra treningsdata og opprett Ollama-modeller på nytt."
+          buttonText={rebuildMutation.isPending ? 'Bygger...' : 'Rebuild'}
+          onClick={() => rebuildMutation.mutate()}
+          disabled={rebuildMutation.isPending}
+          result={rebuildMutation.data?.data}
+          error={rebuildMutation.error}
+          color="blue"
+        />
+
+        {/* Backup */}
+        <ActionCard
+          icon={<Download className="w-5 h-5" />}
+          title="Backup Models"
+          description="Eksporter modeller til prosjektmappen for overføring til annen maskin."
+          buttonText={backupMutation.isPending ? 'Eksporterer...' : 'Backup'}
+          onClick={() => backupMutation.mutate()}
+          disabled={backupMutation.isPending}
+          result={backupMutation.data?.data}
+          error={backupMutation.error}
+          color="green"
+        />
+
+        {/* Restore */}
+        <ActionCard
+          icon={<Upload className="w-5 h-5" />}
+          title="Restore Models"
+          description="Gjenopprett modeller fra backup uten å laste ned base-modeller på nytt."
+          buttonText={restoreMutation.isPending ? 'Gjenoppretter...' : 'Restore'}
+          onClick={() => restoreMutation.mutate()}
+          disabled={restoreMutation.isPending}
+          result={restoreMutation.data?.data}
+          error={restoreMutation.error}
+          color="purple"
+        />
+      </div>
+
+      {/* Training Data */}
+      <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <Database className="w-5 h-5" />
+          Treningsdata
+        </h2>
+
+        {dataQuery.isLoading ? (
+          <div className="text-gray-500">Laster...</div>
+        ) : (
+          <>
+            <div className="mb-4">
+              <span className="text-2xl font-bold text-blue-600">
+                {trainingData?.totalExamples || 0}
+              </span>
+              <span className="text-gray-600 ml-2">totale eksempler</span>
+            </div>
+
+            <div className="space-y-2 mb-6">
+              {trainingData?.files?.map((file) => (
+                <div key={file.name} className="flex items-center justify-between border rounded-lg p-3">
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-gray-500" />
+                    <span className="text-sm font-medium">{file.name}</span>
+                  </div>
+                  <div className="flex items-center gap-4 text-sm text-gray-600">
+                    <span>{file.examples} eksempler</span>
+                    <span>{file.sizeKB} KB</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Add Examples */}
+            <div className="border-t pt-4">
+              <h3 className="font-medium mb-2 flex items-center gap-2">
+                <Plus className="w-4 h-4" />
+                Legg til eksempler (JSONL-format)
+              </h3>
+              <textarea
+                value={newExamples}
+                onChange={(e) => setNewExamples(e.target.value)}
+                rows={4}
+                placeholder={'{"prompt": "Skriv SOAP-notat for...", "response": "S: ..."}\n{"prompt": "...", "response": "..."}'}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+              />
+              <div className="flex items-center justify-between mt-2">
+                <p className="text-xs text-gray-500">
+                  En JSON-linje per eksempel. Felt: prompt, response/completion.
+                </p>
+                <button
+                  onClick={() => addExamplesMutation.mutate(newExamples)}
+                  disabled={!newExamples.trim() || addExamplesMutation.isPending}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
+                >
+                  {addExamplesMutation.isPending ? 'Legger til...' : 'Legg til'}
+                </button>
+              </div>
+              {addExamplesMutation.isSuccess && (
+                <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-sm text-green-800">
+                  Lagt til {addExamplesMutation.data?.data?.data?.added || 0} eksempler.
+                  {addExamplesMutation.data?.data?.data?.errors?.length > 0 && (
+                    <span className="text-yellow-700 ml-2">
+                      {addExamplesMutation.data.data.data.errors.length} feil.
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Test Model */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <TestTube className="w-5 h-5" />
+          Test modell
+        </h2>
+
+        <div className="flex gap-3 mb-3">
+          <select
+            value={selectedTestModel}
+            onChange={(e) => setSelectedTestModel(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           >
-            {runPipelineMutation.isPending ? (
-              <>
-                <Clock className="w-5 h-5 animate-spin" />
-                {t('trainingInProgress')}
-              </>
+            <option value="chiro-no">chiro-no (Primær)</option>
+            <option value="chiro-fast">chiro-fast (Rask)</option>
+            <option value="chiro-norwegian">chiro-norwegian (Norsk)</option>
+            <option value="chiro-medical">chiro-medical (Medisinsk)</option>
+          </select>
+        </div>
+
+        <div className="flex gap-3">
+          <input
+            type="text"
+            value={testPrompt}
+            onChange={(e) => setTestPrompt(e.target.value)}
+            placeholder="Skriv en test-prompt (eller la blank for standard)"
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            onClick={() => testMutation.mutate({ model: selectedTestModel, prompt: testPrompt || undefined })}
+            disabled={testMutation.isPending}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 text-sm whitespace-nowrap"
+          >
+            {testMutation.isPending ? (
+              <><Clock className="w-4 h-4 inline mr-1 animate-spin" /> Tester...</>
             ) : (
-              <>
-                <Play className="w-5 h-5" />
-                {t('runFullPipeline')}
-              </>
+              <><Play className="w-4 h-4 inline mr-1" /> Kjør test</>
             )}
           </button>
         </div>
-      </div>
 
-      {/* Pipeline Steps */}
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-xl font-bold mb-4">{t('pipelineSteps')}</h2>
-
-        <div className="space-y-3">
-          {/* Step 1: Fetch */}
-          <PipelineStep
-            icon={<FolderOpen className="w-5 h-5" />}
-            title={t('fetchDocuments')}
-            description={t('fetchDocumentsDesc')}
-            status={fetchDocsMutation.isPending ? 'running' : fetchDocsMutation.isSuccess ? 'success' : 'pending'}
-            result={fetchDocsMutation.data?.data}
-            onRun={() => handleRunStep('fetch')}
-            disabled={!googleDriveFolderId}
-          />
-
-          {/* Step 2: Parse */}
-          <PipelineStep
-            icon={<FileText className="w-5 h-5" />}
-            title={t('parseDocuments')}
-            description={t('parseDocumentsDesc')}
-            status={parseMutation.isPending ? 'running' : parseMutation.isSuccess ? 'success' : 'pending'}
-            result={parseMutation.data?.data}
-            onRun={() => handleRunStep('parse')}
-          />
-
-          {/* Step 3: Anonymize */}
-          <PipelineStep
-            icon={<ShieldCheck className="w-5 h-5" />}
-            title={t('anonymizeData')}
-            description={t('anonymizeDataDesc')}
-            status={anonymizeMutation.isPending ? 'running' : anonymizeMutation.isSuccess ? 'success' : 'pending'}
-            result={anonymizeMutation.data?.data}
-            onRun={() => handleRunStep('anonymize')}
-          />
-
-          {/* Step 4: Dataset */}
-          <PipelineStep
-            icon={<Database className="w-5 h-5" />}
-            title={t('createDataset')}
-            description={t('createDatasetDesc')}
-            status={datasetMutation.isPending ? 'running' : datasetMutation.isSuccess ? 'success' : 'pending'}
-            result={datasetMutation.data?.data}
-            onRun={() => handleRunStep('dataset')}
-          />
-
-          {/* Step 5: Train */}
-          <PipelineStep
-            icon={<Cpu className="w-5 h-5" />}
-            title={t('trainModel')}
-            description={t('trainModelDesc')}
-            status={trainMutation.isPending ? 'running' : trainMutation.isSuccess ? 'success' : 'pending'}
-            result={trainMutation.data?.data}
-            onRun={() => handleRunStep('train')}
-            disabled={!modelName}
-          />
-        </div>
-      </div>
-
-      {/* Full Pipeline Results */}
-      {pipelineResults && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center gap-3 mb-4">
-            {pipelineResults.success ? (
-              <CheckCircle2 className="w-6 h-6 text-green-600" />
-            ) : (
-              <XCircle className="w-6 h-6 text-red-600" />
-            )}
-            <h2 className="text-xl font-bold">
-              {pipelineResults.success ? t('trainingComplete') : t('trainingFailed')}
-            </h2>
+        {testResult && (
+          <div className="mt-4 border rounded-lg p-4 bg-gray-50">
+            <div className="text-xs text-gray-500 mb-1">
+              Modell: {testResult.model} | Prompt: {testResult.prompt}
+            </div>
+            <div className="whitespace-pre-wrap text-sm font-mono">
+              {testResult.response}
+            </div>
           </div>
+        )}
 
-          {pipelineResults.success && (
-            <div className="space-y-4">
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <p className="text-sm text-green-800">
-                  Model <strong>{pipelineResults.modelName}</strong> has been trained successfully!
-                </p>
-                <p className="text-sm text-green-700 mt-2">
-                  {t('duration')}: {pipelineResults.duration?.toFixed(2)}s
-                </p>
-              </div>
-
-              {/* Step Results */}
-              <div className="space-y-2">
-                {pipelineResults.steps?.map((step, idx) => (
-                  <div key={idx} className="border border-gray-200 rounded-lg p-3">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-medium capitalize">{step.step}</h4>
-                      <CheckCircle2 className="w-4 h-4 text-green-600" />
-                    </div>
-                    {step.totalDocuments && (
-                      <p className="text-sm text-gray-600 mt-1">
-                        {t('documents')}: {step.totalDocuments}
-                      </p>
-                    )}
-                    {step.total && (
-                      <p className="text-sm text-gray-600 mt-1">
-                        {t('processed')}: {step.total}
-                      </p>
-                    )}
-                    {step.examples && (
-                      <p className="text-sm text-gray-600 mt-1">
-                        {t('trainingExamples')}: {step.examples}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 className="font-medium text-blue-900 mb-2">{t('howToUseModel')}</h4>
-                <code className="block bg-white p-3 rounded border border-blue-200 text-sm">
-                  ollama run {pipelineResults.modelName}
-                </code>
-              </div>
-            </div>
-          )}
-
-          {pipelineResults.error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-sm text-red-800">
-                Error: {pipelineResults.error}
-              </p>
-            </div>
-          )}
-        </div>
-      )}
+        {testMutation.isError && (
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
+            Feil: {testMutation.error?.response?.data?.error || testMutation.error?.message}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
 
-// Pipeline Step Component
-function PipelineStep({ icon, title, description, status, result, onRun, disabled }) {
+// Action Card Component
+function ActionCard({ icon, title, description, buttonText, onClick, disabled, result, error, color }) {
+  const colorClasses = {
+    blue: 'bg-blue-600 hover:bg-blue-700',
+    green: 'bg-green-600 hover:bg-green-700',
+    purple: 'bg-purple-600 hover:bg-purple-700',
+  }
+
   return (
-    <div className={`border rounded-lg p-4 ${
-      status === 'success' ? 'border-green-200 bg-green-50' :
-      status === 'running' ? 'border-blue-200 bg-blue-50' :
-      'border-gray-200'
-    }`}>
-      <div className="flex items-start justify-between">
-        <div className="flex items-start gap-3 flex-1">
-          <div className={`p-2 rounded-lg ${
-            status === 'success' ? 'bg-green-100 text-green-600' :
-            status === 'running' ? 'bg-blue-100 text-blue-600' :
-            'bg-gray-100 text-gray-600'
-          }`}>
-            {icon}
-          </div>
-
-          <div className="flex-1">
-            <h3 className="font-medium text-gray-900">{title}</h3>
-            <p className="text-sm text-gray-600 mt-1">{description}</p>
-
-            {result && (
-              <div className="mt-2 text-sm text-gray-700">
-                {result.totalDocuments && <p>Documents: {result.totalDocuments}</p>}
-                {result.total && <p>Processed: {result.total}</p>}
-                {result.success && <p>Success: {result.success}</p>}
-                {result.examples && <p>Examples: {result.examples}</p>}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {status === 'success' && <CheckCircle2 className="w-5 h-5 text-green-600" />}
-          {status === 'running' && <Clock className="w-5 h-5 text-blue-600 animate-spin" />}
-
-          <button
-            onClick={onRun}
-            disabled={disabled || status === 'running'}
-            className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Run
-          </button>
-        </div>
+    <div className="bg-white rounded-lg shadow p-5">
+      <div className="flex items-center gap-2 mb-2">
+        <div className="p-2 bg-gray-100 rounded-lg">{icon}</div>
+        <h3 className="font-bold">{title}</h3>
       </div>
+      <p className="text-sm text-gray-600 mb-4">{description}</p>
+      <button
+        onClick={onClick}
+        disabled={disabled}
+        className={`w-full px-4 py-2 text-white rounded-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium ${colorClasses[color]}`}
+      >
+        {buttonText}
+      </button>
+
+      {result && (
+        <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded text-xs text-green-800">
+          {result.success !== false ? 'OK' : 'Feil'}
+          {result.steps && (
+            <span className="ml-1">
+              ({result.steps.filter(s => s.success).length}/{result.steps.length} steg)
+            </span>
+          )}
+          {result.results && (
+            <span className="ml-1">
+              ({result.results.filter(r => r.success).length}/{result.results.length} modeller)
+            </span>
+          )}
+        </div>
+      )}
+
+      {error && (
+        <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-800">
+          {error.response?.data?.error || error.message}
+        </div>
+      )}
     </div>
   )
 }

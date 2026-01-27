@@ -37,8 +37,23 @@ if %errorlevel% neq 0 (
 echo OK - Ollama server kjoerer.
 echo.
 
-REM ---- Step 3: Pull base models ----
-echo [3/6] Laster ned base-modeller (dette kan ta lang tid)...
+REM ---- Step 3: Generate Modelfiles from training data ----
+echo [3/7] Genererer Modelfiles fra treningsdata...
+where node >nul 2>nul
+if %errorlevel% equ 0 (
+    node "%~dp0scripts\build-modelfiles.js"
+    if %errorlevel% equ 0 (
+        echo OK - Modelfiles generert med treningseksempler.
+    ) else (
+        echo ADVARSEL: Modelfile-generering feilet. Bruker eksisterende Modelfiles.
+    )
+) else (
+    echo ADVARSEL: Node.js ikke funnet. Bruker eksisterende Modelfiles.
+)
+echo.
+
+REM ---- Step 4: Pull base models ----
+echo [4/7] Laster ned base-modeller (dette kan ta lang tid)...
 echo.
 
 set "PULL_ERRORS=0"
@@ -90,8 +105,8 @@ if %PULL_ERRORS% gtr 0 (
 )
 echo.
 
-REM ---- Step 4: Build custom models ----
-echo [4/6] Bygger tilpassede ChiroClick-modeller...
+REM ---- Step 5: Build custom models ----
+echo [5/7] Bygger tilpassede ChiroClick-modeller...
 echo.
 
 set "BUILD_ERRORS=0"
@@ -144,8 +159,8 @@ echo.
 echo Byggeresultat: %BUILD_SUCCESS% OK, %BUILD_ERRORS% feilet.
 echo.
 
-REM ---- Step 5: Test each model ----
-echo [5/6] Tester modellene med en enkel prompt...
+REM ---- Step 6: Test each model ----
+echo [6/7] Tester modellene med en enkel prompt...
 echo.
 
 set "TEST_ERRORS=0"
@@ -163,8 +178,8 @@ for %%M in (chiro-no chiro-fast chiro-norwegian chiro-medical) do (
     echo.
 )
 
-REM ---- Step 6: Disk space report ----
-echo [6/6] Diskplassbruk for Ollama-modeller...
+REM ---- Step 7: Disk space report ----
+echo [7/7] Diskplassbruk for Ollama-modeller...
 echo.
 ollama list
 echo.

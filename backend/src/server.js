@@ -137,7 +137,8 @@ app.get(`/api/${API_VERSION}`, (req, res) => {
       scheduler: `/api/${API_VERSION}/scheduler`,
       notifications: `/api/${API_VERSION}/notifications`,
       spineTemplates: `/api/${API_VERSION}/spine-templates`,
-      clinicalSettings: `/api/${API_VERSION}/clinical-settings`
+      clinicalSettings: `/api/${API_VERSION}/clinical-settings`,
+      training: `/api/${API_VERSION}/training`
     }
   });
 });

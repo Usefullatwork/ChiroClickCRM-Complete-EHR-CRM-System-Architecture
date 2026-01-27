@@ -713,6 +713,17 @@ export const clinicalSettingsAPI = {
   updateLetterSettings: (settings) => apiClient.patch('/clinical-settings/letters', settings),
 }
 
+// AI Training Management
+export const trainingAPI = {
+  getStatus: () => apiClient.get('/training/status'),
+  getData: () => apiClient.get('/training/data'),
+  addExamples: (jsonlContent, targetFile) => apiClient.post('/training/add-examples', { jsonlContent, targetFile }),
+  rebuild: () => apiClient.post('/training/rebuild'),
+  backup: () => apiClient.post('/training/backup'),
+  restore: () => apiClient.post('/training/restore'),
+  testModel: (model, prompt) => apiClient.get(`/training/test/${model}`, { params: { prompt } }),
+}
+
 // AI Service
 export const aiAPI = {
   getStatus: () => apiClient.get('/ai/status'),
