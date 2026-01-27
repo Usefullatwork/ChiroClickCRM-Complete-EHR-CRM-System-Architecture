@@ -21,21 +21,31 @@ const queryClient = new QueryClient({
 // Get Clerk publishable key from environment
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
-if (!clerkPubKey) {
+// Allow dev mode without Clerk
+const isDev = import.meta.env.DEV
+const useClerk = clerkPubKey && clerkPubKey !== 'pk_test_your_key_here'
+
+if (!useClerk && !isDev) {
   throw new Error('Missing Clerk Publishable Key')
 }
 
 // Initialize CSRF protection
 initializeCSRF()
 
+// Development mode provider that mocks Clerk context
+const DevModeProvider = ({ children }) => children
+
+const AuthProvider = useClerk ? ClerkProvider : DevModeProvider
+const authProps = useClerk ? { publishableKey: clerkPubKey } : {}
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <ClerkProvider publishableKey={clerkPubKey}>
+    <AuthProvider {...authProps}>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <App />
+          <App devMode={!useClerk} />
         </BrowserRouter>
       </QueryClientProvider>
-    </ClerkProvider>
+    </AuthProvider>
   </React.StrictMode>,
 )

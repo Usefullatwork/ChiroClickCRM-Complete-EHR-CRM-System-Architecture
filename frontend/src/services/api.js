@@ -146,8 +146,12 @@ apiClient.interceptors.response.use(
 
       switch (status) {
         case 401:
-          // Unauthorized - redirect to login
-          window.location.href = '/sign-in'
+          // Unauthorized - redirect to login (unless in dev mode)
+          if (!import.meta.env.DEV) {
+            window.location.href = '/sign-in'
+          } else {
+            console.warn('401 Unauthorized - skipping redirect in dev mode')
+          }
           break
         case 403:
           // Forbidden
@@ -466,26 +470,7 @@ export const authAPI = {
   resetPassword: (token, password) => apiClient.post('/auth/reset-password', { token, password }),
 }
 
-// AI Clinical Assistant
-export const aiAPI = {
-  // Get AI service status
-  getStatus: () => apiClient.get('/ai/status'),
-  // Generate SOAP note suggestions
-  generateSuggestions: (chiefComplaint, section = 'subjective') =>
-    apiClient.post('/ai/soap-suggestions', { chiefComplaint, section }),
-  // Suggest diagnosis codes based on clinical data
-  suggestDiagnosis: (soapData) =>
-    apiClient.post('/ai/suggest-diagnosis', soapData),
-  // Analyze for red flags
-  analyzeRedFlags: (patientData, soapData) =>
-    apiClient.post('/ai/analyze-red-flags', { patientData, soapData }),
-  // Generate clinical summary
-  generateSummary: (encounter) =>
-    apiClient.post('/ai/generate-summary', encounter),
-  // Spell check Norwegian text
-  spellCheck: (text) =>
-    apiClient.post('/ai/spell-check', { text }),
-}
+// AI Clinical Assistant - see aiAPI below (line ~730)
 
 // AI Feedback & Learning
 export const aiFeedbackAPI = {

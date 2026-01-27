@@ -13,7 +13,7 @@ export {
   useKeyboardShortcuts as useShortcuts,
   KeyboardShortcutsProvider,
   SHORTCUTS,
-} from './useKeyboardShortcuts';
+} from './useKeyboardShortcuts.jsx';
 
 // PWA / Offline Support
 export {
@@ -27,3 +27,14 @@ export {
   clearOffline,
   offlineFetch,
 } from './usePWA';
+
+// Clinical Preferences
+export {
+  default as useClinicalPreferences,
+  NOTATION_METHODS,
+} from './useClinicalPreferences';
+
+// Patient Intake (Kiosk data)
+export {
+  default as usePatientIntake,
+} from './usePatientIntake';

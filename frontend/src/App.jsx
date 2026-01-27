@@ -22,7 +22,7 @@ import Templates from './pages/Templates'
 import Settings from './pages/Settings'
 import NotFound from './pages/NotFound'
 
-function App() {
+function App({ devMode = false }) {
   return (
     <>
       <Toaster position="top-right" richColors closeButton />
@@ -31,14 +31,18 @@ function App() {
       <Route
         path="/"
         element={
-          <>
-            <SignedIn>
-              <DashboardLayout />
-            </SignedIn>
-            <SignedOut>
-              <RedirectToSignIn />
-            </SignedOut>
-          </>
+          devMode ? (
+            <DashboardLayout />
+          ) : (
+            <>
+              <SignedIn>
+                <DashboardLayout />
+              </SignedIn>
+              <SignedOut>
+                <RedirectToSignIn />
+              </SignedOut>
+            </>
+          )
         }
       >
         <Route index element={<Dashboard />} />
