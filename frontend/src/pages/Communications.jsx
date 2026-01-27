@@ -12,47 +12,15 @@ import {
   User,
   Filter,
   Mail,
-  Smartphone,
-  Calendar,
-  Stethoscope,
-  RefreshCw,
-  CreditCard,
-  Heart,
-  AlertTriangle,
-  Star,
-  ChevronDown
+  Smartphone
 } from 'lucide-react'
 import { communicationsAPI, patientsAPI } from '../services/api'
-import { formatDate, formatPhone } from '../lib/utils'
+import { formatPhone } from '../lib/utils'
+import { useTranslation, formatDate } from '../i18n'
 import toast from '../utils/toast'
-import {
-  TONES,
-  CATEGORIES,
-  TEMPLATES,
-  EMAIL_TEMPLATES,
-  getTemplatesByCategory,
-  getTemplatesByTone,
-  substituteVariables
-} from '../data/communicationTemplates'
-
-// Icon map for categories
-const categoryIcons = {
-  appointments: Calendar,
-  clinical: Stethoscope,
-  recalls: RefreshCw,
-  billing: CreditCard,
-  engagement: Heart,
-  urgent: AlertTriangle
-}
-
-// Get user's preferred language (would come from settings in production)
-const getLanguage = () => {
-  // Check for Norwegian browser language or use 'no' for Norwegian, 'en' for English
-  const browserLang = navigator.language || 'en'
-  return browserLang.startsWith('no') || browserLang.startsWith('nb') || browserLang.startsWith('nn') ? 'no' : 'en'
-}
 
 export default function Communications() {
+  const { t, lang } = useTranslation('communications')
   const queryClient = useQueryClient()
   const [activeTab, setActiveTab] = useState('compose')
   const [messageType, setMessageType] = useState('sms')
@@ -63,15 +31,6 @@ export default function Communications() {
   const [showPatientSearch, setShowPatientSearch] = useState(false)
   const [copied, setCopied] = useState(false)
   const [historyFilter, setHistoryFilter] = useState('')
-
-  // New state for template browser
-  const [selectedCategory, setSelectedCategory] = useState('all')
-  const [selectedTone, setSelectedTone] = useState('direct')
-  const [language, setLanguage] = useState(getLanguage())
-  const [favoriteTemplates, setFavoriteTemplates] = useState(() => {
-    const saved = localStorage.getItem('favoriteTemplates')
-    return saved ? JSON.parse(saved) : []
-  })
 
   // Fetch templates
   const { data: templatesResponse } = useQuery({
@@ -109,55 +68,7 @@ export default function Communications() {
   const remainingChars = maxSmsLength - message.length
   const smsCount = Math.ceil(message.length / maxSmsLength) || 1
 
-  // Get filtered templates based on category and tone
-  const getFilteredTemplates = () => {
-    let templateList = messageType === 'email' ? EMAIL_TEMPLATES : TEMPLATES
-
-    // Filter by category
-    if (selectedCategory !== 'all') {
-      templateList = templateList.filter(t => t.category === selectedCategory)
-    }
-
-    // Filter by tone
-    templateList = templateList.filter(t => t.tone === selectedTone)
-
-    return templateList
-  }
-
-  // Toggle favorite template
-  const toggleFavorite = (templateId) => {
-    const newFavorites = favoriteTemplates.includes(templateId)
-      ? favoriteTemplates.filter(id => id !== templateId)
-      : [...favoriteTemplates, templateId]
-    setFavoriteTemplates(newFavorites)
-    localStorage.setItem('favoriteTemplates', JSON.stringify(newFavorites))
-  }
-
-  // Apply template from new system
-  const applyLocalTemplate = (template) => {
-    setSelectedTemplate(template)
-
-    // Get content in selected language
-    const content = messageType === 'email'
-      ? template.body?.[language] || template.body?.en || ''
-      : template.content?.[language] || template.content?.en || ''
-
-    // Prepare variables from patient data
-    const variables = {}
-    if (selectedPatient) {
-      variables.firstName = selectedPatient.first_name
-      variables.lastName = selectedPatient.last_name
-      variables.fullName = `${selectedPatient.first_name} ${selectedPatient.last_name}`
-      variables.phone = formatPhone(selectedPatient.phone) || ''
-      variables.email = selectedPatient.email || ''
-    }
-
-    // Substitute variables
-    const finalContent = substituteVariables(content, variables)
-    setMessage(finalContent)
-  }
-
-  // Apply template (legacy API templates)
+  // Apply template
   const applyTemplate = (template) => {
     setSelectedTemplate(template)
     let content = template.content
@@ -197,21 +108,21 @@ export default function Communications() {
       setMessage('')
       setSelectedPatient(null)
       setSelectedTemplate(null)
-      toast.success(`${messageType.toUpperCase()} logged successfully! Copy the message and send manually.`)
+      toast.success(t('loggedSuccess').replace('{type}', messageType.toUpperCase()))
     },
     onError: (error) => {
-      toast.error(`Failed to log ${messageType}: ${error.response?.data?.message || error.message}`)
+      toast.error(`${t('logFailed').replace('{type}', messageType)}: ${error.response?.data?.message || error.message}`)
     },
   })
 
   const handleSend = () => {
     if (!selectedPatient) {
-      toast.warning('Please select a patient')
+      toast.warning(t('selectPatientWarning'))
       return
     }
 
     if (!message.trim()) {
-      toast.warning('Please enter a message')
+      toast.warning(t('enterMessageWarning'))
       return
     }
 
@@ -228,9 +139,9 @@ export default function Communications() {
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Communications</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">{t('title')}</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Send SMS and email messages to patients
+          {t('subtitle')}
         </p>
       </div>
 
@@ -247,7 +158,7 @@ export default function Communications() {
           >
             <div className="flex items-center gap-2">
               <MessageSquare className="w-4 h-4" />
-              Compose
+              {t('compose')}
             </div>
           </button>
           <button
@@ -260,7 +171,7 @@ export default function Communications() {
           >
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4" />
-              History
+              {t('history')}
             </div>
           </button>
         </nav>
@@ -274,7 +185,7 @@ export default function Communications() {
             {/* Message Type Selector */}
             <div className="bg-white rounded-lg border border-gray-200 p-6">
               <label className="block text-sm font-medium text-gray-700 mb-3">
-                Message Type
+                {t('messageType')}
               </label>
               <div className="flex gap-3">
                 <button
@@ -297,7 +208,7 @@ export default function Communications() {
                   }`}
                 >
                   <Mail className="w-5 h-5" />
-                  <span className="font-medium">Email</span>
+                  <span className="font-medium">{t('sendEmail').replace('Send ', '')}</span>
                 </button>
               </div>
             </div>
@@ -305,7 +216,7 @@ export default function Communications() {
             {/* Patient Selection */}
             <div className="bg-white rounded-lg border border-gray-200 p-6">
               <label className="block text-sm font-medium text-gray-700 mb-3">
-                Recipient
+                {t('recipient')}
               </label>
 
               {selectedPatient ? (
@@ -321,7 +232,7 @@ export default function Communications() {
                       <p className="text-xs text-gray-600">
                         {messageType === 'sms'
                           ? formatPhone(selectedPatient.phone)
-                          : selectedPatient.email || 'No email on file'}
+                          : selectedPatient.email || t('noEmailOnFile')}
                       </p>
                     </div>
                   </div>
@@ -337,7 +248,7 @@ export default function Communications() {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <input
                     type="text"
-                    placeholder="Search patients by name, phone, or email..."
+                    placeholder={t('searchPatients')}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={searchTerm}
                     onChange={(e) => {
@@ -352,7 +263,7 @@ export default function Communications() {
                     <div className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto">
                       {searchLoading ? (
                         <div className="p-4 text-center text-sm text-gray-500">
-                          Searching...
+                          {t('searching')}
                         </div>
                       ) : searchResults.length > 0 ? (
                         searchResults.map((patient) => (
@@ -375,7 +286,7 @@ export default function Communications() {
                         ))
                       ) : (
                         <div className="p-4 text-center text-sm text-gray-500">
-                          No patients found
+                          {t('noPatientsFound')}
                         </div>
                       )}
                     </div>
@@ -387,12 +298,12 @@ export default function Communications() {
             {/* Message Composer */}
             <div className="bg-white rounded-lg border border-gray-200 p-6">
               <label className="block text-sm font-medium text-gray-700 mb-3">
-                Message
+                {t('message')}
               </label>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder={`Type your ${messageType} message here...`}
+                placeholder={messageType === 'sms' ? t('typeMessageSms') : t('typeMessageEmail')}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                 rows={messageType === 'sms' ? 6 : 10}
               />
@@ -407,10 +318,12 @@ export default function Communications() {
                       ? 'text-orange-600'
                       : 'text-gray-500'
                   }`}>
-                    {remainingChars} characters remaining
+                    {t('charactersRemaining').replace('{count}', remainingChars)}
                   </span>
                   <span className="text-gray-500">
-                    {smsCount} SMS {smsCount > 1 ? 'messages' : 'message'}
+                    {smsCount > 1
+                      ? t('smsCountPlural').replace('{count}', smsCount)
+                      : t('smsCount').replace('{count}', smsCount)}
                   </span>
                 </div>
               )}
@@ -425,12 +338,12 @@ export default function Communications() {
                   {copied ? (
                     <>
                       <Check className="w-4 h-4 text-green-600" />
-                      <span className="text-green-600">Copied!</span>
+                      <span className="text-green-600">{t('copied')}</span>
                     </>
                   ) : (
                     <>
                       <Copy className="w-4 h-4" />
-                      Copy to Clipboard
+                      {t('copyToClipboard')}
                     </>
                   )}
                 </button>
@@ -440,183 +353,30 @@ export default function Communications() {
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Send className="w-4 h-4" />
-                  {sendMutation.isLoading ? 'Logging...' : 'Log Message'}
+                  {sendMutation.isLoading ? t('logging') : t('logMessage')}
                 </button>
               </div>
 
               {messageType === 'sms' && (
                 <p className="text-xs text-gray-500 mt-3">
-                  Note: Messages are logged in the system. Copy and send manually via your SMS provider.
+                  {t('smsNote')}
                 </p>
               )}
             </div>
           </div>
 
-          {/* Templates Sidebar - Enhanced */}
-          <div className="lg:col-span-1 space-y-4">
-            {/* Tone Selector */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
-                {language === 'no' ? 'Tone' : 'Tone'}
-              </label>
-              <div className="grid grid-cols-2 gap-2">
-                {Object.values(TONES).map((tone) => (
-                  <button
-                    key={tone.id}
-                    onClick={() => setSelectedTone(tone.id)}
-                    className={`px-3 py-2 text-xs font-medium rounded-lg border transition-colors ${
-                      selectedTone === tone.id
-                        ? 'border-blue-600 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
-                    }`}
-                    title={tone.description[language]}
-                  >
-                    {tone.name[language]}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Language Toggle */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
-                {language === 'no' ? 'Språk' : 'Language'}
-              </label>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setLanguage('no')}
-                  className={`flex-1 px-3 py-2 text-xs font-medium rounded-lg border transition-colors ${
-                    language === 'no'
-                      ? 'border-blue-600 bg-blue-50 text-blue-700'
-                      : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                  }`}
-                >
-                  🇳🇴 Norsk
-                </button>
-                <button
-                  onClick={() => setLanguage('en')}
-                  className={`flex-1 px-3 py-2 text-xs font-medium rounded-lg border transition-colors ${
-                    language === 'en'
-                      ? 'border-blue-600 bg-blue-50 text-blue-700'
-                      : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                  }`}
-                >
-                  🇬🇧 English
-                </button>
-              </div>
-            </div>
-
-            {/* Category Filter */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
-                {language === 'no' ? 'Kategori' : 'Category'}
-              </label>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() => setSelectedCategory('all')}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
-                    selectedCategory === 'all'
-                      ? 'border-blue-600 bg-blue-50 text-blue-700'
-                      : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                  }`}
-                >
-                  {language === 'no' ? 'Alle' : 'All'}
-                </button>
-                {Object.values(CATEGORIES).map((cat) => {
-                  const IconComponent = categoryIcons[cat.id] || FileText
-                  return (
-                    <button
-                      key={cat.id}
-                      onClick={() => setSelectedCategory(cat.id)}
-                      className={`flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
-                        selectedCategory === cat.id
-                          ? 'border-blue-600 bg-blue-50 text-blue-700'
-                          : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                      }`}
-                    >
-                      <IconComponent className="w-3 h-3" />
-                      {cat.name[language]}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-
-            {/* Template List */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
+          {/* Templates Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <h3 className="text-sm font-medium text-gray-900 mb-4 flex items-center gap-2">
                 <FileText className="w-4 h-4" />
-                {language === 'no' ? 'Maler' : 'Templates'}
-                <span className="text-xs text-gray-400">
-                  ({getFilteredTemplates().length})
-                </span>
+                {t('messageTemplates')}
               </h3>
 
-              <div className="space-y-2 max-h-96 overflow-y-auto">
-                {getFilteredTemplates().length > 0 ? (
-                  getFilteredTemplates().map((template) => {
-                    const isFavorite = favoriteTemplates.includes(template.id)
-                    const displayContent = messageType === 'email'
-                      ? template.subject?.[language] || template.subject?.en || ''
-                      : template.content?.[language] || template.content?.en || ''
-
-                    return (
-                      <div
-                        key={template.id}
-                        className={`relative p-3 rounded-lg border transition-colors cursor-pointer ${
-                          selectedTemplate?.id === template.id
-                            ? 'border-blue-600 bg-blue-50'
-                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                        }`}
-                        onClick={() => applyLocalTemplate(template)}
-                      >
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            toggleFavorite(template.id)
-                          }}
-                          className="absolute top-2 right-2 p-1 hover:bg-gray-100 rounded"
-                        >
-                          <Star
-                            className={`w-4 h-4 ${
-                              isFavorite ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
-                            }`}
-                          />
-                        </button>
-                        <div className="pr-6">
-                          <div className="font-medium text-sm text-gray-900">
-                            {template.name[language]}
-                          </div>
-                          <div className="text-xs text-gray-500 mt-1 line-clamp-2">
-                            {displayContent}
-                          </div>
-                          <div className="flex items-center gap-2 mt-2">
-                            <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
-                              {CATEGORIES[template.category]?.name[language]}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  })
-                ) : (
-                  <div className="text-center py-6 text-sm text-gray-500">
-                    {language === 'no' ? 'Ingen maler funnet' : 'No templates found'}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Legacy API Templates (if any) */}
-            {templates.length > 0 && (
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
-                <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
-                  <FileText className="w-4 h-4" />
-                  {language === 'no' ? 'Egendefinerte Maler' : 'Custom Templates'}
-                </h3>
-                <div className="space-y-2">
-                  {templates
-                    .filter(t => !messageType || t.type === messageType.toUpperCase())
+              <div className="space-y-2">
+                {templates.length > 0 ? (
+                  templates
+                    .filter(tmpl => !messageType || tmpl.type === messageType.toUpperCase())
                     .map((template) => (
                       <button
                         key={template.id}
@@ -634,10 +394,14 @@ export default function Communications() {
                           {template.content}
                         </div>
                       </button>
-                    ))}
-                </div>
+                    ))
+                ) : (
+                  <div className="text-center py-6 text-sm text-gray-500">
+                    {t('noTemplates')}
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
         </div>
       )}
@@ -654,9 +418,9 @@ export default function Communications() {
                 onChange={(e) => setHistoryFilter(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">All Messages</option>
-                <option value="SMS">SMS Only</option>
-                <option value="EMAIL">Email Only</option>
+                <option value="">{t('allMessages')}</option>
+                <option value="SMS">{t('smsOnly')}</option>
+                <option value="EMAIL">{t('emailOnly')}</option>
               </select>
             </div>
           </div>
@@ -666,7 +430,7 @@ export default function Communications() {
             {historyLoading ? (
               <div className="px-6 py-12 text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="text-sm text-gray-500 mt-3">Loading history...</p>
+                <p className="text-sm text-gray-500 mt-3">{t('loadingHistory')}</p>
               </div>
             ) : history.length > 0 ? (
               history.map((comm) => (
@@ -699,11 +463,11 @@ export default function Communications() {
                           {comm.message}
                         </p>
                         <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                          <span>{formatDate(comm.created_at, 'time')}</span>
+                          <span>{formatDate(comm.created_at, lang, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                           {comm.template_name && (
-                            <span>Template: {comm.template_name}</span>
+                            <span>{t('templateLabel')}: {comm.template_name}</span>
                           )}
-                          <span>By: {comm.sent_by_name || 'System'}</span>
+                          <span>{t('byLabel')}: {comm.sent_by_name || t('system')}</span>
                         </div>
                       </div>
                     </div>
@@ -713,7 +477,7 @@ export default function Communications() {
             ) : (
               <div className="px-6 py-12 text-center">
                 <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm text-gray-500">No messages sent yet</p>
+                <p className="text-sm text-gray-500">{t('noMessagesSent')}</p>
               </div>
             )}
           </div>

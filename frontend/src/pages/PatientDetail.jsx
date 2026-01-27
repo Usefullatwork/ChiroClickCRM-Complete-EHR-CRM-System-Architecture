@@ -26,11 +26,13 @@ import {
 import { patientsAPI, encountersAPI, appointmentsAPI } from '../services/api'
 import { formatDate, formatPhone, calculateAge } from '../lib/utils'
 import GDPRExportModal from '../components/GDPRExportModal'
+import { useTranslation } from '../i18n'
 
 export default function PatientDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { t, lang } = useTranslation('patients')
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({})
   const [showGDPRModal, setShowGDPRModal] = useState(false)
@@ -83,7 +85,7 @@ export default function PatientDetail() {
     return (
       <div className="p-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800">Patient not found</p>
+          <p className="text-red-800">{t('patientNotFound')}</p>
         </div>
       </div>
     )
@@ -126,7 +128,7 @@ export default function PatientDetail() {
                 className="flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
               >
                 <Save className="w-4 h-4" />
-                Save Changes
+                {t('savePatient')}
               </button>
             </>
           ) : (
@@ -170,12 +172,12 @@ export default function PatientDetail() {
         <div className="lg:col-span-2 space-y-6">
           {/* Contact Information */}
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-4">Contact Information</h2>
+            <h2 className="text-lg font-semibold mb-4">{t('contactInfo')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-start gap-3">
                 <Phone className="w-5 h-5 text-gray-400 mt-0.5" />
                 <div className="flex-1">
-                  <p className="text-sm text-gray-600">Phone</p>
+                  <p className="text-sm text-gray-600">{t('phone')}</p>
                   {isEditing ? (
                     <input
                       type="tel"
@@ -192,7 +194,7 @@ export default function PatientDetail() {
               <div className="flex items-start gap-3">
                 <Mail className="w-5 h-5 text-gray-400 mt-0.5" />
                 <div className="flex-1">
-                  <p className="text-sm text-gray-600">Email</p>
+                  <p className="text-sm text-gray-600">{t('email')}</p>
                   {isEditing ? (
                     <input
                       type="email"
@@ -209,7 +211,7 @@ export default function PatientDetail() {
               <div className="flex items-start gap-3">
                 <MessageSquare className="w-5 h-5 text-gray-400 mt-0.5" />
                 <div className="flex-1">
-                  <p className="text-sm text-gray-600">Preferred Contact</p>
+                  <p className="text-sm text-gray-600">{t('preferredContactMethod')}</p>
                   {isEditing ? (
                     <select
                       value={formData.preferred_contact_method || ''}
@@ -255,7 +257,7 @@ export default function PatientDetail() {
               <div className="mt-4 flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-gray-400 mt-0.5" />
                 <div>
-                  <p className="text-sm text-gray-600">Address</p>
+                  <p className="text-sm text-gray-600">{t('address')}</p>
                   <p className="font-medium">
                     {patient.address.street}<br />
                     {patient.address.postal_code} {patient.address.city}
@@ -267,10 +269,10 @@ export default function PatientDetail() {
 
           {/* Clinical Information */}
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-4">Clinical Information</h2>
+            <h2 className="text-lg font-semibold mb-4">{t('clinical')}</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Main Problem (Hovedproblem)</label>
+                <label className="block text-sm text-gray-600 mb-1">{t('mainProblem')}</label>
                 {isEditing ? (
                   <input
                     type="text"
@@ -319,7 +321,7 @@ export default function PatientDetail() {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-600 mb-1">General Notes</label>
+                <label className="block text-sm text-gray-600 mb-1">{t('notes')}</label>
                 {isEditing ? (
                   <textarea
                     value={formData.general_notes || ''}
@@ -373,11 +375,11 @@ export default function PatientDetail() {
             <h2 className="text-lg font-semibold mb-4">Quick Stats</h2>
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Total Visits</span>
+                <span className="text-gray-600">{t('totalVisits')}</span>
                 <span className="font-bold text-lg">{patient.total_visits || 0}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Last Visit</span>
+                <span className="text-gray-600">{t('lastVisit')}</span>
                 <span className="font-medium">{formatDate(patient.last_visit_date)}</span>
               </div>
               <div className="flex justify-between items-center">
@@ -431,16 +433,16 @@ export default function PatientDetail() {
 
           {/* Consent Status */}
           <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="font-semibold mb-3">Consent</h3>
+            <h3 className="font-semibold mb-3">{t('consentGiven')}</h3>
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">SMS</span>
+                <span className="text-gray-600">{t('sms')}</span>
                 <span className={patient.consent_sms ? 'text-green-600' : 'text-gray-400'}>
                   {patient.consent_sms ? '✓' : '✗'}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">Email</span>
+                <span className="text-gray-600">{t('email')}</span>
                 <span className={patient.consent_email ? 'text-green-600' : 'text-gray-400'}>
                   {patient.consent_email ? '✓' : '✗'}
                 </span>

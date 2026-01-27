@@ -20,8 +20,10 @@ import {
   Download
 } from 'lucide-react'
 import apiClient from '../services/api'
+import { useTranslation } from '../i18n'
 
 export default function Training() {
+  const { t } = useTranslation('common')
   const [googleDriveFolderId, setGoogleDriveFolderId] = useState('')
   const [modelName, setModelName] = useState('')
   const [temperature, setTemperature] = useState(0.7)
@@ -77,7 +79,7 @@ export default function Training() {
 
   const handleRunFullPipeline = () => {
     if (!googleDriveFolderId || !modelName) {
-      alert('Please provide Google Drive Folder ID and Model Name')
+      alert(t('provideFolderAndModel'))
       return
     }
 
@@ -95,7 +97,7 @@ export default function Training() {
     switch (step) {
       case 'fetch':
         if (!googleDriveFolderId) {
-          alert('Please provide Google Drive Folder ID')
+          alert(t('provideFolderId'))
           return
         }
         fetchDocsMutation.mutate(googleDriveFolderId)
@@ -111,7 +113,7 @@ export default function Training() {
         break
       case 'train':
         if (!modelName) {
-          alert('Please provide Model Name')
+          alert(t('provideModelName'))
           return
         }
         trainMutation.mutate(modelName)
@@ -125,39 +127,39 @@ export default function Training() {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <Brain className="w-8 h-8 text-blue-600" />
-          <h1 className="text-3xl font-bold">AI Training Pipeline</h1>
+          <h1 className="text-3xl font-bold">{t('aiTrainingPipeline')}</h1>
         </div>
         <p className="text-gray-600">
-          Train a custom Gemini 3 Pro model on your clinical documentation
+          {t('trainCustomModel')}
         </p>
       </div>
 
       {/* Configuration */}
       <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-xl font-bold mb-4">Configuration</h2>
+        <h2 className="text-xl font-bold mb-4">{t('configuration')}</h2>
 
         <div className="space-y-4">
           {/* Google Drive Folder ID */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Google Drive Folder ID
+              {t('googleDriveFolderId')}
             </label>
             <input
               type="text"
               value={googleDriveFolderId}
               onChange={(e) => setGoogleDriveFolderId(e.target.value)}
-              placeholder="Folder ID containing PDFs and Word documents"
+              placeholder={t('folderIdPlaceholder')}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
             <p className="text-xs text-gray-500 mt-1">
-              Find this in the Google Drive folder URL: drive.google.com/drive/folders/[FOLDER_ID]
+              {t('folderIdHint')}
             </p>
           </div>
 
           {/* Model Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Model Name
+              {t('modelName')}
             </label>
             <input
               type="text"
@@ -167,14 +169,14 @@ export default function Training() {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
             <p className="text-xs text-gray-500 mt-1">
-              Choose a unique name for your trained model
+              {t('modelNameHint')}
             </p>
           </div>
 
           {/* Temperature */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Temperature: {temperature}
+              {t('temperature')}: {temperature}
             </label>
             <input
               type="range"
@@ -186,14 +188,14 @@ export default function Training() {
               className="w-full"
             />
             <p className="text-xs text-gray-500 mt-1">
-              Lower = more focused, Higher = more creative
+              {t('temperatureHint')}
             </p>
           </div>
 
           {/* System Prompt */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              System Prompt (Norwegian)
+              {t('systemPrompt')}
             </label>
             <textarea
               value={systemPrompt}
@@ -214,12 +216,12 @@ export default function Training() {
             {runPipelineMutation.isPending ? (
               <>
                 <Clock className="w-5 h-5 animate-spin" />
-                Training in Progress...
+                {t('trainingInProgress')}
               </>
             ) : (
               <>
                 <Play className="w-5 h-5" />
-                Run Full Pipeline
+                {t('runFullPipeline')}
               </>
             )}
           </button>
@@ -228,14 +230,14 @@ export default function Training() {
 
       {/* Pipeline Steps */}
       <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-xl font-bold mb-4">Pipeline Steps</h2>
+        <h2 className="text-xl font-bold mb-4">{t('pipelineSteps')}</h2>
 
         <div className="space-y-3">
           {/* Step 1: Fetch */}
           <PipelineStep
             icon={<FolderOpen className="w-5 h-5" />}
-            title="1. Fetch Documents"
-            description="Download PDFs and Word documents from Google Drive"
+            title={t('fetchDocuments')}
+            description={t('fetchDocumentsDesc')}
             status={fetchDocsMutation.isPending ? 'running' : fetchDocsMutation.isSuccess ? 'success' : 'pending'}
             result={fetchDocsMutation.data?.data}
             onRun={() => handleRunStep('fetch')}
@@ -245,8 +247,8 @@ export default function Training() {
           {/* Step 2: Parse */}
           <PipelineStep
             icon={<FileText className="w-5 h-5" />}
-            title="2. Parse Documents"
-            description="Extract text from PDFs and Word documents"
+            title={t('parseDocuments')}
+            description={t('parseDocumentsDesc')}
             status={parseMutation.isPending ? 'running' : parseMutation.isSuccess ? 'success' : 'pending'}
             result={parseMutation.data?.data}
             onRun={() => handleRunStep('parse')}
@@ -255,8 +257,8 @@ export default function Training() {
           {/* Step 3: Anonymize */}
           <PipelineStep
             icon={<ShieldCheck className="w-5 h-5" />}
-            title="3. Anonymize Data"
-            description="Remove PII (GDPR compliant)"
+            title={t('anonymizeData')}
+            description={t('anonymizeDataDesc')}
             status={anonymizeMutation.isPending ? 'running' : anonymizeMutation.isSuccess ? 'success' : 'pending'}
             result={anonymizeMutation.data?.data}
             onRun={() => handleRunStep('anonymize')}
@@ -265,8 +267,8 @@ export default function Training() {
           {/* Step 4: Dataset */}
           <PipelineStep
             icon={<Database className="w-5 h-5" />}
-            title="4. Create Dataset"
-            description="Generate training examples (JSONL format)"
+            title={t('createDataset')}
+            description={t('createDatasetDesc')}
             status={datasetMutation.isPending ? 'running' : datasetMutation.isSuccess ? 'success' : 'pending'}
             result={datasetMutation.data?.data}
             onRun={() => handleRunStep('dataset')}
@@ -275,8 +277,8 @@ export default function Training() {
           {/* Step 5: Train */}
           <PipelineStep
             icon={<Cpu className="w-5 h-5" />}
-            title="5. Train Model"
-            description="Fine-tune Gemini 3 Pro with Ollama"
+            title={t('trainModel')}
+            description={t('trainModelDesc')}
             status={trainMutation.isPending ? 'running' : trainMutation.isSuccess ? 'success' : 'pending'}
             result={trainMutation.data?.data}
             onRun={() => handleRunStep('train')}
@@ -295,7 +297,7 @@ export default function Training() {
               <XCircle className="w-6 h-6 text-red-600" />
             )}
             <h2 className="text-xl font-bold">
-              {pipelineResults.success ? 'Training Complete!' : 'Training Failed'}
+              {pipelineResults.success ? t('trainingComplete') : t('trainingFailed')}
             </h2>
           </div>
 
@@ -306,7 +308,7 @@ export default function Training() {
                   Model <strong>{pipelineResults.modelName}</strong> has been trained successfully!
                 </p>
                 <p className="text-sm text-green-700 mt-2">
-                  Duration: {pipelineResults.duration?.toFixed(2)}s
+                  {t('duration')}: {pipelineResults.duration?.toFixed(2)}s
                 </p>
               </div>
 
@@ -320,17 +322,17 @@ export default function Training() {
                     </div>
                     {step.totalDocuments && (
                       <p className="text-sm text-gray-600 mt-1">
-                        Documents: {step.totalDocuments}
+                        {t('documents')}: {step.totalDocuments}
                       </p>
                     )}
                     {step.total && (
                       <p className="text-sm text-gray-600 mt-1">
-                        Processed: {step.total}
+                        {t('processed')}: {step.total}
                       </p>
                     )}
                     {step.examples && (
                       <p className="text-sm text-gray-600 mt-1">
-                        Training examples: {step.examples}
+                        {t('trainingExamples')}: {step.examples}
                       </p>
                     )}
                   </div>
@@ -338,7 +340,7 @@ export default function Training() {
               </div>
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 className="font-medium text-blue-900 mb-2">How to use your model:</h4>
+                <h4 className="font-medium text-blue-900 mb-2">{t('howToUseModel')}</h4>
                 <code className="block bg-white p-3 rounded border border-blue-200 text-sm">
                   ollama run {pipelineResults.modelName}
                 </code>

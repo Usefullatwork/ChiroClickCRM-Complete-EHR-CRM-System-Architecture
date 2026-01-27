@@ -15,11 +15,12 @@ import {
   XCircle
 } from 'lucide-react'
 import { appointmentsAPI } from '../services/api'
-import { formatDate, formatTime } from '../lib/utils'
+import { useTranslation, formatDate, formatTime } from '../i18n'
 
 export default function Appointments() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { t, lang } = useTranslation('appointments')
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
   const [statusFilter, setStatusFilter] = useState('')
 
@@ -51,8 +52,8 @@ export default function Appointments() {
   })
 
   const handleCancel = (appointment) => {
-    if (!confirm(`Cancel appointment for ${appointment.patient_name}?`)) return
-    const reason = prompt('Cancellation reason:')
+    if (!confirm(t('cancelConfirmPrompt').replace('{name}', appointment.patient_name))) return
+    const reason = prompt(t('cancellationReasonPrompt'))
     if (reason) {
       cancelMutation.mutate({ id: appointment.id, reason })
     }
@@ -84,22 +85,22 @@ export default function Appointments() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Appointments</h1>
-          <p className="text-gray-600 mt-1">{appointments.length} appointments on {formatDate(selectedDate)}</p>
+          <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
+          <p className="text-gray-600 mt-1">{t('appointmentsOnDate').replace('{count}', appointments.length).replace('{date}', formatDate(selectedDate, lang))}</p>
         </div>
         <button
           onClick={() => navigate('/appointments/new')}
           className="flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
         >
           <Plus className="w-5 h-5" />
-          New Appointment
+          {t('newAppointment')}
         </button>
       </div>
 
       {/* Filters */}
       <div className="flex gap-4 mb-6">
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">{t('date')}</label>
           <input
             type="date"
             value={selectedDate}
@@ -108,18 +109,18 @@ export default function Appointments() {
           />
         </div>
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">{t('status')}</label>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value="">All Statuses</option>
-            <option value="PENDING">Pending</option>
-            <option value="CONFIRMED">Confirmed</option>
-            <option value="COMPLETED">Completed</option>
-            <option value="CANCELLED">Cancelled</option>
-            <option value="NO_SHOW">No Show</option>
+            <option value="">{t('allStatuses')}</option>
+            <option value="PENDING">{t('pending')}</option>
+            <option value="CONFIRMED">{t('confirmed')}</option>
+            <option value="COMPLETED">{t('completed')}</option>
+            <option value="CANCELLED">{t('cancelled')}</option>
+            <option value="NO_SHOW">{t('noShow')}</option>
           </select>
         </div>
       </div>
@@ -132,8 +133,8 @@ export default function Appointments() {
       ) : appointments.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-lg">
           <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600 text-lg">No appointments found</p>
-          <p className="text-gray-500 mt-2">Try selecting a different date or status</p>
+          <p className="text-gray-600 text-lg">{t('noAppointmentsFound')}</p>
+          <p className="text-gray-500 mt-2">{t('tryDifferentFilter')}</p>
         </div>
       ) : (
         <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -158,11 +159,11 @@ export default function Appointments() {
                         <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
                           <div className="flex items-center gap-1">
                             <Clock className="w-4 h-4" />
-                            {formatTime(appointment.start_time)} - {formatTime(appointment.end_time)}
+                            {formatTime(appointment.start_time, lang)} - {formatTime(appointment.end_time, lang)}
                           </div>
                           <div className="flex items-center gap-1">
                             <User className="w-4 h-4" />
-                            {appointment.practitioner_name || 'Not assigned'}
+                            {appointment.practitioner_name || t('notAssigned')}
                           </div>
                         </div>
                         {appointment.notes && (
@@ -184,7 +185,7 @@ export default function Appointments() {
                         className="flex items-center gap-1 px-3 py-1 text-sm text-green-700 bg-green-100 rounded-lg hover:bg-green-200 disabled:opacity-50"
                       >
                         <CheckCircle className="w-4 h-4" />
-                        Confirm
+                        {t('confirm')}
                       </button>
                     )}
 
@@ -195,7 +196,7 @@ export default function Appointments() {
                         className="flex items-center gap-1 px-3 py-1 text-sm text-red-700 bg-red-100 rounded-lg hover:bg-red-200 disabled:opacity-50"
                       >
                         <XCircle className="w-4 h-4" />
-                        Cancel
+                        {t('cancel')}
                       </button>
                     )}
 
@@ -203,7 +204,7 @@ export default function Appointments() {
                       onClick={() => navigate(`/patients/${appointment.patient_id}`)}
                       className="px-3 py-1 text-sm text-blue-700 bg-blue-100 rounded-lg hover:bg-blue-200"
                     >
-                      View Patient
+                      {t('viewPatient')}
                     </button>
                   </div>
                 </div>

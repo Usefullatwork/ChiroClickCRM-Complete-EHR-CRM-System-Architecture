@@ -23,23 +23,12 @@ import {
   Stethoscope,
   FileText,
   Activity,
-  Layers,
-  Zap,
-  Upload,
-  CalendarClock,
-  MessageSquare,
-  ChevronDown,
-  ChevronUp,
-  Edit3,
-  RotateCcw,
-  Target
+  Layers
 } from 'lucide-react'
-import { organizationAPI, usersAPI, spineTemplatesAPI, clinicalSettingsAPI } from '../services/api'
+import { organizationAPI, usersAPI } from '../services/api'
 import { formatDate } from '../lib/utils'
 import AISettings from '../components/AISettings'
-import SchedulerDecisions from '../components/scheduler/SchedulerDecisions'
-import AppointmentImporter from '../components/scheduler/AppointmentImporter'
-import TodaysMessages from '../components/scheduler/TodaysMessages'
+import { useTranslation } from '../i18n'
 
 // Adjustment notation methods available in the system
 const ADJUSTMENT_NOTATION_METHODS = [
@@ -127,327 +116,26 @@ const DEFAULT_CLINICAL_PREFS = {
   defaultView: 'front'
 }
 
-// Spine Templates Editor Component
-function SpineTemplatesEditor({ lang }) {
-  const queryClient = useQueryClient()
-  const [expandedSegment, setExpandedSegment] = useState(null)
-  const [editingTemplate, setEditingTemplate] = useState(null)
-  const [editText, setEditText] = useState('')
-
-  // Fetch grouped templates
-  const { data: templatesData, isLoading, refetch } = useQuery({
-    queryKey: ['spine-templates', 'grouped', lang === 'en' ? 'EN' : 'NO'],
-    queryFn: () => spineTemplatesAPI.getGrouped(lang === 'en' ? 'EN' : 'NO'),
-    staleTime: 5 * 60 * 1000
-  })
-
-  const templates = templatesData?.data?.data || {}
-
-  // Update mutation
-  const updateMutation = useMutation({
-    mutationFn: (data) => spineTemplatesAPI.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['spine-templates'])
-      setEditingTemplate(null)
-      setEditText('')
-    }
-  })
-
-  // Reset mutation
-  const resetMutation = useMutation({
-    mutationFn: () => spineTemplatesAPI.resetToDefaults(lang === 'en' ? 'EN' : 'NO'),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['spine-templates'])
-      alert(lang === 'no' ? 'Maler tilbakestilt til standard' : 'Templates reset to defaults')
-    }
-  })
-
-  const handleEdit = (template) => {
-    setEditingTemplate(template)
-    setEditText(template.text_template)
-  }
-
-  const handleSave = () => {
-    if (!editingTemplate || !editText.trim()) return
-    updateMutation.mutate({
-      segment: editingTemplate.segment,
-      direction: editingTemplate.direction,
-      finding_type: editingTemplate.finding_type || 'palpation',
-      text_template: editText,
-      language: lang === 'en' ? 'EN' : 'NO'
-    })
-  }
-
-  const handleCancel = () => {
-    setEditingTemplate(null)
-    setEditText('')
-  }
-
-  // Group segments by region
-  const regions = {
-    cervical: ['C0-C1', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7'],
-    thoracic: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
-    lumbar: ['L1', 'L2', 'L3', 'L4', 'L5'],
-    sacral: ['Sacrum', 'SI-L', 'SI-R', 'Coccyx'],
-    muscle: ['C-para', 'T-para', 'L-para', 'QL', 'Piriformis']
-  }
-
-  const regionLabels = {
-    cervical: lang === 'no' ? 'Cervical' : 'Cervical',
-    thoracic: lang === 'no' ? 'Thoracal' : 'Thoracic',
-    lumbar: lang === 'no' ? 'Lumbal' : 'Lumbar',
-    sacral: lang === 'no' ? 'Sakrum/Bekken' : 'Sacrum/Pelvis',
-    muscle: lang === 'no' ? 'Muskulatur' : 'Muscles'
-  }
-
-  const directionLabels = {
-    left: lang === 'no' ? 'Venstre' : 'Left',
-    right: lang === 'no' ? 'Høyre' : 'Right',
-    bilateral: lang === 'no' ? 'Bilateral' : 'Bilateral',
-    posterior: lang === 'no' ? 'Posterior' : 'Posterior',
-    anterior: lang === 'no' ? 'Anterior' : 'Anterior',
-    superior: lang === 'no' ? 'Superior' : 'Superior',
-    inferior: lang === 'no' ? 'Inferior' : 'Inferior',
-    inflare: lang === 'no' ? 'Inflare' : 'Inflare',
-    outflare: lang === 'no' ? 'Outflare' : 'Outflare'
-  }
-
-  return (
-    <div className="bg-white rounded-lg border border-gray-200">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
-              <Target className="w-5 h-5 text-emerald-600" />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">
-                {lang === 'no' ? 'Palpasjonsmaler (Rask-klikk)' : 'Palpation Templates (Quick-Click)'}
-              </h2>
-              <p className="text-sm text-gray-500">
-                {lang === 'no'
-                  ? 'Tilpass teksten som settes inn ved rask-klikk på ryggsøylen'
-                  : 'Customize the text inserted by quick-click spine buttons'}
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={() => {
-              if (confirm(lang === 'no' ? 'Tilbakestille alle maler til standard?' : 'Reset all templates to defaults?')) {
-                resetMutation.mutate()
-              }
-            }}
-            disabled={resetMutation.isLoading}
-            className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center gap-1.5"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            {lang === 'no' ? 'Tilbakestill' : 'Reset'}
-          </button>
-        </div>
-      </div>
-
-      <div className="p-4">
-        {isLoading ? (
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="w-6 h-6 animate-spin text-emerald-500" />
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {Object.entries(regions).map(([regionKey, segments]) => {
-              const hasTemplates = segments.some(seg => templates[seg]?.length > 0)
-              if (!hasTemplates) return null
-
-              return (
-                <div key={regionKey} className="border border-gray-200 rounded-lg overflow-hidden">
-                  <button
-                    onClick={() => setExpandedSegment(expandedSegment === regionKey ? null : regionKey)}
-                    className="w-full flex items-center justify-between px-4 py-2.5 bg-gray-50 hover:bg-gray-100"
-                  >
-                    <span className="text-sm font-medium text-gray-700">{regionLabels[regionKey]}</span>
-                    {expandedSegment === regionKey ? (
-                      <ChevronUp className="w-4 h-4 text-gray-500" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4 text-gray-500" />
-                    )}
-                  </button>
-
-                  {expandedSegment === regionKey && (
-                    <div className="p-3 space-y-2 bg-white">
-                      {segments.map(segment => {
-                        const segmentTemplates = templates[segment] || []
-                        if (segmentTemplates.length === 0) return null
-
-                        return (
-                          <div key={segment} className="border border-gray-100 rounded-lg p-2">
-                            <p className="text-xs font-semibold text-gray-600 mb-1.5">{segment}</p>
-                            <div className="space-y-1">
-                              {segmentTemplates.map(template => (
-                                <div
-                                  key={`${template.segment}-${template.direction}`}
-                                  className={`flex items-start gap-2 p-2 rounded ${
-                                    editingTemplate?.segment === template.segment &&
-                                    editingTemplate?.direction === template.direction
-                                      ? 'bg-emerald-50 border border-emerald-200'
-                                      : 'bg-gray-50'
-                                  }`}
-                                >
-                                  <span className="text-xs font-medium text-gray-500 w-16 shrink-0">
-                                    {directionLabels[template.direction] || template.direction}
-                                  </span>
-
-                                  {editingTemplate?.segment === template.segment &&
-                                   editingTemplate?.direction === template.direction ? (
-                                    <div className="flex-1 space-y-2">
-                                      <textarea
-                                        value={editText}
-                                        onChange={(e) => setEditText(e.target.value)}
-                                        className="w-full px-2 py-1.5 text-xs border border-gray-300 rounded focus:ring-2 focus:ring-emerald-500 resize-none"
-                                        rows={2}
-                                      />
-                                      <div className="flex gap-1.5">
-                                        <button
-                                          onClick={handleSave}
-                                          disabled={updateMutation.isLoading}
-                                          className="px-2 py-1 text-xs bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50"
-                                        >
-                                          {updateMutation.isLoading ? '...' : (lang === 'no' ? 'Lagre' : 'Save')}
-                                        </button>
-                                        <button
-                                          onClick={handleCancel}
-                                          className="px-2 py-1 text-xs border border-gray-300 rounded hover:bg-gray-50"
-                                        >
-                                          {lang === 'no' ? 'Avbryt' : 'Cancel'}
-                                        </button>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <>
-                                      <p className="flex-1 text-xs text-gray-700 truncate" title={template.text_template}>
-                                        {template.text_template}
-                                      </p>
-                                      <button
-                                        onClick={() => handleEdit(template)}
-                                        className="p-1 text-gray-400 hover:text-emerald-600 rounded"
-                                        title={lang === 'no' ? 'Rediger' : 'Edit'}
-                                      >
-                                        <Edit3 className="w-3.5 h-3.5" />
-                                      </button>
-                                      {!template.is_default && (
-                                        <span className="px-1.5 py-0.5 text-[10px] bg-emerald-100 text-emerald-700 rounded">
-                                          {lang === 'no' ? 'Tilpasset' : 'Custom'}
-                                        </span>
-                                      )}
-                                    </>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        )}
-
-        <p className="text-xs text-gray-500 mt-3 text-center">
-          {lang === 'no'
-            ? 'Klikk på "Rediger" for å tilpasse tekstmalen for hvert segment og retning.'
-            : 'Click "Edit" to customize the text template for each segment and direction.'}
-        </p>
-      </div>
-    </div>
-  )
-}
-
 export default function Settings() {
+  const { t, lang: i18nLang } = useTranslation('settings')
   const queryClient = useQueryClient()
   const [activeTab, setActiveTab] = useState('organization')
   const [editMode, setEditMode] = useState(false)
   const [formData, setFormData] = useState({})
 
-  // ============================================
-  // CLINICAL SETTINGS (Backend-powered)
-  // ============================================
-
-  // Fetch clinical settings from backend
-  const { data: clinicalSettingsResponse, isLoading: clinicalSettingsLoading } = useQuery({
-    queryKey: ['clinical-settings'],
-    queryFn: () => clinicalSettingsAPI.getAll(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+  // Clinical preferences state
+  const [clinicalPrefs, setClinicalPrefs] = useState(() => {
+    const saved = localStorage.getItem('chiroclick_clinical_prefs')
+    return saved ? JSON.parse(saved) : DEFAULT_CLINICAL_PREFS
   })
 
-  // Get clinical settings with defaults
-  const clinicalSettings = clinicalSettingsResponse?.data || DEFAULT_CLINICAL_PREFS
+  // Save clinical preferences to localStorage
+  useEffect(() => {
+    localStorage.setItem('chiroclick_clinical_prefs', JSON.stringify(clinicalPrefs))
+  }, [clinicalPrefs])
 
-  // For backwards compatibility, map to the old clinicalPrefs structure
-  const clinicalPrefs = {
-    adjustmentNotation: clinicalSettings.adjustment?.style || 'segment_listing',
-    language: clinicalSettings.display?.language || 'no',
-    showDermatomes: clinicalSettings.display?.showDermatomes ?? true,
-    showTriggerPoints: clinicalSettings.display?.showTriggerPoints ?? true,
-    autoGenerateNarrative: clinicalSettings.display?.autoGenerateNarrative ?? true,
-    defaultView: clinicalSettings.display?.defaultView || 'front',
-    // Extended settings
-    gonsteadSettings: clinicalSettings.adjustment?.gonstead || {},
-    diversifiedSettings: clinicalSettings.adjustment?.diversified || {},
-    testSettings: clinicalSettings.tests || {},
-    letterSettings: clinicalSettings.letters || {},
-    soapSettings: clinicalSettings.soap || {},
-  }
-
-  // Update clinical settings mutation
-  const updateClinicalSettingsMutation = useMutation({
-    mutationFn: (updates) => clinicalSettingsAPI.update(updates),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['clinical-settings'])
-    },
-    onError: (error) => {
-      console.error('Failed to update clinical settings:', error)
-    },
-  })
-
-  // Reset clinical settings mutation
-  const resetClinicalSettingsMutation = useMutation({
-    mutationFn: () => clinicalSettingsAPI.reset(),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['clinical-settings'])
-      alert(lang === 'no' ? 'Kliniske innstillinger tilbakestilt' : 'Clinical settings reset to defaults')
-    },
-    onError: (error) => {
-      alert(`Failed to reset settings: ${error.response?.data?.message || error.message}`)
-    },
-  })
-
-  // Handle clinical preference change - updates backend
   const handleClinicalPrefChange = (key, value) => {
-    // Map the key to the correct nested structure
-    let updates = {}
-    if (key === 'adjustmentNotation') {
-      updates = { adjustment: { style: value } }
-    } else if (key === 'language') {
-      updates = { display: { language: value } }
-    } else if (key === 'showDermatomes' || key === 'showTriggerPoints' || key === 'autoGenerateNarrative' || key === 'defaultView') {
-      updates = { display: { [key]: value } }
-    } else {
-      updates = { [key]: value }
-    }
-    updateClinicalSettingsMutation.mutate(updates)
-  }
-
-  // Handle nested settings updates
-  const handleNestedSettingsChange = (section, subsection, key, value) => {
-    const updates = {
-      [section]: {
-        [subsection]: {
-          [key]: value
-        }
-      }
-    }
-    updateClinicalSettingsMutation.mutate(updates)
+    setClinicalPrefs(prev => ({ ...prev, [key]: value }))
   }
 
   const lang = clinicalPrefs.language || 'no'
@@ -483,10 +171,10 @@ export default function Settings() {
     onSuccess: () => {
       queryClient.invalidateQueries(['organization'])
       setEditMode(false)
-      alert('Organization settings updated successfully')
+      alert(t('orgUpdatedSuccess'))
     },
     onError: (error) => {
-      alert(`Failed to update organization: ${error.response?.data?.message || error.message}`)
+      alert(`${t('orgUpdateFailed')}: ${error.response?.data?.message || error.message}`)
     },
   })
 
@@ -496,10 +184,10 @@ export default function Settings() {
     onSuccess: () => {
       queryClient.invalidateQueries(['current-user'])
       setEditMode(false)
-      alert('Profile updated successfully')
+      alert(t('profileUpdatedSuccess'))
     },
     onError: (error) => {
-      alert(`Failed to update profile: ${error.response?.data?.message || error.message}`)
+      alert(`${t('profileUpdateFailed')}: ${error.response?.data?.message || error.message}`)
     },
   })
 
@@ -508,10 +196,10 @@ export default function Settings() {
     mutationFn: (data) => organizationAPI.inviteUser(data),
     onSuccess: () => {
       queryClient.invalidateQueries(['organization-users'])
-      alert('User invited successfully')
+      alert(t('userInvitedSuccess'))
     },
     onError: (error) => {
-      alert(`Failed to invite user: ${error.response?.data?.message || error.message}`)
+      alert(`${t('userInviteFailed')}: ${error.response?.data?.message || error.message}`)
     },
   })
 
@@ -534,9 +222,9 @@ export default function Settings() {
   }
 
   const handleInviteUser = () => {
-    const email = prompt('Enter email address to invite:')
+    const email = prompt(t('enterEmailToInvite'))
     if (email) {
-      const role = prompt('Enter role (ADMIN, PRACTITIONER, STAFF):', 'PRACTITIONER')
+      const role = prompt(t('enterRole'), 'PRACTITIONER')
       if (role) {
         inviteUserMutation.mutate({ email, role })
       }
@@ -547,9 +235,9 @@ export default function Settings() {
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">{t('title')}</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Manage your organization and profile settings
+          {t('manageSettings')}
         </p>
       </div>
 
@@ -569,7 +257,7 @@ export default function Settings() {
           >
             <div className="flex items-center gap-2">
               <Building2 className="w-4 h-4" />
-              Organization
+              {t('organization')}
             </div>
           </button>
           <button
@@ -585,7 +273,7 @@ export default function Settings() {
           >
             <div className="flex items-center gap-2">
               <User className="w-4 h-4" />
-              Profile
+              {t('profile')}
             </div>
           </button>
           <button
@@ -601,7 +289,7 @@ export default function Settings() {
           >
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4" />
-              Users
+              {t('users')}
             </div>
           </button>
           <button
@@ -617,7 +305,7 @@ export default function Settings() {
           >
             <div className="flex items-center gap-2">
               <Bell className="w-4 h-4" />
-              Notifications
+              {t('notifications')}
             </div>
           </button>
           <button
@@ -633,7 +321,7 @@ export default function Settings() {
           >
             <div className="flex items-center gap-2">
               <Database className="w-4 h-4" />
-              Integrations
+              {t('integrations')}
             </div>
           </button>
           <button
@@ -649,7 +337,7 @@ export default function Settings() {
           >
             <div className="flex items-center gap-2">
               <Brain className="w-4 h-4" />
-              AI Assistant
+              {t('aiAssistant')}
             </div>
           </button>
           <button
@@ -665,23 +353,7 @@ export default function Settings() {
           >
             <div className="flex items-center gap-2">
               <Stethoscope className="w-4 h-4" />
-              Clinical
-            </div>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab('automation')
-              setEditMode(false)
-            }}
-            className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
-              activeTab === 'automation'
-                ? 'border-orange-600 text-orange-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4" />
-              Automatisering
+              {t('clinical')}
             </div>
           </button>
         </nav>
@@ -700,14 +372,14 @@ export default function Settings() {
               <div className="bg-white rounded-lg border border-gray-200">
                 <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                   <h2 className="text-lg font-semibold text-gray-900">
-                    Organization Information
+                    {t('organizationInfo')}
                   </h2>
                   {!editMode ? (
                     <button
                       onClick={() => handleEdit(organization)}
                       className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                     >
-                      Edit
+                      {t('edit')}
                     </button>
                   ) : (
                     <div className="flex gap-2">
@@ -715,7 +387,7 @@ export default function Settings() {
                         onClick={handleCancel}
                         className="px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
                       >
-                        Cancel
+                        {t('cancel')}
                       </button>
                       <button
                         onClick={handleSave}
@@ -725,12 +397,12 @@ export default function Settings() {
                         {updateOrgMutation.isLoading ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            Saving...
+                            {t('saving')}
                           </>
                         ) : (
                           <>
                             <Save className="w-4 h-4" />
-                            Save
+                            {t('save')}
                           </>
                         )}
                       </button>
@@ -743,7 +415,7 @@ export default function Settings() {
                     {/* Organization Name */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Organization Name
+                        {t('orgName')}
                       </label>
                       {editMode ? (
                         <input
@@ -760,7 +432,7 @@ export default function Settings() {
                     {/* Email */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Email
+                        {t('email')}
                       </label>
                       {editMode ? (
                         <input
@@ -780,7 +452,7 @@ export default function Settings() {
                     {/* Phone */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Phone
+                        {t('clinicPhone')}
                       </label>
                       {editMode ? (
                         <input
@@ -800,7 +472,7 @@ export default function Settings() {
                     {/* Website */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Website
+                        {t('website')}
                       </label>
                       {editMode ? (
                         <input
@@ -821,7 +493,7 @@ export default function Settings() {
                   {/* Address */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Address
+                      {t('clinicAddress')}
                     </label>
                     {editMode ? (
                       <textarea
@@ -841,7 +513,7 @@ export default function Settings() {
                   {!editMode && (
                     <div className="pt-4 border-t border-gray-200">
                       <p className="text-xs text-gray-500">
-                        Created: {formatDate(organization.created_at, 'time')}
+                        {t('created')}: {formatDate(organization.created_at, 'time')}
                       </p>
                     </div>
                   )}
@@ -857,10 +529,10 @@ export default function Settings() {
                     </div>
                     <div>
                       <h2 className="text-lg font-semibold text-gray-900">
-                        Patient Self-Check-In Kiosk
+                        {t('kioskTitle')}
                       </h2>
                       <p className="text-sm text-gray-500">
-                        Touch-friendly check-in for waiting room tablets
+                        {t('kioskDescription')}
                       </p>
                     </div>
                   </div>
@@ -869,24 +541,24 @@ export default function Settings() {
                 <div className="p-6">
                   <div className="space-y-4">
                     <p className="text-sm text-gray-600">
-                      Launch kiosk mode for patient self-check-in. Patients can:
+                      {t('kioskLaunchDescription')}
                     </p>
                     <ul className="text-sm text-gray-600 space-y-2 ml-4">
                       <li className="flex items-center gap-2">
                         <Check className="w-4 h-4 text-teal-600" />
-                        Find their appointment by name or phone
+                        {t('kioskFeature1')}
                       </li>
                       <li className="flex items-center gap-2">
                         <Check className="w-4 h-4 text-teal-600" />
-                        Verify identity with date of birth
+                        {t('kioskFeature2')}
                       </li>
                       <li className="flex items-center gap-2">
                         <Check className="w-4 h-4 text-teal-600" />
-                        Enter chief complaint and pain level
+                        {t('kioskFeature3')}
                       </li>
                       <li className="flex items-center gap-2">
                         <Check className="w-4 h-4 text-teal-600" />
-                        Auto-populate SOAP notes for provider
+                        {t('kioskFeature4')}
                       </li>
                     </ul>
 
@@ -897,18 +569,18 @@ export default function Settings() {
                                    transition-colors flex items-center justify-center gap-2 font-medium"
                       >
                         <Monitor className="w-5 h-5" />
-                        Launch Kiosk Mode
+                        {t('launchKiosk')}
                         <ExternalLink className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => {
                           navigator.clipboard.writeText(`${window.location.origin}/kiosk`)
-                          alert('Kiosk URL copied to clipboard!')
+                          alert(t('kioskUrlCopied'))
                         }}
                         className="px-4 py-3 border border-gray-300 text-gray-700 rounded-lg
                                    hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
                       >
-                        Copy Kiosk URL
+                        {t('copyKioskUrl')}
                       </button>
                     </div>
 
@@ -916,10 +588,10 @@ export default function Settings() {
                       <div className="flex items-start gap-2">
                         <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
                         <div className="text-sm">
-                          <p className="font-medium text-blue-900">Tip: Full-screen mode</p>
+                          <p className="font-medium text-blue-900">{t('fullscreenTip')}</p>
                           <p className="text-blue-700 mt-1">
-                            For the best experience, press <kbd className="px-1.5 py-0.5 bg-blue-100 rounded text-xs font-mono">F11</kbd> after
-                            launching to enter full-screen mode on the kiosk device.
+                            {t('fullscreenDescription').replace('{key}', '')}
+                            <kbd className="px-1.5 py-0.5 bg-blue-100 rounded text-xs font-mono">F11</kbd>
                           </p>
                         </div>
                       </div>
@@ -943,14 +615,14 @@ export default function Settings() {
             <div className="bg-white rounded-lg border border-gray-200">
               <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-gray-900">
-                  User Profile
+                  {t('userProfile')}
                 </h2>
                 {!editMode ? (
                   <button
                     onClick={() => handleEdit(currentUser)}
                     className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
-                    Edit
+                    {t('edit')}
                   </button>
                 ) : (
                   <div className="flex gap-2">
@@ -958,7 +630,7 @@ export default function Settings() {
                       onClick={handleCancel}
                       className="px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
                     >
-                      Cancel
+                      {t('cancel')}
                     </button>
                     <button
                       onClick={handleSave}
@@ -968,12 +640,12 @@ export default function Settings() {
                       {updateUserMutation.isLoading ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          Saving...
+                          {t('saving')}
                         </>
                       ) : (
                         <>
                           <Save className="w-4 h-4" />
-                          Save
+                          {t('save')}
                         </>
                       )}
                     </button>
@@ -986,7 +658,7 @@ export default function Settings() {
                   {/* First Name */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      First Name
+                      {t('firstName')}
                     </label>
                     {editMode ? (
                       <input
@@ -1003,7 +675,7 @@ export default function Settings() {
                   {/* Last Name */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Last Name
+                      {t('lastName')}
                     </label>
                     {editMode ? (
                       <input
@@ -1020,18 +692,18 @@ export default function Settings() {
                   {/* Email */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email
+                      {t('email')}
                     </label>
                     <p className="text-sm text-gray-900">{currentUser.email || '-'}</p>
                     <p className="text-xs text-gray-500 mt-1">
-                      Email cannot be changed here
+                      {t('emailCannotChange')}
                     </p>
                   </div>
 
                   {/* Role */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Role
+                      {t('role')}
                     </label>
                     <p className="text-sm text-gray-900">
                       <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">
@@ -1051,14 +723,14 @@ export default function Settings() {
         <div className="bg-white rounded-lg border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">
-              Organization Users
+              {t('orgUsers')}
             </h2>
             <button
               onClick={handleInviteUser}
               disabled={inviteUserMutation.isLoading}
               className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
             >
-              Invite User
+              {t('inviteUser')}
             </button>
           </div>
 
@@ -1066,7 +738,7 @@ export default function Settings() {
             {usersLoading ? (
               <div className="px-6 py-12 text-center">
                 <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto" />
-                <p className="text-sm text-gray-500 mt-3">Loading users...</p>
+                <p className="text-sm text-gray-500 mt-3">{t('loadingUsers')}</p>
               </div>
             ) : organizationUsers.length > 0 ? (
               organizationUsers.map((user) => (
@@ -1103,7 +775,7 @@ export default function Settings() {
             ) : (
               <div className="px-6 py-12 text-center">
                 <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm text-gray-500">No users found</p>
+                <p className="text-sm text-gray-500">{t('noUsersFound')}</p>
               </div>
             )}
           </div>
@@ -1115,10 +787,10 @@ export default function Settings() {
         <div className="bg-white rounded-lg border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">
-              Notification Preferences
+              {t('notificationPrefs')}
             </h2>
             <p className="text-sm text-gray-500 mt-1">
-              Manage how you receive notifications
+              {t('manageNotifications')}
             </p>
           </div>
 
@@ -1126,8 +798,8 @@ export default function Settings() {
             {/* Email Notifications */}
             <div className="flex items-center justify-between py-3 border-b border-gray-100">
               <div>
-                <p className="text-sm font-medium text-gray-900">Email Notifications</p>
-                <p className="text-xs text-gray-500">Receive notifications via email</p>
+                <p className="text-sm font-medium text-gray-900">{t('emailNotifications')}</p>
+                <p className="text-xs text-gray-500">{t('emailNotificationsDesc')}</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" className="sr-only peer" defaultChecked />
@@ -1138,8 +810,8 @@ export default function Settings() {
             {/* Appointment Reminders */}
             <div className="flex items-center justify-between py-3 border-b border-gray-100">
               <div>
-                <p className="text-sm font-medium text-gray-900">Appointment Reminders</p>
-                <p className="text-xs text-gray-500">Get reminders for upcoming appointments</p>
+                <p className="text-sm font-medium text-gray-900">{t('appointmentReminders')}</p>
+                <p className="text-xs text-gray-500">{t('appointmentRemindersDesc')}</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" className="sr-only peer" defaultChecked />
@@ -1150,8 +822,8 @@ export default function Settings() {
             {/* Follow-up Notifications */}
             <div className="flex items-center justify-between py-3 border-b border-gray-100">
               <div>
-                <p className="text-sm font-medium text-gray-900">Follow-up Notifications</p>
-                <p className="text-xs text-gray-500">Get notified about pending follow-ups</p>
+                <p className="text-sm font-medium text-gray-900">{t('followUpNotifications')}</p>
+                <p className="text-xs text-gray-500">{t('followUpNotificationsDesc')}</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" className="sr-only peer" defaultChecked />
@@ -1162,8 +834,8 @@ export default function Settings() {
             {/* System Updates */}
             <div className="flex items-center justify-between py-3">
               <div>
-                <p className="text-sm font-medium text-gray-900">System Updates</p>
-                <p className="text-xs text-gray-500">Receive notifications about system updates</p>
+                <p className="text-sm font-medium text-gray-900">{t('systemUpdates')}</p>
+                <p className="text-xs text-gray-500">{t('systemUpdatesDesc')}</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" className="sr-only peer" />
@@ -1176,10 +848,10 @@ export default function Settings() {
                 <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-blue-900">
-                    Notification preferences are coming soon
+                    {t('notificationComingSoon')}
                   </p>
                   <p className="text-xs text-blue-700 mt-1">
-                    We're working on implementing full notification preferences. For now, these are display-only.
+                    {t('notificationComingSoonDesc')}
                   </p>
                 </div>
               </div>
@@ -1195,31 +867,31 @@ export default function Settings() {
           <div className="bg-white rounded-lg border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">SolvIt Integration</h2>
+                <h2 className="text-lg font-semibold text-gray-900">{t('solvitIntegration')}</h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  Patient management system integration
+                  {t('solvitDesc')}
                 </p>
               </div>
               <span className="px-3 py-1 text-sm font-medium bg-green-100 text-green-800 rounded flex items-center gap-2">
                 <Check className="w-4 h-4" />
-                Active
+                {t('active')}
               </span>
             </div>
             <div className="p-6">
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Status:</span>
-                  <span className="text-gray-900 font-medium">Connected</span>
+                  <span className="text-gray-600">{t('status')}:</span>
+                  <span className="text-gray-900 font-medium">{t('connected')}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Last Sync:</span>
+                  <span className="text-gray-600">{t('lastSync')}:</span>
                   <span className="text-gray-900 font-medium">
                     {formatDate(new Date(), 'time')}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Sync Mode:</span>
-                  <span className="text-gray-900 font-medium">Automatic</span>
+                  <span className="text-gray-600">{t('syncMode')}:</span>
+                  <span className="text-gray-900 font-medium">{t('automatic')}</span>
                 </div>
               </div>
             </div>
@@ -1229,29 +901,29 @@ export default function Settings() {
           <div className="bg-white rounded-lg border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">Google Drive Integration</h2>
+                <h2 className="text-lg font-semibold text-gray-900">{t('googleDriveIntegration')}</h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  Cloud storage for training data and documents
+                  {t('googleDriveDesc')}
                 </p>
               </div>
               <span className="px-3 py-1 text-sm font-medium bg-green-100 text-green-800 rounded flex items-center gap-2">
                 <Check className="w-4 h-4" />
-                Active
+                {t('active')}
               </span>
             </div>
             <div className="p-6">
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Status:</span>
-                  <span className="text-gray-900 font-medium">Connected</span>
+                  <span className="text-gray-600">{t('status')}:</span>
+                  <span className="text-gray-900 font-medium">{t('connected')}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Training Data Folder:</span>
-                  <span className="text-gray-900 font-medium">Configured</span>
+                  <span className="text-gray-600">{t('trainingDataFolder')}:</span>
+                  <span className="text-gray-900 font-medium">{t('configured')}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Auto Import:</span>
-                  <span className="text-gray-900 font-medium">Enabled</span>
+                  <span className="text-gray-600">{t('autoImport')}:</span>
+                  <span className="text-gray-900 font-medium">{t('enabled')}</span>
                 </div>
               </div>
             </div>
@@ -1261,22 +933,22 @@ export default function Settings() {
           <div className="bg-white rounded-lg border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">Stripe Integration</h2>
+                <h2 className="text-lg font-semibold text-gray-900">{t('stripeIntegration')}</h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  Payment processing (Coming soon)
+                  {t('stripeDesc')}
                 </p>
               </div>
               <span className="px-3 py-1 text-sm font-medium bg-gray-100 text-gray-800 rounded">
-                Not Connected
+                {t('notConnected')}
               </span>
             </div>
             <div className="p-6">
               <p className="text-sm text-gray-600 mb-4">
-                Connect Stripe to process payments directly in ChiroClickCRM.
+                {t('connectStripeDesc')}
               </p>
               <button className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
                 <CreditCard className="w-4 h-4" />
-                Connect Stripe (Coming Soon)
+                {t('connectStripe')}
               </button>
             </div>
           </div>
@@ -1284,9 +956,9 @@ export default function Settings() {
           {/* API Access */}
           <div className="bg-white rounded-lg border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">API Access</h2>
+              <h2 className="text-lg font-semibold text-gray-900">{t('apiAccess')}</h2>
               <p className="text-sm text-gray-500 mt-1">
-                Manage API keys for external integrations
+                {t('apiAccessDesc')}
               </p>
             </div>
             <div className="p-6">
@@ -1294,10 +966,10 @@ export default function Settings() {
                 <Key className="w-5 h-5 text-blue-600 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-blue-900">
-                    API access coming soon
+                    {t('apiComingSoon')}
                   </p>
                   <p className="text-xs text-blue-700 mt-1">
-                    We're working on implementing API key management for external integrations.
+                    {t('apiComingSoonDesc')}
                   </p>
                 </div>
               </div>
@@ -1314,16 +986,6 @@ export default function Settings() {
       {/* Clinical Settings Tab */}
       {activeTab === 'clinical' && (
         <div className="space-y-6">
-          {/* Loading state */}
-          {clinicalSettingsLoading && (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-teal-600" />
-              <span className="ml-3 text-gray-600">
-                {lang === 'no' ? 'Laster innstillinger...' : 'Loading settings...'}
-              </span>
-            </div>
-          )}
-
           {/* Adjustment Notation Method */}
           <div className="bg-white rounded-lg border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200">
@@ -1333,12 +995,10 @@ export default function Settings() {
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900">
-                    {lang === 'no' ? 'Justeringsnotasjon' : 'Adjustment Notation'}
+                    {t('adjustmentNotation')}
                   </h2>
                   <p className="text-sm text-gray-500">
-                    {lang === 'no'
-                      ? 'Velg foretrukket metode for å dokumentere justeringer'
-                      : 'Select your preferred method for documenting adjustments'}
+                    {t('adjustmentNotationDesc')}
                   </p>
                 </div>
               </div>
@@ -1370,7 +1030,7 @@ export default function Settings() {
                         </span>
                         {clinicalPrefs.adjustmentNotation === method.id && (
                           <span className="px-2 py-0.5 text-xs font-medium bg-teal-100 text-teal-700 rounded">
-                            {lang === 'no' ? 'Aktiv' : 'Active'}
+                            {t('activeLabel')}
                           </span>
                         )}
                       </div>
@@ -1384,374 +1044,6 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* Gonstead Settings - Show when Gonstead is selected */}
-          {clinicalPrefs.adjustmentNotation === 'gonstead_listing' && (
-            <div className="bg-white rounded-lg border-2 border-amber-200">
-              <div className="px-6 py-4 border-b border-amber-200 bg-amber-50">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
-                    <Activity className="w-5 h-5 text-amber-600" />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-900">
-                      {lang === 'no' ? 'Gonstead Innstillinger' : 'Gonstead Settings'}
-                    </h2>
-                    <p className="text-sm text-gray-600">
-                      {lang === 'no'
-                        ? 'Tilpass Gonstead-listingnotasjon'
-                        : 'Customize Gonstead listing notation'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-6 space-y-4">
-                {/* Full notation toggle */}
-                <div className="flex items-center justify-between py-3 border-b border-gray-100">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {lang === 'no' ? 'Full notasjon' : 'Full Notation'}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {lang === 'no'
-                        ? 'Bruk full notasjon (f.eks. "C5 PRS-SP" vs "PRS")'
-                        : 'Use full notation (e.g., "C5 PRS-SP" vs "PRS")'}
-                    </p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={clinicalPrefs.gonsteadSettings?.useFullNotation ?? true}
-                      onChange={(e) => handleNestedSettingsChange('adjustment', 'gonstead', 'useFullNotation', e.target.checked)}
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
-                  </label>
-                </div>
-
-                {/* Include direction toggle */}
-                <div className="flex items-center justify-between py-3 border-b border-gray-100">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {lang === 'no' ? 'Inkluder retning' : 'Include Direction'}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {lang === 'no'
-                        ? 'Inkluder retningsbeskrivelse i listingen'
-                        : 'Include direction description in listing'}
-                    </p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={clinicalPrefs.gonsteadSettings?.includeDirection ?? true}
-                      onChange={(e) => handleNestedSettingsChange('adjustment', 'gonstead', 'includeDirection', e.target.checked)}
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
-                  </label>
-                </div>
-
-                {/* Gonstead listings reference */}
-                <div className="mt-4 p-4 bg-amber-50 rounded-lg border border-amber-200">
-                  <p className="text-sm font-medium text-amber-900 mb-2">
-                    {lang === 'no' ? 'Gonstead Listing Referanse:' : 'Gonstead Listing Reference:'}
-                  </p>
-                  <div className="grid grid-cols-2 gap-4 text-xs text-amber-800">
-                    <div>
-                      <p className="font-semibold mb-1">{lang === 'no' ? 'Posterior Rotasjon' : 'Posterior Rotation'}:</p>
-                      <ul className="space-y-0.5">
-                        <li><code className="bg-amber-100 px-1 rounded">PR</code> - Posterior Right</li>
-                        <li><code className="bg-amber-100 px-1 rounded">PL</code> - Posterior Left</li>
-                        <li><code className="bg-amber-100 px-1 rounded">PRS</code> - Posterior Right Superior</li>
-                        <li><code className="bg-amber-100 px-1 rounded">PLS</code> - Posterior Left Superior</li>
-                        <li><code className="bg-amber-100 px-1 rounded">PRI</code> - Posterior Right Inferior</li>
-                        <li><code className="bg-amber-100 px-1 rounded">PLI</code> - Posterior Left Inferior</li>
-                      </ul>
-                    </div>
-                    <div>
-                      <p className="font-semibold mb-1">{lang === 'no' ? 'Sakrum/Bekken' : 'Sacrum/Pelvis'}:</p>
-                      <ul className="space-y-0.5">
-                        <li><code className="bg-amber-100 px-1 rounded">AS</code> - Anterior Superior</li>
-                        <li><code className="bg-amber-100 px-1 rounded">AI</code> - Anterior Inferior</li>
-                        <li><code className="bg-amber-100 px-1 rounded">PI</code> - Posterior Inferior</li>
-                        <li><code className="bg-amber-100 px-1 rounded">IN</code> - Inflare</li>
-                        <li><code className="bg-amber-100 px-1 rounded">EX</code> - Outflare</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Diversified Settings - Show when Diversified is selected */}
-          {clinicalPrefs.adjustmentNotation === 'diversified_notation' && (
-            <div className="bg-white rounded-lg border-2 border-indigo-200">
-              <div className="px-6 py-4 border-b border-indigo-200 bg-indigo-50">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
-                    <Activity className="w-5 h-5 text-indigo-600" />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-900">
-                      {lang === 'no' ? 'Diversifisert Innstillinger' : 'Diversified Settings'}
-                    </h2>
-                    <p className="text-sm text-gray-600">
-                      {lang === 'no'
-                        ? 'Tilpass diversifisert teknikk-dokumentasjon'
-                        : 'Customize diversified technique documentation'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-6 space-y-4">
-                {/* Anatomical terms toggle */}
-                <div className="flex items-center justify-between py-3 border-b border-gray-100">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {lang === 'no' ? 'Anatomiske termer' : 'Anatomical Terms'}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {lang === 'no'
-                        ? 'Bruk full anatomisk terminologi'
-                        : 'Use full anatomical terminology'}
-                    </p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={clinicalPrefs.diversifiedSettings?.useAnatomicalTerms ?? true}
-                      onChange={(e) => handleNestedSettingsChange('adjustment', 'diversified', 'useAnatomicalTerms', e.target.checked)}
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-500"></div>
-                  </label>
-                </div>
-
-                {/* Include restriction type */}
-                <div className="flex items-center justify-between py-3 border-b border-gray-100">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {lang === 'no' ? 'Inkluder restriksjonstype' : 'Include Restriction Type'}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {lang === 'no'
-                        ? 'Spesifiser type bevegelsesrestriksjon'
-                        : 'Specify type of motion restriction'}
-                    </p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={clinicalPrefs.diversifiedSettings?.includeRestriction ?? true}
-                      onChange={(e) => handleNestedSettingsChange('adjustment', 'diversified', 'includeRestriction', e.target.checked)}
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-500"></div>
-                  </label>
-                </div>
-
-                {/* Diversified terminology reference */}
-                <div className="mt-4 p-4 bg-indigo-50 rounded-lg border border-indigo-200">
-                  <p className="text-sm font-medium text-indigo-900 mb-2">
-                    {lang === 'no' ? 'Diversifisert Terminologi:' : 'Diversified Terminology:'}
-                  </p>
-                  <div className="grid grid-cols-2 gap-4 text-xs text-indigo-800">
-                    <div>
-                      <p className="font-semibold mb-1">{lang === 'no' ? 'Restriksjonstyper' : 'Restriction Types'}:</p>
-                      <ul className="space-y-0.5">
-                        <li><code className="bg-indigo-100 px-1 rounded">Hypomobil</code> - {lang === 'no' ? 'Redusert bevegelse' : 'Reduced motion'}</li>
-                        <li><code className="bg-indigo-100 px-1 rounded">Fiksasjon</code> - {lang === 'no' ? 'Låst segment' : 'Locked segment'}</li>
-                        <li><code className="bg-indigo-100 px-1 rounded">Subluksasjon</code> - {lang === 'no' ? 'Dysfunksjon' : 'Dysfunction'}</li>
-                      </ul>
-                    </div>
-                    <div>
-                      <p className="font-semibold mb-1">{lang === 'no' ? 'Bevegelsesretninger' : 'Motion Directions'}:</p>
-                      <ul className="space-y-0.5">
-                        <li><code className="bg-indigo-100 px-1 rounded">Fleksjon</code> / <code className="bg-indigo-100 px-1 rounded">Ekstensjon</code></li>
-                        <li><code className="bg-indigo-100 px-1 rounded">Lateral fleksjon</code> (H/V)</li>
-                        <li><code className="bg-indigo-100 px-1 rounded">Rotasjon</code> (H/V)</li>
-                        <li><code className="bg-indigo-100 px-1 rounded">Kombinert</code></li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Test Documentation Settings */}
-          <div className="bg-white rounded-lg border border-gray-200">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-rose-100 flex items-center justify-center">
-                  <Activity className="w-5 h-5 text-rose-600" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    {lang === 'no' ? 'Testdokumentasjon' : 'Test Documentation'}
-                  </h2>
-                  <p className="text-sm text-gray-500">
-                    {lang === 'no'
-                      ? 'Innstillinger for kliniske tester og undersøkelser'
-                      : 'Settings for clinical tests and examinations'}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-6 space-y-6">
-              {/* Orthopedic Test Format */}
-              <div>
-                <p className="text-sm font-medium text-gray-900 mb-3">
-                  {lang === 'no' ? 'Ortopediske tester - Resultatformat' : 'Orthopedic Tests - Result Format'}
-                </p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {[
-                    { id: 'plus_minus', label: '+/-', desc: lang === 'no' ? 'Pluss/minus' : 'Plus/minus' },
-                    { id: 'pos_neg', label: 'Pos/Neg', desc: lang === 'no' ? 'Positiv/negativ' : 'Positive/negative' },
-                    { id: 'numeric', label: '0-3', desc: lang === 'no' ? 'Numerisk skala' : 'Numeric scale' },
-                    { id: 'descriptive', label: lang === 'no' ? 'Beskrivende' : 'Descriptive', desc: lang === 'no' ? 'Full tekst' : 'Full text' },
-                  ].map(format => (
-                    <label
-                      key={format.id}
-                      className={`p-3 rounded-lg border-2 cursor-pointer text-center transition-all ${
-                        (clinicalPrefs.testSettings?.orthopedic?.resultFormat || 'plus_minus') === format.id
-                          ? 'border-rose-500 bg-rose-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="orthoResultFormat"
-                        value={format.id}
-                        className="sr-only"
-                        checked={(clinicalPrefs.testSettings?.orthopedic?.resultFormat || 'plus_minus') === format.id}
-                        onChange={(e) => handleNestedSettingsChange('tests', 'orthopedic', 'resultFormat', e.target.value)}
-                      />
-                      <p className="font-medium text-gray-900">{format.label}</p>
-                      <p className="text-xs text-gray-500">{format.desc}</p>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Neurological Test Format */}
-              <div>
-                <p className="text-sm font-medium text-gray-900 mb-3">
-                  {lang === 'no' ? 'Refleksgradering' : 'Reflex Grading'}
-                </p>
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { id: 'numeric', label: '0-4', desc: lang === 'no' ? 'Standard numerisk' : 'Standard numeric' },
-                    { id: 'plus_minus', label: '+/++/+++', desc: lang === 'no' ? 'Pluss-system' : 'Plus system' },
-                    { id: 'descriptive', label: lang === 'no' ? 'Beskrivende' : 'Descriptive', desc: lang === 'no' ? 'Absent/normal/hyperaktiv' : 'Absent/normal/hyperactive' },
-                  ].map(format => (
-                    <label
-                      key={format.id}
-                      className={`p-3 rounded-lg border-2 cursor-pointer text-center transition-all ${
-                        (clinicalPrefs.testSettings?.neurological?.reflexGrading || 'numeric') === format.id
-                          ? 'border-rose-500 bg-rose-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="reflexGrading"
-                        value={format.id}
-                        className="sr-only"
-                        checked={(clinicalPrefs.testSettings?.neurological?.reflexGrading || 'numeric') === format.id}
-                        onChange={(e) => handleNestedSettingsChange('tests', 'neurological', 'reflexGrading', e.target.value)}
-                      />
-                      <p className="font-medium text-gray-900">{format.label}</p>
-                      <p className="text-xs text-gray-500">{format.desc}</p>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* ROM Format */}
-              <div>
-                <p className="text-sm font-medium text-gray-900 mb-3">
-                  {lang === 'no' ? 'Bevegelighet (ROM) - Format' : 'Range of Motion (ROM) - Format'}
-                </p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {[
-                    { id: 'degrees', label: lang === 'no' ? 'Grader' : 'Degrees', desc: '45°, 90°' },
-                    { id: 'percentage', label: '%', desc: '50%, 75%' },
-                    { id: 'descriptive', label: lang === 'no' ? 'Beskrivende' : 'Descriptive', desc: lang === 'no' ? 'Normal/redusert' : 'Normal/reduced' },
-                    { id: 'aga', label: 'AGA', desc: lang === 'no' ? 'AGA-skala' : 'AGA scale' },
-                  ].map(format => (
-                    <label
-                      key={format.id}
-                      className={`p-3 rounded-lg border-2 cursor-pointer text-center transition-all ${
-                        (clinicalPrefs.testSettings?.rom?.format || 'degrees') === format.id
-                          ? 'border-rose-500 bg-rose-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="romFormat"
-                        value={format.id}
-                        className="sr-only"
-                        checked={(clinicalPrefs.testSettings?.rom?.format || 'degrees') === format.id}
-                        onChange={(e) => handleNestedSettingsChange('tests', 'rom', 'format', e.target.value)}
-                      />
-                      <p className="font-medium text-gray-900">{format.label}</p>
-                      <p className="text-xs text-gray-500">{format.desc}</p>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Additional test options */}
-              <div className="space-y-3 pt-4 border-t border-gray-100">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {lang === 'no' ? 'Inkluder normalverdier' : 'Include Normal Values'}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {lang === 'no' ? 'Vis referanseverdier ved ROM' : 'Show reference values for ROM'}
-                    </p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={clinicalPrefs.testSettings?.rom?.includeNormal ?? true}
-                      onChange={(e) => handleNestedSettingsChange('tests', 'rom', 'includeNormal', e.target.checked)}
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-rose-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-500"></div>
-                  </label>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {lang === 'no' ? 'Inkluder dermatomer' : 'Include Dermatomes'}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {lang === 'no' ? 'Vis dermatomreferanse i nevrologiske tester' : 'Show dermatome reference in neuro tests'}
-                    </p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={clinicalPrefs.testSettings?.neurological?.includeDermatomes ?? true}
-                      onChange={(e) => handleNestedSettingsChange('tests', 'neurological', 'includeDermatomes', e.target.checked)}
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-rose-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-500"></div>
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Language Preference */}
           <div className="bg-white rounded-lg border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200">
@@ -1761,12 +1053,10 @@ export default function Settings() {
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900">
-                    {lang === 'no' ? 'Språk' : 'Language'}
+                    {t('languageSetting')}
                   </h2>
                   <p className="text-sm text-gray-500">
-                    {lang === 'no'
-                      ? 'Velg språk for kliniske komponenter'
-                      : 'Select language for clinical components'}
+                    {t('languageSettingDesc')}
                   </p>
                 </div>
               </div>
@@ -1791,7 +1081,7 @@ export default function Settings() {
                   />
                   <div>
                     <span className="font-medium text-gray-900">Norsk</span>
-                    <p className="text-xs text-gray-500">Norwegian</p>
+                    <p className="text-xs text-gray-500">{t('norwegian')}</p>
                   </div>
                 </label>
 
@@ -1812,7 +1102,7 @@ export default function Settings() {
                   />
                   <div>
                     <span className="font-medium text-gray-900">English</span>
-                    <p className="text-xs text-gray-500">Engelsk</p>
+                    <p className="text-xs text-gray-500">{t('english')}</p>
                   </div>
                 </label>
               </div>
@@ -1828,12 +1118,10 @@ export default function Settings() {
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900">
-                    {lang === 'no' ? 'Kartvisning' : 'Chart Display'}
+                    {t('chartDisplay')}
                   </h2>
                   <p className="text-sm text-gray-500">
-                    {lang === 'no'
-                      ? 'Standardinnstillinger for anatomiske kart'
-                      : 'Default settings for anatomical charts'}
+                    {t('chartDisplayDesc')}
                   </p>
                 </div>
               </div>
@@ -1844,12 +1132,10 @@ export default function Settings() {
               <div className="flex items-center justify-between py-3 border-b border-gray-100">
                 <div>
                   <p className="text-sm font-medium text-gray-900">
-                    {lang === 'no' ? 'Vis dermatomer' : 'Show Dermatomes'}
+                    {t('showDermatomes')}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {lang === 'no'
-                      ? 'Vis nerverotsfordelinger på anatomisk kart'
-                      : 'Display nerve root distributions on anatomical charts'}
+                    {t('showDermatomesDesc')}
                   </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -1867,12 +1153,10 @@ export default function Settings() {
               <div className="flex items-center justify-between py-3 border-b border-gray-100">
                 <div>
                   <p className="text-sm font-medium text-gray-900">
-                    {lang === 'no' ? 'Vis triggerpunkter' : 'Show Trigger Points'}
+                    {t('showTriggerPoints')}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {lang === 'no'
-                      ? 'Vis myofascielle triggerpunkter på kart'
-                      : 'Display myofascial trigger points on charts'}
+                    {t('showTriggerPointsDesc')}
                   </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -1890,12 +1174,10 @@ export default function Settings() {
               <div className="flex items-center justify-between py-3">
                 <div>
                   <p className="text-sm font-medium text-gray-900">
-                    {lang === 'no' ? 'Auto-generer narrativ' : 'Auto-generate Narrative'}
+                    {t('autoGenerateNarrative')}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {lang === 'no'
-                      ? 'Generer klinisk narrativ automatisk ved lagring'
-                      : 'Automatically generate clinical narrative on save'}
+                    {t('autoGenerateNarrativeDesc')}
                   </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -1911,142 +1193,24 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* Spine Templates (Quick Palpation) */}
-          <SpineTemplatesEditor lang={lang} />
-
-          {/* Current Settings Summary */}
+          {/* Current Selection Summary */}
           <div className="bg-teal-50 rounded-lg border border-teal-200 p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-start gap-3">
-                <Check className="w-5 h-5 text-teal-600 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-teal-900">
-                    {lang === 'no' ? 'Aktive innstillinger' : 'Active Settings'}
-                  </p>
-                  <div className="mt-2 space-y-1">
-                    <p className="text-sm text-teal-700">
-                      <span className="font-medium">{lang === 'no' ? 'Notasjon:' : 'Notation:'}</span>{' '}
-                      {ADJUSTMENT_NOTATION_METHODS.find(m => m.id === clinicalPrefs.adjustmentNotation)?.name[lang] ||
-                       ADJUSTMENT_NOTATION_METHODS.find(m => m.id === clinicalPrefs.adjustmentNotation)?.name.en}
-                    </p>
-                    <p className="text-sm text-teal-700">
-                      <span className="font-medium">{lang === 'no' ? 'Ortopediske tester:' : 'Ortho tests:'}</span>{' '}
-                      {clinicalPrefs.testSettings?.orthopedic?.resultFormat === 'plus_minus' ? '+/-' :
-                       clinicalPrefs.testSettings?.orthopedic?.resultFormat === 'pos_neg' ? 'Pos/Neg' :
-                       clinicalPrefs.testSettings?.orthopedic?.resultFormat === 'numeric' ? '0-3' : lang === 'no' ? 'Beskrivende' : 'Descriptive'}
-                    </p>
-                    <p className="text-sm text-teal-700">
-                      <span className="font-medium">{lang === 'no' ? 'ROM:' : 'ROM:'}</span>{' '}
-                      {clinicalPrefs.testSettings?.rom?.format === 'degrees' ? (lang === 'no' ? 'Grader' : 'Degrees') :
-                       clinicalPrefs.testSettings?.rom?.format === 'percentage' ? '%' :
-                       clinicalPrefs.testSettings?.rom?.format === 'aga' ? 'AGA' : lang === 'no' ? 'Beskrivende' : 'Descriptive'}
-                    </p>
-                  </div>
-                  <p className="text-xs text-teal-600 mt-3">
-                    {updateClinicalSettingsMutation.isPending ? (
-                      <span className="flex items-center gap-1">
-                        <Loader2 className="w-3 h-3 animate-spin" />
-                        {lang === 'no' ? 'Lagrer...' : 'Saving...'}
-                      </span>
-                    ) : (
-                      lang === 'no'
-                        ? 'Innstillingene synkroniseres automatisk til serveren.'
-                        : 'Settings are automatically synced to the server.'
-                    )}
-                  </p>
-                </div>
+            <div className="flex items-start gap-3">
+              <Check className="w-5 h-5 text-teal-600 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-teal-900">
+                  {t('activeNotation')}
+                </p>
+                <p className="text-sm text-teal-700 mt-1">
+                  {ADJUSTMENT_NOTATION_METHODS.find(m => m.id === clinicalPrefs.adjustmentNotation)?.name[lang] ||
+                   ADJUSTMENT_NOTATION_METHODS.find(m => m.id === clinicalPrefs.adjustmentNotation)?.name.en}
+                </p>
+                <p className="text-xs text-teal-600 mt-2">
+                  {t('activeNotationDesc')}
+                </p>
               </div>
-
-              {/* Reset Button */}
-              <button
-                onClick={() => {
-                  if (confirm(lang === 'no'
-                    ? 'Tilbakestille alle kliniske innstillinger til standard?'
-                    : 'Reset all clinical settings to defaults?')) {
-                    resetClinicalSettingsMutation.mutate()
-                  }
-                }}
-                disabled={resetClinicalSettingsMutation.isPending}
-                className="px-3 py-1.5 text-sm border border-teal-300 rounded-lg text-teal-700 hover:bg-teal-100 flex items-center gap-1.5 transition-colors disabled:opacity-50"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                {lang === 'no' ? 'Tilbakestill' : 'Reset'}
-              </button>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Automation Tab */}
-      {activeTab === 'automation' && (
-        <div className="space-y-6">
-          {/* Today's Messages - Main Focus */}
-          <div className="bg-white rounded-lg border-2 border-green-200 shadow-sm">
-            <div className="px-6 py-4 border-b border-green-200 bg-green-50">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-green-500 flex items-center justify-center">
-                  <MessageSquare className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Dagens Meldinger
-                  </h2>
-                  <p className="text-sm text-gray-600">
-                    Se over og godkjenn meldinger før de sendes
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="p-6">
-              <TodaysMessages />
-            </div>
-          </div>
-
-          {/* Appointment Import */}
-          <div className="bg-white rounded-lg border border-gray-200">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                  <Upload className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Importer Timer fra SolvitJournal
-                  </h2>
-                  <p className="text-sm text-gray-500">
-                    Lim inn fra SolvitJournal kalender eller last opp Excel
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="p-6">
-              <AppointmentImporter onImportComplete={() => {
-                window.location.reload()
-              }} />
-            </div>
-          </div>
-
-          {/* Conflict Decisions - Secondary */}
-          <details className="bg-white rounded-lg border border-gray-200">
-            <summary className="px-6 py-4 cursor-pointer hover:bg-gray-50">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
-                  <CalendarClock className="w-5 h-5 text-orange-600" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Konflikter & Utsettelser
-                  </h2>
-                  <p className="text-sm text-gray-500">
-                    Når pasienter booker ny time før planlagt SMS
-                  </p>
-                </div>
-              </div>
-            </summary>
-            <div className="p-6 border-t">
-              <SchedulerDecisions />
-            </div>
-          </details>
         </div>
       )}
     </div>

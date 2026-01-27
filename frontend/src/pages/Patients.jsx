@@ -4,9 +4,11 @@ import { useQuery } from '@tanstack/react-query';
 import { patientsAPI } from '../services/api';
 import { formatDate, formatPhone, calculateAge, getStatusColor, debounce } from '../lib/utils';
 import { Search, Plus, Filter, Download, Upload } from 'lucide-react';
+import { useTranslation } from '../i18n';
 
 export default function Patients() {
   const navigate = useNavigate();
+  const { t, lang } = useTranslation('patients');
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [filters, setFilters] = useState({
@@ -104,9 +106,9 @@ export default function Patients() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Patients</h1>
+          <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
           <p className="text-gray-600 mt-1">
-            {pagination.total} total patients
+            {pagination.total} {t('totalPatients').toLowerCase()}
           </p>
         </div>
 
@@ -130,7 +132,7 @@ export default function Patients() {
             onClick={() => navigate('/patients/new')}
           >
             <Plus size={20} />
-            New Patient
+            {t('newPatient')}
           </button>
         </div>
       </div>
@@ -142,7 +144,7 @@ export default function Patients() {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
           <input
             type="text"
-            placeholder="Search patients by name, email, phone, or SolvIt ID..."
+            placeholder={t('searchPatients')}
             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -182,7 +184,7 @@ export default function Patients() {
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading patients...</p>
+            <p className="mt-4 text-gray-600">{t('loadingPatient')}</p>
           </div>
         </div>
       ) : error ? (
@@ -191,7 +193,7 @@ export default function Patients() {
         </div>
       ) : patients.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-lg">
-          <p className="text-gray-600 text-lg">No patients found</p>
+          <p className="text-gray-600 text-lg">{t('noPatients')}</p>
           <p className="text-gray-500 mt-2">Try adjusting your search or filters</p>
         </div>
       ) : (
@@ -219,13 +221,13 @@ export default function Patients() {
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('last_visit_date')}
                   >
-                    Last Visit
+                    {t('lastVisit')}
                     {filters.sortBy === 'last_visit_date' && (
                       <span className="ml-1">{filters.sortOrder === 'asc' ? '↑' : '↓'}</span>
                     )}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Visits
+                    {t('totalVisits')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status

@@ -21,6 +21,7 @@ import {
   XCircle,
   AlertCircle
 } from 'lucide-react'
+import { useTranslation, formatDate, formatTime } from '../i18n'
 import {
   startOfMonth,
   endOfMonth,
@@ -38,6 +39,7 @@ import {
 export default function Calendar() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { t, lang } = useTranslation('appointments')
   const [currentDate, setCurrentDate] = useState(new Date())
   const [view, setView] = useState('month') // 'month' or 'week' or 'day'
   const [selectedDate, setSelectedDate] = useState(new Date())
@@ -146,7 +148,7 @@ export default function Calendar() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Calendar</h1>
+          <h1 className="text-3xl font-bold text-gray-900">{t('calendar')}</h1>
           <p className="text-gray-600">
             {format(currentDate, 'MMMM yyyy')}
           </p>
@@ -187,12 +189,12 @@ export default function Calendar() {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="ALL">All Status</option>
-            <option value="PENDING">Pending</option>
-            <option value="CONFIRMED">Confirmed</option>
-            <option value="CANCELLED">Cancelled</option>
-            <option value="COMPLETED">Completed</option>
-            <option value="NO_SHOW">No Show</option>
+            <option value="ALL">{t('allStatus')}</option>
+            <option value="PENDING">{t('pending')}</option>
+            <option value="CONFIRMED">{t('confirmed')}</option>
+            <option value="CANCELLED">{t('cancelled')}</option>
+            <option value="COMPLETED">{t('completed')}</option>
+            <option value="NO_SHOW">{t('noShow')}</option>
           </select>
 
           <button
@@ -200,7 +202,7 @@ export default function Calendar() {
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             <Plus className="w-4 h-4" />
-            New Appointment
+            {t('newAppointment')}
           </button>
         </div>
       </div>
@@ -218,7 +220,7 @@ export default function Calendar() {
             onClick={today}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
           >
-            Today
+            {t('today')}
           </button>
           <button
             onClick={nextMonth}
@@ -230,7 +232,7 @@ export default function Calendar() {
 
         <div className="text-lg font-semibold text-gray-900">
           {view === 'month' && format(currentDate, 'MMMM yyyy')}
-          {view === 'week' && `Week of ${format(weekDays[0], 'MMM d, yyyy')}`}
+          {view === 'week' && t('weekOf').replace('{date}', format(weekDays[0], 'MMM d, yyyy'))}
           {view === 'day' && format(selectedDate, 'EEEE, MMMM d, yyyy')}
         </div>
 
@@ -242,11 +244,18 @@ export default function Calendar() {
         <div className="bg-white rounded-lg shadow overflow-hidden">
           {/* Week Days Header */}
           <div className="grid grid-cols-7 border-b bg-gray-50">
-            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
-              <div key={day} className="px-2 py-3 text-center text-sm font-semibold text-gray-700">
-                {day}
-              </div>
-            ))}
+            {(() => {
+              const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 })
+              return Array.from({ length: 7 }, (_, i) => {
+                const d = addDays(weekStart, i)
+                const label = d.toLocaleDateString(lang === 'no' ? 'nb-NO' : 'en-US', { weekday: 'short' })
+                return (
+                  <div key={i} className="px-2 py-3 text-center text-sm font-semibold text-gray-700">
+                    {label}
+                  </div>
+                )
+              })
+            })()}
           </div>
 
           {/* Calendar Grid */}
@@ -292,7 +301,7 @@ export default function Calendar() {
                     ))}
                     {dayAppointments.length > 3 && (
                       <div className="text-xs text-gray-500 px-1.5">
-                        +{dayAppointments.length - 3} more
+                        {t('moreAppointments').replace('{count}', dayAppointments.length - 3)}
                       </div>
                     )}
                   </div>
@@ -376,13 +385,13 @@ export default function Calendar() {
             ) : getAppointmentsForDate(selectedDate).length === 0 ? (
               <div className="text-center py-12">
                 <CalendarIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">No appointments scheduled for this day</p>
+                <p className="text-gray-600">{t('noAppointmentsScheduled')}</p>
                 <button
                   onClick={() => navigate('/appointments/new')}
                   className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
                   <Plus className="w-4 h-4" />
-                  Schedule Appointment
+                  {t('scheduleAppointment')}
                 </button>
               </div>
             ) : (
@@ -412,7 +421,7 @@ export default function Calendar() {
                             {format(parseISO(apt.start_time), 'HH:mm')} - {format(parseISO(apt.end_time), 'HH:mm')}
                           </div>
                           <div>
-                            Type: {apt.appointment_type}
+                            {t('type')}: {apt.appointment_type}
                           </div>
                         </div>
 
@@ -431,17 +440,17 @@ export default function Calendar() {
                               disabled={confirmMutation.isPending}
                               className="px-3 py-1.5 text-sm font-medium text-green-700 bg-green-50 border border-green-300 rounded-lg hover:bg-green-100 disabled:opacity-50"
                             >
-                              Confirm
+                              {t('confirm')}
                             </button>
                             <button
                               onClick={() => {
-                                const reason = prompt('Cancellation reason:')
+                                const reason = prompt(t('cancellationReasonPrompt'))
                                 if (reason) cancelMutation.mutate({ id: apt.id, reason })
                               }}
                               disabled={cancelMutation.isPending}
                               className="px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 border border-red-300 rounded-lg hover:bg-red-100 disabled:opacity-50"
                             >
-                              Cancel
+                              {t('cancel')}
                             </button>
                           </>
                         )}
@@ -449,7 +458,7 @@ export default function Calendar() {
                           onClick={() => navigate(`/appointments/${apt.id}`)}
                           className="px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded-lg hover:bg-blue-100"
                         >
-                          View Details
+                          {t('viewDetails')}
                         </button>
                       </div>
                     </div>

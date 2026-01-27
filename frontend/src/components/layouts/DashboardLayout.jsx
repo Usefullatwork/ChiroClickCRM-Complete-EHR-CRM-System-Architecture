@@ -4,6 +4,7 @@ import {
   Users,
   Calendar,
   CalendarDays,
+  Kanban,
   MessageSquare,
   CheckCircle2,
   DollarSign,
@@ -13,8 +14,11 @@ import {
   Shield,
   BookOpen,
   Settings,
-  User
+  User,
+  HeartHandshake
 } from 'lucide-react'
+import { useTranslation } from '../../i18n'
+import LanguageSwitcher from '../LanguageSwitcher'
 
 // Mock user for development
 const devUser = {
@@ -28,28 +32,31 @@ const devOrganization = {
   name: 'ChiroClick Demo Clinic'
 }
 
+const NAV_ITEMS = [
+  { key: 'dashboard', href: '/', icon: LayoutDashboard },
+  { key: 'patients', href: '/patients', icon: Users },
+  { key: 'calendar', href: '/calendar', icon: CalendarDays },
+  { key: 'patientFlow', href: '/patient-flow', icon: Kanban },
+  { key: 'appointments', href: '/appointments', icon: Calendar },
+  { key: 'communications', href: '/communications', icon: MessageSquare },
+  { key: 'followUps', href: '/follow-ups', icon: CheckCircle2 },
+  { key: 'crm', href: '/crm', icon: HeartHandshake },
+  { key: 'financial', href: '/financial', icon: DollarSign },
+  { key: 'kpi', href: '/kpi', icon: TrendingUp },
+  { key: 'templates', href: '/templates', icon: BookOpen },
+  { key: 'import', href: '/import', icon: Upload },
+  { key: 'aiTraining', href: '/training', icon: Brain },
+  { key: 'auditLogs', href: '/audit-logs', icon: Shield },
+  { key: 'settings', href: '/settings', icon: Settings },
+]
+
 export default function DashboardLayout() {
   const location = useLocation()
+  const { t } = useTranslation('navigation')
 
   // In dev mode without Clerk, use mock data
   const user = devUser
   const organization = devOrganization
-
-  const navigation = [
-    { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-    { name: 'Patients', href: '/patients', icon: Users },
-    { name: 'Calendar', href: '/calendar', icon: CalendarDays },
-    { name: 'Appointments', href: '/appointments', icon: Calendar },
-    { name: 'Communications', href: '/communications', icon: MessageSquare },
-    { name: 'Follow-ups', href: '/follow-ups', icon: CheckCircle2 },
-    { name: 'Financial', href: '/financial', icon: DollarSign },
-    { name: 'KPI', href: '/kpi', icon: TrendingUp },
-    { name: 'Templates', href: '/templates', icon: BookOpen },
-    { name: 'Import', href: '/import', icon: Upload },
-    { name: 'AI Training', href: '/training', icon: Brain },
-    { name: 'Audit Logs', href: '/audit-logs', icon: Shield },
-    { name: 'Settings', href: '/settings', icon: Settings },
-  ]
 
   const isActive = (href) => {
     if (href === '/') {
@@ -74,11 +81,11 @@ export default function DashboardLayout() {
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto px-3 py-4">
             <ul className="space-y-1">
-              {navigation.map((item) => {
+              {NAV_ITEMS.map((item) => {
                 const active = isActive(item.href)
                 const Icon = item.icon
                 return (
-                  <li key={item.name}>
+                  <li key={item.key}>
                     <Link
                       to={item.href}
                       className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
@@ -88,7 +95,7 @@ export default function DashboardLayout() {
                       }`}
                     >
                       <Icon className="w-5 h-5" />
-                      {item.name}
+                      {t(item.key)}
                     </Link>
                   </li>
                 )
@@ -96,17 +103,22 @@ export default function DashboardLayout() {
             </ul>
           </nav>
 
-          {/* User Profile */}
-          <div className="p-4 border-t border-gray-200">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
-                <User className="w-5 h-5 text-white" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
-                  {user?.fullName || user?.firstName || 'Mads Admin'}
-                </p>
-                <p className="text-xs text-gray-500">Practitioner</p>
+          {/* Language Switcher + User Profile */}
+          <div className="border-t border-gray-200">
+            <div className="px-4 py-3 flex justify-center">
+              <LanguageSwitcher />
+            </div>
+            <div className="px-4 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
+                  <User className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">
+                    {user?.fullName || user?.firstName || 'Mads Admin'}
+                  </p>
+                  <p className="text-xs text-gray-500">{t('practitioner')}</p>
+                </div>
               </div>
             </div>
           </div>
