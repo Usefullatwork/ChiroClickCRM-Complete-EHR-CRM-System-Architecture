@@ -241,16 +241,83 @@ These are placeholders to prevent import errors:
 | ExercisePanel | `frontend/src/components/exercises/index.jsx` |
 
 ### Stub Backend Routes Created
-| Route | Path |
-|-------|------|
-| scheduler | `backend/src/routes/scheduler.js` |
-| kiosk | `backend/src/routes/kiosk.js` |
-| crm | `backend/src/routes/crm.js` |
-| automations | `backend/src/routes/automations.js` |
-| bulkCommunication | `backend/src/routes/bulkCommunication.js` |
-| exercises | `backend/src/routes/exercises.js` |
-| notifications | `backend/src/routes/notifications.js` |
-| patientPortal | `backend/src/routes/patientPortal.js` |
+| Route | Path | Status |
+|-------|------|--------|
+| scheduler | `backend/src/routes/scheduler.js` | Stub |
+| kiosk | `backend/src/routes/kiosk.js` | Stub |
+| crm | `backend/src/routes/crm.js` | **COMPLETE** |
+| automations | `backend/src/routes/automations.js` | Stub |
+| bulkCommunication | `backend/src/routes/bulkCommunication.js` | Stub |
+| exercises | `backend/src/routes/exercises.js` | Stub |
+| notifications | `backend/src/routes/notifications.js` | Stub |
+| patientPortal | `backend/src/routes/patientPortal.js` | Stub |
+
+---
+
+## CRM System (Completed 2026-01-28)
+
+### Status: FULLY OPERATIONAL
+
+The CRM module is now complete with 40+ API endpoints:
+
+### CRM API Endpoints
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /crm/overview | Dashboard metrics |
+| GET | /crm/leads | Lead list with filtering |
+| GET | /crm/leads/pipeline | Pipeline statistics |
+| GET/POST | /crm/leads/:id | Lead CRUD |
+| POST | /crm/leads/:id/convert | Convert to patient |
+| GET | /crm/lifecycle | Patients by lifecycle |
+| GET | /crm/lifecycle/stats | Lifecycle statistics |
+| GET/POST | /crm/referrals | Referral management |
+| GET | /crm/referrals/stats | Referral statistics |
+| GET/POST | /crm/surveys | Survey management |
+| GET | /crm/surveys/:id/responses | Survey responses |
+| GET | /crm/surveys/nps/stats | NPS analytics |
+| GET/POST | /crm/communications | Communication history |
+| GET/POST | /crm/campaigns | Campaign management |
+| POST | /crm/campaigns/:id/launch | Launch campaign |
+| GET/POST | /crm/workflows | Workflow automation |
+| POST | /crm/workflows/:id/toggle | Toggle workflow |
+| GET | /crm/retention | Retention dashboard |
+| GET | /crm/retention/churn | Churn analysis |
+| GET | /crm/retention/cohorts | Cohort analysis |
+| GET/POST | /crm/waitlist | Waitlist management |
+| POST | /crm/waitlist/notify | Notify waitlist |
+| GET/PUT | /crm/settings | CRM settings |
+
+### Key Files
+- `backend/src/routes/crm.js` - Full route definitions (310 lines)
+- `backend/src/controllers/crm.js` - Controller with 50+ methods
+- `backend/src/services/crm.js` - Business logic (~1300 lines)
+
+### Test Credentials
+| Email | Password | Role |
+|-------|----------|------|
+| mads@chiroclick.no | admin123 | PRACTITIONER |
+
+### Testing CRM
+```bash
+# Login and save cookie
+curl -c cookies.txt -X POST http://localhost:3000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"mads@chiroclick.no","password":"admin123"}'
+
+# Test CRM Overview
+curl -b cookies.txt http://localhost:3000/api/v1/crm/overview
+
+# Test Leads
+curl -b cookies.txt http://localhost:3000/api/v1/crm/leads
+
+# Test Lifecycle Stats
+curl -b cookies.txt http://localhost:3000/api/v1/crm/lifecycle/stats
+```
+
+### Database Fixes Applied
+1. Created `current_tenant_id()` function for RLS
+2. Fixed `setTenantContext()` to use `set_config()` instead of `SET`
+3. Changed `clinic_id` to `organization_id` in CRM service/controller
 
 ### Clinical Settings System (NEW)
 Full backend API for clinical documentation preferences:
