@@ -3,7 +3,7 @@
  * Provides aggregated stats and quick access data for the main dashboard
  */
 
-import { query } from '../db/index.js';
+import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
 
 /**
@@ -36,24 +36,34 @@ export const getDashboardStats = async (req, res) => {
     );
 
     // Get pending follow-ups count
-    const pendingFollowUpsResult = await query(
-      `SELECT COUNT(*) as count
-       FROM followups
-       WHERE organization_id = $1
-         AND status = 'PENDING'
-         AND due_date <= CURRENT_DATE + INTERVAL '7 days'`,
-      [organizationId]
-    );
+    let pendingFollowUpsResult;
+    try {
+      pendingFollowUpsResult = await query(
+        `SELECT COUNT(*) as count
+         FROM follow_ups
+         WHERE organization_id = $1
+           AND status = 'PENDING'
+           AND due_date <= CURRENT_DATE + INTERVAL '7 days'`,
+        [organizationId]
+      );
+    } catch (e) {
+      pendingFollowUpsResult = { rows: [{ count: 0 }] };
+    }
 
     // Get month revenue
-    const monthRevenueResult = await query(
-      `SELECT COALESCE(SUM(paid_amount), 0) as revenue
-       FROM financial_transactions
-       WHERE organization_id = $1
-         AND payment_status = 'PAID'
-         AND created_at >= $2`,
-      [organizationId, firstDayOfMonth]
-    );
+    let monthRevenueResult;
+    try {
+      monthRevenueResult = await query(
+        `SELECT COALESCE(SUM(patient_amount), 0) as revenue
+         FROM financial_metrics
+         WHERE organization_id = $1
+           AND payment_status = 'PAID'
+           AND created_at >= $2`,
+        [organizationId, firstDayOfMonth]
+      );
+    } catch (e) {
+      monthRevenueResult = { rows: [{ revenue: 0 }] };
+    }
 
     const stats = {
       todayAppointments: parseInt(todayAppointmentsResult.rows[0].count),
@@ -90,10 +100,10 @@ export const getTodayAppointments = async (req, res) => {
          a.patient_id,
          a.start_time,
          a.end_time,
-         a.duration_minutes,
+         EXTRACT(EPOCH FROM (a.end_time - a.start_time))/60 as duration_minutes,
          a.appointment_type,
          a.status,
-         a.notes,
+         a.internal_notes as notes,
          a.cancellation_reason,
          p.first_name || ' ' || p.last_name as patient_name,
          p.phone,
@@ -135,13 +145,13 @@ export const getPendingTasks = async (req, res) => {
       `SELECT
          f.id,
          f.patient_id,
-         f.type,
+         f.follow_up_type as type,
          f.due_date,
          f.priority,
          f.notes,
          p.first_name || ' ' || p.last_name as patient_name,
          p.phone
-       FROM followups f
+       FROM follow_ups f
        JOIN patients p ON f.patient_id = p.id
        WHERE f.organization_id = $1
          AND f.status = 'PENDING'

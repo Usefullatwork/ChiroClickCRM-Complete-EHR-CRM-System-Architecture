@@ -178,7 +178,7 @@ export const getFollowUpStatus = async (organizationId) => {
       `SELECT
         f.contact_method,
         COUNT(*) as count
-      FROM followups f
+      FROM follow_ups f
       WHERE f.organization_id = $1
         AND f.status = 'PENDING'
         AND f.type IN ('REBOOKING_SELF', 'ACUTE_TRAUMA')
