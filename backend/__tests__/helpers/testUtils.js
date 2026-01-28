@@ -130,9 +130,8 @@ export async function createTestPatient(organizationId, overrides = {}) {
 export async function createTestEncounter(organizationId, patientId, practitionerId, overrides = {}) {
   const defaults = {
     encounter_type: 'FOLLOWUP',
-    status: 'in_progress',
     chief_complaint: 'Test complaint',
-    subjective: {},
+    subjective: { chief_complaint: 'Test complaint' },
     objective: {},
     assessment: {},
     plan: {}
@@ -140,11 +139,16 @@ export async function createTestEncounter(organizationId, patientId, practitione
 
   const data = { ...defaults, ...overrides };
 
+  // Merge chief_complaint into subjective if provided
+  if (data.chief_complaint && !data.subjective.chief_complaint) {
+    data.subjective = { ...data.subjective, chief_complaint: data.chief_complaint };
+  }
+
   const result = await db.query(
-    `INSERT INTO clinical_encounters (organization_id, patient_id, practitioner_id, encounter_type, status, encounter_date, subjective, objective, assessment, plan)
-     VALUES ($1, $2, $3, $4, $5, NOW(), $6, $7, $8, $9)
+    `INSERT INTO clinical_encounters (organization_id, patient_id, practitioner_id, encounter_type, encounter_date, subjective, objective, assessment, plan)
+     VALUES ($1, $2, $3, $4, NOW(), $5, $6, $7, $8)
      RETURNING *`,
-    [organizationId, patientId, practitionerId, data.encounter_type, data.status, JSON.stringify(data.subjective), JSON.stringify(data.objective), JSON.stringify(data.assessment), JSON.stringify(data.plan)]
+    [organizationId, patientId, practitionerId, data.encounter_type, JSON.stringify(data.subjective), JSON.stringify(data.objective), JSON.stringify(data.assessment), JSON.stringify(data.plan)]
   );
 
   return result.rows[0];
