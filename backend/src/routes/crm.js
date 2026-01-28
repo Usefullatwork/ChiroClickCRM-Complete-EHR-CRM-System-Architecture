@@ -305,6 +305,6 @@ router.get('/settings', crmController.getCRMSettings);
  * PUT /api/v1/crm/settings
  * Update CRM settings
  */
-router.put('/settings', requireRole('ADMIN'), crmController.updateCRMSettings);
+router.put('/settings', requireRole(['ADMIN']), crmController.updateCRMSettings);
 
 export default router;
