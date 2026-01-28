@@ -21,7 +21,8 @@ import {
   XCircle,
   Clock,
   FileText,
-  Calendar
+  Calendar,
+  ChevronDown
 } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
 import InvoiceModal from '../components/InvoiceModal'
@@ -43,6 +44,7 @@ export default function Financial() {
 
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [selectedInvoiceTransaction, setSelectedInvoiceTransaction] = useState(null)
+  const [showExportMenu, setShowExportMenu] = useState(false)
 
   // Fetch financial summary
   const { data: summaryData } = useQuery({
@@ -143,6 +145,77 @@ export default function Financial() {
   // Chart colors
   const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899']
 
+  // Export functionality
+  const exportToCSV = () => {
+    const headers = ['Date', 'Patient', 'Type', 'Amount', 'Insurance', 'Payment Method', 'Status', 'Invoice Number']
+    const rows = transactions.map(t => [
+      new Date(t.created_at).toISOString().split('T')[0],
+      t.patient_name || 'Unknown',
+      t.transaction_type || '',
+      t.patient_amount || 0,
+      t.insurance_amount || 0,
+      t.payment_method || '',
+      t.payment_status || '',
+      t.invoice_number || ''
+    ])
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell =>
+        typeof cell === 'string' && cell.includes(',') ? `"${cell}"` : cell
+      ).join(','))
+    ].join('\n')
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', `financial-export-${new Date().toISOString().split('T')[0]}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    setShowExportMenu(false)
+  }
+
+  const exportToExcel = () => {
+    // Excel XML format (simple version)
+    const headers = ['Date', 'Patient', 'Type', 'Amount', 'Insurance', 'Payment Method', 'Status', 'Invoice Number']
+    const rows = transactions.map(t => [
+      new Date(t.created_at).toISOString().split('T')[0],
+      t.patient_name || 'Unknown',
+      t.transaction_type || '',
+      t.patient_amount || 0,
+      t.insurance_amount || 0,
+      t.payment_method || '',
+      t.payment_status || '',
+      t.invoice_number || ''
+    ])
+
+    let xmlContent = `<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+  <Worksheet ss:Name="Financial Report">
+    <Table>
+      <Row>${headers.map(h => `<Cell><Data ss:Type="String">${h}</Data></Cell>`).join('')}</Row>
+      ${rows.map(row => `<Row>${row.map((cell, i) =>
+        `<Cell><Data ss:Type="${i === 3 || i === 4 ? 'Number' : 'String'}">${cell}</Data></Cell>`
+      ).join('')}</Row>`).join('\n      ')}
+    </Table>
+  </Worksheet>
+</Workbook>`
+
+    const blob = new Blob([xmlContent], { type: 'application/vnd.ms-excel' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', `financial-export-${new Date().toISOString().split('T')[0]}.xls`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    setShowExportMenu(false)
+  }
+
   return (
     <div className="p-6">
       {/* Header */}
@@ -153,13 +226,32 @@ export default function Financial() {
         </div>
 
         <div className="flex gap-3">
-          <button
-            className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-            onClick={() => {/* TODO: Export functionality */}}
-          >
-            <Download size={20} />
-            {t('export')}
-          </button>
+          <div className="relative">
+            <button
+              className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              onClick={() => setShowExportMenu(!showExportMenu)}
+            >
+              <Download size={20} />
+              {t('export')}
+              <ChevronDown size={16} />
+            </button>
+            {showExportMenu && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                <button
+                  onClick={exportToCSV}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-lg"
+                >
+                  Export as CSV
+                </button>
+                <button
+                  onClick={exportToExcel}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg"
+                >
+                  Export as Excel
+                </button>
+              </div>
+            )}
+          </div>
           <button
             className="flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
             onClick={() => setShowCreateModal(true)}

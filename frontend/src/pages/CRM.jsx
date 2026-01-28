@@ -40,7 +40,9 @@ import {
   Bell,
   Target,
   Zap,
-  ListChecks
+  ListChecks,
+  Menu,
+  X
 } from 'lucide-react';
 
 // Import CRM sub-components
@@ -75,6 +77,7 @@ export default function CRM() {
   const { t, lang } = useTranslation('crm');
   const [activeModule, setActiveModule] = useState('overview');
   const [loading, setLoading] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [overviewStats, setOverviewStats] = useState({
     newLeads: 0,
     activePatients: 0,
@@ -411,28 +414,50 @@ export default function CRM() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white border-b border-gray-200 px-4 md:px-6 py-4">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {t('customerRelationshipManagement')}
-            </h1>
-            <p className="text-sm text-gray-500 mt-1">
-              {t('crmSubtitle')}
-            </p>
+          <div className="flex items-center gap-3">
+            {/* Mobile menu button */}
+            <button
+              className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+            <div>
+              <h1 className="text-xl md:text-2xl font-bold text-gray-900">
+                {t('customerRelationshipManagement')}
+              </h1>
+              <p className="text-sm text-gray-500 mt-1 hidden sm:block">
+                {t('crmSubtitle')}
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <button className="flex items-center gap-2 px-3 md:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm md:text-base">
               <Plus className="w-4 h-4" />
-              {t('newLead')}
+              <span className="hidden sm:inline">{t('newLead')}</span>
             </button>
           </div>
         </div>
       </div>
 
-      <div className="flex">
+      <div className="flex relative">
+        {/* Mobile sidebar overlay */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
         {/* Sidebar Navigation */}
-        <div className="w-64 bg-white border-r border-gray-200 min-h-[calc(100vh-73px)]">
+        <div className={`
+          fixed lg:relative z-30 lg:z-auto
+          w-64 bg-white border-r border-gray-200 min-h-[calc(100vh-73px)]
+          transform transition-transform duration-300 ease-in-out
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}>
           <nav className="p-4 space-y-1">
             {CRM_MODULES.map((module) => {
               const Icon = module.icon;
@@ -441,7 +466,10 @@ export default function CRM() {
               return (
                 <button
                   key={module.id}
-                  onClick={() => setActiveModule(module.id)}
+                  onClick={() => {
+                    setActiveModule(module.id);
+                    setSidebarOpen(false);
+                  }}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors
                     ${isActive
                       ? `bg-${module.color}-50 text-${module.color}-700 border border-${module.color}-200`
@@ -456,7 +484,7 @@ export default function CRM() {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-4 md:p-6 w-full lg:w-auto">
           {renderModuleContent()}
         </div>
       </div>
