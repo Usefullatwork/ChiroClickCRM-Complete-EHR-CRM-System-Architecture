@@ -161,13 +161,16 @@ export const closePool = async () => {
 /**
  * Set tenant context for Row-Level Security (RLS)
  * Must be called before queries on RLS-enabled tables
+ * Note: This uses set_config with is_local=false so it persists for the session
  * @param {string} organizationId - The organization UUID
  */
 export const setTenantContext = async (organizationId) => {
   if (!organizationId) {
     throw new Error('Organization ID required for tenant context');
   }
-  await query(`SET app.current_tenant = $1`, [organizationId]);
+  // Use set_config instead of SET to avoid GUC registration requirement
+  // is_local=false means it persists for the connection (not just transaction)
+  await query(`SELECT set_config('app.current_tenant', $1, false)`, [organizationId]);
 };
 
 /**
@@ -175,7 +178,7 @@ export const setTenantContext = async (organizationId) => {
  * Should be called after request completes
  */
 export const clearTenantContext = async () => {
-  await query(`RESET app.current_tenant`);
+  await query(`SELECT set_config('app.current_tenant', '', false)`);
 };
 
 /**
@@ -189,11 +192,11 @@ export const clearTenantContext = async () => {
 export const queryWithTenant = async (organizationId, text, params = []) => {
   const client = await pool.connect();
   try {
-    await client.query(`SET app.current_tenant = $1`, [organizationId]);
+    await client.query(`SELECT set_config('app.current_tenant', $1, false)`, [organizationId]);
     const result = await client.query(text, params);
     return result;
   } finally {
-    await client.query(`RESET app.current_tenant`);
+    await client.query(`SELECT set_config('app.current_tenant', '', false)`);
     client.release();
   }
 };
