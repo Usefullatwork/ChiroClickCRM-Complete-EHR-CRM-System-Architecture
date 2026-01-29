@@ -671,6 +671,11 @@ gh pr list --state open
 
 ## HEAVY TODO LIST FOR TONIGHT
 
+### Priority 0: FIX SCHEDULER BUG (Critical)
+**Error**: `column w.clinic_id does not exist` every minute from cron job
+**File**: `backend/src/jobs/scheduler.js:70`
+**Fix**: Change `w.clinic_id` to `w.organization_id` in `processScheduledWorkflowActions`
+
 ### Priority 1: Merge New PRs
 ```bash
 # List all open PRs
