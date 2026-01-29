@@ -336,6 +336,183 @@ export default function PatientDetail() {
             </div>
           </div>
 
+          {/* Treatment Preferences */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold mb-4">Behandlingspreferanser</h2>
+            <div className="space-y-4">
+              {/* Preference indicators when not editing */}
+              {!isEditing ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="flex items-center gap-3 p-3 rounded-lg border border-gray-200">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                      patient.treatment_pref_needles === true ? 'bg-green-100' :
+                      patient.treatment_pref_needles === false ? 'bg-red-100' : 'bg-gray-100'
+                    }`}>
+                      <span className={`text-lg ${
+                        patient.treatment_pref_needles === true ? 'text-green-600' :
+                        patient.treatment_pref_needles === false ? 'text-red-600' : 'text-gray-400'
+                      }`}>
+                        {patient.treatment_pref_needles === true ? '✓' :
+                         patient.treatment_pref_needles === false ? '✗' : '?'}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">Nåler</p>
+                      <p className="font-medium">
+                        {patient.treatment_pref_needles === true ? 'OK' :
+                         patient.treatment_pref_needles === false ? 'Ikke OK' : 'Ikke avklart'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-3 rounded-lg border border-gray-200">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                      patient.treatment_pref_adjustments === true ? 'bg-green-100' :
+                      patient.treatment_pref_adjustments === false ? 'bg-red-100' : 'bg-gray-100'
+                    }`}>
+                      <span className={`text-lg ${
+                        patient.treatment_pref_adjustments === true ? 'text-green-600' :
+                        patient.treatment_pref_adjustments === false ? 'text-red-600' : 'text-gray-400'
+                      }`}>
+                        {patient.treatment_pref_adjustments === true ? '✓' :
+                         patient.treatment_pref_adjustments === false ? '✗' : '?'}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">Justeringer</p>
+                      <p className="font-medium">
+                        {patient.treatment_pref_adjustments === true ? 'OK' :
+                         patient.treatment_pref_adjustments === false ? 'Ikke OK' : 'Ikke avklart'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-3 rounded-lg border border-gray-200">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                      patient.treatment_pref_neck_adjustments === true ? 'bg-green-100' :
+                      patient.treatment_pref_neck_adjustments === false ? 'bg-red-100' : 'bg-gray-100'
+                    }`}>
+                      <span className={`text-lg ${
+                        patient.treatment_pref_neck_adjustments === true ? 'text-green-600' :
+                        patient.treatment_pref_neck_adjustments === false ? 'text-red-600' : 'text-gray-400'
+                      }`}>
+                        {patient.treatment_pref_neck_adjustments === true ? '✓' :
+                         patient.treatment_pref_neck_adjustments === false ? '✗' : '?'}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">Nakkejusteringer</p>
+                      <p className="font-medium">
+                        {patient.treatment_pref_neck_adjustments === true ? 'OK' :
+                         patient.treatment_pref_neck_adjustments === false ? 'Ikke OK' : 'Ikke avklart'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* Edit mode */
+                <div className="space-y-3">
+                  <div className="flex items-center gap-6">
+                    <span className="text-sm font-medium text-gray-700 w-32">Nåler:</span>
+                    <div className="flex items-center gap-4">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="edit_pref_needles"
+                          checked={formData.treatment_pref_needles === true}
+                          onChange={() => setFormData({...formData, treatment_pref_needles: true})}
+                          className="w-4 h-4 text-green-600" />
+                        <span className="text-sm text-green-700">OK</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="edit_pref_needles"
+                          checked={formData.treatment_pref_needles === false}
+                          onChange={() => setFormData({...formData, treatment_pref_needles: false})}
+                          className="w-4 h-4 text-red-600" />
+                        <span className="text-sm text-red-700">Ikke OK</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="edit_pref_needles"
+                          checked={formData.treatment_pref_needles === null}
+                          onChange={() => setFormData({...formData, treatment_pref_needles: null})}
+                          className="w-4 h-4 text-gray-600" />
+                        <span className="text-sm text-gray-500">Ikke avklart</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-6">
+                    <span className="text-sm font-medium text-gray-700 w-32">Justeringer:</span>
+                    <div className="flex items-center gap-4">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="edit_pref_adj"
+                          checked={formData.treatment_pref_adjustments === true}
+                          onChange={() => setFormData({...formData, treatment_pref_adjustments: true})}
+                          className="w-4 h-4 text-green-600" />
+                        <span className="text-sm text-green-700">OK</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="edit_pref_adj"
+                          checked={formData.treatment_pref_adjustments === false}
+                          onChange={() => setFormData({...formData, treatment_pref_adjustments: false})}
+                          className="w-4 h-4 text-red-600" />
+                        <span className="text-sm text-red-700">Ikke OK</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="edit_pref_adj"
+                          checked={formData.treatment_pref_adjustments === null}
+                          onChange={() => setFormData({...formData, treatment_pref_adjustments: null})}
+                          className="w-4 h-4 text-gray-600" />
+                        <span className="text-sm text-gray-500">Ikke avklart</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-6">
+                    <span className="text-sm font-medium text-gray-700 w-32">Nakkejusteringer:</span>
+                    <div className="flex items-center gap-4">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="edit_pref_neck"
+                          checked={formData.treatment_pref_neck_adjustments === true}
+                          onChange={() => setFormData({...formData, treatment_pref_neck_adjustments: true})}
+                          className="w-4 h-4 text-green-600" />
+                        <span className="text-sm text-green-700">OK</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="edit_pref_neck"
+                          checked={formData.treatment_pref_neck_adjustments === false}
+                          onChange={() => setFormData({...formData, treatment_pref_neck_adjustments: false})}
+                          className="w-4 h-4 text-red-600" />
+                        <span className="text-sm text-red-700">Ikke OK</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="edit_pref_neck"
+                          checked={formData.treatment_pref_neck_adjustments === null}
+                          onChange={() => setFormData({...formData, treatment_pref_neck_adjustments: null})}
+                          className="w-4 h-4 text-gray-600" />
+                        <span className="text-sm text-gray-500">Ikke avklart</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Notes */}
+              <div className="mt-4">
+                <label className="block text-sm text-gray-600 mb-1">Preferansenotater</label>
+                {isEditing ? (
+                  <textarea
+                    value={formData.treatment_pref_notes || ''}
+                    onChange={(e) => setFormData({ ...formData, treatment_pref_notes: e.target.value })}
+                    rows={2}
+                    placeholder="Eventuelle notater om behandlingspreferanser..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  />
+                ) : (
+                  <p className="text-gray-700">{patient.treatment_pref_notes || '-'}</p>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Recent Encounters */}
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold mb-4">Recent Visits</h2>

@@ -123,7 +123,12 @@ export default function Training() {
         {statusQuery.isLoading ? (
           <div className="text-gray-500">Laster...</div>
         ) : statusQuery.isError ? (
-          <div className="text-red-500">Feil ved henting av status</div>
+          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+            <div className="text-red-700 font-medium">Feil ved henting av status</div>
+            <div className="text-red-600 text-sm mt-1">
+              {statusQuery.error?.response?.data?.error || statusQuery.error?.message || 'Ukjent feil'}
+            </div>
+          </div>
         ) : (
           <>
             <div className="flex items-center gap-2 mb-4">

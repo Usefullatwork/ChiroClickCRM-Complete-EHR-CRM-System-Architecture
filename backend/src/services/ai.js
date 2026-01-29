@@ -872,6 +872,71 @@ export const getAIStatus = async () => {
 
 export { getModelForTask, MODEL_ROUTING };
 
+/**
+ * Get the appropriate model for a clinical field type
+ */
+export const getModelForField = (fieldType) => {
+  const fieldModelMap = {
+    'spell-check': 'chiro-fast',
+    'autocomplete': 'chiro-fast',
+    'soap-subjective': 'chiro-no',
+    'soap-objective': 'chiro-no',
+    'soap-assessment': 'chiro-no',
+    'soap-plan': 'chiro-no',
+    'diagnosis': 'chiro-no',
+    'red-flag': 'chiro-medical',
+    'letter': 'chiro-norwegian',
+    'communication': 'chiro-norwegian',
+  };
+  return fieldModelMap[fieldType] || AI_MODEL || 'chiro-no';
+};
+
+/**
+ * Build a prompt for field-specific AI generation
+ */
+export const buildFieldPrompt = (fieldType, context = {}, language = 'no') => {
+  const basePrompt = context.chiefComplaint
+    ? `Basert på hovedklage: ${context.chiefComplaint}\n`
+    : '';
+  return `${basePrompt}Generer ${fieldType} for klinisk dokumentasjon.`;
+};
+
+/**
+ * Generate AI completion as a stream (SSE)
+ */
+export const generateCompletionStream = async (model, prompt, res) => {
+  try {
+    const response = await axios.post(`${OLLAMA_BASE_URL}/api/generate`, {
+      model: model || AI_MODEL,
+      prompt,
+      stream: true,
+    }, { responseType: 'stream', timeout: 60000 });
+
+    response.data.on('data', (chunk) => {
+      try {
+        const parsed = JSON.parse(chunk.toString());
+        if (parsed.response) {
+          res.write(`data: ${JSON.stringify({ text: parsed.response })}\n\n`);
+        }
+        if (parsed.done) {
+          res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+          res.end();
+        }
+      } catch (e) {
+        // Skip unparseable chunks
+      }
+    });
+
+    response.data.on('error', (err) => {
+      res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
+      res.end();
+    });
+  } catch (error) {
+    res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
+    res.end();
+  }
+};
+
 export default {
   spellCheckNorwegian,
   generateSOAPSuggestions,

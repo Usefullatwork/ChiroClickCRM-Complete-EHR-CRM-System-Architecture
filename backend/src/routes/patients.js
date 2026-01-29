@@ -5,6 +5,8 @@
 
 import express from 'express';
 import * as patientController from '../controllers/patients.js';
+import * as exercisesController from '../controllers/exercises.js';
+import * as pdfController from '../controllers/pdf.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
 import {
@@ -106,6 +108,50 @@ router.delete(
   requireRole(['ADMIN', 'PRACTITIONER']),
   validate(deletePatientSchema),
   patientController.deletePatient
+);
+
+// ============================================================================
+// PATIENT EXERCISE ROUTES
+// ============================================================================
+
+/**
+ * @route   GET /api/v1/patients/:patientId/exercises
+ * @desc    Get patient's exercise prescriptions
+ * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @query   status, includeCompleted, page, limit
+ */
+router.get('/:patientId/exercises', exercisesController.getPatientExercises);
+
+/**
+ * @route   POST /api/v1/patients/:patientId/exercises
+ * @desc    Prescribe an exercise to a patient
+ * @access  Private (ADMIN, PRACTITIONER)
+ */
+router.post(
+  '/:patientId/exercises',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  exercisesController.prescribe
+);
+
+/**
+ * @route   POST /api/v1/patients/:patientId/programs
+ * @desc    Assign an exercise program to a patient
+ * @access  Private (ADMIN, PRACTITIONER)
+ */
+router.post(
+  '/:patientId/programs',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  exercisesController.assignProgram
+);
+
+/**
+ * @route   GET /api/v1/patients/:patientId/exercises/pdf
+ * @desc    Generate PDF handout of patient's exercise program
+ * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ */
+router.get(
+  '/:patientId/exercises/pdf',
+  pdfController.generateExerciseHandout
 );
 
 export default router;

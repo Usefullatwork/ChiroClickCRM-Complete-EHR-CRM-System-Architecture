@@ -30,9 +30,12 @@ import {
   Video,
   Image,
   X,
-  ChevronDown
+  ChevronDown,
+  ChevronUp,
+  Bone,
+  RotateCcw
 } from 'lucide-react'
-import { organizationAPI, usersAPI, exercisesAPI } from '../services/api'
+import { organizationAPI, usersAPI, exercisesAPI, spineTemplatesAPI } from '../services/api'
 import { formatDate } from '../lib/utils'
 import AISettings from '../components/AISettings'
 import { useTranslation } from '../i18n'
@@ -149,6 +152,11 @@ export default function Settings() {
   const [selectedExercise, setSelectedExercise] = useState(null)
   const [exerciseModalMode, setExerciseModalMode] = useState(null) // 'create' | 'edit' | null
   const [exerciseFormData, setExerciseFormData] = useState({})
+
+  // Spine templates state
+  const [expandedSpineRegions, setExpandedSpineRegions] = useState({})
+  const [editingTemplate, setEditingTemplate] = useState(null)
+  const [templateEditText, setTemplateEditText] = useState('')
 
   const handleClinicalPrefChange = (key, value) => {
     setClinicalPrefs(prev => ({ ...prev, [key]: value }))
@@ -291,6 +299,82 @@ export default function Settings() {
       toast.error(`${lang === 'no' ? 'Kunne ikke slette øvelse' : 'Failed to delete exercise'}: ${error.response?.data?.message || error.message}`)
     },
   })
+
+  // Fetch spine templates for clinical tab
+  const { data: spineTemplatesResponse, isLoading: spineTemplatesLoading } = useQuery({
+    queryKey: ['spine-templates-grouped'],
+    queryFn: () => spineTemplatesAPI.getGrouped(clinicalPrefs.language || 'NO'),
+    enabled: activeTab === 'clinical',
+  })
+
+  const spineTemplates = spineTemplatesResponse?.data || {}
+
+  // Spine template regions for display
+  const SPINE_REGIONS_CONFIG = {
+    cervical: { label: lang === 'no' ? 'Cervical (nakke)' : 'Cervical', segments: ['C0-C1', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7'] },
+    thoracic: { label: lang === 'no' ? 'Thoracal (bryst)' : 'Thoracic', segments: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'] },
+    lumbar: { label: lang === 'no' ? 'Lumbal (korsrygg)' : 'Lumbar', segments: ['L1', 'L2', 'L3', 'L4', 'L5'] },
+    sacral: { label: lang === 'no' ? 'Sakral/Bekken' : 'Sacral/Pelvis', segments: ['Sacrum', 'SI-L', 'SI-R', 'Coccyx'] },
+    muscle: { label: lang === 'no' ? 'Muskulatur' : 'Muscles', segments: ['C-para', 'T-para', 'L-para', 'QL', 'Piriformis'] }
+  }
+
+  // Update spine template mutation
+  const updateSpineTemplateMutation = useMutation({
+    mutationFn: ({ id, data }) => spineTemplatesAPI.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['spine-templates-grouped'])
+      setEditingTemplate(null)
+      setTemplateEditText('')
+      toast.success(lang === 'no' ? 'Mal oppdatert' : 'Template updated')
+    },
+    onError: (error) => {
+      toast.error(`${lang === 'no' ? 'Kunne ikke oppdatere mal' : 'Failed to update template'}: ${error.response?.data?.message || error.message}`)
+    },
+  })
+
+  // Reset spine templates mutation
+  const resetSpineTemplatesMutation = useMutation({
+    mutationFn: () => spineTemplatesAPI.resetToDefaults(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['spine-templates-grouped'])
+      toast.success(lang === 'no' ? 'Maler tilbakestilt til standard' : 'Templates reset to defaults')
+    },
+    onError: (error) => {
+      toast.error(`${lang === 'no' ? 'Kunne ikke tilbakestille maler' : 'Failed to reset templates'}: ${error.response?.data?.message || error.message}`)
+    },
+  })
+
+  // Spine template handlers
+  const toggleSpineRegion = (region) => {
+    setExpandedSpineRegions(prev => ({ ...prev, [region]: !prev[region] }))
+  }
+
+  const handleEditTemplate = (template) => {
+    setEditingTemplate(template)
+    setTemplateEditText(template.text_template)
+  }
+
+  const handleSaveTemplate = () => {
+    if (editingTemplate && templateEditText.trim()) {
+      updateSpineTemplateMutation.mutate({
+        id: editingTemplate.id,
+        data: { text_template: templateEditText.trim() }
+      })
+    }
+  }
+
+  const handleCancelTemplateEdit = () => {
+    setEditingTemplate(null)
+    setTemplateEditText('')
+  }
+
+  const handleResetTemplates = () => {
+    if (window.confirm(lang === 'no'
+      ? 'Er du sikker på at du vil tilbakestille alle palpasjonsmaler til standard? Dette kan ikke angres.'
+      : 'Are you sure you want to reset all palpation templates to defaults? This cannot be undone.')) {
+      resetSpineTemplatesMutation.mutate()
+    }
+  }
 
   const handleSave = () => {
     if (activeTab === 'organization') {
@@ -1402,6 +1486,148 @@ export default function Settings() {
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-600"></div>
                 </label>
               </div>
+            </div>
+          </div>
+
+          {/* Spine Palpation Templates */}
+          <div className="bg-white rounded-lg border border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+                    <Bone className="w-5 h-5 text-orange-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      {lang === 'no' ? 'Palpasjonsmaler (Rask-klikk)' : 'Palpation Templates (Quick-Click)'}
+                    </h2>
+                    <p className="text-sm text-gray-500">
+                      {lang === 'no'
+                        ? 'Tilpass tekstmaler for rask palpasjonsdokumentasjon'
+                        : 'Customize text templates for rapid palpation documentation'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleResetTemplates}
+                  disabled={resetSpineTemplatesMutation.isPending}
+                  className="px-3 py-1.5 text-sm text-orange-600 hover:text-orange-700 hover:bg-orange-50 rounded-lg flex items-center gap-1.5 transition-colors"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  {lang === 'no' ? 'Tilbakestill' : 'Reset'}
+                </button>
+              </div>
+            </div>
+
+            <div className="divide-y divide-gray-100">
+              {spineTemplatesLoading ? (
+                <div className="px-6 py-8 text-center">
+                  <Loader2 className="w-6 h-6 animate-spin text-orange-600 mx-auto" />
+                  <p className="text-sm text-gray-500 mt-2">
+                    {lang === 'no' ? 'Laster maler...' : 'Loading templates...'}
+                  </p>
+                </div>
+              ) : (
+                Object.entries(SPINE_REGIONS_CONFIG).map(([regionKey, regionConfig]) => (
+                  <div key={regionKey}>
+                    {/* Region Header */}
+                    <button
+                      onClick={() => toggleSpineRegion(regionKey)}
+                      className="w-full px-6 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                    >
+                      <span className="text-sm font-medium text-gray-900">{regionConfig.label}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">
+                          {regionConfig.segments.length} {lang === 'no' ? 'segmenter' : 'segments'}
+                        </span>
+                        {expandedSpineRegions[regionKey] ? (
+                          <ChevronUp className="w-4 h-4 text-gray-400" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4 text-gray-400" />
+                        )}
+                      </div>
+                    </button>
+
+                    {/* Expanded Templates */}
+                    {expandedSpineRegions[regionKey] && (
+                      <div className="bg-gray-50 px-6 py-3 space-y-2">
+                        {regionConfig.segments.map(segment => {
+                          const segmentTemplates = spineTemplates[segment] || []
+                          return (
+                            <div key={segment} className="bg-white rounded-lg border border-gray-200 p-3">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-sm font-medium text-gray-700">{segment}</span>
+                              </div>
+                              <div className="space-y-1.5">
+                                {segmentTemplates.map(template => (
+                                  <div
+                                    key={template.id}
+                                    className="flex items-center gap-2 text-xs group"
+                                  >
+                                    <span className="w-16 text-gray-500 uppercase">
+                                      {template.direction === 'left' && (lang === 'no' ? 'Venstre' : 'Left')}
+                                      {template.direction === 'right' && (lang === 'no' ? 'Høyre' : 'Right')}
+                                      {template.direction === 'bilateral' && 'Bilateral'}
+                                      {template.direction === 'posterior' && 'Posterior'}
+                                      {template.direction === 'anterior' && 'Anterior'}
+                                      {template.direction === 'superior' && 'Superior'}
+                                      {template.direction === 'inferior' && 'Inferior'}
+                                      {template.direction === 'inflare' && 'Inflare'}
+                                      {template.direction === 'outflare' && 'Outflare'}
+                                    </span>
+                                    {editingTemplate?.id === template.id ? (
+                                      <div className="flex-1 flex items-center gap-2">
+                                        <input
+                                          type="text"
+                                          value={templateEditText}
+                                          onChange={(e) => setTemplateEditText(e.target.value)}
+                                          className="flex-1 px-2 py-1 text-xs border border-orange-300 rounded focus:outline-none focus:ring-1 focus:ring-orange-500"
+                                          autoFocus
+                                        />
+                                        <button
+                                          onClick={handleSaveTemplate}
+                                          disabled={updateSpineTemplateMutation.isPending}
+                                          className="p-1 text-green-600 hover:bg-green-50 rounded"
+                                        >
+                                          <Check className="w-3.5 h-3.5" />
+                                        </button>
+                                        <button
+                                          onClick={handleCancelTemplateEdit}
+                                          className="p-1 text-gray-500 hover:bg-gray-100 rounded"
+                                        >
+                                          <X className="w-3.5 h-3.5" />
+                                        </button>
+                                      </div>
+                                    ) : (
+                                      <>
+                                        <span className="flex-1 text-gray-600 truncate">
+                                          {template.text_template}
+                                        </span>
+                                        <button
+                                          onClick={() => handleEditTemplate(template)}
+                                          className="p-1 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                                          title={lang === 'no' ? 'Rediger' : 'Edit'}
+                                        >
+                                          <Edit3 className="w-3.5 h-3.5" />
+                                        </button>
+                                      </>
+                                    )}
+                                  </div>
+                                ))}
+                                {segmentTemplates.length === 0 && (
+                                  <p className="text-xs text-gray-400 italic">
+                                    {lang === 'no' ? 'Ingen maler funnet' : 'No templates found'}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
             </div>
           </div>
 

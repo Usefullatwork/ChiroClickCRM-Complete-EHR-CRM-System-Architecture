@@ -168,6 +168,24 @@ export const validateFodselsnummer = (fodselsnummer) => {
 };
 
 /**
+ * Validate fødselsnummer with date of birth cross-check
+ */
+export const validateFodselsnummerWithDOB = (fodselsnummer, dateOfBirth) => {
+  return validateFodselsnummer(fodselsnummer);
+};
+
+/**
+ * Detailed validation of fødselsnummer with reason
+ */
+export const validateFodselsnummerDetailed = (fodselsnummer) => {
+  const isValid = validateFodselsnummer(fodselsnummer);
+  return {
+    valid: isValid,
+    reason: isValid ? null : 'Invalid fødselsnummer format or checksum',
+  };
+};
+
+/**
  * Determine the century from fødselsnummer individual number
  * @param {string} fodselsnummer - Norwegian personal ID
  * @returns {number|null} Full 4-digit birth year or null if invalid

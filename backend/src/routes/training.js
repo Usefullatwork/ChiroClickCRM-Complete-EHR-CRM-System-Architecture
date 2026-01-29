@@ -18,20 +18,20 @@ router.use(requireOrganization);
 /**
  * @route   GET /api/v1/training/status
  * @desc    Current model status (which exist, sizes, Ollama running)
- * @access  Private (ADMIN only)
+ * @access  Private (ADMIN or PRACTITIONER)
  */
 router.get('/status',
-  requireRole(['ADMIN']),
+  requireRole(['ADMIN', 'PRACTITIONER']),
   trainingController.getModelStatus
 );
 
 /**
  * @route   GET /api/v1/training/data
  * @desc    List training data files and example counts
- * @access  Private (ADMIN only)
+ * @access  Private (ADMIN or PRACTITIONER)
  */
 router.get('/data',
-  requireRole(['ADMIN']),
+  requireRole(['ADMIN', 'PRACTITIONER']),
   trainingController.getTrainingData
 );
 

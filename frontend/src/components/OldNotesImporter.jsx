@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import toast from '../utils/toast';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 
@@ -48,10 +49,10 @@ export default function OldNotesImporter({ patientId, onClose }) {
       queryClient.invalidateQueries(['oldNotes', patientId]);
       setNoteContent('');
       setFilename('');
-      alert('Note uploaded successfully!');
+      toast.success('Notat lastet opp!');
     },
     onError: (error) => {
-      alert(`Error uploading note: ${error.response?.data?.error || error.message}`);
+      toast.error(`Feil ved opplasting: ${error.response?.data?.error || error.message}`);
     }
   });
 
@@ -68,10 +69,10 @@ export default function OldNotesImporter({ patientId, onClose }) {
     onSuccess: () => {
       queryClient.invalidateQueries(['oldNotes', patientId]);
       setMultipleNotes([{ content: '', filename: '' }]);
-      alert('Notes uploaded successfully!');
+      toast.success('Notater lastet opp!');
     },
     onError: (error) => {
-      alert(`Error uploading notes: ${error.response?.data?.error || error.message}`);
+      toast.error(`Feil ved opplasting: ${error.response?.data?.error || error.message}`);
     }
   });
 
@@ -87,10 +88,10 @@ export default function OldNotesImporter({ patientId, onClose }) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['oldNotes', patientId]);
-      alert('Note processed successfully!');
+      toast.success('Notat prosessert!');
     },
     onError: (error) => {
-      alert(`Error processing note: ${error.response?.data?.error || error.message}`);
+      toast.error(`Feil ved prosessering: ${error.response?.data?.error || error.message}`);
     }
   });
 
@@ -106,7 +107,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['oldNotes', patientId]);
-      alert('Note review saved!');
+      toast.success('Vurdering lagret!');
     }
   });
 
@@ -123,10 +124,10 @@ export default function OldNotesImporter({ patientId, onClose }) {
     onSuccess: (data) => {
       queryClient.invalidateQueries(['oldNotes', patientId]);
       queryClient.invalidateQueries(['encounters', patientId]);
-      alert(`Note converted to encounter #${data.encounter.id}!`);
+      toast.success(`Notat konvertert til journal #${data.encounter.id}!`);
     },
     onError: (error) => {
-      alert(`Error converting note: ${error.response?.data?.error || error.message}`);
+      toast.error(`Feil ved konvertering: ${error.response?.data?.error || error.message}`);
     }
   });
 
@@ -140,13 +141,13 @@ export default function OldNotesImporter({ patientId, onClose }) {
     onSuccess: () => {
       queryClient.invalidateQueries(['oldNotes', patientId]);
       setSelectedNoteId(null);
-      alert('Note deleted!');
+      toast.success('Notat slettet!');
     }
   });
 
   const handleUploadSingle = () => {
     if (!noteContent.trim()) {
-      alert('Please enter note content');
+      toast.warning('Vennligst skriv inn notatinnhold');
       return;
     }
 
@@ -161,7 +162,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
     const validNotes = multipleNotes.filter(n => n.content.trim());
 
     if (validNotes.length === 0) {
-      alert('Please enter at least one note');
+      toast.warning('Vennligst skriv inn minst ett notat');
       return;
     }
 
@@ -481,9 +482,17 @@ export default function OldNotesImporter({ patientId, onClose }) {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              if (confirm('Delete this note?')) {
-                                deleteNoteMutation.mutate(note.id);
-                              }
+                              toast.info('Vil du slette dette notatet?', {
+                                action: {
+                                  label: 'Slett',
+                                  onClick: () => deleteNoteMutation.mutate(note.id)
+                                },
+                                cancel: {
+                                  label: 'Avbryt',
+                                  onClick: () => {}
+                                },
+                                duration: 10000
+                              });
                             }}
                             className="text-xs text-red-600 hover:text-red-800"
                           >

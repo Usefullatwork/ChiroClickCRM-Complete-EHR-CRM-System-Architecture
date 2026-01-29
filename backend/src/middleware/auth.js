@@ -364,6 +364,9 @@ export const optionalAuth = async (req, res, next) => {
   }
 };
 
+// Alias for backwards compatibility
+export const authenticate = requireAuth;
+
 export default {
   requireAuth,
   requireLocalAuth,

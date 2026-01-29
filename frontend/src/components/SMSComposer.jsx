@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Copy, Check, Send, Smartphone } from 'lucide-react';
+import toast from '../utils/toast';
 
 /**
  * SMS Composer Component
@@ -29,9 +30,9 @@ export default function SMSComposer({ recipientPhone, recipientName, onSend, onC
 
       // Show instructions for manual sending
       setManualSendConfirmation(true);
+      toast.success('Melding kopiert til utklippstavle');
     } catch (error) {
-      console.error('Failed to copy to clipboard:', error);
-      alert('Failed to copy message. Please select and copy manually.');
+      toast.error('Kunne ikke kopiere. Vennligst merk og kopier manuelt.');
     }
   };
 
@@ -50,9 +51,9 @@ export default function SMSComposer({ recipientPhone, recipientName, onSend, onC
       setMessage('');
       setCharCount(0);
       setManualSendConfirmation(false);
+      toast.success('SMS loggfort');
     } catch (error) {
-      console.error('Error logging SMS:', error);
-      alert('Failed to log SMS. Please try again.');
+      toast.error('Kunne ikke logge SMS. Vennligst prøv igjen.');
     } finally {
       setSending(false);
     }
@@ -71,9 +72,9 @@ export default function SMSComposer({ recipientPhone, recipientName, onSend, onC
       // Reset form
       setMessage('');
       setCharCount(0);
+      toast.success('SMS sendt via Phone Link');
     } catch (error) {
-      console.error('Error sending via Phone Link:', error);
-      alert('Failed to send via Phone Link. Try copying manually instead.');
+      toast.error('Kunne ikke sende via Phone Link. Prøv å kopiere manuelt.');
     } finally {
       setSending(false);
     }

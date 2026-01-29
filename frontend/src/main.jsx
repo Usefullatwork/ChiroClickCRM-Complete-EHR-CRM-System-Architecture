@@ -25,10 +25,13 @@ const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 // Initialize CSRF protection
 initializeCSRF()
 
+// Check if we're in dev mode (no valid Clerk key)
+const isDevMode = !clerkPubKey || clerkPubKey.includes('your_key_here') || clerkPubKey.startsWith('pk_test_')
+
 // Render with or without Clerk based on key availability
 const AppWrapper = ({ children }) => {
-  // Only use Clerk if we have a valid key (not placeholder)
-  if (clerkPubKey && !clerkPubKey.includes('your_key_here')) {
+  // Only use Clerk if we have a valid production key
+  if (clerkPubKey && !clerkPubKey.includes('your_key_here') && !clerkPubKey.startsWith('pk_test_')) {
     return <ClerkProvider publishableKey={clerkPubKey}>{children}</ClerkProvider>
   }
   // Development mode without Clerk
@@ -42,7 +45,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <QueryClientProvider client={queryClient}>
         <LanguageProvider>
           <BrowserRouter>
-            <App />
+            <App devMode={isDevMode} />
           </BrowserRouter>
         </LanguageProvider>
       </QueryClientProvider>

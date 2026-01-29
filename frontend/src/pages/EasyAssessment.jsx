@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { encountersAPI, patientsAPI, diagnosisAPI, aiAPI } from '../services/api';
+import toast from '../utils/toast';
 import {
   Save, AlertTriangle, Brain, X, Sparkles, Globe,
   BookOpen, ChevronLeft, ChevronRight, Settings, Eye, Edit3,
@@ -274,13 +275,13 @@ export default function EasyAssessment() {
       return encountersAPI.create(saveData);
     },
     onSuccess: (response) => {
-      alert('Encounter saved successfully!');
+      toast.success('Journalen er lagret!');
       if (!encounterId && response?.data?.id) {
         navigate(`/patients/${patientId}/easy-assessment/${response.data.id}`);
       }
     },
     onError: (error) => {
-      alert(`Error saving encounter: ${error.message}`);
+      toast.error(`Feil ved lagring: ${error.message}`);
     }
   });
 

@@ -741,6 +741,53 @@ export const aiAPI = {
   getStreamUrl: () => `${API_URL}/ai/generate-field-stream`,
 }
 
+// Exercise Library API
+export const exercisesAPI = {
+  // Exercise Library CRUD
+  getAll: (params) => apiClient.get('/exercises', { params }),
+  getById: (id) => apiClient.get(`/exercises/${id}`),
+  create: (data) => apiClient.post('/exercises', data),
+  update: (id, data) => apiClient.patch(`/exercises/${id}`, data),
+  delete: (id) => apiClient.delete(`/exercises/${id}`),
+
+  // Categories and Regions
+  getCategories: () => apiClient.get('/exercises/categories'),
+  getBodyRegions: () => apiClient.get('/exercises/body-regions'),
+
+  // User favorites and recent
+  getFavorites: (limit = 20) => apiClient.get('/exercises/favorites', { params: { limit } }),
+  getRecentlyUsed: (limit = 10) => apiClient.get('/exercises/recent', { params: { limit } }),
+
+  // Statistics
+  getStats: () => apiClient.get('/exercises/stats'),
+  getTopPrescribed: (limit = 10) => apiClient.get('/exercises/top-prescribed', { params: { limit } }),
+  getComplianceStats: (days = 30) => apiClient.get('/exercises/compliance', { params: { days } }),
+
+  // Exercise Programs
+  getPrograms: (params) => apiClient.get('/exercises/programs', { params }),
+  getProgramById: (id) => apiClient.get(`/exercises/programs/${id}`),
+  createProgram: (data) => apiClient.post('/exercises/programs', data),
+  updateProgram: (id, data) => apiClient.patch(`/exercises/programs/${id}`, data),
+  deleteProgram: (id) => apiClient.delete(`/exercises/programs/${id}`),
+
+  // Prescriptions
+  getPrescriptionById: (id) => apiClient.get(`/exercises/prescriptions/${id}`),
+  updatePrescription: (id, data) => apiClient.patch(`/exercises/prescriptions/${id}`, data),
+  logCompliance: (id, data) => apiClient.post(`/exercises/prescriptions/${id}/compliance`, data),
+  discontinuePrescription: (id, reason) => apiClient.post(`/exercises/prescriptions/${id}/discontinue`, { reason }),
+  completePrescription: (id) => apiClient.post(`/exercises/prescriptions/${id}/complete`),
+
+  // Patient-specific
+  getPatientExercises: (patientId, params) => apiClient.get(`/patients/${patientId}/exercises`, { params }),
+  prescribeToPatient: (patientId, data) => apiClient.post(`/patients/${patientId}/exercises`, data),
+  assignProgramToPatient: (patientId, data) => apiClient.post(`/patients/${patientId}/programs`, data),
+
+  // PDF generation
+  getPatientExercisePDF: (patientId) => apiClient.get(`/patients/${patientId}/exercises/pdf`, {
+    responseType: 'blob'
+  }),
+}
+
 // Export API URL for streaming endpoints
 export { API_URL }
 

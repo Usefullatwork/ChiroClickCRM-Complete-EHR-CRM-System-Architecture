@@ -1,4 +1,5 @@
-export default {
+module.exports = {
+  ignorePatterns: ['dist/**', 'node_modules/**', '*.min.js'],
   env: {
     browser: true,
     es2021: true
@@ -26,7 +27,7 @@ export default {
     'react-hooks/exhaustive-deps': 'warn',
 
     // Error prevention
-    'no-console': ['warn', { allow: ['warn', 'error'] }],
+    'no-console': ['error', { allow: ['warn', 'error'] }],
     'no-unused-vars': ['error', {
       argsIgnorePattern: '^_',
       varsIgnorePattern: '^_'

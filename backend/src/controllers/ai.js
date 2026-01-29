@@ -8,6 +8,9 @@ import { generateCompletionStream, getModelForField, buildFieldPrompt } from '..
 import logger from '../utils/logger.js';
 import cache, { CacheKeys } from '../utils/cache.js';
 import crypto from 'crypto';
+import aiFeedbackService from '../application/services/AIFeedbackService.js';
+import aiRetrainingService from '../application/services/AIRetrainingService.js';
+import circuitBreakerRegistry from '../infrastructure/resilience/CircuitBreakerRegistry.js';
 
 export const spellCheck = async (req, res) => {
   try {
@@ -225,6 +228,148 @@ export const generateField = async (req, res) => {
   }
 };
 
+// =================================================================
+// AI Feedback & Metrics Handlers
+// =================================================================
+
+/**
+ * Record feedback on AI suggestion
+ */
+export const recordFeedback = async (req, res) => {
+  try {
+    const { suggestionId, feedbackType, rating, correctedText, comment, context } = req.body;
+
+    if (!suggestionId || !feedbackType) {
+      return res.status(400).json({ error: 'suggestionId and feedbackType are required' });
+    }
+
+    const result = await aiFeedbackService.recordFeedback({
+      suggestionId,
+      feedbackType,
+      rating,
+      correctedText,
+      comment,
+      context,
+      organizationId: req.organizationId,
+      userId: req.user.id
+    });
+
+    res.json(result);
+  } catch (error) {
+    logger.error('Error in recordFeedback controller:', error);
+    res.status(500).json({ error: error.message || 'Failed to record feedback' });
+  }
+};
+
+/**
+ * Get AI performance metrics
+ */
+export const getAIMetrics = async (req, res) => {
+  try {
+    const { period = 'week', fieldType } = req.query;
+
+    const metrics = await aiFeedbackService.getMetrics({
+      organizationId: req.organizationId,
+      period,
+      fieldType
+    });
+
+    res.json(metrics);
+  } catch (error) {
+    logger.error('Error in getAIMetrics controller:', error);
+    res.status(500).json({ error: error.message || 'Failed to get metrics' });
+  }
+};
+
+/**
+ * Get circuit breaker health status
+ */
+export const getCircuitStatus = async (req, res) => {
+  try {
+    const status = circuitBreakerRegistry.getHealthSummary();
+    const allStatus = circuitBreakerRegistry.getAllStatus();
+
+    res.json({
+      summary: status,
+      services: allStatus
+    });
+  } catch (error) {
+    logger.error('Error in getCircuitStatus controller:', error);
+    res.status(500).json({ error: error.message || 'Failed to get circuit status' });
+  }
+};
+
+/**
+ * Reset circuit breaker for a service
+ */
+export const resetCircuitBreaker = async (req, res) => {
+  try {
+    const { service } = req.params;
+
+    const status = circuitBreakerRegistry.getStatus(service);
+    if (!status) {
+      return res.status(404).json({ error: `Circuit breaker for service '${service}' not found` });
+    }
+
+    circuitBreakerRegistry.reset(service);
+
+    logger.info('Circuit breaker reset by user', {
+      service,
+      userId: req.user.id,
+      previousState: status.state
+    });
+
+    res.json({
+      success: true,
+      service,
+      previousState: status.state,
+      currentState: 'CLOSED',
+      resetBy: req.user.id,
+      resetAt: new Date().toISOString()
+    });
+  } catch (error) {
+    logger.error('Error in resetCircuitBreaker controller:', error);
+    res.status(500).json({ error: error.message || 'Failed to reset circuit breaker' });
+  }
+};
+
+/**
+ * Get retraining status
+ */
+export const getRetrainingStatus = async (req, res) => {
+  try {
+    const checkStatus = await aiFeedbackService.checkRetrainingStatus(req.organizationId);
+    const retrainingStatus = aiRetrainingService.getStatus();
+
+    res.json({
+      check: checkStatus,
+      retraining: retrainingStatus,
+      history: aiRetrainingService.getHistory(5)
+    });
+  } catch (error) {
+    logger.error('Error in getRetrainingStatus controller:', error);
+    res.status(500).json({ error: error.message || 'Failed to get retraining status' });
+  }
+};
+
+/**
+ * Trigger AI retraining
+ */
+export const triggerRetraining = async (req, res) => {
+  try {
+    const result = await aiFeedbackService.triggerRetraining({
+      organizationId: req.organizationId,
+      reason: 'manual',
+      triggeredBy: req.user.id
+    });
+
+    res.json(result);
+  } catch (error) {
+    logger.error('Error in triggerRetraining controller:', error);
+    res.status(500).json({ error: error.message || 'Failed to trigger retraining' });
+  }
+};
+
 export default {
   spellCheck,
   generateSOAPSuggestion,
@@ -234,5 +379,12 @@ export default {
   recordOutcomeFeedback,
   getAIStatus,
   generateFieldStream,
-  generateField
+  generateField,
+  // New CQRS endpoints
+  recordFeedback,
+  getAIMetrics,
+  getCircuitStatus,
+  resetCircuitBreaker,
+  getRetrainingStatus,
+  triggerRetraining
 };

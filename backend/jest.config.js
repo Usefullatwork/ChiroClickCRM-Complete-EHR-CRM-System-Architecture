@@ -5,8 +5,9 @@
 
 export default {
   testEnvironment: 'node',
-  roots: ['<rootDir>/tests'],
+  roots: ['<rootDir>/__tests__'],
   testMatch: ['**/*.test.js'],
+  injectGlobals: true,
   collectCoverageFrom: [
     'src/**/*.js',
     '!src/server.js',
@@ -23,9 +24,17 @@ export default {
     }
   },
   transform: {},
+  testTimeout: 30000,
+  verbose: true,
+  // Workaround for ESM
+  extensionsToTreatAsEsm: [],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1'
   },
-  testTimeout: 10000,
-  verbose: true
+  // Run tests serially to avoid database conflicts
+  maxWorkers: 1,
+  // Force exit after tests complete (handles open database connections)
+  forceExit: true,
+  // Detect open handles for debugging
+  detectOpenHandles: false
 };

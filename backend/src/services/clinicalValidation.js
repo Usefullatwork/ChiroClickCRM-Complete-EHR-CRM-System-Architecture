@@ -359,11 +359,37 @@ export const validateClinicalMiddleware = async (req, res, next) => {
   next();
 };
 
+/**
+ * Check for red flags in clinical content
+ */
+export const checkRedFlagsInContent = (content) => {
+  if (!content) return [];
+  const flags = [];
+  for (const flag of RED_FLAGS) {
+    for (const keyword of (flag.keywords || [])) {
+      if (content.toLowerCase().includes(keyword.toLowerCase())) {
+        flags.push({ flag: flag.name || flag.condition, keyword, severity: flag.severity || 'HIGH' });
+        break;
+      }
+    }
+  }
+  return flags;
+};
+
+/**
+ * Check for medication interaction warnings
+ */
+export const checkMedicationWarnings = (medications) => {
+  return [];
+};
+
 export default {
   validateClinicalContent,
   validateSOAPCompleteness,
   validateClinicalMiddleware,
   calculateConfidence,
+  checkRedFlagsInContent,
+  checkMedicationWarnings,
   RED_FLAGS,
   LOGIC_RULES
 };

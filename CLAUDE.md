@@ -435,3 +435,117 @@ cd backend && npm test -- --verbose
 # Run without coverage threshold enforcement
 cd backend && npm test -- --coverageThreshold='{}'
 ```
+
+---
+
+## Exercise Library + Rehab System (2026-01-29)
+
+### Status: FULLY IMPLEMENTED
+
+Complete exercise prescription system with offline support for single practitioner clinics.
+
+### Backend Components
+| Component | Path | Status |
+|-----------|------|--------|
+| Migration | `backend/migrations/023_exercise_library.sql` | COMPLETE |
+| Controller | `backend/src/controllers/exercises.js` | COMPLETE (850+ lines) |
+| Service | `backend/src/services/exercises.js` | COMPLETE (1100+ lines) |
+| Routes | `backend/src/routes/exercises.js` | COMPLETE |
+| Patient Routes | `backend/src/routes/patients.js` | Exercise routes added |
+| PDF Handout | `backend/src/services/pdf.js` | Exercise handout generation added |
+| Seed Data | `backend/seeds/exercise_library.sql` | 40+ exercises, 5 programs |
+
+### Frontend Components
+| Component | Path | Status |
+|-----------|------|--------|
+| ExercisePanel | `frontend/src/components/exercises/index.jsx` | COMPLETE (670 lines) |
+| useExerciseSync | `frontend/src/hooks/useExerciseSync.js` | COMPLETE (520+ lines) |
+| PatientExercises Portal | `frontend/src/pages/portal/PatientExercises.jsx` | COMPLETE |
+| Service Worker | `frontend/public/sw.js` | Exercise caching added |
+| API Client | `frontend/src/services/api.js` | exercisesAPI complete |
+
+### Database Tables
+```sql
+-- Main tables
+exercise_library         -- 40+ global exercises with Norwegian instructions
+patient_exercise_prescriptions  -- Patient-specific prescriptions with compliance tracking
+exercise_programs        -- Reusable program templates (McGill Big 3, etc.)
+patient_exercise_programs -- Assigned programs per patient
+exercise_favorites       -- Practitioner's frequently used exercises
+```
+
+### Exercise API Endpoints
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /exercises | List with filters (category, bodyRegion, search) |
+| GET | /exercises/categories | Available categories |
+| GET | /exercises/body-regions | Available body regions |
+| GET | /exercises/favorites | User's favorites |
+| GET | /exercises/recent | Recently used |
+| GET | /exercises/stats | Usage statistics |
+| GET | /exercises/programs | Program templates |
+| POST | /exercises/programs | Create program |
+| GET | /exercises/prescriptions/:id | Get prescription |
+| POST | /exercises/prescriptions/:id/compliance | Log daily compliance |
+| POST | /patients/:id/exercises | Prescribe to patient |
+| GET | /patients/:id/exercises | Patient's exercises |
+| GET | /patients/:id/exercises/pdf | Generate PDF handout |
+
+### Offline Support Features
+1. **Exercise Library Caching** - Full library cached in IndexedDB
+2. **Prescription Queuing** - Offline prescriptions synced when online
+3. **Compliance Logging** - Can log compliance offline
+4. **Service Worker** - Caches exercise media and API responses
+5. **Background Sync** - Automatic sync when connection restored
+
+### Patient Portal
+- **URL**: `/portal/exercises/:patientId` or `/portal/exercises`
+- **Auth**: PIN entry or magic link token
+- **Features**: View exercises, log compliance, rate effectiveness, download PDF
+
+### Exercise Categories (Norwegian)
+- Tøyning (Stretching)
+- Styrke (Strengthening)
+- Mobilitet (Mobility)
+- Balanse (Balance)
+- Vestibulær (Vestibular)
+- Pust (Breathing)
+- Holdning (Posture)
+- Nervegliding (Nerve Glide)
+
+### Body Regions (Norwegian)
+- Nakke (Cervical)
+- Brystsøyle (Thoracic)
+- Korsrygg (Lumbar)
+- Skulder (Shoulder)
+- Hofte (Hip)
+- Kne (Knee)
+- Ankel (Ankle)
+- Kjerne (Core)
+- Helkropp (Full Body)
+
+### Seeded Programs
+1. **Nakkesmerter - Grunnprogram** - Chin tuck, stretches, isometrics
+2. **Korsrygg - McGill Big 3** - Curl-up, side plank, bird-dog
+3. **Skulder - Rotatorcuff rehabilitering** - Pendulum, rotator cuff exercises
+4. **Holdningskorrigering** - Posture correction for desk workers
+5. **Balanse og propriosepsjon** - Balance training
+
+### Testing
+```bash
+# Run migration
+cd backend && npm run migrate
+
+# Seed exercise data
+docker exec -i chiroclickcrm-db psql -U postgres -d chiroclickcrm < seeds/exercise_library.sql
+
+# Test API
+curl -b cookies.txt http://localhost:3000/api/v1/exercises
+curl -b cookies.txt "http://localhost:3000/api/v1/exercises?category=stretching&bodyRegion=cervical"
+
+# Test PDF generation
+curl -b cookies.txt http://localhost:3000/api/v1/patients/{patient-id}/exercises/pdf --output test.pdf
+```
+
+### User Authentication Note
+For first users: Provide login credentials directly. They download a version they can log into. Patient portal uses PIN/magic link (no main system auth required).

@@ -38,3 +38,8 @@ export {
 export {
   default as usePatientIntake,
 } from './usePatientIntake';
+
+// Exercise Sync (offline support)
+export {
+  default as useExerciseSync,
+} from './useExerciseSync';

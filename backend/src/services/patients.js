@@ -186,10 +186,15 @@ export const createPatient = async (organizationId, patientData) => {
         consent_marketing,
         consent_date,
         first_visit_date,
-        internal_notes
+        internal_notes,
+        treatment_pref_needles,
+        treatment_pref_adjustments,
+        treatment_pref_neck_adjustments,
+        treatment_pref_notes
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16,
-        $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30
+        $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30,
+        $31, $32, $33, $34
       ) RETURNING *`,
       [
         organizationId,
@@ -221,7 +226,11 @@ export const createPatient = async (organizationId, patientData) => {
         patientData.consent_marketing || false,
         patientData.consent_date || new Date(),
         patientData.first_visit_date || null,
-        patientData.internal_notes || null
+        patientData.internal_notes || null,
+        patientData.treatment_pref_needles ?? null,
+        patientData.treatment_pref_adjustments ?? null,
+        patientData.treatment_pref_neck_adjustments ?? null,
+        patientData.treatment_pref_notes || null
       ]
     );
 
@@ -260,7 +269,10 @@ export const updatePatient = async (organizationId, patientId, patientData) => {
       'allergies', 'current_medications', 'medical_history', 'status',
       'category', 'referral_source', 'referring_doctor', 'insurance_type',
       'insurance_number', 'has_nav_rights', 'consent_sms', 'consent_email',
-      'consent_marketing', 'internal_notes', 'encrypted_personal_number'
+      'consent_marketing', 'internal_notes', 'encrypted_personal_number',
+      // Treatment preferences
+      'treatment_pref_needles', 'treatment_pref_adjustments',
+      'treatment_pref_neck_adjustments', 'treatment_pref_notes'
     ];
 
     for (const field of allowedFields) {

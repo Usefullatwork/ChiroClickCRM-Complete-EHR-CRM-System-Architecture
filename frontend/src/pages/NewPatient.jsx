@@ -49,7 +49,12 @@ export default function NewPatient() {
     consent_email: true,
     consent_data_storage: true,
     consent_marketing: false,
-    consent_video_marketing: false
+    consent_video_marketing: false,
+    // Treatment preferences
+    treatment_pref_needles: null,
+    treatment_pref_adjustments: null,
+    treatment_pref_neck_adjustments: null,
+    treatment_pref_notes: ''
   })
 
   // Create patient mutation
@@ -544,6 +549,140 @@ export default function NewPatient() {
               />
               <span className="text-sm text-gray-700">Consent to video marketing</span>
             </label>
+          </div>
+        </div>
+
+        {/* Treatment Preferences */}
+        <div className="pt-6 border-t border-gray-200">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Behandlingspreferanser</h3>
+          <p className="text-sm text-gray-500 mb-4">
+            Angi hva pasienten er komfortabel med. La stå tom hvis ikke avklart.
+          </p>
+          <div className="space-y-4">
+            {/* Needles preference */}
+            <div className="flex items-center gap-6">
+              <span className="text-sm font-medium text-gray-700 w-40">Nåler (dry needling, akupunktur):</span>
+              <div className="flex items-center gap-4">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="treatment_pref_needles"
+                    checked={formData.treatment_pref_needles === true}
+                    onChange={() => handleChange('treatment_pref_needles', true)}
+                    className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
+                  />
+                  <span className="text-sm text-green-700">OK</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="treatment_pref_needles"
+                    checked={formData.treatment_pref_needles === false}
+                    onChange={() => handleChange('treatment_pref_needles', false)}
+                    className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
+                  />
+                  <span className="text-sm text-red-700">Ikke OK</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="treatment_pref_needles"
+                    checked={formData.treatment_pref_needles === null}
+                    onChange={() => handleChange('treatment_pref_needles', null)}
+                    className="w-4 h-4 text-gray-600 border-gray-300 focus:ring-gray-500"
+                  />
+                  <span className="text-sm text-gray-500">Ikke avklart</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Adjustments preference */}
+            <div className="flex items-center gap-6">
+              <span className="text-sm font-medium text-gray-700 w-40">Justeringer generelt:</span>
+              <div className="flex items-center gap-4">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="treatment_pref_adjustments"
+                    checked={formData.treatment_pref_adjustments === true}
+                    onChange={() => handleChange('treatment_pref_adjustments', true)}
+                    className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
+                  />
+                  <span className="text-sm text-green-700">OK</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="treatment_pref_adjustments"
+                    checked={formData.treatment_pref_adjustments === false}
+                    onChange={() => handleChange('treatment_pref_adjustments', false)}
+                    className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
+                  />
+                  <span className="text-sm text-red-700">Ikke OK</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="treatment_pref_adjustments"
+                    checked={formData.treatment_pref_adjustments === null}
+                    onChange={() => handleChange('treatment_pref_adjustments', null)}
+                    className="w-4 h-4 text-gray-600 border-gray-300 focus:ring-gray-500"
+                  />
+                  <span className="text-sm text-gray-500">Ikke avklart</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Neck adjustments preference */}
+            <div className="flex items-center gap-6">
+              <span className="text-sm font-medium text-gray-700 w-40">Nakkejusteringer spesifikt:</span>
+              <div className="flex items-center gap-4">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="treatment_pref_neck_adjustments"
+                    checked={formData.treatment_pref_neck_adjustments === true}
+                    onChange={() => handleChange('treatment_pref_neck_adjustments', true)}
+                    className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
+                  />
+                  <span className="text-sm text-green-700">OK</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="treatment_pref_neck_adjustments"
+                    checked={formData.treatment_pref_neck_adjustments === false}
+                    onChange={() => handleChange('treatment_pref_neck_adjustments', false)}
+                    className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
+                  />
+                  <span className="text-sm text-red-700">Ikke OK</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="treatment_pref_neck_adjustments"
+                    checked={formData.treatment_pref_neck_adjustments === null}
+                    onChange={() => handleChange('treatment_pref_neck_adjustments', null)}
+                    className="w-4 h-4 text-gray-600 border-gray-300 focus:ring-gray-500"
+                  />
+                  <span className="text-sm text-gray-500">Ikke avklart</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Treatment preference notes */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Notater om behandlingspreferanser
+              </label>
+              <textarea
+                value={formData.treatment_pref_notes}
+                onChange={(e) => handleChange('treatment_pref_notes', e.target.value)}
+                rows={2}
+                placeholder="f.eks. pasient er nervøs for nakkejusteringer pga tidligere ubehag..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
           </div>
         </div>
 

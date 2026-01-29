@@ -15,6 +15,8 @@ import {
 import { formatDate, formatTime } from '../lib/utils'
 import { dashboardAPI, appointmentsAPI, followUpsAPI } from '../services/api'
 import { useTranslation, formatDateWithWeekday, formatDateShort, formatTime as i18nFormatTime } from '../i18n'
+import toast from '../utils/toast'
+import { StatsGridSkeleton, AppointmentsListSkeleton, ListSkeleton } from '../components/ui/Skeleton'
 
 export default function Dashboard() {
   const navigate = useNavigate()
@@ -45,17 +47,38 @@ export default function Dashboard() {
 
   // Handle appointment cancellation
   const handleCancelAppointment = async (appointmentId, patientName) => {
-    if (!confirm(t('cancelAppointmentConfirm').replace('{name}', patientName))) return
-
-    const reason = prompt(t('cancellationReason'))
-
-    try {
-      await appointmentsAPI.cancel(appointmentId, reason || 'Cancelled by practitioner')
-      refetchAppointments()
-    } catch (error) {
-      alert(t('cancelFailed'))
-      console.error('Cancel error:', error)
-    }
+    // Use toast confirmation instead of browser confirm
+    toast.promise(
+      new Promise((resolve, reject) => {
+        const toastId = toast.info(
+          `${t('cancelAppointmentConfirm').replace('{name}', patientName)}`,
+          {
+            action: {
+              label: t('confirm') || 'Bekreft',
+              onClick: async () => {
+                try {
+                  await appointmentsAPI.cancel(appointmentId, 'Cancelled by practitioner')
+                  refetchAppointments()
+                  resolve()
+                } catch (error) {
+                  reject(error)
+                }
+              }
+            },
+            cancel: {
+              label: t('cancel') || 'Avbryt',
+              onClick: () => reject(new Error('Cancelled'))
+            },
+            duration: 10000
+          }
+        )
+      }),
+      {
+        loading: t('cancelling') || 'Avbestiller...',
+        success: t('appointmentCancelled') || 'Time avbestilt',
+        error: (err) => err.message === 'Cancelled' ? '' : t('cancelFailed')
+      }
+    )
   }
 
   // Mark patient as contacted for follow-up
@@ -68,8 +91,21 @@ export default function Dashboard() {
   })
 
   const handleMarkContacted = (patient, method) => {
-    if (!confirm(t('markContactedConfirm').replace('{name}', `${patient.first_name} ${patient.last_name}`))) return
-    markContactedMutation.mutate({ patientId: patient.id, method })
+    const patientName = `${patient.first_name} ${patient.last_name}`
+    toast.info(
+      t('markContactedConfirm').replace('{name}', patientName),
+      {
+        action: {
+          label: t('confirm') || 'Bekreft',
+          onClick: () => markContactedMutation.mutate({ patientId: patient.id, method })
+        },
+        cancel: {
+          label: t('cancel') || 'Avbryt',
+          onClick: () => {}
+        },
+        duration: 10000
+      }
+    )
   }
 
   // Quick actions
@@ -103,24 +139,28 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {statCards.map((stat) => {
-          const Icon = stat.icon
-          return (
-            <div key={stat.label} className="bg-white rounded-lg border border-gray-200 p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">{stat.label}</p>
-                  <p className="text-2xl font-semibold text-gray-900 mt-1">{stat.value}</p>
-                </div>
-                <div className={`w-12 h-12 rounded-lg bg-${stat.color}-50 flex items-center justify-center`}>
-                  <Icon className={`w-6 h-6 text-${stat.color}-600`} />
+      {statsLoading ? (
+        <StatsGridSkeleton count={4} className="mb-6" />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          {statCards.map((stat) => {
+            const Icon = stat.icon
+            return (
+              <div key={stat.label} className="bg-white rounded-lg border border-gray-200 p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">{stat.label}</p>
+                    <p className="text-2xl font-semibold text-gray-900 mt-1">{stat.value}</p>
+                  </div>
+                  <div className={`w-12 h-12 rounded-lg bg-${stat.color}-50 flex items-center justify-center`}>
+                    <Icon className={`w-6 h-6 text-${stat.color}-600`} />
+                  </div>
                 </div>
               </div>
-            </div>
-          )
-        })}
-      </div>
+            )
+          })}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Today's Schedule */}
@@ -138,10 +178,7 @@ export default function Dashboard() {
             </div>
             <div className="divide-y divide-gray-100">
               {appointmentsLoading ? (
-                <div className="px-5 py-12 text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                  <p className="text-sm text-gray-500 mt-3">{t('loadingAppointments')}</p>
-                </div>
+                <AppointmentsListSkeleton items={5} />
               ) : appointments && appointments.length > 0 ? (
                 appointments.map((apt) => (
                   <div
@@ -242,9 +279,7 @@ export default function Dashboard() {
             </div>
             <div className="divide-y divide-gray-100">
               {followUpLoading ? (
-                <div className="px-5 py-8 text-center">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
-                </div>
+                <ListSkeleton items={5} showAvatar={false} />
               ) : followUpPatients && followUpPatients.length > 0 ? (
                 followUpPatients.slice(0, 5).map((patient) => {
                   const followUpDate = new Date(patient.follow_up_date)
