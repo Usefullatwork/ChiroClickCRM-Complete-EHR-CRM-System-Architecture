@@ -333,28 +333,50 @@ export default function EnhancedClinicalTextarea({
     }, 0);
   };
 
-  // Fetch AI suggestion (debounced)
+  // Fetch AI ghost text suggestion (debounced)
   useEffect(() => {
-    if (!showAIButton || value.length < 20 || disabled) {
+    // Only fetch suggestions if AI button is shown and we have enough text
+    if (!showAIButton || value.length < 30 || disabled || isListening) {
       setAiSuggestion('');
+      return;
+    }
+
+    // Don't suggest if text ends with macro or slash command in progress
+    if (value.match(/\.[a-z]+$/i) || value.match(/\/[a-z]*$/i)) {
       return;
     }
 
     const timeout = setTimeout(async () => {
       try {
         setIsAILoading(true);
-        // This would call AI API for suggestions
-        // const response = await aiAPI.generateField(section, { partialText: value, ...aiContext });
-        // setAiSuggestion(response?.data?.continuation || '');
+        const response = await aiAPI.generateField(section, {
+          partialText: value,
+          maxTokens: 50, // Short continuation only
+          ...aiContext
+        }, 'no');
+
+        // Extract continuation from response
+        const continuation = response?.data?.text || response?.data?.continuation || '';
+
+        // Only show if it's a meaningful continuation (not repeating existing text)
+        if (continuation && continuation.length > 5 && !value.includes(continuation.trim())) {
+          // Trim to first sentence or max 60 chars for ghost text
+          const trimmed = continuation.split(/[.!?]/)[0].trim();
+          setAiSuggestion(trimmed.length > 60 ? trimmed.substring(0, 60) + '...' : trimmed + '.');
+        } else {
+          setAiSuggestion('');
+        }
       } catch (err) {
-        console.error('AI suggestion failed:', err);
+        // Silently fail - ghost text is optional enhancement
+        console.debug('AI ghost text failed:', err.message);
+        setAiSuggestion('');
       } finally {
         setIsAILoading(false);
       }
-    }, 800);
+    }, 1200); // Longer delay for ghost text to avoid too many API calls
 
     return () => clearTimeout(timeout);
-  }, [value, section, aiContext, showAIButton, disabled]);
+  }, [value, section, aiContext, showAIButton, disabled, isListening]);
 
   return (
     <div className={`relative ${className}`}>

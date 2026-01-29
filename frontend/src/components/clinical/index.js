@@ -17,3 +17,4 @@ export { default as SALTBanner } from './SALTBanner';
 export { default as AIConfidenceBadge, AIConfidenceDot, calculateConfidence } from './AIConfidenceBadge';
 export { default as AIDiagnosisSidebar } from './AIDiagnosisSidebar';
 export { default as EnhancedClinicalTextarea, MACROS } from './EnhancedClinicalTextarea';
+export { default as VoiceInputButton, useVoiceInput } from './VoiceInputButton';

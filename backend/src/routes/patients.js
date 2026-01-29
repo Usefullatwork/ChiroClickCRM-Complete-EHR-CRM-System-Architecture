@@ -5,6 +5,7 @@
 
 import express from 'express';
 import * as patientController from '../controllers/patients.js';
+import * as encounterController from '../controllers/encounters.js';
 import * as exercisesController from '../controllers/exercises.js';
 import * as pdfController from '../controllers/pdf.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
@@ -108,6 +109,24 @@ router.delete(
   requireRole(['ADMIN', 'PRACTITIONER']),
   validate(deletePatientSchema),
   patientController.deletePatient
+);
+
+// ============================================================================
+// SALT (Same As Last Time) ROUTES
+// ============================================================================
+
+/**
+ * @route   GET /api/v1/patients/:patientId/encounters/last-similar
+ * @desc    Get last similar encounter for SALT functionality
+ * @access  Private (ADMIN, PRACTITIONER)
+ * @query   chiefComplaint - optional complaint to match against
+ * @query   excludeId - encounter ID to exclude from results
+ * @query   maxAgeDays - max age of encounters to consider (default 365)
+ */
+router.get(
+  '/:patientId/encounters/last-similar',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  encounterController.getLastSimilarEncounter
 );
 
 // ============================================================================

@@ -33,3 +33,24 @@ export {
   default as useClinicalPreferences,
   NOTATION_METHODS,
 } from './useClinicalPreferences';
+
+// Patient Intake (Kiosk data)
+export {
+  default as usePatientIntake,
+} from './usePatientIntake';
+
+// Exercise Sync (offline support)
+export {
+  default as useExerciseSync,
+} from './useExerciseSync';
+
+// SALT - Same As Last Time (encounter template)
+export {
+  default as useSALT,
+  useSALT as useSameAsLastTime,
+} from './useSALT';
+
+// Red Flag Screening
+export {
+  default as useRedFlagScreening,
+} from './useRedFlagScreening';

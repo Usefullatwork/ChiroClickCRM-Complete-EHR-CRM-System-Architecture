@@ -331,6 +331,124 @@ export const checkRedFlags = async (req, res) => {
   }
 };
 
+/**
+ * Get last similar encounter for SALT (Same As Last Time) functionality
+ * GET /api/v1/patients/:patientId/encounters/last-similar
+ *
+ * Returns the most recent signed encounter for the patient that could be used
+ * as a template for the current visit. Optionally filters by chief complaint similarity.
+ */
+export const getLastSimilarEncounter = async (req, res) => {
+  try {
+    const { organizationId, user } = req;
+    const { patientId } = req.params;
+    const { chiefComplaint, excludeId, maxAgeDays = 365 } = req.query;
+
+    // Get most recent signed encounters for patient
+    const result = await encounterService.getAllEncounters(organizationId, {
+      patientId,
+      signed: true,
+      limit: 10, // Get last 10 to find best match
+      page: 1
+    });
+
+    if (!result.encounters || result.encounters.length === 0) {
+      return res.json({ encounter: null, matchScore: 0 });
+    }
+
+    // Filter out current encounter if specified
+    let candidates = result.encounters.filter(e => e.id !== excludeId);
+
+    // Filter by age
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - parseInt(maxAgeDays));
+    candidates = candidates.filter(e => new Date(e.created_at) >= cutoffDate);
+
+    if (candidates.length === 0) {
+      return res.json({ encounter: null, matchScore: 0 });
+    }
+
+    // If chief complaint provided, try to find best match
+    let bestMatch = candidates[0];
+    let matchScore = 0.5; // Default score for recency
+
+    if (chiefComplaint && chiefComplaint.length > 3) {
+      const normalizedComplaint = chiefComplaint.toLowerCase().trim();
+
+      for (const encounter of candidates) {
+        const encComplaint = encounter.subjective?.chief_complaint?.toLowerCase() || '';
+
+        // Simple similarity scoring
+        if (encComplaint === normalizedComplaint) {
+          bestMatch = encounter;
+          matchScore = 1.0;
+          break;
+        } else if (encComplaint.includes(normalizedComplaint) || normalizedComplaint.includes(encComplaint)) {
+          if (matchScore < 0.8) {
+            bestMatch = encounter;
+            matchScore = 0.8;
+          }
+        } else {
+          // Check for shared keywords
+          const complaintWords = normalizedComplaint.split(/\s+/).filter(w => w.length > 3);
+          const encWords = encComplaint.split(/\s+/).filter(w => w.length > 3);
+          const sharedWords = complaintWords.filter(w => encWords.includes(w));
+
+          if (sharedWords.length > 0) {
+            const keywordScore = 0.5 + (sharedWords.length / complaintWords.length) * 0.3;
+            if (keywordScore > matchScore) {
+              bestMatch = encounter;
+              matchScore = keywordScore;
+            }
+          }
+        }
+      }
+    }
+
+    // Calculate days since encounter
+    const daysSince = Math.floor(
+      (new Date() - new Date(bestMatch.created_at)) / (1000 * 60 * 60 * 24)
+    );
+
+    // Log audit
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'READ',
+      resourceType: 'ENCOUNTER',
+      resourceId: bestMatch.id,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+      details: { purpose: 'SALT_LOOKUP' }
+    });
+
+    res.json({
+      encounter: {
+        id: bestMatch.id,
+        created_at: bestMatch.created_at,
+        encounter_type: bestMatch.encounter_type,
+        subjective: bestMatch.subjective,
+        objective: bestMatch.objective,
+        assessment: bestMatch.assessment,
+        plan: bestMatch.plan,
+        icpc_codes: bestMatch.icpc_codes,
+        vas_pain_start: bestMatch.vas_pain_start,
+        vas_pain_end: bestMatch.vas_pain_end
+      },
+      matchScore,
+      daysSince
+    });
+  } catch (error) {
+    logger.error('Error in getLastSimilarEncounter controller:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: 'Failed to retrieve similar encounter'
+    });
+  }
+};
+
 export default {
   getEncounters,
   getEncounter,
@@ -340,5 +458,6 @@ export default {
   signEncounter,
   generateNote,
   getEncounterHistory,
-  checkRedFlags
+  checkRedFlags,
+  getLastSimilarEncounter
 };

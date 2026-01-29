@@ -221,6 +221,8 @@ export const encountersAPI = {
   update: (id, data) => apiClient.patch(`/encounters/${id}`, data),
   sign: (id) => apiClient.post(`/encounters/${id}/sign`),
   generateNote: (id) => apiClient.post(`/encounters/${id}/generate-note`),
+  // SALT (Same As Last Time) - get last similar encounter for quick documentation
+  getLastSimilar: (patientId, options = {}) => apiClient.get(`/patients/${patientId}/encounters/last-similar`, { params: options }),
   // Amendments for signed encounters
   getAmendments: (encounterId) => apiClient.get(`/encounters/${encounterId}/amendments`),
   createAmendment: (encounterId, data) => apiClient.post(`/encounters/${encounterId}/amendments`, data),
@@ -752,6 +754,9 @@ export const aiAPI = {
     apiClient.post('/ai/generate-field', { fieldType, context, language }),
   // Streaming endpoint - uses fetch directly for SSE support
   getStreamUrl: () => `${API_URL}/ai/generate-field-stream`,
+  // Feedback on AI suggestions (thumbs up/down, corrections)
+  submitFeedback: (data) => apiClient.post('/ai/feedback', data),
+  recordOutcomeFeedback: (data) => apiClient.post('/ai/outcome-feedback', data),
 }
 
 // Exercise Library API
