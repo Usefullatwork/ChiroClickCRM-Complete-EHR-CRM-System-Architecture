@@ -1,17 +1,17 @@
 /**
- * EnhancedClinicalTextarea - Combines macro expansion (.xx) and slash commands (/xxx)
- * Plus optional AI ghost text suggestions
+ * EnhancedClinicalTextarea - All-in-one clinical documentation input
  *
  * Features:
  * - Type ".bs" + space → expands to "Bedring siden sist."
  * - Type "/better" → shows command menu, Enter/Tab inserts
  * - Tab accepts ghost AI suggestions
+ * - Click mic to dictate (browser Web Speech API)
  * - Quick phrase chips below
  */
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useSlashCommands, SlashCommandMenu } from '../assessment/SlashCommands';
-import { Sparkles, Loader2 } from 'lucide-react';
+import { Sparkles, Loader2, Mic, MicOff, Square } from 'lucide-react';
 import { aiAPI } from '../../services/api';
 
 // Norwegian macros - type ".xx" + space to expand
@@ -71,6 +71,11 @@ const MACROS = {
   '.diff': 'Differensialdiagnoser: '
 };
 
+// Check if browser supports speech recognition
+const SpeechRecognition = typeof window !== 'undefined'
+  ? window.SpeechRecognition || window.webkitSpeechRecognition
+  : null;
+
 export default function EnhancedClinicalTextarea({
   value,
   onChange,
@@ -83,15 +88,30 @@ export default function EnhancedClinicalTextarea({
   rows = 3,
   className = '',
   showAIButton = false,
+  showVoiceInput = true, // Enable voice by default
   aiContext = {},
   onAIGenerate,
   ...props
 }) {
   const textareaRef = useRef(null);
+  const recognitionRef = useRef(null);
+
+  // UI State
   const [showMacroHint, setShowMacroHint] = useState(false);
   const [macroHint, setMacroHint] = useState('');
   const [aiSuggestion, setAiSuggestion] = useState('');
   const [isAILoading, setIsAILoading] = useState(false);
+
+  // Voice State
+  const [isListening, setIsListening] = useState(false);
+  const [voiceSupported, setVoiceSupported] = useState(false);
+  const [interimTranscript, setInterimTranscript] = useState('');
+  const [voiceError, setVoiceError] = useState(null);
+
+  // Check voice support on mount
+  useEffect(() => {
+    setVoiceSupported(!!SpeechRecognition);
+  }, []);
 
   // Slash commands hook
   const {
@@ -105,6 +125,89 @@ export default function EnhancedClinicalTextarea({
     selectCommand,
     closeMenu
   } = useSlashCommands();
+
+  // Initialize speech recognition
+  const initRecognition = useCallback(() => {
+    if (!SpeechRecognition) return null;
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'nb-NO'; // Norwegian Bokmål
+
+    recognition.onstart = () => {
+      setIsListening(true);
+      setVoiceError(null);
+    };
+
+    recognition.onresult = (event) => {
+      let interim = '';
+      let final = '';
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          final += transcript;
+        } else {
+          interim += transcript;
+        }
+      }
+
+      setInterimTranscript(interim);
+
+      if (final) {
+        // Append final transcript to value
+        const needsSpace = value && !value.endsWith(' ') && !value.endsWith('\n');
+        const newValue = value + (needsSpace ? ' ' : '') + final;
+        onChange(newValue);
+        setInterimTranscript('');
+      }
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error:', event.error);
+      setVoiceError(event.error === 'not-allowed'
+        ? 'Mikrofontilgang nektet'
+        : event.error === 'no-speech'
+        ? 'Ingen tale oppdaget'
+        : `Feil: ${event.error}`
+      );
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+      setInterimTranscript('');
+    };
+
+    return recognition;
+  }, [value, onChange]);
+
+  // Start/stop voice recognition
+  const toggleVoice = useCallback(() => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      setInterimTranscript('');
+    } else {
+      if (!recognitionRef.current) {
+        recognitionRef.current = initRecognition();
+      }
+      try {
+        recognitionRef.current?.start();
+      } catch (err) {
+        // Already started, ignore
+        console.warn('Recognition already started:', err);
+      }
+    }
+  }, [isListening, initRecognition]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      recognitionRef.current?.stop();
+    };
+  }, []);
 
   // Expand macro in text
   const expandMacro = useCallback((text, cursorPosition) => {
@@ -183,8 +286,12 @@ export default function EnhancedClinicalTextarea({
       return;
     }
 
-    // Escape to clear AI suggestion
+    // Escape to clear AI suggestion or stop voice
     if (e.key === 'Escape') {
+      if (isListening) {
+        toggleVoice();
+        return;
+      }
       if (aiSuggestion) {
         setAiSuggestion('');
         return;
@@ -251,12 +358,12 @@ export default function EnhancedClinicalTextarea({
 
   return (
     <div className={`relative ${className}`}>
-      {/* Label */}
+      {/* Label with hints */}
       {label && (
         <label className="block text-sm font-medium text-gray-700 mb-1">
           {label}
           <span className="ml-2 text-xs text-gray-400 font-normal">
-            .xx for makro · /xxx for kommandoer
+            .xx makro · /xxx kommando{voiceSupported && showVoiceInput ? ' · 🎤 diktering' : ''}
           </span>
         </label>
       )}
@@ -272,17 +379,24 @@ export default function EnhancedClinicalTextarea({
           disabled={disabled}
           rows={rows}
           className={`
-            w-full p-3 rounded-lg border border-slate-200
+            w-full p-3 pr-20 rounded-lg border
+            ${isListening ? 'border-red-400 ring-2 ring-red-200' : 'border-slate-200'}
             focus:ring-2 focus:ring-blue-500 focus:border-transparent
             resize-none text-sm
             disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed
-            ${aiSuggestion ? 'pr-24' : ''}
           `}
           {...props}
         />
 
+        {/* Interim transcript overlay (shows what's being heard) */}
+        {interimTranscript && (
+          <div className="absolute bottom-12 left-3 right-3 px-2 py-1 bg-red-50 border border-red-200 rounded text-sm text-red-700 italic">
+            {interimTranscript}...
+          </div>
+        )}
+
         {/* AI ghost text overlay */}
-        {aiSuggestion && (
+        {aiSuggestion && !isListening && (
           <div
             className="absolute top-0 left-0 right-0 p-3 pointer-events-none whitespace-pre-wrap text-sm"
             style={{ color: 'transparent' }}
@@ -292,32 +406,66 @@ export default function EnhancedClinicalTextarea({
           </div>
         )}
 
+        {/* Right-side buttons */}
+        <div className="absolute top-2 right-2 flex items-center gap-1">
+          {/* Voice input button */}
+          {voiceSupported && showVoiceInput && !disabled && (
+            <button
+              onClick={toggleVoice}
+              className={`p-1.5 rounded transition-all ${
+                isListening
+                  ? 'bg-red-500 text-white animate-pulse hover:bg-red-600'
+                  : 'text-gray-400 hover:text-red-500 hover:bg-red-50'
+              }`}
+              title={isListening ? 'Stopp diktering (Esc)' : 'Start diktering'}
+              type="button"
+            >
+              {isListening ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            </button>
+          )}
+
+          {/* AI button */}
+          {showAIButton && onAIGenerate && !aiSuggestion && !isAILoading && !isListening && (
+            <button
+              onClick={() => onAIGenerate(section, field)}
+              disabled={disabled}
+              className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors disabled:opacity-50"
+              title="Generer med AI"
+              type="button"
+            >
+              <Sparkles className="w-4 h-4" />
+            </button>
+          )}
+
+          {/* AI loading indicator */}
+          {isAILoading && (
+            <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />
+          )}
+        </div>
+
         {/* Tab hint for AI suggestion */}
-        {aiSuggestion && (
+        {aiSuggestion && !isListening && (
           <div className="absolute bottom-2 right-2 text-xs text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">
             Tab for å akseptere
           </div>
         )}
 
-        {/* AI loading indicator */}
-        {isAILoading && (
-          <div className="absolute bottom-2 right-2">
-            <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />
+        {/* Voice recording indicator */}
+        {isListening && (
+          <div className="absolute bottom-2 left-2 flex items-center gap-2 text-xs text-red-600 bg-red-50 px-2 py-1 rounded">
+            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+            Lytter... (Esc for å stoppe)
           </div>
         )}
-
-        {/* Manual AI button */}
-        {showAIButton && onAIGenerate && !aiSuggestion && !isAILoading && (
-          <button
-            onClick={() => onAIGenerate(section, field)}
-            disabled={disabled}
-            className="absolute top-2 right-2 p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors disabled:opacity-50"
-            title="Generer med AI"
-          >
-            <Sparkles className="w-4 h-4" />
-          </button>
-        )}
       </div>
+
+      {/* Voice error message */}
+      {voiceError && (
+        <div className="mt-1 text-xs text-red-600 flex items-center gap-1">
+          <MicOff className="w-3 h-3" />
+          {voiceError}
+        </div>
+      )}
 
       {/* Macro hint */}
       {showMacroHint && (
@@ -343,6 +491,7 @@ export default function EnhancedClinicalTextarea({
             <button
               key={phrase}
               onClick={() => insertQuickPhrase(phrase)}
+              type="button"
               className="px-2.5 py-1 text-xs rounded-full bg-slate-100 text-slate-600 hover:bg-blue-100 hover:text-blue-700 transition-colors"
             >
               + {phrase}
