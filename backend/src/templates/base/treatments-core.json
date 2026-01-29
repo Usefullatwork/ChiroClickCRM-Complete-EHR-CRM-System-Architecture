@@ -1,0 +1,242 @@
+{
+  "templateId": "treatments-core",
+  "version": "1.0.0",
+  "description": "Core treatment terminology - shared across all language levels",
+
+  "treatments": {
+    "manualTherapy": {
+      "SMT": {
+        "short": "SMT",
+        "full_no": "Spinal manipulativ terapi",
+        "full_en": "Spinal Manipulative Therapy",
+        "description_no": "Høyhastighets, lav-amplitude thrust-teknikk rettet mot spinalleddet",
+        "description_en": "High-velocity, low-amplitude thrust technique directed at spinal joints",
+        "category": "manipulation",
+        "indications": ["segmentell hypomobilitet", "fasettleddsdysfunksjon"],
+        "contraindications": ["ustabilitet", "fraktur", "infeksjon", "malignitet"]
+      },
+      "EMT": {
+        "short": "EMT",
+        "full_no": "Ekstremitetsmanipulasjon",
+        "full_en": "Extremity Manipulative Therapy",
+        "description_no": "Manipulasjonsteknikk rettet mot ekstremitetsledd",
+        "description_en": "Manipulation technique directed at extremity joints",
+        "category": "manipulation"
+      },
+      "MOB": {
+        "short": "MOB",
+        "full_no": "Mobilisering",
+        "full_en": "Mobilization",
+        "description_no": "Lavhastighets passiv bevegelse av ledd innenfor normal bevegelsesutslag",
+        "description_en": "Low-velocity passive movement of joints within normal range",
+        "category": "mobilization"
+      },
+      "cx mob": {
+        "short": "cx mob",
+        "full_no": "Cervikalmobilisering",
+        "full_en": "Cervical mobilization",
+        "description_no": "Mobilisering av cervikalcolumna",
+        "category": "mobilization",
+        "style": "sigrun"
+      },
+      "tx mob": {
+        "short": "tx mob",
+        "full_no": "Thorakalmobilisering",
+        "full_en": "Thoracic mobilization",
+        "description_no": "Mobilisering av thorakalcolumna",
+        "category": "mobilization",
+        "style": "sigrun"
+      },
+      "lx mob": {
+        "short": "lx mob",
+        "full_no": "Lumbalmobilisering",
+        "full_en": "Lumbar mobilization",
+        "description_no": "Mobilisering av lumbalcolumna",
+        "category": "mobilization",
+        "style": "sigrun"
+      }
+    },
+
+    "softTissue": {
+      "IMS": {
+        "short": "IMS",
+        "full_no": "Intramuskulær stimulering (tørrnåling)",
+        "full_en": "Intramuscular Stimulation (dry needling)",
+        "description_no": "Nålbehandling av triggerpunkter i muskulatur",
+        "description_en": "Needle treatment of trigger points in muscles",
+        "category": "needling"
+      },
+      "TrP": {
+        "short": "TrP",
+        "full_no": "Triggerpunktbehandling",
+        "full_en": "Trigger Point treatment",
+        "description_no": "Manuell behandling av myofascielle triggerpunkter",
+        "category": "soft_tissue"
+      },
+      "tp": {
+        "short": "tp",
+        "full_no": "Triggerpunktbehandling",
+        "full_en": "Trigger point treatment",
+        "category": "soft_tissue",
+        "style": "sigrun"
+      },
+      "trp": {
+        "short": "trp",
+        "full_no": "Triggerpunktbehandling",
+        "full_en": "Trigger point treatment",
+        "category": "soft_tissue",
+        "style": "sigrun"
+      },
+      "mass": {
+        "short": "mass",
+        "full_no": "Massasje",
+        "full_en": "Massage",
+        "description_no": "Manuell bløtvevsbehandling",
+        "category": "soft_tissue",
+        "style": "sigrun"
+      },
+      "løsgjøring": {
+        "short": "løsgjøring",
+        "full_no": "Mobilisering og løsgjøring av bløtvev",
+        "full_en": "Soft tissue mobilization and release",
+        "category": "soft_tissue"
+      }
+    },
+
+    "stretching": {
+      "Tøy": {
+        "short": "Tøy",
+        "full_no": "Tøyning",
+        "full_en": "Stretching",
+        "description_no": "Passiv eller aktiv muskeltøyning",
+        "description_en": "Passive or active muscle stretching",
+        "category": "stretching"
+      },
+      "tøy": {
+        "short": "tøy",
+        "full_no": "Tøyning",
+        "full_en": "Stretching",
+        "category": "stretching",
+        "style": "sigrun"
+      },
+      "PIR": {
+        "short": "PIR",
+        "full_no": "Post-isometrisk relaksasjon",
+        "full_en": "Post-Isometric Relaxation",
+        "description_no": "Muskelenergi-teknikk for tøyning",
+        "category": "stretching"
+      },
+      "MET": {
+        "short": "MET",
+        "full_no": "Muskelenergi-teknikk",
+        "full_en": "Muscle Energy Technique",
+        "description_no": "Aktiv teknikk hvor pasienten kontraherer muskulatur mot motstand",
+        "category": "stretching"
+      }
+    },
+
+    "modalities": {
+      "TBB": {
+        "short": "TBB",
+        "full_no": "Trykkbølgebehandling",
+        "full_en": "Shockwave therapy",
+        "description_no": "Ekstrakorporal trykkbølgeterapi",
+        "description_en": "Extracorporeal shockwave therapy",
+        "category": "modality"
+      },
+      "AKU": {
+        "short": "AKU",
+        "full_no": "Akupunktur",
+        "full_en": "Acupuncture",
+        "category": "modality"
+      },
+      "KMI": {
+        "short": "KMI",
+        "full_no": "Kinesiotape",
+        "full_en": "Kinesio tape",
+        "category": "taping"
+      },
+      "KT": {
+        "short": "KT",
+        "full_no": "Kinesiotape",
+        "full_en": "Kinesio tape",
+        "category": "taping"
+      },
+      "COX": {
+        "short": "COX",
+        "full_no": "Cox fleksjon-distraksjon",
+        "full_en": "Cox Flexion-Distraction technique",
+        "description_no": "Mekanisk fleksjon-distraksjon teknikk for columna",
+        "category": "distraction"
+      }
+    },
+
+    "positions": {
+      "supine": {
+        "short": "supine",
+        "full_no": "Ryggleie",
+        "full_en": "Supine position"
+      },
+      "prone": {
+        "short": "prone",
+        "full_no": "Mageleie",
+        "full_en": "Prone position"
+      },
+      "side": {
+        "short": "side",
+        "full_no": "Sideleie",
+        "full_en": "Side-lying position"
+      },
+      "seated": {
+        "short": "seated",
+        "full_no": "Sittende",
+        "full_en": "Seated position"
+      }
+    },
+
+    "intensity": {
+      "+": {
+        "short": "+",
+        "full_no": "Normal intensitet",
+        "full_en": "Normal intensity"
+      },
+      "++": {
+        "short": "++",
+        "full_no": "Økt intensitet",
+        "full_en": "Increased intensity"
+      },
+      "+++": {
+        "short": "+++",
+        "full_no": "Høy intensitet",
+        "full_en": "High intensity"
+      }
+    },
+
+    "followUp": {
+      "beh": {
+        "short": "beh",
+        "full_no": "Behandling",
+        "full_en": "Treatment",
+        "style": "sigrun"
+      },
+      "rep": {
+        "short": "rep",
+        "full_no": "Repeterer/samme behandling",
+        "full_en": "Repeated treatment",
+        "style": "sigrun"
+      },
+      "som sist": {
+        "short": "som sist",
+        "full_no": "Samme behandling som sist",
+        "full_en": "Same treatment as last time",
+        "style": "sigrun"
+      },
+      "oppf": {
+        "short": "oppf",
+        "full_no": "Oppfølging",
+        "full_en": "Follow-up",
+        "style": "sigrun"
+      }
+    }
+  }
+}

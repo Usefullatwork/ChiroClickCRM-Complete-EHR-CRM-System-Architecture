@@ -1,0 +1,96 @@
+{
+  "templateId": "basic-phrases",
+  "version": "1.0.0",
+  "languageLevel": "basic",
+  "documentTypes": ["journal"],
+  "description": "Quick abbreviated phrases for daily journal notes",
+
+  "phrases": {
+    "anamnese": {
+      "improvement": [
+        "bedre",
+        "mye bedre",
+        "klart bedre",
+        "mindre vondt",
+        "føler seg bedre"
+      ],
+      "noChange": [
+        "som sist",
+        "uendret",
+        "samme",
+        "ikke noe endring"
+      ],
+      "worsening": [
+        "verre",
+        "mer vondt",
+        "økt",
+        "tilbake"
+      ],
+      "painDescriptions": [
+        "vondt i {location}",
+        "smerter {location}",
+        "stiv i {location}",
+        "stråler til {location}",
+        "nummenhet {location}"
+      ],
+      "temporalModifiers": [
+        "siden sist",
+        "de siste dagene",
+        "etter trening",
+        "om natten",
+        "om morgenen"
+      ]
+    },
+
+    "undersokelse": {
+      "mobility": [
+        "hypomobil {segment}",
+        "palpøm {location}",
+        "stram {muscle}",
+        "redusert ROM"
+      ],
+      "tests": [
+        "{test} ua",
+        "{test} pos {side}",
+        "{test} neg"
+      ],
+      "neurological": [
+        "kraft normal",
+        "sens normal",
+        "reflekser normale"
+      ]
+    },
+
+    "behandling": {
+      "smtPattern": "SMT {segment} {direction} {intensity}",
+      "emtPattern": "EMT {joint} {side} {intensity}",
+      "imsPattern": "IMS {muscle} {side}",
+      "stretchPattern": "Tøy {muscle} {side} x{reps}",
+      "separators": ["++", "+"]
+    },
+
+    "notat": {
+      "followUp": [
+        "oppf om {days} dager",
+        "kontroll om {weeks} uker",
+        "ring ved behov"
+      ],
+      "exercises": [
+        "hjemmeøvelser utlevert",
+        "øvelser gjennomgått",
+        "fortsett med øvelser"
+      ],
+      "referral": [
+        "henvises til {specialist}",
+        "vurdere rtg/MR",
+        "kontakt fastlege"
+      ]
+    }
+  },
+
+  "abbreviationStyle": {
+    "preferShortForms": true,
+    "allowLowercase": true,
+    "omitPunctuation": true
+  }
+}

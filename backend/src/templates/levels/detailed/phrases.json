@@ -1,0 +1,129 @@
+{
+  "templateId": "detailed-phrases",
+  "version": "1.0.0",
+  "languageLevel": "detailed",
+  "documentTypes": ["epikrise", "henvisning"],
+  "description": "Professional clinical phrases for formal documents",
+
+  "phrases": {
+    "epikrise": {
+      "introduction": [
+        "Pasienten ble henvist til undertegnede for vurdering og behandling av {condition}.",
+        "Ved første konsultasjon {date} presenterte pasienten med følgende hovedproblemstilling:",
+        "Pasienten søkte behandling grunnet {complaint} av {duration} varighet."
+      ],
+      "historyPresentation": [
+        "Pasienten beskriver {symptom_description} som debuterte {onset}.",
+        "Symptomene forverres ved {aggravating} og lindres av {relieving}.",
+        "Det foreligger ingen relevante tidligere skader eller operasjoner i aktuelt område.",
+        "Pasienten har tidligere mottatt behandling for lignende plager hos {provider}."
+      ],
+      "examinationFindings": [
+        "Ved klinisk undersøkelse påvises følgende funn:",
+        "Inspeksjon avdekker {observation_findings}.",
+        "Palpatorisk foreligger ømhet over {palpation_location}.",
+        "Aktiv bevegelsesutslag viser redusert {movement} med {degrees} grader reduksjon.",
+        "Nevrologisk undersøkelse viser {neurological_findings}.",
+        "Spesifikke ortopediske tester:",
+        "- {test_name}: {test_result}"
+      ],
+      "diagnosis": [
+        "Basert på anamnese og kliniske funn stilles følgende diagnose:",
+        "Kliniske funn er forenlige med {diagnosis}.",
+        "Differensialdiagnostisk vurderes {differential_diagnoses}."
+      ],
+      "treatment": [
+        "Pasienten har mottatt konservativ behandling bestående av:",
+        "Behandlingen har inkludert spinal manipulativ terapi rettet mot {segments}.",
+        "I tillegg til manuell behandling er det gitt instruksjon i hjemmeøvelser.",
+        "Totalt har pasienten gjennomført {number} behandlinger over {duration}."
+      ],
+      "assessment": [
+        "Pasienten rapporterer {improvement_status} etter behandlingsperioden.",
+        "Funksjonelt har pasienten oppnådd {functional_improvement}.",
+        "Samlet vurdering tilsier at prognosen er {prognosis}."
+      ],
+      "plan": [
+        "Det anbefales videre oppfølging med {recommendation}.",
+        "Pasienten henvises til {referral_destination} for videre utredning.",
+        "Kontroll om {timeframe} etter behov."
+      ],
+      "closing": [
+        "Vennlig hilsen",
+        "Med vennlig hilsen",
+        "Undertegnede står til disposisjon for eventuelle spørsmål."
+      ]
+    },
+
+    "henvisning": {
+      "introduction": [
+        "Henviser herved ovennevnte pasient til vurdering hos {specialist}.",
+        "Pasienten henvises for videre utredning og vurdering av {condition}.",
+        "Ønsker vurdering av pasient med følgende problemstilling:"
+      ],
+      "reasonForReferral": [
+        "Henvisningsårsak:",
+        "Pasienten har vedvarende {symptoms} til tross for konservativ behandling.",
+        "Det ønskes bildediagnostikk for å utelukke {differential_diagnoses}.",
+        "Ber om spesialistvurdering grunnet manglende respons på behandling."
+      ],
+      "clinicalHistory": [
+        "Sykehistorie:",
+        "Aktuelt debut: {onset}",
+        "Symptomutvikling: {progression}",
+        "Tidligere behandling: {previous_treatment}",
+        "Effekt av behandling: {treatment_effect}"
+      ],
+      "clinicalFindings": [
+        "Kliniske funn ved siste undersøkelse {date}:",
+        "Inspeksjon: {inspection}",
+        "Palpasjon: {palpation}",
+        "Bevegelighet: {mobility}",
+        "Nevrologisk: {neurological}",
+        "Ortopediske tester: {tests}"
+      ],
+      "currentTreatment": [
+        "Nåværende behandling:",
+        "Pasienten mottar kiropraktorbehandling med fokus på {treatment_focus}.",
+        "Frekvens: {frequency}",
+        "Respons: {response}"
+      ],
+      "questions": [
+        "Konkret ønskes:",
+        "1. Vurdering av indikasjon for bildediagnostikk",
+        "2. Vurdering av differensialdiagnoser",
+        "3. Anbefaling vedrørende videre behandling",
+        "4. Eventuell indikasjon for invasiv behandling"
+      ],
+      "redFlags": [
+        "NB: Følgende røde flagg er vurdert og funnet negative:",
+        "- Malignitetsmistanke",
+        "- Infeksjon",
+        "- Fraktur",
+        "- Cauda equina syndrom",
+        "- Progressivt nevrologisk utfall"
+      ]
+    },
+
+    "common": {
+      "anatomy_descriptions": {
+        "cervical": "cervikalcolumna (nakkehvirvelsøylen)",
+        "thoracic": "thorakalcolumna (brysthvirvelsøylen)",
+        "lumbar": "lumbalcolumna (lendehvirvelsøylen)",
+        "sacroiliac": "iliosakralleddene (IS-leddene)"
+      },
+      "improvement_terms": {
+        "significant": "betydelig bedring",
+        "moderate": "moderat bedring",
+        "mild": "lett bedring",
+        "unchanged": "uendret tilstand",
+        "worsened": "forverring av symptomer"
+      },
+      "duration_terms": {
+        "acute": "akutt (< 6 uker)",
+        "subacute": "subakutt (6-12 uker)",
+        "chronic": "kronisk (> 12 uker)"
+      }
+    }
+  }
+}

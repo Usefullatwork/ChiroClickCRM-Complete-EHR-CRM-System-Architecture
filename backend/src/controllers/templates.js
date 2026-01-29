@@ -415,6 +415,207 @@ export const getFMSTemplates = async (req, res) => {
   }
 };
 
+// ============================================
+// Document Type Template Endpoints
+// ============================================
+
+// Import the modular template service
+import { templateService as modularTemplateService, getAllDocumentTypes, getDocumentTypeConfig } from '../templates/index.js';
+
+/**
+ * Get all document types
+ * GET /api/v1/templates/document-types
+ */
+export const getDocumentTypes = async (req, res) => {
+  try {
+    const documentTypes = getAllDocumentTypes();
+    res.json({
+      success: true,
+      documentTypes
+    });
+  } catch (error) {
+    logger.error('Error in getDocumentTypes controller:', error);
+    res.status(500).json({ error: 'Failed to retrieve document types' });
+  }
+};
+
+/**
+ * Get templates for a specific document type
+ * GET /api/v1/templates/for-document/:type
+ */
+export const getTemplatesForDocument = async (req, res) => {
+  try {
+    const { type } = req.params;
+    const { practitioner, specialty, bodyRegion } = req.query;
+
+    const config = getDocumentTypeConfig(type);
+    if (!config) {
+      return res.status(404).json({ error: `Unknown document type: ${type}` });
+    }
+
+    const templates = await modularTemplateService.loadForDocumentType(type, {
+      practitioner,
+      specialty,
+      bodyRegion
+    });
+
+    res.json({
+      success: true,
+      documentType: config,
+      templates
+    });
+  } catch (error) {
+    logger.error('Error in getTemplatesForDocument controller:', error);
+    res.status(500).json({ error: 'Failed to retrieve templates for document type' });
+  }
+};
+
+/**
+ * Create a custom template set
+ * POST /api/v1/templates/custom-set
+ */
+export const createCustomTemplateSet = async (req, res) => {
+  try {
+    const { templateIds, languageLevel } = req.body;
+
+    if (!templateIds || !Array.isArray(templateIds)) {
+      return res.status(400).json({ error: 'templateIds array is required' });
+    }
+
+    const customSet = await modularTemplateService.createCustomSet(templateIds, {
+      languageLevel: languageLevel || 'basic'
+    });
+
+    res.json({
+      success: true,
+      customSet
+    });
+  } catch (error) {
+    logger.error('Error in createCustomTemplateSet controller:', error);
+    res.status(500).json({ error: 'Failed to create custom template set' });
+  }
+};
+
+/**
+ * Get terminology for a specific term
+ * GET /api/v1/templates/terminology/:term
+ */
+export const getTerminology = async (req, res) => {
+  try {
+    const { term } = req.params;
+    const { level, documentType } = req.query;
+
+    const terminology = await modularTemplateService.getTerminology(
+      term,
+      level || 'basic',
+      documentType
+    );
+
+    if (!terminology) {
+      return res.status(404).json({ error: `Term not found: ${term}` });
+    }
+
+    res.json({
+      success: true,
+      term,
+      level: level || 'basic',
+      terminology
+    });
+  } catch (error) {
+    logger.error('Error in getTerminology controller:', error);
+    res.status(500).json({ error: 'Failed to retrieve terminology' });
+  }
+};
+
+/**
+ * Expand abbreviations in text
+ * POST /api/v1/templates/expand
+ */
+export const expandAbbreviations = async (req, res) => {
+  try {
+    const { text, documentType } = req.body;
+
+    if (!text) {
+      return res.status(400).json({ error: 'text is required' });
+    }
+
+    const expanded = await modularTemplateService.expandAbbreviations(
+      text,
+      documentType || 'epikrise'
+    );
+
+    res.json({
+      success: true,
+      original: text,
+      expanded
+    });
+  } catch (error) {
+    logger.error('Error in expandAbbreviations controller:', error);
+    res.status(500).json({ error: 'Failed to expand abbreviations' });
+  }
+};
+
+/**
+ * Abbreviate text
+ * POST /api/v1/templates/abbreviate
+ */
+export const abbreviateText = async (req, res) => {
+  try {
+    const { text, documentType } = req.body;
+
+    if (!text) {
+      return res.status(400).json({ error: 'text is required' });
+    }
+
+    const abbreviated = await modularTemplateService.abbreviateText(
+      text,
+      documentType || 'journal'
+    );
+
+    res.json({
+      success: true,
+      original: text,
+      abbreviated
+    });
+  } catch (error) {
+    logger.error('Error in abbreviateText controller:', error);
+    res.status(500).json({ error: 'Failed to abbreviate text' });
+  }
+};
+
+/**
+ * Get terms by category
+ * GET /api/v1/templates/terms/:category
+ */
+export const getTermsByCategory = async (req, res) => {
+  try {
+    const { category } = req.params;
+    const { level } = req.query;
+
+    const validCategories = ['anatomy', 'treatments', 'examinations'];
+    if (!validCategories.includes(category)) {
+      return res.status(400).json({
+        error: `Invalid category. Must be one of: ${validCategories.join(', ')}`
+      });
+    }
+
+    const terms = await modularTemplateService.getTermsByCategory(
+      category,
+      level || 'basic'
+    );
+
+    res.json({
+      success: true,
+      category,
+      level: level || 'basic',
+      terms
+    });
+  } catch (error) {
+    logger.error('Error in getTermsByCategory controller:', error);
+    res.status(500).json({ error: 'Failed to retrieve terms' });
+  }
+};
+
 export default {
   getAllTemplates,
   getTemplatesByCategory,
@@ -437,5 +638,13 @@ export default {
   screenRedFlags,
   getTestClusters,
   getTestClusterByCondition,
-  getFMSTemplates
+  getFMSTemplates,
+  // Document Type Template endpoints
+  getDocumentTypes,
+  getTemplatesForDocument,
+  createCustomTemplateSet,
+  getTerminology,
+  expandAbbreviations,
+  abbreviateText,
+  getTermsByCategory
 };

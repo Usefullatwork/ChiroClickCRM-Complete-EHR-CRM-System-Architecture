@@ -21,6 +21,35 @@ router.get('/search', templateController.searchTemplates);
 // GET /api/v1/templates/by-category
 router.get('/by-category', templateController.getTemplatesByCategory);
 
+// ============================================
+// Modular Document Type Template Routes
+// ============================================
+
+// GET /api/v1/templates/document-types - List all document types
+router.get('/document-types', templateController.getDocumentTypes);
+
+// GET /api/v1/templates/for-document/:type - Get templates for document type
+router.get('/for-document/:type', templateController.getTemplatesForDocument);
+
+// POST /api/v1/templates/custom-set - Create custom template combination
+router.post('/custom-set', templateController.createCustomTemplateSet);
+
+// GET /api/v1/templates/terminology/:term - Get terminology for a term
+router.get('/terminology/:term', templateController.getTerminology);
+
+// POST /api/v1/templates/expand - Expand abbreviations to full form
+router.post('/expand', templateController.expandAbbreviations);
+
+// POST /api/v1/templates/abbreviate - Abbreviate text to short form
+router.post('/abbreviate', templateController.abbreviateText);
+
+// GET /api/v1/templates/terms/:category - Get terms by category
+router.get('/terms/:category', templateController.getTermsByCategory);
+
+// ============================================
+// End Modular Document Type Template Routes
+// ============================================
+
 // GET /api/v1/templates
 router.get('/', templateController.getAllTemplates);
 

@@ -1,0 +1,113 @@
+{
+  "templateId": "specialty-chiropractic",
+  "version": "1.0.0",
+  "specialty": "chiropractic",
+  "description": "Chiropractic-specific clinical terminology",
+
+  "treatments": {
+    "chiropracticTechniques": {
+      "diversified": {
+        "short": "Diversified",
+        "full_no": "Diversified teknikk",
+        "description_no": "Standard HVLA justering med fokus på gjenoppretting av normal leddbevegelighet",
+        "category": "manipulation"
+      },
+      "gonstead": {
+        "short": "Gonstead",
+        "full_no": "Gonstead teknikk",
+        "description_no": "Spesifikk HVLA justering med detaljert leddanalyse og presis kontakt",
+        "category": "manipulation"
+      },
+      "activator": {
+        "short": "Activator",
+        "full_no": "Activator Methods",
+        "description_no": "Instrumentbasert lavkraft justering ved hjelp av Activator-instrument",
+        "category": "instrument-assisted"
+      },
+      "thompson": {
+        "short": "Thompson",
+        "full_no": "Thompson Drop teknikk",
+        "description_no": "Segmentell dropbord-assistert justeringsteknikk",
+        "category": "drop-table"
+      },
+      "flexionDistraction": {
+        "short": "Cox",
+        "full_no": "Cox fleksjon-distraksjon",
+        "description_no": "Mekanisk assistert fleksjon og distraksjon for discogene tilstander",
+        "category": "traction"
+      }
+    },
+
+    "subluxationListings": {
+      "PR": {
+        "short": "PR",
+        "full_no": "Posterior høyre",
+        "description_no": "Vertebra er posterior og rotert mot høyre"
+      },
+      "PL": {
+        "short": "PL",
+        "full_no": "Posterior venstre",
+        "description_no": "Vertebra er posterior og rotert mot venstre"
+      },
+      "PRS": {
+        "short": "PRS",
+        "full_no": "Posterior høyre sidebøyning",
+        "description_no": "Vertebra er posterior med høyre sidebøyning"
+      },
+      "PLS": {
+        "short": "PLS",
+        "full_no": "Posterior venstre sidebøyning",
+        "description_no": "Vertebra er posterior med venstre sidebøyning"
+      },
+      "PIR": {
+        "short": "PIR",
+        "full_no": "Posterior inferior høyre",
+        "description_no": "IS-ledd posisjon: posterior inferior på høyre side"
+      },
+      "PIL": {
+        "short": "PIL",
+        "full_no": "Posterior inferior venstre",
+        "description_no": "IS-ledd posisjon: posterior inferior på venstre side"
+      },
+      "ASR": {
+        "short": "ASR",
+        "full_no": "Anterior superior høyre",
+        "description_no": "IS-ledd posisjon: anterior superior på høyre side"
+      },
+      "ASL": {
+        "short": "ASL",
+        "full_no": "Anterior superior venstre",
+        "description_no": "IS-ledd posisjon: anterior superior på venstre side"
+      }
+    }
+  },
+
+  "examinations": {
+    "chiropracticAssessment": {
+      "staticPalpation": {
+        "short": "Statisk palpasjon",
+        "description_no": "Palpasjon av spinalprosesser, facettledd, og paraspinale muskler i hvile"
+      },
+      "motionPalpation": {
+        "short": "Bevegelsespalpasjon",
+        "description_no": "Vurdering av segmentell bevegelighet ved passiv bevegelse"
+      },
+      "legLengthCheck": {
+        "short": "Benlengde",
+        "description_no": "Vurdering av funksjonell benlengde i ryggleie"
+      },
+      "postureAnalysis": {
+        "short": "Holdningsanalyse",
+        "description_no": "Visuell og instrumentell vurdering av statisk holdning"
+      }
+    }
+  },
+
+  "documentation": {
+    "chiropracticNotes": {
+      "findingFormat": "Hypomobil {segment} {direction}",
+      "treatmentFormat": "SMT {segment} {direction} {intensity}",
+      "responseFormat": "God respons på behandling, bedret bevegelighet"
+    }
+  }
+}

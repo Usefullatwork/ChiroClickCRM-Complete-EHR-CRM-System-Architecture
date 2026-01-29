@@ -1,0 +1,491 @@
+{
+  "templateId": "anatomy-core",
+  "version": "1.0.0",
+  "description": "Core anatomical terminology - shared across all language levels",
+
+  "anatomy": {
+    "spinalSegments": {
+      "C0": {
+        "short": "C0",
+        "full_no": "Os occipitale (nakkebenet)",
+        "full_en": "Occiput",
+        "region": "cervical"
+      },
+      "C1": {
+        "short": "C1",
+        "full_no": "Atlas (1. nakkevirvel)",
+        "full_en": "Atlas (first cervical vertebra)",
+        "region": "cervical"
+      },
+      "C2": {
+        "short": "C2",
+        "full_no": "Axis (2. nakkevirvel)",
+        "full_en": "Axis (second cervical vertebra)",
+        "region": "cervical"
+      },
+      "C3": {
+        "short": "C3",
+        "full_no": "3. nakkevirvel",
+        "full_en": "Third cervical vertebra",
+        "region": "cervical"
+      },
+      "C4": {
+        "short": "C4",
+        "full_no": "4. nakkevirvel",
+        "full_en": "Fourth cervical vertebra",
+        "region": "cervical"
+      },
+      "C5": {
+        "short": "C5",
+        "full_no": "5. nakkevirvel",
+        "full_en": "Fifth cervical vertebra",
+        "region": "cervical"
+      },
+      "C6": {
+        "short": "C6",
+        "full_no": "6. nakkevirvel",
+        "full_en": "Sixth cervical vertebra",
+        "region": "cervical"
+      },
+      "C7": {
+        "short": "C7",
+        "full_no": "7. nakkevirvel",
+        "full_en": "Seventh cervical vertebra",
+        "region": "cervical"
+      },
+      "T1": {
+        "short": "T1",
+        "full_no": "1. brystvirvel",
+        "full_en": "First thoracic vertebra",
+        "region": "thoracic"
+      },
+      "T2": {
+        "short": "T2",
+        "full_no": "2. brystvirvel",
+        "full_en": "Second thoracic vertebra",
+        "region": "thoracic"
+      },
+      "T3": {
+        "short": "T3",
+        "full_no": "3. brystvirvel",
+        "full_en": "Third thoracic vertebra",
+        "region": "thoracic"
+      },
+      "T4": {
+        "short": "T4",
+        "full_no": "4. brystvirvel",
+        "full_en": "Fourth thoracic vertebra",
+        "region": "thoracic"
+      },
+      "T5": {
+        "short": "T5",
+        "full_no": "5. brystvirvel",
+        "full_en": "Fifth thoracic vertebra",
+        "region": "thoracic"
+      },
+      "T6": {
+        "short": "T6",
+        "full_no": "6. brystvirvel",
+        "full_en": "Sixth thoracic vertebra",
+        "region": "thoracic"
+      },
+      "T7": {
+        "short": "T7",
+        "full_no": "7. brystvirvel",
+        "full_en": "Seventh thoracic vertebra",
+        "region": "thoracic"
+      },
+      "T8": {
+        "short": "T8",
+        "full_no": "8. brystvirvel",
+        "full_en": "Eighth thoracic vertebra",
+        "region": "thoracic"
+      },
+      "T9": {
+        "short": "T9",
+        "full_no": "9. brystvirvel",
+        "full_en": "Ninth thoracic vertebra",
+        "region": "thoracic"
+      },
+      "T10": {
+        "short": "T10",
+        "full_no": "10. brystvirvel",
+        "full_en": "Tenth thoracic vertebra",
+        "region": "thoracic"
+      },
+      "T11": {
+        "short": "T11",
+        "full_no": "11. brystvirvel",
+        "full_en": "Eleventh thoracic vertebra",
+        "region": "thoracic"
+      },
+      "T12": {
+        "short": "T12",
+        "full_no": "12. brystvirvel",
+        "full_en": "Twelfth thoracic vertebra",
+        "region": "thoracic"
+      },
+      "L1": {
+        "short": "L1",
+        "full_no": "1. lendevirvel",
+        "full_en": "First lumbar vertebra",
+        "region": "lumbar"
+      },
+      "L2": {
+        "short": "L2",
+        "full_no": "2. lendevirvel",
+        "full_en": "Second lumbar vertebra",
+        "region": "lumbar"
+      },
+      "L3": {
+        "short": "L3",
+        "full_no": "3. lendevirvel",
+        "full_en": "Third lumbar vertebra",
+        "region": "lumbar"
+      },
+      "L4": {
+        "short": "L4",
+        "full_no": "4. lendevirvel",
+        "full_en": "Fourth lumbar vertebra",
+        "region": "lumbar"
+      },
+      "L5": {
+        "short": "L5",
+        "full_no": "5. lendevirvel",
+        "full_en": "Fifth lumbar vertebra",
+        "region": "lumbar"
+      },
+      "S1": {
+        "short": "S1",
+        "full_no": "Sacrum (korsbein)",
+        "full_en": "Sacrum",
+        "region": "sacral"
+      }
+    },
+
+    "directions": {
+      "PR": {
+        "short": "PR",
+        "full_no": "Posterior høyre rotasjon",
+        "full_en": "Posterior to Right rotation"
+      },
+      "PL": {
+        "short": "PL",
+        "full_no": "Posterior venstre rotasjon",
+        "full_en": "Posterior to Left rotation"
+      },
+      "PRS": {
+        "short": "PRS",
+        "full_no": "Posterior høyre sidebøyning",
+        "full_en": "Posterior Right Sidebending"
+      },
+      "PLS": {
+        "short": "PLS",
+        "full_no": "Posterior venstre sidebøyning",
+        "full_en": "Posterior Left Sidebending"
+      },
+      "P": {
+        "short": "P",
+        "full_no": "Posterior",
+        "full_en": "Posterior"
+      },
+      "A": {
+        "short": "A",
+        "full_no": "Anterior",
+        "full_en": "Anterior"
+      }
+    },
+
+    "laterality": {
+      "Hø": {
+        "short": "Hø",
+        "full_no": "Høyre",
+        "full_en": "Right"
+      },
+      "Ve": {
+        "short": "Ve",
+        "full_no": "Venstre",
+        "full_en": "Left"
+      },
+      "bilat": {
+        "short": "bilat",
+        "full_no": "Bilateral (begge sider)",
+        "full_en": "Bilateral (both sides)"
+      },
+      "ipsilat": {
+        "short": "ipsilat",
+        "full_no": "Ipsilateral (samme side)",
+        "full_en": "Ipsilateral (same side)"
+      },
+      "contralat": {
+        "short": "contralat",
+        "full_no": "Kontralateral (motsatt side)",
+        "full_en": "Contralateral (opposite side)"
+      }
+    },
+
+    "joints": {
+      "IS-ledd": {
+        "short": "IS-ledd",
+        "full_no": "Iliosakralledd",
+        "full_en": "Sacroiliac joint",
+        "region": "pelvis"
+      },
+      "PIR": {
+        "short": "PIR",
+        "full_no": "Posterior inferior høyre (IS-ledd posisjon)",
+        "full_en": "Posterior Inferior Right (SI joint position)",
+        "region": "pelvis"
+      },
+      "PIL": {
+        "short": "PIL",
+        "full_no": "Posterior inferior venstre (IS-ledd posisjon)",
+        "full_en": "Posterior Inferior Left (SI joint position)",
+        "region": "pelvis"
+      },
+      "ASR": {
+        "short": "ASR",
+        "full_no": "Anterior superior høyre (IS-ledd posisjon)",
+        "full_en": "Anterior Superior Right (SI joint position)",
+        "region": "pelvis"
+      },
+      "ASL": {
+        "short": "ASL",
+        "full_no": "Anterior superior venstre (IS-ledd posisjon)",
+        "full_en": "Anterior Superior Left (SI joint position)",
+        "region": "pelvis"
+      },
+      "GH-ledd": {
+        "short": "GH-ledd",
+        "full_no": "Glenohumeralledd (skulderled)",
+        "full_en": "Glenohumeral joint (shoulder)",
+        "region": "shoulder"
+      },
+      "SC-ledd": {
+        "short": "SC-ledd",
+        "full_no": "Sternoclavicularledd",
+        "full_en": "Sternoclavicular joint",
+        "region": "shoulder"
+      },
+      "AC-ledd": {
+        "short": "AC-ledd",
+        "full_no": "Acromioclavicularledd",
+        "full_en": "Acromioclavicular joint",
+        "region": "shoulder"
+      },
+      "TMJ": {
+        "short": "TMJ",
+        "full_no": "Temporomandibularledd (kjeveledd)",
+        "full_en": "Temporomandibular joint",
+        "region": "head"
+      }
+    },
+
+    "regions": {
+      "C-col": {
+        "short": "C-col",
+        "full_no": "Cervikalcolumna (nakke)",
+        "full_en": "Cervical spine (neck)"
+      },
+      "T-col": {
+        "short": "T-col",
+        "full_no": "Thorakalcolumna (bryst)",
+        "full_en": "Thoracic spine (mid-back)"
+      },
+      "L-col": {
+        "short": "L-col",
+        "full_no": "Lumbalcolumna (lend)",
+        "full_en": "Lumbar spine (low back)"
+      }
+    },
+
+    "bones": {
+      "scapula": {
+        "short": "scapula",
+        "full_no": "Skulderblad",
+        "full_en": "Scapula"
+      },
+      "calcaneus": {
+        "short": "calcaneus",
+        "full_no": "Hælbein",
+        "full_en": "Calcaneus (heel bone)"
+      },
+      "talus": {
+        "short": "talus",
+        "full_no": "Rullebein i ankel",
+        "full_en": "Talus"
+      },
+      "navikularis": {
+        "short": "navikularis",
+        "full_no": "Navikularben (fot)",
+        "full_en": "Navicular bone (foot)"
+      },
+      "cuneiform": {
+        "short": "cuneiform",
+        "full_no": "Kileformede ben (fot)",
+        "full_en": "Cuneiform bones (foot)"
+      },
+      "lunate": {
+        "short": "lunate",
+        "full_no": "Månebein (håndledd)",
+        "full_en": "Lunate bone (wrist)"
+      },
+      "radius": {
+        "short": "radius",
+        "full_no": "Spolebein",
+        "full_en": "Radius"
+      },
+      "ulna": {
+        "short": "ulna",
+        "full_no": "Albueben",
+        "full_en": "Ulna"
+      },
+      "fibula": {
+        "short": "fibula",
+        "full_no": "Leggebein",
+        "full_en": "Fibula"
+      }
+    },
+
+    "muscles": {
+      "traps": {
+        "short": "traps",
+        "full_no": "Musculus trapezius",
+        "full_en": "Trapezius muscle"
+      },
+      "ES": {
+        "short": "ES",
+        "full_no": "Erector spinae (ryggstrekker)",
+        "full_en": "Erector spinae"
+      },
+      "SCM": {
+        "short": "SCM",
+        "full_no": "Musculus sternocleidomastoideus",
+        "full_en": "Sternocleidomastoid"
+      },
+      "subocc": {
+        "short": "subocc",
+        "full_no": "Suboccipitale muskler",
+        "full_en": "Suboccipital muscles"
+      },
+      "infraspinatus": {
+        "short": "infraspinatus",
+        "full_no": "Musculus infraspinatus (rotatorcuff)",
+        "full_en": "Infraspinatus (rotator cuff)"
+      },
+      "supraspinatus": {
+        "short": "supraspinatus",
+        "full_no": "Musculus supraspinatus (rotatorcuff)",
+        "full_en": "Supraspinatus (rotator cuff)"
+      },
+      "subscapularis": {
+        "short": "subscapularis",
+        "full_no": "Musculus subscapularis (rotatorcuff)",
+        "full_en": "Subscapularis (rotator cuff)"
+      },
+      "deltoideus": {
+        "short": "deltoideus",
+        "full_no": "Musculus deltoideus",
+        "full_en": "Deltoid muscle"
+      },
+      "pecs": {
+        "short": "pecs",
+        "full_no": "Musculus pectoralis",
+        "full_en": "Pectoralis muscles"
+      },
+      "glut": {
+        "short": "glut",
+        "full_no": "Glutealmuskulatur",
+        "full_en": "Gluteal muscles"
+      },
+      "glut med": {
+        "short": "glut med",
+        "full_no": "Musculus gluteus medius",
+        "full_en": "Gluteus medius"
+      },
+      "glut max": {
+        "short": "glut max",
+        "full_no": "Musculus gluteus maximus",
+        "full_en": "Gluteus maximus"
+      },
+      "piriformis": {
+        "short": "piriformis",
+        "full_no": "Musculus piriformis",
+        "full_en": "Piriformis muscle"
+      },
+      "psoas": {
+        "short": "psoas",
+        "full_no": "Musculus iliopsoas",
+        "full_en": "Iliopsoas"
+      },
+      "QL": {
+        "short": "QL",
+        "full_no": "Musculus quadratus lumborum",
+        "full_en": "Quadratus lumborum"
+      },
+      "HLB": {
+        "short": "HLB",
+        "full_no": "Hofteleddsbøyere",
+        "full_en": "Hip flexors"
+      },
+      "hamstring": {
+        "short": "hamstring",
+        "full_no": "Hamstringsmuskulatur (bakside lår)",
+        "full_en": "Hamstring muscles"
+      },
+      "quadriceps": {
+        "short": "quadriceps",
+        "full_no": "Musculus quadriceps femoris",
+        "full_en": "Quadriceps femoris"
+      },
+      "gastroc": {
+        "short": "gastroc",
+        "full_no": "Musculus gastrocnemius",
+        "full_en": "Gastrocnemius"
+      },
+      "soleus": {
+        "short": "soleus",
+        "full_no": "Musculus soleus",
+        "full_en": "Soleus muscle"
+      },
+      "tib post": {
+        "short": "tib post",
+        "full_no": "Musculus tibialis posterior",
+        "full_en": "Tibialis posterior"
+      },
+      "tib ant": {
+        "short": "tib ant",
+        "full_no": "Musculus tibialis anterior",
+        "full_en": "Tibialis anterior"
+      },
+      "peroneus": {
+        "short": "peroneus",
+        "full_no": "Musculus peroneus (fibularis)",
+        "full_en": "Peroneus (fibularis) muscles"
+      }
+    },
+
+    "findings": {
+      "ua": {
+        "short": "ua",
+        "full_no": "Uten anmerkning",
+        "full_en": "Unremarkable"
+      },
+      "palpøm": {
+        "short": "palpøm",
+        "full_no": "Palpatorisk øm (øm ved palpasjon)",
+        "full_en": "Tender on palpation"
+      },
+      "hypomobil": {
+        "short": "hypomobil",
+        "full_no": "Redusert bevegelighet (hypomobilitet)",
+        "full_en": "Reduced mobility (hypomobility)"
+      },
+      "fx": {
+        "short": "fx",
+        "full_no": "Fraktur",
+        "full_en": "Fracture"
+      }
+    }
+  }
+}

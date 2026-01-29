@@ -1,0 +1,40 @@
+{
+  "templateId": "basic-treatments",
+  "version": "1.0.0",
+  "languageLevel": "basic",
+  "documentTypes": ["journal"],
+  "description": "Abbreviated treatment terms for quick documentation",
+
+  "treatments": {
+    "shortForms": {
+      "Spinal manipulativ terapi": "SMT",
+      "Ekstremitetsmanipulasjon": "EMT",
+      "Intramuskulær stimulering": "IMS",
+      "Trykkbølgebehandling": "TBB",
+      "Triggerpunktbehandling": "TrP",
+      "Muskelenergi-teknikk": "MET",
+      "Post-isometrisk relaksasjon": "PIR",
+      "Kinesiotape": "KT",
+      "Akupunktur": "AKU",
+      "Cox fleksjon-distraksjon": "COX",
+      "Tøyning": "Tøy",
+      "Cervikalmobilisering": "cx mob",
+      "Thorakalmobilisering": "tx mob",
+      "Lumbalmobilisering": "lx mob",
+      "Massasje": "mass",
+      "Behandling": "beh"
+    },
+
+    "quickPatterns": {
+      "spinalAdjustment": "{segment} {direction} {intensity}",
+      "example": "C5 PR ++",
+      "separator": " ++ "
+    },
+
+    "intensitySymbols": {
+      "normal": "+",
+      "moderate": "++",
+      "firm": "+++"
+    }
+  }
+}

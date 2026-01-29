@@ -1,0 +1,308 @@
+{
+  "templateId": "examinations-core",
+  "version": "1.0.0",
+  "description": "Core examination test terminology - shared across all language levels",
+
+  "examinations": {
+    "cervical": {
+      "Spurlings": {
+        "short": "Spurlings",
+        "full_no": "Spurlings test",
+        "full_en": "Spurling's test",
+        "description_no": "Nerverotkompresjonstest for cervikalcolumna - kombinerer ekstensjon, rotasjon og aksial kompresjon",
+        "description_en": "Nerve root compression test for cervical spine - combines extension, rotation and axial compression",
+        "positive_indicates": "Cervical radiculopathy",
+        "technique": "Ekstender nakken, roter og sidebøy mot symptomatisk side, appliker aksial kompresjon"
+      },
+      "Kompresjon": {
+        "short": "Kompresjon",
+        "full_no": "Kompresjonstest nakke",
+        "full_en": "Cervical compression test",
+        "description_no": "Aksial kompresjon av cervikalcolumna",
+        "positive_indicates": "Discogenic or facet pathology"
+      },
+      "Traksjon": {
+        "short": "Traksjon",
+        "full_no": "Traksjonstest nakke",
+        "full_en": "Cervical traction test",
+        "description_no": "Aksial traksjon av cervikalcolumna",
+        "positive_indicates": "Relief suggests nerve root compression"
+      },
+      "Perkusjon": {
+        "short": "Perkusjon",
+        "full_no": "Perkusjonstest",
+        "full_en": "Percussion test",
+        "description_no": "Perkusjonstest over spinalprosesser"
+      },
+      "Skulderdepresjon": {
+        "short": "Skulderdepresjon",
+        "full_no": "Skulderdepresjonstest",
+        "full_en": "Shoulder depression test",
+        "description_no": "Brakial pleksus strekktest",
+        "positive_indicates": "Upper limb tension / brachial plexus irritation"
+      },
+      "SMR": {
+        "short": "SMR",
+        "full_no": "Sensorisk motorisk refleks test",
+        "full_en": "Sensory Motor Reflex test"
+      }
+    },
+
+    "lumbar": {
+      "Adams": {
+        "short": "Adams",
+        "full_no": "Adams forward bend test",
+        "full_en": "Adams forward bend test",
+        "description_no": "Fremoverfleksjonstest for å vurdere skoliose",
+        "positive_indicates": "Structural scoliosis"
+      },
+      "Kemps": {
+        "short": "Kemps",
+        "full_no": "Kemps test",
+        "full_en": "Kemp's test",
+        "description_no": "Kombinert ekstensjon og rotasjon av lumbalcolumna",
+        "positive_indicates": "Facet joint or disc pathology"
+      },
+      "Slumps": {
+        "short": "Slumps",
+        "full_no": "Slump test",
+        "full_en": "Slump test",
+        "description_no": "Nevral spenningstest for dura og nedre nervesystem",
+        "positive_indicates": "Neural tension / dural irritation"
+      },
+      "Lasegue": {
+        "short": "Lasegue",
+        "full_no": "Lasègues test",
+        "full_en": "Lasègue test / Straight Leg Raise",
+        "description_no": "Passiv fleksjon av hoften med ekstendert kne",
+        "positive_indicates": "L4-S1 nerve root tension"
+      },
+      "SLR": {
+        "short": "SLR",
+        "full_no": "Straight leg raise (Lasègue)",
+        "full_en": "Straight Leg Raise",
+        "description_no": "Passiv fleksjon av hoften med ekstendert kne",
+        "positive_indicates": "L4-S1 nerve root tension"
+      },
+      "Bragard": {
+        "short": "Bragard",
+        "full_no": "Bragards test",
+        "full_en": "Bragard's test",
+        "description_no": "Sensitivisering av SLR med dorsalfleksjon av ankel",
+        "positive_indicates": "Increased nerve root tension"
+      }
+    },
+
+    "shoulder": {
+      "Empty can": {
+        "short": "Empty can",
+        "full_no": "Empty can test",
+        "full_en": "Empty can test",
+        "description_no": "Supraspinatus muskel/sene test",
+        "positive_indicates": "Supraspinatus tendinopathy or tear"
+      },
+      "Hawkins": {
+        "short": "Hawkins",
+        "full_no": "Hawkins-Kennedy test",
+        "full_en": "Hawkins-Kennedy test",
+        "description_no": "Impingement test for subakromial patologi",
+        "positive_indicates": "Subacromial impingement"
+      },
+      "Speeds": {
+        "short": "Speeds",
+        "full_no": "Speeds test",
+        "full_en": "Speed's test",
+        "description_no": "Test for biceps sene patologi",
+        "positive_indicates": "Biceps tendinopathy"
+      },
+      "Neers": {
+        "short": "Neers",
+        "full_no": "Neers test",
+        "full_en": "Neer's test",
+        "description_no": "Impingement test - passiv fleksjon av skulder",
+        "positive_indicates": "Subacromial impingement"
+      },
+      "Yochums": {
+        "short": "Yochums",
+        "full_no": "Yochums test",
+        "full_en": "Yocum's test",
+        "description_no": "Impingement test"
+      },
+      "Painful Arc": {
+        "short": "Painful Arc",
+        "full_no": "Smertebue test",
+        "full_en": "Painful arc test",
+        "description_no": "Aktiv abduksjon med smerte mellom 60-120 grader",
+        "positive_indicates": "Subacromial pathology"
+      },
+      "Winging": {
+        "short": "Winging",
+        "full_no": "Skulderblad vinging test",
+        "full_en": "Scapular winging test",
+        "description_no": "Observasjon av scapula under arm bevegelse",
+        "positive_indicates": "Serratus anterior weakness / long thoracic nerve palsy"
+      }
+    },
+
+    "hip": {
+      "FABER": {
+        "short": "FABER",
+        "full_no": "FABER test (Patrick's test)",
+        "full_en": "FABER test (Flexion Abduction External Rotation)",
+        "description_no": "Fleksjon, abduksjon, utrotasjon test for hofte/SI-ledd",
+        "positive_indicates": "Hip joint or sacroiliac joint pathology"
+      },
+      "FADIR": {
+        "short": "FADIR",
+        "full_no": "FADIR test",
+        "full_en": "FADIR test (Flexion Adduction Internal Rotation)",
+        "description_no": "Fleksjon, adduksjon, innrotasjon test for femoroacetabulær impingement",
+        "positive_indicates": "Femoroacetabular impingement (FAI)"
+      },
+      "Thomas": {
+        "short": "Thomas",
+        "full_no": "Thomas test",
+        "full_en": "Thomas test",
+        "description_no": "Test for hofteleddsbøyer stramhet",
+        "positive_indicates": "Hip flexor tightness / contracture"
+      }
+    },
+
+    "knee": {
+      "McMurray": {
+        "short": "McMurray",
+        "full_no": "McMurray test",
+        "full_en": "McMurray's test",
+        "description_no": "Menisktest med rotasjon og fleksjon/ekstensjon",
+        "positive_indicates": "Meniscal tear"
+      },
+      "Apley": {
+        "short": "Apley",
+        "full_no": "Apley test",
+        "full_en": "Apley's test",
+        "description_no": "Menisktest i mageleie med kompresjon og distraksjon",
+        "positive_indicates": "Meniscal tear"
+      },
+      "Thessaly": {
+        "short": "Thessaly",
+        "full_no": "Thessaly test",
+        "full_en": "Thessaly test",
+        "description_no": "Menisktest i stående stilling med rotasjon",
+        "positive_indicates": "Meniscal pathology"
+      },
+      "Lachmann": {
+        "short": "Lachmann",
+        "full_no": "Lachmann test",
+        "full_en": "Lachmann test",
+        "description_no": "Fremre korsbåndstest i 20-30 grader fleksjon",
+        "positive_indicates": "ACL rupture"
+      },
+      "Drawer": {
+        "short": "Drawer",
+        "full_no": "Drawer test",
+        "full_en": "Drawer test",
+        "description_no": "Test for fremre og bakre korsbånd",
+        "positive_indicates": "ACL or PCL instability"
+      }
+    },
+
+    "neurological": {
+      "Tågange": {
+        "short": "Tågange",
+        "full_no": "Tågange test",
+        "full_en": "Toe walking test",
+        "description_no": "Motortest for S1 nerverot",
+        "positive_indicates": "S1 nerve root weakness"
+      },
+      "Hælgange": {
+        "short": "Hælgange",
+        "full_no": "Hælgange test",
+        "full_en": "Heel walking test",
+        "description_no": "Motortest for L4-L5 nerveroter",
+        "positive_indicates": "L4-L5 nerve root weakness"
+      }
+    },
+
+    "rom": {
+      "ROM": {
+        "short": "ROM",
+        "full_no": "Bevegelsesutslag",
+        "full_en": "Range of Motion"
+      },
+      "AROM": {
+        "short": "AROM",
+        "full_no": "Aktivt bevegelsesutslag",
+        "full_en": "Active Range of Motion"
+      },
+      "PROM": {
+        "short": "PROM",
+        "full_no": "Passivt bevegelsesutslag",
+        "full_en": "Passive Range of Motion"
+      }
+    },
+
+    "results": {
+      "positiv": {
+        "short": "pos",
+        "full_no": "Positiv",
+        "full_en": "Positive"
+      },
+      "negativ": {
+        "short": "neg",
+        "full_no": "Negativ",
+        "full_en": "Negative"
+      },
+      "ua": {
+        "short": "ua",
+        "full_no": "Uten anmerkning",
+        "full_en": "Unremarkable"
+      },
+      "redusert": {
+        "short": "red",
+        "full_no": "Redusert",
+        "full_en": "Reduced"
+      }
+    }
+  },
+
+  "patterns": {
+    "painLocations": [
+      "nakken", "skulder", "arm", "albue", "hånd", "finger",
+      "bryst", "rygg", "korsrygg", "bekken", "hofte",
+      "lår", "kne", "legg", "ankel", "fot"
+    ],
+    "painDescriptors": [
+      "vondt", "smerter", "stiv", "støl", "stramt", "låst",
+      "stikkende", "verkende", "pulserende", "brennende",
+      "dunkende", "skarp"
+    ],
+    "symptomPatterns": [
+      "stråling", "nummenhet", "prikking", "svakhet",
+      "hovent", "ømt", "begrenset", "redusert"
+    ],
+    "temporalPatterns": [
+      "akutt", "gradvis", "plutselig", "kronisk",
+      "intermitterende", "konstant", "periodevis"
+    ],
+    "aggravatingFactors": [
+      "sitte", "stå", "gå", "løpe", "trening", "bevegelse",
+      "fleksjon", "ekstensjon", "rotasjon", "belastning"
+    ],
+    "relievingFactors": [
+      "hvile", "bevegelse", "varme", "kulde", "tøying",
+      "smertestillende", "behandling"
+    ],
+    "assessmentImprovement": [
+      "bedre", "mye bedre", "klart bedre", "gått bedre",
+      "føler seg bedre", "kjenner seg bedre", "betydelig bedre",
+      "slapp", "løsnet", "mindre vondt"
+    ],
+    "assessmentNoChange": [
+      "som sist", "likt", "samme", "ikke noe endring",
+      "fortsatt", "fremdeles"
+    ],
+    "assessmentWorsening": [
+      "verre", "mer vondt", "økt", "tilbake til start"
+    ]
+  }
+}

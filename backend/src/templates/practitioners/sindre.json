@@ -1,0 +1,92 @@
+{
+  "templateId": "practitioner-sindre",
+  "version": "1.0.0",
+  "practitioner": "Sindre",
+  "style": "formal",
+  "defaultLanguageLevel": "detailed",
+  "description": "Sindre's clinical documentation preferences and style",
+
+  "preferences": {
+    "documentationStyle": {
+      "useFullNames": true,
+      "includeIntensityMarkers": true,
+      "separatorPattern": " ++ ",
+      "treatmentFormat": "SMT {segment} {direction} {intensity}"
+    },
+
+    "preferredAbbreviations": [
+      "SMT",
+      "EMT",
+      "IMS",
+      "TBB",
+      "TrP",
+      "MET"
+    ],
+
+    "treatmentSequence": [
+      "SMT (spinal)",
+      "EMT (extremity)",
+      "Ribb (rib adjustments)",
+      "IMS (dry needling)",
+      "Tøy (stretching)"
+    ],
+
+    "examinationSequence": [
+      "Anamnese",
+      "Inspeksjon",
+      "Palpasjon",
+      "ROM",
+      "Nevrologisk",
+      "Ortopediske tester"
+    ]
+  },
+
+  "templates": {
+    "anamnese": {
+      "firstVisit": {
+        "format": "structured",
+        "sections": [
+          "Hovedklage",
+          "Smertebeskrivelse",
+          "Debut/varighet",
+          "Forverrende/lindrende faktorer",
+          "Tidligere behandling",
+          "Sykdommer/Skader/Operasjoner",
+          "Medisiner",
+          "Familie Hx"
+        ],
+        "consent": "Pasienten er informert om behandling som skal gjennomføres, relevante risikoer og bivirkninger, og samtykker til denne."
+      },
+      "followUp": {
+        "format": "freetext",
+        "commonPhrases": [
+          "Føler seg bedre siden sist",
+          "Har gått gradvis bedre",
+          "Mest vondt på nettene",
+          "Klarer ikke å senke skuldrene"
+        ]
+      }
+    },
+
+    "undersokelse": {
+      "format": "structured",
+      "mobilityFormat": "Hypomobil og palpøm {location}",
+      "testFormat": "{test} {result} {side}",
+      "romFormat": "{movement}: {side}: {finding}"
+    },
+
+    "behandling": {
+      "spinalFormat": "SMT {segment} {direction} {intensity}",
+      "ribFormat": "SMT Ribb {number} {side} {intensity}",
+      "extremityFormat": "EMT {joint} {side} {intensity}",
+      "needlingFormat": "IMS {muscle} {side}",
+      "stretchFormat": "Tøy {muscle} {side} x{reps}",
+      "separator": " ++ "
+    }
+  },
+
+  "exampleEntries": {
+    "behandling": "SMT Ribb 1 bilat ++ T4 PL ++ T8 PR ++ EMT scapula bilat ++ GH.-ledd bilat ++ radius bilat ++ lunate bilat ++ IMS øvre traps bilat",
+    "undersokelse": "Hypomobil og palpøm C-col, T-col Spurlings ua, kompresjon ua, traksjon ua, perkusjon ua, skulderdepresjon ua, SMR ua."
+  }
+}

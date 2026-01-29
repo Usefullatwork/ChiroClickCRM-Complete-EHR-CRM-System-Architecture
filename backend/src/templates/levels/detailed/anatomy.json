@@ -1,0 +1,142 @@
+{
+  "templateId": "detailed-anatomy",
+  "version": "1.0.0",
+  "languageLevel": "detailed",
+  "documentTypes": ["epikrise", "henvisning"],
+  "description": "Full professional anatomical terminology for formal documents",
+
+  "anatomy": {
+    "spinalRegions": {
+      "C-col": {
+        "short": "C-col",
+        "full_no": "Cervikalcolumna (nakkehvirvler C1-C7)",
+        "clinical_description": "Den øvre delen av ryggsøylen bestående av 7 nakkehvirvler som bærer kraniet og tillater nakkebevegelighet"
+      },
+      "T-col": {
+        "short": "T-col",
+        "full_no": "Thorakalcolumna (brysthvirvler T1-T12)",
+        "clinical_description": "Den midtre delen av ryggsøylen bestående av 12 brysthvirvler som artikulerer med ribbene"
+      },
+      "L-col": {
+        "short": "L-col",
+        "full_no": "Lumbalcolumna (lendehvirvler L1-L5)",
+        "clinical_description": "Den nedre delen av ryggsøylen bestående av 5 lendehvirvler som bærer mesteparten av kroppsvekten"
+      }
+    },
+
+    "joints": {
+      "IS-ledd": {
+        "short": "IS-ledd",
+        "full_no": "Iliosakralledd (articulatio sacroiliaca)",
+        "clinical_description": "Leddforbindelsen mellom os sacrum og os ilium. Stort, stabilt ledd med begrenset bevegelighet som overfører krefter mellom columna og underekstremitetene."
+      },
+      "GH-ledd": {
+        "short": "GH-ledd",
+        "full_no": "Glenohumeralledd (articulatio glenohumeralis)",
+        "clinical_description": "Kuleledd mellom caput humeri og cavitas glenoidalis scapulae. Kroppens mest bevegelige ledd med stor bevegelsesutslag, men relativ lav stabilitiet."
+      },
+      "AC-ledd": {
+        "short": "AC-ledd",
+        "full_no": "Acromioclavicularledd (articulatio acromioclavicularis)",
+        "clinical_description": "Leddforbindelse mellom acromion og laterale ende av clavicula. Gir økt bevegelighet til skulderbladet."
+      },
+      "SC-ledd": {
+        "short": "SC-ledd",
+        "full_no": "Sternoclavicularledd (articulatio sternoclavicularis)",
+        "clinical_description": "Eneste benforbindelse mellom overekstremiteten og aksialskjelettet. Sadelledd med stor bevegelighet."
+      },
+      "TMJ": {
+        "short": "TMJ",
+        "full_no": "Temporomandibularledd (articulatio temporomandibularis)",
+        "clinical_description": "Kjeveleddet mellom mandibula og os temporale. Kombinert hengsle- og glideledd som tillater åpning, lukking og sidebevegelse av kjeven."
+      }
+    },
+
+    "muscles": {
+      "traps": {
+        "short": "traps",
+        "full_no": "Musculus trapezius",
+        "clinical_description": "Stor, flat muskel som dekker bakre del av nakke og øvre rygg. Består av tre deler: descendens (elevasjon), transversa (retraksjon), og ascendens (depresjon) av scapula.",
+        "innervation": "N. accessorius (CN XI)",
+        "attachments": {
+          "origin": "Protuberantia occipitalis externa, lig. nuchae, proc. spinosi T1-T12",
+          "insertion": "Laterale tredjedel av clavicula, acromion, spina scapulae"
+        }
+      },
+      "SCM": {
+        "short": "SCM",
+        "full_no": "Musculus sternocleidomastoideus",
+        "clinical_description": "Prominent nakkemuskel som roterer hodet til motsatt side og flekterer nakken. Bilateral kontraksjon gir nakkefleksjon.",
+        "innervation": "N. accessorius (CN XI), plexus cervicalis (C2-C3)",
+        "attachments": {
+          "origin": "Manubrium sterni, mediale tredjedel av clavicula",
+          "insertion": "Processus mastoideus, linea nuchalis superior"
+        }
+      },
+      "subocc": {
+        "short": "subocc",
+        "full_no": "Suboccipitale muskler (musculi suboccipitales)",
+        "clinical_description": "Fire dype nakkemuskler som styrer finbevegelser av hodet: m. rectus capitis posterior major og minor, m. obliquus capitis superior og inferior.",
+        "clinical_relevance": "Ofte involvert ved spenningshodepine og cervikal dysfunksjon"
+      },
+      "QL": {
+        "short": "QL",
+        "full_no": "Musculus quadratus lumborum",
+        "clinical_description": "Dyp ryggmuskel mellom crista iliaca og 12. ribbe. Stabiliserer lumbalcolumna og pelvis. Unilateral kontraksjon gir lateral fleksjon.",
+        "innervation": "Th12, L1-L4",
+        "clinical_relevance": "Hyppig kilde til korsryggsmerter og kan referere smerte til gluteal-regionen"
+      },
+      "piriformis": {
+        "short": "piriformis",
+        "full_no": "Musculus piriformis",
+        "clinical_description": "Liten, pæreformet muskel i dype seteregion. Utadrotator og abduktor av hoften. N. ischiadicus passerer under eller gjennom muskelen.",
+        "clinical_relevance": "Kan komprimere n. ischiadicus (piriformis-syndrom) og gi isjiasliknende symptomer"
+      }
+    },
+
+    "nerveRoots": {
+      "C5": {
+        "short": "C5",
+        "full_no": "Nerverot C5",
+        "dermatome": "Lateral overarm",
+        "myotome": "Skulderabduksjon (deltoideus), albufleksjon (biceps)",
+        "reflex": "Bicepsrefleks"
+      },
+      "C6": {
+        "short": "C6",
+        "full_no": "Nerverot C6",
+        "dermatome": "Lateral underarm, tommel, pekefinger",
+        "myotome": "Håndleddekstensjon, albufleksjon (brachioradialis)",
+        "reflex": "Brachioradialisrefleks"
+      },
+      "C7": {
+        "short": "C7",
+        "full_no": "Nerverot C7",
+        "dermatome": "Langfinger",
+        "myotome": "Albuekstensjon (triceps), håndleddfleksjon",
+        "reflex": "Tricepsrefleks"
+      },
+      "L4": {
+        "short": "L4",
+        "full_no": "Nerverot L4",
+        "dermatome": "Mediale legg",
+        "myotome": "Knekstensjon (quadriceps), ankel dorsalfleksjon",
+        "reflex": "Patellarrefleks"
+      },
+      "L5": {
+        "short": "L5",
+        "full_no": "Nerverot L5",
+        "dermatome": "Laterale legg, fotryggen, storetå",
+        "myotome": "Storetå ekstensjon, ankel dorsalfleksjon",
+        "reflex": "Ingen"
+      },
+      "S1": {
+        "short": "S1",
+        "full_no": "Nerverot S1",
+        "dermatome": "Laterale fot, hæl",
+        "myotome": "Ankel plantarfleksjon (gastrocnemius)",
+        "reflex": "Achillesrefleks"
+      }
+    }
+  }
+}

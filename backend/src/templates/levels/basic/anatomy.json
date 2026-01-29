@@ -1,0 +1,41 @@
+{
+  "templateId": "basic-anatomy",
+  "version": "1.0.0",
+  "languageLevel": "basic",
+  "documentTypes": ["journal"],
+  "description": "Abbreviated anatomical terms for daily notes",
+
+  "anatomy": {
+    "shortForms": {
+      "Cervikalcolumna": "C-col",
+      "Thorakalcolumna": "T-col",
+      "Lumbalcolumna": "L-col",
+      "Iliosakralledd": "IS-ledd",
+      "Glenohumeralledd": "GH-ledd",
+      "Sternoclavicularledd": "SC-ledd",
+      "Acromioclavicularledd": "AC-ledd",
+      "Temporomandibularledd": "TMJ",
+      "Hofteleddsbøyere": "HLB",
+      "Musculus trapezius": "traps",
+      "Erector spinae": "ES",
+      "Musculus sternocleidomastoideus": "SCM",
+      "Suboccipitale muskler": "subocc",
+      "Musculus quadratus lumborum": "QL",
+      "Posterior høyre": "PR",
+      "Posterior venstre": "PL",
+      "Høyre": "Hø",
+      "Venstre": "Ve",
+      "Bilateral": "bilat",
+      "Uten anmerkning": "ua"
+    },
+
+    "quickNotation": {
+      "cervical": ["C0", "C1", "C2", "C3", "C4", "C5", "C6", "C7"],
+      "thoracic": ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "T11", "T12"],
+      "lumbar": ["L1", "L2", "L3", "L4", "L5"],
+      "sacral": ["S1"],
+      "directions": ["PR", "PL", "PRS", "PLS", "P", "A"],
+      "siPositions": ["PIR", "PIL", "ASR", "ASL"]
+    }
+  }
+}

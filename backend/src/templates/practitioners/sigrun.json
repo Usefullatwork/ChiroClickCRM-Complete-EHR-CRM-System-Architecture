@@ -1,0 +1,143 @@
+{
+  "templateId": "practitioner-sigrun",
+  "version": "1.0.0",
+  "practitioner": "Sigrun",
+  "style": "abbreviated",
+  "defaultLanguageLevel": "basic",
+  "description": "Sigrun's abbreviated clinical documentation preferences and style",
+
+  "preferences": {
+    "documentationStyle": {
+      "useAbbreviations": true,
+      "useLowercase": true,
+      "minimalPunctuation": true,
+      "separatorPattern": ". ",
+      "treatmentFormat": "{technique} {segment}{direction}"
+    },
+
+    "preferredAbbreviations": [
+      "cx mob",
+      "tx mob",
+      "lx mob",
+      "tp",
+      "trp",
+      "mass",
+      "tøy",
+      "beh"
+    ],
+
+    "treatmentSequence": [
+      "mob (mobilization)",
+      "SMT shorthand (c2 prs, t5p)",
+      "tp (trigger point)",
+      "mass (massage)",
+      "tøy (stretching)"
+    ]
+  },
+
+  "abbreviations": {
+    "regions": {
+      "cx": "cervical",
+      "tx": "thoracic",
+      "lx": "lumbar"
+    },
+    "techniques": {
+      "mob": "mobilisering",
+      "tp": "triggerpunkt",
+      "trp": "triggerpunkt",
+      "mass": "massasje",
+      "tøy": "tøying",
+      "beh": "behandling"
+    },
+    "positions": {
+      "supine": "ryggleie",
+      "prone": "mageleie",
+      "side": "sideleie"
+    },
+    "assessment": {
+      "bedre": "improved",
+      "som sist": "unchanged",
+      "verre": "worsened"
+    }
+  },
+
+  "templates": {
+    "anamnese": {
+      "format": "brief",
+      "commonPhrases": [
+        "bedre",
+        "klart bedre i nakke siden sist",
+        "som sist",
+        "litt vondt i korsrygg",
+        "fortsatt vondt",
+        "ikke noe endring"
+      ]
+    },
+
+    "behandling": {
+      "prefixPattern": "beh: ",
+      "spinalShorthand": "{segment}{direction}",
+      "mobilizationPattern": "{region} mob {position}",
+      "triggerPointPattern": "tp {muscle} {side}",
+      "massagePattern": "mass {area}",
+      "stretchPattern": "tøy {muscle} {side}",
+      "separator": ". "
+    },
+
+    "exampleNotation": {
+      "spinalAdjustments": "c2 prs. t5 p. l4 pl",
+      "mobilization": "cx mob supine",
+      "triggerPoint": "tp øvre traps bilat",
+      "massage": "mass nakke",
+      "stretching": "tøy hlb bilat"
+    }
+  },
+
+  "parsingPatterns": {
+    "treatment": [
+      {
+        "pattern": "([cCtTlL]\\d+)\\s*([pP][rRlLsS]{1,2})",
+        "description": "Spinal segment with direction (c2 prs, t5p)"
+      },
+      {
+        "pattern": "(cx|tx|lx)\\s+mob",
+        "description": "Region mobilization (cx mob, tx mob)"
+      },
+      {
+        "pattern": "t[rp]p?\\s+([\\w\\s]+)",
+        "description": "Trigger point treatment (tp øvre traps)"
+      },
+      {
+        "pattern": "is(?:-ledd)?\\s*(ve|hø|bilat)?",
+        "description": "SI joint treatment"
+      },
+      {
+        "pattern": "mass(?:asje)?\\s+([\\w\\s]+)",
+        "description": "Massage (mass nakke)"
+      },
+      {
+        "pattern": "tøy\\s+([\\w\\s]+)",
+        "description": "Stretching (tøy hlb)"
+      }
+    ],
+    "assessment": [
+      {
+        "pattern": "bedre|mye bedre|klart bedre",
+        "meaning": "improved"
+      },
+      {
+        "pattern": "som sist|uendret|samme",
+        "meaning": "unchanged"
+      },
+      {
+        "pattern": "verre|mer vondt",
+        "meaning": "worsened"
+      }
+    ]
+  },
+
+  "exampleEntries": {
+    "behandling": "beh cx mob supine. c2 prs. t5 p. is-ledd ve. tp øvre traps bilat. mass nakke. tøy hlb",
+    "anamnese": "bedre. klart bedre i nakke siden sist."
+  }
+}

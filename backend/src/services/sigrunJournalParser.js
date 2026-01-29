@@ -2,10 +2,25 @@
  * Sigrun Journal Parser
  * Parse and extract training data from Sigrun's chiropractic journals
  * Handles Sigrun's abbreviated, lowercase note-taking style
+ *
+ * NOTE: This parser now supports loading terminology from the modular template system.
+ * The constants below are maintained for backward compatibility.
+ * For new implementations, use the TemplateService from '../templates/index.js'
+ *
+ * Example using TemplateService:
+ *   import { templateService } from '../templates/index.js';
+ *   const templates = await templateService.loadForDocumentType('journal', { practitioner: 'sigrun' });
  */
 
 import logger from '../utils/logger.js';
 import * as sindreParser from './sindreJournalParser.js';
+
+// Optional: Import from template system for enhanced terminology
+// Uncomment to use template-based terminology:
+// import {
+//   SIGRUN_TREATMENT_PATTERNS as TEMPLATE_PATTERNS,
+//   SIGRUN_ASSESSMENT_PATTERNS as TEMPLATE_ASSESSMENT
+// } from '../templates/terminology.js';
 
 /**
  * Sigrun-specific treatment abbreviations

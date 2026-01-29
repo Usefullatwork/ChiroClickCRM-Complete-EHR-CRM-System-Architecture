@@ -2,9 +2,26 @@
  * Sindre Journal Parser
  * Parse and extract training data from Sindre's chiropractic journals
  * Norwegian chiropractic journal format parser for AI training
+ *
+ * NOTE: This parser now supports loading terminology from the modular template system.
+ * The constants below are maintained for backward compatibility.
+ * For new implementations, use the TemplateService from '../templates/index.js'
+ *
+ * Example using TemplateService:
+ *   import { templateService } from '../templates/index.js';
+ *   const templates = await templateService.loadForDocumentType('journal', { practitioner: 'sindre' });
  */
 
 import logger from '../utils/logger.js';
+
+// Optional: Import from template system for enhanced terminology
+// Uncomment to use template-based terminology:
+// import {
+//   ANATOMICAL_ABBREVIATIONS as TEMPLATE_ANATOMY,
+//   TREATMENT_ABBREVIATIONS as TEMPLATE_TREATMENTS,
+//   EXAMINATION_TESTS as TEMPLATE_TESTS,
+//   COMMON_FINDINGS as TEMPLATE_FINDINGS
+// } from '../templates/terminology.js';
 
 /**
  * Common Norwegian anatomical abbreviations used by Sindre

@@ -1,0 +1,148 @@
+{
+  "templateId": "clinical-reasoning",
+  "version": "1.0.0",
+  "languageLevel": "detailed",
+  "documentTypes": ["epikrise", "henvisning"],
+  "description": "Clinical reasoning templates and diagnostic frameworks",
+
+  "clinicalReasoning": {
+    "diagnosticFrameworks": {
+      "cervicalRadiculopathy": {
+        "name": "Cervikalt radikulopati-syndrom",
+        "clinicalPresentation": "Utstrålende arm-/skuldersmerter med dermatom-distribusjon, evt. parestesier og/eller svakhet",
+        "diagnosticCriteria": [
+          "Utstrålende smerte i dermatomalt mønster",
+          "Positiv Spurlings test",
+          "Motorisk svakhet i myotom",
+          "Sensoriske endringer i dermatom",
+          "Endrede reflekser"
+        ],
+        "redFlags": [
+          "Bilateral radikulopati",
+          "Gangforstyrrelse",
+          "Blærefunksjonsforstyrrelser",
+          "Myelopati-tegn"
+        ],
+        "differentialDiagnoses": [
+          "Cervikalt fasettledd-syndrom",
+          "Myofascielt smertesyndrom",
+          "Thoracic outlet syndrom",
+          "Perifer entrapment-nevropati"
+        ]
+      },
+      "lumbarDiscHerniation": {
+        "name": "Lumbal discusprolaps",
+        "clinicalPresentation": "Korsryggsmerter med utstrålende beinsmerter (isjias), typisk unilateral, forverret ved sitte og fleksjon",
+        "diagnosticCriteria": [
+          "Positiv SLR/Lasègue < 60 grader",
+          "Utstrålende smerte i dermatomalt mønster",
+          "Nevrologisk utfall (sensorisk og/eller motorisk)",
+          "Forverret ved fleksjon og sitte"
+        ],
+        "redFlags": [
+          "Cauda equina syndrom",
+          "Progressivt motorisk utfall",
+          "Bilateral isjias",
+          "Blære-/tarmforstyrrelser",
+          "Sadel-anestesi"
+        ],
+        "imagingIndication": [
+          "Refraktære symptomer > 6 uker konservativ behandling",
+          "Progressivt nevrologisk utfall",
+          "Mistanke om cauda equina",
+          "Vurdering for invasiv behandling"
+        ]
+      },
+      "sacroiliacDysfunction": {
+        "name": "Iliosakralleddsdysfunksjon",
+        "clinicalPresentation": "Ensidig korsrygg/glutealsmerter, ofte med referert smerte til lyske eller bakside lår",
+        "diagnosticCriteria": [
+          "Positiv FABER/Patrick test",
+          "Positiv kompresjon/distraksjon test",
+          "Positiv Gaenslen test",
+          "Smerte ved palpasjon over IS-ledd",
+          "Minimum 3/5 provokasjonstester positive"
+        ],
+        "differentialDiagnoses": [
+          "Lumbal fasettledd-syndrom",
+          "Hofte-patologi",
+          "Piriformis-syndrom",
+          "Lumbal discusprolaps"
+        ]
+      },
+      "myofascialPainSyndrome": {
+        "name": "Myofascielt smertesyndrom",
+        "clinicalPresentation": "Regional muskelsmerte med palpable triggerpunkter og karakteristisk referert smerte",
+        "diagnosticCriteria": [
+          "Palpabel stram muskelband",
+          "Hyperømme punkt innen bandet (triggerpunkt)",
+          "Reproduksjon av pasientens smerte ved palpasjon",
+          "Begrenset bevegelsesutslag"
+        ],
+        "commonLocations": [
+          "Øvre trapezius",
+          "Levator scapulae",
+          "Infraspinatus",
+          "Quadratus lumborum",
+          "Piriformis",
+          "Gluteus medius"
+        ]
+      }
+    },
+
+    "treatmentRationales": {
+      "spinalManipulation": {
+        "indication": "Segmentell hypomobilitet, mekanisk ryggsmerter",
+        "mechanism": "Gjenoppretting av normal leddbevegelighet, inhibisjon av nociceptive signaler, refleksmuskelrelaksasjon",
+        "evidenceBase": "Sterk evidens for akutte og kroniske korsryggsmerter (Cochrane 2017)"
+      },
+      "dryNeedling": {
+        "indication": "Aktive myofascielle triggerpunkter, kroniske muskelsmerter",
+        "mechanism": "Mekanisk disrupsjon av dysfunksjonell motorisk endeplate, lokal twitch-respons, endogen smertehemming",
+        "evidenceBase": "Moderat evidens for myofascielt smertesyndrom"
+      },
+      "mobilization": {
+        "indication": "Leddsmerter med hypomobilitet, kontraindikasjon mot HVLA",
+        "mechanism": "Gradert mekanisk stimulering av leddkapsel, inhibisjon av smerte via gate-kontroll",
+        "evidenceBase": "Sterk evidens, særlig for eldre pasienter og ved kontraindikasjoner mot manipulasjon"
+      }
+    },
+
+    "prognosticFactors": {
+      "favorable": [
+        "Akutt debut",
+        "Kort symptomvarighet",
+        "Mekanisk smertepresentasjon",
+        "God generell helse",
+        "Positiv behandlingsforventning",
+        "Tidlig respons på behandling"
+      ],
+      "unfavorable": [
+        "Kronisk forløp",
+        "Høy smerteintensitet",
+        "Radikulære symptomer",
+        "Psykososiale risikofaktorer",
+        "Tidligere behandlingssvikt",
+        "Komorbiditet"
+      ]
+    },
+
+    "outcomeAssessment": {
+      "globalImprovement": {
+        "completeResolution": "Fullstendig symptomfrihet",
+        "significantImprovement": "> 50% bedring av symptomer og funksjon",
+        "moderateImprovement": "30-50% bedring",
+        "minimalImprovement": "< 30% bedring",
+        "unchanged": "Ingen endring",
+        "worsened": "Forverring"
+      },
+      "functionalOutcomes": [
+        "Evne til å utføre daglige aktiviteter",
+        "Arbeidsevne",
+        "Søvnkvalitet",
+        "Fritidsaktiviteter",
+        "Smertemestring"
+      ]
+    }
+  }
+}

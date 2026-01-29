@@ -1,0 +1,145 @@
+{
+  "templateId": "detailed-treatments",
+  "version": "1.0.0",
+  "languageLevel": "detailed",
+  "documentTypes": ["epikrise", "henvisning"],
+  "description": "Comprehensive professional treatment descriptions for formal documents",
+
+  "treatments": {
+    "manipulation": {
+      "SMT": {
+        "short": "SMT",
+        "full_no": "Spinal manipulativ terapi",
+        "description_no": "Høyhastighets, lav-amplitude (HVLA) thrust-teknikk rettet mot spinalleddet for å gjenopprette normal leddbevegelighet og redusere smerte",
+        "clinical_application": "Anvendes ved segmentell hypomobilitet, fasettleddsdysfunksjon, og mekanisk ryggsmerter",
+        "evidence_level": "Sterk evidens for akutte og kroniske korsryggsmerter",
+        "contraindications": [
+          "Ustabilitet",
+          "Fraktur",
+          "Infeksjon",
+          "Malignitet",
+          "Cauda equina syndrom",
+          "Alvorlig osteoporose"
+        ],
+        "precautions": [
+          "Antikoagulasjonsbehandling",
+          "Inflammatorisk artritt",
+          "Graviditet",
+          "Avansert degenerativ sykdom"
+        ]
+      },
+      "EMT": {
+        "short": "EMT",
+        "full_no": "Ekstremitetsmanipulasjon",
+        "description_no": "HVLA thrust-teknikk rettet mot perifere ledd for å gjenopprette normal leddbevegelighet",
+        "clinical_application": "Anvendes ved leddysfunksjon i ekstremiteter, inkludert skulder, albue, håndledd, hofte, kne og ankel"
+      }
+    },
+
+    "mobilization": {
+      "MOB": {
+        "short": "MOB",
+        "full_no": "Mobilisering",
+        "description_no": "Lavhastighets passiv bevegelse av ledd innenfor eller på grensen til normal bevegelsesutslag. Graderes etter Maitland's skala (grad I-IV).",
+        "grades": {
+          "I": "Små oscillasjoner i begynnelsen av bevegelsesutslaget",
+          "II": "Store oscillasjoner innen bevegelsesutslaget, unngår stramhet",
+          "III": "Store oscillasjoner inn i stramhet",
+          "IV": "Små oscillasjoner i slutten av bevegelsesutslaget, inn i stramhet"
+        }
+      },
+      "cx mob": {
+        "short": "cx mob",
+        "full_no": "Cervikalmobilisering",
+        "description_no": "Mobiliseringsteknikker rettet mot cervikalcolumna for å bedre bevegelighet og redusere smerte. Kan utføres i ulike stillinger (supine, sideleie, sittende)."
+      },
+      "tx mob": {
+        "short": "tx mob",
+        "full_no": "Thorakalmobilisering",
+        "description_no": "Mobiliseringsteknikker rettet mot thorakalcolumna og costovertebralleddene."
+      },
+      "lx mob": {
+        "short": "lx mob",
+        "full_no": "Lumbalmobilisering",
+        "description_no": "Mobiliseringsteknikker rettet mot lumbalcolumna for å bedre segmentell bevegelighet."
+      }
+    },
+
+    "softTissue": {
+      "IMS": {
+        "short": "IMS",
+        "full_no": "Intramuskulær stimulering (tørrnåling)",
+        "description_no": "Teknikk hvor akupunkturnåler penetrerer myofascielle triggerpunkter for å utløse lokal krampereaksjon (twitch response) og fremme muskelrelaksasjon",
+        "mechanism": "Mekanisk disrupsjon av dysfunksjonelle motoriske endeplater og aktivering av endogene smertehemmende mekanismer",
+        "indications": [
+          "Myofascielt smertesyndrom",
+          "Kroniske muskelsmerter",
+          "Aktive triggerpunkter"
+        ],
+        "contraindications": [
+          "Koagulopati",
+          "Lokal infeksjon",
+          "Nålefobi"
+        ]
+      },
+      "TrP": {
+        "short": "TrP",
+        "full_no": "Triggerpunktbehandling",
+        "description_no": "Manuell behandling av myofascielle triggerpunkter ved hjelp av iskemisk kompresjon, dype friksjonsmassasje, eller andre manuelle teknikker",
+        "technique": "Vedvarende trykk på triggerpunktet i 30-90 sekunder, eller til smertelindring oppnås"
+      },
+      "massage": {
+        "short": "mass",
+        "full_no": "Terapeutisk massasje",
+        "description_no": "Manuell bløtvevsbehandling for å redusere muskelspenning, bedre sirkulasjon, og fremme avspenning"
+      }
+    },
+
+    "modalities": {
+      "TBB": {
+        "short": "TBB",
+        "full_no": "Trykkbølgebehandling (ekstrakorporal sjokkbølgeterapi)",
+        "description_no": "Anvendelse av akustiske bølger for å fremme vevshealing, smertereduksjon, og nedbrytning av kalsifiseringer",
+        "indications": [
+          "Plantar fasciitt",
+          "Tennisalbue (lateral epicondylitt)",
+          "Akillessenetendinopati",
+          "Kalkskulder"
+        ],
+        "parameters": "Typisk 2000-3000 impulser, 8-12 Hz, energinivå tilpasset toleranse",
+        "treatment_protocol": "Vanligvis 3-5 behandlinger med 1 ukes intervall"
+      },
+      "COX": {
+        "short": "COX",
+        "full_no": "Cox fleksjon-distraksjon teknikk",
+        "description_no": "Mekanisk assistert teknikk som kombinerer fleksjon og aksiell distraksjon av lumbalcolumna",
+        "indications": [
+          "Discusprolaps",
+          "Spinal stenose",
+          "Fasettledddegenerasjon",
+          "Spondylolisthese"
+        ],
+        "contraindications": [
+          "Aortaaneurisme",
+          "Akutt fraktur",
+          "Malignitet"
+        ]
+      }
+    },
+
+    "stretching": {
+      "MET": {
+        "short": "MET",
+        "full_no": "Muskelenergi-teknikk",
+        "description_no": "Aktiv teknikk hvor pasienten kontraherer spesifikke muskler mot kontrollert motstand, etterfulgt av tøyning til ny barriere",
+        "mechanism": "Utnytter post-isometrisk relaksasjon og reciprok inhibisjon for å øke fleksibilitet",
+        "technique": "Pasienten kontraherer isometrisk i 5-10 sekunder med 20-30% av maksimal kraft, deretter ny passiv tøyning"
+      },
+      "PIR": {
+        "short": "PIR",
+        "full_no": "Post-isometrisk relaksasjon",
+        "description_no": "Tøyningsteknikk som utnytter muskelens reduserte tonus umiddelbart etter isometrisk kontraksjon"
+      }
+    }
+  }
+}
