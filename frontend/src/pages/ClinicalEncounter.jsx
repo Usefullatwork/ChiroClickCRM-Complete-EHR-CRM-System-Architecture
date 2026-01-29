@@ -74,6 +74,9 @@ import NeurologicalExam from '../components/examination/NeurologicalExam';
 import OutcomeMeasures, { OutcomeMeasureSelector } from '../components/examination/OutcomeMeasures';
 import { ExercisePanel } from '../components/exercises';
 import QuickPalpationSpine from '../components/clinical/QuickPalpationSpine';
+// Healthcare UX Components
+import { SALTBanner, AIDiagnosisSidebar } from '../components/clinical';
+import { ConnectionStatus } from '../components/common';
 
 // --- STATIC DATA ---
 const taksterNorwegian = [
@@ -243,6 +246,12 @@ export default function ClinicalEncounter() {
   const [showRegionalExam, setShowRegionalExam] = useState(false);
   const [regionalExamData, setRegionalExamData] = useState({});
   const [showExercisePanel, setShowExercisePanel] = useState(false);
+
+  // Healthcare UX State
+  const [showSALTBanner, setShowSALTBanner] = useState(true); // Show SALT banner when previous encounter found
+  const [saltBannerExpanded, setSaltBannerExpanded] = useState(false);
+  const [showAIDiagnosisSidebar, setShowAIDiagnosisSidebar] = useState(false); // Collapsed by default
+  const [syncStatus, setSyncStatus] = useState({ pending: 0, lastSync: null, error: null });
 
   // New Examination Components State
   const [showMMT, setShowMMT] = useState(false);
@@ -1364,6 +1373,23 @@ export default function ClinicalEncounter() {
             ═══════════════════════════════════════════════════════════════════ */}
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-4xl mx-auto p-6 space-y-6">
+
+            {/* SALT Banner - Shows when similar previous encounter found */}
+            {!isSigned && previousEncounters && showSALTBanner && (
+              <SALTBanner
+                previousEncounter={previousEncounters}
+                onApplyAll={() => {
+                  handleSALT();
+                  setShowSALTBanner(false);
+                }}
+                onApplySection={(section) => {
+                  handleSALT(section);
+                }}
+                onDismiss={() => setShowSALTBanner(false)}
+                isExpanded={saltBannerExpanded}
+                onToggleExpand={() => setSaltBannerExpanded(!saltBannerExpanded)}
+              />
+            )}
 
             {/* ─────────────────────────────────────────────────────────────────
                 S - SUBJECTIVE
@@ -2808,6 +2834,26 @@ export default function ClinicalEncounter() {
       </div>{/* End of main content wrapper with margin */}
 
       {/* ═══════════════════════════════════════════════════════════════════
+          AI DIAGNOSIS SIDEBAR (Collapsible)
+          ═══════════════════════════════════════════════════════════════════ */}
+      <AIDiagnosisSidebar
+        soapData={encounterData}
+        onSelectCode={(suggestion) => {
+          // Add the selected code to ICPC codes
+          if (suggestion.code && !encounterData.icpc_codes.includes(suggestion.code)) {
+            setEncounterData(prev => ({
+              ...prev,
+              icpc_codes: [...prev.icpc_codes, suggestion.code]
+            }));
+            setAutoSaveStatus('unsaved');
+          }
+        }}
+        isCollapsed={!showAIDiagnosisSidebar}
+        onToggle={() => setShowAIDiagnosisSidebar(!showAIDiagnosisSidebar)}
+        disabled={isSigned}
+      />
+
+      {/* ═══════════════════════════════════════════════════════════════════
           TEMPLATE PICKER SIDEBAR
           ═══════════════════════════════════════════════════════════════════ */}
       <TemplatePicker
@@ -2815,6 +2861,16 @@ export default function ClinicalEncounter() {
         onClose={() => setShowTemplatePicker(false)}
         onSelectTemplate={handleTemplateSelect}
         soapSection={activeField?.split('.')[0] || 'subjective'}
+      />
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          CONNECTION STATUS INDICATOR
+          ═══════════════════════════════════════════════════════════════════ */}
+      <ConnectionStatus
+        pendingChanges={autoSaveStatus === 'unsaved' ? 1 : 0}
+        lastSyncTime={lastSaved}
+        syncError={null}
+        position="bottom-left"
       />
 
     </div>
