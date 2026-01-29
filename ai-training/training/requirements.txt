@@ -1,9 +1,15 @@
 # ChiroClick LoRA Fine-Tuning Requirements
 # Install with: pip install -r requirements.txt
 
+# =============================================================================
+# UNSLOTH (Recommended - 2-5x faster, direct GGUF export)
+# =============================================================================
+# Install separately: pip install "unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git"
+# Or for CUDA 12.1: pip install "unsloth[cu121-ampere-torch230] @ git+https://github.com/unslothai/unsloth.git"
+
 # Core ML
 torch>=2.1.0
-transformers>=4.40.0
+transformers>=4.44.0
 datasets>=2.18.0
 accelerate>=0.28.0
 
@@ -14,12 +20,15 @@ trl>=0.8.0
 # Quantization
 bitsandbytes>=0.43.0
 
+# Unsloth dependencies
+xformers>=0.0.26
+
 # Evaluation
 rouge-score>=0.1.2
 nltk>=3.8.0
 
-# GGUF conversion (optional, for Ollama export)
-# llama-cpp-python>=0.2.0
+# GGUF conversion
+# llama-cpp-python>=0.2.0  # Optional: for manual GGUF conversion
 
 # Utilities
 tqdm>=4.66.0
@@ -29,3 +38,21 @@ numpy>=1.24.0
 # Logging (optional)
 wandb>=0.16.0
 tensorboard>=2.16.0
+
+# =============================================================================
+# INSTALLATION INSTRUCTIONS
+# =============================================================================
+#
+# Option A: Standard CUDA (RTX 30xx/40xx)
+#   pip install -r requirements.txt
+#   pip install "unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git"
+#
+# Option B: CUDA 12.1 + Ampere (RTX 30xx/40xx)
+#   pip install -r requirements.txt
+#   pip install "unsloth[cu121-ampere-torch230] @ git+https://github.com/unslothai/unsloth.git"
+#
+# Option C: CPU-only (slower, for testing)
+#   pip install -r requirements.txt
+#   # Skip unsloth, use standard transformers pipeline
+#
+# =============================================================================
