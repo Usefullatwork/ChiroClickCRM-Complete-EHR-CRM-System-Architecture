@@ -100,6 +100,84 @@ A clickable spine segment system for rapid palpation documentation:
 
 ---
 
+## Enhanced Anatomy Visualization Module (2026-01-29)
+**Status:** Code complete, ready for integration
+
+### What Was Built
+A comprehensive 2D/3D anatomical visualization system replacing basic stick figures:
+- **EnhancedSpineDiagram**: Anatomically accurate SVG spine with realistic vertebra shapes
+- **Spine3DViewer**: Interactive 3D spine using Three.js/react-three-fiber
+- **EnhancedBodyDiagram**: Professional body mapping using react-body-highlighter
+- **EnhancedClinicalSidebar**: Mode-switching sidebar (Quick/2D/3D/Body)
+
+### Key Features
+| Feature | Description |
+|---------|-------------|
+| Anatomical SVG paths | Vertebrae with transverse/spinous processes |
+| 3D interaction | Rotate, zoom, click individual vertebrae |
+| Click-to-text | Same workflow as QuickPalpationSpine |
+| Finding markers | Color-coded subluxations, fixations, etc. |
+| Norwegian labels | Full Norwegian language support |
+
+### New Dependencies
+```bash
+npm install react-body-highlighter three @react-three/fiber@8 @react-three/drei@9
+```
+
+### Files Created
+| File | Purpose |
+|------|---------|
+| `frontend/src/components/anatomy/` | New module folder |
+| `anatomy/AnatomyViewer.jsx` | Main combined 2D/3D viewer |
+| `anatomy/AnatomyProvider.jsx` | Context for shared state |
+| `anatomy/spine/EnhancedSpineDiagram.jsx` | Anatomical SVG spine |
+| `anatomy/spine/Spine3DViewer.jsx` | Three.js 3D spine |
+| `anatomy/body/EnhancedBodyDiagram.jsx` | react-body-highlighter wrapper |
+| `anatomy/hooks/useAnatomyClick.js` | Click handling hook |
+| `anatomy/shared/DirectionPopup.jsx` | Shared direction selector |
+| `components/clinical/EnhancedClinicalSidebar.jsx` | Mode-switching sidebar |
+
+### Usage
+```jsx
+// Import the combined viewer
+import { AnatomyViewer, VIEW_MODES } from '@/components/anatomy';
+
+// Full viewer with mode switching
+<AnatomyViewer
+  initialMode={VIEW_MODES.SPINE_2D}
+  spineFindings={findings}
+  onSpineFindingsChange={setFindings}
+  onInsertText={(text) => insertText(text)}
+/>
+
+// Or use individual components
+import { EnhancedSpineDiagram, Spine3DViewer } from '@/components/anatomy';
+```
+
+### Integration with ClinicalEncounter
+Replace QuickPalpationSpine with EnhancedClinicalSidebar:
+```jsx
+// In ClinicalEncounter.jsx, change:
+import QuickPalpationSpine from '../components/clinical/QuickPalpationSpine';
+// To:
+import { EnhancedClinicalSidebar } from '../components/clinical';
+
+// And in the render:
+<EnhancedClinicalSidebar
+  onInsertText={handleSpineTextInsert}
+  disabled={isSigned}
+/>
+```
+
+### 3D Model Support (Future)
+The Spine3DViewer supports loading GLTF models. Free models available:
+- [Human Spinal Column](https://sketchfab.com/3d-models/the-human-spinal-column-bcd9eee09ce044ef98a69c315aa792e2) - CC-BY
+- [Anatomically Correct Skeleton](https://sketchfab.com/3d-models/anatomically-correct-skeleton-3247ca2f8a6346d78142f193eeb59c88) - CC-BY
+
+Place `.gltf` files in `frontend/public/models/` and update Spine3DViewer to load them.
+
+---
+
 ## TODO List
 
 ### Startup Tasks (Do First)
