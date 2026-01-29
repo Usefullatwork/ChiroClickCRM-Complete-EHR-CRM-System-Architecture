@@ -627,3 +627,139 @@ curl -b cookies.txt http://localhost:3000/api/v1/patients/{patient-id}/exercises
 
 ### User Authentication Note
 For first users: Provide login credentials directly. They download a version they can log into. Patient portal uses PIN/magic link (no main system auth required).
+
+---
+
+## Session 2026-01-29: Anatomy Module, AI Fixes, USB Portable
+
+### Completed Today
+
+#### 1. Fixed AI Model Management Page Error
+- **Problem**: `/api/v1/training/status` required ADMIN role, user was PRACTITIONER
+- **Fix**: Changed `backend/src/routes/training.js` to allow `['ADMIN', 'PRACTITIONER']` for status and data endpoints
+- **Also**: Improved error display in `frontend/src/pages/Training.jsx`
+
+#### 2. Merged PR #4: Enhanced Anatomy Visualization Module
+- Merged `claude/improve-model-setup-6HkqY` branch
+- Created combined `frontend/src/components/anatomy/index.js` with all exports
+- **New components added**:
+  - `AnatomyViewer` - Combined 2D/3D viewer with mode switching
+  - `EnhancedSpineDiagram` - Anatomical SVG spine
+  - `Spine3DViewer` - Three.js 3D interactive spine
+  - `EnhancedBodyDiagram` - react-body-highlighter wrapper
+  - `AnatomyProvider` - Context for shared state
+  - `MuscleMap` - Interactive muscle map (50+ muscles)
+  - `AnatomicalSpine` - Simple 2D spine diagram
+
+#### 3. USB Portable Setup (Partial)
+- **Copied Ollama models** to `ollama-models/` folder (21GB)
+- **Created scripts**:
+  - `scripts/setup-ollama-from-usb.bat` - Restore models on new machine
+  - `copy-usb.bat` - Copy project to USB
+- **Updated** `START-CHIROCLICK.bat` with relative paths (`%~dp0`)
+- **Added** `ollama-models/` to `.gitignore`
+- **PENDING**: USB copy was slow/incomplete - needs manual copy or retry
+
+### New PRs to Merge (from Claude Code Online)
+Check for open PRs in the repo - user added more from online Claude sessions.
+
+```bash
+gh pr list --state open
+```
+
+---
+
+## HEAVY TODO LIST FOR TONIGHT
+
+### Priority 1: Merge New PRs
+```bash
+# List all open PRs
+gh pr list --state open
+
+# For each PR, review and merge
+gh pr view <number>
+gh pr merge <number> --merge
+```
+
+### Priority 2: Complete USB Copy
+The USB copy to F: was interrupted. Options:
+1. **Manual copy via Explorer**: Copy `C:\Users\MadsF\ChiroClickCRM` to `F:\ChiroClickCRM`
+2. **Run bat file**: `C:\Users\MadsF\copy-usb.bat`
+3. **Exclude large folders** to speed up:
+   - Skip `node_modules/` (run `npm install` on target)
+   - Skip `.git/` if not needed
+   - Keep `ollama-models/` (21GB - essential for AI)
+
+### Priority 3: Run Database Migrations
+7 new migrations need to be applied:
+```bash
+cd backend && npm run migrate
+```
+
+Migrations pending:
+- 018_examination_clusters.sql
+- 019_vng_vestibular_module.sql
+- 020_clinical_note_versioning.sql
+- 021_audit_logging_enhancement.sql
+- 022_performance_indexes.sql
+- 023_exercise_library.sql
+- 024_patient_treatment_preferences.sql
+
+### Priority 4: Test New Anatomy Components
+1. Open ClinicalEncounter page
+2. Test `AnatomyViewer` with mode switching (Quick/2D/3D/Body)
+3. Verify click-to-text insertion works
+4. Test `MuscleMap` with anterior/posterior views
+
+### Priority 5: Connect CRM Components to Backend API
+Frontend components still use mock data:
+- `LeadManagement.jsx` → `crmAPI.getLeads()`
+- `PatientLifecycle.jsx` → `crmAPI.getPatientsByLifecycle()`
+- `ReferralProgram.jsx` → `crmAPI.getReferrals()`
+- `SurveyManager.jsx` → `crmAPI.getSurveys()`
+- `CampaignManager.jsx` → `crmAPI.getCampaigns()`
+
+### Priority 6: Install New Dependencies (if not done)
+```bash
+cd frontend
+npm install react-body-highlighter three @react-three/fiber@8 @react-three/drei@9
+```
+
+### Priority 7: Seed Exercise Data
+```bash
+docker exec -i chiroclickcrm-db psql -U postgres -d chiroclickcrm < backend/seeds/exercise_library.sql
+```
+
+---
+
+## Quick Reference
+
+### Start System
+```bash
+# Option 1: Use launcher
+START-CHIROCLICK.bat
+
+# Option 2: Manual
+docker-compose up -d
+cd backend && npm run dev
+cd frontend && npm run dev
+```
+
+### Test Credentials
+| Email | Password | Role |
+|-------|----------|------|
+| mads@chiroclick.no | admin123 | PRACTITIONER |
+| admin@chiroclickcrm.no | admin123 | ADMIN |
+
+### Key Commits Today
+- `e78177d` - feat: Add portable USB support with bundled AI models
+- `b413db5` - Merge PR #4: Enhanced Anatomy Visualization Module
+- `ae8d028` - feat: Add anatomy components, exercise system, and improvements
+
+### Files Changed Today
+| Category | Files |
+|----------|-------|
+| AI/Training | `backend/src/routes/training.js`, `frontend/src/pages/Training.jsx` |
+| Anatomy | `frontend/src/components/anatomy/*` (merged from PR) |
+| USB/Portable | `START-CHIROCLICK.bat`, `scripts/setup-ollama-from-usb.bat`, `.gitignore` |
+| Models | `ollama-models/` (21GB copied locally, not in git)
