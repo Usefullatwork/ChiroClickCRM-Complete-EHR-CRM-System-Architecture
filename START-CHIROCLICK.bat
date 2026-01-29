@@ -25,7 +25,7 @@ echo.
 echo  Starting with AI enabled...
 
 :: Update .env to enable AI
-powershell -Command "(Get-Content 'C:\Users\MadsF\ChiroClickCRM\backend\.env') -replace '^AI_ENABLED=.*', 'AI_ENABLED=true' | Set-Content 'C:\Users\MadsF\ChiroClickCRM\backend\.env'"
+powershell -Command "(Get-Content '%~dp0\backend\.env') -replace '^AI_ENABLED=.*', 'AI_ENABLED=true' | Set-Content '%~dp0\backend\.env'"
 
 :: Check if Ollama is running
 echo [1/5] Checking Ollama AI...
@@ -56,17 +56,24 @@ for %%M in (chiro-no chiro-fast chiro-norwegian chiro-medical) do (
 
 if !MODELS_MISSING! gtr 0 (
     echo.
-    echo  %MODELS_MISSING% modell(er) mangler. Bygger automatisk...
+    echo  %MODELS_MISSING% modell(er) mangler.
     echo.
 
-    REM Try restore from backup first
-    if exist "C:\Users\MadsF\ChiroClickCRM\ai-training\models-cache" (
+    REM Try restore from USB/project folder first (fastest - no download)
+    if exist "%~dp0ollama-models\blobs" (
+        echo  Fant modeller i prosjektmappen. Kopierer til Ollama...
+        echo  Dette kan ta noen minutter...
+        powershell -Command "Copy-Item -Path '%~dp0ollama-models\*' -Destination '%USERPROFILE%\.ollama\models' -Recurse -Force"
+        echo  Modeller kopiert!
+        timeout /t 2 /nobreak >nul
+    ) else if exist "%~dp0ai-training\models-cache" (
         echo  Prøver å gjenopprette fra backup...
-        call "C:\Users\MadsF\ChiroClickCRM\scripts\restore-models.bat"
+        call "%~dp0scripts\restore-models.bat"
     ) else (
         REM Build from Modelfiles (will pull base models if needed)
         echo  Bygger modeller fra Modelfiles...
-        pushd "C:\Users\MadsF\ChiroClickCRM\ai-training"
+        echo  Dette vil laste ned ~14GB og ta lang tid...
+        pushd "%~dp0ai-training"
         call build-model.bat
         popd
     )
@@ -83,7 +90,7 @@ echo.
 echo  Starting WITHOUT AI (faster startup)...
 
 :: Update .env to disable AI
-powershell -Command "(Get-Content 'C:\Users\MadsF\ChiroClickCRM\backend\.env') -replace '^AI_ENABLED=.*', 'AI_ENABLED=false' | Set-Content 'C:\Users\MadsF\ChiroClickCRM\backend\.env'"
+powershell -Command "(Get-Content '%~dp0\backend\.env') -replace '^AI_ENABLED=.*', 'AI_ENABLED=false' | Set-Content '%~dp0\backend\.env'"
 
 echo [1/4] Skipping Ollama AI (disabled)
 goto START_BACKEND
@@ -96,7 +103,7 @@ if "%AI_MODE%"=="enabled" (
 ) else (
     echo [2/4] Starting Backend Server...
 )
-cd /d "C:\Users\MadsF\ChiroClickCRM\backend"
+cd /d "%~dp0\backend"
 start "ChiroClick Backend" cmd /k "npm start"
 timeout /t 5 /nobreak >nul
 
@@ -107,7 +114,7 @@ if "%AI_MODE%"=="enabled" (
 ) else (
     echo [3/4] Starting Frontend...
 )
-cd /d "C:\Users\MadsF\ChiroClickCRM\frontend"
+cd /d "%~dp0\frontend"
 start "ChiroClick Frontend" cmd /k "npm run dev"
 timeout /t 8 /nobreak >nul
 
