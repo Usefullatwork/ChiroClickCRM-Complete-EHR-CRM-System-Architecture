@@ -768,3 +768,74 @@ cd frontend && npm run dev
 | Anatomy | `frontend/src/components/anatomy/*` (merged from PR) |
 | USB/Portable | `START-CHIROCLICK.bat`, `scripts/setup-ollama-from-usb.bat`, `.gitignore` |
 | Models | `ollama-models/` (21GB copied locally, not in git)
+
+---
+
+## UNFINISHED TASKS FOR TOMORROW (2026-01-30)
+
+### CRITICAL BUGS TO FIX
+| Bug | File | Fix |
+|-----|------|-----|
+| `column w.clinic_id does not exist` | `backend/src/jobs/scheduler.js:70` | Change `w.clinic_id` → `w.organization_id` |
+
+### PULL REQUESTS TO MERGE
+| PR# | Title | Branch |
+|-----|-------|--------|
+| 5 | Add clinical training dataset for Norwegian medical documentation | `claude/research-ai-training-strategy-UpkyW` |
+| Check for more | `gh pr list --state open` | May have new PRs from Claude online |
+
+### DATABASE WORK
+- [ ] Run pending migrations: `cd backend && npm run migrate`
+- [ ] Seed exercise library: `docker exec -i chiroclickcrm-db psql -U postgres -d chiroclickcrm < backend/seeds/exercise_library.sql`
+- [ ] Seed muscle templates: `docker exec -i chiroclickcrm-db psql -U postgres -d chiroclickcrm < backend/seeds/muscle_soft_tissue_templates.sql`
+
+### USB PORTABLE SETUP (Incomplete)
+- [ ] Copy project to USB F: drive manually via Explorer
+- [ ] Include `ollama-models/` folder (21GB)
+- [ ] Exclude `node_modules/` (can run npm install on target)
+- [ ] Test on clean machine
+
+### FRONTEND WORK
+- [ ] Install 3D dependencies: `cd frontend && npm install react-body-highlighter three @react-three/fiber@8 @react-three/drei@9`
+- [ ] Test AnatomyViewer component (2D/3D mode switching)
+- [ ] Test MuscleMap (anterior/posterior views)
+- [ ] Connect CRM components to actual API (remove mock data)
+
+### BACKEND WORK
+- [ ] Fix scheduler.js clinic_id bug (CRITICAL - causes error every minute)
+- [ ] Review PR #5 RAG/embeddings implementation
+- [ ] Test AI guardrails service
+
+### TESTING
+- [ ] Test AI Model Management page (should work now)
+- [ ] Test exercise prescription flow
+- [ ] Test PDF generation for exercises
+- [ ] Test patient portal exercise view
+
+### FILES CREATED BUT NOT TESTED
+| File | Purpose | Status |
+|------|---------|--------|
+| `frontend/src/components/anatomy/AnatomyViewer.jsx` | Combined 2D/3D viewer | Untested |
+| `frontend/src/components/anatomy/spine/Spine3DViewer.jsx` | 3D spine | Untested |
+| `backend/src/services/exercises.js` | Exercise service | Untested |
+| `backend/src/controllers/exercises.js` | Exercise controller | Untested |
+
+### QUICK START TOMORROW
+```bash
+# 1. Start services
+docker-compose up -d
+cd backend && npm run dev
+cd frontend && npm run dev
+
+# 2. Fix critical bug first
+# Edit backend/src/jobs/scheduler.js line 70
+# Change w.clinic_id to w.organization_id
+
+# 3. Merge PR #5
+gh pr merge 5 --merge
+
+# 4. Run migrations
+cd backend && npm run migrate
+
+# 5. Test at http://localhost:5173
+```
