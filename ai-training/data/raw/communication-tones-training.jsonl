@@ -1,0 +1,210 @@
+{"prompt": "Skriv en SMS påminnelse om time i morgen, direkte tone", "completion": "Hei {{firstName}}, time i morgen kl {{time}} hos {{provider}}. Avbud? Ring {{phone}}."}
+{"prompt": "Write an appointment reminder SMS, direct tone", "completion": "Hi {{firstName}}, appointment tomorrow at {{time}} with {{provider}}. Cancel? Call {{phone}}."}
+{"prompt": "Skriv en SMS påminnelse om time, vennlig tone", "completion": "Hei {{firstName}}! Vi gleder oss til å se deg {{date}} kl {{time}}. Gi beskjed om noe endrer seg. Ha en fin dag!"}
+{"prompt": "Write an appointment reminder SMS, kind tone", "completion": "Hi {{firstName}}! Looking forward to seeing you on {{date}} at {{time}}. Let us know if anything changes. Have a great day!"}
+{"prompt": "Skriv en SMS påminnelse om time, profesjonell tone", "completion": "Påminnelse: Du har time hos {{provider}} i morgen {{date}} kl {{time}}. Ved avbud, kontakt oss på {{phone}}."}
+{"prompt": "Write an appointment reminder SMS, professional tone", "completion": "Reminder: Your appointment with {{provider}} is scheduled for tomorrow {{date}} at {{time}}. To reschedule, contact {{phone}}."}
+{"prompt": "Skriv en oppfølgings-SMS etter behandling, direkte tone", "completion": "Hei {{firstName}}, hvordan går det etter timen? Svar eller ring {{phone}} ved spørsmål."}
+{"prompt": "Write a post-treatment follow-up SMS, direct tone", "completion": "Hi {{firstName}}, how are you feeling after your visit? Reply or call {{phone}} if concerns."}
+{"prompt": "Skriv en oppfølgings-SMS etter behandling, vennlig tone", "completion": "Hei {{firstName}}! Håper du har det bra etter behandlingen. Vi er her om du lurer på noe. God bedring!"}
+{"prompt": "Write a post-treatment follow-up SMS, kind tone", "completion": "Hi {{firstName}}! Hope you are feeling well after your treatment. We are here if you have any questions. Wishing you a speedy recovery!"}
+{"prompt": "Skriv en oppfølgings-SMS etter behandling, empatisk tone", "completion": "Hei {{firstName}}, vi tenker på deg og håper du merker bedring. Ta kontakt hvis det er noe vi kan gjøre for deg."}
+{"prompt": "Write a post-treatment follow-up SMS, empathetic tone", "completion": "Hi {{firstName}}, we are thinking of you and hope you are feeling better. Reach out if there is anything we can do for you."}
+{"prompt": "Skriv en betalingspåminnelse SMS, direkte tone", "completion": "Utestående: {{amount}} kr. Forfallsdato: {{dueDate}}. Betal: {{link}}"}
+{"prompt": "Write a payment reminder SMS, direct tone", "completion": "Outstanding: {{amount}}. Due: {{dueDate}}. Pay: {{link}}"}
+{"prompt": "Skriv en betalingspåminnelse SMS, vennlig tone", "completion": "Hei {{firstName}}, en vennlig påminnelse om utestående {{amount}} kr. Betal enkelt her: {{link}}. Spørsmål? Ring oss!"}
+{"prompt": "Write a payment reminder SMS, kind tone", "completion": "Hi {{firstName}}, a friendly reminder about your outstanding balance of {{amount}}. Pay easily here: {{link}}. Questions? Call us!"}
+{"prompt": "Skriv en velkommen-SMS til ny pasient, direkte tone", "completion": "Velkommen til {{clinic}}! Første time: {{date}} kl {{time}}. Møt opp 15 min før."}
+{"prompt": "Write a welcome SMS for new patient, direct tone", "completion": "Welcome to {{clinic}}! First appointment: {{date}} at {{time}}. Arrive 15 min early."}
+{"prompt": "Skriv en velkommen-SMS til ny pasient, vennlig tone", "completion": "Velkommen til {{clinic}}, {{firstName}}! Vi er så glade for å ha deg. Din første time er {{date}} kl {{time}}. Vi gleder oss!"}
+{"prompt": "Write a welcome SMS for new patient, kind tone", "completion": "Welcome to {{clinic}}, {{firstName}}! We are so happy to have you. Your first appointment is {{date}} at {{time}}. We are excited to meet you!"}
+{"prompt": "Skriv en SMS om stengt klinikk, direkte tone", "completion": "VIKTIG: {{clinic}} er stengt {{date}} pga {{reason}}. Din time er flyttet til {{newDate}}. Ring {{phone}} ved spørsmål."}
+{"prompt": "Write an office closure SMS, direct tone", "completion": "IMPORTANT: {{clinic}} is closed {{date}} due to {{reason}}. Your appointment moved to {{newDate}}. Call {{phone}} with questions."}
+{"prompt": "Skriv en SMS om timeendring, vennlig tone", "completion": "Hei {{firstName}}, vi beklager, men vi måtte flytte timen din til {{newDate}} kl {{newTime}}. Passer dette for deg? Gi oss beskjed!"}
+{"prompt": "Write a schedule change SMS, kind tone", "completion": "Hi {{firstName}}, we apologize, but we had to move your appointment to {{newDate}} at {{newTime}}. Does this work for you? Let us know!"}
+{"prompt": "Skriv en SMS om timeendring, empatisk tone", "completion": "Hei {{firstName}}, vi beklager så mye at vi må flytte timen din. Den nye tiden er {{newDate}} kl {{newTime}}. Vi forstår om dette er upraktisk - ring oss på {{phone}} så finner vi en bedre tid sammen."}
+{"prompt": "Write a schedule change SMS, empathetic tone", "completion": "Hi {{firstName}}, we are so sorry we have to move your appointment. The new time is {{newDate}} at {{newTime}}. We understand if this is inconvenient - call us at {{phone}} and we will find a better time together."}
+{"prompt": "Skriv en SMS om uteblitt time, direkte tone", "completion": "Hei {{firstName}}, du møtte ikke til time i dag. Ring {{phone}} for ny time."}
+{"prompt": "Write a no-show follow-up SMS, direct tone", "completion": "Hi {{firstName}}, you missed your appointment today. Call {{phone}} to reschedule."}
+{"prompt": "Skriv en SMS om uteblitt time, vennlig tone", "completion": "Hei {{firstName}}, vi savnet deg på timen i dag! Håper alt er bra. Ring oss på {{phone}} når du ønsker ny time."}
+{"prompt": "Write a no-show follow-up SMS, kind tone", "completion": "Hi {{firstName}}, we missed you at your appointment today! Hope everything is okay. Call us at {{phone}} when you want to reschedule."}
+{"prompt": "Skriv en SMS om uteblitt time, empatisk tone", "completion": "Hei {{firstName}}, vi forstår at ting skjer. Vi savnet deg på timen i dag. Når du er klar, er vi her for å hjelpe. Ring {{phone}}."}
+{"prompt": "Write a no-show follow-up SMS, empathetic tone", "completion": "Hi {{firstName}}, we understand things happen. We missed you at your appointment today. When you are ready, we are here to help. Call {{phone}}."}
+{"prompt": "Skriv en SMS om innkalling av inaktiv pasient, direkte tone", "completion": "Hei {{firstName}}, vi har ikke sett deg på en stund. Bestill time: {{link}} eller ring {{phone}}."}
+{"prompt": "Write an inactive patient recall SMS, direct tone", "completion": "Hi {{firstName}}, we have not seen you in a while. Book appointment: {{link}} or call {{phone}}."}
+{"prompt": "Skriv en SMS om innkalling av inaktiv pasient, vennlig tone", "completion": "Hei {{firstName}}! Vi har savnet deg! Hvordan har du det? Vi er her når du trenger oss. Bestill time: {{link}}"}
+{"prompt": "Write an inactive patient recall SMS, kind tone", "completion": "Hi {{firstName}}! We have missed you! How are you doing? We are here when you need us. Book appointment: {{link}}"}
+{"prompt": "Skriv en SMS om innkalling av inaktiv pasient, empatisk tone", "completion": "Hei {{firstName}}, vi håper alt er bra med deg. Vi er her for deg når du er klar. Ingen press, bare gi oss en lyd når det passer."}
+{"prompt": "Write an inactive patient recall SMS, empathetic tone", "completion": "Hi {{firstName}}, we hope everything is well with you. We are here for you when you are ready. No pressure, just reach out when it suits you."}
+{"prompt": "Skriv en SMS om tilbakemelding, direkte tone", "completion": "Hei {{firstName}}, hvordan var besøket? Gi tilbakemelding (1 min): {{link}}"}
+{"prompt": "Write a feedback request SMS, direct tone", "completion": "Hi {{firstName}}, how was your visit? Give feedback (1 min): {{link}}"}
+{"prompt": "Skriv en SMS om tilbakemelding, vennlig tone", "completion": "Hei {{firstName}}! Vi setter pris på din mening. Kan du ta 1 minutt og dele hvordan besøket var? {{link}} Tusen takk!"}
+{"prompt": "Write a feedback request SMS, kind tone", "completion": "Hi {{firstName}}! We value your opinion. Could you take 1 minute to share how your visit was? {{link}} Thank you so much!"}
+{"prompt": "Skriv en bursdags-SMS, vennlig tone", "completion": "Gratulerer med dagen, {{firstName}}! Vi ønsker deg en fantastisk dag! Hilsen alle oss på {{clinic}}."}
+{"prompt": "Write a birthday SMS, kind tone", "completion": "Happy Birthday, {{firstName}}! We wish you a wonderful day! Best wishes from everyone at {{clinic}}."}
+{"prompt": "Skriv en SMS om behandlingsinstruksjoner, direkte tone", "completion": "Husk: {{instructions}}. Spørsmål? Ring {{phone}}."}
+{"prompt": "Write a treatment instructions SMS, direct tone", "completion": "Remember: {{instructions}}. Questions? Call {{phone}}."}
+{"prompt": "Skriv en SMS om behandlingsinstruksjoner, profesjonell tone", "completion": "Instruksjoner etter behandling: {{instructions}}. Ved spørsmål, kontakt klinikken på {{phone}}."}
+{"prompt": "Write a treatment instructions SMS, professional tone", "completion": "Post-treatment instructions: {{instructions}}. For questions, contact the clinic at {{phone}}."}
+{"prompt": "Skriv en SMS om øvelsespåminnelse, direkte tone", "completion": "Husk øvelsene dine i dag! Se instruksjonene: {{link}}"}
+{"prompt": "Write an exercise reminder SMS, direct tone", "completion": "Remember your exercises today! See instructions: {{link}}"}
+{"prompt": "Skriv en SMS om øvelsespåminnelse, vennlig tone", "completion": "Hei {{firstName}}! Bare en vennlig påminnelse om øvelsene dine. Du gjør det flott!"}
+{"prompt": "Write an exercise reminder SMS, kind tone", "completion": "Hi {{firstName}}! Just a friendly reminder about your exercises. You are doing great!"}
+{"prompt": "Skriv en SMS om årlig kontroll, direkte tone", "completion": "Hei {{firstName}}, tid for årlig kontroll. Bestill: {{link}} eller ring {{phone}}."}
+{"prompt": "Write an annual checkup SMS, direct tone", "completion": "Hi {{firstName}}, time for your annual checkup. Book: {{link}} or call {{phone}}."}
+{"prompt": "Skriv en SMS om årlig kontroll, profesjonell tone", "completion": "Ifølge våre journaler er det tid for din årlige kontroll. Vennligst bestill time via {{link}} eller ring {{phone}}."}
+{"prompt": "Write an annual checkup SMS, professional tone", "completion": "According to our records, it is time for your annual checkup. Please schedule via {{link}} or call {{phone}}."}
+{"prompt": "Skriv en SMS om betaling mottatt, direkte tone", "completion": "Betaling mottatt: {{amount}} kr. Takk!"}
+{"prompt": "Write a payment received SMS, direct tone", "completion": "Payment received: {{amount}}. Thank you!"}
+{"prompt": "Skriv en SMS om betaling mottatt, vennlig tone", "completion": "Tusen takk for betalingen på {{amount}} kr, {{firstName}}! Din konto er oppdatert."}
+{"prompt": "Write a payment received SMS, kind tone", "completion": "Thank you so much for your payment of {{amount}}, {{firstName}}! Your account is up to date."}
+{"prompt": "Skriv en SMS om anmeldelse, direkte tone", "completion": "Fornøyd med behandlingen? Legg igjen en anmeldelse: {{link}}"}
+{"prompt": "Write a review invitation SMS, direct tone", "completion": "Happy with your treatment? Leave a review: {{link}}"}
+{"prompt": "Skriv en SMS om anmeldelse, vennlig tone", "completion": "Hei {{firstName}}! Hvis du er fornøyd, ville vi satt stor pris på en anmeldelse. Det hjelper andre å finne oss! {{link}}"}
+{"prompt": "Write a review invitation SMS, kind tone", "completion": "Hi {{firstName}}! If you are happy with us, we would really appreciate a review. It helps others find us! {{link}}"}
+{"prompt": "Skriv en timebekreftelse SMS, direkte tone", "completion": "Time bekreftet: {{date}} kl {{time}} hos {{provider}}. Adresse: {{address}}."}
+{"prompt": "Write an appointment confirmation SMS, direct tone", "completion": "Appointment confirmed: {{date}} at {{time}} with {{provider}}. Address: {{address}}."}
+{"prompt": "Skriv en timebekreftelse SMS, vennlig tone", "completion": "Takk for bestillingen, {{firstName}}! Din time er {{date}} kl {{time}}. Vi gleder oss til å se deg!"}
+{"prompt": "Write an appointment confirmation SMS, kind tone", "completion": "Thank you for booking, {{firstName}}! Your appointment is {{date}} at {{time}}. We look forward to seeing you!"}
+{"prompt": "Skriv en velværepåminnelse SMS, vennlig tone", "completion": "Hei {{firstName}}! Tenkte vi skulle høre hvordan det går. Forebyggende behandling kan hjelpe deg holde deg frisk. Bestill: {{link}}"}
+{"prompt": "Write a wellness reminder SMS, kind tone", "completion": "Hi {{firstName}}! Just checking in to see how you are doing. Preventive care can help you stay healthy. Book: {{link}}"}
+{"prompt": "Generer en SMS med direkte tone for en kiropraktor klinikk", "completion": "Bruk kort, presis tekst. Inkluder kun nødvendig informasjon. Eksempel: 'Time {{date}} kl {{time}}. Endre? Ring {{phone}}.'"}
+{"prompt": "Generate a direct tone SMS for a chiropractic clinic", "completion": "Use short, precise text. Include only necessary information. Example: 'Appointment {{date}} at {{time}}. Change? Call {{phone}}.'"}
+{"prompt": "Generer en SMS med vennlig tone for en kiropraktor klinikk", "completion": "Bruk varm, imøtekommende tekst. Vis at du bryr deg. Eksempel: 'Hei {{firstName}}! Vi gleder oss til å se deg. Ha en fin dag!'"}
+{"prompt": "Generate a kind tone SMS for a chiropractic clinic", "completion": "Use warm, welcoming text. Show that you care. Example: 'Hi {{firstName}}! Looking forward to seeing you. Have a great day!'"}
+{"prompt": "Generer en SMS med profesjonell tone for en kiropraktor klinikk", "completion": "Bruk formell, klinisk tekst. Vær presis og informativ. Eksempel: 'Din konsultasjon er planlagt til {{date}} kl {{time}}. Vennligst ankom 15 minutter før.'"}
+{"prompt": "Generate a professional tone SMS for a chiropractic clinic", "completion": "Use formal, clinical text. Be precise and informative. Example: 'Your consultation is scheduled for {{date}} at {{time}}. Please arrive 15 minutes early.'"}
+{"prompt": "Generer en SMS med empatisk tone for en kiropraktor klinikk", "completion": "Vis forståelse og omsorg. Vær støttende. Eksempel: 'Vi forstår at dette kan være vanskelig. Vi er her for deg når du er klar.'"}
+{"prompt": "Generate an empathetic tone SMS for a chiropractic clinic", "completion": "Show understanding and care. Be supportive. Example: 'We understand this can be difficult. We are here for you when you are ready.'"}
+{"prompt": "Hva kjennetegner direkte kommunikasjon?", "completion": "Direkte kommunikasjon er kort, presis og handlingsfokusert. Ingen unødvendige ord. Klar beskjed om hva mottaker skal gjøre."}
+{"prompt": "What characterizes direct communication?", "completion": "Direct communication is short, precise and action-focused. No unnecessary words. Clear message about what the recipient should do."}
+{"prompt": "Hva kjennetegner vennlig kommunikasjon?", "completion": "Vennlig kommunikasjon er varm men effektiv. Anerkjenner følelser, viser omsorg, men holder seg til saken. Bruker positive formuleringer."}
+{"prompt": "What characterizes kind communication?", "completion": "Kind communication is warm but efficient. Acknowledges feelings, shows care, but stays on topic. Uses positive phrasing."}
+{"prompt": "Hva kjennetegner profesjonell kommunikasjon?", "completion": "Profesjonell kommunikasjon er formell, klinisk korrekt og informativ. Bruker fagterminologi når passende. Saklig og respektfull."}
+{"prompt": "What characterizes professional communication?", "completion": "Professional communication is formal, clinically accurate and informative. Uses professional terminology when appropriate. Objective and respectful."}
+{"prompt": "Hva kjennetegner empatisk kommunikasjon?", "completion": "Empatisk kommunikasjon viser forståelse og støtte. Anerkjenner utfordringer. Gir rom for at mottaker kan føle seg hørt og forstått."}
+{"prompt": "What characterizes empathetic communication?", "completion": "Empathetic communication shows understanding and support. Acknowledges challenges. Gives space for the recipient to feel heard and understood."}
+{"prompt": "Skriv en e-post påminnelse om time, direkte tone", "completion": "Emne: Påminnelse om time\n\nHei {{firstName}},\n\nDu har time {{date}} kl {{time}}.\nAdresse: {{address}}\n\nVed avbud, ring {{phone}}.\n\nMvh,\n{{clinic}}"}
+{"prompt": "Write an appointment reminder email, direct tone", "completion": "Subject: Appointment Reminder\n\nHi {{firstName}},\n\nYou have an appointment on {{date}} at {{time}}.\nAddress: {{address}}\n\nTo cancel, call {{phone}}.\n\nRegards,\n{{clinic}}"}
+{"prompt": "Skriv en e-post påminnelse om time, vennlig tone", "completion": "Emne: Vi ser frem til å treffe deg!\n\nHei {{firstName}}!\n\nVi gleder oss til timen din {{date}} kl {{time}}.\n\nHusk å ta med deg eventuelle skjemaer du har fått tilsendt.\n\nSes snart!\n\nVennlig hilsen,\n{{clinic}}"}
+{"prompt": "Write an appointment reminder email, kind tone", "completion": "Subject: Looking forward to seeing you!\n\nHi {{firstName}}!\n\nWe are excited for your appointment on {{date}} at {{time}}.\n\nRemember to bring any forms we have sent you.\n\nSee you soon!\n\nWarm regards,\n{{clinic}}"}
+{"prompt": "Skriv en SMS om venteliste, direkte tone", "completion": "Hei {{firstName}}, ledig time {{date}} kl {{time}}. Ønsker du den? Svar JA eller ring {{phone}}."}
+{"prompt": "Write a waitlist SMS, direct tone", "completion": "Hi {{firstName}}, opening available {{date}} at {{time}}. Want it? Reply YES or call {{phone}}."}
+{"prompt": "Skriv en SMS om venteliste, vennlig tone", "completion": "Hei {{firstName}}! Gode nyheter - vi har fått en ledig time {{date}} kl {{time}}. Vil du ha den? Gi oss beskjed så ordner vi det!"}
+{"prompt": "Write a waitlist SMS, kind tone", "completion": "Hi {{firstName}}! Good news - we have an opening on {{date}} at {{time}}. Would you like it? Let us know and we will set it up!"}
+{"prompt": "Skriv en SMS om dokumentforespørsel, direkte tone", "completion": "Hei {{firstName}}, vi trenger {{document}} før timen din. Send til {{email}} eller lever på klinikken."}
+{"prompt": "Write a document request SMS, direct tone", "completion": "Hi {{firstName}}, we need {{document}} before your appointment. Send to {{email}} or bring to clinic."}
+{"prompt": "Skriv en SMS om dokumentforespørsel, profesjonell tone", "completion": "For å sikre optimal behandling, ber vi om at du sender {{document}} til {{email}} før konsultasjonen {{date}}."}
+{"prompt": "Write a document request SMS, professional tone", "completion": "To ensure optimal care, please send {{document}} to {{email}} before your consultation on {{date}}."}
+{"prompt": "Skriv en SMS før behandling, direkte tone", "completion": "Påminnelse før time: {{preInstructions}}. Spørsmål? Ring {{phone}}."}
+{"prompt": "Write a pre-treatment SMS, direct tone", "completion": "Pre-appointment reminder: {{preInstructions}}. Questions? Call {{phone}}."}
+{"prompt": "Skriv en SMS før behandling, profesjonell tone", "completion": "Forberedelse til din konsultasjon {{date}}: {{preInstructions}}. Kontakt oss ved spørsmål."}
+{"prompt": "Write a pre-treatment SMS, professional tone", "completion": "Preparation for your consultation on {{date}}: {{preInstructions}}. Contact us with questions."}
+{"prompt": "Skriv en SMS om henvisning, direkte tone", "completion": "Henvisning sendt til {{specialist}}. Forventet svar: 2-4 uker. Ref: {{referenceNumber}}."}
+{"prompt": "Write a referral SMS, direct tone", "completion": "Referral sent to {{specialist}}. Expected response: 2-4 weeks. Ref: {{referenceNumber}}."}
+{"prompt": "Skriv en SMS om henvisning, vennlig tone", "completion": "Hei {{firstName}}! Vi har sendt henvisningen din til {{specialist}}. De vil kontakte deg innen 2-4 uker. Ring oss på {{phone}} om du lurer på noe!"}
+{"prompt": "Write a referral SMS, kind tone", "completion": "Hi {{firstName}}! We have sent your referral to {{specialist}}. They will contact you within 2-4 weeks. Call us at {{phone}} if you have questions!"}
+{"prompt": "Skriv en SMS om forsikring, direkte tone", "completion": "Hei {{firstName}}, vi trenger oppdatert forsikringsinformasjon. Ring {{phone}} eller oppdater via {{link}}."}
+{"prompt": "Write an insurance update SMS, direct tone", "completion": "Hi {{firstName}}, we need updated insurance information. Call {{phone}} or update via {{link}}."}
+{"prompt": "Skriv en SMS om forsikring, profesjonell tone", "completion": "Ifølge våre journaler er forsikringsinformasjonen din utløpt. Vennligst oppdater via {{link}} før neste konsultasjon."}
+{"prompt": "Write an insurance update SMS, professional tone", "completion": "According to our records, your insurance information has expired. Please update via {{link}} before your next consultation."}
+{"prompt": "Skriv en SMS om sykmelding klar, direkte tone", "completion": "Din sykmelding er klar. Hent på klinikken eller be om digital kopi på {{email}}."}
+{"prompt": "Write a sick note ready SMS, direct tone", "completion": "Your sick note is ready. Pick up at clinic or request digital copy at {{email}}."}
+{"prompt": "Skriv en SMS om sykmelding klar, vennlig tone", "completion": "Hei {{firstName}}! Sykmeldingen din er klar for henting. Du kan også få den sendt digitalt - bare gi oss beskjed. God bedring!"}
+{"prompt": "Write a sick note ready SMS, kind tone", "completion": "Hi {{firstName}}! Your sick note is ready for pickup. You can also receive it digitally - just let us know. Wishing you a speedy recovery!"}
+{"prompt": "Skriv en SMS om prøvesvar, profesjonell tone", "completion": "Prøvesvarene dine er klare. Logg inn på {{link}} for å se dem, eller kontakt oss på {{phone}} for gjennomgang."}
+{"prompt": "Write a test results SMS, professional tone", "completion": "Your test results are ready. Log in at {{link}} to view them, or contact us at {{phone}} to discuss."}
+{"prompt": "Skriv en SMS om prøvesvar, empatisk tone", "completion": "Hei {{firstName}}, prøvesvarene dine er klare. Vi forstår at ventetiden kan være stressende. Ring oss på {{phone}} når du er klar til å gjennomgå dem sammen."}
+{"prompt": "Write a test results SMS, empathetic tone", "completion": "Hi {{firstName}}, your test results are ready. We understand the waiting can be stressful. Call us at {{phone}} when you are ready to review them together."}
+{"prompt": "Skriv en SMS om røntgen/MR, direkte tone", "completion": "Røntgen/MR-bilder er klare. Resultater diskuteres på neste time {{date}}."}
+{"prompt": "Write an imaging results SMS, direct tone", "completion": "X-ray/MRI images are ready. Results will be discussed at your next appointment {{date}}."}
+{"prompt": "Skriv en SMS om røntgen/MR, profesjonell tone", "completion": "Bildediagnostikken er fullført. Resultatene vil bli grundig gjennomgått under din konsultasjon {{date}} kl {{time}}."}
+{"prompt": "Write an imaging results SMS, professional tone", "completion": "Diagnostic imaging is complete. Results will be thoroughly reviewed during your consultation on {{date}} at {{time}}."}
+{"prompt": "Skriv en SMS om oppfølgingsplan, direkte tone", "completion": "Behandlingsplan: {{treatmentPlan}}. Neste time: {{date}}. Spørsmål? Ring {{phone}}."}
+{"prompt": "Write a treatment plan SMS, direct tone", "completion": "Treatment plan: {{treatmentPlan}}. Next appointment: {{date}}. Questions? Call {{phone}}."}
+{"prompt": "Skriv en SMS om oppfølgingsplan, vennlig tone", "completion": "Hei {{firstName}}! Her er behandlingsplanen vi ble enige om: {{treatmentPlan}}. Vi følger opp {{date}}. Ta kontakt om noe er uklart!"}
+{"prompt": "Write a treatment plan SMS, kind tone", "completion": "Hi {{firstName}}! Here is the treatment plan we agreed on: {{treatmentPlan}}. We will follow up on {{date}}. Reach out if anything is unclear!"}
+{"prompt": "Skriv en SMS om fremgang, vennlig tone", "completion": "Hei {{firstName}}! Flott å se fremgangen din! Fortsett med øvelsene og vi ses {{date}}. Du gjør det kjempebra!"}
+{"prompt": "Write a progress update SMS, kind tone", "completion": "Hi {{firstName}}! Great to see your progress! Keep up with the exercises and we will see you {{date}}. You are doing amazing!"}
+{"prompt": "Skriv en SMS om fremgang, profesjonell tone", "completion": "Behandlingsnotater: God fremgang registrert. Neste vurdering {{date}}. Fortsett med foreskrevet egenbehandling."}
+{"prompt": "Write a progress update SMS, professional tone", "completion": "Treatment notes: Good progress recorded. Next assessment {{date}}. Continue with prescribed home care."}
+{"prompt": "Skriv en SMS om hjemmeøvelser, direkte tone", "completion": "Nye øvelser: {{exerciseLink}}. Gjør daglig. Rapporter problemer."}
+{"prompt": "Write a home exercise SMS, direct tone", "completion": "New exercises: {{exerciseLink}}. Do daily. Report any issues."}
+{"prompt": "Skriv en SMS om hjemmeøvelser, vennlig tone", "completion": "Hei {{firstName}}! Her er øvelsene vi snakket om: {{exerciseLink}}. Husk - litt hver dag er bedre enn mye av og til. Du klarer dette!"}
+{"prompt": "Write a home exercise SMS, kind tone", "completion": "Hi {{firstName}}! Here are the exercises we discussed: {{exerciseLink}}. Remember - a little every day is better than a lot occasionally. You got this!"}
+{"prompt": "Skriv en SMS om neste behandlingsfase, profesjonell tone", "completion": "Du går nå inn i neste fase av behandlingen. Program: {{phase}}. Forventet varighet: {{duration}}. Detaljer ved neste konsultasjon."}
+{"prompt": "Write a treatment phase SMS, professional tone", "completion": "You are now entering the next phase of treatment. Program: {{phase}}. Expected duration: {{duration}}. Details at your next consultation."}
+{"prompt": "Skriv en SMS om rehabilitering, empatisk tone", "completion": "Hei {{firstName}}, vi vet at rehabilitering tar tid og kan være krevende. Husk at hver dag er fremgang, selv de tunge. Vi heier på deg!"}
+{"prompt": "Write a rehabilitation SMS, empathetic tone", "completion": "Hi {{firstName}}, we know rehabilitation takes time and can be challenging. Remember that every day is progress, even the tough ones. We are cheering for you!"}
+{"prompt": "Skriv en SMS om kronisk tilstand, empatisk tone", "completion": "Hei {{firstName}}, vi forstår at det å leve med kroniske smerter er utfordrende. Vi er her for deg - sammen finner vi løsninger som fungerer."}
+{"prompt": "Write a chronic condition SMS, empathetic tone", "completion": "Hi {{firstName}}, we understand living with chronic pain is challenging. We are here for you - together we will find solutions that work."}
+{"prompt": "Skriv en SMS om behandlingsavslutning, vennlig tone", "completion": "Hei {{firstName}}! Gratulerer med fullført behandling! Det har vært en glede å hjelpe deg. Husk at vi er her om du trenger oss i fremtiden."}
+{"prompt": "Write a treatment completion SMS, kind tone", "completion": "Hi {{firstName}}! Congratulations on completing your treatment! It has been a pleasure helping you. Remember we are here if you need us in the future."}
+{"prompt": "Skriv en SMS om behandlingsavslutning, profesjonell tone", "completion": "Behandlingsserie fullført. Vedlikeholdsøvelser anbefales. Kontrolltime anbefales om {{weeks}} uker."}
+{"prompt": "Write a treatment completion SMS, professional tone", "completion": "Treatment series completed. Maintenance exercises recommended. Follow-up appointment recommended in {{weeks}} weeks."}
+{"prompt": "Skriv en SMS om sesongpåminnelse, vennlig tone", "completion": "Hei {{firstName}}! Høsten er her - en god tid for en sjekk! Bestill vedlikeholdstime: {{link}}. Vi passer på deg!"}
+{"prompt": "Write a seasonal reminder SMS, kind tone", "completion": "Hi {{firstName}}! Fall is here - a great time for a checkup! Book a maintenance appointment: {{link}}. We are looking out for you!"}
+{"prompt": "Skriv en SMS om helligdagsstengt, direkte tone", "completion": "{{clinic}} er stengt {{dates}}. Akutt? Ring legevakt. Åpner igjen {{reopenDate}}."}
+{"prompt": "Write a holiday closure SMS, direct tone", "completion": "{{clinic}} closed {{dates}}. Emergency? Call emergency services. Reopening {{reopenDate}}."}
+{"prompt": "Skriv en SMS om helligdagsstengt, vennlig tone", "completion": "Hei {{firstName}}! Vi holder stengt {{dates}} for helligdagene. God ferie! Vi gleder oss til å se deg når vi åpner igjen {{reopenDate}}."}
+{"prompt": "Write a holiday closure SMS, kind tone", "completion": "Hi {{firstName}}! We are closed {{dates}} for the holidays. Happy holidays! Looking forward to seeing you when we reopen {{reopenDate}}."}
+{"prompt": "Skriv en e-post om ny pasient velkomst, vennlig tone", "completion": "Emne: Velkommen til {{clinic}}!\n\nKjære {{firstName}},\n\nVelkommen til oss! Vi er glade for at du har valgt {{clinic}}.\n\nDin første time er {{date}} kl {{time}}. Vennligst møt opp 15 minutter før for å fylle ut skjemaer.\n\nTa med:\n- Gyldig ID\n- Forsikringsinformasjon (hvis aktuelt)\n- Liste over medisiner\n\nVi gleder oss til å møte deg!\n\nVennlig hilsen,\n{{provider}}\n{{clinic}}"}
+{"prompt": "Write a new patient welcome email, kind tone", "completion": "Subject: Welcome to {{clinic}}!\n\nDear {{firstName}},\n\nWelcome! We are so happy you have chosen {{clinic}}.\n\nYour first appointment is on {{date}} at {{time}}. Please arrive 15 minutes early to complete forms.\n\nPlease bring:\n- Valid ID\n- Insurance information (if applicable)\n- List of medications\n\nWe look forward to meeting you!\n\nWarm regards,\n{{provider}}\n{{clinic}}"}
+{"prompt": "Skriv en e-post om behandlingssammendrag, profesjonell tone", "completion": "Emne: Behandlingssammendrag - {{date}}\n\nKjære {{firstName}},\n\nHer er et sammendrag av dagens konsultasjon:\n\nDiagnose: {{diagnosis}}\nBehandling utført: {{treatment}}\nAnbefalinger: {{recommendations}}\nNeste time: {{nextAppointment}}\n\nVed spørsmål, kontakt oss på {{phone}}.\n\nMed vennlig hilsen,\n{{provider}}"}
+{"prompt": "Write a treatment summary email, professional tone", "completion": "Subject: Treatment Summary - {{date}}\n\nDear {{firstName}},\n\nHere is a summary of today's consultation:\n\nDiagnosis: {{diagnosis}}\nTreatment performed: {{treatment}}\nRecommendations: {{recommendations}}\nNext appointment: {{nextAppointment}}\n\nFor questions, contact us at {{phone}}.\n\nBest regards,\n{{provider}}"}
+{"prompt": "Skriv en e-post om faktura, direkte tone", "completion": "Emne: Faktura {{invoiceNumber}}\n\nHei {{firstName}},\n\nFaktura vedlagt.\nBeløp: {{amount}} kr\nForfallsdato: {{dueDate}}\nBetal: {{link}}\n\nSpørsmål? Ring {{phone}}.\n\nMvh,\n{{clinic}}"}
+{"prompt": "Write an invoice email, direct tone", "completion": "Subject: Invoice {{invoiceNumber}}\n\nHi {{firstName}},\n\nInvoice attached.\nAmount: {{amount}}\nDue date: {{dueDate}}\nPay: {{link}}\n\nQuestions? Call {{phone}}.\n\nRegards,\n{{clinic}}"}
+{"prompt": "Skriv en e-post om øvelsesplan, vennlig tone", "completion": "Emne: Din personlige øvelsesplan\n\nHei {{firstName}}!\n\nHer er øvelsesplanen vi laget sammen:\n\n{{exercisePlan}}\n\nHusk:\n- Start rolig\n- Lytt til kroppen\n- Konsistens er nøkkelen\n\nVideoer: {{videoLink}}\n\nSpørsmål? Vi er bare en telefon unna!\n\nLykke til!\n{{provider}}"}
+{"prompt": "Write an exercise plan email, kind tone", "completion": "Subject: Your Personal Exercise Plan\n\nHi {{firstName}}!\n\nHere is the exercise plan we created together:\n\n{{exercisePlan}}\n\nRemember:\n- Start slowly\n- Listen to your body\n- Consistency is key\n\nVideos: {{videoLink}}\n\nQuestions? We are just a phone call away!\n\nGood luck!\n{{provider}}"}
+{"prompt": "Skriv en SMS om bekrefter avbestilling, direkte tone", "completion": "Avbestilling bekreftet for {{date}}. Bestill ny time: {{link}}"}
+{"prompt": "Write a cancellation confirmation SMS, direct tone", "completion": "Cancellation confirmed for {{date}}. Book new appointment: {{link}}"}
+{"prompt": "Skriv en SMS om bekrefter avbestilling, vennlig tone", "completion": "Hei {{firstName}}, vi har mottatt avbestillingen din. Håper alt er bra! Bestill gjerne ny time når det passer: {{link}}"}
+{"prompt": "Write a cancellation confirmation SMS, kind tone", "completion": "Hi {{firstName}}, we have received your cancellation. Hope everything is okay! Feel free to book a new appointment when convenient: {{link}}"}
+{"prompt": "Skriv en SMS om påminnelse 1 uke før, direkte tone", "completion": "Påminnelse: Time om 1 uke, {{date}} kl {{time}}. Endre? Ring {{phone}}."}
+{"prompt": "Write a 1-week reminder SMS, direct tone", "completion": "Reminder: Appointment in 1 week, {{date}} at {{time}}. Change? Call {{phone}}."}
+{"prompt": "Skriv en SMS om påminnelse 1 time før, direkte tone", "completion": "Time om 1 time hos {{provider}}. Adresse: {{address}}."}
+{"prompt": "Write a 1-hour reminder SMS, direct tone", "completion": "Appointment in 1 hour with {{provider}}. Address: {{address}}."}
+{"prompt": "Skriv en SMS om innsjekk, direkte tone", "completion": "Velkommen! Sjekk inn her: {{kioskLink}} eller i resepsjonen."}
+{"prompt": "Write a check-in SMS, direct tone", "completion": "Welcome! Check in here: {{kioskLink}} or at reception."}
+{"prompt": "Skriv en SMS om innsjekk, vennlig tone", "completion": "Hei {{firstName}}! Velkommen til {{clinic}}! Du kan sjekke inn via {{kioskLink}} eller komme rett til resepsjonen. Vi er klare for deg!"}
+{"prompt": "Write a check-in SMS, kind tone", "completion": "Hi {{firstName}}! Welcome to {{clinic}}! You can check in via {{kioskLink}} or come straight to reception. We are ready for you!"}
+{"prompt": "Skriv en SMS om ny behandler, profesjonell tone", "completion": "Informasjon: Din behandler {{oldProvider}} er ikke tilgjengelig. {{newProvider}} tar over din behandling. Kontakt oss på {{phone}} ved spørsmål."}
+{"prompt": "Write a provider change SMS, professional tone", "completion": "Information: Your provider {{oldProvider}} is unavailable. {{newProvider}} will be taking over your care. Contact us at {{phone}} with questions."}
+{"prompt": "Skriv en SMS om ny behandler, empatisk tone", "completion": "Hei {{firstName}}, vi forstår at endring av behandler kan føles uvanlig. {{newProvider}} er fullt oppdatert på din sak og ser frem til å hjelpe deg videre."}
+{"prompt": "Write a provider change SMS, empathetic tone", "completion": "Hi {{firstName}}, we understand that changing providers can feel unusual. {{newProvider}} is fully updated on your case and looks forward to helping you."}
+{"prompt": "Skriv en SMS om tilbud/kampanje, direkte tone", "completion": "Tilbud: {{offer}}. Gyldig til {{validUntil}}. Bestill: {{link}}"}
+{"prompt": "Write a promotion SMS, direct tone", "completion": "Offer: {{offer}}. Valid until {{validUntil}}. Book: {{link}}"}
+{"prompt": "Skriv en SMS om tilbud/kampanje, vennlig tone", "completion": "Hei {{firstName}}! Vi har en spesiell mulighet for deg: {{offer}}. Tenkte du kunne være interessert! Gyldig til {{validUntil}}. {{link}}"}
+{"prompt": "Write a promotion SMS, kind tone", "completion": "Hi {{firstName}}! We have a special opportunity for you: {{offer}}. Thought you might be interested! Valid until {{validUntil}}. {{link}}"}
+{"prompt": "Konverter denne meldingen til direkte tone: Vi vil gjerne informere deg om at din time er planlagt til i morgen.", "completion": "Time i morgen. Spørsmål? Ring oss."}
+{"prompt": "Convert this message to direct tone: We would like to inform you that your appointment is scheduled for tomorrow.", "completion": "Appointment tomorrow. Questions? Call us."}
+{"prompt": "Konverter denne meldingen til vennlig tone: Din time er i morgen.", "completion": "Hei! Vi gleder oss til å se deg i morgen! Ha en fin dag inntil da!"}
+{"prompt": "Convert this message to kind tone: Your appointment is tomorrow.", "completion": "Hi! Looking forward to seeing you tomorrow! Have a great day until then!"}
+{"prompt": "Konverter denne meldingen til empatisk tone: Du møtte ikke til timen din.", "completion": "Vi forstår at ting ikke alltid går som planlagt. Vi savnet deg i dag, men ingen bekymringer - vi er her når du er klar."}
+{"prompt": "Convert this message to empathetic tone: You missed your appointment.", "completion": "We understand things do not always go as planned. We missed you today, but no worries - we are here when you are ready."}
+{"prompt": "Konverter denne meldingen til profesjonell tone: Husk å ta medisinene dine!", "completion": "Vennligst fortsett med foreskrevet medisinering i henhold til behandlingsplanen."}
+{"prompt": "Convert this message to professional tone: Remember to take your medicine!", "completion": "Please continue with prescribed medication according to your treatment plan."}
+{"prompt": "Skriv en kort velkomst til pasient som kommer til første VNG-test, profesjonell tone", "completion": "Velkommen til vestibulær undersøkelse. Testen tar ca. 45 min. Unngå koffein og alkohol 24 timer før. Møt opp uten øyesminke."}
+{"prompt": "Write a welcome for patient coming for first VNG test, professional tone", "completion": "Welcome to your vestibular examination. The test takes approx. 45 min. Avoid caffeine and alcohol 24 hours before. Arrive without eye makeup."}
+{"prompt": "Skriv en SMS etter VNG-test, vennlig tone", "completion": "Hei {{firstName}}! Takk for i dag. Det er normalt å føle seg litt uvel etter testen. Ta det med ro i kveld, og ring oss om noe føles galt."}
+{"prompt": "Write a post-VNG test SMS, kind tone", "completion": "Hi {{firstName}}! Thanks for coming in today. It is normal to feel a bit off after the test. Take it easy tonight, and call us if anything feels wrong."}
+{"prompt": "Skriv en påminnelse om ergonomiske råd, direkte tone", "completion": "Ergonomitips: Juster skjermen til øyehøyde. Stå opp hvert 30. min. Ta pauser."}
+{"prompt": "Write an ergonomic advice reminder, direct tone", "completion": "Ergonomic tip: Adjust screen to eye level. Stand up every 30 min. Take breaks."}
+{"prompt": "Skriv en påminnelse om ergonomiske råd, vennlig tone", "completion": "Hei {{firstName}}! Liten påminnelse: Ryggen din vil takke deg for gode arbeidsvaner. Husk pauser og god sittestilling. Du er flink!"}
+{"prompt": "Write an ergonomic advice reminder, kind tone", "completion": "Hi {{firstName}}! Little reminder: Your back will thank you for good work habits. Remember breaks and good posture. You are doing great!"}
+{"prompt": "Skriv en SMS om journalforespørsel, profesjonell tone", "completion": "Vi har mottatt din forespørsel om journalkopi. Behandlingstid: 5-7 virkedager. Ref: {{referenceNumber}}. Kontakt {{phone}} ved spørsmål."}
+{"prompt": "Write a records request SMS, professional tone", "completion": "We have received your records request. Processing time: 5-7 business days. Ref: {{referenceNumber}}. Contact {{phone}} with questions."}
+{"prompt": "Skriv en SMS om journalkopi klar, direkte tone", "completion": "Journalkopi klar. Hent på klinikken med gyldig ID, eller be om sikker digital sending via {{email}}."}
+{"prompt": "Write a records ready SMS, direct tone", "completion": "Records copy ready. Pick up at clinic with valid ID, or request secure digital delivery via {{email}}."}
+{"prompt": "Skriv en SMS om samtykkeskjema, profesjonell tone", "completion": "Vennligst fullfør samtykkeskjema før konsultasjonen: {{link}}. Dette sikrer at vi kan gi deg best mulig behandling."}
+{"prompt": "Write a consent form SMS, professional tone", "completion": "Please complete consent form before consultation: {{link}}. This ensures we can provide you the best possible care."}
+{"prompt": "Skriv en SMS om påminnelse om å fylle ut skjema, vennlig tone", "completion": "Hei {{firstName}}! Liten påminnelse om skjemaet vi sendte. Det tar bare 2-3 minutter: {{link}}. Takk for hjelpen!"}
+{"prompt": "Write a form reminder SMS, kind tone", "completion": "Hi {{firstName}}! Quick reminder about the form we sent. It only takes 2-3 minutes: {{link}}. Thanks for your help!"}
+{"prompt": "Skriv en SMS om nytt telefonnummer, direkte tone", "completion": "{{clinic}} har nytt telefonnummer: {{newPhone}}. Oppdater kontaktene dine."}
+{"prompt": "Write a new phone number SMS, direct tone", "completion": "{{clinic}} has a new phone number: {{newPhone}}. Please update your contacts."}
+{"prompt": "Skriv en SMS om ny adresse, vennlig tone", "completion": "Spennende nyheter, {{firstName}}! Vi har flyttet til ny adresse: {{newAddress}}. Mer plass, samme gode service. Velkommen!"}
+{"prompt": "Write a new address SMS, kind tone", "completion": "Exciting news, {{firstName}}! We have moved to a new address: {{newAddress}}. More space, same great service. Welcome!"}
+{"prompt": "Skriv en SMS om ny tjeneste, vennlig tone", "completion": "Hei {{firstName}}! Vi tilbyr nå {{newService}}. Vi tror dette kan hjelpe deg! Les mer: {{link}} eller spør oss ved neste time."}
+{"prompt": "Write a new service SMS, kind tone", "completion": "Hi {{firstName}}! We now offer {{newService}}. We think this could help you! Learn more: {{link}} or ask us at your next appointment."}
+{"prompt": "Skriv en takkemelding etter avsluttet behandling, empatisk tone", "completion": "Kjære {{firstName}}, takk for tilliten du har vist oss gjennom behandlingen. Det har vært en ære å følge deg på reisen mot bedre helse. Vi ønsker deg alt godt!"}
+{"prompt": "Write a thank you message after completed treatment, empathetic tone", "completion": "Dear {{firstName}}, thank you for the trust you have shown us throughout your treatment. It has been an honor to accompany you on your journey to better health. We wish you all the best!"}
