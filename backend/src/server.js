@@ -38,7 +38,7 @@ const API_VERSION = process.env.API_VERSION || 'v1';
 app.use(helmet());
 
 // CORS configuration - supports multiple origins
-const corsOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
+const corsOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173,http://localhost:5174')
   .split(',')
   .map(origin => origin.trim());
 
@@ -46,7 +46,7 @@ app.use(cors({
   origin: corsOrigins.length === 1 ? corsOrigins[0] : corsOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Organization-Id']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Organization-Id', 'X-Dev-Bypass']
 }));
 
 // Body parsing

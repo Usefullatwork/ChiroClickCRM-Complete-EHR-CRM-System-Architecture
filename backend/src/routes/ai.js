@@ -92,4 +92,74 @@ router.get('/status',
   aiController.getAIStatus
 );
 
+/**
+ * @route   POST /api/v1/ai/feedback
+ * @desc    Record feedback for AI suggestions (accept/reject/modify)
+ * @access  Private (ADMIN, PRACTITIONER)
+ */
+router.post('/feedback',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  aiController.recordSuggestionFeedback
+);
+
+/**
+ * @route   GET /api/v1/ai/metrics
+ * @desc    Get AI performance metrics and dashboard data
+ * @access  Private (ADMIN)
+ */
+router.get('/metrics',
+  requireRole(['ADMIN']),
+  aiController.getAIMetrics
+);
+
+/**
+ * @route   GET /api/v1/ai/metrics/dashboard
+ * @desc    Get simplified AI metrics for dashboard display
+ * @access  Private (ADMIN, PRACTITIONER)
+ */
+router.get('/metrics/dashboard',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  aiController.getAIDashboardMetrics
+);
+
+/**
+ * @route   GET /api/v1/ai/circuit-status
+ * @desc    Get circuit breaker status for all AI services
+ * @access  Private (ADMIN)
+ */
+router.get('/circuit-status',
+  requireRole(['ADMIN']),
+  aiController.getCircuitBreakerStatus
+);
+
+/**
+ * @route   POST /api/v1/ai/circuit-reset/:service
+ * @desc    Reset circuit breaker for a specific service
+ * @access  Private (ADMIN)
+ */
+router.post('/circuit-reset/:service',
+  requireRole(['ADMIN']),
+  aiController.resetCircuitBreaker
+);
+
+/**
+ * @route   GET /api/v1/ai/training/history
+ * @desc    Get AI model training history
+ * @access  Private (ADMIN)
+ */
+router.get('/training/history',
+  requireRole(['ADMIN']),
+  aiController.getTrainingHistory
+);
+
+/**
+ * @route   POST /api/v1/ai/training/trigger
+ * @desc    Manually trigger model retraining
+ * @access  Private (ADMIN)
+ */
+router.post('/training/trigger',
+  requireRole(['ADMIN']),
+  aiController.triggerRetraining
+);
+
 export default router;

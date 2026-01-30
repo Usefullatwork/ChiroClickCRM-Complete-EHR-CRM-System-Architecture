@@ -1,0 +1,156 @@
+================================================================================
+SOURCE: Untitled document.docx
+EXTRACTED: 2026-01-15T23:43:06.156Z
+CHARACTERS: 4547
+================================================================================
+
+Gemini analyse 
+
+
+
+Analyse av SOPE-notater for Kiropraktor: BTB
+
+Denne analysen identifiserer maler og fraser som kan automatiseres for å øke effektiviteten i journalnotater, legeerklæringer og henvisninger for kiropraktorer som Bjørn Terje Bratt (BTB).
+
+Anamnese (Subjective)
+
+Maler:
+
+Hovedklage: Pasienten klager over [hovedklage], som startet [dato] og har vart i [tid]. [Beskrivelse av symptomer, f.eks. smerte, stivhet, nummenhet, prikking].
+
+Forverring: Symptomene forverres av [aktiviteter/situasjoner].
+
+Bedring: Symptomene bedres av [aktiviteter/situasjoner].
+
+Tidligere behandling: Pasienten har tidligere mottatt behandling for [tilstand] som [beskrivelse av tidligere behandling].
+
+Medisiner: Pasienten bruker [medisinnavn] for [tilstand] [dosering og frekvens].
+
+Sykehistorie: Pasienten har en historie med [beskriv relevante sykdommer eller skader, f.eks. hjernerystelse, bekkenløsning, prolaps, artrose].
+
+Sosialhistorie: Pasienten er [beskriv pasientens yrke, fritidsaktiviteter, familieforhold].
+
+Stress: Pasienten rapporterer [beskriv stressnivå og mulige stressfaktorer].
+
+Trening: Pasienten trener [beskriv type trening og frekvens].
+
+
+
+Gjentakende fraser:
+
+"Pasienten presenterer seg med..."
+
+"Pasienten rapporterer..."
+
+"Pasienten opplever..."
+
+"Pasienten beskriver..."
+
+"Pasienten har hatt plager siden..."
+
+"Pasienten har tidligere mottatt behandling for..."
+
+"Pasienten bruker..."
+
+"Pasienten er bekymret for..."
+
+
+
+Undersøkelse (Objective)
+
+Maler:
+
+Observasjon: [Beskriv observerte funn, f.eks. holdning, synlige muskelfyller, hevelse, blåmerker].
+
+AROM/PROM: [Beskriv bevegelsesutslag i alle plan, angi måleenheter].
+
+Spurling: [Resultat av Spurling test].
+
+Reflekser: [Beskriv reflekser, f.eks. biceps, triceps, brachioradial].
+
+Isometriske tester: [Beskriv isometriske tester, f.eks. biceps, triceps, pronasjon, supinasjon, fingerabduksjon].
+
+Sensibilitet: [Beskriv sensibilitetsfunn, f.eks. smerte, prikking, nummenhet].
+
+Spesielle tester: [Beskriv utført tester, f.eks. Hoffman, Lasegue, Romberg, Dix-Hallpike].
+
+Palpasjon: [Beskriv palpasjonsfunn, f.eks. ømhet, temperatur, triggerpunkter].
+
+Øyebevegelser: [Beskriv funn ved vurdering av øyebevegelser, f.eks. dobbeltsyn, nystagmus, saccades, optokinetisk refleks].
+
+Vestibulær undersøkelse: [Beskriv utført tester, f.eks. Dix-Hallpike, Romberg].
+
+PR: [Beskriv funn ved vurdering av postural balanse, f.eks. ustøhet, falltendens, retningsavhengighet].
+
+DDDK: [Beskriv funn ved vurdering av dynamisk postural kontroll, f.eks. ustøhet, kompensasjoner].
+
+VOR: [Beskriv funn ved vurdering av vestibulo-okulær refleks, f.eks. nystagmus, overshoot, undershoot].
+
+Gaze hold: [Beskriv funn ved vurdering av gaze hold, f.eks. drift, tremor, saccades].
+
+OPK: [Beskriv funn ved vurdering av optokinetisk refleks, f.eks. redusert amplitude, unormalt tempo, sakkader].
+
+Svakhet: [Beskriv funn ved vurdering av muskelstyrke, f.eks. svakhet i spesifikke muskler, påvirkning av bevegelse].
+
+Vibrasjon: [Beskriv funn ved vurdering av vibrasjonssans, f.eks. nedsatt sensibilitet].
+
+Puls: [Beskriv funn ved vurdering av puls, f.eks. økt puls, uregelmessig puls].
+
+
+
+Rygg undersøkelse:
+
+AROM: [Beskriv bevegelsesutslag i lumbalcolumna, f.eks. fleksjon, ekstensjon, rotasjon, lateralfleksjon, angi måleenheter].
+
+Kemp test: [Beskriv funn fra Kemp test, f.eks. smerte, lokalisasjon].
+
+Slump test: [Beskriv funn fra Slump test, f.eks. smerte, prikking, nummenhet].
+
+Lasegue test: [Beskriv funn fra Lasegue test, f.eks. smerte, begrensning].
+
+Perkusjon: [Beskriv funn ved perkusjon av proc spinosus].
+
+Vibrasjonstest: [Beskriv funn ved vibrasjonstest av proc spinosus].
+
+Palpasjon: [Beskriv palpasjonsfunn, f.eks. ømhet, temperatur, triggerpunkter].
+
+
+
+
+
+Maler for spesifikke områder:
+
+Skulder: [Beskriv funn fra Neer, Hawkins, Full can, Empty can, Load shift test, Sulcus sign, Krank test, Apprehension test, AC-ledd kompresjonstest, Crossover test].
+
+Hofte: [Beskriv funn fra Faber, Fadir, Kompressjon 90 grader, Inrotasjon i 90 grader, P4/thigh thrust, Fitzgerald test].
+
+Ankel/Fot: [Beskriv funn fra Talar tilt test, Cotton test, Syndesmose Squeeze test, Ottawa rules].
+
+
+
+Gjentakende fraser:
+
+"Observasjon viser..."
+
+"Arom/Prom er begrenset i..."
+
+"Funksjonsundersøkelse viser..."
+
+"Testene viser..."
+
+"Funn er konsistente med..."
+
+"Palpasjon av [område] avdekker..."
+
+
+
+Behandling (Assessment)
+
+Maler:
+
+Manuell terapi: [Beskriv manuelle teknikker brukt, f.eks. myofascial release (bvm), triggerpunktbehandling (tgp), leddmobilisering (hvla), ART, leddkorrigering (PL, PR), trak
+
+
+
+
+

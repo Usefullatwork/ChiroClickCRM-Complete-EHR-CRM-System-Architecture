@@ -359,11 +359,79 @@ export const validateClinicalMiddleware = async (req, res, next) => {
   next();
 };
 
+/**
+ * Check content for red flags only
+ * @param {string} content - Content to check
+ * @returns {Array} Array of detected red flags
+ */
+export const checkRedFlagsInContent = (content) => {
+  if (!content) return [];
+
+  const detectedFlags = [];
+
+  RED_FLAGS.forEach(flag => {
+    const matches = content.match(flag.pattern);
+    if (matches) {
+      detectedFlags.push({
+        severity: flag.severity,
+        message: flag.message,
+        action: flag.action,
+        code: flag.code,
+        matches: matches
+      });
+    }
+  });
+
+  return detectedFlags;
+};
+
+/**
+ * Medication warnings - checks for medication-related red flags
+ * @param {string} content - Content to check
+ * @param {Array} medications - Patient's current medications
+ * @returns {Array} Array of medication warnings
+ */
+export const checkMedicationWarnings = (content, medications = []) => {
+  const warnings = [];
+
+  // Check for manipulation contraindications with blood thinners
+  const bloodThinners = ['warfarin', 'marevan', 'eliquis', 'xarelto', 'pradaxa', 'klexane', 'fragmin'];
+  const hasManipulation = /hvla|manipulasjon|thrust/gi.test(content);
+
+  if (hasManipulation && medications.some(med =>
+    bloodThinners.some(bt => med.toLowerCase().includes(bt))
+  )) {
+    warnings.push({
+      type: 'medication_warning',
+      severity: 'HIGH',
+      message: 'Advarsel: HVLA/manipulasjon hos pasient på blodfortynnende - vurder forsiktighet',
+      action: 'CAUTION'
+    });
+  }
+
+  // Check for steroid use + certain treatments
+  const steroids = ['prednisolon', 'kortison', 'prednison', 'dexamethason'];
+  if (medications.some(med =>
+    steroids.some(s => med.toLowerCase().includes(s))
+  )) {
+    warnings.push({
+      type: 'medication_note',
+      severity: 'MODERATE',
+      message: 'Pasient bruker steroider - vær oppmerksom på benvev og bløtvev',
+      action: 'NOTE'
+    });
+  }
+
+  return warnings;
+};
+
 export default {
   validateClinicalContent,
   validateSOAPCompleteness,
   validateClinicalMiddleware,
   calculateConfidence,
+  checkRedFlagsInContent,
+  checkMedicationWarnings,
   RED_FLAGS,
   LOGIC_RULES
 };

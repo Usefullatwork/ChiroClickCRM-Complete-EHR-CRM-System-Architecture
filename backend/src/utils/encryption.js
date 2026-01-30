@@ -168,6 +168,101 @@ export const validateFodselsnummer = (fodselsnummer) => {
 };
 
 /**
+ * Validate Norwegian fødselsnummer with detailed error information
+ * @param {string} fodselsnummer - Norwegian personal ID
+ * @returns {{valid: boolean, error?: string, cleaned?: string}} Validation result
+ */
+export const validateFodselsnummerDetailed = (fodselsnummer) => {
+  if (!fodselsnummer) {
+    return { valid: false, error: 'Fødselsnummer er påkrevd' };
+  }
+
+  // Remove any spaces or dashes
+  const cleaned = fodselsnummer.replace(/[\s-]/g, '');
+
+  // Must be exactly 11 digits
+  if (!/^\d{11}$/.test(cleaned)) {
+    return { valid: false, error: 'Fødselsnummer må være nøyaktig 11 siffer' };
+  }
+
+  // Extract date parts (DDMMYY)
+  const day = parseInt(cleaned.substring(0, 2));
+  const month = parseInt(cleaned.substring(2, 4));
+
+  // Basic date validation (accounting for D-numbers where day += 40)
+  const actualDay = day > 40 ? day - 40 : day;
+  if (actualDay < 1 || actualDay > 31) {
+    return { valid: false, error: 'Ugyldig dag i fødselsnummer' };
+  }
+  if (month < 1 || month > 12) {
+    return { valid: false, error: 'Ugyldig måned i fødselsnummer' };
+  }
+
+  // Modulo 11 checksum validation - First check digit
+  const weights1 = [3, 7, 6, 1, 8, 9, 4, 5, 2];
+  let sum1 = 0;
+  for (let i = 0; i < 9; i++) {
+    sum1 += parseInt(cleaned[i]) * weights1[i];
+  }
+  const remainder1 = sum1 % 11;
+  const checkDigit1 = remainder1 === 0 ? 0 : 11 - remainder1;
+
+  if (checkDigit1 === 10 || parseInt(cleaned[9]) !== checkDigit1) {
+    return { valid: false, error: 'Ugyldig kontrollsiffer i fødselsnummer' };
+  }
+
+  // Second check digit
+  const weights2 = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
+  let sum2 = 0;
+  for (let i = 0; i < 10; i++) {
+    sum2 += parseInt(cleaned[i]) * weights2[i];
+  }
+  const remainder2 = sum2 % 11;
+  const checkDigit2 = remainder2 === 0 ? 0 : 11 - remainder2;
+
+  if (checkDigit2 === 10 || parseInt(cleaned[10]) !== checkDigit2) {
+    return { valid: false, error: 'Ugyldig kontrollsiffer i fødselsnummer' };
+  }
+
+  return { valid: true, cleaned };
+};
+
+/**
+ * Validate fødselsnummer and verify it matches a given date of birth
+ * @param {string} fodselsnummer - Norwegian personal ID
+ * @param {Date|string} dateOfBirth - Expected date of birth
+ * @returns {boolean} True if valid and matches DOB
+ */
+export const validateFodselsnummerWithDOB = (fodselsnummer, dateOfBirth) => {
+  if (!validateFodselsnummer(fodselsnummer)) return false;
+  if (!dateOfBirth) return true; // If no DOB to check, just validate the fnr
+
+  const cleaned = fodselsnummer.replace(/[\s-]/g, '');
+  const dob = new Date(dateOfBirth);
+
+  if (isNaN(dob.getTime())) return false;
+
+  // Extract date from fødselsnummer (DDMMYY)
+  let day = parseInt(cleaned.substring(0, 2));
+  const month = parseInt(cleaned.substring(2, 4));
+  const yearDigits = parseInt(cleaned.substring(4, 6));
+
+  // Handle D-numbers (temporary ID for foreigners: day += 40)
+  if (day > 40) day -= 40;
+
+  // Get birth year using century calculation
+  const birthYear = getBirthYearFromFodselsnummer(fodselsnummer);
+  if (!birthYear) return false;
+
+  // Compare with provided DOB
+  return (
+    dob.getDate() === day &&
+    (dob.getMonth() + 1) === month &&
+    dob.getFullYear() === birthYear
+  );
+};
+
+/**
  * Determine the century from fødselsnummer individual number
  * @param {string} fodselsnummer - Norwegian personal ID
  * @returns {number|null} Full 4-digit birth year or null if invalid

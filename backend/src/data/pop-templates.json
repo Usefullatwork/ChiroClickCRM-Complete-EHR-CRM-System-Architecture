@@ -1,0 +1,1470 @@
+{
+  "exportedAt": "2026-01-18T01:29:56.725Z",
+  "source": "pop.gpm.as",
+  "organization": "Klinikk for Alle Majorstuen",
+  "group": {
+    "id": 3481,
+    "name": "Nevrosenter Majorstuen"
+  },
+  "templates": [
+    {
+      "Id": 1149,
+      "Name": "Venstre regime ",
+      "Description": "",
+      "IntensityLevel": null,
+      "Stage": null,
+      "Group": {
+        "Id": 3481,
+        "Name": "Nevrosenter Majorstuen"
+      },
+      "IsArchive": false,
+      "Owner": {
+        "Id": 8827,
+        "Name": "Edle Minnesjord",
+        "PictureFilename": null,
+        "Description": "Kiropraktor",
+        "Mobile": "41489728",
+        "Email": "",
+        "Country": {
+          "Id": 160,
+          "Name": "NORWAY",
+          "ISO": "NO",
+          "Nicename": "Norway",
+          "ISO3": "NOR",
+          "NumCode": 578,
+          "Phonecode": 47
+        }
+      },
+      "TemplateSections": [
+        {
+          "Id": 2272,
+          "Name": "",
+          "Description": null,
+          "TemplateSectionExercises": [
+            {
+              "Id": 3966,
+              "Exercise": {
+                "Id": 8888,
+                "Name": "Medium Lines Right (0.2 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5439,
+                    "FileName": "Kk3n16L5F6y.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "tell 15-20 streker ",
+              "Sequence": 1,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 3967,
+              "Exercise": {
+                "Id": 9202,
+                "Name": "Microsaccades, Diagonal Up Right (0.2 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5788,
+                    "FileName": "eCk9Uffv5a9.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": null,
+              "Sequence": 2,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 3968,
+              "Exercise": {
+                "Id": 9120,
+                "Name": "Pursuits Right, Saccade to Center (0.2 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5686,
+                    "FileName": "uMLphDMRzEL.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": null,
+              "Sequence": 3,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 3969,
+              "Exercise": {
+                "Id": 9218,
+                "Name": "Gaze Stab Horizontal, Seated Left",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5807,
+                    "FileName": "9WdbDPbimDp.jpeg"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "15-20 reps",
+              "Sequence": 4,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 3970,
+              "Exercise": {
+                "Id": 9224,
+                "Name": "T0V Horizontal Right",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5815,
+                    "FileName": "sKjF6FH6ZaS.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "15-20 reps",
+              "Sequence": 5,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 3971,
+              "Exercise": {
+                "Id": 9210,
+                "Name": "Foot Circles, Left Side",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5797,
+                    "FileName": "g4s8Q5eWXMA.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "10 sma + 10 store repetisjoner",
+              "Sequence": 6,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 3972,
+              "Exercise": {
+                "Id": 9177,
+                "Name": "8 Numbers, Left Arm",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5759,
+                    "FileName": "Io8tdt3Ha5L.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "10 sma + 10 store repetisjoner",
+              "Sequence": 7,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 3973,
+              "Exercise": {
+                "Id": 9173,
+                "Name": "8 Numbers Arm + Foot, Left Side",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5754,
+                    "FileName": "bxqCdTBdu4i.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "10 sma + 10 store repetisjoner",
+              "Sequence": 8,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": 1150,
+      "Name": "Hoyre regime ",
+      "Description": "",
+      "IntensityLevel": null,
+      "Stage": null,
+      "Group": {
+        "Id": 3481,
+        "Name": "Nevrosenter Majorstuen"
+      },
+      "IsArchive": false,
+      "Owner": {
+        "Id": 8827,
+        "Name": "Edle Minnesjord",
+        "PictureFilename": null,
+        "Description": "Kiropraktor",
+        "Mobile": "41489728",
+        "Email": "",
+        "Country": {
+          "Id": 160,
+          "Name": "NORWAY",
+          "ISO": "NO",
+          "Nicename": "Norway",
+          "ISO3": "NOR",
+          "NumCode": 578,
+          "Phonecode": 47
+        }
+      },
+      "TemplateSections": [
+        {
+          "Id": 2273,
+          "Name": "",
+          "Description": null,
+          "TemplateSectionExercises": [
+            {
+              "Id": 3974,
+              "Exercise": {
+                "Id": 9087,
+                "Name": "Medium Lines Left (0.2 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5652,
+                    "FileName": "vOsf8np21Xv.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "Tell 15-20 streker ",
+              "Sequence": 1,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 3975,
+              "Exercise": {
+                "Id": 9199,
+                "Name": "Microsaccades, Diagonal Up Left (0.2 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5785,
+                    "FileName": "W3x3Ud4iZxT.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": null,
+              "Sequence": 2,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 3976,
+              "Exercise": {
+                "Id": 9117,
+                "Name": "Pursuits Left, Saccade to Center (0.2 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5683,
+                    "FileName": "jJuXVrJVZQa.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": null,
+              "Sequence": 3,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 3977,
+              "Exercise": {
+                "Id": 9217,
+                "Name": "Gaze Stab Horizontal, Seated Right ",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5806,
+                    "FileName": "HMSjCgE3QIy.jpg"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "15-20 repetisjoner ",
+              "Sequence": 4,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 3978,
+              "Exercise": {
+                "Id": 9225,
+                "Name": "T0V Horizontal Left",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5816,
+                    "FileName": "PkQPcfGstdq.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "15-20 repetisjoner ",
+              "Sequence": 5,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 3979,
+              "Exercise": {
+                "Id": 9176,
+                "Name": "8 Numbers, Right Arm",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5757,
+                    "FileName": "JwUojMrdD68.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "10 sma + 10 store repetisjoner ",
+              "Sequence": 6,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 3980,
+              "Exercise": {
+                "Id": 9178,
+                "Name": "8 Numbers, Right Foot",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5761,
+                    "FileName": "bqlXviwMp6Y.jpg"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "10 sma + 10 store repetisjoner ",
+              "Sequence": 7,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 3981,
+              "Exercise": {
+                "Id": 9172,
+                "Name": "8 Numbers Arm + Foot, Right Side",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5753,
+                    "FileName": "fSuKUcg5nyA.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "10-20 reps ",
+              "Sequence": 8,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": 1151,
+      "Name": "Ovelser",
+      "Description": "",
+      "IntensityLevel": null,
+      "Stage": null,
+      "Group": {
+        "Id": 3481,
+        "Name": "Nevrosenter Majorstuen"
+      },
+      "IsArchive": false,
+      "Owner": {
+        "Id": 8834,
+        "Name": "Jacob Stang",
+        "PictureFilename": null,
+        "Description": "",
+        "Mobile": "97577611",
+        "Email": "",
+        "Country": {
+          "Id": 160,
+          "Name": "NORWAY",
+          "ISO": "NO",
+          "Nicename": "Norway",
+          "ISO3": "NOR",
+          "NumCode": 578,
+          "Phonecode": 47
+        }
+      },
+      "TemplateSections": [
+        {
+          "Id": 2267,
+          "Name": "",
+          "Description": null,
+          "TemplateSectionExercises": [
+            {
+              "Id": 3932,
+              "Exercise": {
+                "Id": 9060,
+                "Name": "Large Lines Down (0.2 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5625,
+                    "FileName": "0gzFcMuULTj.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "Se pa svarte striper, 30 sekunder x 5 serier pr dag",
+              "Sequence": 1,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 3933,
+              "Exercise": {
+                "Id": 9203,
+                "Name": "Microsaccades, Diagonal Up Right (0.4 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5789,
+                    "FileName": "7QtbzdHhTge.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "Holde hodet stille og folg prikken. 5 x pr dag",
+              "Sequence": 2,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": 1152,
+      "Name": "Ovelser",
+      "Description": "Videoer + \n-Spinn pa kontorstol 360 grader til VENSTRE. x2\n- Prikk ovelse: med ja-ja (5 rep opp og ned, 10rep til sammen) + 5x nei-nei BARE til VENSTRE og tilbake til midt. ",
+      "IntensityLevel": null,
+      "Stage": null,
+      "Group": {
+        "Id": 3481,
+        "Name": "Nevrosenter Majorstuen"
+      },
+      "IsArchive": false,
+      "Owner": {
+        "Id": 8835,
+        "Name": "Karina Ranvik Arkin",
+        "PictureFilename": null,
+        "Description": null,
+        "Mobile": "41421775",
+        "Email": null,
+        "Country": {
+          "Id": 160,
+          "Name": "NORWAY",
+          "ISO": "NO",
+          "Nicename": "Norway",
+          "ISO3": "NOR",
+          "NumCode": 578,
+          "Phonecode": 47
+        }
+      },
+      "TemplateSections": [
+        {
+          "Id": 2274,
+          "Name": "",
+          "Description": null,
+          "TemplateSectionExercises": [
+            {
+              "Id": 3982,
+              "Exercise": {
+                "Id": 9120,
+                "Name": "Pursuits Right, Saccade to Center (0.2 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5686,
+                    "FileName": "uMLphDMRzEL.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": null,
+              "Sequence": 1,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 3983,
+              "Exercise": {
+                "Id": 9199,
+                "Name": "Microsaccades, Diagonal Up Left (0.2 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5785,
+                    "FileName": "W3x3Ud4iZxT.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": null,
+              "Sequence": 2,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 3984,
+              "Exercise": {
+                "Id": 8888,
+                "Name": "Medium Lines Right (0.2 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5439,
+                    "FileName": "Kk3n16L5F6y.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "",
+              "Sequence": 3,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 3985,
+              "Exercise": {
+                "Id": 8834,
+                "Name": "Medium Lines Right (0.2 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5383,
+                    "FileName": "L0DP3QD3VUo.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "Hold blikket festet pa den svarte prikken til videoen er ferdig. ",
+              "Sequence": 4,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": 1153,
+      "Name": "Ovelser",
+      "Description": "4 video ovelser + 1 du gjor manuelt (prikk ovelse).\n- Prikk: Sett en prikk/eller noe a holde fokus pa rett fremfor deg i oyehoyde. Sitt litt mer enn en arm lengde unna.\nHold blikket festet pa prikken mens du gjor 6x nei-nei sakte (3 til hver side) med hodet fra side til side. Sa 6x ja-ja sakte med hodet opp og ned. (stopp ikke opp i midten, prov a ha en jevn og fin bevegelse pa hodet)\n\nDisse gjores 5 ganger om dagen",
+      "IntensityLevel": null,
+      "Stage": null,
+      "Group": {
+        "Id": 3481,
+        "Name": "Nevrosenter Majorstuen"
+      },
+      "IsArchive": false,
+      "Owner": {
+        "Id": 8835,
+        "Name": "Karina Ranvik Arkin",
+        "PictureFilename": null,
+        "Description": null,
+        "Mobile": "41421775",
+        "Email": null,
+        "Country": {
+          "Id": 160,
+          "Name": "NORWAY",
+          "ISO": "NO",
+          "Nicename": "Norway",
+          "ISO3": "NOR",
+          "NumCode": 578,
+          "Phonecode": 47
+        }
+      },
+      "TemplateSections": [
+        {
+          "Id": 2275,
+          "Name": "",
+          "Description": null,
+          "TemplateSectionExercises": [
+            {
+              "Id": 3986,
+              "Exercise": {
+                "Id": 9244,
+                "Name": "Random Sakkades Red (0.025 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5846,
+                    "FileName": "JpWa8PiG8CW.PNG"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": null,
+              "Sequence": 1,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 3987,
+              "Exercise": {
+                "Id": 9248,
+                "Name": "Random Sakkades Blue (0.05 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5849,
+                    "FileName": "0dqzFSD0CC1.PNG"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": null,
+              "Sequence": 2,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 3988,
+              "Exercise": {
+                "Id": 8849,
+                "Name": "Medium Lines Left (0.2 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5399,
+                    "FileName": "SA9BWsY8wMl.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "Hol blikket festet pa den svarte prikken til videoen er ferdig.",
+              "Sequence": 3,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 3989,
+              "Exercise": {
+                "Id": 9117,
+                "Name": "Pursuits Left, Saccade to Center (0.2 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5683,
+                    "FileName": "jJuXVrJVZQa.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": null,
+              "Sequence": 4,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": 1157,
+      "Name": "Venstre rettet spontan + gaze stab/T0V ",
+      "Description": "",
+      "IntensityLevel": null,
+      "Stage": null,
+      "Group": {
+        "Id": 3481,
+        "Name": "Nevrosenter Majorstuen"
+      },
+      "IsArchive": false,
+      "Owner": {
+        "Id": 8834,
+        "Name": "Jacob Stang",
+        "PictureFilename": null,
+        "Description": "",
+        "Mobile": "97577611",
+        "Email": "",
+        "Country": {
+          "Id": 160,
+          "Name": "NORWAY",
+          "ISO": "NO",
+          "Nicename": "Norway",
+          "ISO3": "NOR",
+          "NumCode": 578,
+          "Phonecode": 47
+        }
+      },
+      "TemplateSections": [
+        {
+          "Id": 2282,
+          "Name": "",
+          "Description": null,
+          "TemplateSectionExercises": [
+            {
+              "Id": 4009,
+              "Exercise": {
+                "Id": 8852,
+                "Name": "Medium Lines Left (0.2 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5402,
+                    "FileName": "yZuxzSHxs8M.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "Folg den rode prikken med oynene mens hodet star i ro. 30 sekunder x 5 serier pr dag. ",
+              "Sequence": 1,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 4010,
+              "Exercise": {
+                "Id": 9079,
+                "Name": "Large Lines Left (0.4 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5644,
+                    "FileName": "pyPUGrFDcw5.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "Se pa en og en svart stripe mens hodet star stille. 30 sekunder x 5 serier pr dag",
+              "Sequence": 2,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 4011,
+              "Exercise": {
+                "Id": 9118,
+                "Name": "Pursuits Left, Saccade to Center (0.4 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5684,
+                    "FileName": "u9VoS1HVFXn.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "Folg prikken med oynene mens hodet star i ro. Se videoen 5 x pr dag",
+              "Sequence": 3,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 4012,
+              "Exercise": {
+                "Id": 9226,
+                "Name": "T0V Horizontal, Seated",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5817,
+                    "FileName": "Sy1CNRh7OnH.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "10-20 rep x 5 serier pr dag",
+              "Sequence": 4,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 4013,
+              "Exercise": {
+                "Id": 9220,
+                "Name": "Gaze Stab Horizontal, Seated",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5809,
+                    "FileName": "TF3EDE3m5yZ.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "10-20 rep x 5 serier pr dag",
+              "Sequence": 5,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 4014,
+              "Exercise": {
+                "Id": 9222,
+                "Name": "Gaze Stab Vertical, Seated",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5812,
+                    "FileName": "TXG2kcwYZ68.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "10-20 rep x 5 serier pr dag",
+              "Sequence": 6,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": 1158,
+      "Name": "Hoyre rettet spontan + gaze stab/T0V",
+      "Description": "",
+      "IntensityLevel": null,
+      "Stage": null,
+      "Group": {
+        "Id": 3481,
+        "Name": "Nevrosenter Majorstuen"
+      },
+      "IsArchive": false,
+      "Owner": {
+        "Id": 8834,
+        "Name": "Jacob Stang",
+        "PictureFilename": null,
+        "Description": "",
+        "Mobile": "97577611",
+        "Email": "",
+        "Country": {
+          "Id": 160,
+          "Name": "NORWAY",
+          "ISO": "NO",
+          "Nicename": "Norway",
+          "ISO3": "NOR",
+          "NumCode": 578,
+          "Phonecode": 47
+        }
+      },
+      "TemplateSections": [
+        {
+          "Id": 2283,
+          "Name": "",
+          "Description": null,
+          "TemplateSectionExercises": [
+            {
+              "Id": 4015,
+              "Exercise": {
+                "Id": 8831,
+                "Name": "Medium Lines Right (0.2 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5380,
+                    "FileName": "eA1jNtxPzui.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "Folg den rode prikken med oynene mens hodet star i ro. 30 sekunder x 5 serier pr dag. ",
+              "Sequence": 1,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 4016,
+              "Exercise": {
+                "Id": 8880,
+                "Name": "Large Lines Right (0.4 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5431,
+                    "FileName": "9CtQliRgYaG.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "Se pa en og en svart stripe mens hodet star stille. 30 sekunder x 5 serier pr dag",
+              "Sequence": 2,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 4017,
+              "Exercise": {
+                "Id": 9121,
+                "Name": "Pursuits Right, Saccade to Center (0.4 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5687,
+                    "FileName": "GadGkldNQpj.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "Folg prikken med oynene mens hodet star i ro. Se videoen 5 x pr dag",
+              "Sequence": 3,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 4018,
+              "Exercise": {
+                "Id": 9226,
+                "Name": "T0V Horizontal, Seated",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5817,
+                    "FileName": "Sy1CNRh7OnH.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "10-20 rep x 5 serier pr dag",
+              "Sequence": 4,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 4019,
+              "Exercise": {
+                "Id": 9222,
+                "Name": "Gaze Stab Vertical, Seated",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5812,
+                    "FileName": "TXG2kcwYZ68.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "10-20 rep x 5 serier pr dag",
+              "Sequence": 5,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 4020,
+              "Exercise": {
+                "Id": 9220,
+                "Name": "Gaze Stab Horizontal, Seated",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5809,
+                    "FileName": "TF3EDE3m5yZ.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "10-20 rep x 5 serier pr dag",
+              "Sequence": 6,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": 1159,
+      "Name": "Spontan upbeat nystagmus",
+      "Description": "",
+      "IntensityLevel": null,
+      "Stage": null,
+      "Group": {
+        "Id": 3481,
+        "Name": "Nevrosenter Majorstuen"
+      },
+      "IsArchive": false,
+      "Owner": {
+        "Id": 8834,
+        "Name": "Jacob Stang",
+        "PictureFilename": null,
+        "Description": "",
+        "Mobile": "97577611",
+        "Email": "",
+        "Country": {
+          "Id": 160,
+          "Name": "NORWAY",
+          "ISO": "NO",
+          "Nicename": "Norway",
+          "ISO3": "NOR",
+          "NumCode": 578,
+          "Phonecode": 47
+        }
+      },
+      "TemplateSections": [
+        {
+          "Id": 2285,
+          "Name": "",
+          "Description": null,
+          "TemplateSectionExercises": [
+            {
+              "Id": 4027,
+              "Exercise": {
+                "Id": 8916,
+                "Name": "Large Lines Up (0.4 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5470,
+                    "FileName": "PiYNi4sAiBK.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "Se pa en og en svart stripe mens hodet star stille. 30 sekunder x 5 serier pr dag",
+              "Sequence": 1,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 4028,
+              "Exercise": {
+                "Id": 8867,
+                "Name": "Medium Lines Up (0.2 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5417,
+                    "FileName": "oS7NvaI9eSY.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "Folg den rode prikken med oynene mens hodet star i ro. 30 sekunder x 5 serier pr dag. ",
+              "Sequence": 2,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 4029,
+              "Exercise": {
+                "Id": 9124,
+                "Name": "Pursuits Up, Saccade to Center (0.4 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5690,
+                    "FileName": "sETuRK5WPxN.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "Folg prikken med oynene mens hodet star i ro. Se videoen 5 x pr dag",
+              "Sequence": 3,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 4030,
+              "Exercise": {
+                "Id": 9226,
+                "Name": "T0V Horizontal, Seated",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5817,
+                    "FileName": "Sy1CNRh7OnH.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "10-20 rep x 5 serier pr dag",
+              "Sequence": 4,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 4031,
+              "Exercise": {
+                "Id": 9222,
+                "Name": "Gaze Stab Vertical, Seated",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5812,
+                    "FileName": "TXG2kcwYZ68.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "10-20 rep x 5 serier pr dag",
+              "Sequence": 5,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 4032,
+              "Exercise": {
+                "Id": 9220,
+                "Name": "Gaze Stab Horizontal, Seated",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5809,
+                    "FileName": "TF3EDE3m5yZ.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "10-20 rep x 5 serier pr dag",
+              "Sequence": 6,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": 1168,
+      "Name": "Spontan downbeat nystagmus",
+      "Description": "",
+      "IntensityLevel": null,
+      "Stage": null,
+      "Group": {
+        "Id": 3481,
+        "Name": "Nevrosenter Majorstuen"
+      },
+      "IsArchive": false,
+      "Owner": {
+        "Id": 8834,
+        "Name": "Jacob Stang",
+        "PictureFilename": null,
+        "Description": "",
+        "Mobile": "97577611",
+        "Email": "",
+        "Country": {
+          "Id": 160,
+          "Name": "NORWAY",
+          "ISO": "NO",
+          "Nicename": "Norway",
+          "ISO3": "NOR",
+          "NumCode": 578,
+          "Phonecode": 47
+        }
+      },
+      "TemplateSections": [
+        {
+          "Id": 2295,
+          "Name": "",
+          "Description": null,
+          "TemplateSectionExercises": [
+            {
+              "Id": 4061,
+              "Exercise": {
+                "Id": 9061,
+                "Name": "Large Lines Down (0.4 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5626,
+                    "FileName": "1NlOpaYdN9c.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "Se pa og en stripe og hold hodet stille, 30 sekunder x 5 serier pr dag",
+              "Sequence": 1,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 4062,
+              "Exercise": {
+                "Id": 8812,
+                "Name": "Medium Lines Down (0.2 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5356,
+                    "FileName": "RvnLnqhyXaz.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "Folg prikken med oynene og hold hodet stille. 30 sekunder x 5 serier pr dag",
+              "Sequence": 2,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 4063,
+              "Exercise": {
+                "Id": 9115,
+                "Name": "Pursuits Down, Saccade to Center (0.4 hz)",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5681,
+                    "FileName": "WclSTL2IfNq.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "Folg prikken med oynene og hold hodet stille. Se videoen 5 x pr dag",
+              "Sequence": 3,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 4064,
+              "Exercise": {
+                "Id": 9227,
+                "Name": "T0V Vertical, Seated",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5818,
+                    "FileName": "gfIUE1eeH5i.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "10-20 rep x 5 pr dag",
+              "Sequence": 4,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 4065,
+              "Exercise": {
+                "Id": 9222,
+                "Name": "Gaze Stab Vertical, Seated",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5812,
+                    "FileName": "TXG2kcwYZ68.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "10-20 rep x 5 pr dag",
+              "Sequence": 5,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            },
+            {
+              "Id": 4066,
+              "Exercise": {
+                "Id": 9220,
+                "Name": "Gaze Stab Horizontal, Seated",
+                "ExerciseFiles": [
+                  {
+                    "Id": 5809,
+                    "FileName": "TF3EDE3m5yZ.png"
+                  }
+                ]
+              },
+              "Series": null,
+              "Repetitions": null,
+              "Weight": null,
+              "Comment": "10-20 rep x 5 pr dag",
+              "Sequence": 6,
+              "MinutesUsed": null,
+              "StartTime": "",
+              "EndTime": "",
+              "Updated": ""
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "favoriteTemplates": [],
+  "summary": {
+    "totalTemplates": 9,
+    "totalFavorites": 0,
+    "templateIds": [1149, 1150, 1151, 1152, 1153, 1157, 1158, 1159, 1168],
+    "templateNames": [
+      "Venstre regime",
+      "Hoyre regime",
+      "Ovelser",
+      "Ovelser",
+      "Ovelser",
+      "Venstre rettet spontan + gaze stab/T0V",
+      "Hoyre rettet spontan + gaze stab/T0V",
+      "Spontan upbeat nystagmus",
+      "Spontan downbeat nystagmus"
+    ]
+  }
+}

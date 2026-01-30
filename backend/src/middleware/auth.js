@@ -94,6 +94,28 @@ export const requireFreshSession = (req, res, next) => {
  * Automatically detects auth method from request
  */
 export const requireAuth = async (req, res, next) => {
+  // Dev mode bypass - only in development with special header
+  // Use valid UUIDs that match the database schema
+  const DEV_ORG_ID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+  const DEV_USER_ID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12';
+
+  if (process.env.NODE_ENV === 'development' && req.headers['x-dev-bypass'] === 'true') {
+    req.user = {
+      id: DEV_USER_ID,
+      clerk_user_id: 'dev_clerk_001',
+      email: 'dev@chiroclickcrm.local',
+      first_name: 'Dev',
+      last_name: 'User',
+      role: 'ADMIN',
+      organization_id: DEV_ORG_ID,
+      organizationId: DEV_ORG_ID,
+      is_active: true
+    };
+    req.organizationId = DEV_ORG_ID;
+    logger.debug('Dev mode auth bypass active');
+    return next();
+  }
+
   const authMode = getAuthMode(req);
 
   if (!authMode) {
@@ -157,6 +179,14 @@ export const requireAuth = async (req, res, next) => {
  * Sets PostgreSQL RLS context
  */
 export const requireOrganization = async (req, res, next) => {
+  // Dev mode bypass - use valid UUID
+  const DEV_ORG_ID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+
+  if (process.env.NODE_ENV === 'development' && req.headers['x-dev-bypass'] === 'true') {
+    req.organizationId = DEV_ORG_ID;
+    return next();
+  }
+
   try {
     // Get organization from header or user
     const organizationId = req.headers['x-organization-id'] || req.organizationId;
@@ -364,8 +394,12 @@ export const optionalAuth = async (req, res, next) => {
   }
 };
 
+// Alias for backward compatibility
+export const authenticate = requireAuth;
+
 export default {
   requireAuth,
+  authenticate,
   requireLocalAuth,
   requireFreshSession,
   requireOrganization,

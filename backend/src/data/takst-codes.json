@@ -1,0 +1,310 @@
+{
+  "version": "2024.1",
+  "description": "Norwegian chiropractic takst codes (Normaltariff for kiropraktorer)",
+  "lastUpdated": "2024-01-01",
+  "currency": "NOK",
+  "codes": {
+    "1a": {
+      "code": "1a",
+      "name": "Forstegangsundersokelse",
+      "nameEn": "Initial examination",
+      "description": "Forstegangsundersokelse hos kiropraktor. Omfatter anamnese, undersokelse og vurdering.",
+      "descriptionEn": "Initial examination by chiropractor. Includes history, examination and assessment.",
+      "price": 675,
+      "helfoRefund": 254,
+      "patientShare": 421,
+      "duration": 45,
+      "category": "consultation",
+      "canCombineWith": ["4a", "4b", "5a", "5b", "7a", "7b", "7c", "7d", "7e", "7f"],
+      "requiresReferral": false,
+      "helfoCode": "K1a",
+      "notes": "Brukes kun ved forste konsultasjon hos kiropraktoren"
+    },
+    "1b": {
+      "code": "1b",
+      "name": "Enkel konsultasjon",
+      "nameEn": "Simple consultation",
+      "description": "Enkel konsultasjon uten behandling. Radgivning, veiledning eller kortvarig undersokelse.",
+      "descriptionEn": "Simple consultation without treatment. Advice, guidance or brief examination.",
+      "price": 295,
+      "helfoRefund": 107,
+      "patientShare": 188,
+      "duration": 15,
+      "category": "consultation",
+      "canCombineWith": [],
+      "requiresReferral": false,
+      "helfoCode": "K1b",
+      "notes": "Kan ikke kombineres med andre konsultasjonstakster"
+    },
+    "1c": {
+      "code": "1c",
+      "name": "Oppfolgingskonsultasjon",
+      "nameEn": "Follow-up consultation",
+      "description": "Oppfolgingskonsultasjon med undersokelse og behandling.",
+      "descriptionEn": "Follow-up consultation with examination and treatment.",
+      "price": 495,
+      "helfoRefund": 185,
+      "patientShare": 310,
+      "duration": 20,
+      "category": "consultation",
+      "canCombineWith": ["4a", "4b", "5a", "5b", "7a", "7b", "7c", "7d", "7e", "7f"],
+      "requiresReferral": false,
+      "helfoCode": "K1c",
+      "notes": "Standard oppfolgingskonsultasjon"
+    },
+    "1d": {
+      "code": "1d",
+      "name": "Utvidet konsultasjon",
+      "nameEn": "Extended consultation",
+      "description": "Utvidet konsultasjon med grundigere undersokelse og behandling.",
+      "descriptionEn": "Extended consultation with more thorough examination and treatment.",
+      "price": 675,
+      "helfoRefund": 254,
+      "patientShare": 421,
+      "duration": 30,
+      "category": "consultation",
+      "canCombineWith": ["4a", "4b", "5a", "5b", "7a", "7b", "7c", "7d", "7e", "7f"],
+      "requiresReferral": false,
+      "helfoCode": "K1d",
+      "notes": "For mer komplekse tilfeller som krever lengre tid"
+    },
+    "1e": {
+      "code": "1e",
+      "name": "Revurdering",
+      "nameEn": "Re-evaluation",
+      "description": "Ny vurdering av pasient som har vart hos annen kiropraktor eller etter lengre opphold.",
+      "descriptionEn": "Re-evaluation of patient who has been with another chiropractor or after longer break.",
+      "price": 595,
+      "helfoRefund": 222,
+      "patientShare": 373,
+      "duration": 30,
+      "category": "consultation",
+      "canCombineWith": ["4a", "4b", "5a", "5b", "7a", "7b", "7c", "7d", "7e", "7f"],
+      "requiresReferral": false,
+      "helfoCode": "K1e",
+      "notes": "Brukes ved ny vurdering etter opphold pa mer enn 12 maneder"
+    },
+    "1f": {
+      "code": "1f",
+      "name": "Tillegg for lang konsultasjon",
+      "nameEn": "Supplement for extended consultation",
+      "description": "Tillegg for konsultasjon som varer mer enn 30 minutter.",
+      "descriptionEn": "Supplement for consultation lasting more than 30 minutes.",
+      "price": 175,
+      "helfoRefund": 65,
+      "patientShare": 110,
+      "duration": 15,
+      "category": "supplement",
+      "canCombineWith": ["1c", "1d", "1e"],
+      "requiresReferral": false,
+      "helfoCode": "K1f",
+      "notes": "Kan kun brukes som tillegg til andre konsultasjonstakster"
+    },
+    "1g": {
+      "code": "1g",
+      "name": "Telefonkonsultasjon",
+      "nameEn": "Telephone consultation",
+      "description": "Telefonkonsultasjon med pasient. Radgivning og veiledning per telefon.",
+      "descriptionEn": "Telephone consultation with patient. Advice and guidance by phone.",
+      "price": 195,
+      "helfoRefund": 73,
+      "patientShare": 122,
+      "duration": 10,
+      "category": "consultation",
+      "canCombineWith": [],
+      "requiresReferral": false,
+      "helfoCode": "K1g",
+      "notes": "For telefonkonsultasjoner av minimum 10 minutters varighet"
+    },
+    "1h": {
+      "code": "1h",
+      "name": "Videokonsultasjon",
+      "nameEn": "Video consultation",
+      "description": "Videokonsultasjon med pasient. Undersokelse og radgivning via video.",
+      "descriptionEn": "Video consultation with patient. Examination and advice via video.",
+      "price": 395,
+      "helfoRefund": 148,
+      "patientShare": 247,
+      "duration": 20,
+      "category": "consultation",
+      "canCombineWith": [],
+      "requiresReferral": false,
+      "helfoCode": "K1h",
+      "notes": "For videokonsultasjoner med mulighet for visuell undersokelse"
+    },
+    "1k": {
+      "code": "1k",
+      "name": "Gruppetime",
+      "nameEn": "Group session",
+      "description": "Gruppetime med instruert trening eller undervisning. 2-6 pasienter.",
+      "descriptionEn": "Group session with instructed training or education. 2-6 patients.",
+      "price": 145,
+      "helfoRefund": 54,
+      "patientShare": 91,
+      "duration": 30,
+      "category": "group",
+      "canCombineWith": [],
+      "requiresReferral": false,
+      "helfoCode": "K1k",
+      "notes": "For gruppetimer med 2-6 deltakere"
+    }
+  },
+  "additionalCodes": {
+    "4a": {
+      "code": "4a",
+      "name": "Radiologisk begrunnelse",
+      "nameEn": "Radiological justification",
+      "description": "Begrunnelse for henvisning til billeddiagnostikk.",
+      "price": 95,
+      "helfoRefund": 35,
+      "patientShare": 60,
+      "category": "administrative"
+    },
+    "4b": {
+      "code": "4b",
+      "name": "Epikrise/henvisning",
+      "nameEn": "Discharge summary/referral",
+      "description": "Skriving av epikrise eller henvisning til annet helsepersonell.",
+      "price": 195,
+      "helfoRefund": 73,
+      "patientShare": 122,
+      "category": "administrative"
+    },
+    "5a": {
+      "code": "5a",
+      "name": "Sykefravaersattest",
+      "nameEn": "Sick leave certificate",
+      "description": "Utstedelse av sykefravaersattest.",
+      "price": 145,
+      "helfoRefund": 54,
+      "patientShare": 91,
+      "category": "documentation"
+    },
+    "5b": {
+      "code": "5b",
+      "name": "Annen dokumentasjon",
+      "nameEn": "Other documentation",
+      "description": "Annen dokumentasjon pa forespørsel (legeattest, erklæring mv.).",
+      "price": 245,
+      "helfoRefund": 91,
+      "patientShare": 154,
+      "category": "documentation"
+    },
+    "7a": {
+      "code": "7a",
+      "name": "Tillegg kveld",
+      "nameEn": "Evening supplement",
+      "description": "Tillegg for behandling kl. 17-20 pa hverdager.",
+      "price": 75,
+      "helfoRefund": 0,
+      "patientShare": 75,
+      "category": "time_supplement"
+    },
+    "7b": {
+      "code": "7b",
+      "name": "Tillegg lordag",
+      "nameEn": "Saturday supplement",
+      "description": "Tillegg for behandling pa lordager.",
+      "price": 125,
+      "helfoRefund": 0,
+      "patientShare": 125,
+      "category": "time_supplement"
+    },
+    "7c": {
+      "code": "7c",
+      "name": "Tillegg natt",
+      "nameEn": "Night supplement",
+      "description": "Tillegg for behandling mellom kl. 20-08.",
+      "price": 195,
+      "helfoRefund": 0,
+      "patientShare": 195,
+      "category": "time_supplement"
+    },
+    "7d": {
+      "code": "7d",
+      "name": "Tillegg sondag/helligdag",
+      "nameEn": "Sunday/holiday supplement",
+      "description": "Tillegg for behandling pa sondager og helligdager.",
+      "price": 295,
+      "helfoRefund": 0,
+      "patientShare": 295,
+      "category": "time_supplement"
+    },
+    "7e": {
+      "code": "7e",
+      "name": "Hjemmebesok",
+      "nameEn": "Home visit",
+      "description": "Tillegg for hjemmebesok.",
+      "price": 295,
+      "helfoRefund": 110,
+      "patientShare": 185,
+      "category": "location_supplement"
+    },
+    "7f": {
+      "code": "7f",
+      "name": "Sykehjembesok",
+      "nameEn": "Nursing home visit",
+      "description": "Tillegg for besok pa sykehjem eller lignende institusjon.",
+      "price": 195,
+      "helfoRefund": 73,
+      "patientShare": 122,
+      "category": "location_supplement"
+    }
+  },
+  "categories": {
+    "consultation": {
+      "name": "Konsultasjon",
+      "nameEn": "Consultation",
+      "description": "Pasientkonsultasjoner"
+    },
+    "supplement": {
+      "name": "Tillegg",
+      "nameEn": "Supplement",
+      "description": "Tilleggstakster"
+    },
+    "administrative": {
+      "name": "Administrativt",
+      "nameEn": "Administrative",
+      "description": "Administrative tjenester"
+    },
+    "documentation": {
+      "name": "Dokumentasjon",
+      "nameEn": "Documentation",
+      "description": "Dokumentasjonstjenester"
+    },
+    "group": {
+      "name": "Gruppe",
+      "nameEn": "Group",
+      "description": "Gruppetimer"
+    },
+    "time_supplement": {
+      "name": "Tidstillegg",
+      "nameEn": "Time supplement",
+      "description": "Tillegg basert pa tidspunkt"
+    },
+    "location_supplement": {
+      "name": "Stedstillegg",
+      "nameEn": "Location supplement",
+      "description": "Tillegg basert pa sted"
+    }
+  },
+  "exemptions": {
+    "children": {
+      "description": "Barn under 16 ar har fritak for egenandel",
+      "maxAge": 16,
+      "patientShareMultiplier": 0
+    },
+    "chronicDisease": {
+      "description": "Pasienter med visse kroniske sykdommer kan ha redusert egenandel",
+      "requiresDocumentation": true
+    }
+  },
+  "helfoInfo": {
+    "organizationNumber": "889640782",
+    "name": "Helfo",
+    "description": "Helseokonomiforvaltningen",
+    "website": "https://www.helfo.no",
+    "settlementPeriod": "monthly",
+    "directSettlement": true
+  }
+}

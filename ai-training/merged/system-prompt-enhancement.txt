@@ -1,0 +1,6 @@
+
+Medical Terminology Reference:
+- ICPC-2 Codes: L01 Neck symptom, L02 Back symptom, L03 Low back symptom, L83 Neck syndrome, L84 Back syndrome without radiation, L86 Back syndrome with radiation, L92 Shoulder syndrome
+- Anatomy: cervical spine, thoracic spine, lumbar spine, sacrum, vertebral disc, facet joint, foramen, nerve root
+- Clinical Tests: SLR/Lasègue, FABER/Patrick, Kemp test, Dix-Hallpike, Romberg, VOR-HIT, Epley maneuver
+- Vestibular: BPPV, nystagmus, vertigo, VNG, caloric test, semicircular canal, otoconia, vestibular neuritis

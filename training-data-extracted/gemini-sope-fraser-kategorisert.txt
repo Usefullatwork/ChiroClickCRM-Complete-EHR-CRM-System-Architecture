@@ -1,0 +1,332 @@
+================================================================================
+SOURCE: Gemini - full settning gjennomgående fraser fra SOPE-notatene, nå med fulle setninger, og delt inn i kategorier_.docx
+EXTRACTED: 2026-01-15T23:43:44.983Z
+CHARACTERS: 11693
+================================================================================
+
+Ok, her er en liste over unike og gjennomgående fraser fra SOPE-notatene, nå med fulle setninger, og delt inn i kategorier:
+
+Anamnese (Subjective):
+
+Generelt:
+
+Pasienten presenterer seg med [hovedklage], som startet [når det startet] og har vart i [tid].
+
+Pasienten rapporterer at [beskriv symptomer, f.eks. svimmelhet, smerte, nummenhet, prikking, tinnitus].
+
+Pasienten opplever [beskriv symptomer, f.eks. at symptomene forverres, bedres].
+
+Pasienten beskriver [beskriv detaljene rundt symptomene og plagene].
+
+Pasienten har hatt plager siden [tidspunkt], med [beskrivelse av tidligere plager].
+
+Pasienten har tidligere mottatt behandling for [tilstand] som [beskrivelse av tidligere behandling].
+
+Pasienten bruker [medisinnavn] for [tilstand] [dosering og frekvens].
+
+Pasienten er bekymret for [beskriv bekymringene].
+
+Pasienten er usikker på [beskriv hva pasienten er usikker på].
+
+Pasienten forteller om [beskriv detaljene i pasientens historie].
+
+Pasienten har en historie med [beskriv relevante sykdommer eller skader, f.eks. hjernerystelse, kyssesyken, blodpropper, ryggprolaps].
+
+Pasienten nevner at [beskriv hva pasienten nevner].
+
+Pasienten er [beskriv pasientens yrke, f.eks. tømrer, kontormedarbeider, lærer].
+
+Pasienten er [beskriv pasientens status, f.eks. pensjonist, student, hjemmeværende].
+
+Pasienten samtykker til at jeg kan dele informasjon fra konsultasjonen med [henviser, lege, PT, etc.].
+
+Pasienten er informert om at [rettigheter, personvern, etc.].
+
+Pasienten sier seg inneforstått med dette og ønsker et tverrfaglig samarbeide for best mulig resultat.
+
+
+
+Spesifikt for neurologiske tilstander:
+
+Pasienten opplever [beskriv spesifikke symptomer, f.eks. svimmelhet, smerte, nummenhet, prikking, tinnitus].
+
+Pasienten har fått et [beskriv type anfall, f.eks. migreneanfall, slag, seizure].
+
+Pasienten har hatt en periode med [beskriv symptomer, f.eks. afasi, hyperventilering, ME].
+
+
+
+Spesifikt for smerter:
+
+Pasientens symptomer forverres av [aktiviteter/situasjoner].
+
+Pasientens symptomer bedres av [aktiviteter/situasjoner].
+
+Symptomene har vart i [tid] og startet [når symptomene startet].
+
+Symptomene er konstante.
+
+Symptomene er konstante og [beskriv intensitet, f.eks. moderate, sterke, intense].
+
+Pasienten har smerter i [område] på [side].
+
+Smertene [beskriv intensitet, f.eks. øker, reduseres, er konstante, varierer].
+
+Smertene stråler [beskriv retning av smertestråling].
+
+Smertene trigges av [aktiviteter/situasjoner].
+
+Smertene lindres av [aktiviteter/situasjoner].
+
+
+
+Spesifikt for bekken/hofte/rygg:
+
+Pasienten har tidligere hatt bekkenløsning.
+
+Pasienten har tidligere hatt prolaps.
+
+Pasienten er født med [tilstand, f.eks. klumpfot, hoftedysplasi, skoliose].
+
+Pasienten har en operert [del av kroppen, f.eks. hofteprotese, kneprotese].
+
+Pasienten har hatt en forstuet [del av kroppen, f.eks. ankel, finger, håndledd].
+
+Pasienten har hatt en brist i [del av kroppen, f.eks. ribben, haleben].
+
+Pasienten har hatt [tilstand, f.eks. utbrenthet, ME, fibromyalgi].
+
+
+
+Spesifikt for kosthold/vekt:
+
+Pasienten ønsker hjelp med [beskriv mål, f.eks. vektnedgang, vektøkning, kostholdsråd].
+
+Pasienten er [beskriv vektstatus, f.eks. overvektig, undervektig].
+
+Pasienten er [beskriv kostholdsstatus, f.eks. vegetarianer, veganer].
+
+
+
+Spesifikt for trening:
+
+Pasienten trener regelmessig.
+
+Pasienten trener ikke regelmessig.
+
+Pasienten har trent mye i det siste.
+
+Pasienten driver med [beskriv idrett/aktiviteter, f.eks. fotball, dans, styrketrening, løping, golf].
+
+Pasienten har hatt en pause fra trening i [tid].
+
+
+
+Undersøkelse (Objective):
+
+Generelt:
+
+Observasjon viser [beskriv observerte funn, f.eks. holdning, synlige muskelfyller, hevelse].
+
+Arom/Prom er begrenset i [beskriv bevegelsesutslag i alle plan, angi måleenheter].
+
+Funksjonsundersøkelsen viser [beskriv funksjonsundersøkelsen].
+
+Testene viser [beskriv resultatene fra tester, f.eks. Spurling, Lasegue, etc.].
+
+Funnene er konsistente med [beskriv hva funnene er konsistente med, f.eks. en muskulær overbelastning, en fasettleddsdysfunksjon, etc.].
+
+Palpasjon av [område] avdekker [beskriv palpasjonsfunn, f.eks. ømhet, temperatur, triggerpunkter].
+
+
+
+Spesifikt for cervical/thoracolumbar:
+
+Observasjon viser [beskriv observerte funn, f.eks. holdning, synlige muskelfyller, hevelse].
+
+Arom/Prom er begrenset i [beskriv bevegelsesutslag i alle plan, angi måleenheter].
+
+Spurling testen er [beskriv resultat av Spurling test].
+
+Refleksene er [beskriv reflekser, f.eks. biceps, triceps, brachioradial].
+
+Isometriske tester viser [beskriv isometriske tester, f.eks. biceps, triceps, pronasjon, supinasjon, fingerabduksjon].
+
+Sensibiliteten er [beskriv sensibilitetsfunn, f.eks. smerte, prikking, nummenhet].
+
+Spesielle tester som [beskriv utført tester, f.eks. Hoffman, Lasegue, Kemp, Slump, Banktetest, Vibrasjonstest] er [beskriv resultatene fra spesifikke tester].
+
+Palpasjon av [område] avdekker [beskriv palpasjonsfunn, f.eks. ømhet, temperatur, triggerpunkter].
+
+Det er restriksjoner i [beskriv leddrestriksjoner, f.eks. hypomobilitet, stivhet].
+
+
+
+Spesifikt for skulder:
+
+Neer testen er [beskriv resultat av Neer test].
+
+Hawkins testen er [beskriv resultat av Hawkins test].
+
+Full can testen er [beskriv resultat av Full can test].
+
+Empty can testen er [beskriv resultat av Empty can test].
+
+Load shift testen er [beskriv resultat av Load shift test].
+
+Sulcus sign testen er [beskriv resultat av Sulcus sign test].
+
+Krank testen er [beskriv resultat av Krank test].
+
+Apprehension testen er [beskriv resultat av Apprehension test].
+
+AC-ledd kompresjonstesten er [beskriv resultat av AC-ledd kompresjonstest].
+
+Crossover testen er [beskriv resultat av Crossover test].
+
+
+
+Spesifikt for hofte:
+
+Faber testen er [beskriv resultat av Faber test].
+
+Fadir testen er [beskriv resultat av Fadir test].
+
+Kompressjon 90 grader testen er [beskriv resultat av Kompressjon 90 grader test].
+
+Inrotasjon i 90 grader testen er [beskriv resultat av Inrotasjon i 90 grader test].
+
+P4/thigh thrust testen er [beskriv resultat av P4/thigh thrust test].
+
+Fitzgerald testen er [beskriv resultat av Fitzgerald test].
+
+
+
+Spesifikt for ankel/fot:
+
+Talar tilt testen er [beskriv resultat av Talar tilt test].
+
+Cotton testen er [beskriv resultat av Cotton test].
+
+Syndesmose Squeeze testen er [beskriv resultat av Syndesmose Squeeze test].
+
+Ottawa rules viser [beskriv funn fra Ottawa rules].
+
+
+
+Spesifikt for øyebevegelser:
+
+[Beskriv funn ved vurdering av øyebevegelser, f.eks. Det er dobbeltsyn, det er nystagmus, saccadene er normale, optokinetisk refleks er redusert].
+
+PR testen viser [beskriv funn ved vurdering av postural balanse, f.eks. ustøhet, falltendens, retningsavhengighet].
+
+DDDK testen viser [beskriv funn ved vurdering av dynamisk postural kontroll, f.eks. ustøhet, kompensasjoner].
+
+VOR testen viser [beskriv funn ved vurdering av vestibulo-okulær refleks, f.eks. nystagmus, overshoot, undershoot].
+
+Gaze hold testen viser [beskriv funn ved vurdering av gaze hold, f.eks. drift, tremor, saccades].
+
+OPK testen viser [beskriv funn ved vurdering av optokinetisk refleks, f.eks. redusert amplitude, unormalt tempo, sakkader].
+
+Pasienten har svakhet i [beskriv hvilke muskler som er svake].
+
+Vibrasjonstesten viser [beskriv funn ved vurdering av vibrasjonssans, f.eks. nedsatt sensibilitet].
+
+Pulsen er [beskriv funn ved vurdering av puls, f.eks. økt, uregelmessig].
+
+
+
+
+
+Spesifikt for bekken/hofte:
+
+[Beskriv funn fra Faber, Fadir, Kompressjon 90 grader, Inrotasjon i 90 grader, P4/thigh thrust, Fitzgerald test].
+
+
+
+Behandling (Assessment)
+
+Manuell terapi:
+
+[Beskriv manuelle teknikker brukt, f.eks. Det ble utført myofascial release (bvm) på [område], slipper [godt/bra/ok]. Triggerpunktbehandling (tgp) ble utført på [område], slipper [godt/bra/ok]. Leddmobilisering (hvla) ble utført på [område], slipper [godt/bra/ok]. ART ble utført på [område], slipper [godt/bra/ok]. Leddkorrigering (PL, PR) ble utført på [område], slipper [godt/bra/ok]. Traksjon ble utført på [område], slipper [godt/bra/ok]. Mobilisering ble utført på [område], slipper [godt/bra/ok].]
+
+[Beskriv manuell terapi, f.eks. Det ble utført leddmobilisering i lumbalcolumna med bruk av protokoll 2, med/uten stropper].
+
+[Beskriv manuell terapi, f.eks. Leddkorrigering ble utført på [ledd], slipper [godt/bra/ok].]
+
+[Beskriv manuell terapi, f.eks. Det ble utført artikulering av [ledd], slipper [godt/bra/ok].]
+
+
+
+Nålebehandling (IMS):
+
+[Beskriv hvilke muskler som er behandlet med nåler, f.eks. Nålebehandling (IMS) ble utført på [muskel/sener] på [side], triggerpunkter ble funnet, [godt/bra/ok] reaksjon].
+
+[Beskriv nålebehandling, f.eks. Pasienten samtykker til nålebehandling. Området desinfiseres nøye før nålen penetreres.].
+
+[Beskriv nålebehandling, f.eks. Det ble utført IMS i [muskel/sener] på [side], og det ble oppnådd en god twitching-reaksjon].
+
+
+
+Øvelser:
+
+[Beskriv øvelser gitt til pasienten, f.eks. Pasienten ble instruert i å gjøre [type øvelse, f.eks. strekkøvelse, styrkeøvelse, balanseøvelse] for [område/tilstand, f.eks. nakken, skulderen, etc.].]
+
+[Beskriv øvelse, f.eks. Pasienten har utført øvelsene [type øvelse, f.eks. strekkøvelser, styrkeøvelser, balanseøvelser, etc.].]
+
+[Beskriv øvelse, f.eks. Pasienten rapporterer bedring i [type øvelse, f.eks. mobilitet, styrke, etc.].]
+
+
+
+Råd:
+
+[Beskriv råd gitt til pasienten, f.eks. Pasienten ble rådet til å [råd, f.eks. sitte ergonomisk riktig, gå turer, strekke ut muskulaturen, unngå provoserende aktiviteter, etc.].]
+
+
+
+Vestibulær rehabilitering:
+
+[Beskriv spesifikke vestibulære rehabiliteringsøvelser som Epley-manøver, Brandt-Daroff, gaze hold øvelser, f.eks. Epley-manøveren ble utført på [side], og det ble oppnådd en god effekt].
+
+
+
+Konklusjon (Plan):
+
+Diagnose: Pasienten har [diagnose, f.eks. Lumbago, BPPV, Frozen shoulder, Tennisalbue].
+
+Prognose: Prognosen for [tilstanden] er [god/fair/dårlig].
+
+Behandlingsplan: Pasienten skal [beskriv videre behandling, f.eks. få [antall] behandlinger, fortsette med øvelser, henvises til [spesialist], få [undersøkelse, f.eks. MR, ultralyd, etc.].]
+
+Oppfølging: Pasienten vil bli fulgt opp [når, f.eks. om en uke, om 2 uker, etc.].
+
+Eksempel på bruk av maler og fraser i en Journalnotat:
+
+Anamnese: Pasienten presenterer seg med smerter i høyre hofte som startet for to uker siden etter en lang løpetur. Smertene er lokalisert lateralt i hoften og forverres av å gå, spesielt i oppoverbakker. Pasienten har tidligere hatt lignende smerter, men ikke i denne grad. Pasienten er generelt aktiv og trener regelmessig med styrke og kondisjon.
+
+Undersøkelse: Observasjon viser ingen synlige funn. Bevegelsesutslag i høyre hofte er redusert i innrotasjon. Palpasjon av høyre gluteus medius og gluteus minimus avdekker ømhet og triggerpunkter.
+
+Behandling: Triggerpunktbehandling ble utført på høyre gluteus medius og gluteus minimus. Leddkorrigering ble utført på høyre ilium. Pasienten ble instruert i tøyeøvelser for høyre hofte og setemuskler.
+
+Konklusjon: Tilstanden er konsistent med overbelastning av høyre gluteus medius og gluteus minimus. Prognosen er god. Behandlingsplan: 2-3 behandlinger for å lindre symptomer. Pasienten vil bli fulgt opp neste uke.
+
+Husk:
+
+Tilpass malene og frasene til den enkelte pasienten.
+
+Sjekk alltid at informasjonen er korrekt.
+
+Utvikle en strukturert dokumentasjonsprosess for å sikre konsistens og effektivitet.
+
+Videreutvikling:
+
+Utforsk programvare som kan automatisere dokumentasjon.
+
+Lag maler for spesifikke tilstander og behandlingsformer.
+
+Integrer maler og fraser med et automatisk system som genererer SOPE-notater basert på pasientdata.
+
+Ved å strukturere SOPE-notater med maler og fraser, kan du spare tid og forbedre dokumentasjonens kvalitet som kiropraktor.
+
+
+

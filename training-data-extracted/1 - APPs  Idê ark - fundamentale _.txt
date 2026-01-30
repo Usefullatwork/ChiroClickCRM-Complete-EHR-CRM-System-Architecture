@@ -1,0 +1,190 @@
+================================================================================
+SOURCE: 1 - APPs  Idê ark - fundamentale _.docx
+EXTRACTED: 2026-01-15T23:42:21.876Z
+CHARACTERS: 1997
+================================================================================
+
+Mål: Spare terapaut tid
+
+Mål: Spare terapaut tid. 
+
+Hvem gjør jeg det for: MegselvBedre en dagens alternativ Ønsker ikke AI voice stuff 
+
+
+
+
+
+App 
+
+Click Box journal system - limi inn i Sovlit eller Physica Template click to text
+
+Rehab app 
+
+Generiske programmer 
+
+Øvelesbank for spessial øvelser + mulighet til å endre templates for terapaut på egen profil, samt dele sin profil innad på din klinikk 
+
+Andre tjenester med app kjøp - avspenning - breathwork  - ADD ons so du slipper MRR abonoment modell - 
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hvordan Bygge: UX Design: Krisspy + Fiiver Code tools Calude ai 
+
+App builder: cursor, bubble, bolt 
+
+
+
+
+
+
+
+Use case: 
+
+Terapaut 
+
+Kan styre program på web 
+
+Dobbel passinet profil ( frem til integreing inn i SolvIT) 
+
+
+
+Passient 
+
+App + erb (om mulig, git oss mulighene til å ta betaling på nett å ikke bare i app**)
+
+Mulighet til å følge sitt program 
+
+Kan kjøpe ekstra tjenester ved ønske 
+
+Om en vil følge ett tremingsprogram utenom rehab i app burde det være en greie - avtale med PT legge opp 8-12 uker (3-4 programmer i V.3) 
+
+Avspenning - meditasjon 
+
+ 
+
+
+
+DDX tab - Journal system
+
+Click til tekst - spar 3 timer i uke på journal - 12t i mnd 
+
+
+
+
+
+
+
+Amenese 
+
+Setup 
+
+Fraser 
+
+Rettskrivning og organisering med AI 
+
+Undersøkelse 
+
+Click and drop-drag 
+
+Behandling 
+
+Click box 
+
+
+
+Konklusjon 
+
+diagnose + planen fremover
+
+Området behandlet 
+
+Øverlser og program 
+
+Ønsker type ønsker ikke type behandling (nåler justering) 
+
+
+
+Vidre behanling og notat boks
+
+Progresjon 
+
+Undersøkelse 
+
+Behandling
+
+Post checks (v2) 
+
+ 
+
+
+
+Rehab app
+
+Rehab app 
+
+
+
+Workflow: Webapp → Mobil app Bruker
+
+
+
+Webapp
+
+Laste opp video og forklaring 
+
+
+
+
+
+
+
+Umiddelbart ting en burde dekke: - Behanling av BPPV - skulder rehab for 
+
+Bicepssene 
+
+labrum
+
+Generell stailitet 
+
+Svakhet scapula 
+
+Fot og løpeing 
+
+Plantar fascit 
+
+Slatters 
+
+
+
+Hofte: 
+
+FAI  
+
+Osititus pubis 
+
+
+
+
+
+
+
+
+
+Idrettslag (V3) - greit å jobbe med itrettslag som klinikk 
+
+Fotball rehab 
+
+Hånball rehab 
+
+Sprint - fot rehab 
+

@@ -1,0 +1,150 @@
+BEGIN:VCARD
+VERSION:3.0
+FN:Erik Nordmann
+N:Nordmann;Erik;;;
+EMAIL;TYPE=HOME:erik.nordmann@gmail.com
+TEL;TYPE=CELL:+47 91234567
+ADR;TYPE=HOME:;;Storgata 1;Oslo;;0182;Norway
+BDAY:1985-03-15
+NOTE:Nakkesmerter - Aktiv pasient
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Ingrid Svendsen
+N:Svendsen;Ingrid;;;
+EMAIL;TYPE=HOME:ingrid.s@outlook.com
+TEL;TYPE=CELL:+47 92345678
+ADR;TYPE=HOME:;;Karl Johans gate 45;Oslo;;0162;Norway
+BDAY:1990-07-22
+NOTE:Korsryggsmerter - Aktiv pasient
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Lars Bakken
+N:Bakken;Lars;;;
+EMAIL;TYPE=HOME:lars.bakken@hotmail.com
+TEL;TYPE=CELL:+47 93456789
+ADR;TYPE=HOME:;;Bygdoy Alle 12;Oslo;;0265;Norway
+BDAY:1978-11-08
+NOTE:Hodepine - Aktiv pasient
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Kari Moen
+N:Moen;Kari;;;
+EMAIL;TYPE=HOME:kari.moen@yahoo.no
+TEL;TYPE=CELL:+47 94567890
+ADR;TYPE=HOME:;;Frognerveien 8;Oslo;;0263;Norway
+BDAY:1982-05-30
+NOTE:Svimmelhet - Aktiv pasient, VIP
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Ole Johannesen
+N:Johannesen;Ole;;;
+EMAIL;TYPE=HOME:ole.j@gmail.com
+TEL;TYPE=CELL:+47 95678901
+ADR;TYPE=HOME:;;Majorstuen 15;Oslo;;0367;Norway
+BDAY:1975-09-12
+NOTE:Skuldersmerter - Aktiv pasient
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Silje Haugen
+N:Haugen;Silje;;;
+EMAIL;TYPE=HOME:silje.haugen@icloud.com
+TEL;TYPE=CELL:+47 96789012
+ADR;TYPE=HOME:;;Grensen 22;Oslo;;0159;Norway
+BDAY:1995-01-25
+NOTE:Isjias - Aktiv pasient
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Magnus Dahl
+N:Dahl;Magnus;;;
+EMAIL;TYPE=WORK:magnus.d@firma.no
+TEL;TYPE=CELL:+47 97890123
+ADR;TYPE=HOME:;;Thereses gate 5;Oslo;;0354;Norway
+BDAY:1988-06-18
+NOTE:Tennisalbue - Aktiv pasient, forsikring
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Emma Solberg
+N:Solberg;Emma;;;
+EMAIL;TYPE=HOME:emma.solberg@gmail.com
+TEL;TYPE=CELL:+47 98901234
+ADR;TYPE=HOME:;;Pilestredet 30;Oslo;;0166;Norway
+BDAY:1992-12-03
+NOTE:Kneesmerter - Aktiv pasient
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Henrik Lund
+N:Lund;Henrik;;;
+EMAIL;TYPE=HOME:henrik.l@online.no
+TEL;TYPE=CELL:+47 90123456
+ADR;TYPE=HOME:;;Ullevalsveien 12;Oslo;;0852;Norway
+BDAY:1970-04-20
+NOTE:Migrene - Inaktiv, trenger oppfolging
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Marte Eide
+N:Eide;Marte;;;
+EMAIL;TYPE=HOME:marte.eide@telenor.no
+TEL;TYPE=CELL:+47 91122334
+ADR;TYPE=HOME:;;Kirkeveien 45;Oslo;;0368;Norway
+BDAY:1983-08-14
+NOTE:Bekkensmerter - Aktiv pasient
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Bjorn Strand
+N:Strand;Bjorn;;;
+EMAIL;TYPE=HOME:bjorn.strand@outlook.com
+TEL;TYPE=CELL:+47 92233445
+ADR;TYPE=HOME:;;Oscars gate 8;Oslo;;0352;Norway
+BDAY:1965-02-28
+NOTE:Whiplash - Inaktiv, VIP
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Anna Vik
+N:Vik;Anna;;;
+EMAIL;TYPE=HOME:anna.vik@gmail.com
+TEL;TYPE=CELL:+47 93344556
+ADR;TYPE=HOME:;;Drammensveien 120;Oslo;;0273;Norway
+BDAY:1998-10-05
+NOTE:Frozen shoulder - Ny lead fra nettside
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Thomas Aas
+N:Aas;Thomas;;;
+EMAIL;TYPE=HOME:thomas.aas@hotmail.com
+TEL;TYPE=CELL:+47 94455667
+ADR;TYPE=HOME:;;Skovveien 15;Oslo;;0257;Norway
+BDAY:1987-07-17
+NOTE:Plantarfasciitt - Aktiv pasient
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Linda Berg
+N:Berg;Linda;;;
+EMAIL;TYPE=HOME:linda.berg@yahoo.no
+TEL;TYPE=CELL:+47 95566778
+ADR;TYPE=HOME:;;Hegdehaugsveien 32;Oslo;;0352;Norway
+BDAY:1991-04-02
+NOTE:Karpaltunnelsyndrom - Aktiv pasient
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Robert Nilsen
+N:Nilsen;Robert;;;
+EMAIL;TYPE=HOME:robert.n@icloud.com
+TEL;TYPE=CELL:+47 96677889
+ADR;TYPE=HOME:;;Parkveien 8;Oslo;;0350;Norway
+BDAY:1972-11-30
+NOTE:Facettleddssyndrom - Aktiv pasient
+END:VCARD

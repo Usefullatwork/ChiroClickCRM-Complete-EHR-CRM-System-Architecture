@@ -1,0 +1,92 @@
+================================================================================
+SOURCE: VNG Protocol.docx
+EXTRACTED: 2026-01-15T23:42:17.353Z
+CHARACTERS: 773
+================================================================================
+
+Navn:      								Dato:         
+
+
+
+Spontaneous Nystagmus : 
+
+Gaze Light:
+
+Center: 
+
+Left:   
+
+Right: 
+
+Up:      
+
+Down: 
+
+
+
+Gaze Dark:
+
+Center: 
+
+Left:
+
+Right: 
+
+Up:     
+
+Down: 
+
+
+
+Positional:
+
+Head Right:
+
+Head Left:  
+
+Bow:             
+
+Lean:          
+
+
+
+Smooth pursuit
+
+Horizontal: 
+
+Vertical:       
+
+
+
+Saccades:
+
+Prosaccade: Latency:( MS )                                      Velocity:( °/s )                                           Accuracy:( % )               
+
+Antisaccade: Latency:                                                Velocity:                                                    Accuracy: 
+
+
+
+OPK1:
+
+Left 10 dps:   
+
+Right 10 dps: 
+
+left 20 dps:    
+
+Right 20dps:  
+
+
+
+OPK 2:
+
+Down 10 dps: 
+
+Up 10 dps:      
+
+Down 20 dps: 
+
+Up 20 dps:      
+
+
+

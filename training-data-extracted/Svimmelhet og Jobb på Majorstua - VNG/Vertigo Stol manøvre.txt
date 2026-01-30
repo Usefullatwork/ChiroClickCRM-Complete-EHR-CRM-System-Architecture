@@ -1,0 +1,820 @@
+================================================================================
+SOURCE: Vertigo Stol manøvre.docx
+EXTRACTED: 2026-01-15T23:42:33.370Z
+CHARACTERS: 24947
+================================================================================
+
+Vertigo Stol manøvre 
+
+
+
+The spinning sensation and dizziness you get from vertigo can limit your activities and make you feel sick. Depending on the cause, though, some simple maneuvers you can do at home might bring relief.
+
+The most common type of this condition is BPPV (benign paroxysmal positional vertigo). It happens when small crystals of calcium get loose in your inner ear. You may feel it when you're getting in or out of bed, or tilting your head up. People over age 60 are more likely to get BPPV. It’s also the easiest type of vertigo to treat.
+
+Before you try to treat it yourself, see your doctor. If you have vertigo, you'll need to know what type it is and which ear has the problem. To determine affected side:
+
+Sit on a bed so that if you lie down, your head hangs slightly over the end of the bed.
+
+Turn your head to the right and lie back quickly.
+
+Wait 1 minute.
+
+If you feel dizzy, then the right ear is your affected ear.
+
+If no dizziness occurs, sit up.
+
+Wait 1 minute.
+
+Turn your head to the left and lie back quickly. 
+
+Wait 1 minute. 
+
+If you feel dizzy, then the left ear is your affected ear.
+
+If you have BPPV, certain actions can move the calcium crystals that cause the problem out of your ear canal. That should bring relief.
+
+
+
+
+
+Physical examination
+
+Description
+
+Dix−Hallpike manoeuvre
+
+The patient sits at the edge of the bed and the examiner turns the patient’s head 30–45 degrees to the side being tested. The patient needs to keep their eyes open and focus on a stable point, and then quickly lie supine and hyperextend the neck. Horizontal nystagmus denotes a positive test. This test can induce vertigo, so patients should be warned about this before the test is performed.2,7
+
+Orthostatic blood pressure testing
+
+A drop in the systolic blood pressure by more than 20 mm/Hg from a lying down to standing position is significant for a postural drop. This is seen in patients who are dehydrated or who present with autonomic dysfunction.2 Autonomic dysfunction can occur acutely and be driven by vertigo.
+
+Head impulse test
+
+The patient is asked to look at the examiner’s nose and the examiner quickly turns the patient’s head 10–20 degrees. It is abnormal if eyes move rapidly and repetitively, failing to re-fixate to the examiner’s nose. A positive test indicates disrupted vestibule-ocular reflex.7
+
+
+
+
+
+Differential diagnosis
+
+Onset and duration of each attack of vertigo
+
+Provoking factors
+
+Special features
+
+Physical exam findings
+
+Labyrinthitis
+
+Few seconds to minutes
+
+Change in the head position
+
+Tinnitus
+
+Hearing loss present
+
+Vestibular neuronitis
+
+Seconds to minutes
+
+Recent upper respiratory tract infection
+
+Imbalance, while nystagmus is horizontal or rotational, the direction of the fast component is away from the side of the lesion
+
+Absence of hearing loss
+
+Benign paroxysmal positional vertigo
+
+Seconds
+
+Change in the head position
+
+Positional
+
+Positive Dix−Hallpike
+
+Ménière’s disease
+
+Hours
+
+Spontaneous
+
+Hearing loss and tinnitus
+
+Hearing assessment for sensorineural hearing loss
+
+
+
+BPPV
+
+BPPV is the most common cause of vertigo in clinical practice.15 It is caused by an accumulation of calcium crystals in the posterior semicircular canal. These crystals affect the movement of the endolymph in the semicircular canals, which causes vertigo.15 The classic symptoms of BPPV are brief episodes of vertigo, associated with nausea and nystagmus.
+
+The episodes of vertigo are triggered by rapid changes in the position of the head.1 Symptoms can last for weeks and recur after remission. Nystagmus seen in BPPV has a rotational nature.1 The Dix−Hallpike manoeuvre is used to diagnose BPPV. In contrast, the Epley manoeuvre can be used to treat BPPV (Box 1).1 This procedure is performed in an attempt to dislodge the otoliths from the semicircular canals. It has a 77% success rate on the initial attempt and 100% on further attempts.15
+
+
+
+Sit the patient on the bed.
+
+With the neck hyperextended and laterally rotated to 45 degrees, the patient is asked to lie supine.
+
+The patient is required to maintain the supine position for one minute.
+
+The head is turned to the opposite side with lateral rotation of 45 degrees, and remains in this position for one minute.
+
+The head, chest and pelvis are tilted downwards to 135 degrees (almost prone), and this position is maintained for one minute.
+
+Quickly sit the patient upright with their head tilted to the affected side.
+
+This manoeuvre should not be performed in patients with neck injury, carotid stenosis and heart disease1
+
+Acute labyrinthitis
+
+The inner ear is composed of the bony and the membranous labyrinth. Acute labyrinthitis is inflammation of this labyrinth. It presents with vertigo and hearing loss, preceded by a viral infection.16 Middle ear infections can spread to the inner ear and cause labyrithitis. The duration of symptoms ranges from days to weeks. Hearing loss is the main distinguishing factor between labyrithitis and BPPV. Typically, no treatment is required for labyrithitis. However, if suppurative labyrinthitis is suspected, the patient should be referred to the emergency department for drainage of otitis media.17
+
+Ménière’s disease
+
+Ménière’s disease is an uncommon cause of vertigo.18 It is thought to be caused by increased fluid in the endolymph part of the cochlea, which eventually affects the semicircular canals.18 In most patients, the aetiology is unknown.18 Ménière’s disease is commonly seen in women, and the incidence increases in men and women after the age of 60 years.18
+
+Ménière’s disease classically presents with episodes of vertigo lasting longer than 20 minutes, tinnitus, sensorineural hearing loss and aural fullness. Eventually, hearing loss becomes permanent. Pure tone audiometry is the most useful test to assess sensorineural hearing loss.
+
+There is no known cure for Ménière’s disease and treatment is primarily symptomatic.19 Betahistine is the current mainstay of treatment. Surgical treatment options exist; however, most patients are adequately managed with medical treatment.
+
+Vestibular neuronitis
+
+VN is caused by inflammation of the vestibular nerve. This inflammation precedes a viral URTI or herpes zoster infection and is caused by immune-mediated sequelae following the viral illness.15 It is commonly seen in middle-aged adults of both sexes.8 VN often occurs in epidemics during outbreaks of respiratory infections.15 The main characteristic of VN is an acute onset of vertigo without hearing loss or tinnitus. Similarly to BPPV, symptoms of vertigo are aggravated by a change in the position of the head. Loss of balance is more prominent in VN, compared with other causes of vertigo, and patients may commonly present with falls.
+
+Initially, the vertigo is severe, lasts for two to three days and is followed by gradual recovery, which may take two to six weeks.20 Bed rest and antiemetics can be used in the first 24–72 hours. Patients can be reassured that symptoms will improve with time.20
+
+
+
+
+
+Spessifiser forskeller: detailed information about the types of Benign Paroxysmal Positional Vertigo (BPPV) affecting different semicircular canals and the maneuvers used to treat them. BPPV is the most common vestibular disorder, caused by otoconia (calcium carbonate crystals) displaced into the semicircular canals.
+
+Posterior Canal BPPV (PC-BPPV): Manifestation:
+
+Most common type (80-90% of cases)
+
+Vertigo triggered by lying down, rolling over in bed, or looking up
+
+Rotatory nystagmus with upbeating component
+
+Symptoms last 30-60 seconds
+
+Treatment Maneuvers: a) Epley Maneuver:
+
+Most commonly used
+
+Success rate of 80-100% after 1-3 treatments
+
+b) Semont Maneuver:
+
+Alternative to Epley
+
+Involves rapid movement from lying on affected side to opposite side
+
+c) Brandt-Daroff Exercises:
+
+Used for home treatment
+
+Series of head and body movements performed multiple times daily
+
+Horizontal (Lateral) Canal BPPV (HC-BPPV): Manifestation:
+
+Second most common (5-15% of cases)
+
+Two subtypes: geotropic (more common) and apogeotropic
+
+Vertigo triggered by turning head side to side while lying down
+
+Horizontal nystagmus changing direction with head position
+
+Treatment Maneuvers: a) Lempert (BBQ) Roll Maneuver:
+
+For geotropic HC-BPPV
+
+Involves 270° rotation of the body in 90° increments
+
+b) Gufoni Maneuver:
+
+Can be used for both geotropic and apogeotropic HC-BPPV
+
+Involves quickly lying down on the affected side, then turning the head
+
+c) Appiani Maneuver:
+
+Specifically for apogeotropic HC-BPPV
+
+Similar to Gufoni but with opposite head turn
+
+Anterior Canal BPPV (AC-BPPV): Manifestation:
+
+Least common (1-2% of cases)
+
+Vertigo with downbeat nystagmus when lying back or during Dix-Hallpike test
+
+Often resolves spontaneously due to the anatomical position of the canal
+
+Treatment Maneuvers: a) Reverse Epley Maneuver:
+
+Modified version of the standard Epley maneuver
+
+b) Yacovino Maneuver:
+
+Designed specifically for AC-BPPV
+
+Involves extending the head backwards in supine position, then flexing forward
+
+c) Deep Head Hanging Maneuver:
+
+Alternative to Yacovino
+
+Involves hanging the head off the examination table at different angles
+
+Treatment: The TRV chair can modify the traditional maneuvers we discussed earlier:
+
+a) Posterior Canal BPPV:
+
+The Epley maneuver can be performed with greater precision and control.
+
+The chair allows for a modified 360-degree rotation that combines elements of both Epley and Semont maneuvers.
+
+b) Horizontal Canal BPPV:
+
+The Lempert (BBQ) Roll can be performed more smoothly and precisely.
+
+The chair allows for exact 90-degree increments, which can be held for specific durations.
+
+c) Anterior Canal BPPV:
+
+The Reverse Epley and Yacovino maneuvers can be performed with greater accuracy.
+
+The chair allows for precise control of head extension and flexion angles.
+
+Advantages of TRV chair in BPPV treatment:
+
+Increased precision: Exact angles and positions can be achieved and maintained.
+
+Reduced physical strain: Less physical effort is required from both the patient and the practitioner.
+
+Multi-canal BPPV: The chair facilitates treatment of complex or multi-canal BPPV cases.
+
+Patient comfort: Some patients, especially those with mobility issues or obesity, may find chair-based treatments more comfortable.
+
+Objective measurement: Many TRV chairs integrate with video-oculography systems for precise nystagmus recording and analysis.
+
+Modified protocols: When using a TRV chair, some clinicians develop modified protocols that take advantage of the chair's capabilities:
+
+Sequential rotations: Treating multiple canals in a single session becomes more feasible.
+
+Extended rotations: Some protocols involve full 360-degree rotations that aren't possible with manual techniques.
+
+Customized angles: The practitioner can adjust angles precisely based on individual patient responses.
+
+Considerations: While the TRV chair offers many advantages, it's important to note:
+
+Cost: TRV chairs are expensive and not available in all clinical settings.
+
+Training: Proper training is required to effectively use the chair and interpret results.
+
+Not always necessary: Many cases of BPPV can still be effectively treated with traditional manual techniques.
+
+
+
+
+
+Epley Maneuver
+
+If your vertigo comes from your left ear and side:
+
+Sit on the edge of your bed. Turn your head 45 degrees to the left (not as far as your left shoulder). Place a pillow under you so when you lie down, it rests between your shoulders rather than under your head.
+
+Quickly lie down on your back, with your head on the bed (still at the 45-degree angle). The pillow should be under your shoulders. Wait 30 seconds (for any vertigo to stop).
+
+Turn your head halfway (90 degrees) to the right without raising it. Wait 30 seconds.
+
+Turn your head and body on its side to the right, so you're looking at the floor. Wait 30 seconds.
+
+Slowly sit up, but remain on the bed a few minutes.
+
+If the vertigo comes from your right ear, reverse these instructions. Sit on your bed, turn your head 45 degrees to the right, and so on.
+
+Do these movements three times before going to bed each night, until you've gone 24 hours without dizziness.
+
+
+
+
+
+Semont Maneuver
+
+This exercise is for dizziness from the left ear and side:
+
+Sit on the edge of your bed. Turn your head 45 degrees to the right.
+
+Quickly lie down on your left side. Stay there for 30 seconds.
+
+Quickly move to lie down on the opposite end of your bed. Don't change the direction of your head. Keep it at a 45-degree angle and lie for 30 seconds. Look at the floor.
+
+Return slowly to sitting and wait a few minutes.
+
+Reverse these moves for the right ear.
+
+Again, do these moves three times a day until you go 24 hours without vertigo.
+
+
+
+
+
+Half-Somersault or Foster Maneuver
+
+Some people find this maneuver easier to do:
+
+Kneel down and look up at the ceiling for a few seconds.
+
+Touch the floor with your head, tucking your chin so your head goes toward your knees. Wait for any vertigo to stop (about 30 seconds).
+
+Turn your head in the direction of your affected ear (i.e. if you feel dizzy on your left side, turn to face your left elbow). Wait 30 seconds.
+
+Quickly raise your head so it's level with your back while you're on all fours. Keep your head at that 45-degree angle. Wait 30 seconds.
+
+Quickly raise your head so it's fully upright, but keep your head turned to the shoulder of the side you're working on. Then slowly stand up.
+
+
+
+Brandt-Daroff Exercise
+
+Here’s what you need to do for this exercise:
+
+Start in an upright, seated position on your bed.
+
+Tilt your head around a 45-degree angle away from the side causing your vertigo. Move into the lying position on one side with your nose pointed up.
+
+Stay in this position for about 30 seconds or until the vertigo eases off, whichever is longer. Then move back to the seated position.
+
+Repeat on the other side.
+
+You should do these movements from three to five times in a session. You should have three sessions a day for up to 2 weeks, or until the vertigo is gone for 2 days.
+
+
+
+
+
+
+
+Epley Maneuver
+
+Patient starts in long sitting, head rotated 45 degrees to affected side
+
+Patient rapidly reclined to supine position with neck slightly extended. Hold position for 30 seconds, or until nystagmus and dizziness subside
+
+Rotate head 90 degrees to opposite side. Hold position for 20 seconds, or until nystagmus and dizziness subside
+
+Patient rotated 90 degrees from supine to side-lying. Hold position for 20 seconds, or until nystagmus and dizziness subside
+
+Bring patient up into short-sittingMay need to complete this maneuver 1 to 3 visits complete resolution of symptoms.
+
+Semont Maneuver
+
+Patient sits in short sitting, head rotated 45 degrees towards unaffected ear[14]
+
+Examiner places one hand under the bottommost shoulder while the other hand supports the neck
+
+Patient rapidly moves into side-lying to the affected side (face should be oriented towards ceiling). Hold this position for 30 seconds
+
+Without any head movement, patient is to move to side-lying on opposite side of the body (face oriented towards bed). Hold this position for 30 seconds
+
+Lempert Maneuver
+
+Treatment for horizontal/lateral canal BPPV
+
+Patient lie supine on examination table, affected ear down
+
+Quickly turn the head 90 degrees towards unaffected side facing up
+
+Wait 15-20 seconds between each head turn
+
+Turn the head 90 degrees so affected ear is up
+
+Have patient tuck arms to chest, roll patient into prone
+
+Have patient turn on side as you roll their head 90 degrees ( return to original position, affected ear down)
+
+Reposition patient so that they are facing up into sitting position
+
+Gufoni Maneuver
+
+Treatment for horizontal/lateral canal BPPV
+
+Patient taken from sitting to side-lying on affected or unaffected side
+
+Geotropic nystagmus: unaffected
+
+Apogeotropic: affected
+
+Turn patient head quickly towards ground (45-60 degrees), hold in this position for 2 minutes
+
+Patient returns to sitting with head maintained in that position
+
+Habituation Techniques[10]
+
+Avoid quick spins or movements that provoke vertigo
+
+Sleep in semi-recumbent position for next 2 nights following Epley's technique (use a recliner or stack of pillows)
+
+Avoid sleeping on affected side
+
+Try keep head upright during day and avoid all supine activities
+
+After being conservative for a week, start to place head (in controlled environments) in vertigo provoking positions
+
+Lempert (BBQ roll) Maneuver:
+
+Start with the patient lying supine, head turned 45° towards the unaffected side.
+
+Quickly roll the patient 90° towards the affected side (now face down).
+
+Continue rolling the patient in the same direction another 90° (now on their back, face up).
+
+Roll another 90° to end with the patient facing the bed on the unaffected side.
+
+Finally, return the patient to a sitting position.
+
+Each position is held for about 30 seconds or until nystagmus subsides.
+
+Gufoni Maneuver:
+
+Start with the patient sitting on the edge of the bed.
+
+Quickly lay the patient down on their side (affected ear up for geotropic, unaffected ear up for apogeotropic).
+
+Hold this position for 1-2 minutes.
+
+Quickly turn the patient's head 45° downward (nose down) for geotropic, or 45° upward (nose up) for apogeotropic.
+
+Hold this position for 2 minutes.
+
+Slowly return the patient to a sitting position.
+
+Main Differences:
+
+Starting Position:
+
+Lempert: Starts supine
+
+Gufoni: Starts sitting
+
+Number of Positions:
+
+Lempert: Involves multiple 90° rolls (typically 3-4)
+
+Gufoni: Involves only one side-lying position and one head turn
+
+Complexity:
+
+Lempert: More complex, requires more space and often assistance
+
+Gufoni: Simpler, can often be performed with less assistance
+
+Specificity:
+
+Lempert: Primarily designed for geotropic horizontal canal BPPV
+
+Gufoni: Has variations for both geotropic and apogeotropic BPPV
+
+Patient Comfort:
+
+Lempert: Can be more disorienting due to multiple rotations
+
+Gufoni: Generally better tolerated, especially by older or less mobile patients
+
+Time:
+
+Lempert: Usually takes longer to complete (2-3 minutes total)
+
+Gufoni: Can be completed more quickly (about 3-4 minutes total)
+
+Mechanism:
+
+Lempert: Uses gravity to move debris through the entire canal
+
+Gufoni: Uses inertia of the initial movement and then gravity in the head-turn phase
+
+Adaptability:
+
+Lempert: Less easily modified for different scenarios
+
+Gufoni: Can be easily adapted for geotropic vs apogeotropic variants
+
+Evidence Base:
+
+Lempert: Traditional, widely studied
+
+Gufoni: Newer, but gaining popularity due to ease of use and effectiveness
+
+
+
+Posterior Canal BPPV Maneuvers:
+
+a) Epley Maneuver:
+
+Most common and effective for posterior canal BPPV
+
+Involves a series of head position changes
+
+Success rate: 80-100% after 1-3 treatments
+
+b) Semont Maneuver:
+
+Alternative to Epley for posterior canal BPPV
+
+Involves rapid movement from lying on affected side to opposite side
+
+Particularly useful for patients who can't extend their necks
+
+c) Half-Somersault or Foster Maneuver:
+
+Self-treatment option for posterior canal BPPV
+
+Can be easier for some patients to perform at home
+
+Developed by Dr. Carol Foster
+
+Horizontal (Lateral) Canal BPPV Maneuvers:
+
+a) Lempert (BBQ Roll) Maneuver:
+
+Primary treatment for geotropic horizontal canal BPPV
+
+Involves 270° rotation of the body in 90° increments
+
+Requires more space and often assistance
+
+b) Gufoni Maneuver:
+
+Can be used for both geotropic and apogeotropic horizontal canal BPPV
+
+Simpler than Lempert, often better tolerated by patients
+
+Gaining popularity due to ease of use and effectiveness
+
+c) Appiani Maneuver:
+
+Specifically for apogeotropic horizontal canal BPPV
+
+Similar to Gufoni but with opposite head turn
+
+Anterior Canal BPPV Maneuvers:
+
+a) Reverse Epley Maneuver:
+
+Modified version of the standard Epley maneuver
+
+Used for the rare cases of anterior canal BPPV
+
+b) Yacovino Maneuver:
+
+Designed specifically for anterior canal BPPV
+
+Involves extending the head backwards in supine position, then flexing forward
+
+General BPPV Exercises:
+
+a) Brandt-Daroff Exercises:
+
+Used for home treatment and habituation
+
+Series of movements performed multiple times daily
+
+Can be used for various types of BPPV
+
+Supplementary Techniques:
+
+a) Forced Prolonged Positioning:
+
+Used for resistant cases of horizontal canal BPPV
+
+Patient lies on unaffected side for 12 hours
+
+b) Head-shaking:
+
+Can be used before other maneuvers to dislodge otoconia
+
+Should be used cautiously as it can sometimes worsen symptoms
+
+Additional Information:
+
+Success rates vary between maneuvers and BPPV types.
+
+Multiple treatments may be necessary for complete resolution.
+
+Patients should be instructed on post-maneuver restrictions (e.g., avoiding rapid head movements).
+
+Some maneuvers can cause conversion between BPPV types (e.g., posterior to horizontal).
+
+Choice of maneuver depends on the specific type of BPPV, patient factors, and clinician expertise.
+
+In resistant cases, combining or modifying maneuvers may be necessary.
+
+# BPPV Maneuvers Learning Manual
+
+
+
+## I. Introduction to BPPV
+
+Benign Paroxysmal Positional Vertigo (BPPV) is caused by otoconia displaced into the semicircular canals. There are three types based on the affected canal:
+
+1. Posterior Canal BPPV (80-90% of cases)
+
+2. Horizontal (Lateral) Canal BPPV (5-15% of cases)
+
+3. Anterior Canal BPPV (1-2% of cases)
+
+
+
+## II. Diagnosis and Differentiation
+
+
+
+### A. Posterior Canal BPPV
+
+- Diagnostic Test: Positive Dix-Hallpike test
+
+- Nystagmus: Upbeat and torsional, top pole of eye beating towards affected ear
+
+- Latency: 1-5 seconds
+
+- Duration: Usually less than 1 minute
+
+
+
+### B. Horizontal Canal BPPV
+
+- Diagnostic Test: Positive supine roll test
+
+- Nystagmus: Pure horizontal
+
+  * Geotropic: Beats towards ground in both positions, stronger when affected ear down
+
+  * Apogeotropic: Beats away from ground in both positions, stronger when unaffected ear down
+
+- Latency: Minimal or no latency
+
+- Duration: Can last longer than posterior canal BPPV
+
+
+
+### C. Anterior Canal BPPV
+
+- Diagnostic Test: Often during Dix-Hallpike test
+
+- Nystagmus: Downbeat with small torsional component
+
+- Latency: Similar to posterior canal
+
+- Duration: Often shorter than posterior canal BPPV
+
+
+
+## III. Treatment Maneuvers
+
+
+
+### A. Posterior Canal BPPV Maneuvers
+
+
+
+#### 1. Epley Maneuver
+
+1. Patient sits upright, head turned 45° towards affected ear
+
+2. Quickly lie back, head hanging off table, maintain 45° rotation. Hold 30 seconds
+
+3. Rotate head 90° to opposite side. Hold 30 seconds
+
+4. Roll body to side, nose points to floor. Hold 30 seconds
+
+5. Slowly sit up on unaffected side
+
+
+
+#### 2. Semont Maneuver
+
+1. Patient sits upright, head turned 45° away from affected ear
+
+2. Quickly lie down on affected side. Hold 30 seconds
+
+3. Quickly move to opposite side, maintaining head position. Hold 30 seconds
+
+4. Slowly return to sitting
+
+
+
+### B. Horizontal Canal BPPV Maneuvers
+
+
+
+#### 1. Lempert (BBQ Roll) Maneuver
+
+1. Patient lies supine, head turned 45° towards unaffected ear
+
+2. Roll 90° towards affected ear (face down). Hold 30 seconds
+
+3. Roll another 90° (face up). Hold 30 seconds
+
+4. Roll final 90° to face bed on unaffected side. Hold 30 seconds
+
+5. Slowly sit up
+
+
+
+#### 2. Gufoni Maneuver
+
+For geotropic nystagmus:
+
+1. Patient sits on edge of bed
+
+2. Quickly lie on unaffected side. Hold 1-2 minutes
+
+3. Turn head 45° downward. Hold 2 minutes
+
+4. Slowly return to sitting
+
+
+
+For apogeotropic nystagmus:
+
+1. Patient sits on edge of bed
+
+2. Quickly lie on affected side. Hold 1-2 minutes
+
+3. Turn head 45° upward. Hold 2 minutes
+
+4. Slowly return to sitting
+
+
+
+### C. Anterior Canal BPPV Maneuvers
+
+
+
+#### 1. Reverse Epley Maneuver
+
+1. Patient sits upright, head turned 45° towards affected ear
+
+2. Quickly lie back, head hanging off table, maintain 45° rotation. Hold 30 seconds
+
+3. Rotate head 90° to opposite side. Hold 30 seconds
+
+4. Roll body to side, nose points to ceiling. Hold 30 seconds
+
+5. Slowly sit up
+
+
+
+#### 2. Yacovino Maneuver
+
+1. Patient sits on exam table
+
+2. Quickly lie back with head hanging off table. Hold 30 seconds
+
+3. Flex head forward until chin touches chest. Hold 30 seconds
+
+4. Slowly sit up while maintaining chin-to-chest position
+
+
+
+## IV. Additional Maneuvers and Exercises
+
+
+
+1. Brandt-Daroff Exercises: For home treatment and habituation
+
+2. Half-Somersault or Foster Maneuver: Self-treatment option for posterior canal BPPV
+
+3. Forced Prolonged Positioning: For resistant cases of horizontal canal BPPV
+
+
+
+## V. Key Points for Practice
+
+
+
+1. Accurate diagnosis is crucial for selecting the appropriate maneuver
+
+2. Multiple treatments may be necessary for complete resolution
+
+3. Post-maneuver instructions are important (e.g., avoiding rapid head movements)
+
+4. Some maneuvers can cause conversion between BPPV types
+
+5. In resistant cases, combining or modifying maneuvers may be necessary
+
+6. Proper training and supervised practice are essential before performing these maneuvers independently
+
+
+

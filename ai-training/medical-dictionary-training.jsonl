@@ -1,0 +1,97 @@
+{"prompt": "What is the ICPC-2 code for neck pain?", "completion": "L01 - Neck symptom/complaint (Nakkesymptom/plage)"}
+{"prompt": "Hva er ICPC-2 koden for nakkesmerter?", "completion": "L01 - Nakkesymptom/plage (Neck symptom/complaint)"}
+{"prompt": "What is the ICPC-2 code for low back pain?", "completion": "L03 - Low back symptom/complaint (Korsryggsymptom/plage)"}
+{"prompt": "Hva er ICPC-2 koden for korsryggsmerter?", "completion": "L03 - Korsryggsymptom/plage (Low back symptom/complaint)"}
+{"prompt": "What is L84 in ICPC-2?", "completion": "L84 - Back syndrome without radiating pain (Ryggsyndrom uten utstråling)"}
+{"prompt": "Hva er L84 i ICPC-2?", "completion": "L84 - Ryggsyndrom uten utstråling (Back syndrome without radiating pain)"}
+{"prompt": "What is L86 in ICPC-2?", "completion": "L86 - Back syndrome with radiating pain (Ryggsyndrom med utstråling)"}
+{"prompt": "Hva er L86 i ICPC-2?", "completion": "L86 - Ryggsyndrom med utstråling (Back syndrome with radiating pain)"}
+{"prompt": "What is L83 in ICPC-2?", "completion": "L83 - Neck syndrome (Nakkesyndrom)"}
+{"prompt": "Hva er L83 i ICPC-2?", "completion": "L83 - Nakkesyndrom (Neck syndrome)"}
+{"prompt": "What is L92 in ICPC-2?", "completion": "L92 - Shoulder syndrome (Skuldersyndrom)"}
+{"prompt": "Hva er L92 i ICPC-2?", "completion": "L92 - Skuldersyndrom (Shoulder syndrome)"}
+{"prompt": "What is L77 in ICPC-2?", "completion": "L77 - Sprain/strain of ankle (Forstuing/forstrekking av ankel)"}
+{"prompt": "What is L78 in ICPC-2?", "completion": "L78 - Sprain/strain of knee (Forstuing/forstrekking av kne)"}
+{"prompt": "What is L80 in ICPC-2?", "completion": "L80 - Dislocation/subluxation (Dislokasjon/subluksasjon)"}
+{"prompt": "What is L87 in ICPC-2?", "completion": "L87 - Bursitis/tendinitis/synovitis NOS (Bursitt/tendinitt/synovitt)"}
+{"prompt": "What is L89 in ICPC-2?", "completion": "L89 - Osteoarthrosis of hip (Artrose i hofte)"}
+{"prompt": "What is L90 in ICPC-2?", "completion": "L90 - Osteoarthrosis of knee (Artrose i kne)"}
+{"prompt": "What is L93 in ICPC-2?", "completion": "L93 - Tennis elbow (Tennisalbue / Lateral epicondylitt)"}
+{"prompt": "What is L95 in ICPC-2?", "completion": "L95 - Osteoporosis (Osteoporose / Benskjørhet)"}
+{"prompt": "Define cervical spine", "completion": "The cervical spine consists of the top 7 vertebrae (C1-C7) of the human spine, commonly known as the neck. The first vertebra (C1) is called the Atlas."}
+{"prompt": "Definer cervikalcolumna", "completion": "Cervikalcolumna består av de 7 øverste virvlene (C1-C7) i ryggsøylen, ofte kalt nakken. Den første virvelen (C1) kalles Atlas."}
+{"prompt": "Define thoracic spine", "completion": "The thoracic spine is the mid-back region consisting of 12 vertebrae (T1-T12), articulating with the ribs."}
+{"prompt": "Definer torakalcolumna", "completion": "Torakalcolumna er midtre del av ryggen bestående av 12 virvler (T1-T12), som artikulerer med ribbeina."}
+{"prompt": "Define lumbar spine", "completion": "The lumbar spine is the lower back area consisting of 5 vertebrae (L1-L5), the largest movable vertebrae bearing most of the body's weight."}
+{"prompt": "Definer lumbalcolumna", "completion": "Lumbalcolumna er korsryggen bestående av 5 virvler (L1-L5), de største bevegelige virvlene som bærer mesteparten av kroppsvekten."}
+{"prompt": "What is a vertebral disc?", "completion": "A vertebral disc (intervertebral disc) is a fibrocartilaginous structure between vertebrae acting as a shock absorber. It has a tough outer ring (annulus fibrosus) and a soft inner core (nucleus pulposus)."}
+{"prompt": "Hva er en mellomvirvelskive?", "completion": "En mellomvirvelskive (intervertebralskive) er en fibrokartilaginøs struktur mellom virvlene som fungerer som støtdemper. Den har en tøff ytre ring (annulus fibrosus) og en myk indre kjerne (nucleus pulposus)."}
+{"prompt": "What is subluxation?", "completion": "Subluxation is a complex of functional and/or structural articular changes that may compromise neural integrity and influence organ system function and general health."}
+{"prompt": "Hva er subluksasjon?", "completion": "Subluksasjon er et kompleks av funksjonelle og/eller strukturelle leddforandringer som kan kompromittere nevral integritet og påvirke organsystemfunksjon og generell helse."}
+{"prompt": "What is an adjustment?", "completion": "A chiropractic adjustment is the application of controlled force to a joint to increase mobility, reduce pain, and restore proper function. Also called spinal manipulation."}
+{"prompt": "Hva er en justering?", "completion": "En kiropraktisk justering er anvendelse av kontrollert kraft på et ledd for å øke bevegelighet, redusere smerte og gjenopprette normal funksjon. Også kalt spinal manipulasjon."}
+{"prompt": "Define lordosis", "completion": "Lordosis is the normal forward (anterior) curvature of the spine, typically found in the cervical and lumbar regions."}
+{"prompt": "Definer lordose", "completion": "Lordose er den normale fremovervelvingen (anterior kurve) av ryggsøylen, typisk funnet i nakke- og korsryggsregionen."}
+{"prompt": "Define kyphosis", "completion": "Kyphosis is the normal posterior (backward) curvature of the spine, typically found in the thoracic region. Excessive kyphosis is called hyperkyphosis."}
+{"prompt": "Definer kyfose", "completion": "Kyfose er den normale bakover (posterior) kurvingen av ryggsøylen, typisk funnet i torakalregionen. Økt kyfose kalles hyperkyfose."}
+{"prompt": "Define scoliosis", "completion": "Scoliosis is a lateral (side-to-side) curvature of the spine, where the spine appears as an 'S' or 'C' shape when viewed from behind."}
+{"prompt": "Definer skoliose", "completion": "Skoliose er en lateral (side-til-side) kurving av ryggsøylen, der ryggen ser ut som en 'S' eller 'C' form sett bakfra."}
+{"prompt": "What is the FABER test?", "completion": "The FABER test (Flexion, ABduction, External Rotation) is an orthopedic test to detect pathology in the hip, sacroiliac joint, or surrounding structures. Also called Patrick's test."}
+{"prompt": "Hva er FABER-testen?", "completion": "FABER-testen (Fleksjon, Abduksjon, Ekstern Rotasjon) er en ortopedisk test for å påvise patologi i hofte, iliosakralledd eller omliggende strukturer. Også kalt Patricks test."}
+{"prompt": "What is Kemp's test?", "completion": "Kemp's test uses lumbar extension combined with lateral bending to assess for facet joint involvement, disc pathology, or foraminal stenosis."}
+{"prompt": "Hva er Kemps test?", "completion": "Kemps test bruker lumbal ekstensjon kombinert med sidebøying for å vurdere fasettleddsinvolvering, diskuspatologi eller foraminal stenose."}
+{"prompt": "What is the straight leg raise (SLR) test?", "completion": "The straight leg raise (SLR) or Lasègue test is performed with the patient supine, passively raising the leg to test for nerve root tension, particularly indicating L4-S1 radiculopathy."}
+{"prompt": "Hva er straight leg raise (SLR) testen?", "completion": "Straight leg raise (SLR) eller Lasègues test utføres med pasienten liggende på rygg, passiv heving av benet for å teste nerverottensjon, særlig indikasjon på L4-S1 radikulopati."}
+{"prompt": "What is Dix-Hallpike test?", "completion": "The Dix-Hallpike test is a diagnostic maneuver for BPPV (benign paroxysmal positional vertigo) involving rapid head/body positioning to provoke nystagmus and vertigo symptoms."}
+{"prompt": "Hva er Dix-Hallpike test?", "completion": "Dix-Hallpike test er en diagnostisk manøver for BPPV (benign paroksysmal posisjonssvimmelhet) som innebærer rask hode/kroppsposisjonering for å fremprovosere nystagmus og svimmelhetsymptomer."}
+{"prompt": "What is VNG?", "completion": "VNG (Videonystagmography) is a test measuring involuntary eye movements (nystagmus) to assess vestibular and central nervous system function."}
+{"prompt": "Hva er VNG?", "completion": "VNG (Videonystagmografi) er en test som måler ufrivillige øyebevegelser (nystagmus) for å vurdere vestibulær og sentralnervesystemfunksjon."}
+{"prompt": "What is nystagmus?", "completion": "Nystagmus is an involuntary, rhythmic oscillation of the eyes that can be horizontal, vertical, rotary, or mixed. It can indicate vestibular or neurological dysfunction."}
+{"prompt": "Hva er nystagmus?", "completion": "Nystagmus er en ufrivillig, rytmisk oscillasjon av øynene som kan være horisontal, vertikal, rotatorisk eller blandet. Det kan indikere vestibulær eller nevrologisk dysfunksjon."}
+{"prompt": "What is BPPV?", "completion": "BPPV (Benign Paroxysmal Positional Vertigo) is the most common cause of vertigo, caused by otoconia (calcium carbonate crystals) displaced into the semicircular canals."}
+{"prompt": "Hva er BPPV?", "completion": "BPPV (Benign paroksysmal posisjonssvimmelhet) er den vanligste årsaken til svimmelhet, forårsaket av otokonia (kalsiumkarbonatkrystaller) forskjøvet inn i buegangene."}
+{"prompt": "What is the Epley maneuver?", "completion": "The Epley maneuver is a canalith repositioning procedure used to treat posterior canal BPPV by moving displaced otoconia out of the semicircular canal."}
+{"prompt": "Hva er Epley-manøveren?", "completion": "Epley-manøveren er en reposisjoneringsprosedyre for å behandle posterior kanal BPPV ved å flytte forskjøvede otokonia ut av buegangen."}
+{"prompt": "What are dermatomes?", "completion": "Dermatomes are areas of skin innervated by a single spinal nerve root. Testing dermatomes helps identify the level of radiculopathy or spinal cord lesion."}
+{"prompt": "Hva er dermatomer?", "completion": "Dermatomer er hudområder innervert av én enkelt spinalnerverot. Testing av dermatomer hjelper å identifisere nivået av radikulopati eller ryggmargsskade."}
+{"prompt": "What are myotomes?", "completion": "Myotomes are groups of muscles innervated by a single spinal nerve root. Testing myotome strength helps identify radiculopathy level."}
+{"prompt": "Hva er myotomer?", "completion": "Myotomer er grupper av muskler innervert av én enkelt spinalnerverot. Testing av myotomstyrke hjelper å identifisere radikulopatinivå."}
+{"prompt": "What is the C5 myotome?", "completion": "C5 myotome: Shoulder abduction (deltoid muscle). Test by having patient abduct arm against resistance."}
+{"prompt": "What is the C6 myotome?", "completion": "C6 myotome: Elbow flexion (biceps muscle) and wrist extension. Biceps reflex tests C5-C6."}
+{"prompt": "What is the C7 myotome?", "completion": "C7 myotome: Elbow extension (triceps muscle) and wrist flexion. Triceps reflex tests C7."}
+{"prompt": "What is the L4 myotome?", "completion": "L4 myotome: Knee extension (quadriceps muscle) and ankle dorsiflexion. Patellar reflex tests L4."}
+{"prompt": "What is the L5 myotome?", "completion": "L5 myotome: Great toe extension (extensor hallucis longus) and ankle dorsiflexion."}
+{"prompt": "What is the S1 myotome?", "completion": "S1 myotome: Ankle plantarflexion (gastrocnemius) and foot eversion. Achilles reflex tests S1."}
+{"prompt": "Describe reflex grading scale", "completion": "Reflex grading: 0 = absent, 1+ = diminished/hyporeflexic, 2+ = normal, 3+ = brisk/hyperactive, 4+ = clonus. Asymmetry or abnormal reflexes suggest pathology."}
+{"prompt": "Beskriv refleks graderingsskala", "completion": "Refleks gradering: 0 = fraværende, 1+ = redusert/hyporefleksi, 2+ = normal, 3+ = livlig/hyperaktiv, 4+ = klonus. Asymmetri eller unormale reflekser tyder på patologi."}
+{"prompt": "What is radiculopathy?", "completion": "Radiculopathy is compression or irritation of a spinal nerve root causing pain, weakness, numbness, or tingling in the distribution of that nerve (dermatomal/myotomal pattern)."}
+{"prompt": "Hva er radikulopati?", "completion": "Radikulopati er kompresjon eller irritasjon av en spinalnerverot som forårsaker smerte, svakhet, nummenhet eller prikking i nervens fordelingsområde (dermatomalt/myotomalt mønster)."}
+{"prompt": "What is a herniated disc?", "completion": "A herniated disc (disc prolapse, slipped disc) occurs when the nucleus pulposus protrudes through the annulus fibrosus, potentially compressing adjacent nerve roots."}
+{"prompt": "Hva er en diskusprolaps?", "completion": "En diskusprolaps (skiveprolaps) oppstår når nucleus pulposus trenger gjennom annulus fibrosus, og potensielt komprimerer tilstøtende nerverøtter."}
+{"prompt": "What is spinal stenosis?", "completion": "Spinal stenosis is narrowing of the spinal canal or neural foramina, causing compression of the spinal cord or nerve roots. Can be central or lateral stenosis."}
+{"prompt": "Hva er spinal stenose?", "completion": "Spinal stenose er innsnevring av spinalkanalen eller nevrale foramina, som forårsaker kompresjon av ryggmargen eller nerverøtter. Kan være sentral eller lateral stenose."}
+{"prompt": "Define VAS scale", "completion": "VAS (Visual Analog Scale) is a pain measurement tool where patients rate their pain from 0 (no pain) to 10 (worst possible pain). Used to track treatment progress."}
+{"prompt": "Definer VAS-skala", "completion": "VAS (Visuell Analog Skala) er et smertevurderingsverktøy der pasienter graderer smerten fra 0 (ingen smerte) til 10 (verst tenkelig smerte). Brukes til å følge behandlingsframgang."}
+{"prompt": "What is ROM?", "completion": "ROM (Range of Motion) measures joint mobility in degrees. Can be active (patient moves) or passive (examiner moves). Reduced ROM may indicate restriction or pathology."}
+{"prompt": "Hva er ROM?", "completion": "ROM (Range of Motion/Bevegelsesutslag) måler leddbevegelighet i grader. Kan være aktiv (pasient beveger) eller passiv (undersøker beveger). Redusert ROM kan indikere restriksjon eller patologi."}
+{"prompt": "What is palpation?", "completion": "Palpation is the clinical skill of examining the body by touch to assess texture, tenderness, temperature, and tissue quality of muscles, joints, and other structures."}
+{"prompt": "Hva er palpasjon?", "completion": "Palpasjon er den kliniske ferdigheten å undersøke kroppen ved berøring for å vurdere tekstur, ømhet, temperatur og vevskvalitet av muskler, ledd og andre strukturer."}
+{"prompt": "What is hypertonia?", "completion": "Hypertonia (hypertonicity) is increased muscle tone or tension, often felt as tightness or guarding during palpation. Can indicate muscle spasm or protective response."}
+{"prompt": "Hva er hypertoni?", "completion": "Hypertoni (hypertonisitet) er økt muskeltonus eller spenning, ofte følt som stramhet eller vakthold ved palpasjon. Kan indikere muskelspasme eller beskyttende respons."}
+{"prompt": "What is a trigger point?", "completion": "A trigger point is a hyperirritable spot in a taut band of skeletal muscle, characterized by local tenderness and referred pain when compressed."}
+{"prompt": "Hva er et triggerpunkt?", "completion": "Et triggerpunkt er et hyperirritabelt punkt i en stram muskelband, karakterisert av lokal ømhet og referert smerte ved kompresjon."}
+{"prompt": "What is mobilization?", "completion": "Mobilization is a manual therapy technique applying controlled, graded force to a joint to restore normal motion without high-velocity thrust."}
+{"prompt": "Hva er mobilisering?", "completion": "Mobilisering er en manuell terapiteknikk som anvender kontrollert, gradert kraft på et ledd for å gjenopprette normal bevegelse uten høyhastighets thrust."}
+{"prompt": "What is manipulation?", "completion": "Manipulation (adjustment) is a high-velocity, low-amplitude thrust applied to a joint, often producing an audible release (cavitation)."}
+{"prompt": "Hva er manipulasjon?", "completion": "Manipulasjon (justering) er et høyhastighets, lav-amplitude thrust på et ledd, som ofte produserer en hørbar frigjøring (kavitasjon)."}
+{"prompt": "What is vestibular neuritis?", "completion": "Vestibular neuritis is acute inflammation of the vestibular nerve causing severe vertigo, nausea, and imbalance without hearing loss. Usually viral in origin."}
+{"prompt": "Hva er vestibularisnevritt?", "completion": "Vestibularisnevritt er akutt betennelse i balansennerven som forårsaker alvorlig svimmelhet, kvalme og ubalanse uten hørselstap. Vanligvis viral årsak."}
+{"prompt": "What is the caloric test?", "completion": "The caloric test irrigates warm or cool water/air into the ear canal to stimulate the vestibular system. COWS mnemonic: Cold Opposite, Warm Same (direction of nystagmus fast phase)."}
+{"prompt": "Hva er kalorisk test?", "completion": "Kalorisk test irrigerer varmt eller kaldt vann/luft i øregangen for å stimulere vestibulærsystemet. COWS huskeregel: Cold Opposite, Warm Same (retning av nystagmus' raske fase)."}
+{"prompt": "List types of nystagmus", "completion": "Nystagmus types: Spontaneous, gaze-evoked, positional, post-rotational, caloric-induced, downbeat, upbeat, torsional, periodic alternating, and congenital."}
+{"prompt": "List røde flagg for korsryggsmerter", "completion": "Røde flagg for korsryggsmerter: Cauda equina-symptomer (blære/tarm-dysfunksjon, sadel-anestesi), feber, uforklarlig vekttap, nattlige smerter, progredierende nevrologisk utfall, trauma, krefthistorie, steroidbruk."}
+{"prompt": "List red flags for low back pain", "completion": "Red flags for LBP: Cauda equina symptoms (bladder/bowel dysfunction, saddle anesthesia), fever, unexplained weight loss, night pain, progressive neurological deficit, trauma, cancer history, steroid use."}
+{"prompt": "What is antalgic gait?", "completion": "Antalgic gait is a limping pattern where the patient shortens stance phase on the painful limb to minimize weight-bearing time and reduce pain."}
+{"prompt": "Hva er antalgisk gange?", "completion": "Antalgisk gange er et haltemønster der pasienten forkorter standfasen på det smertefulle benet for å minimere belastningstid og redusere smerte."}
+{"prompt": "What is lateral list?", "completion": "Lateral list (antalgic lean) is a lateral deviation of the trunk, often seen in acute disc herniation as the patient shifts weight away from the affected side."}
+{"prompt": "Hva er lateral liste?", "completion": "Lateral liste (antalgisk helning) er en lateral avvikelse av trunken, ofte sett ved akutt diskusprolaps når pasienten skifter vekt bort fra den affiserte siden."}

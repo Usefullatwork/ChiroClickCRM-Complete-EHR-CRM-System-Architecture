@@ -27,3 +27,9 @@ export {
   clearOffline,
   offlineFetch,
 } from './usePWA';
+
+// Clinical Preferences
+export {
+  default as useClinicalPreferences,
+  NOTATION_METHODS,
+} from './useClinicalPreferences';

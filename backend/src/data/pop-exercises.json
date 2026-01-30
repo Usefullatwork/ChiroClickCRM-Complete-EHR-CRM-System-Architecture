@@ -1,0 +1,42 @@
+{
+  "exportedAt": "2026-01-18T09:38:43.794Z",
+  "source": "pop.gpm.as",
+  "organization": "Klinikk for Alle Majorstuen",
+  "group": { "id": 3481, "name": "Nevrosenter Majorstuen" },
+  "totalCount": 460,
+  "categories": {
+    "BPPV Manuvers": { "count": 19, "subcategories": ["Posterior Canal", "Lateral Canal", "Anterior Canal"] },
+    "Reflexes": { "count": 4, "subcategories": ["Primitive reflexes"] },
+    "Physical Exercises": { "count": 13, "subcategories": ["Strength", "Core / Stability", "Explosiveness"] },
+    "VRT Animations": { "count": 69, "subcategories": ["Frontal Lobe", "Sinusoidal Pursuits", "Microsaccades, Pursuit Back", "Predicteble Sakkades", "Random Sakkades", "Pursuits", "Pursuits, Saccade to Center"] },
+    "VRT Kids Animations": { "count": 27, "subcategories": ["Frontal Lobe", "Sinusoidal Pursuits", "Microsaccades, Pursuit Back"] },
+    "VRT Exercises": { "count": 27, "subcategories": ["Divergens / Convergence", "Gaze Stab", "T0V", "T2V", "VOR", "Saccades"] },
+    "Cerebellar Exercises": { "count": 13, "subcategories": ["Hand", "Foot", "Combo"] },
+    "OPK (red)": { "count": 144, "subcategories": ["Classic", "In Phase", "Center Dot", "Diagonal"] },
+    "OPK (black)": { "count": 144, "subcategories": ["Classic", "In Phase", "Center Dot", "Diagonal"] }
+  },
+  "sampleExercises": [
+    {"id": 9155, "name": "BBQ Roll Right Side", "category": "Lateral Canal", "parentCategory": "BPPV Manuvers", "videoUrl": "https://vimeo.com/1050465405"},
+    {"id": 9158, "name": "BBQ Roll Left Side", "category": "Lateral Canal", "parentCategory": "BPPV Manuvers", "videoUrl": "https://vimeo.com/1050465384"},
+    {"id": 9204, "name": "Loaded Epley's Right Side", "category": "Posterior Canal", "parentCategory": "BPPV Manuvers", "videoUrl": "https://vimeo.com/1050148977"},
+    {"id": 9205, "name": "Loaded Epley's Left Side", "category": "Posterior Canal", "parentCategory": "BPPV Manuvers", "videoUrl": "https://vimeo.com/1050148913"},
+    {"id": 9160, "name": "Epley's Right Side", "category": "Posterior Canal", "parentCategory": "BPPV Manuvers", "videoUrl": "https://vimeo.com/1050017988"},
+    {"id": 9161, "name": "Epley's Left Side", "category": "Posterior Canal", "parentCategory": "BPPV Manuvers", "videoUrl": "https://vimeo.com/1050017955"},
+    {"id": 9311, "name": "Lizard", "category": "Primitive reflexes", "parentCategory": "Reflexes", "videoUrl": "https://vimeo.com/919118564"},
+    {"id": 9310, "name": "Starfish", "category": "Primitive reflexes", "parentCategory": "Reflexes", "videoUrl": "https://vimeo.com/919118591"},
+    {"id": 9309, "name": "Spinal Galant", "category": "Primitive reflexes", "parentCategory": "Reflexes", "videoUrl": "https://vimeo.com/919115694"},
+    {"id": 9308, "name": "Snow Angel", "category": "Primitive reflexes", "parentCategory": "Reflexes", "videoUrl": "https://vimeo.com/919115760"},
+    {"id": 9307, "name": "Good Morning", "category": "Strength", "parentCategory": "Physical Exercises", "videoUrl": "https://vimeo.com/902689476"},
+    {"id": 9306, "name": "Heel Raises", "category": "Strength", "parentCategory": "Physical Exercises", "videoUrl": "https://vimeo.com/902685413"},
+    {"id": 9303, "name": "Mountain Climber", "category": "Core / Stability", "parentCategory": "Physical Exercises", "videoUrl": "https://vimeo.com/900780714"},
+    {"id": 9302, "name": "Arm and Leg Lift", "category": "Core / Stability", "parentCategory": "Physical Exercises", "videoUrl": "https://vimeo.com/897008711"},
+    {"id": 9304, "name": "Glute Bridge", "category": "Strength", "parentCategory": "Physical Exercises", "videoUrl": "https://vimeo.com/900782887"},
+    {"id": 9223, "name": "Convergence Thumb", "category": "Divergens / Convergence", "parentCategory": "VRT Exercises", "videoUrl": "https://vimeo.com/817622110"},
+    {"id": 9213, "name": "Divergens Thumb", "category": "Divergens / Convergence", "parentCategory": "VRT Exercises", "videoUrl": "https://vimeo.com/817620934"},
+    {"id": 9222, "name": "Gaze Stab Vertical, Seated", "category": "Gaze Stab", "parentCategory": "VRT Exercises", "videoUrl": "https://vimeo.com/817621915"},
+    {"id": 9220, "name": "Gaze Stab Horizontal, Seated", "category": "Gaze Stab", "parentCategory": "VRT Exercises", "videoUrl": "https://vimeo.com/817621659"},
+    {"id": 9227, "name": "T0V Vertical, Seated", "category": "T0V", "parentCategory": "VRT Exercises", "videoUrl": "https://vimeo.com/817622493"},
+    {"id": 9226, "name": "T0V Horizontal, Seated", "category": "T0V", "parentCategory": "VRT Exercises", "videoUrl": "https://vimeo.com/817622426"}
+  ],
+  "note": "Full exercise data with 460 exercises stored in browser window.__exportedExercises. Use API endpoint /api/Exercises/group with PageSize parameter to retrieve all."
+}

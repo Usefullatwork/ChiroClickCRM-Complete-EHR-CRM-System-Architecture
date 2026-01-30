@@ -1,0 +1,272 @@
+================================================================================
+SOURCE: Based on the provided document, here is a detailed analysis and organization of templates and recurring phrases for SOPE notes (Subjective, Objective, Assessment, Plan).docx
+EXTRACTED: 2026-01-15T23:43:12.966Z
+CHARACTERS: 7118
+================================================================================
+
+Based on the provided document, here is a detailed analysis and organization of templates and recurring phrases for SOPE notes (Subjective, Objective, Assessment, Plan). This includes full-length citations and examples from the document, organized for each section.
+
+
+
+### Analysis of SOPE Notes
+
+
+
+#### 1. Anamnese (Subjective)
+
+**Purpose:** To collect the patient's subjective experiences, symptoms, and history.
+
+
+
+**Template:**
+
+```
+
+Pasienten rapporterer: [Symptomer/beskrivelser]
+
+Varighet av symptomer: [Antall dager/uker/måneder]
+
+Tidligere medisinsk historie: [Relevant medisinsk historie]
+
+Allergier: [Liste over allergier]
+
+Livsstilsfaktorer: [Røyking, alkoholforbruk, fysisk aktivitet]
+
+```
+
+
+
+**Examples from Document:**
+
+- "32 år gammel mann med episode med akutt hodepine. Kom for to dager siden. Fikk først synsforstyrrelser, opplevde det som at han mistet dybdesyn, fokus og følelse av å være påvirket av alkohol."
+
+- "40 år gammel kvinne med subakutte nakkesmerter. Startet for ca en mnd siden. Ukjent årsak, men kom ganske plutselig."
+
+- "81 år gammel mann med akutt svimmelhet. Startet 5 dager siden. Våknet og ble veldig svimmel da han reiste seg. Litt kvalm, men ingen oppkast."
+
+
+
+#### 2. Undersøkelse (Objective)
+
+**Purpose:** Document objective findings from physical examinations and test results.
+
+
+
+**Template:**
+
+```
+
+Generell tilstand: [Beskrivelse]
+
+Vital tegn: [Puls, blodtrykk, respirasjonsfrekvens, temperatur]
+
+Fysisk undersøkelse: [Beskrivelse av funn]
+
+Laboratorie- og bildediagnostikk: [Resultater av relevante tester]
+
+```
+
+
+
+**Examples from Document:**
+
+- "Inspeksjon: noe utrettet kyfose torakalt. ROM: u.a. Palp.: hypomob. midtorakalt. Økt tonus og triggerpunkter bilat. i øv.traps, lev.scap og rhomboideii."
+
+- "Palp.: hypomob. og palp.øm i LS overgang. Økt tonus ve. piri, gmed, gmin, bilat. QL og ES i nedre lumbalcol."
+
+- "Dix Hallpike: pos hø side. Svimmelhet og svak rotatorisk geotrop nystagmus. Varer ca 5 sek."
+
+
+
+#### 3. Behandling (Assessment)
+
+**Purpose:** Assess the patient's condition and diagnoses based on subjective and objective data.
+
+
+
+**Template:**
+
+```
+
+Diagnose: [Diagnoser]
+
+Differensialdiagnoser: [Mulige andre diagnoser]
+
+Vurdering av tilstand: [Beskrivelse]
+
+Prognose: [Forventet utvikling]
+
+```
+
+
+
+**Examples from Document:**
+
+- "Diagnose: L18 Myalgi. Kristin Bergby 29.03.2017"
+
+- "Vurderes til fasettleddsrelaterte smerter sannsynligvis grunnet belastninger over tid. Kristin Bergby 21.03.2017"
+
+- "Sannsynligvis en irritasjon i Hoffas fettpute venstre side. Kristin Bergby 17.10.2022"
+
+
+
+#### 4. Konklusjon (Plan)
+
+**Purpose:** Create a treatment plan and recommendations for further follow-up.
+
+
+
+**Template:**
+
+```
+
+Behandlingsplan: [Beskrivelse av behandlingsstrategi]
+
+Medisiner: [Reseptbelagte medisiner]
+
+Oppfølgingsplan: [Tidspunkt for neste kontroll, videre tester]
+
+Anbefalinger: [Råd til pasienten]
+
+```
+
+
+
+**Examples from Document:**
+
+- "Beh.: leddjustering T7 P, T4 P (HL) Slipper bra. Trp bilat. øv.traps (++), rhomboid (++), lev.scap(+) Råd om alternative øv. for rhomboideii, midtre traps, lev.scap. (ro med tau, lave skuldre. Omvendt flies skråbenk. Nedtrekk foran bryst) Viser tøyeøv. for rhomboideii, akukball. Mikropauser på jobb."
+
+- "Beh.: Cox L4/5, L5/S1 m/cuffs (fortsatt noe stivere og vondere hø side). Protokoll 2, leddjustering bilat. PI ilium (PBpushpull) Slipper ok."
+
+- "Beh.: BBQ manøver hø side x2. Gir råd om bevegelse. Info om BPPV. Info om at kan bli midlertidig forverring i symptomer etter u.s./beh. Ny time om en uke."
+
+
+
+### Note and Journal Templates
+
+For effective organization, structured templates ensure consistency and completeness in documentation.
+
+
+
+**Note Template:**
+
+```
+
+Pasientinformasjon: [Navn, alder, kjønn]
+
+Dato for konsultasjon: [Dato]
+
+Anamnese: [Se over]
+
+Undersøkelse: [Se over]
+
+Behandling: [Se over]
+
+Konklusjon: [Se over]
+
+Dokumentert av: [Navn på lege/sykepleier]
+
+```
+
+
+
+**Journal Template:**
+
+```
+
+Overskrift: [Navn, dato, tid]
+
+Innledning: [Kort introduksjon av pasienten og konsultasjonen]
+
+Anamnese: [Detaljert pasienthistorie]
+
+Undersøkelse: [Objektive funn]
+
+Behandling: [Diagnose og vurdering]
+
+Konklusjon: [Behandlingsplan og anbefalinger]
+
+Signatur: [Navn og tittel på helsepersonell]
+
+```
+
+
+
+### Setup for Tests
+
+Standardized setups ensure consistency and accuracy in documenting test results.
+
+
+
+**Test Setup Template:**
+
+```
+
+Testnavn: [Navn på testen]
+
+Dato og tid: [Dato og tid for testen]
+
+Resultat: [Beskrivelse av resultatet]
+
+Kommentarer: [Eventuelle bemerkninger eller vurderinger]
+
+```
+
+
+
+### Quotes for Treatment Course
+
+Standardized quotes document the treatment course and summarize key milestones and changes in the patient's condition.
+
+
+
+**Example Quotes:**
+
+- "Behandlingen har resultert i..."
+
+- "Pasientens tilstand har forbedret seg etter..."
+
+- "Videre behandling anbefales å inkludere..."
+
+
+
+### Implementation of Automatic Responses
+
+To implement automatic responses, use templates and recurring phrases to create standardized text blocks that can be inserted into journals and notes based on patient data inputs. This can be done using text generation tools and templates integrated into the journaling system.
+
+
+
+### Examples of Full Text Sections
+
+
+
+**Anamnese Examples:**
+
+- "32 år gammel mann med episode med akutt hodepine. Kom for to dager siden. Fikk først synsforstyrrelser, opplevde det som at han mistet dybdesyn, fokus og følelse av å være påvirket av alkohol. Ingen lysglimt. Kom seg hjem og fikk sovet en time. Våknet med intens hodepine, en-sidig høyre side. Ingen medikamenter hjalp."
+
+- "40 år gammel kvinne med subakutte nakkesmerter. Startet for ca en mnd siden. Ukjent årsak, men kom ganske plutselig. Sitter venstre side fra nakke og ut i skulder. Går også ut i ve arm i blant. Ganske konstant i noe grad i nakke/skulderbue. Trigges av å jobbe på PC og mobil."
+
+- "81 år gammel mann med akutt svimmelhet. Startet 5 dager siden. Våknet og ble veldig svimmel da han reiste seg. Litt kvalm, men ingen oppkast. Litt hp frontalt. Morgenen er verst. Blir svimmel når han reiser seg. Dårlig balanse når han skal gå. Blir svimmel når han snur hodet."
+
+
+
+**Undersøkelse Examples:**
+
+- "Inspeksjon: noe utrettet kyfose torakalt. ROM: u.a. Palp.: hypomob. midtorakalt. Økt tonus og triggerpunkter bilat. i øv.traps, lev.scap og rhomboideii. O/N: (-)cerv. kompr., (-)skulder depr. (-)Spurling's"
+
+- "Palp.: hypomob. og palp.øm i LS overgang. Økt tonus ve. piri, gmed, gmin, bilat. QL og ES i nedre lumbalcol."
+
+- "Dix Hallpike: pos hø side. Svimmelhet og svak rotatorisk geotrop nystagmus. Varer ca 5 sek."
+
+
+
+**Behandling Examples:**
+
+- "Beh.: leddjustering T7 P, T4 P (HL) Slipper bra. Trp bilat. øv.traps (++), rhomboid (++), lev.scap(+) Råd om alternative øv. for rhomboideii, midtre traps, lev.scap. (ro med tau, lave skuldre. Omvendt flies skråbenk. Nedtrekk foran bryst) Viser tøyeøv. for rhomboideii, akukball. Mikropauser på jobb."
+
+- "Beh.: Cox L4/5, L5/S1 m/cuffs (fortsatt noe stivere og vondere hø side). Protokoll 2, leddjustering bilat. PI ilium (PBpushpull) Slipper ok."
+
+- "Beh.: BBQ manøver hø side x2. Gir råd om
+
+
+

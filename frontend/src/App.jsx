@@ -1,6 +1,27 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react'
+import { SignedIn as ClerkSignedIn, SignedOut as ClerkSignedOut, RedirectToSignIn as ClerkRedirectToSignIn } from '@clerk/clerk-react'
 import { Toaster } from 'sonner'
+
+// Check if we're in development mode with placeholder key
+const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+const isDevMode = !clerkPubKey ||
+  clerkPubKey === 'pk_test_your_key_here' ||
+  clerkPubKey.includes('placeholder')
+
+// In dev mode, always show signed-in content
+const SignedIn = isDevMode
+  ? ({ children }) => <>{children}</>
+  : ClerkSignedIn
+
+// In dev mode, never show signed-out content
+const SignedOut = isDevMode
+  ? ({ children }) => null
+  : ClerkSignedOut
+
+// In dev mode, don't redirect to sign in
+const RedirectToSignIn = isDevMode
+  ? () => null
+  : ClerkRedirectToSignIn
 import DashboardLayout from './components/layouts/DashboardLayout'
 import Dashboard from './pages/Dashboard'
 import Patients from './pages/Patients'

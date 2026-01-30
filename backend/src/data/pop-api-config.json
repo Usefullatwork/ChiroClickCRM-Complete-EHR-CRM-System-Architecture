@@ -1,0 +1,57 @@
+{
+  "exportedAt": "2026-01-18T09:40:00.000Z",
+  "source": "pop.gpm.as",
+  "apiEndpoints": {
+    "base": "https://pop.gpm.as/api",
+    "auth": "/Auth",
+    "athletes": "/Athletes",
+    "templates": "/Templates",
+    "exercises": "/Exercises/group",
+    "programs": "/Programs",
+    "favoriteTemplates": "/FavoriteTemplates"
+  },
+  "authentication": {
+    "type": "Basic",
+    "headers": {
+      "Authorization": "Basic {auth_token}",
+      "AuthorizationType": "Group",
+      "group_id": "{group_id}",
+      "athlete-authorization": "{athlete_auth_token}",
+      "Accept": "application/json",
+      "X-Requested-With": "XMLHttpRequest"
+    }
+  },
+  "organization": {
+    "id": 3190,
+    "name": "Klinikk for Alle Majorstuen"
+  },
+  "group": {
+    "id": 3481,
+    "name": "Nevrosenter Majorstuen"
+  },
+  "settings": {
+    "apiRoot": "/api/",
+    "apiSignalR": "/signalr",
+    "version": "0.0.2-157",
+    "athletesTemplateFile": "/athletes-template.xlsx"
+  },
+  "uiSettings": {
+    "logoImg": "./img/gpm-hvit.png",
+    "maxCharacterExerciseName": 50,
+    "maxCharacterExerciseDescription": 800,
+    "hideRegisterLogin": true
+  },
+  "languages": {
+    "available": ["en_US", "nb_NO", "sv_SE", "es_ES", "de_DE"],
+    "default": "en_US"
+  },
+  "sportId": 1074,
+  "sportName": "Nevrokiropraktikk",
+  "dataStats": {
+    "totalExercises": 460,
+    "totalAthletes": 1119,
+    "totalTrainers": 6,
+    "totalPrograms": 1294,
+    "totalTemplates": 11
+  }
+}

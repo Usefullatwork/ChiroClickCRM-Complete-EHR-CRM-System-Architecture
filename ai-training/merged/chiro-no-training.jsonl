@@ -1,0 +1,40 @@
+{"prompt":"What is L84 in ICPC-2?","completion":"L84 - Back syndrome without radiating pain (Ryggsyndrom uten utstråling)"}
+{"prompt":"Hva er L84 i ICPC-2?","completion":"L84 - Ryggsyndrom uten utstråling (Back syndrome without radiating pain)"}
+{"prompt":"What is L86 in ICPC-2?","completion":"L86 - Back syndrome with radiating pain (Ryggsyndrom med utstråling)"}
+{"prompt":"Hva er L86 i ICPC-2?","completion":"L86 - Ryggsyndrom med utstråling (Back syndrome with radiating pain)"}
+{"prompt":"What is L95 in ICPC-2?","completion":"L95 - Osteoporosis (Osteoporose / Benskjørhet)"}
+{"prompt":"Definer cervikalcolumna","completion":"Cervikalcolumna består av de 7 øverste virvlene (C1-C7) i ryggsøylen, ofte kalt nakken. Den første virvelen (C1) kalles Atlas."}
+{"prompt":"Definer torakalcolumna","completion":"Torakalcolumna er midtre del av ryggen bestående av 12 virvler (T1-T12), som artikulerer med ribbeina."}
+{"prompt":"Definer lumbalcolumna","completion":"Lumbalcolumna er korsryggen bestående av 5 virvler (L1-L5), de største bevegelige virvlene som bærer mesteparten av kroppsvekten."}
+{"prompt":"Hva er en mellomvirvelskive?","completion":"En mellomvirvelskive (intervertebralskive) er en fibrokartilaginøs struktur mellom virvlene som fungerer som støtdemper. Den har en tøff ytre ring (annulus fibrosus) og en myk indre kjerne (nucleus pulposus)."}
+{"prompt":"Hva er subluksasjon?","completion":"Subluksasjon er et kompleks av funksjonelle og/eller strukturelle leddforandringer som kan kompromittere nevral integritet og påvirke organsystemfunksjon og generell helse."}
+{"prompt":"Hva er en justering?","completion":"En kiropraktisk justering er anvendelse av kontrollert kraft på et ledd for å øke bevegelighet, redusere smerte og gjenopprette normal funksjon. Også kalt spinal manipulasjon."}
+{"prompt":"Definer lordose","completion":"Lordose er den normale fremovervelvingen (anterior kurve) av ryggsøylen, typisk funnet i nakke- og korsryggsregionen."}
+{"prompt":"Definer kyfose","completion":"Kyfose er den normale bakover (posterior) kurvingen av ryggsøylen, typisk funnet i torakalregionen. Økt kyfose kalles hyperkyfose."}
+{"prompt":"Definer skoliose","completion":"Skoliose er en lateral (side-til-side) kurving av ryggsøylen, der ryggen ser ut som en 'S' eller 'C' form sett bakfra."}
+{"prompt":"Hva er FABER-testen?","completion":"FABER-testen (Fleksjon, Abduksjon, Ekstern Rotasjon) er en ortopedisk test for å påvise patologi i hofte, iliosakralledd eller omliggende strukturer. Også kalt Patricks test."}
+{"prompt":"Hva er Kemps test?","completion":"Kemps test bruker lumbal ekstensjon kombinert med sidebøying for å vurdere fasettleddsinvolvering, diskuspatologi eller foraminal stenose."}
+{"prompt":"Hva er straight leg raise (SLR) testen?","completion":"Straight leg raise (SLR) eller Lasègues test utføres med pasienten liggende på rygg, passiv heving av benet for å teste nerverottensjon, særlig indikasjon på L4-S1 radikulopati."}
+{"prompt":"Hva er Dix-Hallpike test?","completion":"Dix-Hallpike test er en diagnostisk manøver for BPPV (benign paroksysmal posisjonssvimmelhet) som innebærer rask hode/kroppsposisjonering for å fremprovosere nystagmus og svimmelhetsymptomer."}
+{"prompt":"Hva er VNG?","completion":"VNG (Videonystagmografi) er en test som måler ufrivillige øyebevegelser (nystagmus) for å vurdere vestibulær og sentralnervesystemfunksjon."}
+{"prompt":"Hva er nystagmus?","completion":"Nystagmus er en ufrivillig, rytmisk oscillasjon av øynene som kan være horisontal, vertikal, rotatorisk eller blandet. Det kan indikere vestibulær eller nevrologisk dysfunksjon."}
+{"prompt":"Hva er BPPV?","completion":"BPPV (Benign paroksysmal posisjonssvimmelhet) er den vanligste årsaken til svimmelhet, forårsaket av otokonia (kalsiumkarbonatkrystaller) forskjøvet inn i buegangene."}
+{"prompt":"Hva er Epley-manøveren?","completion":"Epley-manøveren er en reposisjoneringsprosedyre for å behandle posterior kanal BPPV ved å flytte forskjøvede otokonia ut av buegangen."}
+{"prompt":"Hva er dermatomer?","completion":"Dermatomer er hudområder innervert av én enkelt spinalnerverot. Testing av dermatomer hjelper å identifisere nivået av radikulopati eller ryggmargsskade."}
+{"prompt":"Hva er myotomer?","completion":"Myotomer er grupper av muskler innervert av én enkelt spinalnerverot. Testing av myotomstyrke hjelper å identifisere radikulopatinivå."}
+{"prompt":"Beskriv refleks graderingsskala","completion":"Refleks gradering: 0 = fraværende, 1+ = redusert/hyporefleksi, 2+ = normal, 3+ = livlig/hyperaktiv, 4+ = klonus. Asymmetri eller unormale reflekser tyder på patologi."}
+{"prompt":"Hva er radikulopati?","completion":"Radikulopati er kompresjon eller irritasjon av en spinalnerverot som forårsaker smerte, svakhet, nummenhet eller prikking i nervens fordelingsområde (dermatomalt/myotomalt mønster)."}
+{"prompt":"Hva er en diskusprolaps?","completion":"En diskusprolaps (skiveprolaps) oppstår når nucleus pulposus trenger gjennom annulus fibrosus, og potensielt komprimerer tilstøtende nerverøtter."}
+{"prompt":"Hva er spinal stenose?","completion":"Spinal stenose er innsnevring av spinalkanalen eller nevrale foramina, som forårsaker kompresjon av ryggmargen eller nerverøtter. Kan være sentral eller lateral stenose."}
+{"prompt":"Definer VAS-skala","completion":"VAS (Visuell Analog Skala) er et smertevurderingsverktøy der pasienter graderer smerten fra 0 (ingen smerte) til 10 (verst tenkelig smerte). Brukes til å følge behandlingsframgang."}
+{"prompt":"Hva er ROM?","completion":"ROM (Range of Motion/Bevegelsesutslag) måler leddbevegelighet i grader. Kan være aktiv (pasient beveger) eller passiv (undersøker beveger). Redusert ROM kan indikere restriksjon eller patologi."}
+{"prompt":"Hva er palpasjon?","completion":"Palpasjon er den kliniske ferdigheten å undersøke kroppen ved berøring for å vurdere tekstur, ømhet, temperatur og vevskvalitet av muskler, ledd og andre strukturer."}
+{"prompt":"Hva er hypertoni?","completion":"Hypertoni (hypertonisitet) er økt muskeltonus eller spenning, ofte følt som stramhet eller vakthold ved palpasjon. Kan indikere muskelspasme eller beskyttende respons."}
+{"prompt":"Hva er et triggerpunkt?","completion":"Et triggerpunkt er et hyperirritabelt punkt i en stram muskelband, karakterisert av lokal ømhet og referert smerte ved kompresjon."}
+{"prompt":"Hva er mobilisering?","completion":"Mobilisering er en manuell terapiteknikk som anvender kontrollert, gradert kraft på et ledd for å gjenopprette normal bevegelse uten høyhastighets thrust."}
+{"prompt":"Hva er manipulasjon?","completion":"Manipulasjon (justering) er et høyhastighets, lav-amplitude thrust på et ledd, som ofte produserer en hørbar frigjøring (kavitasjon)."}
+{"prompt":"Hva er vestibularisnevritt?","completion":"Vestibularisnevritt er akutt betennelse i balansennerven som forårsaker alvorlig svimmelhet, kvalme og ubalanse uten hørselstap. Vanligvis viral årsak."}
+{"prompt":"Hva er kalorisk test?","completion":"Kalorisk test irrigerer varmt eller kaldt vann/luft i øregangen for å stimulere vestibulærsystemet. COWS huskeregel: Cold Opposite, Warm Same (retning av nystagmus' raske fase)."}
+{"prompt":"List røde flagg for korsryggsmerter","completion":"Røde flagg for korsryggsmerter: Cauda equina-symptomer (blære/tarm-dysfunksjon, sadel-anestesi), feber, uforklarlig vekttap, nattlige smerter, progredierende nevrologisk utfall, trauma, krefthistorie, steroidbruk."}
+{"prompt":"Hva er antalgisk gange?","completion":"Antalgisk gange er et haltemønster der pasienten forkorter standfasen på det smertefulle benet for å minimere belastningstid og redusere smerte."}
+{"prompt":"Hva er lateral liste?","completion":"Lateral liste (antalgisk helning) er en lateral avvikelse av trunken, ofte sett ved akutt diskusprolaps når pasienten skifter vekt bort fra den affiserte siden."}

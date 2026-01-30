@@ -1,0 +1,100 @@
+================================================================================
+SOURCE: Gemini analysis.docx
+EXTRACTED: 2026-01-15T23:43:24.392Z
+CHARACTERS: 5030
+================================================================================
+
+Gemini analysis 
+
+
+
+Analyse av SOPE-notater for Fysioterapeut: AMV
+
+Denne analysen fokuserer på å identifisere maler og fraser for å automatisere SOPE-notater (Subjective, Objective, Assessment, Plan) for fysioterapeuter som Arne Martin Vik (AMV). Jeg har sortert informasjonen etter de fire SOPE-kategoriene, og lagt til eksempler for å illustrere hvordan malene og frasene kan brukes.
+
+1. Anamnese (Subjective)
+
+Maler:
+
+Aktuelt: Pasienten presenterer med [hovedklage] som startet [dato] og har vart i [tid]. [Beskrivelse av symptomer og lokalisasjon]. [Symptomene forverres av [aktiviteter/situasjoner]]. [Symptomene bedres av [aktiviteter/situasjoner]].
+
+Tidligere behandling: Pasienten har tidligere mottatt behandling for [tilstand] som [beskrivelse av tidligere behandling].
+
+Medisiner: Pasienten bruker [medisinnavn] for [tilstand] [dosering og frekvens].
+
+Sykehistorie: Pasienten har en historie med [beskriv relevante sykdommer eller skader, f.eks. hjernerystelse, korsbåndruptur, artrose].
+
+Sosialhistorie: Pasienten er [beskriv pasientens yrke, fritidsaktiviteter, familieforhold].
+
+Trening: Pasienten trener [beskriv type trening og frekvens].
+
+Stress: Pasienten rapporterer [beskriv stressnivå og mulige stressfaktorer].
+
+Eksempel:
+
+Aktuelt: Pasienten presenterer med smerter i venstre kne som startet forrige uke etter en vridning under en fotballkamp. Smertene er lokalisert på innsiden av kneet og øker ved gange, spesielt i trapper. Symptomene lindres av hvile.Tidligere behandling: Pasienten har tidligere fått behandling hos en annen fysioterapeut for et lignende problem, men uten å oppnå varig bedring.Medisiner: Pasienten tar ingen medisiner.Sykehistorie: Pasienten har ingen alvorlige sykdommer, men har tidligere røket korsbåndet i venstre kne.Sosialhistorie: Pasienten er en aktiv mann som spiller fotball 3 ganger i uken og trener styrke 2 ganger i uken.Stress: Pasienten rapporterer et høyt stressnivå på grunn av mye jobb og ansvar.
+
+2. Objektiv (Objective)
+
+Maler:
+
+Holdning/Inspeksjon: [Beskriv observerte funn, f.eks. holdning, synlige muskelfyller, hevelse, blåmerker].
+
+AROM (Active Range of Motion): [Beskriv bevegelsesutslag i alle plan, angi måleenheter, f.eks. fleksjon, ekstensjon, abduksjon, adduksjon, rotasjon].
+
+PROM (Passive Range of Motion): [Beskriv passiv bevegelsesutslag, angi måleenheter].
+
+Muskelstyrke: [Beskriv styrketest utført og resultat, f.eks. Quadriceps: 4/5 ift Oxford muskelstyrkeskala].
+
+Spesielle tester: [Beskriv utført tester, f.eks. Lachmann, McMurray, Spurling, Dix-Hallpike, Romberg, Y-test, Single Leg Hop test].
+
+Palpasjon: [Beskriv palpasjonsfunn, f.eks. ømhet, temperatur, triggerpunkter].
+
+Eksempel:
+
+Holdning/Inspeksjon: Pasienten har en fremoverlent holdning med fremskutt hode. Lett observerbar hevelse rundt høyre ankel.AROM kne: Lett nedsatt fleksjon i venstre kne.PROM kne: Ua.Muskelstyrke: Quadriceps: 4/5 høyre ift Oxford muskelstyrkeskala.Spesielle tester: Skuffetest ankel: Økt laksitet i venstre side.Palpasjon: Meget ømt over høyre sete, spesielt over piriformis og gluteus medius.
+
+3. Vurdering (Assessment)
+
+Diagnose: [Diagnose, f.eks. Lumbago, Patellofemoral smertesyndrom, Achilles tendinopati, Piriformis syndrom].
+
+Funn: [Beskriv viktige funn fra undersøkelsen, f.eks. økt tonus i musklene, nedsatt bevegelsesutslag, positive tester, ømhet, triggerpunkter].
+
+Mulig årsak: [Beskriv potensielle årsaker til pasientens tilstand, f.eks. overbelastning, dårlig holdning, skader, stress].
+
+Eksempel:
+
+Diagnose: Lumbago med muskulære spenninger.Funn: Nedsatt bevegelsesutslag i lumbalcolumna, ømhet i setet og Lx, spesielt over QL bilateralt.Mulig årsak: Overbelastning på grunn av mye jobbing og lite trening.
+
+4. Plan (Plan)
+
+Behandling: [Beskriv plan for videre behandling, f.eks. manuell terapi, øvelser, kinesiotape, instruksjoner, informasjon].
+
+Oppfølging: [Beskriv plan for oppfølging, f.eks. neste time om [tid], rehabiliteringsplan].
+
+Eksempel:
+
+Behandling: Triggerpunktbehandling av sete og Lx. Mobiliseringsbehandling av bekken med kaudalt glide på høyre side.Oppfølging: Pasienten vil bli fulgt opp om 2 uker.
+
+Viktig:
+
+Tilpass: Bruk malene og frasene for å lage en individuell behandlingsplan for hver pasient.
+
+Informasjon: Sørg for å gi pasienten nødvendig informasjon om diagnose, behandlingsplan og forventninger til behandlingen.
+
+Progresjon: Utfør regelmessig vurdering av pasientens fremgang og juster behandlingen/øvelser etter behov.
+
+Utvidelse av malene:
+
+Spesifikke maler: Utvikle maler for spesifikke tilstander, f.eks. skuldersmerter, knesmerter, smerter i korsryggen, svimmelhet.
+
+Øvelse-maler: Lag maler for spesifikke øvelser, f.eks. Wall slide, Jefferson curl, sideliggende sumo, step-up.
+
+Henvisning: Lag maler for henvisninger til andre helsepersonell, f.eks. lege, ortoped, kiropraktor, psykolog.
+
+Ved å bruke maler og fraser kan du øke effektiviteten i dokumentasjon og behandlingsprosessen.
+
+Husk å tilpasse malene og frasene til den enkelte pasienten for å sikre at dokumentasjonen er relevant og nøyaktig.
+
+
+

@@ -39,6 +39,9 @@ if (process.env.NODE_ENV === 'production' || process.env.DB_SSL === 'true') {
 // Create connection pool
 const pool = new Pool(poolConfig);
 
+// Export pool for direct access when needed (transactions, etc.)
+export { pool };
+
 // Connection error handling
 pool.on('error', (err, client) => {
   logger.error('Unexpected error on idle client', { error: err.message, stack: err.stack });

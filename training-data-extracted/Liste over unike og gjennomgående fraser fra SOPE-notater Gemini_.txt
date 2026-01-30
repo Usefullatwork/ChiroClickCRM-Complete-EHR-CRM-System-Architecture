@@ -1,0 +1,276 @@
+================================================================================
+SOURCE: Liste over unike og gjennomgående fraser fra SOPE-notater Gemini_.docx
+EXTRACTED: 2026-01-15T23:43:42.576Z
+CHARACTERS: 6681
+================================================================================
+
+Liste over unike og gjennomgående fraser fra SOPE-notater
+
+Her er en liste over fraser, både unike og gjennomgående, identifisert fra SOPE-notatene i filene du har levert. Jeg har delt frasene inn i kategorier basert på SOPE-delen der de oftest forekommer:
+
+Anamnese (Subjective):
+
+Generelt:
+
+Pasienten presenterer seg med...
+
+Pasienten rapporterer...
+
+Pasienten opplever...
+
+Pasienten beskriver...
+
+Pasienten har hatt plager siden...
+
+Pasienten har tidligere mottatt behandling for...
+
+Pasienten bruker...
+
+Pasienten er bekymret for...
+
+Pasienten er usikker på...
+
+Pasienten forteller om...
+
+Pasienten har en historie med...
+
+Pasienten nevner...
+
+Pasienten er...
+
+Det er mistanke om...
+
+Pasienten har en tendens til...
+
+Pasienten har ingen kjente sykdommer.
+
+Pasienten tar ingen medisiner.
+
+Pasienten har ingen kjente skader.
+
+Pasienten har ikke hatt noen spesifikke hendelser.
+
+Pasienten er gift.
+
+Pasienten har [antall] barn.
+
+Pasienten jobber som...
+
+Pasienten er... [yrke, pensjonist, student, etc.].
+
+Pasienten samtykker til at jeg kan dele informasjon fra konsultasjonen med [henviser, lege, PT, etc.].
+
+Pasienten er informert om at [rettigheter, personvern, etc.].
+
+Pasienten sier seg inneforstått med dette og ønsker et tverrfaglig samarbeide for best mulig resultat.
+
+
+
+Spesifikt for neurologiske tilstander:
+
+Pasienten opplever [beskriv spesifikke symptomer, f.eks. svimmelhet, smerte, nummenhet, prikking, tinnitus].
+
+Pasienten har fått et [beskriv type anfall, f.eks. migreneanfall, slag, seizure].
+
+Pasienten har hatt en periode med [beskriv symptomer, f.eks. afasi, hyperventilering, ME].
+
+
+
+Spesifikt for smerter:
+
+Pasienten opplever forverring av [aktiviteter/situasjoner].
+
+Pasienten opplever bedring av [aktiviteter/situasjoner].
+
+Symptomene har vart i [tid] og startet [når symptomene startet].
+
+Symptomene er konstante.
+
+Symptomene er konstante og [beskriv intensitet, f.eks. moderate, sterke, intense].
+
+Pasienten har smerter i [område] på [side].
+
+Smertene [beskriv intensitet, f.eks. øker, reduseres, er konstante, varierer].
+
+Smertene stråler [beskriv retning av smertestråling].
+
+Smertene trigges av [aktiviteter/situasjoner].
+
+Smertene lindres av [aktiviteter/situasjoner].
+
+
+
+Spesifikt for bekken/hofte/rygg:
+
+Pasienten har tidligere hatt bekkenløsning.
+
+Pasienten har tidligere hatt prolaps.
+
+Pasienten er født med [tilstand, f.eks. klumpfot, hoftedysplasi, skoliose].
+
+Pasienten har en operert [del av kroppen, f.eks. hofteprotese, kneprotese].
+
+Pasienten har hatt en forstuet [del av kroppen, f.eks. ankel, finger, håndledd].
+
+Pasienten har hatt en brist i [del av kroppen, f.eks. ribben, haleben].
+
+Pasienten har hatt [tilstand, f.eks. utbrenthet, ME, fibromyalgi].
+
+
+
+Spesifikt for kosthold/vekt:
+
+Pasienten ønsker hjelp med [beskriv mål, f.eks. vektnedgang, vektøkning, kostholdsråd].
+
+Pasienten er [beskriv vektstatus, f.eks. overvektig, undervektig].
+
+Pasienten er [beskriv kostholdsstatus, f.eks. vegetarianer, veganer].
+
+
+
+Spesifikt for trening:
+
+Pasienten trener regelmessig.
+
+Pasienten trener ikke regelmessig.
+
+Pasienten har trent mye i det siste.
+
+Pasienten driver med [beskriv idrett/aktiviteter, f.eks. fotball, dans, styrketrening, løping, golf].
+
+Pasienten har hatt en pause fra trening i [tid].
+
+
+
+Undersøkelse (Objective):
+
+Generelt:
+
+Observasjon viser...
+
+Arom/Prom er begrenset i...
+
+Funksjonsundersøkelse viser...
+
+Testene viser...
+
+Funn er konsistente med...
+
+Palpasjon av [område] avdekker...
+
+
+
+Spesifikt for cervical/thoracolumbar:
+
+Observasjon viser [beskriv observerte funn, f.eks. holdning, synlige muskelfyller, hevelse].
+
+Arom/Prom [beskriv bevegelsesutslag i alle plan, angi måleenheter].
+
+Spurling [beskriv resultat av Spurling test].
+
+Reflekser [beskriv reflekser, f.eks. biceps, triceps, brachioradial].
+
+Isometriske tester [beskriv isometriske tester, f.eks. biceps, triceps, pronasjon, supinasjon, fingerabduksjon].
+
+Sensibilitet [beskriv sensibilitetsfunn, f.eks. smerte, prikking, nummenhet].
+
+Spesielle tester [beskriv utført tester, f.eks. Hoffman, Lasegue, Kemp, Slump, Banktetest, Vibrasjonstest].
+
+Palpasjon [beskriv palpasjonsfunn, f.eks. ømhet, temperatur, triggerpunkter].
+
+Restriksjoner [beskriv leddrestriksjoner, f.eks. hypomobilitet, stivhet].
+
+
+
+Spesifikt for skulder:
+
+Neer [beskriv resultat av Neer test].
+
+Hawkins [beskriv resultat av Hawkins test].
+
+Full can [beskriv resultat av Full can test].
+
+Empty can [beskriv resultat av Empty can test].
+
+Load shift test [beskriv resultat av Load shift test].
+
+Sulcus sign [beskriv resultat av Sulcus sign test].
+
+Krank test [beskriv resultat av Krank test].
+
+Apprehension test [beskriv resultat av Apprehension test].
+
+AC-ledd kompresjonstest [beskriv resultat av AC-ledd kompresjonstest].
+
+Crossover test [beskriv resultat av Crossover test].
+
+
+
+Spesifikt for hofte:
+
+Faber [beskriv resultat av Faber test].
+
+Fadir [beskriv resultat av Fadir test].
+
+Kompressjon 90 grader [beskriv resultat av Kompressjon 90 grader test].
+
+Inrotasjon i 90 grader [beskriv resultat av Inrotasjon i 90 grader test].
+
+P4/thigh thrust [beskriv resultat av P4/thigh thrust test].
+
+Fitzgerald test [beskriv resultat av Fitzgerald test].
+
+
+
+Spesifikt for ankel/fot:
+
+Talar tilt test [beskriv resultat av Talar tilt test].
+
+Cotton test [beskriv resultat av Cotton test].
+
+Syndesmose Squeeze test [beskriv resultat av Syndesmose Squeeze test].
+
+Ottawa rules [beskriv funn fra Ottawa rules].
+
+
+
+Spesifikt for øyebevegelser:
+
+[Beskriv funn ved vurdering av øyebevegelser, f.eks. dobbeltsyn, nystagmus, saccades, optokinetisk refleks].
+
+PR [beskriv funn ved vurdering av postural balanse, f.eks. ustøhet, falltendens, retningsavhengighet].
+
+DDDK [beskriv funn ved vurdering av dynamisk postural kontroll, f.eks. ustøhet, kompensasjoner].
+
+VOR [beskriv funn ved vurdering av vestibulo-okulær refleks, f.eks. nystagmus, overshoot, undershoot].
+
+Gaze hold [beskriv funn ved vurdering av gaze hold, f.eks. drift, tremor, saccades].
+
+OPK [beskriv funn ved vurdering av optokinetisk refleks, f.eks. redusert amplitude, unormalt tempo, sakkader].
+
+Svakhet [beskriv funn ved vurdering av muskelstyrke, f.eks. svakhet i spesifikke muskler, påvirkning av bevegelse].
+
+Vibrasjon [beskriv funn ved vurdering av vibrasjonssans, f.eks. nedsatt sensibilitet].
+
+Puls [beskriv funn ved vurdering av puls, f.eks. økt puls, uregelmessig puls].
+
+
+
+
+
+Spesifikt for bekken/hofte:
+
+[Beskriv funn fra Faber, Fadir, Kompressjon 90 grader, Inrotasjon i 90 grader, P4/thigh thrust, Fitzgerald test].
+
+
+
+Behandling (Assessment)
+
+Manuell terapi:
+
+[Beskriv manuelle teknikker brukt, f.eks. myofascial release (bvm), triggerpunktbehandling (tgp), leddmobilisering (hvla), ART, leddkorrigering (PL, PR), trak
+
+
+
+
+

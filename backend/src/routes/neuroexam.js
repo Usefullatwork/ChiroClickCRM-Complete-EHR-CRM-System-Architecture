@@ -9,12 +9,13 @@
  * - BPPV treatment logging
  */
 
-const express = require('express');
+import express from 'express';
+import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
+import { body, param, query, validationResult } from 'express-validator';
+import { pool } from '../config/database.js';
+import { logAudit } from '../utils/audit.js';
+
 const router = express.Router();
-const { requireAuth, requireOrganization, requireRole } = require('../middleware/auth');
-const { body, param, query, validationResult } = require('express-validator');
-const pool = require('../config/database');
-const { logAudit } = require('../utils/audit');
 
 // =============================================================================
 // VALIDATION MIDDLEWARE
@@ -800,4 +801,4 @@ function determineReferralUrgency(redFlags, clusterScores) {
   return 'ROUTINE';
 }
 
-module.exports = router;
+export default router;

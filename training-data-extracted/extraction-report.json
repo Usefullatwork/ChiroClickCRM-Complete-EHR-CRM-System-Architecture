@@ -1,0 +1,337 @@
+{
+  "timestamp": "2026-01-15T23:43:49.773Z",
+  "inputDir": "D:\\PROGAMMVARE - EHR - Øvelse - Behandling\\EHR  --- CMR\\Build folder EHR\\TRENINGS DATA OF UTVIKLINGSHULL",
+  "outputDir": "D:\\ChiroClickCRM-Complete-EHR-CRM-System-Architecture\\training-data-extracted",
+  "summary": {
+    "total": 54,
+    "success": 54,
+    "failed": 0,
+    "skipped": 0
+  },
+  "files": [
+    {
+      "path": "Undersøkelse ark 1  a.docx",
+      "status": "success",
+      "outputPath": "Undersøkelse ark 1  a.txt",
+      "chars": 1158
+    },
+    {
+      "path": "Undersøkelse ark 1 .docx",
+      "status": "success",
+      "outputPath": "Undersøkelse ark 1 .txt",
+      "chars": 1158
+    },
+    {
+      "path": "Undersøkelse ark 2 a.docx",
+      "status": "success",
+      "outputPath": "Undersøkelse ark 2 a.txt",
+      "chars": 828
+    },
+    {
+      "path": "Undersøkelse ark 2.docx",
+      "status": "success",
+      "outputPath": "Undersøkelse ark 2.txt",
+      "chars": 828
+    },
+    {
+      "path": "Undersøkelse ark 3.docx",
+      "status": "success",
+      "outputPath": "Undersøkelse ark 3.txt",
+      "chars": 726
+    },
+    {
+      "path": "Undersøkelse ark 4.docx",
+      "status": "success",
+      "outputPath": "Undersøkelse ark 4.txt",
+      "chars": 864
+    },
+    {
+      "path": "VNG Protocol mal.docx",
+      "status": "success",
+      "outputPath": "VNG Protocol mal.txt",
+      "chars": 773
+    },
+    {
+      "path": "VNG Protocol.docx",
+      "status": "success",
+      "outputPath": "VNG Protocol.txt",
+      "chars": 773
+    },
+    {
+      "path": "- the final usecase - Comprehensive Hybrid Development Plan_ From Bubble.docx",
+      "status": "success",
+      "outputPath": "- the final usecase - Comprehensive Hybrid Development Plan_ From Bubble.txt",
+      "chars": 16659
+    },
+    {
+      "path": "1 - APPs  Idê ark - fundamentale _.docx",
+      "status": "success",
+      "outputPath": "1 - APPs  Idê ark - fundamentale _.txt",
+      "chars": 1997
+    },
+    {
+      "path": "2 - Journaling System Development Plan.docx",
+      "status": "success",
+      "outputPath": "2 - Journaling System Development Plan.txt",
+      "chars": 34412
+    },
+    {
+      "path": "3 -  Complete AI Tool Stack for No-Code_Low-Code Development.docx",
+      "status": "success",
+      "outputPath": "3 -  Complete AI Tool Stack for No-Code_Low-Code Development.txt",
+      "chars": 6507
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\Testing with a VNG from interacustics - i need to differantiate nystagmus.docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\Testing with a VNG from interacustics - i need to differantiate nystagmus.txt",
+      "chars": 40030
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\TRV stol kurs - Interacoustics.docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\TRV stol kurs - Interacoustics.txt",
+      "chars": 11562
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\Vertigo Stol manøvre.docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\Vertigo Stol manøvre.txt",
+      "chars": 24947
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\VNG Main file_.docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\VNG Main file_.txt",
+      "chars": 452
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\Gemini edit .docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\Gemini edit .txt",
+      "chars": 6590
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\Based on the provided document, here is an analysis and organization of templates and phrases for SOPE notes (Subjective, Objective, Assessment, Plan), including templates for notes, journal entries, exercises, te.docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\Based on the provided document, here is an analysis and organization of templates and phrases for SOPE notes (Subjective, Objective, Assessment, Plan), including templates for notes, journal entries, exercises, te.txt",
+      "chars": 4811
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\Ny - BH not HS - Neuro.docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\Ny - BH not HS - Neuro.txt",
+      "chars": 195273
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\Ny - Edle Minnesjord Nevrokiropraktor - BH - Kiropraktor.docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\Ny - Edle Minnesjord Nevrokiropraktor - BH - Kiropraktor.txt",
+      "chars": 508112
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\Ny - Karina Ranvik Arkin Nevrokiropraktor - BH - Kiropraktor.docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\Ny - Karina Ranvik Arkin Nevrokiropraktor - BH - Kiropraktor.txt",
+      "chars": 405775
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\Ny - Mikael Sveen Nevrokiropraktor - BH - Kiropraktor.docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\Ny - Mikael Sveen Nevrokiropraktor - BH - Kiropraktor.txt",
+      "chars": 234546
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\Ny - Jacob Stang Nevrokiropraktor - BH - Kiropraktor.docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\Ny - Jacob Stang Nevrokiropraktor - BH - Kiropraktor.txt",
+      "chars": 85442
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\Ny - Eirik Bjargo - BH - Kiropraktor.docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\Ny - Eirik Bjargo - BH - Kiropraktor.txt",
+      "chars": 5611
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\Ny - Sindre Busk Witzøe - BH - Kiropraktor.docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\Ny - Sindre Busk Witzøe - BH - Kiropraktor.txt",
+      "chars": 204068
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\Ny - Sigrun Låg Kleiv - BH - Kiropraktor.docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\Ny - Sigrun Låg Kleiv - BH - Kiropraktor.txt",
+      "chars": 183310
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\Gemini analyse.docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\Gemini analyse.txt",
+      "chars": 5710
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\Ny Passient setup .docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\Ny Passient setup .txt",
+      "chars": 348170
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\Here is a detailed analysis and organization of full-length quotes and examples for SOPE notes based on the provided documents.docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\Here is a detailed analysis and organization of full-length quotes and examples for SOPE notes based on the provided documents.txt",
+      "chars": 6363
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\BTB ny -BH JR.docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\BTB ny -BH JR.txt",
+      "chars": 386783
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\Based on the provided document, here's an analysis and organization of templates and recurring phrases for SOPE notes (Subjective, Objective, Assessment, Plan).docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\Based on the provided document, here's an analysis and organization of templates and recurring phrases for SOPE notes (Subjective, Objective, Assessment, Plan).txt",
+      "chars": 7050
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\Untitled document.docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\Untitled document.txt",
+      "chars": 4547
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\KB -Ny - BH .docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\KB -Ny - BH .txt",
+      "chars": 624897
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\Based on the provided document, here is a detailed analysis and organization of templates and recurring phrases for SOPE notes (Subjective, Objective, Assessment, Plan).docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\Based on the provided document, here is a detailed analysis and organization of templates and recurring phrases for SOPE notes (Subjective, Objective, Assessment, Plan).txt",
+      "chars": 7118
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\Gemini anlyse.docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\Gemini anlyse.txt",
+      "chars": 4656
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\KATG - NY - BH JUR.docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\KATG - NY - BH JUR.txt",
+      "chars": 569501
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\Based on the provided document, here is a detailed analysis and organization of templates and recurring phrases for SOPE notes (Subjective, Objective, Assessment, Plan), including templates for notes, journal entr.docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\Based on the provided document, here is a detailed analysis and organization of templates and recurring phrases for SOPE notes (Subjective, Objective, Assessment, Plan), including templates for notes, journal entr.txt",
+      "chars": 5586
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\AMV - NY  -  BH - JO.docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\AMV - NY  -  BH - JO.txt",
+      "chars": 756806
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\Based on the provided document, here is an analysis and organization of templates and recurring phrases for SOPE notes (Subjective, Objective, Assessment, Plan), including templates for notes, journal entries, exe.docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\Based on the provided document, here is an analysis and organization of templates and recurring phrases for SOPE notes (Subjective, Objective, Assessment, Plan), including templates for notes, journal entries, exe.txt",
+      "chars": 6845
+    },
+    {
+      "path": "Svimmelhet og Jobb på Majorstua - VNG\\Gemini analysis.docx",
+      "status": "success",
+      "outputPath": "Svimmelhet og Jobb på Majorstua - VNG\\Gemini analysis.txt",
+      "chars": 5030
+    },
+    {
+      "path": "drive-download-20260115T230537Z-1-001\\tekst til backrom.docx",
+      "status": "success",
+      "outputPath": "drive-download-20260115T230537Z-1-001\\tekst til backrom.txt",
+      "chars": 4817
+    },
+    {
+      "path": "drive-download-20260115T230537Z-1-001\\Undersøkelse Folder før Excel.docx",
+      "status": "success",
+      "outputPath": "drive-download-20260115T230537Z-1-001\\Undersøkelse Folder før Excel.txt",
+      "chars": 381
+    },
+    {
+      "path": "drive-download-20260115T230537Z-1-001\\Vestibulære tester_Svimmelhet.docx",
+      "status": "success",
+      "outputPath": "drive-download-20260115T230537Z-1-001\\Vestibulære tester_Svimmelhet.txt",
+      "chars": 4128
+    },
+    {
+      "path": "drive-download-20260115T230537Z-1-001\\Vestibulært mastersheet.docx",
+      "status": "success",
+      "outputPath": "drive-download-20260115T230537Z-1-001\\Vestibulært mastersheet.txt",
+      "chars": 13630
+    },
+    {
+      "path": "kiropraktorer,  spesifikke frasene, undersøkelser, og behandlinger være mer rettet mot kiropraktisk praksis.docx",
+      "status": "success",
+      "outputPath": "kiropraktorer,  spesifikke frasene, undersøkelser, og behandlinger være mer rettet mot kiropraktisk praksis.txt",
+      "chars": 6960
+    },
+    {
+      "path": "Liste over unike og gjennomgående fraser fra SOPE-notater Gemini_.docx",
+      "status": "success",
+      "outputPath": "Liste over unike og gjennomgående fraser fra SOPE-notater Gemini_.txt",
+      "chars": 6681
+    },
+    {
+      "path": "Prompt for analyse av SOPE (- Anamnese - Undersøkelse - Behandling - Konklusjon) note for organisering, maler, og unike og gjengående fraser for gjennbruk og mautmatisk respons.docx",
+      "status": "success",
+      "outputPath": "Prompt for analyse av SOPE (- Anamnese - Undersøkelse - Behandling - Konklusjon) note for organisering, maler, og unike og gjengående fraser for gjennbruk og mautmatisk respons.txt",
+      "chars": 3988
+    },
+    {
+      "path": "### Utdypende Analyse av SOPE-notater fra Seks Dokumenter.docx",
+      "status": "success",
+      "outputPath": "### Utdypende Analyse av SOPE-notater fra Seks Dokumenter.txt",
+      "chars": 6707
+    },
+    {
+      "path": "Fraser og strukturer som går igjen på tvers av de seks dokumentene som kan være svært nyttige i et mer automatisert system for å øke hastigheten og effektiviteten ved notatskriving.docx",
+      "status": "success",
+      "outputPath": "Fraser og strukturer som går igjen på tvers av de seks dokumentene som kan være svært nyttige i et mer automatisert system for å øke hastigheten og effektiviteten ved notatskriving.txt",
+      "chars": 3977
+    },
+    {
+      "path": "Gemini - full settning gjennomgående fraser fra SOPE-notatene, nå med fulle setninger, og delt inn i kategorier_.docx",
+      "status": "success",
+      "outputPath": "Gemini - full settning gjennomgående fraser fra SOPE-notatene, nå med fulle setninger, og delt inn i kategorier_.txt",
+      "chars": 11693
+    },
+    {
+      "path": "Gemini Cross analyse.docx",
+      "status": "success",
+      "outputPath": "Gemini Cross analyse.txt",
+      "chars": 5427
+    },
+    {
+      "path": "Ny - BH not HS - Neuro.docx",
+      "status": "success",
+      "outputPath": "Ny - BH not HS - Neuro.txt",
+      "chars": 195273
+    },
+    {
+      "path": "Based on the provided document, here is an analysis and organization of templates and phrases for SOPE notes (Subjective, Objective, Assessment, Plan), including templates for notes, journal entries, exercises, te.docx",
+      "status": "success",
+      "outputPath": "Based on the provided document, here is an analysis and organization of templates and phrases for SOPE notes (Subjective, Objective, Assessment, Plan), including templates for notes, journal entries, exercises, te.txt",
+      "chars": 4811
+    },
+    {
+      "path": "Gemini edit .docx",
+      "status": "success",
+      "outputPath": "Gemini edit .txt",
+      "chars": 6590
+    }
+  ]
+}

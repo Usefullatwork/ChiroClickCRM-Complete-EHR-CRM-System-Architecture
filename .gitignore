@@ -67,3 +67,11 @@ backup/
 *.xlsx
 *.csv
 exports/
+exercise_videos/
+mobile-app/node_modules/
+nul
+*.timestamp-*.mjs
+
+# Large binaries - should be installed locally
+bin/ollama/
+bin/pgsql/

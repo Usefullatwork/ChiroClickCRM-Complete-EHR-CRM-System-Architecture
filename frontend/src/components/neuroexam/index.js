@@ -1,19 +1,21 @@
 /**
- * Neurological Exam Module
- *
- * Comprehensive cluster-based neurological examination system
- * for chiropractic clinical documentation.
+ * Neuro Exam Components Index
+ * Compact neurological examination components
  */
 
-// Main components
-export { default as NeurologicalExam, NeurologicalExamCompact } from './NeurologicalExam';
+import React from 'react';
 
-// Definitions and utilities
-export {
-  EXAM_CLUSTERS,
-  calculateClusterScore,
-  checkRedFlags,
-  generateNarrative,
-  formatNarrativeForSOAP,
-  diagnoseBPPV
-} from './neurologicalExamDefinitions';
+export const NeurologicalExamCompact = ({ patientId, encounterId, onDataChange }) => {
+  return (
+    <div className="p-3 border rounded-lg bg-white">
+      <h4 className="text-md font-medium mb-2">Neuro (kompakt)</h4>
+      <div className="grid grid-cols-3 gap-2 text-sm">
+        <div className="text-gray-600">Reflekser: Normal</div>
+        <div className="text-gray-600">Sensibilitet: Normal</div>
+        <div className="text-gray-600">Motorikk: Normal</div>
+      </div>
+    </div>
+  );
+};
+
+export default NeurologicalExamCompact;

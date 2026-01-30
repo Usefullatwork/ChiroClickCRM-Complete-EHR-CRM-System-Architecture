@@ -1,0 +1,28 @@
+{
+  "generated": "2026-01-16T00:09:32.042Z",
+  "statistics": {
+    "filesProcessed": 54,
+    "trainingPairs": 5642,
+    "totalCharacters": 4991337,
+    "categories": {
+      "examination": 8,
+      "vestibular": 32,
+      "general": 5,
+      "soap_templates": 6,
+      "phrases": 2,
+      "clinical_cases": 1
+    }
+  },
+  "outputs": [
+    "training-data.jsonl - OpenAI/Llama chat format",
+    "training-data-alpaca.json - Alpaca instruction format",
+    "Modelfile - Ollama model definition",
+    "rag-chunks.json - RAG-ready document chunks",
+    "build-model.bat - Windows build script",
+    "build-model.sh - Linux/Mac build script"
+  ],
+  "usage": {
+    "ollama": "Run build-model.bat to create the chiro-no model",
+    "test": "ollama run chiro-no \"Skriv et SOPE-notat for en pasient med nakkesmerter\""
+  }
+}
