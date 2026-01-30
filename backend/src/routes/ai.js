@@ -12,6 +12,74 @@ const router = express.Router();
 router.use(requireAuth);
 router.use(requireOrganization);
 
+// =================================================================
+// AI Feedback & Metrics Endpoints (CQRS)
+// =================================================================
+
+/**
+ * @route   POST /api/v1/ai/feedback
+ * @desc    Record feedback on AI suggestion
+ * @access  Private (ADMIN, PRACTITIONER)
+ */
+router.post('/feedback',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  aiController.recordFeedback
+);
+
+/**
+ * @route   GET /api/v1/ai/metrics
+ * @desc    Get AI performance metrics
+ * @access  Private (ADMIN)
+ */
+router.get('/metrics',
+  requireRole(['ADMIN']),
+  aiController.getAIMetrics
+);
+
+/**
+ * @route   GET /api/v1/ai/circuit-status
+ * @desc    Get circuit breaker health status
+ * @access  Private (ADMIN, PRACTITIONER)
+ */
+router.get('/circuit-status',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  aiController.getCircuitStatus
+);
+
+/**
+ * @route   POST /api/v1/ai/circuit-reset/:service
+ * @desc    Reset circuit breaker for a service
+ * @access  Private (ADMIN)
+ */
+router.post('/circuit-reset/:service',
+  requireRole(['ADMIN']),
+  aiController.resetCircuitBreaker
+);
+
+/**
+ * @route   GET /api/v1/ai/retraining-status
+ * @desc    Check if AI retraining is needed
+ * @access  Private (ADMIN)
+ */
+router.get('/retraining-status',
+  requireRole(['ADMIN']),
+  aiController.getRetrainingStatus
+);
+
+/**
+ * @route   POST /api/v1/ai/trigger-retraining
+ * @desc    Manually trigger AI retraining
+ * @access  Private (ADMIN)
+ */
+router.post('/trigger-retraining',
+  requireRole(['ADMIN']),
+  aiController.triggerRetraining
+);
+
+// =================================================================
+// Original AI Endpoints
+// =================================================================
+
 /**
  * @route   POST /api/v1/ai/spell-check
  * @desc    Norwegian spell check for clinical notes

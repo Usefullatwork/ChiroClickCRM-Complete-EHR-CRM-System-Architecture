@@ -64,7 +64,43 @@ export const generateInvoice = async (req, res) => {
   }
 };
 
+/**
+ * Generate exercise handout PDF for a patient
+ * GET /api/v1/patients/:patientId/exercises/pdf
+ */
+export const generateExerciseHandout = async (req, res) => {
+  try {
+    const { organizationId, user } = req;
+    const { patientId } = req.params;
+
+    const result = await pdfService.generateExerciseHandout(organizationId, patientId);
+
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'GENERATE',
+      resourceType: 'EXERCISE_HANDOUT',
+      resourceId: patientId,
+      details: { exerciseCount: result.exerciseCount },
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent')
+    });
+
+    // Return PDF as binary response
+    res.setHeader('Content-Type', result.contentType);
+    res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
+    res.setHeader('Content-Length', result.buffer.length);
+    res.send(result.buffer);
+  } catch (error) {
+    logger.error('Error in generateExerciseHandout controller:', error);
+    res.status(500).json({ error: 'Failed to generate exercise handout' });
+  }
+};
+
 export default {
   generatePatientLetter,
-  generateInvoice
+  generateInvoice,
+  generateExerciseHandout
 };

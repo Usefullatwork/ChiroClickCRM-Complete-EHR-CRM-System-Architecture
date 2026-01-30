@@ -12,7 +12,7 @@ import logger from '../utils/logger.js';
  */
 export const getAll = async (req, res) => {
   try {
-    const organizationId = req.headers['x-organization-id'];
+    const organizationId = req.organizationId;
     const { segment, direction, finding_type, language = 'NO' } = req.query;
 
     // Build query - get org templates first, then defaults for missing
@@ -93,7 +93,7 @@ export const getAll = async (req, res) => {
  */
 export const getGroupedBySegment = async (req, res) => {
   try {
-    const organizationId = req.headers['x-organization-id'];
+    const organizationId = req.organizationId;
     const { language = 'NO' } = req.query;
 
     const sql = `
@@ -152,7 +152,7 @@ export const getGroupedBySegment = async (req, res) => {
  */
 export const getBySegmentDirection = async (req, res) => {
   try {
-    const organizationId = req.headers['x-organization-id'];
+    const organizationId = req.organizationId;
     const { segment, direction } = req.params;
     const { finding_type = 'palpation', language = 'NO' } = req.query;
 
@@ -206,7 +206,7 @@ export const getBySegmentDirection = async (req, res) => {
  */
 export const create = async (req, res) => {
   try {
-    const organizationId = req.headers['x-organization-id'];
+    const organizationId = req.organizationId;
     const { segment, direction, finding_type = 'palpation', text_template, language = 'NO', sort_order = 0 } = req.body;
 
     if (!segment || !direction || !text_template) {
@@ -257,7 +257,7 @@ export const create = async (req, res) => {
  */
 export const update = async (req, res) => {
   try {
-    const organizationId = req.headers['x-organization-id'];
+    const organizationId = req.organizationId;
     const { id } = req.params;
     const { text_template, sort_order } = req.body;
 
@@ -268,20 +268,52 @@ export const update = async (req, res) => {
       });
     }
 
-    const sql = `
+    // First, try to update an org-specific template
+    const updateSql = `
       UPDATE spine_text_templates
       SET text_template = $1, sort_order = COALESCE($2, sort_order), updated_at = NOW()
       WHERE id = $3 AND organization_id = $4
       RETURNING *
     `;
 
-    const result = await query(sql, [text_template, sort_order, id, organizationId]);
+    let result = await query(updateSql, [text_template, sort_order, id, organizationId]);
 
+    // If no org template found, check if it's a default template and create an org override
     if (result.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        error: 'Template not found or not owned by organization'
-      });
+      // Check if this is a default template
+      const checkSql = `SELECT * FROM spine_text_templates WHERE id = $1 AND is_default = true`;
+      const checkResult = await query(checkSql, [id]);
+
+      if (checkResult.rows.length === 0) {
+        return res.status(404).json({
+          success: false,
+          error: 'Template not found'
+        });
+      }
+
+      // Create an org-specific override from the default template
+      const defaultTemplate = checkResult.rows[0];
+      const insertSql = `
+        INSERT INTO spine_text_templates
+          (organization_id, segment, direction, finding_type, text_template, language, is_default, sort_order)
+        VALUES ($1, $2, $3, $4, $5, $6, false, $7)
+        ON CONFLICT (organization_id, segment, direction, finding_type, language)
+        DO UPDATE SET
+          text_template = EXCLUDED.text_template,
+          sort_order = EXCLUDED.sort_order,
+          updated_at = NOW()
+        RETURNING *
+      `;
+
+      result = await query(insertSql, [
+        organizationId,
+        defaultTemplate.segment,
+        defaultTemplate.direction,
+        defaultTemplate.finding_type,
+        text_template,
+        defaultTemplate.language,
+        sort_order || defaultTemplate.sort_order
+      ]);
     }
 
     res.json({
@@ -303,7 +335,7 @@ export const update = async (req, res) => {
  */
 export const remove = async (req, res) => {
   try {
-    const organizationId = req.headers['x-organization-id'];
+    const organizationId = req.organizationId;
     const { id } = req.params;
 
     const sql = `
@@ -340,7 +372,7 @@ export const remove = async (req, res) => {
  */
 export const bulkUpdate = async (req, res) => {
   try {
-    const organizationId = req.headers['x-organization-id'];
+    const organizationId = req.organizationId;
     const { templates } = req.body;
 
     if (!Array.isArray(templates)) {
@@ -403,7 +435,7 @@ export const bulkUpdate = async (req, res) => {
  */
 export const resetToDefaults = async (req, res) => {
   try {
-    const organizationId = req.headers['x-organization-id'];
+    const organizationId = req.organizationId;
     const { language = 'NO' } = req.query;
 
     const sql = `

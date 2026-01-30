@@ -1,6 +1,7 @@
 # Ollama Modelfile for Norwegian Chiropractic Documentation AI
-# Generated: 2026-01-16T00:09:31.854Z
-# Training examples: 5642
+# Model: chiro-no (Default/Balanced)
+# Purpose: General clinical documentation assistance
+# Base: llama3.2 - Good balance of speed and quality
 
 FROM llama3.2
 
@@ -8,6 +9,7 @@ FROM llama3.2
 PARAMETER temperature 0.3
 PARAMETER top_p 0.9
 PARAMETER num_predict 500
+PARAMETER num_ctx 4096
 PARAMETER stop "<|eot_id|>"
 PARAMETER stop "<|end_of_text|>"
 
@@ -58,68 +60,13 @@ VIKTIGE RETNINGSLINJER:
 - Oppfølging planlagt
 
 
-
-## Vestibulær Vurdering (VNG)
-
-### Tester inkludert:
-- Spontan nystagmus: tilstede/fraværende, retning
-- Blikktest lys/mørke: senter, venstre, høyre, opp, ned
-- Stillingstest: hode høyre/venstre, bøy, len
-- Smooth pursuit: horisontal, vertikal
-- Sakkader: prosakkade, antisakkade (latens, hastighet, nøyaktighet)
-- OPK: optokinetisk respons
-- VOR/HIT: vestibulo-okulær refleks, hodeimpulstest
-- Dix-Hallpike: BPPV-vurdering
-
-### Cerebellum-tester:
-- Romberg 7-steg
-- Ettbeinstående balanse
-- Finger til nese
-- Raske vekslende bevegelser
-- Fingertrykking
-- Dobbeltoppgave
-
-### BPPV typer:
-- Kanalolithiasis: symptomer < 30 sek, latens 2-30 sek, reversering
-- Cupulolithiasis: vedvarende symptomer, ingen latens, ingen reversering
-- Påvirkede bueganger: bakre, fremre, horisontal
-
-
-
-## Vanlige behandlingsfraser
-
-### Manuell terapi:
-- Leddmobilisering (HVLA) utført på [segment], god respons
-- Myofascial release (BVM) på [muskel], slipper godt
-- Triggerpunktbehandling på [muskel], god twitching-reaksjon
-- Artikulering av [ledd]
-- Traksjon av [område]
-
-### Nålebehandling (IMS):
-- Nålebehandling utført på [muskel] bilateralt
-- God lokal twitch-respons oppnådd
-- Området desinfisert før behandling
-
-### Øvelser:
-- Instruert i McKenzie-øvelser
-- Instruert i strekkøvelser for [muskelgruppe]
-- Instruert i styrkeøvelser for [muskelgruppe]
-- Instruert i balanseøvelser
-- Instruert i vestibulære rehabiliteringsøvelser
-
-### Råd:
-- Ergonomiske råd gitt
-- Unngå langvarig sitting
-- Bruk lendestøtte
-- Gå korte turer flere ganger daglig
-- Varme/kulde etter behov
-
-
 Svar alltid på norsk med profesjonell klinisk dokumentasjon."""
 
-# Medical terminology reference for enhanced clinical vocabulary
-MESSAGE user """Hva er de vanligste ICPC-2 kodene for kiropraktorer?"""
-MESSAGE assistant """De vanligste ICPC-2 kodene for kiropraktorer:
+# ============================================================================
+# ICPC-2 CODES TRAINING
+# ============================================================================
+MESSAGE user "Hva er de vanligste ICPC-2 kodene for kiropraktorer?"
+MESSAGE assistant "De vanligste ICPC-2 kodene for kiropraktorer:
 
 **Symptom/plage koder:**
 - L01 Nakkesymptom/plage
@@ -142,10 +89,13 @@ MESSAGE assistant """De vanligste ICPC-2 kodene for kiropraktorer:
 - L77 Forstuing/forstrekking ankel
 - L78 Forstuing/forstrekking kne
 - L79 Forstuing/forstrekking annet ledd
-- L80 Dislokasjon/subluksasjon"""
+- L80 Dislokasjon/subluksasjon"
 
-MESSAGE user """What are the key orthopedic tests for lumbar spine?"""
-MESSAGE assistant """Key orthopedic tests for lumbar spine examination:
+# ============================================================================
+# ORTHOPEDIC TESTS TRAINING
+# ============================================================================
+MESSAGE user "What are the key orthopedic tests for lumbar spine?"
+MESSAGE assistant "Key orthopedic tests for lumbar spine examination:
 
 **Nerve Tension Tests:**
 - SLR (Straight Leg Raise) / Lasègue's test: L4-S1 radiculopathy
@@ -166,10 +116,13 @@ MESSAGE assistant """Key orthopedic tests for lumbar spine examination:
 - Hoover's test: Non-organic findings
 - Waddell signs: Psychosocial factors
 
-**Grading:** Positive = reproduces concordant symptoms"""
+**Grading:** Positive = reproduces concordant symptoms"
 
-MESSAGE user """Dokumenter VNG-funn for BPPV"""
-MESSAGE assistant """VNG-undersøkelse - BPPV vurdering:
+# ============================================================================
+# VNG/VESTIBULAR TRAINING
+# ============================================================================
+MESSAGE user "Dokumenter VNG-funn for BPPV"
+MESSAGE assistant "VNG-undersøkelse - BPPV vurdering:
 
 **Dix-Hallpike Test:**
 - Høyre side: Positiv - oppslående, torsjonell nystagmus
@@ -187,55 +140,148 @@ MESSAGE assistant """VNG-undersøkelse - BPPV vurdering:
 Funnene er konsistente med BPPV i høyre bakre buegang (kanalolithiasis).
 Epley reposisjoneringsmanøver anbefales.
 
-**ICPC-2:** H82 Vestibulært syndrom"""
+**ICPC-2:** H82 Vestibulært syndrom"
 
-# Communication Tones Training
-MESSAGE user """Skriv en SMS påminnelse om time, direkte tone"""
-MESSAGE assistant """Hei {{firstName}}, time i morgen kl {{time}} hos {{provider}}. Avbud? Ring {{phone}}."""
+# ============================================================================
+# CHIEF COMPLAINT TRAINING
+# ============================================================================
+MESSAGE user "Generer hovedklage for pasient med nakkesmerter"
+MESSAGE assistant "Pasienten oppsøker klinikken grunnet nakkesmerter med stivhet som har vedvart de siste 3 dagene. Smertene stråler opp mot bakhodet og ned i skulderpartiet."
 
-MESSAGE user """Skriv en SMS påminnelse om time, vennlig tone"""
-MESSAGE assistant """Hei {{firstName}}! Vi gleder oss til å se deg {{date}} kl {{time}}. Gi beskjed om noe endrer seg. Ha en fin dag!"""
+MESSAGE user "Generer hovedklage for pasient med korsryggsmerter"
+MESSAGE assistant "Pasienten presenterer med akutte smerter i nedre korsrygg. Smertene oppstod plutselig i går ved løfting og har forverret seg. Ingen utstråling til bena."
 
-MESSAGE user """Skriv en SMS påminnelse om time, profesjonell tone"""
-MESSAGE assistant """Påminnelse: Du har time hos {{provider}} i morgen {{date}} kl {{time}}. Ved avbud, kontakt oss på {{phone}}."""
+MESSAGE user "Generer hovedklage for pasient med hodepine"
+MESSAGE assistant "Pasienten kommer inn med tilbakevendende hodepine, primært lokalisert på høyre side av hodet. Hodepinen starter ofte i nakken og stråler fremover mot øyet."
 
-MESSAGE user """Skriv en oppfølgings-SMS etter behandling, direkte tone"""
-MESSAGE assistant """Hei {{firstName}}, hvordan går det etter timen? Svar eller ring {{phone}} ved spørsmål."""
+MESSAGE user "Generer hovedklage for gravid pasient med bekkensmerter"
+MESSAGE assistant "Gravid i uke 28, presenterer med smerter i bekkenet og symfysen. Smertene øker ved gange, trappegang og når hun snur seg i sengen."
 
-MESSAGE user """Skriv en oppfølgings-SMS etter behandling, vennlig tone"""
-MESSAGE assistant """Hei {{firstName}}! Håper du har det bra etter behandlingen. Vi er her om du lurer på noe. God bedring!"""
+# ============================================================================
+# ONSET TRAINING
+# ============================================================================
+MESSAGE user "Generer symptomstart for akutt nakkesmerte"
+MESSAGE assistant "Symptomene startet for 3 dager siden etter langvarig arbeid ved dataskjerm. Gradvis forverring. Ingen kjent utløsende årsak eller traume."
 
-MESSAGE user """Skriv en oppfølgings-SMS etter behandling, empatisk tone"""
-MESSAGE assistant """Hei {{firstName}}, vi tenker på deg og håper du merker bedring. Ta kontakt hvis det er noe vi kan gjøre for deg."""
+MESSAGE user "Generer symptomstart for akutt korsryggsmerte"
+MESSAGE assistant "Akutt debut i går ved løfting av tung gjenstand. Kjente et 'klikk' i ryggen etterfulgt av umiddelbar smerte. Har forverret seg over natten."
 
-MESSAGE user """Skriv en betalingspåminnelse, direkte tone"""
-MESSAGE assistant """Utestående: {{amount}} kr. Forfallsdato: {{dueDate}}. Betal: {{link}}"""
+# ============================================================================
+# HISTORY TRAINING
+# ============================================================================
+MESSAGE user "Generer sykehistorie for nakkesmerte"
+MESSAGE assistant "Tidligere episoder med nakkesmerter, sist for 6 måneder siden. Ingen operasjoner eller alvorlige skader. Stillesittende kontorarbeid. Ikke røyker. Generelt god helse."
 
-MESSAGE user """Skriv en betalingspåminnelse, vennlig tone"""
-MESSAGE assistant """Hei {{firstName}}, en vennlig påminnelse om utestående {{amount}} kr. Betal enkelt her: {{link}}. Spørsmål? Ring oss!"""
+MESSAGE user "Generer sykehistorie for korsryggsmerte"
+MESSAGE assistant "Flere tidligere episoder med korsryggsmerter. Sist behandlet for 1 år siden med god effekt. Jobber som lagerarbeider. Ingen kjente systemiske sykdommer."
 
-MESSAGE user """Skriv en velkommen-SMS til ny pasient, vennlig tone"""
-MESSAGE assistant """Velkommen til {{clinic}}, {{firstName}}! Vi er så glade for å ha deg. Din første time er {{date}} kl {{time}}. Vi gleder oss!"""
+# ============================================================================
+# PALPATION TRAINING
+# ============================================================================
+MESSAGE user "Generer palpasjon for nakkesmerte"
+MESSAGE assistant "Ømhet og hypertoni i øvre trapezius bilateralt, mest uttalt høyre. Triggerpunkter i levator scapulae bilateralt. Segmental dysfunksjon C2-C3, C5-C6. Suboccipital spenning."
 
-MESSAGE user """Skriv en SMS om uteblitt time, empatisk tone"""
-MESSAGE assistant """Hei {{firstName}}, vi forstår at ting skjer. Vi savnet deg på timen i dag. Når du er klar, er vi her for å hjelpe. Ring {{phone}}."""
+MESSAGE user "Generer palpasjon for korsryggsmerte"
+MESSAGE assistant "Uttalt ømhet og spasme i paraspinal muskulatur L4-S1, verst venstre. Triggerpunkter i gluteus medius bilateralt. Segmental dysfunksjon L4-L5, L5-S1. IS-ledd ua."
 
-MESSAGE user """Skriv en SMS om innkalling av inaktiv pasient, vennlig tone"""
-MESSAGE assistant """Hei {{firstName}}! Vi har savnet deg! Hvordan har du det? Vi er her når du trenger oss. Bestill time: {{link}}"""
+# ============================================================================
+# ROM TRAINING
+# ============================================================================
+MESSAGE user "Generer bevegelsesutslag for nakke"
+MESSAGE assistant "Cervical ROM: Fleksjon 40° (50), ekstensjon 45° (60), høyre rotasjon 50° (70), venstre rotasjon 65° (70), høyre lateralfleksjon 30° (45), venstre lateralfleksjon 40° (45). Mest begrenset høyre rotasjon og lateralfleksjon."
 
-MESSAGE user """Hva kjennetegner direkte kommunikasjon?"""
-MESSAGE assistant """Direkte kommunikasjon er kort, presis og handlingsfokusert. Ingen unødvendige ord. Klar beskjed om hva mottaker skal gjøre."""
+MESSAGE user "Generer bevegelsesutslag for korsrygg"
+MESSAGE assistant "Lumbal ROM: Fleksjon betydelig redusert - finger-gulv 35cm. Ekstensjon 15° (25), høyre rotasjon 20° (30), venstre rotasjon 25° (30). Lateralfleksjon 20° bilateralt (30). Smerte ved ende-range fleksjon."
 
-MESSAGE user """Hva kjennetegner vennlig kommunikasjon?"""
-MESSAGE assistant """Vennlig kommunikasjon er varm men effektiv. Anerkjenner følelser, viser omsorg, men holder seg til saken. Bruker positive formuleringer."""
+# ============================================================================
+# CLINICAL REASONING TRAINING
+# ============================================================================
+MESSAGE user "Generer klinisk resonnering for nakkesmerte"
+MESSAGE assistant "Funnene er konsistente med cervikalt fasettleddsyndrom C2-C3, C5-C6 med assosiert myofascielt smertesyndrom. Positiv Spurling og mekanisk presentasjon uten nevrologiske utfall støtter diagnosen. Ingen røde flagg identifisert."
 
-MESSAGE user """Hva kjennetegner empatisk kommunikasjon?"""
-MESSAGE assistant """Empatisk kommunikasjon viser forståelse og støtte. Anerkjenner utfordringer. Gir rom for at mottaker kan føle seg hørt og forstått."""
+MESSAGE user "Generer klinisk resonnering for korsryggsmerte"
+MESSAGE assistant "Presentasjonen tyder på akutt lumbal fasettleddsdysfunksjon L4-L5, L5-S1. Positiv Kemps test, normal nevrologi og negativ SLR taler mot diskogen etiologi. Mekanisk smerte konsistent med fasettirritasjon."
+
+# ============================================================================
+# DIAGNOSIS TRAINING
+# ============================================================================
+MESSAGE user "Generer diagnose for nakkesmerte"
+MESSAGE assistant "Cervikalt fasettleddsyndrom C2-C3, C5-C6 med myofascielt smertesyndrom i øvre trapezius og levator scapulae. ICPC-2: L83 Nakkesyndrom."
+
+MESSAGE user "Generer diagnose for korsryggsmerte"
+MESSAGE assistant "Akutt lumbal fasettleddsrestriksjon L4-L5, L5-S1 med assosiert muskelspasme. ICPC-2: L84 Ryggsyndrom uten utstråling."
+
+# ============================================================================
+# TREATMENT TRAINING
+# ============================================================================
+MESSAGE user "Generer behandling for nakkesmerte"
+MESSAGE assistant "Leddmobilisering/manipulasjon C2-C3, C5-C6 med god respons. Myofascial release øvre trapezius og levator scapulae bilateralt. Triggerpunktbehandling. Strekkøvelser instruert. Ergonomiske råd gitt."
+
+MESSAGE user "Generer behandling for korsryggsmerte"
+MESSAGE assistant "Leddmobilisering L4-L5, L5-S1. BVM erector spinae og gluteus medius bilateralt. Traksjonsbehandling lumbal. Instruert i McKenzie ekstensjon-øvelser. Isbruk anbefalt. Råd om aktivitetsmodifisering."
+
+# ============================================================================
+# FOLLOW-UP TRAINING
+# ============================================================================
+MESSAGE user "Generer oppfølging for nakkesmerte"
+MESSAGE assistant "Respons: God respons på behandling, pasienten rapporterer 30% bedring. Plan: Ny time om 3-4 dager. Mål: Øke ROM og redusere smerte ytterligere. Forventede besøk: 4-6 totalt."
+
+MESSAGE user "Generer oppfølging for korsryggsmerte"
+MESSAGE assistant "Respons: Moderat respons, fortsatt stivhet men mindre smerte. Plan: Fortsette nåværende behandlingstilnærming. Ny time om 2-3 dager. Evaluere etter 3 behandlinger. Vurdere bildediagnostikk ved manglende fremgang."
+
+# ============================================================================
+# SAFETY ASSESSMENT TRAINING
+# ============================================================================
+MESSAGE user "Generer sikkerhetsvurdering nakke"
+MESSAGE assistant "Ingen motoriske utfall, nevrologiske funn i overekstremiteter, eller andre indikasjoner på alvorlig patologi i cervikalcolumna. Lokal spinal dysfunksjon uten kontraindikasjoner for behandling. Vil kontinuerlig vurdere behov for bildediagnostikk eller henvisning ved symptomendring."
+
+MESSAGE user "Generer sikkerhetsvurdering korsrygg"
+MESSAGE assistant "Ingen motorisk svakhet, nevrologiske utfall i underekstremiteter, eller andre tegn på alvorlig patologi. Pasienten benekter cauda equina symptomer (sadel-anestesi, blære/tarmproblemer). Lokal spinal dysfunksjon, ingen kontraindikasjoner til behandling."
+
+# ============================================================================
+# COMMUNICATION TONES TRAINING
+# ============================================================================
+MESSAGE user "Skriv en SMS påminnelse om time, direkte tone"
+MESSAGE assistant "Hei {{firstName}}, time i morgen kl {{time}} hos {{provider}}. Avbud? Ring {{phone}}."
+
+MESSAGE user "Skriv en SMS påminnelse om time, vennlig tone"
+MESSAGE assistant "Hei {{firstName}}! Vi gleder oss til å se deg {{date}} kl {{time}}. Gi beskjed om noe endrer seg. Ha en fin dag!"
+
+MESSAGE user "Skriv en SMS påminnelse om time, profesjonell tone"
+MESSAGE assistant "Påminnelse: Du har time hos {{provider}} i morgen {{date}} kl {{time}}. Ved avbud, kontakt oss på {{phone}}."
+
+MESSAGE user "Skriv en oppfølgings-SMS etter behandling, vennlig tone"
+MESSAGE assistant "Hei {{firstName}}! Håper du har det bra etter behandlingen. Vi er her om du lurer på noe. God bedring!"
+
+MESSAGE user "Skriv en oppfølgings-SMS etter behandling, empatisk tone"
+MESSAGE assistant "Hei {{firstName}}, vi tenker på deg og håper du merker bedring. Ta kontakt hvis det er noe vi kan gjøre for deg."
+
+MESSAGE user "Skriv en betalingspåminnelse, vennlig tone"
+MESSAGE assistant "Hei {{firstName}}, en vennlig påminnelse om utestående {{amount}} kr. Betal enkelt her: {{link}}. Spørsmål? Ring oss!"
+
+MESSAGE user "Skriv en velkommen-SMS til ny pasient, vennlig tone"
+MESSAGE assistant "Velkommen til {{clinic}}, {{firstName}}! Vi er så glade for å ha deg. Din første time er {{date}} kl {{time}}. Vi gleder oss!"
+
+MESSAGE user "Skriv en SMS om uteblitt time, empatisk tone"
+MESSAGE assistant "Hei {{firstName}}, vi forstår at ting skjer. Vi savnet deg på timen i dag. Når du er klar, er vi her for å hjelpe. Ring {{phone}}."
+
+MESSAGE user "Skriv en SMS om innkalling av inaktiv pasient, vennlig tone"
+MESSAGE assistant "Hei {{firstName}}! Vi har savnet deg! Hvordan har du det? Vi er her når du trenger oss. Bestill time: {{link}}"
+
+MESSAGE user "Hva kjennetegner direkte kommunikasjon?"
+MESSAGE assistant "Direkte kommunikasjon er kort, presis og handlingsfokusert. Ingen unødvendige ord. Klar beskjed om hva mottaker skal gjøre."
+
+MESSAGE user "Hva kjennetegner vennlig kommunikasjon?"
+MESSAGE assistant "Vennlig kommunikasjon er varm men effektiv. Anerkjenner følelser, viser omsorg, men holder seg til saken. Bruker positive formuleringer."
+
+MESSAGE user "Hva kjennetegner empatisk kommunikasjon?"
+MESSAGE assistant "Empatisk kommunikasjon viser forståelse og støtte. Anerkjenner utfordringer. Gir rom for at mottaker kan føle seg hørt og forstått."
 
 # License notice
 LICENSE """
-This model is trained on Norwegian chiropractic clinical documentation.
+ChiroClick AI Model (chiro-no) - Norwegian Chiropractic Documentation Assistant
+Trained on Norwegian clinical documentation patterns.
 Enhanced with bilingual medical terminology (Norwegian/English).
-For educational and clinical documentation assistance purposes only.
+For clinical documentation assistance purposes only.
 Not a substitute for professional clinical judgment.
 """

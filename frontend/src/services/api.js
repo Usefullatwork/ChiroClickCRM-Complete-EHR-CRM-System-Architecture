@@ -159,8 +159,12 @@ apiClient.interceptors.response.use(
 
       switch (status) {
         case 401:
-          // Unauthorized - redirect to login
-          window.location.href = '/sign-in'
+          // Unauthorized - redirect to login (unless in dev mode)
+          if (!import.meta.env.DEV) {
+            window.location.href = '/sign-in'
+          } else {
+            console.warn('401 Unauthorized - skipping redirect in dev mode')
+          }
           break
         case 403:
           // Forbidden
@@ -479,26 +483,7 @@ export const authAPI = {
   resetPassword: (token, password) => apiClient.post('/auth/reset-password', { token, password }),
 }
 
-// AI Clinical Assistant
-export const aiAPI = {
-  // Get AI service status
-  getStatus: () => apiClient.get('/ai/status'),
-  // Generate SOAP note suggestions
-  generateSuggestions: (chiefComplaint, section = 'subjective') =>
-    apiClient.post('/ai/soap-suggestions', { chiefComplaint, section }),
-  // Suggest diagnosis codes based on clinical data
-  suggestDiagnosis: (soapData) =>
-    apiClient.post('/ai/suggest-diagnosis', soapData),
-  // Analyze for red flags
-  analyzeRedFlags: (patientData, soapData) =>
-    apiClient.post('/ai/analyze-red-flags', { patientData, soapData }),
-  // Generate clinical summary
-  generateSummary: (encounter) =>
-    apiClient.post('/ai/generate-summary', encounter),
-  // Spell check Norwegian text
-  spellCheck: (text) =>
-    apiClient.post('/ai/spell-check', { text }),
-}
+// AI Clinical Assistant - see aiAPI below (line ~730)
 
 // AI Feedback & Learning
 export const aiFeedbackAPI = {
@@ -719,6 +704,105 @@ export const spineTemplatesAPI = {
   // Reset all to defaults
   resetToDefaults: (language = 'NO') => apiClient.post('/spine-templates/reset', null, { params: { language } }),
 }
+
+// Clinical Settings API
+export const clinicalSettingsAPI = {
+  // Get all clinical settings
+  getAll: () => apiClient.get('/clinical-settings'),
+  // Get default settings reference
+  getDefaults: () => apiClient.get('/clinical-settings/defaults'),
+  // Update clinical settings (partial update)
+  update: (settings) => apiClient.patch('/clinical-settings', settings),
+  // Update specific section
+  updateSection: (section, data) => apiClient.patch(`/clinical-settings/${section}`, data),
+  // Reset all to defaults
+  reset: () => apiClient.post('/clinical-settings/reset'),
+  // Adjustment notation
+  getAdjustmentTemplates: () => apiClient.get('/clinical-settings/adjustment/templates'),
+  setAdjustmentStyle: (style) => apiClient.put('/clinical-settings/adjustment/style', { style }),
+  // Test settings
+  updateTestSettings: (testType, settings) => apiClient.patch(`/clinical-settings/tests/${testType}`, settings),
+  // Letter settings
+  updateLetterSettings: (settings) => apiClient.patch('/clinical-settings/letters', settings),
+}
+
+// AI Training Management
+export const trainingAPI = {
+  getStatus: () => apiClient.get('/training/status'),
+  getData: () => apiClient.get('/training/data'),
+  addExamples: (jsonlContent, targetFile) => apiClient.post('/training/add-examples', { jsonlContent, targetFile }),
+  rebuild: () => apiClient.post('/training/rebuild'),
+  backup: () => apiClient.post('/training/backup'),
+  restore: () => apiClient.post('/training/restore'),
+  testModel: (model, prompt) => apiClient.get(`/training/test/${model}`, { params: { prompt } }),
+}
+
+// AI Service
+export const aiAPI = {
+  getStatus: () => apiClient.get('/ai/status'),
+  spellCheck: (text) => apiClient.post('/ai/spell-check', { text }),
+  generateSOAPSuggestion: (chiefComplaint, section) =>
+    apiClient.post('/ai/soap-suggestion', { chiefComplaint, section }),
+  suggestDiagnosis: (soapData) => apiClient.post('/ai/suggest-diagnosis', { soapData }),
+  analyzeRedFlags: (patientData, soapData) =>
+    apiClient.post('/ai/analyze-red-flags', { patientData, soapData }),
+  generateClinicalSummary: (encounter) =>
+    apiClient.post('/ai/clinical-summary', { encounter }),
+  generateField: (fieldType, context, language) =>
+    apiClient.post('/ai/generate-field', { fieldType, context, language }),
+  // Streaming endpoint - uses fetch directly for SSE support
+  getStreamUrl: () => `${API_URL}/ai/generate-field-stream`,
+}
+
+// Exercise Library API
+export const exercisesAPI = {
+  // Exercise Library CRUD
+  getAll: (params) => apiClient.get('/exercises', { params }),
+  getById: (id) => apiClient.get(`/exercises/${id}`),
+  create: (data) => apiClient.post('/exercises', data),
+  update: (id, data) => apiClient.patch(`/exercises/${id}`, data),
+  delete: (id) => apiClient.delete(`/exercises/${id}`),
+
+  // Categories and Regions
+  getCategories: () => apiClient.get('/exercises/categories'),
+  getBodyRegions: () => apiClient.get('/exercises/body-regions'),
+
+  // User favorites and recent
+  getFavorites: (limit = 20) => apiClient.get('/exercises/favorites', { params: { limit } }),
+  getRecentlyUsed: (limit = 10) => apiClient.get('/exercises/recent', { params: { limit } }),
+
+  // Statistics
+  getStats: () => apiClient.get('/exercises/stats'),
+  getTopPrescribed: (limit = 10) => apiClient.get('/exercises/top-prescribed', { params: { limit } }),
+  getComplianceStats: (days = 30) => apiClient.get('/exercises/compliance', { params: { days } }),
+
+  // Exercise Programs
+  getPrograms: (params) => apiClient.get('/exercises/programs', { params }),
+  getProgramById: (id) => apiClient.get(`/exercises/programs/${id}`),
+  createProgram: (data) => apiClient.post('/exercises/programs', data),
+  updateProgram: (id, data) => apiClient.patch(`/exercises/programs/${id}`, data),
+  deleteProgram: (id) => apiClient.delete(`/exercises/programs/${id}`),
+
+  // Prescriptions
+  getPrescriptionById: (id) => apiClient.get(`/exercises/prescriptions/${id}`),
+  updatePrescription: (id, data) => apiClient.patch(`/exercises/prescriptions/${id}`, data),
+  logCompliance: (id, data) => apiClient.post(`/exercises/prescriptions/${id}/compliance`, data),
+  discontinuePrescription: (id, reason) => apiClient.post(`/exercises/prescriptions/${id}/discontinue`, { reason }),
+  completePrescription: (id) => apiClient.post(`/exercises/prescriptions/${id}/complete`),
+
+  // Patient-specific
+  getPatientExercises: (patientId, params) => apiClient.get(`/patients/${patientId}/exercises`, { params }),
+  prescribeToPatient: (patientId, data) => apiClient.post(`/patients/${patientId}/exercises`, data),
+  assignProgramToPatient: (patientId, data) => apiClient.post(`/patients/${patientId}/programs`, data),
+
+  // PDF generation
+  getPatientExercisePDF: (patientId) => apiClient.get(`/patients/${patientId}/exercises/pdf`, {
+    responseType: 'blob'
+  }),
+}
+
+// Export API URL for streaming endpoints
+export { API_URL }
 
 // Export default API client
 export default apiClient

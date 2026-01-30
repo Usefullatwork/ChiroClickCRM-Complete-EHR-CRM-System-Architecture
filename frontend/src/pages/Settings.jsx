@@ -12,7 +12,6 @@ import {
   Phone,
   MapPin,
   Globe,
-  Settings as SettingsIcon,
   Users,
   CreditCard,
   Database,
@@ -22,24 +21,25 @@ import {
   ExternalLink,
   Stethoscope,
   FileText,
-  Activity,
   Layers,
-  Zap,
-  Upload,
-  CalendarClock,
-  MessageSquare,
+  Dumbbell,
+  Search,
+  Plus,
+  Edit3,
+  Trash2,
+  Video,
+  Image,
+  X,
   ChevronDown,
   ChevronUp,
-  Edit3,
-  RotateCcw,
-  Target
+  Bone,
+  RotateCcw
 } from 'lucide-react'
-import { organizationAPI, usersAPI, spineTemplatesAPI } from '../services/api'
+import { organizationAPI, usersAPI, exercisesAPI, spineTemplatesAPI } from '../services/api'
 import { formatDate } from '../lib/utils'
 import AISettings from '../components/AISettings'
-import SchedulerDecisions from '../components/scheduler/SchedulerDecisions'
-import AppointmentImporter from '../components/scheduler/AppointmentImporter'
-import TodaysMessages from '../components/scheduler/TodaysMessages'
+import { useTranslation } from '../i18n'
+import toast from '../utils/toast'
 
 // Adjustment notation methods available in the system
 const ADJUSTMENT_NOTATION_METHODS = [
@@ -127,243 +127,8 @@ const DEFAULT_CLINICAL_PREFS = {
   defaultView: 'front'
 }
 
-// Spine Templates Editor Component
-function SpineTemplatesEditor({ lang }) {
-  const queryClient = useQueryClient()
-  const [expandedSegment, setExpandedSegment] = useState(null)
-  const [editingTemplate, setEditingTemplate] = useState(null)
-  const [editText, setEditText] = useState('')
-
-  // Fetch grouped templates
-  const { data: templatesData, isLoading, refetch } = useQuery({
-    queryKey: ['spine-templates', 'grouped', lang === 'en' ? 'EN' : 'NO'],
-    queryFn: () => spineTemplatesAPI.getGrouped(lang === 'en' ? 'EN' : 'NO'),
-    staleTime: 5 * 60 * 1000
-  })
-
-  const templates = templatesData?.data?.data || {}
-
-  // Update mutation
-  const updateMutation = useMutation({
-    mutationFn: (data) => spineTemplatesAPI.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['spine-templates'])
-      setEditingTemplate(null)
-      setEditText('')
-    }
-  })
-
-  // Reset mutation
-  const resetMutation = useMutation({
-    mutationFn: () => spineTemplatesAPI.resetToDefaults(lang === 'en' ? 'EN' : 'NO'),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['spine-templates'])
-      alert(lang === 'no' ? 'Maler tilbakestilt til standard' : 'Templates reset to defaults')
-    }
-  })
-
-  const handleEdit = (template) => {
-    setEditingTemplate(template)
-    setEditText(template.text_template)
-  }
-
-  const handleSave = () => {
-    if (!editingTemplate || !editText.trim()) return
-    updateMutation.mutate({
-      segment: editingTemplate.segment,
-      direction: editingTemplate.direction,
-      finding_type: editingTemplate.finding_type || 'palpation',
-      text_template: editText,
-      language: lang === 'en' ? 'EN' : 'NO'
-    })
-  }
-
-  const handleCancel = () => {
-    setEditingTemplate(null)
-    setEditText('')
-  }
-
-  // Group segments by region
-  const regions = {
-    cervical: ['C0-C1', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7'],
-    thoracic: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
-    lumbar: ['L1', 'L2', 'L3', 'L4', 'L5'],
-    sacral: ['Sacrum', 'SI-L', 'SI-R', 'Coccyx'],
-    muscle: ['C-para', 'T-para', 'L-para', 'QL', 'Piriformis']
-  }
-
-  const regionLabels = {
-    cervical: lang === 'no' ? 'Cervical' : 'Cervical',
-    thoracic: lang === 'no' ? 'Thoracal' : 'Thoracic',
-    lumbar: lang === 'no' ? 'Lumbal' : 'Lumbar',
-    sacral: lang === 'no' ? 'Sakrum/Bekken' : 'Sacrum/Pelvis',
-    muscle: lang === 'no' ? 'Muskulatur' : 'Muscles'
-  }
-
-  const directionLabels = {
-    left: lang === 'no' ? 'Venstre' : 'Left',
-    right: lang === 'no' ? 'Høyre' : 'Right',
-    bilateral: lang === 'no' ? 'Bilateral' : 'Bilateral',
-    posterior: lang === 'no' ? 'Posterior' : 'Posterior',
-    anterior: lang === 'no' ? 'Anterior' : 'Anterior',
-    superior: lang === 'no' ? 'Superior' : 'Superior',
-    inferior: lang === 'no' ? 'Inferior' : 'Inferior',
-    inflare: lang === 'no' ? 'Inflare' : 'Inflare',
-    outflare: lang === 'no' ? 'Outflare' : 'Outflare'
-  }
-
-  return (
-    <div className="bg-white rounded-lg border border-gray-200">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
-              <Target className="w-5 h-5 text-emerald-600" />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">
-                {lang === 'no' ? 'Palpasjonsmaler (Rask-klikk)' : 'Palpation Templates (Quick-Click)'}
-              </h2>
-              <p className="text-sm text-gray-500">
-                {lang === 'no'
-                  ? 'Tilpass teksten som settes inn ved rask-klikk på ryggsøylen'
-                  : 'Customize the text inserted by quick-click spine buttons'}
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={() => {
-              if (confirm(lang === 'no' ? 'Tilbakestille alle maler til standard?' : 'Reset all templates to defaults?')) {
-                resetMutation.mutate()
-              }
-            }}
-            disabled={resetMutation.isLoading}
-            className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center gap-1.5"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            {lang === 'no' ? 'Tilbakestill' : 'Reset'}
-          </button>
-        </div>
-      </div>
-
-      <div className="p-4">
-        {isLoading ? (
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="w-6 h-6 animate-spin text-emerald-500" />
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {Object.entries(regions).map(([regionKey, segments]) => {
-              const hasTemplates = segments.some(seg => templates[seg]?.length > 0)
-              if (!hasTemplates) return null
-
-              return (
-                <div key={regionKey} className="border border-gray-200 rounded-lg overflow-hidden">
-                  <button
-                    onClick={() => setExpandedSegment(expandedSegment === regionKey ? null : regionKey)}
-                    className="w-full flex items-center justify-between px-4 py-2.5 bg-gray-50 hover:bg-gray-100"
-                  >
-                    <span className="text-sm font-medium text-gray-700">{regionLabels[regionKey]}</span>
-                    {expandedSegment === regionKey ? (
-                      <ChevronUp className="w-4 h-4 text-gray-500" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4 text-gray-500" />
-                    )}
-                  </button>
-
-                  {expandedSegment === regionKey && (
-                    <div className="p-3 space-y-2 bg-white">
-                      {segments.map(segment => {
-                        const segmentTemplates = templates[segment] || []
-                        if (segmentTemplates.length === 0) return null
-
-                        return (
-                          <div key={segment} className="border border-gray-100 rounded-lg p-2">
-                            <p className="text-xs font-semibold text-gray-600 mb-1.5">{segment}</p>
-                            <div className="space-y-1">
-                              {segmentTemplates.map(template => (
-                                <div
-                                  key={`${template.segment}-${template.direction}`}
-                                  className={`flex items-start gap-2 p-2 rounded ${
-                                    editingTemplate?.segment === template.segment &&
-                                    editingTemplate?.direction === template.direction
-                                      ? 'bg-emerald-50 border border-emerald-200'
-                                      : 'bg-gray-50'
-                                  }`}
-                                >
-                                  <span className="text-xs font-medium text-gray-500 w-16 shrink-0">
-                                    {directionLabels[template.direction] || template.direction}
-                                  </span>
-
-                                  {editingTemplate?.segment === template.segment &&
-                                   editingTemplate?.direction === template.direction ? (
-                                    <div className="flex-1 space-y-2">
-                                      <textarea
-                                        value={editText}
-                                        onChange={(e) => setEditText(e.target.value)}
-                                        className="w-full px-2 py-1.5 text-xs border border-gray-300 rounded focus:ring-2 focus:ring-emerald-500 resize-none"
-                                        rows={2}
-                                      />
-                                      <div className="flex gap-1.5">
-                                        <button
-                                          onClick={handleSave}
-                                          disabled={updateMutation.isLoading}
-                                          className="px-2 py-1 text-xs bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50"
-                                        >
-                                          {updateMutation.isLoading ? '...' : (lang === 'no' ? 'Lagre' : 'Save')}
-                                        </button>
-                                        <button
-                                          onClick={handleCancel}
-                                          className="px-2 py-1 text-xs border border-gray-300 rounded hover:bg-gray-50"
-                                        >
-                                          {lang === 'no' ? 'Avbryt' : 'Cancel'}
-                                        </button>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <>
-                                      <p className="flex-1 text-xs text-gray-700 truncate" title={template.text_template}>
-                                        {template.text_template}
-                                      </p>
-                                      <button
-                                        onClick={() => handleEdit(template)}
-                                        className="p-1 text-gray-400 hover:text-emerald-600 rounded"
-                                        title={lang === 'no' ? 'Rediger' : 'Edit'}
-                                      >
-                                        <Edit3 className="w-3.5 h-3.5" />
-                                      </button>
-                                      {!template.is_default && (
-                                        <span className="px-1.5 py-0.5 text-[10px] bg-emerald-100 text-emerald-700 rounded">
-                                          {lang === 'no' ? 'Tilpasset' : 'Custom'}
-                                        </span>
-                                      )}
-                                    </>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        )}
-
-        <p className="text-xs text-gray-500 mt-3 text-center">
-          {lang === 'no'
-            ? 'Klikk på "Rediger" for å tilpasse tekstmalen for hvert segment og retning.'
-            : 'Click "Edit" to customize the text template for each segment and direction.'}
-        </p>
-      </div>
-    </div>
-  )
-}
-
 export default function Settings() {
+  const { t } = useTranslation('settings')
   const queryClient = useQueryClient()
   const [activeTab, setActiveTab] = useState('organization')
   const [editMode, setEditMode] = useState(false)
@@ -379,6 +144,19 @@ export default function Settings() {
   useEffect(() => {
     localStorage.setItem('chiroclick_clinical_prefs', JSON.stringify(clinicalPrefs))
   }, [clinicalPrefs])
+
+  // Exercise management state
+  const [exerciseSearch, setExerciseSearch] = useState('')
+  const [exerciseCategoryFilter, setExerciseCategoryFilter] = useState('')
+  const [exerciseBodyRegionFilter, setExerciseBodyRegionFilter] = useState('')
+  const [selectedExercise, setSelectedExercise] = useState(null)
+  const [exerciseModalMode, setExerciseModalMode] = useState(null) // 'create' | 'edit' | null
+  const [exerciseFormData, setExerciseFormData] = useState({})
+
+  // Spine templates state
+  const [expandedSpineRegions, setExpandedSpineRegions] = useState({})
+  const [editingTemplate, setEditingTemplate] = useState(null)
+  const [templateEditText, setTemplateEditText] = useState('')
 
   const handleClinicalPrefChange = (key, value) => {
     setClinicalPrefs(prev => ({ ...prev, [key]: value }))
@@ -411,16 +189,48 @@ export default function Settings() {
 
   const organizationUsers = usersResponse?.data?.users || []
 
+  // Fetch exercises for the exercises tab
+  const { data: exercisesResponse, isLoading: exercisesLoading } = useQuery({
+    queryKey: ['exercises', exerciseSearch, exerciseCategoryFilter, exerciseBodyRegionFilter],
+    queryFn: () => exercisesAPI.getAll({
+      search: exerciseSearch || undefined,
+      category: exerciseCategoryFilter || undefined,
+      bodyRegion: exerciseBodyRegionFilter || undefined,
+      limit: 100
+    }),
+    enabled: activeTab === 'exercises',
+  })
+
+  const exercises = exercisesResponse?.data?.exercises || []
+
+  // Fetch exercise categories
+  const { data: categoriesResponse } = useQuery({
+    queryKey: ['exercise-categories'],
+    queryFn: () => exercisesAPI.getCategories(),
+    enabled: activeTab === 'exercises',
+  })
+
+  const exerciseCategories = categoriesResponse?.data?.categories || []
+
+  // Fetch exercise body regions
+  const { data: bodyRegionsResponse } = useQuery({
+    queryKey: ['exercise-body-regions'],
+    queryFn: () => exercisesAPI.getBodyRegions(),
+    enabled: activeTab === 'exercises',
+  })
+
+  const exerciseBodyRegions = bodyRegionsResponse?.data?.bodyRegions || []
+
   // Update organization mutation
   const updateOrgMutation = useMutation({
     mutationFn: (data) => organizationAPI.update(data),
     onSuccess: () => {
       queryClient.invalidateQueries(['organization'])
       setEditMode(false)
-      alert('Organization settings updated successfully')
+      toast.success(t('orgUpdatedSuccess'))
     },
     onError: (error) => {
-      alert(`Failed to update organization: ${error.response?.data?.message || error.message}`)
+      toast.error(`${t('orgUpdateFailed')}: ${error.response?.data?.message || error.message}`)
     },
   })
 
@@ -430,10 +240,10 @@ export default function Settings() {
     onSuccess: () => {
       queryClient.invalidateQueries(['current-user'])
       setEditMode(false)
-      alert('Profile updated successfully')
+      toast.success(t('profileUpdatedSuccess'))
     },
     onError: (error) => {
-      alert(`Failed to update profile: ${error.response?.data?.message || error.message}`)
+      toast.error(`${t('profileUpdateFailed')}: ${error.response?.data?.message || error.message}`)
     },
   })
 
@@ -442,12 +252,129 @@ export default function Settings() {
     mutationFn: (data) => organizationAPI.inviteUser(data),
     onSuccess: () => {
       queryClient.invalidateQueries(['organization-users'])
-      alert('User invited successfully')
+      toast.success(t('userInvitedSuccess'))
     },
     onError: (error) => {
-      alert(`Failed to invite user: ${error.response?.data?.message || error.message}`)
+      toast.error(`${t('userInviteFailed')}: ${error.response?.data?.message || error.message}`)
     },
   })
+
+  // Create exercise mutation
+  const createExerciseMutation = useMutation({
+    mutationFn: (data) => exercisesAPI.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['exercises'])
+      setExerciseModalMode(null)
+      setExerciseFormData({})
+      toast.success(lang === 'no' ? 'Øvelse opprettet' : 'Exercise created')
+    },
+    onError: (error) => {
+      toast.error(`${lang === 'no' ? 'Kunne ikke opprette øvelse' : 'Failed to create exercise'}: ${error.response?.data?.message || error.message}`)
+    },
+  })
+
+  // Update exercise mutation
+  const updateExerciseMutation = useMutation({
+    mutationFn: ({ id, data }) => exercisesAPI.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['exercises'])
+      setExerciseModalMode(null)
+      setSelectedExercise(null)
+      setExerciseFormData({})
+      toast.success(lang === 'no' ? 'Øvelse oppdatert' : 'Exercise updated')
+    },
+    onError: (error) => {
+      toast.error(`${lang === 'no' ? 'Kunne ikke oppdatere øvelse' : 'Failed to update exercise'}: ${error.response?.data?.message || error.message}`)
+    },
+  })
+
+  // Delete exercise mutation
+  const deleteExerciseMutation = useMutation({
+    mutationFn: (id) => exercisesAPI.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['exercises'])
+      toast.success(lang === 'no' ? 'Øvelse slettet' : 'Exercise deleted')
+    },
+    onError: (error) => {
+      toast.error(`${lang === 'no' ? 'Kunne ikke slette øvelse' : 'Failed to delete exercise'}: ${error.response?.data?.message || error.message}`)
+    },
+  })
+
+  // Fetch spine templates for clinical tab
+  const { data: spineTemplatesResponse, isLoading: spineTemplatesLoading } = useQuery({
+    queryKey: ['spine-templates-grouped'],
+    queryFn: () => spineTemplatesAPI.getGrouped(clinicalPrefs.language || 'NO'),
+    enabled: activeTab === 'clinical',
+  })
+
+  const spineTemplates = spineTemplatesResponse?.data || {}
+
+  // Spine template regions for display
+  const SPINE_REGIONS_CONFIG = {
+    cervical: { label: lang === 'no' ? 'Cervical (nakke)' : 'Cervical', segments: ['C0-C1', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7'] },
+    thoracic: { label: lang === 'no' ? 'Thoracal (bryst)' : 'Thoracic', segments: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'] },
+    lumbar: { label: lang === 'no' ? 'Lumbal (korsrygg)' : 'Lumbar', segments: ['L1', 'L2', 'L3', 'L4', 'L5'] },
+    sacral: { label: lang === 'no' ? 'Sakral/Bekken' : 'Sacral/Pelvis', segments: ['Sacrum', 'SI-L', 'SI-R', 'Coccyx'] },
+    muscle: { label: lang === 'no' ? 'Muskulatur' : 'Muscles', segments: ['C-para', 'T-para', 'L-para', 'QL', 'Piriformis'] }
+  }
+
+  // Update spine template mutation
+  const updateSpineTemplateMutation = useMutation({
+    mutationFn: ({ id, data }) => spineTemplatesAPI.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['spine-templates-grouped'])
+      setEditingTemplate(null)
+      setTemplateEditText('')
+      toast.success(lang === 'no' ? 'Mal oppdatert' : 'Template updated')
+    },
+    onError: (error) => {
+      toast.error(`${lang === 'no' ? 'Kunne ikke oppdatere mal' : 'Failed to update template'}: ${error.response?.data?.message || error.message}`)
+    },
+  })
+
+  // Reset spine templates mutation
+  const resetSpineTemplatesMutation = useMutation({
+    mutationFn: () => spineTemplatesAPI.resetToDefaults(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['spine-templates-grouped'])
+      toast.success(lang === 'no' ? 'Maler tilbakestilt til standard' : 'Templates reset to defaults')
+    },
+    onError: (error) => {
+      toast.error(`${lang === 'no' ? 'Kunne ikke tilbakestille maler' : 'Failed to reset templates'}: ${error.response?.data?.message || error.message}`)
+    },
+  })
+
+  // Spine template handlers
+  const toggleSpineRegion = (region) => {
+    setExpandedSpineRegions(prev => ({ ...prev, [region]: !prev[region] }))
+  }
+
+  const handleEditTemplate = (template) => {
+    setEditingTemplate(template)
+    setTemplateEditText(template.text_template)
+  }
+
+  const handleSaveTemplate = () => {
+    if (editingTemplate && templateEditText.trim()) {
+      updateSpineTemplateMutation.mutate({
+        id: editingTemplate.id,
+        data: { text_template: templateEditText.trim() }
+      })
+    }
+  }
+
+  const handleCancelTemplateEdit = () => {
+    setEditingTemplate(null)
+    setTemplateEditText('')
+  }
+
+  const handleResetTemplates = () => {
+    if (window.confirm(lang === 'no'
+      ? 'Er du sikker på at du vil tilbakestille alle palpasjonsmaler til standard? Dette kan ikke angres.'
+      : 'Are you sure you want to reset all palpation templates to defaults? This cannot be undone.')) {
+      resetSpineTemplatesMutation.mutate()
+    }
+  }
 
   const handleSave = () => {
     if (activeTab === 'organization') {
@@ -468,22 +395,129 @@ export default function Settings() {
   }
 
   const handleInviteUser = () => {
-    const email = prompt('Enter email address to invite:')
+    const email = prompt(t('enterEmailToInvite'))
     if (email) {
-      const role = prompt('Enter role (ADMIN, PRACTITIONER, STAFF):', 'PRACTITIONER')
+      const role = prompt(t('enterRole'), 'PRACTITIONER')
       if (role) {
         inviteUserMutation.mutate({ email, role })
       }
     }
   }
 
+  // Exercise handlers
+  const handleOpenExerciseCreate = () => {
+    setExerciseFormData({
+      name_no: '',
+      name_en: '',
+      category: 'strengthening',
+      body_region: 'core',
+      difficulty: 'beginner',
+      instructions_no: '',
+      instructions_en: '',
+      contraindications: '',
+      precautions: '',
+      default_sets: 3,
+      default_reps: 10,
+      default_hold_seconds: null,
+      default_frequency: 'daily',
+      video_url: '',
+      image_url: '',
+      equipment_needed: [],
+      tags: []
+    })
+    setExerciseModalMode('create')
+  }
+
+  const handleOpenExerciseEdit = (exercise) => {
+    setSelectedExercise(exercise)
+    setExerciseFormData({
+      name_no: exercise.name_no || '',
+      name_en: exercise.name_en || '',
+      category: exercise.category || 'strengthening',
+      body_region: exercise.body_region || 'core',
+      difficulty: exercise.difficulty || 'beginner',
+      instructions_no: exercise.instructions_no || '',
+      instructions_en: exercise.instructions_en || '',
+      contraindications: exercise.contraindications || '',
+      precautions: exercise.precautions || '',
+      default_sets: exercise.default_sets || 3,
+      default_reps: exercise.default_reps || 10,
+      default_hold_seconds: exercise.default_hold_seconds || null,
+      default_frequency: exercise.default_frequency || 'daily',
+      video_url: exercise.video_url || '',
+      image_url: exercise.image_url || '',
+      equipment_needed: exercise.equipment_needed || [],
+      tags: exercise.tags || []
+    })
+    setExerciseModalMode('edit')
+  }
+
+  const handleSaveExercise = () => {
+    if (exerciseModalMode === 'create') {
+      createExerciseMutation.mutate(exerciseFormData)
+    } else if (exerciseModalMode === 'edit' && selectedExercise) {
+      updateExerciseMutation.mutate({ id: selectedExercise.id, data: exerciseFormData })
+    }
+  }
+
+  const handleCloseExerciseModal = () => {
+    setExerciseModalMode(null)
+    setSelectedExercise(null)
+    setExerciseFormData({})
+  }
+
+  const handleDeleteExercise = (exercise) => {
+    if (window.confirm(lang === 'no'
+      ? `Er du sikker på at du vil slette "${exercise.name_no}"?`
+      : `Are you sure you want to delete "${exercise.name_en || exercise.name_no}"?`
+    )) {
+      deleteExerciseMutation.mutate(exercise.id)
+    }
+  }
+
+  // Helper to extract YouTube video ID
+  const getYouTubeVideoId = (url) => {
+    if (!url) {
+      return null
+    }
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&?/]+)/)
+    return match ? match[1] : null
+  }
+
+  // Category and body region labels
+  const categoryLabels = {
+    stretching: { no: 'Tøyning', en: 'Stretching' },
+    strengthening: { no: 'Styrke', en: 'Strengthening' },
+    mobility: { no: 'Mobilitet', en: 'Mobility' },
+    balance: { no: 'Balanse', en: 'Balance' },
+    posture: { no: 'Holdning', en: 'Posture' },
+    breathing: { no: 'Pust', en: 'Breathing' },
+    nerve_glide: { no: 'Nervegliding', en: 'Nerve Glide' },
+    vestibular: { no: 'Vestibulær', en: 'Vestibular' }
+  }
+
+  const bodyRegionLabels = {
+    cervical: { no: 'Nakke', en: 'Cervical' },
+    thoracic: { no: 'Brystsøyle', en: 'Thoracic' },
+    lumbar: { no: 'Korsrygg', en: 'Lumbar' },
+    shoulder: { no: 'Skulder', en: 'Shoulder' },
+    hip: { no: 'Hofte', en: 'Hip' },
+    knee: { no: 'Kne', en: 'Knee' },
+    ankle: { no: 'Ankel', en: 'Ankle' },
+    foot: { no: 'Fot', en: 'Foot' },
+    core: { no: 'Kjerne', en: 'Core' },
+    upper_extremity: { no: 'Overekstremitet', en: 'Upper Extremity' },
+    lower_extremity: { no: 'Underekstremitet', en: 'Lower Extremity' },
+    full_body: { no: 'Helkropp', en: 'Full Body' }
+  }
+
   return (
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">{t('title')}</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Manage your organization and profile settings
+          {t('manageSettings')}
         </p>
       </div>
 
@@ -503,7 +537,7 @@ export default function Settings() {
           >
             <div className="flex items-center gap-2">
               <Building2 className="w-4 h-4" />
-              Organization
+              {t('organization')}
             </div>
           </button>
           <button
@@ -519,7 +553,7 @@ export default function Settings() {
           >
             <div className="flex items-center gap-2">
               <User className="w-4 h-4" />
-              Profile
+              {t('profile')}
             </div>
           </button>
           <button
@@ -535,7 +569,7 @@ export default function Settings() {
           >
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4" />
-              Users
+              {t('users')}
             </div>
           </button>
           <button
@@ -551,7 +585,7 @@ export default function Settings() {
           >
             <div className="flex items-center gap-2">
               <Bell className="w-4 h-4" />
-              Notifications
+              {t('notifications')}
             </div>
           </button>
           <button
@@ -567,7 +601,7 @@ export default function Settings() {
           >
             <div className="flex items-center gap-2">
               <Database className="w-4 h-4" />
-              Integrations
+              {t('integrations')}
             </div>
           </button>
           <button
@@ -583,7 +617,7 @@ export default function Settings() {
           >
             <div className="flex items-center gap-2">
               <Brain className="w-4 h-4" />
-              AI Assistant
+              {t('aiAssistant')}
             </div>
           </button>
           <button
@@ -599,23 +633,23 @@ export default function Settings() {
           >
             <div className="flex items-center gap-2">
               <Stethoscope className="w-4 h-4" />
-              Clinical
+              {t('clinical')}
             </div>
           </button>
           <button
             onClick={() => {
-              setActiveTab('automation')
+              setActiveTab('exercises')
               setEditMode(false)
             }}
             className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
-              activeTab === 'automation'
-                ? 'border-orange-600 text-orange-600'
+              activeTab === 'exercises'
+                ? 'border-green-600 text-green-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
             <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4" />
-              Automatisering
+              <Dumbbell className="w-4 h-4" />
+              {lang === 'no' ? 'Øvelser' : 'Exercises'}
             </div>
           </button>
         </nav>
@@ -634,14 +668,14 @@ export default function Settings() {
               <div className="bg-white rounded-lg border border-gray-200">
                 <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                   <h2 className="text-lg font-semibold text-gray-900">
-                    Organization Information
+                    {t('organizationInfo')}
                   </h2>
                   {!editMode ? (
                     <button
                       onClick={() => handleEdit(organization)}
                       className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                     >
-                      Edit
+                      {t('edit')}
                     </button>
                   ) : (
                     <div className="flex gap-2">
@@ -649,7 +683,7 @@ export default function Settings() {
                         onClick={handleCancel}
                         className="px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
                       >
-                        Cancel
+                        {t('cancel')}
                       </button>
                       <button
                         onClick={handleSave}
@@ -659,12 +693,12 @@ export default function Settings() {
                         {updateOrgMutation.isLoading ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            Saving...
+                            {t('saving')}
                           </>
                         ) : (
                           <>
                             <Save className="w-4 h-4" />
-                            Save
+                            {t('save')}
                           </>
                         )}
                       </button>
@@ -677,7 +711,7 @@ export default function Settings() {
                     {/* Organization Name */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Organization Name
+                        {t('orgName')}
                       </label>
                       {editMode ? (
                         <input
@@ -694,7 +728,7 @@ export default function Settings() {
                     {/* Email */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Email
+                        {t('email')}
                       </label>
                       {editMode ? (
                         <input
@@ -714,7 +748,7 @@ export default function Settings() {
                     {/* Phone */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Phone
+                        {t('clinicPhone')}
                       </label>
                       {editMode ? (
                         <input
@@ -734,7 +768,7 @@ export default function Settings() {
                     {/* Website */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Website
+                        {t('website')}
                       </label>
                       {editMode ? (
                         <input
@@ -755,7 +789,7 @@ export default function Settings() {
                   {/* Address */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Address
+                      {t('clinicAddress')}
                     </label>
                     {editMode ? (
                       <textarea
@@ -775,7 +809,7 @@ export default function Settings() {
                   {!editMode && (
                     <div className="pt-4 border-t border-gray-200">
                       <p className="text-xs text-gray-500">
-                        Created: {formatDate(organization.created_at, 'time')}
+                        {t('created')}: {formatDate(organization.created_at, 'time')}
                       </p>
                     </div>
                   )}
@@ -791,10 +825,10 @@ export default function Settings() {
                     </div>
                     <div>
                       <h2 className="text-lg font-semibold text-gray-900">
-                        Patient Self-Check-In Kiosk
+                        {t('kioskTitle')}
                       </h2>
                       <p className="text-sm text-gray-500">
-                        Touch-friendly check-in for waiting room tablets
+                        {t('kioskDescription')}
                       </p>
                     </div>
                   </div>
@@ -803,24 +837,24 @@ export default function Settings() {
                 <div className="p-6">
                   <div className="space-y-4">
                     <p className="text-sm text-gray-600">
-                      Launch kiosk mode for patient self-check-in. Patients can:
+                      {t('kioskLaunchDescription')}
                     </p>
                     <ul className="text-sm text-gray-600 space-y-2 ml-4">
                       <li className="flex items-center gap-2">
                         <Check className="w-4 h-4 text-teal-600" />
-                        Find their appointment by name or phone
+                        {t('kioskFeature1')}
                       </li>
                       <li className="flex items-center gap-2">
                         <Check className="w-4 h-4 text-teal-600" />
-                        Verify identity with date of birth
+                        {t('kioskFeature2')}
                       </li>
                       <li className="flex items-center gap-2">
                         <Check className="w-4 h-4 text-teal-600" />
-                        Enter chief complaint and pain level
+                        {t('kioskFeature3')}
                       </li>
                       <li className="flex items-center gap-2">
                         <Check className="w-4 h-4 text-teal-600" />
-                        Auto-populate SOAP notes for provider
+                        {t('kioskFeature4')}
                       </li>
                     </ul>
 
@@ -831,18 +865,18 @@ export default function Settings() {
                                    transition-colors flex items-center justify-center gap-2 font-medium"
                       >
                         <Monitor className="w-5 h-5" />
-                        Launch Kiosk Mode
+                        {t('launchKiosk')}
                         <ExternalLink className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => {
                           navigator.clipboard.writeText(`${window.location.origin}/kiosk`)
-                          alert('Kiosk URL copied to clipboard!')
+                          toast.success(t('kioskUrlCopied'))
                         }}
                         className="px-4 py-3 border border-gray-300 text-gray-700 rounded-lg
                                    hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
                       >
-                        Copy Kiosk URL
+                        {t('copyKioskUrl')}
                       </button>
                     </div>
 
@@ -850,10 +884,10 @@ export default function Settings() {
                       <div className="flex items-start gap-2">
                         <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
                         <div className="text-sm">
-                          <p className="font-medium text-blue-900">Tip: Full-screen mode</p>
+                          <p className="font-medium text-blue-900">{t('fullscreenTip')}</p>
                           <p className="text-blue-700 mt-1">
-                            For the best experience, press <kbd className="px-1.5 py-0.5 bg-blue-100 rounded text-xs font-mono">F11</kbd> after
-                            launching to enter full-screen mode on the kiosk device.
+                            {t('fullscreenDescription').replace('{key}', '')}
+                            <kbd className="px-1.5 py-0.5 bg-blue-100 rounded text-xs font-mono">F11</kbd>
                           </p>
                         </div>
                       </div>
@@ -877,14 +911,14 @@ export default function Settings() {
             <div className="bg-white rounded-lg border border-gray-200">
               <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-gray-900">
-                  User Profile
+                  {t('userProfile')}
                 </h2>
                 {!editMode ? (
                   <button
                     onClick={() => handleEdit(currentUser)}
                     className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
-                    Edit
+                    {t('edit')}
                   </button>
                 ) : (
                   <div className="flex gap-2">
@@ -892,7 +926,7 @@ export default function Settings() {
                       onClick={handleCancel}
                       className="px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
                     >
-                      Cancel
+                      {t('cancel')}
                     </button>
                     <button
                       onClick={handleSave}
@@ -902,12 +936,12 @@ export default function Settings() {
                       {updateUserMutation.isLoading ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          Saving...
+                          {t('saving')}
                         </>
                       ) : (
                         <>
                           <Save className="w-4 h-4" />
-                          Save
+                          {t('save')}
                         </>
                       )}
                     </button>
@@ -920,7 +954,7 @@ export default function Settings() {
                   {/* First Name */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      First Name
+                      {t('firstName')}
                     </label>
                     {editMode ? (
                       <input
@@ -937,7 +971,7 @@ export default function Settings() {
                   {/* Last Name */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Last Name
+                      {t('lastName')}
                     </label>
                     {editMode ? (
                       <input
@@ -954,18 +988,18 @@ export default function Settings() {
                   {/* Email */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email
+                      {t('email')}
                     </label>
                     <p className="text-sm text-gray-900">{currentUser.email || '-'}</p>
                     <p className="text-xs text-gray-500 mt-1">
-                      Email cannot be changed here
+                      {t('emailCannotChange')}
                     </p>
                   </div>
 
                   {/* Role */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Role
+                      {t('role')}
                     </label>
                     <p className="text-sm text-gray-900">
                       <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">
@@ -985,14 +1019,14 @@ export default function Settings() {
         <div className="bg-white rounded-lg border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">
-              Organization Users
+              {t('orgUsers')}
             </h2>
             <button
               onClick={handleInviteUser}
               disabled={inviteUserMutation.isLoading}
               className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
             >
-              Invite User
+              {t('inviteUser')}
             </button>
           </div>
 
@@ -1000,7 +1034,7 @@ export default function Settings() {
             {usersLoading ? (
               <div className="px-6 py-12 text-center">
                 <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto" />
-                <p className="text-sm text-gray-500 mt-3">Loading users...</p>
+                <p className="text-sm text-gray-500 mt-3">{t('loadingUsers')}</p>
               </div>
             ) : organizationUsers.length > 0 ? (
               organizationUsers.map((user) => (
@@ -1037,7 +1071,7 @@ export default function Settings() {
             ) : (
               <div className="px-6 py-12 text-center">
                 <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm text-gray-500">No users found</p>
+                <p className="text-sm text-gray-500">{t('noUsersFound')}</p>
               </div>
             )}
           </div>
@@ -1049,10 +1083,10 @@ export default function Settings() {
         <div className="bg-white rounded-lg border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">
-              Notification Preferences
+              {t('notificationPrefs')}
             </h2>
             <p className="text-sm text-gray-500 mt-1">
-              Manage how you receive notifications
+              {t('manageNotifications')}
             </p>
           </div>
 
@@ -1060,8 +1094,8 @@ export default function Settings() {
             {/* Email Notifications */}
             <div className="flex items-center justify-between py-3 border-b border-gray-100">
               <div>
-                <p className="text-sm font-medium text-gray-900">Email Notifications</p>
-                <p className="text-xs text-gray-500">Receive notifications via email</p>
+                <p className="text-sm font-medium text-gray-900">{t('emailNotifications')}</p>
+                <p className="text-xs text-gray-500">{t('emailNotificationsDesc')}</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" className="sr-only peer" defaultChecked />
@@ -1072,8 +1106,8 @@ export default function Settings() {
             {/* Appointment Reminders */}
             <div className="flex items-center justify-between py-3 border-b border-gray-100">
               <div>
-                <p className="text-sm font-medium text-gray-900">Appointment Reminders</p>
-                <p className="text-xs text-gray-500">Get reminders for upcoming appointments</p>
+                <p className="text-sm font-medium text-gray-900">{t('appointmentReminders')}</p>
+                <p className="text-xs text-gray-500">{t('appointmentRemindersDesc')}</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" className="sr-only peer" defaultChecked />
@@ -1084,8 +1118,8 @@ export default function Settings() {
             {/* Follow-up Notifications */}
             <div className="flex items-center justify-between py-3 border-b border-gray-100">
               <div>
-                <p className="text-sm font-medium text-gray-900">Follow-up Notifications</p>
-                <p className="text-xs text-gray-500">Get notified about pending follow-ups</p>
+                <p className="text-sm font-medium text-gray-900">{t('followUpNotifications')}</p>
+                <p className="text-xs text-gray-500">{t('followUpNotificationsDesc')}</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" className="sr-only peer" defaultChecked />
@@ -1096,8 +1130,8 @@ export default function Settings() {
             {/* System Updates */}
             <div className="flex items-center justify-between py-3">
               <div>
-                <p className="text-sm font-medium text-gray-900">System Updates</p>
-                <p className="text-xs text-gray-500">Receive notifications about system updates</p>
+                <p className="text-sm font-medium text-gray-900">{t('systemUpdates')}</p>
+                <p className="text-xs text-gray-500">{t('systemUpdatesDesc')}</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" className="sr-only peer" />
@@ -1110,10 +1144,10 @@ export default function Settings() {
                 <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-blue-900">
-                    Notification preferences are coming soon
+                    {t('notificationComingSoon')}
                   </p>
                   <p className="text-xs text-blue-700 mt-1">
-                    We're working on implementing full notification preferences. For now, these are display-only.
+                    {t('notificationComingSoonDesc')}
                   </p>
                 </div>
               </div>
@@ -1129,31 +1163,31 @@ export default function Settings() {
           <div className="bg-white rounded-lg border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">SolvIt Integration</h2>
+                <h2 className="text-lg font-semibold text-gray-900">{t('solvitIntegration')}</h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  Patient management system integration
+                  {t('solvitDesc')}
                 </p>
               </div>
               <span className="px-3 py-1 text-sm font-medium bg-green-100 text-green-800 rounded flex items-center gap-2">
                 <Check className="w-4 h-4" />
-                Active
+                {t('active')}
               </span>
             </div>
             <div className="p-6">
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Status:</span>
-                  <span className="text-gray-900 font-medium">Connected</span>
+                  <span className="text-gray-600">{t('status')}:</span>
+                  <span className="text-gray-900 font-medium">{t('connected')}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Last Sync:</span>
+                  <span className="text-gray-600">{t('lastSync')}:</span>
                   <span className="text-gray-900 font-medium">
                     {formatDate(new Date(), 'time')}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Sync Mode:</span>
-                  <span className="text-gray-900 font-medium">Automatic</span>
+                  <span className="text-gray-600">{t('syncMode')}:</span>
+                  <span className="text-gray-900 font-medium">{t('automatic')}</span>
                 </div>
               </div>
             </div>
@@ -1163,29 +1197,29 @@ export default function Settings() {
           <div className="bg-white rounded-lg border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">Google Drive Integration</h2>
+                <h2 className="text-lg font-semibold text-gray-900">{t('googleDriveIntegration')}</h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  Cloud storage for training data and documents
+                  {t('googleDriveDesc')}
                 </p>
               </div>
               <span className="px-3 py-1 text-sm font-medium bg-green-100 text-green-800 rounded flex items-center gap-2">
                 <Check className="w-4 h-4" />
-                Active
+                {t('active')}
               </span>
             </div>
             <div className="p-6">
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Status:</span>
-                  <span className="text-gray-900 font-medium">Connected</span>
+                  <span className="text-gray-600">{t('status')}:</span>
+                  <span className="text-gray-900 font-medium">{t('connected')}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Training Data Folder:</span>
-                  <span className="text-gray-900 font-medium">Configured</span>
+                  <span className="text-gray-600">{t('trainingDataFolder')}:</span>
+                  <span className="text-gray-900 font-medium">{t('configured')}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Auto Import:</span>
-                  <span className="text-gray-900 font-medium">Enabled</span>
+                  <span className="text-gray-600">{t('autoImport')}:</span>
+                  <span className="text-gray-900 font-medium">{t('enabled')}</span>
                 </div>
               </div>
             </div>
@@ -1195,22 +1229,22 @@ export default function Settings() {
           <div className="bg-white rounded-lg border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">Stripe Integration</h2>
+                <h2 className="text-lg font-semibold text-gray-900">{t('stripeIntegration')}</h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  Payment processing (Coming soon)
+                  {t('stripeDesc')}
                 </p>
               </div>
               <span className="px-3 py-1 text-sm font-medium bg-gray-100 text-gray-800 rounded">
-                Not Connected
+                {t('notConnected')}
               </span>
             </div>
             <div className="p-6">
               <p className="text-sm text-gray-600 mb-4">
-                Connect Stripe to process payments directly in ChiroClickCRM.
+                {t('connectStripeDesc')}
               </p>
               <button className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
                 <CreditCard className="w-4 h-4" />
-                Connect Stripe (Coming Soon)
+                {t('connectStripe')}
               </button>
             </div>
           </div>
@@ -1218,9 +1252,9 @@ export default function Settings() {
           {/* API Access */}
           <div className="bg-white rounded-lg border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">API Access</h2>
+              <h2 className="text-lg font-semibold text-gray-900">{t('apiAccess')}</h2>
               <p className="text-sm text-gray-500 mt-1">
-                Manage API keys for external integrations
+                {t('apiAccessDesc')}
               </p>
             </div>
             <div className="p-6">
@@ -1228,10 +1262,10 @@ export default function Settings() {
                 <Key className="w-5 h-5 text-blue-600 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-blue-900">
-                    API access coming soon
+                    {t('apiComingSoon')}
                   </p>
                   <p className="text-xs text-blue-700 mt-1">
-                    We're working on implementing API key management for external integrations.
+                    {t('apiComingSoonDesc')}
                   </p>
                 </div>
               </div>
@@ -1257,12 +1291,10 @@ export default function Settings() {
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900">
-                    {lang === 'no' ? 'Justeringsnotasjon' : 'Adjustment Notation'}
+                    {t('adjustmentNotation')}
                   </h2>
                   <p className="text-sm text-gray-500">
-                    {lang === 'no'
-                      ? 'Velg foretrukket metode for å dokumentere justeringer'
-                      : 'Select your preferred method for documenting adjustments'}
+                    {t('adjustmentNotationDesc')}
                   </p>
                 </div>
               </div>
@@ -1294,7 +1326,7 @@ export default function Settings() {
                         </span>
                         {clinicalPrefs.adjustmentNotation === method.id && (
                           <span className="px-2 py-0.5 text-xs font-medium bg-teal-100 text-teal-700 rounded">
-                            {lang === 'no' ? 'Aktiv' : 'Active'}
+                            {t('activeLabel')}
                           </span>
                         )}
                       </div>
@@ -1317,12 +1349,10 @@ export default function Settings() {
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900">
-                    {lang === 'no' ? 'Språk' : 'Language'}
+                    {t('languageSetting')}
                   </h2>
                   <p className="text-sm text-gray-500">
-                    {lang === 'no'
-                      ? 'Velg språk for kliniske komponenter'
-                      : 'Select language for clinical components'}
+                    {t('languageSettingDesc')}
                   </p>
                 </div>
               </div>
@@ -1347,7 +1377,7 @@ export default function Settings() {
                   />
                   <div>
                     <span className="font-medium text-gray-900">Norsk</span>
-                    <p className="text-xs text-gray-500">Norwegian</p>
+                    <p className="text-xs text-gray-500">{t('norwegian')}</p>
                   </div>
                 </label>
 
@@ -1368,7 +1398,7 @@ export default function Settings() {
                   />
                   <div>
                     <span className="font-medium text-gray-900">English</span>
-                    <p className="text-xs text-gray-500">Engelsk</p>
+                    <p className="text-xs text-gray-500">{t('english')}</p>
                   </div>
                 </label>
               </div>
@@ -1384,12 +1414,10 @@ export default function Settings() {
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900">
-                    {lang === 'no' ? 'Kartvisning' : 'Chart Display'}
+                    {t('chartDisplay')}
                   </h2>
                   <p className="text-sm text-gray-500">
-                    {lang === 'no'
-                      ? 'Standardinnstillinger for anatomiske kart'
-                      : 'Default settings for anatomical charts'}
+                    {t('chartDisplayDesc')}
                   </p>
                 </div>
               </div>
@@ -1400,12 +1428,10 @@ export default function Settings() {
               <div className="flex items-center justify-between py-3 border-b border-gray-100">
                 <div>
                   <p className="text-sm font-medium text-gray-900">
-                    {lang === 'no' ? 'Vis dermatomer' : 'Show Dermatomes'}
+                    {t('showDermatomes')}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {lang === 'no'
-                      ? 'Vis nerverotsfordelinger på anatomisk kart'
-                      : 'Display nerve root distributions on anatomical charts'}
+                    {t('showDermatomesDesc')}
                   </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -1423,12 +1449,10 @@ export default function Settings() {
               <div className="flex items-center justify-between py-3 border-b border-gray-100">
                 <div>
                   <p className="text-sm font-medium text-gray-900">
-                    {lang === 'no' ? 'Vis triggerpunkter' : 'Show Trigger Points'}
+                    {t('showTriggerPoints')}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {lang === 'no'
-                      ? 'Vis myofascielle triggerpunkter på kart'
-                      : 'Display myofascial trigger points on charts'}
+                    {t('showTriggerPointsDesc')}
                   </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -1446,12 +1470,10 @@ export default function Settings() {
               <div className="flex items-center justify-between py-3">
                 <div>
                   <p className="text-sm font-medium text-gray-900">
-                    {lang === 'no' ? 'Auto-generer narrativ' : 'Auto-generate Narrative'}
+                    {t('autoGenerateNarrative')}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {lang === 'no'
-                      ? 'Generer klinisk narrativ automatisk ved lagring'
-                      : 'Automatically generate clinical narrative on save'}
+                    {t('autoGenerateNarrativeDesc')}
                   </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -1467,8 +1489,147 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* Spine Templates (Quick Palpation) */}
-          <SpineTemplatesEditor lang={lang} />
+          {/* Spine Palpation Templates */}
+          <div className="bg-white rounded-lg border border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+                    <Bone className="w-5 h-5 text-orange-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      {lang === 'no' ? 'Palpasjonsmaler (Rask-klikk)' : 'Palpation Templates (Quick-Click)'}
+                    </h2>
+                    <p className="text-sm text-gray-500">
+                      {lang === 'no'
+                        ? 'Tilpass tekstmaler for rask palpasjonsdokumentasjon'
+                        : 'Customize text templates for rapid palpation documentation'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleResetTemplates}
+                  disabled={resetSpineTemplatesMutation.isPending}
+                  className="px-3 py-1.5 text-sm text-orange-600 hover:text-orange-700 hover:bg-orange-50 rounded-lg flex items-center gap-1.5 transition-colors"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  {lang === 'no' ? 'Tilbakestill' : 'Reset'}
+                </button>
+              </div>
+            </div>
+
+            <div className="divide-y divide-gray-100">
+              {spineTemplatesLoading ? (
+                <div className="px-6 py-8 text-center">
+                  <Loader2 className="w-6 h-6 animate-spin text-orange-600 mx-auto" />
+                  <p className="text-sm text-gray-500 mt-2">
+                    {lang === 'no' ? 'Laster maler...' : 'Loading templates...'}
+                  </p>
+                </div>
+              ) : (
+                Object.entries(SPINE_REGIONS_CONFIG).map(([regionKey, regionConfig]) => (
+                  <div key={regionKey}>
+                    {/* Region Header */}
+                    <button
+                      onClick={() => toggleSpineRegion(regionKey)}
+                      className="w-full px-6 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                    >
+                      <span className="text-sm font-medium text-gray-900">{regionConfig.label}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">
+                          {regionConfig.segments.length} {lang === 'no' ? 'segmenter' : 'segments'}
+                        </span>
+                        {expandedSpineRegions[regionKey] ? (
+                          <ChevronUp className="w-4 h-4 text-gray-400" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4 text-gray-400" />
+                        )}
+                      </div>
+                    </button>
+
+                    {/* Expanded Templates */}
+                    {expandedSpineRegions[regionKey] && (
+                      <div className="bg-gray-50 px-6 py-3 space-y-2">
+                        {regionConfig.segments.map(segment => {
+                          const segmentTemplates = spineTemplates[segment] || []
+                          return (
+                            <div key={segment} className="bg-white rounded-lg border border-gray-200 p-3">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-sm font-medium text-gray-700">{segment}</span>
+                              </div>
+                              <div className="space-y-1.5">
+                                {segmentTemplates.map(template => (
+                                  <div
+                                    key={template.id}
+                                    className="flex items-center gap-2 text-xs group"
+                                  >
+                                    <span className="w-16 text-gray-500 uppercase">
+                                      {template.direction === 'left' && (lang === 'no' ? 'Venstre' : 'Left')}
+                                      {template.direction === 'right' && (lang === 'no' ? 'Høyre' : 'Right')}
+                                      {template.direction === 'bilateral' && 'Bilateral'}
+                                      {template.direction === 'posterior' && 'Posterior'}
+                                      {template.direction === 'anterior' && 'Anterior'}
+                                      {template.direction === 'superior' && 'Superior'}
+                                      {template.direction === 'inferior' && 'Inferior'}
+                                      {template.direction === 'inflare' && 'Inflare'}
+                                      {template.direction === 'outflare' && 'Outflare'}
+                                    </span>
+                                    {editingTemplate?.id === template.id ? (
+                                      <div className="flex-1 flex items-center gap-2">
+                                        <input
+                                          type="text"
+                                          value={templateEditText}
+                                          onChange={(e) => setTemplateEditText(e.target.value)}
+                                          className="flex-1 px-2 py-1 text-xs border border-orange-300 rounded focus:outline-none focus:ring-1 focus:ring-orange-500"
+                                          autoFocus
+                                        />
+                                        <button
+                                          onClick={handleSaveTemplate}
+                                          disabled={updateSpineTemplateMutation.isPending}
+                                          className="p-1 text-green-600 hover:bg-green-50 rounded"
+                                        >
+                                          <Check className="w-3.5 h-3.5" />
+                                        </button>
+                                        <button
+                                          onClick={handleCancelTemplateEdit}
+                                          className="p-1 text-gray-500 hover:bg-gray-100 rounded"
+                                        >
+                                          <X className="w-3.5 h-3.5" />
+                                        </button>
+                                      </div>
+                                    ) : (
+                                      <>
+                                        <span className="flex-1 text-gray-600 truncate">
+                                          {template.text_template}
+                                        </span>
+                                        <button
+                                          onClick={() => handleEditTemplate(template)}
+                                          className="p-1 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                                          title={lang === 'no' ? 'Rediger' : 'Edit'}
+                                        >
+                                          <Edit3 className="w-3.5 h-3.5" />
+                                        </button>
+                                      </>
+                                    )}
+                                  </div>
+                                ))}
+                                {segmentTemplates.length === 0 && (
+                                  <p className="text-xs text-gray-400 italic">
+                                    {lang === 'no' ? 'Ingen maler funnet' : 'No templates found'}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
 
           {/* Current Selection Summary */}
           <div className="bg-teal-50 rounded-lg border border-teal-200 p-4">
@@ -1476,16 +1637,14 @@ export default function Settings() {
               <Check className="w-5 h-5 text-teal-600 mt-0.5" />
               <div>
                 <p className="text-sm font-medium text-teal-900">
-                  {lang === 'no' ? 'Aktiv notasjonsmetode' : 'Active Notation Method'}
+                  {t('activeNotation')}
                 </p>
                 <p className="text-sm text-teal-700 mt-1">
                   {ADJUSTMENT_NOTATION_METHODS.find(m => m.id === clinicalPrefs.adjustmentNotation)?.name[lang] ||
                    ADJUSTMENT_NOTATION_METHODS.find(m => m.id === clinicalPrefs.adjustmentNotation)?.name.en}
                 </p>
                 <p className="text-xs text-teal-600 mt-2">
-                  {lang === 'no'
-                    ? 'Denne metoden vil brukes som standard i kliniske notater.'
-                    : 'This method will be used as default in clinical notes.'}
+                  {t('activeNotationDesc')}
                 </p>
               </div>
             </div>
@@ -1493,76 +1652,503 @@ export default function Settings() {
         </div>
       )}
 
-      {/* Automation Tab */}
-      {activeTab === 'automation' && (
+      {/* Exercises Tab */}
+      {activeTab === 'exercises' && (
         <div className="space-y-6">
-          {/* Today's Messages - Main Focus */}
-          <div className="bg-white rounded-lg border-2 border-green-200 shadow-sm">
-            <div className="px-6 py-4 border-b border-green-200 bg-green-50">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-green-500 flex items-center justify-center">
-                  <MessageSquare className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Dagens Meldinger
-                  </h2>
-                  <p className="text-sm text-gray-600">
-                    Se over og godkjenn meldinger før de sendes
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="p-6">
-              <TodaysMessages />
-            </div>
-          </div>
-
-          {/* Appointment Import */}
+          {/* Header with Create Button */}
           <div className="bg-white rounded-lg border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                  <Upload className="w-5 h-5 text-blue-600" />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                    <Dumbbell className="w-5 h-5 text-green-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      {lang === 'no' ? 'Øvelsesbibliotek' : 'Exercise Library'}
+                    </h2>
+                    <p className="text-sm text-gray-500">
+                      {lang === 'no'
+                        ? 'Administrer øvelser, legg til videoer og bilder'
+                        : 'Manage exercises, add videos and images'}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Importer Timer fra SolvitJournal
-                  </h2>
-                  <p className="text-sm text-gray-500">
-                    Lim inn fra SolvitJournal kalender eller last opp Excel
-                  </p>
+                <button
+                  onClick={handleOpenExerciseCreate}
+                  className="px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  {lang === 'no' ? 'Ny øvelse' : 'New Exercise'}
+                </button>
+              </div>
+            </div>
+
+            {/* Search and Filters */}
+            <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+              <div className="flex flex-col sm:flex-row gap-4">
+                {/* Search */}
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    value={exerciseSearch}
+                    onChange={(e) => setExerciseSearch(e.target.value)}
+                    placeholder={lang === 'no' ? 'Søk etter øvelser...' : 'Search exercises...'}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+
+                {/* Category Filter */}
+                <div className="relative">
+                  <select
+                    value={exerciseCategoryFilter}
+                    onChange={(e) => setExerciseCategoryFilter(e.target.value)}
+                    className="appearance-none pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+                  >
+                    <option value="">{lang === 'no' ? 'Alle kategorier' : 'All Categories'}</option>
+                    {exerciseCategories.map(cat => (
+                      <option key={cat} value={cat}>
+                        {categoryLabels[cat]?.[lang] || cat}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                </div>
+
+                {/* Body Region Filter */}
+                <div className="relative">
+                  <select
+                    value={exerciseBodyRegionFilter}
+                    onChange={(e) => setExerciseBodyRegionFilter(e.target.value)}
+                    className="appearance-none pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+                  >
+                    <option value="">{lang === 'no' ? 'Alle regioner' : 'All Regions'}</option>
+                    {exerciseBodyRegions.map(region => (
+                      <option key={region} value={region}>
+                        {bodyRegionLabels[region]?.[lang] || region}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                 </div>
               </div>
             </div>
-            <div className="p-6">
-              <AppointmentImporter onImportComplete={() => {
-                window.location.reload()
-              }} />
+
+            {/* Exercise List */}
+            <div className="divide-y divide-gray-100">
+              {exercisesLoading ? (
+                <div className="px-6 py-12 text-center">
+                  <Loader2 className="w-8 h-8 animate-spin text-green-600 mx-auto" />
+                  <p className="text-sm text-gray-500 mt-3">
+                    {lang === 'no' ? 'Laster øvelser...' : 'Loading exercises...'}
+                  </p>
+                </div>
+              ) : exercises.length > 0 ? (
+                exercises.map((exercise) => (
+                  <div key={exercise.id} className="px-6 py-4 hover:bg-gray-50 transition-colors">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4 flex-1 min-w-0">
+                        {/* Image or Placeholder */}
+                        <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+                          {exercise.image_url ? (
+                            <img
+                              src={exercise.image_url}
+                              alt={exercise.name_no}
+                              className="w-full h-full object-cover"
+                              onError={(e) => { e.target.style.display = 'none' }}
+                            />
+                          ) : (
+                            <Dumbbell className="w-6 h-6 text-gray-400" />
+                          )}
+                        </div>
+
+                        {/* Exercise Info */}
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {lang === 'no' ? exercise.name_no : (exercise.name_en || exercise.name_no)}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 rounded">
+                              {categoryLabels[exercise.category]?.[lang] || exercise.category}
+                            </span>
+                            <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 rounded">
+                              {bodyRegionLabels[exercise.body_region]?.[lang] || exercise.body_region}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Status Indicators */}
+                        <div className="flex items-center gap-3 flex-shrink-0">
+                          {exercise.image_url ? (
+                            <div className="flex items-center gap-1 text-green-600" title={lang === 'no' ? 'Har bilde' : 'Has image'}>
+                              <Image className="w-4 h-4" />
+                              <Check className="w-3 h-3" />
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-1 text-gray-400" title={lang === 'no' ? 'Mangler bilde' : 'No image'}>
+                              <Image className="w-4 h-4" />
+                              <X className="w-3 h-3" />
+                            </div>
+                          )}
+
+                          {exercise.video_url ? (
+                            <div className="flex items-center gap-1 text-green-600" title={lang === 'no' ? 'Har video' : 'Has video'}>
+                              <Video className="w-4 h-4" />
+                              <Check className="w-3 h-3" />
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-1 text-gray-400" title={lang === 'no' ? 'Mangler video' : 'No video'}>
+                              <Video className="w-4 h-4" />
+                              <X className="w-3 h-3" />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex items-center gap-2 ml-4">
+                        <button
+                          onClick={() => handleOpenExerciseEdit(exercise)}
+                          className="p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                          title={lang === 'no' ? 'Rediger' : 'Edit'}
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                        {!exercise.is_global && (
+                          <button
+                            onClick={() => handleDeleteExercise(exercise)}
+                            className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            title={lang === 'no' ? 'Slett' : 'Delete'}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="px-6 py-12 text-center">
+                  <Dumbbell className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-sm text-gray-500">
+                    {exerciseSearch || exerciseCategoryFilter || exerciseBodyRegionFilter
+                      ? (lang === 'no' ? 'Ingen øvelser funnet med disse filtrene' : 'No exercises found with these filters')
+                      : (lang === 'no' ? 'Ingen øvelser lagt til ennå' : 'No exercises added yet')}
+                  </p>
+                </div>
+              )}
             </div>
+
+            {/* Results Summary */}
+            {exercises.length > 0 && (
+              <div className="px-6 py-3 bg-gray-50 border-t border-gray-200 text-sm text-gray-500">
+                {lang === 'no'
+                  ? `Viser ${exercises.length} øvelse${exercises.length !== 1 ? 'r' : ''}`
+                  : `Showing ${exercises.length} exercise${exercises.length !== 1 ? 's' : ''}`}
+              </div>
+            )}
           </div>
 
-          {/* Conflict Decisions - Secondary */}
-          <details className="bg-white rounded-lg border border-gray-200">
-            <summary className="px-6 py-4 cursor-pointer hover:bg-gray-50">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
-                  <CalendarClock className="w-5 h-5 text-orange-600" />
+          {/* Exercise Modal */}
+          {exerciseModalMode && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+                {/* Modal Header */}
+                <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {exerciseModalMode === 'create'
+                      ? (lang === 'no' ? 'Ny øvelse' : 'New Exercise')
+                      : (lang === 'no' ? 'Rediger øvelse' : 'Edit Exercise')}
+                  </h3>
+                  <button
+                    onClick={handleCloseExerciseModal}
+                    className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
                 </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Konflikter & Utsettelser
-                  </h2>
-                  <p className="text-sm text-gray-500">
-                    Når pasienter booker ny time før planlagt SMS
-                  </p>
+
+                {/* Modal Content */}
+                <div className="flex-1 overflow-y-auto p-6">
+                  <div className="space-y-6">
+                    {/* Names */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {lang === 'no' ? 'Navn (Norsk)' : 'Name (Norwegian)'} *
+                        </label>
+                        <input
+                          type="text"
+                          value={exerciseFormData.name_no || ''}
+                          onChange={(e) => setExerciseFormData({ ...exerciseFormData, name_no: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                          placeholder={lang === 'no' ? 'f.eks. Kne til bryst tøyning' : 'e.g. Knee to Chest Stretch'}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {lang === 'no' ? 'Navn (Engelsk)' : 'Name (English)'}
+                        </label>
+                        <input
+                          type="text"
+                          value={exerciseFormData.name_en || ''}
+                          onChange={(e) => setExerciseFormData({ ...exerciseFormData, name_en: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                          placeholder="e.g. Knee to Chest Stretch"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Category, Body Region, Difficulty */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {lang === 'no' ? 'Kategori' : 'Category'}
+                        </label>
+                        <select
+                          value={exerciseFormData.category || 'strengthening'}
+                          onChange={(e) => setExerciseFormData({ ...exerciseFormData, category: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        >
+                          {Object.entries(categoryLabels).map(([key, labels]) => (
+                            <option key={key} value={key}>{labels[lang] || key}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {lang === 'no' ? 'Kroppsregion' : 'Body Region'}
+                        </label>
+                        <select
+                          value={exerciseFormData.body_region || 'core'}
+                          onChange={(e) => setExerciseFormData({ ...exerciseFormData, body_region: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        >
+                          {Object.entries(bodyRegionLabels).map(([key, labels]) => (
+                            <option key={key} value={key}>{labels[lang] || key}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {lang === 'no' ? 'Vanskelighetsgrad' : 'Difficulty'}
+                        </label>
+                        <select
+                          value={exerciseFormData.difficulty || 'beginner'}
+                          onChange={(e) => setExerciseFormData({ ...exerciseFormData, difficulty: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        >
+                          <option value="beginner">{lang === 'no' ? 'Nybegynner' : 'Beginner'}</option>
+                          <option value="intermediate">{lang === 'no' ? 'Middels' : 'Intermediate'}</option>
+                          <option value="advanced">{lang === 'no' ? 'Avansert' : 'Advanced'}</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Video URL */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {lang === 'no' ? 'Video URL (YouTube)' : 'Video URL (YouTube)'}
+                      </label>
+                      <input
+                        type="url"
+                        value={exerciseFormData.video_url || ''}
+                        onChange={(e) => setExerciseFormData({ ...exerciseFormData, video_url: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder="https://www.youtube.com/watch?v=..."
+                      />
+                      {exerciseFormData.video_url && getYouTubeVideoId(exerciseFormData.video_url) && (
+                        <div className="mt-2 rounded-lg overflow-hidden border border-gray-200">
+                          <iframe
+                            width="100%"
+                            height="200"
+                            src={`https://www.youtube.com/embed/${getYouTubeVideoId(exerciseFormData.video_url)}`}
+                            title="Video preview"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Image URL */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {lang === 'no' ? 'Bilde URL' : 'Image URL'}
+                      </label>
+                      <input
+                        type="url"
+                        value={exerciseFormData.image_url || ''}
+                        onChange={(e) => setExerciseFormData({ ...exerciseFormData, image_url: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder="https://raw.githubusercontent.com/yuhonas/free-exercise-db/..."
+                      />
+                      {exerciseFormData.image_url && (
+                        <div className="mt-2 flex justify-center">
+                          <img
+                            src={exerciseFormData.image_url}
+                            alt="Preview"
+                            className="max-h-32 rounded-lg border border-gray-200"
+                            onError={(e) => { e.target.style.display = 'none' }}
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Instructions */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {lang === 'no' ? 'Instruksjoner (Norsk)' : 'Instructions (Norwegian)'}
+                        </label>
+                        <textarea
+                          value={exerciseFormData.instructions_no || ''}
+                          onChange={(e) => setExerciseFormData({ ...exerciseFormData, instructions_no: e.target.value })}
+                          rows={4}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                          placeholder={lang === 'no' ? 'Detaljerte instruksjoner...' : 'Detailed instructions...'}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {lang === 'no' ? 'Instruksjoner (Engelsk)' : 'Instructions (English)'}
+                        </label>
+                        <textarea
+                          value={exerciseFormData.instructions_en || ''}
+                          onChange={(e) => setExerciseFormData({ ...exerciseFormData, instructions_en: e.target.value })}
+                          rows={4}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                          placeholder="Detailed instructions..."
+                        />
+                      </div>
+                    </div>
+
+                    {/* Contraindications and Precautions */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {lang === 'no' ? 'Kontraindikasjoner' : 'Contraindications'}
+                        </label>
+                        <textarea
+                          value={exerciseFormData.contraindications || ''}
+                          onChange={(e) => setExerciseFormData({ ...exerciseFormData, contraindications: e.target.value })}
+                          rows={2}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                          placeholder={lang === 'no' ? 'Når øvelsen ikke bør utføres...' : 'When the exercise should not be performed...'}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {lang === 'no' ? 'Forholdsregler' : 'Precautions'}
+                        </label>
+                        <textarea
+                          value={exerciseFormData.precautions || ''}
+                          onChange={(e) => setExerciseFormData({ ...exerciseFormData, precautions: e.target.value })}
+                          rows={2}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                          placeholder={lang === 'no' ? 'Viktige hensyn...' : 'Important considerations...'}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Dosing Defaults */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {lang === 'no' ? 'Standard dosering' : 'Default Dosing'}
+                      </label>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">
+                            {lang === 'no' ? 'Sett' : 'Sets'}
+                          </label>
+                          <input
+                            type="number"
+                            value={exerciseFormData.default_sets || 3}
+                            onChange={(e) => setExerciseFormData({ ...exerciseFormData, default_sets: parseInt(e.target.value) || 3 })}
+                            min={1}
+                            max={10}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">
+                            {lang === 'no' ? 'Reps' : 'Reps'}
+                          </label>
+                          <input
+                            type="number"
+                            value={exerciseFormData.default_reps || 10}
+                            onChange={(e) => setExerciseFormData({ ...exerciseFormData, default_reps: parseInt(e.target.value) || 10 })}
+                            min={1}
+                            max={100}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">
+                            {lang === 'no' ? 'Hold (sek)' : 'Hold (sec)'}
+                          </label>
+                          <input
+                            type="number"
+                            value={exerciseFormData.default_hold_seconds || ''}
+                            onChange={(e) => setExerciseFormData({ ...exerciseFormData, default_hold_seconds: e.target.value ? parseInt(e.target.value) : null })}
+                            min={0}
+                            max={300}
+                            placeholder="-"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">
+                            {lang === 'no' ? 'Frekvens' : 'Frequency'}
+                          </label>
+                          <select
+                            value={exerciseFormData.default_frequency || 'daily'}
+                            onChange={(e) => setExerciseFormData({ ...exerciseFormData, default_frequency: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                          >
+                            <option value="daily">{lang === 'no' ? 'Daglig' : 'Daily'}</option>
+                            <option value="2x_daily">{lang === 'no' ? '2x daglig' : '2x Daily'}</option>
+                            <option value="3x_week">{lang === 'no' ? '3x per uke' : '3x Weekly'}</option>
+                            <option value="2x_week">{lang === 'no' ? '2x per uke' : '2x Weekly'}</option>
+                            <option value="weekly">{lang === 'no' ? 'Ukentlig' : 'Weekly'}</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Modal Footer */}
+                <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-end gap-3 flex-shrink-0">
+                  <button
+                    onClick={handleCloseExerciseModal}
+                    className="px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                  >
+                    {lang === 'no' ? 'Avbryt' : 'Cancel'}
+                  </button>
+                  <button
+                    onClick={handleSaveExercise}
+                    disabled={!exerciseFormData.name_no || createExerciseMutation.isLoading || updateExerciseMutation.isLoading}
+                    className="px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center gap-2"
+                  >
+                    {(createExerciseMutation.isLoading || updateExerciseMutation.isLoading) ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        {lang === 'no' ? 'Lagrer...' : 'Saving...'}
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4" />
+                        {lang === 'no' ? 'Lagre' : 'Save'}
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
-            </summary>
-            <div className="p-6 border-t">
-              <SchedulerDecisions />
             </div>
-          </details>
+          )}
         </div>
       )}
     </div>

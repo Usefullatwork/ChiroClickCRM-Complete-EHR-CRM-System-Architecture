@@ -27,6 +27,12 @@ export {
   ADVICE_PHRASES
 } from './SmartTextInput';
 
+// Inline AI generation button
+export {
+  default as InlineAIButton,
+  InlineAIButtonCompact
+} from './InlineAIButton';
+
 // Body diagram for pain location
 export { default as BodyDiagram, QuickRegionSelect } from './BodyDiagram';
 

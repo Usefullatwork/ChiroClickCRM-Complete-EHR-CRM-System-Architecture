@@ -24,6 +24,7 @@ import {
   Database
 } from 'lucide-react'
 import { format } from 'date-fns'
+import { useTranslation } from '../i18n'
 
 // Mock API - In production, this would call a real audit logs endpoint
 const mockAuditAPI = {
@@ -114,6 +115,7 @@ const mockAuditAPI = {
 }
 
 export default function AuditLogs() {
+  const { t } = useTranslation('common')
   const [filters, setFilters] = useState({
     startDate: '',
     endDate: '',
@@ -188,9 +190,9 @@ export default function AuditLogs() {
           <div className="flex items-center gap-3">
             <Shield className="w-8 h-8 text-blue-600" />
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Audit Logs</h1>
+              <h1 className="text-3xl font-bold text-gray-900">{t('auditLogs')}</h1>
               <p className="text-gray-600">
-                GDPR Article 30 - Record of processing activities
+                {t('auditLogsSubtitle')}
               </p>
             </div>
           </div>
@@ -199,7 +201,7 @@ export default function AuditLogs() {
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             <Download className="w-4 h-4" />
-            Export Logs
+            {t('exportLogs')}
           </button>
         </div>
       </div>
@@ -209,11 +211,9 @@ export default function AuditLogs() {
         <div className="flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
           <div>
-            <h3 className="font-semibold text-gray-900 mb-1">GDPR Compliance</h3>
+            <h3 className="font-semibold text-gray-900 mb-1">{t('gdprCompliance')}</h3>
             <p className="text-sm text-gray-700">
-              All system activities are logged in compliance with GDPR Article 30. These logs record
-              all processing activities involving personal data and must be retained for compliance purposes.
-              Access to this audit trail is restricted to administrators.
+              {t('gdprComplianceDesc')}
             </p>
           </div>
         </div>
@@ -225,7 +225,7 @@ export default function AuditLogs() {
           {/* Date Range */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Start Date
+              {t('startDate')}
             </label>
             <input
               type="date"
@@ -237,7 +237,7 @@ export default function AuditLogs() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              End Date
+              {t('endDate')}
             </label>
             <input
               type="date"
@@ -250,69 +250,69 @@ export default function AuditLogs() {
           {/* Action Filter */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Action
+              {t('action')}
             </label>
             <select
               value={filters.action}
               onChange={(e) => setFilters(prev => ({ ...prev, action: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">All Actions</option>
-              <option value="CREATE">Create</option>
+              <option value="">{t('allActions')}</option>
+              <option value="CREATE">{t('create')}</option>
               <option value="READ">Read</option>
-              <option value="UPDATE">Update</option>
-              <option value="DELETE">Delete</option>
-              <option value="EXPORT">Export</option>
+              <option value="UPDATE">{t('update')}</option>
+              <option value="DELETE">{t('delete')}</option>
+              <option value="EXPORT">{t('export')}</option>
             </select>
           </div>
 
           {/* Resource Type Filter */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Resource Type
+              {t('resourceType')}
             </label>
             <select
               value={filters.resourceType}
               onChange={(e) => setFilters(prev => ({ ...prev, resourceType: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">All Resources</option>
+              <option value="">{t('allResources')}</option>
               <option value="PATIENT">Patient</option>
-              <option value="ENCOUNTER">Clinical Encounter</option>
-              <option value="APPOINTMENT">Appointment</option>
+              <option value="ENCOUNTER">{t('clinicalEncounter')}</option>
+              <option value="APPOINTMENT">{t('appointment')}</option>
               <option value="FINANCIAL">Financial</option>
-              <option value="COMMUNICATION">Communication</option>
-              <option value="DOCUMENT">Document</option>
+              <option value="COMMUNICATION">{t('communication')}</option>
+              <option value="DOCUMENT">{t('document')}</option>
             </select>
           </div>
 
           {/* User Role Filter */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              User Role
+              {t('userRole')}
             </label>
             <select
               value={filters.userRole}
               onChange={(e) => setFilters(prev => ({ ...prev, userRole: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">All Roles</option>
-              <option value="ADMIN">Admin</option>
-              <option value="PRACTITIONER">Practitioner</option>
-              <option value="ASSISTANT">Assistant</option>
+              <option value="">{t('allRoles')}</option>
+              <option value="ADMIN">{t('admin')}</option>
+              <option value="PRACTITIONER">{t('practitioner')}</option>
+              <option value="ASSISTANT">{t('assistant')}</option>
             </select>
           </div>
 
           {/* Search */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Search
+              {t('search')}
             </label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
                 type="text"
-                placeholder="Search logs..."
+                placeholder={t('searchLogs')}
                 value={filters.search}
                 onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
                 className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -329,22 +329,22 @@ export default function AuditLogs() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Timestamp
+                  {t('timestamp')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  User
+                  {t('user')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Action
+                  {t('action')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Resource
+                  {t('resource')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  IP Address
+                  {t('ipAddress')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Details
+                  {t('details')}
                 </th>
               </tr>
             </thead>
@@ -353,14 +353,14 @@ export default function AuditLogs() {
                 <tr>
                   <td colSpan="6" className="px-6 py-12 text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="text-sm text-gray-500 mt-3">Loading audit logs...</p>
+                    <p className="text-sm text-gray-500 mt-3">{t('loadingAuditLogs')}</p>
                   </td>
                 </tr>
               ) : logs.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="px-6 py-12 text-center">
                     <Shield className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-sm text-gray-500">No audit logs found</p>
+                    <p className="text-sm text-gray-500">{t('noAuditLogs')}</p>
                   </td>
                 </tr>
               ) : (
@@ -407,7 +407,7 @@ export default function AuditLogs() {
                         onClick={() => setSelectedLog(log)}
                         className="text-blue-600 hover:text-blue-900 font-medium"
                       >
-                        View Details
+                        {t('viewDetails')}
                       </button>
                     </td>
                   </tr>
@@ -424,7 +424,7 @@ export default function AuditLogs() {
           <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">Audit Log Details</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{t('auditLogDetails')}</h3>
                 <button
                   onClick={() => setSelectedLog(null)}
                   className="p-2 hover:bg-gray-100 rounded-lg"
@@ -437,13 +437,13 @@ export default function AuditLogs() {
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Timestamp</label>
+                  <label className="text-sm font-medium text-gray-500">{t('timestamp')}</label>
                   <p className="mt-1 text-sm text-gray-900">
                     {format(new Date(selectedLog.created_at), 'PPpp')}
                   </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Action</label>
+                  <label className="text-sm font-medium text-gray-500">{t('action')}</label>
                   <p className="mt-1">
                     <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border ${getActionColor(selectedLog.action)}`}>
                       {getActionIcon(selectedLog.action)}
@@ -452,16 +452,16 @@ export default function AuditLogs() {
                   </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">User</label>
+                  <label className="text-sm font-medium text-gray-500">{t('user')}</label>
                   <p className="mt-1 text-sm text-gray-900">{selectedLog.user_name}</p>
                   <p className="text-xs text-gray-500">{selectedLog.user_email}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Role</label>
+                  <label className="text-sm font-medium text-gray-500">{t('role')}</label>
                   <p className="mt-1 text-sm text-gray-900">{selectedLog.user_role}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Resource Type</label>
+                  <label className="text-sm font-medium text-gray-500">{t('resourceType')}</label>
                   <p className="mt-1 text-sm text-gray-900">{selectedLog.resource_type}</p>
                 </div>
                 <div>
@@ -469,11 +469,11 @@ export default function AuditLogs() {
                   <p className="mt-1 text-sm text-gray-900 font-mono">{selectedLog.resource_id}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">IP Address</label>
+                  <label className="text-sm font-medium text-gray-500">{t('ipAddress')}</label>
                   <p className="mt-1 text-sm text-gray-900">{selectedLog.ip_address}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">User Agent</label>
+                  <label className="text-sm font-medium text-gray-500">{t('userAgent')}</label>
                   <p className="mt-1 text-xs text-gray-900 truncate" title={selectedLog.user_agent}>
                     {selectedLog.user_agent}
                   </p>
@@ -482,7 +482,7 @@ export default function AuditLogs() {
 
               {selectedLog.reason && (
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Reason</label>
+                  <label className="text-sm font-medium text-gray-500">{t('reason')}</label>
                   <p className="mt-1 text-sm text-gray-900 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
                     {selectedLog.reason}
                   </p>
@@ -491,7 +491,7 @@ export default function AuditLogs() {
 
               {selectedLog.changes && (
                 <div>
-                  <label className="text-sm font-medium text-gray-500 mb-2 block">Changes</label>
+                  <label className="text-sm font-medium text-gray-500 mb-2 block">{t('changes')}</label>
                   <pre className="text-xs bg-gray-50 p-3 rounded-lg border border-gray-200 overflow-x-auto">
                     {JSON.stringify(selectedLog.changes, null, 2)}
                   </pre>
@@ -504,7 +504,7 @@ export default function AuditLogs() {
                 onClick={() => setSelectedLog(null)}
                 className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
               >
-                Close
+                {t('close')}
               </button>
             </div>
           </div>

@@ -16,10 +16,12 @@ import {
   AlertTriangle
 } from 'lucide-react'
 import { followUpsAPI, patientsAPI } from '../services/api'
-import { formatDate, formatPhone } from '../lib/utils'
+import { formatPhone } from '../lib/utils'
+import { useTranslation, formatDate } from '../i18n'
 import toast from '../utils/toast'
 
 export default function FollowUps() {
+  const { t, lang } = useTranslation('appointments')
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [filters, setFilters] = useState({
@@ -65,7 +67,7 @@ export default function FollowUps() {
       queryClient.invalidateQueries(['dashboard-stats'])
     },
     onError: (error) => {
-      toast.error(`Failed to complete follow-up: ${error.response?.data?.message || error.message}`)
+      toast.error(`${t('failedComplete')}: ${error.response?.data?.message || error.message}`)
     },
   })
 
@@ -76,7 +78,7 @@ export default function FollowUps() {
       queryClient.invalidateQueries(['followups'])
     },
     onError: (error) => {
-      toast.error(`Failed to skip follow-up: ${error.response?.data?.message || error.message}`)
+      toast.error(`${t('failedSkip')}: ${error.response?.data?.message || error.message}`)
     },
   })
 
@@ -149,9 +151,9 @@ export default function FollowUps() {
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Follow-ups</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">{t('followUps')}</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Manage patient follow-up tasks and reminders
+          {t('followUpsSubtitle')}
         </p>
       </div>
 
@@ -168,7 +170,7 @@ export default function FollowUps() {
           >
             <div className="flex items-center gap-2">
               <FileText className="w-4 h-4" />
-              All Follow-ups
+              {t('allFollowUps')}
             </div>
           </button>
           <button
@@ -181,7 +183,7 @@ export default function FollowUps() {
           >
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4" />
-              Pending
+              {t('pending')}
               {followUps.filter(fu => fu.status === 'PENDING').length > 0 && (
                 <span className="px-2 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">
                   {followUps.filter(fu => fu.status === 'PENDING').length}
@@ -199,7 +201,7 @@ export default function FollowUps() {
           >
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4" />
-              Completed
+              {t('completed')}
             </div>
           </button>
           <button
@@ -212,7 +214,7 @@ export default function FollowUps() {
           >
             <div className="flex items-center gap-2">
               <AlertCircle className="w-4 h-4" />
-              Patients Needing Follow-up
+              {t('patientsNeedingFollowUp')}
               {patientsNeedingFollowUp.length > 0 && (
                 <span className="px-2 py-0.5 text-xs font-medium bg-red-100 text-red-800 rounded-full">
                   {patientsNeedingFollowUp.length}
@@ -229,7 +231,7 @@ export default function FollowUps() {
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
               <Filter className="w-5 h-5 text-gray-400" />
-              <span className="text-sm font-medium text-gray-700">Filters:</span>
+              <span className="text-sm font-medium text-gray-700">{t('filters')}:</span>
             </div>
 
             <select
@@ -237,11 +239,11 @@ export default function FollowUps() {
               onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
               className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">All Statuses</option>
-              <option value="PENDING">Pending</option>
-              <option value="COMPLETED">Completed</option>
-              <option value="CANCELLED">Cancelled</option>
-              <option value="SKIPPED">Skipped</option>
+              <option value="">{t('allStatuses')}</option>
+              <option value="PENDING">{t('pending')}</option>
+              <option value="COMPLETED">{t('completed')}</option>
+              <option value="CANCELLED">{t('cancelled')}</option>
+              <option value="SKIPPED">{t('skipped')}</option>
             </select>
 
             <select
@@ -249,17 +251,17 @@ export default function FollowUps() {
               onChange={(e) => setFilters(prev => ({ ...prev, priority: e.target.value }))}
               className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">All Priorities</option>
-              <option value="HIGH">High Priority</option>
-              <option value="MEDIUM">Medium Priority</option>
-              <option value="LOW">Low Priority</option>
+              <option value="">{t('allPriorities')}</option>
+              <option value="HIGH">{t('highPriority')}</option>
+              <option value="MEDIUM">{t('mediumPriority')}</option>
+              <option value="LOW">{t('lowPriority')}</option>
             </select>
 
             <div className="flex-1 min-w-[200px] relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
                 type="text"
-                placeholder="Search by patient name or notes..."
+                placeholder={t('searchFollowUps')}
                 value={filters.search}
                 onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
                 className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -272,7 +274,7 @@ export default function FollowUps() {
                 className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1"
               >
                 <X className="w-4 h-4" />
-                Clear filters
+                {t('clearFilters')}
               </button>
             )}
           </div>
@@ -285,10 +287,10 @@ export default function FollowUps() {
         <div className="bg-white rounded-lg border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">
-              Patients Flagged for Follow-up
+              {t('patientsFlagged')}
             </h2>
             <p className="text-sm text-gray-500 mt-1">
-              These patients have been marked as needing follow-up contact
+              {t('patientsFlaggedDesc')}
             </p>
           </div>
 
@@ -296,7 +298,7 @@ export default function FollowUps() {
             {patientsLoading ? (
               <div className="px-6 py-12 text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="text-sm text-gray-500 mt-3">Loading patients...</p>
+                <p className="text-sm text-gray-500 mt-3">{t('loadingPatients')}</p>
               </div>
             ) : patientsNeedingFollowUp.length > 0 ? (
               patientsNeedingFollowUp.map((patient) => (
@@ -315,7 +317,7 @@ export default function FollowUps() {
                             {patient.first_name} {patient.last_name}
                           </h3>
                           <span className="px-2 py-0.5 text-xs font-medium bg-red-100 text-red-700 rounded">
-                            Follow-up Needed
+                            {t('followUpNeeded')}
                           </span>
                         </div>
                         <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
@@ -325,12 +327,12 @@ export default function FollowUps() {
                           </span>
                           <span className="flex items-center gap-1">
                             <Calendar className="w-4 h-4" />
-                            Last visit: {formatDate(patient.last_visit_date)}
+                            {t('lastVisit')}: {formatDate(patient.last_visit_date, lang)}
                           </span>
                         </div>
                         {patient.follow_up_reason && (
                           <p className="text-sm text-gray-600 mt-2">
-                            Reason: {patient.follow_up_reason}
+                            {t('reasonLabel')}: {patient.follow_up_reason}
                           </p>
                         )}
                       </div>
@@ -340,13 +342,13 @@ export default function FollowUps() {
                         onClick={() => navigate(`/patients/${patient.id}`)}
                         className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
                       >
-                        View Patient
+                        {t('viewPatient')}
                       </button>
                       <button
                         onClick={() => navigate('/communications', { state: { patientId: patient.id } })}
                         className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                       >
-                        Contact
+                        {t('contact')}
                       </button>
                     </div>
                   </div>
@@ -355,7 +357,7 @@ export default function FollowUps() {
             ) : (
               <div className="px-6 py-12 text-center">
                 <CheckCircle2 className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm text-gray-500">No patients currently need follow-up</p>
+                <p className="text-sm text-gray-500">{t('noPatientsNeedFollowUp')}</p>
               </div>
             )}
           </div>
@@ -367,7 +369,7 @@ export default function FollowUps() {
             {isLoading ? (
               <div className="px-6 py-12 text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="text-sm text-gray-500 mt-3">Loading follow-ups...</p>
+                <p className="text-sm text-gray-500 mt-3">{t('loadingFollowUps')}</p>
               </div>
             ) : filteredFollowUps.length > 0 ? (
               filteredFollowUps.map((followUp) => (
@@ -393,7 +395,7 @@ export default function FollowUps() {
                           </span>
                           {isOverdue(followUp.due_date) && followUp.status === 'PENDING' && (
                             <span className="px-2 py-0.5 text-xs font-medium bg-red-100 text-red-700 rounded">
-                              Overdue
+                              {t('overdue')}
                             </span>
                           )}
                         </div>
@@ -407,19 +409,19 @@ export default function FollowUps() {
                         <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
-                            Due: {formatDate(followUp.due_date)}
+                            {t('dueLabel')}: {formatDate(followUp.due_date, lang)}
                           </span>
                           {followUp.follow_up_type && (
-                            <span>Type: {followUp.follow_up_type}</span>
+                            <span>{t('typeLabel')}: {followUp.follow_up_type}</span>
                           )}
                           {followUp.assigned_to_name && (
-                            <span>Assigned to: {followUp.assigned_to_name}</span>
+                            <span>{t('assignedTo')}: {followUp.assigned_to_name}</span>
                           )}
                         </div>
 
                         {followUp.completion_notes && (
                           <p className="text-xs text-green-600 mt-2">
-                            Completion notes: {followUp.completion_notes}
+                            {t('completionNotes')}: {followUp.completion_notes}
                           </p>
                         )}
                       </div>
@@ -433,14 +435,14 @@ export default function FollowUps() {
                           className="px-3 py-1.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center gap-1"
                         >
                           <CheckCircle2 className="w-4 h-4" />
-                          Complete
+                          {t('complete')}
                         </button>
                         <button
                           onClick={() => handleSkip(followUp)}
                           disabled={skipMutation.isLoading}
                           className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                         >
-                          Skip
+                          {t('skip')}
                         </button>
                       </div>
                     )}
@@ -452,8 +454,8 @@ export default function FollowUps() {
                 <Clock className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                 <p className="text-sm text-gray-500">
                   {filters.status || filters.priority || filters.search
-                    ? 'No follow-ups match your filters'
-                    : 'No follow-ups found'}
+                    ? t('noFollowUpsMatch')
+                    : t('noFollowUpsFound')}
                 </p>
               </div>
             )}

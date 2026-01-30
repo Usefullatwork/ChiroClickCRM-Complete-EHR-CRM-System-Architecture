@@ -15,13 +15,62 @@ import { validateClinicalContent, checkRedFlagsInContent, checkMedicationWarning
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
 const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY || null;
 const AI_PROVIDER = process.env.AI_PROVIDER || 'ollama'; // 'ollama' or 'claude'
-const AI_MODEL = process.env.AI_MODEL || 'gemini-3-pro-preview:7b'; // Default: Gemini 3 Pro Preview 7B (8GB+ RAM)
+const AI_MODEL = process.env.AI_MODEL || 'chiro-no'; // Default: chiro-no (Mistral 7B fine-tuned)
+const AI_ENABLED = process.env.AI_ENABLED !== 'false'; // Default: true unless explicitly disabled
+
+/**
+ * Task-based model routing
+ * Routes different clinical tasks to the most appropriate specialized model
+ */
+const MODEL_ROUTING = {
+  // chiro-no (Mistral 7B) - Primary clinical model for structured documentation
+  'soap_notes': 'chiro-no',
+  'clinical_summary': 'chiro-no',
+  'journal_organization': 'chiro-no',
+  'diagnosis_suggestion': 'chiro-no',
+  'sick_leave': 'chiro-no',
+
+  // chiro-fast (Llama 3.2 3B) - Fast autocomplete and short suggestions
+  'autocomplete': 'chiro-fast',
+  'spell_check': 'chiro-fast',
+  'abbreviation': 'chiro-fast',
+  'quick_suggestion': 'chiro-fast',
+
+  // chiro-norwegian (Viking 7B) - Norwegian language specialist
+  'norwegian_text': 'chiro-norwegian',
+  'patient_communication': 'chiro-norwegian',
+  'referral_letter': 'chiro-norwegian',
+  'report_writing': 'chiro-norwegian',
+
+  // chiro-medical (MedGemma 4B) - Clinical reasoning and safety
+  'red_flag_analysis': 'chiro-medical',
+  'differential_diagnosis': 'chiro-medical',
+  'treatment_safety': 'chiro-medical',
+  'clinical_reasoning': 'chiro-medical',
+  'medication_interaction': 'chiro-medical',
+};
+
+/**
+ * Get the appropriate model for a given task type
+ * Falls back to AI_MODEL env var or chiro-no if task not mapped
+ */
+const getModelForTask = (taskType) => {
+  return MODEL_ROUTING[taskType] || AI_MODEL;
+};
+
+/**
+ * Check if AI is available and enabled
+ */
+const isAIAvailable = () => {
+  return AI_ENABLED;
+};
 
 /**
  * Generate AI completion using selected provider
  */
 const generateCompletion = async (prompt, systemPrompt = null, options = {}) => {
-  const { maxTokens = 500, temperature = 0.7 } = options;
+  const { maxTokens = 500, temperature = 0.7, taskType = null } = options;
+  const model = taskType ? getModelForTask(taskType) : AI_MODEL;
 
   try {
     if (AI_PROVIDER === 'claude' && CLAUDE_API_KEY) {
@@ -46,11 +95,11 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
 
       return response.data.content[0].text;
     } else {
-      // Use Ollama (local)
+      // Use Ollama (local) with task-routed model
       const response = await axios.post(
         `${OLLAMA_BASE_URL}/api/generate`,
         {
-          model: AI_MODEL,
+          model,
           prompt: systemPrompt ? `${systemPrompt}\n\n${prompt}` : prompt,
           stream: false,
           options: {
@@ -73,6 +122,11 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
  * Spell check and grammar correction for Norwegian clinical notes
  */
 export const spellCheckNorwegian = async (text) => {
+  // Return fallback if AI is disabled
+  if (!isAIAvailable()) {
+    return { original: text, corrected: text, hasChanges: false, aiAvailable: false };
+  }
+
   const systemPrompt = `Du er en norsk språkassistent som er spesialisert på kiropraktisk medisinsk terminologi.
 Korriger stavefeil og grammatiske feil i den følgende kliniske teksten.
 Behold alle medisinske fagtermer. Svar kun med den korrigerte teksten uten forklaringer.`;
@@ -80,16 +134,17 @@ Behold alle medisinske fagtermer. Svar kun med den korrigerte teksten uten forkl
   const prompt = `Korriger følgende tekst:\n\n${text}`;
 
   try {
-    const correctedText = await generateCompletion(prompt, systemPrompt, { maxTokens: 1000, temperature: 0.3 });
+    const correctedText = await generateCompletion(prompt, systemPrompt, { maxTokens: 1000, temperature: 0.3, taskType: 'spell_check' });
 
     return {
       original: text,
       corrected: correctedText.trim(),
-      hasChanges: text.trim() !== correctedText.trim()
+      hasChanges: text.trim() !== correctedText.trim(),
+      aiAvailable: true
     };
   } catch (error) {
     logger.error('Spell check error:', error);
-    return { original: text, corrected: text, hasChanges: false, error: error.message };
+    return { original: text, corrected: text, hasChanges: false, aiAvailable: false, error: error.message };
   }
 };
 
@@ -97,6 +152,11 @@ Behold alle medisinske fagtermer. Svar kun med den korrigerte teksten uten forkl
  * Generate SOAP note suggestions based on symptoms
  */
 export const generateSOAPSuggestions = async (chiefComplaint, section = 'subjective') => {
+  // Return fallback if AI is disabled
+  if (!isAIAvailable()) {
+    return { section, chiefComplaint, suggestion: '', aiAvailable: false };
+  }
+
   let systemPrompt;
   let prompt;
 
@@ -130,20 +190,21 @@ export const generateSOAPSuggestions = async (chiefComplaint, section = 'subject
       break;
 
     default:
-      throw new Error('Invalid section');
+      return { section, chiefComplaint, suggestion: '', error: 'Invalid section', aiAvailable: false };
   }
 
   try {
-    const suggestion = await generateCompletion(prompt, systemPrompt, { maxTokens: 400, temperature: 0.8 });
+    const suggestion = await generateCompletion(prompt, systemPrompt, { maxTokens: 400, temperature: 0.8, taskType: 'soap_notes' });
 
     return {
       section,
       chiefComplaint,
-      suggestion: suggestion.trim()
+      suggestion: suggestion.trim(),
+      aiAvailable: true
     };
   } catch (error) {
     logger.error('SOAP suggestion error:', error);
-    return { section, chiefComplaint, suggestion: '', error: error.message };
+    return { section, chiefComplaint, suggestion: '', aiAvailable: false, error: error.message };
   }
 };
 
@@ -151,18 +212,29 @@ export const generateSOAPSuggestions = async (chiefComplaint, section = 'subject
  * Suggest ICPC-2 diagnosis codes based on clinical presentation
  */
 export const suggestDiagnosisCodes = async (soapData) => {
+  // Return fallback if AI is disabled
+  if (!isAIAvailable()) {
+    return { suggestion: '', codes: [], reasoning: '', aiAvailable: false };
+  }
+
   const { subjective, objective, assessment } = soapData;
 
   // Get common chiropractic ICPC-2 codes from database
-  const codesResult = await query(
-    `SELECT code, description_no, description_en, chapter
-     FROM diagnosis_codes
-     WHERE system = 'ICPC2' AND chapter IN ('L', 'N') AND commonly_used = true
-     ORDER BY usage_count DESC
-     LIMIT 20`
-  );
+  let availableCodes = [];
+  try {
+    const codesResult = await query(
+      `SELECT code, description_no, description_en, chapter
+       FROM diagnosis_codes
+       WHERE system = 'ICPC2' AND chapter IN ('L', 'N') AND commonly_used = true
+       ORDER BY usage_count DESC
+       LIMIT 20`
+    );
+    availableCodes = codesResult.rows;
+  } catch (dbError) {
+    logger.error('Database error fetching diagnosis codes:', dbError);
+    return { suggestion: '', codes: [], reasoning: '', aiAvailable: false, error: 'Database unavailable' };
+  }
 
-  const availableCodes = codesResult.rows;
   const codesText = availableCodes.map(c => `${c.code} - ${c.description_no}`).join('\n');
 
   const systemPrompt = `Du er en kiropraktor-assistent. Basert på kliniske funn, foreslå de mest relevante ICPC-2 diagnosekodene.
@@ -180,7 +252,7 @@ Vurdering: ${assessment?.clinical_reasoning || ''}
 Foreslå ICPC-2 koder:`;
 
   try {
-    const suggestion = await generateCompletion(prompt, systemPrompt, { maxTokens: 300, temperature: 0.5 });
+    const suggestion = await generateCompletion(prompt, systemPrompt, { maxTokens: 300, temperature: 0.5, taskType: 'diagnosis_suggestion' });
 
     // Extract codes from response
     const suggestedCodes = [];
@@ -193,11 +265,12 @@ Foreslå ICPC-2 koder:`;
     return {
       suggestion: suggestion.trim(),
       codes: suggestedCodes,
-      reasoning: suggestion
+      reasoning: suggestion,
+      aiAvailable: true
     };
   } catch (error) {
     logger.error('Diagnosis suggestion error:', error);
-    return { suggestion: '', codes: [], reasoning: '', error: error.message };
+    return { suggestion: '', codes: [], reasoning: '', aiAvailable: false, error: error.message };
   }
 };
 
@@ -215,9 +288,15 @@ export const analyzeRedFlags = async (patientData, soapData) => {
     soapData.assessment?.clinical_reasoning || ''
   ].join(' ');
 
-  // Rule-based red flag detection
-  const redFlagsDetected = checkRedFlagsInContent(clinicalContent);
-  const medicationWarnings = checkMedicationWarnings(patientData.current_medications || []);
+  // Rule-based red flag detection (works without AI)
+  let redFlagsDetected = [];
+  let medicationWarnings = [];
+  try {
+    redFlagsDetected = checkRedFlagsInContent(clinicalContent);
+    medicationWarnings = checkMedicationWarnings(patientData.current_medications || []);
+  } catch (error) {
+    logger.error('Rule-based red flag check error:', error);
+  }
 
   // Comprehensive validation with patient context
   const validationResult = await validateClinicalContent(clinicalContent, {
@@ -240,7 +319,25 @@ export const analyzeRedFlags = async (patientData, soapData) => {
       detectedFlags: redFlagsDetected,
       medicationWarnings,
       requiresImmediateAction: true,
-      source: 'clinical_validation'
+      source: 'clinical_validation',
+      aiAvailable: isAIAvailable()
+    };
+  }
+
+  // If AI is disabled, return rule-based results only
+  if (!isAIAvailable()) {
+    return {
+      analysis: redFlagsDetected.length > 0
+        ? `Automatisk oppdagede røde flagg: ${redFlagsDetected.map(f => f.message).join('; ')}`
+        : 'AI-analyse deaktivert. Regelbasert sjekk fullført.',
+      riskLevel: validationResult.riskLevel,
+      canTreat: !validationResult.hasRedFlags,
+      recommendReferral: validationResult.requiresReview,
+      detectedFlags: redFlagsDetected,
+      medicationWarnings,
+      confidence: validationResult.confidence,
+      source: 'clinical_validation_only',
+      aiAvailable: false
     };
   }
 
@@ -272,7 +369,7 @@ ${redFlagsDetected.length > 0 ? `MERK: Følgende røde flagg ble oppdaget automa
 Analyser røde flagg og gi anbefaling:`;
 
   try {
-    const analysis = await generateCompletion(prompt, systemPrompt, { maxTokens: 400, temperature: 0.4 });
+    const analysis = await generateCompletion(prompt, systemPrompt, { maxTokens: 400, temperature: 0.4, taskType: 'red_flag_analysis' });
 
     // Combine AI analysis with rule-based detection
     let riskLevel = validationResult.riskLevel;
@@ -293,7 +390,8 @@ Analyser røde flagg og gi anbefaling:`;
       detectedFlags: redFlagsDetected,
       medicationWarnings,
       confidence: validationResult.confidence,
-      source: 'combined'
+      source: 'combined',
+      aiAvailable: true
     };
   } catch (error) {
     logger.error('Red flag analysis error:', error);
@@ -310,6 +408,7 @@ Analyser røde flagg og gi anbefaling:`;
       medicationWarnings,
       confidence: validationResult.confidence,
       source: 'clinical_validation_only',
+      aiAvailable: false,
       error: error.message
     };
   }
@@ -319,6 +418,11 @@ Analyser røde flagg og gi anbefaling:`;
  * Generate clinical summary from encounter
  */
 export const generateClinicalSummary = async (encounter) => {
+  // Return fallback if AI is disabled
+  if (!isAIAvailable()) {
+    return { summary: '', encounterId: encounter.id, aiAvailable: false };
+  }
+
   const systemPrompt = `Du er en kiropraktor-assistent. Generer et kort, profesjonelt klinisk sammendrag på norsk.
 Sammendraget skal være kortfattet og egnet for journalføring eller henvisningsbrev.`;
 
@@ -344,15 +448,16 @@ Oppfølging: ${encounter.plan?.follow_up || ''}
 Generer kort sammendrag (2-3 setninger):`;
 
   try {
-    const summary = await generateCompletion(prompt, systemPrompt, { maxTokens: 200, temperature: 0.6 });
+    const summary = await generateCompletion(prompt, systemPrompt, { maxTokens: 200, temperature: 0.6, taskType: 'clinical_summary' });
 
     return {
       summary: summary.trim(),
-      encounterId: encounter.id
+      encounterId: encounter.id,
+      aiAvailable: true
     };
   } catch (error) {
     logger.error('Clinical summary error:', error);
-    return { summary: '', error: error.message };
+    return { summary: '', encounterId: encounter.id, aiAvailable: false, error: error.message };
   }
 };
 
@@ -382,6 +487,16 @@ export const learnFromOutcome = async (encounterId, outcomeData) => {
  * Converts unstructured text into structured clinical data + SOAP format + tasks
  */
 export const organizeOldJournalNotes = async (noteContent, patientContext = {}) => {
+  // Return fallback if AI is disabled
+  if (!isAIAvailable()) {
+    return {
+      success: false,
+      organizedData: null,
+      aiAvailable: false,
+      error: 'AI is disabled'
+    };
+  }
+
   const systemPrompt = `Du er en erfaren kiropraktor-assistent som er ekspert på å organisere og strukturere gamle journalnotater.
 
 Din oppgave er å analysere ustrukturerte journalnotater og strukturere dem i et klinisk format MED utdrag av HANDLINGSOPPGAVER.
@@ -520,7 +635,8 @@ Svar kun med JSON.`;
   try {
     const response = await generateCompletion(prompt, systemPrompt, {
       maxTokens: 2000,
-      temperature: 0.4 // Lower temperature for more consistent structured output
+      temperature: 0.4, // Lower temperature for more consistent structured output
+      taskType: 'journal_organization'
     });
 
     // Parse JSON response
@@ -561,7 +677,8 @@ Svar kun med JSON.`;
       organizedData,
       rawResponse: response,
       model: AI_MODEL,
-      provider: AI_PROVIDER
+      provider: AI_PROVIDER,
+      aiAvailable: true
     };
 
   } catch (error) {
@@ -569,7 +686,8 @@ Svar kun med JSON.`;
     return {
       success: false,
       error: error.message,
-      organizedData: null
+      organizedData: null,
+      aiAvailable: false
     };
   }
 };
@@ -579,6 +697,21 @@ Svar kun med JSON.`;
  * Useful for importing multiple notes at once
  */
 export const organizeMultipleNotes = async (notes, patientContext = {}) => {
+  // Return fallback if AI is disabled
+  if (!isAIAvailable()) {
+    return {
+      totalNotes: notes.length,
+      successfullyProcessed: 0,
+      results: notes.map(note => ({
+        noteId: note.id || null,
+        filename: note.filename || null,
+        success: false,
+        error: 'AI is disabled'
+      })),
+      aiAvailable: false
+    };
+  }
+
   const results = [];
 
   for (const note of notes) {
@@ -614,6 +747,17 @@ export const organizeMultipleNotes = async (notes, patientContext = {}) => {
  * Useful when a patient has multiple old notes that should be consolidated
  */
 export const mergeOrganizedNotes = async (organizedNotes, patientContext = {}) => {
+  // Return fallback if AI is disabled
+  if (!isAIAvailable()) {
+    return {
+      success: false,
+      mergedNote: '',
+      sourceNotesCount: organizedNotes.length,
+      aiAvailable: false,
+      error: 'AI is disabled'
+    };
+  }
+
   const systemPrompt = `Du er en erfaren kiropraktor-assistent. Din oppgave er å samle og konsolidere flere journalnotater til én omfattende, kronologisk journalpost.
 
 Prinsipper:
@@ -640,7 +784,8 @@ Lag ett samlet, kronologisk SOAP-notat som fanger hele pasienthistorikken.`;
   try {
     const merged = await generateCompletion(prompt, systemPrompt, {
       maxTokens: 2000,
-      temperature: 0.5
+      temperature: 0.5,
+      taskType: 'clinical_summary'
     });
 
     return {
@@ -652,13 +797,15 @@ Lag ett samlet, kronologisk SOAP-notat som fanger hele pasienthistorikken.`;
           !min || (n.suggested_date && n.suggested_date < min) ? n.suggested_date : min, null),
         latest: organizedNotes.reduce((max, n) =>
           !max || (n.suggested_date && n.suggested_date > max) ? n.suggested_date : max, null)
-      }
+      },
+      aiAvailable: true
     };
   } catch (error) {
     logger.error('Merge organized notes error:', error);
     return {
       success: false,
-      error: error.message
+      error: error.message,
+      aiAvailable: false
     };
   }
 };
@@ -667,25 +814,49 @@ Lag ett samlet, kronologisk SOAP-notat som fanger hele pasienthistorikken.`;
  * Get AI service status
  */
 export const getAIStatus = async () => {
+  // If AI is disabled via env, return disabled status immediately
+  if (!AI_ENABLED) {
+    return {
+      provider: AI_PROVIDER,
+      available: false,
+      enabled: false,
+      model: AI_MODEL,
+      message: 'AI is disabled via AI_ENABLED=false'
+    };
+  }
+
+  const expectedModels = ['chiro-no', 'chiro-fast', 'chiro-norwegian', 'chiro-medical'];
+
   try {
     if (AI_PROVIDER === 'ollama') {
       const response = await axios.get(`${OLLAMA_BASE_URL}/api/tags`, { timeout: 5000 });
+      const installedModels = response.data.models?.map(m => m.name) || [];
+      const modelStatus = {};
+      for (const name of expectedModels) {
+        modelStatus[name] = installedModels.some(m => m.startsWith(name));
+      }
       return {
         provider: 'ollama',
         available: true,
-        model: AI_MODEL,
-        models: response.data.models?.map(m => m.name) || []
+        enabled: true,
+        defaultModel: AI_MODEL,
+        routing: MODEL_ROUTING,
+        models: installedModels,
+        modelStatus
       };
     } else if (AI_PROVIDER === 'claude' && CLAUDE_API_KEY) {
       return {
         provider: 'claude',
         available: true,
-        model: AI_MODEL
+        enabled: true,
+        model: AI_MODEL,
+        routing: MODEL_ROUTING
       };
     } else {
       return {
         provider: AI_PROVIDER,
         available: false,
+        enabled: true,
         error: 'AI provider not configured'
       };
     }
@@ -693,8 +864,76 @@ export const getAIStatus = async () => {
     return {
       provider: AI_PROVIDER,
       available: false,
+      enabled: true,
       error: error.message
     };
+  }
+};
+
+export { getModelForTask, MODEL_ROUTING };
+
+/**
+ * Get the appropriate model for a clinical field type
+ */
+export const getModelForField = (fieldType) => {
+  const fieldModelMap = {
+    'spell-check': 'chiro-fast',
+    'autocomplete': 'chiro-fast',
+    'soap-subjective': 'chiro-no',
+    'soap-objective': 'chiro-no',
+    'soap-assessment': 'chiro-no',
+    'soap-plan': 'chiro-no',
+    'diagnosis': 'chiro-no',
+    'red-flag': 'chiro-medical',
+    'letter': 'chiro-norwegian',
+    'communication': 'chiro-norwegian',
+  };
+  return fieldModelMap[fieldType] || AI_MODEL || 'chiro-no';
+};
+
+/**
+ * Build a prompt for field-specific AI generation
+ */
+export const buildFieldPrompt = (fieldType, context = {}, language = 'no') => {
+  const basePrompt = context.chiefComplaint
+    ? `Basert på hovedklage: ${context.chiefComplaint}\n`
+    : '';
+  return `${basePrompt}Generer ${fieldType} for klinisk dokumentasjon.`;
+};
+
+/**
+ * Generate AI completion as a stream (SSE)
+ */
+export const generateCompletionStream = async (model, prompt, res) => {
+  try {
+    const response = await axios.post(`${OLLAMA_BASE_URL}/api/generate`, {
+      model: model || AI_MODEL,
+      prompt,
+      stream: true,
+    }, { responseType: 'stream', timeout: 60000 });
+
+    response.data.on('data', (chunk) => {
+      try {
+        const parsed = JSON.parse(chunk.toString());
+        if (parsed.response) {
+          res.write(`data: ${JSON.stringify({ text: parsed.response })}\n\n`);
+        }
+        if (parsed.done) {
+          res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+          res.end();
+        }
+      } catch (e) {
+        // Skip unparseable chunks
+      }
+    });
+
+    response.data.on('error', (err) => {
+      res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
+      res.end();
+    });
+  } catch (error) {
+    res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
+    res.end();
   }
 };
 
@@ -708,5 +947,7 @@ export default {
   organizeOldJournalNotes,
   organizeMultipleNotes,
   mergeOrganizedNotes,
-  getAIStatus
+  getAIStatus,
+  getModelForTask,
+  MODEL_ROUTING
 };

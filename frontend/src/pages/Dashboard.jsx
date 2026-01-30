@@ -14,10 +14,14 @@ import {
 } from 'lucide-react'
 import { formatDate, formatTime } from '../lib/utils'
 import { dashboardAPI, appointmentsAPI, followUpsAPI } from '../services/api'
+import { useTranslation, formatDateWithWeekday, formatDateShort, formatTime as i18nFormatTime } from '../i18n'
+import toast from '../utils/toast'
+import { StatsGridSkeleton, AppointmentsListSkeleton, ListSkeleton } from '../components/ui/Skeleton'
 
 export default function Dashboard() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { t, lang } = useTranslation('dashboard')
 
   // Fetch dashboard stats from real API
   const { data: statsResponse, isLoading: statsLoading } = useQuery({
@@ -43,17 +47,38 @@ export default function Dashboard() {
 
   // Handle appointment cancellation
   const handleCancelAppointment = async (appointmentId, patientName) => {
-    if (!confirm(`Cancel appointment for ${patientName}?`)) return
-
-    const reason = prompt('Cancellation reason (optional):')
-
-    try {
-      await appointmentsAPI.cancel(appointmentId, reason || 'Cancelled by practitioner')
-      refetchAppointments()
-    } catch (error) {
-      alert('Failed to cancel appointment. Please try again.')
-      console.error('Cancel error:', error)
-    }
+    // Use toast confirmation instead of browser confirm
+    toast.promise(
+      new Promise((resolve, reject) => {
+        const toastId = toast.info(
+          `${t('cancelAppointmentConfirm').replace('{name}', patientName)}`,
+          {
+            action: {
+              label: t('confirm') || 'Bekreft',
+              onClick: async () => {
+                try {
+                  await appointmentsAPI.cancel(appointmentId, 'Cancelled by practitioner')
+                  refetchAppointments()
+                  resolve()
+                } catch (error) {
+                  reject(error)
+                }
+              }
+            },
+            cancel: {
+              label: t('cancel') || 'Avbryt',
+              onClick: () => reject(new Error('Cancelled'))
+            },
+            duration: 10000
+          }
+        )
+      }),
+      {
+        loading: t('cancelling') || 'Avbestiller...',
+        success: t('appointmentCancelled') || 'Time avbestilt',
+        error: (err) => err.message === 'Cancelled' ? '' : t('cancelFailed')
+      }
+    )
   }
 
   // Mark patient as contacted for follow-up
@@ -66,59 +91,37 @@ export default function Dashboard() {
   })
 
   const handleMarkContacted = (patient, method) => {
-    if (!confirm(`Mark ${patient.first_name} ${patient.last_name} as contacted?`)) return
-    markContactedMutation.mutate({ patientId: patient.id, method })
+    const patientName = `${patient.first_name} ${patient.last_name}`
+    toast.info(
+      t('markContactedConfirm').replace('{name}', patientName),
+      {
+        action: {
+          label: t('confirm') || 'Bekreft',
+          onClick: () => markContactedMutation.mutate({ patientId: patient.id, method })
+        },
+        cancel: {
+          label: t('cancel') || 'Avbryt',
+          onClick: () => {}
+        },
+        duration: 10000
+      }
+    )
   }
 
   // Quick actions
   const quickActions = [
-    {
-      name: 'New Patient',
-      icon: Users,
-      color: 'blue',
-      action: () => navigate('/patients/new')
-    },
-    {
-      name: 'New Appointment',
-      icon: Calendar,
-      color: 'green',
-      action: () => navigate('/appointments/new')
-    },
-    {
-      name: 'Send SMS',
-      icon: MessageSquare,
-      color: 'purple',
-      action: () => navigate('/communications')
-    },
-    {
-      name: 'SOAP Note',
-      icon: FileText,
-      color: 'orange',
-      action: () => navigate('/patients')
-    }
+    { name: t('newPatient'), icon: Users, color: 'blue', action: () => navigate('/patients/new') },
+    { name: t('newAppointment'), icon: Calendar, color: 'green', action: () => navigate('/appointments/new') },
+    { name: t('sendSMS'), icon: MessageSquare, color: 'purple', action: () => navigate('/communications') },
+    { name: t('soapNote'), icon: FileText, color: 'orange', action: () => navigate('/patients') }
   ]
 
   const statCards = [
+    { label: t('todaysAppointments'), value: stats?.todayAppointments || 0, icon: Calendar, color: 'blue' },
+    { label: t('activePatients'), value: stats?.activePatients || 0, icon: Users, color: 'green' },
+    { label: t('pendingFollowUps'), value: stats?.pendingFollowUps || 0, icon: CheckCircle2, color: 'orange' },
     {
-      label: "Today's Appointments",
-      value: stats?.todayAppointments || 0,
-      icon: Calendar,
-      color: 'blue'
-    },
-    {
-      label: 'Active Patients',
-      value: stats?.activePatients || 0,
-      icon: Users,
-      color: 'green'
-    },
-    {
-      label: 'Pending Follow-ups',
-      value: stats?.pendingFollowUps || 0,
-      icon: CheckCircle2,
-      color: 'orange'
-    },
-    {
-      label: 'Revenue (This Month)',
+      label: t('revenueThisMonth'),
       value: stats?.monthRevenue ? `${(stats.monthRevenue / 1000).toFixed(0)}k kr` : '0 kr',
       icon: TrendingUp,
       color: 'purple'
@@ -129,52 +132,53 @@ export default function Dashboard() {
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">{t('title')}</h1>
         <p className="text-sm text-gray-500 mt-1">
-          {new Date().toLocaleDateString('no-NO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          {formatDateWithWeekday(new Date(), lang)}
         </p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {statCards.map((stat) => {
-          const Icon = stat.icon
-          return (
-            <div key={stat.label} className="bg-white rounded-lg border border-gray-200 p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">{stat.label}</p>
-                  <p className="text-2xl font-semibold text-gray-900 mt-1">{stat.value}</p>
-                </div>
-                <div className={`w-12 h-12 rounded-lg bg-${stat.color}-50 flex items-center justify-center`}>
-                  <Icon className={`w-6 h-6 text-${stat.color}-600`} />
+      {statsLoading ? (
+        <StatsGridSkeleton count={4} className="mb-6" />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          {statCards.map((stat) => {
+            const Icon = stat.icon
+            return (
+              <div key={stat.label} className="bg-white rounded-lg border border-gray-200 p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">{stat.label}</p>
+                    <p className="text-2xl font-semibold text-gray-900 mt-1">{stat.value}</p>
+                  </div>
+                  <div className={`w-12 h-12 rounded-lg bg-${stat.color}-50 flex items-center justify-center`}>
+                    <Icon className={`w-6 h-6 text-${stat.color}-600`} />
+                  </div>
                 </div>
               </div>
-            </div>
-          )
-        })}
-      </div>
+            )
+          })}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Today's Schedule */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-lg border border-gray-200">
             <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Today's Schedule</h2>
+              <h2 className="text-lg font-semibold text-gray-900">{t('todaysSchedule')}</h2>
               <button
                 onClick={() => navigate('/appointments')}
                 className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
               >
-                View all
+                {t('viewAll')}
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
             <div className="divide-y divide-gray-100">
               {appointmentsLoading ? (
-                <div className="px-5 py-12 text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                  <p className="text-sm text-gray-500 mt-3">Loading appointments...</p>
-                </div>
+                <AppointmentsListSkeleton items={5} />
               ) : appointments && appointments.length > 0 ? (
                 appointments.map((apt) => (
                   <div
@@ -188,14 +192,14 @@ export default function Dashboard() {
                       >
                         <div className="text-center">
                           <div className="text-sm font-semibold text-gray-900">
-                            {new Date(apt.start_time).toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}
+                            {i18nFormatTime(apt.start_time, lang)}
                           </div>
-                          <div className="text-xs text-gray-500">{apt.duration_minutes || 30} min</div>
+                          <div className="text-xs text-gray-500">{apt.duration_minutes || 30} {t('min')}</div>
                         </div>
                         <div className="h-10 w-px bg-gray-200" />
                         <div>
                           <p className="text-sm font-medium text-gray-900">{apt.patient_name}</p>
-                          <p className="text-xs text-gray-500">{apt.appointment_type || 'Appointment'}</p>
+                          <p className="text-xs text-gray-500">{apt.appointment_type || t('appointment')}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -208,7 +212,7 @@ export default function Dashboard() {
                             ? 'bg-red-50 text-red-700'
                             : 'bg-gray-50 text-gray-700'
                         }`}>
-                          {apt.status}
+                          {t(apt.status?.toLowerCase(), apt.status)}
                         </span>
                         {apt.status !== 'CANCELLED' && apt.status !== 'COMPLETED' && (
                           <button
@@ -217,7 +221,7 @@ export default function Dashboard() {
                               handleCancelAppointment(apt.id, apt.patient_name)
                             }}
                             className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-red-50 text-red-600 transition-opacity"
-                            title="Cancel appointment"
+                            title={t('cancelAppointment')}
                           >
                             <X className="w-4 h-4" />
                           </button>
@@ -229,7 +233,7 @@ export default function Dashboard() {
               ) : (
                 <div className="px-5 py-12 text-center">
                   <Clock className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-sm text-gray-500">No appointments scheduled for today</p>
+                  <p className="text-sm text-gray-500">{t('noAppointmentsToday')}</p>
                 </div>
               )}
             </div>
@@ -240,7 +244,7 @@ export default function Dashboard() {
         <div>
           <div className="bg-white rounded-lg border border-gray-200">
             <div className="px-5 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
+              <h2 className="text-lg font-semibold text-gray-900">{t('quickActions')}</h2>
             </div>
             <div className="p-4 space-y-2">
               {quickActions.map((action) => {
@@ -264,20 +268,18 @@ export default function Dashboard() {
           {/* Pending Follow-ups */}
           <div className="bg-white rounded-lg border border-gray-200 mt-6">
             <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Patients Needing Follow-up</h2>
+              <h2 className="text-lg font-semibold text-gray-900">{t('patientsNeedingFollowUp')}</h2>
               <button
                 onClick={() => navigate('/follow-ups')}
                 className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
               >
-                View all
+                {t('viewAll')}
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
             <div className="divide-y divide-gray-100">
               {followUpLoading ? (
-                <div className="px-5 py-8 text-center">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
-                </div>
+                <ListSkeleton items={5} showAvatar={false} />
               ) : followUpPatients && followUpPatients.length > 0 ? (
                 followUpPatients.slice(0, 5).map((patient) => {
                   const followUpDate = new Date(patient.follow_up_date)
@@ -294,12 +296,12 @@ export default function Dashboard() {
                             {patient.first_name} {patient.last_name}
                           </p>
                           <p className="text-xs text-gray-500 truncate mt-0.5">
-                            {patient.main_problem || 'No problem specified'}
+                            {patient.main_problem || t('noProblemSpecified')}
                           </p>
                           <div className="flex items-center gap-2 mt-1">
                             <span className={`text-xs font-medium ${isOverdue ? 'text-red-600' : 'text-gray-600'}`}>
-                              {isOverdue ? 'Overdue: ' : 'Due: '}
-                              {followUpDate.toLocaleDateString('no-NO', { month: 'short', day: 'numeric' })}
+                              {isOverdue ? `${t('overdue')}: ` : `${t('due')}: `}
+                              {formatDateShort(followUpDate, lang)}
                             </span>
                             {patient.preferred_contact_method && (
                               <span className="text-xs text-gray-400">
@@ -312,7 +314,7 @@ export default function Dashboard() {
                           onClick={() => handleMarkContacted(patient, patient.preferred_contact_method || 'SMS')}
                           disabled={markContactedMutation.isPending}
                           className="flex-shrink-0 px-2 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50 rounded transition-colors disabled:opacity-50"
-                          title="Mark as contacted"
+                          title={t('markAsContacted')}
                         >
                           <CheckCircle2 className="w-4 h-4" />
                         </button>
@@ -323,7 +325,7 @@ export default function Dashboard() {
               ) : (
                 <div className="px-5 py-8 text-center">
                   <CheckCircle2 className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-                  <p className="text-sm text-gray-500">No patients need follow-up</p>
+                  <p className="text-sm text-gray-500">{t('noFollowUpsNeeded')}</p>
                 </div>
               )}
             </div>

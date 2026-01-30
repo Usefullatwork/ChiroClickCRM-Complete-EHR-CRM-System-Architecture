@@ -6,6 +6,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { templatesAPI } from '../services/api'
+import { useTranslation } from '../i18n'
 import {
   FileText,
   Search,
@@ -22,6 +23,7 @@ import {
 } from 'lucide-react'
 
 export default function Templates() {
+  const { t } = useTranslation('common')
   const queryClient = useQueryClient()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
@@ -89,7 +91,7 @@ export default function Templates() {
   const copyTemplate = (template) => {
     const content = `${template.name}\n\n${template.description || ''}\n\n${JSON.stringify(template.fields, null, 2)}`
     navigator.clipboard.writeText(content)
-    alert('Template copied to clipboard!')
+    alert(t('templateCopied'))
   }
 
   return (
@@ -100,9 +102,9 @@ export default function Templates() {
           <div className="flex items-center gap-3">
             <BookOpen className="w-8 h-8 text-blue-600" />
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Clinical Templates</h1>
+              <h1 className="text-3xl font-bold text-gray-900">{t('clinicalTemplates')}</h1>
               <p className="text-gray-600">
-                Norwegian examination protocols and templates
+                {t('templatesSubtitle')}
               </p>
             </div>
           </div>
@@ -132,7 +134,7 @@ export default function Templates() {
               <FileText className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Total Templates</p>
+              <p className="text-sm text-gray-600">{t('totalTemplates')}</p>
               <p className="text-2xl font-bold text-gray-900">{filteredTemplates.length}</p>
             </div>
           </div>
@@ -144,7 +146,7 @@ export default function Templates() {
               <Star className="w-5 h-5 text-yellow-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Favorites</p>
+              <p className="text-sm text-gray-600">{t('favorites')}</p>
               <p className="text-2xl font-bold text-gray-900">
                 {filteredTemplates.filter(t => t.is_favorite).length}
               </p>
@@ -158,7 +160,7 @@ export default function Templates() {
               <TrendingUp className="w-5 h-5 text-green-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Most Used</p>
+              <p className="text-sm text-gray-600">{t('mostUsed')}</p>
               <p className="text-2xl font-bold text-gray-900">
                 {filteredTemplates.reduce((max, t) => Math.max(max, t.usage_count || 0), 0)}
               </p>
@@ -172,7 +174,7 @@ export default function Templates() {
               <Filter className="w-5 h-5 text-purple-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Categories</p>
+              <p className="text-sm text-gray-600">{t('categories')}</p>
               <p className="text-2xl font-bold text-gray-900">{allCategories.length}</p>
             </div>
           </div>
@@ -187,7 +189,7 @@ export default function Templates() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
               type="text"
-              placeholder="Search templates..."
+              placeholder={t('searchTemplates')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -200,7 +202,7 @@ export default function Templates() {
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="">All Categories</option>
+            <option value="">{t('allCategories')}</option>
             {allCategories.map((category) => (
               <option key={category} value={category}>{category}</option>
             ))}
@@ -212,12 +214,12 @@ export default function Templates() {
       {isLoading ? (
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="text-gray-600 mt-4">Loading templates...</p>
+          <p className="text-gray-600 mt-4">{t('loadingTemplates')}</p>
         </div>
       ) : filteredTemplates.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
           <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-600">No templates found matching your criteria</p>
+          <p className="text-gray-600">{t('noTemplatesFound')}</p>
         </div>
       ) : viewMode === 'grid' ? (
         /* Grid View */
@@ -259,7 +261,7 @@ export default function Templates() {
                 </span>
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-3 h-3" />
-                  <span>{template.usage_count || 0} uses</span>
+                  <span>{t('uses').replace('{count}', template.usage_count || 0)}</span>
                 </div>
               </div>
             </div>
@@ -272,16 +274,16 @@ export default function Templates() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Template Name
+                  {t('name')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Category
+                  {t('categories')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Usage
+                  {t('usageCount')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  {t('actions')}
                 </th>
               </tr>
             </thead>
@@ -313,7 +315,7 @@ export default function Templates() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {template.usage_count || 0} uses
+                    {t('uses').replace('{count}', template.usage_count || 0)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <button
@@ -382,13 +384,13 @@ export default function Templates() {
             <div className="p-6">
               {selectedTemplate.description && (
                 <div className="mb-6">
-                  <h4 className="font-semibold text-gray-900 mb-2">Description</h4>
+                  <h4 className="font-semibold text-gray-900 mb-2">{t('description')}</h4>
                   <p className="text-gray-700">{selectedTemplate.description}</p>
                 </div>
               )}
 
               <div className="mb-6">
-                <h4 className="font-semibold text-gray-900 mb-2">Template Fields</h4>
+                <h4 className="font-semibold text-gray-900 mb-2">{t('templateFields')}</h4>
                 <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                   <pre className="text-sm text-gray-700 whitespace-pre-wrap">
                     {JSON.stringify(selectedTemplate.fields, null, 2)}
@@ -398,21 +400,21 @@ export default function Templates() {
 
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-gray-600">Language:</span>
+                  <span className="text-gray-600">{t('language')}:</span>
                   <span className="ml-2 font-medium">{selectedTemplate.language}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Usage Count:</span>
+                  <span className="text-gray-600">{t('usageCount')}:</span>
                   <span className="ml-2 font-medium">{selectedTemplate.usage_count || 0}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Created:</span>
+                  <span className="text-gray-600">{t('created')}:</span>
                   <span className="ml-2 font-medium">
                     {new Date(selectedTemplate.created_at).toLocaleDateString('no-NO')}
                   </span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Last Updated:</span>
+                  <span className="text-gray-600">{t('lastUpdated')}:</span>
                   <span className="ml-2 font-medium">
                     {new Date(selectedTemplate.updated_at).toLocaleDateString('no-NO')}
                   </span>
@@ -425,13 +427,13 @@ export default function Templates() {
                 onClick={() => setSelectedTemplate(null)}
                 className="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
               >
-                Close
+                {t('close')}
               </button>
               <button
                 onClick={() => copyTemplate(selectedTemplate)}
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
-                Copy Template
+                {t('copyTemplate')}
               </button>
             </div>
           </div>

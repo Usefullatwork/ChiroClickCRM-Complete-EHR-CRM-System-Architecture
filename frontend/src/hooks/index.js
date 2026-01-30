@@ -13,7 +13,7 @@ export {
   useKeyboardShortcuts as useShortcuts,
   KeyboardShortcutsProvider,
   SHORTCUTS,
-} from './useKeyboardShortcuts';
+} from './useKeyboardShortcuts.jsx';
 
 // PWA / Offline Support
 export {

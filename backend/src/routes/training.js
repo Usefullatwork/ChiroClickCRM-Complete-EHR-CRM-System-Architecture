@@ -11,6 +11,84 @@ const router = express.Router();
 router.use(requireAuth);
 router.use(requireOrganization);
 
+// ============================================================================
+// MODEL MANAGEMENT ENDPOINTS (new)
+// ============================================================================
+
+/**
+ * @route   GET /api/v1/training/status
+ * @desc    Current model status (which exist, sizes, Ollama running)
+ * @access  Private (ADMIN or PRACTITIONER)
+ */
+router.get('/status',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  trainingController.getModelStatus
+);
+
+/**
+ * @route   GET /api/v1/training/data
+ * @desc    List training data files and example counts
+ * @access  Private (ADMIN or PRACTITIONER)
+ */
+router.get('/data',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  trainingController.getTrainingData
+);
+
+/**
+ * @route   POST /api/v1/training/add-examples
+ * @desc    Add new JSONL examples to training data
+ * @access  Private (ADMIN only)
+ */
+router.post('/add-examples',
+  requireRole(['ADMIN']),
+  trainingController.addExamples
+);
+
+/**
+ * @route   POST /api/v1/training/rebuild
+ * @desc    Rebuild Modelfiles from training data + re-create Ollama models
+ * @access  Private (ADMIN only)
+ */
+router.post('/rebuild',
+  requireRole(['ADMIN']),
+  trainingController.rebuildModels
+);
+
+/**
+ * @route   POST /api/v1/training/backup
+ * @desc    Export models to project folder
+ * @access  Private (ADMIN only)
+ */
+router.post('/backup',
+  requireRole(['ADMIN']),
+  trainingController.backupModels
+);
+
+/**
+ * @route   POST /api/v1/training/restore
+ * @desc    Import models from project folder backup
+ * @access  Private (ADMIN only)
+ */
+router.post('/restore',
+  requireRole(['ADMIN']),
+  trainingController.restoreModels
+);
+
+/**
+ * @route   GET /api/v1/training/test/:model
+ * @desc    Run test prompt against a model
+ * @access  Private (ADMIN only)
+ */
+router.get('/test/:model',
+  requireRole(['ADMIN']),
+  trainingController.testModel
+);
+
+// ============================================================================
+// LEGACY PIPELINE ENDPOINTS
+// ============================================================================
+
 /**
  * @route   POST /api/v1/training/pipeline
  * @desc    Run full training pipeline (fetch, parse, anonymize, train)

@@ -8,9 +8,11 @@ import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { patientsAPI } from '../services/api'
 import { ArrowLeft, Save, AlertCircle, User, Phone, Mail, MapPin, Calendar, FileText } from 'lucide-react'
+import { useTranslation } from '../i18n'
 
 export default function NewPatient() {
   const navigate = useNavigate()
+  const { t, lang } = useTranslation('patients')
   const [errors, setErrors] = useState({})
 
   // Form state
@@ -47,7 +49,12 @@ export default function NewPatient() {
     consent_email: true,
     consent_data_storage: true,
     consent_marketing: false,
-    consent_video_marketing: false
+    consent_video_marketing: false,
+    // Treatment preferences
+    treatment_pref_needles: null,
+    treatment_pref_adjustments: null,
+    treatment_pref_neck_adjustments: null,
+    treatment_pref_notes: ''
   })
 
   // Create patient mutation
@@ -157,7 +164,7 @@ export default function NewPatient() {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">New Patient</h1>
+            <h1 className="text-3xl font-bold text-gray-900">{t('newPatient')}</h1>
             <p className="text-gray-600">Create a new patient record</p>
           </div>
         </div>
@@ -180,7 +187,7 @@ export default function NewPatient() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
             <User className="w-5 h-5 text-gray-600" />
-            <h2 className="text-lg font-semibold">Basic Information</h2>
+            <h2 className="text-lg font-semibold">{t('personalInfo')}</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -202,7 +209,7 @@ export default function NewPatient() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Gender <span className="text-red-600">*</span>
+                {t('gender')} <span className="text-red-600">*</span>
               </label>
               <select
                 value={formData.gender}
@@ -212,16 +219,16 @@ export default function NewPatient() {
                 }`}
               >
                 <option value="">Select gender</option>
-                <option value="MALE">Male</option>
-                <option value="FEMALE">Female</option>
-                <option value="OTHER">Other</option>
+                <option value="MALE">{t('male')}</option>
+                <option value="FEMALE">{t('female')}</option>
+                <option value="OTHER">{t('other')}</option>
               </select>
               {errors.gender && <p className="text-red-600 text-sm mt-1">{errors.gender}</p>}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                First Name <span className="text-red-600">*</span>
+                {t('firstName')} <span className="text-red-600">*</span>
               </label>
               <input
                 type="text"
@@ -237,7 +244,7 @@ export default function NewPatient() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Last Name <span className="text-red-600">*</span>
+                {t('lastName')} <span className="text-red-600">*</span>
               </label>
               <input
                 type="text"
@@ -253,7 +260,7 @@ export default function NewPatient() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Date of Birth <span className="text-red-600">*</span>
+                {t('dateOfBirth')} <span className="text-red-600">*</span>
               </label>
               <input
                 type="date"
@@ -290,13 +297,13 @@ export default function NewPatient() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
             <Phone className="w-5 h-5 text-gray-600" />
-            <h2 className="text-lg font-semibold">Contact Information</h2>
+            <h2 className="text-lg font-semibold">{t('contactInfo')}</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Phone
+                {t('phone')}
               </label>
               <input
                 type="tel"
@@ -312,7 +319,7 @@ export default function NewPatient() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
+                {t('email')}
               </label>
               <input
                 type="email"
@@ -328,7 +335,7 @@ export default function NewPatient() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Preferred Contact Method
+                {t('preferredContactMethod')}
               </label>
               <select
                 value={formData.preferred_contact_method}
@@ -336,9 +343,9 @@ export default function NewPatient() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Not set</option>
-                <option value="SMS">SMS</option>
-                <option value="EMAIL">Email</option>
-                <option value="PHONE">Phone</option>
+                <option value="SMS">{t('sms')}</option>
+                <option value="EMAIL">{t('email')}</option>
+                <option value="PHONE">{t('phone')}</option>
                 <option value="NO_CONTACT">Do not contact</option>
               </select>
             </div>
@@ -364,7 +371,7 @@ export default function NewPatient() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
             <MapPin className="w-5 h-5 text-gray-600" />
-            <h2 className="text-lg font-semibold">Address</h2>
+            <h2 className="text-lg font-semibold">{t('address')}</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -383,7 +390,7 @@ export default function NewPatient() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Postal Code
+                {t('postalCode')}
               </label>
               <input
                 type="text"
@@ -396,7 +403,7 @@ export default function NewPatient() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                City
+                {t('city')}
               </label>
               <input
                 type="text"
@@ -413,13 +420,13 @@ export default function NewPatient() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
             <FileText className="w-5 h-5 text-gray-600" />
-            <h2 className="text-lg font-semibold">Clinical Information</h2>
+            <h2 className="text-lg font-semibold">{t('clinical')}</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Main Problem (Hovedproblem)
+                {t('mainProblem')}
               </label>
               <input
                 type="text"
@@ -475,7 +482,7 @@ export default function NewPatient() {
 
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                General Notes
+                {t('notes')}
               </label>
               <textarea
                 value={formData.general_notes}
@@ -490,7 +497,7 @@ export default function NewPatient() {
 
         {/* Consent */}
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-4">Consent (Samtykke)</h2>
+          <h2 className="text-lg font-semibold mb-4">{t('consentGiven')}</h2>
 
           <div className="space-y-3">
             <label className="flex items-center gap-3">
@@ -545,6 +552,140 @@ export default function NewPatient() {
           </div>
         </div>
 
+        {/* Treatment Preferences */}
+        <div className="pt-6 border-t border-gray-200">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Behandlingspreferanser</h3>
+          <p className="text-sm text-gray-500 mb-4">
+            Angi hva pasienten er komfortabel med. La stå tom hvis ikke avklart.
+          </p>
+          <div className="space-y-4">
+            {/* Needles preference */}
+            <div className="flex items-center gap-6">
+              <span className="text-sm font-medium text-gray-700 w-40">Nåler (dry needling, akupunktur):</span>
+              <div className="flex items-center gap-4">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="treatment_pref_needles"
+                    checked={formData.treatment_pref_needles === true}
+                    onChange={() => handleChange('treatment_pref_needles', true)}
+                    className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
+                  />
+                  <span className="text-sm text-green-700">OK</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="treatment_pref_needles"
+                    checked={formData.treatment_pref_needles === false}
+                    onChange={() => handleChange('treatment_pref_needles', false)}
+                    className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
+                  />
+                  <span className="text-sm text-red-700">Ikke OK</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="treatment_pref_needles"
+                    checked={formData.treatment_pref_needles === null}
+                    onChange={() => handleChange('treatment_pref_needles', null)}
+                    className="w-4 h-4 text-gray-600 border-gray-300 focus:ring-gray-500"
+                  />
+                  <span className="text-sm text-gray-500">Ikke avklart</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Adjustments preference */}
+            <div className="flex items-center gap-6">
+              <span className="text-sm font-medium text-gray-700 w-40">Justeringer generelt:</span>
+              <div className="flex items-center gap-4">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="treatment_pref_adjustments"
+                    checked={formData.treatment_pref_adjustments === true}
+                    onChange={() => handleChange('treatment_pref_adjustments', true)}
+                    className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
+                  />
+                  <span className="text-sm text-green-700">OK</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="treatment_pref_adjustments"
+                    checked={formData.treatment_pref_adjustments === false}
+                    onChange={() => handleChange('treatment_pref_adjustments', false)}
+                    className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
+                  />
+                  <span className="text-sm text-red-700">Ikke OK</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="treatment_pref_adjustments"
+                    checked={formData.treatment_pref_adjustments === null}
+                    onChange={() => handleChange('treatment_pref_adjustments', null)}
+                    className="w-4 h-4 text-gray-600 border-gray-300 focus:ring-gray-500"
+                  />
+                  <span className="text-sm text-gray-500">Ikke avklart</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Neck adjustments preference */}
+            <div className="flex items-center gap-6">
+              <span className="text-sm font-medium text-gray-700 w-40">Nakkejusteringer spesifikt:</span>
+              <div className="flex items-center gap-4">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="treatment_pref_neck_adjustments"
+                    checked={formData.treatment_pref_neck_adjustments === true}
+                    onChange={() => handleChange('treatment_pref_neck_adjustments', true)}
+                    className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
+                  />
+                  <span className="text-sm text-green-700">OK</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="treatment_pref_neck_adjustments"
+                    checked={formData.treatment_pref_neck_adjustments === false}
+                    onChange={() => handleChange('treatment_pref_neck_adjustments', false)}
+                    className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
+                  />
+                  <span className="text-sm text-red-700">Ikke OK</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="treatment_pref_neck_adjustments"
+                    checked={formData.treatment_pref_neck_adjustments === null}
+                    onChange={() => handleChange('treatment_pref_neck_adjustments', null)}
+                    className="w-4 h-4 text-gray-600 border-gray-300 focus:ring-gray-500"
+                  />
+                  <span className="text-sm text-gray-500">Ikke avklart</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Treatment preference notes */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Notater om behandlingspreferanser
+              </label>
+              <textarea
+                value={formData.treatment_pref_notes}
+                onChange={(e) => handleChange('treatment_pref_notes', e.target.value)}
+                rows={2}
+                placeholder="f.eks. pasient er nervøs for nakkejusteringer pga tidligere ubehag..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </div>
+        </div>
+
         {/* Actions */}
         <div className="flex items-center justify-end gap-3 pb-6">
           <button
@@ -560,7 +701,7 @@ export default function NewPatient() {
             className="flex items-center gap-2 px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
           >
             <Save className="w-4 h-4" />
-            {createMutation.isPending ? 'Creating...' : 'Create Patient'}
+            {createMutation.isPending ? 'Creating...' : t('createPatient')}
           </button>
         </div>
       </form>

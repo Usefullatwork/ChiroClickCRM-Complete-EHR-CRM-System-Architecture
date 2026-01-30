@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { encountersAPI, patientsAPI, diagnosisAPI } from '../services/api';
+import { encountersAPI, patientsAPI, diagnosisAPI, aiAPI } from '../services/api';
+import toast from '../utils/toast';
 import {
   Save, AlertTriangle, Brain, X, Sparkles, Globe,
   BookOpen, ChevronLeft, ChevronRight, Settings, Eye, Edit3,
@@ -102,6 +103,15 @@ export default function EasyAssessment() {
   const [showIntakeParser, setShowIntakeParser] = useState(false);
   // Create translator function bound to current language
   const tr = createTranslator(language);
+
+  // Query AI service status for inline generation availability
+  const { data: aiStatus } = useQuery({
+    queryKey: ['ai-status'],
+    queryFn: () => aiAPI.getStatus(),
+    staleTime: 60000, // Check every minute
+    refetchInterval: 60000
+  });
+  const aiAvailable = aiStatus?.data?.available ?? false;
 
   // Form state - SOAP format with quick-select arrays
   const [encounterData, setEncounterData] = useState({
@@ -265,19 +275,49 @@ export default function EasyAssessment() {
       return encountersAPI.create(saveData);
     },
     onSuccess: (response) => {
-      alert('Encounter saved successfully!');
+      toast.success('Journalen er lagret!');
       if (!encounterId && response?.data?.id) {
         navigate(`/patients/${patientId}/easy-assessment/${response.data.id}`);
       }
     },
     onError: (error) => {
-      alert(`Error saving encounter: ${error.message}`);
+      toast.error(`Feil ved lagring: ${error.message}`);
     }
   });
 
   const handleSave = () => {
     saveMutation.mutate(encounterData);
   };
+
+  // Calculate patient age helper
+  const calculateAge = (dateOfBirth) => {
+    if (!dateOfBirth) return null;
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  // Build context object for AI field generation
+  const buildAIContext = (fieldType) => ({
+    patientAge: patient?.data?.date_of_birth ? calculateAge(patient.data.date_of_birth) : null,
+    patientGender: patient?.data?.gender,
+    chiefComplaint: encounterData.subjective.chief_complaint,
+    painLocations: encounterData.pain_locations,
+    painQualities: encounterData.pain_qualities,
+    aggravatingFactors: encounterData.aggravating_factors_selected,
+    relievingFactors: encounterData.relieving_factors_selected,
+    existingText: {
+      subjective: encounterData.subjective,
+      objective: encounterData.objective,
+      assessment: encounterData.assessment,
+      plan: encounterData.plan
+    }
+  });
 
   const updateField = (section, field, value) => {
     setEncounterData(prev => ({
@@ -789,6 +829,11 @@ export default function EasyAssessment() {
                         quickPhrases={CHIEF_COMPLAINT_PHRASES}
                         rows={2}
                         required
+                        aiEnabled={true}
+                        aiFieldType="chief_complaint"
+                        aiContext={buildAIContext('chief_complaint')}
+                        aiAvailable={aiAvailable}
+                        language={language}
                       />
                     </div>
 
@@ -800,6 +845,11 @@ export default function EasyAssessment() {
                         placeholder="Describe how the problem developed..."
                         quickPhrases={HISTORY_PHRASES}
                         rows={3}
+                        aiEnabled={true}
+                        aiFieldType="history"
+                        aiContext={buildAIContext('history')}
+                        aiAvailable={aiAvailable}
+                        language={language}
                       />
                     </div>
 
@@ -811,6 +861,11 @@ export default function EasyAssessment() {
                         placeholder="When did it start?"
                         quickPhrases={ONSET_PHRASES}
                         rows={1}
+                        aiEnabled={true}
+                        aiFieldType="onset"
+                        aiContext={buildAIContext('onset')}
+                        aiAvailable={aiAvailable}
+                        language={language}
                       />
                     </div>
 
@@ -933,6 +988,11 @@ export default function EasyAssessment() {
                             onChange={(val) => updateField('objective', 'observation', val)}
                             placeholder="Visual observations, gait, posture..."
                             rows={3}
+                            aiEnabled={true}
+                            aiFieldType="observation"
+                            aiContext={buildAIContext('observation')}
+                            aiAvailable={aiAvailable}
+                            language={language}
                           />
                         </div>
                         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
@@ -942,6 +1002,11 @@ export default function EasyAssessment() {
                             onChange={(val) => updateField('objective', 'palpation', val)}
                             placeholder="Tenderness, muscle tension..."
                             rows={3}
+                            aiEnabled={true}
+                            aiFieldType="palpation"
+                            aiContext={buildAIContext('palpation')}
+                            aiAvailable={aiAvailable}
+                            language={language}
                           />
                         </div>
                         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
@@ -951,6 +1016,11 @@ export default function EasyAssessment() {
                             onChange={(val) => updateField('objective', 'rom', val)}
                             placeholder="ROM findings..."
                             rows={3}
+                            aiEnabled={true}
+                            aiFieldType="rom"
+                            aiContext={buildAIContext('rom')}
+                            aiAvailable={aiAvailable}
+                            language={language}
                           />
                         </div>
                         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
@@ -1021,6 +1091,11 @@ export default function EasyAssessment() {
                         placeholder="Your clinical reasoning..."
                         quickPhrases={CLINICAL_REASONING_PHRASES}
                         rows={4}
+                        aiEnabled={true}
+                        aiFieldType="clinical_reasoning"
+                        aiContext={buildAIContext('clinical_reasoning')}
+                        aiAvailable={aiAvailable}
+                        language={language}
                       />
                     </div>
 
@@ -1032,6 +1107,11 @@ export default function EasyAssessment() {
                           onChange={(val) => updateField('assessment', 'differential_diagnosis', val)}
                           placeholder="Other diagnoses considered..."
                           rows={2}
+                          aiEnabled={true}
+                          aiFieldType="differential_diagnosis"
+                          aiContext={buildAIContext('differential_diagnosis')}
+                          aiAvailable={aiAvailable}
+                          language={language}
                         />
                       </div>
                       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
@@ -1041,6 +1121,11 @@ export default function EasyAssessment() {
                           onChange={(val) => updateField('assessment', 'prognosis', val)}
                           placeholder="Expected recovery..."
                           rows={2}
+                          aiEnabled={true}
+                          aiFieldType="prognosis"
+                          aiContext={buildAIContext('prognosis')}
+                          aiAvailable={aiAvailable}
+                          language={language}
                         />
                       </div>
                     </div>
@@ -1103,6 +1188,11 @@ export default function EasyAssessment() {
                           onChange={(val) => updateField('plan', 'treatment', val)}
                           placeholder="Treatment performed..."
                           rows={4}
+                          aiEnabled={true}
+                          aiFieldType="treatment"
+                          aiContext={buildAIContext('treatment')}
+                          aiAvailable={aiAvailable}
+                          language={language}
                         />
                       </div>
                       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
@@ -1112,6 +1202,11 @@ export default function EasyAssessment() {
                           onChange={(val) => updateField('plan', 'exercises', val)}
                           placeholder="Home exercises..."
                           rows={4}
+                          aiEnabled={true}
+                          aiFieldType="exercises"
+                          aiContext={buildAIContext('exercises')}
+                          aiAvailable={aiAvailable}
+                          language={language}
                         />
                       </div>
                     </div>
@@ -1126,6 +1221,11 @@ export default function EasyAssessment() {
                         placeholder="Patient education..."
                         quickPhrases={ADVICE_PHRASES}
                         rows={3}
+                        aiEnabled={true}
+                        aiFieldType="advice"
+                        aiContext={buildAIContext('advice')}
+                        aiAvailable={aiAvailable}
+                        language={language}
                       />
                     </div>
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
@@ -1136,6 +1236,11 @@ export default function EasyAssessment() {
                         placeholder="Next appointment..."
                         quickPhrases={FOLLOW_UP_PHRASES}
                         rows={3}
+                        aiEnabled={true}
+                        aiFieldType="follow_up"
+                        aiContext={buildAIContext('follow_up')}
+                        aiAvailable={aiAvailable}
+                        language={language}
                       />
                     </div>
                   </div>

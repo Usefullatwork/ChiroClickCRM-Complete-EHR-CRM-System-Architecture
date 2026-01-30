@@ -8,9 +8,11 @@ import { useNavigate } from 'react-router-dom'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { appointmentsAPI, patientsAPI, usersAPI } from '../services/api'
 import { ArrowLeft, Save, Calendar, Clock, User, Repeat } from 'lucide-react'
+import { useTranslation, formatDate, formatTime } from '../i18n'
 
 export default function NewAppointment() {
   const navigate = useNavigate()
+  const { t, lang } = useTranslation('appointments')
 
   const [formData, setFormData] = useState({
     patient_id: '',
@@ -57,7 +59,7 @@ export default function NewAppointment() {
         })
         setErrors(backendErrors)
       } else {
-        setErrors({ general: error.response?.data?.message || 'Failed to create appointment' })
+        setErrors({ general: error.response?.data?.message || t('failedToCreate') })
       }
     }
   })
@@ -130,8 +132,8 @@ export default function NewAppointment() {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">New Appointment</h1>
-            <p className="text-gray-600">Schedule a new patient appointment</p>
+            <h1 className="text-3xl font-bold text-gray-900">{t('newAppointment')}</h1>
+            <p className="text-gray-600">{t('scheduleNewAppointment')}</p>
           </div>
         </div>
       </div>
@@ -149,20 +151,20 @@ export default function NewAppointment() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
             <User className="w-5 h-5 text-gray-600" />
-            <h2 className="text-lg font-semibold">Patient & Practitioner</h2>
+            <h2 className="text-lg font-semibold">{t('patientPractitioner')}</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Patient Selection */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Patient <span className="text-red-600">*</span>
+                {t('patient')} <span className="text-red-600">*</span>
               </label>
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search patient by name..."
+                placeholder={t('searchPatientPlaceholder')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
               />
               {searchTerm.length > 1 && patients.length > 0 && (
@@ -189,7 +191,7 @@ export default function NewAppointment() {
             {/* Practitioner Selection */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Practitioner <span className="text-red-600">*</span>
+                {t('practitioner')} <span className="text-red-600">*</span>
               </label>
               <select
                 value={formData.practitioner_id}
@@ -198,7 +200,7 @@ export default function NewAppointment() {
                   errors.practitioner_id ? 'border-red-500' : 'border-gray-300'
                 }`}
               >
-                <option value="">Select practitioner</option>
+                <option value="">{t('selectPractitionerPlaceholder')}</option>
                 {users.map((user) => (
                   <option key={user.id} value={user.id}>
                     {user.first_name} {user.last_name} - {user.role}
@@ -214,13 +216,13 @@ export default function NewAppointment() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
             <Calendar className="w-5 h-5 text-gray-600" />
-            <h2 className="text-lg font-semibold">Date & Time</h2>
+            <h2 className="text-lg font-semibold">{t('dateTime')}</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Start Time <span className="text-red-600">*</span>
+                {t('startTime')} <span className="text-red-600">*</span>
               </label>
               <input
                 type="datetime-local"
@@ -236,7 +238,7 @@ export default function NewAppointment() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                End Time <span className="text-red-600">*</span>
+                {t('endTime')} <span className="text-red-600">*</span>
               </label>
               <input
                 type="datetime-local"
@@ -256,13 +258,13 @@ export default function NewAppointment() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
             <Clock className="w-5 h-5 text-gray-600" />
-            <h2 className="text-lg font-semibold">Appointment Details</h2>
+            <h2 className="text-lg font-semibold">{t('appointmentDetails')}</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Appointment Type <span className="text-red-600">*</span>
+                {t('appointmentType')} <span className="text-red-600">*</span>
               </label>
               <select
                 value={formData.appointment_type}
@@ -271,38 +273,38 @@ export default function NewAppointment() {
                   errors.appointment_type ? 'border-red-500' : 'border-gray-300'
                 }`}
               >
-                <option value="REGULAR">Regular Appointment</option>
-                <option value="INITIAL">Initial Consultation</option>
-                <option value="FOLLOWUP">Follow-up</option>
-                <option value="EMERGENCY">Emergency</option>
-                <option value="REEXAM">Re-examination</option>
+                <option value="REGULAR">{t('regularAppointment')}</option>
+                <option value="INITIAL">{t('initialConsultation')}</option>
+                <option value="FOLLOWUP">{t('followUp')}</option>
+                <option value="EMERGENCY">{t('emergency')}</option>
+                <option value="REEXAM">{t('reExamination')}</option>
               </select>
               {errors.appointment_type && <p className="text-red-600 text-sm mt-1">{errors.appointment_type}</p>}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Status
+                {t('status')}
               </label>
               <select
                 value={formData.status}
                 onChange={(e) => handleChange('status', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="PENDING">Pending</option>
-                <option value="CONFIRMED">Confirmed</option>
+                <option value="PENDING">{t('pending')}</option>
+                <option value="CONFIRMED">{t('confirmed')}</option>
               </select>
             </div>
 
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Patient Notes
+                {t('patientNotes')}
               </label>
               <textarea
                 value={formData.patient_notes}
                 onChange={(e) => handleChange('patient_notes', e.target.value)}
                 rows={3}
-                placeholder="Any special notes for this appointment..."
+                placeholder={t('patientNotesPlaceholder')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -313,31 +315,31 @@ export default function NewAppointment() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
             <Repeat className="w-5 h-5 text-gray-600" />
-            <h2 className="text-lg font-semibold">Recurring Appointment (Optional)</h2>
+            <h2 className="text-lg font-semibold">{t('recurringAppointment')}</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Recurring Pattern
+                {t('recurringPattern')}
               </label>
               <select
                 value={formData.recurring_pattern}
                 onChange={(e) => handleChange('recurring_pattern', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">One-time appointment</option>
-                <option value="WEEKLY">Weekly</option>
-                <option value="BIWEEKLY">Bi-weekly (Every 2 weeks)</option>
-                <option value="MONTHLY">Monthly</option>
-                <option value="CUSTOM">Custom</option>
+                <option value="">{t('oneTimeAppointment')}</option>
+                <option value="WEEKLY">{t('weekly')}</option>
+                <option value="BIWEEKLY">{t('biweekly')}</option>
+                <option value="MONTHLY">{t('monthly')}</option>
+                <option value="CUSTOM">{t('custom')}</option>
               </select>
             </div>
 
             {formData.recurring_pattern && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Recurring Until <span className="text-red-600">*</span>
+                  {t('recurringUntil')} <span className="text-red-600">*</span>
                 </label>
                 <input
                   type="date"
@@ -356,8 +358,7 @@ export default function NewAppointment() {
           {formData.recurring_pattern && (
             <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
               <p className="text-sm text-blue-800">
-                <strong>Note:</strong> Recurring appointments will be created automatically based on the pattern you selected.
-                You can modify or cancel individual appointments later.
+                <strong>{t('notes')}:</strong> {t('recurringNote')}
               </p>
             </div>
           )}
@@ -370,7 +371,7 @@ export default function NewAppointment() {
             onClick={() => navigate('/appointments')}
             className="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
           >
-            Cancel
+            {t('cancel')}
           </button>
           <button
             type="submit"
@@ -378,7 +379,7 @@ export default function NewAppointment() {
             className="flex items-center gap-2 px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
           >
             <Save className="w-4 h-4" />
-            {createMutation.isPending ? 'Creating...' : 'Create Appointment'}
+            {createMutation.isPending ? t('creatingAppointment') : t('createAppointment')}
           </button>
         </div>
       </form>

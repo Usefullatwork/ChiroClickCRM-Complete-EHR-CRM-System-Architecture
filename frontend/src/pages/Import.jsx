@@ -7,8 +7,10 @@ import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { Upload, FileSpreadsheet, FileText, AlertCircle, CheckCircle2, X } from 'lucide-react'
 import apiClient from '../services/api'
+import { useTranslation } from '../i18n'
 
 export default function Import() {
+  const { t } = useTranslation('common')
   const [activeTab, setActiveTab] = useState('excel') // 'excel' | 'text'
   const [dragActive, setDragActive] = useState(false)
   const [file, setFile] = useState(null)
@@ -90,7 +92,7 @@ export default function Import() {
     ]
 
     if (!validTypes.includes(selectedFile.type) && !selectedFile.name.match(/\.(xlsx|xls|csv)$/i)) {
-      alert('Please upload an Excel file (.xlsx, .xls) or CSV file')
+      alert(t('invalidFileType'))
       return
     }
 
@@ -139,7 +141,7 @@ export default function Import() {
       link.click()
       link.remove()
     } catch (error) {
-      alert('Failed to download template')
+      alert(t('failedDownloadTemplate'))
     }
   }
 
@@ -147,8 +149,8 @@ export default function Import() {
     <div className="p-6 max-w-6xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">Import Patients</h1>
-        <p className="text-gray-600">Upload Excel files or paste data from Solvit</p>
+        <h1 className="text-3xl font-bold mb-2">{t('importPatients')}</h1>
+        <p className="text-gray-600">{t('importSubtitle')}</p>
       </div>
 
       {/* Tabs */}
@@ -163,7 +165,7 @@ export default function Import() {
         >
           <div className="flex items-center gap-2">
             <FileSpreadsheet className="w-5 h-5" />
-            Excel Upload
+            {t('excelUpload')}
           </div>
         </button>
         <button
@@ -176,7 +178,7 @@ export default function Import() {
         >
           <div className="flex items-center gap-2">
             <FileText className="w-5 h-5" />
-            Paste Text
+            {t('pasteText')}
           </div>
         </button>
       </div>
@@ -189,15 +191,15 @@ export default function Import() {
             <div className="flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
-                <h3 className="font-semibold text-blue-900 mb-1">Need a template?</h3>
+                <h3 className="font-semibold text-blue-900 mb-1">{t('needTemplate')}</h3>
                 <p className="text-sm text-blue-800 mb-3">
-                  Download our Excel template with all required columns and formatting
+                  {t('downloadTemplateDesc')}
                 </p>
                 <button
                   onClick={downloadTemplate}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
                 >
-                  Download Template
+                  {t('downloadTemplate')}
                 </button>
               </div>
             </div>
@@ -217,10 +219,10 @@ export default function Import() {
           >
             <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <p className="text-lg font-medium text-gray-700 mb-2">
-              {file ? file.name : 'Drop Excel file here or click to browse'}
+              {file ? file.name : t('dropFileHere')}
             </p>
             <p className="text-sm text-gray-500 mb-4">
-              Supports .xlsx, .xls, and .csv files
+              {t('supportsFormats')}
             </p>
             <input
               type="file"
@@ -233,7 +235,7 @@ export default function Import() {
               htmlFor="file-upload"
               className="inline-block px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer"
             >
-              Browse Files
+              {t('browseFiles')}
             </label>
           </div>
 
@@ -264,7 +266,7 @@ export default function Import() {
                   disabled={uploadExcelMutation.isPending}
                   className="flex-1 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
-                  {uploadExcelMutation.isPending ? 'Uploading...' : 'Upload and Import'}
+                  {uploadExcelMutation.isPending ? t('uploading') : t('uploadAndImport')}
                 </button>
               </div>
             </div>
@@ -280,9 +282,9 @@ export default function Import() {
             <div className="flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-semibold text-blue-900 mb-1">How to use</h3>
+                <h3 className="font-semibold text-blue-900 mb-1">{t('howToUse')}</h3>
                 <p className="text-sm text-blue-800">
-                  Copy patient data from Solvit or Excel and paste below. Supports both table format (multiple patients) and single patient data.
+                  {t('howToUseDesc')}
                 </p>
               </div>
             </div>
@@ -291,12 +293,12 @@ export default function Import() {
           {/* Text Area */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Paste Patient Data
+              {t('pastePatientData')}
             </label>
             <textarea
               value={pastedText}
               onChange={(e) => setPastedText(e.target.value)}
-              placeholder="Paste patient data here..."
+              placeholder={t('pasteHere')}
               rows={12}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
             />
@@ -308,18 +310,18 @@ export default function Import() {
             disabled={!pastedText.trim() || parseTextMutation.isPending}
             className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
           >
-            {parseTextMutation.isPending ? 'Parsing...' : 'Parse Data'}
+            {parseTextMutation.isPending ? t('parsing') : t('parseData')}
           </button>
 
           {/* Preview Parsed Data */}
           {parsedData && (
             <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-4">Preview</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('preview')}</h3>
 
               {parsedData.type === 'table' ? (
                 <div>
                   <p className="text-sm text-gray-600 mb-3">
-                    Found {parsedData.patients.length} patients
+                    {t('foundPatients').replace('{count}', parsedData.patients.length)}
                   </p>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
@@ -346,7 +348,7 @@ export default function Import() {
                     </table>
                     {parsedData.patients.length > 5 && (
                       <p className="text-xs text-gray-500 mt-2">
-                        ...and {parsedData.patients.length - 5} more
+                        {t('andMore').replace('{count}', parsedData.patients.length - 5)}
                       </p>
                     )}
                   </div>
@@ -365,7 +367,7 @@ export default function Import() {
                 disabled={importPatientsMutation.isPending}
                 className="mt-4 w-full px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
-                {importPatientsMutation.isPending ? 'Importing...' : 'Import to Database'}
+                {importPatientsMutation.isPending ? t('importing') : t('importToDatabase')}
               </button>
             </div>
           )}
@@ -377,7 +379,7 @@ export default function Import() {
         <div className="mt-6 bg-white border border-gray-200 rounded-lg p-6">
           <div className="flex items-center gap-3 mb-4">
             <CheckCircle2 className="w-6 h-6 text-green-600" />
-            <h3 className="text-lg font-semibold">Import Complete</h3>
+            <h3 className="text-lg font-semibold">{t('importComplete')}</h3>
           </div>
 
           <div className="grid grid-cols-3 gap-4 mb-4">
@@ -385,25 +387,25 @@ export default function Import() {
               <p className="text-2xl font-bold text-green-600">
                 {importResults.data?.imported || 0}
               </p>
-              <p className="text-sm text-gray-600">Imported</p>
+              <p className="text-sm text-gray-600">{t('imported')}</p>
             </div>
             <div className="text-center p-4 bg-blue-50 rounded-lg">
               <p className="text-2xl font-bold text-blue-600">
                 {importResults.data?.updated || 0}
               </p>
-              <p className="text-sm text-gray-600">Updated</p>
+              <p className="text-sm text-gray-600">{t('updated')}</p>
             </div>
             <div className="text-center p-4 bg-yellow-50 rounded-lg">
               <p className="text-2xl font-bold text-yellow-600">
                 {importResults.data?.skipped || 0}
               </p>
-              <p className="text-sm text-gray-600">Skipped</p>
+              <p className="text-sm text-gray-600">{t('skipped')}</p>
             </div>
           </div>
 
           {importResults.data?.errors && importResults.data.errors.length > 0 && (
             <div className="border-t border-gray-200 pt-4">
-              <h4 className="font-medium text-gray-900 mb-2">Errors</h4>
+              <h4 className="font-medium text-gray-900 mb-2">{t('errors')}</h4>
               <div className="space-y-1 max-h-40 overflow-y-auto">
                 {importResults.data.errors.map((error, idx) => (
                   <p key={idx} className="text-sm text-red-600">
@@ -422,7 +424,7 @@ export default function Import() {
             }}
             className="mt-4 w-full px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
           >
-            Import More
+            {t('importMore')}
           </button>
         </div>
       )}
