@@ -100,114 +100,41 @@ A clickable spine segment system for rapid palpation documentation:
 
 ---
 
-## PRIORITY: Repository Cleanup (Session 2026-01-30)
+## Repository Cleanup (Completed 2026-01-30)
 
-### Current Status
-- **Branch**: `claude/chiroclickcrm-ehr-system-01UQ8tUJXuBbkUKHvdMFk3iH`
-- **Divergence**: 2 local commits ahead, 30 remote commits behind
-- **Staged files**: 282 files ready to commit
-- **Untracked files**: 60 files remaining to stage
-- **Chosen strategy**: Rebase onto remote (then organize commits)
+### Status: ALL PHASES COMPLETE
 
-### PHASE 1: Git Cleanup (IN PROGRESS)
+### Phase 1: Git Cleanup - DONE
+- Updated .gitignore for large binary files (ollama, pgsql, AI models)
+- Renamed long filenames in training-data-extracted/
+- Staged all 60+ untracked files
+- Used merge strategy (not rebase) to resolve 30 commits behind
+- Pushed all changes to remote
 
-#### Step 1.1: Stage Remaining Files
-The following 60 files still need to be staged:
-```bash
-# Backend extras
-git add backend/src/config/ backend/src/data/ backend/src/domain/
-git add backend/src/jobs/ backend/src/migrations/scripts/ backend/src/scripts/
-git add backend/tests/
+### Phase 2: Spine Palpation Database - DONE
+- Created spine_text_templates table
+- Seeded 149 Norwegian palpation templates
+- Tested all API endpoints (authenticated via session cookie)
+- Templates cover C0-C1 through Coccyx + muscle groups
 
-# Database
-git add database/migrations/ database/seeds/ database/run_all_migrations.sql
+### Phase 3: Documentation Reorganization - DONE
+- Created docs/ hierarchy:
+  - docs/getting-started/ (3 files)
+  - docs/architecture/ (4 files)
+  - docs/clinical/ (12 files)
+  - docs/deployment/ (4 files)
+  - docs/development/ (9 files)
+  - docs/ai-training/ (7 files)
+  - docs/archive/ (12 old completion notices)
+- Trimmed README.md from 555 to 241 lines
+- Kept at root: README.md, CLAUDE.md, SECURITY.md, docker-compose.yml
 
-# Frontend extras
-git add frontend/Dockerfile.dev frontend/package-lock.json frontend/public/
-git add frontend/scripts/ frontend/src/__tests__/ frontend/src/data/
-git add frontend/src/examples/ frontend/src/utils/
-
-# Root files
-git add bin/ scripts/ sample-data/ training-data-extracted/
-git add *.js *.sql *.py *.txt *.json
-
-# SKIP these large folders (add to .gitignore):
-# - exercise_videos/ (video files)
-# - mobile-app/ (if contains node_modules)
-```
-
-#### Step 1.2: Create .gitignore for Large Files
-```bash
-echo "exercise_videos/" >> .gitignore
-echo "mobile-app/node_modules/" >> .gitignore
-echo "nul" >> .gitignore
-echo "*.mjs" >> .gitignore
-```
-
-#### Step 1.3: Create WIP Commit
-```bash
-git commit -m "WIP: All uncommitted changes before rebase"
-```
-
-#### Step 1.4: Rebase onto Remote
-```bash
-git fetch origin
-git rebase origin/claude/chiroclickcrm-ehr-system-01UQ8tUJXuBbkUKHvdMFk3iH
-# Resolve any conflicts if needed
-```
-
-#### Step 1.5: Reorganize into Logical Commits (Optional)
-After rebase, can soft reset and create organized commits:
-1. CQRS Architecture & AI Feedback
-2. Backend Services & Routes
-3. Database Migrations
-4. Frontend Components
-5. AI Training Data
-6. Infrastructure & Config
-7. Documentation
-
-### PHASE 2: Documentation Reorganization
-
-#### New Folder Structure
-```
-/docs
-  /getting-started/   SETUP-GUIDE.md, QUICK-START.md
-  /architecture/      OVERVIEW.md, DATABASE.md, AI-SYSTEM.md, SECURITY.md
-  /clinical/          VESTIBULAR-MODULE.md, BPPV-EXERCISES.md, etc.
-  /deployment/        DOCKER.md, RUNBOOK.md, COMPLIANCE.md
-  /development/       FRONTEND.md, API.md, TESTING.md
-  /archive/           Old completion notices
-```
-
-#### Files to Archive (Redundant)
-- 100_PERCENT_COMPLETE.md
-- IMPLEMENTATION_COMPLETE.md
-- COMPLETED_TASKS_SUMMARY.md
-- MERGE_COMPLETE.md
-- CRITICAL_FIXES_TODAY.md
-
-#### Files to Keep at Root
-- README.md (trim to ~200 lines)
-- CLAUDE.md (this file)
-- SECURITY.md (summary only)
-- CHANGELOG.md (create from history)
-- docker-compose.yml
-
-### PHASE 3: Environment Validation
-
-#### Create Setup Scripts
-- `scripts/setup.sh` (Linux/Mac)
-- `scripts/setup.bat` (Windows)
-
-#### Test Startup Sequence
-1. `docker-compose up -d postgres redis`
-2. Wait for database
-3. Run migrations
-4. `cd backend && npm install && npm run dev`
-5. `cd frontend && npm install && npm run dev`
-
-#### Update .env.example
-Add missing AI model config variables.
+### Phase 4: Environment Validation - DONE
+- Created scripts/setup.sh (Linux/Mac)
+- Created scripts/setup.bat (Windows)
+- Updated backend/.env.example with AI model variants
+- Docker services verified healthy
+- Backend health check passing
 
 ---
 
