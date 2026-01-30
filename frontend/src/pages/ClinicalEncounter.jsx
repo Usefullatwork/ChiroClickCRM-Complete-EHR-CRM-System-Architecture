@@ -74,6 +74,9 @@ import NeurologicalExam from '../components/examination/NeurologicalExam';
 import OutcomeMeasures, { OutcomeMeasureSelector } from '../components/examination/OutcomeMeasures';
 import { ExercisePanel } from '../components/exercises';
 import QuickPalpationSpine from '../components/clinical/QuickPalpationSpine';
+// Healthcare UX Components
+import { SALTBanner, AIDiagnosisSidebar, EnhancedClinicalTextarea } from '../components/clinical';
+import { ConnectionStatus } from '../components/common';
 
 // --- STATIC DATA ---
 const taksterNorwegian = [
@@ -243,6 +246,12 @@ export default function ClinicalEncounter() {
   const [showRegionalExam, setShowRegionalExam] = useState(false);
   const [regionalExamData, setRegionalExamData] = useState({});
   const [showExercisePanel, setShowExercisePanel] = useState(false);
+
+  // Healthcare UX State
+  const [showSALTBanner, setShowSALTBanner] = useState(true); // Show SALT banner when previous encounter found
+  const [saltBannerExpanded, setSaltBannerExpanded] = useState(false);
+  const [showAIDiagnosisSidebar, setShowAIDiagnosisSidebar] = useState(false); // Collapsed by default
+  const [syncStatus, setSyncStatus] = useState({ pending: 0, lastSync: null, error: null });
 
   // New Examination Components State
   const [showMMT, setShowMMT] = useState(false);
@@ -1365,6 +1374,23 @@ export default function ClinicalEncounter() {
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-4xl mx-auto p-6 space-y-6">
 
+            {/* SALT Banner - Shows when similar previous encounter found */}
+            {!isSigned && previousEncounters && showSALTBanner && (
+              <SALTBanner
+                previousEncounter={previousEncounters}
+                onApplyAll={() => {
+                  handleSALT();
+                  setShowSALTBanner(false);
+                }}
+                onApplySection={(section) => {
+                  handleSALT(section);
+                }}
+                onDismiss={() => setShowSALTBanner(false)}
+                isExpanded={saltBannerExpanded}
+                onToggleExpand={() => setSaltBannerExpanded(!saltBannerExpanded)}
+              />
+            )}
+
             {/* ─────────────────────────────────────────────────────────────────
                 S - SUBJECTIVE
                 ───────────────────────────────────────────────────────────────── */}
@@ -1397,32 +1423,19 @@ export default function ClinicalEncounter() {
                   disabled={isSigned}
                   className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm font-medium disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
                 />
-                <textarea
-                  ref={(el) => textAreaRefs.current['subjective.history'] = el}
-                  placeholder="Anamnese og symptombeskrivelse... (bruk .bs for makro)"
-                  className="w-full min-h-[100px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
+                <EnhancedClinicalTextarea
                   value={encounterData.subjective.history}
-                  onChange={(e) => {
-                    if (!handleTextInputWithMacros(e, 'subjective', 'history')) {
-                      updateField('subjective', 'history', e.target.value);
-                    }
-                  }}
-                  onFocus={() => setActiveField('subjective.history')}
+                  onChange={(val) => updateField('subjective', 'history', val)}
+                  placeholder="Anamnese og symptombeskrivelse..."
+                  label="Sykehistorie"
+                  section="subjective"
+                  field="history"
+                  quickPhrases={quickPhrases.subjective}
                   disabled={isSigned}
+                  rows={4}
+                  showVoiceInput={true}
+                  showAIButton={false}
                 />
-                {!isSigned && (
-                  <div className="flex flex-wrap gap-1.5">
-                    {quickPhrases.subjective.map(phrase => (
-                      <button
-                        key={phrase}
-                        onClick={() => handleQuickPhrase(phrase, 'subjective', 'history')}
-                        className="px-2.5 py-1 text-xs rounded-full bg-slate-100 text-slate-600 hover:bg-blue-100 hover:text-blue-700 transition-colors"
-                      >
-                        + {phrase}
-                      </button>
-                    ))}
-                  </div>
-                )}
                 <div className="grid grid-cols-2 gap-3">
                   <input
                     type="text"
@@ -1459,28 +1472,29 @@ export default function ClinicalEncounter() {
 
                 {/* Observation & Palpation */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <textarea
-                    placeholder="Observasjon (holdning, gange)..."
+                  <EnhancedClinicalTextarea
                     value={encounterData.objective.observation}
-                    onChange={(e) => {
-                      if (!handleTextInputWithMacros(e, 'objective', 'observation')) {
-                        updateField('objective', 'observation', e.target.value);
-                      }
-                    }}
+                    onChange={(val) => updateField('objective', 'observation', val)}
+                    placeholder="Observasjon (holdning, gange)..."
+                    label="Observasjon"
+                    section="objective"
+                    field="observation"
                     disabled={isSigned}
-                    className="min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-500 resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
+                    rows={3}
+                    showVoiceInput={true}
+                    showAIButton={false}
                   />
-                  <textarea
-                    ref={palpationRef}
-                    placeholder="Palpasjon (ømhet, spenninger)... (bruk .palp for makro)"
+                  <EnhancedClinicalTextarea
                     value={encounterData.objective.palpation}
-                    onChange={(e) => {
-                      if (!handleTextInputWithMacros(e, 'objective', 'palpation')) {
-                        updateField('objective', 'palpation', e.target.value);
-                      }
-                    }}
+                    onChange={(val) => updateField('objective', 'palpation', val)}
+                    placeholder="Palpasjon (ømhet, spenninger)..."
+                    label="Palpasjon"
+                    section="objective"
+                    field="palpation"
                     disabled={isSigned}
-                    className="min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-500 resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
+                    rows={3}
+                    showVoiceInput={true}
+                    showAIButton={false}
                   />
                 </div>
 
@@ -2246,14 +2260,21 @@ export default function ClinicalEncounter() {
                   </div>
                 )}
 
-                <textarea
-                  ref={(el) => textAreaRefs.current['assessment.clinical_reasoning'] = el}
-                  placeholder="Klinisk resonnering og vurdering..."
-                  className="w-full min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
+                <EnhancedClinicalTextarea
                   value={encounterData.assessment.clinical_reasoning}
-                  onChange={(e) => updateField('assessment', 'clinical_reasoning', e.target.value)}
-                  onFocus={() => setActiveField('assessment.clinical_reasoning')}
+                  onChange={(val) => updateField('assessment', 'clinical_reasoning', val)}
+                  placeholder="Klinisk resonnering og vurdering..."
+                  label="Klinisk vurdering"
+                  section="assessment"
+                  field="clinical_reasoning"
                   disabled={isSigned}
+                  rows={3}
+                  showVoiceInput={true}
+                  showAIButton={true}
+                  aiContext={{
+                    soapData: encounterData,
+                    patientId: patientId
+                  }}
                 />
 
                 <input
@@ -2365,24 +2386,23 @@ export default function ClinicalEncounter() {
                     )}
                   </div>
                 ) : (
-                  <textarea
-                    ref={(el) => textAreaRefs.current['plan.treatment'] = el}
+                  <EnhancedClinicalTextarea
+                    value={encounterData.plan.treatment}
+                    onChange={(val) => updateField('plan', 'treatment', val)}
                     placeholder={
                       currentNotationMethod.id === 'segment_listing' ? 'Segmentlisting: f.eks. C5 PRS, T4-T6 anterior, L5 PLI...' :
                       currentNotationMethod.id === 'gonstead_listing' ? 'Gonstead: f.eks. Atlas ASLA, C2 PRSA, L5 PLI-M...' :
                       currentNotationMethod.id === 'diversified_notation' ? 'Diversifisert: beskriv manipulasjoner og mobiliseringer...' :
                       currentNotationMethod.id === 'soap_narrative' ? 'SOAP narrativ: beskriv behandlingen i detalj...' :
-                      'Utført behandling... (bruk .hvla for makro)'
+                      'Utført behandling...'
                     }
-                    className="w-full min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
-                    value={encounterData.plan.treatment}
-                    onChange={(e) => {
-                      if (!handleTextInputWithMacros(e, 'plan', 'treatment')) {
-                        updateField('plan', 'treatment', e.target.value);
-                      }
-                    }}
-                    onFocus={() => setActiveField('plan.treatment')}
+                    label="Behandling"
+                    section="plan"
+                    field="treatment"
                     disabled={isSigned}
+                    rows={3}
+                    showVoiceInput={true}
+                    showAIButton={false}
                   />
                 )}
 
@@ -2476,14 +2496,17 @@ export default function ClinicalEncounter() {
                     </div>
                   )}
 
-                  <textarea
-                    ref={(el) => textAreaRefs.current['plan.exercises'] = el}
-                    placeholder="Hjemmeøvelser og råd... (eller velg fra biblioteket over)"
-                    className="w-full min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
+                  <EnhancedClinicalTextarea
                     value={encounterData.plan.exercises}
-                    onChange={(e) => updateField('plan', 'exercises', e.target.value)}
-                    onFocus={() => setActiveField('plan.exercises')}
+                    onChange={(val) => updateField('plan', 'exercises', val)}
+                    placeholder="Hjemmeøvelser og råd... (eller velg fra biblioteket over)"
+                    label="Hjemmeøvelser"
+                    section="plan"
+                    field="exercises"
                     disabled={isSigned}
+                    rows={3}
+                    showVoiceInput={true}
+                    showAIButton={false}
                   />
                 </div>
 
@@ -2808,6 +2831,26 @@ export default function ClinicalEncounter() {
       </div>{/* End of main content wrapper with margin */}
 
       {/* ═══════════════════════════════════════════════════════════════════
+          AI DIAGNOSIS SIDEBAR (Collapsible)
+          ═══════════════════════════════════════════════════════════════════ */}
+      <AIDiagnosisSidebar
+        soapData={encounterData}
+        onSelectCode={(suggestion) => {
+          // Add the selected code to ICPC codes
+          if (suggestion.code && !encounterData.icpc_codes.includes(suggestion.code)) {
+            setEncounterData(prev => ({
+              ...prev,
+              icpc_codes: [...prev.icpc_codes, suggestion.code]
+            }));
+            setAutoSaveStatus('unsaved');
+          }
+        }}
+        isCollapsed={!showAIDiagnosisSidebar}
+        onToggle={() => setShowAIDiagnosisSidebar(!showAIDiagnosisSidebar)}
+        disabled={isSigned}
+      />
+
+      {/* ═══════════════════════════════════════════════════════════════════
           TEMPLATE PICKER SIDEBAR
           ═══════════════════════════════════════════════════════════════════ */}
       <TemplatePicker
@@ -2815,6 +2858,16 @@ export default function ClinicalEncounter() {
         onClose={() => setShowTemplatePicker(false)}
         onSelectTemplate={handleTemplateSelect}
         soapSection={activeField?.split('.')[0] || 'subjective'}
+      />
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          CONNECTION STATUS INDICATOR
+          ═══════════════════════════════════════════════════════════════════ */}
+      <ConnectionStatus
+        pendingChanges={autoSaveStatus === 'unsaved' ? 1 : 0}
+        lastSyncTime={lastSaved}
+        syncError={null}
+        position="bottom-left"
       />
 
     </div>
