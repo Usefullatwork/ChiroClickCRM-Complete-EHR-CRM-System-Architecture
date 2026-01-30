@@ -1,5 +1,44 @@
 # ChiroClick CRM - Claude Code Memory
 
+## PRIORITY TODO (Session 2026-01-31)
+
+### Backend Not Starting - Missing Dependencies
+The Docker backend fails to start due to missing npm packages. Fix these:
+
+1. **Add missing dependencies to `backend/package.json`:**
+   ```json
+   "winston": "^3.11.0",
+   "xlsx": "^0.18.5"
+   ```
+
+2. **Fix duplicate function declarations in `backend/src/controllers/ai.js`:**
+   - Already fixed: `getAIMetrics`, `resetCircuitBreaker`, `triggerRetraining`
+   - Verify no more duplicates exist
+
+3. **Rebuild and test:**
+   ```bash
+   cd F:\ChiroClickCRM-Complete-EHR-CRM-System-Architecture
+   docker-compose build --no-cache backend
+   docker-compose up -d backend
+   curl http://localhost:3000/health
+   ```
+
+### Training Page Shows "Not Found"
+- The `/api/v1/training/status` endpoint returns 404
+- Need to verify `backend/src/routes/training.js` is properly registered
+- Check if route file has syntax errors
+
+### Language Switching Issue
+- User reports pressing "EN" still shows Norwegian text
+- Check frontend i18n implementation
+- Verify language toggle component
+
+### Training Data
+- Currently have 5,738 training examples in `ai-training/merged/chiro-complete-training.jsonl`
+- User mentioned 400+ files might be missing - verify training data completeness
+
+---
+
 ## Project Overview
 Norwegian-compliant EHR-CRM-PMS system for chiropractic practices.
 - **Location**: `F:\ChiroClickCRM-Complete-EHR-CRM-System-Architecture`

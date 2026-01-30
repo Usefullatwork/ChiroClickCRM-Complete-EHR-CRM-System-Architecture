@@ -261,9 +261,9 @@ export const recordFeedback = async (req, res) => {
 };
 
 /**
- * Get AI performance metrics
+ * Get AI feedback metrics
  */
-export const getAIMetrics = async (req, res) => {
+export const getAIFeedbackMetrics = async (req, res) => {
   try {
     const { period = 'week', fieldType } = req.query;
 
@@ -275,7 +275,7 @@ export const getAIMetrics = async (req, res) => {
 
     res.json(metrics);
   } catch (error) {
-    logger.error('Error in getAIMetrics controller:', error);
+    logger.error('Error in getAIFeedbackMetrics controller:', error);
     res.status(500).json({ error: error.message || 'Failed to get metrics' });
   }
 };
@@ -299,40 +299,6 @@ export const getCircuitStatus = async (req, res) => {
 };
 
 /**
- * Reset circuit breaker for a service
- */
-export const resetCircuitBreaker = async (req, res) => {
-  try {
-    const { service } = req.params;
-
-    const status = circuitBreakerRegistry.getStatus(service);
-    if (!status) {
-      return res.status(404).json({ error: `Circuit breaker for service '${service}' not found` });
-    }
-
-    circuitBreakerRegistry.reset(service);
-
-    logger.info('Circuit breaker reset by user', {
-      service,
-      userId: req.user.id,
-      previousState: status.state
-    });
-
-    res.json({
-      success: true,
-      service,
-      previousState: status.state,
-      currentState: 'CLOSED',
-      resetBy: req.user.id,
-      resetAt: new Date().toISOString()
-    });
-  } catch (error) {
-    logger.error('Error in resetCircuitBreaker controller:', error);
-    res.status(500).json({ error: error.message || 'Failed to reset circuit breaker' });
-  }
-};
-
-/**
  * Get retraining status
  */
 export const getRetrainingStatus = async (req, res) => {
@@ -348,24 +314,6 @@ export const getRetrainingStatus = async (req, res) => {
   } catch (error) {
     logger.error('Error in getRetrainingStatus controller:', error);
     res.status(500).json({ error: error.message || 'Failed to get retraining status' });
-  }
-};
-
-/**
- * Trigger AI retraining
- */
-export const triggerRetraining = async (req, res) => {
-  try {
-    const result = await aiFeedbackService.triggerRetraining({
-      organizationId: req.organizationId,
-      reason: 'manual',
-      triggeredBy: req.user.id
-    });
-
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in triggerRetraining controller:', error);
-    res.status(500).json({ error: error.message || 'Failed to trigger retraining' });
   }
 };
 
