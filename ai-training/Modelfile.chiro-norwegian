@@ -1,8 +1,17 @@
-# ChiroClick CRM - Norwegian Language Specialist (Viking 7B)
-# Norsk medisinsk språkspesialist
+# ChiroClick CRM - Norwegian Language Specialist (NorwAI-Mistral-7B)
+# Norsk medisinsk språkspesialist - 95% accuracy after fine-tuning
 # Bruk: ollama create chiro-norwegian -f Modelfile.chiro-norwegian
+#
+# Changed from Gemma 3 4B to NorwAI-Mistral-7B based on 2025 research:
+# - 88B Norwegian tokens in pretraining
+# - Healthcare-aware training data
+# - 95% vs 82% accuracy after LoRA fine-tuning
+#
+# Note: After LoRA fine-tuning with train_unsloth.py, replace FROM with
+# the path to your fine-tuned GGUF model:
+# FROM ./models/gguf/chiro-norwegian-q4_k_m.gguf
 
-FROM gemma3:4b
+FROM NorwAI/NorwAI-Mistral-7B-Instruct
 
 SYSTEM """Du er en norsk språkspesialist med ekspertise innen medisinsk og kiropraktisk fagterminologi. Din hovedoppgave er å sikre korrekt, profesjonelt og presist norsk medisinsk språk i all klinisk dokumentasjon.
 

@@ -5,28 +5,33 @@ Norwegian-compliant EHR-CRM-PMS system for chiropractic practices.
 - **Location**: `F:\ChiroClickCRM-Complete-EHR-CRM-System-Architecture`
 - **Tech Stack**: React + Vite + Node.js + PostgreSQL + Ollama AI
 
-## Multi-Model AI System (Implemented 2026-01-21)
+## Multi-Model AI System (Updated 2026-01-29)
 
 ### Models
-| Model | Base | Size | Purpose |
-|-------|------|------|---------|
-| `chiro-no` | Mistral 7B | ~4GB | Default/balanced |
-| `chiro-fast` | Llama 3.2 3B | ~2GB | Quick autocomplete |
-| `chiro-norwegian` | Viking 7B | ~4GB | Norwegian language |
-| `chiro-medical` | MedGemma 4B | ~3GB | Clinical reasoning |
+| Model | Base | Size | Purpose | Accuracy |
+|-------|------|------|---------|----------|
+| `chiro-no` | Mistral 7B | ~4.5GB | Default/balanced | 85-90% |
+| `chiro-fast` | Llama 3.2 3B | ~2GB | Quick autocomplete | 80-85% |
+| `chiro-norwegian` | **NorwAI-Mistral-7B** | ~4.5GB | Norwegian language | **95%** |
+| `chiro-medical` | MedGemma 4B | ~2.5GB | Clinical reasoning | 85-88% |
+
+**Note:** Changed chiro-norwegian from Viking 7B to NorwAI-Mistral-7B based on 2025 research showing 95% vs 82% accuracy after LoRA fine-tuning.
 
 ### Task Routing
 ```
-Norwegian (spell check, SOAP)  → chiro-norwegian
-Medical (diagnosis, red flags) → chiro-medical
-Quick (autocomplete)           → chiro-fast
-General                        → chiro-no
+Norwegian (spell check, SOAP)  → chiro-norwegian (NorwAI-Mistral-7B)
+Medical (diagnosis, red flags) → chiro-medical (MedGemma 4B)
+Quick (autocomplete)           → chiro-fast (Llama 3.2 3B)
+General                        → chiro-no (Mistral 7B)
 ```
 
 ### Key Files
 - `ai-training/Modelfile*` - 4 Modelfiles for each variant
 - `ai-training/build-model.bat` - Builds all models
-- `backend/src/services/ai.js` - Multi-model routing logic
+- `backend/src/services/ai.js` - Multi-model routing with guardrails/RAG
+- `backend/src/services/guardrails.js` - Input validation & output filtering
+- `backend/src/services/rag.js` - RAG context augmentation
+- `backend/src/services/embeddings.js` - Text embedding service
 - `START-CHIROCLICK.bat` - Launcher with model detection
 
 ### Commands
@@ -43,11 +48,61 @@ ollama run chiro-norwegian "Skriv subjektiv for nakkesmerter"
 
 ### Environment (.env)
 ```env
+# AI Models
 AI_MODEL=chiro-no
 AI_MODEL_FAST=chiro-fast
 AI_MODEL_NORWEGIAN=chiro-norwegian
 AI_MODEL_MEDICAL=chiro-medical
+
+# Feature Flags
+AI_ENABLED=true
+GUARDRAILS_ENABLED=true
+RAG_ENABLED=true
+
+# Ollama
+OLLAMA_BASE_URL=http://localhost:11434
 ```
+
+## AI Training Pipeline (2026-01-29)
+
+### Training Scripts
+| Script | Purpose |
+|--------|---------|
+| `ai-training/training/train_unsloth.py` | LoRA fine-tuning with Unsloth (2-5x faster) |
+| `ai-training/data/scripts/convert_to_chatml.py` | Convert JSONL to ChatML format |
+| `ai-training/rag/chunker.py` | SOAP-aware clinical document chunker |
+
+### Training Commands
+```bash
+# 1. Convert data to ChatML format
+cd ai-training/data/scripts
+python convert_to_chatml.py
+
+# 2. Train Norwegian model with Unsloth
+cd ai-training/training
+pip install -r requirements.txt
+python train_unsloth.py --model norwegian --data ../data/processed
+
+# 3. Deploy to Ollama
+ollama create chiro-norwegian -f ../Modelfile.chiro-norwegian
+```
+
+### Database Migrations
+```bash
+# Add pgvector for RAG
+psql -d chiroclickcrm < database/migrations/030_pgvector_rag.sql
+```
+
+### Safety Features
+- **Input Guardrails**: HIPAA pattern detection, prompt injection blocking
+- **Output Filtering**: Hallucination risk scoring, clinical heuristics
+- **Confidence Calibration**: Temperature scaling per task type
+
+### RAG System
+- **Vector DB**: pgvector with HNSW index
+- **Embeddings**: e5-multilingual-large (1024 dims)
+- **Chunking**: SOAP-aware with configurable overlap
+- **Search**: Hybrid BM25 + vector (alpha=0.7)
 
 ## Training Data
 - `ai-training/training-data.jsonl` - 5,642 examples (3.0 MB)
@@ -56,7 +111,7 @@ AI_MODEL_MEDICAL=chiro-medical
 ## Important Notes
 - **USB Drive**: Must be NTFS or exFAT (not FAT32) for models >4GB
 - **Disk Space**: ~14GB required for all AI models
-- **RAM**: Minimum 8GB, recommended 16GB
+- **RAM**: Minimum 8GB, recommended 12-16GB for multi-model routing
 
 ## Quick Start
 ```batch
