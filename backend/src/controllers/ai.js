@@ -3,13 +3,16 @@
  * Handles AI-powered clinical intelligence requests
  */
 
+import crypto from 'crypto';
 import * as aiService from '../services/ai.js';
 import { generateCompletionStream, getModelForField, buildFieldPrompt } from '../services/ai.js';
 import logger from '../utils/logger.js';
+import cache from '../utils/cache.js';
 import { RecordFeedbackCommand, recordFeedbackHandler } from '../application/commands/RecordFeedbackCommand.js';
 import { GetAIMetricsQuery, getAIMetricsHandler, getAIDashboardHandler } from '../application/queries/GetAIMetricsQuery.js';
 import { circuitBreakerRegistry, CircuitBreakers } from '../infrastructure/resilience/CircuitBreaker.js';
 import { aiRetrainingService } from '../application/services/AIRetrainingService.js';
+import { aiFeedbackService } from '../application/services/AIFeedbackService.js';
 
 export const spellCheck = async (req, res) => {
   try {

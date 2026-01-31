@@ -15,6 +15,7 @@ export const navigation = {
     aiTraining: 'AI Training',
     auditLogs: 'Audit Logs',
     settings: 'Settings',
+    practitioner: 'Practitioner',
   },
   no: {
     dashboard: 'Dashbord',
@@ -32,5 +33,6 @@ export const navigation = {
     aiTraining: 'AI-trening',
     auditLogs: 'Revisjonslogg',
     settings: 'Innstillinger',
+    practitioner: 'Behandler',
   }
 }

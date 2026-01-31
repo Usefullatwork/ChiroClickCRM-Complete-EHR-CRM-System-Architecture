@@ -20,7 +20,7 @@ export const detectAndTriggerWorkflows = async (organizationId, triggerType, dat
     // Find active workflows matching this trigger
     const workflowsResult = await query(
       `SELECT * FROM workflows
-       WHERE (organization_id = $1 OR clinic_id = $1)
+       WHERE organization_id = $1
          AND trigger_type = $2
          AND is_active = true`,
       [organizationId, triggerType]
@@ -90,7 +90,7 @@ const checkConditions = async (organizationId, conditions, data) => {
     entity = result.rows[0];
   } else if (leadId) {
     const result = await query(
-      `SELECT * FROM leads WHERE id = $1 AND (organization_id = $2 OR clinic_id = $2)`,
+      `SELECT * FROM leads WHERE id = $1 AND organization_id = $2`,
       [leadId, organizationId]
     );
     entity = result.rows[0];
@@ -316,7 +316,7 @@ export const onReferralReceived = async (organizationId, referralId, referredPat
 export const detectDaysSinceVisit = async () => {
   // Get all active workflows with DAYS_SINCE_VISIT trigger
   const workflowsResult = await query(
-    `SELECT w.*, COALESCE(w.organization_id, w.clinic_id) as org_id
+    `SELECT w.*, w.organization_id as org_id
      FROM workflows w
      WHERE w.trigger_type = 'DAYS_SINCE_VISIT'
        AND w.is_active = true`
