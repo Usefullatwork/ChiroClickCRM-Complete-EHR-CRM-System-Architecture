@@ -5,12 +5,25 @@
 import { jest } from '@jest/globals';
 
 // Mock the database
+const mockQuery = jest.fn();
 const mockPool = {
-  query: jest.fn()
+  query: mockQuery,
+  connect: jest.fn()
 };
 
 jest.unstable_mockModule('../../../src/config/database.js', () => ({
-  default: { pool: mockPool }
+  query: mockQuery,
+  pool: mockPool,
+  getClient: jest.fn().mockResolvedValue(mockPool),
+  transaction: jest.fn((callback) => callback(mockPool)),
+  healthCheck: jest.fn().mockResolvedValue(true),
+  default: {
+    query: mockQuery,
+    pool: mockPool,
+    getClient: jest.fn().mockResolvedValue(mockPool),
+    transaction: jest.fn((callback) => callback(mockPool)),
+    healthCheck: jest.fn().mockResolvedValue(true)
+  }
 }));
 
 // Import after mocking
@@ -36,7 +49,7 @@ describe('Encounters Service', () => {
         status: 'in_progress'
       };
 
-      mockPool.query.mockResolvedValueOnce({ rows: [mockEncounter] });
+      mockQuery.mockResolvedValueOnce({ rows: [mockEncounter] });
 
       const result = await encountersService.createEncounter({
         patientId: 'pat-123',
@@ -48,7 +61,7 @@ describe('Encounters Service', () => {
 
       expect(result).toBeDefined();
       expect(result.id).toBe('enc-123');
-      expect(mockPool.query).toHaveBeenCalled();
+      expect(mockQuery).toHaveBeenCalled();
     });
 
     it('should validate required fields', async () => {
@@ -67,7 +80,7 @@ describe('Encounters Service', () => {
         plan: 'Updated plan'
       };
 
-      mockPool.query.mockResolvedValueOnce({ rows: [mockUpdated] });
+      mockQuery.mockResolvedValueOnce({ rows: [mockUpdated] });
 
       const result = await encountersService.updateSOAPNote('enc-123', {
         subjective: 'Updated subjective',
@@ -80,7 +93,7 @@ describe('Encounters Service', () => {
     });
 
     it('should not allow updates to signed encounters', async () => {
-      mockPool.query.mockResolvedValueOnce({
+      mockQuery.mockResolvedValueOnce({
         rows: [{ id: 'enc-123', signed_at: new Date() }]
       });
 
@@ -97,8 +110,8 @@ describe('Encounters Service', () => {
         signed_by: 'prac-123'
       };
 
-      mockPool.query.mockResolvedValueOnce({ rows: [{ status: 'completed' }] });
-      mockPool.query.mockResolvedValueOnce({ rows: [mockSigned] });
+      mockQuery.mockResolvedValueOnce({ rows: [{ status: 'completed' }] });
+      mockQuery.mockResolvedValueOnce({ rows: [mockSigned] });
 
       const result = await encountersService.signEncounter('enc-123', 'prac-123');
 
@@ -107,7 +120,7 @@ describe('Encounters Service', () => {
     });
 
     it('should require completed status before signing', async () => {
-      mockPool.query.mockResolvedValueOnce({ rows: [{ status: 'in_progress' }] });
+      mockQuery.mockResolvedValueOnce({ rows: [{ status: 'in_progress' }] });
 
       await expect(encountersService.signEncounter('enc-123', 'prac-123'))
         .rejects.toThrow(/not completed/i);
@@ -125,7 +138,7 @@ describe('Encounters Service', () => {
         is_primary: true
       };
 
-      mockPool.query.mockResolvedValueOnce({ rows: [mockDiagnosis] });
+      mockQuery.mockResolvedValueOnce({ rows: [mockDiagnosis] });
 
       const result = await encountersService.addDiagnosis('enc-123', {
         code: 'L03',
@@ -157,7 +170,7 @@ describe('Encounters Service', () => {
         technique: 'diversified'
       };
 
-      mockPool.query.mockResolvedValueOnce({ rows: [mockTreatment] });
+      mockQuery.mockResolvedValueOnce({ rows: [mockTreatment] });
 
       const result = await encountersService.addTreatment('enc-123', {
         code: 'L215',
@@ -183,7 +196,7 @@ describe('Encounters Service', () => {
         treatments: [{ code: 'L215', description: 'Adjustment' }]
       };
 
-      mockPool.query.mockResolvedValueOnce({ rows: [mockEncounter] });
+      mockQuery.mockResolvedValueOnce({ rows: [mockEncounter] });
 
       const narrative = await encountersService.generateClinicalNarrative('enc-123');
 
@@ -234,7 +247,7 @@ describe('Clinical Measurements', () => {
         body_region: 'lower_back'
       };
 
-      mockPool.query.mockResolvedValueOnce({ rows: [mockMeasurement] });
+      mockQuery.mockResolvedValueOnce({ rows: [mockMeasurement] });
 
       const result = await encountersService.recordVASScore('enc-123', {
         value: 7,
@@ -267,7 +280,7 @@ describe('Clinical Measurements', () => {
         rotation_right: 75
       };
 
-      mockPool.query.mockResolvedValueOnce({ rows: [mockROM] });
+      mockQuery.mockResolvedValueOnce({ rows: [mockROM] });
 
       const result = await encountersService.recordROMFindings('enc-123', {
         region: 'cervical',

@@ -606,6 +606,63 @@ export const getProgressHistory = async (req, res) => {
 }
 
 // ============================================================================
+// ALIASES (for patient routes compatibility)
+// ============================================================================
+
+/**
+ * Alias for getPatientPrescriptions
+ * @route GET /api/v1/patients/:patientId/exercises
+ */
+export const getPatientExercises = getPatientPrescriptions;
+
+/**
+ * Alias for createPrescription
+ * @route POST /api/v1/patients/:patientId/exercises
+ */
+export const prescribe = createPrescription;
+
+/**
+ * Assign an exercise program to a patient
+ * @route POST /api/v1/patients/:patientId/programs
+ */
+export const assignProgram = async (req, res) => {
+  try {
+    const { organizationId, user } = req;
+    const { patientId } = req.params;
+    const { programId, startDate, notes } = req.body;
+
+    // For now, use createPrescription with program exercises
+    // This would need a proper implementation to copy exercises from a program template
+    const prescription = await exerciseLibraryService.createPrescription(organizationId, {
+      patientId,
+      templateId: programId,
+      startDate,
+      notes,
+      prescribedBy: user.id
+    });
+
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      action: 'ASSIGN_PROGRAM',
+      resourceType: 'EXERCISE_PROGRAM',
+      resourceId: prescription.id,
+      details: { patientId, programId },
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent')
+    });
+
+    res.status(201).json({
+      success: true,
+      data: prescription
+    });
+  } catch (error) {
+    logger.error('Error assigning program:', error);
+    res.status(500).json({ error: 'Failed to assign program' });
+  }
+};
+
+// ============================================================================
 // DELIVERY
 // ============================================================================
 
@@ -754,5 +811,10 @@ export default {
   generatePDF,
   sendEmail,
   sendReminder,
-  sendSMS
+  sendSMS,
+
+  // Aliases for patient routes compatibility
+  getPatientExercises: getPatientPrescriptions,
+  prescribe: createPrescription,
+  assignProgram
 }

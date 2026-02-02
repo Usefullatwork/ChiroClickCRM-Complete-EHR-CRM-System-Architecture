@@ -85,6 +85,11 @@ export const getRedisClient = async () => {
 export const isRedisAvailable = () => isConnected;
 
 /**
+ * Alias for isRedisAvailable (for backwards compatibility)
+ */
+export const isRedisConnected = () => isConnected;
+
+/**
  * Close Redis connection
  */
 export const closeRedis = async () => {
@@ -327,6 +332,7 @@ export default {
   initRedis,
   getRedisClient,
   isRedisAvailable,
+  isRedisConnected,
   closeRedis,
   redisHealthCheck,
   redisCache,
