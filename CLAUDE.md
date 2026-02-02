@@ -893,3 +893,49 @@ cd backend && npm run migrate
 
 # 5. Test at http://localhost:5173
 ```
+
+---
+
+## Session 2026-02-02: Plan Verification & Cleanup
+
+### Verified Items (No Changes Needed)
+The following items from a previous plan were verified to be already resolved or non-existent:
+
+| Planned Fix | Actual Status |
+|-------------|---------------|
+| AI controller `getCircuitStatus` export mismatch | Not applicable - `ai.js` is 223 lines, no circuit breaker functionality exists |
+| Missing CRM translations (LeadManagement, PatientLifecycle, etc.) | Components don't exist - actual CRM has WaitlistManager, RecallManager, SMSConversation |
+| `winston`/`xlsx` dependencies | Already in package.json |
+| Training routes 404 | Routes properly registered |
+| 3D dependencies | Already installed |
+| AnatomyViewer/MuscleMap issues | Fully functional |
+
+### Actual CRM Components
+The CRM folder contains:
+- `WaitlistManager.jsx` - Waitlist management (Jane App style)
+- `RecallManager.jsx` - Recall/reminder campaigns (CT Engage style)
+- `SMSConversation.jsx` - Two-way SMS communication
+
+**No LeadManagement, PatientLifecycle, ReferralProgram, SurveyManager, or CampaignManager components exist in this branch.**
+
+### Database Seeds Location
+Seeds are in two locations:
+- `database/seeds/` - Core seeds (demo-users.sql, spine-templates.sql, icpc2_codes.sql, etc.)
+- `backend/seeds/` - Clinical template seeds (17 files total)
+
+### AI Controller Exports (Current State)
+`backend/src/controllers/ai.js` exports:
+```javascript
+export default {
+  spellCheck,
+  generateSOAPSuggestion,
+  suggestDiagnosis,
+  analyzeRedFlags,
+  generateClinicalSummary,
+  recordOutcomeFeedback,
+  getAIStatus,
+  generateFieldStream,
+  generateField
+};
+```
+No circuit breaker functionality implemented in this branch.
