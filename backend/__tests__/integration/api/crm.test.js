@@ -15,10 +15,16 @@ import {
   createTestCampaign,
   cleanupTestData,
   setTenantContext,
-  randomUUID
+  randomUUID,
+  isDatabaseAvailable
 } from '../../helpers/testUtils.js';
 
-describe('CRM API Integration Tests', () => {
+// Check database availability before running tests
+const dbAvailable = await isDatabaseAvailable();
+
+const describeIfDb = dbAvailable ? describe : describe.skip;
+
+describeIfDb('CRM API Integration Tests', () => {
   let testOrg;
   let testUser;
   let testSession;

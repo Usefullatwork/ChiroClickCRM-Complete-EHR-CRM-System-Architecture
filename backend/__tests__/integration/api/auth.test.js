@@ -11,10 +11,16 @@ import {
   createTestUser,
   createTestSession,
   cleanupTestData,
-  randomUUID
+  randomUUID,
+  isDatabaseAvailable
 } from '../../helpers/testUtils.js';
 
-describe('Auth API Integration Tests', () => {
+// Check database availability before running tests
+const dbAvailable = await isDatabaseAvailable();
+
+const describeIfDb = dbAvailable ? describe : describe.skip;
+
+describeIfDb('Auth API Integration Tests', () => {
   let testOrg;
   let testUser;
   let testSession;
