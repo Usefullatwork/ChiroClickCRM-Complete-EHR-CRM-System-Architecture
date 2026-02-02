@@ -3,6 +3,8 @@
  * Makes tests independent of the scheduler
  */
 
+import { jest } from '@jest/globals';
+
 const schedule = jest.fn().mockReturnValue({
   start: jest.fn(),
   stop: jest.fn()
