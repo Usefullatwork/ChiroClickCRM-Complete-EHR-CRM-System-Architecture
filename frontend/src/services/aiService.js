@@ -10,6 +10,10 @@
  * Privacy: All AI processing happens locally - no PII leaves the server
  */
 
+import logger from '../utils/logger';
+
+const log = logger.scope('AIService');
+
 // Default Ollama configuration
 const DEFAULT_CONFIG = {
   baseUrl: 'http://localhost:11434',
@@ -33,7 +37,7 @@ export function getAIConfig() {
       return { ...DEFAULT_CONFIG, ...JSON.parse(stored) };
     }
   } catch (e) {
-    console.warn('Failed to load AI config:', e);
+    log.warn('Failed to load AI config', { error: e.message });
   }
   return DEFAULT_CONFIG;
 }
@@ -46,7 +50,7 @@ export function saveAIConfig(config) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
     return true;
   } catch (e) {
-    console.error('Failed to save AI config:', e);
+    log.error('Failed to save AI config', { error: e.message });
     return false;
   }
 }
@@ -90,7 +94,7 @@ export async function listModels() {
     const data = await response.json();
     return data.models || [];
   } catch (error) {
-    console.error('Failed to list models:', error);
+    log.error('Failed to list models', { error: error.message });
     return [];
   }
 }
@@ -141,7 +145,7 @@ export async function generateText(prompt, options = {}) {
       promptEvalCount: data.prompt_eval_count,
     };
   } catch (error) {
-    console.error('Generate text error:', error);
+    log.error('Generate text error', { error: error.message });
     throw error;
   }
 }
@@ -180,7 +184,7 @@ export async function chatCompletion(messages, options = {}) {
       model: data.model,
     };
   } catch (error) {
-    console.error('Chat completion error:', error);
+    log.error('Chat completion error', { error: error.message });
     throw error;
   }
 }

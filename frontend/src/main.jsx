@@ -7,6 +7,9 @@ import App from './App'
 import './index.css'
 import { initializeCSRF } from './services/api'
 import { LanguageProvider } from './i18n'
+import logger from './utils/logger'
+
+const log = logger.scope('Main')
 
 // Create React Query client
 const queryClient = new QueryClient({
@@ -55,7 +58,7 @@ function MockClerkProvider({ children }) {
     isSignedIn: true,
     session: { id: 'dev_session_001' },
     organization: mockUser.organizationMemberships[0].organization,
-    signOut: () => console.log('[Dev Mode] Sign out clicked'),
+    signOut: () => log.debug('Dev mode sign out clicked'),
     getToken: async () => 'dev_token_mock',
   }
 
@@ -82,8 +85,7 @@ const AuthWrapper = isDevMode ? MockClerkProvider : ({ children }) => (
 )
 
 if (isDevMode) {
-  console.log('%c[DEV MODE] Running without Clerk authentication', 'color: orange; font-weight: bold')
-  console.log('%cMock user:', 'color: gray', mockUser)
+  log.info('Running in DEV MODE without Clerk authentication', { mockUser })
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(

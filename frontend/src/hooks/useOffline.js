@@ -39,6 +39,9 @@ import {
   triggerSync as triggerSyncQueue,
   SYNC_TYPES
 } from '../utils/syncQueue';
+import logger from '../utils/logger';
+
+const log = logger.scope('Offline');
 
 // =============================================================================
 // CONSTANTS
@@ -104,7 +107,7 @@ export function useOffline(options = {}) {
       navigator.serviceWorker
         .register(SERVICE_WORKER_PATH)
         .then((registration) => {
-          console.log('[useOffline] Service worker registered');
+          log.debug(' Service worker registered');
           setSwRegistration(registration);
 
           // Listen for updates
@@ -113,19 +116,19 @@ export function useOffline(options = {}) {
             if (newWorker) {
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  console.log('[useOffline] New service worker available');
+                  log.debug(' New service worker available');
                 }
               });
             }
           });
         })
         .catch((error) => {
-          console.error('[useOffline] Service worker registration failed:', error);
+          log.error(' Service worker registration failed:', error);
         });
 
       // Wait for service worker to be ready
       navigator.serviceWorker.ready.then(() => {
-        console.log('[useOffline] Service worker ready');
+        log.debug(' Service worker ready');
         setSwReady(true);
       });
 
@@ -144,21 +147,21 @@ export function useOffline(options = {}) {
 
     switch (type) {
       case 'SYNC_SUCCESS':
-        console.log('[useOffline] Sync success for item:', payload?.itemId);
+        log.debug(' Sync success for item:', payload?.itemId);
         updatePendingCount();
         break;
 
       case 'VIDEO_CACHED':
-        console.log('[useOffline] Video cached:', payload?.url);
+        log.debug(' Video cached:', payload?.url);
         updateCachedVideoStats();
         break;
 
       case 'VIDEO_CACHE_FAILED':
-        console.error('[useOffline] Video cache failed:', payload?.url, payload?.error);
+        log.error(' Video cache failed:', payload?.url, payload?.error);
         break;
 
       case 'CACHE_STATUS':
-        console.log('[useOffline] Cache status:', payload);
+        log.debug(' Cache status:', payload);
         break;
     }
   }, []);
@@ -169,7 +172,7 @@ export function useOffline(options = {}) {
 
   useEffect(() => {
     const handleOnline = () => {
-      console.log('[useOffline] Now online');
+      log.debug(' Now online');
       setIsOnline(true);
       setSyncStatus(null);
 
@@ -189,7 +192,7 @@ export function useOffline(options = {}) {
     };
 
     const handleOffline = () => {
-      console.log('[useOffline] Now offline');
+      log.debug(' Now offline');
       setIsOnline(false);
 
       if (onOffline) {
@@ -218,7 +221,7 @@ export function useOffline(options = {}) {
     if (autoSync) {
       autoSyncCleanupRef.current = enableAutoSync({
         onProgress: (current, total) => {
-          console.log(`[useOffline] Sync progress: ${current}/${total}`);
+          log.debug('Sync progress', { current, total });
         },
         onItemComplete: (item, success) => {
           if (success) {
@@ -226,7 +229,7 @@ export function useOffline(options = {}) {
           }
         },
         onError: (item, error) => {
-          console.error('[useOffline] Sync error:', error);
+          log.error(' Sync error:', error);
         }
       });
 
@@ -248,7 +251,7 @@ export function useOffline(options = {}) {
       const stats = await getSyncQueueStats();
       setPendingSyncCount(stats.pending);
     } catch (error) {
-      console.error('[useOffline] Error getting sync stats:', error);
+      log.error(' Error getting sync stats:', error);
     }
   }, []);
 
@@ -260,7 +263,7 @@ export function useOffline(options = {}) {
       setCachedVideoCount(videos.length);
       setCachedVideoSize(size);
     } catch (error) {
-      console.error('[useOffline] Error getting video stats:', error);
+      log.error(' Error getting video stats:', error);
     }
   }, []);
 
@@ -272,7 +275,7 @@ export function useOffline(options = {}) {
       setPendingSyncCount(stats.unsyncedProgress + stats.pendingSyncItems);
       setCachedVideoCount(stats.cachedVideos);
     } catch (error) {
-      console.error('[useOffline] Error getting storage stats:', error);
+      log.error(' Error getting storage stats:', error);
     }
   }, []);
 
@@ -297,12 +300,12 @@ export function useOffline(options = {}) {
    */
   const triggerSync = useCallback(async () => {
     if (!isOnline) {
-      console.log('[useOffline] Cannot sync - offline');
+      log.debug(' Cannot sync - offline');
       return { success: false, reason: 'offline' };
     }
 
     if (isSyncing) {
-      console.log('[useOffline] Sync already in progress');
+      log.debug(' Sync already in progress');
       return { success: false, reason: 'in_progress' };
     }
 
@@ -316,7 +319,7 @@ export function useOffline(options = {}) {
     try {
       const result = await processSyncQueue({
         onProgress: (current, total) => {
-          console.log(`[useOffline] Sync progress: ${current}/${total}`);
+          log.debug('Sync progress', { current, total });
         }
       });
 
@@ -340,7 +343,7 @@ export function useOffline(options = {}) {
 
       return { success: true, result };
     } catch (error) {
-      console.error('[useOffline] Sync failed:', error);
+      log.error(' Sync failed:', error);
       setSyncStatus('error');
 
       if (onSyncError) {
@@ -362,7 +365,7 @@ export function useOffline(options = {}) {
    */
   const cachePrescriptionOffline = useCallback(async (prescriptionData) => {
     if (!token) {
-      console.error('[useOffline] No token provided');
+      log.error(' No token provided');
       return false;
     }
 
@@ -371,7 +374,7 @@ export function useOffline(options = {}) {
       await updateStorageStats();
       return true;
     } catch (error) {
-      console.error('[useOffline] Error caching prescription:', error);
+      log.error(' Error caching prescription:', error);
       return false;
     }
   }, [token, updateStorageStats]);
@@ -383,7 +386,7 @@ export function useOffline(options = {}) {
     try {
       return await getCachedPrescription(prescriptionId);
     } catch (error) {
-      console.error('[useOffline] Error getting cached prescription:', error);
+      log.error(' Error getting cached prescription:', error);
       return null;
     }
   }, []);
@@ -397,7 +400,7 @@ export function useOffline(options = {}) {
     try {
       return await getCachedPrescriptionsByToken(token);
     } catch (error) {
-      console.error('[useOffline] Error getting cached prescriptions:', error);
+      log.error(' Error getting cached prescriptions:', error);
       return [];
     }
   }, [token]);
@@ -411,7 +414,7 @@ export function useOffline(options = {}) {
    */
   const cacheVideo = useCallback(async (url, exerciseId) => {
     if (!swReady || !navigator.serviceWorker.controller) {
-      console.warn('[useOffline] Service worker not ready');
+      log.warn(' Service worker not ready');
       return false;
     }
 
@@ -429,7 +432,7 @@ export function useOffline(options = {}) {
 
       return true;
     } catch (error) {
-      console.error('[useOffline] Error caching video:', error);
+      log.error(' Error caching video:', error);
       return false;
     }
   }, [swReady, updateCachedVideoStats]);
@@ -455,7 +458,7 @@ export function useOffline(options = {}) {
 
       return true;
     } catch (error) {
-      console.error('[useOffline] Error removing cached video:', error);
+      log.error(' Error removing cached video:', error);
       return false;
     }
   }, [swReady, updateCachedVideoStats]);
@@ -467,7 +470,7 @@ export function useOffline(options = {}) {
     try {
       return await isVideoCached(url);
     } catch (error) {
-      console.error('[useOffline] Error checking video cache:', error);
+      log.error(' Error checking video cache:', error);
       return false;
     }
   }, []);
@@ -501,7 +504,7 @@ export function useOffline(options = {}) {
 
       return true;
     } catch (error) {
-      console.error('[useOffline] Error recording progress:', error);
+      log.error(' Error recording progress:', error);
       return false;
     }
   }, [isOnline, token, triggerSync, updatePendingCount]);
@@ -513,7 +516,7 @@ export function useOffline(options = {}) {
     try {
       return await getTodaysProgress(prescriptionId);
     } catch (error) {
-      console.error('[useOffline] Error getting today progress:', error);
+      log.error(' Error getting today progress:', error);
       return [];
     }
   }, []);
@@ -539,7 +542,7 @@ export function useOffline(options = {}) {
       await updateStorageStats();
       return true;
     } catch (error) {
-      console.error('[useOffline] Error clearing offline data:', error);
+      log.error(' Error clearing offline data:', error);
       return false;
     }
   }, [swReady, updateStorageStats]);
