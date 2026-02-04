@@ -33,6 +33,9 @@ import { Button } from '../ui/Button';
 import { Card, CardHeader, CardBody, CardFooter } from '../ui/Card';
 import { Alert } from '../ui/Alert';
 import { Modal } from '../ui/Modal';
+import logger from '../../utils/logger';
+
+const log = logger.scope('VCardImport');
 
 // Norwegian translations
 const TRANSLATIONS = {
@@ -248,7 +251,7 @@ const parseVCard = (vcfContent) => {
         contacts.push(contact);
       }
     } catch (error) {
-      console.warn('Failed to parse vCard entry:', error);
+      log.warn('Failed to parse vCard entry', { error: error.message });
     }
   }
 

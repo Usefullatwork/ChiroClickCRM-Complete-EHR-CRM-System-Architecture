@@ -26,10 +26,12 @@ import { validateClinicalContent, checkRedFlagsInContent, checkMedicationWarning
 
 // Import guardrails for input validation and output filtering
 let guardrailsService = null;
+let guardrailsLoadError = null;
 try {
   const guardrails = await import('./guardrails.js');
   guardrailsService = guardrails.guardrailsService;
 } catch (e) {
+  guardrailsLoadError = e.message;
   logger.warn('Guardrails service not available:', e.message);
 }
 
@@ -41,6 +43,62 @@ try {
 } catch (e) {
   logger.warn('RAG service not available:', e.message);
 }
+
+/**
+ * Safety-critical task types that MUST have guardrails
+ * If guardrails are unavailable for these, we must fail safe
+ */
+const SAFETY_CRITICAL_TASKS = [
+  'red_flag_analysis',
+  'differential_diagnosis',
+  'treatment_safety',
+  'clinical_reasoning',
+  'medication_interaction',
+  'contraindication_check',
+  'diagnosis_suggestion',
+];
+
+/**
+ * Check if guardrails are required and available for a task type
+ * Returns { required: boolean, available: boolean, canProceed: boolean }
+ */
+const checkGuardrailsForTask = (taskType, skipGuardrails = false) => {
+  const isSafetyCritical = SAFETY_CRITICAL_TASKS.includes(taskType);
+  const guardrailsAvailable = guardrailsService !== null;
+  const guardrailsEnabled = process.env.GUARDRAILS_ENABLED !== 'false';
+
+  // Safety-critical tasks MUST have guardrails in production
+  if (isSafetyCritical && !skipGuardrails) {
+    if (!guardrailsAvailable) {
+      logger.error(`SAFETY: Guardrails unavailable for safety-critical task: ${taskType}`, {
+        loadError: guardrailsLoadError,
+        taskType,
+      });
+      return {
+        required: true,
+        available: false,
+        canProceed: process.env.NODE_ENV !== 'production', // Only allow in dev
+        reason: `Guardrails required for ${taskType} but not available`,
+      };
+    }
+    if (!guardrailsEnabled) {
+      logger.warn(`SAFETY: Guardrails disabled for safety-critical task: ${taskType}`);
+      return {
+        required: true,
+        available: true,
+        canProceed: process.env.NODE_ENV !== 'production',
+        reason: `Guardrails disabled but required for ${taskType}`,
+      };
+    }
+  }
+
+  return {
+    required: isSafetyCritical,
+    available: guardrailsAvailable && guardrailsEnabled,
+    canProceed: true,
+    reason: null,
+  };
+};
 
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
 const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY || null;
@@ -175,9 +233,23 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
   const modelConfig = MODEL_CONFIG[model] || MODEL_CONFIG['chiro-no'];
   const effectiveTemperature = temperature ?? modelConfig.temperature ?? 0.3;
 
+  // Step 0: Check if guardrails are required and available for this task
+  const guardrailsCheck = checkGuardrailsForTask(taskType, skipGuardrails);
+  if (!guardrailsCheck.canProceed) {
+    logger.error('BLOCKED: Safety-critical task without guardrails', {
+      taskType,
+      reason: guardrailsCheck.reason,
+    });
+    throw new Error(
+      `Safety-critical task "${taskType}" blocked: ${guardrailsCheck.reason}. ` +
+      'Contact administrator to enable guardrails service.'
+    );
+  }
+
   // Step 1: Validate input through guardrails
   let sanitizedPrompt = prompt;
   let inputWarnings = [];
+  let guardrailsValidationFailed = false;
 
   if (GUARDRAILS_ENABLED && guardrailsService && !skipGuardrails) {
     try {
@@ -194,6 +266,18 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
       sanitizedPrompt = inputValidation.sanitized;
       inputWarnings = inputValidation.warnings || [];
     } catch (guardrailError) {
+      guardrailsValidationFailed = true;
+      // For safety-critical tasks, fail if guardrails validation fails
+      if (guardrailsCheck.required) {
+        logger.error('BLOCKED: Guardrails validation failed for safety-critical task', {
+          taskType,
+          error: guardrailError.message,
+        });
+        throw new Error(
+          `Safety validation failed for "${taskType}": ${guardrailError.message}. ` +
+          'Cannot proceed without successful validation.'
+        );
+      }
       logger.warn('Guardrails validation error, proceeding with caution:', guardrailError.message);
     }
   }
@@ -299,11 +383,40 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
           hallucinationRisk: outputResult.hallucinationRisk,
           ragContext,
           requiresReview: outputResult.requiresReview,
+          guardrailsApplied: true,
         }
       };
     } catch (guardrailError) {
+      // For safety-critical tasks, fail if output filtering fails
+      if (guardrailsCheck.required) {
+        logger.error('BLOCKED: Output guardrails failed for safety-critical task', {
+          taskType,
+          error: guardrailError.message,
+        });
+        throw new Error(
+          `Safety output filtering failed for "${taskType}": ${guardrailError.message}. ` +
+          'Cannot return unvalidated output for safety-critical tasks.'
+        );
+      }
       logger.warn('Output guardrails error, returning raw:', guardrailError.message);
     }
+  }
+
+  // For safety-critical tasks without guardrails, add mandatory disclaimer
+  if (guardrailsCheck.required && !guardrailsCheck.available) {
+    const disclaimer = '\n\n⚠️ ADVARSEL: Dette resultatet er ikke validert av sikkerhetssystemet. ' +
+      'Klinisk gjennomgang er PÅKREVD før bruk.';
+    return {
+      text: rawOutput + disclaimer,
+      metadata: {
+        model,
+        modelConfig: modelConfig.description,
+        inputWarnings,
+        guardrailsApplied: false,
+        requiresReview: true,
+        safetyWarning: 'Output not validated - manual review required',
+      }
+    };
   }
 
   // Return simple string for backward compatibility when guardrails disabled

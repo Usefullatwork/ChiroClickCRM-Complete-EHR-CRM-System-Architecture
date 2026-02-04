@@ -13,6 +13,9 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useSlashCommands, SlashCommandMenu } from '../assessment/SlashCommands';
 import { Sparkles, Loader2, Mic, MicOff, Square } from 'lucide-react';
 import { aiAPI } from '../../services/api';
+import logger from '../../utils/logger';
+
+const log = logger.scope('ClinicalTextarea');
 
 // Norwegian macros - type ".xx" + space to expand
 const MACROS = {
@@ -165,7 +168,7 @@ export default function EnhancedClinicalTextarea({
     };
 
     recognition.onerror = (event) => {
-      console.error('Speech recognition error:', event.error);
+      log.error('Speech recognition error', { error: event.error });
       setVoiceError(event.error === 'not-allowed'
         ? 'Mikrofontilgang nektet'
         : event.error === 'no-speech'
@@ -197,7 +200,7 @@ export default function EnhancedClinicalTextarea({
         recognitionRef.current?.start();
       } catch (err) {
         // Already started, ignore
-        console.warn('Recognition already started:', err);
+        log.debug('Recognition already started', { error: err.message });
       }
     }
   }, [isListening, initRecognition]);
@@ -368,7 +371,7 @@ export default function EnhancedClinicalTextarea({
         }
       } catch (err) {
         // Silently fail - ghost text is optional enhancement
-        console.debug('AI ghost text failed:', err.message);
+        log.debug('AI ghost text failed', { error: err.message });
         setAiSuggestion('');
       } finally {
         setIsAILoading(false);

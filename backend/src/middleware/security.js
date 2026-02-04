@@ -50,7 +50,7 @@ export const enforce2FA = async (req, res, next) => {
   }
 
   // Check if user is admin or has elevated privileges
-  const requiresAFA = ['ADMIN', 'SUPER_ADMIN', 'OWNER'].includes(user.role);
+  const requires2FA = ['ADMIN', 'SUPER_ADMIN', 'OWNER'].includes(user.role);
 
   if (requires2FA) {
     // Check if 2FA is enabled (integrate with Clerk or your auth provider)

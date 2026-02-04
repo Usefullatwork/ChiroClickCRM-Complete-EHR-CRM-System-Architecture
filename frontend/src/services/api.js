@@ -4,6 +4,9 @@
  */
 
 import axios from 'axios'
+import logger from '../utils/logger'
+
+const log = logger.scope('API')
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1'
 const API_TIMEOUT = import.meta.env.VITE_API_TIMEOUT || 30000
@@ -84,7 +87,7 @@ export const clearOrganizationId = () => {
 export const initializeCSRF = async () => {
   // CSRF is not needed when using JWT/Bearer token authentication
   // This is a placeholder for future CSRF implementation if needed
-  console.log('API client initialized')
+  log.debug('API client initialized')
   return true
 }
 
@@ -121,7 +124,7 @@ apiClient.interceptors.request.use(
         config.headers.Authorization = `Bearer ${token}`
       }
     } catch (error) {
-      console.error('Failed to get auth token:', error)
+      log.error('Failed to get auth token', { error: error.message })
     }
 
     // Get organization ID from secure storage
@@ -133,7 +136,7 @@ apiClient.interceptors.request.use(
       const isExempt = exemptPaths.some(path => config.url?.includes(path))
 
       if (!isExempt) {
-        console.error('Organization ID is missing. Please select an organization.')
+        log.error('Organization ID is missing. Please select an organization.')
         return Promise.reject(new Error('Organization ID is required. Please select an organization in settings.'))
       }
     } else {
@@ -163,34 +166,34 @@ apiClient.interceptors.response.use(
           if (!import.meta.env.DEV) {
             window.location.href = '/sign-in'
           } else {
-            console.warn('401 Unauthorized - skipping redirect in dev mode')
+            log.warn('401 Unauthorized - skipping redirect in dev mode')
           }
           break
         case 403:
           // Forbidden
-          console.error('Access denied:', data.message)
+          log.error('Access denied', { message: data.message })
           break
         case 404:
           // Not found
-          console.error('Resource not found:', data.message)
+          log.warn('Resource not found', { message: data.message })
           break
         case 429:
           // Rate limit exceeded
-          console.error('Too many requests:', data.message)
+          log.warn('Too many requests', { message: data.message })
           break
         case 500:
           // Server error
-          console.error('Server error:', data.message)
+          log.error('Server error', { message: data.message })
           break
         default:
-          console.error('API error:', data.message)
+          log.error('API error', { status, message: data.message })
       }
     } else if (error.request) {
       // Request made but no response
-      console.error('Network error: No response from server')
+      log.error('Network error: No response from server')
     } else {
       // Something else happened
-      console.error('Request error:', error.message)
+      log.error('Request error', { message: error.message })
     }
 
     return Promise.reject(error)

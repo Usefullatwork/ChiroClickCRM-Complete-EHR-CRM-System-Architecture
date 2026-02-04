@@ -39,6 +39,9 @@ import {
   createSpeechRecognition,
   getAIConfig,
 } from '../../services/aiService';
+import logger from '../../utils/logger';
+
+const log = logger.scope('AIScribe');
 
 // =============================================================================
 // AI SCRIBE BUTTON - Compact trigger for voice recording
@@ -69,7 +72,7 @@ export function AIScribeButton({
         }
       },
       onError: (event) => {
-        console.error('Speech recognition error:', event.error);
+        log.error('Speech recognition error', { error: event.error });
         setIsRecording(false);
       },
       onEnd: () => {
@@ -81,7 +84,7 @@ export function AIScribeButton({
 
     return () => {
       if (sr) {
-        try { sr.stop(); } catch (e) { /* ignore */ }
+        try { sr.stop(); } catch (e) { log.debug('Speech recognition cleanup', { message: e.message }); }
       }
     };
   }, [language]);
@@ -204,7 +207,7 @@ export default function AIScribe({
         setInterimTranscript(interim);
       },
       onError: (event) => {
-        console.error('Speech recognition error:', event.error);
+        log.error('Speech recognition error', { error: event.error });
         if (event.error === 'not-allowed') {
           setError(language === 'no'
             ? 'Mikrofontilgang nektet. Vennligst aktiver i nettleserinnstillinger.'
@@ -218,7 +221,7 @@ export default function AIScribe({
           try {
             recognitionRef.current.start();
           } catch (e) {
-            // Already started, ignore
+            log.debug('Speech recognition restart', { message: e.message });
           }
         }
       },
@@ -228,7 +231,7 @@ export default function AIScribe({
 
     return () => {
       if (sr) {
-        try { sr.stop(); } catch (e) { /* ignore */ }
+        try { sr.stop(); } catch (e) { log.debug('Speech recognition cleanup', { message: e.message }); }
       }
       if (timerRef.current) {
         clearInterval(timerRef.current);
@@ -266,7 +269,7 @@ export default function AIScribe({
 
   const stopRecording = () => {
     if (recognitionRef.current) {
-      try { recognitionRef.current.stop(); } catch (e) { /* ignore */ }
+      try { recognitionRef.current.stop(); } catch (e) { log.debug('Speech recognition stop', { message: e.message }); }
     }
     if (timerRef.current) {
       clearInterval(timerRef.current);
@@ -284,9 +287,9 @@ export default function AIScribe({
         timerRef.current = setInterval(() => {
           setDuration((d) => d + 1);
         }, 1000);
-      } catch (e) { /* ignore */ }
+      } catch (e) { log.debug('Speech recognition resume', { message: e.message }); }
     } else {
-      try { recognitionRef.current?.stop(); } catch (e) { /* ignore */ }
+      try { recognitionRef.current?.stop(); } catch (e) { log.debug('Speech recognition pause', { message: e.message }); }
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
@@ -642,7 +645,7 @@ export function AIScribeCompact({
       },
       onEnd: () => {
         if (isRecording && recognitionRef.current) {
-          try { recognitionRef.current.start(); } catch (e) { /* ignore */ }
+          try { recognitionRef.current.start(); } catch (e) { log.debug('Speech recognition auto-restart', { message: e.message }); }
         }
       },
     });
@@ -650,7 +653,7 @@ export function AIScribeCompact({
     recognitionRef.current = sr;
 
     return () => {
-      if (sr) try { sr.stop(); } catch (e) { /* ignore */ }
+      if (sr) try { sr.stop(); } catch (e) { log.debug('Speech recognition cleanup', { message: e.message }); }
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, [language, isRecording]);
