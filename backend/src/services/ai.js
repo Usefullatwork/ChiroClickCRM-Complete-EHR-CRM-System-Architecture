@@ -106,6 +106,11 @@ const AI_ENABLED = process.env.AI_ENABLED !== 'false'; // Default: true unless e
 const GUARDRAILS_ENABLED = process.env.GUARDRAILS_ENABLED !== 'false'; // Default: true
 const RAG_ENABLED = process.env.RAG_ENABLED !== 'false'; // Default: true
 
+// Smart model lifecycle: keep_alive controls how long models stay in VRAM
+// On 16GB systems, only 1 model should be resident at a time
+const KEEP_ALIVE = process.env.AI_KEEP_ALIVE || '2m'; // Unload after 2 min idle
+let currentLoadedModel = null;
+
 /**
  * Model configurations with metadata
  * Based on 2025 research: NorwAI-Mistral-7B achieves 95% accuracy for Norwegian clinical text
@@ -307,23 +312,30 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
   }
 
   // Step 3: Generate completion via Ollama (local)
+  // Smart lifecycle: track loaded model for VRAM management
   let rawOutput;
 
   try {
+    if (currentLoadedModel && currentLoadedModel !== model) {
+      logger.debug(`Model switch: ${currentLoadedModel} → ${model}`);
+    }
+
     const response = await axios.post(
       `${OLLAMA_BASE_URL}/api/generate`,
       {
         model,
         prompt: systemPrompt ? `${systemPrompt}\n\n${augmentedPrompt}` : augmentedPrompt,
         stream: false,
+        keep_alive: KEEP_ALIVE, // Auto-unload after idle period
         options: {
           temperature: effectiveTemperature,
           num_predict: maxTokens
         }
       },
-      { timeout: 30000 }
+      { timeout: 60000 } // 60s for model loading + generation
     );
 
+    currentLoadedModel = model;
     rawOutput = response.data.response;
   } catch (error) {
     logger.error('AI completion error:', error.message);
@@ -1222,6 +1234,7 @@ export const generateCompletionStream = async (model, prompt, res) => {
       model: model || AI_MODEL,
       prompt,
       stream: true,
+      keep_alive: KEEP_ALIVE,
     }, { responseType: 'stream', timeout: 60000 });
 
     response.data.on('data', (chunk) => {
