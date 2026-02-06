@@ -12,7 +12,7 @@
  * while providing professional anatomical visualizations.
  */
 import React, { useState, useCallback } from 'react';
-import { Layers, Cube, User, ChevronDown, ChevronUp, Settings, X } from 'lucide-react';
+import { Layers, Box, User, ChevronDown, ChevronUp, Settings, X } from 'lucide-react';
 import QuickPalpationSpine from './QuickPalpationSpine';
 import {
   EnhancedSpineDiagram,
@@ -45,7 +45,7 @@ const MODE_CONFIG = {
   [SIDEBAR_MODES.SPINE_3D]: {
     label: '3D Spine',
     shortLabel: '3D',
-    icon: Cube,
+    icon: Box,
     description: '3D interaktiv visning'
   },
   [SIDEBAR_MODES.BODY]: {

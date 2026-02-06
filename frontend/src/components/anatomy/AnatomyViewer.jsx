@@ -7,7 +7,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { spineTemplatesAPI } from '../../services/api';
-import { Layers, Cube, User, Activity, RotateCcw, Settings } from 'lucide-react';
+import { Layers, Box, User, Activity, RotateCcw, Settings } from 'lucide-react';
 
 // Import anatomy components
 import EnhancedSpineDiagram, { CompactSpineDiagram } from './spine/EnhancedSpineDiagram';
@@ -31,7 +31,7 @@ const MODE_CONFIG = {
   },
   [VIEW_MODES.SPINE_3D]: {
     label: 'Ryggrad 3D',
-    icon: Cube,
+    icon: Box,
     description: '3D interaktiv modell'
   },
   [VIEW_MODES.BODY_2D]: {

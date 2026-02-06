@@ -5,8 +5,8 @@
 CREATE TABLE IF NOT EXISTS old_note_actionable_items (
     id SERIAL PRIMARY KEY,
     note_id INTEGER NOT NULL REFERENCES imported_journal_notes(id) ON DELETE CASCADE,
-    patient_id INTEGER NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
-    organization_id INTEGER NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+    organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
 
     -- Item details
     item_type VARCHAR(50) NOT NULL, -- FOLLOW_UP, TODO, SEND_NOTE, CALL_PATIENT, PRESCRIPTION, REFERRAL, TEST_RESULT, REMINDER, OTHER
@@ -21,10 +21,10 @@ CREATE TABLE IF NOT EXISTS old_note_actionable_items (
     status VARCHAR(50) DEFAULT 'PENDING', -- PENDING, IN_PROGRESS, COMPLETED, CANCELLED
     completed BOOLEAN DEFAULT false,
     completed_at TIMESTAMPTZ,
-    completed_by INTEGER REFERENCES users(id),
+    completed_by UUID REFERENCES users(id),
 
     -- Assignment
-    assigned_to INTEGER REFERENCES users(id),
+    assigned_to UUID REFERENCES users(id),
 
     -- Context from AI extraction
     original_text TEXT, -- The original text from note that generated this item
@@ -53,8 +53,8 @@ CREATE INDEX idx_actionable_items_type ON old_note_actionable_items(item_type);
 CREATE TABLE IF NOT EXISTS old_note_communications (
     id SERIAL PRIMARY KEY,
     note_id INTEGER NOT NULL REFERENCES imported_journal_notes(id) ON DELETE CASCADE,
-    patient_id INTEGER NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
-    organization_id INTEGER NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+    organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
 
     -- Communication details
     communication_type VARCHAR(50) NOT NULL, -- SMS, EMAIL, PHONE_CALL, LETTER, IN_PERSON

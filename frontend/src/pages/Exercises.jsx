@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useTranslation } from '../i18n'
 import {
   ArrowLeft,
   Plus,
@@ -43,7 +44,7 @@ export default function Exercises() {
 
   // View state
   const [activeTab, setActiveTab] = useState('library') // library, prescriptions, create
-  const [language, setLanguage] = useState('no')
+  const { lang: language, setLang: setLanguage } = useTranslation()
 
   // Data state
   const [exercises, setExercises] = useState([])

@@ -1,41 +1,23 @@
 # ChiroClick CRM - Claude Code Memory
 
-## PRIORITY TODO (Session 2026-01-31)
+## RECENT FIXES (Session 2026-02-03)
 
-### Backend Not Starting - Missing Dependencies
-The Docker backend fails to start due to missing npm packages. Fix these:
+### Backend Fixes
+- ✅ Rebuilt node_modules to fix corrupted cors package
+- ✅ Removed dead code `getCircuitBreakerStatus` from `backend/src/controllers/ai.js`
 
-1. **Add missing dependencies to `backend/package.json`:**
-   ```json
-   "winston": "^3.11.0",
-   "xlsx": "^0.18.5"
-   ```
+### Language Switching Fix
+- ✅ Fixed 8 pages using local `useState` for language instead of global `useTranslation`:
+  - EasyAssessment.jsx, CRM.jsx, Automations.jsx, Exercises.jsx
+  - Letters.jsx, ReferralLetters.jsx, SickNotes.jsx, VNGAssessment.jsx
+- All pages now use `useTranslation()` hook from `../i18n`
 
-2. **Fix duplicate function declarations in `backend/src/controllers/ai.js`:**
-   - Already fixed: `getAIMetrics`, `resetCircuitBreaker`, `triggerRetraining`
-   - Verify no more duplicates exist
-
-3. **Rebuild and test:**
-   ```bash
-   cd F:\ChiroClickCRM-Complete-EHR-CRM-System-Architecture
-   docker-compose build --no-cache backend
-   docker-compose up -d backend
-   curl http://localhost:3000/health
-   ```
-
-### Training Page Shows "Not Found"
-- The `/api/v1/training/status` endpoint returns 404
-- Need to verify `backend/src/routes/training.js` is properly registered
-- Check if route file has syntax errors
-
-### Language Switching Issue
-- User reports pressing "EN" still shows Norwegian text
-- Check frontend i18n implementation
-- Verify language toggle component
+### Design Improvements
+- ✅ Changed `bg-blue-600` → `bg-teal-600` in Appointments.jsx
+- ✅ Fixed mobile sidebar in DashboardLayout.jsx (hidden on <768px)
 
 ### Training Data
 - Currently have 5,738 training examples in `ai-training/merged/chiro-complete-training.jsonl`
-- User mentioned 400+ files might be missing - verify training data completeness
 
 ---
 
@@ -725,10 +707,9 @@ gh pr list --state open
 
 ## HEAVY TODO LIST FOR TONIGHT
 
-### Priority 0: FIX SCHEDULER BUG (Critical)
-**Error**: `column w.clinic_id does not exist` every minute from cron job
-**File**: `backend/src/jobs/scheduler.js:70`
-**Fix**: Change `w.clinic_id` to `w.organization_id` in `processScheduledWorkflowActions`
+### Priority 0: ~~FIX SCHEDULER BUG~~ (RESOLVED)
+~~**Error**: `column w.clinic_id does not exist`~~
+✅ Already fixed - `scheduler.js` now uses `organization_id`
 
 ### Priority 1: Merge New PRs
 ```bash

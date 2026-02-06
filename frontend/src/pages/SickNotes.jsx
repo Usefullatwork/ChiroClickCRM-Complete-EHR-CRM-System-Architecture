@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
+import { useTranslation } from '../i18n'
 import { ArrowLeft, Plus, FileText, Search, Filter, Loader2, AlertCircle, Sparkles } from 'lucide-react'
 import SickNoteGenerator, { getDefaultSickNoteData } from '../components/documents/SickNoteGenerator'
 import { lettersApi } from '../api/letters'
@@ -8,7 +9,7 @@ export default function SickNotes() {
   const { patientId } = useParams()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const [language, setLanguage] = useState('no')
+  const { lang: language, setLang: setLanguage } = useTranslation()
   const [view, setView] = useState(searchParams.get('new') ? 'create' : 'list')
   const [sickNoteData, setSickNoteData] = useState(getDefaultSickNoteData())
   const [searchTerm, setSearchTerm] = useState('')

@@ -413,26 +413,6 @@ export const getAIDashboardMetrics = async (req, res) => {
 };
 
 /**
- * Get circuit breaker status for all services
- */
-export const getCircuitBreakerStatus = async (req, res) => {
-  try {
-    const status = circuitBreakerRegistry.getAllStatus();
-
-    res.json({
-      success: true,
-      data: status
-    });
-  } catch (error) {
-    logger.error('Error getting circuit breaker status:', error);
-    res.status(500).json({
-      error: 'CircuitBreakerError',
-      message: error.message || 'Failed to get circuit breaker status'
-    });
-  }
-};
-
-/**
  * Reset circuit breaker for a specific service
  */
 export const resetCircuitBreaker = async (req, res) => {
@@ -524,7 +504,6 @@ export default {
   recordSuggestionFeedback,
   getAIMetrics,
   getAIDashboardMetrics,
-  getCircuitBreakerStatus,
   resetCircuitBreaker,
   getTrainingHistory,
   triggerRetraining

@@ -3,7 +3,7 @@
  * Uses React Query for data fetching and caching
  */
 
-import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/client';
 
 /**

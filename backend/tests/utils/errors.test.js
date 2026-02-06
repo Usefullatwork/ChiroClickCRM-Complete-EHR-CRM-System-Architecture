@@ -167,16 +167,16 @@ describe('Custom Error Classes', () => {
 
   describe('ExternalServiceError', () => {
     it('should create with service name only', () => {
-      const error = new ExternalServiceError('Clerk');
+      const error = new ExternalServiceError('Ollama');
 
-      expect(error.message).toBe("External service 'Clerk' is unavailable");
+      expect(error.message).toBe("External service 'Ollama' is unavailable");
       expect(error.statusCode).toBe(502);
       expect(error.code).toBe('EXTERNAL_SERVICE_ERROR');
-      expect(error.details).toEqual({ service: 'Clerk' });
+      expect(error.details).toEqual({ service: 'Ollama' });
     });
 
     it('should create with custom message', () => {
-      const error = new ExternalServiceError('Clerk', 'API rate limit exceeded');
+      const error = new ExternalServiceError('Ollama', 'API rate limit exceeded');
 
       expect(error.message).toBe('API rate limit exceeded');
     });

@@ -10,6 +10,7 @@
 
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useTranslation } from '../i18n'
 import {
   FileText,
   Send,
@@ -75,7 +76,7 @@ const STATUS_COLORS = {
 export default function Letters() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const [language, setLanguage] = useState('no')
+  const { lang: language, setLang: setLanguage } = useTranslation()
   const [letters, setLetters] = useState([])
   const [letterTypes, setLetterTypes] = useState([])
   const [loading, setLoading] = useState(true)

@@ -16,6 +16,7 @@
 
 import { useState, useEffect } from 'react';
 import { crmAPI, patientsAPI } from '../services/api';
+import { useTranslation } from '../i18n';
 import {
   Users,
   UserPlus,
@@ -144,7 +145,7 @@ const CRM_MODULES = [
 
 export default function CRM() {
   const [activeModule, setActiveModule] = useState('overview');
-  const [language, setLanguage] = useState('no');
+  const { lang: language, setLang: setLanguage } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [overviewStats, setOverviewStats] = useState({
     newLeads: 0,

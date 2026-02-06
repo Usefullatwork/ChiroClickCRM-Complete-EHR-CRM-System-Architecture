@@ -16,6 +16,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from '../i18n';
 import {
   Zap,
   Plus,
@@ -127,7 +128,7 @@ const STATUS_COLORS = {
 
 export default function Automations() {
   const queryClient = useQueryClient();
-  const [language, setLanguage] = useState('no'); // Default to Norwegian
+  const { lang: language, setLang: setLanguage } = useTranslation();
 
   // UI State
   const [activeTab, setActiveTab] = useState('workflows');

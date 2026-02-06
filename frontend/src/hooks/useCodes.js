@@ -2,7 +2,7 @@
  * Medical Codes Hook (ICPC-2, ICD-10)
  */
 
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/client';
 
 /**

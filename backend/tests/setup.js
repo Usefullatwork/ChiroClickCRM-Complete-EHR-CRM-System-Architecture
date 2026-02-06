@@ -7,6 +7,8 @@ import { jest } from '@jest/globals';
 
 // Mock environment variables
 process.env.NODE_ENV = 'test';
+process.env.DESKTOP_MODE = 'true';
+process.env.CACHE_ENGINE = 'memory';
 process.env.ENCRYPTION_KEY = 'test_encryption_key_32_chars__!';
 process.env.JWT_SECRET = 'test_jwt_secret';
 
@@ -82,7 +84,6 @@ export const createTestEncounter = (overrides = {}) => ({
 export const createTestUser = (overrides = {}) => ({
   id: 'test-user-id-789',
   organization_id: 'test-org-id-456',
-  clerk_user_id: 'clerk_user_123',
   email: 'practitioner@example.com',
   first_name: 'Test',
   last_name: 'Practitioner',

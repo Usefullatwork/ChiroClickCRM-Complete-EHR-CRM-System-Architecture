@@ -7,6 +7,8 @@
 
 // Set test environment before anything else
 process.env.NODE_ENV = 'test';
+process.env.DESKTOP_MODE = 'true';
+process.env.CACHE_ENGINE = 'memory';
 process.env.DATABASE_URL = process.env.TEST_DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/chiroclickcrm_test';
 
 // Load dotenv for test environment

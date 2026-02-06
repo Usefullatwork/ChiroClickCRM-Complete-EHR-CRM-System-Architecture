@@ -90,7 +90,7 @@ export default function Appointments() {
         </div>
         <button
           onClick={() => navigate('/appointments/new')}
-          className="flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+          className="flex items-center gap-2 px-4 py-2 text-white bg-teal-600 rounded-lg hover:bg-teal-700"
         >
           <Plus className="w-5 h-5" />
           {t('newAppointment')}

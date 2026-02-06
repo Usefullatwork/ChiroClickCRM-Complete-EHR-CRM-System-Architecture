@@ -1,21 +1,37 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useTranslation } from '../i18n'
 import { ArrowLeft, Save, Printer } from 'lucide-react'
 import VNGModule, { getDefaultVNGData } from '../components/assessment/VNGModule'
+import { patientsAPI } from '../services/api'
 
 export default function VNGAssessment() {
   const { patientId } = useParams()
   const navigate = useNavigate()
-  const [language, setLanguage] = useState('no')
+  const { lang: language, setLang: setLanguage } = useTranslation()
   const [vngData, setVngData] = useState(getDefaultVNGData())
   const [isSaving, setIsSaving] = useState(false)
+  const [patient, setPatient] = useState(null)
+  const [isLoadingPatient, setIsLoadingPatient] = useState(false)
 
-  // Mock patient data for demo
-  const patient = patientId ? {
-    id: patientId,
-    name: 'Demo Pasient',
-    dateOfBirth: '1985-03-15'
-  } : null
+  // Fetch patient data from API
+  useEffect(() => {
+    if (patientId) {
+      setIsLoadingPatient(true)
+      patientsAPI.getById(patientId)
+        .then(data => {
+          setPatient({
+            id: data.id,
+            name: `${data.first_name} ${data.last_name}`,
+            dateOfBirth: data.date_of_birth
+          })
+        })
+        .catch(err => {
+          console.warn('Failed to load patient:', err.message)
+        })
+        .finally(() => setIsLoadingPatient(false))
+    }
+  }, [patientId])
 
   const handleSave = async () => {
     setIsSaving(true)
@@ -52,7 +68,9 @@ export default function VNGAssessment() {
               <h1 className="text-xl font-semibold text-gray-900">
                 {language === 'no' ? 'VNG-undersøkelse' : 'VNG Assessment'}
               </h1>
-              {patient && (
+              {isLoadingPatient ? (
+                <p className="text-sm text-gray-400">{language === 'no' ? 'Laster...' : 'Loading...'}</p>
+              ) : patient && (
                 <p className="text-sm text-gray-500">{patient.name}</p>
               )}
             </div>

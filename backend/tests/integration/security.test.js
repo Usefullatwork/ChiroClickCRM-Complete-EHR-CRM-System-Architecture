@@ -18,7 +18,7 @@ import {
 } from '../../src/middleware/security.js';
 import { errorHandler } from '../../src/middleware/errorHandler.js';
 
-// Mock Redis for rate limiting
+// Mock cache (in-memory in desktop mode, Redis in SaaS mode)
 jest.mock('../../src/config/redis.js', () => ({
   rateLimit: {
     check: jest.fn().mockResolvedValue({

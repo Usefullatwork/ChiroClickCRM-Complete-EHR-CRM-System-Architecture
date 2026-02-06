@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from '../i18n';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { encountersAPI, patientsAPI, diagnosisAPI, aiAPI } from '../services/api';
 import toast from '../utils/toast';
@@ -90,8 +91,8 @@ export default function EasyAssessment() {
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
   const [showBodyChart, setShowBodyChart] = useState(false);
   const [showTemplateLibrary, setShowTemplateLibrary] = useState(false);
-  // Phase 1 states
-  const [language, setLanguage] = useState('en'); // 'en' | 'no'
+  // Phase 1 states - use global language context
+  const { lang: language, setLang: setLanguage } = useTranslation();
   const [showMacroMatrix, setShowMacroMatrix] = useState(false);
   const [showCompliancePanel, setShowCompliancePanel] = useState(false);
   const [showPrintPreview, setShowPrintPreview] = useState(false);

@@ -4,14 +4,14 @@
 -- Table to store imported old journal notes before processing
 CREATE TABLE IF NOT EXISTS imported_journal_notes (
     id SERIAL PRIMARY KEY,
-    patient_id INTEGER NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
-    organization_id INTEGER NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+    organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
 
     -- Original note data
     original_content TEXT NOT NULL,
     original_filename VARCHAR(255),
     upload_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    uploaded_by INTEGER REFERENCES users(id),
+    uploaded_by UUID REFERENCES users(id),
 
     -- Processing status
     processing_status VARCHAR(50) NOT NULL DEFAULT 'pending', -- pending, processing, completed, failed, reviewed
@@ -29,13 +29,13 @@ CREATE TABLE IF NOT EXISTS imported_journal_notes (
     suggested_diagnosis_codes TEXT[], -- Array of suggested ICPC-2/ICD-10 codes
 
     -- Review and approval
-    reviewed_by INTEGER REFERENCES users(id),
+    reviewed_by UUID REFERENCES users(id),
     reviewed_date TIMESTAMPTZ,
     review_notes TEXT,
     approved BOOLEAN DEFAULT false,
 
     -- Conversion to clinical encounter
-    converted_to_encounter_id INTEGER REFERENCES clinical_encounters(id),
+    converted_to_encounter_id UUID REFERENCES clinical_encounters(id),
     conversion_date TIMESTAMPTZ,
 
     -- Metadata
@@ -53,15 +53,15 @@ CREATE INDEX idx_imported_notes_approved ON imported_journal_notes(approved) WHE
 -- Table for tracking batches of imported notes (if uploading multiple files at once)
 CREATE TABLE IF NOT EXISTS imported_notes_batches (
     id SERIAL PRIMARY KEY,
-    organization_id INTEGER NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
-    patient_id INTEGER REFERENCES patients(id) ON DELETE CASCADE, -- NULL if batch contains multiple patients
+    organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    patient_id UUID REFERENCES patients(id) ON DELETE CASCADE, -- NULL if batch contains multiple patients
 
     batch_name VARCHAR(255),
     total_notes INTEGER NOT NULL DEFAULT 0,
     processed_notes INTEGER NOT NULL DEFAULT 0,
     approved_notes INTEGER NOT NULL DEFAULT 0,
 
-    uploaded_by INTEGER REFERENCES users(id),
+    uploaded_by UUID REFERENCES users(id),
     upload_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     batch_status VARCHAR(50) NOT NULL DEFAULT 'uploading', -- uploading, processing, completed, failed

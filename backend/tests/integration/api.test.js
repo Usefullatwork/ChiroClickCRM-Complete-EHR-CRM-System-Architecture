@@ -40,12 +40,9 @@ jest.unstable_mockModule('../../src/utils/keyRotation.js', () => ({
   },
 }));
 
-jest.unstable_mockModule('@clerk/clerk-sdk-node', () => ({
-  ClerkExpressRequireAuth: jest.fn(() => (req, res, next) => {
-    req.auth = { userId: 'test-clerk-user-id' };
-    next();
-  }),
-}));
+// Auth is now local session-based (no Clerk)
+// The auth middleware checks req.cookies.session and validates via sessions table
+// For tests, we mock the database to return a valid user
 
 // Set environment variables
 process.env.NODE_ENV = 'test';
@@ -113,7 +110,7 @@ describe('API Integration Tests', () => {
     beforeAll(() => {
       // Mock user in database
       db.query.mockImplementation((sql, params) => {
-        if (sql.includes('SELECT * FROM users WHERE clerk_user_id')) {
+        if (sql.includes('SELECT') && sql.includes('users') && sql.includes('WHERE')) {
           return Promise.resolve({
             rows: [{
               id: 'test-user-id',
