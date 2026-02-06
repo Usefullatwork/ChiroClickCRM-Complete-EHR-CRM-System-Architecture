@@ -19,6 +19,8 @@ import {
 } from 'lucide-react'
 import { useTranslation } from '../../i18n'
 import LanguageSwitcher from '../LanguageSwitcher'
+import DesktopStatusBar from '../desktop/DesktopStatusBar'
+import useTheme from '../../hooks/useTheme'
 
 // Mock user for development
 const devUser = {
@@ -53,6 +55,7 @@ const NAV_ITEMS = [
 export default function DashboardLayout() {
   const location = useLocation()
   const { t } = useTranslation('navigation')
+  const { isDark, toggleTheme } = useTheme()
 
   const user = devUser
   const organization = devOrganization
@@ -65,9 +68,9 @@ export default function DashboardLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       {/* Sidebar - hidden on mobile */}
-      <div className="hidden md:flex md:flex-col md:fixed md:inset-y-0 md:left-0 md:w-64 bg-white border-r border-gray-200">
+      <div className="hidden md:flex md:flex-col md:fixed md:inset-y-0 md:left-0 md:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
         <div className="flex flex-col h-full">
           {/* Logo & Organization */}
           <div className="px-4 py-4 border-b border-gray-200">
@@ -102,10 +105,13 @@ export default function DashboardLayout() {
             </ul>
           </nav>
 
-          {/* Language Switcher + User Profile */}
-          <div className="border-t border-gray-200">
-            <div className="px-4 py-3 flex justify-center">
+          {/* Language Switcher + Dark Mode + User Profile */}
+          <div className="border-t border-gray-200 dark:border-gray-700">
+            <div className="px-4 py-3 flex items-center justify-center gap-3">
               <LanguageSwitcher />
+              <button onClick={toggleTheme} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400" title={isDark ? 'Lys modus' : 'Mørk modus'}>
+                {isDark ? '\u2600' : '\u263E'}
+              </button>
             </div>
             <div className="px-4 pb-4">
               <div className="flex items-center gap-3">
@@ -125,8 +131,13 @@ export default function DashboardLayout() {
       </div>
 
       {/* Main content - full width on mobile, with left margin on desktop */}
-      <div className="md:ml-64">
+      <div className="md:ml-64 flex-1">
         <Outlet />
+      </div>
+
+      {/* Desktop status bar */}
+      <div className="md:ml-64">
+        <DesktopStatusBar />
       </div>
     </div>
   )
