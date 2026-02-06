@@ -9,6 +9,7 @@ This directory contains Terraform configurations for deploying ChiroClickCRM to 
 ## When to Use Terraform
 
 Use these Terraform configurations when:
+
 - Deploying to AWS for production/staging
 - Need managed database (RDS) with automatic backups
 - Require high availability across multiple AZs
@@ -25,6 +26,7 @@ docker-compose up -d
 ```
 
 This gives you:
+
 - PostgreSQL database
 - Redis cache
 - Ollama (local AI)
@@ -61,12 +63,14 @@ terraform apply -var-file="environments/dev/terraform.tfvars"
 ### Environment-Specific Deployment
 
 #### Development
+
 ```bash
 terraform plan -var-file="environments/dev/terraform.tfvars"
 terraform apply -var-file="environments/dev/terraform.tfvars"
 ```
 
 #### Production
+
 ```bash
 terraform plan -var-file="environments/prod/terraform.tfvars"
 terraform apply -var-file="environments/prod/terraform.tfvars"
@@ -74,26 +78,28 @@ terraform apply -var-file="environments/prod/terraform.tfvars"
 
 ## Resources Created
 
-| Resource | Description |
-|----------|-------------|
-| VPC | Private network with public, private, and database subnets |
-| RDS PostgreSQL | Managed PostgreSQL 15 with RLS support |
-| ElastiCache Redis | Managed Redis for caching and sessions |
-| S3 Bucket | Document storage with encryption and versioning |
-| ECR Repository | Container registry for backend images |
-| ECS Cluster | Fargate cluster for running containers |
-| Secrets Manager | Secure storage for database credentials |
-| Security Groups | Network security for all components |
+| Resource          | Description                                                |
+| ----------------- | ---------------------------------------------------------- |
+| VPC               | Private network with public, private, and database subnets |
+| RDS PostgreSQL    | Managed PostgreSQL 15 with RLS support                     |
+| ElastiCache Redis | Managed Redis for caching and sessions                     |
+| S3 Bucket         | Document storage with encryption and versioning            |
+| ECR Repository    | Container registry for backend images                      |
+| ECS Cluster       | Fargate cluster for running containers                     |
+| Secrets Manager   | Secure storage for database credentials                    |
+| Security Groups   | Network security for all components                        |
 
 ## Cost Estimates
 
 ### Development (~$50-100/month)
+
 - db.t3.micro RDS
 - cache.t3.micro Redis
 - Minimal ECS (256 CPU, 512MB)
 - Single NAT Gateway
 
 ### Production (~$500-1000/month)
+
 - db.r6g.large RDS with Multi-AZ
 - cache.r6g.large Redis
 - ECS with auto-scaling

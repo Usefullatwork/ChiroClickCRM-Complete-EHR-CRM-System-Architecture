@@ -46,7 +46,7 @@ jest.unstable_mockModule('../../src/utils/keyRotation.js', () => ({
 
 // Set environment variables
 process.env.NODE_ENV = 'test';
-process.env.ENCRYPTION_KEY = 'test_encryption_key_32_chars__!';
+process.env.ENCRYPTION_KEY = 'abcdefghijklmnopqrstuvwxyz123456';
 process.env.PORT = '3001';
 
 describe('API Integration Tests', () => {
@@ -112,12 +112,14 @@ describe('API Integration Tests', () => {
       db.query.mockImplementation((sql, params) => {
         if (sql.includes('SELECT') && sql.includes('users') && sql.includes('WHERE')) {
           return Promise.resolve({
-            rows: [{
-              id: 'test-user-id',
-              organization_id: 'test-org-id',
-              role: 'PRACTITIONER',
-              is_active: true,
-            }],
+            rows: [
+              {
+                id: 'test-user-id',
+                organization_id: 'test-org-id',
+                role: 'PRACTITIONER',
+                is_active: true,
+              },
+            ],
           });
         }
         if (sql.includes('SELECT COUNT(*)')) {
@@ -140,12 +142,14 @@ describe('API Integration Tests', () => {
       db.query.mockImplementation((sql) => {
         if (sql.includes('SELECT * FROM users')) {
           return Promise.resolve({
-            rows: [{
-              id: 'test-user-id',
-              organization_id: 'test-org-id',
-              role: 'PRACTITIONER',
-              is_active: true,
-            }],
+            rows: [
+              {
+                id: 'test-user-id',
+                organization_id: 'test-org-id',
+                role: 'PRACTITIONER',
+                is_active: true,
+              },
+            ],
           });
         }
         if (sql.includes('SELECT COUNT(*)')) {

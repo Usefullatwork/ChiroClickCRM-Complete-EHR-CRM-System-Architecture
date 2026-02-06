@@ -25,8 +25,8 @@ jest.unstable_mockModule('../../src/utils/logger.js', () => ({
   },
 }));
 
-// Set encryption key before importing
-process.env.ENCRYPTION_KEY = 'test_encryption_key_32_chars__!';
+// Set encryption key before importing (must be exactly 32 characters for AES-256)
+process.env.ENCRYPTION_KEY = 'abcdefghijklmnopqrstuvwxyz123456';
 
 // Import the service after mocks are set up
 const patientService = await import('../../src/services/patients.js');
@@ -228,7 +228,9 @@ describe('Patient Service', () => {
     it('should return null for non-existent patient', async () => {
       mockQuery.mockResolvedValueOnce({ rows: [] });
 
-      const result = await patientService.updatePatient(testOrgId, 'non-existent', { first_name: 'Test' });
+      const result = await patientService.updatePatient(testOrgId, 'non-existent', {
+        first_name: 'Test',
+      });
 
       expect(result).toBeNull();
     });

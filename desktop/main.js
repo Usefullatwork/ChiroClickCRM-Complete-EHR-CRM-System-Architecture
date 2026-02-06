@@ -1,24 +1,168 @@
 /**
  * ChiroClickCRM Desktop - Electron Main Process
- * Manages the browser window, backend server, and Ollama AI.
+ * Manages the browser window, backend server lifecycle, and application menus.
  */
 
 const { app, BrowserWindow, ipcMain, dialog, Menu, shell } = require('electron');
+const { fork } = require('child_process');
 const path = require('path');
-const { launchBackend, stopBackend } = require('./backend-launcher');
-const { checkOllama, startOllama } = require('./ollama-manager');
-const { isFirstRun, runFirstTimeSetup } = require('./first-run');
+const fs = require('fs');
+const http = require('http');
+const ElectronStore = require('electron-store');
 
-const isDev = process.argv.includes('--dev');
-const BACKEND_PORT = process.env.PORT || 3000;
+// ============================================================================
+// Settings Store - persists window position/size across sessions
+// ============================================================================
 
+const store = new ElectronStore({
+  name: 'chiroclickcrm-settings',
+  defaults: {
+    windowBounds: { x: undefined, y: undefined, width: 1280, height: 800 },
+    maximized: false,
+  },
+});
+
+const BACKEND_PORT = 3000;
 let mainWindow = null;
 let backendProcess = null;
 
+// ============================================================================
+// Backend Server Management
+// ============================================================================
+
+/**
+ * Poll the backend health endpoint until it responds 200 or retries are exhausted.
+ * @param {number} port - Port to check
+ * @param {number} maxRetries - Maximum number of attempts (default 30)
+ * @param {number} interval - Milliseconds between attempts (default 500)
+ * @returns {Promise<boolean>} true if backend is healthy
+ */
+function waitForBackendHealth(port, maxRetries = 30, interval = 500) {
+  return new Promise((resolve) => {
+    let attempts = 0;
+
+    const check = () => {
+      attempts++;
+      const req = http.get(`http://localhost:${port}/health`, (res) => {
+        if (res.statusCode === 200) {
+          resolve(true);
+        } else if (attempts < maxRetries) {
+          setTimeout(check, interval);
+        } else {
+          resolve(false);
+        }
+      });
+
+      req.on('error', () => {
+        if (attempts < maxRetries) {
+          setTimeout(check, interval);
+        } else {
+          resolve(false);
+        }
+      });
+
+      req.setTimeout(2000, () => {
+        req.destroy();
+        if (attempts < maxRetries) {
+          setTimeout(check, interval);
+        } else {
+          resolve(false);
+        }
+      });
+    };
+
+    check();
+  });
+}
+
+/**
+ * Start the backend by forking the Express server as a child process.
+ */
+function startBackend() {
+  const backendDir = path.join(__dirname, '..', 'backend');
+  const serverPath = path.join(backendDir, 'src', 'server.js');
+
+  const env = {
+    ...process.env,
+    DESKTOP_MODE: 'true',
+    NODE_ENV: 'production',
+    PORT: String(BACKEND_PORT),
+    DB_ENGINE: 'pglite',
+    CACHE_ENGINE: 'memory',
+  };
+
+  console.log(`[desktop] Starting backend server on port ${BACKEND_PORT}...`);
+
+  backendProcess = fork(serverPath, [], {
+    cwd: backendDir,
+    env,
+    stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
+  });
+
+  backendProcess.stdout?.on('data', (data) => {
+    console.log(`[backend] ${data.toString().trim()}`);
+  });
+
+  backendProcess.stderr?.on('data', (data) => {
+    console.error(`[backend:err] ${data.toString().trim()}`);
+  });
+
+  backendProcess.on('exit', (code) => {
+    console.log(`[desktop] Backend process exited with code ${code}`);
+    backendProcess = null;
+  });
+
+  backendProcess.on('error', (err) => {
+    console.error(`[desktop] Failed to start backend: ${err.message}`);
+    if (mainWindow) {
+      mainWindow.webContents.send('backend-error', err.message);
+    }
+  });
+
+  return backendProcess;
+}
+
+/**
+ * Kill the backend process gracefully, then force-kill after timeout.
+ */
+function stopBackend() {
+  return new Promise((resolve) => {
+    if (!backendProcess) {
+      resolve();
+      return;
+    }
+
+    const proc = backendProcess;
+    backendProcess = null;
+
+    proc.on('exit', () => resolve());
+
+    proc.kill('SIGTERM');
+
+    // Force kill after 5 seconds if still alive
+    setTimeout(() => {
+      if (!proc.killed) {
+        proc.kill('SIGKILL');
+      }
+      resolve();
+    }, 5000);
+  });
+}
+
+// ============================================================================
+// Window Management
+// ============================================================================
+
 function createWindow() {
+  // Restore saved window bounds
+  const { x, y, width, height } = store.get('windowBounds');
+  const wasMaximized = store.get('maximized');
+
   mainWindow = new BrowserWindow({
-    width: 1400,
-    height: 900,
+    x,
+    y,
+    width,
+    height,
     minWidth: 1024,
     minHeight: 700,
     title: 'ChiroClickCRM',
@@ -27,26 +171,33 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: true,
     },
-    show: false, // Show after ready
+    show: false,
   });
+
+  if (wasMaximized) {
+    mainWindow.maximize();
+  }
 
   // Show when ready to prevent white flash
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
   });
 
-  // In dev mode, load from Vite dev server
-  if (isDev) {
-    mainWindow.loadURL('http://localhost:5173');
-    mainWindow.webContents.openDevTools();
-  } else {
-    // In production, load from backend's static serving
-    mainWindow.loadURL(`http://localhost:${BACKEND_PORT}`);
-  }
+  // Save window position and size on move/resize
+  const saveBounds = () => {
+    if (!mainWindow) return;
+    const isMax = mainWindow.isMaximized();
+    store.set('maximized', isMax);
+    if (!isMax) {
+      store.set('windowBounds', mainWindow.getBounds());
+    }
+  };
 
-  // Handle external links
+  mainWindow.on('resize', saveBounds);
+  mainWindow.on('move', saveBounds);
+
+  // Handle external links - open in default browser
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: 'deny' };
@@ -57,54 +208,91 @@ function createWindow() {
   });
 }
 
+// ============================================================================
+// Application Menu
+// ============================================================================
+
 function createMenu() {
   const template = [
     {
-      label: 'Fil',
+      label: 'File',
       submenu: [
         {
-          label: 'Sikkerhetskopi...',
-          accelerator: 'CmdOrCtrl+Shift+B',
-          click: () => mainWindow?.webContents.send('menu:backup'),
+          label: 'Export Data...',
+          accelerator: 'CmdOrCtrl+Shift+E',
+          click: async () => {
+            const { filePath } = await dialog.showSaveDialog(mainWindow, {
+              title: 'Export Data',
+              defaultPath: `chiroclickcrm-export-${new Date().toISOString().split('T')[0]}.sql`,
+              filters: [
+                { name: 'SQL Backup', extensions: ['sql'] },
+                { name: 'All Files', extensions: ['*'] },
+              ],
+            });
+            if (filePath && mainWindow) {
+              mainWindow.webContents.send('menu:export-data', filePath);
+            }
+          },
+        },
+        {
+          label: 'Import Data...',
+          accelerator: 'CmdOrCtrl+Shift+I',
+          click: async () => {
+            const { filePaths } = await dialog.showOpenDialog(mainWindow, {
+              title: 'Import Data',
+              filters: [
+                { name: 'SQL Backup', extensions: ['sql'] },
+                { name: 'All Files', extensions: ['*'] },
+              ],
+              properties: ['openFile'],
+            });
+            if (filePaths.length > 0 && mainWindow) {
+              mainWindow.webContents.send('menu:import-data', filePaths[0]);
+            }
+          },
         },
         { type: 'separator' },
-        { label: 'Avslutt', role: 'quit' },
+        { label: 'Quit', role: 'quit', accelerator: 'CmdOrCtrl+Q' },
       ],
     },
     {
-      label: 'Rediger',
+      label: 'View',
       submenu: [
-        { label: 'Angre', role: 'undo' },
-        { label: 'Gjenta', role: 'redo' },
+        { label: 'Reload', role: 'reload', accelerator: 'CmdOrCtrl+R' },
+        { label: 'Toggle DevTools', role: 'toggleDevTools', accelerator: 'F12' },
         { type: 'separator' },
-        { label: 'Klipp ut', role: 'cut' },
-        { label: 'Kopier', role: 'copy' },
-        { label: 'Lim inn', role: 'paste' },
-        { label: 'Velg alt', role: 'selectAll' },
+        { label: 'Full Screen', role: 'togglefullscreen', accelerator: 'F11' },
       ],
     },
     {
-      label: 'Vis',
-      submenu: [
-        { label: 'Last inn på nytt', role: 'reload' },
-        { label: 'Full skjerm', role: 'togglefullscreen' },
-        ...(isDev ? [
-          { type: 'separator' },
-          { label: 'Developer Tools', role: 'toggleDevTools' },
-        ] : []),
-      ],
-    },
-    {
-      label: 'Hjelp',
+      label: 'Help',
       submenu: [
         {
-          label: 'Om ChiroClickCRM',
+          label: 'About ChiroClickCRM',
           click: () => {
             dialog.showMessageBox(mainWindow, {
               type: 'info',
-              title: 'Om ChiroClickCRM',
-              message: 'ChiroClickCRM v2.0.0',
-              detail: 'Standalone Desktop Edition\nNorsk EHR-CRM for kiropraktorer\n\nOffline-first. Dine data. Din maskin.',
+              title: 'About ChiroClickCRM',
+              message: `ChiroClickCRM v${app.getVersion()}`,
+              detail: 'Standalone Desktop Edition\nEHR-CRM for Chiropractors\n\nOffline-first. Your data. Your machine.',
+            });
+          },
+        },
+        {
+          label: 'Documentation',
+          click: () => {
+            shell.openExternal('https://github.com/your-org/chiroclickcrm/wiki');
+          },
+        },
+        { type: 'separator' },
+        {
+          label: 'Check for Updates',
+          click: () => {
+            dialog.showMessageBox(mainWindow, {
+              type: 'info',
+              title: 'Updates',
+              message: 'You are running the latest version.',
+              detail: `Version ${app.getVersion()}`,
             });
           },
         },
@@ -119,33 +307,57 @@ function createMenu() {
 // IPC Handlers
 // ============================================================================
 
-ipcMain.handle('app:getInfo', () => ({
-  version: app.getVersion(),
-  platform: process.platform,
-  desktopMode: true,
-  backendPort: BACKEND_PORT,
-  isDev,
-}));
-
-ipcMain.handle('ollama:status', async () => {
-  return await checkOllama();
+ipcMain.handle('get-app-version', () => {
+  return app.getVersion();
 });
 
-ipcMain.handle('ollama:start', async () => {
-  return await startOllama();
+ipcMain.handle('open-external-link', (_, url) => {
+  shell.openExternal(url);
 });
 
-ipcMain.handle('backup:create', async () => {
-  const { filePath } = await dialog.showSaveDialog(mainWindow, {
-    title: 'Lagre sikkerhetskopi',
-    defaultPath: `chiroclickcrm-backup-${new Date().toISOString().split('T')[0]}.sql`,
-    filters: [{ name: 'SQL Backup', extensions: ['sql'] }],
-  });
-  if (filePath) {
-    mainWindow.webContents.send('backup:started', filePath);
-    return filePath;
+ipcMain.handle('get-data-path', () => {
+  return path.join(__dirname, '..', 'data');
+});
+
+ipcMain.handle('restart-backend', async () => {
+  console.log('[desktop] Restarting backend...');
+  await stopBackend();
+  startBackend();
+  const ready = await waitForBackendHealth(BACKEND_PORT);
+  if (ready && mainWindow) {
+    mainWindow.webContents.send('backend-ready');
+    mainWindow.loadURL(`http://localhost:${BACKEND_PORT}`);
   }
-  return null;
+  return ready;
+});
+
+ipcMain.handle('check-ollama-status', async () => {
+  return new Promise((resolve) => {
+    const req = http.get('http://localhost:11434/api/tags', (res) => {
+      let data = '';
+      res.on('data', (chunk) => (data += chunk));
+      res.on('end', () => {
+        try {
+          const parsed = JSON.parse(data);
+          resolve({
+            running: true,
+            models: (parsed.models || []).map((m) => m.name),
+          });
+        } catch {
+          resolve({ running: true, models: [] });
+        }
+      });
+    });
+
+    req.on('error', () => {
+      resolve({ running: false, models: [] });
+    });
+
+    req.setTimeout(3000, () => {
+      req.destroy();
+      resolve({ running: false, models: [] });
+    });
+  });
 });
 
 // ============================================================================
@@ -153,59 +365,60 @@ ipcMain.handle('backup:create', async () => {
 // ============================================================================
 
 app.whenReady().then(async () => {
-  // Set environment for desktop mode
-  process.env.DESKTOP_MODE = 'true';
-  process.env.DB_ENGINE = 'pglite';
-  process.env.CACHE_ENGINE = 'memory';
-  process.env.NODE_ENV = isDev ? 'development' : 'production';
-  process.env.PORT = String(BACKEND_PORT);
-
-  // Check for first run
-  if (await isFirstRun()) {
-    // Show splash/loading while setting up
-    const splash = new BrowserWindow({
-      width: 500,
-      height: 350,
-      frame: false,
-      alwaysOnTop: true,
-      transparent: true,
-    });
-    splash.loadURL(`data:text/html,
-      <html><body style="font-family:system-ui;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#0d9488;color:white;border-radius:12px;margin:0">
-        <h1 style="font-size:2em;margin:0">ChiroClickCRM</h1>
-        <p style="opacity:0.8">Setter opp database...</p>
-        <div style="width:200px;height:4px;background:rgba(255,255,255,0.3);border-radius:2px;margin-top:20px">
-          <div style="width:0%;height:100%;background:white;border-radius:2px;animation:load 3s ease-in-out infinite"></div>
-        </div>
-        <style>@keyframes load{0%{width:0}50%{width:80%}100%{width:100%}}</style>
-      </body></html>
-    `);
-
-    await runFirstTimeSetup();
-    splash.close();
-  }
-
-  // Launch backend server
-  if (!isDev) {
-    backendProcess = await launchBackend(BACKEND_PORT);
-  }
-
+  // Set up menu
   createMenu();
+
+  // Create the main window (hidden until ready-to-show)
   createWindow();
+
+  // Start the backend server
+  startBackend();
+
+  // Wait for the backend to become healthy
+  const healthy = await waitForBackendHealth(BACKEND_PORT);
+
+  if (healthy) {
+    console.log('[desktop] Backend is healthy, loading application...');
+    mainWindow.loadURL(`http://localhost:${BACKEND_PORT}`);
+    if (mainWindow) {
+      mainWindow.webContents.send('backend-ready');
+    }
+  } else {
+    console.error('[desktop] Backend failed to start within timeout');
+    if (mainWindow) {
+      mainWindow.webContents.send('backend-error', 'Backend server failed to start. Please restart the application.');
+      mainWindow.loadURL(`data:text/html,
+        <html>
+        <body style="font-family:system-ui;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0;background:#1a1a2e;color:#e0e0e0">
+          <h1 style="color:#ef4444">Backend Failed to Start</h1>
+          <p>The backend server did not respond within the timeout period.</p>
+          <p>Please close the application and try again.</p>
+          <p style="font-size:0.85em;opacity:0.6;margin-top:2em">Check the console logs for more details.</p>
+        </body>
+        </html>
+      `);
+    }
+  }
 });
 
 app.on('window-all-closed', async () => {
-  await stopBackend(backendProcess);
+  await stopBackend();
   app.quit();
 });
 
 app.on('activate', () => {
+  // macOS: re-create window when dock icon is clicked
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
+    mainWindow.loadURL(`http://localhost:${BACKEND_PORT}`);
   }
 });
 
 // Graceful shutdown
-app.on('before-quit', async () => {
-  await stopBackend(backendProcess);
+app.on('before-quit', async (event) => {
+  if (backendProcess) {
+    event.preventDefault();
+    await stopBackend();
+    app.quit();
+  }
 });

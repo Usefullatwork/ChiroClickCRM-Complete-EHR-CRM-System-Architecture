@@ -12,7 +12,7 @@ setup('authenticate', async ({ page }) => {
   await page.goto('/');
 
   // For testing purposes, we'll mock the authentication
-  // In production, you would use real Clerk authentication
+  // Desktop mode uses auto-authentication
   await page.evaluate(() => {
     const mockUser = {
       id: 'e2e-test-user-id',

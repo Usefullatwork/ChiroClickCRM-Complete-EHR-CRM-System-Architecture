@@ -3,7 +3,7 @@
  * Caches API responses for GET requests
  */
 
-import { getCache, setCache } from '../config/redis.js';
+import { redisCache } from '../config/redis.js';
 import logger from '../utils/logger.js';
 
 /**
@@ -17,18 +17,13 @@ export const cacheMiddleware = (ttl = 300) => {
       return next();
     }
 
-    // Don't cache if Redis is not configured
-    if (!process.env.REDIS_URL) {
-      return next();
-    }
-
     try {
       // Generate cache key from URL and organization
       const organizationId = req.headers['x-organization-id'];
       const cacheKey = `api:${organizationId}:${req.originalUrl}`;
 
       // Try to get from cache
-      const cachedResponse = await getCache(cacheKey);
+      const cachedResponse = await redisCache.get(cacheKey);
 
       if (cachedResponse) {
         logger.debug('Serving from cache', { key: cacheKey });
@@ -42,7 +37,7 @@ export const cacheMiddleware = (ttl = 300) => {
       res.json = (body) => {
         // Only cache successful responses
         if (res.statusCode === 200) {
-          setCache(cacheKey, body, ttl).catch(err => {
+          redisCache.set(cacheKey, body, ttl).catch((err) => {
             logger.error('Failed to cache response', { error: err.message });
           });
         }
@@ -64,8 +59,6 @@ export const cacheMiddleware = (ttl = 300) => {
  */
 export const invalidateCacheMiddleware = () => {
   return async (req, res, next) => {
-    const { deleteCache } = await import('../config/redis.js');
-
     // Only invalidate on mutations
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
       const organizationId = req.headers['x-organization-id'];
@@ -77,7 +70,7 @@ export const invalidateCacheMiddleware = () => {
         // Invalidate related caches on successful mutation
         if (res.statusCode >= 200 && res.statusCode < 300) {
           const resource = req.originalUrl.split('/')[3]; // e.g., 'patients', 'encounters'
-          deleteCache(`api:${organizationId}:*/api/v1/${resource}*`).catch(err => {
+          redisCache.delPattern(`api:${organizationId}:*/api/v1/${resource}*`).catch((err) => {
             logger.error('Failed to invalidate cache', { error: err.message });
           });
         }
@@ -92,5 +85,5 @@ export const invalidateCacheMiddleware = () => {
 
 export default {
   cacheMiddleware,
-  invalidateCacheMiddleware
+  invalidateCacheMiddleware,
 };

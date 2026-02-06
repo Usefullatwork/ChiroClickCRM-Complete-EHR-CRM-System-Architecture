@@ -12,7 +12,7 @@
 
 import csrf from 'csurf';
 import helmet from 'helmet';
-import { rateLimit } from '../config/redis.js';
+import { redisRateLimiter } from '../config/redis.js';
 
 /**
  * CSRF Protection Middleware
@@ -22,8 +22,8 @@ export const csrfProtection = csrf({
   cookie: {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict'
-  }
+    sameSite: 'strict',
+  },
 });
 
 /**
@@ -33,7 +33,7 @@ export const sendCsrfToken = (req, res, next) => {
   res.cookie('XSRF-TOKEN', req.csrfToken(), {
     httpOnly: false, // Accessible to JavaScript (needed for axios)
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict'
+    sameSite: 'strict',
   });
   next();
 };
@@ -53,7 +53,7 @@ export const enforce2FA = async (req, res, next) => {
   const requires2FA = ['ADMIN', 'SUPER_ADMIN', 'OWNER'].includes(user.role);
 
   if (requires2FA) {
-    // Check if 2FA is enabled (integrate with Clerk or your auth provider)
+    // Check if 2FA is enabled
     const has2FA = user.twoFactorEnabled || user.mfaEnabled;
 
     if (!has2FA) {
@@ -61,7 +61,7 @@ export const enforce2FA = async (req, res, next) => {
         error: '2FA Required',
         message: 'Two-factor authentication is required for admin accounts',
         action: 'ENABLE_2FA',
-        setupUrl: '/settings/security/2fa'
+        setupUrl: '/settings/security/2fa',
       });
     }
 
@@ -73,17 +73,17 @@ export const enforce2FA = async (req, res, next) => {
       return res.status(403).json({
         error: '2FA Verification Required',
         message: 'Please verify your identity with 2FA',
-        action: 'VERIFY_2FA'
+        action: 'VERIFY_2FA',
       });
     }
 
     // Check if 2FA verification is stale (> 12 hours)
-    const twelveHoursAgo = Date.now() - (12 * 60 * 60 * 1000);
+    const twelveHoursAgo = Date.now() - 12 * 60 * 60 * 1000;
     if (mfaVerifiedAt < twelveHoursAgo) {
       return res.status(403).json({
         error: '2FA Session Expired',
         message: 'Please re-verify your identity',
-        action: 'VERIFY_2FA'
+        action: 'VERIFY_2FA',
       });
     }
   }
@@ -105,7 +105,7 @@ export const requireRole = (allowedRoles) => {
     if (!allowedRoles.includes(user.role)) {
       return res.status(403).json({
         error: 'Forbidden',
-        message: `This action requires one of the following roles: ${allowedRoles.join(', ')}`
+        message: `This action requires one of the following roles: ${allowedRoles.join(', ')}`,
       });
     }
 
@@ -120,28 +120,19 @@ export const requireRole = (allowedRoles) => {
  * router.post('/admin/delete-patient', strictRateLimit, deletePatient);
  */
 export const strictRateLimit = async (req, res, next) => {
-  const identifier = req.user?.id || req.ip;
-  const endpoint = req.path;
+  const identifier = `${req.user?.id || req.ip}:strict:${req.path}`;
 
-  const result = await rateLimit.check(
-    identifier,
-    `strict:${endpoint}`,
-    5, // Only 5 requests
-    15 * 60 // per 15 minutes
-  );
+  const result = await redisRateLimiter.checkLimit(identifier, 5, 15 * 60);
 
   if (!result.allowed) {
     return res.status(429).json({
       error: 'Rate Limit Exceeded',
       message: 'Too many attempts. Please try again later.',
-      retryAfter: result.resetIn
+      retryAfter: Math.ceil((result.resetAt - Date.now()) / 1000),
     });
   }
 
-  // Add rate limit headers
-  res.set('X-RateLimit-Limit', result.limit);
-  res.set('X-RateLimit-Remaining', result.limit - result.current);
-  res.set('X-RateLimit-Reset', result.resetIn);
+  res.set('X-RateLimit-Remaining', String(result.remaining));
 
   next();
 };
@@ -150,25 +141,18 @@ export const strictRateLimit = async (req, res, next) => {
  * Moderate rate limiting for normal endpoints
  */
 export const moderateRateLimit = async (req, res, next) => {
-  const identifier = req.user?.id || req.ip;
-  const endpoint = req.path;
+  const identifier = `${req.user?.id || req.ip}:moderate:${req.path}`;
 
-  const result = await rateLimit.check(
-    identifier,
-    `moderate:${endpoint}`,
-    60, // 60 requests
-    60 // per minute
-  );
+  const result = await redisRateLimiter.checkLimit(identifier, 60, 60);
 
   if (!result.allowed) {
     return res.status(429).json({
       error: 'Rate Limit Exceeded',
-      retryAfter: result.resetIn
+      retryAfter: Math.ceil((result.resetAt - Date.now()) / 1000),
     });
   }
 
-  res.set('X-RateLimit-Limit', result.limit);
-  res.set('X-RateLimit-Remaining', result.limit - result.current);
+  res.set('X-RateLimit-Remaining', String(result.remaining));
 
   next();
 };
@@ -187,20 +171,20 @@ export const securityHeaders = helmet({
       fontSrc: ["'self'"],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
-      frameSrc: ["'none'"]
-    }
+      frameSrc: ["'none'"],
+    },
   },
   hsts: {
     maxAge: 31536000, // 1 year
     includeSubDomains: true,
-    preload: true
+    preload: true,
   },
   noSniff: true,
   xssFilter: true,
   hidePoweredBy: true,
   frameguard: {
-    action: 'deny'
-  }
+    action: 'deny',
+  },
 });
 
 /**
@@ -210,7 +194,7 @@ export const securityHeaders = helmet({
 export const sanitizeInput = (req, res, next) => {
   // Sanitize query parameters
   if (req.query) {
-    Object.keys(req.query).forEach(key => {
+    Object.keys(req.query).forEach((key) => {
       if (typeof req.query[key] === 'string') {
         req.query[key] = sanitizeString(req.query[key]);
       }
@@ -221,7 +205,7 @@ export const sanitizeInput = (req, res, next) => {
   if (req.body) {
     const preserveFields = ['subjective', 'objective', 'assessment', 'plan', 'notes'];
 
-    Object.keys(req.body).forEach(key => {
+    Object.keys(req.body).forEach((key) => {
       if (typeof req.body[key] === 'string' && !preserveFields.includes(key)) {
         req.body[key] = sanitizeString(req.body[key]);
       }
@@ -249,13 +233,12 @@ const sanitizeString = (str) => {
  */
 export const validateOrganization = async (req, res, next) => {
   const user = req.user;
-  const requestedOrgId = req.params.organizationId ||
-                         req.body.organizationId ||
-                         req.headers['x-organization-id'];
+  const requestedOrgId =
+    req.params.organizationId || req.body.organizationId || req.headers['x-organization-id'];
 
   if (!requestedOrgId) {
     return res.status(400).json({
-      error: 'Organization ID required'
+      error: 'Organization ID required',
     });
   }
 
@@ -268,7 +251,7 @@ export const validateOrganization = async (req, res, next) => {
   if (user.organizationId !== requestedOrgId) {
     return res.status(403).json({
       error: 'Forbidden',
-      message: 'You do not have access to this organization'
+      message: 'You do not have access to this organization',
     });
   }
 
@@ -299,9 +282,9 @@ export const secureSession = {
     secure: process.env.NODE_ENV === 'production', // HTTPS only in production
     httpOnly: true, // Prevent JavaScript access
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: 'strict'
+    sameSite: 'strict',
   },
-  rolling: true // Reset maxAge on each request
+  rolling: true, // Reset maxAge on each request
 };
 
 /**
@@ -317,11 +300,11 @@ export const logSecurityEvent = async (req, eventType, details = {}) => {
       ...details,
       userAgent: req.headers['user-agent'],
       ip: req.ip,
-      path: req.path
+      path: req.path,
     },
     ipAddress: req.ip,
     userAgent: req.headers['user-agent'],
-    success: details.success !== false
+    success: details.success !== false,
   });
 };
 
@@ -337,5 +320,5 @@ export default {
   validateOrganization,
   requireHTTPS,
   secureSession,
-  logSecurityEvent
+  logSecurityEvent,
 };

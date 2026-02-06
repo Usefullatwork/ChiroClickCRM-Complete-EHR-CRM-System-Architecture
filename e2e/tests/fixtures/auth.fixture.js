@@ -12,9 +12,9 @@ export const test = base.extend({
     // Navigate to login
     await page.goto('/login');
 
-    // Check if already authenticated (Clerk session)
+    // Check if already authenticated (session cookie)
     const isAuthenticated = await page.evaluate(() => {
-      return window.Clerk?.user !== null;
+      return !!sessionStorage.getItem('auth_token');
     }).catch(() => false);
 
     if (!isAuthenticated) {

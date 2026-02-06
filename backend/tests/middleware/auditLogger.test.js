@@ -7,7 +7,7 @@ import { describe, it, expect, jest, beforeEach } from '@jest/globals';
 
 // Mock the audit utility
 jest.unstable_mockModule('../../src/utils/audit.js', () => ({
-  logAudit: jest.fn().mockResolvedValue(true)
+  logAudit: jest.fn().mockResolvedValue(true),
 }));
 
 // Mock the logger
@@ -15,16 +15,16 @@ jest.unstable_mockModule('../../src/utils/logger.js', () => ({
   default: {
     error: jest.fn(),
     info: jest.fn(),
-    warn: jest.fn()
-  }
+    warn: jest.fn(),
+  },
 }));
 
 // Import after mocking
-const { auditLogger, auditSensitiveAccess, auditBulkOperation } = await import('../../src/middleware/auditLogger.js');
+const { auditLogger, auditSensitiveAccess, auditBulkOperation } =
+  await import('../../src/middleware/auditLogger.js');
 const { logAudit } = await import('../../src/utils/audit.js');
 
 describe('Audit Logger Middleware', () => {
-
   let mockReq;
   let mockRes;
   let nextFn;
@@ -43,15 +43,16 @@ describe('Audit Logger Middleware', () => {
       user: {
         id: 'user-123',
         email: 'test@example.com',
-        role: 'PRACTITIONER'
+        role: 'PRACTITIONER',
       },
       organizationId: 'org-123',
-      connection: { remoteAddress: '192.168.1.1' }
+      connection: { remoteAddress: '192.168.1.1' },
     };
 
     mockRes = {
       statusCode: 200,
-      json: jest.fn().mockReturnThis()
+      json: jest.fn().mockReturnThis(),
+      status: jest.fn().mockReturnThis(),
     };
 
     nextFn = jest.fn();
@@ -87,7 +88,7 @@ describe('Audit Logger Middleware', () => {
       mockRes.json({ id: '123', name: 'Test Patient' });
 
       // Wait for setImmediate
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise((resolve) => setImmediate(resolve));
 
       expect(logAudit).toHaveBeenCalled();
     });
@@ -100,7 +101,7 @@ describe('Audit Logger Middleware', () => {
       await auditLogger(mockReq, mockRes, nextFn);
       mockRes.json({ id: '456', first_name: 'Test' });
 
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise((resolve) => setImmediate(resolve));
 
       expect(logAudit).toHaveBeenCalled();
     });
@@ -112,7 +113,7 @@ describe('Audit Logger Middleware', () => {
       await auditLogger(mockReq, mockRes, nextFn);
       mockRes.json({ success: true });
 
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise((resolve) => setImmediate(resolve));
 
       expect(logAudit).toHaveBeenCalled();
     });
@@ -126,7 +127,7 @@ describe('Audit Logger Middleware', () => {
       await auditLogger(mockReq, mockRes, nextFn);
       mockRes.json({ id: '123', first_name: 'NewName' });
 
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise((resolve) => setImmediate(resolve));
 
       expect(logAudit).toHaveBeenCalled();
     });
@@ -151,7 +152,7 @@ describe('Audit Logger Middleware', () => {
       expect(mockRes.json).toHaveBeenCalledWith(
         expect.objectContaining({
           error: 'BadRequestError',
-          code: 'AUDIT_REASON_REQUIRED'
+          code: 'AUDIT_REASON_REQUIRED',
         })
       );
       expect(nextFn).not.toHaveBeenCalled();
@@ -192,7 +193,7 @@ describe('Audit Logger Middleware', () => {
       const resourceIds = ['id-1', 'id-2', 'id-3'];
 
       await auditBulkOperation(mockReq, 'DELETE', 'PATIENT', resourceIds, {
-        reason: 'Bulk anonymization'
+        reason: 'Bulk anonymization',
       });
 
       expect(logAudit).toHaveBeenCalledWith(
@@ -203,8 +204,8 @@ describe('Audit Logger Middleware', () => {
           metadata: expect.objectContaining({
             bulkOperation: true,
             affectedCount: 3,
-            resourceIds: ['id-1', 'id-2', 'id-3']
-          })
+            resourceIds: ['id-1', 'id-2', 'id-3'],
+          }),
         })
       );
     });
@@ -218,8 +219,8 @@ describe('Audit Logger Middleware', () => {
         expect.objectContaining({
           metadata: expect.objectContaining({
             affectedCount: 150,
-            resourceIds: expect.arrayContaining([expect.stringContaining('id-')])
-          })
+            resourceIds: expect.arrayContaining([expect.stringContaining('id-')]),
+          }),
         })
       );
 
@@ -230,28 +231,30 @@ describe('Audit Logger Middleware', () => {
   });
 
   describe('Resource Type Extraction', () => {
+    // Use POST method so shouldAudit() returns true for all resource types
+    // (GET only triggers auditing for sensitive resources like patients)
     const testPaths = [
-      { path: '/api/v1/patients/123', expected: 'PATIENT' },
-      { path: '/api/v1/appointments/456', expected: 'APPOINTMENT' },
-      { path: '/api/v1/communications', expected: 'COMMUNICATION' },
-      { path: '/api/v1/follow-ups/789', expected: 'FOLLOW_UP' },
-      { path: '/api/v1/encounters', expected: 'CLINICAL_ENCOUNTER' },
-      { path: '/api/v1/gdpr/requests', expected: 'GDPR_REQUEST' }
+      { path: '/api/v1/patients/123', method: 'GET', expected: 'PATIENT' },
+      { path: '/api/v1/appointments/456', method: 'POST', expected: 'APPOINTMENT' },
+      { path: '/api/v1/communications', method: 'POST', expected: 'COMMUNICATION' },
+      { path: '/api/v1/follow-ups/789', method: 'POST', expected: 'FOLLOW_UP' },
+      { path: '/api/v1/encounters', method: 'POST', expected: 'CLINICAL_ENCOUNTER' },
+      { path: '/api/v1/gdpr/requests', method: 'POST', expected: 'GDPR_REQUEST' },
     ];
 
-    testPaths.forEach(({ path, expected }) => {
+    testPaths.forEach(({ path, method, expected }) => {
       it(`should extract ${expected} from ${path}`, async () => {
         mockReq.path = path;
-        mockReq.method = 'GET';
+        mockReq.method = method;
 
         await auditLogger(mockReq, mockRes, nextFn);
         mockRes.json({ data: [] });
 
-        await new Promise(resolve => setImmediate(resolve));
+        await new Promise((resolve) => setImmediate(resolve));
 
         expect(logAudit).toHaveBeenCalledWith(
           expect.objectContaining({
-            resourceType: expected
+            resourceType: expected,
           })
         );
       });

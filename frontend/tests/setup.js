@@ -8,7 +8,7 @@ import '@testing-library/jest-dom';
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: jest.fn().mockImplementation(query => ({
+  value: jest.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -23,9 +23,15 @@ Object.defineProperty(window, 'matchMedia', {
 // Mock IntersectionObserver
 class IntersectionObserver {
   constructor() {}
-  observe() { return null; }
-  disconnect() { return null; }
-  unobserve() { return null; }
+  observe() {
+    return null;
+  }
+  disconnect() {
+    return null;
+  }
+  unobserve() {
+    return null;
+  }
 }
 
 window.IntersectionObserver = IntersectionObserver;
@@ -33,9 +39,15 @@ window.IntersectionObserver = IntersectionObserver;
 // Mock ResizeObserver
 class ResizeObserver {
   constructor() {}
-  observe() { return null; }
-  disconnect() { return null; }
-  unobserve() { return null; }
+  observe() {
+    return null;
+  }
+  disconnect() {
+    return null;
+  }
+  unobserve() {
+    return null;
+  }
 }
 
 window.ResizeObserver = ResizeObserver;
@@ -43,22 +55,18 @@ window.ResizeObserver = ResizeObserver;
 // Mock scrollTo
 window.scrollTo = jest.fn();
 
-// Mock Clerk
-window.Clerk = {
-  session: {
-    getToken: jest.fn().mockResolvedValue('mock-token'),
-  },
-};
+// Mock desktop auth (no external auth provider)
+window.__DESKTOP_MODE__ = true;
 
 // Mock sessionStorage
 const sessionStorageMock = (() => {
   let store = {};
   return {
-    getItem: jest.fn(key => store[key] || null),
+    getItem: jest.fn((key) => store[key] || null),
     setItem: jest.fn((key, value) => {
       store[key] = value;
     }),
-    removeItem: jest.fn(key => {
+    removeItem: jest.fn((key) => {
       delete store[key];
     }),
     clear: jest.fn(() => {
@@ -75,11 +83,11 @@ Object.defineProperty(window, 'sessionStorage', {
 const localStorageMock = (() => {
   let store = {};
   return {
-    getItem: jest.fn(key => store[key] || null),
+    getItem: jest.fn((key) => store[key] || null),
     setItem: jest.fn((key, value) => {
       store[key] = value;
     }),
-    removeItem: jest.fn(key => {
+    removeItem: jest.fn((key) => {
       delete store[key];
     }),
     clear: jest.fn(() => {

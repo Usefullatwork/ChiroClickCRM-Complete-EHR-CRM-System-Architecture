@@ -23,7 +23,7 @@ ChiroClickCRM is a comprehensive Electronic Health Record (EHR) and Customer Rel
 
 ## Authentication
 
-This API uses [Clerk](https://clerk.dev) for authentication. Include the Bearer token in the Authorization header:
+This API uses session-based authentication or API keys. Include the Bearer token in the Authorization header:
 
 \`\`\`
 Authorization: Bearer <your_token>
@@ -115,11 +115,24 @@ This API is designed to comply with:
         parameters: [
           { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
           { name: 'limit', in: 'query', schema: { type: 'integer', default: 20 } },
-          { name: 'search', in: 'query', schema: { type: 'string' }, description: 'Search by name, email, phone' },
-          { name: 'status', in: 'query', schema: { type: 'string', enum: ['ACTIVE', 'INACTIVE', 'FINISHED'] } },
+          {
+            name: 'search',
+            in: 'query',
+            schema: { type: 'string' },
+            description: 'Search by name, email, phone',
+          },
+          {
+            name: 'status',
+            in: 'query',
+            schema: { type: 'string', enum: ['ACTIVE', 'INACTIVE', 'FINISHED'] },
+          },
           { name: 'category', in: 'query', schema: { type: 'string' } },
           { name: 'sortBy', in: 'query', schema: { type: 'string', default: 'last_name' } },
-          { name: 'sortOrder', in: 'query', schema: { type: 'string', enum: ['asc', 'desc'], default: 'asc' } },
+          {
+            name: 'sortOrder',
+            in: 'query',
+            schema: { type: 'string', enum: ['asc', 'desc'], default: 'asc' },
+          },
         ],
         responses: {
           200: {
@@ -311,7 +324,14 @@ This API is designed to comply with:
           { name: 'startDate', in: 'query', schema: { type: 'string', format: 'date' } },
           { name: 'endDate', in: 'query', schema: { type: 'string', format: 'date' } },
           { name: 'practitionerId', in: 'query', schema: { type: 'string', format: 'uuid' } },
-          { name: 'status', in: 'query', schema: { type: 'string', enum: ['SCHEDULED', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'NO_SHOW'] } },
+          {
+            name: 'status',
+            in: 'query',
+            schema: {
+              type: 'string',
+              enum: ['SCHEDULED', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'NO_SHOW'],
+            },
+          },
         ],
         responses: {
           200: {
@@ -453,7 +473,13 @@ This API is designed to comply with:
         tags: ['Diagnosis'],
         summary: 'Search diagnosis codes',
         parameters: [
-          { name: 'q', in: 'query', required: true, schema: { type: 'string' }, description: 'Search term' },
+          {
+            name: 'q',
+            in: 'query',
+            required: true,
+            schema: { type: 'string' },
+            description: 'Search term',
+          },
           { name: 'system', in: 'query', schema: { type: 'string', enum: ['ICPC-2', 'ICD-10'] } },
           { name: 'limit', in: 'query', schema: { type: 'integer', default: 20 } },
         ],
@@ -535,7 +561,10 @@ This API is designed to comply with:
           patient_id: { type: 'string', format: 'uuid' },
           practitioner_id: { type: 'string', format: 'uuid' },
           encounter_date: { type: 'string', format: 'date' },
-          encounter_type: { type: 'string', enum: ['INITIAL', 'FOLLOWUP', 'REASSESSMENT', 'DISCHARGE'] },
+          encounter_type: {
+            type: 'string',
+            enum: ['INITIAL', 'FOLLOWUP', 'REASSESSMENT', 'DISCHARGE'],
+          },
           subjective: { type: 'object' },
           objective: { type: 'object' },
           assessment: { type: 'object' },
@@ -670,9 +699,7 @@ This API is designed to comply with:
       },
     },
   },
-  security: [
-    { bearerAuth: [] },
-  ],
+  security: [{ bearerAuth: [] }],
 };
 
 export default openApiSpec;

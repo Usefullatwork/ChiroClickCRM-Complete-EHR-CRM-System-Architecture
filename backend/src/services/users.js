@@ -11,13 +11,7 @@ import * as organizationService from './organizations.js';
  * Get all users in an organization
  */
 export const getAllUsers = async (organizationId, options = {}) => {
-  const {
-    page = 1,
-    limit = 50,
-    search = '',
-    role = null,
-    status = null
-  } = options;
+  const { page = 1, limit = 50, search = '', role = null, status = null } = options;
 
   const offset = (page - 1) * limit;
   let whereConditions = ['organization_id = $1'];
@@ -25,7 +19,9 @@ export const getAllUsers = async (organizationId, options = {}) => {
   let paramIndex = 2;
 
   if (search) {
-    whereConditions.push(`(first_name ILIKE $${paramIndex} OR last_name ILIKE $${paramIndex} OR email ILIKE $${paramIndex})`);
+    whereConditions.push(
+      `(first_name ILIKE $${paramIndex} OR last_name ILIKE $${paramIndex} OR email ILIKE $${paramIndex})`
+    );
     params.push(`%${search}%`);
     paramIndex++;
   }
@@ -45,17 +41,14 @@ export const getAllUsers = async (organizationId, options = {}) => {
   const whereClause = whereConditions.join(' AND ');
 
   // Get total count
-  const countResult = await query(
-    `SELECT COUNT(*) FROM users WHERE ${whereClause}`,
-    params
-  );
+  const countResult = await query(`SELECT COUNT(*) FROM users WHERE ${whereClause}`, params);
   const total = parseInt(countResult.rows[0].count);
 
   // Get paginated results
   const result = await query(
     `SELECT
       id,
-      clerk_user_id,
+
       organization_id,
       email,
       first_name,
@@ -81,8 +74,8 @@ export const getAllUsers = async (organizationId, options = {}) => {
       page,
       limit,
       total,
-      pages: Math.ceil(total / limit)
-    }
+      pages: Math.ceil(total / limit),
+    },
   };
 };
 
@@ -93,7 +86,7 @@ export const getUserById = async (organizationId, userId) => {
   const result = await query(
     `SELECT
       id,
-      clerk_user_id,
+
       organization_id,
       email,
       first_name,
@@ -126,14 +119,16 @@ export const createUser = async (organizationId, userData) => {
     role = 'PRACTITIONER',
     hpr_number = null,
     specialization = null,
-    phone = null
+    phone = null,
   } = userData;
 
   // Check organization limits
   if (role === 'PRACTITIONER' || role === 'ADMIN') {
     const limits = await organizationService.checkOrganizationLimits(organizationId);
     if (!limits.withinLimits.practitioners) {
-      throw new Error(`Organization has reached maximum practitioner limit (${limits.limits.practitioners.max})`);
+      throw new Error(
+        `Organization has reached maximum practitioner limit (${limits.limits.practitioners.max})`
+      );
     }
   }
 
@@ -162,8 +157,14 @@ export const createUser = async (organizationId, userData) => {
  */
 export const updateUser = async (organizationId, userId, updateData) => {
   const allowedFields = [
-    'first_name', 'last_name', 'role', 'hpr_number', 'specialization',
-    'phone', 'status', 'preferences'
+    'first_name',
+    'last_name',
+    'role',
+    'hpr_number',
+    'specialization',
+    'phone',
+    'status',
+    'preferences',
   ];
 
   const updates = [];
@@ -227,10 +228,7 @@ export const updateUserPreferences = async (organizationId, userId, preferences)
  * Update last login
  */
 export const updateLastLogin = async (userId) => {
-  await query(
-    `UPDATE users SET last_login = NOW() WHERE id = $1`,
-    [userId]
-  );
+  await query(`UPDATE users SET last_login = NOW() WHERE id = $1`, [userId]);
 };
 
 /**
@@ -325,5 +323,5 @@ export default {
   deactivateUser,
   reactivateUser,
   getUserStats,
-  getPractitioners
+  getPractitioners,
 };

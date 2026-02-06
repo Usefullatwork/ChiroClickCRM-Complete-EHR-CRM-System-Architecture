@@ -8,7 +8,7 @@
  * - View progress over time
  * - Download PDF handout
  *
- * Authentication: PIN or magic link (no Clerk required)
+ * Authentication: PIN or magic link
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -29,7 +29,7 @@ import {
   TrendingUp,
   Dumbbell,
   RefreshCw,
-  ExternalLink
+  ExternalLink,
 } from 'lucide-react';
 
 // API base URL
@@ -40,7 +40,7 @@ const FREQUENCY_LABELS = {
   daily: 'Daglig',
   '2x_daily': '2 ganger daglig',
   '3x_week': '3 ganger per uke',
-  weekly: 'Ukentlig'
+  weekly: 'Ukentlig',
 };
 
 const BODY_REGION_LABELS = {
@@ -54,7 +54,7 @@ const BODY_REGION_LABELS = {
   core: 'Kjerne',
   full_body: 'Helkropp',
   upper_extremity: 'Overekstremitet',
-  lower_extremity: 'Underekstremitet'
+  lower_extremity: 'Underekstremitet',
 };
 
 /**
@@ -154,7 +154,7 @@ const ExerciseCard = ({ prescription, onLogCompliance, onRate, todayCompleted })
     if (!prescription.compliance_log) return 0;
     const entries = Object.values(prescription.compliance_log);
     if (entries.length === 0) return 0;
-    const completed = entries.filter(e => e.completed).length;
+    const completed = entries.filter((e) => e.completed).length;
     return Math.round((completed / entries.length) * 100);
   }, [prescription.compliance_log]);
 
@@ -162,7 +162,7 @@ const ExerciseCard = ({ prescription, onLogCompliance, onRate, todayCompleted })
     await onLogCompliance(prescription.id, {
       completed: true,
       pain_level: painLevel || null,
-      notes: notes || null
+      notes: notes || null,
     });
     setPainLevel(0);
     setNotes('');
@@ -190,9 +190,7 @@ const ExerciseCard = ({ prescription, onLogCompliance, onRate, todayCompleted })
 
           {/* Info */}
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-slate-800 text-lg">
-              {prescription.exercise_name}
-            </h3>
+            <h3 className="font-semibold text-slate-800 text-lg">{prescription.exercise_name}</h3>
             <div className="flex flex-wrap gap-2 mt-1">
               {prescription.body_region && (
                 <span className="text-xs px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full">
@@ -204,10 +202,11 @@ const ExerciseCard = ({ prescription, onLogCompliance, onRate, todayCompleted })
               <span className="font-medium text-slate-700">
                 {prescription.sets || 3} x {prescription.reps || 10}
               </span>
-              {prescription.hold_seconds && (
-                <span> &bull; Hold {prescription.hold_seconds}s</span>
-              )}
-              <span> &bull; {FREQUENCY_LABELS[prescription.frequency] || prescription.frequency}</span>
+              {prescription.hold_seconds && <span> &bull; Hold {prescription.hold_seconds}s</span>}
+              <span>
+                {' '}
+                &bull; {FREQUENCY_LABELS[prescription.frequency] || prescription.frequency}
+              </span>
             </div>
           </div>
 
@@ -309,8 +308,8 @@ const ExerciseCard = ({ prescription, onLogCompliance, onRate, todayCompleted })
                       ? level <= 3
                         ? 'bg-green-500 text-white'
                         : level <= 6
-                        ? 'bg-yellow-500 text-white'
-                        : 'bg-red-500 text-white'
+                          ? 'bg-yellow-500 text-white'
+                          : 'bg-red-500 text-white'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
@@ -341,11 +340,7 @@ const ExerciseCard = ({ prescription, onLogCompliance, onRate, todayCompleted })
             <h4 className="font-medium text-slate-700 mb-2">Hvor nyttig er denne øvelsen?</h4>
             <div className="flex gap-2">
               {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  onClick={() => onRate(prescription.id, star)}
-                  className="p-1"
-                >
+                <button key={star} onClick={() => onRate(prescription.id, star)} className="p-1">
                   <Star
                     className={`w-8 h-8 transition-colors ${
                       (prescription.patient_rating || 0) >= star
@@ -402,7 +397,7 @@ const PatientExercises = () => {
       const response = await fetch(`${API_URL}/patient-portal/validate-token`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: magicToken })
+        body: JSON.stringify({ token: magicToken }),
       });
 
       if (!response.ok) {
@@ -427,7 +422,7 @@ const PatientExercises = () => {
       const response = await fetch(`${API_URL}/patient-portal/validate-pin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ patientId, pin })
+        body: JSON.stringify({ patientId, pin }),
       });
 
       if (!response.ok) {
@@ -451,9 +446,9 @@ const PatientExercises = () => {
     try {
       const response = await fetch(`${API_URL}/patient-portal/exercises?patientId=${pId}`, {
         headers: {
-          'Authorization': `Bearer ${sessionToken}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${sessionToken}`,
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -474,14 +469,14 @@ const PatientExercises = () => {
       const response = await fetch(`${API_URL}/patient-portal/compliance`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${sessionToken}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${sessionToken}`,
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           prescriptionId,
           ...complianceData,
-          date: new Date().toISOString().split('T')[0]
-        })
+          date: new Date().toISOString().split('T')[0],
+        }),
       });
 
       if (!response.ok) {
@@ -489,16 +484,16 @@ const PatientExercises = () => {
       }
 
       // Update local state
-      setPrescriptions(prev =>
-        prev.map(p => {
+      setPrescriptions((prev) =>
+        prev.map((p) => {
           if (p.id === prescriptionId) {
             const today = new Date().toISOString().split('T')[0];
             return {
               ...p,
               compliance_log: {
                 ...p.compliance_log,
-                [today]: complianceData
-              }
+                [today]: complianceData,
+              },
             };
           }
           return p;
@@ -516,17 +511,15 @@ const PatientExercises = () => {
       await fetch(`${API_URL}/patient-portal/rate`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${sessionToken}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${sessionToken}`,
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ prescriptionId, rating })
+        body: JSON.stringify({ prescriptionId, rating }),
       });
 
       // Update local state
-      setPrescriptions(prev =>
-        prev.map(p =>
-          p.id === prescriptionId ? { ...p, patient_rating: rating } : p
-        )
+      setPrescriptions((prev) =>
+        prev.map((p) => (p.id === prescriptionId ? { ...p, patient_rating: rating } : p))
       );
     } catch (err) {
       console.error('Failed to rate exercise:', err);
@@ -540,8 +533,8 @@ const PatientExercises = () => {
         `${API_URL}/patient-portal/exercises/pdf?patientId=${patientInfo?.id || patientId}`,
         {
           headers: {
-            'Authorization': `Bearer ${sessionToken}`
-          }
+            Authorization: `Bearer ${sessionToken}`,
+          },
         }
       );
 
@@ -573,13 +566,7 @@ const PatientExercises = () => {
 
   // Show PIN entry if not authenticated
   if (!isAuthenticated && !token) {
-    return (
-      <PinEntry
-        onSubmit={validatePin}
-        error={error}
-        isLoading={isLoading}
-      />
-    );
+    return <PinEntry onSubmit={validatePin} error={error} isLoading={isLoading} />;
   }
 
   // Loading state
@@ -620,10 +607,10 @@ const PatientExercises = () => {
     if (prescriptions.length === 0) return 0;
     let total = 0;
     let completed = 0;
-    prescriptions.forEach(p => {
+    prescriptions.forEach((p) => {
       const entries = Object.values(p.compliance_log || {});
       total += entries.length;
-      completed += entries.filter(e => e.completed).length;
+      completed += entries.filter((e) => e.completed).length;
     });
     return total > 0 ? Math.round((completed / total) * 100) : 0;
   }, [prescriptions]);
@@ -661,8 +648,7 @@ const PatientExercises = () => {
         <div className="grid grid-cols-3 gap-3 mb-6">
           <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
             <div className="flex items-center gap-2 text-slate-500 text-xs mb-1">
-              <Activity className="w-3.5 h-3.5" />
-              I dag
+              <Activity className="w-3.5 h-3.5" />I dag
             </div>
             <div className="text-2xl font-bold text-slate-800">
               {completedToday}/{totalExercises}
@@ -673,18 +659,14 @@ const PatientExercises = () => {
               <TrendingUp className="w-3.5 h-3.5" />
               Totalt
             </div>
-            <div className="text-2xl font-bold text-green-600">
-              {overallCompliance}%
-            </div>
+            <div className="text-2xl font-bold text-green-600">{overallCompliance}%</div>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
             <div className="flex items-center gap-2 text-slate-500 text-xs mb-1">
               <Calendar className="w-3.5 h-3.5" />
               Øvelser
             </div>
-            <div className="text-2xl font-bold text-slate-800">
-              {totalExercises}
-            </div>
+            <div className="text-2xl font-bold text-slate-800">{totalExercises}</div>
           </div>
         </div>
 
@@ -729,7 +711,9 @@ const PatientExercises = () => {
         {/* Refresh button */}
         <div className="mt-6 text-center">
           <button
-            onClick={() => loadExercises(patientInfo?.id || patientId, localStorage.getItem('portal_session'))}
+            onClick={() =>
+              loadExercises(patientInfo?.id || patientId, localStorage.getItem('portal_session'))
+            }
             className="inline-flex items-center gap-2 px-4 py-2 text-sm text-slate-500 hover:text-slate-700 transition-colors"
           >
             <RefreshCw className="w-4 h-4" />

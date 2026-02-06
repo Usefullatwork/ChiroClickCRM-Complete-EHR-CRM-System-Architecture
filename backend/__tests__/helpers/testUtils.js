@@ -20,7 +20,7 @@ export async function createTestOrganization(overrides = {}) {
     org_number: `${Math.floor(100000000 + Math.random() * 900000000)}`,
     subscription_tier: 'PRO',
     is_active: true,
-    settings: {}
+    settings: {},
   };
 
   const data = { ...defaults, ...overrides };
@@ -29,7 +29,13 @@ export async function createTestOrganization(overrides = {}) {
     `INSERT INTO organizations (name, org_number, subscription_tier, is_active, settings)
      VALUES ($1, $2, $3, $4, $5)
      RETURNING *`,
-    [data.name, data.org_number, data.subscription_tier, data.is_active, JSON.stringify(data.settings)]
+    [
+      data.name,
+      data.org_number,
+      data.subscription_tier,
+      data.is_active,
+      JSON.stringify(data.settings),
+    ]
   );
 
   return result.rows[0];
@@ -49,7 +55,7 @@ export async function createTestUser(organizationId, overrides = {}) {
     last_name: 'User',
     role: 'PRACTITIONER',
     is_active: true,
-    email_verified: true
+    email_verified: true,
   };
 
   const data = { ...defaults, ...overrides };
@@ -61,7 +67,16 @@ export async function createTestUser(organizationId, overrides = {}) {
     `INSERT INTO users (organization_id, email, first_name, last_name, role, is_active, password_hash, email_verified)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
      RETURNING id, email, first_name, last_name, role, organization_id`,
-    [organizationId, data.email, data.first_name, data.last_name, data.role, data.is_active, passwordHash, data.email_verified]
+    [
+      organizationId,
+      data.email,
+      data.first_name,
+      data.last_name,
+      data.role,
+      data.is_active,
+      passwordHash,
+      data.email_verified,
+    ]
   );
 
   return result.rows[0];
@@ -85,7 +100,7 @@ export async function createTestSession(userId) {
   return {
     sessionId,
     expiresAt,
-    cookie: `session=${sessionId}`
+    cookie: `session=${sessionId}`,
   };
 }
 
@@ -104,16 +119,25 @@ export async function createTestPatient(organizationId, overrides = {}) {
     email: `patient${timestamp}@test.com`,
     phone: '+4712345678',
     date_of_birth: '1990-01-01',
-    lifecycle_stage: 'ACTIVE'
+    status: 'ACTIVE',
   };
 
   const data = { ...defaults, ...overrides };
 
   const result = await db.query(
-    `INSERT INTO patients (organization_id, solvit_id, first_name, last_name, email, phone, date_of_birth, lifecycle_stage)
+    `INSERT INTO patients (organization_id, solvit_id, first_name, last_name, email, phone, date_of_birth, status)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
      RETURNING *`,
-    [organizationId, data.solvit_id, data.first_name, data.last_name, data.email, data.phone, data.date_of_birth, data.lifecycle_stage]
+    [
+      organizationId,
+      data.solvit_id,
+      data.first_name,
+      data.last_name,
+      data.email,
+      data.phone,
+      data.date_of_birth,
+      data.status,
+    ]
   );
 
   return result.rows[0];
@@ -127,14 +151,19 @@ export async function createTestPatient(organizationId, overrides = {}) {
  * @param {object} overrides - Override default values
  * @returns {Promise<object>} Created encounter
  */
-export async function createTestEncounter(organizationId, patientId, practitionerId, overrides = {}) {
+export async function createTestEncounter(
+  organizationId,
+  patientId,
+  practitionerId,
+  overrides = {}
+) {
   const defaults = {
     encounter_type: 'FOLLOWUP',
     chief_complaint: 'Test complaint',
     subjective: { chief_complaint: 'Test complaint' },
     objective: {},
     assessment: {},
-    plan: {}
+    plan: {},
   };
 
   const data = { ...defaults, ...overrides };
@@ -148,7 +177,16 @@ export async function createTestEncounter(organizationId, patientId, practitione
     `INSERT INTO clinical_encounters (organization_id, patient_id, practitioner_id, encounter_type, encounter_date, subjective, objective, assessment, plan)
      VALUES ($1, $2, $3, $4, NOW(), $5, $6, $7, $8)
      RETURNING *`,
-    [organizationId, patientId, practitionerId, data.encounter_type, JSON.stringify(data.subjective), JSON.stringify(data.objective), JSON.stringify(data.assessment), JSON.stringify(data.plan)]
+    [
+      organizationId,
+      patientId,
+      practitionerId,
+      data.encounter_type,
+      JSON.stringify(data.subjective),
+      JSON.stringify(data.objective),
+      JSON.stringify(data.assessment),
+      JSON.stringify(data.plan),
+    ]
   );
 
   return result.rows[0];
@@ -169,7 +207,7 @@ export async function createTestLead(organizationId, overrides = {}) {
     phone: '+4798765432',
     source: 'WEBSITE',
     status: 'NEW',
-    temperature: 'WARM'
+    temperature: 'WARM',
   };
 
   const data = { ...defaults, ...overrides };
@@ -178,7 +216,16 @@ export async function createTestLead(organizationId, overrides = {}) {
     `INSERT INTO leads (organization_id, first_name, last_name, email, phone, source, status, temperature)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
      RETURNING *`,
-    [organizationId, data.first_name, data.last_name, data.email, data.phone, data.source, data.status, data.temperature]
+    [
+      organizationId,
+      data.first_name,
+      data.last_name,
+      data.email,
+      data.phone,
+      data.source,
+      data.status,
+      data.temperature,
+    ]
   );
 
   return result.rows[0];
@@ -197,7 +244,7 @@ export async function createTestCampaign(organizationId, overrides = {}) {
     status: 'DRAFT',
     email_subject: 'Test Subject',
     email_template: 'Test content',
-    sms_template: 'Test SMS'
+    sms_template: 'Test SMS',
   };
 
   const data = { ...defaults, ...overrides };
@@ -206,7 +253,15 @@ export async function createTestCampaign(organizationId, overrides = {}) {
     `INSERT INTO campaigns (organization_id, name, campaign_type, status, email_subject, email_template, sms_template)
      VALUES ($1, $2, $3, $4, $5, $6, $7)
      RETURNING *`,
-    [organizationId, data.name, data.campaign_type, data.status, data.email_subject, data.email_template, data.sms_template]
+    [
+      organizationId,
+      data.name,
+      data.campaign_type,
+      data.status,
+      data.email_subject,
+      data.email_template,
+      data.sms_template,
+    ]
   );
 
   return result.rows[0];
@@ -240,8 +295,14 @@ export async function cleanupTestData(organizationId) {
   };
 
   // Delete in correct order due to foreign keys
-  await safeDelete('DELETE FROM sessions WHERE user_id IN (SELECT id FROM users WHERE organization_id = $1)', [organizationId]);
-  await safeDelete('DELETE FROM encounter_amendments WHERE encounter_id IN (SELECT id FROM clinical_encounters WHERE organization_id = $1)', [organizationId]);
+  await safeDelete(
+    'DELETE FROM sessions WHERE user_id IN (SELECT id FROM users WHERE organization_id = $1)',
+    [organizationId]
+  );
+  await safeDelete(
+    'DELETE FROM encounter_amendments WHERE encounter_id IN (SELECT id FROM clinical_encounters WHERE organization_id = $1)',
+    [organizationId]
+  );
   await safeDelete('DELETE FROM clinical_encounters WHERE organization_id = $1', [organizationId]);
   await safeDelete('DELETE FROM leads WHERE organization_id = $1', [organizationId]);
   await safeDelete('DELETE FROM campaigns WHERE organization_id = $1', [organizationId]);
@@ -264,5 +325,5 @@ export function randomUUID() {
  * @returns {Promise<void>}
  */
 export function wait(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

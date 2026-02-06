@@ -12,22 +12,22 @@ export const swaggerOptions = {
       description: 'Norwegian-compliant EHR-CRM-PMS API for chiropractic practices',
       contact: {
         name: 'ChiroClickCRM Support',
-        email: 'support@chiroclickcrm.no'
+        email: 'support@chiroclickcrm.no',
       },
       license: {
         name: 'Private and Confidential',
-        url: 'https://chiroclickcrm.no/license'
-      }
+        url: 'https://chiroclickcrm.no/license',
+      },
     },
     servers: [
       {
         url: 'http://localhost:3000/api/v1',
-        description: 'Development server'
+        description: 'Development server',
       },
       {
         url: 'https://api.chiroclickcrm.no/api/v1',
-        description: 'Production server'
-      }
+        description: 'Production server',
+      },
     ],
     components: {
       securitySchemes: {
@@ -35,14 +35,14 @@ export const swaggerOptions = {
           type: 'http',
           scheme: 'bearer',
           bearerFormat: 'JWT',
-          description: 'Clerk.com JWT token'
+          description: 'Session or API key token',
         },
         OrganizationId: {
           type: 'apiKey',
           in: 'header',
           name: 'X-Organization-Id',
-          description: 'Multi-tenant organization identifier (UUID)'
-        }
+          description: 'Multi-tenant organization identifier (UUID)',
+        },
       },
       schemas: {
         Patient: {
@@ -52,60 +52,60 @@ export const swaggerOptions = {
             id: {
               type: 'string',
               format: 'uuid',
-              description: 'Patient unique identifier'
+              description: 'Patient unique identifier',
             },
             first_name: {
               type: 'string',
               maxLength: 100,
-              example: 'Ola'
+              example: 'Ola',
             },
             last_name: {
               type: 'string',
               maxLength: 100,
-              example: 'Nordmann'
+              example: 'Nordmann',
             },
             date_of_birth: {
               type: 'string',
               format: 'date',
-              example: '1985-05-15'
+              example: '1985-05-15',
             },
             fodselsnummer: {
               type: 'string',
               pattern: '^\\d{11}$',
               description: 'Norwegian fødselsnummer (11 digits)',
-              example: '15058512345'
+              example: '15058512345',
             },
             email: {
               type: 'string',
               format: 'email',
-              example: 'ola.nordmann@example.com'
+              example: 'ola.nordmann@example.com',
             },
             phone: {
               type: 'string',
               pattern: '^\\+47\\d{8}$',
-              example: '+4791234567'
+              example: '+4791234567',
             },
             address: {
               type: 'object',
               properties: {
                 street: { type: 'string', example: 'Storgata 1' },
                 postal_code: { type: 'string', example: '0123' },
-                city: { type: 'string', example: 'Oslo' }
-              }
+                city: { type: 'string', example: 'Oslo' },
+              },
             },
             consent_sms: {
               type: 'boolean',
-              description: 'Consent for SMS communications'
+              description: 'Consent for SMS communications',
             },
             consent_email: {
               type: 'boolean',
-              description: 'Consent for email communications'
+              description: 'Consent for email communications',
             },
             consent_marketing: {
               type: 'boolean',
-              description: 'Consent for marketing communications'
-            }
-          }
+              description: 'Consent for marketing communications',
+            },
+          },
         },
         ClinicalEncounter: {
           type: 'object',
@@ -113,25 +113,25 @@ export const swaggerOptions = {
           properties: {
             id: {
               type: 'string',
-              format: 'uuid'
+              format: 'uuid',
             },
             patient_id: {
               type: 'string',
-              format: 'uuid'
+              format: 'uuid',
             },
             encounter_date: {
               type: 'string',
               format: 'date-time',
-              example: '2025-01-15T14:30:00Z'
+              example: '2025-01-15T14:30:00Z',
             },
             encounter_type: {
               type: 'string',
               enum: ['INITIAL', 'FOLLOW_UP', 'REASSESSMENT', 'EMERGENCY'],
-              example: 'INITIAL'
+              example: 'INITIAL',
             },
             chief_complaint: {
               type: 'string',
-              example: 'Low back pain for 2 weeks'
+              example: 'Low back pain for 2 weeks',
             },
             soap_notes: {
               type: 'object',
@@ -139,8 +139,8 @@ export const swaggerOptions = {
                 subjective: { type: 'string' },
                 objective: { type: 'string' },
                 assessment: { type: 'string' },
-                plan: { type: 'string' }
-              }
+                plan: { type: 'string' },
+              },
             },
             diagnosis_codes: {
               type: 'array',
@@ -149,33 +149,33 @@ export const swaggerOptions = {
                 properties: {
                   icpc2_code: { type: 'string', example: 'L03' },
                   icd10_code: { type: 'string', example: 'M54.5' },
-                  description: { type: 'string', example: 'Low back pain' }
-                }
-              }
+                  description: { type: 'string', example: 'Low back pain' },
+                },
+              },
             },
             is_signed: {
               type: 'boolean',
-              description: 'Whether encounter has been digitally signed (immutable after signing)'
-            }
-          }
+              description: 'Whether encounter has been digitally signed (immutable after signing)',
+            },
+          },
         },
         Error: {
           type: 'object',
           properties: {
             error: {
               type: 'string',
-              description: 'Error message'
+              description: 'Error message',
             },
             code: {
               type: 'string',
-              description: 'Error code'
+              description: 'Error code',
             },
             details: {
               type: 'object',
-              description: 'Additional error details'
-            }
-          }
-        }
+              description: 'Additional error details',
+            },
+          },
+        },
       },
       responses: {
         UnauthorizedError: {
@@ -183,107 +183,107 @@ export const swaggerOptions = {
           content: {
             'application/json': {
               schema: {
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/Error',
               },
               example: {
                 error: 'Unauthorized',
-                code: 'AUTH_REQUIRED'
-              }
-            }
-          }
+                code: 'AUTH_REQUIRED',
+              },
+            },
+          },
         },
         NotFoundError: {
           description: 'Resource not found',
           content: {
             'application/json': {
               schema: {
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/Error',
               },
               example: {
                 error: 'Resource not found',
-                code: 'NOT_FOUND'
-              }
-            }
-          }
+                code: 'NOT_FOUND',
+              },
+            },
+          },
         },
         ValidationError: {
           description: 'Request validation failed',
           content: {
             'application/json': {
               schema: {
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/Error',
               },
               example: {
                 error: 'Validation failed',
                 code: 'VALIDATION_ERROR',
                 details: {
                   field: 'email',
-                  message: 'Invalid email format'
-                }
-              }
-            }
-          }
-        }
-      }
+                  message: 'Invalid email format',
+                },
+              },
+            },
+          },
+        },
+      },
     },
     security: [
       {
         BearerAuth: [],
-        OrganizationId: []
-      }
+        OrganizationId: [],
+      },
     ],
     tags: [
       {
         name: 'Patients',
-        description: 'Patient management operations'
+        description: 'Patient management operations',
       },
       {
         name: 'Encounters',
-        description: 'Clinical encounter documentation'
+        description: 'Clinical encounter documentation',
       },
       {
         name: 'Appointments',
-        description: 'Appointment scheduling and management'
+        description: 'Appointment scheduling and management',
       },
       {
         name: 'Communications',
-        description: 'SMS, email, and patient communications'
+        description: 'SMS, email, and patient communications',
       },
       {
         name: 'Follow-ups',
-        description: 'CRM follow-up tasks and automation'
+        description: 'CRM follow-up tasks and automation',
       },
       {
         name: 'Financial',
-        description: 'Financial metrics and invoicing'
+        description: 'Financial metrics and invoicing',
       },
       {
         name: 'KPI',
-        description: 'Key performance indicators and analytics'
+        description: 'Key performance indicators and analytics',
       },
       {
         name: 'Outcomes',
-        description: 'Clinical outcomes and treatment effectiveness'
+        description: 'Clinical outcomes and treatment effectiveness',
       },
       {
         name: 'GDPR',
-        description: 'Data privacy and GDPR compliance'
+        description: 'Data privacy and GDPR compliance',
       },
       {
         name: 'FHIR',
-        description: 'HL7 FHIR R4 interoperability endpoints'
+        description: 'HL7 FHIR R4 interoperability endpoints',
       },
       {
         name: 'Telehealth',
-        description: 'Video consultation management'
+        description: 'Video consultation management',
       },
       {
         name: 'Portal',
-        description: 'Patient portal and engagement'
-      }
-    ]
+        description: 'Patient portal and engagement',
+      },
+    ],
   },
-  apis: ['./src/routes/*.js'] // Path to route files with JSDoc comments
+  apis: ['./src/routes/*.js'], // Path to route files with JSDoc comments
 };
 
 export default swaggerOptions;

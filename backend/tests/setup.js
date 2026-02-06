@@ -9,11 +9,16 @@ import { jest } from '@jest/globals';
 process.env.NODE_ENV = 'test';
 process.env.DESKTOP_MODE = 'true';
 process.env.CACHE_ENGINE = 'memory';
-process.env.ENCRYPTION_KEY = 'test_encryption_key_32_chars__!';
+process.env.ENCRYPTION_KEY = 'abcdefghijklmnopqrstuvwxyz123456';
 process.env.JWT_SECRET = 'test_jwt_secret';
 
 // Mock logger to prevent console spam during tests
-jest.unstable_mockModule('../src/utils/logger.js', () => ({
+// Use dynamic path resolution for logger mock
+const loggerPath = new URL('../src/utils/logger.js', import.meta.url).pathname.replace(
+  /^\/([A-Z]:)/,
+  '$1'
+);
+jest.unstable_mockModule(loggerPath, () => ({
   default: {
     info: jest.fn(),
     warn: jest.fn(),
@@ -117,6 +122,89 @@ export const createTestCommunication = (overrides = {}) => ({
   sent_at: new Date().toISOString(),
   ...overrides,
 });
+
+// Exercise test data factories
+export const createTestExercise = (overrides = {}) => ({
+  id: 'test-exercise-id-123',
+  organization_id: 'test-org-id-456',
+  name: 'Cat-Camel Stretch',
+  name_no: 'Katt-Kamel Tøyning',
+  category: 'stretching',
+  body_region: 'lumbar',
+  description: 'Alternating cat and camel positions',
+  instructions: 'Start on hands and knees...',
+  sets: 3,
+  reps: 10,
+  hold_seconds: null,
+  difficulty: 'beginner',
+  equipment: null,
+  media_url: null,
+  is_global: true,
+  created_at: new Date().toISOString(),
+  ...overrides,
+});
+
+export const createTestPrescription = (overrides = {}) => ({
+  id: 'test-prescription-id-123',
+  organization_id: 'test-org-id-456',
+  patient_id: 'test-patient-id-123',
+  exercise_id: 'test-exercise-id-123',
+  prescribed_by: 'test-user-id-789',
+  sets: 3,
+  reps: 10,
+  frequency: 'daily',
+  duration_weeks: 4,
+  notes: 'Perform slowly',
+  status: 'ACTIVE',
+  prescribed_at: new Date().toISOString(),
+  ...overrides,
+});
+
+export const createTestExerciseProgress = (overrides = {}) => ({
+  id: 'test-progress-id-123',
+  prescription_id: 'test-prescription-id-123',
+  patient_id: 'test-patient-id-123',
+  completed_at: new Date().toISOString(),
+  pain_level: 3,
+  difficulty_rating: 2,
+  notes: 'Felt good',
+  ...overrides,
+});
+
+export const createTestPortalToken = (overrides = {}) => ({
+  id: 'test-token-id-123',
+  patient_id: 'test-patient-id-123',
+  token: 'test-portal-token-abc123',
+  expires_at: new Date(Date.now() + 86400000).toISOString(),
+  ...overrides,
+});
+
+// Mock Express request/response helpers
+export const createMockRequest = (overrides = {}) => ({
+  params: {},
+  query: {},
+  body: {},
+  user: createTestUser(),
+  headers: { 'x-organization-id': 'test-org-id-456' },
+  ...overrides,
+});
+
+export const createMockResponse = () => {
+  const res = {
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn().mockReturnThis(),
+    send: jest.fn().mockReturnThis(),
+    set: jest.fn().mockReturnThis(),
+  };
+  return res;
+};
+
+// Create multiple test items
+export const createMany = (factory, count, overrides = {}) => {
+  return Array.from({ length: count }, (_, i) =>
+    factory({ id: `${factory({}).id}-${i}`, ...overrides })
+  );
+};
 
 // Async test helper
 export const waitFor = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

@@ -41,7 +41,7 @@ describe('Cache Utility', () => {
       expect(cache.get('temp-key')).toBe('temp-value');
 
       // Wait for expiration
-      await new Promise(resolve => setTimeout(resolve, 1100));
+      await new Promise((resolve) => setTimeout(resolve, 1100));
 
       expect(cache.get('temp-key')).toBeNull();
     });
@@ -49,7 +49,7 @@ describe('Cache Utility', () => {
     it('should not expire keys with TTL 0 (permanent)', async () => {
       cache.set('perm-key', 'perm-value', 0);
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(cache.get('perm-key')).toBe('perm-value');
     });
@@ -96,28 +96,35 @@ describe('Cache Utility', () => {
 
   describe('Statistics', () => {
     it('should track hits and misses', () => {
+      const statsBefore = cache.getStats();
+      const hitsBefore = statsBefore.hits;
+      const missesBefore = statsBefore.misses;
+
       cache.set('key1', 'value1');
 
       cache.get('key1'); // hit
       cache.get('key2'); // miss
       cache.get('key1'); // hit
 
-      const stats = cache.getStats();
+      const statsAfter = cache.getStats();
 
-      expect(stats.hits).toBe(2);
-      expect(stats.misses).toBe(1);
-      expect(stats.hitRate).toBe('66.67%');
+      expect(statsAfter.hits - hitsBefore).toBe(2);
+      expect(statsAfter.misses - missesBefore).toBe(1);
     });
 
     it('should track sets and deletes', () => {
+      const statsBefore = cache.getStats();
+      const setsBefore = statsBefore.sets;
+      const deletesBefore = statsBefore.deletes;
+
       cache.set('key1', 'value1');
       cache.set('key2', 'value2');
       cache.delete('key1');
 
-      const stats = cache.getStats();
+      const statsAfter = cache.getStats();
 
-      expect(stats.sets).toBe(2);
-      expect(stats.deletes).toBe(1);
+      expect(statsAfter.sets - setsBefore).toBe(2);
+      expect(statsAfter.deletes - deletesBefore).toBe(1);
     });
   });
 

@@ -1,9 +1,11 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // Use relative asset paths so desktop mode (Electron) can load from localhost
+  base: './',
   plugins: [react()],
   esbuild: {
     loader: 'jsx',
@@ -34,8 +36,6 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
-    // Use relative paths so Electron can load from file:// or localhost
-    base: './',
   },
   test: {
     globals: true,
@@ -47,4 +47,4 @@ export default defineConfig({
       exclude: ['node_modules/', 'src/__tests__/'],
     },
   },
-})
+});

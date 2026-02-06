@@ -1,6 +1,11 @@
 /**
- * First Run Setup
- * Initializes the PGlite database with schema and seed data on first launch.
+ * First Run Check
+ * Checks if the PGlite database directory exists. If not, this is the first
+ * launch and the database will be initialized automatically by the backend's
+ * db-init.js when PGlite starts.
+ *
+ * This module provides a simple check and an optional splash screen message
+ * for the first-run experience.
  */
 
 const fs = require('fs');
@@ -10,71 +15,93 @@ const DATA_DIR = path.join(__dirname, '..', 'data');
 const PGLITE_DIR = path.join(DATA_DIR, 'pglite');
 
 /**
- * Check if this is the first time the app is running
+ * Check if this is the first time the app is running.
+ * Returns true if the PGlite data directory does not exist or is empty.
  */
-async function isFirstRun() {
-  return !fs.existsSync(PGLITE_DIR) || fs.readdirSync(PGLITE_DIR).length === 0;
+function isFirstRun() {
+  if (!fs.existsSync(PGLITE_DIR)) {
+    return true;
+  }
+  try {
+    const contents = fs.readdirSync(PGLITE_DIR);
+    return contents.length === 0;
+  } catch {
+    return true;
+  }
 }
 
 /**
- * Run first-time database setup
- * Uses the migration runner which handles PGlite initialization
+ * Ensure all required data directories exist for the application.
+ * Called on first run before the backend starts.
  */
-async function runFirstTimeSetup() {
-  console.log('First run detected - initializing database...');
+function ensureDataDirectories() {
+  const dirs = [
+    'data',
+    'data/pglite',
+    'data/backups',
+    'data/uploads',
+    'data/exports',
+    'data/logs',
+    'data/temp',
+  ];
 
-  // Ensure data directories exist
-  const dirs = ['data', 'data/pglite', 'data/backups', 'data/uploads', 'data/exports', 'data/logs', 'data/temp'];
   for (const dir of dirs) {
     const fullPath = path.join(__dirname, '..', dir);
     if (!fs.existsSync(fullPath)) {
       fs.mkdirSync(fullPath, { recursive: true });
-      console.log(`Created: ${fullPath}`);
+      console.log(`[first-run] Created directory: ${fullPath}`);
     }
   }
-
-  // Set environment for PGlite
-  process.env.DESKTOP_MODE = 'true';
-  process.env.DB_ENGINE = 'pglite';
-  process.env.CACHE_ENGINE = 'memory';
-
-  // Run migrations using the migration runner
-  try {
-    const migrationRunner = path.join(__dirname, '..', 'database', 'migrations', 'run.js');
-    // Fork the migration runner as a child process
-    const { fork } = require('child_process');
-
-    await new Promise((resolve, reject) => {
-      const child = fork(migrationRunner, [], {
-        env: {
-          ...process.env,
-          DESKTOP_MODE: 'true',
-          DB_ENGINE: 'pglite',
-          PGLITE_DATA_DIR: PGLITE_DIR,
-        },
-        stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
-      });
-
-      child.stdout?.on('data', (data) => console.log(`[migrate] ${data.toString().trim()}`));
-      child.stderr?.on('data', (data) => console.error(`[migrate:err] ${data.toString().trim()}`));
-
-      child.on('exit', (code) => {
-        if (code === 0) {
-          console.log('Database setup completed successfully');
-          resolve();
-        } else {
-          reject(new Error(`Migration runner exited with code ${code}`));
-        }
-      });
-
-      child.on('error', reject);
-    });
-  } catch (error) {
-    console.error('First-run setup failed:', error.message);
-    // Don't throw - app can still start, user may need to run migrations manually
-  }
-
-  console.log('First-run setup complete');
 }
 
-module.exports = { isFirstRun, runFirstTimeSetup };
+/**
+ * Get an HTML string for a splash screen to display while the database initializes.
+ * This can be loaded into a frameless BrowserWindow during first-run setup.
+ */
+function getSplashHTML() {
+  return `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="
+  font-family: system-ui, -apple-system, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+  background: #0d9488;
+  color: white;
+  border-radius: 12px;
+  user-select: none;
+">
+  <h1 style="font-size: 2em; margin: 0 0 0.5em 0;">ChiroClickCRM</h1>
+  <p style="opacity: 0.85; margin: 0;">Initializing database...</p>
+  <div style="
+    width: 200px;
+    height: 4px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 2px;
+    margin-top: 24px;
+    overflow: hidden;
+  ">
+    <div style="
+      width: 0%;
+      height: 100%;
+      background: white;
+      border-radius: 2px;
+      animation: load 2.5s ease-in-out infinite;
+    "></div>
+  </div>
+  <style>
+    @keyframes load {
+      0%   { width: 0%; }
+      50%  { width: 80%; }
+      100% { width: 100%; }
+    }
+  </style>
+</body>
+</html>`;
+}
+
+module.exports = { isFirstRun, ensureDataDirectories, getSplashHTML };

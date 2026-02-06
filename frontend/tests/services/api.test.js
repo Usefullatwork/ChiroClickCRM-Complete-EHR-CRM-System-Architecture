@@ -7,25 +7,37 @@ import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 // Setup mocks
 const mockSessionStorage = {
   store: {},
-  getItem: jest.fn(key => mockSessionStorage.store[key] || null),
-  setItem: jest.fn((key, value) => { mockSessionStorage.store[key] = value; }),
-  removeItem: jest.fn(key => { delete mockSessionStorage.store[key]; }),
-  clear: jest.fn(() => { mockSessionStorage.store = {}; }),
+  getItem: jest.fn((key) => mockSessionStorage.store[key] || null),
+  setItem: jest.fn((key, value) => {
+    mockSessionStorage.store[key] = value;
+  }),
+  removeItem: jest.fn((key) => {
+    delete mockSessionStorage.store[key];
+  }),
+  clear: jest.fn(() => {
+    mockSessionStorage.store = {};
+  }),
 };
 
 const mockLocalStorage = {
   store: {},
-  getItem: jest.fn(key => mockLocalStorage.store[key] || null),
-  setItem: jest.fn((key, value) => { mockLocalStorage.store[key] = value; }),
-  removeItem: jest.fn(key => { delete mockLocalStorage.store[key]; }),
-  clear: jest.fn(() => { mockLocalStorage.store = {}; }),
+  getItem: jest.fn((key) => mockLocalStorage.store[key] || null),
+  setItem: jest.fn((key, value) => {
+    mockLocalStorage.store[key] = value;
+  }),
+  removeItem: jest.fn((key) => {
+    delete mockLocalStorage.store[key];
+  }),
+  clear: jest.fn(() => {
+    mockLocalStorage.store = {};
+  }),
 };
 
 global.sessionStorage = mockSessionStorage;
 global.localStorage = mockLocalStorage;
-global.btoa = str => Buffer.from(str).toString('base64');
-global.atob = str => Buffer.from(str, 'base64').toString();
-global.window = { Clerk: { session: { getToken: jest.fn().mockResolvedValue('test-token') } } };
+global.btoa = (str) => Buffer.from(str).toString('base64');
+global.atob = (str) => Buffer.from(str, 'base64').toString();
+global.window = { __DESKTOP_MODE__: true };
 
 describe('API Client', () => {
   beforeEach(() => {

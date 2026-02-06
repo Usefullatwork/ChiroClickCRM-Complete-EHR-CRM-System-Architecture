@@ -1,31 +1,35 @@
 /**
  * Electron Preload Script
  * Secure IPC bridge between renderer and main process.
- * Only exposes specific, safe APIs to the frontend.
+ * Uses contextBridge to expose only specific, safe APIs to the frontend.
  */
 
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  // App info
-  getAppInfo: () => ipcRenderer.invoke('app:getInfo'),
+  // App version
+  getVersion: () => ipcRenderer.invoke('get-app-version'),
 
-  // Ollama AI management
-  getOllamaStatus: () => ipcRenderer.invoke('ollama:status'),
-  startOllama: () => ipcRenderer.invoke('ollama:start'),
+  // Open URL in default system browser
+  openExternal: (url) => ipcRenderer.invoke('open-external-link', url),
 
-  // Backup
-  createBackup: () => ipcRenderer.invoke('backup:create'),
+  // Get the path to the data directory
+  getDataPath: () => ipcRenderer.invoke('get-data-path'),
 
-  // Listen for events from main process
-  onBackupStarted: (callback) => {
-    ipcRenderer.on('backup:started', (_, filePath) => callback(filePath));
+  // Restart the backend server process
+  restartBackend: () => ipcRenderer.invoke('restart-backend'),
+
+  // Check if Ollama AI is running and list available models
+  checkOllama: () => ipcRenderer.invoke('check-ollama-status'),
+
+  // Listen for backend lifecycle events from the main process
+  onBackendReady: (callback) => {
+    ipcRenderer.on('backend-ready', () => callback());
   },
-  onMenuAction: (action, callback) => {
-    ipcRenderer.on(`menu:${action}`, () => callback());
+  onBackendError: (callback) => {
+    ipcRenderer.on('backend-error', (_, message) => callback(message));
   },
 
-  // Platform info
+  // Platform identifier
   platform: process.platform,
-  isDesktop: true,
 });

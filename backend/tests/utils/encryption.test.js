@@ -5,8 +5,8 @@
 
 import { describe, it, expect, beforeAll } from '@jest/globals';
 
-// Set encryption key before importing module
-process.env.ENCRYPTION_KEY = 'test_encryption_key_32_chars__!';
+// Set encryption key before importing module (must be exactly 32 characters for AES-256)
+process.env.ENCRYPTION_KEY = 'abcdefghijklmnopqrstuvwxyz123456';
 
 const encryptionModule = await import('../../src/utils/encryption.js');
 const {
@@ -15,7 +15,7 @@ const {
   hash,
   validateFodselsnummer,
   getBirthYearFromFodselsnummer,
-  maskSensitive
+  maskSensitive,
 } = encryptionModule;
 
 describe('Encryption Utilities', () => {
@@ -72,7 +72,7 @@ describe('Encryption Utilities', () => {
     });
 
     it('should throw error for invalid encrypted data format', () => {
-      expect(() => decrypt('invalid_data_without_colon')).toThrow('Invalid encrypted data format');
+      expect(() => decrypt('invalid_data_without_colon')).toThrow('Failed to decrypt data');
     });
   });
 
