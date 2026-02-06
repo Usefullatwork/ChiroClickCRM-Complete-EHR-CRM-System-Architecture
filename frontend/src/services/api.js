@@ -3,17 +3,17 @@
  * Centralized API communication with ChiroClickCRM backend
  */
 
-import axios from 'axios'
-import logger from '../utils/logger'
+import axios from 'axios';
+import logger from '../utils/logger';
 
-const log = logger.scope('API')
+const log = logger.scope('API');
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1'
-const API_TIMEOUT = import.meta.env.VITE_API_TIMEOUT || 30000
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+const API_TIMEOUT = import.meta.env.VITE_API_TIMEOUT || 30000;
 
 // Secure organization storage using sessionStorage (more secure than localStorage)
 // Organization ID is cleared when browser tab is closed
-const ORG_STORAGE_KEY = 'org_session'
+const ORG_STORAGE_KEY = 'org_session';
 
 /**
  * Securely store organization ID
@@ -22,19 +22,19 @@ const ORG_STORAGE_KEY = 'org_session'
  */
 export const setOrganizationId = (organizationId) => {
   if (!organizationId) {
-    sessionStorage.removeItem(ORG_STORAGE_KEY)
-    return
+    sessionStorage.removeItem(ORG_STORAGE_KEY);
+    return;
   }
   // Store with timestamp for potential expiry checks
   const data = {
     id: organizationId,
-    ts: Date.now()
-  }
-  sessionStorage.setItem(ORG_STORAGE_KEY, btoa(JSON.stringify(data)))
-}
+    ts: Date.now(),
+  };
+  sessionStorage.setItem(ORG_STORAGE_KEY, btoa(JSON.stringify(data)));
+};
 
-// Default organization ID for development mode
-const DEV_ORGANIZATION_ID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'
+// Default organization ID for desktop/development mode
+const DEV_ORGANIZATION_ID = 'a0000000-0000-0000-0000-000000000001';
 
 /**
  * Retrieve organization ID from secure storage
@@ -42,42 +42,42 @@ const DEV_ORGANIZATION_ID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'
  */
 export const getOrganizationId = () => {
   try {
-    const stored = sessionStorage.getItem(ORG_STORAGE_KEY)
+    const stored = sessionStorage.getItem(ORG_STORAGE_KEY);
     if (!stored) {
       // Fallback to localStorage for migration (remove after initial deployment)
-      const legacyId = localStorage.getItem('organizationId')
+      const legacyId = localStorage.getItem('organizationId');
       if (legacyId) {
-        setOrganizationId(legacyId)
-        localStorage.removeItem('organizationId') // Clean up legacy storage
-        return legacyId
+        setOrganizationId(legacyId);
+        localStorage.removeItem('organizationId'); // Clean up legacy storage
+        return legacyId;
       }
       // Use default organization ID in development mode
       if (import.meta.env.DEV) {
-        return DEV_ORGANIZATION_ID
+        return DEV_ORGANIZATION_ID;
       }
-      return null
+      return null;
     }
-    const data = JSON.parse(atob(stored))
+    const data = JSON.parse(atob(stored));
     // Optional: Add expiry check (e.g., 24 hours)
-    const MAX_AGE = 24 * 60 * 60 * 1000 // 24 hours
+    const MAX_AGE = 24 * 60 * 60 * 1000; // 24 hours
     if (Date.now() - data.ts > MAX_AGE) {
-      sessionStorage.removeItem(ORG_STORAGE_KEY)
-      return null
+      sessionStorage.removeItem(ORG_STORAGE_KEY);
+      return null;
     }
-    return data.id
+    return data.id;
   } catch {
-    sessionStorage.removeItem(ORG_STORAGE_KEY)
-    return null
+    sessionStorage.removeItem(ORG_STORAGE_KEY);
+    return null;
   }
-}
+};
 
 /**
  * Clear organization ID from storage
  */
 export const clearOrganizationId = () => {
-  sessionStorage.removeItem(ORG_STORAGE_KEY)
-  localStorage.removeItem('organizationId') // Clean up legacy storage
-}
+  sessionStorage.removeItem(ORG_STORAGE_KEY);
+  localStorage.removeItem('organizationId'); // Clean up legacy storage
+};
 
 /**
  * Initialize CSRF protection
@@ -87,9 +87,9 @@ export const clearOrganizationId = () => {
 export const initializeCSRF = async () => {
   // CSRF is not needed when using JWT/Bearer token authentication
   // This is a placeholder for future CSRF implementation if needed
-  log.debug('API client initialized')
-  return true
-}
+  log.debug('API client initialized');
+  return true;
+};
 
 // Create axios instance
 const apiClient = axios.create({
@@ -99,83 +99,81 @@ const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
   withCredentials: true, // Enable cookies for secure session handling
-})
+});
 
 // Request interceptor - Add organization ID header
 apiClient.interceptors.request.use(
   async (config) => {
     // Get organization ID from secure storage
-    const organizationId = getOrganizationId()
+    const organizationId = getOrganizationId();
     if (!organizationId) {
       // Organization ID is required for most API calls
       // Allow some endpoints without org ID (e.g., organization selection)
-      const exemptPaths = ['/organizations', '/users/me']
-      const isExempt = exemptPaths.some(path => config.url?.includes(path))
+      const exemptPaths = ['/organizations', '/users/me'];
+      const isExempt = exemptPaths.some((path) => config.url?.includes(path));
 
       if (!isExempt) {
-        log.error('Organization ID is missing. Please select an organization.')
-        return Promise.reject(new Error('Organization ID is required. Please select an organization in settings.'))
+        log.error('Organization ID is missing. Please select an organization.');
+        return Promise.reject(
+          new Error('Organization ID is required. Please select an organization in settings.')
+        );
       }
     } else {
-      config.headers['X-Organization-Id'] = organizationId
+      config.headers['X-Organization-Id'] = organizationId;
     }
 
-    return config
+    return config;
   },
   (error) => {
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
-)
+);
 
 // Response interceptor - Handle errors
 apiClient.interceptors.response.use(
   (response) => {
-    return response
+    return response;
   },
   (error) => {
     if (error.response) {
       // Server responded with error status
-      const { status, data } = error.response
+      const { status, data } = error.response;
 
       switch (status) {
         case 401:
-          // Unauthorized - redirect to login (unless in dev mode)
-          if (!import.meta.env.DEV) {
-            window.location.href = '/sign-in'
-          } else {
-            log.warn('401 Unauthorized - skipping redirect in dev mode')
-          }
-          break
+          // Unauthorized - log warning (desktop mode has no external login page)
+          log.warn('401 Unauthorized - session may have expired');
+          break;
         case 403:
           // Forbidden
-          log.error('Access denied', { message: data.message })
-          break
+          log.error('Access denied', { message: data.message });
+          break;
         case 404:
           // Not found
-          log.warn('Resource not found', { message: data.message })
-          break
+          log.warn('Resource not found', { message: data.message });
+          break;
         case 429:
           // Rate limit exceeded
-          log.warn('Too many requests', { message: data.message })
-          break
+          log.warn('Too many requests', { message: data.message });
+          break;
         case 500:
           // Server error
-          log.error('Server error', { message: data.message })
-          break
+          log.error('Server error', { message: data.message });
+          break;
         default:
-          log.error('API error', { status, message: data.message })
+          log.error('API error', { status, message: data.message });
       }
     } else if (error.request) {
       // Request made but no response
-      log.error('Network error: No response from server')
+      log.error('Network error: No response from server');
     } else {
       // Something else happened
-      log.error('Request error', { message: error.message })
+      log.error('Request error', { message: error.message });
     }
 
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
-)
+);
 
 // ============================================================================
 // API METHODS
@@ -190,7 +188,7 @@ export const patientsAPI = {
   delete: (id) => apiClient.delete(`/patients/${id}`),
   search: (query) => apiClient.get('/patients/search', { params: { q: query } }),
   getStatistics: (id) => apiClient.get(`/patients/${id}/statistics`),
-}
+};
 
 // Clinical Encounters
 export const encountersAPI = {
@@ -202,13 +200,17 @@ export const encountersAPI = {
   sign: (id) => apiClient.post(`/encounters/${id}/sign`),
   generateNote: (id) => apiClient.post(`/encounters/${id}/generate-note`),
   // SALT (Same As Last Time) - get last similar encounter for quick documentation
-  getLastSimilar: (patientId, options = {}) => apiClient.get(`/patients/${patientId}/encounters/last-similar`, { params: options }),
+  getLastSimilar: (patientId, options = {}) =>
+    apiClient.get(`/patients/${patientId}/encounters/last-similar`, { params: options }),
   // Amendments for signed encounters
   getAmendments: (encounterId) => apiClient.get(`/encounters/${encounterId}/amendments`),
-  createAmendment: (encounterId, data) => apiClient.post(`/encounters/${encounterId}/amendments`, data),
-  signAmendment: (encounterId, amendmentId) => apiClient.post(`/encounters/${encounterId}/amendments/${amendmentId}/sign`),
-  deleteAmendment: (encounterId, amendmentId) => apiClient.delete(`/encounters/${encounterId}/amendments/${amendmentId}`),
-}
+  createAmendment: (encounterId, data) =>
+    apiClient.post(`/encounters/${encounterId}/amendments`, data),
+  signAmendment: (encounterId, amendmentId) =>
+    apiClient.post(`/encounters/${encounterId}/amendments/${amendmentId}/sign`),
+  deleteAmendment: (encounterId, amendmentId) =>
+    apiClient.delete(`/encounters/${encounterId}/amendments/${amendmentId}`),
+};
 
 // Appointments
 export const appointmentsAPI = {
@@ -220,7 +222,7 @@ export const appointmentsAPI = {
   cancel: (id, reason) => apiClient.post(`/appointments/${id}/cancel`, { reason }),
   confirm: (id) => apiClient.post(`/appointments/${id}/confirm`),
   checkIn: (id) => apiClient.post(`/appointments/${id}/check-in`),
-}
+};
 
 // Communications
 export const communicationsAPI = {
@@ -230,7 +232,7 @@ export const communicationsAPI = {
   sendSMS: (data) => apiClient.post('/communications/sms', data),
   sendEmail: (data) => apiClient.post('/communications/email', data),
   getTemplates: () => apiClient.get('/communications/templates'),
-}
+};
 
 // Follow-ups
 export const followUpsAPI = {
@@ -241,8 +243,9 @@ export const followUpsAPI = {
   complete: (id, notes) => apiClient.post(`/followups/${id}/complete`, { notes }),
   skip: (id, reason) => apiClient.post(`/followups/${id}/skip`, { reason }),
   getPatientsNeedingFollowUp: () => apiClient.get('/followups/patients/needingFollowUp'),
-  markPatientAsContacted: (patientId, method) => apiClient.post(`/followups/patients/${patientId}/contacted`, { method }),
-}
+  markPatientAsContacted: (patientId, method) =>
+    apiClient.post(`/followups/patients/${patientId}/contacted`, { method }),
+};
 
 // Financial
 export const financialAPI = {
@@ -257,14 +260,14 @@ export const financialAPI = {
   getOutstanding: (params) => apiClient.get('/financial/outstanding', { params }),
   getDailyRevenueChart: (params) => apiClient.get('/financial/chart/daily-revenue', { params }),
   generateInvoiceNumber: () => apiClient.get('/financial/invoice-number'),
-}
+};
 
 // Dashboard
 export const dashboardAPI = {
   getStats: () => apiClient.get('/dashboard/stats'),
   getTodayAppointments: () => apiClient.get('/dashboard/appointments/today'),
   getPendingTasks: () => apiClient.get('/dashboard/tasks/pending'),
-}
+};
 
 // KPI Dashboard
 export const kpiAPI = {
@@ -276,25 +279,28 @@ export const kpiAPI = {
   getRebookingRate: () => apiClient.get('/kpi/rebooking-rate'),
   getTopDiagnoses: (limit) => apiClient.get('/kpi/top-diagnoses', { params: { limit } }),
   // Detailed KPI tracking
-  getDetailedKPIs: (startDate, endDate) => apiClient.get('/kpi/detailed', { params: { startDate, endDate } }),
-  getCategoryBreakdown: (startDate, endDate) => apiClient.get('/kpi/category-breakdown', { params: { startDate, endDate } }),
-  getGeographicDistribution: (startDate, endDate) => apiClient.get('/kpi/geographic', { params: { startDate, endDate } }),
+  getDetailedKPIs: (startDate, endDate) =>
+    apiClient.get('/kpi/detailed', { params: { startDate, endDate } }),
+  getCategoryBreakdown: (startDate, endDate) =>
+    apiClient.get('/kpi/category-breakdown', { params: { startDate, endDate } }),
+  getGeographicDistribution: (startDate, endDate) =>
+    apiClient.get('/kpi/geographic', { params: { startDate, endDate } }),
   importData: (data) => apiClient.post('/kpi/import', { data }),
-}
+};
 
 // Diagnosis Codes
 export const diagnosisAPI = {
   search: (query) => apiClient.get('/diagnosis/search', { params: { q: query } }),
   getCommon: () => apiClient.get('/diagnosis/common'),
   getByCode: (code) => apiClient.get(`/diagnosis/${code}`),
-}
+};
 
 // Treatment Codes
 export const treatmentsAPI = {
   getAll: () => apiClient.get('/treatments'),
   getCommon: () => apiClient.get('/treatments/common'),
   getByCode: (code) => apiClient.get(`/treatments/${code}`),
-}
+};
 
 // Organization
 export const organizationAPI = {
@@ -302,14 +308,14 @@ export const organizationAPI = {
   update: (data) => apiClient.patch('/organizations/current', data),
   getUsers: () => apiClient.get('/organizations/current/users'),
   inviteUser: (data) => apiClient.post('/organizations/current/invite', data),
-}
+};
 
 // Users
 export const usersAPI = {
   getCurrent: () => apiClient.get('/users/me'),
   update: (data) => apiClient.patch('/users/me', data),
   getAll: () => apiClient.get('/users'),
-}
+};
 
 // Clinical Templates
 export const templatesAPI = {
@@ -323,35 +329,45 @@ export const templatesAPI = {
   trackUsage: (id, data) => apiClient.post(`/templates/${id}/use`, data),
   incrementUsage: (id) => apiClient.post(`/templates/${id}/use`),
   getCategories: (params) => apiClient.get('/templates/categories', { params }),
-  search: (query, language = 'NO') => apiClient.get('/templates/search', { params: { q: query, language } }),
+  search: (query, language = 'NO') =>
+    apiClient.get('/templates/search', { params: { q: query, language } }),
 
   // Orthopedic Tests Library
   getTestsLibrary: (params) => apiClient.get('/templates/tests/library', { params }),
-  getTestByCode: (code, language = 'NO') => apiClient.get(`/templates/tests/${code}`, { params: { language } }),
+  getTestByCode: (code, language = 'NO') =>
+    apiClient.get(`/templates/tests/${code}`, { params: { language } }),
 
   // User Preferences
   getUserPreferences: () => apiClient.get('/templates/preferences/user'),
   addFavorite: (templateId) => apiClient.post(`/templates/preferences/favorites/${templateId}`),
-  removeFavorite: (templateId) => apiClient.delete(`/templates/preferences/favorites/${templateId}`),
+  removeFavorite: (templateId) =>
+    apiClient.delete(`/templates/preferences/favorites/${templateId}`),
 
   // Clinical Phrases
   getPhrases: (params) => apiClient.get('/templates/phrases', { params }),
-  getPhrasesByRegion: (region, language = 'NO') => apiClient.get(`/templates/phrases/byregion/${region}`, { params: { language } }),
-}
+  getPhrasesByRegion: (region, language = 'NO') =>
+    apiClient.get(`/templates/phrases/byregion/${region}`, { params: { language } }),
+};
 
 // Structured Examinations
 export const examinationsAPI = {
   // Protocols
-  getBodyRegions: (language = 'NO') => apiClient.get('/examinations/protocols/body-regions', { params: { language } }),
-  getCategories: (language = 'NO') => apiClient.get('/examinations/protocols/categories', { params: { language } }),
+  getBodyRegions: (language = 'NO') =>
+    apiClient.get('/examinations/protocols/body-regions', { params: { language } }),
+  getCategories: (language = 'NO') =>
+    apiClient.get('/examinations/protocols/categories', { params: { language } }),
   getAllProtocols: (params) => apiClient.get('/examinations/protocols', { params }),
   getProtocolById: (id) => apiClient.get(`/examinations/protocols/${id}`),
-  searchProtocols: (query, language = 'NO', limit = 50) => apiClient.get('/examinations/protocols/search', { params: { query, language, limit } }),
-  getProtocolsByRegion: (region, language = 'NO') => apiClient.get(`/examinations/protocols/by-region/${region}`, { params: { language } }),
-  getProtocolsByCategory: (category, language = 'NO') => apiClient.get(`/examinations/protocols/by-category/${category}`, { params: { language } }),
+  searchProtocols: (query, language = 'NO', limit = 50) =>
+    apiClient.get('/examinations/protocols/search', { params: { query, language, limit } }),
+  getProtocolsByRegion: (region, language = 'NO') =>
+    apiClient.get(`/examinations/protocols/by-region/${region}`, { params: { language } }),
+  getProtocolsByCategory: (category, language = 'NO') =>
+    apiClient.get(`/examinations/protocols/by-category/${category}`, { params: { language } }),
 
   // Findings
-  getFindingsByEncounter: (encounterId) => apiClient.get(`/examinations/findings/encounter/${encounterId}`),
+  getFindingsByEncounter: (encounterId) =>
+    apiClient.get(`/examinations/findings/encounter/${encounterId}`),
   getFindingById: (id) => apiClient.get(`/examinations/findings/${id}`),
   createFinding: (data) => apiClient.post('/examinations/findings', data),
   createBatchFindings: (findings) => apiClient.post('/examinations/findings/batch', { findings }),
@@ -363,30 +379,37 @@ export const examinationsAPI = {
   getRedFlags: (encounterId) => apiClient.get(`/examinations/red-flags/${encounterId}`),
 
   // Template Sets
-  getAllTemplateSets: (language = 'NO') => apiClient.get('/examinations/template-sets', { params: { language } }),
-  getTemplateSetsByComplaint: (complaint, language = 'NO') => apiClient.get(`/examinations/template-sets/by-complaint/${complaint}`, { params: { language } }),
+  getAllTemplateSets: (language = 'NO') =>
+    apiClient.get('/examinations/template-sets', { params: { language } }),
+  getTemplateSetsByComplaint: (complaint, language = 'NO') =>
+    apiClient.get(`/examinations/template-sets/by-complaint/${complaint}`, {
+      params: { language },
+    }),
   getTemplateSetById: (id) => apiClient.get(`/examinations/template-sets/${id}`),
   createTemplateSet: (data) => apiClient.post('/examinations/template-sets', data),
   incrementTemplateSetUsage: (id) => apiClient.post(`/examinations/template-sets/${id}/use`),
-}
+};
 
 // PDF Generation
 export const pdfAPI = {
   generateInvoice: (financialMetricId) => apiClient.post(`/pdf/invoice/${financialMetricId}`),
-  generatePatientLetter: (encounterId, letterType) => apiClient.post(`/pdf/letter/${encounterId}`, { letterType }),
-}
+  generatePatientLetter: (encounterId, letterType) =>
+    apiClient.post(`/pdf/letter/${encounterId}`, { letterType }),
+};
 
 // GDPR
 export const gdprAPI = {
   getRequests: () => apiClient.get('/gdpr/requests'),
   createRequest: (data) => apiClient.post('/gdpr/requests', data),
-  updateRequestStatus: (requestId, data) => apiClient.patch(`/gdpr/requests/${requestId}/status`, data),
+  updateRequestStatus: (requestId, data) =>
+    apiClient.patch(`/gdpr/requests/${requestId}/status`, data),
   exportPatientData: (patientId) => apiClient.get(`/gdpr/patient/${patientId}/data-access`),
-  exportDataPortability: (patientId) => apiClient.get(`/gdpr/patient/${patientId}/data-portability`),
+  exportDataPortability: (patientId) =>
+    apiClient.get(`/gdpr/patient/${patientId}/data-portability`),
   processErasure: (requestId) => apiClient.post(`/gdpr/requests/${requestId}/erasure`),
   updateConsent: (patientId, data) => apiClient.patch(`/gdpr/patient/${patientId}/consent`, data),
   getConsentAudit: (patientId) => apiClient.get(`/gdpr/patient/${patientId}/consent-audit`),
-}
+};
 
 // CRM - Customer Relationship Management
 export const crmAPI = {
@@ -415,7 +438,8 @@ export const crmAPI = {
   // Surveys
   getSurveys: () => apiClient.get('/crm/surveys'),
   createSurvey: (data) => apiClient.post('/crm/surveys', data),
-  getSurveyResponses: (surveyId, params) => apiClient.get(`/crm/surveys/${surveyId}/responses`, { params }),
+  getSurveyResponses: (surveyId, params) =>
+    apiClient.get(`/crm/surveys/${surveyId}/responses`, { params }),
   getNPSStats: (period) => apiClient.get('/crm/surveys/nps/stats', { params: { period } }),
 
   // Communications
@@ -451,7 +475,7 @@ export const crmAPI = {
   // Settings
   getSettings: () => apiClient.get('/crm/settings'),
   updateSettings: (data) => apiClient.put('/crm/settings', data),
-}
+};
 
 // Authentication
 export const authAPI = {
@@ -463,7 +487,7 @@ export const authAPI = {
   verifyEmail: (token) => apiClient.post('/auth/verify-email', { token }),
   requestPasswordReset: (email) => apiClient.post('/auth/forgot-password', { email }),
   resetPassword: (token, password) => apiClient.post('/auth/reset-password', { token, password }),
-}
+};
 
 // AI Clinical Assistant - see aiAPI below (line ~730)
 
@@ -478,7 +502,8 @@ export const aiFeedbackAPI = {
   // Get overall AI performance metrics (admin)
   getPerformanceMetrics: (params) => apiClient.get('/ai/performance', { params }),
   // Get suggestions needing review (admin)
-  getSuggestionsNeedingReview: (limit) => apiClient.get('/ai/suggestions/review', { params: { limit } }),
+  getSuggestionsNeedingReview: (limit) =>
+    apiClient.get('/ai/suggestions/review', { params: { limit } }),
   // Get common corrections (admin)
   getCommonCorrections: (params) => apiClient.get('/ai/corrections/common', { params }),
   // Trigger manual retraining (admin)
@@ -490,70 +515,75 @@ export const aiFeedbackAPI = {
   // Rollback to previous model
   rollbackModel: (versionId) => apiClient.post(`/ai/model/rollback/${versionId}`),
   // Export feedback for training
-  exportFeedback: (format = 'jsonl') => apiClient.get('/ai/feedback/export', { params: { format } }),
-}
+  exportFeedback: (format = 'jsonl') =>
+    apiClient.get('/ai/feedback/export', { params: { format } }),
+};
 
 // Data Import
 export const importAPI = {
   // Excel import
   downloadTemplate: () => apiClient.get('/import/patients/template', { responseType: 'blob' }),
   importExcel: (file, options = {}) => {
-    const formData = new FormData()
-    formData.append('file', file)
-    Object.entries(options).forEach(([key, value]) => formData.append(key, value))
+    const formData = new FormData();
+    formData.append('file', file);
+    Object.entries(options).forEach(([key, value]) => formData.append(key, value));
     return apiClient.post('/import/patients/excel', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
   },
 
   // Text import
   parseText: (text) => apiClient.post('/import/patients/parse-text', { text }),
-  importFromText: (patients, options = {}) => apiClient.post('/import/patients/from-text', { patients, ...options }),
+  importFromText: (patients, options = {}) =>
+    apiClient.post('/import/patients/from-text', { patients, ...options }),
 
   // CSV import
   parseCSV: (file, options = {}) => {
-    const formData = new FormData()
-    formData.append('file', file)
-    Object.entries(options).forEach(([key, value]) => formData.append(key, String(value)))
+    const formData = new FormData();
+    formData.append('file', file);
+    Object.entries(options).forEach(([key, value]) => formData.append(key, String(value)));
     return apiClient.post('/import/patients/csv/parse', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
   },
   importCSV: (file, mappings, options = {}) => {
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('mappings', JSON.stringify(mappings))
-    Object.entries(options).forEach(([key, value]) => formData.append(key, String(value)))
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('mappings', JSON.stringify(mappings));
+    Object.entries(options).forEach(([key, value]) => formData.append(key, String(value)));
     return apiClient.post('/import/patients/csv', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
   },
 
   // vCard import/export
   parseVCard: (file) => {
-    const formData = new FormData()
-    formData.append('file', file)
+    const formData = new FormData();
+    formData.append('file', file);
     return apiClient.post('/import/patients/vcard/parse', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
   },
   importVCard: (file, options = {}) => {
-    const formData = new FormData()
-    formData.append('file', file)
-    Object.entries(options).forEach(([key, value]) => formData.append(key, String(value)))
+    const formData = new FormData();
+    formData.append('file', file);
+    Object.entries(options).forEach(([key, value]) => formData.append(key, String(value)));
     return apiClient.post('/import/patients/vcard', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
   },
-  exportVCard: (patientIds = []) => apiClient.post('/import/patients/vcard/export', { patientIds }, { responseType: 'blob' }),
+  exportVCard: (patientIds = []) =>
+    apiClient.post('/import/patients/vcard/export', { patientIds }, { responseType: 'blob' }),
 
   // Google Contacts
-  importGoogleContacts: (contacts, options = {}) => apiClient.post('/import/patients/google', { contacts, ...options }),
+  importGoogleContacts: (contacts, options = {}) =>
+    apiClient.post('/import/patients/google', { contacts, ...options }),
 
   // Mapping templates
   getMappingTemplates: () => apiClient.get('/import/mapping-templates'),
-  saveMappingTemplate: (name, mappings) => apiClient.post('/import/mapping-templates', { name, mappings }),
-}
+  saveMappingTemplate: (name, mappings) =>
+    apiClient.post('/import/mapping-templates', { name, mappings }),
+};
 
 // Bulk Communications
 export const bulkCommunicationsAPI = {
@@ -567,7 +597,7 @@ export const bulkCommunicationsAPI = {
   getPendingQueue: (params) => apiClient.get('/communications/queue/pending', { params }),
   // Preview personalized messages
   previewBulk: (data) => apiClient.post('/communications/bulk-preview', data),
-}
+};
 
 // Billing API - Norwegian Healthcare Invoicing
 export const billingAPI = {
@@ -590,11 +620,12 @@ export const billingAPI = {
 
   // Payments
   getInvoicePayments: (invoiceId) => apiClient.get(`/billing/invoices/${invoiceId}/payments`),
-  recordPayment: (invoiceId, data) => apiClient.post(`/billing/invoices/${invoiceId}/payments`, data),
+  recordPayment: (invoiceId, data) =>
+    apiClient.post(`/billing/invoices/${invoiceId}/payments`, data),
 
   // HELFO Reports
   getHelfoReport: (params) => apiClient.get('/billing/helfo-report', { params }),
-}
+};
 
 // Analytics Dashboard
 export const analyticsAPI = {
@@ -613,25 +644,31 @@ export const analyticsAPI = {
   // Patient volume trends
   getPatientTrends: () => apiClient.get('/analytics/trends/patients'),
   // Export to CSV
-  exportCSV: (type, params) => apiClient.get(`/analytics/export/${type}`, {
-    params,
-    responseType: 'blob'
-  }),
-}
+  exportCSV: (type, params) =>
+    apiClient.get(`/analytics/export/${type}`, {
+      params,
+      responseType: 'blob',
+    }),
+};
 
 // Progress Tracking / Fremgangssporing
 export const progressAPI = {
   // Patient progress analytics
-  getPatientStats: (patientId, params) => apiClient.get(`/progress/patient/${patientId}/stats`, { params }),
-  getWeeklyCompliance: (patientId, weeks = 12) => apiClient.get(`/progress/patient/${patientId}/weekly`, { params: { weeks } }),
-  getDailyProgress: (patientId, months = 3) => apiClient.get(`/progress/patient/${patientId}/daily`, { params: { months } }),
-  getPainHistory: (patientId, days = 90) => apiClient.get(`/progress/patient/${patientId}/pain`, { params: { days } }),
-  logPainEntry: (patientId, painLevel, notes) => apiClient.post(`/progress/patient/${patientId}/pain`, { painLevel, notes }),
+  getPatientStats: (patientId, params) =>
+    apiClient.get(`/progress/patient/${patientId}/stats`, { params }),
+  getWeeklyCompliance: (patientId, weeks = 12) =>
+    apiClient.get(`/progress/patient/${patientId}/weekly`, { params: { weeks } }),
+  getDailyProgress: (patientId, months = 3) =>
+    apiClient.get(`/progress/patient/${patientId}/daily`, { params: { months } }),
+  getPainHistory: (patientId, days = 90) =>
+    apiClient.get(`/progress/patient/${patientId}/pain`, { params: { days } }),
+  logPainEntry: (patientId, painLevel, notes) =>
+    apiClient.post(`/progress/patient/${patientId}/pain`, { painLevel, notes }),
 
   // Therapist/Clinic analytics
   getAllPatientsCompliance: (params) => apiClient.get('/progress/compliance', { params }),
   getClinicOverview: () => apiClient.get('/progress/overview'),
-}
+};
 
 // Workflow Automation
 export const automationsAPI = {
@@ -644,7 +681,8 @@ export const automationsAPI = {
   toggleWorkflow: (id) => apiClient.post(`/automations/workflows/${id}/toggle`),
 
   // Execution history
-  getWorkflowExecutions: (workflowId, params) => apiClient.get(`/automations/workflows/${workflowId}/executions`, { params }),
+  getWorkflowExecutions: (workflowId, params) =>
+    apiClient.get(`/automations/workflows/${workflowId}/executions`, { params }),
   getExecutions: (params) => apiClient.get('/automations/executions', { params }),
 
   // Testing
@@ -660,14 +698,15 @@ export const automationsAPI = {
   // Manual processing (admin)
   processAutomations: () => apiClient.post('/automations/process'),
   processTimeTriggers: () => apiClient.post('/automations/process-time-triggers'),
-}
+};
 
 // Spine Templates (Quick-Click Palpation)
 export const spineTemplatesAPI = {
   // Get all templates (with org customizations merged with defaults)
   getAll: (params) => apiClient.get('/spine-templates', { params }),
   // Get templates grouped by segment (for UI)
-  getGrouped: (language = 'NO') => apiClient.get('/spine-templates/grouped', { params: { language } }),
+  getGrouped: (language = 'NO') =>
+    apiClient.get('/spine-templates/grouped', { params: { language } }),
   // Get available segments
   getSegments: () => apiClient.get('/spine-templates/segments'),
   // Get available directions
@@ -684,8 +723,9 @@ export const spineTemplatesAPI = {
   // Delete custom template (revert to default)
   delete: (id) => apiClient.delete(`/spine-templates/${id}`),
   // Reset all to defaults
-  resetToDefaults: (language = 'NO') => apiClient.post('/spine-templates/reset', null, { params: { language } }),
-}
+  resetToDefaults: (language = 'NO') =>
+    apiClient.post('/spine-templates/reset', null, { params: { language } }),
+};
 
 // Clinical Settings API
 export const clinicalSettingsAPI = {
@@ -703,21 +743,23 @@ export const clinicalSettingsAPI = {
   getAdjustmentTemplates: () => apiClient.get('/clinical-settings/adjustment/templates'),
   setAdjustmentStyle: (style) => apiClient.put('/clinical-settings/adjustment/style', { style }),
   // Test settings
-  updateTestSettings: (testType, settings) => apiClient.patch(`/clinical-settings/tests/${testType}`, settings),
+  updateTestSettings: (testType, settings) =>
+    apiClient.patch(`/clinical-settings/tests/${testType}`, settings),
   // Letter settings
   updateLetterSettings: (settings) => apiClient.patch('/clinical-settings/letters', settings),
-}
+};
 
 // AI Training Management
 export const trainingAPI = {
   getStatus: () => apiClient.get('/training/status'),
   getData: () => apiClient.get('/training/data'),
-  addExamples: (jsonlContent, targetFile) => apiClient.post('/training/add-examples', { jsonlContent, targetFile }),
+  addExamples: (jsonlContent, targetFile) =>
+    apiClient.post('/training/add-examples', { jsonlContent, targetFile }),
   rebuild: () => apiClient.post('/training/rebuild'),
   backup: () => apiClient.post('/training/backup'),
   restore: () => apiClient.post('/training/restore'),
   testModel: (model, prompt) => apiClient.get(`/training/test/${model}`, { params: { prompt } }),
-}
+};
 
 // AI Service
 export const aiAPI = {
@@ -728,8 +770,7 @@ export const aiAPI = {
   suggestDiagnosis: (soapData) => apiClient.post('/ai/suggest-diagnosis', { soapData }),
   analyzeRedFlags: (patientData, soapData) =>
     apiClient.post('/ai/analyze-red-flags', { patientData, soapData }),
-  generateClinicalSummary: (encounter) =>
-    apiClient.post('/ai/clinical-summary', { encounter }),
+  generateClinicalSummary: (encounter) => apiClient.post('/ai/clinical-summary', { encounter }),
   generateField: (fieldType, context, language) =>
     apiClient.post('/ai/generate-field', { fieldType, context, language }),
   // Streaming endpoint - uses fetch directly for SSE support
@@ -737,7 +778,7 @@ export const aiAPI = {
   // Feedback on AI suggestions (thumbs up/down, corrections)
   submitFeedback: (data) => apiClient.post('/ai/feedback', data),
   recordOutcomeFeedback: (data) => apiClient.post('/ai/outcome-feedback', data),
-}
+};
 
 // Exercise Library API
 export const exercisesAPI = {
@@ -758,7 +799,8 @@ export const exercisesAPI = {
 
   // Statistics
   getStats: () => apiClient.get('/exercises/stats'),
-  getTopPrescribed: (limit = 10) => apiClient.get('/exercises/top-prescribed', { params: { limit } }),
+  getTopPrescribed: (limit = 10) =>
+    apiClient.get('/exercises/top-prescribed', { params: { limit } }),
   getComplianceStats: (days = 30) => apiClient.get('/exercises/compliance', { params: { days } }),
 
   // Exercise Programs
@@ -772,22 +814,26 @@ export const exercisesAPI = {
   getPrescriptionById: (id) => apiClient.get(`/exercises/prescriptions/${id}`),
   updatePrescription: (id, data) => apiClient.patch(`/exercises/prescriptions/${id}`, data),
   logCompliance: (id, data) => apiClient.post(`/exercises/prescriptions/${id}/compliance`, data),
-  discontinuePrescription: (id, reason) => apiClient.post(`/exercises/prescriptions/${id}/discontinue`, { reason }),
+  discontinuePrescription: (id, reason) =>
+    apiClient.post(`/exercises/prescriptions/${id}/discontinue`, { reason }),
   completePrescription: (id) => apiClient.post(`/exercises/prescriptions/${id}/complete`),
 
   // Patient-specific
-  getPatientExercises: (patientId, params) => apiClient.get(`/patients/${patientId}/exercises`, { params }),
+  getPatientExercises: (patientId, params) =>
+    apiClient.get(`/patients/${patientId}/exercises`, { params }),
   prescribeToPatient: (patientId, data) => apiClient.post(`/patients/${patientId}/exercises`, data),
-  assignProgramToPatient: (patientId, data) => apiClient.post(`/patients/${patientId}/programs`, data),
+  assignProgramToPatient: (patientId, data) =>
+    apiClient.post(`/patients/${patientId}/programs`, data),
 
   // PDF generation
-  getPatientExercisePDF: (patientId) => apiClient.get(`/patients/${patientId}/exercises/pdf`, {
-    responseType: 'blob'
-  }),
-}
+  getPatientExercisePDF: (patientId) =>
+    apiClient.get(`/patients/${patientId}/exercises/pdf`, {
+      responseType: 'blob',
+    }),
+};
 
 // Export API URL for streaming endpoints
-export { API_URL }
+export { API_URL };
 
 // Export default API client
-export default apiClient
+export default apiClient;

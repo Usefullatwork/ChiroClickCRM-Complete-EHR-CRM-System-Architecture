@@ -77,6 +77,20 @@ export const initPGlite = async () => {
 
     initialized = true;
     logger.info('PGlite database initialized successfully');
+
+    // Run first-time schema + seed setup if needed
+    try {
+      const { initializeDatabase } = await import('./db-init.js');
+      await initializeDatabase({
+        query: async (text, params) => {
+          const res = await db.query(text, params || []);
+          return { rows: res.rows || [], rowCount: res.affectedRows ?? res.rows?.length ?? 0 };
+        },
+      });
+    } catch (initErr) {
+      logger.warn('DB init skipped:', initErr.message);
+    }
+
     return db;
   } catch (error) {
     logger.error('Failed to initialize PGlite:', error);

@@ -3,27 +3,34 @@
  * Real-time practice metrics and analytics
  */
 
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { kpiAPI } from '../services/api'
-import { TrendingUp, TrendingDown, Users, Calendar, MapPin, Activity } from 'lucide-react'
-import { useTranslation } from '../i18n'
+import { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { kpiAPI } from '../services/api';
+import { TrendingUp, TrendingDown, Users, MapPin, Activity } from 'lucide-react';
+import { useTranslation } from '../i18n';
 
 export default function KPI() {
-  const { t, lang } = useTranslation('financial')
-  const [dateRange, setDateRange] = useState('30') // days
+  const { t } = useTranslation('financial');
+  const [dateRange, setDateRange] = useState('30'); // days
 
-  // Calculate date range
-  const endDate = new Date().toISOString()
-  const startDate = new Date(Date.now() - parseInt(dateRange) * 24 * 60 * 60 * 1000).toISOString()
+  // Memoize dates so queryKey stays stable between renders
+  const { startDate, endDate } = useMemo(() => {
+    const end = new Date();
+    end.setHours(23, 59, 59, 0);
+    const start = new Date(end.getTime() - parseInt(dateRange) * 24 * 60 * 60 * 1000);
+    start.setHours(0, 0, 0, 0);
+    return { startDate: start.toISOString(), endDate: end.toISOString() };
+  }, [dateRange]);
 
   // Fetch detailed KPI data
   const { data: kpiData, isLoading } = useQuery({
-    queryKey: ['kpi-detailed', startDate, endDate],
+    queryKey: ['kpi-detailed', dateRange],
     queryFn: () => kpiAPI.getDetailedKPIs(startDate, endDate),
-  })
+    staleTime: 60000, // Cache for 1 minute
+    retry: 1,
+  });
 
-  const metrics = kpiData?.data?.data
+  const metrics = kpiData?.data || kpiData;
 
   if (isLoading) {
     return (
@@ -31,7 +38,7 @@ export default function KPI() {
         <h1 className="text-3xl font-bold mb-6">{t('kpiDashboard')}</h1>
         <p className="text-gray-600">{t('loadingMetrics')}</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -63,7 +70,9 @@ export default function KPI() {
           title={t('rebookingRate')}
           value={`${metrics?.overview?.rebooking_rate || 0}%`}
           icon={<TrendingUp className="w-6 h-6 text-green-600" />}
-          subtitle={t('ofPatients').replace('{rebooked}', metrics?.overview?.rebooked_patients || 0).replace('{total}', metrics?.overview?.total_patients || 0)}
+          subtitle={t('ofPatients')
+            .replace('{rebooked}', metrics?.overview?.rebooked_patients || 0)
+            .replace('{total}', metrics?.overview?.total_patients || 0)}
           trend={metrics?.overview?.rebooking_rate >= 75 ? 'up' : 'down'}
         />
 
@@ -99,11 +108,21 @@ export default function KPI() {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">{t('category')}</th>
-                <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">{t('patients')}</th>
-                <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">{t('visits')}</th>
-                <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">{t('avgVisits')}</th>
-                <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">{t('rebookingRate')}</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                  {t('category')}
+                </th>
+                <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                  {t('patients')}
+                </th>
+                <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                  {t('visits')}
+                </th>
+                <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                  {t('avgVisits')}
+                </th>
+                <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                  {t('rebookingRate')}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -122,9 +141,13 @@ export default function KPI() {
                     {parseFloat(category.avg_visits_per_patient).toFixed(1)}
                   </td>
                   <td className="px-4 py-3 text-sm text-right">
-                    <span className={`font-semibold ${
-                      parseFloat(category.rebooking_rate) >= 75 ? 'text-green-600' : 'text-yellow-600'
-                    }`}>
+                    <span
+                      className={`font-semibold ${
+                        parseFloat(category.rebooking_rate) >= 75
+                          ? 'text-green-600'
+                          : 'text-yellow-600'
+                      }`}
+                    >
                       {parseFloat(category.rebooking_rate).toFixed(1)}%
                     </span>
                   </td>
@@ -146,9 +169,14 @@ export default function KPI() {
                 <MapPin className="w-5 h-5 text-gray-400" />
               </div>
               <p className="text-3xl font-bold text-blue-600 mb-1">{geo.patient_count}</p>
-              <p className="text-sm text-gray-600">{t('totalVisits').replace('{count}', geo.total_visits)}</p>
+              <p className="text-sm text-gray-600">
+                {t('totalVisits').replace('{count}', geo.total_visits)}
+              </p>
               <p className="text-sm text-gray-500">
-                {t('avgVisitsPerPatient').replace('{avg}', parseFloat(geo.avg_visits_per_patient).toFixed(1))}
+                {t('avgVisitsPerPatient').replace(
+                  '{avg}',
+                  parseFloat(geo.avg_visits_per_patient).toFixed(1)
+                )}
               </p>
             </div>
           ))}
@@ -162,10 +190,18 @@ export default function KPI() {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">{t('treatmentType')}</th>
-                <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">{t('patients')}</th>
-                <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">{t('treatments')}</th>
-                <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">{t('avgPerPatient')}</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                  {t('treatmentType')}
+                </th>
+                <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                  {t('patients')}
+                </th>
+                <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                  {t('treatments')}
+                </th>
+                <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                  {t('avgPerPatient')}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -213,9 +249,15 @@ export default function KPI() {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">{t('source')}</th>
-                  <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">{t('patients')}</th>
-                  <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">{t('percentage')}</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                    {t('source')}
+                  </th>
+                  <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                    {t('patients')}
+                  </th>
+                  <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                    {t('percentage')}
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -238,7 +280,7 @@ export default function KPI() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
 // Metric Card Component
@@ -251,17 +293,14 @@ function MetricCard({ title, value, icon, subtitle, trend }) {
       </div>
       <div className="flex items-baseline gap-2">
         <p className="text-3xl font-bold text-gray-900">{value}</p>
-        {trend && (
-          trend === 'up' ? (
+        {trend &&
+          (trend === 'up' ? (
             <TrendingUp className="w-4 h-4 text-green-600" />
           ) : (
             <TrendingDown className="w-4 h-4 text-red-600" />
-          )
-        )}
+          ))}
       </div>
-      {subtitle && (
-        <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
-      )}
+      {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
     </div>
-  )
+  );
 }

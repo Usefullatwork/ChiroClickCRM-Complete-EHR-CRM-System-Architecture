@@ -75,3 +75,9 @@ nul
 # Large binaries - should be installed locally
 bin/ollama/
 bin/pgsql/
+
+# PGlite data directory (runtime database)
+data/pglite/
+
+# Session cookies
+cookies.txt

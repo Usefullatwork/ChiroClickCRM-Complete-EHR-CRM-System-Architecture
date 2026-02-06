@@ -12,9 +12,7 @@ const API_TIMEOUT = parseInt(import.meta.env.VITE_API_TIMEOUT || '30000');
  * Get CSRF token from cookie
  */
 const getCsrfToken = () => {
-  const cookie = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('XSRF-TOKEN='));
+  const cookie = document.cookie.split('; ').find((row) => row.startsWith('XSRF-TOKEN='));
 
   return cookie ? decodeURIComponent(cookie.split('=')[1]) : null;
 };
@@ -35,7 +33,7 @@ const axiosInstance = axios.create({
   withCredentials: true, // Send cookies (CSRF token, session)
   headers: {
     'Content-Type': 'application/json',
-  }
+  },
 });
 
 /**
@@ -80,8 +78,7 @@ axiosInstance.interceptors.response.use(
     // Handle specific error codes
     switch (response.status) {
       case 401:
-        // Unauthorized - redirect to login
-        window.location.href = '/login';
+        // Unauthorized - desktop mode has no login page, silently skip
         break;
 
       case 403:
@@ -93,12 +90,11 @@ axiosInstance.interceptors.response.use(
         }
         break;
 
-      case 429:
+      case 429: {
         // Rate limit exceeded
         const retryAfter = response.data?.retryAfter || response.headers['x-ratelimit-reset'];
-        throw new Error(
-          `Rate limit exceeded. Please try again in ${retryAfter} seconds.`
-        );
+        throw new Error(`Rate limit exceeded. Please try again in ${retryAfter} seconds.`);
+      }
 
       case 500:
       case 502:
@@ -127,7 +123,7 @@ export const api = {
     async getToken() {
       const response = await axiosInstance.get('/auth/csrf-token');
       return response.data.csrfToken;
-    }
+    },
   },
 
   /**
@@ -161,10 +157,10 @@ export const api = {
 
     async search(query) {
       const response = await axiosInstance.get('/patients/search', {
-        params: { q: query }
+        params: { q: query },
       });
       return response.data;
-    }
+    },
   },
 
   /**
@@ -199,7 +195,7 @@ export const api = {
     async getVersions(encounterId) {
       const response = await axiosInstance.get(`/encounters/${encounterId}/versions`);
       return response.data;
-    }
+    },
   },
 
   /**
@@ -229,7 +225,7 @@ export const api = {
     async cancel(id, reason) {
       const response = await axiosInstance.post(`/appointments/${id}/cancel`, { reason });
       return response.data;
-    }
+    },
   },
 
   /**
@@ -243,17 +239,17 @@ export const api = {
 
     async searchICPC2(query) {
       const response = await axiosInstance.get('/codes/icpc2/search', {
-        params: { q: query }
+        params: { q: query },
       });
       return response.data;
     },
 
     async getByChapter(chapter) {
       const response = await axiosInstance.get('/codes/icpc2', {
-        params: { chapter }
+        params: { chapter },
       });
       return response.data;
-    }
+    },
   },
 
   /**
@@ -273,7 +269,7 @@ export const api = {
     async create(data) {
       const response = await axiosInstance.post('/templates', data);
       return response.data;
-    }
+    },
   },
 
   /**
@@ -288,7 +284,7 @@ export const api = {
     async provideFeedback(suggestionId, feedback) {
       const response = await axiosInstance.post(`/ai/feedback/${suggestionId}`, feedback);
       return response.data;
-    }
+    },
   },
 
   /**
@@ -303,7 +299,7 @@ export const api = {
     async getRecentActivity() {
       const response = await axiosInstance.get('/dashboard/activity');
       return response.data;
-    }
+    },
   },
 
   /**
@@ -312,17 +308,17 @@ export const api = {
   gdpr: {
     async exportPatientData(patientId) {
       const response = await axiosInstance.get(`/gdpr/export/${patientId}`, {
-        responseType: 'blob'
+        responseType: 'blob',
       });
       return response.data;
     },
 
     async deletePatientData(patientId, reason) {
       const response = await axiosInstance.delete(`/gdpr/delete/${patientId}`, {
-        data: { reason }
+        data: { reason },
       });
       return response.data;
-    }
+    },
   },
 
   /**
@@ -334,7 +330,7 @@ export const api = {
         action,
         resourceType,
         resourceId,
-        metadata
+        metadata,
       });
       return response.data;
     },
@@ -342,7 +338,7 @@ export const api = {
     async getPatientAccessLog(patientId) {
       const response = await axiosInstance.get(`/audit/patient/${patientId}`);
       return response.data;
-    }
+    },
   },
 
   /**
@@ -383,7 +379,7 @@ export const api = {
      */
     async getMessageStats(dateRange) {
       const response = await axiosInstance.get('/analytics/message-stats', {
-        params: dateRange
+        params: dateRange,
       });
       return response.data;
     },
@@ -422,7 +418,7 @@ export const api = {
     async exportKPIData(params) {
       const response = await axiosInstance.get('/analytics/export', {
         params,
-        responseType: 'blob'
+        responseType: 'blob',
       });
       return response.data;
     },
@@ -463,8 +459,8 @@ export const api = {
     async getSaturdayVisits(params) {
       const response = await axiosInstance.get('/analytics/saturday-visits', { params });
       return response.data;
-    }
-  }
+    },
+  },
 };
 
 /**
@@ -476,19 +472,19 @@ export const handleApiError = (error) => {
     return {
       message: error.response.data?.message || error.message,
       status: error.response.status,
-      data: error.response.data
+      data: error.response.data,
     };
   } else if (error.request) {
     // Request made but no response
     return {
       message: 'No response from server - please check your connection',
-      status: 0
+      status: 0,
     };
   } else {
     // Error in request setup
     return {
       message: error.message,
-      status: 0
+      status: 0,
     };
   }
 };

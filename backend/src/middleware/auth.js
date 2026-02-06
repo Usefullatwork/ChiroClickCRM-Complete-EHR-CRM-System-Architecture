@@ -31,7 +31,7 @@ export const requireLocalAuth = async (req, res, next) => {
     if (!sessionId) {
       return res.status(401).json({
         error: 'Unauthorized',
-        message: 'Session required. Please login'
+        message: 'Session required. Please login',
       });
     }
 
@@ -41,7 +41,7 @@ export const requireLocalAuth = async (req, res, next) => {
       res.clearCookie('session');
       return res.status(401).json({
         error: 'Unauthorized',
-        message: 'Session expired. Please login again'
+        message: 'Session expired. Please login again',
       });
     }
 
@@ -54,7 +54,7 @@ export const requireLocalAuth = async (req, res, next) => {
     logger.error('Local auth error:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Authentication failed'
+      message: 'Authentication failed',
     });
   }
 };
@@ -68,7 +68,7 @@ export const requireFreshSession = (req, res, next) => {
     return res.status(403).json({
       error: 'Fresh Session Required',
       message: 'Please confirm your password to continue',
-      code: 'FRESH_SESSION_REQUIRED'
+      code: 'FRESH_SESSION_REQUIRED',
     });
   }
   next();
@@ -78,7 +78,26 @@ export const requireFreshSession = (req, res, next) => {
  * Authentication middleware
  * Supports session-based auth and API key auth
  */
-export const requireAuth = async (req, res, next) => {
+export const requireAuth = (req, res, next) => {
+  // Desktop mode - auto-authenticate as seeded practitioner
+  const DESKTOP_ORG_ID = 'a0000000-0000-0000-0000-000000000001';
+  const DESKTOP_USER_ID = 'b0000000-0000-0000-0000-000000000099';
+
+  if (process.env.DESKTOP_MODE === 'true') {
+    req.user = {
+      id: DESKTOP_USER_ID,
+      email: 'mads@chiroclick.no',
+      first_name: 'Mads',
+      last_name: 'Admin',
+      role: 'ADMIN',
+      organization_id: DESKTOP_ORG_ID,
+      organizationId: DESKTOP_ORG_ID,
+      is_active: true,
+    };
+    req.organizationId = DESKTOP_ORG_ID;
+    return next();
+  }
+
   // Dev mode bypass - only in development with special header
   const DEV_ORG_ID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
   const DEV_USER_ID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12';
@@ -92,7 +111,7 @@ export const requireAuth = async (req, res, next) => {
       role: 'ADMIN',
       organization_id: DEV_ORG_ID,
       organizationId: DEV_ORG_ID,
-      is_active: true
+      is_active: true,
     };
     req.organizationId = DEV_ORG_ID;
     logger.debug('Dev mode auth bypass active');
@@ -104,7 +123,7 @@ export const requireAuth = async (req, res, next) => {
   if (!authMode) {
     return res.status(401).json({
       error: 'Unauthorized',
-      message: 'Authentication required'
+      message: 'Authentication required',
     });
   }
 
@@ -118,7 +137,7 @@ export const requireAuth = async (req, res, next) => {
 
   return res.status(401).json({
     error: 'Unauthorized',
-    message: 'Invalid authentication method'
+    message: 'Invalid authentication method',
   });
 };
 
@@ -128,6 +147,12 @@ export const requireAuth = async (req, res, next) => {
  * Sets PostgreSQL RLS context
  */
 export const requireOrganization = async (req, res, next) => {
+  // Desktop mode - always use seeded org
+  if (process.env.DESKTOP_MODE === 'true') {
+    req.organizationId = 'a0000000-0000-0000-0000-000000000001';
+    return next();
+  }
+
   // Dev mode bypass - use valid UUID
   const DEV_ORG_ID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
 
@@ -143,21 +168,25 @@ export const requireOrganization = async (req, res, next) => {
     if (!organizationId) {
       return res.status(400).json({
         error: 'Bad Request',
-        message: 'Organization context required'
+        message: 'Organization context required',
       });
     }
 
     // Verify user belongs to the organization
-    if (req.user && req.user.organizationId !== organizationId && req.user.organization_id !== organizationId) {
+    if (
+      req.user &&
+      req.user.organizationId !== organizationId &&
+      req.user.organization_id !== organizationId
+    ) {
       logger.warn('Unauthorized organization access attempt', {
         userId: req.user.id,
         requestedOrg: organizationId,
-        userOrg: req.user.organizationId || req.user.organization_id
+        userOrg: req.user.organizationId || req.user.organization_id,
       });
 
       return res.status(403).json({
         error: 'Forbidden',
-        message: 'You do not have access to this organization'
+        message: 'You do not have access to this organization',
       });
     }
 
@@ -170,7 +199,7 @@ export const requireOrganization = async (req, res, next) => {
     logger.error('Organization middleware error:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to verify organization access'
+      message: 'Failed to verify organization access',
     });
   }
 };
@@ -179,31 +208,29 @@ export const requireOrganization = async (req, res, next) => {
  * Role-based access control middleware
  * @param {string[]} allowedRoles - Array of roles that can access the route
  */
-export const requireRole = (allowedRoles) => {
-  return (req, res, next) => {
-    if (!req.user) {
-      return res.status(401).json({
-        error: 'Unauthorized',
-        message: 'Authentication required'
-      });
-    }
+export const requireRole = (allowedRoles) => (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({
+      error: 'Unauthorized',
+      message: 'Authentication required',
+    });
+  }
 
-    const userRole = req.user.role || req.user.Role;
-    if (!allowedRoles.includes(userRole)) {
-      logger.warn('Unauthorized role access attempt', {
-        userId: req.user.id,
-        userRole,
-        requiredRoles: allowedRoles
-      });
+  const userRole = req.user.role || req.user.Role;
+  if (!allowedRoles.includes(userRole)) {
+    logger.warn('Unauthorized role access attempt', {
+      userId: req.user.id,
+      userRole,
+      requiredRoles: allowedRoles,
+    });
 
-      return res.status(403).json({
-        error: 'Forbidden',
-        message: `This action requires one of the following roles: ${allowedRoles.join(', ')}`
-      });
-    }
+    return res.status(403).json({
+      error: 'Forbidden',
+      message: `This action requires one of the following roles: ${allowedRoles.join(', ')}`,
+    });
+  }
 
-    next();
-  };
+  next();
 };
 
 /**
@@ -216,7 +243,7 @@ export const requireApiKey = async (req, res, next) => {
     if (!authHeader?.startsWith('Bearer cck_')) {
       return res.status(401).json({
         error: 'Unauthorized',
-        message: 'Valid API key required'
+        message: 'Valid API key required',
       });
     }
 
@@ -241,15 +268,16 @@ export const requireApiKey = async (req, res, next) => {
     if (result.rows.length === 0) {
       return res.status(401).json({
         error: 'Unauthorized',
-        message: 'Invalid or expired API key'
+        message: 'Invalid or expired API key',
       });
     }
 
     const apiKeyRecord = result.rows[0];
 
     // Update last used timestamp (async, don't wait)
-    query('UPDATE api_keys SET last_used_at = NOW() WHERE id = $1', [apiKeyRecord.id])
-      .catch(err => logger.error('Failed to update API key last_used_at', err));
+    query('UPDATE api_keys SET last_used_at = NOW() WHERE id = $1', [apiKeyRecord.id]).catch(
+      (err) => logger.error('Failed to update API key last_used_at', err)
+    );
 
     req.apiKey = apiKeyRecord;
     req.organizationId = apiKeyRecord.organization_id;
@@ -262,7 +290,7 @@ export const requireApiKey = async (req, res, next) => {
     logger.error('API key auth error:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Authentication failed'
+      message: 'Authentication failed',
     });
   }
 };
@@ -270,29 +298,27 @@ export const requireApiKey = async (req, res, next) => {
 /**
  * Check if API key has required scope
  */
-export const requireScope = (requiredScopes) => {
-  return (req, res, next) => {
-    if (!req.apiKey) {
-      return res.status(401).json({
-        error: 'Unauthorized',
-        message: 'API key authentication required'
-      });
-    }
+export const requireScope = (requiredScopes) => (req, res, next) => {
+  if (!req.apiKey) {
+    return res.status(401).json({
+      error: 'Unauthorized',
+      message: 'API key authentication required',
+    });
+  }
 
-    const keyScopes = req.apiKey.scopes || [];
-    const hasScope = requiredScopes.some(scope =>
-      keyScopes.includes(scope) || keyScopes.includes('admin')
-    );
+  const keyScopes = req.apiKey.scopes || [];
+  const hasScope = requiredScopes.some(
+    (scope) => keyScopes.includes(scope) || keyScopes.includes('admin')
+  );
 
-    if (!hasScope) {
-      return res.status(403).json({
-        error: 'Forbidden',
-        message: `This action requires one of the following scopes: ${requiredScopes.join(', ')}`
-      });
-    }
+  if (!hasScope) {
+    return res.status(403).json({
+      error: 'Forbidden',
+      message: `This action requires one of the following scopes: ${requiredScopes.join(', ')}`,
+    });
+  }
 
-    next();
-  };
+  next();
 };
 
 /**
@@ -338,5 +364,5 @@ export default {
   requireRole,
   requireApiKey,
   requireScope,
-  optionalAuth
+  optionalAuth,
 };
