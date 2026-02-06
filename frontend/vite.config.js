@@ -34,6 +34,8 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    // Use relative paths so Electron can load from file:// or localhost
+    base: './',
   },
   test: {
     globals: true,

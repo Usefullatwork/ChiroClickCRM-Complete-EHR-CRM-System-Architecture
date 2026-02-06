@@ -1,0 +1,69 @@
+{
+  "name": "chiroclickcrm-desktop",
+  "version": "2.0.0",
+  "description": "ChiroClickCRM Desktop - Standalone EHR-CRM for Chiropractic Clinics",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:portable": "electron-builder --win portable"
+  },
+  "build": {
+    "appId": "com.chiroclickcrm.desktop",
+    "productName": "ChiroClickCRM",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "backend-launcher.js",
+      "ollama-manager.js",
+      "first-run.js"
+    ],
+    "extraResources": [
+      {
+        "from": "../backend",
+        "to": "backend",
+        "filter": ["**/*", "!node_modules/.cache/**"]
+      },
+      {
+        "from": "../frontend/dist",
+        "to": "frontend",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "../database",
+        "to": "database",
+        "filter": ["**/*"]
+      }
+    ],
+    "win": {
+      "target": ["nsis", "portable"],
+      "icon": "icons/icon.ico"
+    },
+    "mac": {
+      "target": ["dmg"],
+      "icon": "icons/icon.icns"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    },
+    "portable": {
+      "artifactName": "ChiroClickCRM-Portable-${version}.exe"
+    }
+  },
+  "dependencies": {
+    "electron-store": "^8.1.0"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  }
+}

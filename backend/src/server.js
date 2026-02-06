@@ -20,14 +20,10 @@ import { initializeScheduler, shutdownScheduler } from './jobs/scheduler.js';
 
 // Load environment variables
 const result = dotenv.config();
-if (result.error) {
-  console.error('DOTENV Error:', result.error);
-}
 
 // Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 3000;
-console.log('Configured PORT:', PORT);
 const API_VERSION = process.env.API_VERSION || 'v1';
 
 // ============================================================================
@@ -226,11 +222,47 @@ app.use(`/api/${API_VERSION}/patient-portal`, patientPortalRoutes);
 app.use('/api/docs', docsRoutes);
 
 // ============================================================================
+// DESKTOP MODE: Static file serving
+// ============================================================================
+
+if (process.env.DESKTOP_MODE === 'true') {
+  const path = await import('path');
+  const { fileURLToPath } = await import('url');
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.default.dirname(__filename);
+  const frontendDist = path.default.resolve(__dirname, '../../frontend/dist');
+
+  try {
+    const fs = await import('fs');
+    if (fs.default.existsSync(frontendDist)) {
+      app.use(express.static(frontendDist));
+      // SPA fallback - serve index.html for all non-API routes
+      app.get('*', (req, res, next) => {
+        if (req.path.startsWith('/api/') || req.path === '/health') {
+          return next();
+        }
+        res.sendFile(path.default.join(frontendDist, 'index.html'));
+      });
+      logger.info(`Desktop mode: Serving frontend from ${frontendDist}`);
+    }
+  } catch (e) {
+    logger.warn('Desktop mode: Frontend dist not found, API-only mode');
+  }
+}
+
+// ============================================================================
 // ERROR HANDLING
 // ============================================================================
 
 // 404 handler
 app.use((req, res) => {
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({
+      error: 'Not Found',
+      message: `Cannot ${req.method} ${req.path}`,
+      path: req.path
+    });
+  }
   res.status(404).json({
     error: 'Not Found',
     message: `Cannot ${req.method} ${req.path}`,
@@ -264,13 +296,10 @@ app.use((err, req, res, next) => {
 // ============================================================================
 
 let server;
-console.log('Checking NODE_ENV:', process.env.NODE_ENV);
 
 if (process.env.NODE_ENV !== 'test') {
-  console.log('Starting app.listen...');
   try {
     server = app.listen(PORT, async () => {
-      console.log('Inside app.listen callback');
       logger.info(`🚀 ChiroClickCRM API Server started`);
       logger.info(`📍 Environment: ${process.env.NODE_ENV}`);
       logger.info(`📍 Port: ${PORT}`);
@@ -296,10 +325,10 @@ if (process.env.NODE_ENV !== 'test') {
       }
     });
     server.on('error', (e) => {
-      console.error('SERVER ERROR EVENT:', e);
+      logger.error('Server error:', e);
     });
   } catch (err) {
-    console.error('SYNCHRONOUS APP.LISTEN ERROR:', err);
+    logger.error('Failed to start server:', err);
   }
 }
 
