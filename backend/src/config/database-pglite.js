@@ -8,9 +8,24 @@
  */
 
 import { PGlite } from '@electric-sql/pglite';
-import { vector } from '@electric-sql/pglite/contrib/vector';
 import { getPGliteDataDir, ensureDataDirectories } from './data-paths.js';
 import logger from '../utils/logger.js';
+
+// Optional contrib extensions
+let vector = null;
+let uuid_ossp = null;
+try {
+  const mod = await import('@electric-sql/pglite/contrib/vector');
+  vector = mod.vector;
+} catch {
+  // vector extension not available in this PGlite version
+}
+try {
+  const mod = await import('@electric-sql/pglite/contrib/uuid_ossp');
+  uuid_ossp = mod.uuid_ossp;
+} catch {
+  // uuid_ossp not available
+}
 
 let db = null;
 let initialized = false;
@@ -30,23 +45,34 @@ export const initPGlite = async () => {
   logger.info(`Initializing PGlite database at: ${dataDir}`);
 
   try {
+    const extensions = {};
+    if (vector) {
+      extensions.vector = vector;
+    }
+    if (uuid_ossp) {
+      extensions.uuid_ossp = uuid_ossp;
+    }
+
     db = new PGlite(dataDir, {
-      extensions: {
-        vector,
-      },
+      extensions,
     });
 
     // Wait for PGlite to be ready
     await db.waitReady;
 
-    // Enable pgcrypto for gen_random_uuid() (used throughout schema)
-    await db.exec('CREATE EXTENSION IF NOT EXISTS "pgcrypto"');
+    // Enable uuid_ossp for UUID generation (pgcrypto not available in PGlite)
+    // gen_random_uuid() is built-in for PG14+, but uuid_ossp provides uuid_generate_v4()
+    try {
+      await db.exec('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"');
+    } catch (e) {
+      logger.warn('uuid-ossp not available, using built-in gen_random_uuid()');
+    }
 
-    // Enable vector extension for RAG
+    // Enable vector extension for RAG (optional)
     try {
       await db.exec('CREATE EXTENSION IF NOT EXISTS "vector"');
     } catch (e) {
-      logger.warn('pgvector extension not available in PGlite, RAG search will be limited:', e.message);
+      logger.warn('pgvector extension not available in PGlite, RAG search will be limited');
     }
 
     initialized = true;

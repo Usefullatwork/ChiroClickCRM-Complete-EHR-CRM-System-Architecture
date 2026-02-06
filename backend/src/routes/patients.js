@@ -139,7 +139,7 @@ router.get(
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  * @query   status, includeCompleted, page, limit
  */
-router.get('/:patientId/exercises', exercisesController.getPatientExercises);
+router.get('/:patientId/exercises', exercisesController.getPatientPrescriptions);
 
 /**
  * @route   POST /api/v1/patients/:patientId/exercises
@@ -149,7 +149,7 @@ router.get('/:patientId/exercises', exercisesController.getPatientExercises);
 router.post(
   '/:patientId/exercises',
   requireRole(['ADMIN', 'PRACTITIONER']),
-  exercisesController.prescribe
+  exercisesController.createPrescription
 );
 
 /**
@@ -160,7 +160,7 @@ router.post(
 router.post(
   '/:patientId/programs',
   requireRole(['ADMIN', 'PRACTITIONER']),
-  exercisesController.assignProgram
+  exercisesController.createPrescription
 );
 
 /**
