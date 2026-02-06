@@ -1,6 +1,6 @@
 /**
  * AI Service
- * Intelligent clinical assistance using Ollama (local) or Claude API
+ * Intelligent clinical assistance using Ollama (local)
  *
  * Features:
  * - SOAP note generation and suggestions
@@ -101,8 +101,6 @@ const checkGuardrailsForTask = (taskType, skipGuardrails = false) => {
 };
 
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
-const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY || null;
-const AI_PROVIDER = process.env.AI_PROVIDER || 'ollama'; // 'ollama' or 'claude'
 const AI_MODEL = process.env.AI_MODEL || 'chiro-no'; // Default: chiro-no (Mistral 7B fine-tuned)
 const AI_ENABLED = process.env.AI_ENABLED !== 'false'; // Default: true unless explicitly disabled
 const GUARDRAILS_ENABLED = process.env.GUARDRAILS_ENABLED !== 'false'; // Default: true
@@ -308,49 +306,25 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
     }
   }
 
-  // Step 3: Generate completion
+  // Step 3: Generate completion via Ollama (local)
   let rawOutput;
 
   try {
-    if (AI_PROVIDER === 'claude' && CLAUDE_API_KEY) {
-      // Use Claude API
-      const response = await axios.post(
-        'https://api.anthropic.com/v1/messages',
-        {
-          model: AI_MODEL,
-          max_tokens: maxTokens,
+    const response = await axios.post(
+      `${OLLAMA_BASE_URL}/api/generate`,
+      {
+        model,
+        prompt: systemPrompt ? `${systemPrompt}\n\n${augmentedPrompt}` : augmentedPrompt,
+        stream: false,
+        options: {
           temperature: effectiveTemperature,
-          system: systemPrompt || 'Du er en klinisk assistent for kiropraktorer i Norge. Svar på norsk med korrekt medisinsk terminologi.',
-          messages: [{ role: 'user', content: augmentedPrompt }]
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': CLAUDE_API_KEY,
-            'anthropic-version': '2023-06-01'
-          }
+          num_predict: maxTokens
         }
-      );
+      },
+      { timeout: 30000 }
+    );
 
-      rawOutput = response.data.content[0].text;
-    } else {
-      // Use Ollama (local) with task-routed model
-      const response = await axios.post(
-        `${OLLAMA_BASE_URL}/api/generate`,
-        {
-          model,
-          prompt: systemPrompt ? `${systemPrompt}\n\n${augmentedPrompt}` : augmentedPrompt,
-          stream: false,
-          options: {
-            temperature: effectiveTemperature,
-            num_predict: maxTokens
-          }
-        },
-        { timeout: 30000 }
-      );
-
-      rawOutput = response.data.response;
-    }
+    rawOutput = response.data.response;
   } catch (error) {
     logger.error('AI completion error:', error.message);
     throw new Error('AI service unavailable');
@@ -1008,7 +982,7 @@ Svar kun med JSON.`;
       organizedData,
       rawResponse: response,
       model: AI_MODEL,
-      provider: AI_PROVIDER,
+      provider: 'ollama',
       aiAvailable: true
     };
 
@@ -1148,7 +1122,7 @@ export const getAIStatus = async () => {
   // If AI is disabled via env, return disabled status immediately
   if (!AI_ENABLED) {
     return {
-      provider: AI_PROVIDER,
+      provider: 'ollama',
       available: false,
       enabled: false,
       model: AI_MODEL,
@@ -1174,52 +1148,31 @@ export const getAIStatus = async () => {
   }
 
   try {
-    if (AI_PROVIDER === 'ollama') {
-      const response = await axios.get(`${OLLAMA_BASE_URL}/api/tags`, { timeout: 5000 });
-      const installedModels = response.data.models?.map(m => m.name) || [];
-      const modelStatus = {};
-      for (const name of expectedModels) {
-        const installed = installedModels.some(m => m.startsWith(name));
-        modelStatus[name] = {
-          installed,
-          config: MODEL_CONFIG[name] || null,
-        };
-      }
-      return {
-        provider: 'ollama',
-        available: true,
-        enabled: true,
-        defaultModel: AI_MODEL,
-        routing: MODEL_ROUTING,
-        models: installedModels,
-        modelStatus,
-        modelConfigs: MODEL_CONFIG,
-        guardrails: guardrailsStatus,
-        rag: ragStatus,
-      };
-    } else if (AI_PROVIDER === 'claude' && CLAUDE_API_KEY) {
-      return {
-        provider: 'claude',
-        available: true,
-        enabled: true,
-        model: AI_MODEL,
-        routing: MODEL_ROUTING,
-        guardrails: guardrailsStatus,
-        rag: ragStatus,
-      };
-    } else {
-      return {
-        provider: AI_PROVIDER,
-        available: false,
-        enabled: true,
-        error: 'AI provider not configured',
-        guardrails: guardrailsStatus,
-        rag: ragStatus,
+    const response = await axios.get(`${OLLAMA_BASE_URL}/api/tags`, { timeout: 5000 });
+    const installedModels = response.data.models?.map(m => m.name) || [];
+    const modelStatus = {};
+    for (const name of expectedModels) {
+      const installed = installedModels.some(m => m.startsWith(name));
+      modelStatus[name] = {
+        installed,
+        config: MODEL_CONFIG[name] || null,
       };
     }
+    return {
+      provider: 'ollama',
+      available: true,
+      enabled: true,
+      defaultModel: AI_MODEL,
+      routing: MODEL_ROUTING,
+      models: installedModels,
+      modelStatus,
+      modelConfigs: MODEL_CONFIG,
+      guardrails: guardrailsStatus,
+      rag: ragStatus,
+    };
   } catch (error) {
     return {
-      provider: AI_PROVIDER,
+      provider: 'ollama',
       available: false,
       enabled: true,
       error: error.message,

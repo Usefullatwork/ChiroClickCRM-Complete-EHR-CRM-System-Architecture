@@ -1,74 +1,32 @@
 /**
  * Monitoring and Observability Configuration
- * Sentry, metrics, health checks
+ * Desktop standalone mode: local metrics and health checks only
  */
 
-import * as Sentry from '@sentry/node';
-import { ProfilingIntegration } from '@sentry/profiling-node';
 import logger from '../utils/logger.js';
 
 /**
- * Initialize Sentry error monitoring
+ * Initialize monitoring (no-op in desktop mode)
  */
 export const initSentry = (app) => {
-  if (process.env.SENTRY_DSN && process.env.NODE_ENV === 'production') {
-    Sentry.init({
-      dsn: process.env.SENTRY_DSN,
-      environment: process.env.NODE_ENV,
-      integrations: [
-        // Performance monitoring
-        new Sentry.Integrations.Http({ tracing: true }),
-        new Sentry.Integrations.Express({ app }),
-        new ProfilingIntegration(),
-      ],
-      // Performance sampling
-      tracesSampleRate: parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE || '0.1'),
-      profilesSampleRate: parseFloat(process.env.SENTRY_PROFILES_SAMPLE_RATE || '0.1'),
-
-      // Filter sensitive data
-      beforeSend(event, hint) {
-        // Remove sensitive headers
-        if (event.request) {
-          delete event.request.cookies;
-          if (event.request.headers) {
-            delete event.request.headers.authorization;
-            delete event.request.headers['x-organization-id'];
-          }
-        }
-
-        // Scrub patient data from error messages
-        if (event.message) {
-          event.message = event.message.replace(/\b\d{11}\b/g, '[FODSELSNUMMER_REDACTED]');
-        }
-
-        return event;
-      },
-
-      ignoreErrors: [
-        // Ignore common browser errors
-        'Non-Error promise rejection captured',
-        'ResizeObserver loop limit exceeded',
-      ],
-    });
-
-    logger.info('✓ Sentry monitoring initialized');
-  }
+  // Sentry removed for standalone desktop mode
+  logger.info('Monitoring: desktop mode (local metrics only)');
 };
 
 /**
- * Sentry request handler (must be first middleware)
+ * Request handler (pass-through)
  */
-export const sentryRequestHandler = () => Sentry.Handlers.requestHandler();
+export const sentryRequestHandler = () => (req, res, next) => next();
 
 /**
- * Sentry tracing handler
+ * Tracing handler (pass-through)
  */
-export const sentryTracingHandler = () => Sentry.Handlers.tracingHandler();
+export const sentryTracingHandler = () => (req, res, next) => next();
 
 /**
- * Sentry error handler (must be before other error handlers)
+ * Error handler (pass-through)
  */
-export const sentryErrorHandler = () => Sentry.Handlers.errorHandler();
+export const sentryErrorHandler = () => (err, req, res, next) => next(err);
 
 /**
  * Enhanced health check with detailed status
@@ -87,13 +45,6 @@ export const healthCheckDetailed = async (req, res) => {
         status: 'unknown',
         responseTime: null
       },
-      redis: {
-        status: 'not_configured',
-        responseTime: null
-      },
-      sentry: {
-        status: process.env.SENTRY_DSN ? 'configured' : 'not_configured'
-      }
     },
     system: {
       memory: {
@@ -101,9 +52,6 @@ export const healthCheckDetailed = async (req, res) => {
         total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
         unit: 'MB'
       },
-      cpu: {
-        loadAverage: process.platform !== 'win32' ? require('os').loadavg() : [0, 0, 0]
-      }
     }
   };
 
@@ -120,17 +68,6 @@ export const healthCheckDetailed = async (req, res) => {
     checks.services.database.status = 'error';
     checks.services.database.error = error.message;
     checks.status = 'degraded';
-  }
-
-  // Check Redis (if configured)
-  if (process.env.REDIS_URL) {
-    try {
-      // TODO: Implement Redis health check when Redis is added
-      checks.services.redis.status = 'not_implemented';
-    } catch (error) {
-      checks.services.redis.status = 'error';
-      checks.services.redis.error = error.message;
-    }
   }
 
   const httpStatus = checks.status === 'healthy' ? 200 : 503;
@@ -170,10 +107,8 @@ export const readinessProbe = async (req, res) => {
  * Metrics endpoint (Prometheus-compatible)
  */
 export const metricsEndpoint = (req, res) => {
-  // Basic metrics in Prometheus format
   const metrics = [];
 
-  // Process metrics
   metrics.push(`# HELP nodejs_heap_size_total_bytes Total heap size in bytes`);
   metrics.push(`# TYPE nodejs_heap_size_total_bytes gauge`);
   metrics.push(`nodejs_heap_size_total_bytes ${process.memoryUsage().heapTotal}`);

@@ -1,31 +1,12 @@
 /**
  * RLAIF (Reinforcement Learning from AI Feedback) Service
- * Uses Claude to evaluate and rank AI suggestions for training
- * Implements AI-assisted feedback when human feedback is limited
+ * Uses heuristic scoring to evaluate and rank AI suggestions for training
+ * Standalone desktop mode - no cloud API dependencies
  */
 
-import Anthropic from '@anthropic-ai/sdk';
-import { query, transaction } from '../config/database.js';
+import { query } from '../config/database.js';
 import * as aiLearning from './aiLearning.js';
 import logger from '../utils/logger.js';
-
-// Configuration
-const CLAUDE_MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-4-20250514';
-const CLAUDE_API_KEY = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY;
-const OFFLINE_MODE = process.env.RLAIF_OFFLINE_MODE === 'true' || !CLAUDE_API_KEY;
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000;
-
-// Initialize Anthropic client (if API key available)
-let anthropicClient = null;
-if (CLAUDE_API_KEY && !OFFLINE_MODE) {
-  try {
-    anthropicClient = new Anthropic({ apiKey: CLAUDE_API_KEY });
-    logger.info('RLAIF: Anthropic client initialized');
-  } catch (error) {
-    logger.warn('RLAIF: Failed to initialize Anthropic client, running in offline mode');
-  }
-}
 
 /**
  * Quality criteria for Norwegian chiropractic documentation
@@ -73,56 +54,8 @@ export const generatePreferencePairs = async (suggestions, options = {}) => {
     maxPairs = 50
   } = options;
 
-  logger.info(`RLAIF: Generating preference pairs for ${suggestions.length} suggestions`);
-
-  if (OFFLINE_MODE || !anthropicClient) {
-    logger.info('RLAIF: Running in offline mode, using heuristic ranking');
-    return generatePreferencePairsOffline(suggestions, options);
-  }
-
-  const preferencePairs = [];
-
-  try {
-    // Create pairs of suggestions for comparison
-    const pairs = createSuggestionPairs(suggestions, maxPairs);
-
-    for (const pair of pairs) {
-      try {
-        const ranking = await rankPairWithClaude(pair, suggestionType, contextData);
-        if (ranking) {
-          preferencePairs.push({
-            chosen: ranking.preferred,
-            rejected: ranking.rejected,
-            scores: ranking.scores,
-            reasoning: ranking.reasoning,
-            suggestionType,
-            generatedBy: 'claude'
-          });
-        }
-      } catch (pairError) {
-        logger.warn('RLAIF: Failed to rank pair:', pairError.message);
-      }
-
-      // Rate limiting
-      await delay(500);
-    }
-
-    // Store pairs in database
-    if (preferencePairs.length > 0) {
-      await storePreferencePairs(preferencePairs);
-    }
-
-    logger.info(`RLAIF: Generated ${preferencePairs.length} preference pairs`);
-
-    return {
-      success: true,
-      pairsGenerated: preferencePairs.length,
-      pairs: preferencePairs
-    };
-  } catch (error) {
-    logger.error('RLAIF: Error generating preference pairs:', error);
-    throw error;
-  }
+  logger.info(`RLAIF: Generating preference pairs for ${suggestions.length} suggestions (heuristic mode)`);
+  return generatePreferencePairsOffline(suggestions, options);
 };
 
 /**
@@ -147,100 +80,7 @@ const createSuggestionPairs = (suggestions, maxPairs) => {
 };
 
 /**
- * Rank a pair of suggestions using Claude
- */
-const rankPairWithClaude = async (pair, suggestionType, contextData) => {
-  const [suggestionA, suggestionB] = pair;
-
-  const systemPrompt = `Du er en ekspert på klinisk dokumentasjon for kiropraktorer i Norge.
-Din oppgave er å evaluere og rangere kliniske tekster basert på kvalitetskriterier.
-
-Evalueringskriterier og vekting:
-${Object.entries(QUALITY_CRITERIA).map(([key, val]) =>
-  `- ${key} (${val.weight * 100}%): ${val.description}`
-).join('\n')}
-
-Svar alltid i JSON-format.`;
-
-  const userPrompt = `Sammenlign følgende to ${getTypeDescription(suggestionType)}:
-
-TEKST A:
-${suggestionA.text || suggestionA.content || suggestionA}
-
-TEKST B:
-${suggestionB.text || suggestionB.content || suggestionB}
-
-${contextData.prompt ? `Kontekst/prompt: ${contextData.prompt}` : ''}
-
-Evaluer begge tekster og gi:
-1. Score for hver tekst på hvert kriterium (0-10)
-2. Hvilken tekst som er best totalt sett
-3. Kort begrunnelse
-
-Svar i JSON-format:
-{
-  "scores_a": {"clinical_accuracy": X, "completeness": X, ...},
-  "scores_b": {"clinical_accuracy": X, "completeness": X, ...},
-  "total_a": X,
-  "total_b": X,
-  "preferred": "A" eller "B",
-  "reasoning": "Kort begrunnelse"
-}`;
-
-  try {
-    const response = await anthropicClient.messages.create({
-      model: CLAUDE_MODEL,
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userPrompt }]
-    });
-
-    const responseText = response.content[0].text;
-
-    // Extract JSON from response
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      logger.warn('RLAIF: Could not parse Claude response as JSON');
-      return null;
-    }
-
-    const result = JSON.parse(jsonMatch[0]);
-
-    return {
-      preferred: result.preferred === 'A' ? suggestionA : suggestionB,
-      rejected: result.preferred === 'A' ? suggestionB : suggestionA,
-      scores: {
-        a: { criteria: result.scores_a, total: result.total_a },
-        b: { criteria: result.scores_b, total: result.total_b }
-      },
-      reasoning: result.reasoning
-    };
-  } catch (error) {
-    logger.error('RLAIF: Claude ranking failed:', error.message);
-    return null;
-  }
-};
-
-/**
- * Get type description for prompts
- */
-const getTypeDescription = (type) => {
-  const descriptions = {
-    'soap_subjective': 'subjektive journalnotater (S i SOPE)',
-    'soap_objective': 'objektive undersøkelsesfunn (O i SOPE)',
-    'soap_assessment': 'kliniske vurderinger (P i SOPE)',
-    'soap_plan': 'behandlingsplaner (E i SOPE)',
-    'sms_reminder': 'SMS-påminnelser',
-    'sms_followup': 'oppfølgings-SMS',
-    'clinical_phrase': 'kliniske fraser',
-    'vestibular_documentation': 'vestibulær dokumentasjon',
-    'default': 'kliniske tekster'
-  };
-  return descriptions[type] || descriptions.default;
-};
-
-/**
- * Offline/fallback preference pair generation using heuristics
+ * Preference pair generation using heuristics
  */
 const generatePreferencePairsOffline = async (suggestions, options) => {
   const { suggestionType = 'clinical_documentation' } = options;
@@ -452,80 +292,7 @@ const buildPromptForType = (type) => {
  * Returns detailed quality scores
  */
 export const evaluateSuggestionQuality = async (suggestion, options = {}) => {
-  const {
-    suggestionType = 'clinical_documentation',
-    contextData = {}
-  } = options;
-
-  if (OFFLINE_MODE || !anthropicClient) {
-    return evaluateSuggestionQualityOffline(suggestion, options);
-  }
-
-  logger.info('RLAIF: Evaluating suggestion quality with Claude');
-
-  const systemPrompt = `Du er en ekspert på kvalitetsvurdering av klinisk dokumentasjon for kiropraktorer i Norge.
-Evaluer teksten basert på følgende kriterier og gi en score 0-10 for hvert:
-
-${Object.entries(QUALITY_CRITERIA).map(([key, val]) =>
-  `${key}: ${val.description}`
-).join('\n')}
-
-Svar i JSON-format med scores og en kort begrunnelse.`;
-
-  const userPrompt = `Evaluer følgende ${getTypeDescription(suggestionType)}:
-
-${suggestion.text || suggestion.content || suggestion}
-
-${contextData.prompt ? `Kontekst: ${contextData.prompt}` : ''}
-
-Gi JSON-respons:
-{
-  "scores": {
-    "clinical_accuracy": X,
-    "completeness": X,
-    "conciseness": X,
-    "norwegian_quality": X,
-    "professional_tone": X,
-    "icpc2_compliance": X,
-    "red_flag_awareness": X
-  },
-  "weighted_total": X,
-  "grade": "A|B|C|D|F",
-  "strengths": ["...", "..."],
-  "improvements": ["...", "..."],
-  "summary": "Kort oppsummering"
-}`;
-
-  try {
-    const response = await anthropicClient.messages.create({
-      model: CLAUDE_MODEL,
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userPrompt }]
-    });
-
-    const responseText = response.content[0].text;
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-
-    if (!jsonMatch) {
-      throw new Error('Could not parse evaluation response');
-    }
-
-    const evaluation = JSON.parse(jsonMatch[0]);
-
-    // Store evaluation
-    await storeEvaluation(suggestion, evaluation, options);
-
-    return {
-      success: true,
-      evaluation,
-      model: CLAUDE_MODEL
-    };
-  } catch (error) {
-    logger.error('RLAIF: Quality evaluation failed:', error);
-    // Fall back to offline evaluation
-    return evaluateSuggestionQualityOffline(suggestion, options);
-  }
+  return evaluateSuggestionQualityOffline(suggestion, options);
 };
 
 /**
@@ -702,7 +469,7 @@ export const getRLAIFStats = async () => {
     return {
       preferencePairs: pairsResult.rows[0],
       evaluations: evalsResult.rows[0],
-      mode: OFFLINE_MODE ? 'offline' : 'online'
+      mode: 'local'
     };
   } catch (error) {
     logger.error('RLAIF: Error getting stats:', error);
