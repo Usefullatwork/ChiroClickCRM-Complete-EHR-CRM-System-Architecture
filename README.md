@@ -1,6 +1,46 @@
-# ChiroClickCRM - Complete EHR-CRM System
+# ChiroClickCRM v2.0.0 - Standalone Desktop Edition
 
 A Norwegian-compliant practice management system combining Electronic Health Records (EHR), Customer Relationship Management (CRM), and Practice Management System (PMS) for chiropractic practices.
+
+**v2.0.0** is a fully self-contained desktop application. Zero cloud dependencies. All data stays on your machine.
+
+## Quick Start (Desktop)
+
+### Prerequisites
+
+- Node.js >= 18.0.0
+- npm >= 9.0.0
+- Ollama (optional, for AI features)
+
+### Option 1: Double-click launcher
+
+```bash
+START-DESKTOP.bat
+```
+
+### Option 2: Manual start
+
+```bash
+# Install dependencies (first time only)
+cd backend && npm install --legacy-peer-deps
+cd ../frontend && npm install --legacy-peer-deps
+
+# Start the application
+cd backend && npm run dev
+# In a new terminal:
+cd frontend && npm run dev
+```
+
+### Access
+
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:3000/api/v1
+- **Health check**: http://localhost:3000/health
+
+### Demo Credentials
+
+- **Admin**: admin@chiroclickcrm.no / admin123
+- **Practitioner**: kiropraktor@chiroclickcrm.no / admin123
 
 ## System Overview
 
@@ -9,7 +49,8 @@ ChiroClickCRM provides:
 - **EHR**: Clinical documentation, SOAP notes, diagnosis, treatment tracking
 - **CRM**: Patient retention, automated communications, follow-ups
 - **PMS**: Scheduling, KPIs, financial tracking
-- **Clinical Intelligence**: Outcome tracking, risk assessment, treatment effectiveness
+- **AI**: Local AI clinical assistant via Ollama (no cloud API keys needed)
+- **Dark Mode**: Full dark/light theme support
 
 ## Architecture
 
@@ -19,9 +60,11 @@ ChiroClickCRM provides:
 ├─────────────────────────────────────────────────────┤
 │  Business Logic - Clinical rules, safety checks     │
 ├─────────────────────────────────────────────────────┤
-│  API Layer - Node.js/Express with multi-tenancy    │
+│  API Layer - Node.js/Express (local only)          │
 ├─────────────────────────────────────────────────────┤
-│  Data Layer - PostgreSQL with full audit trails    │
+│  Data Layer - PGlite (embedded) or PostgreSQL      │
+├─────────────────────────────────────────────────────┤
+│  AI Layer - Ollama (local models, optional)        │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -31,77 +74,41 @@ ChiroClickCRM provides:
 |-------|------------|
 | Frontend | React 18, Vite, Tailwind CSS, shadcn/ui |
 | Backend | Node.js, Express |
-| Database | PostgreSQL with JSONB |
-| Auth | Clerk.com |
-| SMS | Telnyx |
-| PDF | react-pdf |
-| State | Zustand, React Query |
+| Database | PGlite (embedded) or PostgreSQL |
+| Cache | In-memory (desktop) or Redis (SaaS) |
+| Auth | Local sessions + bcrypt + JWT |
+| AI | Ollama (local models) |
+| Desktop | Electron (optional packaging) |
+| State | Zustand, TanStack Query |
 
-## Quick Start
+## Database Modes
 
-### Prerequisites
+| Mode | Engine | Use Case |
+|------|--------|----------|
+| `DB_ENGINE=pglite` | PGlite (embedded) | Desktop, no install needed |
+| `DB_ENGINE=postgres` | PostgreSQL | Docker, SaaS, production |
 
-- Node.js >= 18.0.0
-- PostgreSQL >= 14
-- npm >= 9.0.0
+## AI Models (Optional)
 
-### Using Docker (Recommended)
+ChiroClickCRM uses local AI models via Ollama for clinical documentation:
+
+| Model | Base | Size | Purpose |
+|-------|------|------|---------|
+| chiro-no | Mistral 7B | ~4.5GB | Clinical documentation |
+| chiro-fast | Llama 3.2 3B | ~2GB | Quick autocomplete |
+| chiro-norwegian | NorwAI-Mistral-7B | ~4.5GB | Norwegian language |
+| chiro-medical | MedGemma 4B | ~2.5GB | Clinical safety |
 
 ```bash
-# Start all services
-docker-compose up -d
-
-# Access the application
-# Frontend: http://localhost:5173
-# Backend API: http://localhost:3000/api/v1
+# Install Ollama, then build models:
+cd ai-training && build-model.bat
 ```
-
-### Manual Installation
-
-1. **Clone and setup database**
-   ```bash
-   git clone <repository-url>
-   cd ChiroClickCRM-Complete-EHR-CRM-System-Architecture
-
-   # Create PostgreSQL database
-   createdb chiroclickcrm
-   psql chiroclickcrm < database/schema.sql
-   ```
-
-2. **Backend**
-   ```bash
-   cd backend
-   cp .env.example .env
-   # Edit .env with your configuration
-   npm install
-   npm run dev
-   ```
-
-3. **Frontend**
-   ```bash
-   cd frontend
-   cp .env.example .env
-   npm install
-   npm run dev
-   ```
-
-4. **Access**
-   - Frontend: http://localhost:5173
-   - Backend API: http://localhost:3000/api/v1
-   - Health check: http://localhost:3000/health
-
-### Demo Credentials
-
-- **Admin**: admin@chiroclickcrm.no / admin123
-- **Practitioner**: kiropraktor@chiroclickcrm.no / admin123
-- **Receptionist**: resepsjon@chiroclickcrm.no / admin123
 
 ## Security & Compliance
 
 ### GDPR Compliance
 
-- Consent management for SMS, email, marketing
-- AES-256-CBC encryption for sensitive fields (fodselsnummer)
+- AES-256-CBC encryption for sensitive fields
 - Complete audit trails (Article 30)
 - Right to Access, Erasure, and Portability
 
@@ -109,7 +116,6 @@ docker-compose up -d
 
 - ICPC-2 and ICD-10 diagnosis codes
 - Norwegian treatment codes (Takster)
-- NAV/HELFO integration
 - HPR number validation
 
 ## Key Features
@@ -118,37 +124,11 @@ docker-compose up -d
 |--------|--------------|
 | **Clinical (EHR)** | SOAP notes, click-to-text, body chart, orthopedic tests, red flag alerts |
 | **CRM** | SMS/Email via templates, automated recalls, delivery tracking |
-| **Scheduling** | Online booking, recurring appointments, waitlist |
-| **Financial** | Package tracking, NAV series, HELFO claims, invoicing |
-| **KPI Dashboard** | Revenue, visits, no-shows, retention, rebooking rates |
-| **Outcomes** | VAS tracking, treatment effectiveness, cohort analysis |
+| **Scheduling** | Appointments, recurring bookings, waitlist |
+| **Financial** | Package tracking, NAV series, HELFO claims |
+| **KPI Dashboard** | Revenue, visits, no-shows, retention rates |
+| **AI Assistant** | Local clinical documentation, streaming completions |
 | **GDPR** | Data access, portability, erasure requests |
-
-## Database Schema
-
-14 core tables organized into:
-
-- **Clinical**: organizations, users, patients, clinical_encounters, clinical_measurements
-- **CRM**: communications, appointments, follow_ups, message_templates
-- **Financial**: financial_metrics, diagnosis_codes, treatment_codes
-- **Compliance**: audit_logs, gdpr_requests
-
-## API Overview
-
-The backend provides 40+ endpoints across these modules:
-
-- `/api/v1/patients` - Patient management
-- `/api/v1/encounters` - Clinical documentation
-- `/api/v1/appointments` - Scheduling
-- `/api/v1/communications` - SMS/Email
-- `/api/v1/followups` - CRM tasks
-- `/api/v1/financial` - Billing and invoices
-- `/api/v1/kpi` - Dashboard metrics
-- `/api/v1/outcomes` - Treatment analytics
-- `/api/v1/gdpr` - Compliance requests
-- `/api/v1/pdf` - Document generation
-
-See [docs/development/API.md](docs/development/API.md) for full API documentation.
 
 ## Project Structure
 
@@ -156,41 +136,27 @@ See [docs/development/API.md](docs/development/API.md) for full API documentatio
 ChiroClickCRM/
 ├── backend/           # Node.js/Express API
 │   ├── src/
-│   │   ├── config/    # Database, logger config
-│   │   ├── routes/    # API endpoints
+│   │   ├── config/    # Database, cache, vault routers
+│   │   ├── routes/    # API endpoints (40+)
 │   │   ├── controllers/
-│   │   ├── middleware/
-│   │   ├── services/  # Business logic
-│   │   └── utils/     # Helpers, encryption
+│   │   ├── middleware/ # Auth, security, rate limiting
+│   │   └── services/  # Business logic, AI, CRM
 │   └── database/
 ├── frontend/          # React + Vite
 │   └── src/
 │       ├── components/
 │       ├── pages/
-│       ├── hooks/
+│       ├── hooks/     # Auto-save, theme, AI streaming
 │       └── services/
-├── database/          # Schema and migrations
-│   ├── schema.sql
-│   ├── migrations/
-│   └── seeds/
+├── desktop/           # Electron packaging
+│   ├── main.js
+│   ├── preload.js
+│   └── backend-launcher.js
+├── ai-training/       # Ollama Modelfiles + training data
+├── database/          # Schema, migrations, seeds
 ├── docs/              # Full documentation
-│   ├── getting-started/
-│   ├── architecture/
-│   ├── clinical/
-│   ├── deployment/
-│   └── development/
-└── docker-compose.yml
+└── _archive/          # Legacy Docker/cloud configs
 ```
-
-## Documentation
-
-Detailed documentation is in the `/docs` directory:
-
-- **Getting Started**: [docs/getting-started/](docs/getting-started/)
-- **Architecture**: [docs/architecture/](docs/architecture/)
-- **Clinical Modules**: [docs/clinical/](docs/clinical/)
-- **Deployment**: [docs/deployment/](docs/deployment/)
-- **Development**: [docs/development/](docs/development/)
 
 ## Testing
 
@@ -198,44 +164,30 @@ Detailed documentation is in the `/docs` directory:
 # Backend tests
 cd backend && npm test
 
-# Frontend tests
-cd frontend && npm test
-```
-
-## Deployment
-
-```bash
-# Production build
-cd backend && npm run build
+# Frontend build verification
 cd frontend && npm run build
 ```
 
-Required environment variables:
-- Database credentials
-- API keys (Clerk, Telnyx)
-- Encryption key (32 chars for AES-256)
-- SMTP configuration
+## Environment Variables
 
-See [docs/deployment/](docs/deployment/) for detailed deployment guides.
+Copy `backend/.env.example` to `backend/.env` and configure:
 
-## Version
+**Required:**
+- `ENCRYPTION_KEY` - 32-char key for AES-256
+- `JWT_SECRET` - Secret for JWT tokens
+- `SESSION_SECRET` - Session encryption secret
 
-**v4.0.0** - Production-Ready Release (November 2025)
-- All 7 implementation phases complete
-- 40+ API endpoints, 14 database tables
-- Full GDPR compliance suite
-- Norwegian healthcare compliance (ICPC-2, Takster, NAV/HELFO)
+**Desktop defaults (no config needed):**
+- `DESKTOP_MODE=true`
+- `DB_ENGINE=pglite`
+- `CACHE_ENGINE=memory`
+
+See `.env.example` for all options.
 
 ## License
 
 Private and Confidential - All Rights Reserved
 
-## Support
-
-- Check documentation in `/docs`
-- Create an issue in the repository
-- Contact the development team
-
 ---
 
-Built for Norwegian chiropractic practices
+Built for Norwegian chiropractic practices. v2.0.0 - Standalone Desktop Edition.

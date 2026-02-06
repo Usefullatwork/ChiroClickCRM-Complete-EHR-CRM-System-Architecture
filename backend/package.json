@@ -1,6 +1,6 @@
 {
   "name": "chiroclickcrm-backend",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "ChiroClickCRM Backend API - Norwegian-compliant EHR-CRM system",
   "main": "src/server.js",
   "type": "module",
