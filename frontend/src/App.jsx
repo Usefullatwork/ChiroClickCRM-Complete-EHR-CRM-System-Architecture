@@ -1,28 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
-import { SignedIn as ClerkSignedIn, SignedOut as ClerkSignedOut, RedirectToSignIn as ClerkRedirectToSignIn } from '@clerk/clerk-react'
+import { Routes, Route } from 'react-router-dom'
 import { Toaster } from 'sonner'
-
-// Check if we're in development mode with placeholder key
-const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
-const isDevMode = !clerkPubKey ||
-  clerkPubKey === 'pk_test_your_key_here' ||
-  clerkPubKey.includes('placeholder')
-
-// In dev mode, always show signed-in content
-const SignedIn = isDevMode
-  ? ({ children }) => <>{children}</>
-  : ClerkSignedIn
-
-// In dev mode, never show signed-out content
-const SignedOut = isDevMode
-  ? ({ children }) => null
-  : ClerkSignedOut
-
-// In dev mode, don't redirect to sign in
-const RedirectToSignIn = isDevMode
-  ? () => null
-  : ClerkRedirectToSignIn
 import DashboardLayout from './components/layouts/DashboardLayout'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { authAPI } from './services/api'
@@ -65,31 +43,32 @@ function PageLoader() {
   )
 }
 
-function App({ devMode = false }) {
-  const [isAuthReady, setIsAuthReady] = useState(!devMode)
+function App() {
+  const [isAuthReady, setIsAuthReady] = useState(false)
 
-  // Auto-login in dev mode
+  // Auto-login on startup
   useEffect(() => {
-    if (devMode) {
-      const autoLogin = async () => {
-        try {
-          // Check if already logged in
-          const checkRes = await fetch('/api/v1/auth/me', { credentials: 'include' })
-          if (checkRes.ok) {
-            setIsAuthReady(true)
-            return
-          }
-          // Login with dev credentials
-          await authAPI.login({ email: 'mads@chiroclick.no', password: 'admin123' })
-          console.log('Dev mode: Auto-logged in as mads@chiroclick.no')
-        } catch (err) {
-          console.warn('Dev auto-login failed:', err.message)
+    const autoLogin = async () => {
+      try {
+        // Check if already logged in
+        const checkRes = await fetch('/api/v1/auth/me', { credentials: 'include' })
+        if (checkRes.ok) {
+          setIsAuthReady(true)
+          return
         }
-        setIsAuthReady(true)
+        // Login with dev credentials from environment variables
+        const devEmail = import.meta.env.VITE_DEV_EMAIL
+        const devPassword = import.meta.env.VITE_DEV_PASSWORD
+        if (devEmail && devPassword) {
+          await authAPI.login({ email: devEmail, password: devPassword })
+        }
+      } catch (err) {
+        // Auto-login is optional, continue without it
       }
-      autoLogin()
+      setIsAuthReady(true)
     }
-  }, [devMode])
+    autoLogin()
+  }, [])
 
   if (!isAuthReady) {
     return <PageLoader />
@@ -103,22 +82,9 @@ function App({ devMode = false }) {
       <Route
         path="/"
         element={
-          devMode ? (
-            <Suspense fallback={<PageLoader />}>
-              <DashboardLayout />
-            </Suspense>
-          ) : (
-            <>
-              <SignedIn>
-                <Suspense fallback={<PageLoader />}>
-                  <DashboardLayout />
-                </Suspense>
-              </SignedIn>
-              <SignedOut>
-                <RedirectToSignIn />
-              </SignedOut>
-            </>
-          )
+          <Suspense fallback={<PageLoader />}>
+            <DashboardLayout />
+          </Suspense>
         }
       >
         <Route index element={<Suspense fallback={<PageLoader />}><Dashboard /></Suspense>} />

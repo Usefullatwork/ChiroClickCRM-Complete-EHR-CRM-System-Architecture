@@ -82,7 +82,7 @@ export const clearOrganizationId = () => {
 /**
  * Initialize CSRF protection
  * Fetches CSRF token from the server and stores it for subsequent requests
- * Note: Currently a no-op as backend uses JWT/Clerk auth instead of CSRF tokens
+ * Note: Currently a no-op as backend uses session-based auth
  */
 export const initializeCSRF = async () => {
   // CSRF is not needed when using JWT/Bearer token authentication
@@ -101,32 +101,9 @@ const apiClient = axios.create({
   withCredentials: true, // Enable cookies for secure session handling
 })
 
-// Check if we're in development mode with placeholder Clerk key
-const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
-const isDevMode = import.meta.env.DEV && (!clerkPubKey ||
-  clerkPubKey === 'pk_test_your_key_here' ||
-  clerkPubKey.includes('placeholder'))
-
-// Request interceptor - Add auth token and organization ID
+// Request interceptor - Add organization ID header
 apiClient.interceptors.request.use(
   async (config) => {
-    // Dev mode bypass - send special header to skip backend auth
-    if (isDevMode) {
-      config.headers['X-Dev-Bypass'] = 'true'
-      config.headers['X-Organization-Id'] = DEV_ORGANIZATION_ID
-      return config
-    }
-
-    // Get auth token from Clerk (async for proper token refresh)
-    try {
-      const token = await window.Clerk?.session?.getToken()
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`
-      }
-    } catch (error) {
-      log.error('Failed to get auth token', { error: error.message })
-    }
-
     // Get organization ID from secure storage
     const organizationId = getOrganizationId()
     if (!organizationId) {

@@ -22,16 +22,6 @@ vi.mock('axios', () => ({
   },
 }));
 
-// Mock window.Clerk
-Object.defineProperty(window, 'Clerk', {
-  value: {
-    session: {
-      getToken: vi.fn(() => 'test-token'),
-    },
-  },
-  writable: true,
-});
-
 // Mock localStorage
 const localStorageMock = {
   getItem: vi.fn(() => 'org-123'),

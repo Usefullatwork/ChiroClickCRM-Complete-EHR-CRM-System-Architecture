@@ -1,57 +1,62 @@
 /**
  * Authentication Hook
- * Wraps Clerk authentication with app-specific logic
+ * Local session-based authentication
  */
 
-import { useAuth as useClerkAuth, useUser } from '@clerk/clerk-react';
-import { useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { authAPI } from '../services/api';
 
 export const useAuth = () => {
-  const { isLoaded, userId, signOut } = useClerkAuth();
-  const { user } = useUser();
+  const [user, setUser] = useState(null);
+  const [isLoaded, setIsLoaded] = useState(false);
   const navigate = useNavigate();
 
-  // Get user metadata
-  const role = user?.publicMetadata?.role || 'PRACTITIONER';
-  const organizationId = user?.publicMetadata?.organizationId;
-  const twoFactorEnabled = user?.twoFactorEnabled || false;
+  // Fetch current user on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/v1/auth/me', { credentials: 'include' });
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user || data);
+        }
+      } catch (err) {
+        // Not logged in
+      }
+      setIsLoaded(true);
+    };
+    checkAuth();
+  }, []);
 
-  // Check if user is admin
+  const role = user?.role || 'PRACTITIONER';
+  const organizationId = user?.organization_id || user?.organizationId;
   const isAdmin = ['ADMIN', 'SUPER_ADMIN', 'OWNER'].includes(role);
 
-  // Check 2FA requirement for admin users
-  useEffect(() => {
-    if (!isLoaded || !user) return;
-
-    // Admin users MUST have 2FA enabled
-    if (isAdmin && !twoFactorEnabled) {
-      navigate('/settings/security/2fa');
-    }
-  }, [isLoaded, user, isAdmin, twoFactorEnabled, navigate]);
-
-  // Store organization ID in localStorage for API calls
-  useEffect(() => {
-    if (organizationId) {
-      localStorage.setItem('organizationId', organizationId);
-    }
-  }, [organizationId]);
-
-  const hasPermission = (requiredRoles) => {
+  const hasPermission = useCallback((requiredRoles) => {
     if (!Array.isArray(requiredRoles)) {
       requiredRoles = [requiredRoles];
     }
     return requiredRoles.includes(role);
-  };
+  }, [role]);
+
+  const signOut = useCallback(async () => {
+    try {
+      await authAPI.logout();
+    } catch (err) {
+      // Continue even if logout API fails
+    }
+    setUser(null);
+    navigate('/');
+  }, [navigate]);
 
   return {
     isLoaded,
-    isSignedIn: !!userId,
-    userId,
+    isSignedIn: !!user,
+    userId: user?.id,
     user,
     role,
     organizationId,
-    twoFactorEnabled,
     isAdmin,
     hasPermission,
     signOut

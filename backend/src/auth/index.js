@@ -1,8 +1,7 @@
 /**
  * Authentication Module
  *
- * Local-first authentication that works without external services.
- * Supports optional Clerk.com integration for production if configured.
+ * Local-only authentication for standalone desktop mode.
  *
  * Features:
  * - Password-based authentication with bcrypt

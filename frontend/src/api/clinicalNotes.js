@@ -35,25 +35,13 @@ const notesClient = axios.create({
   withCredentials: true,
 })
 
-// Request interceptor - Add auth token and organization ID
+// Request interceptor - Add organization ID
 notesClient.interceptors.request.use(
   async (config) => {
-    // Get auth token from Clerk
-    try {
-      const token = await window.Clerk?.session?.getToken()
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`
-      }
-    } catch (error) {
-      console.error('Failed to get auth token:', error)
-    }
-
-    // Get organization ID
     const organizationId = getOrganizationId()
     if (organizationId) {
       config.headers['X-Organization-Id'] = organizationId
     }
-
     return config
   },
   (error) => Promise.reject(error)

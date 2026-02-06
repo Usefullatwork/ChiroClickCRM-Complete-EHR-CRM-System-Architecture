@@ -1,37 +1,22 @@
 /**
  * Authentication Middleware
- * Supports both local auth (sessions) and Clerk.com (if configured)
+ * Local-only authentication via sessions and API keys.
  */
 
 import { query, setTenantContext } from '../config/database.js';
 import { validateSession } from '../auth/sessions.js';
 import logger from '../utils/logger.js';
 
-// Check if Clerk is configured
-const CLERK_ENABLED = !!(process.env.CLERK_SECRET_KEY && process.env.CLERK_PUBLISHABLE_KEY);
-
-// Conditionally import Clerk
-let ClerkExpressRequireAuth;
-if (CLERK_ENABLED) {
-  try {
-    const clerk = await import('@clerk/clerk-sdk-node');
-    ClerkExpressRequireAuth = clerk.ClerkExpressRequireAuth;
-    logger.info('Clerk authentication enabled');
-  } catch (error) {
-    logger.warn('Clerk SDK not available, using local auth only');
-  }
-}
-
 /**
  * Get auth mode from request
- * Checks for session cookie (local) or Authorization header (Clerk/Bearer)
+ * Checks for session cookie (local) or Bearer token (API key)
  */
 const getAuthMode = (req) => {
   if (req.cookies?.session) {
     return 'local';
   }
   if (req.headers.authorization?.startsWith('Bearer ')) {
-    return CLERK_ENABLED ? 'clerk' : 'bearer';
+    return 'bearer';
   }
   return null;
 };
@@ -90,19 +75,17 @@ export const requireFreshSession = (req, res, next) => {
 };
 
 /**
- * Hybrid authentication - supports both local and Clerk
- * Automatically detects auth method from request
+ * Authentication middleware
+ * Supports session-based auth and API key auth
  */
 export const requireAuth = async (req, res, next) => {
   // Dev mode bypass - only in development with special header
-  // Use valid UUIDs that match the database schema
   const DEV_ORG_ID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
   const DEV_USER_ID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12';
 
   if (process.env.NODE_ENV === 'development' && req.headers['x-dev-bypass'] === 'true') {
     req.user = {
       id: DEV_USER_ID,
-      clerk_user_id: 'dev_clerk_001',
       email: 'dev@chiroclickcrm.local',
       first_name: 'Dev',
       last_name: 'User',
@@ -129,44 +112,10 @@ export const requireAuth = async (req, res, next) => {
     return requireLocalAuth(req, res, next);
   }
 
-  if (authMode === 'clerk' && ClerkExpressRequireAuth) {
-    // Use Clerk authentication
-    return ClerkExpressRequireAuth()(req, res, async (error) => {
-      if (error) {
-        return res.status(401).json({
-          error: 'Unauthorized',
-          message: 'Invalid or expired token'
-        });
-      }
-
-      try {
-        // Get user from database using Clerk ID
-        const userResult = await query(
-          'SELECT * FROM users WHERE clerk_user_id = $1 AND is_active = true',
-          [req.auth.userId]
-        );
-
-        if (userResult.rows.length === 0) {
-          return res.status(404).json({
-            error: 'Not Found',
-            message: 'User not found in database'
-          });
-        }
-
-        req.user = userResult.rows[0];
-        req.organizationId = req.user.organization_id;
-        next();
-      } catch (dbError) {
-        logger.error('Clerk user lookup error:', dbError);
-        res.status(500).json({
-          error: 'Internal Server Error',
-          message: 'Failed to authenticate user'
-        });
-      }
-    });
+  if (authMode === 'bearer') {
+    return requireApiKey(req, res, next);
   }
 
-  // Bearer token without Clerk - could be API key
   return res.status(401).json({
     error: 'Unauthorized',
     message: 'Invalid authentication method'
@@ -368,23 +317,6 @@ export const optionalAuth = async (req, res, next) => {
           req.organizationId = result.user.organizationId;
         }
       }
-    } else if (authMode === 'clerk' && ClerkExpressRequireAuth) {
-      // Try Clerk auth but don't require it
-      await new Promise((resolve) => {
-        ClerkExpressRequireAuth()(req, res, async () => {
-          if (req.auth?.userId) {
-            const userResult = await query(
-              'SELECT * FROM users WHERE clerk_user_id = $1 AND is_active = true',
-              [req.auth.userId]
-            );
-            if (userResult.rows.length > 0) {
-              req.user = userResult.rows[0];
-              req.organizationId = req.user.organization_id;
-            }
-          }
-          resolve();
-        });
-      });
     }
 
     next();

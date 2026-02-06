@@ -44,20 +44,22 @@ export default function InlineAIButton({
     abortControllerRef.current = new AbortController();
 
     try {
-      // Get auth token and org ID
-      const token = await window.Clerk?.session?.getToken();
-      const organizationId = localStorage.getItem('organizationId');
-
-      if (!organizationId) {
-        throw new Error('Organization ID is required');
-      }
+      // Get org ID from session storage
+      let organizationId;
+      try {
+        const stored = sessionStorage.getItem('org_session');
+        if (stored) {
+          organizationId = JSON.parse(atob(stored)).id;
+        }
+      } catch { /* ignore */ }
+      organizationId = organizationId || localStorage.getItem('organizationId');
 
       const response = await fetch(`${API_URL}/ai/generate-field-stream`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-          'X-Organization-Id': organizationId
+          'X-Organization-Id': organizationId || ''
         },
         body: JSON.stringify({ fieldType, context, language }),
         signal: abortControllerRef.current.signal

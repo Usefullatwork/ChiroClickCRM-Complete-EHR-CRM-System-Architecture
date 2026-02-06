@@ -125,9 +125,8 @@ export const loginWithPassword = async (email, password, metadata = {}) => {
     throw new Error('Account is deactivated. Please contact support');
   }
 
-  // Check if user has password (might be Clerk-only user)
   if (!user.password_hash) {
-    throw new Error('This account uses external authentication. Please login with your provider');
+    throw new Error('No password set for this account');
   }
 
   // Verify password

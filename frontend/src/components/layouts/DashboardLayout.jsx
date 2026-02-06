@@ -54,7 +54,6 @@ export default function DashboardLayout() {
   const location = useLocation()
   const { t } = useTranslation('navigation')
 
-  // In dev mode without Clerk, use mock data
   const user = devUser
   const organization = devOrganization
 
@@ -67,8 +66,8 @@ export default function DashboardLayout() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <div className="fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-200">
+      {/* Sidebar - hidden on mobile */}
+      <div className="hidden md:flex md:flex-col md:fixed md:inset-y-0 md:left-0 md:w-64 bg-white border-r border-gray-200">
         <div className="flex flex-col h-full">
           {/* Logo & Organization */}
           <div className="px-4 py-4 border-b border-gray-200">
@@ -125,8 +124,8 @@ export default function DashboardLayout() {
         </div>
       </div>
 
-      {/* Main content */}
-      <div className="ml-64">
+      {/* Main content - full width on mobile, with left margin on desktop */}
+      <div className="md:ml-64">
         <Outlet />
       </div>
     </div>

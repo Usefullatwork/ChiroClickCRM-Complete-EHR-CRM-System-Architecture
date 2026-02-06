@@ -116,40 +116,10 @@ export const getUserById = async (organizationId, userId) => {
 };
 
 /**
- * Get user by Clerk ID
- */
-export const getUserByClerkId = async (clerkUserId) => {
-  const result = await query(
-    `SELECT
-      id,
-      clerk_user_id,
-      organization_id,
-      email,
-      first_name,
-      last_name,
-      role,
-      hpr_number,
-      specialization,
-      phone,
-      status,
-      preferences,
-      last_login,
-      created_at,
-      updated_at
-    FROM users
-    WHERE clerk_user_id = $1`,
-    [clerkUserId]
-  );
-
-  return result.rows[0] || null;
-};
-
-/**
  * Create new user
  */
 export const createUser = async (organizationId, userData) => {
   const {
-    clerk_user_id,
     email,
     first_name,
     last_name,
@@ -170,7 +140,6 @@ export const createUser = async (organizationId, userData) => {
   const result = await query(
     `INSERT INTO users (
       organization_id,
-      clerk_user_id,
       email,
       first_name,
       last_name,
@@ -179,9 +148,9 @@ export const createUser = async (organizationId, userData) => {
       specialization,
       phone,
       status
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'ACTIVE')
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'ACTIVE')
     RETURNING *`,
-    [organizationId, clerk_user_id, email, first_name, last_name, role, hpr_number, specialization, phone]
+    [organizationId, email, first_name, last_name, role, hpr_number, specialization, phone]
   );
 
   logger.info(`User created: ${result.rows[0].id} - ${email} in organization: ${organizationId}`);
@@ -349,7 +318,6 @@ export const getPractitioners = async (organizationId) => {
 export default {
   getAllUsers,
   getUserById,
-  getUserByClerkId,
   createUser,
   updateUser,
   updateUserPreferences,

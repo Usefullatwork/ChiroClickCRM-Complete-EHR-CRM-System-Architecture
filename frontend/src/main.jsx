@@ -1,7 +1,6 @@
-import React, { createContext, useContext } from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import { ClerkProvider } from '@clerk/clerk-react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App'
 import './index.css'
@@ -22,82 +21,19 @@ const queryClient = new QueryClient({
   },
 })
 
-// Get Clerk publishable key from environment
-const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
-
-// Check if we're in development mode with placeholder key
-const isDevMode = !clerkPubKey ||
-  clerkPubKey === 'pk_test_your_key_here' ||
-  clerkPubKey.includes('placeholder')
-
-// Mock user for development
-const mockUser = {
-  id: 'dev_user_001',
-  firstName: 'Dev',
-  lastName: 'User',
-  fullName: 'Dev User',
-  emailAddresses: [{ emailAddress: 'dev@chiroclickcrm.local' }],
-  primaryEmailAddress: { emailAddress: 'dev@chiroclickcrm.local' },
-  organizationMemberships: [{
-    organization: {
-      id: 'dev_org_001',
-      name: 'Development Clinic',
-      slug: 'dev-clinic'
-    },
-    role: 'admin'
-  }]
-}
-
-// Mock Clerk context for development
-const MockClerkContext = createContext(null)
-
-function MockClerkProvider({ children }) {
-  const mockClerk = {
-    user: mockUser,
-    isLoaded: true,
-    isSignedIn: true,
-    session: { id: 'dev_session_001' },
-    organization: mockUser.organizationMemberships[0].organization,
-    signOut: () => log.debug('Dev mode sign out clicked'),
-    getToken: async () => 'dev_token_mock',
-  }
-
-  return (
-    <MockClerkContext.Provider value={mockClerk}>
-      {children}
-    </MockClerkContext.Provider>
-  )
-}
-
-// Hook to use mock auth in dev mode
-export function useDevAuth() {
-  return useContext(MockClerkContext)
-}
-
 // Initialize CSRF protection
 initializeCSRF()
 
-// Render app with appropriate auth provider
-const AuthWrapper = isDevMode ? MockClerkProvider : ({ children }) => (
-  <ClerkProvider publishableKey={clerkPubKey}>
-    {children}
-  </ClerkProvider>
-)
-
-if (isDevMode) {
-  log.info('Running in DEV MODE without Clerk authentication', { mockUser })
-}
+log.info('ChiroClickCRM Desktop starting')
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <AuthWrapper>
-      <QueryClientProvider client={queryClient}>
-        <LanguageProvider>
-          <BrowserRouter>
-            <App devMode={isDevMode} />
-          </BrowserRouter>
-        </LanguageProvider>
-      </QueryClientProvider>
-    </AuthWrapper>
+    <QueryClientProvider client={queryClient}>
+      <LanguageProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </LanguageProvider>
+    </QueryClientProvider>
   </React.StrictMode>,
 )
