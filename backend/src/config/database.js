@@ -1,208 +1,43 @@
 /**
- * Database Configuration
- * PostgreSQL connection with connection pooling
+ * Database Configuration Router
+ * Routes to PGlite (desktop mode) or PostgreSQL (SaaS mode).
+ *
+ * DB_ENGINE=pglite  -> Embedded PostgreSQL via PGlite (default for desktop)
+ * DB_ENGINE=postgres -> Standard PostgreSQL via pg Pool (for SaaS)
+ *
+ * All consumers import from this file - the switch is transparent.
  */
 
-import pkg from 'pg';
-const { Pool } = pkg;
 import dotenv from 'dotenv';
-import logger from '../utils/logger.js';
-
 dotenv.config();
 
-const poolConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME || 'chiroclickcrm',
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD,
-  max: parseInt(process.env.DB_POOL_MAX || '10'),
-  min: parseInt(process.env.DB_POOL_MIN || '2'),
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 10000,
-};
+const DB_ENGINE = process.env.DB_ENGINE || (process.env.DESKTOP_MODE === 'true' ? 'pglite' : 'postgres');
 
-// Enable SSL in production with proper certificate validation
-if (process.env.NODE_ENV === 'production' || process.env.DB_SSL === 'true') {
-  poolConfig.ssl = {
-    // Enable proper certificate validation in production
-    // Set DB_SSL_REJECT_UNAUTHORIZED=false only for self-signed certs in development
-    rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false',
-    // Optional: Custom CA certificate for self-hosted databases
-    ...(process.env.DB_SSL_CA && { ca: process.env.DB_SSL_CA }),
-    // Optional: Client certificate authentication
-    ...(process.env.DB_SSL_CERT && { cert: process.env.DB_SSL_CERT }),
-    ...(process.env.DB_SSL_KEY && { key: process.env.DB_SSL_KEY }),
-  };
+let dbModule;
+
+if (DB_ENGINE === 'pglite') {
+  // Desktop mode: embedded PostgreSQL
+  dbModule = await import('./database-pglite.js');
+} else {
+  // SaaS mode: standard PostgreSQL pool
+  dbModule = await import('./database-pg.js');
 }
 
-// Create connection pool
-const pool = new Pool(poolConfig);
+// Re-export all named exports
+export const query = dbModule.query;
+export const getClient = dbModule.getClient;
+export const transaction = dbModule.transaction;
+export const savepoint = dbModule.savepoint;
+export const healthCheck = dbModule.healthCheck;
+export const closePool = dbModule.closePool;
+export const setTenantContext = dbModule.setTenantContext;
+export const clearTenantContext = dbModule.clearTenantContext;
+export const queryWithTenant = dbModule.queryWithTenant;
+export const pool = dbModule.pool || null;
 
-// Export pool for direct access when needed (transactions, etc.)
-export { pool };
-
-// Connection error handling
-pool.on('error', (err, client) => {
-  logger.error('Unexpected error on idle client', { error: err.message, stack: err.stack });
-  process.exit(-1);
-});
-
-// Test connection
-pool.on('connect', () => {
-  logger.info('✓ Database connected successfully');
-});
-
-/**
- * Execute a query with error handling
- * @param {string} text - SQL query
- * @param {array} params - Query parameters
- * @returns {Promise<object>} Query result
- */
-export const query = async (text, params) => {
-  const start = Date.now();
-  try {
-    const res = await pool.query(text, params);
-    const duration = Date.now() - start;
-
-    // Log slow queries (>1000ms)
-    if (duration > 1000) {
-      logger.warn('Slow query detected', {
-        text: text.substring(0, 100),
-        duration: `${duration}ms`,
-        rows: res.rowCount
-      });
-    }
-
-    return res;
-  } catch (error) {
-    logger.error('Database query error', {
-      error: error.message,
-      query: text.substring(0, 100),
-      stack: error.stack
-    });
-    throw error;
-  }
-};
-
-/**
- * Get a client from the pool for transactions
- * @returns {Promise<object>} Database client
- */
-export const getClient = async () => {
-  const client = await pool.connect();
-  return client;
-};
-
-/**
- * Transaction helper
- * @param {function} callback - Function containing transaction logic
- * @param {object} options - Transaction options (isolationLevel)
- * @returns {Promise<any>} Transaction result
- */
-export const transaction = async (callback, options = {}) => {
-  const client = await pool.connect();
-  const isolationLevel = options.isolationLevel || 'READ COMMITTED';
-
-  try {
-    // Start transaction with specified isolation level
-    await client.query(`BEGIN ISOLATION LEVEL ${isolationLevel}`);
-
-    const result = await callback(client);
-
-    await client.query('COMMIT');
-    return result;
-  } catch (error) {
-    await client.query('ROLLBACK');
-    throw error;
-  } finally {
-    client.release();
-  }
-};
-
-/**
- * Savepoint helper for nested transactions
- * @param {object} client - Database client from transaction
- * @param {string} name - Savepoint name
- * @param {function} callback - Function containing savepoint logic
- * @returns {Promise<any>} Savepoint result
- */
-export const savepoint = async (client, name, callback) => {
-  try {
-    await client.query(`SAVEPOINT ${name}`);
-    const result = await callback(client);
-    await client.query(`RELEASE SAVEPOINT ${name}`);
-    return result;
-  } catch (error) {
-    await client.query(`ROLLBACK TO SAVEPOINT ${name}`);
-    throw error;
-  }
-};
-
-/**
- * Health check for database connection
- * @returns {Promise<boolean>} Connection status
- */
-export const healthCheck = async () => {
-  try {
-    const result = await query('SELECT NOW()');
-    return result.rows.length > 0;
-  } catch (error) {
-    logger.error('Database health check failed', { error: error.message });
-    return false;
-  }
-};
-
-/**
- * Close all database connections (for graceful shutdown)
- */
-export const closePool = async () => {
-  await pool.end();
-  logger.info('✓ Database pool closed');
-};
-
-/**
- * Set tenant context for Row-Level Security (RLS)
- * Must be called before queries on RLS-enabled tables
- * Note: This uses set_config with is_local=false so it persists for the session
- * @param {string} organizationId - The organization UUID
- */
-export const setTenantContext = async (organizationId) => {
-  if (!organizationId) {
-    throw new Error('Organization ID required for tenant context');
-  }
-  // Use set_config instead of SET to avoid GUC registration requirement
-  // is_local=false means it persists for the connection (not just transaction)
-  await query(`SELECT set_config('app.current_tenant', $1, false)`, [organizationId]);
-};
-
-/**
- * Clear tenant context
- * Should be called after request completes
- */
-export const clearTenantContext = async () => {
-  await query(`SELECT set_config('app.current_tenant', '', false)`);
-};
-
-/**
- * Execute query with tenant context
- * Automatically sets and clears tenant context
- * @param {string} organizationId - The organization UUID
- * @param {string} text - SQL query
- * @param {array} params - Query parameters
- * @returns {Promise<object>} Query result
- */
-export const queryWithTenant = async (organizationId, text, params = []) => {
-  const client = await pool.connect();
-  try {
-    await client.query(`SELECT set_config('app.current_tenant', $1, false)`, [organizationId]);
-    const result = await client.query(text, params);
-    return result;
-  } finally {
-    await client.query(`SELECT set_config('app.current_tenant', '', false)`);
-    client.release();
-  }
-};
+// PGlite-specific exports (only available in desktop mode)
+export const initPGlite = dbModule.initPGlite || null;
+export const execSQL = dbModule.execSQL || null;
 
 export default {
   query,
@@ -213,5 +48,5 @@ export default {
   closePool,
   setTenantContext,
   clearTenantContext,
-  queryWithTenant
+  queryWithTenant,
 };
