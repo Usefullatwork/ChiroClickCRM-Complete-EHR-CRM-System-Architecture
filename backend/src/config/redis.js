@@ -1,327 +1,121 @@
 /**
- * Redis Client Configuration
- * Provides Redis connection for caching and session storage
+ * Cache Configuration Router
+ * Routes to in-memory cache (desktop) or Redis (SaaS).
+ *
+ * CACHE_ENGINE=memory  -> In-memory Map-based cache (default for desktop)
+ * CACHE_ENGINE=redis   -> Redis client (for SaaS/Docker)
  */
 
-import { createClient } from 'redis';
-import logger from '../utils/logger.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
-// Redis configuration from environment
-const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
-const REDIS_PASSWORD = process.env.REDIS_PASSWORD || undefined;
-const REDIS_DB = parseInt(process.env.REDIS_DB || '0');
-const REDIS_KEY_PREFIX = process.env.REDIS_KEY_PREFIX || 'chiroclickcrm:';
+const CACHE_ENGINE = process.env.CACHE_ENGINE ||
+  (process.env.DESKTOP_MODE === 'true' ? 'memory' : 'redis');
 
-// Create Redis client
-let client = null;
-let isConnected = false;
+let cacheModule;
 
-/**
- * Initialize Redis connection
- */
-export const initRedis = async () => {
-  if (client && isConnected) {
-    return client;
-  }
-
+if (CACHE_ENGINE === 'memory') {
+  cacheModule = await import('./memory-cache.js');
+} else {
+  // Dynamic import of the real Redis module
+  // Only loaded when CACHE_ENGINE=redis
   try {
-    client = createClient({
-      url: REDIS_URL,
-      password: REDIS_PASSWORD,
-      database: REDIS_DB,
-      socket: {
-        reconnectStrategy: (retries) => {
-          if (retries > 10) {
-            logger.error('Redis: Max reconnection attempts reached');
-            return new Error('Max reconnection attempts reached');
-          }
-          const delay = Math.min(retries * 100, 3000);
-          logger.warn(`Redis: Reconnecting in ${delay}ms (attempt ${retries})`);
-          return delay;
+    const { createClient } = await import('redis');
+    const logger = (await import('../utils/logger.js')).default;
+
+    const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
+    const REDIS_PASSWORD = process.env.REDIS_PASSWORD || undefined;
+    const REDIS_DB = parseInt(process.env.REDIS_DB || '0');
+    const REDIS_KEY_PREFIX = process.env.REDIS_KEY_PREFIX || 'chiroclickcrm:';
+
+    let client = null;
+    let isConnected = false;
+
+    const initRedis = async () => {
+      if (client && isConnected) return client;
+      client = createClient({
+        url: REDIS_URL,
+        password: REDIS_PASSWORD,
+        database: REDIS_DB,
+        socket: {
+          reconnectStrategy: (retries) => {
+            if (retries > 10) return new Error('Max reconnection attempts');
+            return Math.min(retries * 100, 3000);
+          },
+        },
+      });
+      client.on('error', (err) => { logger.error('Redis error:', err); isConnected = false; });
+      client.on('ready', () => { isConnected = true; });
+      client.on('end', () => { isConnected = false; });
+      await client.connect();
+      return client;
+    };
+
+    const getRedisClient = async () => { if (!client || !isConnected) await initRedis(); return client; };
+    const prefixKey = (key) => `${REDIS_KEY_PREFIX}${key}`;
+
+    cacheModule = {
+      initRedis,
+      getRedisClient,
+      isRedisAvailable: () => isConnected,
+      isRedisConnected: () => isConnected,
+      closeRedis: async () => { if (client) { await client.quit(); client = null; isConnected = false; } },
+      redisHealthCheck: async () => {
+        try { return client && isConnected && (await client.ping()) === 'PONG'; }
+        catch { return false; }
+      },
+      redisCache: {
+        async get(key) { try { const v = await (await getRedisClient()).get(prefixKey(key)); return v ? JSON.parse(v) : null; } catch { return null; } },
+        async set(key, value, ttl = 300) { try { const c = await getRedisClient(); ttl > 0 ? await c.setEx(prefixKey(key), ttl, JSON.stringify(value)) : await c.set(prefixKey(key), JSON.stringify(value)); return true; } catch { return false; } },
+        async del(key) { try { await (await getRedisClient()).del(prefixKey(key)); return true; } catch { return false; } },
+        async delPattern(pattern) { try { const c = await getRedisClient(); const keys = await c.keys(prefixKey(pattern)); if (keys.length) await c.del(keys); return keys.length; } catch { return 0; } },
+        async getOrSet(key, fetchFn, ttl = 300) { const cached = await this.get(key); if (cached !== null) return cached; const v = await fetchFn(); await this.set(key, v, ttl); return v; },
+        async exists(key) { try { return await (await getRedisClient()).exists(prefixKey(key)); } catch { return false; } },
+        async expire(key, ttl) { try { await (await getRedisClient()).expire(prefixKey(key), ttl); return true; } catch { return false; } },
+        async incr(key) { try { return await (await getRedisClient()).incr(prefixKey(key)); } catch { return null; } },
+        async ttl(key) { try { return await (await getRedisClient()).ttl(prefixKey(key)); } catch { return -1; } },
+      },
+      redisRateLimiter: {
+        async checkLimit(identifier, limit, windowSeconds) {
+          try {
+            const c = await getRedisClient();
+            const key = prefixKey(`ratelimit:${identifier}`);
+            const now = Date.now();
+            await c.zRemRangeByScore(key, 0, now - windowSeconds * 1000);
+            const count = await c.zCard(key);
+            if (count >= limit) return { allowed: false, remaining: 0, resetAt: now };
+            await c.zAdd(key, { score: now, value: `${now}` });
+            await c.expire(key, windowSeconds);
+            return { allowed: true, remaining: limit - count - 1, resetAt: now + windowSeconds * 1000 };
+          } catch { return { allowed: true, remaining: limit, resetAt: Date.now() }; }
         },
       },
-    });
+      redisSession: {
+        async set(sid, data, ttl = 86400) { return cacheModule.redisCache.set(`session:${sid}`, data, ttl); },
+        async get(sid) { return cacheModule.redisCache.get(`session:${sid}`); },
+        async del(sid) { return cacheModule.redisCache.del(`session:${sid}`); },
+        async touch(sid, ttl = 86400) { return cacheModule.redisCache.expire(`session:${sid}`, ttl); },
+      },
+    };
 
-    client.on('error', (err) => {
-      logger.error('Redis Client Error:', err);
-      isConnected = false;
-    });
-
-    client.on('connect', () => {
-      logger.info('Redis: Connecting...');
-    });
-
-    client.on('ready', () => {
-      logger.info('Redis: Connected and ready');
-      isConnected = true;
-    });
-
-    client.on('end', () => {
-      logger.info('Redis: Connection closed');
-      isConnected = false;
-    });
-
-    await client.connect();
-    return client;
+    logger.info('Redis cache engine loaded');
   } catch (error) {
-    logger.error('Redis: Failed to connect', error);
-    throw error;
+    // Redis not available, fall back to memory cache
+    const logger = (await import('../utils/logger.js')).default;
+    logger.warn('Redis not available, falling back to memory cache:', error.message);
+    cacheModule = await import('./memory-cache.js');
   }
-};
+}
 
-/**
- * Get Redis client (initializes if needed)
- */
-export const getRedisClient = async () => {
-  if (!client || !isConnected) {
-    await initRedis();
-  }
-  return client;
-};
-
-/**
- * Check if Redis is available
- */
-export const isRedisAvailable = () => isConnected;
-
-/**
- * Close Redis connection
- */
-export const closeRedis = async () => {
-  if (client) {
-    await client.quit();
-    client = null;
-    isConnected = false;
-    logger.info('Redis: Connection closed gracefully');
-  }
-};
-
-/**
- * Redis health check
- */
-export const redisHealthCheck = async () => {
-  try {
-    if (!client || !isConnected) {
-      return false;
-    }
-    const result = await client.ping();
-    return result === 'PONG';
-  } catch (error) {
-    logger.error('Redis health check failed:', error);
-    return false;
-  }
-};
-
-/**
- * Prefixed key helper
- */
-export const prefixKey = (key) => `${REDIS_KEY_PREFIX}${key}`;
-
-/**
- * Redis Cache Operations
- */
-export const redisCache = {
-  /**
-   * Get value from Redis
-   */
-  async get(key) {
-    try {
-      const client = await getRedisClient();
-      const value = await client.get(prefixKey(key));
-      return value ? JSON.parse(value) : null;
-    } catch (error) {
-      logger.error('Redis GET error:', error);
-      return null;
-    }
-  },
-
-  /**
-   * Set value in Redis with optional TTL
-   */
-  async set(key, value, ttlSeconds = 300) {
-    try {
-      const client = await getRedisClient();
-      const serialized = JSON.stringify(value);
-      if (ttlSeconds > 0) {
-        await client.setEx(prefixKey(key), ttlSeconds, serialized);
-      } else {
-        await client.set(prefixKey(key), serialized);
-      }
-      return true;
-    } catch (error) {
-      logger.error('Redis SET error:', error);
-      return false;
-    }
-  },
-
-  /**
-   * Delete key from Redis
-   */
-  async del(key) {
-    try {
-      const client = await getRedisClient();
-      await client.del(prefixKey(key));
-      return true;
-    } catch (error) {
-      logger.error('Redis DEL error:', error);
-      return false;
-    }
-  },
-
-  /**
-   * Delete keys matching pattern
-   */
-  async delPattern(pattern) {
-    try {
-      const client = await getRedisClient();
-      const keys = await client.keys(prefixKey(pattern));
-      if (keys.length > 0) {
-        await client.del(keys);
-      }
-      return keys.length;
-    } catch (error) {
-      logger.error('Redis DEL pattern error:', error);
-      return 0;
-    }
-  },
-
-  /**
-   * Get or set value (cache-aside pattern)
-   */
-  async getOrSet(key, fetchFn, ttlSeconds = 300) {
-    const cached = await this.get(key);
-    if (cached !== null) {
-      return cached;
-    }
-
-    const value = await fetchFn();
-    await this.set(key, value, ttlSeconds);
-    return value;
-  },
-
-  /**
-   * Check if key exists
-   */
-  async exists(key) {
-    try {
-      const client = await getRedisClient();
-      return await client.exists(prefixKey(key));
-    } catch (error) {
-      logger.error('Redis EXISTS error:', error);
-      return false;
-    }
-  },
-
-  /**
-   * Set expiry on existing key
-   */
-  async expire(key, ttlSeconds) {
-    try {
-      const client = await getRedisClient();
-      await client.expire(prefixKey(key), ttlSeconds);
-      return true;
-    } catch (error) {
-      logger.error('Redis EXPIRE error:', error);
-      return false;
-    }
-  },
-
-  /**
-   * Increment counter
-   */
-  async incr(key) {
-    try {
-      const client = await getRedisClient();
-      return await client.incr(prefixKey(key));
-    } catch (error) {
-      logger.error('Redis INCR error:', error);
-      return null;
-    }
-  },
-
-  /**
-   * Get TTL for key
-   */
-  async ttl(key) {
-    try {
-      const client = await getRedisClient();
-      return await client.ttl(prefixKey(key));
-    } catch (error) {
-      logger.error('Redis TTL error:', error);
-      return -1;
-    }
-  },
-};
-
-/**
- * Redis Rate Limiting Helper
- */
-export const redisRateLimiter = {
-  /**
-   * Check rate limit using sliding window
-   */
-  async checkLimit(identifier, limit, windowSeconds) {
-    try {
-      const client = await getRedisClient();
-      const key = prefixKey(`ratelimit:${identifier}`);
-      const now = Date.now();
-      const windowStart = now - windowSeconds * 1000;
-
-      // Remove old entries
-      await client.zRemRangeByScore(key, 0, windowStart);
-
-      // Count current entries
-      const count = await client.zCard(key);
-
-      if (count >= limit) {
-        return { allowed: false, remaining: 0, resetAt: windowStart + windowSeconds * 1000 };
-      }
-
-      // Add new entry
-      await client.zAdd(key, { score: now, value: `${now}` });
-      await client.expire(key, windowSeconds);
-
-      return { allowed: true, remaining: limit - count - 1, resetAt: now + windowSeconds * 1000 };
-    } catch (error) {
-      logger.error('Redis rate limit error:', error);
-      // Fail open - allow request if Redis is unavailable
-      return { allowed: true, remaining: limit, resetAt: Date.now() };
-    }
-  },
-};
-
-/**
- * Redis Session Store Helper
- */
-export const redisSession = {
-  /**
-   * Store session data
-   */
-  async set(sessionId, data, ttlSeconds = 86400) {
-    return redisCache.set(`session:${sessionId}`, data, ttlSeconds);
-  },
-
-  /**
-   * Get session data
-   */
-  async get(sessionId) {
-    return redisCache.get(`session:${sessionId}`);
-  },
-
-  /**
-   * Delete session
-   */
-  async del(sessionId) {
-    return redisCache.del(`session:${sessionId}`);
-  },
-
-  /**
-   * Refresh session TTL
-   */
-  async touch(sessionId, ttlSeconds = 86400) {
-    return redisCache.expire(`session:${sessionId}`, ttlSeconds);
-  },
-};
+export const initRedis = cacheModule.initRedis;
+export const getRedisClient = cacheModule.getRedisClient;
+export const isRedisAvailable = cacheModule.isRedisAvailable;
+export const isRedisConnected = cacheModule.isRedisConnected || cacheModule.isRedisAvailable;
+export const closeRedis = cacheModule.closeRedis;
+export const redisHealthCheck = cacheModule.redisHealthCheck;
+export const redisCache = cacheModule.redisCache;
+export const redisRateLimiter = cacheModule.redisRateLimiter;
+export const redisSession = cacheModule.redisSession;
 
 export default {
   initRedis,
