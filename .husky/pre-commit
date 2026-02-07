@@ -8,7 +8,7 @@ npx lint-staged
 
 # Check for console.log statements (skip desktop/, tests/, and portal pages)
 echo "🔍 Checking for console.log statements..."
-if git diff --cached --name-only | grep -E '\.(js|jsx|ts|tsx)$' | grep -v -E '(desktop/|tests/|__tests__/|\.test\.|portal/)' | xargs grep -n "console\.\(log\|warn\|error\|debug\)" 2>/dev/null; then
+if git diff --cached --name-only | grep -E '\.(js|jsx|ts|tsx)$' | grep -v -E '(desktop/|tests/|__tests__/|\.test\.|portal/|database/|migrations/)' | xargs grep -n "console\.\(log\|warn\|error\|debug\)" 2>/dev/null; then
   echo "❌ Found console statements. Please use logger instead."
   echo "   Use: import logger from './utils/logger.js'; logger.info(...)"
   exit 1

@@ -220,10 +220,9 @@ async function runMigrations() {
     const executedMigrations = await getExecutedMigrations(db);
     console.log(`Already executed: ${executedMigrations.length} migrations`);
 
-    // Get all migration files from both directories
+    // Get all migration files from the canonical directory
     const migrationDirs = [
-      __dirname, // /database/migrations/
-      path.join(__dirname, '../../backend/migrations') // /backend/migrations/
+      path.join(__dirname, '../../backend/migrations') // /backend/migrations/ (single source of truth)
     ];
 
     const allMigrations = [];
