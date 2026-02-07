@@ -174,8 +174,16 @@ export const createTestExerciseProgress = (overrides = {}) => ({
 export const createTestPortalToken = (overrides = {}) => ({
   id: 'test-token-id-123',
   patient_id: 'test-patient-id-123',
-  token: 'test-portal-token-abc123',
+  organization_id: 'test-org-id-456',
+  access_token: 'mock-generated-token-abc123def456ghij789klmno',
+  token_type: 'exercises',
   expires_at: new Date(Date.now() + 86400000).toISOString(),
+  is_revoked: false,
+  patient_first_name: 'Test',
+  patient_last_name: 'Patient',
+  patient_email: 'test@example.com',
+  organization_name: 'Test Clinic',
+  organization_phone: '+47 12 34 56 78',
   ...overrides,
 });
 

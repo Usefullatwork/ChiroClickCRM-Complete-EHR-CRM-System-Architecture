@@ -36,4 +36,7 @@ export default {
   forceExit: true,
   // Detect open handles for debugging
   detectOpenHandles: false,
+  // Reset mock state (including implementations) between tests
+  // Prevents mockResolvedValueOnce leaking between tests
+  resetMocks: true,
 };

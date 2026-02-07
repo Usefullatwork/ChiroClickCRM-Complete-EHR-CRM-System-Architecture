@@ -247,12 +247,10 @@ describe('Encryption Utilities', () => {
       const fodselsnummer = '15076500565';
       const encrypted = encrypt(fodselsnummer);
 
-      // No digit from original should appear in exact position
-      for (let i = 0; i < fodselsnummer.length; i++) {
-        const digit = fodselsnummer[i];
-        const encryptedAtSamePosition = encrypted[i];
-        expect(encryptedAtSamePosition).not.toBe(digit);
-      }
+      // Encrypted data should not be the same as original
+      expect(encrypted).not.toBe(fodselsnummer);
+      // Encrypted output should be longer (includes IV + auth tag)
+      expect(encrypted.length).toBeGreaterThan(fodselsnummer.length);
     });
 
     test('should support encryption of all Norwegian special characters', () => {

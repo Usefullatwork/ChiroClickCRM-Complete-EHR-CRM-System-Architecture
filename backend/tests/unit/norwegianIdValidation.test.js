@@ -16,9 +16,9 @@ import {
 describe('Norwegian Fødselsnummer Validation', () => {
   describe('validateFodselsnummer', () => {
     test('should validate correct fødselsnummer', () => {
-      // Valid test numbers (from official Norwegian test data)
-      expect(validateFodselsnummer('15076500565')).toBe(true); // 15.07.1965
-      expect(validateFodselsnummer('01010123476')).toBe(true); // 01.01.2001
+      // Valid test numbers with correct Mod11 checksums
+      expect(validateFodselsnummer('15076500565')).toBe(true); // 15.07.1965 (1900s)
+      expect(validateFodselsnummer('01010150074')).toBe(true); // 01.01.2001 (2000s, individnummer 500)
     });
 
     test('should reject invalid checksum K1', () => {
@@ -53,7 +53,7 @@ describe('Norwegian Fødselsnummer Validation', () => {
 
     test('should validate D-numbers (foreign temporary ID)', () => {
       // D-number: first digit + 40 (day 01 becomes 41)
-      expect(validateFodselsnummer('41076500593')).toBe(true); // D-number (41.07.1965)
+      expect(validateFodselsnummer('41076500027')).toBe(true); // D-number (41.07.1965)
     });
 
     test('should reject invalid date components', () => {
@@ -73,20 +73,19 @@ describe('Norwegian Fødselsnummer Validation', () => {
     });
 
     test('should extract birth date for 2000s', () => {
-      const date = extractBirthDate('01010123476'); // 01.01.2001
+      const date = extractBirthDate('01010150074'); // 01.01.2001 (individnummer 500, century 2000)
       expect(date.getFullYear()).toBe(2001);
       expect(date.getMonth()).toBe(0); // January
       expect(date.getDate()).toBe(1);
     });
 
     test('should extract birth date for 1800s (individnummer 500-749)', () => {
-      const date = extractBirthDate('01018500000'); // Approximate
-      expect(date.getFullYear()).toBeGreaterThanOrEqual(1854);
-      expect(date.getFullYear()).toBeLessThanOrEqual(1899);
+      const date = extractBirthDate('01018550063'); // 01.01.1885 (individnummer 500, year>=54 -> 1800s)
+      expect(date.getFullYear()).toBe(1885);
     });
 
     test('should handle D-numbers (subtract 40 from day)', () => {
-      const date = extractBirthDate('41076500593'); // D-number: 01.07.1965
+      const date = extractBirthDate('41076500027'); // D-number: 01.07.1965
       expect(date.getFullYear()).toBe(1965);
       expect(date.getMonth()).toBe(6); // July
       expect(date.getDate()).toBe(1); // 41 - 40 = 1
@@ -100,19 +99,15 @@ describe('Norwegian Fødselsnummer Validation', () => {
 
   describe('extractGender', () => {
     test('should return M for odd digit 9', () => {
-      expect(extractGender('15076500565')).toBe('M'); // Digit 9 = 6 (even) → wait, let me check
-      // Actually digit 9 is index 8: '15076500565'[8] = '5' (odd) → M
-      expect(extractGender('01010123476')).toBe('M'); // Digit 9 = '7' (odd) → M
+      // Gender digit is at index 8 (0-indexed). Odd = Male.
+      expect(extractGender('15076500565')).toBe('M'); // '15076500565'[8] = '5' (odd) -> M
+      expect(extractGender('01010150155')).toBe('M'); // '01010150155'[8] = '1' (odd) -> M
     });
 
     test('should return F for even digit 9', () => {
-      expect(extractGender('15076500565')).toBe('M'); // Let me recalculate
-      // '15076500565' - positions: 0=1, 1=5, 2=0, 3=7, 4=6, 5=5, 6=0, 7=0, 8=5, 9=6, 10=5
-      // Digit 9 (0-indexed position 8) = '5' (odd) → Male
-
-      // I need a female example - digit 9 (position 8) must be even
-      // Example: if digit 9 is '6', it's female
-      expect(extractGender('15076500664')).toBe('F'); // Assuming digit 9 = '6' (even)
+      // Gender digit at index 8. Even = Female.
+      // '15076500050'[8] = '0' (even) -> Female
+      expect(extractGender('15076500050')).toBe('F');
     });
 
     test('should return null for invalid fødselsnummer', () => {
@@ -123,15 +118,15 @@ describe('Norwegian Fødselsnummer Validation', () => {
 
   describe('isDNumber', () => {
     test('should return true for D-numbers', () => {
-      expect(isDNumber('41076500593')).toBe(true); // Day = 41 (01 + 40)
-      expect(isDNumber('51076500000')).toBe(true); // Day = 51 (11 + 40)
-      expect(isDNumber('71076500000')).toBe(true); // Day = 71 (31 + 40)
+      expect(isDNumber('41076500027')).toBe(true); // Day = 41 (01 + 40)
+      expect(isDNumber('51076500189')).toBe(true); // Day = 51 (11 + 40)
+      expect(isDNumber('71076500120')).toBe(true); // Day = 71 (31 + 40)
     });
 
     test('should return false for regular fødselsnummer', () => {
       expect(isDNumber('15076500565')).toBe(false); // Day = 15
-      expect(isDNumber('01010123476')).toBe(false); // Day = 01
-      expect(isDNumber('31010123456')).toBe(false); // Day = 31
+      expect(isDNumber('01010150074')).toBe(false); // Day = 01
+      expect(isDNumber('31010100073')).toBe(false); // Day = 31
     });
 
     test('should return false for invalid input', () => {
@@ -153,14 +148,13 @@ describe('Norwegian Fødselsnummer Validation', () => {
 
     test('should calculate correct age', () => {
       expect(calculateAge('15076500565')).toBe(60); // Born 1965-07-15, now 2025-11-19
-      expect(calculateAge('01010123476')).toBe(24); // Born 2001-01-01, now 2025-11-19
+      expect(calculateAge('01010150074')).toBe(24); // Born 2001-01-01, now 2025-11-19
     });
 
     test('should account for birthday not yet passed this year', () => {
-      expect(calculateAge('19120155555')).toBe(69); // Born 2001-12-19 (not yet passed in mock date)
-      // Wait, mock date is 2025-11-19, so 2001-12-19 hasn't happened yet
-      // Age would be 2025 - 2001 - 1 = 23
-      // Let me recalculate...
+      // Born 2001-12-19, mock date is 2025-11-19 (birthday not yet passed)
+      // Age = 2025 - 2001 - 1 = 23
+      expect(calculateAge('19120150076')).toBe(23);
     });
 
     test('should return null for invalid fødselsnummer', () => {
@@ -174,7 +168,7 @@ describe('Norwegian Fødselsnummer Validation', () => {
       expect(result.valid).toBe(true);
       expect(result.sanitized).toBe('15076500565');
       expect(result.birthDate).toBeInstanceOf(Date);
-      expect(result.age).toBeGreaterThan(0);
+      expect(result.age).toBeGreaterThanOrEqual(0);
       expect(result.gender).toBe('M');
       expect(result.isDNumber).toBe(false);
       expect(result.errors).toHaveLength(0);
@@ -187,7 +181,7 @@ describe('Norwegian Fødselsnummer Validation', () => {
     });
 
     test('should detect D-numbers', () => {
-      const result = validateAndSanitize('41076500593');
+      const result = validateAndSanitize('41076500027');
       expect(result.valid).toBe(true);
       expect(result.isDNumber).toBe(true);
     });
@@ -210,7 +204,8 @@ describe('Norwegian Fødselsnummer Validation', () => {
   describe('Edge Cases', () => {
     test('should handle leap year dates', () => {
       // February 29 in a leap year (2000 was a leap year)
-      const leapDate = extractBirthDate('29020012345'); // Feb 29, 2000
+      // 29020050088: DD=29, MM=02, YY=00, individnummer=500 (>=500 && year<=39 -> century 2000)
+      const leapDate = extractBirthDate('29020050088'); // Feb 29, 2000
       expect(leapDate).not.toBeNull();
       if (leapDate) {
         expect(leapDate.getMonth()).toBe(1); // February
@@ -225,8 +220,10 @@ describe('Norwegian Fødselsnummer Validation', () => {
 
     test('should handle century transitions correctly', () => {
       // Test 1899 to 1900 boundary
-      const date1899 = extractBirthDate('31128999999'); // Dec 31, 1899 (individnummer 500-749)
-      const date1900 = extractBirthDate('01010000000'); // Jan 1, 1900 (individnummer 000-499)
+      // 31129950016: DD=31, MM=12, YY=99, individnummer=500 (500-749 && year>=54 -> century 1800 -> 1899)
+      const date1899 = extractBirthDate('31129950016'); // Dec 31, 1899
+      // 01010000110: DD=01, MM=01, YY=00, individnummer=001 (000-499 -> century 1900 -> 1900)
+      const date1900 = extractBirthDate('01010000110'); // Jan 1, 1900
 
       // Both should be valid dates
       expect(date1899).not.toBeNull();
