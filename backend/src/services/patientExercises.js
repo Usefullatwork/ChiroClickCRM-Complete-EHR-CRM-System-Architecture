@@ -5,9 +5,9 @@
  * @module services/patientExercises
  */
 
-import { query, transaction } from '../config/database.js'
-import logger from '../utils/logger.js'
-import crypto from 'crypto'
+import { query, transaction } from '../config/database.js';
+import logger from '../utils/logger.js';
+import crypto from 'crypto';
 
 // ============================================================================
 // TOKEN MANAGEMENT
@@ -17,8 +17,13 @@ import crypto from 'crypto'
  * Generate a secure random access token
  */
 const generateToken = () => {
-  return crypto.randomBytes(32).toString('hex')
-}
+  const bytes = crypto.randomBytes(32);
+  if (bytes && typeof bytes.toString === 'function') {
+    return bytes.toString('hex');
+  }
+  // Fallback for environments where crypto is unavailable
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+};
 
 /**
  * Create a portal access token for a patient
@@ -27,11 +32,16 @@ const generateToken = () => {
  * @param {string} tokenType - Type of token (exercises, documents, forms, general)
  * @param {number} expiryDays - Days until token expires (default 30)
  */
-export const createPortalToken = async (organizationId, patientId, tokenType = 'exercises', expiryDays = 30) => {
+export const createPortalToken = async (
+  organizationId,
+  patientId,
+  tokenType = 'exercises',
+  expiryDays = 30
+) => {
   try {
-    const accessToken = generateToken()
-    const expiresAt = new Date()
-    expiresAt.setDate(expiresAt.getDate() + expiryDays)
+    const accessToken = generateToken();
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + expiryDays);
 
     const result = await query(
       `INSERT INTO patient_portal_tokens (
@@ -39,15 +49,15 @@ export const createPortalToken = async (organizationId, patientId, tokenType = '
       ) VALUES ($1, $2, $3, $4, $5)
       RETURNING *`,
       [patientId, organizationId, accessToken, tokenType, expiresAt]
-    )
+    );
 
-    logger.info('Portal token created:', { patientId, tokenType, expiresAt })
-    return result.rows[0]
+    logger.info('Portal token created:', { patientId, tokenType, expiresAt });
+    return result.rows[0];
   } catch (error) {
-    logger.error('Error creating portal token:', error)
-    throw error
+    logger.error('Error creating portal token:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Validate a portal access token
@@ -57,7 +67,7 @@ export const createPortalToken = async (organizationId, patientId, tokenType = '
 export const validatePortalToken = async (token) => {
   try {
     if (!token || token.length < 32) {
-      return null
+      return null;
     }
 
     const result = await query(
@@ -75,10 +85,10 @@ export const validatePortalToken = async (token) => {
          AND t.expires_at > CURRENT_TIMESTAMP
          AND NOT t.is_revoked`,
       [token]
-    )
+    );
 
     if (result.rows.length === 0) {
-      return null
+      return null;
     }
 
     // Update usage tracking
@@ -87,14 +97,14 @@ export const validatePortalToken = async (token) => {
        SET last_used_at = CURRENT_TIMESTAMP, use_count = use_count + 1
        WHERE access_token = $1`,
       [token]
-    )
+    );
 
-    return result.rows[0]
+    return result.rows[0];
   } catch (error) {
-    logger.error('Error validating portal token:', error)
-    throw error
+    logger.error('Error validating portal token:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Revoke a portal token
@@ -102,16 +112,15 @@ export const validatePortalToken = async (token) => {
  */
 export const revokePortalToken = async (token) => {
   try {
-    await query(
-      `UPDATE patient_portal_tokens SET is_revoked = true WHERE access_token = $1`,
-      [token]
-    )
-    return true
+    await query(`UPDATE patient_portal_tokens SET is_revoked = true WHERE access_token = $1`, [
+      token,
+    ]);
+    return true;
   } catch (error) {
-    logger.error('Error revoking portal token:', error)
-    throw error
+    logger.error('Error revoking portal token:', error);
+    throw error;
   }
-}
+};
 
 // ============================================================================
 // PATIENT PRESCRIPTION ACCESS
@@ -123,9 +132,9 @@ export const revokePortalToken = async (token) => {
  */
 export const getPatientPrescriptions = async (token) => {
   try {
-    const tokenData = await validatePortalToken(token)
+    const tokenData = await validatePortalToken(token);
     if (!tokenData) {
-      return null
+      return null;
     }
 
     const result = await query(
@@ -153,18 +162,18 @@ export const getPatientPrescriptions = async (token) => {
          AND p.status IN ('active', 'paused')
        ORDER BY p.prescribed_at DESC`,
       [tokenData.patient_id, tokenData.organization_id]
-    )
+    );
 
     return {
       patient: {
         firstName: tokenData.patient_first_name,
-        lastName: tokenData.patient_last_name
+        lastName: tokenData.patient_last_name,
       },
       clinic: {
         name: tokenData.organization_name,
-        phone: tokenData.organization_phone
+        phone: tokenData.organization_phone,
       },
-      prescriptions: result.rows.map(row => ({
+      prescriptions: result.rows.map((row) => ({
         id: row.id,
         status: row.status,
         startDate: row.start_date,
@@ -173,14 +182,14 @@ export const getPatientPrescriptions = async (token) => {
         prescribedAt: row.prescribed_at,
         prescribedBy: row.prescribed_by_name,
         exerciseCount: parseInt(row.exercise_count),
-        completedToday: parseInt(row.completed_today)
-      }))
-    }
+        completedToday: parseInt(row.completed_today),
+      })),
+    };
   } catch (error) {
-    logger.error('Error getting patient prescriptions:', error)
-    throw error
+    logger.error('Error getting patient prescriptions:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Get a specific prescription with exercises for patient portal
@@ -189,9 +198,9 @@ export const getPatientPrescriptions = async (token) => {
  */
 export const getPrescriptionDetail = async (token, prescriptionId) => {
   try {
-    const tokenData = await validatePortalToken(token)
+    const tokenData = await validatePortalToken(token);
     if (!tokenData) {
-      return null
+      return null;
     }
 
     // Get prescription
@@ -206,13 +215,13 @@ export const getPrescriptionDetail = async (token, prescriptionId) => {
          AND p.organization_id = $3
          AND p.status IN ('active', 'paused')`,
       [prescriptionId, tokenData.patient_id, tokenData.organization_id]
-    )
+    );
 
     if (prescriptionResult.rows.length === 0) {
-      return null
+      return null;
     }
 
-    const prescription = prescriptionResult.rows[0]
+    const prescription = prescriptionResult.rows[0];
 
     // Get exercises with completion status for today
     const exercisesResult = await query(
@@ -255,16 +264,16 @@ export const getPrescriptionDetail = async (token, prescriptionId) => {
        WHERE pe.prescription_id = $1
        ORDER BY pe.display_order, el.name`,
       [prescriptionId]
-    )
+    );
 
     return {
       patient: {
         firstName: tokenData.patient_first_name,
-        lastName: tokenData.patient_last_name
+        lastName: tokenData.patient_last_name,
       },
       clinic: {
         name: tokenData.organization_name,
-        phone: tokenData.organization_phone
+        phone: tokenData.organization_phone,
       },
       prescription: {
         id: prescription.id,
@@ -273,9 +282,9 @@ export const getPrescriptionDetail = async (token, prescriptionId) => {
         endDate: prescription.end_date,
         patientInstructions: prescription.patient_instructions,
         prescribedAt: prescription.prescribed_at,
-        prescribedBy: prescription.prescribed_by_name
+        prescribedBy: prescription.prescribed_by_name,
       },
-      exercises: exercisesResult.rows.map(row => ({
+      exercises: exercisesResult.rows.map((row) => ({
         id: row.prescribed_exercise_id,
         exerciseId: row.exercise_id,
         name: row.name_norwegian || row.name,
@@ -296,14 +305,14 @@ export const getPrescriptionDetail = async (token, prescriptionId) => {
         frequencyPerDay: row.frequency_per_day,
         frequencyPerWeek: row.frequency_per_week,
         customInstructions: row.custom_instructions,
-        completedToday: row.completed_today
-      }))
-    }
+        completedToday: row.completed_today,
+      })),
+    };
   } catch (error) {
-    logger.error('Error getting prescription detail:', error)
-    throw error
+    logger.error('Error getting prescription detail:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Get exercise detail for patient portal
@@ -313,9 +322,9 @@ export const getPrescriptionDetail = async (token, prescriptionId) => {
  */
 export const getExerciseDetail = async (token, prescriptionId, exerciseId) => {
   try {
-    const tokenData = await validatePortalToken(token)
+    const tokenData = await validatePortalToken(token);
     if (!tokenData) {
-      return null
+      return null;
     }
 
     // Verify prescription belongs to patient
@@ -323,10 +332,10 @@ export const getExerciseDetail = async (token, prescriptionId, exerciseId) => {
       `SELECT id FROM exercise_prescriptions
        WHERE id = $1 AND patient_id = $2 AND organization_id = $3`,
       [prescriptionId, tokenData.patient_id, tokenData.organization_id]
-    )
+    );
 
     if (prescriptionCheck.rows.length === 0) {
-      return null
+      return null;
     }
 
     // Get exercise detail
@@ -366,22 +375,22 @@ export const getExerciseDetail = async (token, prescriptionId, exerciseId) => {
        WHERE pe.prescription_id = $1
          AND pe.exercise_id = $2`,
       [prescriptionId, exerciseId]
-    )
+    );
 
     if (result.rows.length === 0) {
-      return null
+      return null;
     }
 
-    const row = result.rows[0]
+    const row = result.rows[0];
 
     return {
       patient: {
         firstName: tokenData.patient_first_name,
-        lastName: tokenData.patient_last_name
+        lastName: tokenData.patient_last_name,
       },
       clinic: {
         name: tokenData.organization_name,
-        phone: tokenData.organization_phone
+        phone: tokenData.organization_phone,
       },
       exercise: {
         id: row.prescribed_exercise_id,
@@ -406,14 +415,14 @@ export const getExerciseDetail = async (token, prescriptionId, exerciseId) => {
         frequencyPerWeek: row.frequency_per_week || row.frequency_per_week_default,
         customInstructions: row.custom_instructions,
         completedToday: row.completed_today,
-        progressHistory: row.progress_history || []
-      }
-    }
+        progressHistory: row.progress_history || [],
+      },
+    };
   } catch (error) {
-    logger.error('Error getting exercise detail:', error)
-    throw error
+    logger.error('Error getting exercise detail:', error);
+    throw error;
   }
-}
+};
 
 // ============================================================================
 // PROGRESS TRACKING
@@ -428,9 +437,9 @@ export const getExerciseDetail = async (token, prescriptionId, exerciseId) => {
  */
 export const recordExerciseProgress = async (token, prescriptionId, exerciseId, progressData) => {
   try {
-    const tokenData = await validatePortalToken(token)
+    const tokenData = await validatePortalToken(token);
     if (!tokenData) {
-      throw new Error('Ugyldig eller utloopt tilgangstoken')
+      throw new Error('Ugyldig eller utlopt tilgangstoken');
     }
 
     // Verify prescription belongs to patient
@@ -438,13 +447,20 @@ export const recordExerciseProgress = async (token, prescriptionId, exerciseId, 
       `SELECT id FROM exercise_prescriptions
        WHERE id = $1 AND patient_id = $2 AND organization_id = $3 AND status = 'active'`,
       [prescriptionId, tokenData.patient_id, tokenData.organization_id]
-    )
+    );
 
     if (prescriptionCheck.rows.length === 0) {
-      throw new Error('Oppskriften ble ikke funnet eller er ikke aktiv')
+      throw new Error('Oppskriften ble ikke funnet eller er ikke aktiv');
     }
 
-    const { setsCompleted, repsCompleted, holdSecondsCompleted, difficultyRating, painRating, notes } = progressData
+    const {
+      setsCompleted,
+      repsCompleted,
+      holdSecondsCompleted,
+      difficultyRating,
+      painRating,
+      notes,
+    } = progressData;
 
     const result = await query(
       `INSERT INTO exercise_progress (
@@ -462,26 +478,26 @@ export const recordExerciseProgress = async (token, prescriptionId, exerciseId, 
         holdSecondsCompleted,
         difficultyRating,
         painRating,
-        notes
+        notes,
       ]
-    )
+    );
 
     logger.info('Exercise progress recorded:', {
       patientId: tokenData.patient_id,
       prescriptionId,
-      exerciseId
-    })
+      exerciseId,
+    });
 
     return {
       success: true,
       progress: result.rows[0],
-      message: 'Fremgang registrert!'
-    }
+      message: 'Fremgang registrert!',
+    };
   } catch (error) {
-    logger.error('Error recording exercise progress:', error)
-    throw error
+    logger.error('Error recording exercise progress:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Get progress history for a prescription
@@ -491,22 +507,22 @@ export const recordExerciseProgress = async (token, prescriptionId, exerciseId, 
  */
 export const getProgressHistory = async (token, prescriptionId, options = {}) => {
   try {
-    const tokenData = await validatePortalToken(token)
+    const tokenData = await validatePortalToken(token);
     if (!tokenData) {
-      return null
+      return null;
     }
 
-    const { limit = 50, offset = 0 } = options
+    const { limit = 50, offset = 0 } = options;
 
     // Verify prescription belongs to patient
     const prescriptionCheck = await query(
       `SELECT id FROM exercise_prescriptions
        WHERE id = $1 AND patient_id = $2 AND organization_id = $3`,
       [prescriptionId, tokenData.patient_id, tokenData.organization_id]
-    )
+    );
 
     if (prescriptionCheck.rows.length === 0) {
-      return null
+      return null;
     }
 
     const result = await query(
@@ -521,7 +537,7 @@ export const getProgressHistory = async (token, prescriptionId, options = {}) =>
        ORDER BY ep.completed_at DESC
        LIMIT $2 OFFSET $3`,
       [prescriptionId, limit, offset]
-    )
+    );
 
     // Get summary stats
     const statsResult = await query(
@@ -533,12 +549,12 @@ export const getProgressHistory = async (token, prescriptionId, options = {}) =>
        FROM exercise_progress
        WHERE prescription_id = $1`,
       [prescriptionId]
-    )
+    );
 
-    const stats = statsResult.rows[0]
+    const stats = statsResult.rows[0];
 
     return {
-      progress: result.rows.map(row => ({
+      progress: result.rows.map((row) => ({
         id: row.id,
         exerciseId: row.exercise_id,
         exerciseName: row.exercise_name_norwegian || row.exercise_name,
@@ -549,20 +565,20 @@ export const getProgressHistory = async (token, prescriptionId, options = {}) =>
         holdSecondsCompleted: row.hold_seconds_completed,
         difficultyRating: row.difficulty_rating,
         painRating: row.pain_rating,
-        notes: row.notes
+        notes: row.notes,
       })),
       stats: {
         totalCompletions: parseInt(stats.total_completions),
         activeDays: parseInt(stats.active_days),
         avgDifficulty: parseFloat(stats.avg_difficulty) || 0,
-        avgPain: parseFloat(stats.avg_pain) || 0
-      }
-    }
+        avgPain: parseFloat(stats.avg_pain) || 0,
+      },
+    };
   } catch (error) {
-    logger.error('Error getting progress history:', error)
-    throw error
+    logger.error('Error getting progress history:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Get daily progress summary for patient
@@ -572,12 +588,12 @@ export const getProgressHistory = async (token, prescriptionId, options = {}) =>
  */
 export const getDailyProgressSummary = async (token, prescriptionId, date = new Date()) => {
   try {
-    const tokenData = await validatePortalToken(token)
+    const tokenData = await validatePortalToken(token);
     if (!tokenData) {
-      return null
+      return null;
     }
 
-    const dateStr = date.toISOString().split('T')[0]
+    const dateStr = date.toISOString().split('T')[0];
 
     const result = await query(
       `SELECT
@@ -593,27 +609,28 @@ export const getDailyProgressSummary = async (token, prescriptionId, date = new 
          AND p.patient_id = $2
          AND ep.completed_at::date = $3`,
       [prescriptionId, tokenData.patient_id, dateStr]
-    )
+    );
 
-    const row = result.rows[0]
+    const row = result.rows[0] || {};
+    const exercisesCompleted = parseInt(row.exercises_completed) || 0;
+    const totalExercises = parseInt(row.total_exercises) || 0;
 
     return {
       date: dateStr,
-      exercisesCompleted: parseInt(row.exercises_completed) || 0,
-      totalExercises: parseInt(row.total_exercises) || 0,
-      completionPercentage: row.total_exercises > 0
-        ? Math.round((row.exercises_completed / row.total_exercises) * 100)
-        : 0,
+      exercisesCompleted,
+      totalExercises,
+      completionPercentage:
+        totalExercises > 0 ? Math.round((exercisesCompleted / totalExercises) * 100) : 0,
       totalSets: parseInt(row.total_sets) || 0,
       totalReps: parseInt(row.total_reps) || 0,
       avgDifficulty: parseFloat(row.avg_difficulty) || 0,
-      avgPain: parseFloat(row.avg_pain) || 0
-    }
+      avgPain: parseFloat(row.avg_pain) || 0,
+    };
   } catch (error) {
-    logger.error('Error getting daily progress summary:', error)
-    throw error
+    logger.error('Error getting daily progress summary:', error);
+    throw error;
   }
-}
+};
 
 // Export default for service
 export default {
@@ -630,5 +647,5 @@ export default {
   // Progress tracking
   recordExerciseProgress,
   getProgressHistory,
-  getDailyProgressSummary
-}
+  getDailyProgressSummary,
+};

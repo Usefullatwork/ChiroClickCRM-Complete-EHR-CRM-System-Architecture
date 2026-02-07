@@ -509,6 +509,162 @@ export const requireHprNumber = () => {
   };
 };
 
+// ============================================================================
+// STANDALONE UTILITY FUNCTIONS
+// ============================================================================
+
+/**
+ * Validate Norwegian fødselsnummer (11-digit personal ID)
+ * @param {string} fnr - The fødselsnummer to validate
+ * @returns {Object} { valid, birthDate, gender, isDNumber, error }
+ */
+export function validateFodselsnummer(fnr) {
+  if (fnr == null) {
+    return { valid: false, error: 'Fødselsnummer not provided' };
+  }
+
+  if (typeof fnr !== 'string') {
+    return { valid: false, error: 'Must be a string' };
+  }
+
+  // Clean up spaces
+  fnr = fnr.replace(/\s/g, '');
+
+  if (fnr.length !== 11) {
+    return { valid: false, error: 'Must be 11 digits' };
+  }
+
+  if (!/^\d{11}$/.test(fnr)) {
+    return { valid: false, error: 'Must contain only digits' };
+  }
+
+  const digits = fnr.split('').map(Number);
+
+  // Check for D-number (day + 40)
+  let day = parseInt(fnr.substring(0, 2), 10);
+  const isDNumber = day > 40;
+  if (isDNumber) {
+    day -= 40;
+  }
+
+  const month = parseInt(fnr.substring(2, 4), 10);
+  const yearPart = parseInt(fnr.substring(4, 6), 10);
+  const individualNumber = parseInt(fnr.substring(6, 9), 10);
+
+  // Determine century from individual number
+  let year;
+  if (individualNumber < 500) {
+    year = 1900 + yearPart;
+  } else if (individualNumber < 750 && yearPart >= 54) {
+    year = 1800 + yearPart;
+  } else if (individualNumber >= 500 && individualNumber < 1000 && yearPart < 40) {
+    year = 2000 + yearPart;
+  } else {
+    year = 1900 + yearPart;
+  }
+
+  // Validate date
+  const birthDate = new Date(year, month - 1, day);
+  if (birthDate.getMonth() !== month - 1 || birthDate.getDate() !== day) {
+    return { valid: false, error: 'Invalid birth date' };
+  }
+
+  // Checksum validation (weighted modulus 11)
+  const w1 = [3, 7, 6, 1, 8, 9, 4, 5, 2];
+  const w2 = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
+
+  // Gender: odd individual number = male, even = female
+  const gender = individualNumber % 2 === 0 ? 'FEMALE' : 'MALE';
+  const birthDateStr = birthDate.toISOString().split('T')[0];
+
+  // Checksum validation (weighted modulus 11)
+  let sum1 = 0;
+  for (let i = 0; i < 9; i++) sum1 += digits[i] * w1[i];
+  const r1 = 11 - (sum1 % 11);
+  const k1 = r1 === 11 ? 0 : r1;
+  if (k1 === 10 || k1 !== digits[9]) {
+    return { valid: false, error: 'Invalid checksum', birthDate: birthDateStr, gender, isDNumber };
+  }
+
+  let sum2 = 0;
+  for (let i = 0; i < 10; i++) sum2 += digits[i] * w2[i];
+  const r2 = 11 - (sum2 % 11);
+  const k2 = r2 === 11 ? 0 : r2;
+  if (k2 === 10 || k2 !== digits[10]) {
+    return { valid: false, error: 'Invalid checksum', birthDate: birthDateStr, gender, isDNumber };
+  }
+
+  return {
+    valid: true,
+    birthDate: birthDateStr,
+    gender,
+    isDNumber,
+  };
+}
+
+/**
+ * Validate HPR number format and optionally check against DB
+ * @param {string} hprNumber - The HPR number to validate
+ * @returns {Object} { valid, error }
+ */
+export async function validateHprNumber(hprNumber) {
+  if (hprNumber == null) {
+    return { valid: false, error: 'HPR number not provided' };
+  }
+
+  if (typeof hprNumber !== 'string') {
+    hprNumber = String(hprNumber);
+  }
+
+  // HPR numbers are 7-9 digits
+  if (!/^\d{7,9}$/.test(hprNumber)) {
+    return { valid: false, error: 'Invalid HPR number format' };
+  }
+
+  // Format is valid - would need DB/API lookup for full validation
+  return { valid: true, error: null };
+}
+
+/**
+ * Extract HPR number from HelseID claims object
+ * @param {Object} claims - HelseID token claims
+ * @returns {string|null} HPR number or null
+ */
+export function extractHprNumber(claims) {
+  if (!claims) return null;
+  return claims['helseid://claims/hpr/hpr_number'] || claims['hpr_number'] || null;
+}
+
+/**
+ * Extract personal number (fødselsnummer) from HelseID claims
+ * @param {Object} claims - HelseID token claims
+ * @returns {string|null} Personal number or null
+ */
+export function extractPersonalNumber(claims) {
+  if (!claims) return null;
+  return claims['helseid://claims/identity/pid'] || claims['pid'] || null;
+}
+
+/**
+ * Get HelseID configuration status
+ * @returns {Object} Status information
+ */
+export function getHelseIdStatus() {
+  const env = process.env.HELSEID_ENV || 'test';
+  const config = HELSEID_ENVIRONMENTS[env];
+
+  return {
+    configured: !!(process.env.HELSEID_CLIENT_ID && process.env.HELSEID_REDIRECT_URI),
+    environment: env,
+    clientInitialized: false,
+    endpoints: {
+      issuer: config.issuer,
+      authorization_endpoint: config.authorizationEndpoint,
+      token_endpoint: config.tokenEndpoint,
+    },
+  };
+}
+
 // Export client class and middleware
 export { HelseIdClient };
 export default HelseIdClient;

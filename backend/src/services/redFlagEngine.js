@@ -24,7 +24,7 @@ export const RED_FLAG_CATEGORIES = {
     name_en: 'Cauda Equina Syndrome',
     severity: 'CRITICAL',
     action: 'IMMEDIATE_REFERRAL',
-    timeframe: 'immediate'
+    timeframe: 'immediate',
   },
   MALIGNANCY: {
     code: 'MAL',
@@ -32,7 +32,7 @@ export const RED_FLAG_CATEGORIES = {
     name_en: 'Malignancy',
     severity: 'HIGH',
     action: 'URGENT_REFERRAL',
-    timeframe: '24-48 hours'
+    timeframe: '24-48 hours',
   },
   INFECTION: {
     code: 'INF',
@@ -40,7 +40,7 @@ export const RED_FLAG_CATEGORIES = {
     name_en: 'Infection',
     severity: 'HIGH',
     action: 'MEDICAL_EVALUATION',
-    timeframe: '24 hours'
+    timeframe: '24 hours',
   },
   FRACTURE: {
     code: 'FX',
@@ -48,7 +48,7 @@ export const RED_FLAG_CATEGORIES = {
     name_en: 'Fracture',
     severity: 'HIGH',
     action: 'IMAGING_REQUIRED',
-    timeframe: '24-48 hours'
+    timeframe: '24-48 hours',
   },
   VASCULAR: {
     code: 'VAS',
@@ -56,7 +56,7 @@ export const RED_FLAG_CATEGORIES = {
     name_en: 'Vascular Pathology',
     severity: 'HIGH',
     action: 'EMERGENCY_EVALUATION',
-    timeframe: 'immediate'
+    timeframe: 'immediate',
   },
   INFLAMMATORY: {
     code: 'INFL',
@@ -64,7 +64,7 @@ export const RED_FLAG_CATEGORIES = {
     name_en: 'Inflammatory Condition',
     severity: 'MODERATE',
     action: 'SPECIALIST_REFERRAL',
-    timeframe: '1-2 weeks'
+    timeframe: '1-2 weeks',
   },
   NEUROLOGICAL: {
     code: 'NEURO',
@@ -72,7 +72,7 @@ export const RED_FLAG_CATEGORIES = {
     name_en: 'Neurological Compromise',
     severity: 'MODERATE',
     action: 'DETAILED_EXAM',
-    timeframe: '48-72 hours'
+    timeframe: '48-72 hours',
   },
   SYSTEMIC: {
     code: 'SYS',
@@ -80,7 +80,7 @@ export const RED_FLAG_CATEGORIES = {
     name_en: 'Systemic Disease',
     severity: 'MODERATE',
     action: 'MEDICAL_CONSULTATION',
-    timeframe: '1 week'
+    timeframe: '1 week',
   },
   MEDICATION: {
     code: 'MED',
@@ -88,7 +88,7 @@ export const RED_FLAG_CATEGORIES = {
     name_en: 'Medication Interaction',
     severity: 'MODERATE',
     action: 'PRECAUTION',
-    timeframe: 'ongoing'
+    timeframe: 'ongoing',
   },
   AGE_RELATED: {
     code: 'AGE',
@@ -96,8 +96,8 @@ export const RED_FLAG_CATEGORIES = {
     name_en: 'Age-Related Risk',
     severity: 'LOW',
     action: 'MODIFIED_TREATMENT',
-    timeframe: 'ongoing'
-  }
+    timeframe: 'ongoing',
+  },
 };
 
 // ============================================================================
@@ -111,20 +111,19 @@ export const RED_FLAG_RULES = [
     category: 'CAUDA_EQUINA',
     patterns: [
       /blære.*dysfunksjon/i,
+      /blæreforstyrrel/i,
       /urin.*inkontinens/i,
       /urin.*retensjon/i,
       /bladder.*dysfunction/i,
       /urinary.*incontinence/i,
       /urinary.*retention/i,
       /kan\s*ikke\s*late\s*vannet/i,
-      /difficulty\s*urinating/i
+      /difficulty\s*urinating/i,
+      /cauda\s*equina/i,
     ],
     description_no: 'Blæreforstyrrelser - mulig cauda equina',
     description_en: 'Bladder dysfunction - possible cauda equina',
-    questions: [
-      'Har pasienten problemer med vannlating?',
-      'Er det endringer i blærefunksjon?'
-    ]
+    questions: ['Har pasienten problemer med vannlating?', 'Er det endringer i blærefunksjon?'],
   },
   {
     id: 'ce_bowel',
@@ -135,11 +134,11 @@ export const RED_FLAG_RULES = [
       /bowel.*dysfunction/i,
       /fecal.*incontinence/i,
       /loss\s*of\s*bowel\s*control/i,
-      /tap\s*av\s*kontroll.*tarm/i
+      /tap\s*av\s*kontroll.*tarm/i,
     ],
     description_no: 'Tarmforstyrrelser - mulig cauda equina',
     description_en: 'Bowel dysfunction - possible cauda equina',
-    questions: ['Har pasienten endringer i tarmfunksjon?']
+    questions: ['Har pasienten endringer i tarmfunksjon?'],
   },
   {
     id: 'ce_saddle',
@@ -152,11 +151,11 @@ export const RED_FLAG_RULES = [
       /saddle.*numbness/i,
       /perianal.*numbness/i,
       /nummen.*mellom\s*bena/i,
-      /numbness.*between\s*legs/i
+      /numbness.*between\s*legs/i,
     ],
     description_no: 'Sadel-anestesi - kritisk tegn på cauda equina',
     description_en: 'Saddle anesthesia - critical sign of cauda equina',
-    questions: ['Er det nummenhet i seteregionen eller mellom bena?']
+    questions: ['Er det nummenhet i seteregionen eller mellom bena?'],
   },
   {
     id: 'ce_bilateral',
@@ -166,11 +165,11 @@ export const RED_FLAG_RULES = [
       /bilateral.*weakness/i,
       /begge\s*bena.*svake/i,
       /both\s*legs.*weak/i,
-      /progressiv.*bilateral/i
+      /progressiv.*bilateral/i,
     ],
     description_no: 'Bilateral svakhet i underekstremiteter',
     description_en: 'Bilateral lower extremity weakness',
-    questions: ['Er det svakhet i begge bena?']
+    questions: ['Er det svakhet i begge bena?'],
   },
 
   // ============ HIGH: Malignancy ============
@@ -183,11 +182,11 @@ export const RED_FLAG_RULES = [
       /known\s*malignancy/i,
       /kjent\s*malignitet/i,
       /metastas/i,
-      /metastas/i
+      /metastas/i,
     ],
     description_no: 'Tidligere krefthistorie',
     description_en: 'Previous cancer history',
-    riskMultiplier: 2.0
+    riskMultiplier: 2.0,
   },
   {
     id: 'mal_weight',
@@ -198,11 +197,11 @@ export const RED_FLAG_RULES = [
       /vekttap.*[5-9]|[1-9]\d+\s*kg/i,
       /lost.*[5-9]|[1-9]\d+\s*kg/i,
       /betydelig\s*vekttap/i,
-      /significant\s*weight\s*loss/i
+      /significant\s*weight\s*loss/i,
     ],
     description_no: 'Uforklarlig vekttap',
     description_en: 'Unexplained weight loss',
-    questions: ['Har pasienten hatt uforklarlig vekttap?']
+    questions: ['Har pasienten hatt uforklarlig vekttap?'],
   },
   {
     id: 'mal_night',
@@ -216,11 +215,11 @@ export const RED_FLAG_RULES = [
       /wakes.*night/i,
       /konstant.*smerte/i,
       /constant.*pain/i,
-      /unrelenting/i
+      /unrelenting/i,
     ],
     description_no: 'Nattlige smerter som vekker pasienten',
     description_en: 'Night pain that wakes patient',
-    questions: ['Vekkes pasienten av smertene om natten?']
+    questions: ['Vekkes pasienten av smertene om natten?'],
   },
   {
     id: 'mal_age',
@@ -229,11 +228,11 @@ export const RED_FLAG_RULES = [
       /alder.*over\s*50.*første\s*gang/i,
       /age.*over\s*50.*first\s*episode/i,
       /ny.*debut.*[5-9]\d\s*år/i,
-      /new.*onset.*[5-9]\d\s*year/i
+      /new.*onset.*[5-9]\d\s*year/i,
     ],
     description_no: 'Første episode av ryggsmerter etter 50 år',
     description_en: 'First episode of back pain after 50',
-    ageThreshold: 50
+    ageThreshold: 50,
   },
 
   // ============ HIGH: Infection ============
@@ -246,11 +245,11 @@ export const RED_FLAG_RULES = [
       /temperatur.*[3][89]\.[0-9]/i,
       /temp.*[3][89]/i,
       /febrile/i,
-      /febril/i
+      /febril/i,
     ],
     description_no: 'Feber tilstede',
     description_en: 'Fever present',
-    questions: ['Har pasienten feber?']
+    questions: ['Har pasienten feber?'],
   },
   {
     id: 'inf_immune',
@@ -265,24 +264,19 @@ export const RED_FLAG_RULES = [
       /kjemoterapi/i,
       /chemotherapy/i,
       /steroid.*langvarig/i,
-      /long.*term.*steroid/i
+      /long.*term.*steroid/i,
     ],
     description_no: 'Immunsupprimert pasient',
     description_en: 'Immunocompromised patient',
-    riskMultiplier: 1.5
+    riskMultiplier: 1.5,
   },
   {
     id: 'inf_iv',
     category: 'INFECTION',
-    patterns: [
-      /iv\s*drug/i,
-      /intravenøs.*stoff/i,
-      /sprøyte.*misbruk/i,
-      /injection\s*drug/i
-    ],
+    patterns: [/iv\s*drug/i, /intravenøs.*stoff/i, /sprøyte.*misbruk/i, /injection\s*drug/i],
     description_no: 'IV stoffmisbruk',
     description_en: 'IV drug use',
-    riskMultiplier: 2.0
+    riskMultiplier: 2.0,
   },
   {
     id: 'inf_surgery',
@@ -293,11 +287,11 @@ export const RED_FLAG_RULES = [
       /operert.*[<4]\s*uker/i,
       /surgery.*[<4]\s*weeks/i,
       /post.*operativ/i,
-      /post.*operative/i
+      /post.*operative/i,
     ],
     description_no: 'Nylig kirurgisk inngrep',
     description_en: 'Recent surgical procedure',
-    questions: ['Har pasienten hatt kirurgi nylig?']
+    questions: ['Har pasienten hatt kirurgi nylig?'],
   },
 
   // ============ HIGH: Fracture ============
@@ -314,11 +308,11 @@ export const RED_FLAG_RULES = [
       /fall.*fra\s*høyde/i,
       /fall.*from\s*height/i,
       /sykkelulykke/i,
-      /bicycle\s*accident/i
+      /bicycle\s*accident/i,
     ],
     description_no: 'Betydelig traume',
     description_en: 'Significant trauma',
-    questions: ['Har pasienten vært utsatt for betydelig traume?']
+    questions: ['Har pasienten vært utsatt for betydelig traume?'],
   },
   {
     id: 'fx_osteoporosis',
@@ -330,11 +324,11 @@ export const RED_FLAG_RULES = [
       /osteopeni/i,
       /osteopenia/i,
       /lavt\s*kalsium/i,
-      /low\s*bone\s*density/i
+      /low\s*bone\s*density/i,
     ],
     description_no: 'Kjent osteoporose',
     description_en: 'Known osteoporosis',
-    riskMultiplier: 1.5
+    riskMultiplier: 1.5,
   },
   {
     id: 'fx_steroid',
@@ -345,27 +339,21 @@ export const RED_FLAG_RULES = [
       /kortison.*langvarig/i,
       /chronic.*corticosteroid/i,
       /prednisolon/i,
-      /prednisone/i
+      /prednisone/i,
     ],
     description_no: 'Langvarig steroidbruk',
     description_en: 'Long-term steroid use',
-    riskMultiplier: 1.3
+    riskMultiplier: 1.3,
   },
 
   // ============ HIGH: Vascular ============
   {
     id: 'vas_aneurysm',
     category: 'VASCULAR',
-    patterns: [
-      /aneurisme/i,
-      /aneurysm/i,
-      /pulserende.*masse/i,
-      /pulsating.*mass/i,
-      /aorta/i
-    ],
+    patterns: [/aneurisme/i, /aneurysm/i, /pulserende.*masse/i, /pulsating.*mass/i, /aorta/i],
     description_no: 'Mulig aneurisme',
     description_en: 'Possible aneurysm',
-    questions: ['Er det pulserende masse i abdomen?']
+    questions: ['Er det pulserende masse i abdomen?'],
   },
   {
     id: 'vas_claudication',
@@ -376,10 +364,10 @@ export const RED_FLAG_RULES = [
       /bein.*smerter.*gange/i,
       /leg.*pain.*walking/i,
       /hvile.*bedrer/i,
-      /rest.*improves/i
+      /rest.*improves/i,
     ],
     description_no: 'Claudicatio intermittens',
-    description_en: 'Intermittent claudication'
+    description_en: 'Intermittent claudication',
   },
 
   // ============ MODERATE: Neurological ============
@@ -392,11 +380,11 @@ export const RED_FLAG_RULES = [
       /tiltagende.*nummenhet/i,
       /increasing.*numbness/i,
       /forverres.*raskt/i,
-      /rapidly.*worsening/i
+      /rapidly.*worsening/i,
     ],
     description_no: 'Progressive nevrologiske symptomer',
     description_en: 'Progressive neurological symptoms',
-    questions: ['Forverres symptomene over tid?']
+    questions: ['Forverres symptomene over tid?'],
   },
   {
     id: 'neuro_myelopathy',
@@ -410,11 +398,11 @@ export const RED_FLAG_RULES = [
       /positive.*babinski/i,
       /clonus/i,
       /spastis/i,
-      /spastic/i
+      /spastic/i,
     ],
     description_no: 'Tegn på myelopati',
     description_en: 'Signs of myelopathy',
-    questions: ['Er det øvre motornevron-tegn?']
+    questions: ['Er det øvre motornevron-tegn?'],
   },
 
   // ============ MODERATE: Inflammatory ============
@@ -424,15 +412,16 @@ export const RED_FLAG_RULES = [
     patterns: [
       /morgenstivhet.*[>3]0\s*min/i,
       /morning\s*stiffness.*[>3]0/i,
+      /morning\s*stiffness/i,
       /stiv.*om\s*morgenen/i,
       /stiff.*morning/i,
       /bedres.*aktivitet/i,
-      /improves.*activity/i
+      /improves.*activity/i,
     ],
     description_no: 'Morgenstivhet >30 min som bedres med aktivitet',
     description_en: 'Morning stiffness >30 min improving with activity',
     ageThreshold: 40,
-    ageLessThan: true
+    ageLessThan: true,
   },
   {
     id: 'infl_family',
@@ -442,11 +431,11 @@ export const RED_FLAG_RULES = [
       /ankylosing.*spondylitis.*family/i,
       /bechterew.*familie/i,
       /psoriasis.*artritt.*familie/i,
-      /psoriatic.*arthritis.*family/i
+      /psoriatic.*arthritis.*family/i,
     ],
     description_no: 'Familiehistorie med inflammatorisk rygglidelse',
-    description_en: 'Family history of inflammatory spine disease'
-  }
+    description_en: 'Family history of inflammatory spine disease',
+  },
 ];
 
 // ============================================================================
@@ -483,15 +472,15 @@ export const scanForRedFlags = (text, context = {}) => {
           timeframe: category.timeframe,
           description: {
             no: rule.description_no,
-            en: rule.description_en
+            en: rule.description_en,
           },
           categoryName: {
             no: category.name_no,
-            en: category.name_en
+            en: category.name_en,
           },
           matchedPattern: pattern.toString(),
           questions: rule.questions || [],
-          riskMultiplier: rule.riskMultiplier || 1.0
+          riskMultiplier: rule.riskMultiplier || 1.0,
         });
 
         break; // Only match once per rule
@@ -541,10 +530,10 @@ export const calculateRiskScore = (detectedFlags, context = {}) => {
 
   // Determine level and recommendation
   let level, recommendation;
-  if (totalScore >= 80 || detectedFlags.some(f => f.severity === 'CRITICAL')) {
+  if (totalScore >= 80 || detectedFlags.some((f) => f.severity === 'CRITICAL')) {
     level = 'CRITICAL';
     recommendation = 'immediate_referral';
-  } else if (totalScore >= 50 || detectedFlags.some(f => f.severity === 'HIGH')) {
+  } else if (totalScore >= 50 || detectedFlags.some((f) => f.severity === 'HIGH')) {
     level = 'HIGH';
     recommendation = 'urgent_evaluation';
   } else if (totalScore >= 25) {
@@ -560,7 +549,7 @@ export const calculateRiskScore = (detectedFlags, context = {}) => {
     level,
     recommendation,
     flagCount: detectedFlags.length,
-    highestSeverity: detectedFlags[0]?.severity || 'LOW'
+    highestSeverity: detectedFlags[0]?.severity || 'LOW',
   };
 };
 
@@ -577,7 +566,7 @@ export const getScreeningQuestions = (detectedFlags, language = 'no') => {
         category: flag.category,
         severity: flag.severity,
         questions: flag.questions,
-        context: flag.description[language]
+        context: flag.description[language],
       });
       askedCategories.add(flag.category);
     }
@@ -599,14 +588,14 @@ export const generateAlert = (detectedFlags, riskScore, language = 'no') => {
       critical: '🚨 KRITISK: Umiddelbar henvisning påkrevd!',
       high: '⚠️ HØYT: Snarlig medisinsk evaluering anbefalt',
       moderate: '⚡ MODERAT: Forsiktighet anbefalt',
-      low: 'ℹ️ LAV: Vær oppmerksom på risikofaktorer'
+      low: 'ℹ️ LAV: Vær oppmerksom på risikofaktorer',
     },
     en: {
       critical: '🚨 CRITICAL: Immediate referral required!',
       high: '⚠️ HIGH: Prompt medical evaluation recommended',
       moderate: '⚡ MODERATE: Caution advised',
-      low: 'ℹ️ LOW: Be aware of risk factors'
-    }
+      low: 'ℹ️ LOW: Be aware of risk factors',
+    },
   };
 
   const level = riskScore.level.toLowerCase();
@@ -616,21 +605,27 @@ export const generateAlert = (detectedFlags, riskScore, language = 'no') => {
     level: riskScore.level,
     title: msg[level],
     score: riskScore.score,
-    flags: detectedFlags.map(f => ({
+    flags: detectedFlags.map((f) => ({
       category: f.categoryName[language],
       description: f.description[language],
       action: f.action,
-      timeframe: f.timeframe
+      timeframe: f.timeframe,
     })),
     recommendation: riskScore.recommendation,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
 };
 
 /**
  * Log red flag detection for audit
  */
-export const logRedFlagDetection = async (patientId, encounterId, detectedFlags, riskScore, userId) => {
+export const logRedFlagDetection = async (
+  patientId,
+  encounterId,
+  detectedFlags,
+  riskScore,
+  userId
+) => {
   try {
     await query(
       `INSERT INTO audit_logs (
@@ -645,17 +640,18 @@ export const logRedFlagDetection = async (patientId, encounterId, detectedFlags,
           flagCount: detectedFlags.length,
           riskScore: riskScore.score,
           riskLevel: riskScore.level,
-          flags: detectedFlags.map(f => ({
+          flags: detectedFlags.map((f) => ({
             category: f.category,
             severity: f.severity,
-            ruleId: f.ruleId
-          }))
-        })
+            ruleId: f.ruleId,
+          })),
+        }),
       ]
     );
 
-    logger.info(`Red flags logged for encounter ${encounterId}: ${detectedFlags.length} flags, risk level ${riskScore.level}`);
-
+    logger.info(
+      `Red flags logged for encounter ${encounterId}: ${detectedFlags.length} flags, risk level ${riskScore.level}`
+    );
   } catch (error) {
     logger.error('Failed to log red flag detection:', error);
   }
@@ -672,5 +668,5 @@ export default {
   calculateRiskScore,
   getScreeningQuestions,
   generateAlert,
-  logRedFlagDetection
+  logRedFlagDetection,
 };

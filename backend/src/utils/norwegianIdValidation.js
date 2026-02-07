@@ -20,6 +20,8 @@
  * @returns {boolean} - True if valid
  */
 export const validateFodselsnummer = (fnr) => {
+  if (!fnr || typeof fnr !== 'string') return false;
+
   // Remove any spaces or dashes
   fnr = fnr.replace(/[\s-]/g, '');
 
@@ -220,11 +222,21 @@ export const calculateAge = (fnr) => {
 /**
  * Validate and sanitize fødselsnummer for storage
  * @param {string} fnr - Fødselsnummer to validate
- * @returns {Object} - { valid: boolean, fnr: string|null, error: string|null }
+ * @returns {Object} - { valid, sanitized, birthDate, age, gender, isDNumber, errors }
  */
 export const validateAndSanitize = (fnr) => {
-  if (!fnr) {
-    return { valid: false, fnr: null, error: 'Fødselsnummer is required' };
+  const errors = [];
+
+  if (!fnr || typeof fnr !== 'string') {
+    return {
+      valid: false,
+      sanitized: null,
+      birthDate: null,
+      age: null,
+      gender: null,
+      isDNumber: false,
+      errors: ['Fødselsnummer is required'],
+    };
   }
 
   // Remove whitespace and dashes
@@ -232,26 +244,66 @@ export const validateAndSanitize = (fnr) => {
 
   // Validate format
   if (!/^\d{11}$/.test(sanitized)) {
-    return { valid: false, fnr: null, error: 'Fødselsnummer must be 11 digits' };
+    errors.push('Fødselsnummer must be 11 digits');
+    return {
+      valid: false,
+      sanitized,
+      birthDate: null,
+      age: null,
+      gender: null,
+      isDNumber: false,
+      errors,
+    };
   }
 
   // Validate checksum
   if (!validateFodselsnummer(sanitized)) {
-    return { valid: false, fnr: null, error: 'Invalid fødselsnummer (checksum failed)' };
+    errors.push('Invalid fødselsnummer (checksum validation failed)');
+    return {
+      valid: false,
+      sanitized,
+      birthDate: null,
+      age: null,
+      gender: null,
+      isDNumber: false,
+      errors,
+    };
   }
 
-  // Check if person is too young (< 0 years old means future date)
+  const birthDate = extractBirthDate(sanitized);
   const age = calculateAge(sanitized);
-  if (age < 0) {
-    return { valid: false, fnr: null, error: 'Invalid birth date (future date)' };
+  const gender = extractGender(sanitized);
+  const dNumber = isDNumber(sanitized);
+
+  // Check if person is too young (< 0 years old means future date)
+  if (age !== null && age < 0) {
+    errors.push('Invalid birth date (future date)');
   }
 
   // Check if person is too old (> 130 years is likely an error)
-  if (age > 130) {
-    return { valid: false, fnr: null, error: 'Invalid birth date (too old)' };
+  if (age !== null && age > 130) {
+    errors.push('Invalid birth date (too old)');
   }
 
-  return { valid: true, fnr: sanitized, error: null };
+  // Validate actual date (reject Feb 30, etc.)
+  if (birthDate) {
+    const day = parseInt(sanitized.substring(0, 2));
+    const month = parseInt(sanitized.substring(2, 4));
+    const actualDay = day > 40 ? day - 40 : day;
+    if (birthDate.getDate() !== actualDay || birthDate.getMonth() !== month - 1) {
+      errors.push('Invalid date (day does not exist in month)');
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    sanitized,
+    birthDate,
+    age,
+    gender,
+    isDNumber: dNumber,
+    errors,
+  };
 };
 
 export default {
@@ -261,5 +313,5 @@ export default {
   isDNumber,
   formatFodselsnummer,
   calculateAge,
-  validateAndSanitize
+  validateAndSanitize,
 };
