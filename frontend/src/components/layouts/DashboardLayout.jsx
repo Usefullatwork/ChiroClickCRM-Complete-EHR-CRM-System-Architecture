@@ -1,4 +1,4 @@
-import { Outlet, Link, useLocation } from 'react-router-dom'
+import { Outlet, Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   Users,
@@ -15,24 +15,24 @@ import {
   BookOpen,
   Settings,
   User,
-  HeartHandshake
-} from 'lucide-react'
-import { useTranslation } from '../../i18n'
-import LanguageSwitcher from '../LanguageSwitcher'
-import DesktopStatusBar from '../desktop/DesktopStatusBar'
-import useTheme from '../../hooks/useTheme'
+  HeartHandshake,
+} from 'lucide-react';
+import { useTranslation } from '../../i18n';
+import LanguageSwitcher from '../LanguageSwitcher';
+import DesktopStatusBar from '../desktop/DesktopStatusBar';
+import useTheme from '../../hooks/useTheme';
 
 // Mock user for development
 const devUser = {
   firstName: 'Mads',
   lastName: 'Admin',
   fullName: 'Mads Admin',
-  imageUrl: null
-}
+  imageUrl: null,
+};
 
 const devOrganization = {
-  name: 'ChiroClick Demo Clinic'
-}
+  name: 'ChiroClick Demo Clinic',
+};
 
 const NAV_ITEMS = [
   { key: 'dashboard', href: '/', icon: LayoutDashboard },
@@ -50,22 +50,22 @@ const NAV_ITEMS = [
   { key: 'aiTraining', href: '/training', icon: Brain },
   { key: 'auditLogs', href: '/audit-logs', icon: Shield },
   { key: 'settings', href: '/settings', icon: Settings },
-]
+];
 
 export default function DashboardLayout() {
-  const location = useLocation()
-  const { t } = useTranslation('navigation')
-  const { isDark, toggleTheme } = useTheme()
+  const location = useLocation();
+  const { t } = useTranslation('navigation');
+  const { isDark, toggleTheme } = useTheme();
 
-  const user = devUser
-  const organization = devOrganization
+  const user = devUser;
+  const organization = devOrganization;
 
   const isActive = (href) => {
     if (href === '/') {
-      return location.pathname === '/'
+      return location.pathname === '/';
     }
-    return location.pathname.startsWith(href)
-  }
+    return location.pathname.startsWith(href);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
@@ -73,10 +73,10 @@ export default function DashboardLayout() {
       <div className="hidden md:flex md:flex-col md:fixed md:inset-y-0 md:left-0 md:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
         <div className="flex flex-col h-full">
           {/* Logo & Organization */}
-          <div className="px-4 py-4 border-b border-gray-200">
-            <h1 className="text-xl font-semibold text-gray-900">ChiroClickCRM</h1>
+          <div className="px-4 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">ChiroClickCRM</h1>
             {organization && (
-              <p className="text-xs text-gray-500 mt-1">{organization.name}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-200 mt-1">{organization.name}</p>
             )}
           </div>
 
@@ -84,23 +84,23 @@ export default function DashboardLayout() {
           <nav className="flex-1 overflow-y-auto px-3 py-4">
             <ul className="space-y-1">
               {NAV_ITEMS.map((item) => {
-                const active = isActive(item.href)
-                const Icon = item.icon
+                const active = isActive(item.href);
+                const Icon = item.icon;
                 return (
                   <li key={item.key}>
                     <Link
                       to={item.href}
                       className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                         active
-                          ? 'bg-blue-50 text-blue-700'
-                          : 'text-gray-700 hover:bg-gray-100'
+                          ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
+                          : 'text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
                       }`}
                     >
                       <Icon className="w-5 h-5" />
                       {t(item.key)}
                     </Link>
                   </li>
-                )
+                );
               })}
             </ul>
           </nav>
@@ -109,7 +109,11 @@ export default function DashboardLayout() {
           <div className="border-t border-gray-200 dark:border-gray-700">
             <div className="px-4 py-3 flex items-center justify-center gap-3">
               <LanguageSwitcher />
-              <button onClick={toggleTheme} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400" title={isDark ? 'Lys modus' : 'Mørk modus'}>
+              <button
+                onClick={toggleTheme}
+                className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-200"
+                title={isDark ? 'Lys modus' : 'Mørk modus'}
+              >
                 {isDark ? '\u2600' : '\u263E'}
               </button>
             </div>
@@ -119,10 +123,10 @@ export default function DashboardLayout() {
                   <User className="w-5 h-5 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                     {user?.fullName || user?.firstName || 'Mads Admin'}
                   </p>
-                  <p className="text-xs text-gray-500">{t('practitioner')}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-200">{t('practitioner')}</p>
                 </div>
               </div>
             </div>
@@ -140,5 +144,5 @@ export default function DashboardLayout() {
         <DesktopStatusBar />
       </div>
     </div>
-  )
+  );
 }

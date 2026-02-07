@@ -16,7 +16,7 @@ export default function Patients() {
     status: '',
     category: '',
     sortBy: 'last_name',
-    sortOrder: 'asc'
+    sortOrder: 'asc',
   });
   const [page, setPage] = useState(1);
   const limit = 20;
@@ -34,28 +34,29 @@ export default function Patients() {
   // Fetch patients
   const { data, isLoading, error } = useQuery({
     queryKey: ['patients', page, limit, debouncedSearch, filters],
-    queryFn: () => patientsAPI.getAll({
-      page,
-      limit,
-      search: debouncedSearch,
-      ...filters
-    }),
-    keepPreviousData: true
+    queryFn: () =>
+      patientsAPI.getAll({
+        page,
+        limit,
+        search: debouncedSearch,
+        ...filters,
+      }),
+    keepPreviousData: true,
   });
 
   const patients = data?.data?.patients || [];
   const pagination = data?.data?.pagination || { page: 1, pages: 1, total: 0 };
 
   const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({ ...prev, [key]: value }));
     setPage(1);
   };
 
   const handleSort = (column) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       sortBy: column,
-      sortOrder: prev.sortBy === column && prev.sortOrder === 'asc' ? 'desc' : 'asc'
+      sortOrder: prev.sortBy === column && prev.sortOrder === 'asc' ? 'desc' : 'asc',
     }));
   };
 
@@ -66,10 +67,21 @@ export default function Patients() {
     }
 
     // Create CSV content
-    const headers = ['ID', 'First Name', 'Last Name', 'Email', 'Phone', 'Date of Birth', 'Status', 'Category', 'Total Visits', 'Last Visit'];
+    const headers = [
+      'ID',
+      'First Name',
+      'Last Name',
+      'Email',
+      'Phone',
+      'Date of Birth',
+      'Status',
+      'Category',
+      'Total Visits',
+      'Last Visit',
+    ];
     const csvRows = [headers.join(',')];
 
-    patients.forEach(patient => {
+    patients.forEach((patient) => {
       const row = [
         patient.solvit_id || '',
         patient.first_name || '',
@@ -80,9 +92,9 @@ export default function Patients() {
         patient.status || '',
         patient.category || '',
         patient.total_visits || 0,
-        patient.last_visit_date || ''
+        patient.last_visit_date || '',
       ];
-      csvRows.push(row.map(field => `"${field}"`).join(','));
+      csvRows.push(row.map((field) => `"${field}"`).join(','));
     });
 
     const csvContent = csvRows.join('\n');
@@ -107,22 +119,22 @@ export default function Patients() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
+          <p className="text-gray-600 dark:text-gray-200 mt-1">
             {pagination.total} {t('totalPatients').toLowerCase()}
           </p>
         </div>
 
         <div className="flex gap-3">
           <button
-            className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+            className="flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
             onClick={handleExport}
           >
             <Download size={20} />
             Export
           </button>
           <button
-            className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+            className="flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
             onClick={handleImport}
           >
             <Upload size={20} />
@@ -142,11 +154,14 @@ export default function Patients() {
       <div className="mb-6 space-y-4">
         {/* Search Bar */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+          <Search
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            size={20}
+          />
           <input
             type="text"
             placeholder={t('searchPatients')}
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -155,7 +170,7 @@ export default function Patients() {
         {/* Filters */}
         <div className="flex gap-4">
           <select
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={filters.status}
             onChange={(e) => handleFilterChange('status', e.target.value)}
           >
@@ -167,7 +182,7 @@ export default function Patients() {
           </select>
 
           <select
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={filters.category}
             onChange={(e) => handleFilterChange('category', e.target.value)}
           >
@@ -188,18 +203,20 @@ export default function Patients() {
           <p className="text-red-800">Error loading patients: {error.message}</p>
         </div>
       ) : patients.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg">
-          <p className="text-gray-600 text-lg">{t('noPatients')}</p>
-          <p className="text-gray-500 mt-2">Try adjusting your search or filters</p>
+        <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <p className="text-gray-600 dark:text-white text-lg">{t('noPatients')}</p>
+          <p className="text-gray-500 dark:text-gray-200 mt-2">
+            Try adjusting your search or filters
+          </p>
         </div>
       ) : (
         <>
-          <div className="bg-white shadow-md rounded-lg overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+          <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-900">
                 <tr>
                   <th
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
                     onClick={() => handleSort('last_name')}
                   >
                     Name
@@ -207,14 +224,14 @@ export default function Patients() {
                       <span className="ml-1">{filters.sortOrder === 'asc' ? '↑' : '↓'}</span>
                     )}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
                     Age
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
                     Contact
                   </th>
                   <th
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
                     onClick={() => handleSort('last_visit_date')}
                   >
                     {t('lastVisit')}
@@ -222,55 +239,62 @@ export default function Patients() {
                       <span className="ml-1">{filters.sortOrder === 'asc' ? '↑' : '↓'}</span>
                     )}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
                     {t('totalVisits')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {patients.map((patient) => (
                   <tr
                     key={patient.id}
-                    className="hover:bg-gray-50 cursor-pointer"
+                    className="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
                     onClick={() => navigate(`/patients/${patient.id}`)}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
-                          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                            <span className="text-blue-600 font-medium">
-                              {patient.first_name[0]}{patient.last_name[0]}
+                          <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                            <span className="text-blue-600 dark:text-blue-400 font-medium">
+                              {patient.first_name[0]}
+                              {patient.last_name[0]}
                             </span>
                           </div>
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
                             {patient.first_name} {patient.last_name}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-500 dark:text-gray-200">
                             ID: {patient.solvit_id}
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                       {calculateAge(patient.date_of_birth) || '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{patient.email || '-'}</div>
-                      <div className="text-sm text-gray-500">{formatPhone(patient.phone)}</div>
+                      <div className="text-sm text-gray-900 dark:text-gray-100">
+                        {patient.email || '-'}
+                      </div>
+                      <div className="text-sm text-gray-500 dark:text-gray-200">
+                        {formatPhone(patient.phone)}
+                      </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                       {formatDate(patient.last_visit_date)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{patient.total_visits || 0}</div>
+                      <div className="text-sm text-gray-900 dark:text-gray-100">
+                        {patient.total_visits || 0}
+                      </div>
                       {patient.upcoming_appointments > 0 && (
                         <div className="text-xs text-blue-600">
                           {patient.upcoming_appointments} upcoming
@@ -278,16 +302,20 @@ export default function Patients() {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(patient.status)}`}>
+                      <span
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(patient.status)}`}
+                      >
                         {patient.status}
                       </span>
                       {patient.category && (
-                        <div className="text-xs text-gray-500 mt-1">{patient.category}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-200 mt-1">
+                          {patient.category}
+                        </div>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
-                        className="text-blue-600 hover:text-blue-900 mr-4"
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-4"
                         onClick={(e) => {
                           e.stopPropagation();
                           navigate(`/patients/${patient.id}`);
@@ -296,7 +324,7 @@ export default function Patients() {
                         View
                       </button>
                       <button
-                        className="text-green-600 hover:text-green-900"
+                        className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300"
                         onClick={(e) => {
                           e.stopPropagation();
                           navigate(`/patients/${patient.id}/encounter`);
@@ -314,18 +342,16 @@ export default function Patients() {
           {/* Pagination */}
           {pagination.pages > 1 && (
             <div className="flex items-center justify-between mt-6">
-              <div className="text-sm text-gray-700">
-                Showing <span className="font-medium">{((page - 1) * limit) + 1}</span> to{' '}
-                <span className="font-medium">
-                  {Math.min(page * limit, pagination.total)}
-                </span>{' '}
-                of <span className="font-medium">{pagination.total}</span> results
+              <div className="text-sm text-gray-700 dark:text-white">
+                Showing <span className="font-medium">{(page - 1) * limit + 1}</span> to{' '}
+                <span className="font-medium">{Math.min(page * limit, pagination.total)}</span> of{' '}
+                <span className="font-medium">{pagination.total}</span> results
               </div>
 
               <div className="flex gap-2">
                 <button
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
                 >
                   Previous
@@ -346,7 +372,7 @@ export default function Patients() {
                         className={`px-4 py-2 text-sm font-medium rounded-lg ${
                           pageNum === page
                             ? 'text-white bg-blue-600'
-                            : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+                            : 'text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
                         }`}
                         onClick={() => setPage(pageNum)}
                       >
@@ -354,14 +380,18 @@ export default function Patients() {
                       </button>
                     );
                   } else if (pageNum === page - 2 || pageNum === page + 2) {
-                    return <span key={pageNum} className="px-2 py-2">...</span>;
+                    return (
+                      <span key={pageNum} className="px-2 py-2">
+                        ...
+                      </span>
+                    );
                   }
                   return null;
                 })}
 
                 <button
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={() => setPage(p => Math.min(pagination.pages, p + 1))}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => setPage((p) => Math.min(pagination.pages, p + 1))}
                   disabled={page === pagination.pages}
                 >
                   Next
