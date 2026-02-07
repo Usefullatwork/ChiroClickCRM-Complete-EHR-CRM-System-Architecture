@@ -78,13 +78,19 @@ if %errorlevel% neq 0 (
 )
 echo.
 
-echo   Pulling gemma3:4b (for chiro-norwegian)...
-ollama pull gemma3:4b
+echo   Pulling NorwAI/NorwAI-Mistral-7B-Instruct (for chiro-norwegian)...
+ollama pull NorwAI/NorwAI-Mistral-7B-Instruct
 if %errorlevel% neq 0 (
-    echo   FEIL: Kunne ikke laste ned gemma3:4b
-    set /a PULL_ERRORS+=1
+    echo   ADVARSEL: NorwAI-Mistral-7B ikke tilgjengelig. Proever mistral:7b som fallback...
+    ollama pull mistral:7b
+    if %errorlevel% neq 0 (
+        echo   FEIL: Kunne ikke laste ned noen norsk modell
+        set /a PULL_ERRORS+=1
+    ) else (
+        echo   OK - mistral:7b lastet ned som fallback for norsk.
+    )
 ) else (
-    echo   OK - gemma3:4b lastet ned.
+    echo   OK - NorwAI/NorwAI-Mistral-7B-Instruct lastet ned.
 )
 echo.
 

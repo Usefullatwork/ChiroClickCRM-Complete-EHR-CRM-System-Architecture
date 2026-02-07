@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # PostgreSQL Database
@@ -44,7 +44,7 @@ services:
       ENCRYPTION_KEY: ${ENCRYPTION_KEY}
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
       AI_PROVIDER: ${AI_PROVIDER:-ollama}
-      AI_MODEL: ${AI_MODEL:-gemini-3-pro-preview:7b}
+      AI_MODEL: ${AI_MODEL:-chiro-no}
       PHONE_BRIDGE_METHOD: ${PHONE_BRIDGE_METHOD:-manual}
       PHONE_DEVICE_ID: ${PHONE_DEVICE_ID}
       PHONE_API_URL: ${PHONE_API_URL}
@@ -70,12 +70,18 @@ services:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
 
-  # Ollama AI Service (Local LLM) - Gemini 3 Pro Preview 7B
+  # Ollama AI Service (Local LLM) - ChiroClick Custom Models
   ollama:
     image: ollama/ollama:latest
     container_name: chiroclickcrm-ollama
@@ -97,9 +103,9 @@ services:
               count: all
               capabilities: [gpu]
     # If no GPU available, comment out the devices section only (keep memory limits)
-    # Gemini 3 Pro Preview 7B requires minimum 8GB RAM, recommended 16GB
+    # ChiroClick models require minimum 8GB RAM, recommended 16GB
 
-  # Ollama Model Loader (downloads Gemini 3 Pro Preview 7B on first run)
+  # Ollama Model Loader (pulls base models on first run)
   ollama-setup:
     image: ollama/ollama:latest
     container_name: chiroclickcrm-ollama-setup
@@ -110,8 +116,10 @@ services:
       -c "
       echo 'Waiting for Ollama service...' &&
       sleep 10 &&
-      ollama pull ${AI_MODEL:-gemini-3-pro-preview:7b} &&
-      echo 'Model ${AI_MODEL:-gemini-3-pro-preview:7b} downloaded successfully'
+      ollama pull mistral:7b &&
+      ollama pull llama3.2:3b &&
+      ollama pull alibayram/medgemma:4b &&
+      echo 'Base models downloaded successfully. Run build-model.bat to create custom chiro-* models.'
       "
     networks:
       - chiroclickcrm-network
