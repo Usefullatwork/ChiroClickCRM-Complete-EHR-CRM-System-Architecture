@@ -16,6 +16,7 @@
 
 import { useState, useEffect } from 'react';
 import { crmAPI, patientsAPI } from '../services/api';
+import logger from '../utils/logger';
 import { useTranslation } from '../i18n';
 import {
   Users,
@@ -40,7 +41,7 @@ import {
   Bell,
   Target,
   Zap,
-  ListChecks
+  ListChecks,
 } from 'lucide-react';
 
 // Import CRM sub-components
@@ -62,85 +63,88 @@ const CRM_MODULES = [
     name: { no: 'Oversikt', en: 'Overview' },
     icon: BarChart3,
     color: 'blue',
-    description: { no: 'CRM dashbord og nøkkeltall', en: 'CRM dashboard and key metrics' }
+    description: { no: 'CRM dashbord og nøkkeltall', en: 'CRM dashboard and key metrics' },
   },
   {
     id: 'leads',
     name: { no: 'Leads', en: 'Leads' },
     icon: UserPlus,
     color: 'purple',
-    description: { no: 'Administrer potensielle pasienter', en: 'Manage potential patients' }
+    description: { no: 'Administrer potensielle pasienter', en: 'Manage potential patients' },
   },
   {
     id: 'lifecycle',
     name: { no: 'Pasientlivssyklus', en: 'Patient Lifecycle' },
     icon: Users,
     color: 'teal',
-    description: { no: 'Spor pasientstatus og engasjement', en: 'Track patient status and engagement' }
+    description: {
+      no: 'Spor pasientstatus og engasjement',
+      en: 'Track patient status and engagement',
+    },
   },
   {
     id: 'referrals',
     name: { no: 'Henvisninger', en: 'Referrals' },
     icon: Gift,
     color: 'orange',
-    description: { no: 'Henvisningsprogram og belønninger', en: 'Referral program and rewards' }
+    description: { no: 'Henvisningsprogram og belønninger', en: 'Referral program and rewards' },
   },
   {
     id: 'surveys',
     name: { no: 'Undersøkelser', en: 'Surveys' },
     icon: Star,
     color: 'yellow',
-    description: { no: 'NPS og tilfredshetsmålinger', en: 'NPS and satisfaction tracking' }
+    description: { no: 'NPS og tilfredshetsmålinger', en: 'NPS and satisfaction tracking' },
   },
   {
     id: 'communications',
     name: { no: 'Kommunikasjon', en: 'Communications' },
     icon: MessageSquare,
     color: 'green',
-    description: { no: 'Meldingshistorikk og samtaler', en: 'Message history and conversations' }
+    description: { no: 'Meldingshistorikk og samtaler', en: 'Message history and conversations' },
   },
   {
     id: 'campaigns',
     name: { no: 'Kampanjer', en: 'Campaigns' },
     icon: Send,
     color: 'pink',
-    description: { no: 'Markedsføring og tilbakekalling', en: 'Marketing and recall campaigns' }
+    description: { no: 'Markedsføring og tilbakekalling', en: 'Marketing and recall campaigns' },
   },
   {
     id: 'workflows',
     name: { no: 'Automatisering', en: 'Automation' },
     icon: Workflow,
     color: 'indigo',
-    description: { no: 'Automatiske arbeidsflyter', en: 'Automated workflows' }
+    description: { no: 'Automatiske arbeidsflyter', en: 'Automated workflows' },
   },
   {
     id: 'retention',
     name: { no: 'Retensjon', en: 'Retention' },
     icon: TrendingUp,
     color: 'emerald',
-    description: { no: 'Retensjonsanalyse og churn', en: 'Retention analysis and churn' }
+    description: { no: 'Retensjonsanalyse og churn', en: 'Retention analysis and churn' },
   },
   {
     id: 'waitlist',
     name: { no: 'Venteliste', en: 'Waitlist' },
     icon: Clock,
     color: 'amber',
-    description: { no: 'Administrer avbestillingsventeliste', en: 'Manage cancellation waitlist' }
+    description: { no: 'Administrer avbestillingsventeliste', en: 'Manage cancellation waitlist' },
   },
   {
     id: 'exercises',
     name: { no: 'Øvelsesmaler', en: 'Exercise Templates' },
     icon: FileText,
     color: 'cyan',
-    description: { no: 'Send øvelsesPDF-er til pasienter', en: 'Send exercise PDFs to patients' }
+    description: { no: 'Send øvelsesPDF-er til pasienter', en: 'Send exercise PDFs to patients' },
   },
   {
     id: 'settings',
     name: { no: 'Innstillinger', en: 'Settings' },
     icon: Settings,
     color: 'gray',
-    description: { no: 'CRM-innstillinger og frekvenser', en: 'CRM settings and frequencies' }
-  }
+    description: { no: 'CRM-innstillinger og frekvenser', en: 'CRM settings and frequencies' },
+  },
 ];
 
 export default function CRM() {
@@ -155,7 +159,7 @@ export default function CRM() {
     avgNPS: 0,
     reactivationRate: 0,
     openCampaigns: 0,
-    waitlistCount: 0
+    waitlistCount: 0,
   });
 
   const [waitlistData, setWaitlistData] = useState([]);
@@ -170,26 +174,28 @@ export default function CRM() {
       try {
         const [wRes, pRes] = await Promise.all([
           crmAPI.getWaitlist(),
-          patientsAPI.getAll({ limit: 1000 })
+          patientsAPI.getAll({ limit: 1000 }),
         ]);
         const entries = wRes.data?.entries || wRes.data || [];
-        setWaitlistData(entries.map(e => ({
-          id: e.id,
-          patientId: e.patient_id,
-          priority: (e.priority || 'normal').toLowerCase(),
-          timePreferences: e.preferred_days || ['any'],
-          dayPreferences: ['any'],
-          notes: e.notes || '',
-          notifyBySMS: true,
-          notifyByEmail: false,
-          dateAdded: e.added_at || e.created_at,
-          status: (e.status || 'pending').toLowerCase(),
-          notificationsSent: e.notification_count || 0
-        })));
+        setWaitlistData(
+          entries.map((e) => ({
+            id: e.id,
+            patientId: e.patient_id,
+            priority: (e.priority || 'normal').toLowerCase(),
+            timePreferences: e.preferred_days || ['any'],
+            dayPreferences: ['any'],
+            notes: e.notes || '',
+            notifyBySMS: true,
+            notifyByEmail: false,
+            dateAdded: e.added_at || e.created_at,
+            status: (e.status || 'pending').toLowerCase(),
+            notificationsSent: e.notification_count || 0,
+          }))
+        );
         const patients = pRes.data?.patients || pRes.data || [];
         setPatientsList(patients);
       } catch (err) {
-        console.error('Failed to fetch waitlist:', err);
+        logger.error('Failed to fetch waitlist:', err);
       }
     };
     fetchWaitlist();
@@ -210,22 +216,11 @@ export default function CRM() {
             avgNPS: response.data.avgNPS || 0,
             reactivationRate: 0, // Not tracked yet
             openCampaigns: 0, // Not tracked yet
-            waitlistCount: response.data.waitlistCount || 0
+            waitlistCount: response.data.waitlistCount || 0,
           });
         }
       } catch (error) {
-        console.error('Failed to fetch CRM overview:', error);
-        // Keep mock data on error for development
-        setOverviewStats({
-          newLeads: 12,
-          activePatients: 847,
-          atRiskPatients: 34,
-          pendingReferrals: 8,
-          avgNPS: 72,
-          reactivationRate: 23,
-          openCampaigns: 3,
-          waitlistCount: 15
-        });
+        logger.error('Failed to fetch CRM overview:', error);
       } finally {
         setLoading(false);
       }
@@ -253,47 +248,62 @@ export default function CRM() {
       case 'retention':
         return <RetentionDashboard language={language} />;
       case 'waitlist':
-        return <WaitlistManager
-          language={language}
-          waitlist={waitlistData}
-          patients={patientsList}
-          onAdd={async (entry) => {
-            try {
-              await crmAPI.addToWaitlist({
-                patient_id: entry.patientId,
-                priority: entry.priority?.toUpperCase() || 'NORMAL',
-                notes: entry.notes,
-                preferred_days: entry.timePreferences
-              });
-              const res = await crmAPI.getWaitlist();
-              const entries = res.data?.entries || res.data || [];
-              setWaitlistData(entries.map(e => ({
-                id: e.id, patientId: e.patient_id,
-                priority: (e.priority || 'normal').toLowerCase(),
-                timePreferences: e.preferred_days || ['any'],
-                dayPreferences: ['any'], notes: e.notes || '',
-                notifyBySMS: true, notifyByEmail: false,
-                dateAdded: e.added_at || e.created_at,
-                status: (e.status || 'pending').toLowerCase(),
-                notificationsSent: e.notification_count || 0
-              })));
-            } catch (err) { console.error('Failed to add to waitlist:', err); }
-          }}
-          onRemove={async (id) => {
-            try {
-              await crmAPI.updateWaitlistEntry(id, { status: 'CANCELLED' });
-              setWaitlistData(prev => prev.filter(e => e.id !== id));
-            } catch (err) { console.error('Failed to remove from waitlist:', err); }
-          }}
-          onNotify={async (entry, message) => {
-            try {
-              await crmAPI.notifyWaitlist({ entryId: entry.id });
-              setWaitlistData(prev => prev.map(e =>
-                e.id === entry.id ? { ...e, notificationsSent: e.notificationsSent + 1 } : e
-              ));
-            } catch (err) { console.error('Failed to notify:', err); }
-          }}
-        />;
+        return (
+          <WaitlistManager
+            language={language}
+            waitlist={waitlistData}
+            patients={patientsList}
+            onAdd={async (entry) => {
+              try {
+                await crmAPI.addToWaitlist({
+                  patient_id: entry.patientId,
+                  priority: entry.priority?.toUpperCase() || 'NORMAL',
+                  notes: entry.notes,
+                  preferred_days: entry.timePreferences,
+                });
+                const res = await crmAPI.getWaitlist();
+                const entries = res.data?.entries || res.data || [];
+                setWaitlistData(
+                  entries.map((e) => ({
+                    id: e.id,
+                    patientId: e.patient_id,
+                    priority: (e.priority || 'normal').toLowerCase(),
+                    timePreferences: e.preferred_days || ['any'],
+                    dayPreferences: ['any'],
+                    notes: e.notes || '',
+                    notifyBySMS: true,
+                    notifyByEmail: false,
+                    dateAdded: e.added_at || e.created_at,
+                    status: (e.status || 'pending').toLowerCase(),
+                    notificationsSent: e.notification_count || 0,
+                  }))
+                );
+              } catch (err) {
+                logger.error('Failed to add to waitlist:', err);
+              }
+            }}
+            onRemove={async (id) => {
+              try {
+                await crmAPI.updateWaitlistEntry(id, { status: 'CANCELLED' });
+                setWaitlistData((prev) => prev.filter((e) => e.id !== id));
+              } catch (err) {
+                logger.error('Failed to remove from waitlist:', err);
+              }
+            }}
+            onNotify={async (entry, message) => {
+              try {
+                await crmAPI.notifyWaitlist({ entryId: entry.id });
+                setWaitlistData((prev) =>
+                  prev.map((e) =>
+                    e.id === entry.id ? { ...e, notificationsSent: e.notificationsSent + 1 } : e
+                  )
+                );
+              } catch (err) {
+                logger.error('Failed to notify:', err);
+              }
+            }}
+          />
+        );
       case 'exercises':
         return <ExerciseTemplates language={language} />;
       case 'settings':
@@ -354,9 +364,24 @@ export default function CRM() {
           </div>
           <div className="space-y-2">
             <PipelineBar label={t({ no: 'Nye', en: 'New' })} count={5} total={12} color="blue" />
-            <PipelineBar label={t({ no: 'Kontaktet', en: 'Contacted' })} count={4} total={12} color="yellow" />
-            <PipelineBar label={t({ no: 'Booket', en: 'Booked' })} count={2} total={12} color="green" />
-            <PipelineBar label={t({ no: 'Konvertert', en: 'Converted' })} count={1} total={12} color="teal" />
+            <PipelineBar
+              label={t({ no: 'Kontaktet', en: 'Contacted' })}
+              count={4}
+              total={12}
+              color="yellow"
+            />
+            <PipelineBar
+              label={t({ no: 'Booket', en: 'Booked' })}
+              count={2}
+              total={12}
+              color="green"
+            />
+            <PipelineBar
+              label={t({ no: 'Konvertert', en: 'Converted' })}
+              count={1}
+              total={12}
+              color="teal"
+            />
           </div>
         </div>
 
@@ -426,7 +451,8 @@ export default function CRM() {
           </div>
           <div className="mt-4 pt-3 border-t border-gray-100">
             <p className="text-sm text-gray-500">
-              {overviewStats.pendingReferrals} {t({ no: 'ventende belønninger', en: 'pending rewards' })}
+              {overviewStats.pendingReferrals}{' '}
+              {t({ no: 'ventende belønninger', en: 'pending rewards' })}
             </p>
           </div>
         </div>
@@ -446,18 +472,8 @@ export default function CRM() {
             </button>
           </div>
           <div className="space-y-3">
-            <CampaignPreview
-              name="Vi savner deg"
-              type="REACTIVATION"
-              sent={127}
-              responded={23}
-            />
-            <CampaignPreview
-              name="Bursdag Januar"
-              type="BIRTHDAY"
-              sent={45}
-              responded={12}
-            />
+            <CampaignPreview name="Vi savner deg" type="REACTIVATION" sent={127} responded={23} />
+            <CampaignPreview name="Bursdag Januar" type="BIRTHDAY" sent={45} responded={12} />
           </div>
         </div>
 
@@ -476,21 +492,9 @@ export default function CRM() {
             </button>
           </div>
           <div className="space-y-3">
-            <WorkflowStatus
-              name="Velkomstsekvens"
-              status="active"
-              runsToday={3}
-            />
-            <WorkflowStatus
-              name="30-dagers sjekk"
-              status="active"
-              runsToday={7}
-            />
-            <WorkflowStatus
-              name="Bursdagshilsen"
-              status="active"
-              runsToday={2}
-            />
+            <WorkflowStatus name="Velkomstsekvens" status="active" runsToday={3} />
+            <WorkflowStatus name="30-dagers sjekk" status="active" runsToday={7} />
+            <WorkflowStatus name="Bursdagshilsen" status="active" runsToday={2} />
           </div>
         </div>
 
@@ -510,7 +514,9 @@ export default function CRM() {
           </div>
           <div className="text-center py-4">
             <p className="text-3xl font-bold text-amber-600">{overviewStats.waitlistCount}</p>
-            <p className="text-sm text-gray-500">{t({ no: 'pasienter venter', en: 'patients waiting' })}</p>
+            <p className="text-sm text-gray-500">
+              {t({ no: 'pasienter venter', en: 'patients waiting' })}
+            </p>
           </div>
           <button className="w-full mt-2 px-3 py-2 bg-amber-50 text-amber-700 rounded-lg text-sm font-medium hover:bg-amber-100">
             {t({ no: 'Sjekk ledige tider', en: 'Check available slots' })}
@@ -527,12 +533,13 @@ export default function CRM() {
             </div>
             <div className="flex-1">
               <h3 className="font-semibold text-red-900">
-                {overviewStats.atRiskPatients} {t({ no: 'pasienter i faresonen', en: 'patients at risk' })}
+                {overviewStats.atRiskPatients}{' '}
+                {t({ no: 'pasienter i faresonen', en: 'patients at risk' })}
               </h3>
               <p className="text-sm text-red-700 mt-1">
                 {t({
                   no: 'Disse pasientene har ikke vært innom på over 6 uker. Vurder å sende en påminnelse.',
-                  en: 'These patients haven\'t visited in over 6 weeks. Consider sending a reminder.'
+                  en: "These patients haven't visited in over 6 weeks. Consider sending a reminder.",
                 })}
               </p>
               <div className="flex gap-2 mt-3">
@@ -563,7 +570,10 @@ export default function CRM() {
               {t({ no: 'Kunderelasjonshåndtering', en: 'Customer Relationship Management' })}
             </h1>
             <p className="text-sm text-gray-500 mt-1">
-              {t({ no: 'Administrer pasienter, leads, kampanjer og kommunikasjon', en: 'Manage patients, leads, campaigns and communication' })}
+              {t({
+                no: 'Administrer pasienter, leads, kampanjer og kommunikasjon',
+                en: 'Manage patients, leads, campaigns and communication',
+              })}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -594,11 +604,15 @@ export default function CRM() {
                   key={module.id}
                   onClick={() => setActiveModule(module.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors
-                    ${isActive
-                      ? `bg-${module.color}-50 text-${module.color}-700 border border-${module.color}-200`
-                      : 'text-gray-600 hover:bg-gray-50'}`}
+                    ${
+                      isActive
+                        ? `bg-${module.color}-50 text-${module.color}-700 border border-${module.color}-200`
+                        : 'text-gray-600 hover:bg-gray-50'
+                    }`}
                 >
-                  <Icon className={`w-5 h-5 ${isActive ? `text-${module.color}-500` : 'text-gray-400'}`} />
+                  <Icon
+                    className={`w-5 h-5 ${isActive ? `text-${module.color}-500` : 'text-gray-400'}`}
+                  />
                   <span className="text-sm font-medium">{t(module.name)}</span>
                 </button>
               );
@@ -607,9 +621,7 @@ export default function CRM() {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-6">
-          {renderModuleContent()}
-        </div>
+        <div className="flex-1 p-6">{renderModuleContent()}</div>
       </div>
     </div>
   );
@@ -619,15 +631,20 @@ export default function CRM() {
 
 function StatCard({ icon: Icon, label, value, color, suffix = '', trend, alert }) {
   return (
-    <div className={`bg-white rounded-xl border ${alert ? 'border-red-200' : 'border-gray-200'} p-4`}>
+    <div
+      className={`bg-white rounded-xl border ${alert ? 'border-red-200' : 'border-gray-200'} p-4`}
+    >
       <div className="flex items-center justify-between">
         <div className={`p-2 rounded-lg bg-${color}-50`}>
           <Icon className={`w-5 h-5 text-${color}-500`} />
         </div>
-        {alert && <span className="px-2 py-0.5 text-xs bg-red-100 text-red-700 rounded-full">!</span>}
+        {alert && (
+          <span className="px-2 py-0.5 text-xs bg-red-100 text-red-700 rounded-full">!</span>
+        )}
       </div>
       <p className={`text-2xl font-bold mt-3 text-${alert ? 'red' : 'gray'}-900`}>
-        {value}{suffix}
+        {value}
+        {suffix}
       </p>
       <p className="text-sm text-gray-500">{label}</p>
       {trend && <p className="text-xs text-green-600 mt-1">{trend}</p>}
@@ -642,10 +659,7 @@ function PipelineBar({ label, count, total, color }) {
     <div className="flex items-center gap-3">
       <span className="text-xs text-gray-500 w-20">{label}</span>
       <div className="flex-1 bg-gray-100 rounded-full h-2">
-        <div
-          className={`h-2 rounded-full bg-${color}-500`}
-          style={{ width: `${percentage}%` }}
-        />
+        <div className={`h-2 rounded-full bg-${color}-500`} style={{ width: `${percentage}%` }} />
       </div>
       <span className="text-xs font-medium text-gray-700 w-6">{count}</span>
     </div>
@@ -655,7 +669,9 @@ function PipelineBar({ label, count, total, color }) {
 function MessagePreview({ name, message, time, type }) {
   return (
     <div className="flex items-start gap-3">
-      <div className={`w-2 h-2 rounded-full mt-2 ${type === 'inbound' ? 'bg-green-500' : 'bg-blue-500'}`} />
+      <div
+        className={`w-2 h-2 rounded-full mt-2 ${type === 'inbound' ? 'bg-green-500' : 'bg-blue-500'}`}
+      />
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-gray-900">{name}</p>
         <p className="text-xs text-gray-500 truncate">{message}</p>
@@ -669,7 +685,7 @@ function ReferralPreview({ referrer, referred, status, reward }) {
   const statusColors = {
     PENDING: 'bg-yellow-100 text-yellow-700',
     BOOKED: 'bg-blue-100 text-blue-700',
-    CONVERTED: 'bg-green-100 text-green-700'
+    CONVERTED: 'bg-green-100 text-green-700',
   };
 
   return (
@@ -679,9 +695,7 @@ function ReferralPreview({ referrer, referred, status, reward }) {
         <p className="text-xs text-gray-500">fra {referrer}</p>
       </div>
       <div className="text-right">
-        <span className={`px-2 py-0.5 text-xs rounded-full ${statusColors[status]}`}>
-          {status}
-        </span>
+        <span className={`px-2 py-0.5 text-xs rounded-full ${statusColors[status]}`}>{status}</span>
         <p className="text-xs text-gray-500 mt-1">{reward}</p>
       </div>
     </div>
@@ -710,7 +724,9 @@ function WorkflowStatus({ name, status, runsToday }) {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">
-        <span className={`w-2 h-2 rounded-full ${status === 'active' ? 'bg-green-500' : 'bg-gray-300'}`} />
+        <span
+          className={`w-2 h-2 rounded-full ${status === 'active' ? 'bg-green-500' : 'bg-gray-300'}`}
+        />
         <p className="text-sm text-gray-700">{name}</p>
       </div>
       <span className="text-xs text-gray-500">{runsToday} i dag</span>

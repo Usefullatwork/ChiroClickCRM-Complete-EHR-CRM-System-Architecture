@@ -1,56 +1,60 @@
-import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { useTranslation } from '../i18n'
-import { ArrowLeft, Save, Printer } from 'lucide-react'
-import VNGModule, { getDefaultVNGData } from '../components/assessment/VNGModule'
-import { patientsAPI } from '../services/api'
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from '../i18n';
+import { ArrowLeft, Save, Printer } from 'lucide-react';
+import VNGModule, { getDefaultVNGData } from '../components/assessment/VNGModule';
+import { patientsAPI, vestibularAPI } from '../services/api';
+import logger from '../utils/logger';
 
 export default function VNGAssessment() {
-  const { patientId } = useParams()
-  const navigate = useNavigate()
-  const { lang: language, setLang: setLanguage } = useTranslation()
-  const [vngData, setVngData] = useState(getDefaultVNGData())
-  const [isSaving, setIsSaving] = useState(false)
-  const [patient, setPatient] = useState(null)
-  const [isLoadingPatient, setIsLoadingPatient] = useState(false)
+  const { patientId } = useParams();
+  const navigate = useNavigate();
+  const { lang: language, setLang: setLanguage } = useTranslation();
+  const [vngData, setVngData] = useState(getDefaultVNGData());
+  const [isSaving, setIsSaving] = useState(false);
+  const [patient, setPatient] = useState(null);
+  const [isLoadingPatient, setIsLoadingPatient] = useState(false);
 
   // Fetch patient data from API
   useEffect(() => {
     if (patientId) {
-      setIsLoadingPatient(true)
-      patientsAPI.getById(patientId)
-        .then(data => {
+      setIsLoadingPatient(true);
+      patientsAPI
+        .getById(patientId)
+        .then((data) => {
           setPatient({
             id: data.id,
             name: `${data.first_name} ${data.last_name}`,
-            dateOfBirth: data.date_of_birth
-          })
+            dateOfBirth: data.date_of_birth,
+          });
         })
-        .catch(err => {
-          console.warn('Failed to load patient:', err.message)
+        .catch((err) => {
+          logger.warn('Failed to load patient:', err.message);
         })
-        .finally(() => setIsLoadingPatient(false))
+        .finally(() => setIsLoadingPatient(false));
     }
-  }, [patientId])
+  }, [patientId]);
 
   const handleSave = async () => {
-    setIsSaving(true)
+    setIsSaving(true);
     try {
-      // TODO: Implement actual save to backend
-      console.log('Saving VNG data:', vngData)
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      alert(language === 'no' ? 'VNG-undersøkelse lagret!' : 'VNG assessment saved!')
+      const payload = {
+        patient_id: patientId,
+        assessment_data: vngData,
+      };
+      await vestibularAPI.create(payload);
+      alert(language === 'no' ? 'VNG-undersøkelse lagret!' : 'VNG assessment saved!');
     } catch (error) {
-      console.error('Error saving VNG data:', error)
-      alert(language === 'no' ? 'Feil ved lagring' : 'Error saving')
+      logger.error('Error saving VNG data:', error);
+      alert(language === 'no' ? 'Feil ved lagring' : 'Error saving');
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   const handlePrint = () => {
-    window.print()
-  }
+    window.print();
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -69,9 +73,11 @@ export default function VNGAssessment() {
                 {language === 'no' ? 'VNG-undersøkelse' : 'VNG Assessment'}
               </h1>
               {isLoadingPatient ? (
-                <p className="text-sm text-gray-400">{language === 'no' ? 'Laster...' : 'Loading...'}</p>
-              ) : patient && (
-                <p className="text-sm text-gray-500">{patient.name}</p>
+                <p className="text-sm text-gray-400">
+                  {language === 'no' ? 'Laster...' : 'Loading...'}
+                </p>
+              ) : (
+                patient && <p className="text-sm text-gray-500">{patient.name}</p>
               )}
             </div>
           </div>
@@ -116,8 +122,12 @@ export default function VNGAssessment() {
             >
               <Save className="w-4 h-4" />
               {isSaving
-                ? (language === 'no' ? 'Lagrer...' : 'Saving...')
-                : (language === 'no' ? 'Lagre' : 'Save')}
+                ? language === 'no'
+                  ? 'Lagrer...'
+                  : 'Saving...'
+                : language === 'no'
+                  ? 'Lagre'
+                  : 'Save'}
             </button>
           </div>
         </div>
@@ -125,13 +135,8 @@ export default function VNGAssessment() {
 
       {/* Main content */}
       <div className="p-6">
-        <VNGModule
-          data={vngData}
-          onChange={setVngData}
-          language={language}
-          patientId={patientId}
-        />
+        <VNGModule data={vngData} onChange={setVngData} language={language} patientId={patientId} />
       </div>
     </div>
-  )
+  );
 }

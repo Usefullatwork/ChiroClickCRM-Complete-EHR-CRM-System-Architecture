@@ -832,6 +832,44 @@ export const exercisesAPI = {
     }),
 };
 
+// Vestibular / VNG Assessments API
+export const vestibularAPI = {
+  create: (data) => apiClient.post('/vestibular', data),
+  getById: (id) => apiClient.get(`/vestibular/${id}`),
+  getByPatient: (patientId) => apiClient.get(`/vestibular/patient/${patientId}`),
+  getByEncounter: (encounterId) => apiClient.get(`/vestibular/encounter/${encounterId}`),
+  update: (id, data) => apiClient.patch(`/vestibular/${id}`, data),
+  delete: (id) => apiClient.delete(`/vestibular/${id}`),
+  getBPPVTrends: (patientId) => apiClient.get(`/vestibular/patient/${patientId}/bppv-trends`),
+};
+
+// Scheduler API
+export const schedulerAPI = {
+  schedule: (data) => apiClient.post('/scheduler/communications', data),
+  getPending: (params) => apiClient.get('/scheduler/pending', { params }),
+  checkConflicts: (data) => apiClient.post('/scheduler/check-conflicts', data),
+  getDecisions: (params) => apiClient.get('/scheduler/decisions', { params }),
+  resolveDecision: (id, data) => apiClient.post(`/scheduler/decisions/${id}`, data),
+};
+
+// Notifications API
+export const notificationsAPI = {
+  getAll: (params) => apiClient.get('/notifications', { params }),
+  getUnreadCount: () => apiClient.get('/notifications/unread-count'),
+  markRead: (id) => apiClient.put(`/notifications/${id}/read`),
+  markAllRead: () => apiClient.put('/notifications/read-all'),
+  delete: (id) => apiClient.delete(`/notifications/${id}`),
+};
+
+// Patient Portal API
+export const patientPortalAPI = {
+  loginWithPin: (pin, patientId) => apiClient.post('/patient-portal/auth/pin', { pin, patientId }),
+  getProfile: () => apiClient.get('/patient-portal/profile'),
+  getAppointments: () => apiClient.get('/patient-portal/appointments'),
+  getExercises: () => apiClient.get('/patient-portal/exercises'),
+  logCompliance: (id, data) => apiClient.post(`/patient-portal/exercises/${id}/compliance`, data),
+};
+
 // Export API URL for streaming endpoints
 export { API_URL };
 
