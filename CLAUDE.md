@@ -3,42 +3,50 @@
 ## RECENT FIXES (Session 2026-02-03)
 
 ### Backend Fixes
+
 - ✅ Rebuilt node_modules to fix corrupted cors package
 - ✅ Removed dead code `getCircuitBreakerStatus` from `backend/src/controllers/ai.js`
 
 ### Language Switching Fix
+
 - ✅ Fixed 8 pages using local `useState` for language instead of global `useTranslation`:
   - EasyAssessment.jsx, CRM.jsx, Automations.jsx, Exercises.jsx
   - Letters.jsx, ReferralLetters.jsx, SickNotes.jsx, VNGAssessment.jsx
 - All pages now use `useTranslation()` hook from `../i18n`
 
 ### Design Improvements
+
 - ✅ Changed `bg-blue-600` → `bg-teal-600` in Appointments.jsx
 - ✅ Fixed mobile sidebar in DashboardLayout.jsx (hidden on <768px)
 
 ### Training Data
+
 - Currently have 5,738 training examples in `ai-training/merged/chiro-complete-training.jsonl`
 
 ---
 
 ## Project Overview
+
 Norwegian-compliant EHR-CRM-PMS system for chiropractic practices.
-- **Location**: `F:\ChiroClickCRM-Complete-EHR-CRM-System-Architecture`
+
+- **Location**: `D:\ChiroClickCRM-Complete-EHR-CRM-System-Architecture`
 - **Tech Stack**: React + Vite + Node.js + PostgreSQL + Ollama AI
 
 ## Multi-Model AI System (Updated 2026-01-29)
 
 ### Models
-| Model | Base | Size | Purpose | Accuracy |
-|-------|------|------|---------|----------|
-| `chiro-no` | Mistral 7B | ~4.5GB | Default/balanced | 85-90% |
-| `chiro-fast` | Llama 3.2 3B | ~2GB | Quick autocomplete | 80-85% |
-| `chiro-norwegian` | **NorwAI-Mistral-7B** | ~4.5GB | Norwegian language | **95%** |
-| `chiro-medical` | MedGemma 4B | ~2.5GB | Clinical reasoning | 85-88% |
+
+| Model             | Base                  | Size   | Purpose            | Accuracy |
+| ----------------- | --------------------- | ------ | ------------------ | -------- |
+| `chiro-no`        | Mistral 7B            | ~4.5GB | Default/balanced   | 85-90%   |
+| `chiro-fast`      | Llama 3.2 3B          | ~2GB   | Quick autocomplete | 80-85%   |
+| `chiro-norwegian` | **NorwAI-Mistral-7B** | ~4.5GB | Norwegian language | **95%**  |
+| `chiro-medical`   | MedGemma 4B           | ~2.5GB | Clinical reasoning | 85-88%   |
 
 **Note:** Changed chiro-norwegian from Viking 7B to NorwAI-Mistral-7B based on 2025 research showing 95% vs 82% accuracy after LoRA fine-tuning.
 
 ### Task Routing
+
 ```
 Norwegian (spell check, SOAP)  → chiro-norwegian (NorwAI-Mistral-7B)
 Medical (diagnosis, red flags) → chiro-medical (MedGemma 4B)
@@ -47,6 +55,7 @@ General                        → chiro-no (Mistral 7B)
 ```
 
 ### Key Files
+
 - `ai-training/Modelfile*` - 4 Modelfiles for each variant
 - `ai-training/build-model.bat` - Builds all models
 - `backend/src/services/ai.js` - Multi-model routing with guardrails/RAG
@@ -56,6 +65,7 @@ General                        → chiro-no (Mistral 7B)
 - `START-CHIROCLICK.bat` - Launcher with model detection
 
 ### Commands
+
 ```batch
 # Build all models (~14GB total)
 cd ai-training && build-model.bat
@@ -68,6 +78,7 @@ ollama run chiro-norwegian "Skriv subjektiv for nakkesmerter"
 ```
 
 ### Environment (.env)
+
 ```env
 # AI Models
 AI_MODEL=chiro-no
@@ -87,13 +98,15 @@ OLLAMA_BASE_URL=http://localhost:11434
 ## AI Training Pipeline (2026-01-29)
 
 ### Training Scripts
-| Script | Purpose |
-|--------|---------|
-| `ai-training/training/train_unsloth.py` | LoRA fine-tuning with Unsloth (2-5x faster) |
-| `ai-training/data/scripts/convert_to_chatml.py` | Convert JSONL to ChatML format |
-| `ai-training/rag/chunker.py` | SOAP-aware clinical document chunker |
+
+| Script                                          | Purpose                                     |
+| ----------------------------------------------- | ------------------------------------------- |
+| `ai-training/training/train_unsloth.py`         | LoRA fine-tuning with Unsloth (2-5x faster) |
+| `ai-training/data/scripts/convert_to_chatml.py` | Convert JSONL to ChatML format              |
+| `ai-training/rag/chunker.py`                    | SOAP-aware clinical document chunker        |
 
 ### Training Commands
+
 ```bash
 # 1. Convert data to ChatML format
 cd ai-training/data/scripts
@@ -109,38 +122,46 @@ ollama create chiro-norwegian -f ../Modelfile.chiro-norwegian
 ```
 
 ### Database Migrations
+
 ```bash
 # Add pgvector for RAG
 psql -d chiroclickcrm < database/migrations/030_pgvector_rag.sql
 ```
 
 ### Safety Features
+
 - **Input Guardrails**: HIPAA pattern detection, prompt injection blocking
 - **Output Filtering**: Hallucination risk scoring, clinical heuristics
 - **Confidence Calibration**: Temperature scaling per task type
 
 ### RAG System
+
 - **Vector DB**: pgvector with HNSW index
 - **Embeddings**: e5-multilingual-large (1024 dims)
 - **Chunking**: SOAP-aware with configurable overlap
 - **Search**: Hybrid BM25 + vector (alpha=0.7)
 
 ## Training Data
+
 - `ai-training/training-data.jsonl` - 5,642 examples (3.0 MB)
 - `ai-training/rag-chunks.json` - RAG data (4.4 MB)
 
 ## Important Notes
+
 - **USB Drive**: Must be NTFS or exFAT (not FAT32) for models >4GB
 - **Disk Space**: ~14GB required for all AI models
 - **RAM**: Minimum 8GB, recommended 12-16GB for multi-model routing
 
 ## Quick Start
+
 ```batch
 START-CHIROCLICK.bat
 ```
+
 Options on first run: [B]uild all, [M]inimal, [S]kip AI
 
 ## Documentation Updated
+
 - README.md - AI section added
 - PORTABLE_SETUP.md - Multi-model guide
 - TRAINING_GUIDE.md - Training instructions
@@ -149,29 +170,34 @@ Options on first run: [B]uild all, [M]inimal, [S]kip AI
 ---
 
 ## Current Work: Quick-Click Spine Palpation System (2026-01-25)
+
 **Status:** Code complete, needs database setup & testing
 
 ### What Was Built
+
 A clickable spine segment system for rapid palpation documentation:
+
 - Click spine segment -> select direction -> Norwegian clinical text inserted into palpation field
 - Right sidebar always visible in ClinicalEncounter
 - 100+ default Norwegian templates for all spine segments
 - Customizable templates per organization via Settings UI
 
 ### Files Created/Modified
-| File | Status |
-|------|--------|
-| `database/schema.sql` | Added spine_text_templates table |
-| `database/seeds/spine-templates.sql` | NEW - 100+ Norwegian templates |
-| `backend/src/controllers/spineTemplates.js` | NEW - CRUD controller |
-| `backend/src/routes/spineTemplates.js` | NEW - API routes |
-| `backend/src/server.js` | Added route registration |
-| `frontend/src/components/clinical/QuickPalpationSpine.jsx` | NEW - Main component |
-| `frontend/src/pages/ClinicalEncounter.jsx` | Integrated sidebar |
-| `frontend/src/pages/Settings.jsx` | Added template editor |
-| `frontend/src/services/api.js` | Added spineTemplatesAPI |
+
+| File                                                       | Status                           |
+| ---------------------------------------------------------- | -------------------------------- |
+| `database/schema.sql`                                      | Added spine_text_templates table |
+| `database/seeds/spine-templates.sql`                       | NEW - 100+ Norwegian templates   |
+| `backend/src/controllers/spineTemplates.js`                | NEW - CRUD controller            |
+| `backend/src/routes/spineTemplates.js`                     | NEW - API routes                 |
+| `backend/src/server.js`                                    | Added route registration         |
+| `frontend/src/components/clinical/QuickPalpationSpine.jsx` | NEW - Main component             |
+| `frontend/src/pages/ClinicalEncounter.jsx`                 | Integrated sidebar               |
+| `frontend/src/pages/Settings.jsx`                          | Added template editor            |
+| `frontend/src/services/api.js`                             | Added spineTemplatesAPI          |
 
 ### Commit
+
 `7961cb0` - feat(clinical): Add quick-click spine palpation text insertion system
 
 ---
@@ -181,6 +207,7 @@ A clickable spine segment system for rapid palpation documentation:
 ### Status: ALL PHASES COMPLETE
 
 ### Phase 1: Git Cleanup - DONE
+
 - Updated .gitignore for large binary files (ollama, pgsql, AI models)
 - Renamed long filenames in training-data-extracted/
 - Staged all 60+ untracked files
@@ -188,12 +215,14 @@ A clickable spine segment system for rapid palpation documentation:
 - Pushed all changes to remote
 
 ### Phase 2: Spine Palpation Database - DONE
+
 - Created spine_text_templates table
 - Seeded 149 Norwegian palpation templates
 - Tested all API endpoints (authenticated via session cookie)
 - Templates cover C0-C1 through Coccyx + muscle groups
 
 ### Phase 3: Documentation Reorganization - DONE
+
 - Created docs/ hierarchy:
   - docs/getting-started/ (3 files)
   - docs/architecture/ (4 files)
@@ -206,6 +235,7 @@ A clickable spine segment system for rapid palpation documentation:
 - Kept at root: README.md, CLAUDE.md, SECURITY.md, docker-compose.yml
 
 ### Phase 4: Environment Validation - DONE
+
 - Created scripts/setup.sh (Linux/Mac)
 - Created scripts/setup.bat (Windows)
 - Updated backend/.env.example with AI model variants
@@ -217,25 +247,31 @@ A clickable spine segment system for rapid palpation documentation:
 ## TODO List
 
 ### Startup Tasks (Do First)
+
 - [ ] **Start Docker containers** - `docker-compose up -d`
 - [ ] **Start backend server** - `cd backend && npm run dev`
 - [ ] **Start frontend server** - `cd frontend && npm run dev`
 
 ### Database Setup
+
 - [ ] **Run database migration** - Create spine_text_templates table
+
   ```sql
   -- Connect to database
   docker exec -it chiroclickcrm-db psql -U postgres -d chiroclickcrm
 
   -- Then run the table creation from schema.sql (the spine_text_templates section)
   ```
+
 - [ ] **Seed default templates** - Populate Norwegian palpation templates
   ```bash
   docker exec -i chiroclickcrm-db psql -U postgres -d chiroclickcrm < database/seeds/spine-templates.sql
   ```
 
 ### Testing
+
 - [ ] **Test API endpoints**
+
   ```bash
   # List all segments
   curl http://localhost:3000/api/v1/spine-templates/segments
@@ -264,21 +300,23 @@ A clickable spine segment system for rapid palpation documentation:
 ---
 
 ## Spine Templates API Reference
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | /api/v1/spine-templates | List all templates |
-| GET | /api/v1/spine-templates/grouped | Templates grouped by segment |
-| GET | /api/v1/spine-templates/segments | List of segments |
-| GET | /api/v1/spine-templates/directions | List of directions |
-| GET | /api/v1/spine-templates/:segment/:direction | Specific template |
-| POST | /api/v1/spine-templates | Create custom template |
-| PATCH | /api/v1/spine-templates/:id | Update template |
-| DELETE | /api/v1/spine-templates/:id | Delete custom (revert to default) |
-| POST | /api/v1/spine-templates/reset | Reset all to defaults |
+
+| Method | Endpoint                                    | Description                       |
+| ------ | ------------------------------------------- | --------------------------------- |
+| GET    | /api/v1/spine-templates                     | List all templates                |
+| GET    | /api/v1/spine-templates/grouped             | Templates grouped by segment      |
+| GET    | /api/v1/spine-templates/segments            | List of segments                  |
+| GET    | /api/v1/spine-templates/directions          | List of directions                |
+| GET    | /api/v1/spine-templates/:segment/:direction | Specific template                 |
+| POST   | /api/v1/spine-templates                     | Create custom template            |
+| PATCH  | /api/v1/spine-templates/:id                 | Update template                   |
+| DELETE | /api/v1/spine-templates/:id                 | Delete custom (revert to default) |
+| POST   | /api/v1/spine-templates/reset               | Reset all to defaults             |
 
 ---
 
 ## Future Enhancements (Backlog)
+
 - [ ] Voice command: "C2 left" -> inserts text
 - [ ] Quick-tap mode: double-tap segment for default direction
 - [ ] Favorites: pin frequently used segment+direction combos
@@ -289,7 +327,9 @@ A clickable spine segment system for rapid palpation documentation:
 ## Session 2026-01-27: Database & Frontend Fixes
 
 ### Database Schema Applied
+
 The following were added to make auth work:
+
 ```sql
 -- Run these if starting fresh:
 ALTER TABLE users ADD COLUMN password_hash VARCHAR(255);
@@ -329,21 +369,26 @@ Migration file: `database/migrations/005_complete_auth_schema.sql`
 Demo users seed: `database/seeds/demo-users.sql`
 
 ### Test Credentials
-| Email | Password | Role |
-|-------|----------|------|
-| admin@chiroclickcrm.no | admin123 | ADMIN |
+
+| Email                        | Password | Role         |
+| ---------------------------- | -------- | ------------ |
+| admin@chiroclickcrm.no       | admin123 | ADMIN        |
 | kiropraktor@chiroclickcrm.no | admin123 | PRACTITIONER |
 
 ### Frontend Dev Mode
+
 The frontend can run WITHOUT Clerk by using a placeholder key in `.env`:
+
 ```env
 VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_key_here
 ```
+
 - `main.jsx` - Detects placeholder key and skips ClerkProvider
 - `App.jsx` - Renders without SignedIn/SignedOut wrappers in dev mode
 - `api.js` - Skips 401 redirect to /sign-in in dev mode
 
 ### Stub Components Created
+
 These are placeholders to prevent import errors:
 | Component | Path |
 |-----------|------|
@@ -355,16 +400,17 @@ These are placeholders to prevent import errors:
 | ExercisePanel | `frontend/src/components/exercises/index.jsx` |
 
 ### Stub Backend Routes Created
-| Route | Path | Status |
-|-------|------|--------|
-| scheduler | `backend/src/routes/scheduler.js` | Stub |
-| kiosk | `backend/src/routes/kiosk.js` | Stub |
-| crm | `backend/src/routes/crm.js` | **COMPLETE** |
-| automations | `backend/src/routes/automations.js` | Stub |
-| bulkCommunication | `backend/src/routes/bulkCommunication.js` | Stub |
-| exercises | `backend/src/routes/exercises.js` | Stub |
-| notifications | `backend/src/routes/notifications.js` | Stub |
-| patientPortal | `backend/src/routes/patientPortal.js` | Stub |
+
+| Route             | Path                                      | Status       |
+| ----------------- | ----------------------------------------- | ------------ |
+| scheduler         | `backend/src/routes/scheduler.js`         | Stub         |
+| kiosk             | `backend/src/routes/kiosk.js`             | Stub         |
+| crm               | `backend/src/routes/crm.js`               | **COMPLETE** |
+| automations       | `backend/src/routes/automations.js`       | Stub         |
+| bulkCommunication | `backend/src/routes/bulkCommunication.js` | Stub         |
+| exercises         | `backend/src/routes/exercises.js`         | Stub         |
+| notifications     | `backend/src/routes/notifications.js`     | Stub         |
+| patientPortal     | `backend/src/routes/patientPortal.js`     | Stub         |
 
 ---
 
@@ -375,43 +421,47 @@ These are placeholders to prevent import errors:
 The CRM module is now complete with 40+ API endpoints:
 
 ### CRM API Endpoints
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | /crm/overview | Dashboard metrics |
-| GET | /crm/leads | Lead list with filtering |
-| GET | /crm/leads/pipeline | Pipeline statistics |
-| GET/POST | /crm/leads/:id | Lead CRUD |
-| POST | /crm/leads/:id/convert | Convert to patient |
-| GET | /crm/lifecycle | Patients by lifecycle |
-| GET | /crm/lifecycle/stats | Lifecycle statistics |
-| GET/POST | /crm/referrals | Referral management |
-| GET | /crm/referrals/stats | Referral statistics |
-| GET/POST | /crm/surveys | Survey management |
-| GET | /crm/surveys/:id/responses | Survey responses |
-| GET | /crm/surveys/nps/stats | NPS analytics |
-| GET/POST | /crm/communications | Communication history |
-| GET/POST | /crm/campaigns | Campaign management |
-| POST | /crm/campaigns/:id/launch | Launch campaign |
-| GET/POST | /crm/workflows | Workflow automation |
-| POST | /crm/workflows/:id/toggle | Toggle workflow |
-| GET | /crm/retention | Retention dashboard |
-| GET | /crm/retention/churn | Churn analysis |
-| GET | /crm/retention/cohorts | Cohort analysis |
-| GET/POST | /crm/waitlist | Waitlist management |
-| POST | /crm/waitlist/notify | Notify waitlist |
-| GET/PUT | /crm/settings | CRM settings |
+
+| Method   | Endpoint                   | Description              |
+| -------- | -------------------------- | ------------------------ |
+| GET      | /crm/overview              | Dashboard metrics        |
+| GET      | /crm/leads                 | Lead list with filtering |
+| GET      | /crm/leads/pipeline        | Pipeline statistics      |
+| GET/POST | /crm/leads/:id             | Lead CRUD                |
+| POST     | /crm/leads/:id/convert     | Convert to patient       |
+| GET      | /crm/lifecycle             | Patients by lifecycle    |
+| GET      | /crm/lifecycle/stats       | Lifecycle statistics     |
+| GET/POST | /crm/referrals             | Referral management      |
+| GET      | /crm/referrals/stats       | Referral statistics      |
+| GET/POST | /crm/surveys               | Survey management        |
+| GET      | /crm/surveys/:id/responses | Survey responses         |
+| GET      | /crm/surveys/nps/stats     | NPS analytics            |
+| GET/POST | /crm/communications        | Communication history    |
+| GET/POST | /crm/campaigns             | Campaign management      |
+| POST     | /crm/campaigns/:id/launch  | Launch campaign          |
+| GET/POST | /crm/workflows             | Workflow automation      |
+| POST     | /crm/workflows/:id/toggle  | Toggle workflow          |
+| GET      | /crm/retention             | Retention dashboard      |
+| GET      | /crm/retention/churn       | Churn analysis           |
+| GET      | /crm/retention/cohorts     | Cohort analysis          |
+| GET/POST | /crm/waitlist              | Waitlist management      |
+| POST     | /crm/waitlist/notify       | Notify waitlist          |
+| GET/PUT  | /crm/settings              | CRM settings             |
 
 ### Key Files
+
 - `backend/src/routes/crm.js` - Full route definitions (310 lines)
 - `backend/src/controllers/crm.js` - Controller with 50+ methods
 - `backend/src/services/crm.js` - Business logic (~1300 lines)
 
 ### Test Credentials
-| Email | Password | Role |
-|-------|----------|------|
+
+| Email              | Password | Role         |
+| ------------------ | -------- | ------------ |
 | mads@chiroclick.no | admin123 | PRACTITIONER |
 
 ### Testing CRM
+
 ```bash
 # Login and save cookie
 curl -c cookies.txt -X POST http://localhost:3000/api/v1/auth/login \
@@ -429,14 +479,17 @@ curl -b cookies.txt http://localhost:3000/api/v1/crm/lifecycle/stats
 ```
 
 ### Database Fixes Applied
+
 1. Created `current_tenant_id()` function for RLS
 2. Fixed `setTenantContext()` to use `set_config()` instead of `SET`
 3. Changed `clinic_id` to `organization_id` in CRM service/controller
 
 ### Clinical Settings System (NEW)
+
 Full backend API for clinical documentation preferences:
 
 **Files:**
+
 - `backend/src/services/clinicalSettings.js` - Settings service with defaults
 - `backend/src/controllers/clinicalSettings.js` - CRUD controller
 - `backend/src/routes/clinicalSettings.js` - API routes
@@ -451,6 +504,7 @@ Full backend API for clinical documentation preferences:
 | POST | /clinical-settings/reset | Reset to defaults |
 
 **Settings Structure:**
+
 ```javascript
 {
   adjustment: {
@@ -467,22 +521,26 @@ Full backend API for clinical documentation preferences:
 ```
 
 ### Letter Templates Added to AI Training
+
 14 Norwegian letter templates added to `ai-training/letters-training.jsonl`:
+
 - Headache referral letters
 - Exam declarations (studieattester)
 - Insurance reports
 - Referrals to neurologist, orthopedist, physiotherapy
 
 ### Common Issues & Fixes
-| Issue | Fix |
-|-------|-----|
-| `useKeyboardShortcuts.js` parse error | File contains JSX - renamed to `.jsx` |
-| Duplicate `aiAPI` export | Remove first declaration at line ~470 in api.js |
-| Duplicate hook exports | Don't export both `default as X` and `X` |
+
+| Issue                                  | Fix                                                |
+| -------------------------------------- | -------------------------------------------------- |
+| `useKeyboardShortcuts.js` parse error  | File contains JSX - renamed to `.jsx`              |
+| Duplicate `aiAPI` export               | Remove first declaration at line ~470 in api.js    |
+| Duplicate hook exports                 | Don't export both `default as X` and `X`           |
 | Missing index.js for directory imports | Create `index.js` that re-exports from `index.jsx` |
-| 401 redirect loop in dev | Check `import.meta.env.DEV` before redirecting |
+| 401 redirect loop in dev               | Check `import.meta.env.DEV` before redirecting     |
 
 ### Running the System
+
 ```bash
 # Docker (backend + db + redis)
 docker-compose up -d
@@ -500,11 +558,13 @@ cd frontend && npm run dev
 ## Testing Status (2026-01-28)
 
 ### Current State
+
 - **All tests pass**: 118 tests, 0 failures
 - **Test suites**: 5 passing (CRM, Auth, Patients, Encounters, Health)
 - **Coverage**: ~23% (threshold is 70% - not enforced)
 
 ### What Was Fixed
+
 1. CRM tests - Updated to match actual API response structures
 2. Auth tests - Fixed response code expectations
 3. Patients tests - Added required fields (solvit_id, date_of_birth), fixed schema
@@ -512,6 +572,7 @@ cd frontend && npm run dev
 5. Unit tests - Removed (tested non-existent functions)
 
 ### TODO: Improve Test Coverage
+
 When continuing with testing, consider:
 
 1. **Lower coverage threshold** (in `jest.config.js`):
@@ -536,6 +597,7 @@ When continuing with testing, consider:
    - Consider adding missing columns or updating code
 
 ### Commands
+
 ```bash
 # Run all tests
 cd backend && npm test
@@ -559,26 +621,29 @@ cd backend && npm test -- --coverageThreshold='{}'
 Complete exercise prescription system with offline support for single practitioner clinics.
 
 ### Backend Components
-| Component | Path | Status |
-|-----------|------|--------|
-| Migration | `backend/migrations/023_exercise_library.sql` | COMPLETE |
-| Controller | `backend/src/controllers/exercises.js` | COMPLETE (850+ lines) |
-| Service | `backend/src/services/exercises.js` | COMPLETE (1100+ lines) |
-| Routes | `backend/src/routes/exercises.js` | COMPLETE |
-| Patient Routes | `backend/src/routes/patients.js` | Exercise routes added |
-| PDF Handout | `backend/src/services/pdf.js` | Exercise handout generation added |
-| Seed Data | `backend/seeds/exercise_library.sql` | 40+ exercises, 5 programs |
+
+| Component      | Path                                          | Status                            |
+| -------------- | --------------------------------------------- | --------------------------------- |
+| Migration      | `backend/migrations/023_exercise_library.sql` | COMPLETE                          |
+| Controller     | `backend/src/controllers/exercises.js`        | COMPLETE (850+ lines)             |
+| Service        | `backend/src/services/exercises.js`           | COMPLETE (1100+ lines)            |
+| Routes         | `backend/src/routes/exercises.js`             | COMPLETE                          |
+| Patient Routes | `backend/src/routes/patients.js`              | Exercise routes added             |
+| PDF Handout    | `backend/src/services/pdf.js`                 | Exercise handout generation added |
+| Seed Data      | `backend/seeds/exercise_library.sql`          | 40+ exercises, 5 programs         |
 
 ### Frontend Components
-| Component | Path | Status |
-|-----------|------|--------|
-| ExercisePanel | `frontend/src/components/exercises/index.jsx` | COMPLETE (670 lines) |
-| useExerciseSync | `frontend/src/hooks/useExerciseSync.js` | COMPLETE (520+ lines) |
-| PatientExercises Portal | `frontend/src/pages/portal/PatientExercises.jsx` | COMPLETE |
-| Service Worker | `frontend/public/sw.js` | Exercise caching added |
-| API Client | `frontend/src/services/api.js` | exercisesAPI complete |
+
+| Component               | Path                                             | Status                 |
+| ----------------------- | ------------------------------------------------ | ---------------------- |
+| ExercisePanel           | `frontend/src/components/exercises/index.jsx`    | COMPLETE (670 lines)   |
+| useExerciseSync         | `frontend/src/hooks/useExerciseSync.js`          | COMPLETE (520+ lines)  |
+| PatientExercises Portal | `frontend/src/pages/portal/PatientExercises.jsx` | COMPLETE               |
+| Service Worker          | `frontend/public/sw.js`                          | Exercise caching added |
+| API Client              | `frontend/src/services/api.js`                   | exercisesAPI complete  |
 
 ### Database Tables
+
 ```sql
 -- Main tables
 exercise_library         -- 40+ global exercises with Norwegian instructions
@@ -589,23 +654,25 @@ exercise_favorites       -- Practitioner's frequently used exercises
 ```
 
 ### Exercise API Endpoints
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | /exercises | List with filters (category, bodyRegion, search) |
-| GET | /exercises/categories | Available categories |
-| GET | /exercises/body-regions | Available body regions |
-| GET | /exercises/favorites | User's favorites |
-| GET | /exercises/recent | Recently used |
-| GET | /exercises/stats | Usage statistics |
-| GET | /exercises/programs | Program templates |
-| POST | /exercises/programs | Create program |
-| GET | /exercises/prescriptions/:id | Get prescription |
-| POST | /exercises/prescriptions/:id/compliance | Log daily compliance |
-| POST | /patients/:id/exercises | Prescribe to patient |
-| GET | /patients/:id/exercises | Patient's exercises |
-| GET | /patients/:id/exercises/pdf | Generate PDF handout |
+
+| Method | Endpoint                                | Description                                      |
+| ------ | --------------------------------------- | ------------------------------------------------ |
+| GET    | /exercises                              | List with filters (category, bodyRegion, search) |
+| GET    | /exercises/categories                   | Available categories                             |
+| GET    | /exercises/body-regions                 | Available body regions                           |
+| GET    | /exercises/favorites                    | User's favorites                                 |
+| GET    | /exercises/recent                       | Recently used                                    |
+| GET    | /exercises/stats                        | Usage statistics                                 |
+| GET    | /exercises/programs                     | Program templates                                |
+| POST   | /exercises/programs                     | Create program                                   |
+| GET    | /exercises/prescriptions/:id            | Get prescription                                 |
+| POST   | /exercises/prescriptions/:id/compliance | Log daily compliance                             |
+| POST   | /patients/:id/exercises                 | Prescribe to patient                             |
+| GET    | /patients/:id/exercises                 | Patient's exercises                              |
+| GET    | /patients/:id/exercises/pdf             | Generate PDF handout                             |
 
 ### Offline Support Features
+
 1. **Exercise Library Caching** - Full library cached in IndexedDB
 2. **Prescription Queuing** - Offline prescriptions synced when online
 3. **Compliance Logging** - Can log compliance offline
@@ -613,11 +680,13 @@ exercise_favorites       -- Practitioner's frequently used exercises
 5. **Background Sync** - Automatic sync when connection restored
 
 ### Patient Portal
+
 - **URL**: `/portal/exercises/:patientId` or `/portal/exercises`
 - **Auth**: PIN entry or magic link token
 - **Features**: View exercises, log compliance, rate effectiveness, download PDF
 
 ### Exercise Categories (Norwegian)
+
 - Tøyning (Stretching)
 - Styrke (Strengthening)
 - Mobilitet (Mobility)
@@ -628,6 +697,7 @@ exercise_favorites       -- Practitioner's frequently used exercises
 - Nervegliding (Nerve Glide)
 
 ### Body Regions (Norwegian)
+
 - Nakke (Cervical)
 - Brystsøyle (Thoracic)
 - Korsrygg (Lumbar)
@@ -639,6 +709,7 @@ exercise_favorites       -- Practitioner's frequently used exercises
 - Helkropp (Full Body)
 
 ### Seeded Programs
+
 1. **Nakkesmerter - Grunnprogram** - Chin tuck, stretches, isometrics
 2. **Korsrygg - McGill Big 3** - Curl-up, side plank, bird-dog
 3. **Skulder - Rotatorcuff rehabilitering** - Pendulum, rotator cuff exercises
@@ -646,6 +717,7 @@ exercise_favorites       -- Practitioner's frequently used exercises
 5. **Balanse og propriosepsjon** - Balance training
 
 ### Testing
+
 ```bash
 # Run migration
 cd backend && npm run migrate
@@ -662,6 +734,7 @@ curl -b cookies.txt http://localhost:3000/api/v1/patients/{patient-id}/exercises
 ```
 
 ### User Authentication Note
+
 For first users: Provide login credentials directly. They download a version they can log into. Patient portal uses PIN/magic link (no main system auth required).
 
 ---
@@ -671,11 +744,13 @@ For first users: Provide login credentials directly. They download a version the
 ### Completed Today
 
 #### 1. Fixed AI Model Management Page Error
+
 - **Problem**: `/api/v1/training/status` required ADMIN role, user was PRACTITIONER
 - **Fix**: Changed `backend/src/routes/training.js` to allow `['ADMIN', 'PRACTITIONER']` for status and data endpoints
 - **Also**: Improved error display in `frontend/src/pages/Training.jsx`
 
 #### 2. Merged PR #4: Enhanced Anatomy Visualization Module
+
 - Merged `claude/improve-model-setup-6HkqY` branch
 - Created combined `frontend/src/components/anatomy/index.js` with all exports
 - **New components added**:
@@ -688,6 +763,7 @@ For first users: Provide login credentials directly. They download a version the
   - `AnatomicalSpine` - Simple 2D spine diagram
 
 #### 3. USB Portable Setup (Partial)
+
 - **Copied Ollama models** to `ollama-models/` folder (21GB)
 - **Created scripts**:
   - `scripts/setup-ollama-from-usb.bat` - Restore models on new machine
@@ -697,6 +773,7 @@ For first users: Provide login credentials directly. They download a version the
 - **PENDING**: USB copy was slow/incomplete - needs manual copy or retry
 
 ### New PRs to Merge (from Claude Code Online)
+
 Check for open PRs in the repo - user added more from online Claude sessions.
 
 ```bash
@@ -705,76 +782,10 @@ gh pr list --state open
 
 ---
 
-## HEAVY TODO LIST FOR TONIGHT
-
-### Priority 0: ~~FIX SCHEDULER BUG~~ (RESOLVED)
-~~**Error**: `column w.clinic_id does not exist`~~
-✅ Already fixed - `scheduler.js` now uses `organization_id`
-
-### Priority 1: Merge New PRs
-```bash
-# List all open PRs
-gh pr list --state open
-
-# For each PR, review and merge
-gh pr view <number>
-gh pr merge <number> --merge
-```
-
-### Priority 2: Complete USB Copy
-The USB copy to F: was interrupted. Options:
-1. **Manual copy via Explorer**: Copy `C:\Users\MadsF\ChiroClickCRM` to `F:\ChiroClickCRM`
-2. **Run bat file**: `C:\Users\MadsF\copy-usb.bat`
-3. **Exclude large folders** to speed up:
-   - Skip `node_modules/` (run `npm install` on target)
-   - Skip `.git/` if not needed
-   - Keep `ollama-models/` (21GB - essential for AI)
-
-### Priority 3: Run Database Migrations
-7 new migrations need to be applied:
-```bash
-cd backend && npm run migrate
-```
-
-Migrations pending:
-- 018_examination_clusters.sql
-- 019_vng_vestibular_module.sql
-- 020_clinical_note_versioning.sql
-- 021_audit_logging_enhancement.sql
-- 022_performance_indexes.sql
-- 023_exercise_library.sql
-- 024_patient_treatment_preferences.sql
-
-### Priority 4: Test New Anatomy Components
-1. Open ClinicalEncounter page
-2. Test `AnatomyViewer` with mode switching (Quick/2D/3D/Body)
-3. Verify click-to-text insertion works
-4. Test `MuscleMap` with anterior/posterior views
-
-### Priority 5: Connect CRM Components to Backend API
-Frontend components still use mock data:
-- `LeadManagement.jsx` → `crmAPI.getLeads()`
-- `PatientLifecycle.jsx` → `crmAPI.getPatientsByLifecycle()`
-- `ReferralProgram.jsx` → `crmAPI.getReferrals()`
-- `SurveyManager.jsx` → `crmAPI.getSurveys()`
-- `CampaignManager.jsx` → `crmAPI.getCampaigns()`
-
-### Priority 6: Install New Dependencies (if not done)
-```bash
-cd frontend
-npm install react-body-highlighter three @react-three/fiber@8 @react-three/drei@9
-```
-
-### Priority 7: Seed Exercise Data
-```bash
-docker exec -i chiroclickcrm-db psql -U postgres -d chiroclickcrm < backend/seeds/exercise_library.sql
-```
-
----
-
 ## Quick Reference
 
 ### Start System
+
 ```bash
 # Option 1: Use launcher
 START-CHIROCLICK.bat
@@ -786,91 +797,30 @@ cd frontend && npm run dev
 ```
 
 ### Test Credentials
-| Email | Password | Role |
-|-------|----------|------|
-| mads@chiroclick.no | admin123 | PRACTITIONER |
-| admin@chiroclickcrm.no | admin123 | ADMIN |
 
-### Key Commits Today
-- `e78177d` - feat: Add portable USB support with bundled AI models
-- `b413db5` - Merge PR #4: Enhanced Anatomy Visualization Module
-- `ae8d028` - feat: Add anatomy components, exercise system, and improvements
-
-### Files Changed Today
-| Category | Files |
-|----------|-------|
-| AI/Training | `backend/src/routes/training.js`, `frontend/src/pages/Training.jsx` |
-| Anatomy | `frontend/src/components/anatomy/*` (merged from PR) |
-| USB/Portable | `START-CHIROCLICK.bat`, `scripts/setup-ollama-from-usb.bat`, `.gitignore` |
-| Models | `ollama-models/` (21GB copied locally, not in git)
+| Email                  | Password | Role         |
+| ---------------------- | -------- | ------------ |
+| mads@chiroclick.no     | admin123 | PRACTITIONER |
+| admin@chiroclickcrm.no | admin123 | ADMIN        |
 
 ---
 
-## UNFINISHED TASKS FOR TOMORROW (2026-01-30)
+## Resolved Items (2026-02-07)
 
-### CRITICAL BUGS TO FIX
-| Bug | File | Fix |
-|-----|------|-----|
-| `column w.clinic_id does not exist` | `backend/src/jobs/scheduler.js:70` | Change `w.clinic_id` → `w.organization_id` |
+The following were previously listed as TODO but are confirmed complete:
 
-### PULL REQUESTS TO MERGE
-| PR# | Title | Branch |
-|-----|-------|--------|
-| 5 | Add clinical training dataset for Norwegian medical documentation | `claude/research-ai-training-strategy-UpkyW` |
-| Check for more | `gh pr list --state open` | May have new PRs from Claude online |
+- ✅ Scheduler clinic_id bug → uses `organization_id`
+- ✅ CRM frontend connected to backend API → all 14 components use real `crmAPI.*` calls
+- ✅ 3D dependencies installed → three, @react-three/fiber, @react-three/drei in package.json
+- ✅ Exercise system → 670-line ExercisePanel with full API
+- ✅ Multi-model AI routing → 42KB ai.js with task-based routing
+- ✅ AI model references fixed → docker-compose.yml and build-model.bat updated
+- ✅ training_data/ cleanup → obsolete files removed, all data in ai-training/
 
-### DATABASE WORK
-- [ ] Run pending migrations: `cd backend && npm run migrate`
-- [ ] Seed exercise library: `docker exec -i chiroclickcrm-db psql -U postgres -d chiroclickcrm < backend/seeds/exercise_library.sql`
-- [ ] Seed muscle templates: `docker exec -i chiroclickcrm-db psql -U postgres -d chiroclickcrm < backend/seeds/muscle_soft_tissue_templates.sql`
+### Remaining TODO
 
-### USB PORTABLE SETUP (Incomplete)
-- [ ] Copy project to USB F: drive manually via Explorer
-- [ ] Include `ollama-models/` folder (21GB)
-- [ ] Exclude `node_modules/` (can run npm install on target)
-- [ ] Test on clean machine
-
-### FRONTEND WORK
-- [ ] Install 3D dependencies: `cd frontend && npm install react-body-highlighter three @react-three/fiber@8 @react-three/drei@9`
 - [ ] Test AnatomyViewer component (2D/3D mode switching)
 - [ ] Test MuscleMap (anterior/posterior views)
-- [ ] Connect CRM components to actual API (remove mock data)
-
-### BACKEND WORK
-- [ ] Fix scheduler.js clinic_id bug (CRITICAL - causes error every minute)
-- [ ] Review PR #5 RAG/embeddings implementation
-- [ ] Test AI guardrails service
-
-### TESTING
-- [ ] Test AI Model Management page (should work now)
-- [ ] Test exercise prescription flow
-- [ ] Test PDF generation for exercises
-- [ ] Test patient portal exercise view
-
-### FILES CREATED BUT NOT TESTED
-| File | Purpose | Status |
-|------|---------|--------|
-| `frontend/src/components/anatomy/AnatomyViewer.jsx` | Combined 2D/3D viewer | Untested |
-| `frontend/src/components/anatomy/spine/Spine3DViewer.jsx` | 3D spine | Untested |
-| `backend/src/services/exercises.js` | Exercise service | Untested |
-| `backend/src/controllers/exercises.js` | Exercise controller | Untested |
-
-### QUICK START TOMORROW
-```bash
-# 1. Start services
-docker-compose up -d
-cd backend && npm run dev
-cd frontend && npm run dev
-
-# 2. Fix critical bug first
-# Edit backend/src/jobs/scheduler.js line 70
-# Change w.clinic_id to w.organization_id
-
-# 3. Merge PR #5
-gh pr merge 5 --merge
-
-# 4. Run migrations
-cd backend && npm run migrate
-
-# 5. Test at http://localhost:5173
-```
+- [ ] Review/merge any open PRs: `gh pr list --state open`
+- [ ] Run pending database migrations: `cd backend && npm run migrate`
+- [ ] Seed exercise library (if not done): `docker exec -i chiroclickcrm-db psql -U postgres -d chiroclickcrm < backend/seeds/exercise_library.sql`
