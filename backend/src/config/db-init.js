@@ -35,6 +35,10 @@ async function isInitialized(db) {
  */
 export async function initializeDatabase(db) {
   const initialized = await isInitialized(db);
+
+  // Always run schema patches (idempotent ALTER TABLE IF NOT EXISTS)
+  await applySchemaPatches(db);
+
   if (initialized) {
     logger.info('Database already initialized, skipping setup');
     return;
@@ -226,6 +230,73 @@ export async function initializeDatabase(db) {
   }
 
   logger.info('Database initialization complete');
+}
+
+/**
+ * Idempotent schema patches that run on every startup.
+ * Adds columns/tables that may be missing from older PGlite databases.
+ */
+async function applySchemaPatches(db) {
+  const patches = [
+    // Auth columns missing from original schema
+    `ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verify_token VARCHAR(255)`,
+    `ALTER TABLE users ADD COLUMN IF NOT EXISTS password_reset_token VARCHAR(255)`,
+    `ALTER TABLE users ADD COLUMN IF NOT EXISTS password_reset_expires TIMESTAMP`,
+    `ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash VARCHAR(255)`,
+    `ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT false`,
+    `ALTER TABLE users ADD COLUMN IF NOT EXISTS failed_login_attempts INTEGER DEFAULT 0`,
+    `ALTER TABLE users ADD COLUMN IF NOT EXISTS locked_until TIMESTAMP`,
+    // Portal support
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS portal_pin_hash VARCHAR(255)`,
+    // Notifications table
+    `CREATE TABLE IF NOT EXISTS notifications (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      organization_id UUID NOT NULL,
+      user_id UUID NOT NULL,
+      type VARCHAR(50) NOT NULL DEFAULT 'SYSTEM',
+      title VARCHAR(255) NOT NULL,
+      message TEXT,
+      link VARCHAR(500),
+      metadata JSONB,
+      priority VARCHAR(20) DEFAULT 'MEDIUM',
+      read_at TIMESTAMP,
+      created_at TIMESTAMP DEFAULT NOW()
+    )`,
+    // Portal sessions table
+    `CREATE TABLE IF NOT EXISTS portal_sessions (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      patient_id UUID NOT NULL,
+      token VARCHAR(255) NOT NULL UNIQUE,
+      expires_at TIMESTAMP NOT NULL,
+      ip_address VARCHAR(45),
+      created_at TIMESTAMP DEFAULT NOW()
+    )`,
+    // Sessions table
+    `CREATE TABLE IF NOT EXISTS sessions (
+      id VARCHAR(64) PRIMARY KEY,
+      user_id UUID NOT NULL,
+      expires_at TIMESTAMP NOT NULL,
+      ip_address VARCHAR(45),
+      user_agent TEXT,
+      fresh BOOLEAN DEFAULT true,
+      created_at TIMESTAMP DEFAULT NOW()
+    )`,
+  ];
+
+  let applied = 0;
+  for (const sql of patches) {
+    try {
+      await db.query(sql);
+      applied++;
+    } catch (err) {
+      if (!err.message.includes('already exists')) {
+        logger.debug(`Schema patch skipped: ${err.message.substring(0, 80)}`);
+      }
+    }
+  }
+  if (applied > 0) {
+    logger.info(`Applied ${applied} schema patches`);
+  }
 }
 
 /**
