@@ -49,7 +49,16 @@ CREATE TABLE users (
 
   -- Role and credentials
   role VARCHAR(20) CHECK (role IN ('ADMIN', 'PRACTITIONER', 'ASSISTANT')) NOT NULL,
+  password_hash VARCHAR(255),
   hpr_number VARCHAR(20), -- Norwegian Health Personnel Registry
+
+  -- Auth tokens
+  email_verified BOOLEAN DEFAULT false,
+  email_verify_token VARCHAR(255),
+  password_reset_token VARCHAR(255),
+  password_reset_expires TIMESTAMP,
+  failed_login_attempts INTEGER DEFAULT 0,
+  locked_until TIMESTAMP,
 
   -- Professional info
   specializations TEXT[],
