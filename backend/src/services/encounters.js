@@ -6,6 +6,7 @@
 import { query, transaction } from '../config/database.js';
 import logger from '../utils/logger.js';
 import { BusinessLogicError } from '../utils/errors.js';
+import { validate as validateNote } from './noteValidator.js';
 
 /**
  * Get all encounters with filters
@@ -19,7 +20,7 @@ export const getAllEncounters = async (organizationId, options = {}) => {
     startDate = null,
     endDate = null,
     encounterType = null,
-    signed = null
+    signed = null,
   } = options;
 
   const offset = (page - 1) * limit;
@@ -93,8 +94,8 @@ export const getAllEncounters = async (organizationId, options = {}) => {
         page: parseInt(page),
         limit: parseInt(limit),
         total,
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     };
   } catch (error) {
     logger.error('Error getting encounters:', error);
@@ -166,6 +167,12 @@ export const getPatientEncounters = async (organizationId, patientId, limit = 10
  */
 export const createEncounter = async (organizationId, encounterData) => {
   try {
+    // Validate SOAP data before saving
+    const validation = validateNote(encounterData, encounterData.encounter_type || 'SOAP');
+    if (!validation.canSave) {
+      throw new BusinessLogicError(`Validation failed: ${validation.errors.join('; ')}`);
+    }
+
     const result = await query(
       `INSERT INTO clinical_encounters (
         organization_id,
@@ -205,17 +212,27 @@ export const createEncounter = async (organizationId, encounterData) => {
         encounterData.vas_pain_start || null,
         encounterData.vas_pain_end || null,
         encounterData.nav_series_number || null,
-        encounterData.nav_diagnosis_date || null
+        encounterData.nav_diagnosis_date || null,
       ]
     );
 
     logger.info('Encounter created:', {
       organizationId,
       encounterId: result.rows[0].id,
-      patientId: encounterData.patient_id
+      patientId: encounterData.patient_id,
     });
 
-    return result.rows[0];
+    const encounterResult = result.rows[0];
+    if (validation.warnings.length > 0 || validation.redFlags.length > 0) {
+      encounterResult._validation = {
+        warnings: validation.warnings,
+        redFlags: validation.redFlags,
+        completenessScore: validation.completenessScore,
+        suggestions: validation.suggestions,
+      };
+    }
+
+    return encounterResult;
   } catch (error) {
     logger.error('Error creating encounter:', error);
     throw error;
@@ -247,11 +264,20 @@ export const updateEncounter = async (organizationId, encounterId, encounterData
     let paramIndex = 3;
 
     const allowedFields = [
-      'encounter_date', 'encounter_type', 'duration_minutes',
-      'subjective', 'objective', 'assessment', 'plan',
-      'icpc_codes', 'icd10_codes', 'treatments',
-      'vas_pain_start', 'vas_pain_end',
-      'nav_series_number', 'nav_diagnosis_date'
+      'encounter_date',
+      'encounter_type',
+      'duration_minutes',
+      'subjective',
+      'objective',
+      'assessment',
+      'plan',
+      'icpc_codes',
+      'icd10_codes',
+      'treatments',
+      'vas_pain_start',
+      'vas_pain_end',
+      'nav_series_number',
+      'nav_diagnosis_date',
     ];
 
     for (const field of allowedFields) {
@@ -283,7 +309,7 @@ export const updateEncounter = async (organizationId, encounterId, encounterData
     logger.info('Encounter updated:', {
       organizationId,
       encounterId,
-      fieldsUpdated: updateFields.length
+      fieldsUpdated: updateFields.length,
     });
 
     return result.rows[0];
@@ -313,7 +339,7 @@ export const signEncounter = async (organizationId, encounterId, userId) => {
     logger.info('Encounter signed:', {
       organizationId,
       encounterId,
-      signedBy: userId
+      signedBy: userId,
     });
 
     return result.rows[0];
@@ -352,7 +378,8 @@ export const generateFormattedNote = async (organizationId, encounterId) => {
     if (subjective.history) note += `Anamnese: ${subjective.history}\n`;
     if (subjective.onset) note += `Debut: ${subjective.onset}\n`;
     if (subjective.pain_description) note += `Smertebeskrivelse: ${subjective.pain_description}\n`;
-    if (encounter.vas_pain_start !== null) note += `VAS ved start: ${encounter.vas_pain_start}/10\n`;
+    if (encounter.vas_pain_start !== null)
+      note += `VAS ved start: ${encounter.vas_pain_start}/10\n`;
     note += `\n`;
 
     // Objective
@@ -372,7 +399,8 @@ export const generateFormattedNote = async (organizationId, encounterId) => {
     if (encounter.icd10_codes && encounter.icd10_codes.length > 0) {
       note += `Diagnose (ICD-10): ${encounter.icd10_codes.join(', ')}\n`;
     }
-    if (assessment.clinical_reasoning) note += `Klinisk resonnement: ${assessment.clinical_reasoning}\n`;
+    if (assessment.clinical_reasoning)
+      note += `Klinisk resonnement: ${assessment.clinical_reasoning}\n`;
     if (assessment.prognosis) note += `Prognose: ${assessment.prognosis}\n`;
     note += `\n`;
 
@@ -385,10 +413,10 @@ export const generateFormattedNote = async (organizationId, encounterId) => {
     if (encounter.vas_pain_end !== null) note += `VAS ved slutt: ${encounter.vas_pain_end}/10\n`;
 
     // Update encounter with generated note
-    await query(
-      'UPDATE clinical_encounters SET generated_note = $1 WHERE id = $2',
-      [note, encounterId]
-    );
+    await query('UPDATE clinical_encounters SET generated_note = $1 WHERE id = $2', [
+      note,
+      encounterId,
+    ]);
 
     return note;
   } catch (error) {
@@ -474,7 +502,7 @@ export const checkRedFlags = async (patientId, encounterData) => {
     if (patient.current_medications && patient.current_medications.length > 0) {
       const anticoagulants = ['Warfarin', 'Aspirin', 'Xarelto', 'Eliquis', 'Pradaxa'];
       for (const med of patient.current_medications) {
-        if (anticoagulants.some(ac => med.toLowerCase().includes(ac.toLowerCase()))) {
+        if (anticoagulants.some((ac) => med.toLowerCase().includes(ac.toLowerCase()))) {
           warnings.push(`Patient on anticoagulant: ${med} - use caution with manipulation`);
         }
       }
@@ -490,7 +518,9 @@ export const checkRedFlags = async (patientId, encounterData) => {
     );
 
     if (parseInt(visitsResult.rows[0].recent_visits) > 6) {
-      warnings.push('Patient has had >6 visits in the last 30 days - consider referral if no improvement');
+      warnings.push(
+        'Patient has had >6 visits in the last 30 days - consider referral if no improvement'
+      );
     }
 
     return { alerts, warnings };
@@ -509,5 +539,5 @@ export default {
   signEncounter,
   generateFormattedNote,
   getPatientEncounterHistory,
-  checkRedFlags
+  checkRedFlags,
 };

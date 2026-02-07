@@ -6,6 +6,7 @@
 import { query, transaction } from '../config/database.js';
 import logger from '../utils/logger.js';
 import { BusinessLogicError } from '../utils/errors.js';
+import { validate as validateNote } from './noteValidator.js';
 
 /**
  * Get all clinical notes with filters
@@ -22,7 +23,7 @@ export const getAllNotes = async (organizationId, options = {}) => {
     templateType = null,
     status = null,
     isDraft = null,
-    search = null
+    search = null,
   } = options;
 
   const offset = (page - 1) * limit;
@@ -114,8 +115,8 @@ export const getAllNotes = async (organizationId, options = {}) => {
         page: parseInt(page),
         limit: parseInt(limit),
         total,
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     };
   } catch (error) {
     logger.error('Error getting clinical notes:', error);
@@ -196,6 +197,15 @@ export const getPatientNotes = async (organizationId, patientId, options = {}) =
  */
 export const createNote = async (organizationId, noteData, userId) => {
   try {
+    // Validate SOAP data before saving
+    const validation = validateNote(
+      noteData,
+      noteData.note_type || noteData.template_type || 'SOAP'
+    );
+    if (!validation.canSave) {
+      throw new BusinessLogicError(`Validation failed: ${validation.errors.join('; ')}`);
+    }
+
     const result = await query(
       `INSERT INTO clinical_notes (
         organization_id,
@@ -247,17 +257,27 @@ export const createNote = async (organizationId, noteData, userId) => {
         noteData.is_draft !== false ? new Date() : null,
         noteData.auto_save_data ? JSON.stringify(noteData.auto_save_data) : null,
         noteData.encounter_id || null,
-        userId
+        userId,
       ]
     );
 
     logger.info('Clinical note created:', {
       organizationId,
       noteId: result.rows[0].id,
-      patientId: noteData.patient_id
+      patientId: noteData.patient_id,
     });
 
-    return result.rows[0];
+    const noteResult = result.rows[0];
+    if (validation.warnings.length > 0 || validation.redFlags.length > 0) {
+      noteResult._validation = {
+        warnings: validation.warnings,
+        redFlags: validation.redFlags,
+        completenessScore: validation.completenessScore,
+        suggestions: validation.suggestions,
+      };
+    }
+
+    return noteResult;
   } catch (error) {
     logger.error('Error creating clinical note:', error);
     throw error;
@@ -289,14 +309,34 @@ export const updateNote = async (organizationId, noteId, noteData, userId) => {
     let paramIndex = 3;
 
     const allowedFields = [
-      'note_type', 'template_type', 'note_date', 'status',
-      'subjective', 'objective', 'assessment', 'plan',
-      'icd10_codes', 'icpc_codes', 'vestibular_data',
-      'duration_minutes', 'vas_pain_start', 'vas_pain_end',
-      'prescribed_exercises', 'is_draft', 'auto_save_data'
+      'note_type',
+      'template_type',
+      'note_date',
+      'status',
+      'subjective',
+      'objective',
+      'assessment',
+      'plan',
+      'icd10_codes',
+      'icpc_codes',
+      'vestibular_data',
+      'duration_minutes',
+      'vas_pain_start',
+      'vas_pain_end',
+      'prescribed_exercises',
+      'is_draft',
+      'auto_save_data',
     ];
 
-    const jsonFields = ['subjective', 'objective', 'assessment', 'plan', 'vestibular_data', 'prescribed_exercises', 'auto_save_data'];
+    const jsonFields = [
+      'subjective',
+      'objective',
+      'assessment',
+      'plan',
+      'vestibular_data',
+      'prescribed_exercises',
+      'auto_save_data',
+    ];
 
     for (const field of allowedFields) {
       if (noteData[field] !== undefined) {
@@ -334,7 +374,7 @@ export const updateNote = async (organizationId, noteId, noteData, userId) => {
     logger.info('Clinical note updated:', {
       organizationId,
       noteId,
-      fieldsUpdated: updateFields.length
+      fieldsUpdated: updateFields.length,
     });
 
     return result.rows[0];
@@ -395,7 +435,7 @@ export const signNote = async (organizationId, noteId, userId) => {
       assessment: note.assessment,
       plan: note.plan,
       icd10_codes: note.icd10_codes,
-      icpc_codes: note.icpc_codes
+      icpc_codes: note.icpc_codes,
     });
 
     // Simple hash for integrity verification (in production, use crypto)
@@ -421,7 +461,7 @@ export const signNote = async (organizationId, noteId, userId) => {
     logger.info('Clinical note signed:', {
       organizationId,
       noteId,
-      signedBy: userId
+      signedBy: userId,
     });
 
     return result.rows[0];
@@ -450,7 +490,7 @@ export const deleteNote = async (organizationId, noteId, userId) => {
     logger.info('Clinical note deleted:', {
       organizationId,
       noteId,
-      deletedBy: userId
+      deletedBy: userId,
     });
 
     return { deleted: true, id: noteId };
@@ -489,9 +529,12 @@ export const generateFormattedNote = async (organizationId, noteId) => {
     if (subjective.chief_complaint) formattedNote += `Hovedplage: ${subjective.chief_complaint}\n`;
     if (subjective.history) formattedNote += `Anamnese: ${subjective.history}\n`;
     if (subjective.onset) formattedNote += `Debut: ${subjective.onset}\n`;
-    if (subjective.pain_description) formattedNote += `Smertebeskrivelse: ${subjective.pain_description}\n`;
-    if (subjective.aggravating_factors) formattedNote += `Forverrende faktorer: ${subjective.aggravating_factors}\n`;
-    if (subjective.relieving_factors) formattedNote += `Lindrende faktorer: ${subjective.relieving_factors}\n`;
+    if (subjective.pain_description)
+      formattedNote += `Smertebeskrivelse: ${subjective.pain_description}\n`;
+    if (subjective.aggravating_factors)
+      formattedNote += `Forverrende faktorer: ${subjective.aggravating_factors}\n`;
+    if (subjective.relieving_factors)
+      formattedNote += `Lindrende faktorer: ${subjective.relieving_factors}\n`;
     if (note.vas_pain_start !== null) formattedNote += `VAS ved start: ${note.vas_pain_start}/10\n`;
     formattedNote += `\n`;
 
@@ -513,7 +556,8 @@ export const generateFormattedNote = async (organizationId, noteId) => {
     if (note.icd10_codes && note.icd10_codes.length > 0) {
       formattedNote += `Diagnose (ICD-10): ${note.icd10_codes.join(', ')}\n`;
     }
-    if (assessment.clinical_reasoning) formattedNote += `Klinisk resonnement: ${assessment.clinical_reasoning}\n`;
+    if (assessment.clinical_reasoning)
+      formattedNote += `Klinisk resonnement: ${assessment.clinical_reasoning}\n`;
     if (assessment.prognosis) formattedNote += `Prognose: ${assessment.prognosis}\n`;
     formattedNote += `\n`;
 
@@ -529,10 +573,11 @@ export const generateFormattedNote = async (organizationId, noteId) => {
     if (note.vestibular_data && note.template_type === 'VESTIBULAR') {
       formattedNote += `\nVESTIBULAR VURDERING:\n`;
       const vestibular = note.vestibular_data;
-      if (vestibular.primary_diagnosis) formattedNote += `Diagnose: ${vestibular.primary_diagnosis}\n`;
+      if (vestibular.primary_diagnosis)
+        formattedNote += `Diagnose: ${vestibular.primary_diagnosis}\n`;
       if (vestibular.dhi_score) formattedNote += `DHI Score: ${vestibular.dhi_score}/100\n`;
       if (vestibular.maneuvers_performed?.length > 0) {
-        formattedNote += `Utforte manovrer: ${vestibular.maneuvers_performed.map(m => m.type).join(', ')}\n`;
+        formattedNote += `Utforte manovrer: ${vestibular.maneuvers_performed.map((m) => m.type).join(', ')}\n`;
       }
     }
 
@@ -544,10 +589,10 @@ export const generateFormattedNote = async (organizationId, noteId) => {
     }
 
     // Update note with generated text
-    await query(
-      'UPDATE clinical_notes SET generated_note = $1 WHERE id = $2',
-      [formattedNote, noteId]
-    );
+    await query('UPDATE clinical_notes SET generated_note = $1 WHERE id = $2', [
+      formattedNote,
+      noteId,
+    ]);
 
     return formattedNote;
   } catch (error) {
@@ -630,7 +675,8 @@ export const searchNotes = async (organizationId, searchQuery, options = {}) => 
   const { limit = 20, patientId = null } = options;
 
   try {
-    let whereClause = 'WHERE cn.organization_id = $1 AND cn.search_vector @@ plainto_tsquery(\'simple\', $2)';
+    let whereClause =
+      "WHERE cn.organization_id = $1 AND cn.search_vector @@ plainto_tsquery('simple', $2)";
     const params = [organizationId, searchQuery];
     let paramIndex = 3;
 
@@ -678,22 +724,17 @@ export const generateNotePDF = async (organizationId, noteId, options = {}) => {
     }
 
     // Parse JSON fields
-    const subjective = typeof note.subjective === 'string'
-      ? JSON.parse(note.subjective)
-      : note.subjective || {};
-    const objective = typeof note.objective === 'string'
-      ? JSON.parse(note.objective)
-      : note.objective || {};
-    const assessment = typeof note.assessment === 'string'
-      ? JSON.parse(note.assessment)
-      : note.assessment || {};
-    const plan = typeof note.plan === 'string'
-      ? JSON.parse(note.plan)
-      : note.plan || {};
+    const subjective =
+      typeof note.subjective === 'string' ? JSON.parse(note.subjective) : note.subjective || {};
+    const objective =
+      typeof note.objective === 'string' ? JSON.parse(note.objective) : note.objective || {};
+    const assessment =
+      typeof note.assessment === 'string' ? JSON.parse(note.assessment) : note.assessment || {};
+    const plan = typeof note.plan === 'string' ? JSON.parse(note.plan) : note.plan || {};
     const vestibularData = note.vestibular_data
-      ? (typeof note.vestibular_data === 'string'
-          ? JSON.parse(note.vestibular_data)
-          : note.vestibular_data)
+      ? typeof note.vestibular_data === 'string'
+        ? JSON.parse(note.vestibular_data)
+        : note.vestibular_data
       : null;
 
     // Create PDF document
@@ -704,8 +745,8 @@ export const generateNotePDF = async (organizationId, noteId, options = {}) => {
         Title: `Klinisk Notat - ${note.patient_name}`,
         Author: note.practitioner_name || 'ChiroClickCRM',
         Subject: 'Klinisk Notat',
-        CreationDate: new Date()
-      }
+        CreationDate: new Date(),
+      },
     });
 
     // Collect PDF data in buffer
@@ -736,7 +777,11 @@ export const generateNotePDF = async (organizationId, noteId, options = {}) => {
     };
 
     // ==== HEADER ====
-    doc.fontSize(18).font('Helvetica-Bold').fillColor('#1a365d').text('KLINISK NOTAT', { align: 'center' });
+    doc
+      .fontSize(18)
+      .font('Helvetica-Bold')
+      .fillColor('#1a365d')
+      .text('KLINISK NOTAT', { align: 'center' });
     doc.moveDown(0.5);
 
     // Clinic info (could be customized per organization)
@@ -751,7 +796,11 @@ export const generateNotePDF = async (organizationId, noteId, options = {}) => {
     doc.fillColor('#000000').fontSize(10);
     doc.text(`Pasient: ${note.patient_name}`, 60, infoBoxY);
     if (note.date_of_birth) {
-      doc.text(`Fodselsdato: ${new Date(note.date_of_birth).toLocaleDateString('no-NO')}`, 300, infoBoxY);
+      doc.text(
+        `Fodselsdato: ${new Date(note.date_of_birth).toLocaleDateString('no-NO')}`,
+        300,
+        infoBoxY
+      );
     }
     doc.text(`Dato: ${new Date(note.note_date).toLocaleDateString('no-NO')}`, 60, infoBoxY + 20);
     doc.text(`Behandler: ${note.practitioner_name || 'Ikke angitt'}`, 300, infoBoxY + 20);
@@ -780,13 +829,19 @@ export const generateNotePDF = async (organizationId, noteId, options = {}) => {
 
     // ==== SUBJECTIVE ====
     addSectionHeader('SUBJEKTIVT (S)');
-    addField('Hovedklage', subjective.chiefComplaint || subjective.chief_complaint || subjective.hovedklage);
+    addField(
+      'Hovedklage',
+      subjective.chiefComplaint || subjective.chief_complaint || subjective.hovedklage
+    );
     addField('Anamnese', subjective.history || subjective.anamnese);
     addField('Debut', subjective.onset || subjective.debut);
     addField('Smertebeskrivelse', subjective.painDescription || subjective.pain_description);
     addField('Lokalisasjon', subjective.location || subjective.lokalisasjon);
     addField('Utstralende smerte', subjective.radiation || subjective.utstralende);
-    addField('Forverrende faktorer', subjective.aggravatingFactors || subjective.aggravating_factors);
+    addField(
+      'Forverrende faktorer',
+      subjective.aggravatingFactors || subjective.aggravating_factors
+    );
     addField('Lindrende faktorer', subjective.relievingFactors || subjective.relieving_factors);
     addField('Nattlig smerte', subjective.nightPain || subjective.night_pain);
     addField('Tidligere behandling', subjective.previousTreatment || subjective.previous_treatment);
@@ -825,9 +880,15 @@ export const generateNotePDF = async (organizationId, noteId, options = {}) => {
       addField('ICPC-2 Diagnosekoder', note.icpc_codes.join(', '));
     }
 
-    addField('Klinisk vurdering', assessment.clinicalReasoning || assessment.clinical_reasoning || assessment.vurdering);
+    addField(
+      'Klinisk vurdering',
+      assessment.clinicalReasoning || assessment.clinical_reasoning || assessment.vurdering
+    );
     addField('Diagnose', assessment.diagnosis || assessment.diagnose);
-    addField('Differensialdiagnoser', assessment.differentialDiagnosis || assessment.differential_diagnosis);
+    addField(
+      'Differensialdiagnoser',
+      assessment.differentialDiagnosis || assessment.differential_diagnosis
+    );
     addField('Prognose', assessment.prognosis || assessment.prognose);
     addField('Alvorlighetsgrad', assessment.severity || assessment.alvorlighet);
 
@@ -835,7 +896,7 @@ export const generateNotePDF = async (organizationId, noteId, options = {}) => {
     if (assessment.redFlags && assessment.redFlags.length > 0) {
       doc.font('Helvetica-Bold').fillColor('#c53030').text('Rode flagg:');
       doc.font('Helvetica').fillColor('#000000');
-      assessment.redFlags.forEach(flag => {
+      assessment.redFlags.forEach((flag) => {
         doc.text(`  • ${flag}`, { indent: 10 });
       });
       doc.moveDown(0.3);
@@ -862,7 +923,7 @@ export const generateNotePDF = async (organizationId, noteId, options = {}) => {
 
       if (vestibularData.maneuversPerformed && vestibularData.maneuversPerformed.length > 0) {
         doc.font('Helvetica-Bold').text('Utforte manovrer:');
-        vestibularData.maneuversPerformed.forEach(m => {
+        vestibularData.maneuversPerformed.forEach((m) => {
           doc.font('Helvetica').text(`  • ${m.type}: ${m.result || 'Utfort'}`, { indent: 10 });
         });
         doc.moveDown(0.3);
@@ -875,16 +936,19 @@ export const generateNotePDF = async (organizationId, noteId, options = {}) => {
 
     // ==== PRESCRIBED EXERCISES ====
     if (note.prescribed_exercises && note.prescribed_exercises.length > 0) {
-      const exercises = typeof note.prescribed_exercises === 'string'
-        ? JSON.parse(note.prescribed_exercises)
-        : note.prescribed_exercises;
+      const exercises =
+        typeof note.prescribed_exercises === 'string'
+          ? JSON.parse(note.prescribed_exercises)
+          : note.prescribed_exercises;
 
       if (exercises.length > 0) {
         addSectionHeader('FORESKREVNE OVELSER');
         exercises.forEach((ex, index) => {
           doc.font('Helvetica-Bold').text(`${index + 1}. ${ex.name || ex.exercise_name}`);
           if (ex.sets && ex.reps) {
-            doc.font('Helvetica').text(`   ${ex.sets} sett x ${ex.reps} repetisjoner`, { indent: 10 });
+            doc
+              .font('Helvetica')
+              .text(`   ${ex.sets} sett x ${ex.reps} repetisjoner`, { indent: 10 });
           }
           if (ex.frequency) {
             doc.font('Helvetica').text(`   Frekvens: ${ex.frequency}`, { indent: 10 });
@@ -916,7 +980,9 @@ export const generateNotePDF = async (organizationId, noteId, options = {}) => {
       doc.fontSize(9).fillColor('#c53030');
       doc.font('Helvetica-Bold').text('UTKAST - IKKE SIGNERT');
       doc.font('Helvetica').fillColor('#718096');
-      doc.text(`Sist lagret: ${new Date(note.draft_saved_at || note.updated_at).toLocaleString('no-NO')}`);
+      doc.text(
+        `Sist lagret: ${new Date(note.draft_saved_at || note.updated_at).toLocaleString('no-NO')}`
+      );
     }
 
     // Footer
@@ -943,7 +1009,6 @@ export const generateNotePDF = async (organizationId, noteId, options = {}) => {
       });
       doc.on('error', reject);
     });
-
   } catch (error) {
     logger.error('Error generating PDF:', error);
     throw error;
@@ -955,12 +1020,12 @@ export const generateNotePDF = async (organizationId, noteId, options = {}) => {
  */
 const getTemplateTypeLabel = (type) => {
   const labels = {
-    'SOAP': 'SOAP Notat',
-    'INITIAL': 'Forstegangsundersokelse',
-    'FOLLOW_UP': 'Oppfolgingskonsultasjon',
-    'VESTIBULAR': 'Vestibular Vurdering',
-    'DISCHARGE': 'Avslutningsnotat',
-    'PROGRESS': 'Fremdriftsnotat'
+    SOAP: 'SOAP Notat',
+    INITIAL: 'Forstegangsundersokelse',
+    FOLLOW_UP: 'Oppfolgingskonsultasjon',
+    VESTIBULAR: 'Vestibular Vurdering',
+    DISCHARGE: 'Avslutningsnotat',
+    PROGRESS: 'Fremdriftsnotat',
   };
   return labels[type] || type;
 };
@@ -1035,7 +1100,7 @@ export const createAmendment = async (organizationId, noteId, amendmentData, use
     logger.info('Amendment created:', {
       organizationId,
       noteId,
-      amendedBy: userId
+      amendedBy: userId,
     });
 
     return result.rows[0];
@@ -1060,5 +1125,5 @@ export default {
   getUserDrafts,
   searchNotes,
   getNoteHistory,
-  createAmendment
+  createAmendment,
 };
