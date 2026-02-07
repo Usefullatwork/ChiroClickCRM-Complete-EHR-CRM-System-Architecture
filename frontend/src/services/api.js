@@ -870,6 +870,33 @@ export const patientPortalAPI = {
   logCompliance: (id, data) => apiClient.post(`/patient-portal/exercises/${id}/compliance`, data),
 };
 
+// Encounter Validation API
+export const encounterValidationAPI = {
+  validate: (data) => apiClient.post('/encounters/validate', data),
+  validateNote: (data) => apiClient.post('/encounters/validate-note', data),
+};
+
+// Clinical Workflow API
+export const workflowAPI = {
+  startEncounter: (data) => apiClient.post('/encounters/workflow/start', data),
+  recordExam: (encounterId, data) =>
+    apiClient.post(`/encounters/${encounterId}/workflow/exam`, data),
+  recordTreatment: (encounterId, data) =>
+    apiClient.post(`/encounters/${encounterId}/workflow/treatment`, data),
+  finalize: (encounterId, data) =>
+    apiClient.post(`/encounters/${encounterId}/workflow/finalize`, data),
+  getContext: (encounterId) => apiClient.get(`/encounters/${encounterId}/workflow/context`),
+};
+
+// Kiosk API
+export const kioskAPI = {
+  checkIn: (data) => apiClient.post('/kiosk/check-in', data),
+  getIntake: (appointmentId) => apiClient.get(`/kiosk/intake/${appointmentId}`),
+  submitIntake: (appointmentId, data) => apiClient.post(`/kiosk/intake/${appointmentId}`, data),
+  submitConsent: (appointmentId, data) => apiClient.post(`/kiosk/consent/${appointmentId}`, data),
+  getQueue: () => apiClient.get('/kiosk/queue'),
+};
+
 // Export API URL for streaming endpoints
 export { API_URL };
 

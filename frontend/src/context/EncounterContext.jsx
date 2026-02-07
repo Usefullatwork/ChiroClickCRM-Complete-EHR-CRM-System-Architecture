@@ -1,8 +1,17 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+/**
+ * EncounterContext - Thin wrapper around Zustand encounterStore
+ *
+ * Maintains backwards compatibility with existing components that use
+ * useEncounter() while delegating all state to the Zustand store.
+ * New components should import from stores/encounterStore directly.
+ */
+
+import React, { createContext, useContext, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { encountersAPI, patientsAPI, diagnosisAPI, treatmentsAPI, aiAPI } from '../services/api';
+import { encountersAPI, patientsAPI, diagnosisAPI } from '../services/api';
 import { usePatientIntake } from '../hooks/usePatientIntake';
+import useEncounterStore from '../stores/encounterStore';
 
 const EncounterContext = createContext();
 
@@ -14,7 +23,7 @@ export const useEncounter = () => {
   return context;
 };
 
-// Default Dev User (The "Open Way" for now)
+// Default Dev User
 const DEV_USER_ID = 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22';
 
 export const EncounterProvider = ({ children }) => {
@@ -23,134 +32,66 @@ export const EncounterProvider = ({ children }) => {
   const queryClient = useQueryClient();
   const autoSaveTimerRef = useRef(null);
 
-  // --- STATE ---
+  // Pull all state and actions from Zustand store
+  const store = useEncounterStore();
 
-  // UI State
-  const [showAIAssistant, setShowAIAssistant] = useState(false);
-  const [showTemplatePicker, setShowTemplatePicker] = useState(false);
-  const [activeField, setActiveField] = useState(null);
-  
-  // Validation State
-  const [errors, setErrors] = useState({});
-
-  // Clinical Data State
-  const [redFlagAlerts, setRedFlagAlerts] = useState([]);
-  const [clinicalWarnings, setClinicalWarnings] = useState([]);
-  const [aiSuggestions, setAiSuggestions] = useState(null);
-  const [aiLoading, setAiLoading] = useState(false);
-
-  // Exam Specific States (Objective)
-  // Grouping them would be cleaner, but keeping flat for easier migration for now
-  const [showNeuroExam, setShowNeuroExam] = useState(false);
-  const [showOrthoExam, setShowOrthoExam] = useState(false);
-  const [showExamProtocol, setShowExamProtocol] = useState(false);
-  const [showClusterTests, setShowClusterTests] = useState(false);
-  const [showBodyDiagram, setShowBodyDiagram] = useState(false);
-  const [showROMTable, setShowROMTable] = useState(false);
-  const [showRegionalExam, setShowRegionalExam] = useState(false);
-  const [showNeurologicalExam, setShowNeurologicalExam] = useState(false);
-  const [showOutcomeMeasures, setShowOutcomeMeasures] = useState(false);
-  const [showMMT, setShowMMT] = useState(false);
-  const [showCranialNerves, setShowCranialNerves] = useState(false);
-  const [showSensoryExam, setShowSensoryExam] = useState(false);
-  const [showPainAssessment, setShowPainAssessment] = useState(false);
-  const [showDTR, setShowDTR] = useState(false);
-  const [showCoordination, setShowCoordination] = useState(false);
-  const [showNerveTension, setShowNerveTension] = useState(false);
-  const [showRegionalDiagrams, setShowRegionalDiagrams] = useState(false);
-  const [showHeadacheAssessment, setShowHeadacheAssessment] = useState(false);
-  const [showTissueMarkers, setShowTissueMarkers] = useState(false);
-
-  // Data Holders
-  const [neuroExamData, setNeuroExamData] = useState(null);
-  const [orthoExamData, setOrthoExamData] = useState(null);
-  const [examProtocolData, setExamProtocolData] = useState({});
-  const [clusterTestData, setClusterTestData] = useState({});
-  const [bodyDiagramMarkers, setBodyDiagramMarkers] = useState([]);
-  const [romTableData, setRomTableData] = useState({});
-  const [neurologicalExamData, setNeurologicalExamData] = useState({});
-  const [outcomeMeasureType, setOutcomeMeasureType] = useState('ndi');
-  const [outcomeMeasureData, setOutcomeMeasureData] = useState({});
-  const [regionalExamData, setRegionalExamData] = useState({});
-  const [mmtData, setMmtData] = useState({});
-  const [cranialNerveData, setCranialNerveData] = useState({});
-  const [sensoryExamData, setSensoryExamData] = useState({});
-  const [painAssessmentData, setPainAssessmentData] = useState({});
-  const [dtrData, setDtrData] = useState({});
-  const [coordinationData, setCoordinationData] = useState({});
-  const [nerveTensionData, setNerveTensionData] = useState({});
-  const [regionalDiagramData, setRegionalDiagramData] = useState({});
-  const [headacheData, setHeadacheData] = useState({});
-  const [tissueMarkerData, setTissueMarkerData] = useState({});
-  const [selectedRegion, setSelectedRegion] = useState('shoulder');
-
-  // Amendment State
-  const [showAmendmentForm, setShowAmendmentForm] = useState(false);
-  const [amendmentContent, setAmendmentContent] = useState('');
-  const [amendmentType, setAmendmentType] = useState('ADDENDUM');
-  const [amendmentReason, setAmendmentReason] = useState('');
-
-  // Auto-save
-  const [autoSaveStatus, setAutoSaveStatus] = useState('saved');
-  const [lastSaved, setLastSaved] = useState(null);
-
-  // Main Encounter Data
-  const [encounterData, setEncounterData] = useState({
-    patient_id: patientId,
-    encounter_date: new Date().toISOString().split('T')[0],
-    encounter_type: 'FOLLOWUP',
-    duration_minutes: 30,
-    subjective: {
-      chief_complaint: '',
-      history: '',
-      onset: '',
-      pain_description: '',
-      aggravating_factors: '',
-      relieving_factors: ''
-    },
-    objective: {
-      observation: '',
-      palpation: '',
-      rom: '',
-      ortho_tests: '',
-      neuro_tests: '',
-      posture: ''
-    },
-    assessment: {
-      clinical_reasoning: '',
-      differential_diagnosis: '',
-      prognosis: '',
-      red_flags_checked: true
-    },
-    plan: {
-      treatment: '',
-      exercises: '',
-      advice: '',
-      follow_up: '',
-      referrals: ''
-    },
-    icpc_codes: [],
-    icd10_codes: [],
-    treatments: [],
-    vas_pain_start: 5,
-    vas_pain_end: 3
-  });
-
-  const [selectedTakster, setSelectedTakster] = useState(['l214']);
-  const [showTakster, setShowTakster] = useState(false);
+  // Destructure for convenience
+  const {
+    encounterData,
+    setEncounterData,
+    selectedTakster,
+    setSelectedTakster,
+    toggleTakst,
+    redFlagAlerts,
+    setRedFlagAlerts,
+    clinicalWarnings,
+    setClinicalWarnings,
+    aiSuggestions,
+    setAiSuggestions,
+    aiLoading,
+    setAiLoading,
+    activeField,
+    setActiveField,
+    errors,
+    setErrors,
+    showAIAssistant,
+    setShowAIAssistant,
+    showTemplatePicker,
+    setShowTemplatePicker,
+    showTakster,
+    setShowTakster,
+    autoSaveStatus,
+    setAutoSaveStatus,
+    lastSaved,
+    setLastSaved,
+    updateField,
+    showAmendmentForm,
+    setShowAmendmentForm,
+    amendmentContent,
+    setAmendmentContent,
+    amendmentType,
+    setAmendmentType,
+    amendmentReason,
+    setAmendmentReason,
+    resetAmendmentForm,
+    taksterNorwegian,
+    markSaved,
+    markSaving,
+    markUnsaved,
+    loadEncounter,
+  } = store;
 
   // --- QUERIES ---
-
   const { data: patient, isLoading: patientLoading } = useQuery({
     queryKey: ['patient', patientId],
     queryFn: () => patientsAPI.getById(patientId),
-    enabled: !!patientId
+    enabled: !!patientId,
   });
 
   const { data: existingEncounter } = useQuery({
     queryKey: ['encounter', encounterId],
     queryFn: () => encountersAPI.getById(encounterId),
-    enabled: !!encounterId
+    enabled: !!encounterId,
   });
 
   const { data: previousEncounters } = useQuery({
@@ -159,16 +100,16 @@ export const EncounterProvider = ({ children }) => {
       const response = await encountersAPI.getAll({ patientId, signed: true, limit: 10 });
       const encounters = response?.data?.encounters || response?.data?.data || response?.data || [];
       const previous = encounters
-        .filter(e => e.id !== encounterId)
+        .filter((e) => e.id !== encounterId)
         .sort((a, b) => new Date(b.encounter_date) - new Date(a.encounter_date));
       return previous[0] || null;
     },
-    enabled: !!patientId
+    enabled: !!patientId,
   });
 
   const { data: commonDiagnoses } = useQuery({
     queryKey: ['diagnosis', 'common'],
-    queryFn: () => diagnosisAPI.getCommon()
+    queryFn: () => diagnosisAPI.getCommon(),
   });
 
   const isSigned = !!encounterData.signed_at;
@@ -176,49 +117,46 @@ export const EncounterProvider = ({ children }) => {
   const { data: amendments, refetch: refetchAmendments } = useQuery({
     queryKey: ['amendments', encounterId],
     queryFn: () => encountersAPI.getAmendments(encounterId),
-    enabled: !!encounterId && isSigned
+    enabled: !!encounterId && isSigned,
   });
 
   // --- EFFECTS ---
-
   useEffect(() => {
     if (existingEncounter?.data) {
-      setEncounterData(prev => ({
-        ...prev,
-        ...existingEncounter.data,
-        encounter_date: new Date(existingEncounter.data.encounter_date).toISOString().split('T')[0]
-      }));
-      setRedFlagAlerts(existingEncounter.data.redFlagAlerts || []);
-      setClinicalWarnings(existingEncounter.data.clinicalWarnings || []);
+      loadEncounter(existingEncounter.data);
     }
-  }, [existingEncounter]);
+  }, [existingEncounter, loadEncounter]);
 
   // Kiosk Logic
   const appointmentId = patient?.currentAppointmentId || null;
-  const { intake: kioskIntake, subjectiveNarrative: kioskSubjective, hasIntake: hasKioskIntake } = usePatientIntake(appointmentId);
-  const [kioskDataApplied, setKioskDataApplied] = useState(false);
+  const {
+    intake: kioskIntake,
+    subjectiveNarrative: kioskSubjective,
+    hasIntake: hasKioskIntake,
+  } = usePatientIntake(appointmentId);
+  const kioskDataAppliedRef = useRef(false);
 
   useEffect(() => {
-    if (hasKioskIntake && kioskSubjective && !kioskDataApplied && !encounterId) {
-      setEncounterData(prev => ({
+    if (hasKioskIntake && kioskSubjective && !kioskDataAppliedRef.current && !encounterId) {
+      setEncounterData((prev) => ({
         ...prev,
         subjective: { ...prev.subjective, chief_complaint: kioskSubjective },
-        vas_pain_start: kioskIntake?.painLevel ?? prev.vas_pain_start
+        vas_pain_start: kioskIntake?.painLevel ?? prev.vas_pain_start,
       }));
-      setKioskDataApplied(true);
+      kioskDataAppliedRef.current = true;
     }
-  }, [hasKioskIntake, kioskSubjective, kioskIntake, kioskDataApplied, encounterId]);
+  }, [hasKioskIntake, kioskSubjective, kioskIntake, encounterId, setEncounterData]);
 
   // Auto-save logic
   useEffect(() => {
     if (encounterId && !isSigned) {
-      setAutoSaveStatus('unsaved');
-      
+      markUnsaved();
+
       if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
-      
+
       autoSaveTimerRef.current = setTimeout(() => {
-        setAutoSaveStatus('saving');
-        handleSave(false); // Silent save
+        markSaving();
+        handleSave(false);
       }, 3000);
     }
     return () => {
@@ -226,8 +164,7 @@ export const EncounterProvider = ({ children }) => {
     };
   }, [encounterData, selectedTakster]);
 
-  // --- ACTIONS ---
-
+  // --- HELPERS ---
   const cleanEmptyStrings = (obj) => {
     if (typeof obj !== 'object' || obj === null) return obj;
     const cleaned = {};
@@ -242,6 +179,7 @@ export const EncounterProvider = ({ children }) => {
     return cleaned;
   };
 
+  // --- MUTATIONS ---
   const saveMutation = useMutation({
     mutationFn: (data) => {
       if (encounterId) return encountersAPI.update(encounterId, data);
@@ -250,33 +188,38 @@ export const EncounterProvider = ({ children }) => {
     onSuccess: (response) => {
       queryClient.invalidateQueries(['encounters']);
       queryClient.invalidateQueries(['patient', patientId]);
-      setAutoSaveStatus('saved');
-      setLastSaved(new Date());
+      markSaved();
       if (!encounterId && response?.data?.id) {
         navigate(`/patients/${patientId}/encounter/${response.data.id}`, { replace: true });
       }
     },
-    onError: () => setAutoSaveStatus('unsaved')
+    onError: () => markUnsaved(),
   });
 
   const signMutation = useMutation({
     mutationFn: (id) => encountersAPI.sign(id),
     onSuccess: () => {
-      setEncounterData(prev => ({ ...prev, signed_at: new Date().toISOString() }));
+      setEncounterData((prev) => ({ ...prev, signed_at: new Date().toISOString() }));
       queryClient.invalidateQueries(['encounter', encounterId]);
-    }
+    },
   });
 
-  // Takster Data (Move to static/API later if needed)
-  const taksterNorwegian = [
-    { id: "l214", code: "L214", name: "Manipulasjonsbehandling", price: 450 },
-    { id: "l215", code: "L215", name: "Bløtvevsbehandling", price: 350 },
-    { id: "l220", code: "L220", name: "Tillegg for øvelser/veiledning", price: 150 },
-    { id: "akutt", code: "AKUTT", name: "Akutt-tillegg (samme dag)", price: 200 },
-  ];
+  const createAmendmentMutation = useMutation({
+    mutationFn: (data) => encountersAPI.createAmendment(encounterId, data),
+    onSuccess: () => {
+      resetAmendmentForm();
+      refetchAmendments();
+    },
+  });
 
+  const signAmendmentMutation = useMutation({
+    mutationFn: (amendmentId) => encountersAPI.signAmendment(encounterId, amendmentId),
+    onSuccess: () => refetchAmendments(),
+  });
+
+  // --- ACTIONS ---
   const totalPrice = taksterNorwegian
-    .filter(t => selectedTakster.includes(t.id))
+    .filter((t) => selectedTakster.includes(t.id))
     .reduce((sum, t) => sum + t.price, 0);
 
   const handleSave = (showToast = true) => {
@@ -285,14 +228,18 @@ export const EncounterProvider = ({ children }) => {
     const assessment = cleanEmptyStrings(encounterData.assessment);
     const plan = cleanEmptyStrings(encounterData.plan);
 
-    const treatments = selectedTakster.map(id => {
-      const takst = taksterNorwegian.find(t => t.id === id);
-      return takst ? { code: takst.code, name: takst.name, price: takst.price, type: 'CHIROPRACTIC' } : null;
-    }).filter(Boolean);
+    const treatments = selectedTakster
+      .map((id) => {
+        const takst = taksterNorwegian.find((t) => t.id === id);
+        return takst
+          ? { code: takst.code, name: takst.name, price: takst.price, type: 'CHIROPRACTIC' }
+          : null;
+      })
+      .filter(Boolean);
 
     const dataToSave = {
       patient_id: patientId,
-      practitioner_id: DEV_USER_ID, // Use const
+      practitioner_id: DEV_USER_ID,
       encounter_date: encounterData.encounter_date,
       encounter_type: encounterData.encounter_type,
       duration_minutes: encounterData.duration_minutes,
@@ -305,14 +252,13 @@ export const EncounterProvider = ({ children }) => {
       ...(Object.keys(plan).length > 0 && { plan }),
       treatments,
       icpc_codes: encounterData.icpc_codes || [],
-      icd10_codes: encounterData.icd10_codes || []
+      icd10_codes: encounterData.icd10_codes || [],
     };
 
     saveMutation.mutate(dataToSave);
   };
 
   const handleSignAndLock = () => {
-    // Validation Logic
     const newErrors = {};
     if (!encounterData.subjective.chief_complaint) newErrors.subjective = true;
     if (Object.keys(newErrors).length > 0) {
@@ -327,128 +273,169 @@ export const EncounterProvider = ({ children }) => {
     }, 500);
   };
 
-  // Helper Wrappers
-  const updateField = (section, field, value) => {
-    setEncounterData(prev => ({
-      ...prev,
-      [section]: { ...prev[section], [field]: value }
-    }));
-  };
-
-  const toggleTakst = (takstId) => {
-    setSelectedTakster(prev =>
-      prev.includes(takstId)
-        ? prev.filter(t => t !== takstId)
-        : [...prev, takstId]
-    );
-  };
-
-  const createAmendmentMutation = useMutation({
-    mutationFn: (data) => encountersAPI.createAmendment(encounterId, data),
-    onSuccess: () => {
-      setShowAmendmentForm(false);
-      setAmendmentContent('');
-      setAmendmentReason('');
-      refetchAmendments();
-    }
-  });
-
-  const signAmendmentMutation = useMutation({
-    mutationFn: (amendmentId) => encountersAPI.signAmendment(encounterId, amendmentId),
-    onSuccess: () => refetchAmendments()
-  });
-
   const handleCreateAmendment = () => {
     if (!amendmentContent.trim()) return;
     createAmendmentMutation.mutate({
       amendment_type: amendmentType,
       reason: amendmentReason,
-      content: amendmentContent
+      content: amendmentContent,
     });
   };
 
+  // Expose the full store + queries/mutations for backwards compat
   const value = {
-    // State
-    patientId, encounterId,
-    patient, patientLoading,
-    encounterData, setEncounterData,
-    redFlagAlerts, setRedFlagAlerts,
-    clinicalWarnings, setClinicalWarnings,
-    aiSuggestions, setAiSuggestions, aiLoading, setAiLoading,
+    // Route params
+    patientId,
+    encounterId,
+    // Query data
+    patient,
+    patientLoading,
+    commonDiagnoses,
+    previousEncounters,
+    amendments,
+    // Computed
     isSigned,
-    autoSaveStatus, lastSaved,
-    activeField, setActiveField,
-    errors, setErrors,
-    
+    totalPrice,
+
+    // All store state (spread for backwards compat)
+    encounterData,
+    setEncounterData,
+    redFlagAlerts,
+    setRedFlagAlerts,
+    clinicalWarnings,
+    setClinicalWarnings,
+    aiSuggestions,
+    setAiSuggestions,
+    aiLoading,
+    setAiLoading,
+    autoSaveStatus,
+    lastSaved,
+    activeField,
+    setActiveField,
+    errors,
+    setErrors,
+
     // UI Toggles
-    showAIAssistant, setShowAIAssistant,
-    showTemplatePicker, setShowTemplatePicker,
-    showNeuroExam, setShowNeuroExam,
-    showOrthoExam, setShowOrthoExam,
-    showExamProtocol, setShowExamProtocol,
-    showClusterTests, setShowClusterTests,
-    showBodyDiagram, setShowBodyDiagram,
-    showROMTable, setShowROMTable,
-    showRegionalExam, setShowRegionalExam,
-    showNeurologicalExam, setShowNeurologicalExam,
-    showOutcomeMeasures, setShowOutcomeMeasures,
-    showMMT, setShowMMT,
-    showDTR, setShowDTR,
-    showSensoryExam, setShowSensoryExam,
-    showCranialNerves, setShowCranialNerves,
-    showCoordination, setShowCoordination,
-    showNerveTension, setShowNerveTension,
-    showRegionalDiagrams, setShowRegionalDiagrams,
-    showHeadacheAssessment, setShowHeadacheAssessment,
-    showTissueMarkers, setShowTissueMarkers,
-    
+    showAIAssistant,
+    setShowAIAssistant,
+    showTemplatePicker,
+    setShowTemplatePicker,
+
+    // Exam toggles (delegate to store)
+    showNeuroExam: store.showNeuroExam,
+    setShowNeuroExam: (v) => store.setUIFlag('showNeuroExam', v),
+    showOrthoExam: store.showOrthoExam,
+    setShowOrthoExam: (v) => store.setUIFlag('showOrthoExam', v),
+    showExamProtocol: store.showExamProtocol,
+    setShowExamProtocol: (v) => store.setUIFlag('showExamProtocol', v),
+    showClusterTests: store.showClusterTests,
+    setShowClusterTests: (v) => store.setUIFlag('showClusterTests', v),
+    showBodyDiagram: store.showBodyDiagram,
+    setShowBodyDiagram: (v) => store.setUIFlag('showBodyDiagram', v),
+    showROMTable: store.showROMTable,
+    setShowROMTable: (v) => store.setUIFlag('showROMTable', v),
+    showRegionalExam: store.showRegionalExam,
+    setShowRegionalExam: (v) => store.setUIFlag('showRegionalExam', v),
+    showNeurologicalExam: store.showNeurologicalExam,
+    setShowNeurologicalExam: (v) => store.setUIFlag('showNeurologicalExam', v),
+    showOutcomeMeasures: store.showOutcomeMeasures,
+    setShowOutcomeMeasures: (v) => store.setUIFlag('showOutcomeMeasures', v),
+    showMMT: store.showMMT,
+    setShowMMT: (v) => store.setUIFlag('showMMT', v),
+    showDTR: store.showDTR,
+    setShowDTR: (v) => store.setUIFlag('showDTR', v),
+    showSensoryExam: store.showSensoryExam,
+    setShowSensoryExam: (v) => store.setUIFlag('showSensoryExam', v),
+    showCranialNerves: store.showCranialNerves,
+    setShowCranialNerves: (v) => store.setUIFlag('showCranialNerves', v),
+    showCoordination: store.showCoordination,
+    setShowCoordination: (v) => store.setUIFlag('showCoordination', v),
+    showNerveTension: store.showNerveTension,
+    setShowNerveTension: (v) => store.setUIFlag('showNerveTension', v),
+    showRegionalDiagrams: store.showRegionalDiagrams,
+    setShowRegionalDiagrams: (v) => store.setUIFlag('showRegionalDiagrams', v),
+    showHeadacheAssessment: store.showHeadacheAssessment,
+    setShowHeadacheAssessment: (v) => store.setUIFlag('showHeadacheAssessment', v),
+    showTissueMarkers: store.showTissueMarkers,
+    setShowTissueMarkers: (v) => store.setUIFlag('showTissueMarkers', v),
+    showPainAssessment: store.showPainAssessment,
+    setShowPainAssessment: (v) => store.setUIFlag('showPainAssessment', v),
+
     // Exam Data
-    neuroExamData, setNeuroExamData,
-    orthoExamData, setOrthoExamData,
-    examProtocolData, setExamProtocolData,
-    clusterTestData, setClusterTestData,
-    bodyDiagramMarkers, setBodyDiagramMarkers,
-    romTableData, setRomTableData,
-    neurologicalExamData, setNeurologicalExamData,
-    outcomeMeasureType, setOutcomeMeasureType,
-    outcomeMeasureData, setOutcomeMeasureData,
-    regionalExamData, setRegionalExamData,
-    mmtData, setMmtData,
-    cranialNerveData, setCranialNerveData,
-    sensoryExamData, setSensoryExamData,
-    painAssessmentData, setPainAssessmentData,
-    dtrData, setDtrData,
-    coordinationData, setCoordinationData,
-    nerveTensionData, setNerveTensionData,
-    regionalDiagramData, setRegionalDiagramData,
-    headacheData, setHeadacheData,
-    tissueMarkerData, setTissueMarkerData,
-    selectedRegion, setSelectedRegion,
+    neuroExamData: store.neuroExamData,
+    setNeuroExamData: (v) => store.setExamData('neuroExamData', v),
+    orthoExamData: store.orthoExamData,
+    setOrthoExamData: (v) => store.setExamData('orthoExamData', v),
+    examProtocolData: store.examProtocolData,
+    setExamProtocolData: (v) => store.setExamData('examProtocolData', v),
+    clusterTestData: store.clusterTestData,
+    setClusterTestData: (v) => store.setExamData('clusterTestData', v),
+    bodyDiagramMarkers: store.bodyDiagramMarkers,
+    setBodyDiagramMarkers: (v) => store.setExamData('bodyDiagramMarkers', v),
+    romTableData: store.romTableData,
+    setRomTableData: (v) => store.setExamData('romTableData', v),
+    neurologicalExamData: store.neurologicalExamData,
+    setNeurologicalExamData: (v) => store.setExamData('neurologicalExamData', v),
+    outcomeMeasureType: store.outcomeMeasureType,
+    setOutcomeMeasureType: (v) => store.setExamData('outcomeMeasureType', v),
+    outcomeMeasureData: store.outcomeMeasureData,
+    setOutcomeMeasureData: (v) => store.setExamData('outcomeMeasureData', v),
+    regionalExamData: store.regionalExamData,
+    setRegionalExamData: (v) => store.setExamData('regionalExamData', v),
+    mmtData: store.mmtData,
+    setMmtData: (v) => store.setExamData('mmtData', v),
+    cranialNerveData: store.cranialNerveData,
+    setCranialNerveData: (v) => store.setExamData('cranialNerveData', v),
+    sensoryExamData: store.sensoryExamData,
+    setSensoryExamData: (v) => store.setExamData('sensoryExamData', v),
+    painAssessmentData: store.painAssessmentData,
+    setPainAssessmentData: (v) => store.setExamData('painAssessmentData', v),
+    dtrData: store.dtrData,
+    setDtrData: (v) => store.setExamData('dtrData', v),
+    coordinationData: store.coordinationData,
+    setCoordinationData: (v) => store.setExamData('coordinationData', v),
+    nerveTensionData: store.nerveTensionData,
+    setNerveTensionData: (v) => store.setExamData('nerveTensionData', v),
+    regionalDiagramData: store.regionalDiagramData,
+    setRegionalDiagramData: (v) => store.setExamData('regionalDiagramData', v),
+    headacheData: store.headacheData,
+    setHeadacheData: (v) => store.setExamData('headacheData', v),
+    tissueMarkerData: store.tissueMarkerData,
+    setTissueMarkerData: (v) => store.setExamData('tissueMarkerData', v),
+    selectedRegion: store.selectedRegion,
+    setSelectedRegion: store.setSelectedRegion,
 
     // Treatment
-    selectedTakster, setSelectedTakster, toggleTakst,
-    showTakster, setShowTakster,
-    taksterNorwegian, totalPrice,
+    selectedTakster,
+    setSelectedTakster,
+    toggleTakst,
+    showTakster,
+    setShowTakster,
+    taksterNorwegian,
 
     // Amendments
-    amendments, showAmendmentForm, setShowAmendmentForm,
-    amendmentContent, setAmendmentContent,
-    amendmentType, setAmendmentType,
-    amendmentReason, setAmendmentReason,
-    handleCreateAmendment, createAmendmentMutation, signAmendmentMutation,
+    showAmendmentForm,
+    setShowAmendmentForm,
+    amendmentContent,
+    setAmendmentContent,
+    amendmentType,
+    setAmendmentType,
+    amendmentReason,
+    setAmendmentReason,
+    handleCreateAmendment,
+    createAmendmentMutation,
+    signAmendmentMutation,
 
     // Actions
-    handleSave, handleSignAndLock, updateField,
-    saveMutation, signMutation,
-    
+    handleSave,
+    handleSignAndLock,
+    updateField,
+    saveMutation,
+    signMutation,
+
     // Refs / Other
     queryClient,
-    commonDiagnoses
   };
 
-  return (
-    <EncounterContext.Provider value={value}>
-      {children}
-    </EncounterContext.Provider>
-  );
+  return <EncounterContext.Provider value={value}>{children}</EncounterContext.Provider>;
 };
