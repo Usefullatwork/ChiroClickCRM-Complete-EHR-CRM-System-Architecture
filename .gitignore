@@ -81,3 +81,8 @@ data/pglite/
 
 # Session cookies
 cookies.txt
+
+# AI training - large local files
+ai-training/ml-env/
+ai-training/models/
+ai-training/data/processed/
