@@ -4,7 +4,7 @@
  */
 
 import { readFile } from 'fs/promises';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { createPatient } from '../services/patients.js';
 import { encrypt } from './encryption.js';
 import logger from './logger.js';
@@ -20,14 +20,30 @@ export const parseExcelFile = async (filePath) => {
     const buffer = await readFile(filePath);
 
     // Parse Excel
-    const workbook = XLSX.read(buffer, { type: 'buffer' });
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(buffer);
 
     // Get first sheet
-    const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
+    const worksheet = workbook.worksheets[0];
 
-    // Convert to JSON
-    const data = XLSX.utils.sheet_to_json(sheet);
+    // Convert to JSON: first row is headers
+    const data = [];
+    const headers = [];
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) {
+        row.eachCell((cell, colNumber) => {
+          headers[colNumber] = cell.value;
+        });
+      } else {
+        const rowObj = {};
+        row.eachCell((cell, colNumber) => {
+          if (headers[colNumber]) {
+            rowObj[headers[colNumber]] = cell.value;
+          }
+        });
+        data.push(rowObj);
+      }
+    });
 
     logger.info(`Parsed Excel file: ${data.length} rows found`);
 
@@ -44,7 +60,10 @@ export const parseExcelFile = async (filePath) => {
  */
 const mapExcelRowToPatient = (row) => {
   return {
-    solvit_id: row['SolvIt ID'] || row['Patient ID'] || `IMPORT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    solvit_id:
+      row['SolvIt ID'] ||
+      row['Patient ID'] ||
+      `IMPORT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     first_name: row['First Name'] || row['Fornavn'] || '',
     last_name: row['Last Name'] || row['Etternavn'] || '',
     date_of_birth: row['Date of Birth'] || row['Fødselsdato'] || null,
@@ -58,7 +77,7 @@ const mapExcelRowToPatient = (row) => {
       street: row['Address'] || row['Adresse'] || '',
       postal_code: row['Postal Code'] || row['Postnummer'] || '',
       city: row['City'] || row['Poststed'] || '',
-      country: row['Country'] || 'Norway'
+      country: row['Country'] || 'Norway',
     },
 
     // Medical information
@@ -92,7 +111,7 @@ const mapExcelRowToPatient = (row) => {
     internal_notes: row['Notes'] || row['Notater'] || null,
 
     // First visit
-    first_visit_date: row['First Visit'] || row['Første Besøk'] || null
+    first_visit_date: row['First Visit'] || row['Første Besøk'] || null,
   };
 };
 
@@ -140,7 +159,11 @@ const parseArray = (value) => {
   if (!value) return [];
   if (Array.isArray(value)) return value;
   // Split by comma, semicolon, or newline
-  return value.toString().split(/[,;\n]/).map(item => item.trim()).filter(Boolean);
+  return value
+    .toString()
+    .split(/[,;\n]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
 };
 
 const parseBoolean = (value) => {
@@ -158,18 +181,14 @@ const parseBoolean = (value) => {
  * @returns {Promise<object>} Import results
  */
 export const importPatientsFromExcel = async (filePath, organizationId, options = {}) => {
-  const {
-    skipDuplicates = true,
-    dryRun = false,
-    onProgress = null
-  } = options;
+  const { skipDuplicates = true, dryRun = false, onProgress = null } = options;
 
   const results = {
     total: 0,
     imported: 0,
     skipped: 0,
     errors: [],
-    patients: []
+    patients: [],
   };
 
   try {
@@ -180,7 +199,7 @@ export const importPatientsFromExcel = async (filePath, organizationId, options 
     logger.info(`Starting import of ${rows.length} patients`, {
       organizationId,
       dryRun,
-      skipDuplicates
+      skipDuplicates,
     });
 
     // Process each row
@@ -196,7 +215,7 @@ export const importPatientsFromExcel = async (filePath, organizationId, options 
           results.errors.push({
             row: i + 2, // +2 because Excel rows start at 1 and we have header
             error: 'Missing required fields: first_name or last_name',
-            data: row
+            data: row,
           });
           results.skipped++;
           continue;
@@ -217,12 +236,12 @@ export const importPatientsFromExcel = async (filePath, organizationId, options 
 
           logger.info(`Imported patient ${i + 1}/${rows.length}:`, {
             id: patient.id,
-            name: `${patient.first_name} ${patient.last_name}`
+            name: `${patient.first_name} ${patient.last_name}`,
           });
         } else {
           results.imported++;
           logger.info(`[DRY RUN] Would import patient ${i + 1}/${rows.length}:`, {
-            name: `${patientData.first_name} ${patientData.last_name}`
+            name: `${patientData.first_name} ${patientData.last_name}`,
           });
         }
 
@@ -231,16 +250,15 @@ export const importPatientsFromExcel = async (filePath, organizationId, options 
           onProgress({
             current: i + 1,
             total: rows.length,
-            patient: patientData
+            patient: patientData,
           });
         }
-
       } catch (error) {
         logger.error(`Error importing patient at row ${i + 2}:`, error);
         results.errors.push({
           row: i + 2,
           error: error.message,
-          data: row
+          data: row,
         });
         results.skipped++;
       }
@@ -250,11 +268,10 @@ export const importPatientsFromExcel = async (filePath, organizationId, options 
       total: results.total,
       imported: results.imported,
       skipped: results.skipped,
-      errors: results.errors.length
+      errors: results.errors.length,
     });
 
     return results;
-
   } catch (error) {
     logger.error('Fatal error during import:', error);
     throw error;
@@ -263,54 +280,82 @@ export const importPatientsFromExcel = async (filePath, organizationId, options 
 
 /**
  * Generate Excel template for patient import
- * @returns {Buffer} Excel file buffer
+ * @returns {Promise<Buffer>} Excel file buffer
  */
-export const generateImportTemplate = () => {
-  const template = [
-    {
-      'SolvIt ID': 'SOLVIT-001',
-      'First Name': 'Ola',
-      'Last Name': 'Nordmann',
-      'Date of Birth': '1980-01-15',
-      'Gender': 'Male',
-      'Email': 'ola@example.com',
-      'Phone': '98765432',
-      'Personal Number': '15018012345',
-      'Address': 'Storgata 1',
-      'Postal Code': '0150',
-      'City': 'Oslo',
-      'Country': 'Norway',
-      'Red Flags': 'Osteoporosis',
-      'Contraindications': 'Recent surgery',
-      'Allergies': 'Penicillin',
-      'Medications': 'Aspirin, Vitamin D',
-      'Medical History': 'Previous lower back pain',
-      'Status': 'Active',
-      'Category': 'Oslo',
-      'Referral Source': 'GP',
-      'Referring Doctor': 'Dr. Hansen',
-      'Insurance Type': 'NAV',
-      'Insurance Number': 'INS-12345',
-      'NAV Rights': 'Yes',
-      'SMS Consent': 'Yes',
-      'Email Consent': 'Yes',
-      'Notes': 'Prefers morning appointments',
-      'First Visit': '2024-01-10'
-    }
+export const generateImportTemplate = async () => {
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Patients');
+
+  const columns = [
+    'SolvIt ID',
+    'First Name',
+    'Last Name',
+    'Date of Birth',
+    'Gender',
+    'Email',
+    'Phone',
+    'Personal Number',
+    'Address',
+    'Postal Code',
+    'City',
+    'Country',
+    'Red Flags',
+    'Contraindications',
+    'Allergies',
+    'Medications',
+    'Medical History',
+    'Status',
+    'Category',
+    'Referral Source',
+    'Referring Doctor',
+    'Insurance Type',
+    'Insurance Number',
+    'NAV Rights',
+    'SMS Consent',
+    'Email Consent',
+    'Notes',
+    'First Visit',
   ];
 
-  const worksheet = XLSX.utils.json_to_sheet(template);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Patients');
+  worksheet.columns = columns.map((name) => ({ header: name, key: name, width: 18 }));
 
-  // Generate buffer
-  const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+  worksheet.addRow({
+    'SolvIt ID': 'SOLVIT-001',
+    'First Name': 'Ola',
+    'Last Name': 'Nordmann',
+    'Date of Birth': '1980-01-15',
+    Gender: 'Male',
+    Email: 'ola@example.com',
+    Phone: '98765432',
+    'Personal Number': '15018012345',
+    Address: 'Storgata 1',
+    'Postal Code': '0150',
+    City: 'Oslo',
+    Country: 'Norway',
+    'Red Flags': 'Osteoporosis',
+    Contraindications: 'Recent surgery',
+    Allergies: 'Penicillin',
+    Medications: 'Aspirin, Vitamin D',
+    'Medical History': 'Previous lower back pain',
+    Status: 'Active',
+    Category: 'Oslo',
+    'Referral Source': 'GP',
+    'Referring Doctor': 'Dr. Hansen',
+    'Insurance Type': 'NAV',
+    'Insurance Number': 'INS-12345',
+    'NAV Rights': 'Yes',
+    'SMS Consent': 'Yes',
+    'Email Consent': 'Yes',
+    Notes: 'Prefers morning appointments',
+    'First Visit': '2024-01-10',
+  });
 
-  return buffer;
+  const buffer = await workbook.xlsx.writeBuffer();
+  return Buffer.from(buffer);
 };
 
 export default {
   parseExcelFile,
   importPatientsFromExcel,
-  generateImportTemplate
+  generateImportTemplate,
 };

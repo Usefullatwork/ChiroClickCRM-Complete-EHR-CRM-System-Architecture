@@ -21,7 +21,7 @@ export const importPatientsExcel = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({
         success: false,
-        error: 'No file uploaded'
+        error: 'No file uploaded',
       });
     }
 
@@ -32,20 +32,20 @@ export const importPatientsExcel = async (req, res) => {
       {
         skipDuplicates: skipDuplicates !== 'false',
         updateExisting: updateExisting === 'true',
-        dryRun: dryRun === 'true'
+        dryRun: dryRun === 'true',
       }
     );
 
     res.json({
       success: true,
       data: results,
-      message: `Import completed: ${results.imported} imported, ${results.updated} updated, ${results.skipped} skipped`
+      message: `Import completed: ${results.imported} imported, ${results.updated} updated, ${results.skipped} skipped`,
     });
   } catch (error) {
     logger.error('Error in importPatientsExcel controller:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to import patients'
+      error: 'Failed to import patients',
     });
   }
 };
@@ -55,16 +55,19 @@ export const importPatientsExcel = async (req, res) => {
  */
 export const downloadTemplate = async (req, res) => {
   try {
-    const buffer = excelImportService.generatePatientTemplate();
+    const buffer = await excelImportService.generatePatientTemplate();
 
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    );
     res.setHeader('Content-Disposition', 'attachment; filename=patient_import_template.xlsx');
     res.send(buffer);
   } catch (error) {
     logger.error('Error in downloadTemplate controller:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to generate template'
+      error: 'Failed to generate template',
     });
   }
 };
@@ -79,7 +82,7 @@ export const parseText = async (req, res) => {
     if (!text) {
       return res.status(400).json({
         success: false,
-        error: 'No text provided'
+        error: 'No text provided',
       });
     }
 
@@ -87,13 +90,13 @@ export const parseText = async (req, res) => {
 
     res.json({
       success: true,
-      data: result
+      data: result,
     });
   } catch (error) {
     logger.error('Error in parseText controller:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to parse text'
+      error: 'Failed to parse text',
     });
   }
 };
@@ -255,14 +258,14 @@ export const importPatientsFromText = async (req, res) => {
     if (!patients || !Array.isArray(patients)) {
       return res.status(400).json({
         success: false,
-        error: 'Invalid patients data. Expected an array of patient objects.'
+        error: 'Invalid patients data. Expected an array of patient objects.',
       });
     }
 
     if (patients.length === 0) {
       return res.status(400).json({
         success: false,
-        error: 'No patients provided for import'
+        error: 'No patients provided for import',
       });
     }
 
@@ -274,14 +277,14 @@ export const importPatientsFromText = async (req, res) => {
       skipped: 0,
       errors: [],
       duplicates: [],
-      importedPatients: []
+      importedPatients: [],
     };
 
     logger.info('Starting text-based patient import', {
       organizationId,
       userId,
       patientCount: patients.length,
-      options: { skipDuplicates, updateExisting, dryRun }
+      options: { skipDuplicates, updateExisting, dryRun },
     });
 
     for (let i = 0; i < patients.length; i++) {
@@ -290,7 +293,10 @@ export const importPatientsFromText = async (req, res) => {
 
       try {
         // Step 1: Validate patient data
-        const { errors: validationErrors, enrichedPatient } = validatePatientData(patient, patientIndex);
+        const { errors: validationErrors, enrichedPatient } = validatePatientData(
+          patient,
+          patientIndex
+        );
 
         if (validationErrors.length > 0) {
           results.errors.push(...validationErrors);
@@ -306,7 +312,7 @@ export const importPatientsFromText = async (req, res) => {
             index: patientIndex,
             name: `${enrichedPatient.first_name} ${enrichedPatient.last_name}`,
             matchedBy: existingPatient.matchedBy,
-            existingId: existingPatient.id
+            existingId: existingPatient.id,
           });
 
           if (updateExisting && !dryRun) {
@@ -321,13 +327,15 @@ export const importPatientsFromText = async (req, res) => {
                 gender: enrichedPatient.gender,
                 email: enrichedPatient.email,
                 phone: enrichedPatient.phone,
-                address: enrichedPatient.address_street ? {
-                  street: enrichedPatient.address_street,
-                  postalCode: enrichedPatient.address_postal_code,
-                  city: enrichedPatient.address_city
-                } : undefined,
+                address: enrichedPatient.address_street
+                  ? {
+                      street: enrichedPatient.address_street,
+                      postalCode: enrichedPatient.address_postal_code,
+                      city: enrichedPatient.address_city,
+                    }
+                  : undefined,
                 personal_number: enrichedPatient.personal_number,
-                internal_notes: enrichedPatient.notes || enrichedPatient.general_notes
+                internal_notes: enrichedPatient.notes || enrichedPatient.general_notes,
               }
             );
             results.updated++;
@@ -335,7 +343,9 @@ export const importPatientsFromText = async (req, res) => {
           } else if (skipDuplicates) {
             results.skipped++;
           } else {
-            results.errors.push(`Patient ${patientIndex}: Duplicate found (matched by ${existingPatient.matchedBy})`);
+            results.errors.push(
+              `Patient ${patientIndex}: Duplicate found (matched by ${existingPatient.matchedBy})`
+            );
             results.skipped++;
           }
           continue;
@@ -357,17 +367,19 @@ export const importPatientsFromText = async (req, res) => {
           email: enrichedPatient.email,
           phone: enrichedPatient.phone,
           personal_number: enrichedPatient.personal_number,
-          address: enrichedPatient.address_street ? {
-            street: enrichedPatient.address_street,
-            postalCode: enrichedPatient.address_postal_code,
-            city: enrichedPatient.address_city
-          } : null,
+          address: enrichedPatient.address_street
+            ? {
+                street: enrichedPatient.address_street,
+                postalCode: enrichedPatient.address_postal_code,
+                city: enrichedPatient.address_city,
+              }
+            : null,
           status: enrichedPatient.status || 'ACTIVE',
           category: enrichedPatient.category,
           referral_source: enrichedPatient.referral_source,
           internal_notes: enrichedPatient.notes || enrichedPatient.general_notes,
           consent_data_storage: true,
-          consent_date: new Date()
+          consent_date: new Date(),
         };
 
         // Create the patient using the patient service
@@ -377,14 +389,13 @@ export const importPatientsFromText = async (req, res) => {
         results.importedPatients.push({
           id: newPatient.id,
           name: `${newPatient.first_name} ${newPatient.last_name}`,
-          solvit_id: newPatient.solvit_id
+          solvit_id: newPatient.solvit_id,
         });
 
         logger.info(`Created new patient ${newPatient.id}`, {
           patientIndex,
-          name: `${newPatient.first_name} ${newPatient.last_name}`
+          name: `${newPatient.first_name} ${newPatient.last_name}`,
         });
-
       } catch (error) {
         logger.error(`Error importing patient ${patientIndex}:`, error);
         results.errors.push(`Patient ${patientIndex}: ${error.message}`);
@@ -402,9 +413,9 @@ export const importPatientsFromText = async (req, res) => {
         updated: results.updated,
         skipped: results.skipped,
         errors: results.errors.length,
-        duplicates: results.duplicates.length
+        duplicates: results.duplicates.length,
       },
-      dryRun
+      dryRun,
     });
 
     // Build response message
@@ -423,17 +434,17 @@ export const importPatientsFromText = async (req, res) => {
         skipped: results.skipped,
         errors: results.errors,
         duplicates: results.duplicates,
-        importedPatients: dryRun ? [] : results.importedPatients
+        importedPatients: dryRun ? [] : results.importedPatients,
       },
       message: dryRun
         ? `Dry run completed: ${messageParts.join(', ')}`
-        : `Import completed: ${messageParts.join(', ')}`
+        : `Import completed: ${messageParts.join(', ')}`,
     });
   } catch (error) {
     logger.error('Error in importPatientsFromText controller:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to import patients from text'
+      error: 'Failed to import patients from text',
     });
   }
 };
@@ -442,5 +453,5 @@ export default {
   importPatientsExcel,
   downloadTemplate,
   parseText,
-  importPatientsFromText
+  importPatientsFromText,
 };

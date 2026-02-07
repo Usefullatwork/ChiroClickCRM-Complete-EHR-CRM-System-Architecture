@@ -3,23 +3,38 @@
  * Import patients from Excel/CSV files
  */
 
-import XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
 
 /**
  * Parse Excel/CSV file
  */
-export const parseExcelFile = (buffer, fileType) => {
+export const parseExcelFile = async (buffer, fileType) => {
   try {
-    const workbook = XLSX.read(buffer, { type: 'buffer' });
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(buffer);
+    const worksheet = workbook.worksheets[0];
+    const sheetName = worksheet.name;
 
-    // Convert to JSON
-    const data = XLSX.utils.sheet_to_json(worksheet, {
-      raw: false, // Get formatted values
-      defval: null // Default value for empty cells
+    // Convert to JSON: first row is headers
+    const data = [];
+    const headers = [];
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) {
+        row.eachCell((cell, colNumber) => {
+          headers[colNumber] = cell.value;
+        });
+      } else {
+        const rowObj = {};
+        row.eachCell((cell, colNumber) => {
+          if (headers[colNumber]) {
+            // Get formatted text value instead of raw to match previous behavior
+            rowObj[headers[colNumber]] = cell.text || cell.value || null;
+          }
+        });
+        data.push(rowObj);
+      }
     });
 
     logger.info('Excel file parsed:', { rows: data.length, sheet: sheetName });
@@ -38,9 +53,7 @@ const mapExcelRowToPatient = (row) => {
   // Helper to find column (case-insensitive, handles variations)
   const findColumn = (row, ...names) => {
     for (const name of names) {
-      const key = Object.keys(row).find(k =>
-        k.toLowerCase().trim() === name.toLowerCase()
-      );
+      const key = Object.keys(row).find((k) => k.toLowerCase().trim() === name.toLowerCase());
       if (key && row[key]) return row[key];
     }
     return null;
@@ -48,30 +61,110 @@ const mapExcelRowToPatient = (row) => {
 
   // Map basic patient data
   const patient = {
-    solvit_id: findColumn(row, 'pasient id', 'solvit_id', 'solvitid', 'solvit id', 'id', 'patient id'),
+    solvit_id: findColumn(
+      row,
+      'pasient id',
+      'solvit_id',
+      'solvitid',
+      'solvit id',
+      'id',
+      'patient id'
+    ),
     first_name: findColumn(row, 'for navn', 'fornavn', 'first_name', 'firstname', 'first name'),
-    last_name: findColumn(row, 'etter navn', 'etternavn', 'last_name', 'lastname', 'last name', 'surname'),
-    date_of_birth: findColumn(row, 'date_of_birth', 'dateofbirth', 'birth_date', 'fødselsdato', 'dob', 'birthdate'),
-    national_id: findColumn(row, 'national_id', 'nationalid', 'personnummer', 'ssn', 'fnr', 'fodselsnummer'),
+    last_name: findColumn(
+      row,
+      'etter navn',
+      'etternavn',
+      'last_name',
+      'lastname',
+      'last name',
+      'surname'
+    ),
+    date_of_birth: findColumn(
+      row,
+      'date_of_birth',
+      'dateofbirth',
+      'birth_date',
+      'fødselsdato',
+      'dob',
+      'birthdate'
+    ),
+    national_id: findColumn(
+      row,
+      'national_id',
+      'nationalid',
+      'personnummer',
+      'ssn',
+      'fnr',
+      'fodselsnummer'
+    ),
     phone: findColumn(row, 'telefonnummer', 'phone', 'telefon', 'mobile', 'mobil', 'phone_number'),
     email: findColumn(row, 'e-post', 'email', 'epost', 'e-mail'),
-    address_street: findColumn(row, 'address_street', 'street', 'address', 'adresse', 'gateadresse'),
-    address_postal_code: findColumn(row, 'address_postal_code', 'postal_code', 'postnummer', 'zip', 'postcode'),
+    address_street: findColumn(
+      row,
+      'address_street',
+      'street',
+      'address',
+      'adresse',
+      'gateadresse'
+    ),
+    address_postal_code: findColumn(
+      row,
+      'address_postal_code',
+      'postal_code',
+      'postnummer',
+      'zip',
+      'postcode'
+    ),
     address_city: findColumn(row, 'address_city', 'city', 'by', 'poststed'),
     gender: findColumn(row, 'gender', 'kjønn', 'sex'),
-    emergency_contact_name: findColumn(row, 'emergency_contact_name', 'emergency_name', 'pårørende', 'next_of_kin'),
-    emergency_contact_phone: findColumn(row, 'emergency_contact_phone', 'emergency_phone', 'pårørende_telefon'),
+    emergency_contact_name: findColumn(
+      row,
+      'emergency_contact_name',
+      'emergency_name',
+      'pårørende',
+      'next_of_kin'
+    ),
+    emergency_contact_phone: findColumn(
+      row,
+      'emergency_contact_phone',
+      'emergency_phone',
+      'pårørende_telefon'
+    ),
     category: findColumn(row, 'category', 'kategori', 'patient_category'),
 
     // CRM fields from Excel
-    preferred_therapist: findColumn(row, 'pasient orginal terapaut', 'preferred_therapist', 'therapist', 'terapeut'),
-    preferred_contact_method: findColumn(row, 'ønsker kontakt på', 'preferred_contact', 'contact_method'),
+    preferred_therapist: findColumn(
+      row,
+      'pasient orginal terapaut',
+      'preferred_therapist',
+      'therapist',
+      'terapeut'
+    ),
+    preferred_contact_method: findColumn(
+      row,
+      'ønsker kontakt på',
+      'preferred_contact',
+      'contact_method'
+    ),
     patient_status: findColumn(row, 'pasient status', 'status'),
     language: findColumn(row, 'språk', 'language', 'lang'),
     main_problem: findColumn(row, 'hovedproblem', 'main_problem', 'chief_complaint', 'problem'),
     treatment_type: findColumn(row, 'behandlingstype', 'treatment_type', 'treatment'),
-    general_notes: findColumn(row, 'generelle notater', 'general_notes', 'notes', 'notater', 'comments'),
-    should_be_followed_up: findColumn(row, 'burde vært fulgt opp', 'follow_up_date', 'should_follow_up'),
+    general_notes: findColumn(
+      row,
+      'generelle notater',
+      'general_notes',
+      'notes',
+      'notater',
+      'comments'
+    ),
+    should_be_followed_up: findColumn(
+      row,
+      'burde vært fulgt opp',
+      'follow_up_date',
+      'should_follow_up'
+    ),
     last_visit_date: findColumn(row, 'siste besøk dato', 'last_visit', 'last_appointment'),
     referral_source: findColumn(row, 'henvisningskilde', 'referral_source', 'referral'),
   };
@@ -88,11 +181,13 @@ const mapExcelRowToPatient = (row) => {
   // Normalize treatment type
   if (patient.treatment_type === 'Kiropraktor') patient.treatment_type = 'KIROPRAKTOR';
   else if (patient.treatment_type === 'Nevrobehandling') patient.treatment_type = 'NEVROBEHANDLING';
-  else if (patient.treatment_type === 'Muskelbehandling') patient.treatment_type = 'MUSKELBEHANDLING';
+  else if (patient.treatment_type === 'Muskelbehandling')
+    patient.treatment_type = 'MUSKELBEHANDLING';
 
   // Normalize contact method
   if (patient.preferred_contact_method === 'Melding') patient.preferred_contact_method = 'SMS';
-  else if (patient.preferred_contact_method?.includes('BARN')) patient.preferred_contact_method = 'NO_CONTACT';
+  else if (patient.preferred_contact_method?.includes('BARN'))
+    patient.preferred_contact_method = 'NO_CONTACT';
 
   return patient;
 };
@@ -140,22 +235,18 @@ const validatePatient = (patient, rowIndex) => {
  * Import patients from Excel file
  */
 export const importPatientsFromExcel = async (organizationId, fileBuffer, userId, options = {}) => {
-  const {
-    skipDuplicates = true,
-    updateExisting = false,
-    dryRun = false
-  } = options;
+  const { skipDuplicates = true, updateExisting = false, dryRun = false } = options;
 
   try {
     // Parse Excel file
-    const rows = parseExcelFile(fileBuffer);
+    const rows = await parseExcelFile(fileBuffer);
 
     const results = {
       total: rows.length,
       imported: 0,
       updated: 0,
       skipped: 0,
-      errors: []
+      errors: [],
     };
 
     for (let i = 0; i < rows.length; i++) {
@@ -252,7 +343,7 @@ export const importPatientsFromExcel = async (organizationId, fileBuffer, userId
                 patient.emergency_contact_name,
                 patient.emergency_contact_phone,
                 patient.category,
-                patient.notes
+                patient.notes,
               ]
             );
             results.updated++;
@@ -302,7 +393,7 @@ export const importPatientsFromExcel = async (organizationId, fileBuffer, userId
               patient.emergency_contact_phone,
               patient.category,
               patient.notes,
-              userId
+              userId,
             ]
           );
           results.imported++;
@@ -325,36 +416,54 @@ export const importPatientsFromExcel = async (organizationId, fileBuffer, userId
 /**
  * Generate Excel template for patient import
  */
-export const generatePatientTemplate = () => {
-  const template = [
-    {
-      'Solvit ID': '12345',
-      'First Name': 'Ola',
-      'Last Name': 'Nordmann',
-      'Date of Birth': '1980-01-15',
-      'National ID': '15018012345',
-      'Phone': '98765432',
-      'Email': 'ola@example.com',
-      'Address Street': 'Storgata 1',
-      'Postal Code': '0001',
-      'City': 'Oslo',
-      'Gender': 'M',
-      'Emergency Contact Name': 'Kari Nordmann',
-      'Emergency Contact Phone': '98765433',
-      'Category': 'OSLO',
-      'Notes': 'Existing patient from Solvit'
-    }
+export const generatePatientTemplate = async () => {
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Patients');
+
+  const columns = [
+    'Solvit ID',
+    'First Name',
+    'Last Name',
+    'Date of Birth',
+    'National ID',
+    'Phone',
+    'Email',
+    'Address Street',
+    'Postal Code',
+    'City',
+    'Gender',
+    'Emergency Contact Name',
+    'Emergency Contact Phone',
+    'Category',
+    'Notes',
   ];
 
-  const worksheet = XLSX.utils.json_to_sheet(template);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Patients');
+  worksheet.columns = columns.map((name) => ({ header: name, key: name, width: 18 }));
 
-  return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+  worksheet.addRow({
+    'Solvit ID': '12345',
+    'First Name': 'Ola',
+    'Last Name': 'Nordmann',
+    'Date of Birth': '1980-01-15',
+    'National ID': '15018012345',
+    Phone: '98765432',
+    Email: 'ola@example.com',
+    'Address Street': 'Storgata 1',
+    'Postal Code': '0001',
+    City: 'Oslo',
+    Gender: 'M',
+    'Emergency Contact Name': 'Kari Nordmann',
+    'Emergency Contact Phone': '98765433',
+    Category: 'OSLO',
+    Notes: 'Existing patient from Solvit',
+  });
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  return Buffer.from(buffer);
 };
 
 export default {
   parseExcelFile,
   importPatientsFromExcel,
-  generatePatientTemplate
+  generatePatientTemplate,
 };

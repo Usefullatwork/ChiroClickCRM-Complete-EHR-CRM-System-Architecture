@@ -10,31 +10,27 @@
  * - Input sanitization
  */
 
-import csrf from 'csurf';
 import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import { redisRateLimiter } from '../config/redis.js';
+import { csrfProtection as customCsrfProtection, csrfErrorHandler } from './csrf.js';
 
 /**
  * CSRF Protection Middleware
- * Prevents Cross-Site Request Forgery attacks
+ * Uses custom Double Submit Cookie implementation (csrf.js)
+ * instead of deprecated csurf package
  */
-export const csrfProtection = csrf({
-  cookie: {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-  },
-});
+export const csrfProtection = customCsrfProtection();
 
 /**
  * Send CSRF token to client
+ * Token is already set as a cookie by the custom CSRF middleware.
+ * This middleware exposes it via a response header for convenience.
  */
 export const sendCsrfToken = (req, res, next) => {
-  res.cookie('XSRF-TOKEN', req.csrfToken(), {
-    httpOnly: false, // Accessible to JavaScript (needed for axios)
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-  });
+  if (req.csrfToken) {
+    res.set('X-CSRF-TOKEN', req.csrfToken());
+  }
   next();
 };
 
@@ -159,15 +155,16 @@ export const moderateRateLimit = async (req, res, next) => {
 
 /**
  * Security headers using Helmet
+ * CSP allows connections to Ollama (localhost:11434) for AI features
  */
 export const securityHeaders = helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles for UI frameworks
+      styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'"],
       imgSrc: ["'self'", 'data:', 'https:'],
-      connectSrc: ["'self'"],
+      connectSrc: ["'self'", 'http://localhost:11434', 'http://127.0.0.1:11434'],
       fontSrc: ["'self'"],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
@@ -175,7 +172,7 @@ export const securityHeaders = helmet({
     },
   },
   hsts: {
-    maxAge: 31536000, // 1 year
+    maxAge: 31536000,
     includeSubDomains: true,
     preload: true,
   },
@@ -185,6 +182,39 @@ export const securityHeaders = helmet({
   frameguard: {
     action: 'deny',
   },
+});
+
+/**
+ * AI-specific rate limit: 10 requests/minute per user
+ * Apply to /api/v1/ai/* routes
+ */
+export const aiRateLimit = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  keyGenerator: (req) => req.user?.id || req.ip,
+  message: {
+    error: 'AI Rate Limit Exceeded',
+    message: 'Too many AI requests. Please wait before trying again.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+/**
+ * Auth brute-force protection: 5 attempts per 15 minutes per IP
+ * Apply to /api/v1/auth/login
+ */
+export const authBruteForceLimit = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  keyGenerator: (req) => req.ip,
+  message: {
+    error: 'Too Many Login Attempts',
+    message:
+      'Account temporarily locked due to too many failed login attempts. Please try again in 15 minutes.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 /**
@@ -310,6 +340,7 @@ export const logSecurityEvent = async (req, eventType, details = {}) => {
 
 export default {
   csrfProtection,
+  csrfErrorHandler,
   sendCsrfToken,
   enforce2FA,
   requireRole,
@@ -321,4 +352,6 @@ export default {
   requireHTTPS,
   secureSession,
   logSecurityEvent,
+  aiRateLimit,
+  authBruteForceLimit,
 };
