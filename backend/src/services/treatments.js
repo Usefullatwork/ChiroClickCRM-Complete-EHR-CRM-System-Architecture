@@ -51,10 +51,7 @@ export const getCommonTreatmentCodes = async () => {
  */
 export const getTreatmentCode = async (code) => {
   try {
-    const result = await query(
-      'SELECT * FROM treatment_codes WHERE code = $1',
-      [code]
-    );
+    const result = await query('SELECT * FROM treatment_codes WHERE code = $1', [code]);
 
     if (result.rows.length === 0) {
       return null;
@@ -94,10 +91,7 @@ export const searchTreatmentCodes = async (searchTerm, limit = 10) => {
  */
 export const incrementTreatmentUsageCount = async (code) => {
   try {
-    await query(
-      'UPDATE treatment_codes SET usage_count = usage_count + 1 WHERE code = $1',
-      [code]
-    );
+    await query('UPDATE treatment_codes SET usage_count = usage_count + 1 WHERE code = $1', [code]);
 
     logger.debug('Incremented treatment usage count for code:', code);
   } catch (error) {
@@ -115,7 +109,7 @@ export const calculateTreatmentPrice = async (treatmentCodes) => {
       return {
         grossAmount: 0,
         insuranceAmount: 0,
-        patientAmount: 0
+        patientAmount: 0,
       };
     }
 
@@ -137,7 +131,7 @@ export const calculateTreatmentPrice = async (treatmentCodes) => {
     return {
       grossAmount: gross,
       insuranceAmount: insurance,
-      patientAmount: patient
+      patientAmount: patient,
     };
   } catch (error) {
     logger.error('Error calculating treatment price:', error);
@@ -149,11 +143,7 @@ export const calculateTreatmentPrice = async (treatmentCodes) => {
  * Get treatment statistics for organization
  */
 export const getTreatmentStatistics = async (organizationId, options = {}) => {
-  const {
-    startDate = null,
-    endDate = null,
-    limit = 10
-  } = options;
+  const { startDate = null, endDate = null, limit = 10 } = options;
 
   try {
     let whereClause = 'WHERE fm.organization_id = $1';
@@ -205,6 +195,45 @@ export const getTreatmentStatistics = async (organizationId, options = {}) => {
   }
 };
 
+/**
+ * Map treatment data into the encounter's plan section.
+ * Merges treatment descriptions, exercises, advice, and follow-up into the plan.
+ *
+ * @param {object} existingPlan - Current plan section of the encounter
+ * @param {object} treatmentData - Incoming treatment data
+ * @returns {object} Updated plan section
+ */
+export const mapTreatmentsToPlan = (existingPlan, treatmentData) => {
+  const plan = { ...existingPlan };
+
+  if (treatmentData.treatment_description) {
+    plan.treatment = treatmentData.treatment_description;
+  }
+
+  if (treatmentData.treatments && treatmentData.treatments.length > 0) {
+    const treatmentDescriptions = treatmentData.treatments
+      .map((t) => {
+        let desc = t.description || t.code || '';
+        if (t.region) desc += ` (${t.region})`;
+        if (t.notes) desc += ` - ${t.notes}`;
+        return desc;
+      })
+      .filter(Boolean);
+
+    plan.treatments_performed = [
+      ...(existingPlan.treatments_performed || []),
+      ...treatmentDescriptions,
+    ];
+  }
+
+  if (treatmentData.exercises) plan.exercises = treatmentData.exercises;
+  if (treatmentData.advice) plan.advice = treatmentData.advice;
+  if (treatmentData.follow_up) plan.follow_up = treatmentData.follow_up;
+  if (treatmentData.referral) plan.referral = treatmentData.referral;
+
+  return plan;
+};
+
 export default {
   getAllTreatmentCodes,
   getCommonTreatmentCodes,
@@ -212,5 +241,6 @@ export default {
   searchTreatmentCodes,
   incrementTreatmentUsageCount,
   calculateTreatmentPrice,
-  getTreatmentStatistics
+  getTreatmentStatistics,
+  mapTreatmentsToPlan,
 };

@@ -23,7 +23,7 @@ export const getBodyRegions = async (language = 'NO') => {
   `;
 
   const result = await query(sql, [language]);
-  return result.rows.map(row => row.body_region);
+  return result.rows.map((row) => row.body_region);
 };
 
 /**
@@ -39,7 +39,7 @@ export const getCategories = async (language = 'NO') => {
   `;
 
   const result = await query(sql, [language]);
-  return result.rows.map(row => row.category);
+  return result.rows.map((row) => row.category);
 };
 
 /**
@@ -53,7 +53,7 @@ export const getAllProtocols = async (options = {}) => {
     search,
     redFlagsOnly = false,
     limit = 100,
-    offset = 0
+    offset = 0,
   } = options;
 
   let sql = `
@@ -113,7 +113,7 @@ export const getAllProtocols = async (options = {}) => {
   const result = await query(sql, params);
   return {
     protocols: result.rows,
-    total: result.rows.length
+    total: result.rows.length,
   };
 };
 
@@ -180,7 +180,7 @@ export const getProtocolsByRegion = async (bodyRegion, language = 'NO') => {
 
   // Group by category
   const grouped = {};
-  result.rows.forEach(protocol => {
+  result.rows.forEach((protocol) => {
     if (!grouped[protocol.category]) {
       grouped[protocol.category] = [];
     }
@@ -275,16 +275,19 @@ export const createFinding = async (organizationId, userId, findingData) => {
     measurement_value,
     measurement_unit,
     pain_score,
-    pain_location
+    pain_location,
   } = findingData;
 
   // Verify encounter belongs to organization
-  const verifyResult = await query(`
+  const verifyResult = await query(
+    `
     SELECT e.id
     FROM clinical_encounters e
     INNER JOIN patients p ON e.patient_id = p.id
     WHERE e.id = $1 AND p.organization_id = $2
-  `, [encounter_id, organizationId]);
+  `,
+    [encounter_id, organizationId]
+  );
 
   if (verifyResult.rows.length === 0) {
     throw new Error('Encounter not found or access denied');
@@ -311,7 +314,7 @@ export const createFinding = async (organizationId, userId, findingData) => {
     RETURNING *
   `;
 
-  const result = await query(sql, [
+  const queryResult = await query(sql, [
     encounter_id,
     protocol_id,
     body_region,
@@ -326,10 +329,10 @@ export const createFinding = async (organizationId, userId, findingData) => {
     measurement_unit,
     pain_score,
     pain_location,
-    userId
+    userId,
   ]);
 
-  return result.rows[0];
+  return queryResult.rows[0];
 };
 
 /**
@@ -337,13 +340,16 @@ export const createFinding = async (organizationId, userId, findingData) => {
  */
 export const updateFinding = async (organizationId, id, updateData) => {
   // Verify finding belongs to organization
-  const verifyResult = await query(`
+  const verifyResult = await query(
+    `
     SELECT f.id
     FROM structured_examination_findings f
     INNER JOIN clinical_encounters e ON f.encounter_id = e.id
     INNER JOIN patients p ON e.patient_id = p.id
     WHERE f.id = $1 AND p.organization_id = $2
-  `, [id, organizationId]);
+  `,
+    [id, organizationId]
+  );
 
   if (verifyResult.rows.length === 0) {
     throw new Error('Finding not found or access denied');
@@ -354,11 +360,18 @@ export const updateFinding = async (organizationId, id, updateData) => {
   let paramCount = 0;
 
   const allowedFields = [
-    'result', 'laterality', 'severity', 'findings_text', 'clinician_notes',
-    'measurement_value', 'measurement_unit', 'pain_score', 'pain_location'
+    'result',
+    'laterality',
+    'severity',
+    'findings_text',
+    'clinician_notes',
+    'measurement_value',
+    'measurement_unit',
+    'pain_score',
+    'pain_location',
   ];
 
-  allowedFields.forEach(field => {
+  allowedFields.forEach((field) => {
     if (updateData[field] !== undefined) {
       paramCount++;
       fields.push(`${field} = $${paramCount}`);
@@ -389,13 +402,16 @@ export const updateFinding = async (organizationId, id, updateData) => {
  */
 export const deleteFinding = async (organizationId, id) => {
   // Verify finding belongs to organization
-  const verifyResult = await query(`
+  const verifyResult = await query(
+    `
     SELECT f.id
     FROM structured_examination_findings f
     INNER JOIN clinical_encounters e ON f.encounter_id = e.id
     INNER JOIN patients p ON e.patient_id = p.id
     WHERE f.id = $1 AND p.organization_id = $2
-  `, [id, organizationId]);
+  `,
+    [id, organizationId]
+  );
 
   if (verifyResult.rows.length === 0) {
     throw new Error('Finding not found or access denied');
@@ -432,12 +448,15 @@ export const createBatchFindings = async (organizationId, userId, findingsArray)
  */
 export const getExaminationSummary = async (organizationId, encounterId) => {
   // Verify encounter belongs to organization
-  const verifyResult = await query(`
+  const verifyResult = await query(
+    `
     SELECT e.id
     FROM clinical_encounters e
     INNER JOIN patients p ON e.patient_id = p.id
     WHERE e.id = $1 AND p.organization_id = $2
-  `, [encounterId, organizationId]);
+  `,
+    [encounterId, organizationId]
+  );
 
   if (verifyResult.rows.length === 0) {
     throw new Error('Encounter not found or access denied');
@@ -454,12 +473,15 @@ export const getExaminationSummary = async (organizationId, encounterId) => {
  */
 export const getRedFlags = async (organizationId, encounterId) => {
   // Verify encounter belongs to organization
-  const verifyResult = await query(`
+  const verifyResult = await query(
+    `
     SELECT e.id
     FROM clinical_encounters e
     INNER JOIN patients p ON e.patient_id = p.id
     WHERE e.id = $1 AND p.organization_id = $2
-  `, [encounterId, organizationId]);
+  `,
+    [encounterId, organizationId]
+  );
 
   if (verifyResult.rows.length === 0) {
     throw new Error('Encounter not found or access denied');
@@ -534,7 +556,7 @@ export const createTemplateSet = async (setData) => {
     chief_complaint,
     chief_complaint_no,
     protocol_ids,
-    language = 'NO'
+    language = 'NO',
   } = setData;
 
   const sql = `
@@ -560,10 +582,49 @@ export const createTemplateSet = async (setData) => {
     chief_complaint,
     chief_complaint_no,
     protocol_ids,
-    language
+    language,
   ]);
 
   return result.rows[0];
+};
+
+/**
+ * Map structured examination findings into the encounter's objective section.
+ * Merges free-text fields and builds a structured findings summary.
+ *
+ * @param {object} existingObjective - Current objective section of the encounter
+ * @param {object} examData - Incoming examination data (free-text fields, bodyRegion, etc.)
+ * @param {Array} storedFindings - Array of stored finding records
+ * @returns {object} Updated objective section
+ */
+export const mapFindingsToObjective = (existingObjective, examData, storedFindings = []) => {
+  const objective = { ...existingObjective };
+
+  if (examData.observation) objective.observation = examData.observation;
+  if (examData.palpation) objective.palpation = examData.palpation;
+  if (examData.rom) objective.rom = examData.rom;
+  if (examData.ortho_tests) objective.ortho_tests = examData.ortho_tests;
+  if (examData.neuro_tests) objective.neuro_tests = examData.neuro_tests;
+  if (examData.vital_signs) objective.vital_signs = examData.vital_signs;
+
+  if (storedFindings.length > 0) {
+    const findingsSummary = storedFindings
+      .map((f) => {
+        let text = f.test_name || '';
+        if (f.result) text += `: ${f.result}`;
+        if (f.laterality) text += ` (${f.laterality})`;
+        if (f.findings_text) text += ` - ${f.findings_text}`;
+        return text;
+      })
+      .filter(Boolean);
+
+    objective.structured_findings = [
+      ...(existingObjective.structured_findings || []),
+      ...findingsSummary,
+    ];
+  }
+
+  return objective;
 };
 
 /**
