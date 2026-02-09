@@ -12,11 +12,21 @@ Usage:
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 import time
 from datetime import datetime
 from pathlib import Path
+
+# Fix Windows console encoding for Norwegian characters and Unicode spinners
+if sys.platform == 'win32':
+    os.environ.setdefault('PYTHONIOENCODING', 'utf-8')
+    try:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    except Exception:
+        pass
 
 # ============================================================
 # Test Cases
@@ -77,7 +87,8 @@ def check_ollama():
     try:
         result = subprocess.run(
             ["ollama", "list"],
-            capture_output=True, text=True, timeout=10
+            capture_output=True, text=True, timeout=10, encoding='utf-8',
+            errors='replace',
         )
         if result.returncode != 0:
             return False, []
@@ -93,20 +104,29 @@ def check_ollama():
         return False, []
 
 
+def sanitize_text(text):
+    """Remove non-printable/braille spinner characters that break Windows console."""
+    if not text:
+        return text
+    # Keep ASCII printable, Norwegian chars, and common Unicode but strip spinners/braille
+    return ''.join(c for c in text if c.isprintable() or c in '\n\r\t')
+
+
 def query_model(model_name, prompt, timeout=120):
     """Send a prompt to an Ollama model and return the response."""
     try:
         start = time.time()
         result = subprocess.run(
             ["ollama", "run", model_name, prompt],
-            capture_output=True, text=True, timeout=timeout
+            capture_output=True, text=True, timeout=timeout, encoding='utf-8',
+            errors='replace',
         )
         elapsed = time.time() - start
 
         if result.returncode != 0:
-            return None, elapsed, result.stderr
+            return None, elapsed, sanitize_text(result.stderr.strip())
 
-        return result.stdout.strip(), elapsed, None
+        return sanitize_text(result.stdout.strip()), elapsed, None
     except subprocess.TimeoutExpired:
         return None, timeout, "Timeout"
     except Exception as e:

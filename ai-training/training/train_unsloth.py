@@ -114,8 +114,8 @@ TRAINING_CONFIG = {
 # Low-VRAM overrides (for 6GB GPUs like RTX 2060)
 LOW_VRAM_CONFIG = {
     'per_device_train_batch_size': 1,
-    'gradient_accumulation_steps': 16,
-    'num_train_epochs': 5,
+    'gradient_accumulation_steps': 4,
+    'num_train_epochs': 3,
 }
 
 # Ultra-low VRAM fallback (if first attempt OOMs)
@@ -236,7 +236,7 @@ def load_model_with_lora(model_key, max_seq_length, logger):
             model_name,
             quantization_config=bnb_config,
             device_map="auto",
-            torch_dtype=torch.float16,
+            dtype=torch.float16,
             trust_remote_code=True,
         )
         tokenizer = AutoTokenizer.from_pretrained(
@@ -251,7 +251,7 @@ def load_model_with_lora(model_key, max_seq_length, logger):
             config['fallback'],
             quantization_config=bnb_config,
             device_map="auto",
-            torch_dtype=torch.float16,
+            dtype=torch.float16,
             trust_remote_code=True,
         )
         tokenizer = AutoTokenizer.from_pretrained(
@@ -363,11 +363,12 @@ def train(
     batch_size=None,
     low_vram=False,
     max_seq_length=None,
+    resume_from_checkpoint=False,
+    packing=True,
 ):
     """Run the training pipeline. Returns (model, tokenizer, lora_path) or (None, None, None) on failure."""
     import torch
-    from transformers import TrainingArguments
-    from trl import SFTTrainer
+    from trl import SFTTrainer, SFTConfig
 
     config = MODELS[model_key]
     output_name = config['output_name']
@@ -378,6 +379,7 @@ def train(
     logger.info(f"Model: {model_key} ({config['description']})")
     logger.info(f"Output: {output_name}")
     logger.info(f"Low VRAM mode: {low_vram}")
+    logger.info(f"Packing: {packing}")
     logger.info(f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     logger.info("=" * 60)
 
@@ -396,7 +398,7 @@ def train(
     t_config = dict(TRAINING_CONFIG)
     if low_vram:
         t_config.update(LOW_VRAM_CONFIG)
-        logger.info("Applied low-VRAM overrides: batch_size=1, grad_accum=16, epochs=5")
+        logger.info(f"Applied low-VRAM overrides: batch_size=1, grad_accum={t_config['gradient_accumulation_steps']}, epochs={t_config['num_train_epochs']}")
 
     if epochs is not None:
         t_config['num_train_epochs'] = epochs
@@ -442,9 +444,9 @@ def train(
         except Exception:
             pass
 
-    # Training arguments
+    # Training arguments (SFTConfig replaces TrainingArguments in trl >= 0.12)
     model_output_dir = str(Path(output_dir) / output_name)
-    training_args = TrainingArguments(
+    sft_config = SFTConfig(
         output_dir=model_output_dir,
         learning_rate=t_config['learning_rate'],
         lr_scheduler_type=t_config['lr_scheduler_type'],
@@ -467,19 +469,20 @@ def train(
         report_to="none",
         seed=42,
         dataloader_pin_memory=False,
+        # SFT-specific params (moved from SFTTrainer constructor)
+        dataset_text_field="text",
+        max_length=seq_len,
+        packing=packing,
     )
 
     # Create SFTTrainer
     logger.info("Initializing SFTTrainer...")
     trainer = SFTTrainer(
         model=model,
-        tokenizer=tokenizer,
+        processing_class=tokenizer,
         train_dataset=formatted_train,
         eval_dataset=formatted_val,
-        args=training_args,
-        dataset_text_field="text",
-        max_seq_length=seq_len,
-        packing=True,
+        args=sft_config,
     )
 
     # Train with OOM recovery
@@ -490,7 +493,11 @@ def train(
     train_start = time.time()
     try:
         log_gpu_memory(logger, "Before training: ")
-        trainer.train()
+        if resume_from_checkpoint:
+            logger.info("Resuming from latest checkpoint...")
+            trainer.train(resume_from_checkpoint=True)
+        else:
+            trainer.train()
     except RuntimeError as e:
         if "out of memory" in str(e).lower():
             logger.warning("OOM detected! Clearing cache and retrying with reduced settings...")
@@ -500,19 +507,17 @@ def train(
             retry_seq_len = ULTRA_LOW_VRAM_CONFIG['max_seq_length_override']
             logger.info(f"Retrying with seq_len={retry_seq_len}, batch=1, grad_accum=8")
 
-            training_args.per_device_train_batch_size = 1
-            training_args.gradient_accumulation_steps = 8
+            sft_config.per_device_train_batch_size = 1
+            sft_config.gradient_accumulation_steps = 8
+            sft_config.max_length = retry_seq_len
 
-            # Recreate trainer with reduced seq_len
+            # Recreate trainer with reduced settings
             trainer = SFTTrainer(
                 model=model,
-                tokenizer=tokenizer,
+                processing_class=tokenizer,
                 train_dataset=formatted_train,
                 eval_dataset=formatted_val,
-                args=training_args,
-                dataset_text_field="text",
-                max_seq_length=retry_seq_len,
-                packing=True,
+                args=sft_config,
             )
 
             try:
@@ -543,92 +548,40 @@ def train(
 # ============================================================
 
 def export_to_gguf(model, tokenizer, output_dir, model_key, quantization, logger):
-    """Export model to GGUF format for Ollama using llama.cpp."""
-    import torch
-    from peft import PeftModel
+    """Save LoRA adapter and prepare for merge+deploy.
 
+    NOTE: Merging a 4-bit quantized model in-memory produces broken safetensors
+    (flat 1D tensors). Use scripts/merge_and_deploy.py for proper float16 merge
+    and Ollama deployment after training completes.
+    """
     config = MODELS[model_key]
     output_name = config['output_name']
+    lora_name = f"{output_name}-lora"
 
     logger.info("=" * 60)
-    logger.info("EXPORTING TO GGUF")
+    logger.info("POST-TRAINING EXPORT")
     logger.info("=" * 60)
 
     export_start = time.time()
 
-    # Merge LoRA weights into base model
-    logger.info("Merging LoRA weights with base model...")
-    try:
-        merged_model = model.merge_and_unload()
-    except Exception as e:
-        logger.error(f"LoRA merge failed: {e}")
-        logger.info("Saving merged model in safetensors format instead")
-        merged_model = model
+    # Save LoRA adapter (already done in train(), but ensure it's saved)
+    lora_dir = Path(output_dir) / f"{output_name}-lora"
+    if not (lora_dir / 'adapter_config.json').exists():
+        logger.info(f"Saving LoRA adapter to: {lora_dir}")
+        model.save_pretrained(str(lora_dir))
+        tokenizer.save_pretrained(str(lora_dir))
 
-    # Save merged model for manual GGUF conversion
-    merged_dir = Path(output_dir) / f"{output_name}-merged"
-    merged_dir.mkdir(parents=True, exist_ok=True)
-
-    logger.info(f"Saving merged model to: {merged_dir}")
-    merged_model.save_pretrained(str(merged_dir), safe_serialization=True)
-    tokenizer.save_pretrained(str(merged_dir))
-
-    # Try to convert to GGUF using llama.cpp if available
-    gguf_dir = Path(output_dir) / 'gguf'
-    gguf_dir.mkdir(parents=True, exist_ok=True)
-    gguf_path = gguf_dir / f"{output_name}.gguf"
-
-    import subprocess
-    # Try convert_hf_to_gguf.py (llama.cpp)
-    convert_scripts = [
-        "convert_hf_to_gguf.py",
-        "convert-hf-to-gguf.py",
-    ]
-
-    converted = False
-    for script in convert_scripts:
-        try:
-            result = subprocess.run(
-                [sys.executable, script, str(merged_dir), "--outfile", str(gguf_path),
-                 "--outtype", quantization],
-                capture_output=True, text=True, timeout=1800
-            )
-            if result.returncode == 0:
-                logger.info(f"GGUF saved: {gguf_path}")
-                converted = True
-                break
-        except (FileNotFoundError, subprocess.TimeoutExpired):
-            continue
-
-    if not converted:
-        logger.warning("llama.cpp converter not found.")
-        logger.info(f"Merged model saved at: {merged_dir}")
-        logger.info("To convert manually:")
-        logger.info(f"  python convert_hf_to_gguf.py {merged_dir} --outfile {gguf_path} --outtype {quantization}")
-
-    # Create Ollama Modelfile regardless
-    lora_name = f"{output_name}-lora"
-    modelfile_path = gguf_dir / f"Modelfile.{lora_name}"
-    modelfile_content = f'''FROM ./{output_name}.gguf
-
-# ChiroClick LoRA fine-tuned model
-# Base: {config['name']}
-# Created: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-
-PARAMETER temperature 0.3
-PARAMETER top_p 0.85
-PARAMETER top_k 40
-PARAMETER num_ctx {config['low_vram_seq_length']}
-PARAMETER repeat_penalty 1.0
-
-SYSTEM """{config['system_prompt']}"""
-'''
-
-    with open(modelfile_path, 'w', encoding='utf-8') as f:
-        f.write(modelfile_content)
-
-    logger.info(f"Modelfile created: {modelfile_path}")
-    logger.info(f"To deploy: cd {gguf_dir} && ollama create {lora_name} -f Modelfile.{lora_name}")
+    logger.info(f"LoRA adapter saved: {lora_dir}")
+    logger.info("")
+    logger.info("NEXT STEP: Merge and deploy to Ollama using:")
+    logger.info(f"  python scripts/merge_and_deploy.py --model {model_key}")
+    logger.info("")
+    logger.info("This will:")
+    logger.info("  1. Load base model in float16 (not 4-bit)")
+    logger.info("  2. Apply LoRA adapter")
+    logger.info("  3. Merge weights")
+    logger.info("  4. Save merged model")
+    logger.info("  5. Deploy to Ollama as {lora_name}")
 
     export_time = time.time() - export_start
     logger.info(f"Export completed in {export_time/60:.1f} minutes")
@@ -672,6 +625,10 @@ Examples:
                         help='Enable low-VRAM mode (batch=1, seq_len=2048, more epochs)')
     parser.add_argument('--skip-export', action='store_true',
                         help='Skip GGUF export')
+    parser.add_argument('--resume', action='store_true',
+                        help='Resume training from latest checkpoint in output dir')
+    parser.add_argument('--no-packing', action='store_true',
+                        help='Disable sequence packing (recommended for 7B models on <=12GB VRAM)')
 
     args = parser.parse_args()
 
@@ -700,6 +657,8 @@ Examples:
         batch_size=args.batch_size,
         low_vram=args.low_vram,
         max_seq_length=args.max_seq_length,
+        resume_from_checkpoint=args.resume,
+        packing=not args.no_packing,
     )
 
     if model is None:

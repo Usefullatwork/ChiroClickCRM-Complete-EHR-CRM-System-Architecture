@@ -27,6 +27,7 @@ SCRIPT_DIR = Path(__file__).parent.resolve()
 AI_TRAINING_DIR = SCRIPT_DIR.parent
 DEFAULT_INPUT_DIRS = [
     AI_TRAINING_DIR / "data" / "raw",
+    AI_TRAINING_DIR / "data" / "mined",
     AI_TRAINING_DIR / "merged",
     AI_TRAINING_DIR / "data",
     AI_TRAINING_DIR,  # root-level JSONL files
