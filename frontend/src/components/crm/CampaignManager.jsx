@@ -1,11 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Send, Mail, MessageSquare, BarChart2, TrendingUp, Users,
-  Plus, Calendar, Clock, CheckCircle, XCircle, Edit, Trash2,
-  Eye, Copy, Play, Pause, Target, MousePointer, UserPlus,
-  Loader2, AlertCircle
+  Send,
+  Mail,
+  MessageSquare,
+  BarChart2,
+  TrendingUp,
+  Users,
+  Plus,
+  Calendar,
+  Clock,
+  CheckCircle,
+  XCircle,
+  Edit,
+  Trash2,
+  Eye,
+  Copy,
+  Play,
+  Pause,
+  Target,
+  MousePointer,
+  UserPlus,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
 import { crmAPI } from '../../services/api';
+import toast from '../../utils/toast';
+import logger from '../../utils/logger';
 
 const CampaignManager = () => {
   const [activeTab, setActiveTab] = useState('active');
@@ -22,7 +42,7 @@ const CampaignManager = () => {
     { id: 'REACTIVATION', label: 'Reaktivering', icon: UserPlus },
     { id: 'REMINDER', label: 'Påminnelse', icon: Clock },
     { id: 'BIRTHDAY', label: 'Bursdag', icon: Calendar },
-    { id: 'SURVEY', label: 'Undersøkelse', icon: BarChart2 }
+    { id: 'SURVEY', label: 'Undersøkelse', icon: BarChart2 },
   ];
 
   // Fetch campaigns from API
@@ -32,7 +52,7 @@ const CampaignManager = () => {
         setLoading(true);
         setError(null);
         const response = await crmAPI.getCampaigns();
-        const campaignData = (response.data?.campaigns || response.data || []).map(c => ({
+        const campaignData = (response.data?.campaigns || response.data || []).map((c) => ({
           id: c.id,
           name: c.name,
           type: c.type,
@@ -48,11 +68,11 @@ const CampaignManager = () => {
           converted: c.converted_count || 0,
           createdAt: c.created_at,
           completedAt: c.completed_at,
-          isAutomated: c.is_automated
+          isAutomated: c.is_automated,
         }));
         setCampaigns(campaignData);
       } catch (err) {
-        console.error('Error fetching campaigns:', err);
+        logger.error('Error fetching campaigns:', err);
         setError(err.message || 'Failed to load campaigns');
       } finally {
         setLoading(false);
@@ -65,11 +85,11 @@ const CampaignManager = () => {
   const handleCreateCampaign = async (campaignData) => {
     try {
       const response = await crmAPI.createCampaign(campaignData);
-      setCampaigns(prev => [...prev, response.data]);
+      setCampaigns((prev) => [...prev, response.data]);
       setShowNewCampaign(false);
     } catch (err) {
-      console.error('Error creating campaign:', err);
-      alert('Failed to create campaign: ' + err.message);
+      logger.error('Error creating campaign:', err);
+      toast.error('Failed to create campaign: ' + err.message);
     }
   };
 
@@ -77,12 +97,12 @@ const CampaignManager = () => {
   const handleLaunchCampaign = async (campaignId) => {
     try {
       await crmAPI.launchCampaign(campaignId);
-      setCampaigns(prev => prev.map(c =>
-        c.id === campaignId ? { ...c, status: 'ACTIVE' } : c
-      ));
+      setCampaigns((prev) =>
+        prev.map((c) => (c.id === campaignId ? { ...c, status: 'ACTIVE' } : c))
+      );
     } catch (err) {
-      console.error('Error launching campaign:', err);
-      alert('Failed to launch campaign: ' + err.message);
+      logger.error('Error launching campaign:', err);
+      toast.error('Failed to launch campaign: ' + err.message);
     }
   };
 
@@ -92,7 +112,7 @@ const CampaignManager = () => {
     SCHEDULED: { label: 'Planlagt', color: 'bg-blue-100 text-blue-700' },
     ACTIVE: { label: 'Aktiv', color: 'bg-green-100 text-green-700' },
     PAUSED: { label: 'Pauset', color: 'bg-yellow-100 text-yellow-700' },
-    COMPLETED: { label: 'Fullført', color: 'bg-purple-100 text-purple-700' }
+    COMPLETED: { label: 'Fullført', color: 'bg-purple-100 text-purple-700' },
   };
 
   // Calculate metrics
@@ -100,9 +120,11 @@ const CampaignManager = () => {
     if (campaign.sent === 0) return null;
     return {
       deliveryRate: Math.round((campaign.delivered / campaign.sent) * 100),
-      openRate: campaign.opened !== null ? Math.round((campaign.opened / campaign.delivered) * 100) : null,
-      clickRate: campaign.clicked !== null ? Math.round((campaign.clicked / campaign.opened) * 100) : null,
-      conversionRate: Math.round((campaign.converted / campaign.sent) * 100)
+      openRate:
+        campaign.opened !== null ? Math.round((campaign.opened / campaign.delivered) * 100) : null,
+      clickRate:
+        campaign.clicked !== null ? Math.round((campaign.clicked / campaign.opened) * 100) : null,
+      conversionRate: Math.round((campaign.converted / campaign.sent) * 100),
     };
   };
 
@@ -111,7 +133,7 @@ const CampaignManager = () => {
     totalSent: campaigns.reduce((sum, c) => sum + c.sent, 0),
     avgOpenRate: 62,
     avgClickRate: 28,
-    avgConversionRate: 8
+    avgConversionRate: 8,
   };
 
   const formatDate = (dateStr) => {
@@ -119,7 +141,7 @@ const CampaignManager = () => {
     return new Date(dateStr).toLocaleDateString('nb-NO', {
       day: 'numeric',
       month: 'short',
-      year: 'numeric'
+      year: 'numeric',
     });
   };
 
@@ -129,12 +151,12 @@ const CampaignManager = () => {
       day: 'numeric',
       month: 'short',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
   // Filter campaigns by tab
-  const filteredCampaigns = campaigns.filter(c => {
+  const filteredCampaigns = campaigns.filter((c) => {
     if (activeTab === 'active') return c.status === 'ACTIVE' || c.status === 'SCHEDULED';
     if (activeTab === 'draft') return c.status === 'DRAFT';
     if (activeTab === 'completed') return c.status === 'COMPLETED';
@@ -193,7 +215,9 @@ const CampaignManager = () => {
               <Send className="w-5 h-5 text-blue-600" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-gray-900">{overallStats.totalSent.toLocaleString('nb-NO')}</p>
+          <p className="text-2xl font-bold text-gray-900">
+            {overallStats.totalSent.toLocaleString('nb-NO')}
+          </p>
           <p className="text-sm text-gray-600">Totalt Sendt</p>
         </div>
 
@@ -231,11 +255,28 @@ const CampaignManager = () => {
       {/* Tabs */}
       <div className="flex gap-4 border-b border-gray-200">
         {[
-          { id: 'active', label: 'Aktive', count: campaigns.filter(c => c.status === 'ACTIVE' || c.status === 'SCHEDULED').length },
-          { id: 'draft', label: 'Utkast', count: campaigns.filter(c => c.status === 'DRAFT').length },
-          { id: 'completed', label: 'Fullført', count: campaigns.filter(c => c.status === 'COMPLETED').length },
-          { id: 'automated', label: 'Automatiserte', count: campaigns.filter(c => c.isAutomated).length }
-        ].map(tab => (
+          {
+            id: 'active',
+            label: 'Aktive',
+            count: campaigns.filter((c) => c.status === 'ACTIVE' || c.status === 'SCHEDULED')
+              .length,
+          },
+          {
+            id: 'draft',
+            label: 'Utkast',
+            count: campaigns.filter((c) => c.status === 'DRAFT').length,
+          },
+          {
+            id: 'completed',
+            label: 'Fullført',
+            count: campaigns.filter((c) => c.status === 'COMPLETED').length,
+          },
+          {
+            id: 'automated',
+            label: 'Automatiserte',
+            count: campaigns.filter((c) => c.isAutomated).length,
+          },
+        ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
@@ -255,9 +296,9 @@ const CampaignManager = () => {
 
       {/* Campaigns List */}
       <div className="space-y-4">
-        {filteredCampaigns.map(campaign => {
+        {filteredCampaigns.map((campaign) => {
           const metrics = getMetrics(campaign);
-          const typeInfo = campaignTypes.find(t => t.id === campaign.type);
+          const typeInfo = campaignTypes.find((t) => t.id === campaign.type);
           const TypeIcon = typeInfo?.icon || Mail;
           const status = statusConfig[campaign.status];
 
@@ -277,7 +318,9 @@ const CampaignManager = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-1">
                     <h3 className="font-bold text-gray-900">{campaign.name}</h3>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${status.color}`}>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${status.color}`}
+                    >
                       {status.label}
                     </span>
                     {campaign.isAutomated && (
@@ -288,7 +331,11 @@ const CampaignManager = () => {
                   </div>
                   <div className="flex items-center gap-4 text-sm text-gray-500">
                     <span className="flex items-center gap-1">
-                      {campaign.channel === 'EMAIL' ? <Mail className="w-4 h-4" /> : <MessageSquare className="w-4 h-4" />}
+                      {campaign.channel === 'EMAIL' ? (
+                        <Mail className="w-4 h-4" />
+                      ) : (
+                        <MessageSquare className="w-4 h-4" />
+                      )}
                       {campaign.channel}
                     </span>
                     <span className="flex items-center gap-1">
@@ -331,25 +378,40 @@ const CampaignManager = () => {
                 )}
 
                 {/* Actions */}
-                <div className="flex gap-1 flex-shrink-0" onClick={e => e.stopPropagation()}>
+                <div className="flex gap-1 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
                   {campaign.status === 'DRAFT' && (
-                    <button className="p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-lg" title="Start">
+                    <button
+                      className="p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-lg"
+                      title="Start"
+                    >
                       <Play className="w-4 h-4" />
                     </button>
                   )}
                   {campaign.status === 'ACTIVE' && !campaign.isAutomated && (
-                    <button className="p-2 text-gray-400 hover:text-yellow-500 hover:bg-yellow-50 rounded-lg" title="Pause">
+                    <button
+                      className="p-2 text-gray-400 hover:text-yellow-500 hover:bg-yellow-50 rounded-lg"
+                      title="Pause"
+                    >
                       <Pause className="w-4 h-4" />
                     </button>
                   )}
-                  <button className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg" title="Rediger">
+                  <button
+                    className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg"
+                    title="Rediger"
+                  >
                     <Edit className="w-4 h-4" />
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg" title="Kopier">
+                  <button
+                    className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg"
+                    title="Kopier"
+                  >
                     <Copy className="w-4 h-4" />
                   </button>
                   {campaign.status === 'DRAFT' && (
-                    <button className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg" title="Slett">
+                    <button
+                      className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg"
+                      title="Slett"
+                    >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   )}
@@ -361,7 +423,9 @@ const CampaignManager = () => {
                 <div className="mt-4 pt-4 border-t border-gray-100">
                   <div className="flex items-center justify-between text-sm mb-1">
                     <span className="text-gray-600">Fremgang</span>
-                    <span className="font-medium">{Math.round((campaign.sent / campaign.audienceSize) * 100)}%</span>
+                    <span className="font-medium">
+                      {Math.round((campaign.sent / campaign.audienceSize) * 100)}%
+                    </span>
                   </div>
                   <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div
@@ -384,11 +448,9 @@ const CampaignManager = () => {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Kampanjetype
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Kampanjetype</label>
                 <div className="grid grid-cols-3 gap-2">
-                  {campaignTypes.map(type => {
+                  {campaignTypes.map((type) => {
                     const Icon = type.icon;
                     return (
                       <button
@@ -404,9 +466,7 @@ const CampaignManager = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Kampanjenavn
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Kampanjenavn</label>
                 <input
                   type="text"
                   placeholder="F.eks. 'Februar Nyhetsbrev'"
@@ -415,9 +475,7 @@ const CampaignManager = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Kanal
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Kanal</label>
                 <div className="flex gap-2">
                   <button className="flex-1 px-4 py-3 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 flex items-center justify-center gap-2">
                     <Mail className="w-4 h-4" />
@@ -431,9 +489,7 @@ const CampaignManager = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Målgruppe
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Målgruppe</label>
                 <select className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500">
                   <option>Velg målgruppe...</option>
                   <option>Alle pasienter</option>
@@ -488,12 +544,20 @@ const CampaignManager = () => {
 
       {/* Campaign Detail View */}
       {selectedCampaign && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setSelectedCampaign(null)}>
-          <div className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          onClick={() => setSelectedCampaign(null)}
+        >
+          <div
+            className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-xl font-bold text-gray-900">{selectedCampaign.name}</h3>
-                <p className="text-gray-500">{campaignTypes.find(t => t.id === selectedCampaign.type)?.label}</p>
+                <p className="text-gray-500">
+                  {campaignTypes.find((t) => t.id === selectedCampaign.type)?.label}
+                </p>
               </div>
               <button
                 onClick={() => setSelectedCampaign(null)}
@@ -543,7 +607,11 @@ const CampaignManager = () => {
                     { label: 'Levert', value: selectedCampaign.delivered, color: 'bg-blue-400' },
                     { label: 'Åpnet', value: selectedCampaign.opened, color: 'bg-green-400' },
                     { label: 'Klikket', value: selectedCampaign.clicked, color: 'bg-purple-400' },
-                    { label: 'Konvertert', value: selectedCampaign.converted, color: 'bg-orange-400' }
+                    {
+                      label: 'Konvertert',
+                      value: selectedCampaign.converted,
+                      color: 'bg-orange-400',
+                    },
                   ].map((step, index) => (
                     <div key={step.label} className="flex items-center gap-3">
                       <span className="w-24 text-sm text-gray-600">{step.label}</span>
@@ -578,7 +646,9 @@ const CampaignManager = () => {
               </div>
               <div className="p-3 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-500">Status</p>
-                <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${statusConfig[selectedCampaign.status].color}`}>
+                <span
+                  className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${statusConfig[selectedCampaign.status].color}`}
+                >
                   {statusConfig[selectedCampaign.status].label}
                 </span>
               </div>

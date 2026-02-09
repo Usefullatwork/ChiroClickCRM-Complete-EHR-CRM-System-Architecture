@@ -5,9 +5,9 @@
  * Clinical notes and SOAP documentation management
  */
 
-import React, { useState, useEffect, useCallback } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
+import React, { useState, useEffect, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   FileText,
   Plus,
@@ -32,16 +32,18 @@ import {
   FileCheck,
   Stethoscope,
   ClipboardList,
-  Activity
-} from 'lucide-react'
-import { clinicalNotesAPI } from '../api/clinicalNotes'
-import { api } from '../api/client'
-import NotesList from '../components/notes/NotesList'
-import NotePreview from '../components/notes/NotePreview'
-import SOAPTemplate from '../components/notes/SOAPTemplate'
-import InitialConsultTemplate from '../components/notes/InitialConsultTemplate'
-import FollowUpTemplate from '../components/notes/FollowUpTemplate'
-import VestibularAssessment from '../components/notes/VestibularAssessment'
+  Activity,
+} from 'lucide-react';
+import { clinicalNotesAPI } from '../api/clinicalNotes';
+import { api } from '../api/client';
+import toast from '../utils/toast';
+import logger from '../utils/logger';
+import NotesList from '../components/notes/NotesList';
+import NotePreview from '../components/notes/NotePreview';
+import SOAPTemplate from '../components/notes/SOAPTemplate';
+import InitialConsultTemplate from '../components/notes/InitialConsultTemplate';
+import FollowUpTemplate from '../components/notes/FollowUpTemplate';
+import VestibularAssessment from '../components/notes/VestibularAssessment';
 
 /**
  * ClinicalNotes Component
@@ -50,141 +52,142 @@ import VestibularAssessment from '../components/notes/VestibularAssessment'
  * @returns {JSX.Element} Clinical notes management page
  */
 export default function ClinicalNotes() {
-  const { patientId: routePatientId } = useParams()
-  const [searchParams, setSearchParams] = useSearchParams()
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
+  const { patientId: routePatientId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   // State management
-  const [selectedPatientId, setSelectedPatientId] = useState(routePatientId || null)
-  const [selectedNoteId, setSelectedNoteId] = useState(null)
-  const [showNoteEditor, setShowNoteEditor] = useState(false)
-  const [noteType, setNoteType] = useState('soap')
-  const [searchTerm, setSearchTerm] = useState('')
-  const [patientSearchTerm, setPatientSearchTerm] = useState('')
-  const [showPatientSelector, setShowPatientSelector] = useState(!routePatientId)
-  const [noteTypeFilter, setNoteTypeFilter] = useState('all')
-  const [dateRange, setDateRange] = useState({ start: '', end: '' })
-  const [showPreview, setShowPreview] = useState(false)
-  const [previewNoteId, setPreviewNoteId] = useState(null)
-  const [showNewNoteMenu, setShowNewNoteMenu] = useState(false)
+  const [selectedPatientId, setSelectedPatientId] = useState(routePatientId || null);
+  const [selectedNoteId, setSelectedNoteId] = useState(null);
+  const [showNoteEditor, setShowNoteEditor] = useState(false);
+  const [noteType, setNoteType] = useState('soap');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [patientSearchTerm, setPatientSearchTerm] = useState('');
+  const [showPatientSelector, setShowPatientSelector] = useState(!routePatientId);
+  const [noteTypeFilter, setNoteTypeFilter] = useState('all');
+  const [dateRange, setDateRange] = useState({ start: '', end: '' });
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewNoteId, setPreviewNoteId] = useState(null);
+  const [showNewNoteMenu, setShowNewNoteMenu] = useState(false);
 
   // Get note type from URL if present
   useEffect(() => {
-    const type = searchParams.get('type')
+    const type = searchParams.get('type');
     if (type) {
-      setNoteType(type)
-      setShowNoteEditor(true)
+      setNoteType(type);
+      setShowNoteEditor(true);
     }
-    const noteId = searchParams.get('noteId')
+    const noteId = searchParams.get('noteId');
     if (noteId) {
-      setSelectedNoteId(noteId)
+      setSelectedNoteId(noteId);
     }
-  }, [searchParams])
+  }, [searchParams]);
 
   // Fetch patients for selector
   const { data: patientsData, isLoading: patientsLoading } = useQuery({
     queryKey: ['patients', patientSearchTerm],
     queryFn: () => api.patients.search(patientSearchTerm || ''),
-    enabled: showPatientSelector || !selectedPatientId
-  })
+    enabled: showPatientSelector || !selectedPatientId,
+  });
 
   // Fetch selected patient details
   const { data: selectedPatient, isLoading: patientLoading } = useQuery({
     queryKey: ['patient', selectedPatientId],
     queryFn: () => api.patients.getById(selectedPatientId),
-    enabled: !!selectedPatientId
-  })
+    enabled: !!selectedPatientId,
+  });
 
   // Fetch notes for selected patient
   const {
     data: notesData,
     isLoading: notesLoading,
-    refetch: refetchNotes
+    refetch: refetchNotes,
   } = useQuery({
     queryKey: ['clinical-notes', selectedPatientId, noteTypeFilter, dateRange, searchTerm],
-    queryFn: () => clinicalNotesAPI.getByPatient(selectedPatientId, {
-      templateType: noteTypeFilter !== 'all' ? noteTypeFilter : undefined,
-      startDate: dateRange.start || undefined,
-      endDate: dateRange.end || undefined,
-      search: searchTerm || undefined,
-      includeDrafts: true
-    }),
-    enabled: !!selectedPatientId
-  })
+    queryFn: () =>
+      clinicalNotesAPI.getByPatient(selectedPatientId, {
+        templateType: noteTypeFilter !== 'all' ? noteTypeFilter : undefined,
+        startDate: dateRange.start || undefined,
+        endDate: dateRange.end || undefined,
+        search: searchTerm || undefined,
+        includeDrafts: true,
+      }),
+    enabled: !!selectedPatientId,
+  });
 
   // Fetch note details for preview
   const { data: previewNote, isLoading: previewLoading } = useQuery({
     queryKey: ['clinical-note', previewNoteId],
     queryFn: () => clinicalNotesAPI.getById(previewNoteId),
-    enabled: !!previewNoteId && showPreview
-  })
+    enabled: !!previewNoteId && showPreview,
+  });
 
   // Fetch note for editing
   const { data: editingNote, isLoading: editingNoteLoading } = useQuery({
     queryKey: ['clinical-note', selectedNoteId],
     queryFn: () => clinicalNotesAPI.getById(selectedNoteId),
-    enabled: !!selectedNoteId && showNoteEditor
-  })
+    enabled: !!selectedNoteId && showNoteEditor,
+  });
 
   // Fetch user's draft notes
   const { data: draftsData } = useQuery({
     queryKey: ['clinical-notes-drafts'],
-    queryFn: () => clinicalNotesAPI.getDrafts()
-  })
+    queryFn: () => clinicalNotesAPI.getDrafts(),
+  });
 
   // Create note mutation
   const createNoteMutation = useMutation({
     mutationFn: (data) => clinicalNotesAPI.create(data),
     onSuccess: (response) => {
-      queryClient.invalidateQueries(['clinical-notes', selectedPatientId])
-      queryClient.invalidateQueries(['clinical-notes-drafts'])
+      queryClient.invalidateQueries(['clinical-notes', selectedPatientId]);
+      queryClient.invalidateQueries(['clinical-notes-drafts']);
       if (response?.data?.id) {
-        setSelectedNoteId(response.data.id)
+        setSelectedNoteId(response.data.id);
       }
-    }
-  })
+    },
+  });
 
   // Update note mutation
   const updateNoteMutation = useMutation({
     mutationFn: ({ id, data }) => clinicalNotesAPI.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries(['clinical-notes', selectedPatientId])
-      queryClient.invalidateQueries(['clinical-notes-drafts'])
-    }
-  })
+      queryClient.invalidateQueries(['clinical-notes', selectedPatientId]);
+      queryClient.invalidateQueries(['clinical-notes-drafts']);
+    },
+  });
 
   // Sign note mutation
   const signNoteMutation = useMutation({
     mutationFn: (id) => clinicalNotesAPI.sign(id),
     onSuccess: () => {
-      queryClient.invalidateQueries(['clinical-notes', selectedPatientId])
-      queryClient.invalidateQueries(['clinical-notes-drafts'])
-      setShowNoteEditor(false)
-      setSelectedNoteId(null)
-    }
-  })
+      queryClient.invalidateQueries(['clinical-notes', selectedPatientId]);
+      queryClient.invalidateQueries(['clinical-notes-drafts']);
+      setShowNoteEditor(false);
+      setSelectedNoteId(null);
+    },
+  });
 
   // Delete note mutation
   const deleteNoteMutation = useMutation({
     mutationFn: (id) => clinicalNotesAPI.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries(['clinical-notes', selectedPatientId])
-      queryClient.invalidateQueries(['clinical-notes-drafts'])
-    }
-  })
+      queryClient.invalidateQueries(['clinical-notes', selectedPatientId]);
+      queryClient.invalidateQueries(['clinical-notes-drafts']);
+    },
+  });
 
   /**
    * Handle patient selection
    * Handterer pasientvalg
    */
   const handleSelectPatient = (patient) => {
-    setSelectedPatientId(patient.id)
-    setShowPatientSelector(false)
-    setPatientSearchTerm('')
+    setSelectedPatientId(patient.id);
+    setShowPatientSelector(false);
+    setPatientSearchTerm('');
     // Update URL
-    navigate(`/notes/${patient.id}`, { replace: true })
-  }
+    navigate(`/notes/${patient.id}`, { replace: true });
+  };
 
   /**
    * Handle creating new note
@@ -192,34 +195,34 @@ export default function ClinicalNotes() {
    */
   const handleCreateNote = (type) => {
     if (!selectedPatientId) {
-      setShowPatientSelector(true)
-      return
+      setShowPatientSelector(true);
+      return;
     }
-    setNoteType(type)
-    setSelectedNoteId(null)
-    setShowNoteEditor(true)
-    setShowNewNoteMenu(false)
-  }
+    setNoteType(type);
+    setSelectedNoteId(null);
+    setShowNoteEditor(true);
+    setShowNewNoteMenu(false);
+  };
 
   /**
    * Handle viewing note details
    * Handterer visning av notatdetaljer
    */
   const handleViewNote = (noteId) => {
-    setPreviewNoteId(noteId)
-    setShowPreview(true)
-  }
+    setPreviewNoteId(noteId);
+    setShowPreview(true);
+  };
 
   /**
    * Handle editing note
    * Handterer redigering av notat
    */
   const handleEditNote = (note) => {
-    setSelectedNoteId(note.id)
-    setNoteType(note.template_type || 'soap')
-    setShowNoteEditor(true)
-    setShowPreview(false)
-  }
+    setSelectedNoteId(note.id);
+    setNoteType(note.template_type || 'soap');
+    setShowNoteEditor(true);
+    setShowPreview(false);
+  };
 
   /**
    * Handle saving note
@@ -231,18 +234,18 @@ export default function ClinicalNotes() {
       note_type: 'SOAP',
       template_type: noteType,
       ...noteData,
-      is_draft: true
-    }
+      is_draft: true,
+    };
 
     if (selectedNoteId) {
-      await updateNoteMutation.mutateAsync({ id: selectedNoteId, data })
+      await updateNoteMutation.mutateAsync({ id: selectedNoteId, data });
     } else {
-      const response = await createNoteMutation.mutateAsync(data)
+      const response = await createNoteMutation.mutateAsync(data);
       if (response?.data?.id) {
-        setSelectedNoteId(response.data.id)
+        setSelectedNoteId(response.data.id);
       }
     }
-  }
+  };
 
   /**
    * Handle signing/locking note
@@ -250,11 +253,11 @@ export default function ClinicalNotes() {
    */
   const handleSignNote = async (noteData) => {
     // First save, then sign
-    await handleSaveNote({ ...noteData, is_draft: false })
+    await handleSaveNote({ ...noteData, is_draft: false });
     if (selectedNoteId) {
-      await signNoteMutation.mutateAsync(selectedNoteId)
+      await signNoteMutation.mutateAsync(selectedNoteId);
     }
-  }
+  };
 
   /**
    * Handle deleting note
@@ -262,13 +265,13 @@ export default function ClinicalNotes() {
    */
   const handleDeleteNote = async (noteId) => {
     if (window.confirm('Er du sikker pa at du vil slette dette notatet? Dette kan ikke angres.')) {
-      await deleteNoteMutation.mutateAsync(noteId)
+      await deleteNoteMutation.mutateAsync(noteId);
       if (showPreview && previewNoteId === noteId) {
-        setShowPreview(false)
-        setPreviewNoteId(null)
+        setShowPreview(false);
+        setPreviewNoteId(null);
       }
     }
-  }
+  };
 
   /**
    * Handle print note
@@ -276,11 +279,11 @@ export default function ClinicalNotes() {
    */
   const handlePrintNote = async (noteId) => {
     try {
-      const response = await clinicalNotesAPI.generateFormatted(noteId)
-      const formattedNote = response?.data?.data?.formatted_note
+      const response = await clinicalNotesAPI.generateFormatted(noteId);
+      const formattedNote = response?.data?.data?.formatted_note;
 
       // Open print window
-      const printWindow = window.open('', '_blank')
+      const printWindow = window.open('', '_blank');
       printWindow.document.write(`
         <html>
           <head>
@@ -297,14 +300,14 @@ export default function ClinicalNotes() {
             <pre>${formattedNote}</pre>
           </body>
         </html>
-      `)
-      printWindow.document.close()
-      printWindow.print()
+      `);
+      printWindow.document.close();
+      printWindow.print();
     } catch (error) {
-      console.error('Error printing note:', error)
-      alert('Kunne ikke generere utskrift. Prosv igjen.')
+      logger.error('Error printing note:', error);
+      toast.error('Kunne ikke generere utskrift. Prosv igjen.');
     }
-  }
+  };
 
   /**
    * Handle PDF export
@@ -313,35 +316,35 @@ export default function ClinicalNotes() {
   const handleExportPDF = async (noteId) => {
     try {
       // Get the PDF from the backend
-      const response = await clinicalNotesAPI.downloadPDF(noteId)
+      const response = await clinicalNotesAPI.downloadPDF(noteId);
 
       // Create blob from response data
-      const blob = new Blob([response.data], { type: 'application/pdf' })
-      const url = window.URL.createObjectURL(blob)
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
 
       // Extract filename from Content-Disposition header if available
-      const contentDisposition = response.headers['content-disposition']
-      let filename = `klinisk-notat-${noteId}.pdf`
+      const contentDisposition = response.headers['content-disposition'];
+      let filename = `klinisk-notat-${noteId}.pdf`;
       if (contentDisposition) {
-        const matches = contentDisposition.match(/filename="(.+)"/)
+        const matches = contentDisposition.match(/filename="(.+)"/);
         if (matches && matches[1]) {
-          filename = matches[1]
+          filename = matches[1];
         }
       }
 
       // Create download link and trigger download
-      const a = document.createElement('a')
-      a.href = url
-      a.download = filename
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      window.URL.revokeObjectURL(url)
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error exporting note:', error)
-      alert('Kunne ikke eksportere PDF. Vennligst prov igjen.')
+      logger.error('Error exporting note:', error);
+      toast.error('Kunne ikke eksportere PDF. Vennligst prov igjen.');
     }
-  }
+  };
 
   /**
    * Get note type badge color
@@ -357,10 +360,10 @@ export default function ClinicalNotes() {
       follow_up: 'bg-purple-100 text-purple-800',
       discharge: 'bg-orange-100 text-orange-800',
       vestibular: 'bg-teal-100 text-teal-800',
-      VESTIBULAR: 'bg-teal-100 text-teal-800'
-    }
-    return badges[type] || 'bg-gray-100 text-gray-800'
-  }
+      VESTIBULAR: 'bg-teal-100 text-teal-800',
+    };
+    return badges[type] || 'bg-gray-100 text-gray-800';
+  };
 
   /**
    * Get note type label in Norwegian
@@ -376,48 +379,48 @@ export default function ClinicalNotes() {
       follow_up: 'Oppfolging',
       discharge: 'Utskrivning',
       vestibular: 'Vestibular',
-      VESTIBULAR: 'Vestibular'
-    }
-    return labels[type] || type
-  }
+      VESTIBULAR: 'Vestibular',
+    };
+    return labels[type] || type;
+  };
 
   /**
    * Render the appropriate note template
    * Rendrer riktig notatmal
    */
   const renderNoteTemplate = () => {
-    const patient = selectedPatient?.data || selectedPatient
-    const noteData = editingNote?.data || editingNote
-    const readOnly = noteData?.signed_at != null
+    const patient = selectedPatient?.data || selectedPatient;
+    const noteData = editingNote?.data || editingNote;
+    const readOnly = noteData?.signed_at != null;
 
     const commonProps = {
       patient,
       initialData: noteData,
       onSave: handleSaveNote,
       onLock: handleSignNote,
-      readOnly
-    }
+      readOnly,
+    };
 
     switch (noteType) {
       case 'initial':
       case 'initial_consult':
-        return <InitialConsultTemplate {...commonProps} />
+        return <InitialConsultTemplate {...commonProps} />;
       case 'followup':
       case 'follow_up':
-        return <FollowUpTemplate {...commonProps} />
+        return <FollowUpTemplate {...commonProps} />;
       case 'vestibular':
       case 'VESTIBULAR':
-        return <VestibularAssessment {...commonProps} />
+        return <VestibularAssessment {...commonProps} />;
       case 'soap':
       case 'standard':
       default:
-        return <SOAPTemplate {...commonProps} />
+        return <SOAPTemplate {...commonProps} />;
     }
-  }
+  };
 
-  const notes = notesData?.data?.data || notesData?.data || []
-  const drafts = draftsData?.data?.data || draftsData?.data || []
-  const patients = patientsData?.data?.data || patientsData?.data || []
+  const notes = notesData?.data?.data || notesData?.data || [];
+  const drafts = draftsData?.data?.data || draftsData?.data || [];
+  const patients = patientsData?.data?.data || patientsData?.data || [];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -439,7 +442,8 @@ export default function ClinicalNotes() {
                 <User className="w-4 h-4 text-gray-600" />
                 {selectedPatient?.data?.first_name || selectedPatient?.first_name ? (
                   <span className="text-sm font-medium text-gray-900">
-                    {selectedPatient?.data?.first_name || selectedPatient?.first_name} {selectedPatient?.data?.last_name || selectedPatient?.last_name}
+                    {selectedPatient?.data?.first_name || selectedPatient?.first_name}{' '}
+                    {selectedPatient?.data?.last_name || selectedPatient?.last_name}
                   </span>
                 ) : (
                   <span className="text-sm text-gray-500">Velg pasient...</span>
@@ -536,8 +540,8 @@ export default function ClinicalNotes() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => {
-                    setShowNoteEditor(false)
-                    setSelectedNoteId(null)
+                    setShowNoteEditor(false);
+                    setSelectedNoteId(null);
                   }}
                   className="p-2 hover:bg-gray-100 rounded-lg"
                 >
@@ -720,7 +724,8 @@ export default function ClinicalNotes() {
                             {patient.first_name} {patient.last_name}
                           </p>
                           <p className="text-sm text-gray-500">
-                            {patient.date_of_birth && new Date(patient.date_of_birth).toLocaleDateString('no-NO')}
+                            {patient.date_of_birth &&
+                              new Date(patient.date_of_birth).toLocaleDateString('no-NO')}
                             {patient.solvit_id && ` - ${patient.solvit_id}`}
                           </p>
                         </div>
@@ -729,7 +734,9 @@ export default function ClinicalNotes() {
                   </div>
                 ) : (
                   <div className="text-center py-8 text-gray-500">
-                    {patientSearchTerm ? 'Ingen pasienter funnet' : 'Skriv for a soke etter pasienter'}
+                    {patientSearchTerm
+                      ? 'Ingen pasienter funnet'
+                      : 'Skriv for a soke etter pasienter'}
                   </div>
                 )}
               </div>
@@ -744,8 +751,8 @@ export default function ClinicalNotes() {
           note={previewNote?.data || previewNote}
           isLoading={previewLoading}
           onClose={() => {
-            setShowPreview(false)
-            setPreviewNoteId(null)
+            setShowPreview(false);
+            setPreviewNoteId(null);
           }}
           onEdit={handleEditNote}
           onPrint={handlePrintNote}
@@ -758,11 +765,8 @@ export default function ClinicalNotes() {
 
       {/* Click outside to close new note menu */}
       {showNewNoteMenu && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={() => setShowNewNoteMenu(false)}
-        />
+        <div className="fixed inset-0 z-40" onClick={() => setShowNewNoteMenu(false)} />
       )}
     </div>
-  )
+  );
 }

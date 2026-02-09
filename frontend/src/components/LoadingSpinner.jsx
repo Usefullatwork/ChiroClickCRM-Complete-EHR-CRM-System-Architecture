@@ -27,7 +27,11 @@ export const LoadingSpinner = ({
   };
 
   return (
-    <div className={`flex items-center justify-center ${className}`} role="status">
+    <div
+      className={`flex items-center justify-center ${className}`}
+      role="status"
+      aria-live="polite"
+    >
       <svg
         className={`animate-spin ${sizeClasses[size]} ${colorClasses[color]}`}
         xmlns="http://www.w3.org/2000/svg"
@@ -76,12 +80,7 @@ export const InlineLoader = ({ className = '' }) => {
 /**
  * Skeleton loading component for content placeholders
  */
-export const Skeleton = ({
-  className = '',
-  variant = 'text',
-  width,
-  height,
-}) => {
+export const Skeleton = ({ className = '', variant = 'text', width, height }) => {
   const variantClasses = {
     text: 'h-4 rounded',
     circular: 'rounded-full',

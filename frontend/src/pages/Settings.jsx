@@ -40,6 +40,7 @@ import { formatDate } from '../lib/utils';
 import AISettings from '../components/AISettings';
 import { useTranslation } from '../i18n';
 import toast from '../utils/toast';
+import Breadcrumbs from '../components/common/Breadcrumbs';
 
 // Adjustment notation methods available in the system
 const ADJUSTMENT_NOTATION_METHODS = [
@@ -550,6 +551,8 @@ export default function Settings() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
+      <Breadcrumbs />
+
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">{t('title')}</h1>

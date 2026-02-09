@@ -5,6 +5,7 @@ import { ArrowLeft, Save, Printer } from 'lucide-react';
 import VNGModule, { getDefaultVNGData } from '../components/assessment/VNGModule';
 import { patientsAPI, vestibularAPI } from '../services/api';
 import logger from '../utils/logger';
+import toast from '../utils/toast';
 
 export default function VNGAssessment() {
   const { patientId } = useParams();
@@ -43,10 +44,10 @@ export default function VNGAssessment() {
         assessment_data: vngData,
       };
       await vestibularAPI.create(payload);
-      alert(language === 'no' ? 'VNG-undersøkelse lagret!' : 'VNG assessment saved!');
+      toast.success(language === 'no' ? 'VNG-undersøkelse lagret!' : 'VNG assessment saved!');
     } catch (error) {
       logger.error('Error saving VNG data:', error);
-      alert(language === 'no' ? 'Feil ved lagring' : 'Error saving');
+      toast.error(language === 'no' ? 'Feil ved lagring' : 'Error saving');
     } finally {
       setIsSaving(false);
     }

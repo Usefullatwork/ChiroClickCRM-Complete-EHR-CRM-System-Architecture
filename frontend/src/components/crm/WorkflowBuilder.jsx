@@ -1,10 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Zap, Play, Pause, Plus, ArrowRight, Clock, Mail, MessageSquare,
-  UserPlus, Calendar, Star, AlertTriangle, CheckCircle, XCircle,
-  Edit, Trash2, Copy, ChevronRight, Settings, Activity, Loader2
+  Zap,
+  Play,
+  Pause,
+  Plus,
+  ArrowRight,
+  Clock,
+  Mail,
+  MessageSquare,
+  UserPlus,
+  Calendar,
+  Star,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  Edit,
+  Trash2,
+  Copy,
+  ChevronRight,
+  Settings,
+  Activity,
+  Loader2,
 } from 'lucide-react';
 import { crmAPI } from '../../services/api';
+import toast from '../../utils/toast';
+import logger from '../../utils/logger';
 
 const WorkflowBuilder = () => {
   const [activeTab, setActiveTab] = useState('active');
@@ -16,12 +36,32 @@ const WorkflowBuilder = () => {
 
   // Trigger types
   const triggerTypes = [
-    { id: 'NEW_PATIENT', label: 'Ny Pasient', icon: UserPlus, description: 'Når en ny pasient registreres' },
-    { id: 'APPOINTMENT_BOOKED', label: 'Time Booket', icon: Calendar, description: 'Når en time blir bestilt' },
-    { id: 'APPOINTMENT_COMPLETED', label: 'Behandling Fullført', icon: CheckCircle, description: 'Etter en behandling' },
+    {
+      id: 'NEW_PATIENT',
+      label: 'Ny Pasient',
+      icon: UserPlus,
+      description: 'Når en ny pasient registreres',
+    },
+    {
+      id: 'APPOINTMENT_BOOKED',
+      label: 'Time Booket',
+      icon: Calendar,
+      description: 'Når en time blir bestilt',
+    },
+    {
+      id: 'APPOINTMENT_COMPLETED',
+      label: 'Behandling Fullført',
+      icon: CheckCircle,
+      description: 'Etter en behandling',
+    },
     { id: 'NO_VISIT', label: 'Ingen Besøk', icon: Clock, description: 'X dager uten besøk' },
     { id: 'BIRTHDAY', label: 'Bursdag', icon: Star, description: 'På pasientens bursdag' },
-    { id: 'LIFECYCLE_CHANGE', label: 'Statusendring', icon: Activity, description: 'Når livssyklus endres' }
+    {
+      id: 'LIFECYCLE_CHANGE',
+      label: 'Statusendring',
+      icon: Activity,
+      description: 'Når livssyklus endres',
+    },
   ];
 
   // Action types
@@ -30,7 +70,7 @@ const WorkflowBuilder = () => {
     { id: 'SEND_SMS', label: 'Send SMS', icon: MessageSquare },
     { id: 'CREATE_TASK', label: 'Opprett Oppgave', icon: CheckCircle },
     { id: 'WAIT', label: 'Vent', icon: Clock },
-    { id: 'UPDATE_PATIENT', label: 'Oppdater Pasient', icon: UserPlus }
+    { id: 'UPDATE_PATIENT', label: 'Oppdater Pasient', icon: UserPlus },
   ];
 
   // Fetch workflows from API
@@ -40,7 +80,7 @@ const WorkflowBuilder = () => {
         setLoading(true);
         setError(null);
         const response = await crmAPI.getWorkflows();
-        const workflowData = (response.data?.workflows || response.data || []).map(w => ({
+        const workflowData = (response.data?.workflows || response.data || []).map((w) => ({
           id: w.id,
           name: w.name,
           description: w.description,
@@ -50,11 +90,11 @@ const WorkflowBuilder = () => {
           executionCount: w.execution_count || 0,
           successRate: w.success_rate || 0,
           lastExecuted: w.last_executed_at,
-          steps: w.steps || []
+          steps: w.steps || [],
         }));
         setWorkflows(workflowData);
       } catch (err) {
-        console.error('Error fetching workflows:', err);
+        logger.error('Error fetching workflows:', err);
         setError(err.message || 'Failed to load workflows');
       } finally {
         setLoading(false);
@@ -67,11 +107,11 @@ const WorkflowBuilder = () => {
   const handleCreateWorkflow = async (workflowData) => {
     try {
       const response = await crmAPI.createWorkflow(workflowData);
-      setWorkflows(prev => [...prev, response.data]);
+      setWorkflows((prev) => [...prev, response.data]);
       setShowNewWorkflow(false);
     } catch (err) {
-      console.error('Error creating workflow:', err);
-      alert('Failed to create workflow: ' + err.message);
+      logger.error('Error creating workflow:', err);
+      toast.error('Failed to create workflow: ' + err.message);
     }
   };
 
@@ -79,12 +119,12 @@ const WorkflowBuilder = () => {
   const handleToggleWorkflow = async (workflowId, active) => {
     try {
       await crmAPI.toggleWorkflow(workflowId, active);
-      setWorkflows(prev => prev.map(w =>
-        w.id === workflowId ? { ...w, status: active ? 'ACTIVE' : 'PAUSED' } : w
-      ));
+      setWorkflows((prev) =>
+        prev.map((w) => (w.id === workflowId ? { ...w, status: active ? 'ACTIVE' : 'PAUSED' } : w))
+      );
     } catch (err) {
-      console.error('Error toggling workflow:', err);
-      alert('Failed to toggle workflow: ' + err.message);
+      logger.error('Error toggling workflow:', err);
+      toast.error('Failed to toggle workflow: ' + err.message);
     }
   };
 
@@ -92,11 +132,11 @@ const WorkflowBuilder = () => {
   const statusConfig = {
     ACTIVE: { label: 'Aktiv', color: 'bg-green-100 text-green-700', icon: Play },
     PAUSED: { label: 'Pauset', color: 'bg-yellow-100 text-yellow-700', icon: Pause },
-    DRAFT: { label: 'Utkast', color: 'bg-gray-100 text-gray-700', icon: Edit }
+    DRAFT: { label: 'Utkast', color: 'bg-gray-100 text-gray-700', icon: Edit },
   };
 
   // Filter workflows
-  const filteredWorkflows = workflows.filter(w => {
+  const filteredWorkflows = workflows.filter((w) => {
     if (activeTab === 'active') return w.status === 'ACTIVE';
     if (activeTab === 'paused') return w.status === 'PAUSED';
     if (activeTab === 'draft') return w.status === 'DRAFT';
@@ -106,9 +146,11 @@ const WorkflowBuilder = () => {
   // Stats
   const stats = {
     total: workflows.length,
-    active: workflows.filter(w => w.status === 'ACTIVE').length,
+    active: workflows.filter((w) => w.status === 'ACTIVE').length,
     totalExecutions: workflows.reduce((sum, w) => sum + w.executionCount, 0),
-    avgSuccessRate: Math.round(workflows.reduce((sum, w) => sum + w.successRate, 0) / workflows.length)
+    avgSuccessRate: Math.round(
+      workflows.reduce((sum, w) => sum + w.successRate, 0) / workflows.length
+    ),
   };
 
   const formatDateTime = (dateStr) => {
@@ -116,7 +158,7 @@ const WorkflowBuilder = () => {
       day: 'numeric',
       month: 'short',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
@@ -191,7 +233,9 @@ const WorkflowBuilder = () => {
               <Activity className="w-5 h-5 text-purple-600" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-gray-900">{stats.totalExecutions.toLocaleString('nb-NO')}</p>
+          <p className="text-2xl font-bold text-gray-900">
+            {stats.totalExecutions.toLocaleString('nb-NO')}
+          </p>
           <p className="text-sm text-gray-600">Totalt Kjøringer</p>
         </div>
 
@@ -209,11 +253,23 @@ const WorkflowBuilder = () => {
       {/* Tabs */}
       <div className="flex gap-4 border-b border-gray-200">
         {[
-          { id: 'active', label: 'Aktive', count: workflows.filter(w => w.status === 'ACTIVE').length },
-          { id: 'paused', label: 'Pauset', count: workflows.filter(w => w.status === 'PAUSED').length },
-          { id: 'draft', label: 'Utkast', count: workflows.filter(w => w.status === 'DRAFT').length },
-          { id: 'all', label: 'Alle', count: workflows.length }
-        ].map(tab => (
+          {
+            id: 'active',
+            label: 'Aktive',
+            count: workflows.filter((w) => w.status === 'ACTIVE').length,
+          },
+          {
+            id: 'paused',
+            label: 'Pauset',
+            count: workflows.filter((w) => w.status === 'PAUSED').length,
+          },
+          {
+            id: 'draft',
+            label: 'Utkast',
+            count: workflows.filter((w) => w.status === 'DRAFT').length,
+          },
+          { id: 'all', label: 'Alle', count: workflows.length },
+        ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
@@ -233,8 +289,8 @@ const WorkflowBuilder = () => {
 
       {/* Workflows List */}
       <div className="space-y-4">
-        {filteredWorkflows.map(workflow => {
-          const trigger = triggerTypes.find(t => t.id === workflow.trigger);
+        {filteredWorkflows.map((workflow) => {
+          const trigger = triggerTypes.find((t) => t.id === workflow.trigger);
           const TriggerIcon = trigger?.icon || Zap;
           const status = statusConfig[workflow.status];
           const StatusIcon = status.icon;
@@ -255,7 +311,9 @@ const WorkflowBuilder = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-1">
                     <h3 className="font-bold text-gray-900">{workflow.name}</h3>
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${status.color}`}>
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${status.color}`}
+                    >
                       <StatusIcon className="w-3 h-3" />
                       {status.label}
                     </span>
@@ -269,7 +327,7 @@ const WorkflowBuilder = () => {
                       {trigger?.label}
                     </div>
                     {workflow.steps.slice(0, 4).map((step, index) => {
-                      const action = actionTypes.find(a => a.id === step.type);
+                      const action = actionTypes.find((a) => a.id === step.type);
                       const ActionIcon = action?.icon || Zap;
                       return (
                         <React.Fragment key={index}>
@@ -282,7 +340,9 @@ const WorkflowBuilder = () => {
                       );
                     })}
                     {workflow.steps.length > 4 && (
-                      <span className="text-xs text-gray-500">+{workflow.steps.length - 4} mer</span>
+                      <span className="text-xs text-gray-500">
+                        +{workflow.steps.length - 4} mer
+                      </span>
                     )}
                   </div>
                 </div>
@@ -294,10 +354,15 @@ const WorkflowBuilder = () => {
                     <p className="text-xs text-gray-500">Kjøringer</p>
                   </div>
                   <div>
-                    <p className={`text-lg font-bold ${
-                      workflow.successRate >= 90 ? 'text-green-600' :
-                      workflow.successRate >= 70 ? 'text-yellow-600' : 'text-red-600'
-                    }`}>
+                    <p
+                      className={`text-lg font-bold ${
+                        workflow.successRate >= 90
+                          ? 'text-green-600'
+                          : workflow.successRate >= 70
+                            ? 'text-yellow-600'
+                            : 'text-red-600'
+                      }`}
+                    >
                       {workflow.successRate}%
                     </p>
                     <p className="text-xs text-gray-500">Suksess</p>
@@ -305,20 +370,32 @@ const WorkflowBuilder = () => {
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-1 flex-shrink-0" onClick={e => e.stopPropagation()}>
+                <div className="flex gap-1 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
                   {workflow.status === 'ACTIVE' ? (
-                    <button className="p-2 text-gray-400 hover:text-yellow-500 hover:bg-yellow-50 rounded-lg" title="Pause">
+                    <button
+                      className="p-2 text-gray-400 hover:text-yellow-500 hover:bg-yellow-50 rounded-lg"
+                      title="Pause"
+                    >
                       <Pause className="w-4 h-4" />
                     </button>
                   ) : (
-                    <button className="p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-lg" title="Aktiver">
+                    <button
+                      className="p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-lg"
+                      title="Aktiver"
+                    >
                       <Play className="w-4 h-4" />
                     </button>
                   )}
-                  <button className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg" title="Rediger">
+                  <button
+                    className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg"
+                    title="Rediger"
+                  >
                     <Edit className="w-4 h-4" />
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg" title="Kopier">
+                  <button
+                    className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg"
+                    title="Kopier"
+                  >
                     <Copy className="w-4 h-4" />
                   </button>
                 </div>
@@ -346,9 +423,7 @@ const WorkflowBuilder = () => {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Navn
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Navn</label>
                 <input
                   type="text"
                   placeholder="F.eks. 'Velkomstsekvens'"
@@ -357,9 +432,7 @@ const WorkflowBuilder = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Beskrivelse
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Beskrivelse</label>
                 <input
                   type="text"
                   placeholder="Kort beskrivelse av automatiseringen..."
@@ -372,7 +445,7 @@ const WorkflowBuilder = () => {
                   Utløser (Trigger)
                 </label>
                 <div className="space-y-2">
-                  {triggerTypes.map(trigger => {
+                  {triggerTypes.map((trigger) => {
                     const Icon = trigger.icon;
                     return (
                       <button
@@ -413,8 +486,14 @@ const WorkflowBuilder = () => {
 
       {/* Workflow Detail Modal */}
       {selectedWorkflow && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setSelectedWorkflow(null)}>
-          <div className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          onClick={() => setSelectedWorkflow(null)}
+        >
+          <div
+            className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-xl font-bold text-gray-900">{selectedWorkflow.name}</h3>
@@ -436,14 +515,14 @@ const WorkflowBuilder = () => {
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
                     {(() => {
-                      const trigger = triggerTypes.find(t => t.id === selectedWorkflow.trigger);
+                      const trigger = triggerTypes.find((t) => t.id === selectedWorkflow.trigger);
                       const TriggerIcon = trigger?.icon || Zap;
                       return <TriggerIcon className="w-6 h-6 text-blue-600" />;
                     })()}
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">
-                      {triggerTypes.find(t => t.id === selectedWorkflow.trigger)?.label}
+                      {triggerTypes.find((t) => t.id === selectedWorkflow.trigger)?.label}
                     </p>
                     <p className="text-sm text-gray-500">Utløser</p>
                   </div>
@@ -451,7 +530,7 @@ const WorkflowBuilder = () => {
 
                 {/* Steps */}
                 {selectedWorkflow.steps.map((step, index) => {
-                  const action = actionTypes.find(a => a.id === step.type);
+                  const action = actionTypes.find((a) => a.id === step.type);
                   const ActionIcon = action?.icon || Zap;
                   return (
                     <div key={index} className="flex items-center gap-4 mb-4 ml-6">
@@ -480,19 +559,25 @@ const WorkflowBuilder = () => {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <p className="text-2xl font-bold text-gray-900">{selectedWorkflow.executionCount}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {selectedWorkflow.executionCount}
+                </p>
                 <p className="text-sm text-gray-500">Totalt Kjøringer</p>
               </div>
               <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <p className={`text-2xl font-bold ${
-                  selectedWorkflow.successRate >= 90 ? 'text-green-600' : 'text-yellow-600'
-                }`}>
+                <p
+                  className={`text-2xl font-bold ${
+                    selectedWorkflow.successRate >= 90 ? 'text-green-600' : 'text-yellow-600'
+                  }`}
+                >
                   {selectedWorkflow.successRate}%
                 </p>
                 <p className="text-sm text-gray-500">Suksessrate</p>
               </div>
               <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm font-medium text-gray-900">{formatDateTime(selectedWorkflow.lastExecuted)}</p>
+                <p className="text-sm font-medium text-gray-900">
+                  {formatDateTime(selectedWorkflow.lastExecuted)}
+                </p>
                 <p className="text-sm text-gray-500">Sist Kjørt</p>
               </div>
             </div>

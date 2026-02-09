@@ -3,9 +3,9 @@
  * Comprehensive patient profile with CRM fields
  */
 
-import { useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   ArrowLeft,
   Edit,
@@ -21,64 +21,66 @@ import {
   AlertCircle,
   MessageSquare,
   Globe,
-  Shield
-} from 'lucide-react'
-import { patientsAPI, encountersAPI, appointmentsAPI } from '../services/api'
-import { formatDate, formatPhone, calculateAge } from '../lib/utils'
-import GDPRExportModal from '../components/GDPRExportModal'
-import { useTranslation } from '../i18n'
+  Shield,
+} from 'lucide-react';
+import { patientsAPI, encountersAPI, appointmentsAPI } from '../services/api';
+import { formatDate, formatPhone, calculateAge } from '../lib/utils';
+import GDPRExportModal from '../components/GDPRExportModal';
+import PatientSummaryCard from '../components/patients/PatientSummaryCard';
+import Breadcrumbs from '../components/common/Breadcrumbs';
+import { useTranslation } from '../i18n';
 
 export default function PatientDetail() {
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
-  const { t, lang } = useTranslation('patients')
-  const [isEditing, setIsEditing] = useState(false)
-  const [formData, setFormData] = useState({})
-  const [showGDPRModal, setShowGDPRModal] = useState(false)
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { t, lang } = useTranslation('patients');
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({});
+  const [showGDPRModal, setShowGDPRModal] = useState(false);
 
   // Fetch patient data
   const { data: patientResponse, isLoading } = useQuery({
     queryKey: ['patient', id],
     queryFn: () => patientsAPI.getById(id),
     onSuccess: (data) => {
-      setFormData(data.data)
-    }
-  })
+      setFormData(data.data);
+    },
+  });
 
   // Fetch encounters
   const { data: encountersResponse } = useQuery({
     queryKey: ['patient-encounters', id],
-    queryFn: () => encountersAPI.getByPatient(id)
-  })
+    queryFn: () => encountersAPI.getByPatient(id),
+  });
 
-  const patient = patientResponse?.data
-  const encounters = encountersResponse?.data?.encounters || []
+  const patient = patientResponse?.data;
+  const encounters = encountersResponse?.data?.encounters || [];
 
   // Update patient mutation
   const updateMutation = useMutation({
     mutationFn: (data) => patientsAPI.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries(['patient', id])
-      setIsEditing(false)
-    }
-  })
+      queryClient.invalidateQueries(['patient', id]);
+      setIsEditing(false);
+    },
+  });
 
   const handleSave = () => {
-    updateMutation.mutate(formData)
-  }
+    updateMutation.mutate(formData);
+  };
 
   const handleCancel = () => {
-    setFormData(patient)
-    setIsEditing(false)
-  }
+    setFormData(patient);
+    setIsEditing(false);
+  };
 
   if (isLoading) {
     return (
       <div className="p-6 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
-    )
+    );
   }
 
   if (!patient) {
@@ -88,17 +90,29 @@ export default function PatientDetail() {
           <p className="text-red-800">{t('patientNotFound')}</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
+      <Breadcrumbs
+        items={[
+          { label: 'Dashboard', href: '/' },
+          { label: t('patients') || 'Patients', href: '/patients' },
+          { label: `${patient.first_name} ${patient.last_name}` },
+        ]}
+      />
+
+      {/* Patient Summary Card */}
+      <PatientSummaryCard patient={patient} patientId={id} />
+
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate('/patients')}
             className="p-2 hover:bg-gray-100 rounded-lg"
+            aria-label="Back to patients"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -215,7 +229,9 @@ export default function PatientDetail() {
                   {isEditing ? (
                     <select
                       value={formData.preferred_contact_method || ''}
-                      onChange={(e) => setFormData({ ...formData, preferred_contact_method: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, preferred_contact_method: e.target.value })
+                      }
                       className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
                     >
                       <option value="">Not set</option>
@@ -246,7 +262,11 @@ export default function PatientDetail() {
                     </select>
                   ) : (
                     <p className="font-medium">
-                      {patient.language === 'NO' ? 'Norsk' : patient.language === 'EN' ? 'English' : 'Other'}
+                      {patient.language === 'NO'
+                        ? 'Norsk'
+                        : patient.language === 'EN'
+                          ? 'English'
+                          : 'Other'}
                     </p>
                   )}
                 </div>
@@ -259,7 +279,8 @@ export default function PatientDetail() {
                 <div>
                   <p className="text-sm text-gray-600">{t('address')}</p>
                   <p className="font-medium">
-                    {patient.address.street}<br />
+                    {patient.address.street}
+                    <br />
                     {patient.address.postal_code} {patient.address.city}
                   </p>
                 </div>
@@ -287,7 +308,9 @@ export default function PatientDetail() {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Treatment Type (Behandlingstype)</label>
+                <label className="block text-sm text-gray-600 mb-1">
+                  Treatment Type (Behandlingstype)
+                </label>
                 {isEditing ? (
                   <select
                     value={formData.treatment_type || ''}
@@ -311,7 +334,9 @@ export default function PatientDetail() {
                   <input
                     type="text"
                     value={formData.preferred_therapist || ''}
-                    onChange={(e) => setFormData({ ...formData, preferred_therapist: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, preferred_therapist: e.target.value })
+                    }
                     placeholder="Mads, Andre, Mikael, Edle..."
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   />
@@ -344,67 +369,115 @@ export default function PatientDetail() {
               {!isEditing ? (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="flex items-center gap-3 p-3 rounded-lg border border-gray-200">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      patient.treatment_pref_needles === true ? 'bg-green-100' :
-                      patient.treatment_pref_needles === false ? 'bg-red-100' : 'bg-gray-100'
-                    }`}>
-                      <span className={`text-lg ${
-                        patient.treatment_pref_needles === true ? 'text-green-600' :
-                        patient.treatment_pref_needles === false ? 'text-red-600' : 'text-gray-400'
-                      }`}>
-                        {patient.treatment_pref_needles === true ? '✓' :
-                         patient.treatment_pref_needles === false ? '✗' : '?'}
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                        patient.treatment_pref_needles === true
+                          ? 'bg-green-100'
+                          : patient.treatment_pref_needles === false
+                            ? 'bg-red-100'
+                            : 'bg-gray-100'
+                      }`}
+                    >
+                      <span
+                        className={`text-lg ${
+                          patient.treatment_pref_needles === true
+                            ? 'text-green-600'
+                            : patient.treatment_pref_needles === false
+                              ? 'text-red-600'
+                              : 'text-gray-400'
+                        }`}
+                      >
+                        {patient.treatment_pref_needles === true
+                          ? '✓'
+                          : patient.treatment_pref_needles === false
+                            ? '✗'
+                            : '?'}
                       </span>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Nåler</p>
                       <p className="font-medium">
-                        {patient.treatment_pref_needles === true ? 'OK' :
-                         patient.treatment_pref_needles === false ? 'Ikke OK' : 'Ikke avklart'}
+                        {patient.treatment_pref_needles === true
+                          ? 'OK'
+                          : patient.treatment_pref_needles === false
+                            ? 'Ikke OK'
+                            : 'Ikke avklart'}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3 p-3 rounded-lg border border-gray-200">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      patient.treatment_pref_adjustments === true ? 'bg-green-100' :
-                      patient.treatment_pref_adjustments === false ? 'bg-red-100' : 'bg-gray-100'
-                    }`}>
-                      <span className={`text-lg ${
-                        patient.treatment_pref_adjustments === true ? 'text-green-600' :
-                        patient.treatment_pref_adjustments === false ? 'text-red-600' : 'text-gray-400'
-                      }`}>
-                        {patient.treatment_pref_adjustments === true ? '✓' :
-                         patient.treatment_pref_adjustments === false ? '✗' : '?'}
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                        patient.treatment_pref_adjustments === true
+                          ? 'bg-green-100'
+                          : patient.treatment_pref_adjustments === false
+                            ? 'bg-red-100'
+                            : 'bg-gray-100'
+                      }`}
+                    >
+                      <span
+                        className={`text-lg ${
+                          patient.treatment_pref_adjustments === true
+                            ? 'text-green-600'
+                            : patient.treatment_pref_adjustments === false
+                              ? 'text-red-600'
+                              : 'text-gray-400'
+                        }`}
+                      >
+                        {patient.treatment_pref_adjustments === true
+                          ? '✓'
+                          : patient.treatment_pref_adjustments === false
+                            ? '✗'
+                            : '?'}
                       </span>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Justeringer</p>
                       <p className="font-medium">
-                        {patient.treatment_pref_adjustments === true ? 'OK' :
-                         patient.treatment_pref_adjustments === false ? 'Ikke OK' : 'Ikke avklart'}
+                        {patient.treatment_pref_adjustments === true
+                          ? 'OK'
+                          : patient.treatment_pref_adjustments === false
+                            ? 'Ikke OK'
+                            : 'Ikke avklart'}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3 p-3 rounded-lg border border-gray-200">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      patient.treatment_pref_neck_adjustments === true ? 'bg-green-100' :
-                      patient.treatment_pref_neck_adjustments === false ? 'bg-red-100' : 'bg-gray-100'
-                    }`}>
-                      <span className={`text-lg ${
-                        patient.treatment_pref_neck_adjustments === true ? 'text-green-600' :
-                        patient.treatment_pref_neck_adjustments === false ? 'text-red-600' : 'text-gray-400'
-                      }`}>
-                        {patient.treatment_pref_neck_adjustments === true ? '✓' :
-                         patient.treatment_pref_neck_adjustments === false ? '✗' : '?'}
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                        patient.treatment_pref_neck_adjustments === true
+                          ? 'bg-green-100'
+                          : patient.treatment_pref_neck_adjustments === false
+                            ? 'bg-red-100'
+                            : 'bg-gray-100'
+                      }`}
+                    >
+                      <span
+                        className={`text-lg ${
+                          patient.treatment_pref_neck_adjustments === true
+                            ? 'text-green-600'
+                            : patient.treatment_pref_neck_adjustments === false
+                              ? 'text-red-600'
+                              : 'text-gray-400'
+                        }`}
+                      >
+                        {patient.treatment_pref_neck_adjustments === true
+                          ? '✓'
+                          : patient.treatment_pref_neck_adjustments === false
+                            ? '✗'
+                            : '?'}
                       </span>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Nakkejusteringer</p>
                       <p className="font-medium">
-                        {patient.treatment_pref_neck_adjustments === true ? 'OK' :
-                         patient.treatment_pref_neck_adjustments === false ? 'Ikke OK' : 'Ikke avklart'}
+                        {patient.treatment_pref_neck_adjustments === true
+                          ? 'OK'
+                          : patient.treatment_pref_neck_adjustments === false
+                            ? 'Ikke OK'
+                            : 'Ikke avklart'}
                       </p>
                     </div>
                   </div>
@@ -416,24 +489,39 @@ export default function PatientDetail() {
                     <span className="text-sm font-medium text-gray-700 w-32">Nåler:</span>
                     <div className="flex items-center gap-4">
                       <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="edit_pref_needles"
+                        <input
+                          type="radio"
+                          name="edit_pref_needles"
                           checked={formData.treatment_pref_needles === true}
-                          onChange={() => setFormData({...formData, treatment_pref_needles: true})}
-                          className="w-4 h-4 text-green-600" />
+                          onChange={() =>
+                            setFormData({ ...formData, treatment_pref_needles: true })
+                          }
+                          className="w-4 h-4 text-green-600"
+                        />
                         <span className="text-sm text-green-700">OK</span>
                       </label>
                       <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="edit_pref_needles"
+                        <input
+                          type="radio"
+                          name="edit_pref_needles"
                           checked={formData.treatment_pref_needles === false}
-                          onChange={() => setFormData({...formData, treatment_pref_needles: false})}
-                          className="w-4 h-4 text-red-600" />
+                          onChange={() =>
+                            setFormData({ ...formData, treatment_pref_needles: false })
+                          }
+                          className="w-4 h-4 text-red-600"
+                        />
                         <span className="text-sm text-red-700">Ikke OK</span>
                       </label>
                       <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="edit_pref_needles"
+                        <input
+                          type="radio"
+                          name="edit_pref_needles"
                           checked={formData.treatment_pref_needles === null}
-                          onChange={() => setFormData({...formData, treatment_pref_needles: null})}
-                          className="w-4 h-4 text-gray-600" />
+                          onChange={() =>
+                            setFormData({ ...formData, treatment_pref_needles: null })
+                          }
+                          className="w-4 h-4 text-gray-600"
+                        />
                         <span className="text-sm text-gray-500">Ikke avklart</span>
                       </label>
                     </div>
@@ -443,51 +531,83 @@ export default function PatientDetail() {
                     <span className="text-sm font-medium text-gray-700 w-32">Justeringer:</span>
                     <div className="flex items-center gap-4">
                       <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="edit_pref_adj"
+                        <input
+                          type="radio"
+                          name="edit_pref_adj"
                           checked={formData.treatment_pref_adjustments === true}
-                          onChange={() => setFormData({...formData, treatment_pref_adjustments: true})}
-                          className="w-4 h-4 text-green-600" />
+                          onChange={() =>
+                            setFormData({ ...formData, treatment_pref_adjustments: true })
+                          }
+                          className="w-4 h-4 text-green-600"
+                        />
                         <span className="text-sm text-green-700">OK</span>
                       </label>
                       <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="edit_pref_adj"
+                        <input
+                          type="radio"
+                          name="edit_pref_adj"
                           checked={formData.treatment_pref_adjustments === false}
-                          onChange={() => setFormData({...formData, treatment_pref_adjustments: false})}
-                          className="w-4 h-4 text-red-600" />
+                          onChange={() =>
+                            setFormData({ ...formData, treatment_pref_adjustments: false })
+                          }
+                          className="w-4 h-4 text-red-600"
+                        />
                         <span className="text-sm text-red-700">Ikke OK</span>
                       </label>
                       <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="edit_pref_adj"
+                        <input
+                          type="radio"
+                          name="edit_pref_adj"
                           checked={formData.treatment_pref_adjustments === null}
-                          onChange={() => setFormData({...formData, treatment_pref_adjustments: null})}
-                          className="w-4 h-4 text-gray-600" />
+                          onChange={() =>
+                            setFormData({ ...formData, treatment_pref_adjustments: null })
+                          }
+                          className="w-4 h-4 text-gray-600"
+                        />
                         <span className="text-sm text-gray-500">Ikke avklart</span>
                       </label>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-6">
-                    <span className="text-sm font-medium text-gray-700 w-32">Nakkejusteringer:</span>
+                    <span className="text-sm font-medium text-gray-700 w-32">
+                      Nakkejusteringer:
+                    </span>
                     <div className="flex items-center gap-4">
                       <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="edit_pref_neck"
+                        <input
+                          type="radio"
+                          name="edit_pref_neck"
                           checked={formData.treatment_pref_neck_adjustments === true}
-                          onChange={() => setFormData({...formData, treatment_pref_neck_adjustments: true})}
-                          className="w-4 h-4 text-green-600" />
+                          onChange={() =>
+                            setFormData({ ...formData, treatment_pref_neck_adjustments: true })
+                          }
+                          className="w-4 h-4 text-green-600"
+                        />
                         <span className="text-sm text-green-700">OK</span>
                       </label>
                       <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="edit_pref_neck"
+                        <input
+                          type="radio"
+                          name="edit_pref_neck"
                           checked={formData.treatment_pref_neck_adjustments === false}
-                          onChange={() => setFormData({...formData, treatment_pref_neck_adjustments: false})}
-                          className="w-4 h-4 text-red-600" />
+                          onChange={() =>
+                            setFormData({ ...formData, treatment_pref_neck_adjustments: false })
+                          }
+                          className="w-4 h-4 text-red-600"
+                        />
                         <span className="text-sm text-red-700">Ikke OK</span>
                       </label>
                       <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="edit_pref_neck"
+                        <input
+                          type="radio"
+                          name="edit_pref_neck"
                           checked={formData.treatment_pref_neck_adjustments === null}
-                          onChange={() => setFormData({...formData, treatment_pref_neck_adjustments: null})}
-                          className="w-4 h-4 text-gray-600" />
+                          onChange={() =>
+                            setFormData({ ...formData, treatment_pref_neck_adjustments: null })
+                          }
+                          className="w-4 h-4 text-gray-600"
+                        />
                         <span className="text-sm text-gray-500">Ikke avklart</span>
                       </label>
                     </div>
@@ -501,7 +621,9 @@ export default function PatientDetail() {
                 {isEditing ? (
                   <textarea
                     value={formData.treatment_pref_notes || ''}
-                    onChange={(e) => setFormData({ ...formData, treatment_pref_notes: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, treatment_pref_notes: e.target.value })
+                    }
                     rows={2}
                     placeholder="Eventuelle notater om behandlingspreferanser..."
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
@@ -565,11 +687,15 @@ export default function PatientDetail() {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Status</span>
-                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                  patient.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                  patient.status === 'INACTIVE' ? 'bg-gray-100 text-gray-800' :
-                  'bg-red-100 text-red-800'
-                }`}>
+                <span
+                  className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                    patient.status === 'ACTIVE'
+                      ? 'bg-green-100 text-green-800'
+                      : patient.status === 'INACTIVE'
+                        ? 'bg-gray-100 text-gray-800'
+                        : 'bg-red-100 text-red-800'
+                  }`}
+                >
                   {patient.status}
                 </span>
               </div>
@@ -632,7 +758,9 @@ export default function PatientDetail() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Video Marketing</span>
-                <span className={patient.consent_video_marketing ? 'text-green-600' : 'text-gray-400'}>
+                <span
+                  className={patient.consent_video_marketing ? 'text-green-600' : 'text-gray-400'}
+                >
                   {patient.consent_video_marketing ? '✓' : '✗'}
                 </span>
               </div>
@@ -643,11 +771,8 @@ export default function PatientDetail() {
 
       {/* GDPR Export Modal */}
       {showGDPRModal && (
-        <GDPRExportModal
-          patient={patient}
-          onClose={() => setShowGDPRModal(false)}
-        />
+        <GDPRExportModal patient={patient} onClose={() => setShowGDPRModal(false)} />
       )}
     </div>
-  )
+  );
 }

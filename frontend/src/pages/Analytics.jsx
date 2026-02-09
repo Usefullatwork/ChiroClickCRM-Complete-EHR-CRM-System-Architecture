@@ -25,9 +25,11 @@ import {
   Target,
   FileText,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
 } from 'lucide-react';
 import { analyticsAPI } from '../services/api';
+import toast from '../utils/toast';
+import logger from '../utils/logger';
 
 // Analytics components
 import { StatCard, StatCardGrid } from '../components/analytics/StatCard';
@@ -45,7 +47,7 @@ const DATE_RANGE_LABELS = {
   month: 'Denne maneden',
   quarter: 'Dette kvartalet',
   year: 'I ar',
-  custom: 'Egendefinert'
+  custom: 'Egendefinert',
 };
 
 /**
@@ -61,7 +63,7 @@ export default function Analytics() {
     const now = new Date();
     return {
       year: now.getFullYear(),
-      month: now.getMonth()
+      month: now.getMonth(),
     };
   });
 
@@ -101,27 +103,21 @@ export default function Analytics() {
     data: dashboardData,
     isLoading,
     error,
-    refetch
+    refetch,
   } = useQuery({
     queryKey: ['analytics-dashboard', dateParams],
     queryFn: () => analyticsAPI.getDashboard(dateParams),
     staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: false,
   });
 
   // Extract data from response
   const analytics = dashboardData?.data || {};
-  const {
-    patients = {},
-    appointments = {},
-    revenue = {},
-    exercises = {},
-    trends = {}
-  } = analytics;
+  const { patients = {}, appointments = {}, revenue = {}, exercises = {}, trends = {} } = analytics;
 
   // Handle month navigation
   const handleMonthChange = (direction) => {
-    setSelectedMonth(prev => {
+    setSelectedMonth((prev) => {
       let newMonth = prev.month + direction;
       let newYear = prev.year;
 
@@ -142,7 +138,7 @@ export default function Analytics() {
     if (dateRange === 'month') {
       return new Date(selectedMonth.year, selectedMonth.month).toLocaleDateString('no-NO', {
         month: 'long',
-        year: 'numeric'
+        year: 'numeric',
       });
     }
     return DATE_RANGE_LABELS[dateRange];
@@ -162,8 +158,8 @@ export default function Analytics() {
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      console.error('Export failed:', err);
-      alert('Kunne ikke eksportere data. Vennligst prov igjen.');
+      logger.error('Export failed:', err);
+      toast.error('Kunne ikke eksportere data. Vennligst prov igjen.');
     }
   };
 
@@ -319,37 +315,19 @@ export default function Analytics() {
 
       {/* Charts Row 1: Patient Metrics & Revenue */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <PatientMetrics
-          data={trends.patientVolume || []}
-          stats={patients}
-          loading={isLoading}
-        />
-        <RevenueChart
-          data={revenue.dailyRevenue || []}
-          stats={revenue}
-          loading={isLoading}
-        />
+        <PatientMetrics data={trends.patientVolume || []} stats={patients} loading={isLoading} />
+        <RevenueChart data={revenue.dailyRevenue || []} stats={revenue} loading={isLoading} />
       </div>
 
       {/* Charts Row 2: Appointments & Exercise Compliance */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <AppointmentStats
-          data={appointments}
-          loading={isLoading}
-        />
-        <ComplianceOverview
-          data={exercises.compliance || {}}
-          loading={isLoading}
-        />
+        <AppointmentStats data={appointments} loading={isLoading} />
+        <ComplianceOverview data={exercises.compliance || {}} loading={isLoading} />
       </div>
 
       {/* Top Prescribed Exercises */}
       <div className="mb-6">
-        <ExerciseStats
-          data={exercises.topPrescribed || []}
-          loading={isLoading}
-          limit={10}
-        />
+        <ExerciseStats data={exercises.topPrescribed || []} loading={isLoading} limit={10} />
       </div>
 
       {/* Quick Stats Footer */}
@@ -377,29 +355,39 @@ export default function Analytics() {
           <div className="text-center p-4 bg-gray-50 rounded-lg">
             <p className="text-xs text-gray-500 mb-1">No-show rate</p>
             <p className="text-xl font-bold text-gray-900">
-              {isLoading ? '-' : `${
-                appointments.thisWeek?.total > 0
-                  ? Math.round((appointments.thisWeek?.noShow / appointments.thisWeek?.total) * 100)
-                  : 0
-              }%`}
+              {isLoading
+                ? '-'
+                : `${
+                    appointments.thisWeek?.total > 0
+                      ? Math.round(
+                          (appointments.thisWeek?.noShow / appointments.thisWeek?.total) * 100
+                        )
+                      : 0
+                  }%`}
             </p>
           </div>
           <div className="text-center p-4 bg-gray-50 rounded-lg">
             <p className="text-xs text-gray-500 mb-1">Inntekt denne mnd</p>
             <p className="text-xl font-bold text-green-600">
-              {isLoading ? '-' : new Intl.NumberFormat('no-NO', {
-                style: 'currency',
-                currency: 'NOK',
-                minimumFractionDigits: 0
-              }).format(revenue.thisMonth?.totalRevenue || 0)}
+              {isLoading
+                ? '-'
+                : new Intl.NumberFormat('no-NO', {
+                    style: 'currency',
+                    currency: 'NOK',
+                    minimumFractionDigits: 0,
+                  }).format(revenue.thisMonth?.totalRevenue || 0)}
             </p>
           </div>
           <div className="text-center p-4 bg-gray-50 rounded-lg">
             <p className="text-xs text-gray-500 mb-1">Endring inntekt</p>
-            <p className={`text-xl font-bold ${
-              (revenue.changePercent || 0) >= 0 ? 'text-green-600' : 'text-red-600'
-            }`}>
-              {isLoading ? '-' : `${revenue.changePercent >= 0 ? '+' : ''}${revenue.changePercent || 0}%`}
+            <p
+              className={`text-xl font-bold ${
+                (revenue.changePercent || 0) >= 0 ? 'text-green-600' : 'text-red-600'
+              }`}
+            >
+              {isLoading
+                ? '-'
+                : `${revenue.changePercent >= 0 ? '+' : ''}${revenue.changePercent || 0}%`}
             </p>
           </div>
         </div>

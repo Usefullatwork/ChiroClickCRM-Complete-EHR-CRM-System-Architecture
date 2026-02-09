@@ -6,6 +6,7 @@ import { formatDate, formatPhone, calculateAge, getStatusColor, debounce } from 
 import { Search, Plus, Filter, Download, Upload } from 'lucide-react';
 import { useTranslation } from '../i18n';
 import { PatientsTableSkeleton } from '../components/ui/Skeleton';
+import toast from '../utils/toast';
 
 export default function Patients() {
   const navigate = useNavigate();
@@ -62,7 +63,7 @@ export default function Patients() {
 
   const handleExport = () => {
     if (!patients || patients.length === 0) {
-      alert('No patients to export');
+      toast.warning('No patients to export');
       return;
     }
 

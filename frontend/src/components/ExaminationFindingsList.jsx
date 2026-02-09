@@ -1,8 +1,20 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { examinationsAPI } from '../services/api';
-import { Edit2, Trash2, AlertTriangle, CheckCircle, XCircle, HelpCircle, FileText, Filter, Copy, Download } from 'lucide-react';
+import {
+  Edit2,
+  Trash2,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  HelpCircle,
+  FileText,
+  Filter,
+  Copy,
+  Download,
+} from 'lucide-react';
 import StructuredExaminationForm from './StructuredExaminationForm';
+import toast from '../utils/toast';
 
 export default function ExaminationFindingsList({ encounterId }) {
   const queryClient = useQueryClient();
@@ -42,9 +54,9 @@ export default function ExaminationFindingsList({ encounterId }) {
   };
 
   const toggleRegion = (region) => {
-    setExpandedRegions(prev => ({
+    setExpandedRegions((prev) => ({
       ...prev,
-      [region]: !prev[region]
+      [region]: !prev[region],
     }));
   };
 
@@ -65,12 +77,18 @@ export default function ExaminationFindingsList({ encounterId }) {
 
   const getResultText = (result) => {
     switch (result) {
-      case 'positive': return 'Positiv';
-      case 'negative': return 'Negativ';
-      case 'equivocal': return 'Uklar';
-      case 'not_tested': return 'Ikke testet';
-      case 'unable_to_perform': return 'Ikke gjennomførbar';
-      default: return result;
+      case 'positive':
+        return 'Positiv';
+      case 'negative':
+        return 'Negativ';
+      case 'equivocal':
+        return 'Uklar';
+      case 'not_tested':
+        return 'Ikke testet';
+      case 'unable_to_perform':
+        return 'Ikke gjennomførbar';
+      default:
+        return result;
     }
   };
 
@@ -101,20 +119,23 @@ export default function ExaminationFindingsList({ encounterId }) {
       finding.findings_text ? ` - ${finding.findings_text}` : ''
     }`;
     navigator.clipboard.writeText(text);
-    alert('Funn kopiert til utklippstavle');
+    toast.success('Funn kopiert til utklippstavle');
   };
 
   const exportFindings = () => {
     if (!findings?.data || findings.data.length === 0) return;
 
     const text = findings.data
-      .map(f => `${f.body_region} - ${f.test_name}: ${getResultText(f.result)}${
-        f.findings_text ? ` - ${f.findings_text}` : ''
-      }`)
+      .map(
+        (f) =>
+          `${f.body_region} - ${f.test_name}: ${getResultText(f.result)}${
+            f.findings_text ? ` - ${f.findings_text}` : ''
+          }`
+      )
       .join('\n');
 
     navigator.clipboard.writeText(text);
-    alert('Alle funn kopiert til utklippstavle');
+    toast.success('Alle funn kopiert til utklippstavle');
   };
 
   const filterFindings = (findingsData) => {
@@ -127,7 +148,7 @@ export default function ExaminationFindingsList({ encounterId }) {
       }
 
       // Filter by result
-      const filtered = regionFindings.filter(finding => {
+      const filtered = regionFindings.filter((finding) => {
         if (filterResult === 'all') return true;
         return finding.result === filterResult;
       });
@@ -230,8 +251,10 @@ export default function ExaminationFindingsList({ encounterId }) {
                   className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="all">Alle regioner</option>
-                  {availableRegions.map(region => (
-                    <option key={region} value={region}>{region}</option>
+                  {availableRegions.map((region) => (
+                    <option key={region} value={region}>
+                      {region}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -254,7 +277,7 @@ export default function ExaminationFindingsList({ encounterId }) {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  {regionFindings.some(f => f.result === 'positive') && (
+                  {regionFindings.some((f) => f.result === 'positive') && (
                     <AlertTriangle className="w-4 h-4 text-red-500" />
                   )}
                   <span className="text-xs text-gray-400">
@@ -267,7 +290,10 @@ export default function ExaminationFindingsList({ encounterId }) {
               {expandedRegions[region] && (
                 <div className="divide-y divide-gray-200">
                   {regionFindings.map((finding) => (
-                    <div key={finding.id} className="px-4 py-3 bg-white hover:bg-gray-50 transition-colors">
+                    <div
+                      key={finding.id}
+                      className="px-4 py-3 bg-white hover:bg-gray-50 transition-colors"
+                    >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           {/* Test Name & Result */}
@@ -288,9 +314,7 @@ export default function ExaminationFindingsList({ encounterId }) {
                           </div>
 
                           {/* Category */}
-                          <div className="text-xs text-gray-500 mb-2">
-                            {finding.category}
-                          </div>
+                          <div className="text-xs text-gray-500 mb-2">{finding.category}</div>
 
                           {/* Details Grid */}
                           <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">

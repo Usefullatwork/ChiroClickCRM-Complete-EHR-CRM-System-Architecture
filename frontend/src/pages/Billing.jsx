@@ -6,9 +6,9 @@
  * chiropractic clinics with takst codes and HELFO integration
  */
 
-import React, { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import {
   CreditCard,
   Plus,
@@ -29,14 +29,16 @@ import {
   Printer,
   BarChart3,
   RefreshCw,
-  Settings
-} from 'lucide-react'
-import { billingAPI } from '../services/api'
-import InvoiceList from '../components/billing/InvoiceList'
-import InvoiceGenerator from '../components/billing/InvoiceGenerator'
-import InvoicePreview from '../components/billing/InvoicePreview'
-import TakstCodes from '../components/billing/TakstCodes'
-import PaymentTracker from '../components/billing/PaymentTracker'
+  Settings,
+} from 'lucide-react';
+import { billingAPI } from '../services/api';
+import toast from '../utils/toast';
+import logger from '../utils/logger';
+import InvoiceList from '../components/billing/InvoiceList';
+import InvoiceGenerator from '../components/billing/InvoiceGenerator';
+import InvoicePreview from '../components/billing/InvoicePreview';
+import TakstCodes from '../components/billing/TakstCodes';
+import PaymentTracker from '../components/billing/PaymentTracker';
 
 /**
  * Billing Component
@@ -45,107 +47,117 @@ import PaymentTracker from '../components/billing/PaymentTracker'
  * @returns {JSX.Element} Billing management page
  */
 export default function Billing() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // State for tabs and modals
-  const [activeTab, setActiveTab] = useState('invoices')
-  const [showInvoiceGenerator, setShowInvoiceGenerator] = useState(false)
-  const [selectedInvoice, setSelectedInvoice] = useState(null)
-  const [showInvoicePreview, setShowInvoicePreview] = useState(false)
-  const [showPaymentTracker, setShowPaymentTracker] = useState(false)
-  const [takstCodesReadOnly, setTakstCodesReadOnly] = useState([])
+  const [activeTab, setActiveTab] = useState('invoices');
+  const [showInvoiceGenerator, setShowInvoiceGenerator] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [showInvoicePreview, setShowInvoicePreview] = useState(false);
+  const [showPaymentTracker, setShowPaymentTracker] = useState(false);
+  const [takstCodesReadOnly, setTakstCodesReadOnly] = useState([]);
 
   // Fetch statistics
-  const { data: statistics, isLoading: statsLoading, refetch: refetchStats } = useQuery({
+  const {
+    data: statistics,
+    isLoading: statsLoading,
+    refetch: refetchStats,
+  } = useQuery({
     queryKey: ['invoice-statistics'],
     queryFn: async () => {
-      const response = await billingAPI.getStatistics()
-      return response.data
-    }
-  })
+      const response = await billingAPI.getStatistics();
+      return response.data;
+    },
+  });
 
   /**
    * Handle creating new invoice
    * Handterer opprettelse av ny faktura
    */
   const handleCreateInvoice = () => {
-    setShowInvoiceGenerator(true)
-  }
+    setShowInvoiceGenerator(true);
+  };
 
   /**
    * Handle viewing invoice details
    * Handterer visning av fakturadetaljer
    */
   const handleViewInvoice = (invoice) => {
-    setSelectedInvoice(invoice)
-    setShowInvoicePreview(true)
-  }
+    setSelectedInvoice(invoice);
+    setShowInvoicePreview(true);
+  };
 
   /**
    * Handle recording payment
    * Handterer registrering av betaling
    */
   const handleRecordPayment = (invoice) => {
-    setSelectedInvoice(invoice)
-    setShowPaymentTracker(true)
-  }
+    setSelectedInvoice(invoice);
+    setShowPaymentTracker(true);
+  };
 
   /**
    * Handle invoice created
    */
   const handleInvoiceCreated = (invoice) => {
-    refetchStats()
-    setShowInvoiceGenerator(false)
+    refetchStats();
+    setShowInvoiceGenerator(false);
     // Show the new invoice
-    setSelectedInvoice(invoice)
-    setShowInvoicePreview(true)
-  }
+    setSelectedInvoice(invoice);
+    setShowInvoicePreview(true);
+  };
 
   /**
    * Handle payment recorded
    */
   const handlePaymentRecorded = () => {
-    refetchStats()
-    setShowPaymentTracker(false)
-    setSelectedInvoice(null)
-  }
+    refetchStats();
+    setShowPaymentTracker(false);
+    setSelectedInvoice(null);
+  };
 
   /**
    * Handle export
    */
   const handleExport = async () => {
     try {
-      const now = new Date()
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
-      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+        .toISOString()
+        .split('T')[0];
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+        .toISOString()
+        .split('T')[0];
 
       const response = await billingAPI.getHelfoReport({
         start_date: startOfMonth,
-        end_date: endOfMonth
-      })
+        end_date: endOfMonth,
+      });
 
       // Create CSV from report data
-      const invoices = response.data.invoices || []
+      const invoices = response.data.invoices || [];
       const csvContent = [
         ['Fakturanummer', 'Dato', 'Pasient', 'HELFO-refusjon'].join(';'),
-        ...invoices.map(inv => [
-          inv.invoice_number,
-          new Date(inv.invoice_date).toLocaleDateString('no-NO'),
-          inv.patient_name,
-          inv.helfo_refund
-        ].join(';'))
-      ].join('\n')
+        ...invoices.map((inv) =>
+          [
+            inv.invoice_number,
+            new Date(inv.invoice_date).toLocaleDateString('no-NO'),
+            inv.patient_name,
+            inv.helfo_refund,
+          ].join(';')
+        ),
+      ].join('\n');
 
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-      const link = document.createElement('a')
-      link.href = URL.createObjectURL(blob)
-      link.download = `helfo-rapport-${startOfMonth}.csv`
-      link.click()
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `helfo-rapport-${startOfMonth}.csv`;
+      link.click();
     } catch (error) {
-      console.error('Export failed:', error)
-      alert('Kunne ikke eksportere rapport')
+      logger.error('Export failed:', error);
+      toast.error('Kunne ikke eksportere rapport');
     }
-  }
+  };
 
   /**
    * Format currency in NOK
@@ -155,9 +167,9 @@ export default function Billing() {
     return new Intl.NumberFormat('no-NO', {
       style: 'currency',
       currency: 'NOK',
-      minimumFractionDigits: 0
-    }).format(amount || 0)
-  }
+      minimumFractionDigits: 0,
+    }).format(amount || 0);
+  };
 
   const stats = statistics || {
     total_outstanding: 0,
@@ -166,8 +178,8 @@ export default function Billing() {
     total_invoices: 0,
     pending_count: 0,
     draft_count: 0,
-    total_helfo_refund: 0
-  }
+    total_helfo_refund: 0,
+  };
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -243,7 +255,7 @@ export default function Billing() {
             <div>
               <p className="text-sm text-gray-600">Forfalt</p>
               <p className="text-2xl font-semibold text-gray-900 mt-1">
-                {statsLoading ? '...' : (stats.overdue_count || 0)}
+                {statsLoading ? '...' : stats.overdue_count || 0}
               </p>
               <p className="text-xs text-gray-500 mt-1">
                 {formatCurrency(stats.total_overdue)} utstaende
@@ -313,17 +325,16 @@ export default function Billing() {
 
       {/* Invoices Tab / Faktura-fane */}
       {activeTab === 'invoices' && (
-        <InvoiceList
-          onViewInvoice={handleViewInvoice}
-          onRecordPayment={handleRecordPayment}
-        />
+        <InvoiceList onViewInvoice={handleViewInvoice} onRecordPayment={handleRecordPayment} />
       )}
 
       {/* Takst Codes Tab / Takstkoder-fane */}
       {activeTab === 'takst' && (
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Norske takstkoder for kiropraktorer</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Norske takstkoder for kiropraktorer
+            </h3>
             <p className="text-sm text-gray-500 mt-1">
               Oversikt over gjeldende takstkoder med HELFO-refusjon og egenandeler
             </p>
@@ -344,8 +355,10 @@ export default function Billing() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* HELFO Report Card */}
-              <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer"
-                   onClick={handleExport}>
+              <div
+                className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer"
+                onClick={handleExport}
+              >
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                     <Download className="w-5 h-5 text-green-600" />
@@ -409,7 +422,8 @@ export default function Billing() {
                 <p className="text-xl font-semibold text-gray-900 mt-1">
                   {formatCurrency(
                     stats.total_invoices > 0
-                      ? ((stats.total_paid || 0) + (stats.total_outstanding || 0)) / stats.total_invoices
+                      ? ((stats.total_paid || 0) + (stats.total_outstanding || 0)) /
+                          stats.total_invoices
                       : 0
                   )}
                 </p>
@@ -419,14 +433,13 @@ export default function Billing() {
                 <p className="text-xl font-semibold text-green-600 mt-1">
                   {stats.total_invoices > 0
                     ? Math.round(((stats.paid_count || 0) / stats.total_invoices) * 100)
-                    : 0}%
+                    : 0}
+                  %
                 </p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Utkast</p>
-                <p className="text-xl font-semibold text-gray-900 mt-1">
-                  {stats.draft_count || 0}
-                </p>
+                <p className="text-xl font-semibold text-gray-900 mt-1">{stats.draft_count || 0}</p>
               </div>
             </div>
           </div>
@@ -446,8 +459,8 @@ export default function Billing() {
         <InvoicePreview
           invoiceId={selectedInvoice.id}
           onClose={() => {
-            setShowInvoicePreview(false)
-            setSelectedInvoice(null)
+            setShowInvoicePreview(false);
+            setSelectedInvoice(null);
           }}
           onRecordPayment={handleRecordPayment}
         />
@@ -458,12 +471,12 @@ export default function Billing() {
         <PaymentTracker
           invoice={selectedInvoice}
           onClose={() => {
-            setShowPaymentTracker(false)
-            setSelectedInvoice(null)
+            setShowPaymentTracker(false);
+            setSelectedInvoice(null);
           }}
           onPaymentRecorded={handlePaymentRecorded}
         />
       )}
     </div>
-  )
+  );
 }

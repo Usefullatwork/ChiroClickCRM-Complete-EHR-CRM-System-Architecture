@@ -1,131 +1,148 @@
-import { useState, useEffect } from 'react'
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
-import { useTranslation } from '../i18n'
-import { ArrowLeft, Plus, FileText, Search, Filter, Loader2, AlertCircle, Sparkles } from 'lucide-react'
-import SickNoteGenerator, { getDefaultSickNoteData } from '../components/documents/SickNoteGenerator'
-import { lettersApi } from '../api/letters'
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from '../i18n';
+import {
+  ArrowLeft,
+  Plus,
+  FileText,
+  Search,
+  Filter,
+  Loader2,
+  AlertCircle,
+  Sparkles,
+} from 'lucide-react';
+import SickNoteGenerator, {
+  getDefaultSickNoteData,
+} from '../components/documents/SickNoteGenerator';
+import { lettersApi } from '../api/letters';
+import toast from '../utils/toast';
+import logger from '../utils/logger';
 
 export default function SickNotes() {
-  const { patientId } = useParams()
-  const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
-  const { lang: language, setLang: setLanguage } = useTranslation()
-  const [view, setView] = useState(searchParams.get('new') ? 'create' : 'list')
-  const [sickNoteData, setSickNoteData] = useState(getDefaultSickNoteData())
-  const [searchTerm, setSearchTerm] = useState('')
+  const { patientId } = useParams();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { lang: language, setLang: setLanguage } = useTranslation();
+  const [view, setView] = useState(searchParams.get('new') ? 'create' : 'list');
+  const [sickNoteData, setSickNoteData] = useState(getDefaultSickNoteData());
+  const [searchTerm, setSearchTerm] = useState('');
 
   // API states
-  const [sickNotes, setSickNotes] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState(null)
-  const [generating, setGenerating] = useState(false)
+  const [sickNotes, setSickNotes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+  const [generating, setGenerating] = useState(false);
 
   // Mock patient data (would come from patient context in real app)
-  const patient = patientId ? {
-    id: patientId,
-    name: 'Demo Pasient',
-    dateOfBirth: '1985-03-15',
-    personalNumber: '15038512345',
-    address: 'Testveien 1, 0123 Oslo'
-  } : null
+  const patient = patientId
+    ? {
+        id: patientId,
+        name: 'Demo Pasient',
+        dateOfBirth: '1985-03-15',
+        personalNumber: '15038512345',
+        address: 'Testveien 1, 0123 Oslo',
+      }
+    : null;
 
   // Fetch sick notes from API
   const fetchSickNotes = async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
       if (patientId) {
         // Fetch for specific patient
-        const response = await lettersApi.getPatientLetters(patientId, { type: 'SICK_NOTE' })
-        setSickNotes(response.letters || [])
+        const response = await lettersApi.getPatientLetters(patientId, { type: 'SICK_NOTE' });
+        setSickNotes(response.letters || []);
       } else {
         // For now, show empty - in real app would fetch all org's sick notes
-        setSickNotes([])
+        setSickNotes([]);
       }
     } catch (err) {
-      console.error('Failed to fetch sick notes:', err)
-      setError(language === 'no' ? 'Kunne ikke laste sykemeldinger' : 'Failed to load sick notes')
+      logger.error('Failed to fetch sick notes:', err);
+      setError(language === 'no' ? 'Kunne ikke laste sykemeldinger' : 'Failed to load sick notes');
       // Fall back to empty array
-      setSickNotes([])
+      setSickNotes([]);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchSickNotes()
-  }, [patientId])
+    fetchSickNotes();
+  }, [patientId]);
 
   // Auto-populate patient data when creating new
   useEffect(() => {
     if (patient && view === 'create') {
-      setSickNoteData(prev => ({
+      setSickNoteData((prev) => ({
         ...prev,
         patientName: patient.name,
         patientDOB: patient.dateOfBirth,
         patientPersonalNumber: patient.personalNumber || '',
-        patientAddress: patient.address || ''
-      }))
+        patientAddress: patient.address || '',
+      }));
     }
-  }, [patient, view])
+  }, [patient, view]);
 
   // Generate letter content with AI
   const handleGenerateWithAI = async () => {
     try {
-      setGenerating(true)
-      setError(null)
+      setGenerating(true);
+      setError(null);
 
       const response = await lettersApi.generateLetter('SICK_NOTE', {
         patientId,
         patientData: patient,
-        currentData: sickNoteData
-      })
+        currentData: sickNoteData,
+      });
 
       if (response.letter) {
-        setSickNoteData(prev => ({
+        setSickNoteData((prev) => ({
           ...prev,
-          ...response.letter
-        }))
+          ...response.letter,
+        }));
       }
     } catch (err) {
-      console.error('AI generation failed:', err)
-      setError(language === 'no' ? 'AI-generering feilet' : 'AI generation failed')
+      logger.error('AI generation failed:', err);
+      setError(language === 'no' ? 'AI-generering feilet' : 'AI generation failed');
     } finally {
-      setGenerating(false)
+      setGenerating(false);
     }
-  }
+  };
 
   const handleSave = async (data) => {
     try {
-      setSaving(true)
-      setError(null)
+      setSaving(true);
+      setError(null);
 
       await lettersApi.saveLetter({
         letterType: 'SICK_NOTE',
         patientId,
         content: data,
-        status: 'DRAFT'
-      })
+        status: 'DRAFT',
+      });
 
-      alert(language === 'no' ? 'Sykemelding lagret!' : 'Sick note saved!')
-      setView('list')
-      fetchSickNotes() // Refresh list
+      toast.success(language === 'no' ? 'Sykemelding lagret!' : 'Sick note saved!');
+      setView('list');
+      fetchSickNotes(); // Refresh list
     } catch (err) {
-      console.error('Save failed:', err)
-      setError(language === 'no' ? 'Kunne ikke lagre sykemelding' : 'Failed to save sick note')
+      logger.error('Save failed:', err);
+      setError(language === 'no' ? 'Kunne ikke lagre sykemelding' : 'Failed to save sick note');
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
-  const filteredNotes = sickNotes.filter(note => {
-    const patientName = note.patient_name || note.patientName || ''
-    const diagnosis = note.diagnosis || ''
-    return patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           diagnosis.toLowerCase().includes(searchTerm.toLowerCase())
-  })
+  const filteredNotes = sickNotes.filter((note) => {
+    const patientName = note.patient_name || note.patientName || '';
+    const diagnosis = note.diagnosis || '';
+    return (
+      patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      diagnosis.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
 
   if (view === 'create') {
     return (
@@ -144,9 +161,7 @@ export default function SickNotes() {
                 <h1 className="text-xl font-semibold text-gray-900">
                   {language === 'no' ? 'Ny sykemelding' : 'New Sick Note'}
                 </h1>
-                {patient && (
-                  <p className="text-sm text-gray-500">{patient.name}</p>
-                )}
+                {patient && <p className="text-sm text-gray-500">{patient.name}</p>}
               </div>
             </div>
 
@@ -208,7 +223,7 @@ export default function SickNotes() {
           />
         </div>
       </div>
-    )
+    );
   }
 
   // List view
@@ -289,7 +304,11 @@ export default function SickNotes() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder={language === 'no' ? 'Søk etter pasient eller diagnose...' : 'Search by patient or diagnosis...'}
+              placeholder={
+                language === 'no'
+                  ? 'Søk etter pasient eller diagnose...'
+                  : 'Search by patient or diagnosis...'
+              }
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -354,18 +373,26 @@ export default function SickNotes() {
                       {note.grad_percent || note.gradPercent}%
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        note.status === 'active' || note.status === 'FINALIZED'
-                          ? 'bg-green-100 text-green-800'
-                          : note.status === 'DRAFT'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          note.status === 'active' || note.status === 'FINALIZED'
+                            ? 'bg-green-100 text-green-800'
+                            : note.status === 'DRAFT'
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
                         {note.status === 'active' || note.status === 'FINALIZED'
-                          ? (language === 'no' ? 'Aktiv' : 'Active')
+                          ? language === 'no'
+                            ? 'Aktiv'
+                            : 'Active'
                           : note.status === 'DRAFT'
-                          ? (language === 'no' ? 'Utkast' : 'Draft')
-                          : (language === 'no' ? 'Utløpt' : 'Expired')}
+                            ? language === 'no'
+                              ? 'Utkast'
+                              : 'Draft'
+                            : language === 'no'
+                              ? 'Utløpt'
+                              : 'Expired'}
                       </span>
                     </td>
                   </tr>
@@ -373,9 +400,7 @@ export default function SickNotes() {
                 {filteredNotes.length === 0 && !loading && (
                   <tr>
                     <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
-                      {language === 'no'
-                        ? 'Ingen sykemeldinger funnet'
-                        : 'No sick notes found'}
+                      {language === 'no' ? 'Ingen sykemeldinger funnet' : 'No sick notes found'}
                     </td>
                   </tr>
                 )}
@@ -385,5 +410,5 @@ export default function SickNotes() {
         </div>
       </div>
     </div>
-  )
+  );
 }

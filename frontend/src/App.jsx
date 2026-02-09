@@ -4,6 +4,8 @@ import { Toaster } from 'sonner';
 import DashboardLayout from './components/layouts/DashboardLayout';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { setOrganizationId } from './services/api';
+import useGlobalKeyboardShortcuts from './hooks/useGlobalKeyboardShortcuts';
+import KeyboardShortcutsModal from './components/common/KeyboardShortcutsModal';
 
 // Lazy load all pages for code splitting
 const Dashboard = lazy(() => import('./pages/Dashboard'));
@@ -34,9 +36,16 @@ const PatientExercises = lazy(() => import('./pages/portal/PatientExercises'));
 // Page loader component for Suspense fallback
 function PageLoader() {
   return (
-    <div className="flex items-center justify-center min-h-[400px]">
+    <div
+      className="flex items-center justify-center min-h-[400px]"
+      role="status"
+      aria-live="polite"
+    >
       <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <div
+          className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"
+          aria-hidden="true"
+        ></div>
         <p className="mt-4 text-gray-600">Laster...</p>
       </div>
     </div>
@@ -45,6 +54,7 @@ function PageLoader() {
 
 function App() {
   const [isAuthReady, setIsAuthReady] = useState(false);
+  const { showHelp, setShowHelp } = useGlobalKeyboardShortcuts();
 
   // Auto-login on startup
   useEffect(() => {
@@ -81,6 +91,7 @@ function App() {
   return (
     <ErrorBoundary>
       <Toaster position="top-right" richColors closeButton />
+      <KeyboardShortcutsModal open={showHelp} onClose={() => setShowHelp(false)} />
       <Routes>
         {/* Protected Routes */}
         <Route

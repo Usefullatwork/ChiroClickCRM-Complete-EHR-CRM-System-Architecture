@@ -3,147 +3,146 @@
  * Excel upload, text parsing, and data import
  */
 
-import { useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
-import { Upload, FileSpreadsheet, FileText, AlertCircle, CheckCircle2, X } from 'lucide-react'
-import apiClient from '../services/api'
-import { useTranslation } from '../i18n'
+import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { Upload, FileSpreadsheet, FileText, AlertCircle, CheckCircle2, X } from 'lucide-react';
+import apiClient from '../services/api';
+import { useTranslation } from '../i18n';
+import toast from '../utils/toast';
 
 export default function Import() {
-  const { t } = useTranslation('common')
-  const [activeTab, setActiveTab] = useState('excel') // 'excel' | 'text'
-  const [dragActive, setDragActive] = useState(false)
-  const [file, setFile] = useState(null)
-  const [pastedText, setPastedText] = useState('')
-  const [parsedData, setParsedData] = useState(null)
-  const [importResults, setImportResults] = useState(null)
+  const { t } = useTranslation('common');
+  const [activeTab, setActiveTab] = useState('excel'); // 'excel' | 'text'
+  const [dragActive, setDragActive] = useState(false);
+  const [file, setFile] = useState(null);
+  const [pastedText, setPastedText] = useState('');
+  const [parsedData, setParsedData] = useState(null);
+  const [importResults, setImportResults] = useState(null);
 
   // Excel upload mutation
   const uploadExcelMutation = useMutation({
     mutationFn: async (formData) => {
       const response = await apiClient.post('/import/patients/excel', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
-      return response.data
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      return response.data;
     },
     onSuccess: (data) => {
-      setImportResults(data)
-      setFile(null)
-    }
-  })
+      setImportResults(data);
+      setFile(null);
+    },
+  });
 
   // Text parsing mutation
   const parseTextMutation = useMutation({
     mutationFn: async (text) => {
-      const response = await apiClient.post('/import/patients/parse-text', { text })
-      return response.data
+      const response = await apiClient.post('/import/patients/parse-text', { text });
+      return response.data;
     },
     onSuccess: (data) => {
-      setParsedData(data.data)
-    }
-  })
+      setParsedData(data.data);
+    },
+  });
 
   // Import parsed patients mutation
   const importPatientsMutation = useMutation({
     mutationFn: async (patients) => {
-      const response = await apiClient.post('/import/patients/text', { patients })
-      return response.data
+      const response = await apiClient.post('/import/patients/text', { patients });
+      return response.data;
     },
     onSuccess: (data) => {
-      setImportResults(data)
-      setPastedText('')
-      setParsedData(null)
-    }
-  })
+      setImportResults(data);
+      setPastedText('');
+      setParsedData(null);
+    },
+  });
 
   // Drag and drop handlers
   const handleDrag = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
+    e.preventDefault();
+    e.stopPropagation();
     if (e.type === 'dragenter' || e.type === 'dragover') {
-      setDragActive(true)
+      setDragActive(true);
     } else if (e.type === 'dragleave') {
-      setDragActive(false)
+      setDragActive(false);
     }
-  }
+  };
 
   const handleDrop = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragActive(false)
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFile(e.dataTransfer.files[0])
+      handleFile(e.dataTransfer.files[0]);
     }
-  }
+  };
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
-      handleFile(e.target.files[0])
+      handleFile(e.target.files[0]);
     }
-  }
+  };
 
   const handleFile = (selectedFile) => {
     // Validate file type
     const validTypes = [
       'application/vnd.ms-excel',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'text/csv'
-    ]
+      'text/csv',
+    ];
 
     if (!validTypes.includes(selectedFile.type) && !selectedFile.name.match(/\.(xlsx|xls|csv)$/i)) {
-      alert(t('invalidFileType'))
-      return
+      toast.error(t('invalidFileType'));
+      return;
     }
 
-    setFile(selectedFile)
-    setImportResults(null)
-  }
+    setFile(selectedFile);
+    setImportResults(null);
+  };
 
   const handleUploadExcel = () => {
-    if (!file) return
+    if (!file) return;
 
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('skipDuplicates', 'true')
-    formData.append('updateExisting', 'false')
-    formData.append('dryRun', 'false')
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('skipDuplicates', 'true');
+    formData.append('updateExisting', 'false');
+    formData.append('dryRun', 'false');
 
-    uploadExcelMutation.mutate(formData)
-  }
+    uploadExcelMutation.mutate(formData);
+  };
 
   const handleParseText = () => {
-    if (!pastedText.trim()) return
-    parseTextMutation.mutate(pastedText)
-  }
+    if (!pastedText.trim()) return;
+    parseTextMutation.mutate(pastedText);
+  };
 
   const handleImportParsed = () => {
-    if (!parsedData) return
+    if (!parsedData) return;
 
-    const patients = parsedData.type === 'table'
-      ? parsedData.patients
-      : [parsedData.patient]
+    const patients = parsedData.type === 'table' ? parsedData.patients : [parsedData.patient];
 
-    importPatientsMutation.mutate(patients)
-  }
+    importPatientsMutation.mutate(patients);
+  };
 
   const downloadTemplate = async () => {
     try {
       const response = await apiClient.get('/import/patients/template', {
-        responseType: 'blob'
-      })
+        responseType: 'blob',
+      });
 
-      const url = window.URL.createObjectURL(new Blob([response.data]))
-      const link = document.createElement('a')
-      link.href = url
-      link.setAttribute('download', 'patient_import_template.xlsx')
-      document.body.appendChild(link)
-      link.click()
-      link.remove()
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'patient_import_template.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
     } catch (error) {
-      alert(t('failedDownloadTemplate'))
+      toast.error(t('failedDownloadTemplate'));
     }
-  }
+  };
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
@@ -192,9 +191,7 @@ export default function Import() {
               <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
                 <h3 className="font-semibold text-blue-900 mb-1">{t('needTemplate')}</h3>
-                <p className="text-sm text-blue-800 mb-3">
-                  {t('downloadTemplateDesc')}
-                </p>
+                <p className="text-sm text-blue-800 mb-3">{t('downloadTemplateDesc')}</p>
                 <button
                   onClick={downloadTemplate}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
@@ -208,9 +205,7 @@ export default function Import() {
           {/* Drop Zone */}
           <div
             className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors ${
-              dragActive
-                ? 'border-blue-500 bg-blue-50'
-                : 'border-gray-300 hover:border-gray-400'
+              dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
             }`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
@@ -221,9 +216,7 @@ export default function Import() {
             <p className="text-lg font-medium text-gray-700 mb-2">
               {file ? file.name : t('dropFileHere')}
             </p>
-            <p className="text-sm text-gray-500 mb-4">
-              {t('supportsFormats')}
-            </p>
+            <p className="text-sm text-gray-500 mb-4">{t('supportsFormats')}</p>
             <input
               type="file"
               id="file-upload"
@@ -247,9 +240,7 @@ export default function Import() {
                   <FileSpreadsheet className="w-8 h-8 text-green-600" />
                   <div>
                     <p className="font-medium text-gray-900">{file.name}</p>
-                    <p className="text-sm text-gray-500">
-                      {(file.size / 1024).toFixed(2)} KB
-                    </p>
+                    <p className="text-sm text-gray-500">{(file.size / 1024).toFixed(2)} KB</p>
                   </div>
                 </div>
                 <button
@@ -283,9 +274,7 @@ export default function Import() {
               <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
               <div>
                 <h3 className="font-semibold text-blue-900 mb-1">{t('howToUse')}</h3>
-                <p className="text-sm text-blue-800">
-                  {t('howToUseDesc')}
-                </p>
+                <p className="text-sm text-blue-800">{t('howToUseDesc')}</p>
               </div>
             </div>
           </div>
@@ -355,10 +344,25 @@ export default function Import() {
                 </div>
               ) : (
                 <div className="space-y-2 text-sm">
-                  <p><strong>Name:</strong> {parsedData.patient.first_name} {parsedData.patient.last_name}</p>
-                  {parsedData.patient.phone && <p><strong>Phone:</strong> {parsedData.patient.phone}</p>}
-                  {parsedData.patient.email && <p><strong>Email:</strong> {parsedData.patient.email}</p>}
-                  {parsedData.patient.address_street && <p><strong>Address:</strong> {parsedData.patient.address_street}</p>}
+                  <p>
+                    <strong>Name:</strong> {parsedData.patient.first_name}{' '}
+                    {parsedData.patient.last_name}
+                  </p>
+                  {parsedData.patient.phone && (
+                    <p>
+                      <strong>Phone:</strong> {parsedData.patient.phone}
+                    </p>
+                  )}
+                  {parsedData.patient.email && (
+                    <p>
+                      <strong>Email:</strong> {parsedData.patient.email}
+                    </p>
+                  )}
+                  {parsedData.patient.address_street && (
+                    <p>
+                      <strong>Address:</strong> {parsedData.patient.address_street}
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -390,9 +394,7 @@ export default function Import() {
               <p className="text-sm text-gray-600">{t('imported')}</p>
             </div>
             <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <p className="text-2xl font-bold text-blue-600">
-                {importResults.data?.updated || 0}
-              </p>
+              <p className="text-2xl font-bold text-blue-600">{importResults.data?.updated || 0}</p>
               <p className="text-sm text-gray-600">{t('updated')}</p>
             </div>
             <div className="text-center p-4 bg-yellow-50 rounded-lg">
@@ -418,9 +420,9 @@ export default function Import() {
 
           <button
             onClick={() => {
-              setImportResults(null)
-              setParsedData(null)
-              setFile(null)
+              setImportResults(null);
+              setParsedData(null);
+              setFile(null);
             }}
             className="mt-4 w-full px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
           >
@@ -429,5 +431,5 @@ export default function Import() {
         </div>
       )}
     </div>
-  )
+  );
 }

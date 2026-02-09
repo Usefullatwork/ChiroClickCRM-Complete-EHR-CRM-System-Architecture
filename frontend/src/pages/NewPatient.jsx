@@ -3,17 +3,32 @@
  * Create a new patient record
  */
 
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useMutation } from '@tanstack/react-query'
-import { patientsAPI } from '../services/api'
-import { ArrowLeft, Save, AlertCircle, User, Phone, Mail, MapPin, Calendar, FileText } from 'lucide-react'
-import { useTranslation } from '../i18n'
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
+import { patientsAPI } from '../services/api';
+import {
+  ArrowLeft,
+  Save,
+  AlertCircle,
+  User,
+  Phone,
+  Mail,
+  MapPin,
+  Calendar,
+  FileText,
+} from 'lucide-react';
+import { useTranslation } from '../i18n';
+import useUnsavedChanges from '../hooks/useUnsavedChanges';
+import UnsavedChangesDialog from '../components/common/UnsavedChangesDialog';
+import Breadcrumbs from '../components/common/Breadcrumbs';
 
 export default function NewPatient() {
-  const navigate = useNavigate()
-  const { t, lang } = useTranslation('patients')
-  const [errors, setErrors] = useState({})
+  const navigate = useNavigate();
+  const { t, lang } = useTranslation('patients');
+  const [errors, setErrors] = useState({});
+  const [isDirty, setIsDirty] = useState(false);
+  const { isBlocked, proceed, reset } = useUnsavedChanges(isDirty);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -28,7 +43,7 @@ export default function NewPatient() {
       street: '',
       city: '',
       postal_code: '',
-      country: 'Norway'
+      country: 'Norway',
     },
     category: '',
     referral_source: '',
@@ -54,89 +69,92 @@ export default function NewPatient() {
     treatment_pref_needles: null,
     treatment_pref_adjustments: null,
     treatment_pref_neck_adjustments: null,
-    treatment_pref_notes: ''
-  })
+    treatment_pref_notes: '',
+  });
 
   // Create patient mutation
   const createMutation = useMutation({
     mutationFn: (data) => patientsAPI.create(data),
     onSuccess: (response) => {
-      const patientId = response.data.id
-      navigate(`/patients/${patientId}`)
+      setIsDirty(false);
+      const patientId = response.data.id;
+      navigate(`/patients/${patientId}`);
     },
     onError: (error) => {
       if (error.response?.data?.details) {
         // Validation errors from backend
-        const backendErrors = {}
+        const backendErrors = {};
         error.response.data.details.forEach(({ field, message }) => {
-          backendErrors[field] = message
-        })
-        setErrors(backendErrors)
+          backendErrors[field] = message;
+        });
+        setErrors(backendErrors);
       } else {
-        setErrors({ general: error.response?.data?.message || 'Failed to create patient' })
+        setErrors({ general: error.response?.data?.message || 'Failed to create patient' });
       }
-    }
-  })
+    },
+  });
 
   // Handle input changes
   const handleChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setIsDirty(true);
     // Clear error for this field
-    setErrors(prev => ({ ...prev, [field]: undefined }))
-  }
+    setErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
 
   const handleAddressChange = (field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      address: { ...prev.address, [field]: value }
-    }))
-  }
+      address: { ...prev.address, [field]: value },
+    }));
+  };
 
   // Validate form before submission
   const validateForm = () => {
-    const newErrors = {}
+    const newErrors = {};
 
     // Required fields
-    if (!formData.solvit_id?.trim()) newErrors.solvit_id = 'SolvIt ID is required'
-    if (!formData.first_name?.trim()) newErrors.first_name = 'First name is required'
-    if (!formData.last_name?.trim()) newErrors.last_name = 'Last name is required'
-    if (!formData.date_of_birth) newErrors.date_of_birth = 'Date of birth is required'
-    if (!formData.gender) newErrors.gender = 'Gender is required'
+    if (!formData.solvit_id?.trim()) newErrors.solvit_id = 'SolvIt ID is required';
+    if (!formData.first_name?.trim()) newErrors.first_name = 'First name is required';
+    if (!formData.last_name?.trim()) newErrors.last_name = 'Last name is required';
+    if (!formData.date_of_birth) newErrors.date_of_birth = 'Date of birth is required';
+    if (!formData.gender) newErrors.gender = 'Gender is required';
 
     // Date validation
     if (formData.date_of_birth && new Date(formData.date_of_birth) > new Date()) {
-      newErrors.date_of_birth = 'Date of birth cannot be in the future'
+      newErrors.date_of_birth = 'Date of birth cannot be in the future';
     }
 
     // Phone validation (Norwegian format)
     if (formData.phone && !/^(\+47)?[0-9]{8}$/.test(formData.phone.replace(/\s/g, ''))) {
-      newErrors.phone = 'Phone must be a valid Norwegian phone number (8 digits)'
+      newErrors.phone = 'Phone must be a valid Norwegian phone number (8 digits)';
     }
 
     // Email validation
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Email must be valid'
+      newErrors.email = 'Email must be valid';
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   // Handle form submission
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!validateForm()) {
-      return
+      return;
     }
 
     // Prepare data for submission (remove empty strings, format arrays)
     const submitData = {
       ...formData,
       // Clean up empty address object
-      address: formData.address.street || formData.address.city || formData.address.postal_code
-        ? formData.address
-        : undefined,
+      address:
+        formData.address.street || formData.address.city || formData.address.postal_code
+          ? formData.address
+          : undefined,
       // Remove empty optional fields
       email: formData.email || undefined,
       phone: formData.phone || undefined,
@@ -146,20 +164,30 @@ export default function NewPatient() {
       preferred_therapist: formData.preferred_therapist || undefined,
       main_problem: formData.main_problem || undefined,
       treatment_type: formData.treatment_type || undefined,
-      general_notes: formData.general_notes || undefined
-    }
+      general_notes: formData.general_notes || undefined,
+    };
 
-    createMutation.mutate(submitData)
-  }
+    createMutation.mutate(submitData);
+  };
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
+      <UnsavedChangesDialog isBlocked={isBlocked} onProceed={proceed} onCancel={reset} />
+      <Breadcrumbs
+        items={[
+          { label: 'Dashboard', href: '/' },
+          { label: t('patients') || 'Patients', href: '/patients' },
+          { label: t('newPatient') || 'New Patient' },
+        ]}
+      />
+
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate('/patients')}
             className="p-2 hover:bg-gray-100 rounded-lg"
+            aria-label="Back to patients"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -239,7 +267,9 @@ export default function NewPatient() {
                 }`}
                 placeholder="First name"
               />
-              {errors.first_name && <p className="text-red-600 text-sm mt-1">{errors.first_name}</p>}
+              {errors.first_name && (
+                <p className="text-red-600 text-sm mt-1">{errors.first_name}</p>
+              )}
             </div>
 
             <div>
@@ -271,13 +301,13 @@ export default function NewPatient() {
                   errors.date_of_birth ? 'border-red-500' : 'border-gray-300'
                 }`}
               />
-              {errors.date_of_birth && <p className="text-red-600 text-sm mt-1">{errors.date_of_birth}</p>}
+              {errors.date_of_birth && (
+                <p className="text-red-600 text-sm mt-1">{errors.date_of_birth}</p>
+              )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Category
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
               <select
                 value={formData.category}
                 onChange={(e) => handleChange('category', e.target.value)}
@@ -302,9 +332,7 @@ export default function NewPatient() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('phone')}
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('phone')}</label>
               <input
                 type="tel"
                 value={formData.phone}
@@ -318,9 +346,7 @@ export default function NewPatient() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('email')}
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
               <input
                 type="email"
                 value={formData.email}
@@ -351,9 +377,7 @@ export default function NewPatient() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Language
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Language</label>
               <select
                 value={formData.language}
                 onChange={(e) => handleChange('language', e.target.value)}
@@ -376,9 +400,7 @@ export default function NewPatient() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Street Address
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
               <input
                 type="text"
                 value={formData.address.street}
@@ -402,9 +424,7 @@ export default function NewPatient() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('city')}
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('city')}</label>
               <input
                 type="text"
                 value={formData.address.city}
@@ -481,9 +501,7 @@ export default function NewPatient() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('notes')}
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('notes')}</label>
               <textarea
                 value={formData.general_notes}
                 onChange={(e) => handleChange('general_notes', e.target.value)}
@@ -561,7 +579,9 @@ export default function NewPatient() {
           <div className="space-y-4">
             {/* Needles preference */}
             <div className="flex items-center gap-6">
-              <span className="text-sm font-medium text-gray-700 w-40">Nåler (dry needling, akupunktur):</span>
+              <span className="text-sm font-medium text-gray-700 w-40">
+                Nåler (dry needling, akupunktur):
+              </span>
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2">
                   <input
@@ -635,7 +655,9 @@ export default function NewPatient() {
 
             {/* Neck adjustments preference */}
             <div className="flex items-center gap-6">
-              <span className="text-sm font-medium text-gray-700 w-40">Nakkejusteringer spesifikt:</span>
+              <span className="text-sm font-medium text-gray-700 w-40">
+                Nakkejusteringer spesifikt:
+              </span>
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2">
                   <input
@@ -706,5 +728,5 @@ export default function NewPatient() {
         </div>
       </form>
     </div>
-  )
+  );
 }

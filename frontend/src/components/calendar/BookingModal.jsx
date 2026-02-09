@@ -14,11 +14,11 @@
  * - Norwegian labels
  */
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { patientsAPI } from '../../services/api'
-import { format, parseISO, addMinutes, isWithinInterval } from 'date-fns'
-import { nb } from 'date-fns/locale'
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { patientsAPI } from '../../services/api';
+import { format, parseISO, addMinutes, isWithinInterval } from 'date-fns';
+import { nb } from 'date-fns/locale';
 import {
   X,
   Search,
@@ -29,8 +29,9 @@ import {
   CheckCircle,
   Loader2,
   Trash2,
-  UserPlus
-} from 'lucide-react'
+  UserPlus,
+} from 'lucide-react';
+import toast from '../../utils/toast';
 
 // =============================================================================
 // CONSTANTS
@@ -43,7 +44,7 @@ const DURATIONS = [
   { value: 60, label: '1 time' },
   { value: 90, label: '1.5 time' },
   { value: 120, label: '2 timer' },
-]
+];
 
 const DEFAULT_DURATIONS_BY_TYPE = {
   INITIAL: 60,
@@ -53,37 +54,37 @@ const DEFAULT_DURATIONS_BY_TYPE = {
   PHONE: 15,
   VIDEO: 30,
   MAINTENANCE: 30,
-}
+};
 
 // =============================================================================
 // PATIENT SEARCH COMPONENT
 // =============================================================================
 
 function PatientSearch({ value, onChange, selectedPatient, onSelect, onClear }) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [searchTerm, setSearchTerm] = useState('')
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Search patients
   const { data: searchResults, isLoading } = useQuery({
     queryKey: ['patients-search', searchTerm],
     queryFn: () => patientsAPI.search(searchTerm),
     enabled: searchTerm.length >= 2,
-    staleTime: 30000
-  })
+    staleTime: 30000,
+  });
 
-  const patients = searchResults?.data?.patients || []
+  const patients = searchResults?.data?.patients || [];
 
   const handleSearch = (e) => {
-    const term = e.target.value
-    setSearchTerm(term)
-    setIsOpen(term.length >= 2)
-  }
+    const term = e.target.value;
+    setSearchTerm(term);
+    setIsOpen(term.length >= 2);
+  };
 
   const handleSelect = (patient) => {
-    onSelect(patient)
-    setSearchTerm('')
-    setIsOpen(false)
-  }
+    onSelect(patient);
+    setSearchTerm('');
+    setIsOpen(false);
+  };
 
   // If a patient is selected, show their name
   if (selectedPatient) {
@@ -106,7 +107,7 @@ function PatientSearch({ value, onChange, selectedPatient, onSelect, onClear }) 
           <X className="w-4 h-4" />
         </button>
       </div>
-    )
+    );
   }
 
   return (
@@ -130,9 +131,7 @@ function PatientSearch({ value, onChange, selectedPatient, onSelect, onClear }) 
         <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto">
           {patients.length === 0 ? (
             <div className="p-4 text-center text-gray-500">
-              {searchTerm.length < 2
-                ? 'Skriv minst 2 tegn for a soke'
-                : 'Ingen pasienter funnet'}
+              {searchTerm.length < 2 ? 'Skriv minst 2 tegn for a soke' : 'Ingen pasienter funnet'}
             </div>
           ) : (
             <ul className="py-1">
@@ -160,7 +159,7 @@ function PatientSearch({ value, onChange, selectedPatient, onSelect, onClear }) 
         </div>
       )}
     </div>
-  )
+  );
 }
 
 // =============================================================================
@@ -168,7 +167,7 @@ function PatientSearch({ value, onChange, selectedPatient, onSelect, onClear }) 
 // =============================================================================
 
 function ConflictWarning({ conflicts }) {
-  if (!conflicts || conflicts.length === 0) return null
+  if (!conflicts || conflicts.length === 0) return null;
 
   return (
     <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -182,14 +181,15 @@ function ConflictWarning({ conflicts }) {
           <ul className="mt-2 space-y-1">
             {conflicts.map((conflict, index) => (
               <li key={index} className="text-sm text-red-700">
-                {format(parseISO(conflict.start_time), 'HH:mm')} - {format(parseISO(conflict.end_time), 'HH:mm')}: {conflict.patient_name}
+                {format(parseISO(conflict.start_time), 'HH:mm')} -{' '}
+                {format(parseISO(conflict.end_time), 'HH:mm')}: {conflict.patient_name}
               </li>
             ))}
           </ul>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // =============================================================================
@@ -207,18 +207,18 @@ export default function BookingModal({
   onCancel,
   isSubmitting,
   isCancelling,
-  typeOptions
+  typeOptions,
 }) {
   // Form state
-  const [selectedPatient, setSelectedPatient] = useState(null)
-  const [practitionerId, setPractitionerId] = useState('')
-  const [appointmentDate, setAppointmentDate] = useState('')
-  const [appointmentTime, setAppointmentTime] = useState('')
-  const [appointmentType, setAppointmentType] = useState('FOLLOWUP')
-  const [duration, setDuration] = useState(30)
-  const [notes, setNotes] = useState('')
-  const [showCancelConfirm, setShowCancelConfirm] = useState(false)
-  const [cancelReason, setCancelReason] = useState('')
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [practitionerId, setPractitionerId] = useState('');
+  const [appointmentDate, setAppointmentDate] = useState('');
+  const [appointmentTime, setAppointmentTime] = useState('');
+  const [appointmentType, setAppointmentType] = useState('FOLLOWUP');
+  const [duration, setDuration] = useState(30);
+  const [notes, setNotes] = useState('');
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [cancelReason, setCancelReason] = useState('');
 
   // Initialize form from props
   useEffect(() => {
@@ -228,95 +228,102 @@ export default function BookingModal({
         id: editingAppointment.patient_id,
         first_name: editingAppointment.patient_name?.split(' ')[0] || '',
         last_name: editingAppointment.patient_name?.split(' ').slice(1).join(' ') || '',
-        phone: editingAppointment.patient_phone
-      })
-      setPractitionerId(editingAppointment.practitioner_id || '')
-      setAppointmentDate(format(parseISO(editingAppointment.start_time), 'yyyy-MM-dd'))
-      setAppointmentTime(format(parseISO(editingAppointment.start_time), 'HH:mm'))
-      setAppointmentType(editingAppointment.appointment_type || 'FOLLOWUP')
+        phone: editingAppointment.patient_phone,
+      });
+      setPractitionerId(editingAppointment.practitioner_id || '');
+      setAppointmentDate(format(parseISO(editingAppointment.start_time), 'yyyy-MM-dd'));
+      setAppointmentTime(format(parseISO(editingAppointment.start_time), 'HH:mm'));
+      setAppointmentType(editingAppointment.appointment_type || 'FOLLOWUP');
 
       // Calculate duration
-      const start = parseISO(editingAppointment.start_time)
-      const end = parseISO(editingAppointment.end_time)
-      const durationMins = Math.round((end - start) / 60000)
-      setDuration(durationMins)
+      const start = parseISO(editingAppointment.start_time);
+      const end = parseISO(editingAppointment.end_time);
+      const durationMins = Math.round((end - start) / 60000);
+      setDuration(durationMins);
 
-      setNotes(editingAppointment.patient_notes || '')
+      setNotes(editingAppointment.patient_notes || '');
     } else if (initialSlot) {
       // New appointment - use slot data
-      setSelectedPatient(null)
-      setPractitionerId(practitioners[0]?.id || '')
-      setAppointmentDate(initialSlot.date)
-      setAppointmentTime(initialSlot.time)
-      setAppointmentType('FOLLOWUP')
-      setDuration(30)
-      setNotes('')
+      setSelectedPatient(null);
+      setPractitionerId(practitioners[0]?.id || '');
+      setAppointmentDate(initialSlot.date);
+      setAppointmentTime(initialSlot.time);
+      setAppointmentType('FOLLOWUP');
+      setDuration(30);
+      setNotes('');
     }
-  }, [editingAppointment, initialSlot, practitioners])
+  }, [editingAppointment, initialSlot, practitioners]);
 
   // Update duration when type changes (for new appointments only)
   useEffect(() => {
     if (!editingAppointment && appointmentType) {
-      const defaultDuration = DEFAULT_DURATIONS_BY_TYPE[appointmentType] || 30
-      setDuration(defaultDuration)
+      const defaultDuration = DEFAULT_DURATIONS_BY_TYPE[appointmentType] || 30;
+      setDuration(defaultDuration);
     }
-  }, [appointmentType, editingAppointment])
+  }, [appointmentType, editingAppointment]);
 
   // Check for conflicts
   const conflicts = useMemo(() => {
-    if (!appointmentDate || !appointmentTime || !practitionerId) return []
+    if (!appointmentDate || !appointmentTime || !practitionerId) return [];
 
-    const startDateTime = new Date(`${appointmentDate}T${appointmentTime}`)
-    const endDateTime = addMinutes(startDateTime, duration)
+    const startDateTime = new Date(`${appointmentDate}T${appointmentTime}`);
+    const endDateTime = addMinutes(startDateTime, duration);
 
-    return existingAppointments.filter(apt => {
+    return existingAppointments.filter((apt) => {
       // Skip the appointment we're editing
-      if (editingAppointment && apt.id === editingAppointment.id) return false
+      if (editingAppointment && apt.id === editingAppointment.id) return false;
 
       // Skip cancelled appointments
-      if (['CANCELLED', 'NO_SHOW'].includes(apt.status)) return false
+      if (['CANCELLED', 'NO_SHOW'].includes(apt.status)) return false;
 
       // Only check same practitioner
-      if (apt.practitioner_id !== practitionerId) return false
+      if (apt.practitioner_id !== practitionerId) return false;
 
-      const aptStart = parseISO(apt.start_time)
-      const aptEnd = parseISO(apt.end_time)
+      const aptStart = parseISO(apt.start_time);
+      const aptEnd = parseISO(apt.end_time);
 
       // Check for overlap
       return (
         (startDateTime >= aptStart && startDateTime < aptEnd) ||
         (endDateTime > aptStart && endDateTime <= aptEnd) ||
         (startDateTime <= aptStart && endDateTime >= aptEnd)
-      )
-    })
-  }, [appointmentDate, appointmentTime, duration, practitionerId, existingAppointments, editingAppointment])
+      );
+    });
+  }, [
+    appointmentDate,
+    appointmentTime,
+    duration,
+    practitionerId,
+    existingAppointments,
+    editingAppointment,
+  ]);
 
   // Calculate end time
   const endTime = useMemo(() => {
-    if (!appointmentDate || !appointmentTime) return ''
-    const startDateTime = new Date(`${appointmentDate}T${appointmentTime}`)
-    const endDateTime = addMinutes(startDateTime, duration)
-    return format(endDateTime, 'HH:mm')
-  }, [appointmentDate, appointmentTime, duration])
+    if (!appointmentDate || !appointmentTime) return '';
+    const startDateTime = new Date(`${appointmentDate}T${appointmentTime}`);
+    const endDateTime = addMinutes(startDateTime, duration);
+    return format(endDateTime, 'HH:mm');
+  }, [appointmentDate, appointmentTime, duration]);
 
   // Handle form submission
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!selectedPatient || !practitionerId || !appointmentDate || !appointmentTime) {
-      alert('Vennligst fyll ut alle pakreve felter')
-      return
+      toast.warning('Vennligst fyll ut alle pakreve felter');
+      return;
     }
 
     if (conflicts.length > 0) {
       const confirmed = window.confirm(
         'Det er en tidskonflikt. Er du sikker pa at du vil opprette denne avtalen likevel?'
-      )
-      if (!confirmed) return
+      );
+      if (!confirmed) return;
     }
 
-    const startDateTime = new Date(`${appointmentDate}T${appointmentTime}`)
-    const endDateTime = addMinutes(startDateTime, duration)
+    const startDateTime = new Date(`${appointmentDate}T${appointmentTime}`);
+    const endDateTime = addMinutes(startDateTime, duration);
 
     const formData = {
       patient_id: selectedPatient.id,
@@ -324,24 +331,24 @@ export default function BookingModal({
       start_time: startDateTime.toISOString(),
       end_time: endDateTime.toISOString(),
       appointment_type: appointmentType,
-      patient_notes: notes || null
-    }
+      patient_notes: notes || null,
+    };
 
-    await onSubmit(formData)
-  }
+    await onSubmit(formData);
+  };
 
   // Handle cancel appointment
   const handleCancelAppointment = async () => {
     if (!cancelReason.trim()) {
-      alert('Vennligst oppgi en avsak for avlysning')
-      return
+      toast.warning('Vennligst oppgi en avsak for avlysning');
+      return;
     }
-    await onCancel(cancelReason)
-    setShowCancelConfirm(false)
-    setCancelReason('')
-  }
+    await onCancel(cancelReason);
+    setShowCancelConfirm(false);
+    setCancelReason('');
+  };
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
@@ -371,9 +378,7 @@ export default function BookingModal({
           <div className="p-6 space-y-5">
             {/* Patient Search */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Pasient *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Pasient *</label>
               <PatientSearch
                 selectedPatient={selectedPatient}
                 onSelect={setSelectedPatient}
@@ -383,9 +388,7 @@ export default function BookingModal({
 
             {/* Practitioner */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Behandler *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Behandler *</label>
               <select
                 value={practitionerId}
                 onChange={(e) => setPractitionerId(e.target.value)}
@@ -435,9 +438,7 @@ export default function BookingModal({
             {/* Type and Duration */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Type *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Type *</label>
                 <select
                   value={appointmentType}
                   onChange={(e) => setAppointmentType(e.target.value)}
@@ -452,9 +453,7 @@ export default function BookingModal({
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Varighet
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Varighet</label>
                 <select
                   value={duration}
                   onChange={(e) => setDuration(parseInt(e.target.value))}
@@ -474,7 +473,8 @@ export default function BookingModal({
               <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-4 py-2 rounded-lg">
                 <Clock className="w-4 h-4" />
                 <span>
-                  Avtalen varer fra <strong>{appointmentTime}</strong> til <strong>{endTime}</strong>
+                  Avtalen varer fra <strong>{appointmentTime}</strong> til{' '}
+                  <strong>{endTime}</strong>
                 </span>
               </div>
             )}
@@ -492,9 +492,7 @@ export default function BookingModal({
 
             {/* Notes */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Notater
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Notater</label>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
@@ -505,52 +503,53 @@ export default function BookingModal({
             </div>
 
             {/* Cancel Appointment Section (Edit mode only) */}
-            {editingAppointment && !['CANCELLED', 'COMPLETED', 'NO_SHOW'].includes(editingAppointment.status) && (
-              <div className="border-t border-gray-200 pt-5">
-                {showCancelConfirm ? (
-                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                    <h4 className="font-medium text-red-800 mb-2">Avlys avtale</h4>
-                    <textarea
-                      value={cancelReason}
-                      onChange={(e) => setCancelReason(e.target.value)}
-                      placeholder="Arsak til avlysning..."
-                      rows={2}
-                      className="w-full px-3 py-2 border border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 mb-3 resize-none"
-                    />
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={handleCancelAppointment}
-                        disabled={isCancelling}
-                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 flex items-center gap-2"
-                      >
-                        {isCancelling && <Loader2 className="w-4 h-4 animate-spin" />}
-                        Bekreft avlysning
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowCancelConfirm(false)
-                          setCancelReason('')
-                        }}
-                        className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
-                      >
-                        Avbryt
-                      </button>
+            {editingAppointment &&
+              !['CANCELLED', 'COMPLETED', 'NO_SHOW'].includes(editingAppointment.status) && (
+                <div className="border-t border-gray-200 pt-5">
+                  {showCancelConfirm ? (
+                    <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                      <h4 className="font-medium text-red-800 mb-2">Avlys avtale</h4>
+                      <textarea
+                        value={cancelReason}
+                        onChange={(e) => setCancelReason(e.target.value)}
+                        placeholder="Arsak til avlysning..."
+                        rows={2}
+                        className="w-full px-3 py-2 border border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 mb-3 resize-none"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={handleCancelAppointment}
+                          disabled={isCancelling}
+                          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 flex items-center gap-2"
+                        >
+                          {isCancelling && <Loader2 className="w-4 h-4 animate-spin" />}
+                          Bekreft avlysning
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowCancelConfirm(false);
+                            setCancelReason('');
+                          }}
+                          className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+                        >
+                          Avbryt
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setShowCancelConfirm(true)}
-                    className="flex items-center gap-2 text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    Avlys denne avtalen
-                  </button>
-                )}
-              </div>
-            )}
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setShowCancelConfirm(true)}
+                      className="flex items-center gap-2 text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Avlys denne avtalen
+                    </button>
+                  )}
+                </div>
+              )}
           </div>
 
           {/* Footer */}
@@ -574,5 +573,5 @@ export default function BookingModal({
         </form>
       </div>
     </div>
-  )
+  );
 }

@@ -77,6 +77,7 @@ import QuickPalpationSpine from '../components/clinical/QuickPalpationSpine';
 // Healthcare UX Components
 import { SALTBanner, AIDiagnosisSidebar, EnhancedClinicalTextarea } from '../components/clinical';
 import { ConnectionStatus } from '../components/common';
+import toast from '../utils/toast';
 
 // --- STATIC DATA ---
 const taksterNorwegian = [
@@ -634,7 +635,7 @@ export default function ClinicalEncounter() {
   // SALT - Same As Last Time: Copy from previous encounter
   const handleSALT = (section = null) => {
     if (!previousEncounters) {
-      alert('Ingen tidligere konsultasjon funnet for denne pasienten.');
+      toast.info('Ingen tidligere konsultasjon funnet for denne pasienten.');
       return;
     }
 

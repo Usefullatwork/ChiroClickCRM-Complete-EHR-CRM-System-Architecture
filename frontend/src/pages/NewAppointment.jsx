@@ -3,16 +3,17 @@
  * Create appointments for patients
  */
 
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { appointmentsAPI, patientsAPI, usersAPI } from '../services/api'
-import { ArrowLeft, Save, Calendar, Clock, User, Repeat } from 'lucide-react'
-import { useTranslation, formatDate, formatTime } from '../i18n'
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { appointmentsAPI, patientsAPI, usersAPI } from '../services/api';
+import { ArrowLeft, Save, Calendar, Clock, User, Repeat } from 'lucide-react';
+import { useTranslation, formatDate, formatTime } from '../i18n';
+import Breadcrumbs from '../components/common/Breadcrumbs';
 
 export default function NewAppointment() {
-  const navigate = useNavigate()
-  const { t, lang } = useTranslation('appointments')
+  const navigate = useNavigate();
+  const { t, lang } = useTranslation('appointments');
 
   const [formData, setFormData] = useState({
     patient_id: '',
@@ -23,90 +24,90 @@ export default function NewAppointment() {
     recurring_pattern: '',
     recurring_end_date: '',
     patient_notes: '',
-    status: 'PENDING'
-  })
+    status: 'PENDING',
+  });
 
-  const [errors, setErrors] = useState({})
-  const [searchTerm, setSearchTerm] = useState('')
+  const [errors, setErrors] = useState({});
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Fetch patients for selection
   const { data: patientsResponse } = useQuery({
     queryKey: ['patients', searchTerm],
     queryFn: () => patientsAPI.getAll({ search: searchTerm, limit: 50 }),
-    enabled: searchTerm.length > 1
-  })
+    enabled: searchTerm.length > 1,
+  });
 
   // Fetch practitioners/users
   const { data: usersResponse } = useQuery({
     queryKey: ['users'],
-    queryFn: () => usersAPI.getAll()
-  })
+    queryFn: () => usersAPI.getAll(),
+  });
 
-  const patients = patientsResponse?.data?.patients || []
-  const users = usersResponse?.data?.users || []
+  const patients = patientsResponse?.data?.patients || [];
+  const users = usersResponse?.data?.users || [];
 
   // Create appointment mutation
   const createMutation = useMutation({
     mutationFn: (data) => appointmentsAPI.create(data),
     onSuccess: () => {
-      navigate('/appointments')
+      navigate('/appointments');
     },
     onError: (error) => {
       if (error.response?.data?.details) {
-        const backendErrors = {}
+        const backendErrors = {};
         error.response.data.details.forEach(({ field, message }) => {
-          backendErrors[field] = message
-        })
-        setErrors(backendErrors)
+          backendErrors[field] = message;
+        });
+        setErrors(backendErrors);
       } else {
-        setErrors({ general: error.response?.data?.message || t('failedToCreate') })
+        setErrors({ general: error.response?.data?.message || t('failedToCreate') });
       }
-    }
-  })
+    },
+  });
 
   const handleChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-    setErrors(prev => ({ ...prev, [field]: undefined }))
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: undefined }));
 
     // Auto-calculate end time if start time changes (default 30 minutes)
     if (field === 'start_time' && value) {
-      const startDate = new Date(value)
-      const endDate = new Date(startDate.getTime() + 30 * 60000) // Add 30 minutes
-      const endTimeString = endDate.toISOString().slice(0, 16)
-      setFormData(prev => ({ ...prev, end_time: endTimeString }))
+      const startDate = new Date(value);
+      const endDate = new Date(startDate.getTime() + 30 * 60000); // Add 30 minutes
+      const endTimeString = endDate.toISOString().slice(0, 16);
+      setFormData((prev) => ({ ...prev, end_time: endTimeString }));
     }
-  }
+  };
 
   const validateForm = () => {
-    const newErrors = {}
+    const newErrors = {};
 
-    if (!formData.patient_id) newErrors.patient_id = 'Patient is required'
-    if (!formData.practitioner_id) newErrors.practitioner_id = 'Practitioner is required'
-    if (!formData.start_time) newErrors.start_time = 'Start time is required'
-    if (!formData.end_time) newErrors.end_time = 'End time is required'
-    if (!formData.appointment_type) newErrors.appointment_type = 'Appointment type is required'
+    if (!formData.patient_id) newErrors.patient_id = 'Patient is required';
+    if (!formData.practitioner_id) newErrors.practitioner_id = 'Practitioner is required';
+    if (!formData.start_time) newErrors.start_time = 'Start time is required';
+    if (!formData.end_time) newErrors.end_time = 'End time is required';
+    if (!formData.appointment_type) newErrors.appointment_type = 'Appointment type is required';
 
     // Validate end time is after start time
     if (formData.start_time && formData.end_time) {
       if (new Date(formData.end_time) <= new Date(formData.start_time)) {
-        newErrors.end_time = 'End time must be after start time'
+        newErrors.end_time = 'End time must be after start time';
       }
     }
 
     // Validate recurring end date if pattern is set
     if (formData.recurring_pattern && !formData.recurring_end_date) {
-      newErrors.recurring_end_date = 'Recurring end date is required for recurring appointments'
+      newErrors.recurring_end_date = 'Recurring end date is required for recurring appointments';
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!validateForm()) {
-      return
+      return;
     }
 
     // Prepare data (remove empty optional fields)
@@ -114,20 +115,29 @@ export default function NewAppointment() {
       ...formData,
       recurring_pattern: formData.recurring_pattern || undefined,
       recurring_end_date: formData.recurring_end_date || undefined,
-      patient_notes: formData.patient_notes || undefined
-    }
+      patient_notes: formData.patient_notes || undefined,
+    };
 
-    createMutation.mutate(submitData)
-  }
+    createMutation.mutate(submitData);
+  };
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
+      <Breadcrumbs
+        items={[
+          { label: 'Dashboard', href: '/' },
+          { label: t('appointments') || 'Appointments', href: '/appointments' },
+          { label: t('newAppointment') || 'New Appointment' },
+        ]}
+      />
+
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate('/appointments')}
             className="p-2 hover:bg-gray-100 rounded-lg"
+            aria-label="Back to appointments"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -174,18 +184,22 @@ export default function NewAppointment() {
                       key={patient.id}
                       type="button"
                       onClick={() => {
-                        handleChange('patient_id', patient.id)
-                        setSearchTerm(`${patient.first_name} ${patient.last_name}`)
+                        handleChange('patient_id', patient.id);
+                        setSearchTerm(`${patient.first_name} ${patient.last_name}`);
                       }}
                       className="w-full text-left px-3 py-2 hover:bg-gray-50 border-b border-gray-100 last:border-0"
                     >
-                      <p className="text-sm font-medium">{patient.first_name} {patient.last_name}</p>
+                      <p className="text-sm font-medium">
+                        {patient.first_name} {patient.last_name}
+                      </p>
                       <p className="text-xs text-gray-500">ID: {patient.solvit_id}</p>
                     </button>
                   ))}
                 </div>
               )}
-              {errors.patient_id && <p className="text-red-600 text-sm mt-1">{errors.patient_id}</p>}
+              {errors.patient_id && (
+                <p className="text-red-600 text-sm mt-1">{errors.patient_id}</p>
+              )}
             </div>
 
             {/* Practitioner Selection */}
@@ -207,7 +221,9 @@ export default function NewAppointment() {
                   </option>
                 ))}
               </select>
-              {errors.practitioner_id && <p className="text-red-600 text-sm mt-1">{errors.practitioner_id}</p>}
+              {errors.practitioner_id && (
+                <p className="text-red-600 text-sm mt-1">{errors.practitioner_id}</p>
+              )}
             </div>
           </div>
         </div>
@@ -233,7 +249,9 @@ export default function NewAppointment() {
                   errors.start_time ? 'border-red-500' : 'border-gray-300'
                 }`}
               />
-              {errors.start_time && <p className="text-red-600 text-sm mt-1">{errors.start_time}</p>}
+              {errors.start_time && (
+                <p className="text-red-600 text-sm mt-1">{errors.start_time}</p>
+              )}
             </div>
 
             <div>
@@ -279,13 +297,13 @@ export default function NewAppointment() {
                 <option value="EMERGENCY">{t('emergency')}</option>
                 <option value="REEXAM">{t('reExamination')}</option>
               </select>
-              {errors.appointment_type && <p className="text-red-600 text-sm mt-1">{errors.appointment_type}</p>}
+              {errors.appointment_type && (
+                <p className="text-red-600 text-sm mt-1">{errors.appointment_type}</p>
+              )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('status')}
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('status')}</label>
               <select
                 value={formData.status}
                 onChange={(e) => handleChange('status', e.target.value)}
@@ -350,7 +368,9 @@ export default function NewAppointment() {
                     errors.recurring_end_date ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
-                {errors.recurring_end_date && <p className="text-red-600 text-sm mt-1">{errors.recurring_end_date}</p>}
+                {errors.recurring_end_date && (
+                  <p className="text-red-600 text-sm mt-1">{errors.recurring_end_date}</p>
+                )}
               </div>
             )}
           </div>
@@ -384,5 +404,5 @@ export default function NewAppointment() {
         </div>
       </form>
     </div>
-  )
+  );
 }

@@ -29,9 +29,11 @@ import {
   AlertCircle,
   TrendingUp,
   Target,
-  Loader2
+  Loader2,
 } from 'lucide-react';
 import { crmAPI } from '../../services/api';
+import toast from '../../utils/toast';
+import logger from '../../utils/logger';
 
 const LEAD_SOURCES = [
   { id: 'WEBSITE', label: { no: 'Nettside', en: 'Website' }, color: 'blue' },
@@ -41,17 +43,21 @@ const LEAD_SOURCES = [
   { id: 'REFERRAL', label: { no: 'Henvisning', en: 'Referral' }, color: 'orange' },
   { id: 'WALK_IN', label: { no: 'Walk-in', en: 'Walk-in' }, color: 'green' },
   { id: 'PHONE_CALL', label: { no: 'Telefonsamtale', en: 'Phone Call' }, color: 'purple' },
-  { id: 'OTHER', label: { no: 'Annet', en: 'Other' }, color: 'gray' }
+  { id: 'OTHER', label: { no: 'Annet', en: 'Other' }, color: 'gray' },
 ];
 
 const LEAD_STAGES = [
   { id: 'NEW', label: { no: 'Nye', en: 'New' }, color: 'blue' },
   { id: 'CONTACTED', label: { no: 'Kontaktet', en: 'Contacted' }, color: 'yellow' },
   { id: 'QUALIFIED', label: { no: 'Kvalifisert', en: 'Qualified' }, color: 'purple' },
-  { id: 'APPOINTMENT_BOOKED', label: { no: 'Time Booket', en: 'Appointment Booked' }, color: 'indigo' },
+  {
+    id: 'APPOINTMENT_BOOKED',
+    label: { no: 'Time Booket', en: 'Appointment Booked' },
+    color: 'indigo',
+  },
   { id: 'SHOWED', label: { no: 'Møtte Opp', en: 'Showed' }, color: 'green' },
   { id: 'CONVERTED', label: { no: 'Konvertert', en: 'Converted' }, color: 'teal' },
-  { id: 'LOST', label: { no: 'Tapt', en: 'Lost' }, color: 'red' }
+  { id: 'LOST', label: { no: 'Tapt', en: 'Lost' }, color: 'red' },
 ];
 
 export default function LeadManagement({ language = 'no' }) {
@@ -73,7 +79,7 @@ export default function LeadManagement({ language = 'no' }) {
         const response = await crmAPI.getLeads({ source: filterSource || undefined });
         setLeads(response.data?.leads || response.data || []);
       } catch (err) {
-        console.error('Error fetching leads:', err);
+        logger.error('Error fetching leads:', err);
         setError(err.message || 'Failed to load leads');
       } finally {
         setLoading(false);
@@ -86,11 +92,11 @@ export default function LeadManagement({ language = 'no' }) {
   const handleCreateLead = async (leadData) => {
     try {
       const response = await crmAPI.createLead(leadData);
-      setLeads(prev => [...prev, response.data]);
+      setLeads((prev) => [...prev, response.data]);
       setShowNewLeadForm(false);
     } catch (err) {
-      console.error('Error creating lead:', err);
-      alert('Failed to create lead: ' + err.message);
+      logger.error('Error creating lead:', err);
+      toast.error('Failed to create lead: ' + err.message);
     }
   };
 
@@ -98,13 +104,13 @@ export default function LeadManagement({ language = 'no' }) {
   const handleUpdateLead = async (leadId, updates) => {
     try {
       const response = await crmAPI.updateLead(leadId, updates);
-      setLeads(prev => prev.map(l => l.id === leadId ? response.data : l));
+      setLeads((prev) => prev.map((l) => (l.id === leadId ? response.data : l)));
       if (selectedLead?.id === leadId) {
         setSelectedLead(response.data);
       }
     } catch (err) {
-      console.error('Error updating lead:', err);
-      alert('Failed to update lead: ' + err.message);
+      logger.error('Error updating lead:', err);
+      toast.error('Failed to update lead: ' + err.message);
     }
   };
 
@@ -112,11 +118,11 @@ export default function LeadManagement({ language = 'no' }) {
   const handleConvertLead = async (leadId) => {
     try {
       await crmAPI.convertLead(leadId);
-      setLeads(prev => prev.map(l => l.id === leadId ? { ...l, status: 'CONVERTED' } : l));
+      setLeads((prev) => prev.map((l) => (l.id === leadId ? { ...l, status: 'CONVERTED' } : l)));
       setSelectedLead(null);
     } catch (err) {
-      console.error('Error converting lead:', err);
-      alert('Failed to convert lead: ' + err.message);
+      logger.error('Error converting lead:', err);
+      toast.error('Failed to convert lead: ' + err.message);
     }
   };
 
@@ -124,9 +130,10 @@ export default function LeadManagement({ language = 'no' }) {
 
   // Group leads by status for Kanban view
   const leadsByStage = useMemo(() => {
-    const filtered = leads.filter(lead => {
+    const filtered = leads.filter((lead) => {
       const matchesSource = !filterSource || lead.source === filterSource;
-      const matchesSearch = !searchQuery ||
+      const matchesSearch =
+        !searchQuery ||
         `${lead.first_name} ${lead.last_name}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
         lead.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         lead.phone?.includes(searchQuery);
@@ -134,8 +141,8 @@ export default function LeadManagement({ language = 'no' }) {
     });
 
     const grouped = {};
-    LEAD_STAGES.forEach(stage => {
-      grouped[stage.id] = filtered.filter(lead => lead.status === stage.id);
+    LEAD_STAGES.forEach((stage) => {
+      grouped[stage.id] = filtered.filter((lead) => lead.status === stage.id);
     });
     return grouped;
   }, [leads, filterSource, searchQuery]);
@@ -143,20 +150,21 @@ export default function LeadManagement({ language = 'no' }) {
   // Calculate conversion stats
   const stats = useMemo(() => {
     const total = leads.length;
-    const converted = leads.filter(l => l.status === 'CONVERTED').length;
-    const lost = leads.filter(l => l.status === 'LOST').length;
-    const hot = leads.filter(l => l.temperature === 'HOT').length;
+    const converted = leads.filter((l) => l.status === 'CONVERTED').length;
+    const lost = leads.filter((l) => l.status === 'LOST').length;
+    const hot = leads.filter((l) => l.temperature === 'HOT').length;
 
     return {
       total,
       converted,
       lost,
       hot,
-      conversionRate: total > 0 ? Math.round((converted / total) * 100) : 0
+      conversionRate: total > 0 ? Math.round((converted / total) * 100) : 0,
     };
   }, [leads]);
 
-  const getSourceInfo = (sourceId) => LEAD_SOURCES.find(s => s.id === sourceId) || LEAD_SOURCES[LEAD_SOURCES.length - 1];
+  const getSourceInfo = (sourceId) =>
+    LEAD_SOURCES.find((s) => s.id === sourceId) || LEAD_SOURCES[LEAD_SOURCES.length - 1];
 
   const handleDragStart = (e, leadId) => {
     e.dataTransfer.setData('leadId', leadId);
@@ -166,9 +174,9 @@ export default function LeadManagement({ language = 'no' }) {
     e.preventDefault();
     const leadId = e.dataTransfer.getData('leadId');
     // Optimistic update
-    setLeads(prev => prev.map(lead =>
-      lead.id === leadId ? { ...lead, status: newStatus } : lead
-    ));
+    setLeads((prev) =>
+      prev.map((lead) => (lead.id === leadId ? { ...lead, status: newStatus } : lead))
+    );
     // Persist to API
     await handleUpdateLead(leadId, { status: newStatus });
   };
@@ -182,7 +190,9 @@ export default function LeadManagement({ language = 'no' }) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
-        <span className="ml-2 text-gray-600">{t({ no: 'Laster leads...', en: 'Loading leads...' })}</span>
+        <span className="ml-2 text-gray-600">
+          {t({ no: 'Laster leads...', en: 'Loading leads...' })}
+        </span>
       </div>
     );
   }
@@ -220,7 +230,9 @@ export default function LeadManagement({ language = 'no' }) {
           <p className="text-2xl font-bold text-green-600">{stats.converted}</p>
         </div>
         <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <p className="text-sm text-gray-500">{t({ no: 'Konverteringsrate', en: 'Conversion Rate' })}</p>
+          <p className="text-sm text-gray-500">
+            {t({ no: 'Konverteringsrate', en: 'Conversion Rate' })}
+          </p>
           <p className="text-2xl font-bold text-blue-600">{stats.conversionRate}%</p>
         </div>
       </div>
@@ -244,8 +256,10 @@ export default function LeadManagement({ language = 'no' }) {
             className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
           >
             <option value="">{t({ no: 'Alle kilder', en: 'All sources' })}</option>
-            {LEAD_SOURCES.map(source => (
-              <option key={source.id} value={source.id}>{t(source.label)}</option>
+            {LEAD_SOURCES.map((source) => (
+              <option key={source.id} value={source.id}>
+                {t(source.label)}
+              </option>
             ))}
           </select>
         </div>
@@ -278,38 +292,44 @@ export default function LeadManagement({ language = 'no' }) {
       {/* Kanban View */}
       {viewMode === 'kanban' && (
         <div className="flex gap-4 overflow-x-auto pb-4">
-          {LEAD_STAGES.slice(0, -1).map(stage => ( // Exclude LOST from kanban
-            <div
-              key={stage.id}
-              className="flex-shrink-0 w-72"
-              onDrop={(e) => handleDrop(e, stage.id)}
-              onDragOver={handleDragOver}
-            >
-              <div className={`flex items-center gap-2 mb-3 px-2`}>
-                <span className={`w-2 h-2 rounded-full bg-${stage.color}-500`} />
-                <h3 className="font-medium text-gray-700">{t(stage.label)}</h3>
-                <span className="text-sm text-gray-400">({leadsByStage[stage.id]?.length || 0})</span>
-              </div>
+          {LEAD_STAGES.slice(0, -1).map(
+            (
+              stage // Exclude LOST from kanban
+            ) => (
+              <div
+                key={stage.id}
+                className="flex-shrink-0 w-72"
+                onDrop={(e) => handleDrop(e, stage.id)}
+                onDragOver={handleDragOver}
+              >
+                <div className={`flex items-center gap-2 mb-3 px-2`}>
+                  <span className={`w-2 h-2 rounded-full bg-${stage.color}-500`} />
+                  <h3 className="font-medium text-gray-700">{t(stage.label)}</h3>
+                  <span className="text-sm text-gray-400">
+                    ({leadsByStage[stage.id]?.length || 0})
+                  </span>
+                </div>
 
-              <div className="space-y-3 min-h-[400px] bg-gray-50 rounded-lg p-2">
-                {leadsByStage[stage.id]?.map(lead => (
-                  <LeadCard
-                    key={lead.id}
-                    lead={lead}
-                    language={language}
-                    onDragStart={(e) => handleDragStart(e, lead.id)}
-                    onClick={() => setSelectedLead(lead)}
-                  />
-                ))}
+                <div className="space-y-3 min-h-[400px] bg-gray-50 rounded-lg p-2">
+                  {leadsByStage[stage.id]?.map((lead) => (
+                    <LeadCard
+                      key={lead.id}
+                      lead={lead}
+                      language={language}
+                      onDragStart={(e) => handleDragStart(e, lead.id)}
+                      onClick={() => setSelectedLead(lead)}
+                    />
+                  ))}
 
-                {leadsByStage[stage.id]?.length === 0 && (
-                  <div className="text-center py-8 text-gray-400 text-sm">
-                    {t({ no: 'Dra leads hit', en: 'Drag leads here' })}
-                  </div>
-                )}
+                  {leadsByStage[stage.id]?.length === 0 && (
+                    <div className="text-center py-8 text-gray-400 text-sm">
+                      {t({ no: 'Dra leads hit', en: 'Drag leads here' })}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          )}
         </div>
       )}
 
@@ -319,25 +339,39 @@ export default function LeadManagement({ language = 'no' }) {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t({ no: 'Navn', en: 'Name' })}</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t({ no: 'Kontakt', en: 'Contact' })}</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t({ no: 'Kilde', en: 'Source' })}</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t({ no: 'Status', en: 'Status' })}</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t({ no: 'Score', en: 'Score' })}</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t({ no: 'Oppfølging', en: 'Follow-up' })}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  {t({ no: 'Navn', en: 'Name' })}
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  {t({ no: 'Kontakt', en: 'Contact' })}
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  {t({ no: 'Kilde', en: 'Source' })}
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  {t({ no: 'Status', en: 'Status' })}
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  {t({ no: 'Score', en: 'Score' })}
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  {t({ no: 'Oppfølging', en: 'Follow-up' })}
+                </th>
                 <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {leads.map(lead => {
+              {leads.map((lead) => {
                 const source = getSourceInfo(lead.source);
-                const stage = LEAD_STAGES.find(s => s.id === lead.status);
+                const stage = LEAD_STAGES.find((s) => s.id === lead.status);
 
                 return (
                   <tr key={lead.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3">
                       <div>
-                        <p className="font-medium text-gray-900">{lead.first_name} {lead.last_name}</p>
+                        <p className="font-medium text-gray-900">
+                          {lead.first_name} {lead.last_name}
+                        </p>
                         <p className="text-xs text-gray-500">{lead.primary_interest}</p>
                       </div>
                     </td>
@@ -348,12 +382,16 @@ export default function LeadManagement({ language = 'no' }) {
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`px-2 py-1 text-xs rounded-full bg-${source.color}-100 text-${source.color}-700`}>
+                      <span
+                        className={`px-2 py-1 text-xs rounded-full bg-${source.color}-100 text-${source.color}-700`}
+                      >
                         {t(source.label)}
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`px-2 py-1 text-xs rounded-full bg-${stage?.color}-100 text-${stage?.color}-700`}>
+                      <span
+                        className={`px-2 py-1 text-xs rounded-full bg-${stage?.color}-100 text-${stage?.color}-700`}
+                      >
                         {t(stage?.label || { no: lead.status, en: lead.status })}
                       </span>
                     </td>
@@ -413,7 +451,7 @@ export default function LeadManagement({ language = 'no' }) {
 
 function LeadCard({ lead, language, onDragStart, onClick }) {
   const t = (obj) => obj[language] || obj.en;
-  const source = LEAD_SOURCES.find(s => s.id === lead.source);
+  const source = LEAD_SOURCES.find((s) => s.id === lead.source);
 
   return (
     <div
@@ -424,7 +462,9 @@ function LeadCard({ lead, language, onDragStart, onClick }) {
     >
       <div className="flex items-start justify-between mb-2">
         <div>
-          <p className="font-medium text-gray-900">{lead.first_name} {lead.last_name}</p>
+          <p className="font-medium text-gray-900">
+            {lead.first_name} {lead.last_name}
+          </p>
           <p className="text-xs text-gray-500">{lead.primary_interest}</p>
         </div>
         {lead.temperature === 'HOT' && (
@@ -448,7 +488,9 @@ function LeadCard({ lead, language, onDragStart, onClick }) {
       </div>
 
       <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100">
-        <span className={`px-2 py-0.5 text-xs rounded-full bg-${source?.color}-100 text-${source?.color}-700`}>
+        <span
+          className={`px-2 py-0.5 text-xs rounded-full bg-${source?.color}-100 text-${source?.color}-700`}
+        >
           {t(source?.label || { no: lead.source, en: lead.source })}
         </span>
         <div className="flex items-center gap-1">
@@ -474,7 +516,7 @@ function NewLeadForm({ language, onClose, onSave }) {
     phone: '',
     source: 'WEBSITE',
     primary_interest: '',
-    notes: ''
+    notes: '',
   });
 
   const handleSubmit = (e) => {
@@ -553,8 +595,10 @@ function NewLeadForm({ language, onClose, onSave }) {
               onChange={(e) => setForm({ ...form, source: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg"
             >
-              {LEAD_SOURCES.map(source => (
-                <option key={source.id} value={source.id}>{t(source.label)}</option>
+              {LEAD_SOURCES.map((source) => (
+                <option key={source.id} value={source.id}>
+                  {t(source.label)}
+                </option>
               ))}
             </select>
           </div>
@@ -568,7 +612,10 @@ function NewLeadForm({ language, onClose, onSave }) {
               value={form.primary_interest}
               onChange={(e) => setForm({ ...form, primary_interest: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-              placeholder={t({ no: 'F.eks. Nakkesmerter, Korsrygg', en: 'e.g. Neck pain, Low back' })}
+              placeholder={t({
+                no: 'F.eks. Nakkesmerter, Korsrygg',
+                en: 'e.g. Neck pain, Low back',
+              })}
             />
           </div>
 
@@ -607,13 +654,15 @@ function NewLeadForm({ language, onClose, onSave }) {
 
 function LeadDetailSidebar({ lead, language, onClose, onUpdate, onConvert }) {
   const t = (obj) => obj[language] || obj.en;
-  const source = LEAD_SOURCES.find(s => s.id === lead.source);
-  const stage = LEAD_STAGES.find(s => s.id === lead.status);
+  const source = LEAD_SOURCES.find((s) => s.id === lead.source);
+  const stage = LEAD_STAGES.find((s) => s.id === lead.status);
 
   return (
     <div className="fixed inset-y-0 right-0 w-96 bg-white shadow-xl border-l border-gray-200 z-50">
       <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-        <h2 className="font-semibold text-gray-900">{t({ no: 'Lead Detaljer', en: 'Lead Details' })}</h2>
+        <h2 className="font-semibold text-gray-900">
+          {t({ no: 'Lead Detaljer', en: 'Lead Details' })}
+        </h2>
         <button onClick={onClose} className="p-1 text-gray-400 hover:text-gray-600">
           <XCircle className="w-5 h-5" />
         </button>
@@ -622,9 +671,13 @@ function LeadDetailSidebar({ lead, language, onClose, onUpdate, onConvert }) {
       <div className="p-6 space-y-6 overflow-y-auto max-h-[calc(100vh-73px)]">
         {/* Name and Status */}
         <div>
-          <h3 className="text-xl font-semibold text-gray-900">{lead.first_name} {lead.last_name}</h3>
+          <h3 className="text-xl font-semibold text-gray-900">
+            {lead.first_name} {lead.last_name}
+          </h3>
           <div className="flex items-center gap-2 mt-2">
-            <span className={`px-2 py-1 text-xs rounded-full bg-${stage?.color}-100 text-${stage?.color}-700`}>
+            <span
+              className={`px-2 py-1 text-xs rounded-full bg-${stage?.color}-100 text-${stage?.color}-700`}
+            >
               {t(stage?.label || { no: lead.status, en: lead.status })}
             </span>
             {lead.temperature === 'HOT' && (
@@ -635,15 +688,23 @@ function LeadDetailSidebar({ lead, language, onClose, onUpdate, onConvert }) {
 
         {/* Contact Info */}
         <div className="space-y-3">
-          <h4 className="text-sm font-medium text-gray-700">{t({ no: 'Kontaktinfo', en: 'Contact Info' })}</h4>
+          <h4 className="text-sm font-medium text-gray-700">
+            {t({ no: 'Kontaktinfo', en: 'Contact Info' })}
+          </h4>
           {lead.email && (
-            <a href={`mailto:${lead.email}`} className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700">
+            <a
+              href={`mailto:${lead.email}`}
+              className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700"
+            >
               <Mail className="w-4 h-4" />
               {lead.email}
             </a>
           )}
           {lead.phone && (
-            <a href={`tel:${lead.phone}`} className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700">
+            <a
+              href={`tel:${lead.phone}`}
+              className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700"
+            >
               <Phone className="w-4 h-4" />
               {lead.phone}
             </a>
@@ -652,7 +713,9 @@ function LeadDetailSidebar({ lead, language, onClose, onUpdate, onConvert }) {
 
         {/* Lead Score */}
         <div>
-          <h4 className="text-sm font-medium text-gray-700 mb-2">{t({ no: 'Lead Score', en: 'Lead Score' })}</h4>
+          <h4 className="text-sm font-medium text-gray-700 mb-2">
+            {t({ no: 'Lead Score', en: 'Lead Score' })}
+          </h4>
           <div className="flex items-center gap-3">
             <div className="flex-1 bg-gray-200 rounded-full h-3">
               <div
@@ -667,26 +730,38 @@ function LeadDetailSidebar({ lead, language, onClose, onUpdate, onConvert }) {
         {/* Source and Interest */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-1">{t({ no: 'Kilde', en: 'Source' })}</h4>
-            <span className={`px-2 py-1 text-xs rounded-full bg-${source?.color}-100 text-${source?.color}-700`}>
+            <h4 className="text-sm font-medium text-gray-700 mb-1">
+              {t({ no: 'Kilde', en: 'Source' })}
+            </h4>
+            <span
+              className={`px-2 py-1 text-xs rounded-full bg-${source?.color}-100 text-${source?.color}-700`}
+            >
               {t(source?.label || { no: lead.source, en: lead.source })}
             </span>
           </div>
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-1">{t({ no: 'Interesse', en: 'Interest' })}</h4>
+            <h4 className="text-sm font-medium text-gray-700 mb-1">
+              {t({ no: 'Interesse', en: 'Interest' })}
+            </h4>
             <p className="text-sm text-gray-600">{lead.primary_interest || '-'}</p>
           </div>
         </div>
 
         {/* Assigned To */}
         <div>
-          <h4 className="text-sm font-medium text-gray-700 mb-1">{t({ no: 'Tildelt', en: 'Assigned To' })}</h4>
-          <p className="text-sm text-gray-600">{lead.assigned_to || t({ no: 'Ikke tildelt', en: 'Unassigned' })}</p>
+          <h4 className="text-sm font-medium text-gray-700 mb-1">
+            {t({ no: 'Tildelt', en: 'Assigned To' })}
+          </h4>
+          <p className="text-sm text-gray-600">
+            {lead.assigned_to || t({ no: 'Ikke tildelt', en: 'Unassigned' })}
+          </p>
         </div>
 
         {/* Quick Actions */}
         <div className="space-y-2">
-          <h4 className="text-sm font-medium text-gray-700">{t({ no: 'Hurtighandlinger', en: 'Quick Actions' })}</h4>
+          <h4 className="text-sm font-medium text-gray-700">
+            {t({ no: 'Hurtighandlinger', en: 'Quick Actions' })}
+          </h4>
           <div className="grid grid-cols-2 gap-2">
             <button className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm hover:bg-blue-100">
               <Phone className="w-4 h-4" />

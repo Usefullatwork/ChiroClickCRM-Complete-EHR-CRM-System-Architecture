@@ -2,13 +2,9 @@ import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { examinationsAPI } from '../services/api';
 import { X, Save, CheckCircle, AlertTriangle, Zap, ListChecks } from 'lucide-react';
+import toast from '../utils/toast';
 
-export default function BatchExaminationForm({
-  encounterId,
-  chiefComplaint,
-  isOpen,
-  onClose
-}) {
+export default function BatchExaminationForm({ encounterId, chiefComplaint, isOpen, onClose }) {
   const queryClient = useQueryClient();
   const [selectedTemplateSet, setSelectedTemplateSet] = useState(null);
   const [protocols, setProtocols] = useState([]);
@@ -36,13 +32,13 @@ export default function BatchExaminationForm({
         setProtocols(data.data.protocols);
         // Initialize findings for all protocols
         const initialFindings = {};
-        data.data.protocols.forEach(protocol => {
+        data.data.protocols.forEach((protocol) => {
           initialFindings[protocol.id] = {
             result: 'not_tested',
             laterality: 'none',
             severity: '',
             findings_text: '',
-            selected: true
+            selected: true,
           };
         });
         setFindings(initialFindings);
@@ -68,33 +64,33 @@ export default function BatchExaminationForm({
   });
 
   const handleResultChange = (protocolId, field, value) => {
-    setFindings(prev => ({
+    setFindings((prev) => ({
       ...prev,
       [protocolId]: {
         ...prev[protocolId],
-        [field]: value
-      }
+        [field]: value,
+      },
     }));
   };
 
   const toggleProtocolSelection = (protocolId) => {
-    setFindings(prev => ({
+    setFindings((prev) => ({
       ...prev,
       [protocolId]: {
         ...prev[protocolId],
-        selected: !prev[protocolId].selected
-      }
+        selected: !prev[protocolId].selected,
+      },
     }));
   };
 
   const markAllAsNormal = () => {
     const updatedFindings = {};
-    Object.keys(findings).forEach(protocolId => {
+    Object.keys(findings).forEach((protocolId) => {
       updatedFindings[protocolId] = {
         ...findings[protocolId],
         result: 'negative',
         severity: '',
-        findings_text: 'Normal'
+        findings_text: 'Normal',
       };
     });
     setFindings(updatedFindings);
@@ -105,8 +101,8 @@ export default function BatchExaminationForm({
 
     // Prepare batch data - only selected protocols
     const batchData = protocols
-      .filter(protocol => findings[protocol.id]?.selected)
-      .map(protocol => {
+      .filter((protocol) => findings[protocol.id]?.selected)
+      .map((protocol) => {
         const finding = findings[protocol.id];
         return {
           encounter_id: encounterId,
@@ -120,10 +116,10 @@ export default function BatchExaminationForm({
           findings_text: finding.findings_text,
         };
       })
-      .filter(finding => finding.result !== 'not_tested'); // Only save tested protocols
+      .filter((finding) => finding.result !== 'not_tested'); // Only save tested protocols
 
     if (batchData.length === 0) {
-      alert('Please mark at least one test as tested');
+      toast.warning('Please mark at least one test as tested');
       return;
     }
 
@@ -132,10 +128,14 @@ export default function BatchExaminationForm({
 
   const getResultBadgeColor = (result) => {
     switch (result) {
-      case 'positive': return 'bg-red-100 text-red-800 border-red-300';
-      case 'negative': return 'bg-green-100 text-green-800 border-green-300';
-      case 'equivocal': return 'bg-yellow-100 text-yellow-800 border-yellow-300';
-      default: return 'bg-gray-100 text-gray-600 border-gray-300';
+      case 'positive':
+        return 'bg-red-100 text-red-800 border-red-300';
+      case 'negative':
+        return 'bg-green-100 text-green-800 border-green-300';
+      case 'equivocal':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      default:
+        return 'bg-gray-100 text-gray-600 border-gray-300';
     }
   };
 
@@ -177,7 +177,7 @@ export default function BatchExaminationForm({
 
               {templateSets?.data && templateSets.data.length > 0 ? (
                 <div className="grid grid-cols-2 gap-3">
-                  {templateSets.data.map(set => (
+                  {templateSets.data.map((set) => (
                     <button
                       key={set.id}
                       onClick={() => setSelectedTemplateSet(set.id)}
@@ -192,9 +192,7 @@ export default function BatchExaminationForm({
                         </span>
                       </div>
                       {set.description_no && (
-                        <p className="text-xs text-gray-600 line-clamp-2">
-                          {set.description_no}
-                        </p>
+                        <p className="text-xs text-gray-600 line-clamp-2">{set.description_no}</p>
                       )}
                     </button>
                   ))}
@@ -277,17 +275,34 @@ export default function BatchExaminationForm({
                             </label>
                             <div className="flex gap-2 flex-wrap">
                               {[
-                                { value: 'negative', label: 'Negativ', icon: CheckCircle, color: 'green' },
-                                { value: 'positive', label: 'Positiv', icon: AlertTriangle, color: 'red' },
-                                { value: 'equivocal', label: 'Uklar', icon: AlertTriangle, color: 'yellow' },
-                              ].map(option => {
+                                {
+                                  value: 'negative',
+                                  label: 'Negativ',
+                                  icon: CheckCircle,
+                                  color: 'green',
+                                },
+                                {
+                                  value: 'positive',
+                                  label: 'Positiv',
+                                  icon: AlertTriangle,
+                                  color: 'red',
+                                },
+                                {
+                                  value: 'equivocal',
+                                  label: 'Uklar',
+                                  icon: AlertTriangle,
+                                  color: 'yellow',
+                                },
+                              ].map((option) => {
                                 const Icon = option.icon;
                                 const isSelected = findings[protocol.id]?.result === option.value;
                                 return (
                                   <button
                                     key={option.value}
                                     type="button"
-                                    onClick={() => handleResultChange(protocol.id, 'result', option.value)}
+                                    onClick={() =>
+                                      handleResultChange(protocol.id, 'result', option.value)
+                                    }
                                     className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border-2 transition-all ${
                                       isSelected
                                         ? `border-${option.color}-500 bg-${option.color}-50 text-${option.color}-800`
@@ -309,7 +324,9 @@ export default function BatchExaminationForm({
                             </label>
                             <select
                               value={findings[protocol.id]?.laterality || 'none'}
-                              onChange={(e) => handleResultChange(protocol.id, 'laterality', e.target.value)}
+                              onChange={(e) =>
+                                handleResultChange(protocol.id, 'laterality', e.target.value)
+                              }
                               className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                             >
                               <option value="none">Ingen</option>
@@ -327,7 +344,9 @@ export default function BatchExaminationForm({
                               </label>
                               <textarea
                                 value={findings[protocol.id]?.findings_text || ''}
-                                onChange={(e) => handleResultChange(protocol.id, 'findings_text', e.target.value)}
+                                onChange={(e) =>
+                                  handleResultChange(protocol.id, 'findings_text', e.target.value)
+                                }
                                 rows="2"
                                 placeholder="Beskriv positive funn..."
                                 className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -348,7 +367,12 @@ export default function BatchExaminationForm({
         {selectedTemplateSet && (
           <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-between items-center">
             <div className="text-sm text-gray-600">
-              {protocols.filter(p => findings[p.id]?.selected && findings[p.id]?.result !== 'not_tested').length} av {protocols.length} tester vil bli lagret
+              {
+                protocols.filter(
+                  (p) => findings[p.id]?.selected && findings[p.id]?.result !== 'not_tested'
+                ).length
+              }{' '}
+              av {protocols.length} tester vil bli lagret
             </div>
             <div className="flex gap-3">
               <button

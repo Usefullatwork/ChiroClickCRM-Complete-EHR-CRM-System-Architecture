@@ -1,10 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Mail, MessageSquare, Phone, Video, Calendar, FileText,
-  Search, Filter, ChevronRight, Clock, User, Send,
-  CheckCircle, XCircle, AlertCircle, Plus, Download, Loader2
+  Mail,
+  MessageSquare,
+  Phone,
+  Video,
+  Calendar,
+  FileText,
+  Search,
+  Filter,
+  ChevronRight,
+  Clock,
+  User,
+  Send,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Plus,
+  Download,
+  Loader2,
 } from 'lucide-react';
 import { crmAPI } from '../../services/api';
+import toast from '../../utils/toast';
+import logger from '../../utils/logger';
 
 const CommunicationHistory = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -22,7 +39,7 @@ const CommunicationHistory = () => {
     { id: 'SMS', label: 'SMS', icon: MessageSquare, color: 'bg-green-500' },
     { id: 'PHONE', label: 'Telefon', icon: Phone, color: 'bg-purple-500' },
     { id: 'VIDEO', label: 'Video', icon: Video, color: 'bg-orange-500' },
-    { id: 'APPOINTMENT', label: 'Timebestilling', icon: Calendar, color: 'bg-teal-500' }
+    { id: 'APPOINTMENT', label: 'Timebestilling', icon: Calendar, color: 'bg-teal-500' },
   ];
 
   // Status configurations
@@ -34,7 +51,7 @@ const CommunicationHistory = () => {
     FAILED: { label: 'Feilet', color: 'bg-red-100 text-red-700', icon: XCircle },
     BOUNCED: { label: 'Returnert', color: 'bg-orange-100 text-orange-700', icon: AlertCircle },
     COMPLETED: { label: 'Fullført', color: 'bg-green-100 text-green-700', icon: CheckCircle },
-    MISSED: { label: 'Ikke Besvart', color: 'bg-red-100 text-red-700', icon: XCircle }
+    MISSED: { label: 'Ikke Besvart', color: 'bg-red-100 text-red-700', icon: XCircle },
   };
 
   // Fetch communications from API
@@ -48,10 +65,11 @@ const CommunicationHistory = () => {
         const response = await crmAPI.getCommunications({ type });
 
         // Map communication data
-        const commData = (response.data?.communications || response.data || []).map(c => ({
+        const commData = (response.data?.communications || response.data || []).map((c) => ({
           id: c.id,
           patientId: c.patient_id,
-          patientName: c.patient_name || `${c.patient_first_name || ''} ${c.patient_last_name || ''}`.trim(),
+          patientName:
+            c.patient_name || `${c.patient_first_name || ''} ${c.patient_last_name || ''}`.trim(),
           type: c.type,
           direction: c.direction || 'OUTBOUND',
           subject: c.subject,
@@ -61,12 +79,12 @@ const CommunicationHistory = () => {
           sentBy: c.sent_by || 'System',
           campaign: c.campaign_name,
           attachments: c.attachments,
-          duration: c.duration
+          duration: c.duration,
         }));
 
         setCommunications(commData);
       } catch (err) {
-        console.error('Error fetching communications:', err);
+        logger.error('Error fetching communications:', err);
         setError(err.message || 'Failed to load communications');
       } finally {
         setLoading(false);
@@ -79,33 +97,34 @@ const CommunicationHistory = () => {
   const handleLogCommunication = async (commData) => {
     try {
       const response = await crmAPI.logCommunication(commData);
-      setCommunications(prev => [response.data, ...prev]);
+      setCommunications((prev) => [response.data, ...prev]);
       setShowNewMessage(false);
     } catch (err) {
-      console.error('Error logging communication:', err);
-      alert('Failed to log communication: ' + err.message);
+      logger.error('Error logging communication:', err);
+      toast.error('Failed to log communication: ' + err.message);
     }
   };
 
   // Calculate stats
   const stats = {
     total: communications.length,
-    emails: communications.filter(c => c.type === 'EMAIL').length,
-    sms: communications.filter(c => c.type === 'SMS').length,
-    calls: communications.filter(c => c.type === 'PHONE').length,
-    thisWeek: communications.filter(c => {
+    emails: communications.filter((c) => c.type === 'EMAIL').length,
+    sms: communications.filter((c) => c.type === 'SMS').length,
+    calls: communications.filter((c) => c.type === 'PHONE').length,
+    thisWeek: communications.filter((c) => {
       const date = new Date(c.sentAt);
       const now = new Date();
       const weekAgo = new Date(now.setDate(now.getDate() - 7));
       return date >= weekAgo;
-    }).length
+    }).length,
   };
 
   // Filter communications
-  const filteredComms = communications.filter(c => {
+  const filteredComms = communications.filter((c) => {
     const matchesType = selectedType === 'ALL' || c.type === selectedType;
-    const matchesSearch = c.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          (c.subject && c.subject.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesSearch =
+      c.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (c.subject && c.subject.toLowerCase().includes(searchTerm.toLowerCase()));
     return matchesType && matchesSearch;
   });
 
@@ -116,12 +135,12 @@ const CommunicationHistory = () => {
       day: 'numeric',
       month: 'short',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
   // Get type info
-  const getTypeInfo = (typeId) => commTypes.find(t => t.id === typeId);
+  const getTypeInfo = (typeId) => commTypes.find((t) => t.id === typeId);
 
   // Loading state
   if (loading) {
@@ -244,7 +263,7 @@ const CommunicationHistory = () => {
             </div>
           </div>
           <div className="flex gap-2">
-            {commTypes.map(type => {
+            {commTypes.map((type) => {
               const Icon = type.icon;
               return (
                 <button
@@ -268,7 +287,7 @@ const CommunicationHistory = () => {
       {/* Communications List */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="divide-y divide-gray-200">
-          {filteredComms.map(comm => {
+          {filteredComms.map((comm) => {
             const typeInfo = getTypeInfo(comm.type);
             const TypeIcon = typeInfo?.icon;
             const status = statusConfig[comm.status];
@@ -282,7 +301,9 @@ const CommunicationHistory = () => {
               >
                 <div className="flex items-start gap-4">
                   {/* Type Icon */}
-                  <div className={`w-10 h-10 rounded-lg ${typeInfo?.color} flex items-center justify-center flex-shrink-0`}>
+                  <div
+                    className={`w-10 h-10 rounded-lg ${typeInfo?.color} flex items-center justify-center flex-shrink-0`}
+                  >
                     {TypeIcon && <TypeIcon className="w-5 h-5 text-white" />}
                   </div>
 
@@ -290,7 +311,9 @@ const CommunicationHistory = () => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-medium text-gray-900">{comm.patientName}</span>
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs ${status?.color}`}>
+                      <span
+                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs ${status?.color}`}
+                      >
                         {StatusIcon && <StatusIcon className="w-3 h-3" />}
                         {status?.label}
                       </span>
@@ -306,8 +329,11 @@ const CommunicationHistory = () => {
                     <p className="text-sm text-gray-600 line-clamp-1">{comm.content}</p>
                     {comm.attachments && (
                       <div className="flex gap-2 mt-2">
-                        {comm.attachments.map(file => (
-                          <span key={file} className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                        {comm.attachments.map((file) => (
+                          <span
+                            key={file}
+                            className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded"
+                          >
                             <FileText className="w-3 h-3" />
                             {file}
                           </span>
@@ -346,15 +372,13 @@ const CommunicationHistory = () => {
             <h3 className="text-lg font-bold text-gray-900 mb-4">Ny Melding</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Meldingstype
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Meldingstype</label>
                 <div className="flex gap-2">
                   {[
                     { id: 'EMAIL', label: 'E-post', icon: Mail },
                     { id: 'SMS', label: 'SMS', icon: MessageSquare },
-                    { id: 'PHONE', label: 'Telefonnotat', icon: Phone }
-                  ].map(type => {
+                    { id: 'PHONE', label: 'Telefonnotat', icon: Phone },
+                  ].map((type) => {
                     const Icon = type.icon;
                     return (
                       <button
@@ -370,9 +394,7 @@ const CommunicationHistory = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Pasient
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Pasient</label>
                 <select className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500">
                   <option>Velg pasient...</option>
                   <option>Erik Hansen</option>
@@ -382,9 +404,7 @@ const CommunicationHistory = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Emne
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Emne</label>
                 <input
                   type="text"
                   placeholder="Emne for meldingen..."
@@ -393,9 +413,7 @@ const CommunicationHistory = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Melding
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Melding</label>
                 <textarea
                   rows={4}
                   placeholder="Skriv din melding her..."
@@ -404,11 +422,11 @@ const CommunicationHistory = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Vedlegg
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Vedlegg</label>
                 <div className="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center">
-                  <p className="text-sm text-gray-500">Dra og slipp filer her, eller klikk for å velge</p>
+                  <p className="text-sm text-gray-500">
+                    Dra og slipp filer her, eller klikk for å velge
+                  </p>
                 </div>
               </div>
             </div>
@@ -453,13 +471,17 @@ const CommunicationHistory = () => {
                   const typeInfo = getTypeInfo(selectedPatient.type);
                   const TypeIcon = typeInfo?.icon;
                   return (
-                    <div className={`w-10 h-10 rounded-lg ${typeInfo?.color} flex items-center justify-center`}>
+                    <div
+                      className={`w-10 h-10 rounded-lg ${typeInfo?.color} flex items-center justify-center`}
+                    >
                       {TypeIcon && <TypeIcon className="w-5 h-5 text-white" />}
                     </div>
                   );
                 })()}
                 <div>
-                  <p className="font-medium text-gray-900">{getTypeInfo(selectedPatient.type)?.label}</p>
+                  <p className="font-medium text-gray-900">
+                    {getTypeInfo(selectedPatient.type)?.label}
+                  </p>
                   <p className="text-sm text-gray-500">{formatDateTime(selectedPatient.sentAt)}</p>
                 </div>
               </div>
@@ -491,7 +513,9 @@ const CommunicationHistory = () => {
                   const status = statusConfig[selectedPatient.status];
                   const StatusIcon = status?.icon;
                   return (
-                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm ${status?.color}`}>
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm ${status?.color}`}
+                    >
                       {StatusIcon && <StatusIcon className="w-4 h-4" />}
                       {status?.label}
                     </span>
@@ -504,8 +528,11 @@ const CommunicationHistory = () => {
                 <div className="p-3 bg-gray-50 rounded-lg">
                   <p className="text-sm text-gray-500 mb-2">Vedlegg</p>
                   <div className="space-y-2">
-                    {selectedPatient.attachments.map(file => (
-                      <button key={file} className="w-full flex items-center gap-2 p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50">
+                    {selectedPatient.attachments.map((file) => (
+                      <button
+                        key={file}
+                        className="w-full flex items-center gap-2 p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
+                      >
                         <FileText className="w-4 h-4 text-gray-400" />
                         <span className="text-sm text-gray-700">{file}</span>
                         <Download className="w-4 h-4 text-gray-400 ml-auto" />

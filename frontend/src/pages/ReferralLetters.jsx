@@ -1,34 +1,49 @@
-import { useState, useEffect } from 'react'
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
-import { useTranslation } from '../i18n'
-import { ArrowLeft, Plus, Send, Search, Filter, Loader2, AlertCircle, Sparkles } from 'lucide-react'
-import ReferralLetterGenerator, { getDefaultReferralData } from '../components/documents/ReferralLetterGenerator'
-import { lettersApi } from '../api/letters'
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from '../i18n';
+import {
+  ArrowLeft,
+  Plus,
+  Send,
+  Search,
+  Filter,
+  Loader2,
+  AlertCircle,
+  Sparkles,
+} from 'lucide-react';
+import ReferralLetterGenerator, {
+  getDefaultReferralData,
+} from '../components/documents/ReferralLetterGenerator';
+import { lettersApi } from '../api/letters';
+import toast from '../utils/toast';
+import logger from '../utils/logger';
 
 export default function ReferralLetters() {
-  const { patientId } = useParams()
-  const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
-  const { lang: language, setLang: setLanguage } = useTranslation()
-  const [view, setView] = useState(searchParams.get('new') ? 'create' : 'list')
-  const [referralData, setReferralData] = useState(getDefaultReferralData())
-  const [searchTerm, setSearchTerm] = useState('')
+  const { patientId } = useParams();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { lang: language, setLang: setLanguage } = useTranslation();
+  const [view, setView] = useState(searchParams.get('new') ? 'create' : 'list');
+  const [referralData, setReferralData] = useState(getDefaultReferralData());
+  const [searchTerm, setSearchTerm] = useState('');
 
   // API states
-  const [referrals, setReferrals] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState(null)
-  const [generating, setGenerating] = useState(false)
+  const [referrals, setReferrals] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+  const [generating, setGenerating] = useState(false);
 
   // Mock patient data (would come from patient context in real app)
-  const patient = patientId ? {
-    id: patientId,
-    name: 'Demo Pasient',
-    dateOfBirth: '1985-03-15',
-    personalNumber: '15038512345',
-    address: 'Testveien 1, 0123 Oslo'
-  } : null
+  const patient = patientId
+    ? {
+        id: patientId,
+        name: 'Demo Pasient',
+        dateOfBirth: '1985-03-15',
+        personalNumber: '15038512345',
+        address: 'Testveien 1, 0123 Oslo',
+      }
+    : null;
 
   const referralTypeLabels = {
     no: {
@@ -37,7 +52,7 @@ export default function ReferralLetters() {
       neurology: 'Nevrolog',
       radiology: 'Bildediagnostikk',
       physio: 'Fysioterapi',
-      vestibular: 'Vestibulær'
+      vestibular: 'Vestibulær',
     },
     en: {
       gp: 'GP',
@@ -45,125 +60,139 @@ export default function ReferralLetters() {
       neurology: 'Neurology',
       radiology: 'Radiology',
       physio: 'Physiotherapy',
-      vestibular: 'Vestibular'
-    }
-  }
+      vestibular: 'Vestibular',
+    },
+  };
 
   const priorityLabels = {
     no: { routine: 'Rutinemessig', soon: 'Snart', urgent: 'Haster' },
-    en: { routine: 'Routine', soon: 'Soon', urgent: 'Urgent' }
-  }
+    en: { routine: 'Routine', soon: 'Soon', urgent: 'Urgent' },
+  };
 
   const statusLabels = {
-    no: { pending: 'Venter', sent: 'Sendt', completed: 'Fullført', DRAFT: 'Utkast', FINALIZED: 'Ferdig', SENT: 'Sendt' },
-    en: { pending: 'Pending', sent: 'Sent', completed: 'Completed', DRAFT: 'Draft', FINALIZED: 'Finalized', SENT: 'Sent' }
-  }
+    no: {
+      pending: 'Venter',
+      sent: 'Sendt',
+      completed: 'Fullført',
+      DRAFT: 'Utkast',
+      FINALIZED: 'Ferdig',
+      SENT: 'Sendt',
+    },
+    en: {
+      pending: 'Pending',
+      sent: 'Sent',
+      completed: 'Completed',
+      DRAFT: 'Draft',
+      FINALIZED: 'Finalized',
+      SENT: 'Sent',
+    },
+  };
 
   // Fetch referrals from API
   const fetchReferrals = async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
       if (patientId) {
         // Fetch for specific patient
-        const response = await lettersApi.getPatientLetters(patientId, { type: 'REFERRAL' })
-        setReferrals(response.letters || [])
+        const response = await lettersApi.getPatientLetters(patientId, { type: 'REFERRAL' });
+        setReferrals(response.letters || []);
       } else {
         // For now, show empty - in real app would fetch all org's referrals
-        setReferrals([])
+        setReferrals([]);
       }
     } catch (err) {
-      console.error('Failed to fetch referrals:', err)
-      setError(language === 'no' ? 'Kunne ikke laste henvisninger' : 'Failed to load referrals')
+      logger.error('Failed to fetch referrals:', err);
+      setError(language === 'no' ? 'Kunne ikke laste henvisninger' : 'Failed to load referrals');
       // Fall back to empty array
-      setReferrals([])
+      setReferrals([]);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchReferrals()
-  }, [patientId])
+    fetchReferrals();
+  }, [patientId]);
 
   // Auto-populate patient data when creating new
   useEffect(() => {
     if (patient && view === 'create') {
-      setReferralData(prev => ({
+      setReferralData((prev) => ({
         ...prev,
         patientName: patient.name,
         patientDOB: patient.dateOfBirth,
         patientPersonalNumber: patient.personalNumber || '',
-        patientAddress: patient.address || ''
-      }))
+        patientAddress: patient.address || '',
+      }));
     }
-  }, [patient, view])
+  }, [patient, view]);
 
   // Generate letter content with AI
   const handleGenerateWithAI = async () => {
     try {
-      setGenerating(true)
-      setError(null)
+      setGenerating(true);
+      setError(null);
 
-      const letterType = referralData.referralType === 'vestibular'
-        ? 'VESTIBULAR_REFERRAL'
-        : 'REFERRAL_LETTER'
+      const letterType =
+        referralData.referralType === 'vestibular' ? 'VESTIBULAR_REFERRAL' : 'REFERRAL_LETTER';
 
       const response = await lettersApi.generateLetter(letterType, {
         patientId,
         patientData: patient,
         currentData: referralData,
-        referralType: referralData.referralType
-      })
+        referralType: referralData.referralType,
+      });
 
       if (response.letter) {
-        setReferralData(prev => ({
+        setReferralData((prev) => ({
           ...prev,
-          ...response.letter
-        }))
+          ...response.letter,
+        }));
       }
     } catch (err) {
-      console.error('AI generation failed:', err)
-      setError(language === 'no' ? 'AI-generering feilet' : 'AI generation failed')
+      logger.error('AI generation failed:', err);
+      setError(language === 'no' ? 'AI-generering feilet' : 'AI generation failed');
     } finally {
-      setGenerating(false)
+      setGenerating(false);
     }
-  }
+  };
 
   const handleSave = async (data) => {
     try {
-      setSaving(true)
-      setError(null)
+      setSaving(true);
+      setError(null);
 
-      const letterType = data.referralType === 'vestibular'
-        ? 'VESTIBULAR_REFERRAL'
-        : 'REFERRAL_LETTER'
+      const letterType =
+        data.referralType === 'vestibular' ? 'VESTIBULAR_REFERRAL' : 'REFERRAL_LETTER';
 
       await lettersApi.saveLetter({
         letterType,
         patientId,
         content: data,
-        status: 'DRAFT'
-      })
+        status: 'DRAFT',
+      });
 
-      alert(language === 'no' ? 'Henvisning lagret!' : 'Referral saved!')
-      setView('list')
-      fetchReferrals() // Refresh list
+      toast.success(language === 'no' ? 'Henvisning lagret!' : 'Referral saved!');
+      setView('list');
+      fetchReferrals(); // Refresh list
     } catch (err) {
-      console.error('Save failed:', err)
-      setError(language === 'no' ? 'Kunne ikke lagre henvisning' : 'Failed to save referral')
+      logger.error('Save failed:', err);
+      setError(language === 'no' ? 'Kunne ikke lagre henvisning' : 'Failed to save referral');
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
-  const filteredReferrals = referrals.filter(ref => {
-    const patientName = ref.patient_name || ref.patientName || ''
-    const recipient = ref.recipient || ''
-    return patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           recipient.toLowerCase().includes(searchTerm.toLowerCase())
-  })
+  const filteredReferrals = referrals.filter((ref) => {
+    const patientName = ref.patient_name || ref.patientName || '';
+    const recipient = ref.recipient || '';
+    return (
+      patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      recipient.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
 
   if (view === 'create') {
     return (
@@ -182,9 +211,7 @@ export default function ReferralLetters() {
                 <h1 className="text-xl font-semibold text-gray-900">
                   {language === 'no' ? 'Ny henvisning' : 'New Referral'}
                 </h1>
-                {patient && (
-                  <p className="text-sm text-gray-500">{patient.name}</p>
-                )}
+                {patient && <p className="text-sm text-gray-500">{patient.name}</p>}
               </div>
             </div>
 
@@ -246,7 +273,7 @@ export default function ReferralLetters() {
           />
         </div>
       </div>
-    )
+    );
   }
 
   // List view
@@ -327,7 +354,11 @@ export default function ReferralLetters() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder={language === 'no' ? 'Søk etter pasient eller mottaker...' : 'Search by patient or recipient...'}
+              placeholder={
+                language === 'no'
+                  ? 'Søk etter pasient eller mottaker...'
+                  : 'Search by patient or recipient...'
+              }
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -386,35 +417,44 @@ export default function ReferralLetters() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {referralTypeLabels[language][ref.referral_type || ref.referralType] || ref.referral_type || ref.referralType || '-'}
+                      {referralTypeLabels[language][ref.referral_type || ref.referralType] ||
+                        ref.referral_type ||
+                        ref.referralType ||
+                        '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {ref.recipient || '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {ref.created_at ? new Date(ref.created_at).toLocaleDateString('nb-NO') : ref.date || '-'}
+                      {ref.created_at
+                        ? new Date(ref.created_at).toLocaleDateString('nb-NO')
+                        : ref.date || '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        ref.priority === 'urgent'
-                          ? 'bg-red-100 text-red-800'
-                          : ref.priority === 'soon'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          ref.priority === 'urgent'
+                            ? 'bg-red-100 text-red-800'
+                            : ref.priority === 'soon'
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
                         {priorityLabels[language][ref.priority] || ref.priority || '-'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        ref.status === 'completed' || ref.status === 'FINALIZED'
-                          ? 'bg-green-100 text-green-800'
-                          : ref.status === 'sent' || ref.status === 'SENT'
-                          ? 'bg-blue-100 text-blue-800'
-                          : ref.status === 'DRAFT'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          ref.status === 'completed' || ref.status === 'FINALIZED'
+                            ? 'bg-green-100 text-green-800'
+                            : ref.status === 'sent' || ref.status === 'SENT'
+                              ? 'bg-blue-100 text-blue-800'
+                              : ref.status === 'DRAFT'
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
                         {statusLabels[language][ref.status] || ref.status || '-'}
                       </span>
                     </td>
@@ -423,9 +463,7 @@ export default function ReferralLetters() {
                 {filteredReferrals.length === 0 && !loading && (
                   <tr>
                     <td colSpan="6" className="px-6 py-12 text-center text-gray-500">
-                      {language === 'no'
-                        ? 'Ingen henvisninger funnet'
-                        : 'No referrals found'}
+                      {language === 'no' ? 'Ingen henvisninger funnet' : 'No referrals found'}
                     </td>
                   </tr>
                 )}
@@ -435,5 +473,5 @@ export default function ReferralLetters() {
         </div>
       </div>
     </div>
-  )
+  );
 }

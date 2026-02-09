@@ -3,10 +3,10 @@
  * Browse and manage Norwegian clinical examination templates
  */
 
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { templatesAPI } from '../services/api'
-import { useTranslation } from '../i18n'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { templatesAPI } from '../services/api';
+import { useTranslation } from '../i18n';
 import {
   FileText,
   Search,
@@ -19,80 +19,82 @@ import {
   TrendingUp,
   Grid,
   List,
-  BookOpen
-} from 'lucide-react'
+  BookOpen,
+} from 'lucide-react';
+import toast from '../utils/toast';
 
 export default function Templates() {
-  const { t } = useTranslation('common')
-  const queryClient = useQueryClient()
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('')
-  const [viewMode, setViewMode] = useState('grid') // 'grid' or 'list'
-  const [selectedTemplate, setSelectedTemplate] = useState(null)
+  const { t } = useTranslation('common');
+  const queryClient = useQueryClient();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
 
   // Fetch templates by category
   const { data: templatesData, isLoading } = useQuery({
     queryKey: ['templates-by-category', 'NO'],
-    queryFn: () => templatesAPI.getByCategory('NO')
-  })
+    queryFn: () => templatesAPI.getByCategory('NO'),
+  });
 
-  const categories = templatesData?.data?.categories || []
+  const categories = templatesData?.data?.categories || [];
 
   // Favorite toggle mutation
   const favoriteMutation = useMutation({
     mutationFn: (templateId) => templatesAPI.toggleFavorite(templateId),
     onSuccess: () => {
-      queryClient.invalidateQueries(['templates-by-category'])
-    }
-  })
+      queryClient.invalidateQueries(['templates-by-category']);
+    },
+  });
 
   // Increment usage mutation
   const usageMutation = useMutation({
     mutationFn: (templateId) => templatesAPI.incrementUsage(templateId),
     onSuccess: () => {
-      queryClient.invalidateQueries(['templates-by-category'])
-    }
-  })
+      queryClient.invalidateQueries(['templates-by-category']);
+    },
+  });
 
   // Filter templates
   const getFilteredTemplates = () => {
-    let allTemplates = []
-    categories.forEach(category => {
-      allTemplates = [...allTemplates, ...category.templates]
-    })
+    let allTemplates = [];
+    categories.forEach((category) => {
+      allTemplates = [...allTemplates, ...category.templates];
+    });
 
-    return allTemplates.filter(template => {
-      const matchesSearch = !searchTerm ||
+    return allTemplates.filter((template) => {
+      const matchesSearch =
+        !searchTerm ||
         template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        template.description?.toLowerCase().includes(searchTerm.toLowerCase())
+        template.description?.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const matchesCategory = !selectedCategory || template.category === selectedCategory
+      const matchesCategory = !selectedCategory || template.category === selectedCategory;
 
-      return matchesSearch && matchesCategory
-    })
-  }
+      return matchesSearch && matchesCategory;
+    });
+  };
 
-  const filteredTemplates = getFilteredTemplates()
+  const filteredTemplates = getFilteredTemplates();
 
   // Get all unique categories
-  const allCategories = categories.map(cat => cat.category)
+  const allCategories = categories.map((cat) => cat.category);
 
   // Handle template selection
   const handleTemplateClick = (template) => {
-    setSelectedTemplate(template)
-    usageMutation.mutate(template.id)
-  }
+    setSelectedTemplate(template);
+    usageMutation.mutate(template.id);
+  };
 
   const handleToggleFavorite = (template, e) => {
-    e.stopPropagation()
-    favoriteMutation.mutate(template.id)
-  }
+    e.stopPropagation();
+    favoriteMutation.mutate(template.id);
+  };
 
   const copyTemplate = (template) => {
-    const content = `${template.name}\n\n${template.description || ''}\n\n${JSON.stringify(template.fields, null, 2)}`
-    navigator.clipboard.writeText(content)
-    alert(t('templateCopied'))
-  }
+    const content = `${template.name}\n\n${template.description || ''}\n\n${JSON.stringify(template.fields, null, 2)}`;
+    navigator.clipboard.writeText(content);
+    toast.success(t('templateCopied'));
+  };
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -103,9 +105,7 @@ export default function Templates() {
             <BookOpen className="w-8 h-8 text-blue-600" />
             <div>
               <h1 className="text-3xl font-bold text-gray-900">{t('clinicalTemplates')}</h1>
-              <p className="text-gray-600">
-                {t('templatesSubtitle')}
-              </p>
+              <p className="text-gray-600">{t('templatesSubtitle')}</p>
             </div>
           </div>
 
@@ -148,7 +148,7 @@ export default function Templates() {
             <div>
               <p className="text-sm text-gray-600">{t('favorites')}</p>
               <p className="text-2xl font-bold text-gray-900">
-                {filteredTemplates.filter(t => t.is_favorite).length}
+                {filteredTemplates.filter((t) => t.is_favorite).length}
               </p>
             </div>
           </div>
@@ -204,7 +204,9 @@ export default function Templates() {
           >
             <option value="">{t('allCategories')}</option>
             {allCategories.map((category) => (
-              <option key={category} value={category}>{category}</option>
+              <option key={category} value={category}>
+                {category}
+              </option>
             ))}
           </select>
         </div>
@@ -233,9 +235,7 @@ export default function Templates() {
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <FileText className="w-5 h-5 text-blue-600" />
-                  <h3 className="font-semibold text-gray-900 text-sm">
-                    {template.name}
-                  </h3>
+                  <h3 className="font-semibold text-gray-900 text-sm">{template.name}</h3>
                 </div>
                 <button
                   onClick={(e) => handleToggleFavorite(template, e)}
@@ -250,15 +250,11 @@ export default function Templates() {
               </div>
 
               {template.description && (
-                <p className="text-xs text-gray-600 mb-3 line-clamp-2">
-                  {template.description}
-                </p>
+                <p className="text-xs text-gray-600 mb-3 line-clamp-2">{template.description}</p>
               )}
 
               <div className="flex items-center justify-between text-xs text-gray-500">
-                <span className="px-2 py-1 bg-gray-100 rounded">
-                  {template.category}
-                </span>
+                <span className="px-2 py-1 bg-gray-100 rounded">{template.category}</span>
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-3 h-3" />
                   <span>{t('uses').replace('{count}', template.usage_count || 0)}</span>
@@ -298,9 +294,7 @@ export default function Templates() {
                     <div className="flex items-center gap-3">
                       <FileText className="w-5 h-5 text-blue-600" />
                       <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {template.name}
-                        </div>
+                        <div className="text-sm font-medium text-gray-900">{template.name}</div>
                         {template.description && (
                           <div className="text-xs text-gray-500 line-clamp-1">
                             {template.description}
@@ -345,17 +339,15 @@ export default function Templates() {
                 <div className="flex items-center gap-3">
                   <FileText className="w-6 h-6 text-blue-600" />
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900">
-                      {selectedTemplate.name}
-                    </h3>
+                    <h3 className="text-xl font-bold text-gray-900">{selectedTemplate.name}</h3>
                     <p className="text-sm text-gray-600">{selectedTemplate.category}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={(e) => {
-                      e.stopPropagation()
-                      handleToggleFavorite(selectedTemplate, e)
+                      e.stopPropagation();
+                      handleToggleFavorite(selectedTemplate, e);
                     }}
                     className="p-2 hover:bg-gray-100 rounded-lg"
                   >
@@ -440,5 +432,5 @@ export default function Templates() {
         </div>
       )}
     </div>
-  )
+  );
 }

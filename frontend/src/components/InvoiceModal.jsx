@@ -3,45 +3,47 @@
  * Generate and preview PDF invoices
  */
 
-import { useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
-import { pdfAPI } from '../services/api'
-import { X, FileText, Download, Loader2 } from 'lucide-react'
+import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { pdfAPI } from '../services/api';
+import { X, FileText, Download, Loader2 } from 'lucide-react';
+import toast from '../utils/toast';
+import logger from '../utils/logger';
 
 export default function InvoiceModal({ transaction, onClose }) {
-  const [invoiceData, setInvoiceData] = useState(null)
+  const [invoiceData, setInvoiceData] = useState(null);
 
   // Generate invoice mutation
   const generateMutation = useMutation({
     mutationFn: (financialMetricId) => pdfAPI.generateInvoice(financialMetricId),
     onSuccess: (response) => {
-      setInvoiceData(response.data)
+      setInvoiceData(response.data);
     },
     onError: (error) => {
-      console.error('Failed to generate invoice:', error)
-      alert(error.response?.data?.error || 'Failed to generate invoice')
-    }
-  })
+      logger.error('Failed to generate invoice:', error);
+      toast.error(error.response?.data?.error || 'Failed to generate invoice');
+    },
+  });
 
   const handleGenerate = () => {
-    generateMutation.mutate(transaction.id)
-  }
+    generateMutation.mutate(transaction.id);
+  };
 
   const handleDownload = () => {
-    if (!invoiceData?.html) return
+    if (!invoiceData?.html) return;
 
     // Convert HTML to downloadable PDF
     // In a real app, you'd use a library like html2pdf.js or jsPDF
     // For now, we'll open a new window with the HTML and let the user print to PDF
-    const printWindow = window.open('', '_blank')
-    printWindow.document.write(invoiceData.html)
-    printWindow.document.close()
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(invoiceData.html);
+    printWindow.document.close();
 
     // Trigger print dialog
     setTimeout(() => {
-      printWindow.print()
-    }, 250)
-  }
+      printWindow.print();
+    }, 250);
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -57,10 +59,7 @@ export default function InvoiceModal({ transaction, onClose }) {
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg"
-          >
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -73,9 +72,7 @@ export default function InvoiceModal({ transaction, onClose }) {
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Ready to Generate Invoice
               </h3>
-              <p className="text-gray-600 mb-6">
-                Generate a PDF invoice for this transaction
-              </p>
+              <p className="text-gray-600 mb-6">Generate a PDF invoice for this transaction</p>
 
               {/* Transaction Details */}
               <div className="bg-gray-50 rounded-lg p-6 max-w-md mx-auto text-left mb-6">
@@ -105,11 +102,15 @@ export default function InvoiceModal({ transaction, onClose }) {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Status:</span>
-                    <span className={`font-medium ${
-                      transaction.payment_status === 'PAID' ? 'text-green-600' :
-                      transaction.payment_status === 'PENDING' ? 'text-yellow-600' :
-                      'text-gray-600'
-                    }`}>
+                    <span
+                      className={`font-medium ${
+                        transaction.payment_status === 'PAID'
+                          ? 'text-green-600'
+                          : transaction.payment_status === 'PENDING'
+                            ? 'text-yellow-600'
+                            : 'text-gray-600'
+                      }`}
+                    >
                       {transaction.payment_status}
                     </span>
                   </div>
@@ -169,5 +170,5 @@ export default function InvoiceModal({ transaction, onClose }) {
         </div>
       </div>
     </div>
-  )
+  );
 }

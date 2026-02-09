@@ -6,28 +6,29 @@ import { TextArea } from '../ui/Input';
 import { Alert } from '../ui/Alert';
 import { useCreateEncounter } from '../../hooks/useEncounters';
 import { useChiropracticCodes } from '../../hooks/useCodes';
+import toast from '../../utils/toast';
 
 const QUICK_TEXT_PRESETS = {
   subjective: [
-    "Reports improved ROM.",
-    "Pain level 4/10.",
-    "Stiffness in morning.",
-    "Radiating pain to left leg.",
-    "Headache reduced."
+    'Reports improved ROM.',
+    'Pain level 4/10.',
+    'Stiffness in morning.',
+    'Radiating pain to left leg.',
+    'Headache reduced.',
   ],
   objective: [
-    "Cervical compression +",
-    "SLR Negative",
-    "Kemps Positive (L)",
-    "Hypertonic Trapezius",
-    "Reduced Flexion L-spine"
+    'Cervical compression +',
+    'SLR Negative',
+    'Kemps Positive (L)',
+    'Hypertonic Trapezius',
+    'Reduced Flexion L-spine',
   ],
   plan: [
-    "Continue treatment plan",
-    "Re-eval in 6 visits",
-    "Home exercises: Cat-Camel",
-    "Ice pack 20min"
-  ]
+    'Continue treatment plan',
+    'Re-eval in 6 visits',
+    'Home exercises: Cat-Camel',
+    'Ice pack 20min',
+  ],
 };
 
 const TREATMENT_CODES = [
@@ -44,7 +45,7 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
     assessment: '',
     plan: '',
     diagnosisCodes: [],
-    treatmentCodes: []
+    treatmentCodes: [],
   });
   const [painScore, setPainScore] = useState(0);
   const [errors, setErrors] = useState({});
@@ -54,27 +55,27 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
   const { data: diagnosisCodes = [], isLoading: codesLoading } = useChiropracticCodes();
 
   const addQuickText = (field, text) => {
-    setNote(prev => ({
+    setNote((prev) => ({
       ...prev,
-      [field]: prev[field] ? `${prev[field]}\n${text}` : text
+      [field]: prev[field] ? `${prev[field]}\n${text}` : text,
     }));
   };
 
   const toggleDiagnosis = (code) => {
-    setNote(prev => ({
+    setNote((prev) => ({
       ...prev,
       diagnosisCodes: prev.diagnosisCodes.includes(code)
-        ? prev.diagnosisCodes.filter(c => c !== code)
-        : [...prev.diagnosisCodes, code]
+        ? prev.diagnosisCodes.filter((c) => c !== code)
+        : [...prev.diagnosisCodes, code],
     }));
   };
 
   const toggleTreatment = (code) => {
-    setNote(prev => ({
+    setNote((prev) => ({
       ...prev,
       treatmentCodes: prev.treatmentCodes.includes(code)
-        ? prev.treatmentCodes.filter(c => c !== code)
-        : [...prev.treatmentCodes, code]
+        ? prev.treatmentCodes.filter((c) => c !== code)
+        : [...prev.treatmentCodes, code],
     }));
   };
 
@@ -100,7 +101,7 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
 
   const handleSave = async (signNow = false) => {
     if (!validate()) {
-      alert('Please complete all required fields');
+      toast.warning('Please complete all required fields');
       return;
     }
 
@@ -116,8 +117,8 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
         diagnosisCodes: note.diagnosisCodes,
         treatmentCodes: note.treatmentCodes,
         metadata: {
-          painScore: painScore
-        }
+          painScore: painScore,
+        },
       };
 
       await createEncounter.mutateAsync(encounterData);
@@ -125,12 +126,12 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
       if (onSave) onSave();
       onCancel();
     } catch (error) {
-      alert(`Failed to save encounter: ${error.message}`);
+      toast.error(`Failed to save encounter: ${error.message}`);
     }
   };
 
   const totalPrice = note.treatmentCodes.reduce((sum, code) => {
-    const treatment = TREATMENT_CODES.find(t => t.code === code);
+    const treatment = TREATMENT_CODES.find((t) => t.code === code);
     return sum + (treatment?.price || 0);
   }, 0);
 
@@ -225,8 +226,8 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
                 { key: 'S', label: 'Subjective' },
                 { key: 'O', label: 'Objective' },
                 { key: 'A', label: 'Assessment' },
-                { key: 'P', label: 'Plan' }
-              ].map(tab => (
+                { key: 'P', label: 'Plan' },
+              ].map((tab) => (
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
@@ -237,9 +238,7 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
                   }`}
                 >
                   {tab.label}
-                  {errors[tab.key.toLowerCase()] && (
-                    <span className="ml-2 text-red-500">*</span>
-                  )}
+                  {errors[tab.key.toLowerCase()] && <span className="ml-2 text-red-500">*</span>}
                 </button>
               ))}
             </div>
@@ -297,7 +296,8 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Diagnosis (ICPC-2) {errors.diagnosisCodes && <span className="text-red-500">*</span>}
+                      Diagnosis (ICPC-2){' '}
+                      {errors.diagnosisCodes && <span className="text-red-500">*</span>}
                     </label>
                     {codesLoading ? (
                       <div className="flex items-center justify-center p-8">
@@ -305,7 +305,7 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
                       </div>
                     ) : (
                       <div className="border border-slate-200 rounded-lg p-2 max-h-64 overflow-y-auto">
-                        {diagnosisCodes.map(code => (
+                        {diagnosisCodes.map((code) => (
                           <label
                             key={code.code}
                             className="flex items-center p-2 hover:bg-slate-50 rounded cursor-pointer"
@@ -342,10 +342,11 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Treatment Codes (Takster) {errors.treatmentCodes && <span className="text-red-500">*</span>}
+                      Treatment Codes (Takster){' '}
+                      {errors.treatmentCodes && <span className="text-red-500">*</span>}
                     </label>
                     <div className="grid grid-cols-2 gap-2 mb-4">
-                      {TREATMENT_CODES.map(t => (
+                      {TREATMENT_CODES.map((t) => (
                         <div
                           key={t.code}
                           onClick={() => toggleTreatment(t.code)}
@@ -357,9 +358,7 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
                         >
                           <div className="flex justify-between items-center">
                             <span className="font-bold text-slate-900">{t.code}</span>
-                            <span className="text-sm font-medium text-slate-600">
-                              {t.price} kr
-                            </span>
+                            <span className="text-sm font-medium text-slate-600">{t.price} kr</span>
                           </div>
                           <div className="text-xs text-slate-500">{t.label}</div>
                         </div>

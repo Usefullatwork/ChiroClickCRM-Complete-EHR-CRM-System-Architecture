@@ -1,11 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Users, Gift, Award, TrendingUp, ChevronRight, Plus,
-  Mail, MessageSquare, Copy, Check, Star, Calendar,
-  DollarSign, UserPlus, Clock, CheckCircle, XCircle,
-  Loader2, AlertCircle
+  Users,
+  Gift,
+  Award,
+  TrendingUp,
+  ChevronRight,
+  Plus,
+  Mail,
+  MessageSquare,
+  Copy,
+  Check,
+  Star,
+  Calendar,
+  DollarSign,
+  UserPlus,
+  Clock,
+  CheckCircle,
+  XCircle,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
 import { crmAPI } from '../../services/api';
+import toast from '../../utils/toast';
+import logger from '../../utils/logger';
 
 const ReferralProgram = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -22,7 +39,7 @@ const ReferralProgram = () => {
     referrerReward: 500, // kr
     refereeDiscount: 200, // kr
     maxReferrals: 10,
-    expiryDays: 90
+    expiryDays: 90,
   };
 
   // Fetch referrals from API
@@ -34,22 +51,25 @@ const ReferralProgram = () => {
 
         const [referralsRes, statsRes] = await Promise.all([
           crmAPI.getReferrals(),
-          crmAPI.getReferralStats()
+          crmAPI.getReferralStats(),
         ]);
 
         // Map referral data
-        const referralData = (referralsRes.data?.referrals || referralsRes.data || []).map(r => ({
+        const referralData = (referralsRes.data?.referrals || referralsRes.data || []).map((r) => ({
           id: r.id,
-          referrerName: r.referrer_name || `${r.referrer_first_name || ''} ${r.referrer_last_name || ''}`.trim(),
+          referrerName:
+            r.referrer_name ||
+            `${r.referrer_first_name || ''} ${r.referrer_last_name || ''}`.trim(),
           referrerEmail: r.referrer_email,
-          refereeName: r.referee_name || `${r.referee_first_name || ''} ${r.referee_last_name || ''}`.trim(),
+          refereeName:
+            r.referee_name || `${r.referee_first_name || ''} ${r.referee_last_name || ''}`.trim(),
           refereeEmail: r.referee_email,
           referralCode: r.referral_code,
           status: r.status || 'SENT',
           createdAt: r.created_at,
           convertedAt: r.converted_at,
           rewardStatus: r.reward_status || 'PENDING',
-          rewardAmount: r.reward_amount || programSettings.referrerReward
+          rewardAmount: r.reward_amount || programSettings.referrerReward,
         }));
 
         setReferrals(referralData);
@@ -59,7 +79,7 @@ const ReferralProgram = () => {
           setTopReferrers(statsRes.data.topReferrers);
         }
       } catch (err) {
-        console.error('Error fetching referrals:', err);
+        logger.error('Error fetching referrals:', err);
         setError(err.message || 'Failed to load referrals');
       } finally {
         setLoading(false);
@@ -72,11 +92,11 @@ const ReferralProgram = () => {
   const handleCreateReferral = async (formData) => {
     try {
       const response = await crmAPI.createReferral(formData);
-      setReferrals(prev => [response.data, ...prev]);
+      setReferrals((prev) => [response.data, ...prev]);
       setShowNewReferralForm(false);
     } catch (err) {
-      console.error('Error creating referral:', err);
-      alert('Failed to create referral: ' + err.message);
+      logger.error('Error creating referral:', err);
+      toast.error('Failed to create referral: ' + err.message);
     }
   };
 
@@ -87,16 +107,21 @@ const ReferralProgram = () => {
     BOOKED: { label: 'Booket', color: 'bg-yellow-100 text-yellow-700', icon: Calendar },
     SHOWED: { label: 'Møtte Opp', color: 'bg-orange-100 text-orange-700', icon: UserPlus },
     CONVERTED: { label: 'Konvertert', color: 'bg-green-100 text-green-700', icon: CheckCircle },
-    EXPIRED: { label: 'Utløpt', color: 'bg-gray-100 text-gray-700', icon: XCircle }
+    EXPIRED: { label: 'Utløpt', color: 'bg-gray-100 text-gray-700', icon: XCircle },
   };
 
   // Calculate stats
   const stats = {
     total: referrals.length,
-    converted: referrals.filter(r => r.status === 'CONVERTED').length,
-    pending: referrals.filter(r => ['SENT', 'OPENED', 'BOOKED', 'SHOWED'].includes(r.status)).length,
-    conversionRate: Math.round((referrals.filter(r => r.status === 'CONVERTED').length / referrals.length) * 100),
-    totalRewards: referrals.filter(r => r.rewardStatus === 'PAID').reduce((sum, r) => sum + r.rewardAmount, 0)
+    converted: referrals.filter((r) => r.status === 'CONVERTED').length,
+    pending: referrals.filter((r) => ['SENT', 'OPENED', 'BOOKED', 'SHOWED'].includes(r.status))
+      .length,
+    conversionRate: Math.round(
+      (referrals.filter((r) => r.status === 'CONVERTED').length / referrals.length) * 100
+    ),
+    totalRewards: referrals
+      .filter((r) => r.rewardStatus === 'PAID')
+      .reduce((sum, r) => sum + r.rewardAmount, 0),
   };
 
   const copyToClipboard = (code) => {
@@ -201,7 +226,9 @@ const ReferralProgram = () => {
               <Gift className="w-5 h-5 text-orange-600" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-gray-900">{stats.totalRewards.toLocaleString('nb-NO')} kr</p>
+          <p className="text-2xl font-bold text-gray-900">
+            {stats.totalRewards.toLocaleString('nb-NO')} kr
+          </p>
           <p className="text-sm text-gray-600">Utbetalt Belønning</p>
         </div>
       </div>
@@ -212,8 +239,8 @@ const ReferralProgram = () => {
           { id: 'overview', label: 'Oversikt' },
           { id: 'referrals', label: 'Alle Henvisninger' },
           { id: 'leaderboard', label: 'Toppliste' },
-          { id: 'settings', label: 'Innstillinger' }
-        ].map(tab => (
+          { id: 'settings', label: 'Innstillinger' },
+        ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
@@ -255,8 +282,8 @@ const ReferralProgram = () => {
               </div>
               <div className="pt-4 border-t border-white/20">
                 <p className="text-sm opacity-80">
-                  Maks {programSettings.maxReferrals} henvisninger per pasient.
-                  Belønning utløper etter {programSettings.expiryDays} dager.
+                  Maks {programSettings.maxReferrals} henvisninger per pasient. Belønning utløper
+                  etter {programSettings.expiryDays} dager.
                 </p>
               </div>
             </div>
@@ -270,21 +297,33 @@ const ReferralProgram = () => {
             </div>
             <div className="space-y-3">
               {topReferrers.slice(0, 5).map((referrer, index) => (
-                <div key={referrer.name} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
-                    index === 0 ? 'bg-yellow-100 text-yellow-700' :
-                    index === 1 ? 'bg-gray-200 text-gray-700' :
-                    index === 2 ? 'bg-orange-100 text-orange-700' :
-                    'bg-gray-100 text-gray-600'
-                  }`}>
+                <div
+                  key={referrer.name}
+                  className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+                >
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                      index === 0
+                        ? 'bg-yellow-100 text-yellow-700'
+                        : index === 1
+                          ? 'bg-gray-200 text-gray-700'
+                          : index === 2
+                            ? 'bg-orange-100 text-orange-700'
+                            : 'bg-gray-100 text-gray-600'
+                    }`}
+                  >
                     {index + 1}
                   </div>
                   <div className="flex-1">
                     <p className="font-medium text-gray-900">{referrer.name}</p>
-                    <p className="text-sm text-gray-600">{referrer.converted} av {referrer.referrals} konvertert</p>
+                    <p className="text-sm text-gray-600">
+                      {referrer.converted} av {referrer.referrals} konvertert
+                    </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-green-600">{referrer.totalReward.toLocaleString('nb-NO')} kr</p>
+                    <p className="font-bold text-green-600">
+                      {referrer.totalReward.toLocaleString('nb-NO')} kr
+                    </p>
                     <p className="text-xs text-gray-500">Totalt opptjent</p>
                   </div>
                 </div>
@@ -307,15 +346,25 @@ const ReferralProgram = () => {
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Henviser</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Ny Pasient</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Kode</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Dato</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                      Henviser
+                    </th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                      Ny Pasient
+                    </th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                      Kode
+                    </th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                      Status
+                    </th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                      Dato
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {referrals.slice(0, 5).map(referral => {
+                  {referrals.slice(0, 5).map((referral) => {
                     const status = statusConfig[referral.status];
                     const StatusIcon = status.icon;
                     return (
@@ -328,7 +377,9 @@ const ReferralProgram = () => {
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
-                            <code className="px-2 py-1 bg-gray-100 rounded text-sm">{referral.referralCode}</code>
+                            <code className="px-2 py-1 bg-gray-100 rounded text-sm">
+                              {referral.referralCode}
+                            </code>
                             <button
                               onClick={() => copyToClipboard(referral.referralCode)}
                               className="p-1 text-gray-400 hover:text-gray-600"
@@ -342,7 +393,9 @@ const ReferralProgram = () => {
                           </div>
                         </td>
                         <td className="px-4 py-3">
-                          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${status.color}`}>
+                          <span
+                            className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${status.color}`}
+                          >
                             <StatusIcon className="w-3 h-3" />
                             {status.label}
                           </span>
@@ -365,17 +418,31 @@ const ReferralProgram = () => {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Henviser</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ny Pasient</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kode</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Opprettet</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Konvertert</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Belønning</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Henviser
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Ny Pasient
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Kode
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Status
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Opprettet
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Konvertert
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Belønning
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {referrals.map(referral => {
+              {referrals.map((referral) => {
                 const status = statusConfig[referral.status];
                 const StatusIcon = status.icon;
                 return (
@@ -393,10 +460,14 @@ const ReferralProgram = () => {
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <code className="px-2 py-1 bg-gray-100 rounded text-sm">{referral.referralCode}</code>
+                      <code className="px-2 py-1 bg-gray-100 rounded text-sm">
+                        {referral.referralCode}
+                      </code>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${status.color}`}>
+                      <span
+                        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${status.color}`}
+                      >
                         <StatusIcon className="w-3 h-3" />
                         {status.label}
                       </span>
@@ -405,7 +476,9 @@ const ReferralProgram = () => {
                     <td className="px-4 py-3 text-gray-600">{formatDate(referral.convertedAt)}</td>
                     <td className="px-4 py-3">
                       {referral.rewardStatus === 'PAID' ? (
-                        <span className="text-green-600 font-medium">{referral.rewardAmount} kr</span>
+                        <span className="text-green-600 font-medium">
+                          {referral.rewardAmount} kr
+                        </span>
                       ) : referral.rewardStatus === 'PENDING' ? (
                         <span className="text-yellow-600">Ventende</span>
                       ) : (
@@ -425,13 +498,21 @@ const ReferralProgram = () => {
           <h3 className="text-lg font-bold text-gray-900 mb-6">Henviser Toppliste</h3>
           <div className="space-y-4">
             {topReferrers.map((referrer, index) => (
-              <div key={referrer.name} className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold ${
-                  index === 0 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-white' :
-                  index === 1 ? 'bg-gradient-to-br from-gray-300 to-gray-500 text-white' :
-                  index === 2 ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-white' :
-                  'bg-gray-200 text-gray-600'
-                }`}>
+              <div
+                key={referrer.name}
+                className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl"
+              >
+                <div
+                  className={`w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold ${
+                    index === 0
+                      ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-white'
+                      : index === 1
+                        ? 'bg-gradient-to-br from-gray-300 to-gray-500 text-white'
+                        : index === 2
+                          ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-white'
+                          : 'bg-gray-200 text-gray-600'
+                  }`}
+                >
                   {index === 0 ? <Award className="w-6 h-6" /> : index + 1}
                 </div>
                 <div className="flex-1">
@@ -441,12 +522,15 @@ const ReferralProgram = () => {
                       <span className="font-medium">{referrer.referrals}</span> henvisninger
                     </span>
                     <span className="text-sm text-gray-600">
-                      <span className="font-medium text-green-600">{referrer.converted}</span> konvertert
+                      <span className="font-medium text-green-600">{referrer.converted}</span>{' '}
+                      konvertert
                     </span>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-green-600">{referrer.totalReward.toLocaleString('nb-NO')} kr</p>
+                  <p className="text-2xl font-bold text-green-600">
+                    {referrer.totalReward.toLocaleString('nb-NO')} kr
+                  </p>
                   <p className="text-sm text-gray-500">Total belønning</p>
                 </div>
               </div>

@@ -3,53 +3,55 @@
  * Export patient data in compliance with GDPR Articles 15 & 20
  */
 
-import { useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
-import { gdprAPI } from '../services/api'
-import { X, Download, Shield, FileText, Database, Loader2 } from 'lucide-react'
+import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { gdprAPI } from '../services/api';
+import { X, Download, Shield, FileText, Database, Loader2 } from 'lucide-react';
+import toast from '../utils/toast';
+import logger from '../utils/logger';
 
 export default function GDPRExportModal({ patient, onClose }) {
-  const [exportType, setExportType] = useState('data-access') // 'data-access' or 'data-portability'
-  const [exportedData, setExportedData] = useState(null)
+  const [exportType, setExportType] = useState('data-access'); // 'data-access' or 'data-portability'
+  const [exportedData, setExportedData] = useState(null);
 
   // Export mutation
   const exportMutation = useMutation({
     mutationFn: (type) => {
       if (type === 'data-access') {
-        return gdprAPI.exportPatientData(patient.id)
+        return gdprAPI.exportPatientData(patient.id);
       } else {
-        return gdprAPI.exportDataPortability(patient.id)
+        return gdprAPI.exportDataPortability(patient.id);
       }
     },
     onSuccess: (response) => {
-      setExportedData(response.data)
+      setExportedData(response.data);
     },
     onError: (error) => {
-      console.error('Failed to export patient data:', error)
-      alert(error.response?.data?.error || 'Failed to export patient data')
-    }
-  })
+      logger.error('Failed to export patient data:', error);
+      toast.error(error.response?.data?.error || 'Failed to export patient data');
+    },
+  });
 
   const handleExport = () => {
-    exportMutation.mutate(exportType)
-  }
+    exportMutation.mutate(exportType);
+  };
 
   const handleDownload = () => {
-    if (!exportedData) return
+    if (!exportedData) return;
 
     // Create downloadable JSON file
-    const dataStr = JSON.stringify(exportedData, null, 2)
-    const dataBlob = new Blob([dataStr], { type: 'application/json' })
-    const url = URL.createObjectURL(dataBlob)
+    const dataStr = JSON.stringify(exportedData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
 
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `patient_data_${patient.id}_${new Date().toISOString().split('T')[0]}.json`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
-  }
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `patient_data_${patient.id}_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -65,10 +67,7 @@ export default function GDPRExportModal({ patient, onClose }) {
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg"
-          >
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -84,8 +83,8 @@ export default function GDPRExportModal({ patient, onClose }) {
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-900 mb-2">GDPR Compliance</h3>
                     <p className="text-sm text-gray-700 mb-3">
-                      Export patient data in accordance with GDPR regulations. Choose the appropriate
-                      export type based on the patient's request.
+                      Export patient data in accordance with GDPR regulations. Choose the
+                      appropriate export type based on the patient's request.
                     </p>
                   </div>
                 </div>
@@ -120,12 +119,13 @@ export default function GDPRExportModal({ patient, onClose }) {
                         </h5>
                       </div>
                       <p className="text-sm text-gray-600">
-                        Export all patient data including medical records, appointments, communications,
-                        and consent history. Includes metadata and processing information.
+                        Export all patient data including medical records, appointments,
+                        communications, and consent history. Includes metadata and processing
+                        information.
                       </p>
                       <div className="mt-2 text-xs text-gray-500">
-                        <strong>Includes:</strong> Patient profile, clinical encounters, appointments,
-                        communications, consent records, audit trail
+                        <strong>Includes:</strong> Patient profile, clinical encounters,
+                        appointments, communications, consent records, audit trail
                       </div>
                     </div>
                   </div>
@@ -156,12 +156,12 @@ export default function GDPRExportModal({ patient, onClose }) {
                         </h5>
                       </div>
                       <p className="text-sm text-gray-600">
-                        Export patient data in a structured, machine-readable format for transfer
-                        to another healthcare provider or service.
+                        Export patient data in a structured, machine-readable format for transfer to
+                        another healthcare provider or service.
                       </p>
                       <div className="mt-2 text-xs text-gray-500">
-                        <strong>Includes:</strong> Patient profile, clinical records, treatment history
-                        (optimized for data transfer)
+                        <strong>Includes:</strong> Patient profile, clinical records, treatment
+                        history (optimized for data transfer)
                       </div>
                     </div>
                   </div>
@@ -272,5 +272,5 @@ export default function GDPRExportModal({ patient, onClose }) {
         </div>
       </div>
     </div>
-  )
+  );
 }

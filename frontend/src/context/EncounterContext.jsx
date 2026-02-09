@@ -1,3 +1,5 @@
+import toast from '../utils/toast';
+
 /**
  * EncounterContext - Thin wrapper around Zustand encounterStore
  *
@@ -263,7 +265,7 @@ export const EncounterProvider = ({ children }) => {
     if (!encounterData.subjective.chief_complaint) newErrors.subjective = true;
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      alert('Vennligst fyll ut hovedklage før signering.');
+      toast.warning('Vennligst fyll ut hovedklage før signering.');
       return;
     }
 
