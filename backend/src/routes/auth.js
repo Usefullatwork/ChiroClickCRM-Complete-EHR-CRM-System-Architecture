@@ -12,8 +12,41 @@ import logger from '../utils/logger.js';
 const router = express.Router();
 
 /**
- * POST /auth/register
- * Register a new user account
+ * @swagger
+ * /auth/register:
+ *   post:
+ *     summary: Register a new user account
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password, firstName, lastName, organizationId]
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               organizationId:
+ *                 type: string
+ *                 format: uuid
+ *               role:
+ *                 type: string
+ *                 enum: [ADMIN, PRACTITIONER, ASSISTANT]
+ *               hprNumber:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Account created successfully
+ *       400:
+ *         description: Validation error or registration failed
  */
 router.post('/register', async (req, res) => {
   try {
@@ -22,7 +55,7 @@ router.post('/register', async (req, res) => {
     if (!email || !password || !firstName || !lastName || !organizationId) {
       return res.status(400).json({
         error: 'Validation Error',
-        message: 'Email, password, first name, last name, and organization ID are required'
+        message: 'Email, password, first name, last name, and organization ID are required',
       });
     }
 
@@ -33,7 +66,7 @@ router.post('/register', async (req, res) => {
       lastName,
       organizationId,
       role,
-      hprNumber
+      hprNumber,
     });
 
     // Set session cookie
@@ -41,7 +74,7 @@ router.post('/register', async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      expires: result.session.expiresAt
+      expires: result.session.expiresAt,
     });
 
     res.status(201).json({
@@ -49,21 +82,42 @@ router.post('/register', async (req, res) => {
       user: result.user,
       // In dev, return verify token for testing. In prod, send email
       ...(process.env.NODE_ENV === 'development' && {
-        emailVerifyToken: result.emailVerifyToken
-      })
+        emailVerifyToken: result.emailVerifyToken,
+      }),
     });
   } catch (error) {
     logger.error('Registration error:', error);
     res.status(400).json({
       error: 'Registration Failed',
-      message: error.message
+      message: error.message,
     });
   }
 });
 
 /**
- * POST /auth/login
- * Login with email and password
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Login with email and password
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful, session cookie set
+ *       401:
+ *         description: Invalid credentials
  */
 router.post('/login', async (req, res) => {
   try {
@@ -72,13 +126,13 @@ router.post('/login', async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         error: 'Validation Error',
-        message: 'Email and password are required'
+        message: 'Email and password are required',
       });
     }
 
     const result = await authService.loginWithPassword(email, password, {
       ipAddress: req.ip,
-      userAgent: req.headers['user-agent']
+      userAgent: req.headers['user-agent'],
     });
 
     // Set session cookie
@@ -86,25 +140,33 @@ router.post('/login', async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      expires: result.session.expiresAt
+      expires: result.session.expiresAt,
     });
 
     res.json({
       message: 'Login successful',
-      user: result.user
+      user: result.user,
     });
   } catch (error) {
     logger.error('Login error:', error);
     res.status(401).json({
       error: 'Authentication Failed',
-      message: error.message
+      message: error.message,
     });
   }
 });
 
 /**
- * POST /auth/logout
- * Logout current session
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: Logout current session
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Logged out successfully
+ *       500:
+ *         description: Server error
  */
 router.post('/logout', async (req, res) => {
   try {
@@ -121,7 +183,7 @@ router.post('/logout', async (req, res) => {
     logger.error('Logout error:', error);
     res.status(500).json({
       error: 'Logout Failed',
-      message: 'An error occurred during logout'
+      message: 'An error occurred during logout',
     });
   }
 });
@@ -140,27 +202,43 @@ router.post('/logout-all', requireLocalAuth, async (req, res) => {
     logger.error('Logout all error:', error);
     res.status(500).json({
       error: 'Logout Failed',
-      message: 'An error occurred during logout'
+      message: 'An error occurred during logout',
     });
   }
 });
 
 /**
- * GET /auth/me
- * Get current user info
+ * @swagger
+ * /auth/me:
+ *   get:
+ *     summary: Get current authenticated user info
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Current user and session info
+ *       401:
+ *         description: Not authenticated
  */
 router.get('/me', requireLocalAuth, async (req, res) => {
   res.json({
     user: req.user,
     session: {
-      fresh: req.session?.fresh || false
-    }
+      fresh: req.session?.fresh || false,
+    },
   });
 });
 
 /**
- * GET /auth/sessions
- * Get all active sessions for current user
+ * @swagger
+ * /auth/sessions:
+ *   get:
+ *     summary: Get all active sessions for current user
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: List of active sessions
+ *       401:
+ *         description: Not authenticated
  */
 router.get('/sessions', requireLocalAuth, async (req, res) => {
   try {
@@ -168,7 +246,7 @@ router.get('/sessions', requireLocalAuth, async (req, res) => {
 
     // Mark current session
     const currentSessionId = req.cookies?.session?.substring(0, 8) + '...';
-    sessions.forEach(s => {
+    sessions.forEach((s) => {
       s.current = s.id === currentSessionId;
     });
 
@@ -177,7 +255,7 @@ router.get('/sessions', requireLocalAuth, async (req, res) => {
     logger.error('Get sessions error:', error);
     res.status(500).json({
       error: 'Server Error',
-      message: 'Failed to retrieve sessions'
+      message: 'Failed to retrieve sessions',
     });
   }
 });
@@ -193,7 +271,7 @@ router.post('/forgot-password', async (req, res) => {
     if (!email) {
       return res.status(400).json({
         error: 'Validation Error',
-        message: 'Email is required'
+        message: 'Email is required',
       });
     }
 
@@ -203,14 +281,15 @@ router.post('/forgot-password', async (req, res) => {
     res.json({
       message: 'If an account exists with this email, a reset link has been sent',
       // In dev, return token for testing. In prod, send email
-      ...(process.env.NODE_ENV === 'development' && result && {
-        resetToken: result.token
-      })
+      ...(process.env.NODE_ENV === 'development' &&
+        result && {
+          resetToken: result.token,
+        }),
     });
   } catch (error) {
     logger.error('Password reset request error:', error);
     res.json({
-      message: 'If an account exists with this email, a reset link has been sent'
+      message: 'If an account exists with this email, a reset link has been sent',
     });
   }
 });
@@ -226,18 +305,20 @@ router.post('/reset-password', async (req, res) => {
     if (!token || !password) {
       return res.status(400).json({
         error: 'Validation Error',
-        message: 'Token and new password are required'
+        message: 'Token and new password are required',
       });
     }
 
     await authService.resetPassword(token, password);
 
-    res.json({ message: 'Password has been reset successfully. Please login with your new password' });
+    res.json({
+      message: 'Password has been reset successfully. Please login with your new password',
+    });
   } catch (error) {
     logger.error('Password reset error:', error);
     res.status(400).json({
       error: 'Reset Failed',
-      message: error.message
+      message: error.message,
     });
   }
 });
@@ -253,7 +334,7 @@ router.post('/change-password', requireLocalAuth, requireFreshSession, async (re
     if (!currentPassword || !newPassword) {
       return res.status(400).json({
         error: 'Validation Error',
-        message: 'Current password and new password are required'
+        message: 'Current password and new password are required',
       });
     }
 
@@ -264,7 +345,7 @@ router.post('/change-password', requireLocalAuth, requireFreshSession, async (re
     logger.error('Password change error:', error);
     res.status(400).json({
       error: 'Change Failed',
-      message: error.message
+      message: error.message,
     });
   }
 });
@@ -280,7 +361,7 @@ router.post('/verify-email', async (req, res) => {
     if (!token) {
       return res.status(400).json({
         error: 'Validation Error',
-        message: 'Verification token is required'
+        message: 'Verification token is required',
       });
     }
 
@@ -291,7 +372,7 @@ router.post('/verify-email', async (req, res) => {
     logger.error('Email verification error:', error);
     res.status(400).json({
       error: 'Verification Failed',
-      message: error.message
+      message: error.message,
     });
   }
 });
@@ -307,13 +388,13 @@ router.post('/resend-verification', requireLocalAuth, async (req, res) => {
     res.json({
       message: 'Verification email sent',
       // In dev, return token for testing
-      ...(process.env.NODE_ENV === 'development' && { token })
+      ...(process.env.NODE_ENV === 'development' && { token }),
     });
   } catch (error) {
     logger.error('Resend verification error:', error);
     res.status(400).json({
       error: 'Resend Failed',
-      message: error.message
+      message: error.message,
     });
   }
 });
@@ -329,7 +410,7 @@ router.post('/confirm-password', requireLocalAuth, async (req, res) => {
     if (!password) {
       return res.status(400).json({
         error: 'Validation Error',
-        message: 'Password is required'
+        message: 'Password is required',
       });
     }
 
@@ -344,7 +425,7 @@ router.post('/confirm-password', requireLocalAuth, async (req, res) => {
     logger.error('Password confirmation error:', error);
     res.status(401).json({
       error: 'Confirmation Failed',
-      message: 'Incorrect password'
+      message: 'Incorrect password',
     });
   }
 });

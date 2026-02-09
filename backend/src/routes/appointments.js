@@ -12,21 +12,77 @@ router.use(requireAuth);
 router.use(requireOrganization);
 
 /**
- * @route   GET /api/v1/appointments
- * @desc    Get all appointments with filters
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /appointments:
+ *   get:
+ *     summary: List all appointments with filters
+ *     tags: [Appointments]
+ *     parameters:
+ *       - in: query
+ *         name: date
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [scheduled, confirmed, checked_in, completed, cancelled, no_show]
+ *       - in: query
+ *         name: practitioner_id
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: List of appointments
+ *       401:
+ *         description: Unauthorized
  */
-router.get('/',
+router.get(
+  '/',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   appointmentController.getAppointments
 );
 
 /**
- * @route   POST /api/v1/appointments
- * @desc    Create new appointment
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /appointments:
+ *   post:
+ *     summary: Create a new appointment
+ *     tags: [Appointments]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [patient_id, start_time, end_time]
+ *             properties:
+ *               patient_id:
+ *                 type: string
+ *                 format: uuid
+ *               practitioner_id:
+ *                 type: string
+ *                 format: uuid
+ *               start_time:
+ *                 type: string
+ *                 format: date-time
+ *               end_time:
+ *                 type: string
+ *                 format: date-time
+ *               appointment_type:
+ *                 type: string
+ *               notes:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Appointment created
+ *       400:
+ *         description: Validation error or time conflict
  */
-router.post('/',
+router.post(
+  '/',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   appointmentController.createAppointment
 );
@@ -36,17 +92,41 @@ router.post('/',
  * @desc    Update appointment status
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.patch('/:id/status',
+router.patch(
+  '/:id/status',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   appointmentController.updateStatus
 );
 
 /**
- * @route   POST /api/v1/appointments/:id/cancel
- * @desc    Cancel appointment with reason
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /appointments/{id}/cancel:
+ *   post:
+ *     summary: Cancel an appointment with reason
+ *     tags: [Appointments]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               reason:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Appointment cancelled
+ *       404:
+ *         description: Appointment not found
  */
-router.post('/:id/cancel',
+router.post(
+  '/:id/cancel',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   appointmentController.cancelAppointment
 );
@@ -56,17 +136,15 @@ router.post('/:id/cancel',
  * @desc    Get appointment statistics
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/stats',
-  requireRole(['ADMIN', 'PRACTITIONER']),
-  appointmentController.getStats
-);
+router.get('/stats', requireRole(['ADMIN', 'PRACTITIONER']), appointmentController.getStats);
 
 /**
  * @route   GET /api/v1/appointments/:id
  * @desc    Get appointment by ID
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.get('/:id',
+router.get(
+  '/:id',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   appointmentController.getAppointmentById
 );
@@ -76,7 +154,8 @@ router.get('/:id',
  * @desc    Update appointment
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.patch('/:id',
+router.patch(
+  '/:id',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   appointmentController.updateAppointment
 );
@@ -86,17 +165,33 @@ router.patch('/:id',
  * @desc    Confirm appointment
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.post('/:id/confirm',
+router.post(
+  '/:id/confirm',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   appointmentController.confirmAppointment
 );
 
 /**
- * @route   POST /api/v1/appointments/:id/check-in
- * @desc    Check in patient for appointment
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /appointments/{id}/check-in:
+ *   post:
+ *     summary: Check in patient for appointment
+ *     tags: [Appointments]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Patient checked in
+ *       404:
+ *         description: Appointment not found
  */
-router.post('/:id/check-in',
+router.post(
+  '/:id/check-in',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   appointmentController.checkInAppointment
 );

@@ -50,9 +50,30 @@ router.post('/validate', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res
 });
 
 /**
- * @route   GET /api/v1/encounters
- * @desc    Get all encounters with filters
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /encounters:
+ *   get:
+ *     summary: List all encounters with filters
+ *     tags: [Encounters]
+ *     parameters:
+ *       - in: query
+ *         name: patient_id
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Paginated list of encounters
+ *       401:
+ *         description: Unauthorized
  */
 router.get(
   '/',
@@ -74,9 +95,38 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/encounters
- * @desc    Create new encounter
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /encounters:
+ *   post:
+ *     summary: Create a new clinical encounter
+ *     tags: [Encounters]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [patient_id]
+ *             properties:
+ *               patient_id:
+ *                 type: string
+ *                 format: uuid
+ *               encounter_type:
+ *                 type: string
+ *                 enum: [SOAP, INITIAL, FOLLOW_UP, RE_EVALUATION]
+ *               subjective:
+ *                 type: string
+ *               objective:
+ *                 type: string
+ *               assessment:
+ *                 type: string
+ *               plan:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Encounter created
+ *       400:
+ *         description: Validation error
  */
 router.post(
   '/',
@@ -98,9 +148,25 @@ router.patch(
 );
 
 /**
- * @route   POST /api/v1/encounters/:id/sign
- * @desc    Sign encounter (makes immutable)
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /encounters/{id}/sign:
+ *   post:
+ *     summary: Sign encounter (makes it immutable)
+ *     tags: [Encounters]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Encounter signed
+ *       404:
+ *         description: Encounter not found
+ *       409:
+ *         description: Encounter already signed
  */
 router.post(
   '/:id/sign',
@@ -242,9 +308,35 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/encounters/:encounterId/amendments
- * @desc    Create amendment for signed encounter
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /encounters/{encounterId}/amendments:
+ *   post:
+ *     summary: Create amendment for a signed encounter
+ *     tags: [Encounters]
+ *     parameters:
+ *       - in: path
+ *         name: encounterId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [reason, changes]
+ *             properties:
+ *               reason:
+ *                 type: string
+ *               changes:
+ *                 type: object
+ *     responses:
+ *       201:
+ *         description: Amendment created
+ *       404:
+ *         description: Encounter not found
  */
 router.post(
   '/:encounterId/amendments',

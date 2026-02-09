@@ -15,7 +15,7 @@ import {
   updatePatientSchema,
   getPatientSchema,
   deletePatientSchema,
-  searchPatientsSchema
+  searchPatientsSchema,
 } from '../validators/patient.validators.js';
 
 const router = express.Router();
@@ -25,16 +25,49 @@ router.use(requireAuth);
 router.use(requireOrganization);
 
 /**
- * @route   GET /api/v1/patients
- * @desc    Get all patients with pagination and filters
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /patients:
+ *   get:
+ *     summary: List all patients with pagination and filters
+ *     tags: [Patients]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Paginated list of patients
+ *       401:
+ *         description: Unauthorized
  */
 router.get('/', patientController.getPatients);
 
 /**
- * @route   GET /api/v1/patients/search
- * @desc    Quick search patients by name, email, phone, or SolvIt ID
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /patients/search:
+ *   get:
+ *     summary: Quick search patients by name, email, phone, or SolvIt ID
+ *     tags: [Patients]
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         schema:
+ *           type: string
+ *         description: Search term
+ *     responses:
+ *       200:
+ *         description: Matching patients
+ *       401:
+ *         description: Unauthorized
  */
 router.get('/search', patientController.searchPatients);
 
@@ -46,7 +79,11 @@ router.get('/search', patientController.searchPatients);
  *          therapist, follow-up filters, sorting, and pagination
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.get('/search/advanced', validate(searchPatientsSchema), patientController.advancedSearchPatients);
+router.get(
+  '/search/advanced',
+  validate(searchPatientsSchema),
+  patientController.advancedSearchPatients
+);
 
 /**
  * @route   GET /api/v1/patients/follow-up/needed
@@ -60,9 +97,23 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/patients/:id
- * @desc    Get patient by ID
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /patients/{id}:
+ *   get:
+ *     summary: Get patient by ID
+ *     tags: [Patients]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Patient details
+ *       404:
+ *         description: Patient not found
  */
 router.get('/:id', validate(getPatientSchema), patientController.getPatient);
 
@@ -78,31 +129,92 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/patients
- * @desc    Create new patient
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /patients:
+ *   post:
+ *     summary: Create a new patient
+ *     tags: [Patients]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [first_name, last_name, date_of_birth]
+ *             properties:
+ *               first_name:
+ *                 type: string
+ *               last_name:
+ *                 type: string
+ *               date_of_birth:
+ *                 type: string
+ *                 format: date
+ *               email:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Patient created
+ *       400:
+ *         description: Validation error
  */
-router.post(
-  '/',
-  validate(createPatientSchema),
-  patientController.createPatient
-);
+router.post('/', validate(createPatientSchema), patientController.createPatient);
 
 /**
- * @route   PATCH /api/v1/patients/:id
- * @desc    Update patient
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /patients/{id}:
+ *   patch:
+ *     summary: Update patient details
+ *     tags: [Patients]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               first_name:
+ *                 type: string
+ *               last_name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Patient updated
+ *       404:
+ *         description: Patient not found
  */
-router.patch(
-  '/:id',
-  validate(updatePatientSchema),
-  patientController.updatePatient
-);
+router.patch('/:id', validate(updatePatientSchema), patientController.updatePatient);
 
 /**
- * @route   DELETE /api/v1/patients/:id
- * @desc    Delete patient (soft delete)
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /patients/{id}:
+ *   delete:
+ *     summary: Delete patient (soft delete)
+ *     tags: [Patients]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Patient deleted
+ *       404:
+ *         description: Patient not found
  */
 router.delete(
   '/:id',
@@ -168,9 +280,6 @@ router.post(
  * @desc    Generate PDF handout of patient's exercise program
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.get(
-  '/:patientId/exercises/pdf',
-  pdfController.generateExerciseHandout
-);
+router.get('/:patientId/exercises/pdf', pdfController.generateExerciseHandout);
 
 export default router;

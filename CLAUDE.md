@@ -805,6 +805,54 @@ cd frontend && npm run dev
 
 ---
 
+## Sprint Improvements (2026-02-09)
+
+### Phase 1: Security Hardening
+
+- All SQL queries parameterized (eliminated string concatenation in queries)
+- Winston logger replaces all console.log/console.error calls
+- Empty catch blocks filled with proper error logging
+- Audit alerting implemented for suspicious activity
+
+### Phase 2: UX/UI Improvements
+
+- **New components:** Breadcrumbs, PatientSummaryCard, KeyboardShortcutsModal, UnsavedChangesDialog
+- **New hooks:** useUnsavedChanges, useGlobalKeyboardShortcuts
+- Mobile navigation integrated into DashboardLayout
+- All `alert()` calls replaced with toast notifications
+- ARIA accessibility pass complete across all interactive elements
+- Loading states added to async operations
+
+### Phase 3: Testing Foundation
+
+- 814 tests across 32 suites — all passing
+- SQL injection test coverage for patient/encounter/auth endpoints
+- Auth bypass tests (session tampering, expired tokens, role escalation)
+- GDPR compliance tests (data export, anonymization, consent)
+
+### Phase 4: Performance Optimization
+
+- N+1 queries fixed in getPatientStatistics and getRetentionDashboard
+- 50+ database indexes added (`database/migrations/040_performance_indexes.sql`)
+- Memory caching on diagnosis codes, treatment types, and org settings
+
+### Phase 5: Feature Completion
+
+- QuickNotePanel wired to follow-ups API
+- NoShowImporter wired to patients search API
+- MessageApprovalDashboard wired to scheduler API
+- usePatientIntake hook wired to kiosk API
+- ExerciseLog export and ProgressChart navigation added
+- All hardcoded placeholders replaced with real data/API calls
+
+### Phase 6: Documentation
+
+- Swagger API docs available at `/api-docs`
+- 20+ endpoint annotations across auth, patients, encounters, appointments, billing routes
+- CLAUDE.md updated with sprint summary
+
+---
+
 ## Resolved Items (2026-02-07)
 
 The following were previously listed as TODO but are confirmed complete:
@@ -822,5 +870,3 @@ The following were previously listed as TODO but are confirmed complete:
 - [ ] Test AnatomyViewer component (2D/3D mode switching)
 - [ ] Test MuscleMap (anterior/posterior views)
 - [ ] Review/merge any open PRs: `gh pr list --state open`
-- [ ] Run pending database migrations: `cd backend && npm run migrate`
-- [ ] Seed exercise library (if not done): `docker exec -i chiroclickcrm-db psql -U postgres -d chiroclickcrm < backend/seeds/exercise_library.sql`

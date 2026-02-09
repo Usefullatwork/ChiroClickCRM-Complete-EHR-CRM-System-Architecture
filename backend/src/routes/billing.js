@@ -20,8 +20,31 @@ router.use(requireOrganization);
 // ============================================================================
 
 /**
- * POST /billing/episodes
- * Create a new care episode
+ * @swagger
+ * /billing/episodes:
+ *   post:
+ *     summary: Create a new care episode
+ *     tags: [Billing]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [patient_id]
+ *             properties:
+ *               patient_id:
+ *                 type: string
+ *                 format: uuid
+ *               diagnosis_codes:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       201:
+ *         description: Care episode created
+ *       400:
+ *         description: Validation error
  */
 router.post('/episodes', async (req, res) => {
   try {
@@ -39,7 +62,10 @@ router.post('/episodes', async (req, res) => {
  */
 router.get('/episodes/patient/:patientId', async (req, res) => {
   try {
-    const episodes = await episodesService.getPatientEpisodes(req.organizationId, req.params.patientId);
+    const episodes = await episodesService.getPatientEpisodes(
+      req.organizationId,
+      req.params.patientId
+    );
     res.json(episodes);
   } catch (error) {
     logger.error('Get patient episodes error:', error);
@@ -53,7 +79,10 @@ router.get('/episodes/patient/:patientId', async (req, res) => {
  */
 router.get('/episodes/patient/:patientId/active', async (req, res) => {
   try {
-    const episode = await episodesService.getActiveEpisode(req.organizationId, req.params.patientId);
+    const episode = await episodesService.getActiveEpisode(
+      req.organizationId,
+      req.params.patientId
+    );
     if (!episode) {
       return res.status(404).json({ error: 'No active episode found' });
     }
@@ -70,7 +99,10 @@ router.get('/episodes/patient/:patientId/active', async (req, res) => {
  */
 router.get('/episodes/:episodeId', async (req, res) => {
   try {
-    const summary = await episodesService.getEpisodeSummary(req.organizationId, req.params.episodeId);
+    const summary = await episodesService.getEpisodeSummary(
+      req.organizationId,
+      req.params.episodeId
+    );
     if (!summary) {
       return res.status(404).json({ error: 'Episode not found' });
     }
@@ -121,19 +153,23 @@ router.post('/episodes/:episodeId/reeval', async (req, res) => {
  * POST /billing/episodes/:episodeId/maintenance
  * Transition episode to maintenance status
  */
-router.post('/episodes/:episodeId/maintenance', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
-  try {
-    const episode = await episodesService.transitionToMaintenance(
-      req.organizationId,
-      req.params.episodeId,
-      { ...req.body, mmi_determined_by: req.user.id }
-    );
-    res.json(episode);
-  } catch (error) {
-    logger.error('Transition to maintenance error:', error);
-    res.status(400).json({ error: 'Failed to transition episode', message: error.message });
+router.post(
+  '/episodes/:episodeId/maintenance',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  async (req, res) => {
+    try {
+      const episode = await episodesService.transitionToMaintenance(
+        req.organizationId,
+        req.params.episodeId,
+        { ...req.body, mmi_determined_by: req.user.id }
+      );
+      res.json(episode);
+    } catch (error) {
+      logger.error('Transition to maintenance error:', error);
+      res.status(400).json({ error: 'Failed to transition episode', message: error.message });
+    }
   }
-});
+);
 
 /**
  * POST /billing/episodes/:episodeId/abn
@@ -157,19 +193,23 @@ router.post('/episodes/:episodeId/abn', async (req, res) => {
  * POST /billing/episodes/:episodeId/discharge
  * Discharge episode
  */
-router.post('/episodes/:episodeId/discharge', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
-  try {
-    const episode = await episodesService.dischargeEpisode(
-      req.organizationId,
-      req.params.episodeId,
-      req.body
-    );
-    res.json(episode);
-  } catch (error) {
-    logger.error('Discharge episode error:', error);
-    res.status(400).json({ error: 'Failed to discharge episode', message: error.message });
+router.post(
+  '/episodes/:episodeId/discharge',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  async (req, res) => {
+    try {
+      const episode = await episodesService.dischargeEpisode(
+        req.organizationId,
+        req.params.episodeId,
+        req.body
+      );
+      res.json(episode);
+    } catch (error) {
+      logger.error('Discharge episode error:', error);
+      res.status(400).json({ error: 'Failed to discharge episode', message: error.message });
+    }
   }
-});
+);
 
 /**
  * GET /billing/episodes/needing-reeval
@@ -197,7 +237,7 @@ router.get('/modifier/:episodeId/:patientId', async (req, res) => {
     );
     res.json({
       modifier,
-      description: getModifierDescription(modifier)
+      description: getModifierDescription(modifier),
     });
   } catch (error) {
     logger.error('Get billing modifier error:', error);
@@ -208,9 +248,9 @@ router.get('/modifier/:episodeId/:patientId', async (req, res) => {
 // Helper function for modifier descriptions
 const getModifierDescription = (modifier) => {
   const descriptions = {
-    'AT': 'Active Treatment - Patient showing measurable improvement',
-    'GA': 'ABN on file - Maintenance care with waiver signed',
-    'GZ': 'No ABN - Expect denial, cannot bill patient'
+    AT: 'Active Treatment - Patient showing measurable improvement',
+    GA: 'ABN on file - Maintenance care with waiver signed',
+    GZ: 'No ABN - Expect denial, cannot bill patient',
   };
   return descriptions[modifier] || 'Unknown modifier';
 };
@@ -220,8 +260,44 @@ const getModifierDescription = (modifier) => {
 // ============================================================================
 
 /**
- * GET /billing/claims
- * Get claims with filters
+ * @swagger
+ * /billing/claims:
+ *   get:
+ *     summary: List claims with filters and pagination
+ *     tags: [Billing]
+ *     parameters:
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: patient_id
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: start_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: end_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Paginated list of claims
+ *       401:
+ *         description: Unauthorized
  */
 router.get('/claims', async (req, res) => {
   try {
@@ -232,7 +308,7 @@ router.get('/claims', async (req, res) => {
       patient_id: req.query.patient_id,
       payer_id: req.query.payer_id,
       start_date: req.query.start_date,
-      end_date: req.query.end_date
+      end_date: req.query.end_date,
     });
     res.json(result);
   } catch (error) {
@@ -256,8 +332,16 @@ router.post('/claims', async (req, res) => {
 });
 
 /**
- * GET /billing/claims/summary
- * Get claims summary by status
+ * @swagger
+ * /billing/claims/summary:
+ *   get:
+ *     summary: Get claims summary grouped by status
+ *     tags: [Billing]
+ *     responses:
+ *       200:
+ *         description: Claims summary with counts and totals per status
+ *       401:
+ *         description: Unauthorized
  */
 router.get('/claims/summary', async (req, res) => {
   try {
@@ -360,11 +444,7 @@ router.post('/claims/:claimId/remittance', requireRole(['ADMIN']), async (req, r
  */
 router.post('/claims/:claimId/appeal', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
   try {
-    const claim = await claimsService.appealClaim(
-      req.organizationId,
-      req.params.claimId,
-      req.body
-    );
+    const claim = await claimsService.appealClaim(req.organizationId, req.params.claimId, req.body);
     res.json(claim);
   } catch (error) {
     logger.error('Appeal claim error:', error);
@@ -401,25 +481,25 @@ router.post('/claims/:claimId/write-off', requireRole(['ADMIN']), async (req, re
 router.get('/cpt-codes', (req, res) => {
   res.json({
     cmt: {
-      '98940': 'CMT 1-2 spinal regions',
-      '98941': 'CMT 3-4 spinal regions',
-      '98942': 'CMT 5 spinal regions'
+      98940: 'CMT 1-2 spinal regions',
+      98941: 'CMT 3-4 spinal regions',
+      98942: 'CMT 5 spinal regions',
     },
     evaluation: {
-      '99203': 'New patient, low complexity',
-      '99204': 'New patient, moderate complexity',
-      '99213': 'Established patient, low complexity',
-      '99214': 'Established patient, moderate complexity'
+      99203: 'New patient, low complexity',
+      99204: 'New patient, moderate complexity',
+      99213: 'Established patient, low complexity',
+      99214: 'Established patient, moderate complexity',
     },
     therapy: {
-      '97110': 'Therapeutic exercises',
-      '97140': 'Manual therapy',
-      '97112': 'Neuromuscular re-education',
-      '97010': 'Hot/cold packs',
-      '97032': 'Electrical stimulation',
-      '97035': 'Ultrasound',
-      '97012': 'Mechanical traction'
-    }
+      97110: 'Therapeutic exercises',
+      97140: 'Manual therapy',
+      97112: 'Neuromuscular re-education',
+      97010: 'Hot/cold packs',
+      97032: 'Electrical stimulation',
+      97035: 'Ultrasound',
+      97012: 'Mechanical traction',
+    },
   });
 });
 
@@ -430,23 +510,23 @@ router.get('/cpt-codes', (req, res) => {
 router.get('/modifiers', (req, res) => {
   res.json({
     chiropractic: {
-      'AT': 'Active Treatment',
-      'GA': 'ABN on file (Waiver)',
-      'GZ': 'No ABN (Expect denial)'
+      AT: 'Active Treatment',
+      GA: 'ABN on file (Waiver)',
+      GZ: 'No ABN (Expect denial)',
     },
     therapy: {
-      'GP': 'Physical Therapy services',
-      'GO': 'Occupational Therapy services',
-      'GN': 'Speech Language Pathology services'
+      GP: 'Physical Therapy services',
+      GO: 'Occupational Therapy services',
+      GN: 'Speech Language Pathology services',
     },
     general: {
-      '25': 'Significant, separately identifiable E/M',
-      '59': 'Distinct procedural service',
-      'XE': 'Separate encounter',
-      'XS': 'Separate structure',
-      'XP': 'Separate practitioner',
-      'XU': 'Unusual non-overlapping service'
-    }
+      25: 'Significant, separately identifiable E/M',
+      59: 'Distinct procedural service',
+      XE: 'Separate encounter',
+      XS: 'Separate structure',
+      XP: 'Separate practitioner',
+      XU: 'Unusual non-overlapping service',
+    },
   });
 });
 
@@ -466,10 +546,10 @@ router.post('/suggest-cmt', async (req, res) => {
       regions_count,
       suggested_cpt: cptCode,
       description: {
-        '98940': 'CMT 1-2 spinal regions',
-        '98941': 'CMT 3-4 spinal regions',
-        '98942': 'CMT 5 spinal regions'
-      }[cptCode]
+        98940: 'CMT 1-2 spinal regions',
+        98941: 'CMT 3-4 spinal regions',
+        98942: 'CMT 5 spinal regions',
+      }[cptCode],
     });
   } catch (error) {
     logger.error('Suggest CMT error:', error);

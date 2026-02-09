@@ -12,6 +12,8 @@ import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 import 'express-async-errors';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
 
 import { healthCheck } from './config/database.js';
 import logger from './utils/logger.js';
@@ -36,14 +38,16 @@ app.use(helmet());
 // CORS configuration - supports multiple origins
 const corsOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173,http://localhost:5174')
   .split(',')
-  .map(origin => origin.trim());
+  .map((origin) => origin.trim());
 
-app.use(cors({
-  origin: corsOrigins.length === 1 ? corsOrigins[0] : corsOrigins,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Organization-Id', 'X-Dev-Bypass']
-}));
+app.use(
+  cors({
+    origin: corsOrigins.length === 1 ? corsOrigins[0] : corsOrigins,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Organization-Id', 'X-Dev-Bypass'],
+  })
+);
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
@@ -59,11 +63,13 @@ app.use(compression());
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 } else {
-  app.use(morgan('combined', {
-    stream: {
-      write: (message) => logger.info(message.trim())
-    }
-  }));
+  app.use(
+    morgan('combined', {
+      stream: {
+        write: (message) => logger.info(message.trim()),
+      },
+    })
+  );
 }
 
 // Rate limiting
@@ -75,6 +81,35 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 app.use(`/api/${API_VERSION}`, limiter);
+
+// ============================================================================
+// SWAGGER API DOCS
+// ============================================================================
+
+const swaggerSpec = swaggerJsdoc({
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'ChiroClickCRM API',
+      version: '1.0.0',
+      description: 'Norwegian EHR/CRM/PMS API for chiropractic practices',
+    },
+    servers: [{ url: `/api/${API_VERSION}` }],
+    components: {
+      securitySchemes: {
+        cookieAuth: {
+          type: 'apiKey',
+          in: 'cookie',
+          name: 'session',
+        },
+      },
+    },
+    security: [{ cookieAuth: [] }],
+  },
+  apis: ['./src/routes/*.js'],
+});
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // ============================================================================
 // ROUTES
@@ -90,7 +125,7 @@ app.get('/health', async (req, res) => {
     uptime: process.uptime(),
     environment: process.env.NODE_ENV,
     version: API_VERSION,
-    database: dbHealthy ? 'connected' : 'disconnected'
+    database: dbHealthy ? 'connected' : 'disconnected',
   });
 });
 
@@ -134,8 +169,8 @@ app.get(`/api/${API_VERSION}`, (req, res) => {
       notifications: `/api/${API_VERSION}/notifications`,
       spineTemplates: `/api/${API_VERSION}/spine-templates`,
       clinicalSettings: `/api/${API_VERSION}/clinical-settings`,
-      training: `/api/${API_VERSION}/training`
-    }
+      training: `/api/${API_VERSION}/training`,
+    },
   });
 });
 
@@ -260,13 +295,13 @@ app.use((req, res) => {
     return res.status(404).json({
       error: 'Not Found',
       message: `Cannot ${req.method} ${req.path}`,
-      path: req.path
+      path: req.path,
     });
   }
   res.status(404).json({
     error: 'Not Found',
     message: `Cannot ${req.method} ${req.path}`,
-    path: req.path
+    path: req.path,
   });
 });
 
@@ -276,18 +311,16 @@ app.use((err, req, res, next) => {
     error: err.message,
     stack: err.stack,
     path: req.path,
-    method: req.method
+    method: req.method,
   });
 
   // Don't leak error details in production
-  const message = process.env.NODE_ENV === 'production'
-    ? 'Internal server error'
-    : err.message;
+  const message = process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message;
 
   res.status(err.status || 500).json({
     error: err.name || 'Error',
     message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
   });
 });
 
@@ -313,13 +346,18 @@ if (process.env.NODE_ENV !== 'test') {
         scheduleKeyRotation();
         logger.info('🔐 Encryption key rotation scheduler initialized');
       } catch (error) {
-        logger.warn('⚠️  Key rotation initialization skipped (table may not exist yet):', error.message);
+        logger.warn(
+          '⚠️  Key rotation initialization skipped (table may not exist yet):',
+          error.message
+        );
       }
 
       // Initialize job scheduler for automated communications and workflows
       try {
         const schedulerResult = await initializeScheduler();
-        logger.info(`📅 Job scheduler initialized (${schedulerResult.jobCount} jobs, timezone: ${schedulerResult.timezone})`);
+        logger.info(
+          `📅 Job scheduler initialized (${schedulerResult.jobCount} jobs, timezone: ${schedulerResult.timezone})`
+        );
       } catch (error) {
         logger.warn('⚠️  Job scheduler initialization skipped:', error.message);
       }
