@@ -27,10 +27,11 @@ import {
   Filter,
   RefreshCw,
   CheckCircle2,
-  XCircle
+  XCircle,
 } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
+import { schedulerAPI } from '../../services/api';
 
 // Message categories
 const MESSAGE_CATEGORIES = {
@@ -38,7 +39,7 @@ const MESSAGE_CATEGORIES = {
   no_show: { label: 'No-show', color: 'red' },
   follow_up: { label: 'Oppfølging', color: 'purple' },
   reminder: { label: 'Påminnelse', color: 'amber' },
-  recall: { label: 'Recall', color: 'blue' }
+  recall: { label: 'Recall', color: 'blue' },
 };
 
 // Single message card component
@@ -49,7 +50,7 @@ function MessageCard({
   onApprove,
   onReject,
   onEdit,
-  isProcessing
+  isProcessing,
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(message.content);
@@ -68,9 +69,11 @@ function MessageCard({
   const categoryColor = MESSAGE_CATEGORIES[message.category]?.color || 'gray';
 
   return (
-    <div className={`border rounded-lg transition-all ${
-      isExpanded ? 'border-blue-300 shadow-md' : 'border-gray-200 hover:border-gray-300'
-    }`}>
+    <div
+      className={`border rounded-lg transition-all ${
+        isExpanded ? 'border-blue-300 shadow-md' : 'border-gray-200 hover:border-gray-300'
+      }`}
+    >
       {/* Header */}
       <button
         onClick={() => onToggleExpand(message.id)}
@@ -78,12 +81,16 @@ function MessageCard({
       >
         <div className="flex items-center gap-3">
           <div className={`p-2 rounded-lg bg-${message.type === 'SMS' ? 'blue' : 'purple'}-50`}>
-            <TypeIcon className={`w-4 h-4 text-${message.type === 'SMS' ? 'blue' : 'purple'}-600`} />
+            <TypeIcon
+              className={`w-4 h-4 text-${message.type === 'SMS' ? 'blue' : 'purple'}-600`}
+            />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <span className="font-medium text-gray-900">{message.patient_name}</span>
-              <span className={`px-2 py-0.5 text-xs font-medium rounded-full bg-${categoryColor}-100 text-${categoryColor}-700`}>
+              <span
+                className={`px-2 py-0.5 text-xs font-medium rounded-full bg-${categoryColor}-100 text-${categoryColor}-700`}
+              >
                 {MESSAGE_CATEGORIES[message.category]?.label || message.category}
               </span>
             </div>
@@ -142,9 +149,7 @@ function MessageCard({
               </div>
             ) : (
               <div className="relative">
-                <p className="text-sm text-gray-700 whitespace-pre-wrap pr-8">
-                  {message.content}
-                </p>
+                <p className="text-sm text-gray-700 whitespace-pre-wrap pr-8">{message.content}</p>
                 <button
                   onClick={() => setIsEditing(true)}
                   className="absolute top-0 right-0 p-1 text-gray-400 hover:text-gray-600"
@@ -187,7 +192,9 @@ function MessageCard({
           <div className="flex items-center justify-between p-4 bg-gray-50 border-t border-gray-200">
             <div className="flex items-center gap-2 text-xs text-gray-500">
               <Clock className="w-3.5 h-3.5" />
-              <span>Opprettet {format(new Date(message.created_at), 'dd.MM.yyyy HH:mm', { locale: nb })}</span>
+              <span>
+                Opprettet {format(new Date(message.created_at), 'dd.MM.yyyy HH:mm', { locale: nb })}
+              </span>
             </div>
 
             <div className="flex gap-2">
@@ -233,56 +240,18 @@ export default function MessageApprovalDashboard({ className = '' }) {
   const [expandedMessageId, setExpandedMessageId] = useState(null);
   const [processingIds, setProcessingIds] = useState(new Set());
 
-  // Fetch pending messages
-  const { data: messagesData, isLoading, refetch } = useQuery({
+  // Fetch pending messages from scheduler
+  const {
+    data: messagesData,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ['pending-messages', selectedCategory],
     queryFn: async () => {
-      // TODO: Replace with actual API call
-      // return communicationsAPI.getPending({ category: selectedCategory });
-
-      // Mock data for demo
-      return {
-        data: [
-          {
-            id: 1,
-            patient_id: 'p1',
-            patient_name: 'Ola Nordmann',
-            type: 'SMS',
-            recipient: '+47 912 34 567',
-            category: 'no_show',
-            content: 'Hei Ola, du møtte ikke til timen din i dag kl. 14:00. Ring oss på 12345678 for å avtale ny time. Hilsen Klinikken',
-            trigger_event: 'No-show 29.01.2026',
-            created_at: new Date().toISOString(),
-            approval_status: 'pending'
-          },
-          {
-            id: 2,
-            patient_id: 'p2',
-            patient_name: 'Kari Hansen',
-            type: 'SMS',
-            recipient: '+47 987 65 432',
-            category: 'no_show',
-            content: 'Hei Kari, vi savnet deg på timen i dag! Håper alt er bra med deg. Ring oss på 12345678 hvis du ønsker å booke ny time. Vennlig hilsen Klinikken',
-            trigger_event: 'No-show 29.01.2026',
-            created_at: new Date(Date.now() - 3600000).toISOString(),
-            approval_status: 'pending'
-          },
-          {
-            id: 3,
-            patient_id: 'p3',
-            patient_name: 'Per Olsen',
-            type: 'EMAIL',
-            recipient: 'per@example.com',
-            category: 'follow_up',
-            content: 'Hei Per,\n\nDet er 2 uker siden siste behandling. Hvordan går det med deg?\n\nTa gjerne kontakt hvis du har spørsmål eller ønsker en ny time.\n\nVennlig hilsen\nKlinikken',
-            trigger_event: 'Oppfølging etter behandling',
-            created_at: new Date(Date.now() - 7200000).toISOString(),
-            approval_status: 'pending'
-          }
-        ]
-      };
+      const response = await schedulerAPI.getTodaysMessages();
+      return response.data;
     },
-    refetchInterval: 30000 // Refetch every 30 seconds
+    refetchInterval: 30000, // Refetch every 30 seconds
   });
 
   const messages = messagesData?.data || [];
@@ -290,57 +259,54 @@ export default function MessageApprovalDashboard({ className = '' }) {
   // Filter messages by category
   const filteredMessages = useMemo(() => {
     if (selectedCategory === 'all') return messages;
-    return messages.filter(m => m.category === selectedCategory);
+    return messages.filter((m) => m.category === selectedCategory);
   }, [messages, selectedCategory]);
 
-  // Approve mutation
+  // Approve mutation — send approved message via scheduler
   const approveMutation = useMutation({
     mutationFn: async (messageId) => {
-      // TODO: Replace with actual API call
-      // return communicationsAPI.approve(messageId);
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API call
-      return { success: true };
+      const response = await schedulerAPI.sendApproved([messageId]);
+      return response.data;
     },
     onMutate: (messageId) => {
-      setProcessingIds(prev => new Set([...prev, messageId]));
+      setProcessingIds((prev) => new Set([...prev, messageId]));
     },
-    onSuccess: (_, messageId) => {
-      queryClient.invalidateQueries(['pending-messages']);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pending-messages'] });
       setExpandedMessageId(null);
     },
     onSettled: (_, __, messageId) => {
-      setProcessingIds(prev => {
+      setProcessingIds((prev) => {
         const next = new Set(prev);
         next.delete(messageId);
         return next;
       });
-    }
+    },
   });
 
-  // Reject mutation
+  // Reject mutation — cancel scheduled message
   const rejectMutation = useMutation({
     mutationFn: async (messageId) => {
-      // TODO: Replace with actual API call
-      // return communicationsAPI.reject(messageId);
-      await new Promise(resolve => setTimeout(resolve, 500));
-      return { success: true };
+      const response = await schedulerAPI.cancelMessage(messageId);
+      return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['pending-messages']);
+      queryClient.invalidateQueries({ queryKey: ['pending-messages'] });
       setExpandedMessageId(null);
-    }
+    },
   });
 
-  // Edit mutation
+  // Edit mutation — update message content then refetch
   const editMutation = useMutation({
     mutationFn: async ({ messageId, content }) => {
-      // TODO: Replace with actual API call
-      // return communicationsAPI.updateContent(messageId, content);
-      return { success: true };
+      // Scheduler doesn't have a direct edit endpoint, so we cancel and re-schedule
+      await schedulerAPI.cancelMessage(messageId);
+      const response = await schedulerAPI.schedule({ content, messageId });
+      return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['pending-messages']);
-    }
+      queryClient.invalidateQueries({ queryKey: ['pending-messages'] });
+    },
   });
 
   // Bulk approve
@@ -352,13 +318,13 @@ export default function MessageApprovalDashboard({ className = '' }) {
 
   // Toggle expand
   const handleToggleExpand = useCallback((messageId) => {
-    setExpandedMessageId(prev => prev === messageId ? null : messageId);
+    setExpandedMessageId((prev) => (prev === messageId ? null : messageId));
   }, []);
 
   // Count by category
   const categoryCounts = useMemo(() => {
     const counts = { all: messages.length };
-    messages.forEach(m => {
+    messages.forEach((m) => {
       counts[m.category] = (counts[m.category] || 0) + 1;
     });
     return counts;
@@ -375,7 +341,8 @@ export default function MessageApprovalDashboard({ className = '' }) {
           <div>
             <h1 className="text-xl font-semibold text-gray-900">Meldingsgodkjenning</h1>
             <p className="text-sm text-gray-500">
-              {filteredMessages.length} melding{filteredMessages.length !== 1 ? 'er' : ''} venter på godkjenning
+              {filteredMessages.length} melding{filteredMessages.length !== 1 ? 'er' : ''} venter på
+              godkjenning
             </p>
           </div>
         </div>
@@ -420,9 +387,11 @@ export default function MessageApprovalDashboard({ className = '' }) {
             >
               {config.label}
               {count > 0 && (
-                <span className={`px-1.5 py-0.5 text-xs rounded-full ${
-                  isActive ? `bg-${config.color}-200` : 'bg-gray-200'
-                }`}>
+                <span
+                  className={`px-1.5 py-0.5 text-xs rounded-full ${
+                    isActive ? `bg-${config.color}-200` : 'bg-gray-200'
+                  }`}
+                >
                   {count}
                 </span>
               )}
@@ -444,7 +413,7 @@ export default function MessageApprovalDashboard({ className = '' }) {
             <p className="text-sm text-gray-400 mt-1">Nye meldinger vil vises her automatisk</p>
           </div>
         ) : (
-          filteredMessages.map(message => (
+          filteredMessages.map((message) => (
             <MessageCard
               key={message.id}
               message={message}
@@ -465,16 +434,14 @@ export default function MessageApprovalDashboard({ className = '' }) {
           <div className="flex items-center gap-4 text-sm text-gray-500">
             <span className="flex items-center gap-1">
               <Phone className="w-4 h-4" />
-              {messages.filter(m => m.type === 'SMS').length} SMS
+              {messages.filter((m) => m.type === 'SMS').length} SMS
             </span>
             <span className="flex items-center gap-1">
               <Mail className="w-4 h-4" />
-              {messages.filter(m => m.type === 'EMAIL').length} e-post
+              {messages.filter((m) => m.type === 'EMAIL').length} e-post
             </span>
           </div>
-          <p className="text-xs text-gray-400">
-            Oppdateres automatisk hvert 30. sekund
-          </p>
+          <p className="text-xs text-gray-400">Oppdateres automatisk hvert 30. sekund</p>
         </div>
       )}
     </div>

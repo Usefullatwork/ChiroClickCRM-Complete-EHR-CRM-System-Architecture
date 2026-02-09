@@ -25,17 +25,18 @@ import {
   X,
   Plus,
   Calendar,
-  User
+  User,
 } from 'lucide-react';
 import { format, formatDistanceToNow, addDays, addWeeks } from 'date-fns';
 import { nb } from 'date-fns/locale';
+import { followUpsAPI } from '../../services/api';
 
 // Note types
 const NOTE_TYPES = {
   note: { label: 'Notat', icon: MessageSquare, color: 'blue' },
   task: { label: 'Oppgave', icon: CheckSquare, color: 'green' },
   reminder: { label: 'Påminnelse', icon: Bell, color: 'amber' },
-  follow_up: { label: 'Oppfølging', icon: Phone, color: 'purple' }
+  follow_up: { label: 'Oppfølging', icon: Phone, color: 'purple' },
 };
 
 // Priority levels
@@ -43,7 +44,7 @@ const PRIORITIES = {
   low: { label: 'Lav', color: 'gray' },
   normal: { label: 'Normal', color: 'blue' },
   high: { label: 'Høy', color: 'orange' },
-  urgent: { label: 'Haster', color: 'red' }
+  urgent: { label: 'Haster', color: 'red' },
 };
 
 // Quick date options
@@ -52,15 +53,30 @@ const QUICK_DATES = [
   { label: 'I morgen', getValue: () => addDays(new Date(), 1) },
   { label: '1 uke', getValue: () => addWeeks(new Date(), 1) },
   { label: '2 uker', getValue: () => addWeeks(new Date(), 2) },
-  { label: '1 måned', getValue: () => addWeeks(new Date(), 4) }
+  { label: '1 måned', getValue: () => addWeeks(new Date(), 4) },
 ];
 
 // Quick note templates
 const QUICK_TEMPLATES = [
-  { label: 'Ring om 2 uker', content: 'Ring pasient for oppfølging', dueOffset: 14, type: 'follow_up' },
+  {
+    label: 'Ring om 2 uker',
+    content: 'Ring pasient for oppfølging',
+    dueOffset: 14,
+    type: 'follow_up',
+  },
   { label: 'Sjekk røntgen', content: 'Sjekk røntgenresultater', dueOffset: 3, type: 'task' },
-  { label: 'Venter på svar', content: 'Venter på tilbakemelding fra pasient', dueOffset: 7, type: 'reminder' },
-  { label: 'Henvis fastlege', content: 'Henvise til fastlege for videre utredning', dueOffset: 0, type: 'task' }
+  {
+    label: 'Venter på svar',
+    content: 'Venter på tilbakemelding fra pasient',
+    dueOffset: 7,
+    type: 'reminder',
+  },
+  {
+    label: 'Henvis fastlege',
+    content: 'Henvise til fastlege for videre utredning',
+    dueOffset: 0,
+    type: 'task',
+  },
 ];
 
 export default function QuickNotePanel({
@@ -71,7 +87,7 @@ export default function QuickNotePanel({
   patientEmail = '',
   onNoteSaved,
   compact = false,
-  className = ''
+  className = '',
 }) {
   const queryClient = useQueryClient();
 
@@ -85,32 +101,29 @@ export default function QuickNotePanel({
   const [sendEmail, setSendEmail] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
-  // Fetch existing notes for this patient
+  // Fetch existing notes/follow-ups for this patient
   const { data: notesData, isLoading: notesLoading } = useQuery({
     queryKey: ['patient-notes', patientId],
     queryFn: async () => {
-      // TODO: Replace with actual API call
-      // return patientNotesAPI.getByPatient(patientId);
-      return { data: [] }; // Placeholder
+      const response = await followUpsAPI.getAll({ patientId, limit: 20 });
+      return response.data;
     },
-    enabled: !!patientId && showHistory
+    enabled: !!patientId && showHistory,
   });
 
-  const notes = notesData?.data || [];
+  const notes = notesData?.followUps || notesData?.data || [];
 
   // Create note mutation
   const createNoteMutation = useMutation({
     mutationFn: async (noteData) => {
-      // TODO: Replace with actual API call
-      // return patientNotesAPI.create(noteData);
-      console.log('Creating note:', noteData);
-      return { data: { id: Date.now(), ...noteData } };
+      const response = await followUpsAPI.create(noteData);
+      return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['patient-notes', patientId]);
+      queryClient.invalidateQueries({ queryKey: ['patient-notes', patientId] });
       resetForm();
       if (onNoteSaved) onNoteSaved();
-    }
+    },
   });
 
   // Reset form
@@ -137,30 +150,55 @@ export default function QuickNotePanel({
   }, []);
 
   // Submit note
-  const handleSubmit = useCallback((e) => {
-    e?.preventDefault();
+  const handleSubmit = useCallback(
+    (e) => {
+      e?.preventDefault();
 
-    if (!content.trim()) return;
+      if (!content.trim()) return;
 
-    const noteData = {
-      patient_id: patientId,
-      encounter_id: encounterId,
-      note_type: noteType,
-      content: content.trim(),
+      const noteData = {
+        patient_id: patientId,
+        encounter_id: encounterId,
+        note_type: noteType,
+        content: content.trim(),
+        priority,
+        due_date: dueDate || null,
+        send_method: sendSms ? 'sms' : sendEmail ? 'email' : null,
+        message_status: sendSms || sendEmail ? 'pending_approval' : null,
+      };
+
+      createNoteMutation.mutate(noteData);
+    },
+    [
+      patientId,
+      encounterId,
+      noteType,
+      content,
       priority,
-      due_date: dueDate || null,
-      send_method: sendSms ? 'sms' : sendEmail ? 'email' : null,
-      message_status: (sendSms || sendEmail) ? 'pending_approval' : null
-    };
-
-    createNoteMutation.mutate(noteData);
-  }, [patientId, encounterId, noteType, content, priority, dueDate, sendSms, sendEmail, createNoteMutation]);
+      dueDate,
+      sendSms,
+      sendEmail,
+      createNoteMutation,
+    ]
+  );
 
   // Toggle complete (for tasks)
-  const handleToggleComplete = useCallback((noteId) => {
-    // TODO: Implement complete toggle
-    console.log('Toggle complete:', noteId);
-  }, []);
+  const completeMutation = useMutation({
+    mutationFn: async (noteId) => {
+      const response = await followUpsAPI.complete(noteId, '');
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['patient-notes', patientId] });
+    },
+  });
+
+  const handleToggleComplete = useCallback(
+    (noteId) => {
+      completeMutation.mutate(noteId);
+    },
+    [completeMutation]
+  );
 
   const NoteTypeConfig = NOTE_TYPES[noteType];
 
@@ -241,7 +279,9 @@ export default function QuickNotePanel({
                 className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 {Object.entries(PRIORITIES).map(([key, config]) => (
-                  <option key={key} value={key}>{config.label}</option>
+                  <option key={key} value={key}>
+                    {config.label}
+                  </option>
                 ))}
               </select>
             </div>
@@ -333,7 +373,7 @@ export default function QuickNotePanel({
               ) : (
                 <>
                   <Plus className="w-4 h-4" />
-                  {(sendSms || sendEmail) ? 'Lagre & kø melding' : 'Lagre'}
+                  {sendSms || sendEmail ? 'Lagre & kø melding' : 'Lagre'}
                 </>
               )}
             </button>
@@ -379,13 +419,19 @@ export default function QuickNotePanel({
                       }`}
                     >
                       <div className="flex items-start gap-2">
-                        <Icon className={`w-4 h-4 mt-0.5 text-${TypeConfig.color}-500 ${isCompleted ? 'opacity-50' : ''}`} />
+                        <Icon
+                          className={`w-4 h-4 mt-0.5 text-${TypeConfig.color}-500 ${isCompleted ? 'opacity-50' : ''}`}
+                        />
                         <div className="flex-1 min-w-0">
-                          <p className={`text-sm ${isCompleted ? 'text-gray-400 line-through' : 'text-gray-700'}`}>
+                          <p
+                            className={`text-sm ${isCompleted ? 'text-gray-400 line-through' : 'text-gray-700'}`}
+                          >
                             {note.content}
                           </p>
                           <div className="flex items-center gap-2 mt-1 text-xs text-gray-400">
-                            <span>{format(new Date(note.created_at), 'dd.MM.yy', { locale: nb })}</span>
+                            <span>
+                              {format(new Date(note.created_at), 'dd.MM.yy', { locale: nb })}
+                            </span>
                             {note.due_date && (
                               <span className="flex items-center gap-1">
                                 <Clock className="w-3 h-3" />

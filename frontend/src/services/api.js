@@ -850,6 +850,9 @@ export const schedulerAPI = {
   checkConflicts: (data) => apiClient.post('/scheduler/check-conflicts', data),
   getDecisions: (params) => apiClient.get('/scheduler/decisions', { params }),
   resolveDecision: (id, data) => apiClient.post(`/scheduler/decisions/${id}`, data),
+  getTodaysMessages: () => apiClient.get('/scheduler/today'),
+  sendApproved: (messageIds) => apiClient.post('/scheduler/send', { messageIds }),
+  cancelMessage: (id) => apiClient.delete(`/scheduler/messages/${id}`),
 };
 
 // Notifications API

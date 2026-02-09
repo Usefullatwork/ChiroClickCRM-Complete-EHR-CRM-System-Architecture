@@ -21,28 +21,32 @@ import {
   Mail,
   Calendar,
   ChevronRight,
-  Loader2
+  Loader2,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { nb } from 'date-fns/locale';
+import { patientsAPI, communicationsAPI } from '../../services/api';
 
 // Message templates for no-shows
 const NO_SHOW_TEMPLATES = {
   direct: {
     label: 'Direkte',
     description: 'Kort og saklig melding',
-    content: 'Hei {{firstName}}, du møtte ikke til timen din {{date}} kl. {{time}}. Ring oss på {{clinicPhone}} for å avtale ny time.'
+    content:
+      'Hei {{firstName}}, du møtte ikke til timen din {{date}} kl. {{time}}. Ring oss på {{clinicPhone}} for å avtale ny time.',
   },
   kind: {
     label: 'Vennlig',
     description: 'Myk og forståelsesfull',
-    content: 'Hei {{firstName}}, vi savnet deg på timen i dag! Håper alt er bra med deg. Ring oss på {{clinicPhone}} hvis du ønsker å booke ny time. Vennlig hilsen {{clinicName}}'
+    content:
+      'Hei {{firstName}}, vi savnet deg på timen i dag! Håper alt er bra med deg. Ring oss på {{clinicPhone}} hvis du ønsker å booke ny time. Vennlig hilsen {{clinicName}}',
   },
   empathetic: {
     label: 'Empatisk',
     description: 'Fokus på pasienten',
-    content: 'Hei {{firstName}}, vi merket at du ikke kunne komme på timen i dag. Vi håper alt er vel med deg. Ikke nøl med å ta kontakt på {{clinicPhone}} når du er klar for en ny time. Ta vare på deg selv!'
-  }
+    content:
+      'Hei {{firstName}}, vi merket at du ikke kunne komme på timen i dag. Vi håper alt er vel med deg. Ikke nøl med å ta kontakt på {{clinicPhone}} når du er klar for en ny time. Ta vare på deg selv!',
+  },
 };
 
 // Parse uploaded data
@@ -52,7 +56,7 @@ function parseNoShowData(text) {
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
-    if (!line || i === 0 && line.toLowerCase().includes('telefon')) continue; // Skip header
+    if (!line || (i === 0 && line.toLowerCase().includes('telefon'))) continue; // Skip header
 
     // Try to parse as CSV or detect format
     const parts = line.split(/[,;\t]/);
@@ -66,7 +70,7 @@ function parseNoShowData(text) {
       time: null,
       matched: false,
       patient: null,
-      error: null
+      error: null,
     };
 
     // Try to extract phone number
@@ -114,7 +118,7 @@ export default function NoShowImporter({
   isOpen,
   onClose,
   clinicName = 'Klinikken',
-  clinicPhone = '12345678'
+  clinicPhone = '12345678',
 }) {
   const queryClient = useQueryClient();
   const fileInputRef = useRef(null);
@@ -159,22 +163,25 @@ export default function NoShowImporter({
     setStep(2);
   }, [rawData]);
 
-  // Match patients (would call API in real implementation)
+  // Match patients by searching each identifier against the patients API
   const matchPatients = useCallback(async () => {
-    // TODO: Replace with actual API call
-    // const matched = await patientsAPI.matchBulk(parsedEntries.map(e => e.identifier));
-
-    // Simulate matching
-    const updated = parsedEntries.map((entry, idx) => ({
-      ...entry,
-      matched: Math.random() > 0.2, // 80% match rate for demo
-      patient: Math.random() > 0.2 ? {
-        id: `p${idx}`,
-        first_name: ['Ola', 'Kari', 'Per', 'Anne', 'Lars'][idx % 5],
-        last_name: ['Nordmann', 'Hansen', 'Olsen', 'Berg', 'Johansen'][idx % 5],
-        phone: entry.identifier
-      } : null
-    }));
+    const updated = await Promise.all(
+      parsedEntries.map(async (entry) => {
+        if (entry.error || !entry.identifier) {
+          return { ...entry, matched: false, patient: null };
+        }
+        try {
+          const response = await patientsAPI.getAll({ search: entry.identifier, limit: 1 });
+          const patients = response.data?.patients || response.data?.data || [];
+          if (patients.length > 0) {
+            return { ...entry, matched: true, patient: patients[0] };
+          }
+          return { ...entry, matched: false, patient: null };
+        } catch {
+          return { ...entry, matched: false, patient: null };
+        }
+      })
+    );
 
     setParsedEntries(updated);
     setStep(3);
@@ -185,16 +192,16 @@ export default function NoShowImporter({
     mutationFn: async () => {
       setIsProcessing(true);
 
-      const matchedEntries = parsedEntries.filter(e => e.matched && e.patient);
+      const matchedEntries = parsedEntries.filter((e) => e.matched && e.patient);
       const template = NO_SHOW_TEMPLATES[selectedTemplate].content;
 
-      const messages = matchedEntries.map(entry => {
+      const messages = matchedEntries.map((entry) => {
         const content = renderTemplate(template, {
           firstName: entry.patient.first_name,
           date: entry.date || format(new Date(), 'dd.MM.yyyy', { locale: nb }),
           time: entry.time || 'timen',
           clinicName,
-          clinicPhone
+          clinicPhone,
         });
 
         return {
@@ -204,13 +211,19 @@ export default function NoShowImporter({
           content,
           category: 'no_show',
           approval_status: sendToApproval ? 'pending' : 'approved',
-          trigger_event: `No-show ${entry.date || 'i dag'}`
+          trigger_event: `No-show ${entry.date || 'i dag'}`,
         };
       });
 
-      // TODO: Replace with actual API call
-      // await communicationsAPI.queueBulk(messages);
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate
+      // Send each message via the communications API
+      for (const msg of messages) {
+        await communicationsAPI.sendSMS({
+          patient_id: msg.patient_id,
+          content: msg.content,
+          category: msg.category,
+          approval_status: msg.approval_status,
+        });
+      }
 
       return { count: messages.length };
     },
@@ -220,7 +233,7 @@ export default function NoShowImporter({
     },
     onSettled: () => {
       setIsProcessing(false);
-    }
+    },
   });
 
   // Reset and close
@@ -235,9 +248,9 @@ export default function NoShowImporter({
 
   if (!isOpen) return null;
 
-  const matchedCount = parsedEntries.filter(e => e.matched).length;
-  const unmatchedCount = parsedEntries.filter(e => !e.matched && !e.error).length;
-  const errorCount = parsedEntries.filter(e => e.error).length;
+  const matchedCount = parsedEntries.filter((e) => e.matched).length;
+  const unmatchedCount = parsedEntries.filter((e) => !e.matched && !e.error).length;
+  const errorCount = parsedEntries.filter((e) => e.error).length;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -314,8 +327,14 @@ export default function NoShowImporter({
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h4 className="font-medium text-blue-800 mb-2">Støttede formater:</h4>
                 <ul className="text-sm text-blue-700 space-y-1">
-                  <li>• Telefonnummer per linje: <code className="bg-blue-100 px-1 rounded">912 34 567</code></li>
-                  <li>• Med dato/tid: <code className="bg-blue-100 px-1 rounded">912 34 567, 29.01.2026, 14:00</code></li>
+                  <li>
+                    • Telefonnummer per linje:{' '}
+                    <code className="bg-blue-100 px-1 rounded">912 34 567</code>
+                  </li>
+                  <li>
+                    • Med dato/tid:{' '}
+                    <code className="bg-blue-100 px-1 rounded">912 34 567, 29.01.2026, 14:00</code>
+                  </li>
                   <li>• CSV med kolonner: telefon, dato, tid</li>
                 </ul>
               </div>
@@ -362,9 +381,11 @@ export default function NoShowImporter({
                         </div>
                       </div>
                     </div>
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      entry.error ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
-                    }`}>
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full ${
+                        entry.error ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+                      }`}
+                    >
                       {entry.error ? 'Feil' : 'OK'}
                     </span>
                   </div>
@@ -374,7 +395,8 @@ export default function NoShowImporter({
               {errorCount > 0 && (
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-700">
                   <AlertCircle className="w-4 h-4 inline mr-2" />
-                  {errorCount} oppføring{errorCount !== 1 ? 'er' : ''} kunne ikke leses og vil bli hoppet over
+                  {errorCount} oppføring{errorCount !== 1 ? 'er' : ''} kunne ikke leses og vil bli
+                  hoppet over
                 </div>
               )}
             </div>
@@ -434,7 +456,7 @@ export default function NoShowImporter({
                             date: format(new Date(), 'dd.MM.yyyy', { locale: nb }),
                             time: '14:00',
                             clinicName,
-                            clinicPhone
+                            clinicPhone,
                           })}
                         </p>
                       </div>
@@ -514,7 +536,7 @@ export default function NoShowImporter({
             {step === 2 && (
               <button
                 onClick={matchPatients}
-                disabled={parsedEntries.filter(e => !e.error).length === 0}
+                disabled={parsedEntries.filter((e) => !e.error).length === 0}
                 className="flex items-center gap-2 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-300 transition-colors"
               >
                 Match pasienter
