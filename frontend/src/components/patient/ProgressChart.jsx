@@ -5,7 +5,7 @@
  * Displays patient's progress over time with charts
  */
 
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo } from 'react';
 import {
   TrendingUp,
   TrendingDown,
@@ -14,8 +14,8 @@ import {
   Target,
   Award,
   ChevronLeft,
-  ChevronRight
-} from 'lucide-react'
+  ChevronRight,
+} from 'lucide-react';
 
 /**
  * ProgressChart Component
@@ -32,10 +32,11 @@ export default function ProgressChart({
   data = [],
   metric = 'completion',
   period = 'week',
-  onPeriodChange
+  onPeriodChange,
 }) {
-  const [selectedMetric, setSelectedMetric] = useState(metric)
-  const [currentPeriod, setCurrentPeriod] = useState(period)
+  const [selectedMetric, setSelectedMetric] = useState(metric);
+  const [currentPeriod, setCurrentPeriod] = useState(period);
+  const [periodOffset, setPeriodOffset] = useState(0);
 
   /**
    * Get metric label in Norwegian
@@ -46,10 +47,10 @@ export default function ProgressChart({
       completion: 'Fullforingsgrad',
       pain: 'Smerteniva',
       difficulty: 'Vanskelighetsgrad',
-      frequency: 'Treningsfrekvens'
-    }
-    return labels[m] || m
-  }
+      frequency: 'Treningsfrekvens',
+    };
+    return labels[m] || m;
+  };
 
   /**
    * Get period label in Norwegian
@@ -59,10 +60,10 @@ export default function ProgressChart({
     const labels = {
       week: 'Denne uken',
       month: 'Denne maneden',
-      quarter: 'Siste 3 maneder'
-    }
-    return labels[p] || p
-  }
+      quarter: 'Siste 3 maneder',
+    };
+    return labels[p] || p;
+  };
 
   /**
    * Calculate statistics from data
@@ -75,79 +76,99 @@ export default function ProgressChart({
         trend: 0,
         total: 0,
         best: 0,
-        streak: 0
-      }
+        streak: 0,
+      };
     }
 
-    const values = data.map(d => d.value || 0)
-    const average = values.reduce((a, b) => a + b, 0) / values.length
-    const firstHalf = values.slice(0, Math.floor(values.length / 2))
-    const secondHalf = values.slice(Math.floor(values.length / 2))
-    const firstAvg = firstHalf.reduce((a, b) => a + b, 0) / (firstHalf.length || 1)
-    const secondAvg = secondHalf.reduce((a, b) => a + b, 0) / (secondHalf.length || 1)
-    const trend = firstAvg > 0 ? ((secondAvg - firstAvg) / firstAvg) * 100 : 0
+    const values = data.map((d) => d.value || 0);
+    const average = values.reduce((a, b) => a + b, 0) / values.length;
+    const firstHalf = values.slice(0, Math.floor(values.length / 2));
+    const secondHalf = values.slice(Math.floor(values.length / 2));
+    const firstAvg = firstHalf.reduce((a, b) => a + b, 0) / (firstHalf.length || 1);
+    const secondAvg = secondHalf.reduce((a, b) => a + b, 0) / (secondHalf.length || 1);
+    const trend = firstAvg > 0 ? ((secondAvg - firstAvg) / firstAvg) * 100 : 0;
 
     return {
       average: Math.round(average),
       trend: Math.round(trend),
       total: values.reduce((a, b) => a + b, 0),
       best: Math.max(...values),
-      streak: calculateStreak(data)
-    }
-  }, [data])
+      streak: calculateStreak(data),
+    };
+  }, [data]);
 
   /**
    * Calculate current streak
    * Beregner navarende rekke
    */
   function calculateStreak(progressData) {
-    if (!progressData || progressData.length === 0) return 0
+    if (!progressData || progressData.length === 0) return 0;
 
-    let streak = 0
-    const sortedData = [...progressData].sort((a, b) =>
-      new Date(b.date) - new Date(a.date)
-    )
+    let streak = 0;
+    const sortedData = [...progressData].sort((a, b) => new Date(b.date) - new Date(a.date));
 
     for (const item of sortedData) {
       if (item.completed) {
-        streak++
+        streak++;
       } else {
-        break
+        break;
       }
     }
-    return streak
+    return streak;
   }
+
+  /**
+   * Get period navigation label
+   */
+  const getPeriodOffsetLabel = () => {
+    if (periodOffset === 0) return getPeriodLabel(currentPeriod);
+    const abs = Math.abs(periodOffset);
+    const unit =
+      currentPeriod === 'week'
+        ? abs === 1
+          ? 'uke'
+          : 'uker'
+        : currentPeriod === 'month'
+          ? abs === 1
+            ? 'maned'
+            : 'maneder'
+          : abs === 1
+            ? 'kvartal'
+            : 'kvartaler';
+    return `${abs} ${unit} siden`;
+  };
 
   /**
    * Handle period navigation
    * Handterer periodenavigasjon
    */
   const handlePeriodChange = (direction) => {
-    // TODO: Implement period navigation
+    const newOffset = direction === 'prev' ? periodOffset - 1 : Math.min(periodOffset + 1, 0);
+    setPeriodOffset(newOffset);
     if (onPeriodChange) {
-      onPeriodChange(direction)
+      onPeriodChange(direction, newOffset);
     }
-  }
+  };
 
   /**
    * Get bar color based on metric
    * Henter stolpefarge basert pa metrikk
    */
   const getBarColor = (value, maxValue) => {
-    const percentage = (value / maxValue) * 100
+    const percentage = (value / maxValue) * 100;
     if (selectedMetric === 'pain') {
       // Lower is better for pain
       // Lavere er bedre for smerte
-      if (percentage <= 30) return 'bg-green-500'
-      if (percentage <= 60) return 'bg-yellow-500'
-      return 'bg-red-500'
+      if (percentage <= 30) return 'bg-green-500';
+      if (percentage <= 60) return 'bg-yellow-500';
+      return 'bg-red-500';
     }
     // Higher is better for completion/frequency
     // Hoyere er bedre for fullforingsgrad/frekvens
-    if (percentage >= 70) return 'bg-green-500'
-    if (percentage >= 40) return 'bg-yellow-500'
-    return 'bg-red-500'
-  }
+    if (percentage >= 70) return 'bg-green-500';
+    if (percentage >= 40) return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
@@ -156,7 +177,7 @@ export default function ProgressChart({
         <div>
           <h3 className="text-lg font-semibold text-gray-900">Fremgang</h3>
           <p className="text-sm text-gray-500 mt-0.5">
-            {getMetricLabel(selectedMetric)} - {getPeriodLabel(currentPeriod)}
+            {getMetricLabel(selectedMetric)} - {getPeriodOffsetLabel()}
           </p>
         </div>
 
@@ -179,7 +200,8 @@ export default function ProgressChart({
           </select>
           <button
             onClick={() => handlePeriodChange('next')}
-            className="p-1 hover:bg-gray-100 rounded"
+            disabled={periodOffset >= 0}
+            className="p-1 hover:bg-gray-100 rounded disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <ChevronRight className="w-5 h-5 text-gray-500" />
           </button>
@@ -210,9 +232,11 @@ export default function ProgressChart({
           <p className="text-xs text-gray-500 mt-1">Gjennomsnitt</p>
         </div>
         <div className="text-center p-3 bg-gray-50 rounded-lg">
-          <div className={`flex items-center justify-center gap-1 text-2xl font-semibold ${
-            statistics.trend >= 0 ? 'text-green-600' : 'text-red-600'
-          }`}>
+          <div
+            className={`flex items-center justify-center gap-1 text-2xl font-semibold ${
+              statistics.trend >= 0 ? 'text-green-600' : 'text-red-600'
+            }`}
+          >
             {statistics.trend >= 0 ? (
               <TrendingUp className="w-5 h-5" />
             ) : (
@@ -239,33 +263,29 @@ export default function ProgressChart({
       <div className="h-48 flex items-end gap-1">
         {data && data.length > 0 ? (
           data.map((item, index) => {
-            const maxValue = Math.max(...data.map(d => d.value || 0), 100)
-            const height = ((item.value || 0) / maxValue) * 100
+            const maxValue = Math.max(...data.map((d) => d.value || 0), 100);
+            const height = ((item.value || 0) / maxValue) * 100;
 
             return (
-              <div
-                key={index}
-                className="flex-1 flex flex-col items-center"
-              >
+              <div key={index} className="flex-1 flex flex-col items-center">
                 <div
                   className={`w-full rounded-t transition-all hover:opacity-80 ${getBarColor(item.value, maxValue)}`}
                   style={{ height: `${Math.max(height, 4)}%` }}
                   title={`${item.date}: ${item.value}%`}
                 />
                 <span className="text-xs text-gray-500 mt-2 rotate-45 origin-left">
-                  {item.label || new Date(item.date).toLocaleDateString('no-NO', { weekday: 'short' })}
+                  {item.label ||
+                    new Date(item.date).toLocaleDateString('no-NO', { weekday: 'short' })}
                 </span>
               </div>
-            )
+            );
           })
         ) : (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <Activity className="w-12 h-12 text-gray-300 mx-auto mb-2" />
               <p className="text-sm text-gray-500">Ingen data tilgjengelig</p>
-              <p className="text-xs text-gray-400 mt-1">
-                Fullfør øvelser for å se fremgangen din
-              </p>
+              <p className="text-xs text-gray-400 mt-1">Fullfør øvelser for å se fremgangen din</p>
             </div>
           </div>
         )}
@@ -287,5 +307,5 @@ export default function ProgressChart({
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -5,9 +5,26 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { encountersAPI, patientsAPI, diagnosisAPI, aiAPI } from '../services/api';
 import toast from '../utils/toast';
 import {
-  Save, AlertTriangle, Brain, X, Sparkles, Globe,
-  BookOpen, ChevronLeft, ChevronRight, Settings, Eye, Edit3,
-  FileText, Printer, Copy, Shield, Grid, Command, Mic, Cpu
+  Save,
+  AlertTriangle,
+  Brain,
+  X,
+  Sparkles,
+  Globe,
+  BookOpen,
+  ChevronLeft,
+  ChevronRight,
+  Settings,
+  Eye,
+  Edit3,
+  FileText,
+  Printer,
+  Copy,
+  Shield,
+  Grid,
+  Command,
+  Mic,
+  Cpu,
 } from 'lucide-react';
 import TemplatePicker from '../components/TemplatePicker';
 
@@ -66,7 +83,7 @@ import {
   CLINICAL_REASONING_PHRASES,
   FOLLOW_UP_PHRASES,
   ADVICE_PHRASES,
-  QUESTIONNAIRE_TYPES
+  QUESTIONNAIRE_TYPES,
 } from '../components/assessment';
 
 /**
@@ -110,7 +127,7 @@ export default function EasyAssessment() {
     queryKey: ['ai-status'],
     queryFn: () => aiAPI.getStatus(),
     staleTime: 60000, // Check every minute
-    refetchInterval: 60000
+    refetchInterval: 60000,
   });
   const aiAvailable = aiStatus?.data?.available ?? false;
 
@@ -128,7 +145,7 @@ export default function EasyAssessment() {
       onset: '',
       pain_description: '',
       aggravating_factors: '',
-      relieving_factors: ''
+      relieving_factors: '',
     },
 
     // Quick-select data for subjective
@@ -144,7 +161,7 @@ export default function EasyAssessment() {
       rom: '',
       ortho_tests: '',
       neuro_tests: '',
-      posture: ''
+      posture: '',
     },
 
     // Quick-select data for objective
@@ -162,7 +179,7 @@ export default function EasyAssessment() {
       clinical_reasoning: '',
       differential_diagnosis: '',
       prognosis: '',
-      red_flags_checked: true
+      red_flags_checked: true,
     },
 
     // Plan section
@@ -171,7 +188,7 @@ export default function EasyAssessment() {
       exercises: '',
       advice: '',
       follow_up: '',
-      referrals: ''
+      referrals: '',
     },
 
     // Quick-select data for plan
@@ -189,14 +206,14 @@ export default function EasyAssessment() {
     outcome_assessment: {
       type: null,
       responses: {},
-      score: null
+      score: null,
     },
 
     // Body Chart annotations (Jane App style)
     body_chart: {
       annotations: [],
-      markers: []
-    }
+      markers: [],
+    },
   });
 
   // NEW: Problem list state
@@ -210,14 +227,14 @@ export default function EasyAssessment() {
   const { data: patient } = useQuery({
     queryKey: ['patient', patientId],
     queryFn: () => patientsAPI.getById(patientId),
-    enabled: !!patientId
+    enabled: !!patientId,
   });
 
   // Fetch patient's encounters to determine visit number
   const { data: patientEncounters } = useQuery({
     queryKey: ['patient-encounters', patientId],
     queryFn: () => encountersAPI.getByPatient(patientId),
-    enabled: !!patientId
+    enabled: !!patientId,
   });
 
   // Set current visit number and get previous encounter for SALT
@@ -233,16 +250,16 @@ export default function EasyAssessment() {
   const { data: existingEncounter } = useQuery({
     queryKey: ['encounter', encounterId],
     queryFn: () => encountersAPI.getById(encounterId),
-    enabled: !!encounterId
+    enabled: !!encounterId,
   });
 
   // Load existing encounter data
   useEffect(() => {
     if (existingEncounter?.data) {
-      setEncounterData(prev => ({
+      setEncounterData((prev) => ({
         ...prev,
         ...existingEncounter.data,
-        encounter_date: new Date(existingEncounter.data.encounter_date).toISOString().split('T')[0]
+        encounter_date: new Date(existingEncounter.data.encounter_date).toISOString().split('T')[0],
       }));
       setRedFlagAlerts(existingEncounter.data.redFlagAlerts || []);
       setClinicalWarnings(existingEncounter.data.clinicalWarnings || []);
@@ -258,7 +275,7 @@ export default function EasyAssessment() {
   // Fetch diagnosis codes
   const { data: commonDiagnoses } = useQuery({
     queryKey: ['diagnosis', 'common'],
-    queryFn: () => diagnosisAPI.getCommon()
+    queryFn: () => diagnosisAPI.getCommon(),
   });
 
   // Save encounter mutation
@@ -268,7 +285,7 @@ export default function EasyAssessment() {
         ...data,
         problems,
         treatmentPlan,
-        generated_narrative: generateNarrativeText()
+        generated_narrative: generateNarrativeText(),
       };
       if (encounterId) {
         return encountersAPI.update(encounterId, saveData);
@@ -283,7 +300,7 @@ export default function EasyAssessment() {
     },
     onError: (error) => {
       toast.error(`Feil ved lagring: ${error.message}`);
-    }
+    },
   });
 
   const handleSave = () => {
@@ -316,51 +333,51 @@ export default function EasyAssessment() {
       subjective: encounterData.subjective,
       objective: encounterData.objective,
       assessment: encounterData.assessment,
-      plan: encounterData.plan
-    }
+      plan: encounterData.plan,
+    },
   });
 
   const updateField = (section, field, value) => {
-    setEncounterData(prev => ({
+    setEncounterData((prev) => ({
       ...prev,
       [section]: {
         ...prev[section],
-        [field]: value
-      }
+        [field]: value,
+      },
     }));
   };
 
   const updateQuickSelect = (field, values) => {
-    setEncounterData(prev => ({
+    setEncounterData((prev) => ({
       ...prev,
-      [field]: values
+      [field]: values,
     }));
   };
 
   const addDiagnosisCode = (code) => {
     if (!encounterData.icpc_codes.includes(code)) {
-      setEncounterData(prev => ({
+      setEncounterData((prev) => ({
         ...prev,
-        icpc_codes: [...prev.icpc_codes, code]
+        icpc_codes: [...prev.icpc_codes, code],
       }));
     }
   };
 
   const removeDiagnosisCode = (code) => {
-    setEncounterData(prev => ({
+    setEncounterData((prev) => ({
       ...prev,
-      icpc_codes: prev.icpc_codes.filter(c => c !== code)
+      icpc_codes: prev.icpc_codes.filter((c) => c !== code),
     }));
   };
 
   // SALT handler - apply cloned data from previous encounter
   const handleSALTApply = (clonedData) => {
-    setEncounterData(prev => ({
+    setEncounterData((prev) => ({
       ...prev,
       ...clonedData,
       subjective: { ...prev.subjective, ...clonedData.subjective },
       objective: { ...prev.objective, ...clonedData.objective },
-      plan: { ...prev.plan, ...clonedData.plan }
+      plan: { ...prev.plan, ...clonedData.plan },
     }));
   };
 
@@ -368,19 +385,32 @@ export default function EasyAssessment() {
   const handleMacroInsert = (text, targetField = 'current') => {
     // Insert based on active tab
     if (activeTab === 'subjective') {
-      updateField('subjective', 'chief_complaint',
-        (encounterData.subjective.chief_complaint ? encounterData.subjective.chief_complaint + ' ' : '') + text
+      updateField(
+        'subjective',
+        'chief_complaint',
+        (encounterData.subjective.chief_complaint
+          ? encounterData.subjective.chief_complaint + ' '
+          : '') + text
       );
     } else if (activeTab === 'objective') {
-      updateField('objective', 'observation',
-        (encounterData.objective.observation ? encounterData.objective.observation + ' ' : '') + text
+      updateField(
+        'objective',
+        'observation',
+        (encounterData.objective.observation ? encounterData.objective.observation + ' ' : '') +
+          text
       );
     } else if (activeTab === 'assessment') {
-      updateField('assessment', 'clinical_reasoning',
-        (encounterData.assessment.clinical_reasoning ? encounterData.assessment.clinical_reasoning + ' ' : '') + text
+      updateField(
+        'assessment',
+        'clinical_reasoning',
+        (encounterData.assessment.clinical_reasoning
+          ? encounterData.assessment.clinical_reasoning + ' '
+          : '') + text
       );
     } else if (activeTab === 'plan') {
-      updateField('plan', 'treatment',
+      updateField(
+        'plan',
+        'treatment',
         (encounterData.plan.treatment ? encounterData.plan.treatment + ' ' : '') + text
       );
     }
@@ -391,12 +421,18 @@ export default function EasyAssessment() {
   const handleComplianceAutoFix = (issue) => {
     if (issue.suggestion && issue.section) {
       if (issue.section === 'objective') {
-        updateField('objective', 'palpation',
-          (encounterData.objective.palpation ? encounterData.objective.palpation + ' ' : '') + issue.suggestion
+        updateField(
+          'objective',
+          'palpation',
+          (encounterData.objective.palpation ? encounterData.objective.palpation + ' ' : '') +
+            issue.suggestion
         );
       } else if (issue.section === 'plan') {
-        updateField('plan', 'treatment',
-          (encounterData.plan.treatment ? encounterData.plan.treatment + ' ' : '') + issue.suggestion
+        updateField(
+          'plan',
+          'treatment',
+          (encounterData.plan.treatment ? encounterData.plan.treatment + ' ' : '') +
+            issue.suggestion
         );
       }
     }
@@ -409,7 +445,7 @@ export default function EasyAssessment() {
       ...encounterData.subjective,
       ...encounterData.objective,
       ...encounterData.assessment,
-      ...encounterData.plan
+      ...encounterData.plan,
     });
 
     const totalVisits = treatmentPlan?.phases?.reduce((sum, p) => sum + p.totalVisits, 0) || 0;
@@ -456,10 +492,10 @@ export default function EasyAssessment() {
     { id: 'subjective', label: 'Subjective', icon: '💬', color: 'green' },
     { id: 'objective', label: 'Objective', icon: '🔍', color: 'blue' },
     { id: 'assessment', label: 'Assessment', icon: '📋', color: 'purple' },
-    { id: 'plan', label: 'Plan', icon: '📝', color: 'orange' }
+    { id: 'plan', label: 'Plan', icon: '📝', color: 'orange' },
   ];
 
-  const currentTabIndex = tabs.findIndex(t => t.id === activeTab);
+  const currentTabIndex = tabs.findIndex((t) => t.id === activeTab);
   const canGoBack = currentTabIndex > 0;
   const canGoForward = currentTabIndex < tabs.length - 1;
 
@@ -491,7 +527,10 @@ export default function EasyAssessment() {
                   </h1>
                   {patient?.data?.date_of_birth && (
                     <span className="text-sm text-gray-500">
-                      {Math.floor((new Date() - new Date(patient.data.date_of_birth)) / 31557600000)} yrs old
+                      {Math.floor(
+                        (new Date() - new Date(patient.data.date_of_birth)) / 31557600000
+                      )}{' '}
+                      yrs old
                     </span>
                   )}
                   <span className="px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800 rounded">
@@ -502,7 +541,9 @@ export default function EasyAssessment() {
                 {treatmentPlan && (
                   <VisitCounter
                     currentVisit={currentVisitNumber}
-                    totalVisits={treatmentPlan.phases?.reduce((sum, p) => sum + p.totalVisits, 0) || 0}
+                    totalVisits={
+                      treatmentPlan.phases?.reduce((sum, p) => sum + p.totalVisits, 0) || 0
+                    }
                     className="mt-1"
                   />
                 )}
@@ -523,17 +564,11 @@ export default function EasyAssessment() {
               </div>
 
               {/* SALT Button */}
-              <SALTButton
-                previousEncounter={previousEncounter}
-                onApply={handleSALTApply}
-              />
+              <SALTButton previousEncounter={previousEncounter} onApply={handleSALTApply} />
 
               {/* AI Status & Controls */}
               <div className="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
-                <AIStatusIndicator
-                  language={language}
-                  onClick={() => setShowAISettings(true)}
-                />
+                <AIStatusIndicator language={language} onClick={() => setShowAISettings(true)} />
                 <button
                   onClick={() => setShowAIScribe(true)}
                   className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100"
@@ -570,7 +605,9 @@ export default function EasyAssessment() {
                 <button
                   onClick={() => setViewMode('easy')}
                   className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                    viewMode === 'easy' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+                    viewMode === 'easy'
+                      ? 'bg-blue-600 text-white'
+                      : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
                   {language === 'en' ? 'Easy' : 'Enkel'}
@@ -578,7 +615,9 @@ export default function EasyAssessment() {
                 <button
                   onClick={() => setViewMode('detailed')}
                   className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                    viewMode === 'detailed' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+                    viewMode === 'detailed'
+                      ? 'bg-blue-600 text-white'
+                      : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
                   {language === 'en' ? 'Detailed' : 'Detaljert'}
@@ -586,7 +625,9 @@ export default function EasyAssessment() {
                 <button
                   onClick={() => setViewMode('preview')}
                   className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                    viewMode === 'preview' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+                    viewMode === 'preview'
+                      ? 'bg-blue-600 text-white'
+                      : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
                   {language === 'en' ? 'Preview' : 'Forhåndsvisning'}
@@ -607,7 +648,13 @@ export default function EasyAssessment() {
                 className="flex items-center gap-1 px-3 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
               >
                 <Copy className="w-4 h-4" />
-                {copiedToClipboard ? (language === 'en' ? 'Copied!' : 'Kopiert!') : (language === 'en' ? 'Copy' : 'Kopier')}
+                {copiedToClipboard
+                  ? language === 'en'
+                    ? 'Copied!'
+                    : 'Kopiert!'
+                  : language === 'en'
+                    ? 'Copy'
+                    : 'Kopier'}
               </button>
 
               <button
@@ -670,7 +717,9 @@ export default function EasyAssessment() {
                 <input
                   type="date"
                   value={encounterData.encounter_date}
-                  onChange={(e) => setEncounterData(prev => ({ ...prev, encounter_date: e.target.value }))}
+                  onChange={(e) =>
+                    setEncounterData((prev) => ({ ...prev, encounter_date: e.target.value }))
+                  }
                   className="px-2 py-1 text-sm border border-gray-300 rounded"
                 />
               </div>
@@ -678,7 +727,9 @@ export default function EasyAssessment() {
                 <label className="text-xs font-medium text-gray-500">Type:</label>
                 <select
                   value={encounterData.encounter_type}
-                  onChange={(e) => setEncounterData(prev => ({ ...prev, encounter_type: e.target.value }))}
+                  onChange={(e) =>
+                    setEncounterData((prev) => ({ ...prev, encounter_type: e.target.value }))
+                  }
                   className="px-2 py-1 text-sm border border-gray-300 rounded"
                 >
                   <option value="INITIAL">Initial</option>
@@ -692,7 +743,12 @@ export default function EasyAssessment() {
                 <input
                   type="number"
                   value={encounterData.duration_minutes}
-                  onChange={(e) => setEncounterData(prev => ({ ...prev, duration_minutes: parseInt(e.target.value) }))}
+                  onChange={(e) =>
+                    setEncounterData((prev) => ({
+                      ...prev,
+                      duration_minutes: parseInt(e.target.value),
+                    }))
+                  }
                   className="w-16 px-2 py-1 text-sm border border-gray-300 rounded"
                 />
                 <span className="text-xs text-gray-500">min</span>
@@ -706,7 +762,12 @@ export default function EasyAssessment() {
                     min="0"
                     max="10"
                     value={encounterData.vas_pain_start ?? ''}
-                    onChange={(e) => setEncounterData(prev => ({ ...prev, vas_pain_start: e.target.value ? parseInt(e.target.value) : null }))}
+                    onChange={(e) =>
+                      setEncounterData((prev) => ({
+                        ...prev,
+                        vas_pain_start: e.target.value ? parseInt(e.target.value) : null,
+                      }))
+                    }
                     className="w-14 px-2 py-1 text-sm border border-gray-300 rounded text-center"
                     placeholder="0-10"
                   />
@@ -718,7 +779,12 @@ export default function EasyAssessment() {
                     min="0"
                     max="10"
                     value={encounterData.vas_pain_end ?? ''}
-                    onChange={(e) => setEncounterData(prev => ({ ...prev, vas_pain_end: e.target.value ? parseInt(e.target.value) : null }))}
+                    onChange={(e) =>
+                      setEncounterData((prev) => ({
+                        ...prev,
+                        vas_pain_end: e.target.value ? parseInt(e.target.value) : null,
+                      }))
+                    }
                     className="w-14 px-2 py-1 text-sm border border-gray-300 rounded text-center"
                     placeholder="0-10"
                   />
@@ -757,7 +823,9 @@ export default function EasyAssessment() {
                   onClick={goToPrevTab}
                   disabled={!canGoBack}
                   className={`flex items-center gap-1 px-3 py-2 rounded-lg font-medium ${
-                    canGoBack ? 'text-gray-700 hover:bg-gray-200' : 'text-gray-300 cursor-not-allowed'
+                    canGoBack
+                      ? 'text-gray-700 hover:bg-gray-200'
+                      : 'text-gray-300 cursor-not-allowed'
                   }`}
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -785,7 +853,9 @@ export default function EasyAssessment() {
                   onClick={goToNextTab}
                   disabled={!canGoForward}
                   className={`flex items-center gap-1 px-3 py-2 rounded-lg font-medium ${
-                    canGoForward ? 'text-gray-700 hover:bg-gray-200' : 'text-gray-300 cursor-not-allowed'
+                    canGoForward
+                      ? 'text-gray-700 hover:bg-gray-200'
+                      : 'text-gray-300 cursor-not-allowed'
                   }`}
                 >
                   Next
@@ -802,7 +872,9 @@ export default function EasyAssessment() {
                       <div className="flex items-center gap-2">
                         <Sparkles className="w-5 h-5 text-purple-500" />
                         <span className="text-sm text-purple-700">
-                          {language === 'en' ? 'Generate Subjective from patient intake' : 'Generer Subjektiv fra pasientopptak'}
+                          {language === 'en'
+                            ? 'Generate Subjective from patient intake'
+                            : 'Generer Subjektiv fra pasientopptak'}
                         </span>
                       </div>
                       <IntakeParserButton
@@ -885,14 +957,18 @@ export default function EasyAssessment() {
                             title="Aggravating Factors"
                             categories={AGGRAVATING_FACTORS_OPTIONS}
                             selectedValues={encounterData.aggravating_factors_selected}
-                            onChange={(vals) => updateQuickSelect('aggravating_factors_selected', vals)}
+                            onChange={(vals) =>
+                              updateQuickSelect('aggravating_factors_selected', vals)
+                            }
                             columns={2}
                           />
                           <QuickCheckboxGrid
                             title="Relieving Factors"
                             categories={RELIEVING_FACTORS_OPTIONS}
                             selectedValues={encounterData.relieving_factors_selected}
-                            onChange={(vals) => updateQuickSelect('relieving_factors_selected', vals)}
+                            onChange={(vals) =>
+                              updateQuickSelect('relieving_factors_selected', vals)
+                            }
                             columns={2}
                           />
                         </div>
@@ -1065,20 +1141,25 @@ export default function EasyAssessment() {
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
                       >
                         <option value="">Select diagnosis...</option>
-                        {commonDiagnoses?.data?.map(code => (
+                        {commonDiagnoses?.data?.map((code) => (
                           <option key={code.code} value={code.code}>
                             {code.code} - {code.description_no || code.description_en}
                           </option>
                         ))}
                       </select>
                       <div className="flex flex-wrap gap-2">
-                        {encounterData.icpc_codes.map(code => (
+                        {encounterData.icpc_codes.map((code) => (
                           <span
                             key={code}
                             className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm"
                           >
                             {code}
-                            <button onClick={() => removeDiagnosisCode(code)} className="hover:text-purple-600">×</button>
+                            <button
+                              onClick={() => removeDiagnosisCode(code)}
+                              className="hover:text-purple-600"
+                            >
+                              ×
+                            </button>
                           </span>
                         ))}
                       </div>
@@ -1105,7 +1186,9 @@ export default function EasyAssessment() {
                         <SmartTextInput
                           label="Differential Diagnosis"
                           value={encounterData.assessment.differential_diagnosis}
-                          onChange={(val) => updateField('assessment', 'differential_diagnosis', val)}
+                          onChange={(val) =>
+                            updateField('assessment', 'differential_diagnosis', val)
+                          }
                           placeholder="Other diagnoses considered..."
                           rows={2}
                           aiEnabled={true}
@@ -1141,7 +1224,7 @@ export default function EasyAssessment() {
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                       <h4 className="text-sm font-medium text-gray-700 mb-3">Outcome Assessment</h4>
                       <div className="grid grid-cols-3 gap-2">
-                        {Object.values(QUESTIONNAIRE_TYPES).map(type => (
+                        {Object.values(QUESTIONNAIRE_TYPES).map((type) => (
                           <button
                             key={type}
                             onClick={() => {
@@ -1289,10 +1372,11 @@ export default function EasyAssessment() {
                 onChange={(responses) => {
                   const answered = Object.keys(responses).length;
                   const total = Object.values(responses).reduce((sum, val) => sum + val, 0);
-                  const percentage = answered > 0 ? Math.round((total / (answered * 5)) * 100) : null;
-                  setEncounterData(prev => ({
+                  const percentage =
+                    answered > 0 ? Math.round((total / (answered * 5)) * 100) : null;
+                  setEncounterData((prev) => ({
                     ...prev,
-                    outcome_assessment: { type: outcomeType, responses, score: percentage }
+                    outcome_assessment: { type: outcomeType, responses, score: percentage },
                   }));
                 }}
               />
@@ -1317,9 +1401,17 @@ export default function EasyAssessment() {
           if (activeTab === 'subjective') {
             updateField('subjective', 'history', encounterData.subjective.history + '\n' + text);
           } else if (activeTab === 'objective') {
-            updateField('objective', 'observation', encounterData.objective.observation + '\n' + text);
+            updateField(
+              'objective',
+              'observation',
+              encounterData.objective.observation + '\n' + text
+            );
           } else if (activeTab === 'assessment') {
-            updateField('assessment', 'clinical_reasoning', encounterData.assessment.clinical_reasoning + '\n' + text);
+            updateField(
+              'assessment',
+              'clinical_reasoning',
+              encounterData.assessment.clinical_reasoning + '\n' + text
+            );
           } else if (activeTab === 'plan') {
             updateField('plan', 'treatment', encounterData.plan.treatment + '\n' + text);
           }
@@ -1346,9 +1438,9 @@ export default function EasyAssessment() {
                 initialAnnotations={encounterData.body_chart?.annotations || []}
                 initialMarkers={encounterData.body_chart?.markers || []}
                 onSave={({ annotations, markers }) => {
-                  setEncounterData(prev => ({
+                  setEncounterData((prev) => ({
                     ...prev,
-                    body_chart: { annotations, markers }
+                    body_chart: { annotations, markers },
                   }));
                   setShowBodyChart(false);
                 }}
@@ -1381,36 +1473,50 @@ export default function EasyAssessment() {
                   // Insert template content based on current tab
                   if (activeTab === 'subjective') {
                     if (template.content?.subjective) {
-                      updateField('subjective', 'chief_complaint',
-                        (encounterData.subjective.chief_complaint ? encounterData.subjective.chief_complaint + '\n' : '') +
-                        template.content.subjective
+                      updateField(
+                        'subjective',
+                        'chief_complaint',
+                        (encounterData.subjective.chief_complaint
+                          ? encounterData.subjective.chief_complaint + '\n'
+                          : '') + template.content.subjective
                       );
                     }
                     if (template.content?.history) {
-                      updateField('subjective', 'history',
-                        (encounterData.subjective.history ? encounterData.subjective.history + '\n' : '') +
-                        template.content.history
+                      updateField(
+                        'subjective',
+                        'history',
+                        (encounterData.subjective.history
+                          ? encounterData.subjective.history + '\n'
+                          : '') + template.content.history
                       );
                     }
                   } else if (activeTab === 'objective') {
                     if (template.content?.objective) {
-                      updateField('objective', 'observation',
-                        (encounterData.objective.observation ? encounterData.objective.observation + '\n' : '') +
-                        template.content.objective
+                      updateField(
+                        'objective',
+                        'observation',
+                        (encounterData.objective.observation
+                          ? encounterData.objective.observation + '\n'
+                          : '') + template.content.objective
                       );
                     }
                   } else if (activeTab === 'assessment') {
                     if (template.content?.assessment) {
-                      updateField('assessment', 'clinical_reasoning',
-                        (encounterData.assessment.clinical_reasoning ? encounterData.assessment.clinical_reasoning + '\n' : '') +
-                        template.content.assessment
+                      updateField(
+                        'assessment',
+                        'clinical_reasoning',
+                        (encounterData.assessment.clinical_reasoning
+                          ? encounterData.assessment.clinical_reasoning + '\n'
+                          : '') + template.content.assessment
                       );
                     }
                   } else if (activeTab === 'plan') {
                     if (template.content?.plan) {
-                      updateField('plan', 'treatment',
+                      updateField(
+                        'plan',
+                        'treatment',
                         (encounterData.plan.treatment ? encounterData.plan.treatment + '\n' : '') +
-                        template.content.plan
+                          template.content.plan
                       );
                     }
                   }
@@ -1428,7 +1534,9 @@ export default function EasyAssessment() {
           <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
               <h3 className="text-lg font-semibold">
-                {language === 'en' ? 'Macro Matrix - Quick Insert' : 'Makromatrise - Hurtiginnsetting'}
+                {language === 'en'
+                  ? 'Macro Matrix - Quick Insert'
+                  : 'Makromatrise - Hurtiginnsetting'}
               </h3>
               <button
                 onClick={() => setShowMacroMatrix(false)}
@@ -1482,9 +1590,9 @@ export default function EasyAssessment() {
         practiceInfo={{
           name: 'ChiroClick Clinic',
           address: 'Healthcare Center, Medical District',
-          phone: '+47 XXX XX XXX',
+          phone: '+47 400 00 000',
           provider: language === 'en' ? 'Provider Name, DC' : 'Behandler, DC',
-          credentials: language === 'en' ? 'Doctor of Chiropractic' : 'Kiropraktor'
+          credentials: language === 'en' ? 'Doctor of Chiropractic' : 'Kiropraktor',
         }}
         isOpen={showPrintPreview}
         onClose={() => setShowPrintPreview(false)}
@@ -1534,23 +1642,38 @@ export default function EasyAssessment() {
                 language={language}
                 onApplySOAP={(sections) => {
                   if (sections.subjective) {
-                    updateField('subjective', 'chief_complaint',
-                      (encounterData.subjective.chief_complaint ? encounterData.subjective.chief_complaint + '\n' : '') + sections.subjective
+                    updateField(
+                      'subjective',
+                      'chief_complaint',
+                      (encounterData.subjective.chief_complaint
+                        ? encounterData.subjective.chief_complaint + '\n'
+                        : '') + sections.subjective
                     );
                   }
                   if (sections.objective) {
-                    updateField('objective', 'observation',
-                      (encounterData.objective.observation ? encounterData.objective.observation + '\n' : '') + sections.objective
+                    updateField(
+                      'objective',
+                      'observation',
+                      (encounterData.objective.observation
+                        ? encounterData.objective.observation + '\n'
+                        : '') + sections.objective
                     );
                   }
                   if (sections.assessment) {
-                    updateField('assessment', 'clinical_reasoning',
-                      (encounterData.assessment.clinical_reasoning ? encounterData.assessment.clinical_reasoning + '\n' : '') + sections.assessment
+                    updateField(
+                      'assessment',
+                      'clinical_reasoning',
+                      (encounterData.assessment.clinical_reasoning
+                        ? encounterData.assessment.clinical_reasoning + '\n'
+                        : '') + sections.assessment
                     );
                   }
                   if (sections.plan) {
-                    updateField('plan', 'treatment',
-                      (encounterData.plan.treatment ? encounterData.plan.treatment + '\n' : '') + sections.plan
+                    updateField(
+                      'plan',
+                      'treatment',
+                      (encounterData.plan.treatment ? encounterData.plan.treatment + '\n' : '') +
+                        sections.plan
                     );
                   }
                   setShowAIScribe(false);
@@ -1558,20 +1681,35 @@ export default function EasyAssessment() {
                 onApplyTranscript={(transcript) => {
                   // Insert transcript based on active tab
                   if (activeTab === 'subjective') {
-                    updateField('subjective', 'chief_complaint',
-                      (encounterData.subjective.chief_complaint ? encounterData.subjective.chief_complaint + '\n' : '') + transcript
+                    updateField(
+                      'subjective',
+                      'chief_complaint',
+                      (encounterData.subjective.chief_complaint
+                        ? encounterData.subjective.chief_complaint + '\n'
+                        : '') + transcript
                     );
                   } else if (activeTab === 'objective') {
-                    updateField('objective', 'observation',
-                      (encounterData.objective.observation ? encounterData.objective.observation + '\n' : '') + transcript
+                    updateField(
+                      'objective',
+                      'observation',
+                      (encounterData.objective.observation
+                        ? encounterData.objective.observation + '\n'
+                        : '') + transcript
                     );
                   } else if (activeTab === 'assessment') {
-                    updateField('assessment', 'clinical_reasoning',
-                      (encounterData.assessment.clinical_reasoning ? encounterData.assessment.clinical_reasoning + '\n' : '') + transcript
+                    updateField(
+                      'assessment',
+                      'clinical_reasoning',
+                      (encounterData.assessment.clinical_reasoning
+                        ? encounterData.assessment.clinical_reasoning + '\n'
+                        : '') + transcript
                     );
                   } else if (activeTab === 'plan') {
-                    updateField('plan', 'treatment',
-                      (encounterData.plan.treatment ? encounterData.plan.treatment + '\n' : '') + transcript
+                    updateField(
+                      'plan',
+                      'treatment',
+                      (encounterData.plan.treatment ? encounterData.plan.treatment + '\n' : '') +
+                        transcript
                     );
                   }
                   setShowAIScribe(false);
@@ -1586,10 +1724,7 @@ export default function EasyAssessment() {
       {showAISettings && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="max-w-2xl w-full">
-            <AISettings
-              language={language}
-              onClose={() => setShowAISettings(false)}
-            />
+            <AISettings language={language} onClose={() => setShowAISettings(false)} />
           </div>
         </div>
       )}

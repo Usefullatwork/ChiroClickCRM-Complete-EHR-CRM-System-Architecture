@@ -281,7 +281,7 @@ function createMenu() {
         {
           label: 'Documentation',
           click: () => {
-            shell.openExternal('https://github.com/your-org/chiroclickcrm/wiki');
+            shell.openExternal('https://github.com/ChiroClick/chiroclickcrm/wiki');
           },
         },
         { type: 'separator' },

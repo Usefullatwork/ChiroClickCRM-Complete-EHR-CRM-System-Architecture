@@ -5,7 +5,7 @@
  * Log of patient's completed exercises
  */
 
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import {
   Calendar,
   Clock,
@@ -17,8 +17,8 @@ import {
   MessageSquare,
   Star,
   Filter,
-  Download
-} from 'lucide-react'
+  Download,
+} from 'lucide-react';
 
 /**
  * ExerciseLog Component
@@ -31,51 +31,46 @@ import {
  * @param {Function} props.onFilterChange - Callback when filter changes
  * @returns {JSX.Element} Exercise log component
  */
-export default function ExerciseLog({
-  logs = [],
-  isLoading = false,
-  onLoadMore,
-  onFilterChange
-}) {
-  const [expandedEntry, setExpandedEntry] = useState(null)
-  const [filter, setFilter] = useState('all')
-  const [sortOrder, setSortOrder] = useState('desc')
+export default function ExerciseLog({ logs = [], isLoading = false, onLoadMore, onFilterChange }) {
+  const [expandedEntry, setExpandedEntry] = useState(null);
+  const [filter, setFilter] = useState('all');
+  const [sortOrder, setSortOrder] = useState('desc');
 
   /**
    * Format date in Norwegian
    * Formaterer dato pa norsk
    */
   const formatDate = (dateString) => {
-    const date = new Date(dateString)
+    const date = new Date(dateString);
     return date.toLocaleDateString('no-NO', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
-    })
-  }
+      day: 'numeric',
+    });
+  };
 
   /**
    * Format time
    * Formaterer tid
    */
   const formatTime = (dateString) => {
-    const date = new Date(dateString)
+    const date = new Date(dateString);
     return date.toLocaleTimeString('no-NO', {
       hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
+      minute: '2-digit',
+    });
+  };
 
   /**
    * Get pain level color
    * Henter smerteniva-farge
    */
   const getPainColor = (level) => {
-    if (level <= 3) return 'text-green-600 bg-green-100'
-    if (level <= 6) return 'text-yellow-600 bg-yellow-100'
-    return 'text-red-600 bg-red-100'
-  }
+    if (level <= 3) return 'text-green-600 bg-green-100';
+    if (level <= 6) return 'text-yellow-600 bg-yellow-100';
+    return 'text-red-600 bg-red-100';
+  };
 
   /**
    * Get difficulty rating display
@@ -85,45 +80,78 @@ export default function ExerciseLog({
     return Array.from({ length: 5 }, (_, i) => (
       <Star
         key={i}
-        className={`w-4 h-4 ${
-          i < rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'
-        }`}
+        className={`w-4 h-4 ${i < rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
       />
-    ))
-  }
+    ));
+  };
 
   /**
    * Handle filter change
    * Handterer filterendring
    */
   const handleFilterChange = (newFilter) => {
-    setFilter(newFilter)
+    setFilter(newFilter);
     if (onFilterChange) {
-      onFilterChange(newFilter)
+      onFilterChange(newFilter);
     }
-  }
+  };
 
   /**
    * Group logs by date
    * Grupperer logger etter dato
    */
   const groupedLogs = logs.reduce((groups, log) => {
-    const date = new Date(log.completedAt).toDateString()
+    const date = new Date(log.completedAt).toDateString();
     if (!groups[date]) {
-      groups[date] = []
+      groups[date] = [];
     }
-    groups[date].push(log)
-    return groups
-  }, {})
+    groups[date].push(log);
+    return groups;
+  }, {});
 
   /**
-   * Export logs
-   * Eksporterer logger
+   * Export logs as CSV
+   * Eksporterer logger som CSV
    */
   const handleExport = () => {
-    // TODO: Implement export functionality
-    console.log('Exporting exercise logs')
-  }
+    if (!logs || logs.length === 0) return;
+
+    const headers = [
+      'Dato',
+      'Tid',
+      'Ovelse',
+      'Fullfort',
+      'Sett',
+      'Repetisjoner',
+      'Smerte',
+      'Vanskelighet',
+      'Varighet (min)',
+      'Notater',
+    ];
+    const rows = logs.map((log) => [
+      new Date(log.completedAt).toLocaleDateString('no-NO'),
+      formatTime(log.completedAt),
+      log.exerciseName || '',
+      log.completed ? 'Ja' : 'Nei',
+      log.setsCompleted || 0,
+      log.repsCompleted || 0,
+      log.painRating !== undefined ? log.painRating : '',
+      log.difficultyRating !== undefined ? log.difficultyRating : '',
+      log.duration || '',
+      (log.notes || '').replace(/"/g, '""'),
+    ]);
+
+    const csv = [headers.join(';'), ...rows.map((r) => r.map((v) => `"${v}"`).join(';'))].join(
+      '\n'
+    );
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `treningslogg-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="bg-white rounded-lg border border-gray-200">
@@ -132,9 +160,7 @@ export default function ExerciseLog({
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">Treningslogg</h3>
-            <p className="text-sm text-gray-500 mt-0.5">
-              Historikk over fullforte ovelser
-            </p>
+            <p className="text-sm text-gray-500 mt-0.5">Historikk over fullforte ovelser</p>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -158,7 +184,7 @@ export default function ExerciseLog({
               { value: 'all', label: 'Alle' },
               { value: 'completed', label: 'Fullfort' },
               { value: 'partial', label: 'Delvis' },
-              { value: 'skipped', label: 'Hoppet over' }
+              { value: 'skipped', label: 'Hoppet over' },
             ].map((option) => (
               <button
                 key={option.value}
@@ -185,9 +211,8 @@ export default function ExerciseLog({
           </div>
         ) : Object.keys(groupedLogs).length > 0 ? (
           Object.entries(groupedLogs)
-            .sort(([a], [b]) => sortOrder === 'desc'
-              ? new Date(b) - new Date(a)
-              : new Date(a) - new Date(b)
+            .sort(([a], [b]) =>
+              sortOrder === 'desc' ? new Date(b) - new Date(a) : new Date(a) - new Date(b)
             )
             .map(([date, dayLogs]) => (
               <div key={date}>
@@ -195,9 +220,7 @@ export default function ExerciseLog({
                 <div className="px-6 py-3 bg-gray-50">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-gray-500" />
-                    <span className="font-medium text-gray-700 capitalize">
-                      {formatDate(date)}
-                    </span>
+                    <span className="font-medium text-gray-700 capitalize">{formatDate(date)}</span>
                     <span className="text-sm text-gray-500">
                       ({dayLogs.length} {dayLogs.length === 1 ? 'ovelse' : 'ovelser'})
                     </span>
@@ -212,18 +235,16 @@ export default function ExerciseLog({
                   >
                     <div
                       className="cursor-pointer"
-                      onClick={() => setExpandedEntry(
-                        expandedEntry === log.id ? null : log.id
-                      )}
+                      onClick={() => setExpandedEntry(expandedEntry === log.id ? null : log.id)}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-3">
                           {/* Status Icon / Statusikon */}
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                            log.completed
-                              ? 'bg-green-100'
-                              : 'bg-yellow-100'
-                          }`}>
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                              log.completed ? 'bg-green-100' : 'bg-yellow-100'
+                            }`}
+                          >
                             {log.completed ? (
                               <CheckCircle className="w-4 h-4 text-green-600" />
                             ) : (
@@ -258,7 +279,9 @@ export default function ExerciseLog({
                         {/* Expand Button / Utvid-knapp */}
                         <div className="flex items-center gap-2">
                           {log.painRating !== undefined && (
-                            <span className={`px-2 py-0.5 text-xs font-medium rounded ${getPainColor(log.painRating)}`}>
+                            <span
+                              className={`px-2 py-0.5 text-xs font-medium rounded ${getPainColor(log.painRating)}`}
+                            >
                               Smerte: {log.painRating}/10
                             </span>
                           )}
@@ -293,8 +316,11 @@ export default function ExerciseLog({
                                 <div className="flex-1 h-2 bg-gray-200 rounded-full">
                                   <div
                                     className={`h-full rounded-full ${
-                                      log.painRating <= 3 ? 'bg-green-500' :
-                                      log.painRating <= 6 ? 'bg-yellow-500' : 'bg-red-500'
+                                      log.painRating <= 3
+                                        ? 'bg-green-500'
+                                        : log.painRating <= 6
+                                          ? 'bg-yellow-500'
+                                          : 'bg-red-500'
                                     }`}
                                     style={{ width: `${log.painRating * 10}%` }}
                                   />
@@ -343,9 +369,7 @@ export default function ExerciseLog({
           <div className="p-12 text-center">
             <Activity className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <h3 className="text-lg font-medium text-gray-900 mb-1">Ingen treningslogg</h3>
-            <p className="text-sm text-gray-500">
-              Pasienten har ikke fullfort noen ovelser enna
-            </p>
+            <p className="text-sm text-gray-500">Pasienten har ikke fullfort noen ovelser enna</p>
           </div>
         )}
       </div>
@@ -362,5 +386,5 @@ export default function ExerciseLog({
         </div>
       )}
     </div>
-  )
+  );
 }
