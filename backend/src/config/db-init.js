@@ -39,6 +39,9 @@ export async function initializeDatabase(db) {
   // Always run schema patches (idempotent ALTER TABLE IF NOT EXISTS)
   await applySchemaPatches(db);
 
+  // Always apply performance indexes (idempotent CREATE INDEX IF NOT EXISTS)
+  await applyPerformanceIndexes(db);
+
   if (initialized) {
     logger.info('Database already initialized, skipping setup');
     return;
@@ -296,6 +299,61 @@ async function applySchemaPatches(db) {
   }
   if (applied > 0) {
     logger.info(`Applied ${applied} schema patches`);
+  }
+}
+
+/**
+ * Apply performance indexes on every startup.
+ * All use IF NOT EXISTS so they're safe to re-run.
+ */
+async function applyPerformanceIndexes(db) {
+  const indexes = [
+    // Patients
+    `CREATE INDEX IF NOT EXISTS idx_patients_org_id ON patients (organization_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_patients_org_status ON patients (organization_id, status)`,
+    `CREATE INDEX IF NOT EXISTS idx_patients_org_last_name ON patients (organization_id, last_name)`,
+    `CREATE INDEX IF NOT EXISTS idx_patients_org_email ON patients (organization_id, email)`,
+    `CREATE INDEX IF NOT EXISTS idx_patients_org_last_visit ON patients (organization_id, last_visit_date)`,
+    `CREATE INDEX IF NOT EXISTS idx_patients_org_lifecycle ON patients (organization_id, lifecycle_stage)`,
+    `CREATE INDEX IF NOT EXISTS idx_patients_first_visit ON patients (organization_id, first_visit_date)`,
+    // Clinical encounters
+    `CREATE INDEX IF NOT EXISTS idx_encounters_patient_id ON clinical_encounters (patient_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_encounters_org_id ON clinical_encounters (organization_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_encounters_org_patient_date ON clinical_encounters (organization_id, patient_id, encounter_date DESC)`,
+    `CREATE INDEX IF NOT EXISTS idx_encounters_practitioner ON clinical_encounters (practitioner_id)`,
+    // Appointments
+    `CREATE INDEX IF NOT EXISTS idx_appointments_patient_id ON appointments (patient_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_appointments_org_start ON appointments (organization_id, start_time)`,
+    `CREATE INDEX IF NOT EXISTS idx_appointments_practitioner_start ON appointments (practitioner_id, start_time)`,
+    `CREATE INDEX IF NOT EXISTS idx_appointments_org_status ON appointments (organization_id, status)`,
+    // Financial
+    `CREATE INDEX IF NOT EXISTS idx_financial_patient_id ON financial_metrics (patient_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_financial_org_patient ON financial_metrics (organization_id, patient_id)`,
+    // Sessions
+    `CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions (user_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions (expires_at)`,
+    // Audit log
+    `CREATE INDEX IF NOT EXISTS idx_audit_log_org_created ON audit_log (organization_id, created_at DESC)`,
+    `CREATE INDEX IF NOT EXISTS idx_audit_log_user ON audit_log (user_id)`,
+    // Follow-ups
+    `CREATE INDEX IF NOT EXISTS idx_followups_patient ON follow_ups (patient_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_followups_org_status ON follow_ups (organization_id, status)`,
+  ];
+
+  let applied = 0;
+  for (const sql of indexes) {
+    try {
+      await db.query(sql);
+      applied++;
+    } catch (err) {
+      // Skip if table doesn't exist yet or index already exists
+      if (!err.message.includes('already exists') && !err.message.includes('does not exist')) {
+        logger.debug(`Index skipped: ${err.message.substring(0, 80)}`);
+      }
+    }
+  }
+  if (applied > 0) {
+    logger.info(`Applied ${applied} performance indexes`);
   }
 }
 

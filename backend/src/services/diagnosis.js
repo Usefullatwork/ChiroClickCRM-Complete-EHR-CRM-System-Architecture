@@ -5,6 +5,7 @@
 
 import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
+import cache, { CacheKeys } from '../utils/cache.js';
 
 /**
  * Search diagnosis codes
@@ -13,7 +14,7 @@ export const searchDiagnosisCodes = async (searchTerm, options = {}) => {
   const {
     system = null, // 'ICPC2' or 'ICD10'
     chapter = null, // 'L', 'N', etc.
-    limit = 20
+    limit = 20,
   } = options;
 
   try {
@@ -62,32 +63,40 @@ export const searchDiagnosisCodes = async (searchTerm, options = {}) => {
 };
 
 /**
- * Get commonly used diagnosis codes
+ * Get commonly used diagnosis codes (cached for 10 minutes)
  */
 export const getCommonDiagnosisCodes = async (system = null) => {
-  try {
-    let whereClause = 'WHERE commonly_used = true';
-    const params = [];
+  const cacheKey = CacheKeys.diagnosisCodesList(system);
 
-    if (system) {
-      params.push(system);
-      whereClause += ` AND system = $1`;
-    }
+  return cache.getOrSet(
+    cacheKey,
+    async () => {
+      try {
+        let whereClause = 'WHERE commonly_used = true';
+        const params = [];
 
-    const result = await query(
-      `SELECT *
-       FROM diagnosis_codes
-       ${whereClause}
-       ORDER BY usage_count DESC, code ASC
-       LIMIT 30`,
-      params
-    );
+        if (system) {
+          params.push(system);
+          whereClause += ` AND system = $1`;
+        }
 
-    return result.rows;
-  } catch (error) {
-    logger.error('Error getting common diagnosis codes:', error);
-    throw error;
-  }
+        const result = await query(
+          `SELECT *
+         FROM diagnosis_codes
+         ${whereClause}
+         ORDER BY usage_count DESC, code ASC
+         LIMIT 30`,
+          params
+        );
+
+        return result.rows;
+      } catch (error) {
+        logger.error('Error getting common diagnosis codes:', error);
+        throw error;
+      }
+    },
+    600
+  );
 };
 
 /**
@@ -95,10 +104,7 @@ export const getCommonDiagnosisCodes = async (system = null) => {
  */
 export const getDiagnosisCode = async (code) => {
   try {
-    const result = await query(
-      'SELECT * FROM diagnosis_codes WHERE code = $1',
-      [code]
-    );
+    const result = await query('SELECT * FROM diagnosis_codes WHERE code = $1', [code]);
 
     if (result.rows.length === 0) {
       return null;
@@ -126,8 +132,8 @@ export const getChiropracticCodes = async () => {
 
     // Group by chapter
     const grouped = {
-      L: result.rows.filter(r => r.chapter === 'L'),
-      N: result.rows.filter(r => r.chapter === 'N')
+      L: result.rows.filter((r) => r.chapter === 'L'),
+      N: result.rows.filter((r) => r.chapter === 'N'),
     };
 
     return grouped;
@@ -171,10 +177,7 @@ export const getICD10Mapping = async (icpc2Code) => {
  */
 export const incrementUsageCount = async (code) => {
   try {
-    await query(
-      'UPDATE diagnosis_codes SET usage_count = usage_count + 1 WHERE code = $1',
-      [code]
-    );
+    await query('UPDATE diagnosis_codes SET usage_count = usage_count + 1 WHERE code = $1', [code]);
 
     logger.debug('Incremented usage count for code:', code);
   } catch (error) {
@@ -187,11 +190,7 @@ export const incrementUsageCount = async (code) => {
  * Get diagnosis statistics for organization
  */
 export const getDiagnosisStatistics = async (organizationId, options = {}) => {
-  const {
-    startDate = null,
-    endDate = null,
-    limit = 10
-  } = options;
+  const { startDate = null, endDate = null, limit = 10 } = options;
 
   try {
     let whereClause = 'WHERE ce.organization_id = $1';
@@ -236,7 +235,7 @@ export const getDiagnosisStatistics = async (organizationId, options = {}) => {
 
     return {
       topDiagnoses: icpc2Result.rows,
-      totalEncounters: icpc2Result.rows.reduce((sum, item) => sum + parseInt(item.count), 0)
+      totalEncounters: icpc2Result.rows.reduce((sum, item) => sum + parseInt(item.count), 0),
     };
   } catch (error) {
     logger.error('Error getting diagnosis statistics:', error);
@@ -251,5 +250,5 @@ export default {
   getChiropracticCodes,
   getICD10Mapping,
   incrementUsageCount,
-  getDiagnosisStatistics
+  getDiagnosisStatistics,
 };

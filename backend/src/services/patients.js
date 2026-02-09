@@ -18,7 +18,7 @@ export const getAllPatients = async (organizationId, options = {}) => {
     status = '',
     category = '',
     sortBy = 'last_name',
-    sortOrder = 'asc'
+    sortOrder = 'asc',
   } = options;
 
   const offset = (page - 1) * limit;
@@ -54,10 +54,7 @@ export const getAllPatients = async (organizationId, options = {}) => {
     }
 
     // Get total count
-    const countResult = await query(
-      `SELECT COUNT(*) FROM patients p ${whereClause}`,
-      params
-    );
+    const countResult = await query(`SELECT COUNT(*) FROM patients p ${whereClause}`, params);
     const total = parseInt(countResult.rows[0].count);
 
     // Get patients with pagination
@@ -79,11 +76,11 @@ export const getAllPatients = async (organizationId, options = {}) => {
     );
 
     // Mask sensitive data
-    const patients = result.rows.map(patient => ({
+    const patients = result.rows.map((patient) => ({
       ...patient,
       encrypted_personal_number: patient.encrypted_personal_number
         ? maskSensitive(patient.encrypted_personal_number, 3)
-        : null
+        : null,
     }));
 
     return {
@@ -92,8 +89,8 @@ export const getAllPatients = async (organizationId, options = {}) => {
         page: parseInt(page),
         limit: parseInt(limit),
         total,
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     };
   } catch (error) {
     logger.error('Error getting patients:', error);
@@ -230,14 +227,14 @@ export const createPatient = async (organizationId, patientData) => {
         patientData.treatment_pref_needles ?? null,
         patientData.treatment_pref_adjustments ?? null,
         patientData.treatment_pref_neck_adjustments ?? null,
-        patientData.treatment_pref_notes || null
+        patientData.treatment_pref_notes || null,
       ]
     );
 
     logger.info('Patient created:', {
       organizationId,
       patientId: result.rows[0].id,
-      solvitId: result.rows[0].solvit_id
+      solvitId: result.rows[0].solvit_id,
     });
 
     return result.rows[0];
@@ -264,15 +261,36 @@ export const updatePatient = async (organizationId, patientId, patientData) => {
     let paramIndex = 3;
 
     const allowedFields = [
-      'first_name', 'last_name', 'date_of_birth', 'gender', 'email', 'phone',
-      'address', 'emergency_contact', 'red_flags', 'contraindications',
-      'allergies', 'current_medications', 'medical_history', 'status',
-      'category', 'referral_source', 'referring_doctor', 'insurance_type',
-      'insurance_number', 'has_nav_rights', 'consent_sms', 'consent_email',
-      'consent_marketing', 'internal_notes', 'encrypted_personal_number',
+      'first_name',
+      'last_name',
+      'date_of_birth',
+      'gender',
+      'email',
+      'phone',
+      'address',
+      'emergency_contact',
+      'red_flags',
+      'contraindications',
+      'allergies',
+      'current_medications',
+      'medical_history',
+      'status',
+      'category',
+      'referral_source',
+      'referring_doctor',
+      'insurance_type',
+      'insurance_number',
+      'has_nav_rights',
+      'consent_sms',
+      'consent_email',
+      'consent_marketing',
+      'internal_notes',
+      'encrypted_personal_number',
       // Treatment preferences
-      'treatment_pref_needles', 'treatment_pref_adjustments',
-      'treatment_pref_neck_adjustments', 'treatment_pref_notes'
+      'treatment_pref_needles',
+      'treatment_pref_adjustments',
+      'treatment_pref_neck_adjustments',
+      'treatment_pref_notes',
     ];
 
     for (const field of allowedFields) {
@@ -302,7 +320,7 @@ export const updatePatient = async (organizationId, patientId, patientData) => {
     logger.info('Patient updated:', {
       organizationId,
       patientId,
-      fieldsUpdated: updateFields.length
+      fieldsUpdated: updateFields.length,
     });
 
     return result.rows[0];
@@ -331,7 +349,7 @@ export const deletePatient = async (organizationId, patientId) => {
 
     logger.info('Patient soft deleted:', {
       organizationId,
-      patientId
+      patientId,
     });
 
     return result.rows[0];
@@ -419,7 +437,7 @@ export const advancedSearchPatients = async (organizationId, filters = {}) => {
     sort_order = 'asc',
     // Pagination
     page = 1,
-    limit = 20
+    limit = 20,
   } = filters;
 
   const offset = (page - 1) * limit;
@@ -562,21 +580,18 @@ export const advancedSearchPatients = async (organizationId, filters = {}) => {
 
     // Validate sort column to prevent SQL injection
     const validSortColumns = {
-      'name': 'p.last_name',
-      'last_name': 'p.last_name',
-      'first_name': 'p.first_name',
-      'date_of_birth': 'p.date_of_birth',
-      'last_visit': 'p.last_visit_date',
-      'created_at': 'p.created_at'
+      name: 'p.last_name',
+      last_name: 'p.last_name',
+      first_name: 'p.first_name',
+      date_of_birth: 'p.date_of_birth',
+      last_visit: 'p.last_visit_date',
+      created_at: 'p.created_at',
     };
     const sortColumn = validSortColumns[sort_by] || 'p.last_name';
     const sortDirection = sort_order.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
 
     // Get total count
-    const countResult = await query(
-      `SELECT COUNT(*) FROM patients p ${whereClause}`,
-      params
-    );
+    const countResult = await query(`SELECT COUNT(*) FROM patients p ${whereClause}`, params);
     const total = parseInt(countResult.rows[0].count);
 
     // Get patients with pagination
@@ -598,11 +613,11 @@ export const advancedSearchPatients = async (organizationId, filters = {}) => {
     );
 
     // Mask sensitive data
-    const patients = result.rows.map(patient => ({
+    const patients = result.rows.map((patient) => ({
       ...patient,
       encrypted_personal_number: patient.encrypted_personal_number
         ? maskSensitive(patient.encrypted_personal_number, 3)
-        : null
+        : null,
     }));
 
     return {
@@ -611,13 +626,23 @@ export const advancedSearchPatients = async (organizationId, filters = {}) => {
         page: parseInt(page),
         limit: parseInt(limit),
         total,
-        pages: Math.ceil(total / limit)
+        pages: Math.ceil(total / limit),
       },
       filters_applied: {
-        q, name, phone, email, date_of_birth,
-        dob_from, dob_to, last_visit_from, last_visit_to,
-        status, category, sort_by, sort_order
-      }
+        q,
+        name,
+        phone,
+        email,
+        date_of_birth,
+        dob_from,
+        dob_to,
+        last_visit_from,
+        last_visit_to,
+        status,
+        category,
+        sort_by,
+        sort_order,
+      },
     };
   } catch (error) {
     logger.error('Error in advanced patient search:', error);
@@ -627,24 +652,51 @@ export const advancedSearchPatients = async (organizationId, filters = {}) => {
 
 /**
  * Get patient statistics
+ * Combined into 2 queries (down from 4) to avoid N+1 pattern
  */
 export const getPatientStatistics = async (organizationId, patientId) => {
   try {
-    // Get visit statistics
-    const visitsResult = await query(
-      `SELECT
-        COUNT(*) as total_visits,
-        COUNT(*) FILTER (WHERE encounter_type = 'INITIAL') as initial_visits,
-        COUNT(*) FILTER (WHERE encounter_type = 'FOLLOWUP') as followup_visits,
-        AVG(duration_minutes) as avg_duration,
-        MIN(encounter_date) as first_visit,
-        MAX(encounter_date) as last_visit
-      FROM clinical_encounters
-      WHERE organization_id = $1 AND patient_id = $2`,
+    // Combined query for visits, financial, and appointment stats
+    const statsResult = await query(
+      `WITH visit_stats AS (
+        SELECT
+          COUNT(*) as total_visits,
+          COUNT(*) FILTER (WHERE encounter_type = 'INITIAL') as initial_visits,
+          COUNT(*) FILTER (WHERE encounter_type = 'FOLLOWUP') as followup_visits,
+          AVG(duration_minutes) as avg_duration,
+          MIN(encounter_date) as first_visit,
+          MAX(encounter_date) as last_visit
+        FROM clinical_encounters
+        WHERE organization_id = $1 AND patient_id = $2
+      ),
+      financial_stats AS (
+        SELECT
+          COALESCE(SUM(gross_amount), 0) as total_gross,
+          COALESCE(SUM(patient_amount), 0) as total_paid,
+          COALESCE(SUM(insurance_amount), 0) as total_insurance,
+          COUNT(*) as total_transactions
+        FROM financial_metrics
+        WHERE organization_id = $1 AND patient_id = $2
+      ),
+      appointment_stats AS (
+        SELECT
+          COUNT(*) as total_appointments,
+          COUNT(*) FILTER (WHERE status = 'COMPLETED') as completed,
+          COUNT(*) FILTER (WHERE status = 'NO_SHOW') as no_shows,
+          COUNT(*) FILTER (WHERE status = 'CANCELLED') as cancelled
+        FROM appointments
+        WHERE organization_id = $1 AND patient_id = $2
+      )
+      SELECT
+        v.total_visits, v.initial_visits, v.followup_visits,
+        v.avg_duration, v.first_visit, v.last_visit,
+        f.total_gross, f.total_paid, f.total_insurance, f.total_transactions,
+        a.total_appointments, a.completed, a.no_shows, a.cancelled
+      FROM visit_stats v, financial_stats f, appointment_stats a`,
       [organizationId, patientId]
     );
 
-    // Get diagnosis statistics
+    // Diagnosis stats needs unnest + GROUP BY, kept as separate query
     const diagnosisResult = await query(
       `SELECT
         unnest(icpc_codes) as code,
@@ -658,35 +710,29 @@ export const getPatientStatistics = async (organizationId, patientId) => {
       [organizationId, patientId]
     );
 
-    // Get financial statistics
-    const financialResult = await query(
-      `SELECT
-        SUM(gross_amount) as total_gross,
-        SUM(patient_amount) as total_paid,
-        SUM(insurance_amount) as total_insurance,
-        COUNT(*) as total_transactions
-      FROM financial_metrics
-      WHERE organization_id = $1 AND patient_id = $2`,
-      [organizationId, patientId]
-    );
-
-    // Get appointment statistics
-    const appointmentResult = await query(
-      `SELECT
-        COUNT(*) as total_appointments,
-        COUNT(*) FILTER (WHERE status = 'COMPLETED') as completed,
-        COUNT(*) FILTER (WHERE status = 'NO_SHOW') as no_shows,
-        COUNT(*) FILTER (WHERE status = 'CANCELLED') as cancelled
-      FROM appointments
-      WHERE organization_id = $1 AND patient_id = $2`,
-      [organizationId, patientId]
-    );
-
+    const s = statsResult.rows[0];
     return {
-      visits: visitsResult.rows[0],
+      visits: {
+        total_visits: s.total_visits,
+        initial_visits: s.initial_visits,
+        followup_visits: s.followup_visits,
+        avg_duration: s.avg_duration,
+        first_visit: s.first_visit,
+        last_visit: s.last_visit,
+      },
       topDiagnoses: diagnosisResult.rows,
-      financial: financialResult.rows[0],
-      appointments: appointmentResult.rows[0]
+      financial: {
+        total_gross: s.total_gross,
+        total_paid: s.total_paid,
+        total_insurance: s.total_insurance,
+        total_transactions: s.total_transactions,
+      },
+      appointments: {
+        total_appointments: s.total_appointments,
+        completed: s.completed,
+        no_shows: s.no_shows,
+        cancelled: s.cancelled,
+      },
     };
   } catch (error) {
     logger.error('Error getting patient statistics:', error);
@@ -734,5 +780,5 @@ export default {
   searchPatients,
   advancedSearchPatients,
   getPatientStatistics,
-  getPatientsNeedingFollowUp
+  getPatientsNeedingFollowUp,
 };

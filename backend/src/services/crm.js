@@ -1135,11 +1135,29 @@ export const toggleWorkflowActive = async (clinicId, workflowId) => {
 
 /**
  * Get retention dashboard
+ * Combined into 2 queries (down from 3) to reduce round-trips
  */
 export const getRetentionDashboard = async (clinicId, period = '30d') => {
   const days = parseInt(period) || 30;
 
-  // Lifecycle distribution
+  // Combined retention metrics in a single query
+  const metricsResult = await query(
+    `SELECT
+      COUNT(*) FILTER (WHERE last_visit_date >= CURRENT_DATE - make_interval(days => $2)) as retained,
+      COUNT(*) FILTER (WHERE lifecycle_stage IN ('ACTIVE', 'AT_RISK')) as total_trackable,
+      AVG(visit_frequency_days) FILTER (WHERE visit_frequency_days > 0) as avg_frequency
+     FROM patients
+     WHERE organization_id = $1`,
+    [clinicId, days]
+  );
+
+  const metrics = metricsResult.rows[0];
+  const retentionRate =
+    metrics.total_trackable > 0
+      ? ((metrics.retained / metrics.total_trackable) * 100).toFixed(1)
+      : 0;
+
+  // Lifecycle distribution needs GROUP BY, kept separate
   const lifecycleResult = await query(
     `SELECT lifecycle_stage, COUNT(*) as count
      FROM patients
@@ -1148,35 +1166,11 @@ export const getRetentionDashboard = async (clinicId, period = '30d') => {
     [clinicId]
   );
 
-  // Retention rate (patients with visit in last X days vs total active)
-  const retentionResult = await query(
-    `SELECT
-      COUNT(*) FILTER (WHERE last_visit_date >= CURRENT_DATE - make_interval(days => $2)) as retained,
-      COUNT(*) FILTER (WHERE lifecycle_stage IN ('ACTIVE', 'AT_RISK')) as total_trackable
-     FROM patients
-     WHERE organization_id = $1`,
-    [clinicId, days]
-  );
-
-  const retention = retentionResult.rows[0];
-  const retentionRate =
-    retention.total_trackable > 0
-      ? ((retention.retained / retention.total_trackable) * 100).toFixed(1)
-      : 0;
-
-  // Average visit frequency
-  const frequencyResult = await query(
-    `SELECT AVG(visit_frequency_days) as avg_frequency
-     FROM patients
-     WHERE organization_id = $1 AND visit_frequency_days > 0`,
-    [clinicId]
-  );
-
   return {
     lifecycleDistribution: lifecycleResult.rows,
     retentionRate: parseFloat(retentionRate),
-    retainedPatients: parseInt(retention.retained),
-    avgVisitFrequency: parseFloat(frequencyResult.rows[0].avg_frequency) || 0,
+    retainedPatients: parseInt(metrics.retained),
+    avgVisitFrequency: parseFloat(metrics.avg_frequency) || 0,
   };
 };
 

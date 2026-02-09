@@ -5,45 +5,62 @@
 
 import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
+import cache, { CacheKeys } from '../utils/cache.js';
 
 /**
- * Get all treatment codes
+ * Get all treatment codes (cached for 10 minutes)
  */
 export const getAllTreatmentCodes = async () => {
-  try {
-    const result = await query(
-      `SELECT *
-       FROM treatment_codes
-       WHERE is_active = true
-       ORDER BY commonly_used DESC, code ASC`,
-      []
-    );
+  const cacheKey = CacheKeys.treatmentCodesList();
 
-    return result.rows;
-  } catch (error) {
-    logger.error('Error getting all treatment codes:', error);
-    throw error;
-  }
+  return cache.getOrSet(
+    cacheKey,
+    async () => {
+      try {
+        const result = await query(
+          `SELECT *
+         FROM treatment_codes
+         WHERE is_active = true
+         ORDER BY commonly_used DESC, code ASC`,
+          []
+        );
+
+        return result.rows;
+      } catch (error) {
+        logger.error('Error getting all treatment codes:', error);
+        throw error;
+      }
+    },
+    600
+  );
 };
 
 /**
- * Get commonly used treatment codes
+ * Get commonly used treatment codes (cached for 10 minutes)
  */
 export const getCommonTreatmentCodes = async () => {
-  try {
-    const result = await query(
-      `SELECT *
-       FROM treatment_codes
-       WHERE commonly_used = true AND is_active = true
-       ORDER BY usage_count DESC, code ASC`,
-      []
-    );
+  const cacheKey = 'treatment:list:common';
 
-    return result.rows;
-  } catch (error) {
-    logger.error('Error getting common treatment codes:', error);
-    throw error;
-  }
+  return cache.getOrSet(
+    cacheKey,
+    async () => {
+      try {
+        const result = await query(
+          `SELECT *
+         FROM treatment_codes
+         WHERE commonly_used = true AND is_active = true
+         ORDER BY usage_count DESC, code ASC`,
+          []
+        );
+
+        return result.rows;
+      } catch (error) {
+        logger.error('Error getting common treatment codes:', error);
+        throw error;
+      }
+    },
+    600
+  );
 };
 
 /**

@@ -5,17 +5,13 @@
 
 import { query, transaction } from '../config/database.js';
 import logger from '../utils/logger.js';
+import cache, { CacheKeys } from '../utils/cache.js';
 
 /**
  * Get all organizations (admin only)
  */
 export const getAllOrganizations = async (options = {}) => {
-  const {
-    page = 1,
-    limit = 50,
-    search = '',
-    status = null
-  } = options;
+  const { page = 1, limit = 50, search = '', status = null } = options;
 
   const offset = (page - 1) * limit;
   let whereConditions = [];
@@ -37,10 +33,7 @@ export const getAllOrganizations = async (options = {}) => {
   const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
 
   // Get total count
-  const countResult = await query(
-    `SELECT COUNT(*) FROM organizations ${whereClause}`,
-    params
-  );
+  const countResult = await query(`SELECT COUNT(*) FROM organizations ${whereClause}`, params);
   const total = parseInt(countResult.rows[0].count);
 
   // Get paginated results
@@ -77,8 +70,8 @@ export const getAllOrganizations = async (options = {}) => {
       page,
       limit,
       total,
-      pages: Math.ceil(total / limit)
-    }
+      pages: Math.ceil(total / limit),
+    },
   };
 };
 
@@ -117,7 +110,7 @@ export const createOrganization = async (orgData) => {
     subscription_tier = 'BASIC',
     max_practitioners = 5,
     max_patients = 500,
-    settings = {}
+    settings = {},
   } = orgData;
 
   return await transaction(async (client) => {
@@ -140,7 +133,20 @@ export const createOrganization = async (orgData) => {
         status
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'ACTIVE', $10, $11, $12, 'ACTIVE')
       RETURNING *`,
-      [name, org_number, email, phone, address, postal_code, city, country, subscription_tier, max_practitioners, max_patients, JSON.stringify(settings)]
+      [
+        name,
+        org_number,
+        email,
+        phone,
+        address,
+        postal_code,
+        city,
+        country,
+        subscription_tier,
+        max_practitioners,
+        max_patients,
+        JSON.stringify(settings),
+      ]
     );
 
     const organization = orgResult.rows[0];
@@ -151,30 +157,46 @@ export const createOrganization = async (orgData) => {
         name: 'Appointment Reminder',
         type: 'SMS',
         subject: null,
-        content: 'Hei {{patient_name}}! Påminnelse om time hos {{clinic_name}} den {{appointment_date}} kl {{appointment_time}}.',
-        variables: ['patient_name', 'clinic_name', 'appointment_date', 'appointment_time']
+        content:
+          'Hei {{patient_name}}! Påminnelse om time hos {{clinic_name}} den {{appointment_date}} kl {{appointment_time}}.',
+        variables: ['patient_name', 'clinic_name', 'appointment_date', 'appointment_time'],
       },
       {
         name: 'Appointment Confirmation',
         type: 'EMAIL',
         subject: 'Timebekreftelse - {{clinic_name}}',
-        content: 'Hei {{patient_name}},\n\nDin time er bekreftet:\nDato: {{appointment_date}}\nKlokkeslett: {{appointment_time}}\nPraktiker: {{practitioner_name}}\n\nMed vennlig hilsen,\n{{clinic_name}}',
-        variables: ['patient_name', 'clinic_name', 'appointment_date', 'appointment_time', 'practitioner_name']
+        content:
+          'Hei {{patient_name}},\n\nDin time er bekreftet:\nDato: {{appointment_date}}\nKlokkeslett: {{appointment_time}}\nPraktiker: {{practitioner_name}}\n\nMed vennlig hilsen,\n{{clinic_name}}',
+        variables: [
+          'patient_name',
+          'clinic_name',
+          'appointment_date',
+          'appointment_time',
+          'practitioner_name',
+        ],
       },
       {
         name: '3-Month Recall',
         type: 'SMS',
         subject: null,
-        content: 'Hei {{patient_name}}! Det har gått 3 måneder siden sist. Trenger du en ny time? Ring oss på {{clinic_phone}}.',
-        variables: ['patient_name', 'clinic_phone']
-      }
+        content:
+          'Hei {{patient_name}}! Det har gått 3 måneder siden sist. Trenger du en ny time? Ring oss på {{clinic_phone}}.',
+        variables: ['patient_name', 'clinic_phone'],
+      },
     ];
 
     for (const template of templates) {
       await client.query(
         `INSERT INTO message_templates (organization_id, name, type, subject, content, variables)
          VALUES ($1, $2, $3, $4, $5, $6)`,
-        [organization.id, template.name, template.type, template.subject, template.content, JSON.stringify(template.variables)]
+        [
+          organization.id,
+          template.name,
+          template.type,
+          template.subject,
+          template.content,
+          JSON.stringify(template.variables),
+        ]
       );
     }
 
@@ -188,8 +210,18 @@ export const createOrganization = async (orgData) => {
  */
 export const updateOrganization = async (organizationId, updateData) => {
   const allowedFields = [
-    'name', 'email', 'phone', 'address', 'postal_code', 'city', 'country',
-    'subscription_tier', 'max_practitioners', 'max_patients', 'settings', 'status'
+    'name',
+    'email',
+    'phone',
+    'address',
+    'postal_code',
+    'city',
+    'country',
+    'subscription_tier',
+    'max_practitioners',
+    'max_patients',
+    'settings',
+    'status',
   ];
 
   const updates = [];
@@ -230,19 +262,26 @@ export const updateOrganization = async (organizationId, updateData) => {
 };
 
 /**
- * Get organization settings
+ * Get organization settings (cached for 5 minutes)
  */
 export const getOrganizationSettings = async (organizationId) => {
-  const result = await query(
-    `SELECT settings FROM organizations WHERE id = $1`,
-    [organizationId]
+  const cacheKey = CacheKeys.organizationSettings(organizationId);
+
+  return cache.getOrSet(
+    cacheKey,
+    async () => {
+      const result = await query(`SELECT settings FROM organizations WHERE id = $1`, [
+        organizationId,
+      ]);
+
+      if (result.rows.length === 0) {
+        throw new Error('Organization not found');
+      }
+
+      return result.rows[0].settings || {};
+    },
+    300
   );
-
-  if (result.rows.length === 0) {
-    throw new Error('Organization not found');
-  }
-
-  return result.rows[0].settings || {};
 };
 
 /**
@@ -260,6 +299,9 @@ export const updateOrganizationSettings = async (organizationId, settings) => {
   if (result.rows.length === 0) {
     throw new Error('Organization not found');
   }
+
+  // Invalidate cached settings
+  cache.delete(CacheKeys.organizationSettings(organizationId));
 
   logger.info(`Organization settings updated: ${organizationId}`);
   return result.rows[0].settings;
@@ -300,7 +342,7 @@ export const checkOrganizationLimits = async (organizationId) => {
     practitioners: org.practitioner_count < org.max_practitioners,
     patients: org.patient_count < org.max_patients,
     canAddPractitioner: org.practitioner_count < org.max_practitioners,
-    canAddPatient: org.patient_count < org.max_patients
+    canAddPatient: org.patient_count < org.max_patients,
   };
 
   return {
@@ -309,15 +351,15 @@ export const checkOrganizationLimits = async (organizationId) => {
       practitioners: {
         current: org.practitioner_count,
         max: org.max_practitioners,
-        available: org.max_practitioners - org.practitioner_count
+        available: org.max_practitioners - org.practitioner_count,
       },
       patients: {
         current: org.patient_count,
         max: org.max_patients,
-        available: org.max_patients - org.patient_count
-      }
+        available: org.max_patients - org.patient_count,
+      },
     },
-    withinLimits
+    withinLimits,
   };
 };
 
@@ -329,5 +371,5 @@ export default {
   getOrganizationSettings,
   updateOrganizationSettings,
   getOrganizationStats,
-  checkOrganizationLimits
+  checkOrganizationLimits,
 };
