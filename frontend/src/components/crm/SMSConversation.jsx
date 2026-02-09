@@ -142,8 +142,10 @@ export default function SMSConversation({
     const normalizedPhone = phone.replace(/\D/g, '');
     return patients.find((p) => {
       const patientPhone = (p.phone || '').replace(/\D/g, '');
-      return patientPhone.endsWith(normalizedPhone.slice(-8)) ||
-        normalizedPhone.endsWith(patientPhone.slice(-8));
+      return (
+        patientPhone.endsWith(normalizedPhone.slice(-8)) ||
+        normalizedPhone.endsWith(patientPhone.slice(-8))
+      );
     });
   };
 
@@ -153,8 +155,7 @@ export default function SMSConversation({
       if (!searchTerm) return true;
       const patient = getPatientByPhone(conv.phone);
       const name = patient ? `${patient.first_name} ${patient.last_name}`.toLowerCase() : '';
-      return name.includes(searchTerm.toLowerCase()) ||
-        conv.phone.includes(searchTerm);
+      return name.includes(searchTerm.toLowerCase()) || conv.phone.includes(searchTerm);
     })
     .sort((a, b) => {
       const aTime = a.lastMessage?.timestamp || 0;
@@ -188,7 +189,7 @@ export default function SMSConversation({
         firstName: patient?.first_name || '',
         lastName: patient?.last_name || '',
         clinicName: 'ChiroClick Clinic',
-        phone: '+47 XXX XX XXX',
+        phone: '+47 400 00 000',
       });
       setNewMessage(formatted);
     }
@@ -239,7 +240,9 @@ export default function SMSConversation({
   const selectedPatient = selectedPhone ? getPatientByPhone(selectedPhone) : null;
 
   return (
-    <div className={`flex h-full bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden ${className}`}>
+    <div
+      className={`flex h-full bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden ${className}`}
+    >
       {/* Conversation List */}
       <div className="w-80 border-r border-gray-200 flex flex-col">
         {/* Header */}
@@ -296,14 +299,20 @@ export default function SMSConversation({
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <p className={`font-medium truncate ${hasUnread ? 'text-gray-900' : 'text-gray-700'}`}>
-                        {patient ? `${patient.first_name} ${patient.last_name}` : formatNorwegianPhone(conv.phone)}
+                      <p
+                        className={`font-medium truncate ${hasUnread ? 'text-gray-900' : 'text-gray-700'}`}
+                      >
+                        {patient
+                          ? `${patient.first_name} ${patient.last_name}`
+                          : formatNorwegianPhone(conv.phone)}
                       </p>
                       <span className="text-xs text-gray-400">
                         {conv.lastMessage?.timestamp && formatTimestamp(conv.lastMessage.timestamp)}
                       </span>
                     </div>
-                    <p className={`text-sm truncate ${hasUnread ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
+                    <p
+                      className={`text-sm truncate ${hasUnread ? 'text-gray-900 font-medium' : 'text-gray-500'}`}
+                    >
                       {conv.lastMessage?.body || '...'}
                     </p>
                   </div>
@@ -380,12 +389,12 @@ export default function SMSConversation({
                         }`}
                       >
                         <p className="text-sm whitespace-pre-wrap">{msg.body}</p>
-                        <div className={`flex items-center justify-end gap-1 mt-1 ${
-                          isOutbound ? 'text-blue-100' : 'text-gray-400'
-                        }`}>
-                          <span className="text-xs">
-                            {formatTimestamp(msg.timestamp)}
-                          </span>
+                        <div
+                          className={`flex items-center justify-end gap-1 mt-1 ${
+                            isOutbound ? 'text-blue-100' : 'text-gray-400'
+                          }`}
+                        >
+                          <span className="text-xs">{formatTimestamp(msg.timestamp)}</span>
                           {isOutbound && getStatusIcon(msg.status)}
                         </div>
                       </div>
@@ -401,15 +410,17 @@ export default function SMSConversation({
               <div className="px-4 py-2 border-t border-gray-100 bg-gray-50">
                 <p className="text-xs font-medium text-gray-500 mb-2">{t.quickReplies}</p>
                 <div className="flex flex-wrap gap-2">
-                  {Object.entries(DEFAULT_TEMPLATES).slice(0, 4).map(([key, template]) => (
-                    <button
-                      key={key}
-                      onClick={() => handleTemplateSelect(key)}
-                      className="px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-full hover:bg-gray-100"
-                    >
-                      {template.name[language] || template.name.en}
-                    </button>
-                  ))}
+                  {Object.entries(DEFAULT_TEMPLATES)
+                    .slice(0, 4)
+                    .map(([key, template]) => (
+                      <button
+                        key={key}
+                        onClick={() => handleTemplateSelect(key)}
+                        className="px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-full hover:bg-gray-100"
+                      >
+                        {template.name[language] || template.name.en}
+                      </button>
+                    ))}
                 </div>
               </div>
             )}
@@ -420,7 +431,9 @@ export default function SMSConversation({
                 <button
                   onClick={() => setShowTemplates(!showTemplates)}
                   className={`p-2 rounded-lg transition-colors ${
-                    showTemplates ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:text-gray-600'
+                    showTemplates
+                      ? 'bg-blue-100 text-blue-600'
+                      : 'text-gray-400 hover:text-gray-600'
                   }`}
                   title={t.templates}
                 >
@@ -494,7 +507,9 @@ export function UnreadBadge({ className = '' }) {
   if (count === 0) return null;
 
   return (
-    <span className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-red-500 rounded-full ${className}`}>
+    <span
+      className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-red-500 rounded-full ${className}`}
+    >
       {count > 99 ? '99+' : count}
     </span>
   );
@@ -544,10 +559,7 @@ export function ConversationPreview({
           <MessageSquare className="w-4 h-4 text-blue-500" />
           {t.title}
         </h3>
-        <button
-          onClick={onClick}
-          className="text-xs text-blue-600 hover:text-blue-700"
-        >
+        <button onClick={onClick} className="text-xs text-blue-600 hover:text-blue-700">
           {t.viewAll}
         </button>
       </div>

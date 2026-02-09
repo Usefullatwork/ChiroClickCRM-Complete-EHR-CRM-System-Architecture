@@ -86,7 +86,7 @@ export async function getExpoPushToken(): Promise<string | null> {
     if (!hasPermission) return null;
 
     const token = await Notifications.getExpoPushTokenAsync({
-      projectId: 'your-project-id' // TODO: Replace with actual project ID
+      projectId: 'chiroclickcrm'
     });
 
     return token.data;

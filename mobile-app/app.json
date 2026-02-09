@@ -71,7 +71,7 @@
     "owner": "chiroclick",
     "updates": {
       "fallbackToCacheTimeout": 0,
-      "url": "https://u.expo.dev/your-project-id"
+      "url": "https://u.expo.dev/chiroclickcrm"
     },
     "runtimeVersion": {
       "policy": "appVersion"
