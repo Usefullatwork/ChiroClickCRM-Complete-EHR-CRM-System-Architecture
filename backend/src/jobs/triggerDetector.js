@@ -35,7 +35,7 @@ export const detectAndTriggerWorkflows = async (organizationId, triggerType, dat
     for (const workflow of workflowsResult.rows) {
       try {
         // Check if conditions are met
-        if (!await checkConditions(organizationId, workflow.conditions, data)) {
+        if (!(await checkConditions(organizationId, workflow.conditions, data))) {
           logger.debug(`[TriggerDetector] Conditions not met for workflow ${workflow.id}`);
           continue;
         }
@@ -56,7 +56,6 @@ export const detectAndTriggerWorkflows = async (organizationId, triggerType, dat
         // Create workflow execution
         await executeWorkflow(workflow, data);
         triggered++;
-
       } catch (error) {
         logger.error(`[TriggerDetector] Error processing workflow ${workflow.id}:`, error);
       }
@@ -83,16 +82,16 @@ const checkConditions = async (organizationId, conditions, data) => {
   let entity = null;
 
   if (patientId) {
-    const result = await query(
-      `SELECT * FROM patients WHERE id = $1 AND organization_id = $2`,
-      [patientId, organizationId]
-    );
+    const result = await query(`SELECT * FROM patients WHERE id = $1 AND organization_id = $2`, [
+      patientId,
+      organizationId,
+    ]);
     entity = result.rows[0];
   } else if (leadId) {
-    const result = await query(
-      `SELECT * FROM leads WHERE id = $1 AND organization_id = $2`,
-      [leadId, organizationId]
-    );
+    const result = await query(`SELECT * FROM leads WHERE id = $1 AND organization_id = $2`, [
+      leadId,
+      organizationId,
+    ]);
     entity = result.rows[0];
   }
 
@@ -170,7 +169,7 @@ const executeWorkflow = async (workflow, data) => {
       leadId || null,
       workflow.trigger_type,
       data,
-      workflow.actions?.length || 0
+      workflow.actions?.length || 0,
     ]
   );
 
@@ -187,12 +186,7 @@ const executeWorkflow = async (workflow, data) => {
 
     if (delayHours > 0) {
       // Schedule for later
-      await scheduleDelayedAction(
-        execution.id,
-        action.type,
-        action,
-        delayHours
-      );
+      await scheduleDelayedAction(execution.id, action.type, action, delayHours);
       logger.info(`[TriggerDetector] Scheduled action ${action.type} for ${delayHours}h later`);
     } else {
       // Execute immediately (first immediate action only, rest get scheduled)
@@ -233,7 +227,7 @@ export const onPatientCreated = async (organizationId, patientId) => {
 export const onAppointmentBooked = async (organizationId, patientId, appointmentId) => {
   return await detectAndTriggerWorkflows(organizationId, 'APPOINTMENT_BOOKED', {
     patientId,
-    appointmentId
+    appointmentId,
   });
 };
 
@@ -243,7 +237,7 @@ export const onAppointmentBooked = async (organizationId, patientId, appointment
 export const onAppointmentCompleted = async (organizationId, patientId, encounterId) => {
   return await detectAndTriggerWorkflows(organizationId, 'APPOINTMENT_COMPLETED', {
     patientId,
-    encounterId
+    encounterId,
   });
 };
 
@@ -253,7 +247,7 @@ export const onAppointmentCompleted = async (organizationId, patientId, encounte
 export const onAppointmentCancelled = async (organizationId, patientId, appointmentId) => {
   return await detectAndTriggerWorkflows(organizationId, 'APPOINTMENT_CANCELLED', {
     patientId,
-    appointmentId
+    appointmentId,
   });
 };
 
@@ -263,7 +257,7 @@ export const onAppointmentCancelled = async (organizationId, patientId, appointm
 export const onAppointmentNoShow = async (organizationId, patientId, appointmentId) => {
   return await detectAndTriggerWorkflows(organizationId, 'APPOINTMENT_NO_SHOW', {
     patientId,
-    appointmentId
+    appointmentId,
   });
 };
 
@@ -281,7 +275,7 @@ export const onLifecycleChange = async (organizationId, patientId, oldStage, new
   return await detectAndTriggerWorkflows(organizationId, 'LIFECYCLE_CHANGE', {
     patientId,
     oldStage,
-    newStage
+    newStage,
   });
 };
 
@@ -292,7 +286,7 @@ export const onSurveyCompleted = async (organizationId, patientId, surveyId, res
   return await detectAndTriggerWorkflows(organizationId, 'SURVEY_COMPLETED', {
     patientId,
     surveyId,
-    responseId
+    responseId,
   });
 };
 
@@ -302,7 +296,7 @@ export const onSurveyCompleted = async (organizationId, patientId, surveyId, res
 export const onReferralReceived = async (organizationId, referralId, referredPatientId) => {
   return await detectAndTriggerWorkflows(organizationId, 'REFERRAL_RECEIVED', {
     referralId,
-    patientId: referredPatientId
+    patientId: referredPatientId,
   });
 };
 
@@ -331,9 +325,9 @@ export const detectDaysSinceVisit = async () => {
     const patientsResult = await query(
       `SELECT id FROM patients
        WHERE organization_id = $1
-         AND last_visit_date = CURRENT_DATE - INTERVAL '${daysSince} days'
+         AND last_visit_date = CURRENT_DATE - make_interval(days => $2)
          AND status = 'ACTIVE'`,
-      [workflow.org_id]
+      [workflow.org_id, daysSince]
     );
 
     for (const patient of patientsResult.rows) {
@@ -353,7 +347,10 @@ export const detectDaysSinceVisit = async () => {
         await executeWorkflow(workflow, { patientId: patient.id });
         triggered++;
       } catch (error) {
-        logger.error(`[TriggerDetector] Error triggering days_since for patient ${patient.id}:`, error);
+        logger.error(
+          `[TriggerDetector] Error triggering days_since for patient ${patient.id}:`,
+          error
+        );
       }
     }
   }
@@ -372,5 +369,5 @@ export default {
   onLifecycleChange,
   onSurveyCompleted,
   onReferralReceived,
-  detectDaysSinceVisit
+  detectDaysSinceVisit,
 };

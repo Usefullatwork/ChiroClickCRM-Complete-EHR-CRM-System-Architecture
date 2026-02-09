@@ -39,7 +39,7 @@ class AIFeedbackService {
     registerEventHandlers({
       [DOMAIN_EVENTS.SUGGESTION_ACCEPTED]: this.handleSuggestionAccepted.bind(this),
       [DOMAIN_EVENTS.SUGGESTION_REJECTED]: this.handleSuggestionRejected.bind(this),
-      [DOMAIN_EVENTS.SUGGESTION_MODIFIED]: this.handleSuggestionModified.bind(this)
+      [DOMAIN_EVENTS.SUGGESTION_MODIFIED]: this.handleSuggestionModified.bind(this),
     });
 
     logger.debug('AI feedback event handlers registered');
@@ -59,7 +59,7 @@ class AIFeedbackService {
         responseTime,
         timestamp: event.metadata.timestamp,
         userId: event.metadata.userId,
-        organizationId: event.metadata.organizationId
+        organizationId: event.metadata.organizationId,
       });
 
       // Update acceptance metrics
@@ -84,7 +84,7 @@ class AIFeedbackService {
         reason,
         timestamp: event.metadata.timestamp,
         userId: event.metadata.userId,
-        organizationId: event.metadata.organizationId
+        organizationId: event.metadata.organizationId,
       });
 
       // Update rejection metrics
@@ -110,7 +110,7 @@ class AIFeedbackService {
         modifiedContent,
         timestamp: event.metadata.timestamp,
         userId: event.metadata.userId,
-        organizationId: event.metadata.organizationId
+        organizationId: event.metadata.organizationId,
       });
 
       // Update modification metrics
@@ -135,7 +135,7 @@ class AIFeedbackService {
       reason,
       responseTime,
       userId,
-      organizationId
+      organizationId,
     } = feedbackData;
 
     // Emit appropriate event based on action
@@ -143,14 +143,10 @@ class AIFeedbackService {
 
     switch (action) {
       case 'ACCEPTED':
-        await eventBus.emit(
-          EventFactory.suggestionAccepted(suggestionId, responseTime, metadata)
-        );
+        await eventBus.emit(EventFactory.suggestionAccepted(suggestionId, responseTime, metadata));
         break;
       case 'REJECTED':
-        await eventBus.emit(
-          EventFactory.suggestionRejected(suggestionId, reason, metadata)
-        );
+        await eventBus.emit(EventFactory.suggestionRejected(suggestionId, reason, metadata));
         break;
       case 'MODIFIED':
         await eventBus.emit(
@@ -175,22 +171,25 @@ class AIFeedbackService {
 
     try {
       // Batch insert to database
-      const values = batch.map((f, i) => {
-        const offset = i * 7;
-        return `($${offset + 1}, $${offset + 2}, $${offset + 3}, $${offset + 4}, $${offset + 5}, $${offset + 6}, $${offset + 7})`;
-      }).join(', ');
+      const values = batch
+        .map((f, i) => {
+          const offset = i * 7;
+          return `($${offset + 1}, $${offset + 2}, $${offset + 3}, $${offset + 4}, $${offset + 5}, $${offset + 6}, $${offset + 7})`;
+        })
+        .join(', ');
 
-      const params = batch.flatMap(f => [
+      const params = batch.flatMap((f) => [
         f.suggestionId,
         f.action,
         f.reason || null,
         JSON.stringify({ original: f.originalContent, modified: f.modifiedContent }),
         f.timestamp,
         f.userId,
-        f.organizationId
+        f.organizationId,
       ]);
 
-      await query(`
+      await query(
+        `
         INSERT INTO ai_feedback (suggestion_id, action, reason, modification_data, created_at, user_id, organization_id)
         VALUES ${values}
         ON CONFLICT (suggestion_id) DO UPDATE SET
@@ -198,7 +197,9 @@ class AIFeedbackService {
           reason = EXCLUDED.reason,
           modification_data = EXCLUDED.modification_data,
           updated_at = NOW()
-      `, params);
+      `,
+        params
+      );
 
       logger.info(`Flushed ${batch.length} feedback records to database`);
 
@@ -216,12 +217,15 @@ class AIFeedbackService {
    */
   async incrementMetric(metricName) {
     try {
-      await query(`
+      await query(
+        `
         INSERT INTO ai_metrics (metric_name, value, recorded_at)
         VALUES ($1, 1, NOW())
         ON CONFLICT (metric_name, DATE(recorded_at))
         DO UPDATE SET value = ai_metrics.value + 1
-      `, [metricName]);
+      `,
+        [metricName]
+      );
 
       // Invalidate cached metrics
       await cacheManager.delete(CacheKeys.aiMetrics());
@@ -251,9 +255,7 @@ class AIFeedbackService {
         logger.info(`Retraining threshold reached: ${newExamples} new examples`);
 
         // Emit training threshold event
-        await eventBus.emit(
-          EventFactory.trainingThresholdReached({ newExamples }, {})
-        );
+        await eventBus.emit(EventFactory.trainingThresholdReached({ newExamples }, {}));
       }
     } catch (error) {
       logger.warn('Error checking retraining threshold:', error.message);
@@ -266,20 +268,24 @@ class AIFeedbackService {
   async getMetrics(days = 7) {
     const cacheKey = CacheKeys.aiMetrics();
 
-    return cacheManager.getOrSet(cacheKey, async () => {
-      const [acceptanceRate, dailyStats, topCorrections] = await Promise.all([
-        this.getAcceptanceRate(days),
-        this.getDailyStats(days),
-        this.getTopCorrections(10)
-      ]);
+    return cacheManager.getOrSet(
+      cacheKey,
+      async () => {
+        const [acceptanceRate, dailyStats, topCorrections] = await Promise.all([
+          this.getAcceptanceRate(days),
+          this.getDailyStats(days),
+          this.getTopCorrections(10),
+        ]);
 
-      return {
-        acceptanceRate,
-        dailyStats,
-        topCorrections,
-        generatedAt: new Date().toISOString()
-      };
-    }, CacheTTL.MEDIUM);
+        return {
+          acceptanceRate,
+          dailyStats,
+          topCorrections,
+          generatedAt: new Date().toISOString(),
+        };
+      },
+      CacheTTL.MEDIUM
+    );
   }
 
   /**
@@ -287,15 +293,18 @@ class AIFeedbackService {
    */
   async getAcceptanceRate(days) {
     try {
-      const result = await query(`
+      const result = await query(
+        `
         SELECT
           COUNT(*) FILTER (WHERE action = 'ACCEPTED') as accepted,
           COUNT(*) FILTER (WHERE action = 'REJECTED') as rejected,
           COUNT(*) FILTER (WHERE action = 'MODIFIED') as modified,
           COUNT(*) as total
         FROM ai_feedback
-        WHERE created_at > NOW() - INTERVAL '${days} days'
-      `);
+        WHERE created_at > NOW() - make_interval(days => $1)
+      `,
+        [days]
+      );
 
       const { accepted, rejected, modified, total } = result.rows[0];
       const totalInt = parseInt(total, 10) || 1;
@@ -306,11 +315,18 @@ class AIFeedbackService {
         modified: parseInt(modified, 10),
         total: parseInt(total, 10),
         acceptanceRate: ((parseInt(accepted, 10) / totalInt) * 100).toFixed(2),
-        modificationRate: ((parseInt(modified, 10) / totalInt) * 100).toFixed(2)
+        modificationRate: ((parseInt(modified, 10) / totalInt) * 100).toFixed(2),
       };
     } catch (error) {
       logger.warn('Error getting acceptance rate:', error.message);
-      return { accepted: 0, rejected: 0, modified: 0, total: 0, acceptanceRate: '0', modificationRate: '0' };
+      return {
+        accepted: 0,
+        rejected: 0,
+        modified: 0,
+        total: 0,
+        acceptanceRate: '0',
+        modificationRate: '0',
+      };
     }
   }
 
@@ -319,17 +335,20 @@ class AIFeedbackService {
    */
   async getDailyStats(days) {
     try {
-      const result = await query(`
+      const result = await query(
+        `
         SELECT
           DATE(created_at) as date,
           COUNT(*) FILTER (WHERE action = 'ACCEPTED') as accepted,
           COUNT(*) FILTER (WHERE action = 'REJECTED') as rejected,
           COUNT(*) FILTER (WHERE action = 'MODIFIED') as modified
         FROM ai_feedback
-        WHERE created_at > NOW() - INTERVAL '${days} days'
+        WHERE created_at > NOW() - make_interval(days => $1)
         GROUP BY DATE(created_at)
         ORDER BY date
-      `);
+      `,
+        [days]
+      );
 
       return result.rows;
     } catch (error) {
@@ -343,7 +362,8 @@ class AIFeedbackService {
    */
   async getTopCorrections(limit) {
     try {
-      const result = await query(`
+      const result = await query(
+        `
         SELECT
           modification_data->>'original' as original,
           modification_data->>'modified' as modified,
@@ -354,7 +374,9 @@ class AIFeedbackService {
         GROUP BY modification_data->>'original', modification_data->>'modified'
         ORDER BY count DESC
         LIMIT $1
-      `, [limit]);
+      `,
+        [limit]
+      );
 
       return result.rows;
     } catch (error) {
@@ -367,12 +389,7 @@ class AIFeedbackService {
    * Export training data as JSONL for model fine-tuning
    */
   async exportTrainingData(options = {}) {
-    const {
-      startDate,
-      endDate,
-      minConfidence = 0.7,
-      includeRejected = false
-    } = options;
+    const { startDate, endDate, minConfidence = 0.7, includeRejected = false } = options;
 
     try {
       let whereClause = 'WHERE 1=1';
@@ -390,7 +407,8 @@ class AIFeedbackService {
         whereClause += ` AND f.action != 'REJECTED'`;
       }
 
-      const result = await query(`
+      const result = await query(
+        `
         SELECT
           s.id as suggestion_id,
           s.type as suggestion_type,
@@ -405,23 +423,29 @@ class AIFeedbackService {
         JOIN ai_feedback f ON f.suggestion_id = s.id
         ${whereClause}
         ORDER BY f.created_at
-      `, params);
+      `,
+        params
+      );
 
       // Format as JSONL
-      const jsonl = result.rows.map(row => JSON.stringify({
-        input: row.input_context,
-        output: row.output_content,
-        type: row.suggestion_type,
-        metadata: {
-          suggestionId: row.suggestion_id,
-          confidence: row.confidence,
-          feedbackAction: row.feedback_action
-        }
-      })).join('\n');
+      const jsonl = result.rows
+        .map((row) =>
+          JSON.stringify({
+            input: row.input_context,
+            output: row.output_content,
+            type: row.suggestion_type,
+            metadata: {
+              suggestionId: row.suggestion_id,
+              confidence: row.confidence,
+              feedbackAction: row.feedback_action,
+            },
+          })
+        )
+        .join('\n');
 
       return {
         count: result.rows.length,
-        data: jsonl
+        data: jsonl,
       };
     } catch (error) {
       logger.error('Error exporting training data:', error);

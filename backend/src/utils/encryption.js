@@ -6,6 +6,7 @@
 
 import crypto from 'crypto';
 import dotenv from 'dotenv';
+import logger from './logger.js';
 
 dotenv.config();
 
@@ -14,8 +15,8 @@ const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
 
 // Validate encryption key
 if (!ENCRYPTION_KEY || ENCRYPTION_KEY.length !== 32) {
-  console.error('⚠️  WARNING: ENCRYPTION_KEY must be exactly 32 characters long');
-  console.error('⚠️  Please set a proper ENCRYPTION_KEY in your .env file');
+  logger.error('⚠️  WARNING: ENCRYPTION_KEY must be exactly 32 characters long');
+  logger.error('⚠️  Please set a proper ENCRYPTION_KEY in your .env file');
 }
 
 /**
@@ -31,11 +32,7 @@ export const encrypt = (text) => {
     const iv = crypto.randomBytes(16);
 
     // Create cipher
-    const cipher = crypto.createCipheriv(
-      ALGORITHM,
-      Buffer.from(ENCRYPTION_KEY),
-      iv
-    );
+    const cipher = crypto.createCipheriv(ALGORITHM, Buffer.from(ENCRYPTION_KEY), iv);
 
     // Encrypt the text
     let encrypted = cipher.update(text, 'utf8', 'hex');
@@ -44,7 +41,7 @@ export const encrypt = (text) => {
     // Return IV + encrypted data (IV is needed for decryption)
     return iv.toString('hex') + ':' + encrypted;
   } catch (error) {
-    console.error('Encryption error:', error);
+    logger.error('Encryption error:', error);
     throw new Error('Failed to encrypt data');
   }
 };
@@ -68,11 +65,7 @@ export const decrypt = (encryptedText) => {
     const encrypted = parts[1];
 
     // Create decipher
-    const decipher = crypto.createDecipheriv(
-      ALGORITHM,
-      Buffer.from(ENCRYPTION_KEY),
-      iv
-    );
+    const decipher = crypto.createDecipheriv(ALGORITHM, Buffer.from(ENCRYPTION_KEY), iv);
 
     // Decrypt the text
     let decrypted = decipher.update(encrypted, 'hex', 'utf8');
@@ -80,7 +73,7 @@ export const decrypt = (encryptedText) => {
 
     return decrypted;
   } catch (error) {
-    console.error('Decryption error:', error);
+    logger.error('Decryption error:', error);
     throw new Error('Failed to decrypt data');
   }
 };
@@ -94,10 +87,7 @@ export const decrypt = (encryptedText) => {
 export const hash = (text) => {
   if (!text) return null;
 
-  return crypto
-    .createHash('sha256')
-    .update(text)
-    .digest('hex');
+  return crypto.createHash('sha256').update(text).digest('hex');
 };
 
 /**
@@ -255,11 +245,7 @@ export const validateFodselsnummerWithDOB = (fodselsnummer, dateOfBirth) => {
   if (!birthYear) return false;
 
   // Compare with provided DOB
-  return (
-    dob.getDate() === day &&
-    (dob.getMonth() + 1) === month &&
-    dob.getFullYear() === birthYear
-  );
+  return dob.getDate() === day && dob.getMonth() + 1 === month && dob.getFullYear() === birthYear;
 };
 
 /**
@@ -307,7 +293,7 @@ export const maskSensitive = (text, visibleChars = 2) => {
 
   const start = text.substring(0, visibleChars);
   const end = text.substring(text.length - visibleChars);
-  const masked = '*'.repeat(text.length - (visibleChars * 2));
+  const masked = '*'.repeat(text.length - visibleChars * 2);
 
   return start + masked + end;
 };
@@ -318,5 +304,5 @@ export default {
   hash,
   validateFodselsnummer,
   getBirthYearFromFodselsnummer,
-  maskSensitive
+  maskSensitive,
 };

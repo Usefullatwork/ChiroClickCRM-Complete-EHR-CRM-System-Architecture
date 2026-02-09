@@ -7,6 +7,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import logger from '../utils/logger.js';
 import {
   DOCUMENT_TYPE_CONFIG,
   LANGUAGE_LEVELS,
@@ -15,7 +16,7 @@ import {
   PRACTITIONER_PRESETS,
   getDocumentTypeConfig,
   getAllDocumentTypes,
-  getLanguageLevelForDocument
+  getLanguageLevelForDocument,
 } from './config.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -42,7 +43,7 @@ class TemplateService {
       await this.loadTemplateCategory('base');
       this.initialized = true;
     } catch (error) {
-      console.error('Failed to initialize TemplateService:', error);
+      logger.error('Failed to initialize TemplateService:', error);
       throw error;
     }
   }
@@ -71,7 +72,7 @@ class TemplateService {
       return template;
     } catch (error) {
       if (error.code === 'ENOENT') {
-        console.warn(`Template not found: ${jsonPath}`);
+        logger.warn(`Template not found: ${jsonPath}`);
         return null;
       }
       throw error;
@@ -103,7 +104,7 @@ class TemplateService {
         }
       }
     } catch (error) {
-      console.error(`Failed to load template category ${category}:`, error);
+      logger.error(`Failed to load template category ${category}:`, error);
     }
 
     return merged;
@@ -158,8 +159,8 @@ class TemplateService {
       phrases: {},
       metadata: {
         loadedPatterns: patterns,
-        loadedAt: new Date().toISOString()
-      }
+        loadedAt: new Date().toISOString(),
+      },
     };
 
     for (const pattern of patterns) {
@@ -189,9 +190,7 @@ class TemplateService {
   async createCustomSet(templateIds, options = {}) {
     const { languageLevel = LANGUAGE_LEVELS.BASIC } = options;
 
-    const templates = await Promise.all(
-      templateIds.map(id => this.loadTemplate(id))
-    );
+    const templates = await Promise.all(templateIds.map((id) => this.loadTemplate(id)));
 
     const merged = {
       languageLevel,
@@ -202,8 +201,8 @@ class TemplateService {
       metadata: {
         customSet: true,
         templateIds,
-        loadedAt: new Date().toISOString()
-      }
+        loadedAt: new Date().toISOString(),
+      },
     };
 
     for (const template of templates) {
@@ -228,10 +227,7 @@ class TemplateService {
     if (documentType) {
       templates = await this.loadForDocumentType(documentType);
     } else {
-      templates = await this.loadTemplateSet([
-        'base/*',
-        `levels/${level}/*`
-      ], level);
+      templates = await this.loadTemplateSet(['base/*', `levels/${level}/*`], level);
     }
 
     // Search in different categories
@@ -270,7 +266,7 @@ class TemplateService {
     // Expand anatomy terms
     if (templates.anatomy) {
       for (const [abbrev, data] of Object.entries(templates.anatomy)) {
-        const fullForm = typeof data === 'string' ? data : (data.full_no || data.full);
+        const fullForm = typeof data === 'string' ? data : data.full_no || data.full;
         if (fullForm) {
           const regex = new RegExp(`\\b${abbrev}\\b`, 'gi');
           expanded = expanded.replace(regex, fullForm);
@@ -281,7 +277,7 @@ class TemplateService {
     // Expand treatment terms
     if (templates.treatments) {
       for (const [abbrev, data] of Object.entries(templates.treatments)) {
-        const fullForm = typeof data === 'string' ? data : (data.full_no || data.full);
+        const fullForm = typeof data === 'string' ? data : data.full_no || data.full;
         if (fullForm) {
           const regex = new RegExp(`\\b${abbrev}\\b`, 'gi');
           expanded = expanded.replace(regex, fullForm);
@@ -307,7 +303,7 @@ class TemplateService {
 
     if (templates.anatomy) {
       for (const [abbrev, data] of Object.entries(templates.anatomy)) {
-        const fullForm = typeof data === 'string' ? data : (data.full_no || data.full);
+        const fullForm = typeof data === 'string' ? data : data.full_no || data.full;
         if (fullForm) {
           reverseMap.set(fullForm.toLowerCase(), abbrev);
         }
@@ -316,7 +312,7 @@ class TemplateService {
 
     if (templates.treatments) {
       for (const [abbrev, data] of Object.entries(templates.treatments)) {
-        const fullForm = typeof data === 'string' ? data : (data.full_no || data.full);
+        const fullForm = typeof data === 'string' ? data : data.full_no || data.full;
         if (fullForm) {
           reverseMap.set(fullForm.toLowerCase(), abbrev);
         }
@@ -339,10 +335,10 @@ class TemplateService {
    * @returns {Array} Array of term entries
    */
   async getTermsByCategory(category, languageLevel = LANGUAGE_LEVELS.BASIC) {
-    const templates = await this.loadTemplateSet([
-      'base/*',
-      `levels/${languageLevel}/*`
-    ], languageLevel);
+    const templates = await this.loadTemplateSet(
+      ['base/*', `levels/${languageLevel}/*`],
+      languageLevel
+    );
 
     if (!templates[category]) {
       return [];
@@ -350,7 +346,7 @@ class TemplateService {
 
     return Object.entries(templates[category]).map(([key, value]) => ({
       key,
-      ...(typeof value === 'string' ? { short: key, full: value } : value)
+      ...(typeof value === 'string' ? { short: key, full: value } : value),
     }));
   }
 
@@ -388,7 +384,7 @@ class TemplateService {
   getCacheStats() {
     return {
       size: this.cache.size,
-      keys: Array.from(this.cache.keys())
+      keys: Array.from(this.cache.keys()),
     };
   }
 }
@@ -408,7 +404,7 @@ export {
   PRACTITIONER_PRESETS,
   getDocumentTypeConfig,
   getAllDocumentTypes,
-  getLanguageLevelForDocument
+  getLanguageLevelForDocument,
 };
 
 export default templateService;

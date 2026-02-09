@@ -5,6 +5,7 @@
  */
 
 import pool from '../config/database.js';
+import logger from '../utils/logger.js';
 
 /**
  * Action types for audit logging
@@ -43,7 +44,7 @@ export const ACTION_TYPES = {
   // System
   BACKUP_CREATE: 'system.backup.create',
   EXPORT_DATA: 'system.export.data',
-  IMPORT_DATA: 'system.import.data'
+  IMPORT_DATA: 'system.import.data',
 };
 
 /**
@@ -63,7 +64,7 @@ export const logAction = async (actionType, userId, details = {}) => {
     userAgent = null,
     sessionId = null,
     success = true,
-    errorMessage = null
+    errorMessage = null,
   } = details;
 
   try {
@@ -94,18 +95,18 @@ export const logAction = async (actionType, userId, details = {}) => {
         userAgent,
         sessionId,
         success,
-        errorMessage
+        errorMessage,
       ]
     );
 
     return result.rows[0];
   } catch (error) {
     // CRITICAL: Audit logging failure should be logged to system logs
-    console.error('AUDIT LOG FAILURE:', {
+    logger.error('AUDIT LOG FAILURE:', {
       actionType,
       userId,
       error: error.message,
-      stack: error.stack
+      stack: error.stack,
     });
 
     // Don't throw - we don't want to break the application
@@ -123,7 +124,7 @@ export const logEncounterAction = async (action, userId, encounterId, details = 
   return await logAction(action, userId, {
     resourceType: 'clinical_encounter',
     resourceId: encounterId,
-    ...details
+    ...details,
   });
 };
 
@@ -144,9 +145,11 @@ export const logAISuggestion = async (userId, suggestionDetails) => {
   } = suggestionDetails;
 
   return await logAction(
-    accepted ? ACTION_TYPES.AI_SUGGESTION_ACCEPT :
-    modified ? ACTION_TYPES.AI_SUGGESTION_MODIFY :
-    ACTION_TYPES.AI_SUGGESTION_REJECT,
+    accepted
+      ? ACTION_TYPES.AI_SUGGESTION_ACCEPT
+      : modified
+        ? ACTION_TYPES.AI_SUGGESTION_MODIFY
+        : ACTION_TYPES.AI_SUGGESTION_REJECT,
     userId,
     {
       resourceType: 'ai_suggestion',
@@ -155,14 +158,14 @@ export const logAISuggestion = async (userId, suggestionDetails) => {
         original: originalText,
         suggested: suggestedText,
         final: finalText,
-        confidence
+        confidence,
       },
       metadata: {
         suggestionType,
         accepted,
         modified,
-        ...metadata
-      }
+        ...metadata,
+      },
     }
   );
 };
@@ -176,7 +179,7 @@ export const logPatientAccess = async (userId, patientId, reason, ipAddress, use
     resourceId: patientId,
     metadata: { reason },
     ipAddress,
-    userAgent
+    userAgent,
   });
 };
 
@@ -190,7 +193,7 @@ export const getAuditTrail = async (resourceType, resourceId, options = {}) => {
     startDate = null,
     endDate = null,
     userId = null,
-    actionTypes = null
+    actionTypes = null,
   } = options;
 
   let query = `
@@ -248,10 +251,10 @@ export const getUserActivitySummary = async (userId, days = 30) => {
       MAX(created_at) as last_action
     FROM audit_log
     WHERE user_id = $1
-      AND created_at > NOW() - INTERVAL '${days} days'
+      AND created_at > NOW() - make_interval(days => $2)
     GROUP BY action_type
     ORDER BY count DESC`,
-    [userId]
+    [userId, days]
   );
 
   return result.rows;
@@ -269,12 +272,12 @@ export const getFailedLoginAttempts = async (timeWindow = '1 hour') => {
       array_agg(DISTINCT metadata->>'username') as usernames_tried
     FROM audit_log
     WHERE action_type = $1
-      AND created_at > NOW() - INTERVAL '${timeWindow}'
+      AND created_at > NOW() - $2::interval
       AND success = false
     GROUP BY ip_address
     HAVING COUNT(*) >= 3
     ORDER BY attempt_count DESC`,
-    [ACTION_TYPES.USER_LOGIN_FAILED]
+    [ACTION_TYPES.USER_LOGIN_FAILED, timeWindow]
   );
 
   return result.rows;
@@ -284,14 +287,36 @@ export const getFailedLoginAttempts = async (timeWindow = '1 hour') => {
  * Alert on audit log failure (implement based on your alerting system)
  */
 const alertAuditFailure = async (error, context) => {
-  // TODO: Implement alerting (email, Slack, PagerDuty, etc.)
-  console.error('CRITICAL: Audit log failure - alerting admins', {
+  logger.error('CRITICAL: Audit log failure', {
+    alert: true,
+    severity: 'CRITICAL',
+    category: 'AUDIT_FAILURE',
     error: error.message,
-    context
+    stack: error.stack,
+    context,
+    timestamp: new Date().toISOString(),
   });
 
-  // Example: Send to monitoring service
-  // await sendToSentry(error, { tags: { type: 'audit_failure' }, extra: context });
+  // Attempt to persist the alert to the database as a fallback
+  try {
+    await pool.query(
+      `INSERT INTO system_alerts (alert_type, severity, message, details, created_at)
+       VALUES ($1, $2, $3, $4, NOW())
+       ON CONFLICT DO NOTHING`,
+      [
+        'AUDIT_FAILURE',
+        'CRITICAL',
+        `Audit log failure: ${error.message}`,
+        JSON.stringify({ context, stack: error.stack }),
+      ]
+    );
+  } catch (alertError) {
+    // Last resort: structured error to stderr for external log aggregation
+    logger.error('CRITICAL: Failed to persist audit failure alert', {
+      originalError: error.message,
+      alertError: alertError.message,
+    });
+  }
 };
 
 /**
@@ -307,19 +332,22 @@ export const auditMiddleware = (actionType) => {
       await logAction(actionType, req.user?.id, {
         resourceType: req.params.resourceType || extractResourceType(req.path),
         resourceId: req.params.id || data?.id,
-        changes: req.method === 'PUT' || req.method === 'PATCH' ? {
-          before: req.originalData,
-          after: data
-        } : null,
+        changes:
+          req.method === 'PUT' || req.method === 'PATCH'
+            ? {
+                before: req.originalData,
+                after: data,
+              }
+            : null,
         metadata: {
           method: req.method,
           path: req.path,
-          query: req.query
+          query: req.query,
         },
         ipAddress: req.ip,
         userAgent: req.headers['user-agent'],
         sessionId: req.session?.id,
-        success: res.statusCode < 400
+        success: res.statusCode < 400,
       });
 
       return originalJson(data);
@@ -344,11 +372,12 @@ const extractResourceType = (path) => {
 export const cleanupOldLogs = async (retentionYears = 10) => {
   const result = await pool.query(
     `DELETE FROM audit_log
-     WHERE created_at < NOW() - INTERVAL '${retentionYears} years'
+     WHERE created_at < NOW() - make_interval(years => $1)
      RETURNING id`,
+    [retentionYears]
   );
 
-  console.log(`Cleaned up ${result.rowCount} audit log entries older than ${retentionYears} years`);
+  logger.info(`Cleaned up ${result.rowCount} audit log entries older than ${retentionYears} years`);
   return result.rowCount;
 };
 
@@ -362,5 +391,5 @@ export default {
   getFailedLoginAttempts,
   auditMiddleware,
   cleanupOldLogs,
-  ACTION_TYPES
+  ACTION_TYPES,
 };

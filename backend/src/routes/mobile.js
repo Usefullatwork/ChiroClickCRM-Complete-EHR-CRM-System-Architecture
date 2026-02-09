@@ -6,6 +6,16 @@
 const express = require('express');
 const router = express.Router();
 const mobileAuth = require('../services/mobileAuth');
+// Logger - noop fallback avoids raw console usage
+const noop = () => {};
+const fallbackLogger = { info: noop, error: noop, warn: noop, debug: noop };
+let logger = fallbackLogger;
+try {
+  const mod = require('../utils/logger');
+  logger = mod.default || mod;
+} catch {
+  // Logger not available in CJS context; structured logging disabled
+}
 
 /**
  * Middleware to verify mobile JWT token
@@ -22,7 +32,7 @@ const authenticateMobile = async (req, res, next) => {
 
     req.mobileUser = {
       id: decoded.userId,
-      phone: decoded.phone
+      phone: decoded.phone,
     };
 
     next();
@@ -50,7 +60,7 @@ router.post('/auth/send-otp', async (req, res) => {
     const result = await mobileAuth.sendOTP(req.db, phoneNumber);
     res.json(result);
   } catch (error) {
-    console.error('Send OTP error:', error);
+    logger.error('Send OTP error:', error);
     res.status(400).json({ error: error.message });
   }
 });
@@ -70,7 +80,7 @@ router.post('/auth/verify-otp', async (req, res) => {
     const result = await mobileAuth.verifyOTP(req.db, phoneNumber, code);
     res.json(result);
   } catch (error) {
-    console.error('Verify OTP error:', error);
+    logger.error('Verify OTP error:', error);
     res.status(400).json({ error: error.message });
   }
 });
@@ -90,7 +100,7 @@ router.post('/auth/google', async (req, res) => {
     const result = await mobileAuth.verifyGoogleToken(req.db, idToken);
     res.json(result);
   } catch (error) {
-    console.error('Google auth error:', error);
+    logger.error('Google auth error:', error);
     res.status(400).json({ error: error.message });
   }
 });
@@ -110,7 +120,7 @@ router.post('/auth/apple', async (req, res) => {
     const result = await mobileAuth.verifyAppleToken(req.db, identityToken, user);
     res.json(result);
   } catch (error) {
-    console.error('Apple auth error:', error);
+    logger.error('Apple auth error:', error);
     res.status(400).json({ error: error.message });
   }
 });
@@ -130,7 +140,7 @@ router.post('/auth/refresh', async (req, res) => {
     const result = await mobileAuth.refreshAccessToken(req.db, refreshToken);
     res.json(result);
   } catch (error) {
-    console.error('Refresh token error:', error);
+    logger.error('Refresh token error:', error);
     res.status(401).json({ error: error.message });
   }
 });
@@ -149,7 +159,7 @@ router.post('/auth/logout', async (req, res) => {
 
     res.json({ success: true });
   } catch (error) {
-    console.error('Logout error:', error);
+    logger.error('Logout error:', error);
     res.json({ success: true }); // Always return success for logout
   }
 });
@@ -171,19 +181,22 @@ router.get('/me', authenticateMobile, async (req, res) => {
     }
 
     // Get streak info
-    const streakResult = await req.db.query(`
+    const streakResult = await req.db.query(
+      `
       SELECT * FROM user_streaks WHERE mobile_user_id = $1
-    `, [req.mobileUser.id]);
+    `,
+      [req.mobileUser.id]
+    );
 
     const streak = streakResult.rows[0] || { current_streak: 0, longest_streak: 0 };
 
     res.json({
       ...user,
       currentStreak: streak.current_streak,
-      longestStreak: streak.longest_streak
+      longestStreak: streak.longest_streak,
     });
   } catch (error) {
-    console.error('Get profile error:', error);
+    logger.error('Get profile error:', error);
     res.status(500).json({ error: 'Failed to get profile' });
   }
 });
@@ -197,7 +210,7 @@ router.patch('/me', authenticateMobile, async (req, res) => {
     const user = await mobileAuth.updateProfile(req.db, req.mobileUser.id, req.body);
     res.json(user);
   } catch (error) {
-    console.error('Update profile error:', error);
+    logger.error('Update profile error:', error);
     res.status(400).json({ error: error.message });
   }
 });
@@ -221,7 +234,7 @@ router.post('/device-token', authenticateMobile, async (req, res) => {
     await mobileAuth.registerDeviceToken(req.db, req.mobileUser.id, token, deviceInfo);
     res.json({ success: true });
   } catch (error) {
-    console.error('Register device token error:', error);
+    logger.error('Register device token error:', error);
     res.status(500).json({ error: 'Failed to register device token' });
   }
 });
@@ -241,7 +254,7 @@ router.delete('/device-token', authenticateMobile, async (req, res) => {
     await mobileAuth.unregisterDeviceToken(req.db, req.mobileUser.id, token);
     res.json({ success: true });
   } catch (error) {
-    console.error('Unregister device token error:', error);
+    logger.error('Unregister device token error:', error);
     res.status(500).json({ error: 'Failed to unregister device token' });
   }
 });
@@ -256,14 +269,7 @@ router.delete('/device-token', authenticateMobile, async (req, res) => {
  */
 router.get('/exercises', authenticateMobile, async (req, res) => {
   try {
-    const {
-      category,
-      bodyRegion,
-      difficulty,
-      search,
-      limit = 50,
-      offset = 0
-    } = req.query;
+    const { category, bodyRegion, difficulty, search, limit = 50, offset = 0 } = req.query;
 
     let query = `
       SELECT
@@ -321,10 +327,10 @@ router.get('/exercises', authenticateMobile, async (req, res) => {
       exercises: result.rows,
       total: result.rows.length,
       limit: parseInt(limit),
-      offset: parseInt(offset)
+      offset: parseInt(offset),
     });
   } catch (error) {
-    console.error('Get exercises error:', error);
+    logger.error('Get exercises error:', error);
     res.status(500).json({ error: 'Failed to get exercises' });
   }
 });
@@ -335,10 +341,13 @@ router.get('/exercises', authenticateMobile, async (req, res) => {
  */
 router.get('/exercises/:id', authenticateMobile, async (req, res) => {
   try {
-    const result = await req.db.query(`
+    const result = await req.db.query(
+      `
       SELECT * FROM exercise_library
       WHERE id = $1 AND is_active = TRUE
-    `, [req.params.id]);
+    `,
+      [req.params.id]
+    );
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Exercise not found' });
@@ -346,7 +355,7 @@ router.get('/exercises/:id', authenticateMobile, async (req, res) => {
 
     res.json(result.rows[0]);
   } catch (error) {
-    console.error('Get exercise error:', error);
+    logger.error('Get exercise error:', error);
     res.status(500).json({ error: 'Failed to get exercise' });
   }
 });
@@ -367,7 +376,7 @@ router.get('/exercise-categories', authenticateMobile, async (req, res) => {
 
     res.json(result.rows);
   } catch (error) {
-    console.error('Get categories error:', error);
+    logger.error('Get categories error:', error);
     res.status(500).json({ error: 'Failed to get categories' });
   }
 });
@@ -419,7 +428,7 @@ router.get('/programs', authenticateMobile, async (req, res) => {
     const result = await req.db.query(query, params);
     res.json(result.rows);
   } catch (error) {
-    console.error('Get programs error:', error);
+    logger.error('Get programs error:', error);
     res.status(500).json({ error: 'Failed to get programs' });
   }
 });
@@ -431,12 +440,15 @@ router.get('/programs', authenticateMobile, async (req, res) => {
 router.get('/programs/:id', authenticateMobile, async (req, res) => {
   try {
     // Get program
-    const programResult = await req.db.query(`
+    const programResult = await req.db.query(
+      `
       SELECT p.*, u.first_name || ' ' || u.last_name as created_by_name
       FROM coaching_programs p
       LEFT JOIN users u ON u.id = p.created_by
       WHERE p.id = $1 AND p.is_active = TRUE
-    `, [req.params.id]);
+    `,
+      [req.params.id]
+    );
 
     if (programResult.rows.length === 0) {
       return res.status(404).json({ error: 'Program not found' });
@@ -445,7 +457,8 @@ router.get('/programs/:id', authenticateMobile, async (req, res) => {
     const program = programResult.rows[0];
 
     // Get weeks with exercises
-    const weeksResult = await req.db.query(`
+    const weeksResult = await req.db.query(
+      `
       SELECT
         pw.*,
         json_agg(
@@ -476,22 +489,27 @@ router.get('/programs/:id', authenticateMobile, async (req, res) => {
       WHERE pw.program_id = $1
       GROUP BY pw.id
       ORDER BY pw.week_number
-    `, [req.params.id]);
+    `,
+      [req.params.id]
+    );
 
     // Check if user is enrolled
-    const enrollmentResult = await req.db.query(`
+    const enrollmentResult = await req.db.query(
+      `
       SELECT * FROM user_program_enrollments
       WHERE mobile_user_id = $1 AND program_id = $2 AND status = 'active'
-    `, [req.mobileUser.id, req.params.id]);
+    `,
+      [req.mobileUser.id, req.params.id]
+    );
 
     res.json({
       ...program,
       weeks: weeksResult.rows,
       isEnrolled: enrollmentResult.rows.length > 0,
-      enrollment: enrollmentResult.rows[0] || null
+      enrollment: enrollmentResult.rows[0] || null,
     });
   } catch (error) {
-    console.error('Get program error:', error);
+    logger.error('Get program error:', error);
     res.status(500).json({ error: 'Failed to get program' });
   }
 });
@@ -503,25 +521,31 @@ router.get('/programs/:id', authenticateMobile, async (req, res) => {
 router.post('/programs/:id/enroll', authenticateMobile, async (req, res) => {
   try {
     // Check if already enrolled
-    const existingResult = await req.db.query(`
+    const existingResult = await req.db.query(
+      `
       SELECT * FROM user_program_enrollments
       WHERE mobile_user_id = $1 AND program_id = $2 AND status = 'active'
-    `, [req.mobileUser.id, req.params.id]);
+    `,
+      [req.mobileUser.id, req.params.id]
+    );
 
     if (existingResult.rows.length > 0) {
       return res.status(400).json({ error: 'Already enrolled in this program' });
     }
 
     // Create enrollment
-    const result = await req.db.query(`
+    const result = await req.db.query(
+      `
       INSERT INTO user_program_enrollments (mobile_user_id, program_id)
       VALUES ($1, $2)
       RETURNING *
-    `, [req.mobileUser.id, req.params.id]);
+    `,
+      [req.mobileUser.id, req.params.id]
+    );
 
     res.json(result.rows[0]);
   } catch (error) {
-    console.error('Enroll error:', error);
+    logger.error('Enroll error:', error);
     res.status(500).json({ error: 'Failed to enroll in program' });
   }
 });
@@ -532,7 +556,8 @@ router.post('/programs/:id/enroll', authenticateMobile, async (req, res) => {
  */
 router.get('/my-programs', authenticateMobile, async (req, res) => {
   try {
-    const result = await req.db.query(`
+    const result = await req.db.query(
+      `
       SELECT
         e.*,
         p.name, p.name_norwegian, p.description, p.description_norwegian,
@@ -541,11 +566,13 @@ router.get('/my-programs', authenticateMobile, async (req, res) => {
       JOIN coaching_programs p ON p.id = e.program_id
       WHERE e.mobile_user_id = $1
       ORDER BY e.status = 'active' DESC, e.started_at DESC
-    `, [req.mobileUser.id]);
+    `,
+      [req.mobileUser.id]
+    );
 
     res.json(result.rows);
   } catch (error) {
-    console.error('Get my programs error:', error);
+    logger.error('Get my programs error:', error);
     res.status(500).json({ error: 'Failed to get programs' });
   }
 });
@@ -563,7 +590,8 @@ router.get('/today', authenticateMobile, async (req, res) => {
     const dayOfWeek = new Date().getDay() || 7; // 1-7 (Monday-Sunday)
 
     // Get active enrollments with today's exercises
-    const result = await req.db.query(`
+    const result = await req.db.query(
+      `
       SELECT
         e.id as enrollment_id,
         e.current_week,
@@ -600,7 +628,9 @@ router.get('/today', authenticateMobile, async (req, res) => {
       JOIN exercise_library ex ON ex.id = pe.exercise_id
       WHERE e.mobile_user_id = $1 AND e.status = 'active'
       ORDER BY p.name, pe.order_index
-    `, [req.mobileUser.id, dayOfWeek]);
+    `,
+      [req.mobileUser.id, dayOfWeek]
+    );
 
     // Group by program
     const programsMap = new Map();
@@ -613,7 +643,7 @@ router.get('/today', authenticateMobile, async (req, res) => {
           enrollmentId: row.enrollment_id,
           currentWeek: row.current_week,
           weekFocus: row.focus_area,
-          exercises: []
+          exercises: [],
         });
       }
       programsMap.get(row.program_id).exercises.push({
@@ -631,17 +661,17 @@ router.get('/today', authenticateMobile, async (req, res) => {
         restSeconds: row.rest_seconds,
         rirTarget: row.rir_target,
         notes: row.exercise_notes,
-        completedToday: row.completed_today
+        completedToday: row.completed_today,
       });
     }
 
     res.json({
       date: new Date().toISOString().split('T')[0],
       dayOfWeek,
-      programs: Array.from(programsMap.values())
+      programs: Array.from(programsMap.values()),
     });
   } catch (error) {
-    console.error('Get today error:', error);
+    logger.error('Get today error:', error);
     res.status(500).json({ error: 'Failed to get today workout' });
   }
 });
@@ -668,10 +698,11 @@ router.post('/log', authenticateMobile, async (req, res) => {
       painRating,
       difficultyRating,
       sorenessRating,
-      notes
+      notes,
     } = req.body;
 
-    const result = await req.db.query(`
+    const result = await req.db.query(
+      `
       INSERT INTO workout_logs (
         mobile_user_id, enrollment_id, program_exercise_id, exercise_id,
         sets_completed, reps_completed, weight_kg, hold_seconds_completed,
@@ -679,18 +710,30 @@ router.post('/log', authenticateMobile, async (req, res) => {
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
       RETURNING *
-    `, [
-      req.mobileUser.id, enrollmentId, programExerciseId, exerciseId,
-      setsCompleted, repsCompleted, weightKg, holdSecondsCompleted,
-      rirActual, painRating, difficultyRating, sorenessRating, notes
-    ]);
+    `,
+      [
+        req.mobileUser.id,
+        enrollmentId,
+        programExerciseId,
+        exerciseId,
+        setsCompleted,
+        repsCompleted,
+        weightKg,
+        holdSecondsCompleted,
+        rirActual,
+        painRating,
+        difficultyRating,
+        sorenessRating,
+        notes,
+      ]
+    );
 
     // Update streak
     await updateStreak(req.db, req.mobileUser.id);
 
     res.json(result.rows[0]);
   } catch (error) {
-    console.error('Log workout error:', error);
+    logger.error('Log workout error:', error);
     res.status(500).json({ error: 'Failed to log workout' });
   }
 });
@@ -704,7 +747,8 @@ router.get('/progress', authenticateMobile, async (req, res) => {
     const { days = 30 } = req.query;
 
     // Get workout counts by date
-    const workoutsByDate = await req.db.query(`
+    const workoutsByDate = await req.db.query(
+      `
       SELECT
         DATE(completed_at) as date,
         COUNT(*) as workout_count,
@@ -712,33 +756,41 @@ router.get('/progress', authenticateMobile, async (req, res) => {
         AVG(difficulty_rating) as avg_difficulty
       FROM workout_logs
       WHERE mobile_user_id = $1
-      AND completed_at > NOW() - INTERVAL '${parseInt(days)} days'
+      AND completed_at > NOW() - make_interval(days => $2)
       GROUP BY DATE(completed_at)
       ORDER BY date DESC
-    `, [req.mobileUser.id]);
+    `,
+      [req.mobileUser.id, parseInt(days)]
+    );
 
     // Get streak info
-    const streakResult = await req.db.query(`
+    const streakResult = await req.db.query(
+      `
       SELECT * FROM user_streaks WHERE mobile_user_id = $1
-    `, [req.mobileUser.id]);
+    `,
+      [req.mobileUser.id]
+    );
 
     // Get total stats
-    const totalStats = await req.db.query(`
+    const totalStats = await req.db.query(
+      `
       SELECT
         COUNT(*) as total_workouts,
         COUNT(DISTINCT DATE(completed_at)) as active_days,
         AVG(pain_rating) as avg_pain_overall
       FROM workout_logs
       WHERE mobile_user_id = $1
-    `, [req.mobileUser.id]);
+    `,
+      [req.mobileUser.id]
+    );
 
     res.json({
       streak: streakResult.rows[0] || { current_streak: 0, longest_streak: 0 },
       workoutsByDate: workoutsByDate.rows,
-      totalStats: totalStats.rows[0]
+      totalStats: totalStats.rows[0],
     });
   } catch (error) {
-    console.error('Get progress error:', error);
+    logger.error('Get progress error:', error);
     res.status(500).json({ error: 'Failed to get progress' });
   }
 });
@@ -749,15 +801,18 @@ router.get('/progress', authenticateMobile, async (req, res) => {
  */
 router.get('/achievements', authenticateMobile, async (req, res) => {
   try {
-    const result = await req.db.query(`
+    const result = await req.db.query(
+      `
       SELECT * FROM user_achievements
       WHERE mobile_user_id = $1
       ORDER BY earned_at DESC
-    `, [req.mobileUser.id]);
+    `,
+      [req.mobileUser.id]
+    );
 
     res.json(result.rows);
   } catch (error) {
-    console.error('Get achievements error:', error);
+    logger.error('Get achievements error:', error);
     res.status(500).json({ error: 'Failed to get achievements' });
   }
 });
@@ -789,19 +844,19 @@ router.get('/social-links', authenticateMobile, async (req, res) => {
         cliniciansMap.set(row.user_id, {
           userId: row.user_id,
           name: row.clinician_name,
-          links: []
+          links: [],
         });
       }
       cliniciansMap.get(row.user_id).links.push({
         platform: row.platform,
         url: row.profile_url,
-        displayName: row.display_name
+        displayName: row.display_name,
       });
     }
 
     res.json(Array.from(cliniciansMap.values()));
   } catch (error) {
-    console.error('Get social links error:', error);
+    logger.error('Get social links error:', error);
     res.status(500).json({ error: 'Failed to get social links' });
   }
 });
@@ -817,21 +872,29 @@ async function updateStreak(db, userId) {
   const today = new Date().toISOString().split('T')[0];
 
   // Get current streak info
-  const streakResult = await db.query(`
+  const streakResult = await db.query(
+    `
     SELECT * FROM user_streaks WHERE mobile_user_id = $1
-  `, [userId]);
+  `,
+    [userId]
+  );
 
   if (streakResult.rows.length === 0) {
     // Initialize streak
-    await db.query(`
+    await db.query(
+      `
       INSERT INTO user_streaks (mobile_user_id, current_streak, longest_streak, last_workout_date, streak_start_date)
       VALUES ($1, 1, 1, $2, $2)
-    `, [userId, today]);
+    `,
+      [userId, today]
+    );
     return;
   }
 
   const streak = streakResult.rows[0];
-  const lastWorkout = streak.last_workout_date ? new Date(streak.last_workout_date).toISOString().split('T')[0] : null;
+  const lastWorkout = streak.last_workout_date
+    ? new Date(streak.last_workout_date).toISOString().split('T')[0]
+    : null;
 
   if (lastWorkout === today) {
     // Already worked out today
@@ -856,11 +919,14 @@ async function updateStreak(db, userId) {
     streakStart = today;
   }
 
-  await db.query(`
+  await db.query(
+    `
     UPDATE user_streaks
     SET current_streak = $1, longest_streak = $2, last_workout_date = $3, streak_start_date = $4, updated_at = NOW()
     WHERE mobile_user_id = $5
-  `, [newStreak, newLongest, today, streakStart, userId]);
+  `,
+    [newStreak, newLongest, today, streakStart, userId]
+  );
 
   // Check for streak achievements
   await checkStreakAchievements(db, userId, newStreak);
@@ -875,16 +941,24 @@ async function checkStreakAchievements(db, userId, streak) {
     { days: 14, type: 'streak_14', name: '2-Week Streak' },
     { days: 30, type: 'streak_30', name: 'Monthly Master' },
     { days: 60, type: 'streak_60', name: '2-Month Champion' },
-    { days: 100, type: 'streak_100', name: 'Century Streak' }
+    { days: 100, type: 'streak_100', name: 'Century Streak' },
   ];
 
   for (const milestone of milestones) {
     if (streak >= milestone.days) {
-      await db.query(`
+      await db.query(
+        `
         INSERT INTO user_achievements (mobile_user_id, achievement_type, achievement_name, description)
         VALUES ($1, $2, $3, $4)
         ON CONFLICT (mobile_user_id, achievement_type, achievement_name) DO NOTHING
-      `, [userId, milestone.type, milestone.name, `Completed ${milestone.days} consecutive days of workouts!`]);
+      `,
+        [
+          userId,
+          milestone.type,
+          milestone.name,
+          `Completed ${milestone.days} consecutive days of workouts!`,
+        ]
+      );
     }
   }
 }

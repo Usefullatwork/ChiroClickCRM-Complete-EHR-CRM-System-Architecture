@@ -5,6 +5,7 @@
  */
 
 import pool from '../config/database.js';
+import logger from '../utils/logger.js';
 
 /**
  * Record user feedback on AI suggestion
@@ -23,7 +24,7 @@ export const recordFeedback = async (feedback) => {
     templateId,
     contextData,
     userRating,
-    timeToDecision
+    timeToDecision,
   } = feedback;
 
   try {
@@ -57,7 +58,7 @@ export const recordFeedback = async (feedback) => {
         templateId,
         contextData ? JSON.stringify(contextData) : null,
         userRating,
-        timeToDecision
+        timeToDecision,
       ]
     );
 
@@ -66,7 +67,7 @@ export const recordFeedback = async (feedback) => {
 
     return result.rows[0];
   } catch (error) {
-    console.error('Error recording AI feedback:', error);
+    logger.error('Error recording AI feedback:', error);
     throw error;
   }
 };
@@ -75,9 +76,7 @@ export const recordFeedback = async (feedback) => {
  * Check if enough feedback accumulated to trigger retraining
  */
 export const checkRetrainingThreshold = async (suggestionType = null) => {
-  const whereClause = suggestionType
-    ? `WHERE suggestion_type = $1 AND`
-    : 'WHERE';
+  const whereClause = suggestionType ? `WHERE suggestion_type = $1 AND` : 'WHERE';
 
   const params = suggestionType ? [suggestionType] : [];
 
@@ -95,12 +94,12 @@ export const checkRetrainingThreshold = async (suggestionType = null) => {
 
   if (result.rows.length > 0) {
     // Trigger retraining notification
-    console.log('🔄 Retraining threshold reached:', result.rows);
+    logger.info('🔄 Retraining threshold reached:', result.rows);
 
     for (const row of result.rows) {
       await notifyRetrainingNeeded(row.suggestion_type, {
         feedbackCount: row.feedback_count,
-        rejectionCount: row.rejection_count
+        rejectionCount: row.rejection_count,
       });
     }
 
@@ -114,11 +113,7 @@ export const checkRetrainingThreshold = async (suggestionType = null) => {
  * Analyze common corrections to identify patterns
  */
 export const analyzeCommonCorrections = async (options = {}) => {
-  const {
-    suggestionType = null,
-    days = 30,
-    minOccurrences = 3
-  } = options;
+  const { suggestionType = null, days = 30, minOccurrences = 3 } = options;
 
   const typeFilter = suggestionType ? 'AND suggestion_type = $1' : '';
   const params = suggestionType ? [suggestionType] : [];
@@ -138,12 +133,12 @@ export const analyzeCommonCorrections = async (options = {}) => {
         ORDER BY created_at DESC
       ) FILTER (WHERE user_correction IS NOT NULL) as examples
     FROM ai_feedback
-    WHERE created_at > NOW() - INTERVAL '${days} days'
+    WHERE created_at > NOW() - make_interval(days => $${params.length + 1})
       ${typeFilter}
     GROUP BY suggestion_type, correction_type
-    HAVING COUNT(*) >= ${minOccurrences}
+    HAVING COUNT(*) >= $${params.length + 2}
     ORDER BY correction_count DESC`,
-    params
+    [...params, days, minOccurrences]
   );
 
   return result.rows;
@@ -157,13 +152,13 @@ export const getPerformanceMetrics = async (options = {}) => {
     suggestionType = null,
     startDate = null,
     endDate = null,
-    groupBy = 'day' // 'day', 'week', 'month'
+    groupBy = 'day', // 'day', 'week', 'month'
   } = options;
 
   const dateGrouping = {
     day: 'DATE(created_at)',
-    week: 'DATE_TRUNC(\'week\', created_at)::DATE',
-    month: 'DATE_TRUNC(\'month\', created_at)::DATE'
+    week: "DATE_TRUNC('week', created_at)::DATE",
+    month: "DATE_TRUNC('month', created_at)::DATE",
   }[groupBy];
 
   let whereConditions = [];
@@ -188,9 +183,7 @@ export const getPerformanceMetrics = async (options = {}) => {
     params.push(endDate);
   }
 
-  const whereClause = whereConditions.length > 0
-    ? 'WHERE ' + whereConditions.join(' AND ')
-    : '';
+  const whereClause = whereConditions.length > 0 ? 'WHERE ' + whereConditions.join(' AND ') : '';
 
   const result = await pool.query(
     `SELECT
@@ -276,11 +269,7 @@ export const getUserFeedbackPattern = async (userId) => {
  * This creates new templates based on user improvements
  */
 export const generateTrainingDataFromFeedback = async (options = {}) => {
-  const {
-    minRating = 4,
-    days = 90,
-    limit = 100
-  } = options;
+  const { minRating = 4, days = 90, limit = 100 } = options;
 
   const result = await pool.query(
     `SELECT
@@ -292,14 +281,14 @@ export const generateTrainingDataFromFeedback = async (options = {}) => {
       u.name as practitioner_name
     FROM ai_feedback af
     JOIN users u ON af.user_id = u.id
-    WHERE af.created_at > NOW() - INTERVAL '${days} days'
-      AND af.user_rating >= $1
+    WHERE af.created_at > NOW() - make_interval(days => $1)
+      AND af.user_rating >= $2
       AND af.correction_type IN ('minor', 'major')
       AND af.user_correction IS NOT NULL
       AND LENGTH(af.user_correction) > 20
     ORDER BY af.user_rating DESC, af.created_at DESC
-    LIMIT $2`,
-    [minRating, limit]
+    LIMIT $3`,
+    [days, minRating, limit]
   );
 
   return result.rows;
@@ -309,20 +298,36 @@ export const generateTrainingDataFromFeedback = async (options = {}) => {
  * Notify about retraining needs (implement based on your notification system)
  */
 const notifyRetrainingNeeded = async (suggestionType, metrics) => {
-  console.log(`
-    🤖 AI RETRAINING NOTIFICATION
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    Type: ${suggestionType}
-    Feedback Count: ${metrics.feedbackCount}
-    Rejections: ${metrics.rejectionCount}
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    Action: Consider retraining AI model
-  `);
+  logger.warn('AI retraining threshold reached', {
+    alert: true,
+    severity: 'WARNING',
+    category: 'AI_RETRAINING',
+    suggestionType,
+    feedbackCount: metrics.feedbackCount,
+    rejectionCount: metrics.rejectionCount,
+    timestamp: new Date().toISOString(),
+  });
 
-  // TODO: Implement actual notification
-  // - Send email to admins
-  // - Create task in task management system
-  // - Trigger automated retraining pipeline
+  // Persist notification to database for admin dashboard
+  try {
+    await pool.query(
+      `INSERT INTO system_alerts (alert_type, severity, message, details, created_at)
+       VALUES ($1, $2, $3, $4, NOW())
+       ON CONFLICT DO NOTHING`,
+      [
+        'AI_RETRAINING_NEEDED',
+        'WARNING',
+        `AI retraining recommended for ${suggestionType}`,
+        JSON.stringify({
+          suggestionType,
+          feedbackCount: metrics.feedbackCount,
+          rejectionCount: metrics.rejectionCount,
+        }),
+      ]
+    );
+  } catch (alertError) {
+    logger.error('Failed to persist retraining notification', { error: alertError.message });
+  }
 };
 
 /**
@@ -334,11 +339,18 @@ export const exportFeedbackForTraining = async (options = {}) => {
     suggestionType = null,
     minRating = 3,
     days = 180,
-    format = 'jsonl' // 'jsonl', 'csv', 'json'
+    format = 'jsonl', // 'jsonl', 'csv', 'json'
   } = options;
 
-  const typeFilter = suggestionType ? 'AND suggestion_type = $1' : '';
-  const params = suggestionType ? [suggestionType, minRating] : [minRating];
+  const params = [days, minRating];
+  let paramIndex = 3;
+  let typeFilter = '';
+
+  if (suggestionType) {
+    typeFilter = `AND suggestion_type = $${paramIndex}`;
+    params.push(suggestionType);
+    paramIndex++;
+  }
 
   const result = await pool.query(
     `SELECT
@@ -351,23 +363,25 @@ export const exportFeedbackForTraining = async (options = {}) => {
       context_data as context,
       user_rating as rating
     FROM ai_feedback
-    WHERE created_at > NOW() - INTERVAL '${days} days'
-      AND user_rating >= $${suggestionType ? 2 : 1}
+    WHERE created_at > NOW() - make_interval(days => $1)
+      AND user_rating >= $2
       ${typeFilter}
     ORDER BY created_at DESC`,
     params
   );
 
   if (format === 'jsonl') {
-    return result.rows.map(row => JSON.stringify(row)).join('\n');
+    return result.rows.map((row) => JSON.stringify(row)).join('\n');
   } else if (format === 'csv') {
     // Simple CSV conversion
     const headers = Object.keys(result.rows[0] || {}).join(',');
-    const rows = result.rows.map(row =>
-      Object.values(row).map(v =>
-        typeof v === 'object' ? JSON.stringify(v) : v
-      ).join(',')
-    ).join('\n');
+    const rows = result.rows
+      .map((row) =>
+        Object.values(row)
+          .map((v) => (typeof v === 'object' ? JSON.stringify(v) : v))
+          .join(',')
+      )
+      .join('\n');
     return `${headers}\n${rows}`;
   }
 
@@ -380,9 +394,9 @@ export const exportFeedbackForTraining = async (options = {}) => {
 export const updateDailyMetrics = async (date = new Date()) => {
   try {
     await pool.query('SELECT update_daily_ai_metrics($1)', [date]);
-    console.log(`✅ Updated AI metrics for ${date.toISOString().split('T')[0]}`);
+    logger.info(`✅ Updated AI metrics for ${date.toISOString().split('T')[0]}`);
   } catch (error) {
-    console.error('Error updating daily AI metrics:', error);
+    logger.error('Error updating daily AI metrics:', error);
     throw error;
   }
 };
@@ -396,5 +410,5 @@ export default {
   getUserFeedbackPattern,
   generateTrainingDataFromFeedback,
   exportFeedbackForTraining,
-  updateDailyMetrics
+  updateDailyMetrics,
 };

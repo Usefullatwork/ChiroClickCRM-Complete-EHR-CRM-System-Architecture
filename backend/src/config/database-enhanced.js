@@ -6,6 +6,7 @@
  */
 
 import pg from 'pg';
+import logger from '../utils/logger.js';
 const { Pool } = pg;
 
 // Try to load Vault, fallback to env vars if not available
@@ -20,7 +21,7 @@ try {
     port: parseInt(process.env.DB_PORT || '5432'),
     database: process.env.DB_NAME || 'chiroclickcrm',
     user: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD
+    password: process.env.DB_PASSWORD,
   });
 }
 
@@ -38,7 +39,7 @@ const poolConfig = {
   application_name: 'ChiroClickCRM',
   keepAlive: true,
   keepAliveInitialDelayMillis: 10000,
-  ssl: isProduction ? { rejectUnauthorized: true } : false
+  ssl: isProduction ? { rejectUnauthorized: true } : false,
 };
 
 let pool = null;
@@ -49,19 +50,19 @@ let readReplicaPool = null;
  */
 export const initializeDatabase = async () => {
   try {
-    console.log('🔄 Initializing database...');
+    logger.info('🔄 Initializing database...');
 
     const credentials = await getDatabaseCredentials();
 
     pool = new Pool({ ...poolConfig, ...credentials });
 
     // Event handlers
-    pool.on('connect', () => isDevelopment && console.log('✅ DB connected'));
-    pool.on('error', (err) => console.error('❌ DB error:', err));
+    pool.on('connect', () => isDevelopment && logger.info('✅ DB connected'));
+    pool.on('error', (err) => logger.error('❌ DB error:', err));
 
     // Test connection
     const test = await pool.query('SELECT NOW() as time, version()');
-    console.log('✅ Database ready:', test.rows[0].time);
+    logger.info('✅ Database ready:', test.rows[0].time);
 
     // Read replica (optional)
     if (process.env.DB_READ_REPLICA_HOST) {
@@ -71,14 +72,14 @@ export const initializeDatabase = async () => {
         port: process.env.DB_READ_REPLICA_PORT || credentials.port,
         database: credentials.database,
         user: credentials.user,
-        password: credentials.password
+        password: credentials.password,
       });
-      console.log('✅ Read replica ready');
+      logger.info('✅ Read replica ready');
     }
 
     return pool;
   } catch (error) {
-    console.error('❌ Database initialization failed:', error);
+    logger.error('❌ Database initialization failed:', error);
     throw error;
   }
 };
@@ -101,12 +102,12 @@ export const query = async (text, params) => {
     const duration = Date.now() - start;
 
     if (isDevelopment || duration > 1000) {
-      console.log('Query:', text.substring(0, 100), `(${duration}ms)`);
+      logger.info('Query:', text.substring(0, 100), `(${duration}ms)`);
     }
 
     return result;
   } catch (error) {
-    console.error('Query error:', error.message);
+    logger.error('Query error:', error.message);
     throw error;
   }
 };
@@ -159,11 +160,14 @@ export const healthCheck = async () => {
 /**
  * Get pool stats
  */
-export const getPoolStats = () => pool ? {
-  total: pool.totalCount,
-  idle: pool.idleCount,
-  waiting: pool.waitingCount
-} : null;
+export const getPoolStats = () =>
+  pool
+    ? {
+        total: pool.totalCount,
+        idle: pool.idleCount,
+        waiting: pool.waitingCount,
+      }
+    : null;
 
 /**
  * Close pools
@@ -171,7 +175,16 @@ export const getPoolStats = () => pool ? {
 export const closeDatabase = async () => {
   if (pool) await pool.end();
   if (readReplicaPool) await readReplicaPool.end();
-  console.log('✅ Database pools closed');
+  logger.info('✅ Database pools closed');
 };
 
-export default { query, queryRead, getClient, transaction, healthCheck, getPoolStats, initializeDatabase, closeDatabase };
+export default {
+  query,
+  queryRead,
+  getClient,
+  transaction,
+  healthCheck,
+  getPoolStats,
+  initializeDatabase,
+  closeDatabase,
+};

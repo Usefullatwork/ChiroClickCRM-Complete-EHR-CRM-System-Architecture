@@ -16,17 +16,18 @@
  */
 
 import { getICPC2Description as getICPC2Desc } from '../data/icpc2-codes.js';
+import logger from '../utils/logger.js';
 
 /**
  * Norwegian OID (Object Identifiers) for healthcare
  */
 const NORWEGIAN_OIDS = {
   FODSELSNUMMER: 'urn:oid:2.16.578.1.12.4.1.4.1', // Norwegian national ID
-  HPR_NUMMER: 'urn:oid:2.16.578.1.12.4.1.4.4',    // Health Personnel Register
-  ICPC2: 'urn:oid:2.16.578.1.12.4.1.1.7170',      // ICPC-2 codes
-  ICD10: 'urn:oid:2.16.578.1.12.4.1.1.7110',      // ICD-10 codes
-  HER_ID: 'urn:oid:2.16.578.1.12.4.1.2',          // Health Enterprise Register
-  ORGANIZATION_NUMBER: 'urn:oid:2.16.578.1.12.4.1.4.101' // Norwegian org number
+  HPR_NUMMER: 'urn:oid:2.16.578.1.12.4.1.4.4', // Health Personnel Register
+  ICPC2: 'urn:oid:2.16.578.1.12.4.1.1.7170', // ICPC-2 codes
+  ICD10: 'urn:oid:2.16.578.1.12.4.1.1.7110', // ICD-10 codes
+  HER_ID: 'urn:oid:2.16.578.1.12.4.1.2', // Health Enterprise Register
+  ORGANIZATION_NUMBER: 'urn:oid:2.16.578.1.12.4.1.4.101', // Norwegian org number
 };
 
 /**
@@ -38,18 +39,20 @@ export const patientToFHIR = (patient) => {
     id: patient.id,
     meta: {
       versionId: patient.version || '1',
-      lastUpdated: patient.updated_at || patient.created_at
+      lastUpdated: patient.updated_at || patient.created_at,
     },
 
     // Norwegian national ID (fødselsnummer)
     identifier: [],
 
     // Name
-    name: [{
-      use: 'official',
-      family: patient.last_name,
-      given: patient.first_name ? [patient.first_name] : []
-    }],
+    name: [
+      {
+        use: 'official',
+        family: patient.last_name,
+        given: patient.first_name ? [patient.first_name] : [],
+      },
+    ],
 
     // Contact details
     telecom: [],
@@ -58,7 +61,8 @@ export const patientToFHIR = (patient) => {
     gender: patient.gender === 'M' ? 'male' : patient.gender === 'F' ? 'female' : 'other',
 
     // Birth date (extracted from fødselsnummer or stored separately)
-    birthDate: patient.birth_date || extractBirthDateFromFodselsnummer(patient.fodselsnummer_encrypted),
+    birthDate:
+      patient.birth_date || extractBirthDateFromFodselsnummer(patient.fodselsnummer_encrypted),
 
     // Address
     address: [],
@@ -67,7 +71,7 @@ export const patientToFHIR = (patient) => {
     active: patient.is_active !== false,
 
     // Communication (preferred language)
-    communication: []
+    communication: [],
   };
 
   // Add fødselsnummer if available (encrypted in DB, decrypted for FHIR export)
@@ -75,7 +79,7 @@ export const patientToFHIR = (patient) => {
     fhirPatient.identifier.push({
       use: 'official',
       system: NORWEGIAN_OIDS.FODSELSNUMMER,
-      value: patient.fodselsnummer_decrypted
+      value: patient.fodselsnummer_decrypted,
     });
   }
 
@@ -83,7 +87,7 @@ export const patientToFHIR = (patient) => {
   fhirPatient.identifier.push({
     use: 'usual',
     system: 'urn:chiroclickcrm:patient-id',
-    value: patient.id
+    value: patient.id,
   });
 
   // Phone
@@ -91,7 +95,7 @@ export const patientToFHIR = (patient) => {
     fhirPatient.telecom.push({
       system: 'phone',
       value: patient.phone,
-      use: 'mobile'
+      use: 'mobile',
     });
   }
 
@@ -99,7 +103,7 @@ export const patientToFHIR = (patient) => {
   if (patient.email) {
     fhirPatient.telecom.push({
       system: 'email',
-      value: patient.email
+      value: patient.email,
     });
   }
 
@@ -111,7 +115,7 @@ export const patientToFHIR = (patient) => {
       line: patient.address ? [patient.address] : [],
       city: patient.city,
       postalCode: patient.postal_code,
-      country: 'NO' // Norway
+      country: 'NO', // Norway
     });
   }
 
@@ -119,12 +123,14 @@ export const patientToFHIR = (patient) => {
   if (patient.preferred_language) {
     fhirPatient.communication.push({
       language: {
-        coding: [{
-          system: 'urn:ietf:bcp:47',
-          code: patient.preferred_language // 'no', 'nn', 'en'
-        }]
+        coding: [
+          {
+            system: 'urn:ietf:bcp:47',
+            code: patient.preferred_language, // 'no', 'nn', 'en'
+          },
+        ],
       },
-      preferred: true
+      preferred: true,
     });
   }
 
@@ -141,22 +147,22 @@ export const patientFromFHIR = (fhirPatient) => {
     last_name: fhirPatient.name?.[0]?.family || '',
     birth_date: fhirPatient.birthDate,
     gender: fhirPatient.gender === 'male' ? 'M' : fhirPatient.gender === 'female' ? 'F' : 'O',
-    is_active: fhirPatient.active !== false
+    is_active: fhirPatient.active !== false,
   };
 
   // Extract fødselsnummer
   const fnrIdentifier = fhirPatient.identifier?.find(
-    id => id.system === NORWEGIAN_OIDS.FODSELSNUMMER
+    (id) => id.system === NORWEGIAN_OIDS.FODSELSNUMMER
   );
   if (fnrIdentifier) {
     patient.fodselsnummer = fnrIdentifier.value; // Will be encrypted on save
   }
 
   // Extract contact info
-  const phone = fhirPatient.telecom?.find(t => t.system === 'phone');
+  const phone = fhirPatient.telecom?.find((t) => t.system === 'phone');
   if (phone) patient.phone = phone.value;
 
-  const email = fhirPatient.telecom?.find(t => t.system === 'email');
+  const email = fhirPatient.telecom?.find((t) => t.system === 'email');
   if (email) patient.email = email.value;
 
   // Extract address
@@ -183,7 +189,7 @@ export const encounterToFHIR = (encounter, patient, practitioner) => {
     resourceType: 'Encounter',
     id: encounter.id,
     meta: {
-      lastUpdated: encounter.updated_at || encounter.created_at
+      lastUpdated: encounter.updated_at || encounter.created_at,
     },
 
     status: encounter.is_signed ? 'finished' : 'in-progress',
@@ -191,53 +197,64 @@ export const encounterToFHIR = (encounter, patient, practitioner) => {
     class: {
       system: 'http://terminology.hl7.org/CodeSystem/v3-ActCode',
       code: 'AMB',
-      display: 'ambulatory'
+      display: 'ambulatory',
     },
 
-    type: [{
-      coding: [{
-        system: 'http://snomed.info/sct',
-        code: '185347001',
-        display: 'Encounter for problem (procedure)'
-      }]
-    }],
+    type: [
+      {
+        coding: [
+          {
+            system: 'http://snomed.info/sct',
+            code: '185347001',
+            display: 'Encounter for problem (procedure)',
+          },
+        ],
+      },
+    ],
 
     subject: {
       reference: `Patient/${encounter.patient_id}`,
-      display: patient ? `${patient.first_name} ${patient.last_name}` : undefined
+      display: patient ? `${patient.first_name} ${patient.last_name}` : undefined,
     },
 
-    participant: [{
-      type: [{
-        coding: [{
-          system: 'http://terminology.hl7.org/CodeSystem/v3-ParticipationType',
-          code: 'PPRF',
-          display: 'primary performer'
-        }]
-      }],
-      individual: {
-        reference: `Practitioner/${encounter.practitioner_id}`,
-        display: practitioner?.name
-      }
-    }],
+    participant: [
+      {
+        type: [
+          {
+            coding: [
+              {
+                system: 'http://terminology.hl7.org/CodeSystem/v3-ParticipationType',
+                code: 'PPRF',
+                display: 'primary performer',
+              },
+            ],
+          },
+        ],
+        individual: {
+          reference: `Practitioner/${encounter.practitioner_id}`,
+          display: practitioner?.name,
+        },
+      },
+    ],
 
     period: {
       start: encounter.encounter_date,
-      end: encounter.encounter_date // Same day for chiropractic visits
+      end: encounter.encounter_date, // Same day for chiropractic visits
     },
 
-    reasonCode: encounter.icpc_codes?.map(code => ({
-      coding: [{
-        system: NORWEGIAN_OIDS.ICPC2,
-        code: code,
-        display: getICPC2Description(code)
-      }]
-    })) || [],
+    reasonCode:
+      encounter.icpc_codes?.map((code) => ({
+        coding: [
+          {
+            system: NORWEGIAN_OIDS.ICPC2,
+            code: code,
+            display: getICPC2Description(code),
+          },
+        ],
+      })) || [],
 
     // Link to SOAP notes (Composition resource)
-    contained: encounter.subjective ? [
-      compositionToFHIR(encounter)
-    ] : []
+    contained: encounter.subjective ? [compositionToFHIR(encounter)] : [],
   };
 };
 
@@ -250,19 +267,23 @@ export const compositionToFHIR = (encounter) => {
     id: `${encounter.id}-notes`,
     status: encounter.is_signed ? 'final' : 'preliminary',
     type: {
-      coding: [{
-        system: 'http://loinc.org',
-        code: '11506-3',
-        display: 'Progress note'
-      }]
+      coding: [
+        {
+          system: 'http://loinc.org',
+          code: '11506-3',
+          display: 'Progress note',
+        },
+      ],
     },
     subject: {
-      reference: `Patient/${encounter.patient_id}`
+      reference: `Patient/${encounter.patient_id}`,
     },
     date: encounter.encounter_date,
-    author: [{
-      reference: `Practitioner/${encounter.practitioner_id}`
-    }],
+    author: [
+      {
+        reference: `Practitioner/${encounter.practitioner_id}`,
+      },
+    ],
     title: 'Chiropractic SOAP Note',
 
     // SOAP sections
@@ -270,60 +291,68 @@ export const compositionToFHIR = (encounter) => {
       {
         title: 'Subjective',
         code: {
-          coding: [{
-            system: 'http://loinc.org',
-            code: '61150-9',
-            display: 'Subjective'
-          }]
+          coding: [
+            {
+              system: 'http://loinc.org',
+              code: '61150-9',
+              display: 'Subjective',
+            },
+          ],
         },
         text: {
           status: 'generated',
-          div: `<div xmlns="http://www.w3.org/1999/xhtml">${escapeHtml(encounter.subjective)}</div>`
-        }
+          div: `<div xmlns="http://www.w3.org/1999/xhtml">${escapeHtml(encounter.subjective)}</div>`,
+        },
       },
       {
         title: 'Objective',
         code: {
-          coding: [{
-            system: 'http://loinc.org',
-            code: '61149-1',
-            display: 'Objective'
-          }]
+          coding: [
+            {
+              system: 'http://loinc.org',
+              code: '61149-1',
+              display: 'Objective',
+            },
+          ],
         },
         text: {
           status: 'generated',
-          div: `<div xmlns="http://www.w3.org/1999/xhtml">${escapeHtml(encounter.objective)}</div>`
-        }
+          div: `<div xmlns="http://www.w3.org/1999/xhtml">${escapeHtml(encounter.objective)}</div>`,
+        },
       },
       {
         title: 'Assessment',
         code: {
-          coding: [{
-            system: 'http://loinc.org',
-            code: '51848-0',
-            display: 'Assessment'
-          }]
+          coding: [
+            {
+              system: 'http://loinc.org',
+              code: '51848-0',
+              display: 'Assessment',
+            },
+          ],
         },
         text: {
           status: 'generated',
-          div: `<div xmlns="http://www.w3.org/1999/xhtml">${escapeHtml(encounter.assessment)}</div>`
-        }
+          div: `<div xmlns="http://www.w3.org/1999/xhtml">${escapeHtml(encounter.assessment)}</div>`,
+        },
       },
       {
         title: 'Plan',
         code: {
-          coding: [{
-            system: 'http://loinc.org',
-            code: '18776-5',
-            display: 'Plan of care'
-          }]
+          coding: [
+            {
+              system: 'http://loinc.org',
+              code: '18776-5',
+              display: 'Plan of care',
+            },
+          ],
         },
         text: {
           status: 'generated',
-          div: `<div xmlns="http://www.w3.org/1999/xhtml">${escapeHtml(encounter.plan)}</div>`
-        }
-      }
-    ]
+          div: `<div xmlns="http://www.w3.org/1999/xhtml">${escapeHtml(encounter.plan)}</div>`,
+        },
+      },
+    ],
   };
 };
 
@@ -335,51 +364,61 @@ export const practitionerToFHIR = (practitioner) => {
     resourceType: 'Practitioner',
     id: practitioner.id,
     meta: {
-      lastUpdated: practitioner.updated_at || practitioner.created_at
+      lastUpdated: practitioner.updated_at || practitioner.created_at,
     },
 
     identifier: [
       {
         use: 'official',
         system: NORWEGIAN_OIDS.HPR_NUMMER,
-        value: practitioner.hpr_nummer // Health Personnel Register number
+        value: practitioner.hpr_nummer, // Health Personnel Register number
       },
       {
         use: 'usual',
         system: 'urn:chiroclickcrm:practitioner-id',
-        value: practitioner.id
-      }
+        value: practitioner.id,
+      },
     ],
 
     active: practitioner.is_active !== false,
 
-    name: [{
-      use: 'official',
-      text: practitioner.name,
-      family: practitioner.last_name,
-      given: practitioner.first_name ? [practitioner.first_name] : []
-    }],
+    name: [
+      {
+        use: 'official',
+        text: practitioner.name,
+        family: practitioner.last_name,
+        given: practitioner.first_name ? [practitioner.first_name] : [],
+      },
+    ],
 
     telecom: [
-      practitioner.phone ? {
-        system: 'phone',
-        value: practitioner.phone
-      } : null,
-      practitioner.email ? {
-        system: 'email',
-        value: practitioner.email
-      } : null
+      practitioner.phone
+        ? {
+            system: 'phone',
+            value: practitioner.phone,
+          }
+        : null,
+      practitioner.email
+        ? {
+            system: 'email',
+            value: practitioner.email,
+          }
+        : null,
     ].filter(Boolean),
 
-    qualification: [{
-      code: {
-        coding: [{
-          system: 'http://snomed.info/sct',
-          code: '3842006',
-          display: 'Chiropractor'
-        }]
-      }
-    }]
+    qualification: [
+      {
+        code: {
+          coding: [
+            {
+              system: 'http://snomed.info/sct',
+              code: '3842006',
+              display: 'Chiropractor',
+            },
+          ],
+        },
+      },
+    ],
   };
 };
 
@@ -407,7 +446,7 @@ const extractBirthDateFromFodselsnummer = (fnr) => {
 
     return `${year}-${month}-${day}`;
   } catch (error) {
-    console.error('Error extracting birth date from fødselsnummer:', error);
+    logger.error('Error extracting birth date from fødselsnummer:', error);
     return null;
   }
 };
@@ -443,10 +482,10 @@ export const createBundle = (resources, type = 'collection') => {
     type: type, // 'collection', 'searchset', 'transaction', etc.
     timestamp: new Date().toISOString(),
     total: resources.length,
-    entry: resources.map(resource => ({
+    entry: resources.map((resource) => ({
       fullUrl: `${resource.resourceType}/${resource.id}`,
-      resource: resource
-    }))
+      resource: resource,
+    })),
   };
 };
 
@@ -482,7 +521,7 @@ export const validateFHIRResource = (resource) => {
 
   return {
     valid: errors.length === 0,
-    errors
+    errors,
   };
 };
 
@@ -494,5 +533,5 @@ export default {
   practitionerToFHIR,
   createBundle,
   validateFHIRResource,
-  NORWEGIAN_OIDS
+  NORWEGIAN_OIDS,
 };

@@ -8,8 +8,8 @@
  * @module services/progressTracking
  */
 
-import { query } from '../config/database.js'
-import logger from '../utils/logger.js'
+import { query } from '../config/database.js';
+import logger from '../utils/logger.js';
 
 // ============================================================================
 // PATIENT PROGRESS ANALYTICS
@@ -25,13 +25,12 @@ import logger from '../utils/logger.js'
  */
 export const getPatientProgressStats = async (organizationId, patientId, options = {}) => {
   try {
-    const { startDate, endDate } = options
-    const dateFilter = startDate && endDate
-      ? `AND ep.completed_at BETWEEN $3 AND $4`
-      : ''
-    const params = startDate && endDate
-      ? [organizationId, patientId, startDate, endDate]
-      : [organizationId, patientId]
+    const { startDate, endDate } = options;
+    const dateFilter = startDate && endDate ? `AND ep.completed_at BETWEEN $3 AND $4` : '';
+    const params =
+      startDate && endDate
+        ? [organizationId, patientId, startDate, endDate]
+        : [organizationId, patientId];
 
     // Get overall statistics
     const statsResult = await query(
@@ -49,7 +48,7 @@ export const getPatientProgressStats = async (organizationId, patientId, options
          AND ep.patient_id = $2
          ${dateFilter}`,
       params
-    )
+    );
 
     // Get prescription compliance
     const complianceResult = await query(
@@ -69,7 +68,7 @@ export const getPatientProgressStats = async (organizationId, patientId, options
        GROUP BY pr.id, pr.status, pr.start_date, pr.end_date
        ORDER BY pr.start_date DESC`,
       [organizationId, patientId]
-    )
+    );
 
     // Get current streak
     const streakResult = await query(
@@ -96,10 +95,10 @@ export const getPatientProgressStats = async (organizationId, patientId, options
         LIMIT 1
       )`,
       [organizationId, patientId]
-    )
+    );
 
-    const stats = statsResult.rows[0]
-    const currentStreak = parseInt(streakResult.rows[0]?.current_streak || 0)
+    const stats = statsResult.rows[0];
+    const currentStreak = parseInt(streakResult.rows[0]?.current_streak || 0);
 
     return {
       summary: {
@@ -110,9 +109,9 @@ export const getPatientProgressStats = async (organizationId, patientId, options
         avgPain: parseFloat(stats.avg_pain)?.toFixed(1) || 0,
         currentStreak,
         firstCompletion: stats.first_completion,
-        lastCompletion: stats.last_completion
+        lastCompletion: stats.last_completion,
       },
-      prescriptions: complianceResult.rows.map(row => ({
+      prescriptions: complianceResult.rows.map((row) => ({
         prescriptionId: row.prescription_id,
         status: row.status,
         startDate: row.start_date,
@@ -120,16 +119,17 @@ export const getPatientProgressStats = async (organizationId, patientId, options
         totalPrescribed: parseInt(row.total_prescribed) || 0,
         completedUnique: parseInt(row.completed_unique) || 0,
         totalCompletions: parseInt(row.total_completions) || 0,
-        complianceRate: row.total_prescribed > 0
-          ? Math.round((row.completed_unique / row.total_prescribed) * 100)
-          : 0
-      }))
-    }
+        complianceRate:
+          row.total_prescribed > 0
+            ? Math.round((row.completed_unique / row.total_prescribed) * 100)
+            : 0,
+      })),
+    };
   } catch (error) {
-    logger.error('Error getting patient progress stats:', error)
-    throw error
+    logger.error('Error getting patient progress stats:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Get weekly compliance data for a patient
@@ -144,7 +144,7 @@ export const getWeeklyCompliance = async (organizationId, patientId, weeks = 12)
     const result = await query(
       `WITH weeks AS (
         SELECT generate_series(
-          DATE_TRUNC('week', CURRENT_DATE - INTERVAL '${weeks - 1} weeks'),
+          DATE_TRUNC('week', CURRENT_DATE - make_interval(weeks => $3 - 1)),
           DATE_TRUNC('week', CURRENT_DATE),
           '1 week'::interval
         ) as week_start
@@ -160,7 +160,7 @@ export const getWeeklyCompliance = async (organizationId, patientId, weeks = 12)
         JOIN exercise_prescriptions pr ON pr.id = ep.prescription_id
         WHERE pr.organization_id = $1
           AND ep.patient_id = $2
-          AND ep.completed_at >= CURRENT_DATE - INTERVAL '${weeks} weeks'
+          AND ep.completed_at >= CURRENT_DATE - make_interval(weeks => $3)
         GROUP BY DATE_TRUNC('week', ep.completed_at)
       ),
       prescribed_weekly AS (
@@ -183,29 +183,28 @@ export const getWeeklyCompliance = async (organizationId, patientId, weeks = 12)
       CROSS JOIN prescribed_weekly pw
       LEFT JOIN weekly_progress wp ON wp.week_start = w.week_start
       ORDER BY w.week_start`,
-      [organizationId, patientId]
-    )
+      [organizationId, patientId, weeks]
+    );
 
-    return result.rows.map(row => ({
+    return result.rows.map((row) => ({
       weekStart: row.week_start,
       weekLabel: new Date(row.week_start).toLocaleDateString('no-NO', {
         day: 'numeric',
-        month: 'short'
+        month: 'short',
       }),
       completions: parseInt(row.completions),
       exercisesDone: parseInt(row.exercises_done),
       activeDays: parseInt(row.active_days),
       avgPain: parseFloat(row.avg_pain)?.toFixed(1) || 0,
       target: parseInt(row.target),
-      complianceRate: row.target > 0
-        ? Math.min(100, Math.round((row.completions / row.target) * 100))
-        : 0
-    }))
+      complianceRate:
+        row.target > 0 ? Math.min(100, Math.round((row.completions / row.target) * 100)) : 0,
+    }));
   } catch (error) {
-    logger.error('Error getting weekly compliance:', error)
-    throw error
+    logger.error('Error getting weekly compliance:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Get daily progress data for calendar view
@@ -231,7 +230,7 @@ export const getDailyProgress = async (organizationId, patientId, months = 3) =>
         JOIN exercise_library el ON el.id = ep.exercise_id
         WHERE pr.organization_id = $1
           AND ep.patient_id = $2
-          AND ep.completed_at >= CURRENT_DATE - INTERVAL '${months} months'
+          AND ep.completed_at >= CURRENT_DATE - make_interval(months => $3)
         GROUP BY DATE(ep.completed_at)
       ),
       prescribed_count AS (
@@ -253,10 +252,10 @@ export const getDailyProgress = async (organizationId, patientId, months = 3) =>
       FROM daily_data d
       CROSS JOIN prescribed_count pc
       ORDER BY d.date`,
-      [organizationId, patientId]
-    )
+      [organizationId, patientId, months]
+    );
 
-    return result.rows.map(row => ({
+    return result.rows.map((row) => ({
       date: row.date,
       completions: parseInt(row.completions),
       exercisesDone: parseInt(row.exercises_done),
@@ -264,15 +263,16 @@ export const getDailyProgress = async (organizationId, patientId, months = 3) =>
       avgPain: parseFloat(row.avg_pain)?.toFixed(1) || null,
       avgDifficulty: parseFloat(row.avg_difficulty)?.toFixed(1) || null,
       exerciseNames: row.exercise_names || [],
-      completionRate: row.total_prescribed > 0
-        ? Math.round((row.exercises_done / row.total_prescribed) * 100)
-        : 0
-    }))
+      completionRate:
+        row.total_prescribed > 0
+          ? Math.round((row.exercises_done / row.total_prescribed) * 100)
+          : 0,
+    }));
   } catch (error) {
-    logger.error('Error getting daily progress:', error)
-    throw error
+    logger.error('Error getting daily progress:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Get pain level history over time
@@ -296,41 +296,43 @@ export const getPainHistory = async (organizationId, patientId, days = 90) => {
        WHERE pr.organization_id = $1
          AND ep.patient_id = $2
          AND ep.pain_rating IS NOT NULL
-         AND ep.completed_at >= CURRENT_DATE - INTERVAL '${days} days'
+         AND ep.completed_at >= CURRENT_DATE - make_interval(days => $3)
        GROUP BY DATE(ep.completed_at)
        ORDER BY DATE(ep.completed_at)`,
-      [organizationId, patientId]
-    )
+      [organizationId, patientId, days]
+    );
 
     // Calculate trend
-    const dataPoints = result.rows
-    let trend = 'stable'
+    const dataPoints = result.rows;
+    let trend = 'stable';
     if (dataPoints.length >= 7) {
-      const firstWeek = dataPoints.slice(0, 7).reduce((sum, d) => sum + parseFloat(d.avg_pain), 0) / 7
-      const lastWeek = dataPoints.slice(-7).reduce((sum, d) => sum + parseFloat(d.avg_pain), 0) / 7
-      const diff = lastWeek - firstWeek
-      if (diff < -1) trend = 'improving'
-      else if (diff > 1) trend = 'worsening'
+      const firstWeek =
+        dataPoints.slice(0, 7).reduce((sum, d) => sum + parseFloat(d.avg_pain), 0) / 7;
+      const lastWeek = dataPoints.slice(-7).reduce((sum, d) => sum + parseFloat(d.avg_pain), 0) / 7;
+      const diff = lastWeek - firstWeek;
+      if (diff < -1) trend = 'improving';
+      else if (diff > 1) trend = 'worsening';
     }
 
     return {
-      data: dataPoints.map(row => ({
+      data: dataPoints.map((row) => ({
         date: row.date,
         avgPain: parseFloat(row.avg_pain)?.toFixed(1),
         minPain: parseInt(row.min_pain),
         maxPain: parseInt(row.max_pain),
-        entryCount: parseInt(row.entry_count)
+        entryCount: parseInt(row.entry_count),
       })),
       trend,
-      currentAvg: dataPoints.length > 0
-        ? parseFloat(dataPoints[dataPoints.length - 1].avg_pain)?.toFixed(1)
-        : null
-    }
+      currentAvg:
+        dataPoints.length > 0
+          ? parseFloat(dataPoints[dataPoints.length - 1].avg_pain)?.toFixed(1)
+          : null,
+    };
   } catch (error) {
-    logger.error('Error getting pain history:', error)
-    throw error
+    logger.error('Error getting pain history:', error);
+    throw error;
   }
-}
+};
 
 // ============================================================================
 // THERAPIST DASHBOARD / CLINIC ANALYTICS
@@ -345,12 +347,12 @@ export const getPainHistory = async (organizationId, patientId, days = 90) => {
  */
 export const getAllPatientsCompliance = async (organizationId, options = {}) => {
   try {
-    const { limit = 50, offset = 0, sortBy = 'compliance_rate', order = 'DESC' } = options
+    const { limit = 50, offset = 0, sortBy = 'compliance_rate', order = 'DESC' } = options;
 
     // Validate sort column to prevent SQL injection
-    const validSortColumns = ['compliance_rate', 'last_activity', 'patient_name', 'active_days']
-    const safeSort = validSortColumns.includes(sortBy) ? sortBy : 'compliance_rate'
-    const safeOrder = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC'
+    const validSortColumns = ['compliance_rate', 'last_activity', 'patient_name', 'active_days'];
+    const safeSort = validSortColumns.includes(sortBy) ? sortBy : 'compliance_rate';
+    const safeOrder = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
     const result = await query(
       `WITH patient_stats AS (
@@ -393,7 +395,7 @@ export const getAllPatientsCompliance = async (organizationId, options = {}) => 
       ORDER BY ${safeSort} ${safeOrder}
       LIMIT $2 OFFSET $3`,
       [organizationId, limit, offset]
-    )
+    );
 
     // Get total count
     const countResult = await query(
@@ -402,10 +404,10 @@ export const getAllPatientsCompliance = async (organizationId, options = {}) => 
        JOIN exercise_prescriptions pr ON pr.patient_id = p.id
        WHERE pr.organization_id = $1 AND pr.status = 'active'`,
       [organizationId]
-    )
+    );
 
     return {
-      patients: result.rows.map(row => ({
+      patients: result.rows.map((row) => ({
         patientId: row.patient_id,
         patientName: row.patient_name,
         email: row.email,
@@ -417,29 +419,29 @@ export const getAllPatientsCompliance = async (organizationId, options = {}) => 
         recentAvgPain: row.recent_avg_pain ? parseFloat(row.recent_avg_pain).toFixed(1) : null,
         totalPrescribed: parseInt(row.total_prescribed),
         complianceRate: parseInt(row.compliance_rate),
-        status: getComplianceStatus(parseInt(row.compliance_rate))
+        status: getComplianceStatus(parseInt(row.compliance_rate)),
       })),
       total: parseInt(countResult.rows[0].total),
       limit,
-      offset
-    }
+      offset,
+    };
   } catch (error) {
-    logger.error('Error getting all patients compliance:', error)
-    throw error
+    logger.error('Error getting all patients compliance:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Get compliance status based on rate
  * Henter overholdelsesstatus basert pa rate
  */
 const getComplianceStatus = (rate) => {
-  if (rate >= 80) return { label: 'Utmerket', labelEn: 'Excellent', color: 'green' }
-  if (rate >= 60) return { label: 'Bra', labelEn: 'Good', color: 'blue' }
-  if (rate >= 40) return { label: 'Middels', labelEn: 'Fair', color: 'yellow' }
-  if (rate >= 20) return { label: 'Lav', labelEn: 'Low', color: 'orange' }
-  return { label: 'Trenger oppfolging', labelEn: 'Needs follow-up', color: 'red' }
-}
+  if (rate >= 80) return { label: 'Utmerket', labelEn: 'Excellent', color: 'green' };
+  if (rate >= 60) return { label: 'Bra', labelEn: 'Good', color: 'blue' };
+  if (rate >= 40) return { label: 'Middels', labelEn: 'Fair', color: 'yellow' };
+  if (rate >= 20) return { label: 'Lav', labelEn: 'Low', color: 'orange' };
+  return { label: 'Trenger oppfolging', labelEn: 'Needs follow-up', color: 'red' };
+};
 
 /**
  * Get clinic-wide exercise compliance overview
@@ -460,7 +462,7 @@ export const getClinicComplianceOverview = async (organizationId) => {
        JOIN exercise_prescriptions pr ON pr.id = ep.prescription_id
        WHERE pr.organization_id = $1`,
       [organizationId]
-    )
+    );
 
     // Compliance distribution
     const distributionResult = await query(
@@ -486,7 +488,7 @@ export const getClinicComplianceOverview = async (organizationId) => {
       FROM patient_compliance
       GROUP BY compliance_level`,
       [organizationId]
-    )
+    );
 
     // Weekly trend
     const trendResult = await query(
@@ -501,40 +503,43 @@ export const getClinicComplianceOverview = async (organizationId) => {
        GROUP BY DATE_TRUNC('week', ep.completed_at)
        ORDER BY week`,
       [organizationId]
-    )
+    );
 
-    const overall = overallResult.rows[0]
-    const distribution = {}
-    distributionResult.rows.forEach(row => {
-      distribution[row.compliance_level] = parseInt(row.patient_count)
-    })
+    const overall = overallResult.rows[0];
+    const distribution = {};
+    distributionResult.rows.forEach((row) => {
+      distribution[row.compliance_level] = parseInt(row.patient_count);
+    });
 
     return {
       overview: {
         activePatients: parseInt(overall.active_patients) || 0,
         totalCompletions: parseInt(overall.total_completions) || 0,
         activeThisWeek: parseInt(overall.active_this_week) || 0,
-        avgPain30d: overall.avg_pain_30d ? parseFloat(overall.avg_pain_30d).toFixed(1) : null
+        avgPain30d: overall.avg_pain_30d ? parseFloat(overall.avg_pain_30d).toFixed(1) : null,
       },
       distribution: {
         excellent: distribution.excellent || 0,
         good: distribution.good || 0,
         fair: distribution.fair || 0,
         low: distribution.low || 0,
-        inactive: distribution.inactive || 0
+        inactive: distribution.inactive || 0,
       },
-      weeklyTrend: trendResult.rows.map(row => ({
+      weeklyTrend: trendResult.rows.map((row) => ({
         week: row.week,
-        weekLabel: new Date(row.week).toLocaleDateString('no-NO', { day: 'numeric', month: 'short' }),
+        weekLabel: new Date(row.week).toLocaleDateString('no-NO', {
+          day: 'numeric',
+          month: 'short',
+        }),
         activePatients: parseInt(row.active_patients),
-        completions: parseInt(row.completions)
-      }))
-    }
+        completions: parseInt(row.completions),
+      })),
+    };
   } catch (error) {
-    logger.error('Error getting clinic compliance overview:', error)
-    throw error
+    logger.error('Error getting clinic compliance overview:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Log a pain entry for a patient
@@ -546,7 +551,13 @@ export const getClinicComplianceOverview = async (organizationId) => {
  * @param {string} notes - Optional notes
  * @param {string} source - Source of entry (portal, clinician, app)
  */
-export const logPainEntry = async (organizationId, patientId, painLevel, notes = null, source = 'portal') => {
+export const logPainEntry = async (
+  organizationId,
+  patientId,
+  painLevel,
+  notes = null,
+  source = 'portal'
+) => {
   try {
     // Get active prescription and first exercise for patient
     const prescriptionResult = await query(
@@ -557,16 +568,16 @@ export const logPainEntry = async (organizationId, patientId, painLevel, notes =
        ORDER BY ep.prescribed_at DESC, pe.display_order ASC
        LIMIT 1`,
       [organizationId, patientId]
-    )
+    );
 
     if (prescriptionResult.rows.length === 0) {
-      throw new Error('Ingen aktiv treningsforskrivning funnet')
+      throw new Error('Ingen aktiv treningsforskrivning funnet');
     }
 
-    const { prescription_id: prescriptionId, exercise_id: exerciseId } = prescriptionResult.rows[0]
+    const { prescription_id: prescriptionId, exercise_id: exerciseId } = prescriptionResult.rows[0];
 
     if (!exerciseId) {
-      throw new Error('Ingen ovelser funnet i treningsforskrivningen')
+      throw new Error('Ingen ovelser funnet i treningsforskrivningen');
     }
 
     // Insert pain-only progress entry
@@ -576,20 +587,20 @@ export const logPainEntry = async (organizationId, patientId, painLevel, notes =
       ) VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *`,
       [prescriptionId, patientId, exerciseId, painLevel, notes, source]
-    )
+    );
 
-    logger.info('Pain entry logged:', { patientId, painLevel, source })
+    logger.info('Pain entry logged:', { patientId, painLevel, source });
 
     return {
       success: true,
       entry: result.rows[0],
-      message: 'Smerteniva registrert!'
-    }
+      message: 'Smerteniva registrert!',
+    };
   } catch (error) {
-    logger.error('Error logging pain entry:', error)
-    throw error
+    logger.error('Error logging pain entry:', error);
+    throw error;
   }
-}
+};
 
 // Export default for service
 export default {
@@ -602,5 +613,5 @@ export default {
 
   // Therapist/Clinic analytics
   getAllPatientsCompliance,
-  getClinicComplianceOverview
-}
+  getClinicComplianceOverview,
+};

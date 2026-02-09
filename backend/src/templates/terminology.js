@@ -7,6 +7,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import logger from '../utils/logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,7 +21,7 @@ const loadTemplate = (relativePath) => {
     const content = fs.readFileSync(fullPath, 'utf-8');
     return JSON.parse(content);
   } catch (error) {
-    console.warn(`Failed to load template: ${relativePath}`, error.message);
+    logger.warn(`Failed to load template: ${relativePath}`, error.message);
     return null;
   }
 };
@@ -107,7 +108,7 @@ export const buildTreatmentAbbreviations = () => {
   if (!treatmentsCore?.treatments) return abbreviations;
 
   // Process all treatment categories
-  Object.values(treatmentsCore.treatments).forEach(category => {
+  Object.values(treatmentsCore.treatments).forEach((category) => {
     if (typeof category === 'object' && category !== null) {
       Object.entries(category).forEach(([key, value]) => {
         if (typeof value === 'object' && value !== null) {
@@ -129,7 +130,7 @@ export const buildExaminationTests = () => {
   if (!examinationsCore?.examinations) return tests;
 
   // Process all examination categories
-  Object.values(examinationsCore.examinations).forEach(category => {
+  Object.values(examinationsCore.examinations).forEach((category) => {
     if (typeof category === 'object' && category !== null) {
       Object.entries(category).forEach(([key, value]) => {
         if (typeof value === 'object' && value !== null) {
@@ -153,7 +154,7 @@ export const buildCommonFindings = () => {
       symptom_patterns: [],
       temporal_patterns: [],
       aggravating_factors: [],
-      relieving_factors: []
+      relieving_factors: [],
     };
   }
 
@@ -163,7 +164,7 @@ export const buildCommonFindings = () => {
     symptom_patterns: examinationsCore.patterns.symptomPatterns || [],
     temporal_patterns: examinationsCore.patterns.temporalPatterns || [],
     aggravating_factors: examinationsCore.patterns.aggravatingFactors || [],
-    relieving_factors: examinationsCore.patterns.relievingFactors || []
+    relieving_factors: examinationsCore.patterns.relievingFactors || [],
   };
 };
 
@@ -180,8 +181,8 @@ export const buildSigrunPatterns = () => {
         improvement: [],
         no_change: [],
         worsening: [],
-        location_descriptors: []
-      }
+        location_descriptors: [],
+      },
     };
   }
 
@@ -192,7 +193,8 @@ export const buildSigrunPatterns = () => {
       treatmentPatterns[key] = value.charAt(0).toUpperCase() + value.slice(1);
     });
     Object.entries(sigrunTemplate.abbreviations.regions || {}).forEach(([key, value]) => {
-      treatmentPatterns[`${key} mob`] = `${value.charAt(0).toUpperCase() + value.slice(1)} mobilization`;
+      treatmentPatterns[`${key} mob`] =
+        `${value.charAt(0).toUpperCase() + value.slice(1)} mobilization`;
     });
     Object.entries(sigrunTemplate.abbreviations.positions || {}).forEach(([key, value]) => {
       treatmentPatterns[key] = value.charAt(0).toUpperCase() + value.slice(1);
@@ -201,15 +203,37 @@ export const buildSigrunPatterns = () => {
 
   // Build assessment patterns
   const assessmentPatterns = {
-    improvement: examinationsCore?.patterns?.assessmentImprovement || ['bedre', 'mye bedre', 'klart bedre'],
+    improvement: examinationsCore?.patterns?.assessmentImprovement || [
+      'bedre',
+      'mye bedre',
+      'klart bedre',
+    ],
     no_change: examinationsCore?.patterns?.assessmentNoChange || ['som sist', 'uendret'],
     worsening: examinationsCore?.patterns?.assessmentWorsening || ['verre', 'mer vondt'],
-    location_descriptors: ['nakke', 'cx', 'c-col', 'cervical', 'rygg', 'tx', 't-col', 'thoracic', 'korsrygg', 'lx', 'l-col', 'lumbar', 'skulder', 'arm', 'hofte', 'bekken', 'sete']
+    location_descriptors: [
+      'nakke',
+      'cx',
+      'c-col',
+      'cervical',
+      'rygg',
+      'tx',
+      't-col',
+      'thoracic',
+      'korsrygg',
+      'lx',
+      'l-col',
+      'lumbar',
+      'skulder',
+      'arm',
+      'hofte',
+      'bekken',
+      'sete',
+    ],
   };
 
   return {
     treatment: treatmentPatterns,
-    assessment: assessmentPatterns
+    assessment: assessmentPatterns,
   };
 };
 
@@ -235,5 +259,5 @@ export default {
   buildTreatmentAbbreviations,
   buildExaminationTests,
   buildCommonFindings,
-  buildSigrunPatterns
+  buildSigrunPatterns,
 };

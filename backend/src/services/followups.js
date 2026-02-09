@@ -16,7 +16,7 @@ export const getAllFollowUps = async (organizationId, options = {}) => {
     patientId = null,
     status = null,
     priority = null,
-    dueDate = null
+    dueDate = null,
   } = options;
 
   const offset = (page - 1) * limit;
@@ -51,10 +51,7 @@ export const getAllFollowUps = async (organizationId, options = {}) => {
   const whereClause = whereConditions.join(' AND ');
 
   // Get total count
-  const countResult = await query(
-    `SELECT COUNT(*) FROM follow_ups f WHERE ${whereClause}`,
-    params
-  );
+  const countResult = await query(`SELECT COUNT(*) FROM follow_ups f WHERE ${whereClause}`, params);
   const total = parseInt(countResult.rows[0].count);
 
   // Get paginated results
@@ -79,8 +76,8 @@ export const getAllFollowUps = async (organizationId, options = {}) => {
       page,
       limit,
       total,
-      pages: Math.ceil(total / limit)
-    }
+      pages: Math.ceil(total / limit),
+    },
   };
 };
 
@@ -118,7 +115,7 @@ export const createFollowUp = async (organizationId, followUpData) => {
     due_date,
     priority = 'MEDIUM',
     assigned_to = null,
-    notes = ''
+    notes = '',
   } = followUpData;
 
   const result = await query(
@@ -144,7 +141,7 @@ export const createFollowUp = async (organizationId, followUpData) => {
       due_date,
       priority,
       assigned_to,
-      notes
+      notes,
     ]
   );
 
@@ -156,13 +153,7 @@ export const createFollowUp = async (organizationId, followUpData) => {
  * Update follow-up
  */
 export const updateFollowUp = async (organizationId, followUpId, updateData) => {
-  const {
-    due_date,
-    priority,
-    assigned_to,
-    notes,
-    status
-  } = updateData;
+  const { due_date, priority, assigned_to, notes, status } = updateData;
 
   const updates = [];
   const params = [followUpId, organizationId];
@@ -315,9 +306,9 @@ export const getUpcomingFollowUps = async (organizationId, days = 7) => {
     WHERE f.organization_id = $1
       AND f.status = 'PENDING'
       AND f.due_date >= NOW()
-      AND f.due_date <= NOW() + INTERVAL '${days} days'
+      AND f.due_date <= NOW() + make_interval(days => $2)
     ORDER BY f.due_date ASC, f.priority DESC`,
-    [organizationId]
+    [organizationId, days]
   );
 
   return result.rows;
@@ -415,7 +406,7 @@ export const autoCreateFollowUps = async (organizationId, encounterId, patientId
     { pattern: /2\s*(week|uke)/i, days: 14, reason: 'Scheduled 2 week follow-up' },
     { pattern: /3\s*(week|uke)/i, days: 21, reason: 'Scheduled 3 week follow-up' },
     { pattern: /1\s*(month|måned)/i, days: 30, reason: 'Scheduled 1 month follow-up' },
-    { pattern: /2\s*(month|måned)/i, days: 60, reason: 'Scheduled 2 month follow-up' }
+    { pattern: /2\s*(month|måned)/i, days: 60, reason: 'Scheduled 2 month follow-up' },
   ];
 
   for (const timeframe of timeframes) {
@@ -429,7 +420,7 @@ export const autoCreateFollowUps = async (organizationId, encounterId, patientId
         follow_up_type: 'APPOINTMENT',
         reason: timeframe.reason,
         due_date: dueDate.toISOString().split('T')[0],
-        priority: 'MEDIUM'
+        priority: 'MEDIUM',
       });
 
       followUps.push(followUp);
@@ -452,5 +443,5 @@ export default {
   getFollowUpStats,
   getPatientsNeedingFollowUp,
   markPatientAsContacted,
-  autoCreateFollowUps
+  autoCreateFollowUps,
 };

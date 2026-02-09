@@ -4,12 +4,8 @@
  * Processes SOPE (Subjective, Objective, Plan, Evaluation) notes
  */
 
-// Simple logger for standalone use
-const logger = {
-  info: (...args) => console.log('[INFO]', ...args),
-  error: (...args) => console.error('[ERROR]', ...args),
-  warn: (...args) => console.warn('[WARN]', ...args)
-};
+import loggerModule from '../utils/logger.js';
+const logger = loggerModule;
 
 /**
  * Parse a single clinical note from corpus
@@ -19,7 +15,7 @@ export const parseClinicalNote = (noteText) => {
   const note = {
     metadata: {},
     sections: {},
-    raw: noteText
+    raw: noteText,
   };
 
   // Extract metadata (date, type)
@@ -65,13 +61,15 @@ const extractSections = (text) => {
   // Section patterns
   const sectionPatterns = {
     anamnese: /Anamnese:([\s\S]*?)(?=\n(?:Undersøkelse|Behandling|Konklusjon|Journalnotat:|$))/i,
-    undersøkelse: /Undersøkelse:([\s\S]*?)(?=\n(?:Anamnese|Behandling|Konklusjon|Journalnotat:|$))/i,
+    undersøkelse:
+      /Undersøkelse:([\s\S]*?)(?=\n(?:Anamnese|Behandling|Konklusjon|Journalnotat:|$))/i,
     behandling: /Behandling:([\s\S]*?)(?=\n(?:Anamnese|Undersøkelse|Konklusjon|Journalnotat:|$))/i,
     konklusjon: /Konklusjon:([\s\S]*?)(?=\n(?:Anamnese|Undersøkelse|Behandling|Journalnotat:|$))/i,
 
     // Specific examination sections
     cervical: /Cervical\s*undersøkelse:([\s\S]*?)(?=\n(?:[A-Z][a-zæøå]+:|Behandling:|$))/i,
-    lumbal: /Lumbal(?:columna)?\s*(?:undersøkelse)?:([\s\S]*?)(?=\n(?:[A-Z][a-zæøå]+:|Behandling:|$))/i,
+    lumbal:
+      /Lumbal(?:columna)?\s*(?:undersøkelse)?:([\s\S]*?)(?=\n(?:[A-Z][a-zæøå]+:|Behandling:|$))/i,
     skulder: /Skulder\s*(?:undersøkelse)?:([\s\S]*?)(?=\n(?:[A-Z][a-zæøå]+:|Behandling:|$))/i,
     hofte: /Hofte\s*(?:undersøkelse)?:([\s\S]*?)(?=\n(?:[A-Z][a-zæøå]+:|Behandling:|$))/i,
 
@@ -81,7 +79,7 @@ const extractSections = (text) => {
     palpasjon: /Palpasjon:([\s\S]*?)(?=\n[A-Z][a-zæøå]+:|$)/i,
     reflekser: /Reflekser:([\s\S]*?)(?=\n[A-Z][a-zæøå]+:|$)/i,
     isometriske_tester: /Isometriske\s*tester:([\s\S]*?)(?=\n[A-Z][a-zæøå]+:|$)/i,
-    sensibilitet: /Sensibilitet:([\s\S]*?)(?=\n[A-Z][a-zæøå]+:|$)/i
+    sensibilitet: /Sensibilitet:([\s\S]*?)(?=\n[A-Z][a-zæøå]+:|$)/i,
   };
 
   for (const [key, pattern] of Object.entries(sectionPatterns)) {
@@ -102,7 +100,23 @@ const extractAnatomicalRegions = (text) => {
 
   const regionKeywords = {
     cervical: ['cervical', 'nakke', 'halsen', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7'],
-    thoracal: ['thoracal', 'thorax', 'bryst', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
+    thoracal: [
+      'thoracal',
+      'thorax',
+      'bryst',
+      'T1',
+      'T2',
+      'T3',
+      'T4',
+      'T5',
+      'T6',
+      'T7',
+      'T8',
+      'T9',
+      'T10',
+      'T11',
+      'T12',
+    ],
     lumbal: ['lumbal', 'korsrygg', 'lumbalen', 'L1', 'L2', 'L3', 'L4', 'L5'],
     sacrum: ['sacrum', 'sacral', 'S1', 'S2', 'bekken', 'SI ledd', 'SI-ledd'],
     skulder: ['skulder', 'shoulder', 'scapula', 'skulderblad'],
@@ -111,12 +125,12 @@ const extractAnatomicalRegions = (text) => {
     hofte: ['hofte', 'hip', 'lyske'],
     kne: ['kne', 'knee', 'patella'],
     ankel: ['ankel', 'ankle', 'talus', 'calcaneus'],
-    fot: ['fot', 'foot', 'plantar']
+    fot: ['fot', 'foot', 'plantar'],
   };
 
   const lowerText = text.toLowerCase();
   for (const [region, keywords] of Object.entries(regionKeywords)) {
-    if (keywords.some(keyword => lowerText.includes(keyword.toLowerCase()))) {
+    if (keywords.some((keyword) => lowerText.includes(keyword.toLowerCase()))) {
       regions.add(region);
     }
   }
@@ -143,7 +157,7 @@ const extractTreatmentTechniques = (text) => {
     met: /\b(?:MET|muscle energy)\b/gi,
     counterstrain: /\bcounterstrain\b/gi,
     eswt: /\b(?:ESWT|trykkbølge|shockwave)\b/gi,
-    iastm: /\b(?:IASTM|instrument assisted)\b/gi
+    iastm: /\b(?:IASTM|instrument assisted)\b/gi,
   };
 
   for (const [technique, pattern] of Object.entries(techniquePatterns)) {
@@ -163,20 +177,20 @@ const extractCommonPhrases = (text) => {
     positive_findings: [],
     negative_findings: [],
     treatment_outcomes: [],
-    patient_responses: []
+    patient_responses: [],
   };
 
   // Positive findings (pain, restriction, etc.)
   const positivePatterns = [
     /\b(?:palpasjonsøm|hyperton|restriktiv|vondt|smerter|begrenset)\b/gi,
     /\b(?:trigger(?:er)?\s+(?:kjent\s+)?smerte|reproduserer\s+smerte)\b/gi,
-    /\b(?:nedsatt|redusert)\s+(?:bevegelighet|bevegelsesutslag|ROM)\b/gi
+    /\b(?:nedsatt|redusert)\s+(?:bevegelighet|bevegelsesutslag|ROM)\b/gi,
   ];
 
-  positivePatterns.forEach(pattern => {
+  positivePatterns.forEach((pattern) => {
     const matches = text.match(pattern);
     if (matches) {
-      phrases.positive_findings.push(...matches.map(m => m.toLowerCase()));
+      phrases.positive_findings.push(...matches.map((m) => m.toLowerCase()));
     }
   });
 
@@ -185,13 +199,13 @@ const extractCommonPhrases = (text) => {
     /\bua\b/gi,
     /\b(?:ingen|ikke)\s+(?:ømhet|smerter|restriksjon|begrenset)\b/gi,
     /\b(?:normal|normale|symmetrisk|intakt)\b/gi,
-    /\bnegativ(?:\s+bilateral)?\b/gi
+    /\bnegativ(?:\s+bilateral)?\b/gi,
   ];
 
-  negativePatterns.forEach(pattern => {
+  negativePatterns.forEach((pattern) => {
     const matches = text.match(pattern);
     if (matches) {
-      phrases.negative_findings.push(...matches.map(m => m.toLowerCase()));
+      phrases.negative_findings.push(...matches.map((m) => m.toLowerCase()));
     }
   });
 
@@ -199,26 +213,26 @@ const extractCommonPhrases = (text) => {
   const outcomePatterns = [
     /\bslipper\s+(?:bra|ok|godt)\b/gi,
     /\b(?:bedre|bedring|god fremgang|mye bedre)\b/gi,
-    /\b(?:øm etter sist|reaksjon)\b/gi
+    /\b(?:øm etter sist|reaksjon)\b/gi,
   ];
 
-  outcomePatterns.forEach(pattern => {
+  outcomePatterns.forEach((pattern) => {
     const matches = text.match(pattern);
     if (matches) {
-      phrases.treatment_outcomes.push(...matches.map(m => m.toLowerCase()));
+      phrases.treatment_outcomes.push(...matches.map((m) => m.toLowerCase()));
     }
   });
 
   // Patient responses
   const responsePatterns = [
     /pasienten\s+(?:samtykker|klager|rapporterer|opplever|beskriver|presenterer)/gi,
-    /pasienten\s+(?:har|har hatt|oppsøker)/gi
+    /pasienten\s+(?:har|har hatt|oppsøker)/gi,
   ];
 
-  responsePatterns.forEach(pattern => {
+  responsePatterns.forEach((pattern) => {
     const matches = text.match(pattern);
     if (matches) {
-      phrases.patient_responses.push(...matches.map(m => m.toLowerCase()));
+      phrases.patient_responses.push(...matches.map((m) => m.toLowerCase()));
     }
   });
 
@@ -253,7 +267,7 @@ export const parseCorpus = (corpusText) => {
   return {
     totalNotes: notes.length,
     notes,
-    statistics: generateCorpusStatistics(notes)
+    statistics: generateCorpusStatistics(notes),
   };
 };
 
@@ -265,20 +279,20 @@ const generateCorpusStatistics = (notes) => {
     noteTypes: {},
     regions: {},
     techniques: {},
-    totalSections: 0
+    totalSections: 0,
   };
 
-  notes.forEach(note => {
+  notes.forEach((note) => {
     // Count note types
     stats.noteTypes[note.type] = (stats.noteTypes[note.type] || 0) + 1;
 
     // Count regions
-    note.regions.forEach(region => {
+    note.regions.forEach((region) => {
       stats.regions[region] = (stats.regions[region] || 0) + 1;
     });
 
     // Count techniques
-    note.techniques.forEach(technique => {
+    note.techniques.forEach((technique) => {
       stats.techniques[technique] = (stats.techniques[technique] || 0) + 1;
     });
 
@@ -298,31 +312,66 @@ export const extractTemplates = (parsedCorpus) => {
   const templates = [];
   const templateMap = new Map(); // To avoid duplicates
 
-  parsedCorpus.notes.forEach(note => {
+  parsedCorpus.notes.forEach((note) => {
     // Extract examination templates
     if (note.sections.cervical) {
-      addTemplate(templateMap, 'Cervical', 'Undersøkelse', 'Cervical eksempel fra praksis', note.sections.cervical, 'objective');
+      addTemplate(
+        templateMap,
+        'Cervical',
+        'Undersøkelse',
+        'Cervical eksempel fra praksis',
+        note.sections.cervical,
+        'objective'
+      );
     }
 
     if (note.sections.lumbal) {
-      addTemplate(templateMap, 'Korsrygg', 'Undersøkelse', 'Lumbal eksempel fra praksis', note.sections.lumbal, 'objective');
+      addTemplate(
+        templateMap,
+        'Korsrygg',
+        'Undersøkelse',
+        'Lumbal eksempel fra praksis',
+        note.sections.lumbal,
+        'objective'
+      );
     }
 
     // Extract treatment templates
     if (note.sections.behandling) {
       const region = note.regions[0] || 'Generelt';
-      addTemplate(templateMap, region.charAt(0).toUpperCase() + region.slice(1), 'Behandling', 'Behandlingseksempel', note.sections.behandling, 'plan');
+      addTemplate(
+        templateMap,
+        region.charAt(0).toUpperCase() + region.slice(1),
+        'Behandling',
+        'Behandlingseksempel',
+        note.sections.behandling,
+        'plan'
+      );
     }
 
     // Extract anamnese templates
     if (note.sections.anamnese) {
       const region = note.regions[0] || 'Generelt';
-      addTemplate(templateMap, region.charAt(0).toUpperCase() + region.slice(1), 'Anamnese', 'Anamnese eksempel', note.sections.anamnese, 'subjective');
+      addTemplate(
+        templateMap,
+        region.charAt(0).toUpperCase() + region.slice(1),
+        'Anamnese',
+        'Anamnese eksempel',
+        note.sections.anamnese,
+        'subjective'
+      );
     }
 
     // Extract common findings patterns
     if (note.sections.palpasjon) {
-      addTemplate(templateMap, 'Palpasjon', 'Funn', 'Palpasjonseksempel', note.sections.palpasjon, 'objective');
+      addTemplate(
+        templateMap,
+        'Palpasjon',
+        'Funn',
+        'Palpasjonseksempel',
+        note.sections.palpasjon,
+        'objective'
+      );
     }
   });
 
@@ -344,7 +393,7 @@ const addTemplate = (templateMap, category, subcategory, name, text, soapSection
       soap_section: soapSection,
       language: 'NO',
       is_system: false,
-      usage_count: 0
+      usage_count: 0,
     });
   }
 };
@@ -358,7 +407,7 @@ export const createTrainingExamples = (parsedCorpus) => {
 
   const examples = [];
 
-  parsedCorpus.notes.forEach(note => {
+  parsedCorpus.notes.forEach((note) => {
     // Example 1: Anamnese -> Undersøkelse
     if (note.sections.anamnese && note.sections.undersøkelse) {
       examples.push({
@@ -367,8 +416,8 @@ export const createTrainingExamples = (parsedCorpus) => {
         metadata: {
           type: 'anamnese_to_exam',
           regions: note.regions,
-          noteId: note.id
-        }
+          noteId: note.id,
+        },
       });
     }
 
@@ -380,8 +429,8 @@ export const createTrainingExamples = (parsedCorpus) => {
         metadata: {
           type: 'findings_to_conclusion',
           regions: note.regions,
-          noteId: note.id
-        }
+          noteId: note.id,
+        },
       });
     }
 
@@ -394,17 +443,17 @@ export const createTrainingExamples = (parsedCorpus) => {
           type: 'full_note',
           regions: note.regions,
           techniques: note.techniques,
-          noteId: note.id
-        }
+          noteId: note.id,
+        },
       });
     }
 
     // Example 4: Treatment technique descriptions
-    note.techniques.forEach(technique => {
+    note.techniques.forEach((technique) => {
       if (note.sections.behandling && note.sections.behandling.includes(technique)) {
         // Extract sentence containing technique
         const sentences = note.sections.behandling.split('.');
-        const relevantSentence = sentences.find(s => s.toLowerCase().includes(technique));
+        const relevantSentence = sentences.find((s) => s.toLowerCase().includes(technique));
 
         if (relevantSentence) {
           examples.push({
@@ -413,8 +462,8 @@ export const createTrainingExamples = (parsedCorpus) => {
             metadata: {
               type: 'technique_documentation',
               technique,
-              noteId: note.id
-            }
+              noteId: note.id,
+            },
           });
         }
       }
@@ -473,5 +522,5 @@ export default {
   extractTemplates,
   createTrainingExamples,
   generateTemplateSeedSQL,
-  generateCorpusStatistics
+  generateCorpusStatistics,
 };

@@ -39,10 +39,10 @@ const ensureDirectories = () => {
     AI_TRAINING_DIR,
     `${TRAINING_DIR}/feedback`,
     `${TRAINING_DIR}/merged`,
-    `${TRAINING_DIR}/backup`
+    `${TRAINING_DIR}/backup`,
   ];
 
-  dirs.forEach(dir => {
+  dirs.forEach((dir) => {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
       logger.info(`Created directory: ${dir}`);
@@ -84,9 +84,10 @@ export const getRetrainingStatus = async () => {
         rejectionThreshold: RETRAINING_REJECTION_THRESHOLD,
         currentFeedbackCount: parseInt(metrics.feedback_count || 0),
         currentRejectionCount: parseInt(metrics.rejection_count || 0),
-        thresholdReached: parseInt(metrics.feedback_count || 0) >= RETRAINING_FEEDBACK_THRESHOLD ||
-                          parseInt(metrics.rejection_count || 0) >= RETRAINING_REJECTION_THRESHOLD
-      }
+        thresholdReached:
+          parseInt(metrics.feedback_count || 0) >= RETRAINING_FEEDBACK_THRESHOLD ||
+          parseInt(metrics.rejection_count || 0) >= RETRAINING_REJECTION_THRESHOLD,
+      },
     };
   } catch (error) {
     logger.error('Error getting retraining status:', error);
@@ -130,11 +131,7 @@ export const getRetrainingHistory = async (limit = 20) => {
  * Export feedback data to JSONL training format
  */
 export const exportFeedbackToTrainingFormat = async (options = {}) => {
-  const {
-    minRating = 3,
-    days = 90,
-    includeRejected = true
-  } = options;
+  const { minRating = 3, days = 90, includeRejected = true } = options;
 
   ensureDirectories();
   logger.info('Exporting feedback to training format...');
@@ -153,7 +150,7 @@ export const exportFeedbackToTrainingFormat = async (options = {}) => {
         af.context_data,
         af.confidence_score
        FROM ai_feedback af
-       WHERE af.created_at > NOW() - INTERVAL '${days} days'
+       WHERE af.created_at > NOW() - make_interval(days => $2)
          AND af.processed_for_training = false
          AND (
            (af.accepted = true AND af.user_rating >= $1)
@@ -161,7 +158,7 @@ export const exportFeedbackToTrainingFormat = async (options = {}) => {
            ${includeRejected ? 'OR (af.accepted = false AND af.user_rating IS NOT NULL)' : ''}
          )
        ORDER BY af.user_rating DESC NULLS LAST, af.created_at DESC`,
-      [minRating]
+      [minRating, days]
     );
 
     const trainingExamples = [];
@@ -175,42 +172,51 @@ export const exportFeedbackToTrainingFormat = async (options = {}) => {
         // Accepted as-is: reinforce original suggestion
         trainingExamples.push({
           messages: [
-            { role: 'user', content: buildPromptFromContext(feedback.suggestion_type, feedback.context_data) },
-            { role: 'assistant', content: feedback.original_suggestion }
+            {
+              role: 'user',
+              content: buildPromptFromContext(feedback.suggestion_type, feedback.context_data),
+            },
+            { role: 'assistant', content: feedback.original_suggestion },
           ],
           metadata: {
             type: 'accepted',
             rating: feedback.user_rating,
-            suggestionType: feedback.suggestion_type
-          }
+            suggestionType: feedback.suggestion_type,
+          },
         });
       } else if (feedback.user_correction) {
         // User made corrections: use corrected version
         trainingExamples.push({
           messages: [
-            { role: 'user', content: buildPromptFromContext(feedback.suggestion_type, feedback.context_data) },
-            { role: 'assistant', content: feedback.user_correction }
+            {
+              role: 'user',
+              content: buildPromptFromContext(feedback.suggestion_type, feedback.context_data),
+            },
+            { role: 'assistant', content: feedback.user_correction },
           ],
           metadata: {
             type: 'corrected',
             correctionType: feedback.correction_type,
             rating: feedback.user_rating,
-            suggestionType: feedback.suggestion_type
-          }
+            suggestionType: feedback.suggestion_type,
+          },
         });
       } else if (!feedback.accepted && includeRejected) {
         // Rejected: potentially use as negative example (for RLAIF)
         trainingExamples.push({
           messages: [
-            { role: 'user', content: buildPromptFromContext(feedback.suggestion_type, feedback.context_data) },
-            { role: 'assistant', content: feedback.original_suggestion }
+            {
+              role: 'user',
+              content: buildPromptFromContext(feedback.suggestion_type, feedback.context_data),
+            },
+            { role: 'assistant', content: feedback.original_suggestion },
           ],
           metadata: {
             type: 'rejected',
             rating: feedback.user_rating,
             suggestionType: feedback.suggestion_type,
-            isNegativeExample: true
-          }
+            isNegativeExample: true,
+          },
         });
       }
     }
@@ -218,7 +224,7 @@ export const exportFeedbackToTrainingFormat = async (options = {}) => {
     // Write to JSONL file
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const outputPath = path.join(TRAINING_DIR, 'feedback', `feedback_${timestamp}.jsonl`);
-    const jsonlContent = trainingExamples.map(ex => JSON.stringify(ex)).join('\n');
+    const jsonlContent = trainingExamples.map((ex) => JSON.stringify(ex)).join('\n');
     fs.writeFileSync(outputPath, jsonlContent);
 
     logger.info(`Exported ${trainingExamples.length} training examples to ${outputPath}`);
@@ -228,10 +234,10 @@ export const exportFeedbackToTrainingFormat = async (options = {}) => {
       examplesCount: trainingExamples.length,
       processedFeedbackIds: processedIds,
       breakdown: {
-        accepted: trainingExamples.filter(e => e.metadata.type === 'accepted').length,
-        corrected: trainingExamples.filter(e => e.metadata.type === 'corrected').length,
-        rejected: trainingExamples.filter(e => e.metadata.type === 'rejected').length
-      }
+        accepted: trainingExamples.filter((e) => e.metadata.type === 'accepted').length,
+        corrected: trainingExamples.filter((e) => e.metadata.type === 'corrected').length,
+        rejected: trainingExamples.filter((e) => e.metadata.type === 'rejected').length,
+      },
     };
   } catch (error) {
     logger.error('Error exporting feedback to training format:', error);
@@ -289,15 +295,18 @@ export const mergeWithBaseTrainingData = async (feedbackDataPath) => {
     let feedbackExamples = [];
     if (fs.existsSync(feedbackDataPath)) {
       const feedbackContent = fs.readFileSync(feedbackDataPath, 'utf-8');
-      feedbackExamples = feedbackContent.split('\n')
-        .filter(line => line.trim())
-        .map(line => JSON.parse(line));
+      feedbackExamples = feedbackContent
+        .split('\n')
+        .filter((line) => line.trim())
+        .map((line) => JSON.parse(line));
       logger.info(`Loaded ${feedbackExamples.length} feedback examples`);
     }
 
     // Deduplicate: prefer newer feedback examples over base
     const mergedExamples = [...baseExamples];
-    const existingPrompts = new Set(baseExamples.map(e => e.messages?.[0]?.content?.toLowerCase()));
+    const existingPrompts = new Set(
+      baseExamples.map((e) => e.messages?.[0]?.content?.toLowerCase())
+    );
 
     for (const example of feedbackExamples) {
       const prompt = example.messages?.[0]?.content?.toLowerCase();
@@ -306,8 +315,8 @@ export const mergeWithBaseTrainingData = async (feedbackDataPath) => {
         existingPrompts.add(prompt);
       } else {
         // Replace base example with feedback example (feedback is more recent/relevant)
-        const idx = mergedExamples.findIndex(e =>
-          e.messages?.[0]?.content?.toLowerCase() === prompt
+        const idx = mergedExamples.findIndex(
+          (e) => e.messages?.[0]?.content?.toLowerCase() === prompt
         );
         if (idx !== -1 && !example.metadata?.isNegativeExample) {
           mergedExamples[idx] = example;
@@ -318,7 +327,7 @@ export const mergeWithBaseTrainingData = async (feedbackDataPath) => {
     // Write merged data
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const outputPath = path.join(TRAINING_DIR, 'merged', `merged_${timestamp}.jsonl`);
-    const jsonlContent = mergedExamples.map(ex => JSON.stringify(ex)).join('\n');
+    const jsonlContent = mergedExamples.map((ex) => JSON.stringify(ex)).join('\n');
     fs.writeFileSync(outputPath, jsonlContent);
 
     logger.info(`Merged ${mergedExamples.length} total examples to ${outputPath}`);
@@ -328,7 +337,7 @@ export const mergeWithBaseTrainingData = async (feedbackDataPath) => {
       totalExamples: mergedExamples.length,
       baseExamples: baseExamples.length,
       feedbackExamples: feedbackExamples.length,
-      newExamples: mergedExamples.length - baseExamples.length
+      newExamples: mergedExamples.length - baseExamples.length,
     };
   } catch (error) {
     logger.error('Error merging training data:', error);
@@ -358,9 +367,9 @@ const extractMessagesFromModelfile = (modelfileContent) => {
         examples.push({
           messages: [
             { role: 'user', content: currentUser },
-            { role: 'assistant', content: match[1] }
+            { role: 'assistant', content: match[1] },
           ],
-          metadata: { type: 'base' }
+          metadata: { type: 'base' },
         });
         currentUser = null;
       }
@@ -374,12 +383,7 @@ const extractMessagesFromModelfile = (modelfileContent) => {
  * Convert merged training data to Ollama Modelfile format
  */
 export const convertToOllamaFormat = async (mergedDataPath, options = {}) => {
-  const {
-    temperature = 0.3,
-    topP = 0.9,
-    numPredict = 500,
-    systemPrompt = null
-  } = options;
+  const { temperature = 0.3, topP = 0.9, numPredict = 500, systemPrompt = null } = options;
 
   ensureDirectories();
   logger.info('Converting to Ollama Modelfile format...');
@@ -387,10 +391,11 @@ export const convertToOllamaFormat = async (mergedDataPath, options = {}) => {
   try {
     // Read merged training data
     const mergedContent = fs.readFileSync(mergedDataPath, 'utf-8');
-    const examples = mergedContent.split('\n')
-      .filter(line => line.trim())
-      .map(line => JSON.parse(line))
-      .filter(ex => !ex.metadata?.isNegativeExample); // Exclude negative examples
+    const examples = mergedContent
+      .split('\n')
+      .filter((line) => line.trim())
+      .map((line) => JSON.parse(line))
+      .filter((ex) => !ex.metadata?.isNegativeExample); // Exclude negative examples
 
     // Read existing Modelfile for system prompt
     const baseModelfilePath = path.join(AI_TRAINING_DIR, 'Modelfile');
@@ -459,7 +464,7 @@ Not a substitute for professional clinical judgment.
       outputPath,
       version,
       examplesCount: examples.length,
-      parameters: { temperature, topP, numPredict }
+      parameters: { temperature, topP, numPredict },
     };
   } catch (error) {
     logger.error('Error converting to Ollama format:', error);
@@ -542,7 +547,7 @@ export const rebuildOllamaModel = async (modelfilePath, modelName = null) => {
       success: true,
       modelName: targetModelName,
       output: stdout,
-      message: `Model ${targetModelName} rebuilt successfully`
+      message: `Model ${targetModelName} rebuilt successfully`,
     };
   } catch (error) {
     logger.error('Error rebuilding Ollama model:', error);
@@ -560,24 +565,25 @@ export const testNewModel = async (modelName = null) => {
   const testCases = [
     {
       name: 'SOAP Subjective',
-      prompt: 'Skriv subjektiv del av SOPE-notat: Pasient med korsryggsmerter i 2 uker etter løfting',
-      expectedContains: ['smert', 'uke', 'løft']
+      prompt:
+        'Skriv subjektiv del av SOPE-notat: Pasient med korsryggsmerter i 2 uker etter løfting',
+      expectedContains: ['smert', 'uke', 'løft'],
     },
     {
       name: 'SMS Reminder',
       prompt: 'Skriv en SMS påminnelse om time, vennlig tone',
-      expectedContains: ['time', 'Hei']
+      expectedContains: ['time', 'Hei'],
     },
     {
       name: 'ICPC-2 Codes',
       prompt: 'Hva er vanlige ICPC-2 koder for nakke- og ryggsmerter?',
-      expectedContains: ['L01', 'L03', 'L83', 'L84']
+      expectedContains: ['L01', 'L03', 'L83', 'L84'],
     },
     {
       name: 'Clinical Phrase',
       prompt: 'Generer klinisk frase for leddmobilisering',
-      expectedContains: ['mobilisering', 'ledd']
-    }
+      expectedContains: ['mobilisering', 'ledd'],
+    },
   ];
 
   const results = [];
@@ -592,7 +598,7 @@ export const testNewModel = async (modelName = null) => {
         );
 
         const response = stdout.trim();
-        const containsExpected = testCase.expectedContains.some(keyword =>
+        const containsExpected = testCase.expectedContains.some((keyword) =>
           response.toLowerCase().includes(keyword.toLowerCase())
         );
 
@@ -601,7 +607,7 @@ export const testNewModel = async (modelName = null) => {
           prompt: testCase.prompt,
           response: response.substring(0, 500),
           passed: containsExpected && response.length > 10,
-          expectedKeywords: testCase.expectedContains
+          expectedKeywords: testCase.expectedContains,
         });
 
         if (containsExpected && response.length > 10) {
@@ -613,14 +619,16 @@ export const testNewModel = async (modelName = null) => {
           prompt: testCase.prompt,
           response: null,
           passed: false,
-          error: testError.message
+          error: testError.message,
         });
       }
     }
 
     const passRate = (passedTests / testCases.length) * 100;
 
-    logger.info(`Model test results: ${passedTests}/${testCases.length} passed (${passRate.toFixed(1)}%)`);
+    logger.info(
+      `Model test results: ${passedTests}/${testCases.length} passed (${passRate.toFixed(1)}%)`
+    );
 
     return {
       modelName: targetModelName,
@@ -628,7 +636,7 @@ export const testNewModel = async (modelName = null) => {
       passedTests,
       passRate,
       passed: passRate >= 75, // Require at least 75% pass rate
-      results
+      results,
     };
   } catch (error) {
     logger.error('Error testing new model:', error);
@@ -683,7 +691,7 @@ export const activateNewModel = async (version, retrainingEventId = null) => {
       success: true,
       version,
       previousVersion: previousModelVersion,
-      message: `Model version ${version} activated successfully`
+      message: `Model version ${version} activated successfully`,
     };
   } catch (error) {
     logger.error('Error activating new model:', error);
@@ -710,7 +718,7 @@ export const rollbackModel = async (targetVersion = null) => {
     if (!fs.existsSync(targetModelfilePath)) {
       // Try to find in backup
       const backupDir = path.join(TRAINING_DIR, 'backup');
-      const backupFiles = fs.readdirSync(backupDir).filter(f => f.includes(rollbackTo));
+      const backupFiles = fs.readdirSync(backupDir).filter((f) => f.includes(rollbackTo));
       if (backupFiles.length === 0) {
         throw new Error(`Modelfile for version ${rollbackTo} not found`);
       }
@@ -742,7 +750,7 @@ export const rollbackModel = async (targetVersion = null) => {
       rolledBackTo: rollbackTo,
       previousVersion: previousModelVersion,
       rebuildResult,
-      message: `Successfully rolled back to version ${rollbackTo}`
+      message: `Successfully rolled back to version ${rollbackTo}`,
     };
   } catch (error) {
     logger.error('Error rolling back model:', error);
@@ -781,7 +789,7 @@ export const notifyAdmins = async (eventType, details) => {
         await outlookBridge.sendEmail({
           to: admin.email,
           subject,
-          body
+          body,
         });
         notifiedCount++;
         logger.info(`Notified admin: ${admin.email}`);
@@ -815,13 +823,13 @@ export const notifyAdmins = async (eventType, details) => {
  */
 const getNotificationSubject = (eventType) => {
   const subjects = {
-    'retraining_started': 'AI Model Retraining Started',
-    'retraining_completed': 'AI Model Retraining Completed Successfully',
-    'retraining_failed': 'AI Model Retraining Failed',
-    'threshold_reached': 'AI Retraining Threshold Reached',
-    'model_activated': 'New AI Model Version Activated',
-    'model_rollback': 'AI Model Rolled Back to Previous Version',
-    'test_failed': 'AI Model Testing Failed'
+    retraining_started: 'AI Model Retraining Started',
+    retraining_completed: 'AI Model Retraining Completed Successfully',
+    retraining_failed: 'AI Model Retraining Failed',
+    threshold_reached: 'AI Retraining Threshold Reached',
+    model_activated: 'New AI Model Version Activated',
+    model_rollback: 'AI Model Rolled Back to Previous Version',
+    test_failed: 'AI Model Testing Failed',
   };
   return subjects[eventType] || `AI Retraining Event: ${eventType}`;
 };
@@ -881,10 +889,7 @@ const getNotificationBody = (eventType, details) => {
  * Run the full retraining pipeline
  */
 export const runRetrainingPipeline = async (options = {}) => {
-  const {
-    trigger = 'manual',
-    dryRun = false
-  } = options;
+  const { trigger = 'manual', dryRun = false } = options;
 
   logger.info('Starting AI retraining pipeline...', { trigger, dryRun });
 
@@ -894,7 +899,7 @@ export const runRetrainingPipeline = async (options = {}) => {
     trigger,
     dryRun,
     steps: [],
-    startTime: new Date()
+    startTime: new Date(),
   };
 
   let retrainingEventId = null;
@@ -969,7 +974,7 @@ export const runRetrainingPipeline = async (options = {}) => {
           convertResult.examplesCount,
           JSON.stringify(testResult),
           feedbackExport.examplesCount,
-          retrainingEventId
+          retrainingEventId,
         ]
       );
     }
@@ -1028,7 +1033,7 @@ export const runRetrainingPipeline = async (options = {}) => {
     await notifyAdmins('retraining_completed', {
       version: convertResult.version,
       examplesCount: convertResult.examplesCount,
-      testPassRate: testResult.passRate
+      testPassRate: testResult.passRate,
     });
 
     logger.info(`Retraining pipeline completed successfully in ${results.duration}s`);
@@ -1050,7 +1055,8 @@ export const runRetrainingPipeline = async (options = {}) => {
     // Notify about failure
     await notifyAdmins('retraining_failed', {
       error: error.message,
-      step: results.steps.length > 0 ? results.steps[results.steps.length - 1].step : 'initialization'
+      step:
+        results.steps.length > 0 ? results.steps[results.steps.length - 1].step : 'initialization',
     });
 
     results.success = false;
@@ -1079,7 +1085,7 @@ export const checkAndTriggerRetraining = async () => {
       // Notify about threshold
       await notifyAdmins('threshold_reached', {
         feedbackCount: status.thresholds.currentFeedbackCount,
-        rejectionCount: status.thresholds.currentRejectionCount
+        rejectionCount: status.thresholds.currentRejectionCount,
       });
 
       // Run pipeline in background
@@ -1113,5 +1119,5 @@ export default {
   notifyAdmins,
   getRetrainingStatus,
   getRetrainingHistory,
-  checkAndTriggerRetraining
+  checkAndTriggerRetraining,
 };

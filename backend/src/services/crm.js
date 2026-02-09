@@ -23,7 +23,7 @@ export const getLeads = async (clinicId, options = {}) => {
     temperature,
     search,
     sortBy = 'created_at',
-    sortOrder = 'desc'
+    sortOrder = 'desc',
   } = options;
 
   const offset = (page - 1) * limit;
@@ -62,15 +62,19 @@ export const getLeads = async (clinicId, options = {}) => {
     params.push(`%${search}%`);
   }
 
-  const validSortColumns = ['created_at', 'first_name', 'last_name', 'score', 'status', 'next_follow_up_date'];
+  const validSortColumns = [
+    'created_at',
+    'first_name',
+    'last_name',
+    'score',
+    'status',
+    'next_follow_up_date',
+  ];
   const sortColumn = validSortColumns.includes(sortBy) ? sortBy : 'created_at';
   const order = sortOrder.toLowerCase() === 'asc' ? 'ASC' : 'DESC';
 
   // Get total count
-  const countResult = await query(
-    `SELECT COUNT(*) as total FROM leads l ${whereClause}`,
-    params
-  );
+  const countResult = await query(`SELECT COUNT(*) as total FROM leads l ${whereClause}`, params);
   const total = parseInt(countResult.rows[0].total);
 
   // Get leads
@@ -91,8 +95,8 @@ export const getLeads = async (clinicId, options = {}) => {
       page,
       limit,
       total,
-      totalPages: Math.ceil(total / limit)
-    }
+      totalPages: Math.ceil(total / limit),
+    },
   };
 };
 
@@ -126,7 +130,7 @@ export const getLeadById = async (clinicId, leadId) => {
 
   return {
     ...result.rows[0],
-    activities: activities.rows
+    activities: activities.rows,
   };
 };
 
@@ -135,8 +139,17 @@ export const getLeadById = async (clinicId, leadId) => {
  */
 export const createLead = async (data) => {
   const {
-    organization_id, first_name, last_name, email, phone, source, source_detail,
-    primary_interest, chief_complaint, notes, assigned_to
+    organization_id,
+    first_name,
+    last_name,
+    email,
+    phone,
+    source,
+    source_detail,
+    primary_interest,
+    chief_complaint,
+    notes,
+    assigned_to,
   } = data;
 
   const result = await query(
@@ -145,8 +158,19 @@ export const createLead = async (data) => {
       primary_interest, chief_complaint, notes, assigned_to, temperature
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'WARM')
     RETURNING *`,
-    [organization_id, first_name, last_name, email, phone, source, source_detail,
-     primary_interest, chief_complaint, notes, assigned_to]
+    [
+      organization_id,
+      first_name,
+      last_name,
+      email,
+      phone,
+      source,
+      source_detail,
+      primary_interest,
+      chief_complaint,
+      notes,
+      assigned_to,
+    ]
   );
 
   // Log activity
@@ -168,9 +192,19 @@ export const updateLead = async (clinicId, leadId, data) => {
   let paramCount = 2;
 
   const allowedFields = [
-    'first_name', 'last_name', 'email', 'phone', 'status', 'score',
-    'temperature', 'assigned_to', 'primary_interest', 'chief_complaint',
-    'notes', 'next_follow_up_date', 'lost_reason'
+    'first_name',
+    'last_name',
+    'email',
+    'phone',
+    'status',
+    'score',
+    'temperature',
+    'assigned_to',
+    'primary_interest',
+    'chief_complaint',
+    'notes',
+    'next_follow_up_date',
+    'lost_reason',
   ];
 
   for (const [key, value] of Object.entries(data)) {
@@ -273,8 +307,8 @@ export const getLeadPipelineStats = async (clinicId) => {
 
   return {
     stages: result.rows,
-    conversionRate: total > 0 ? (converted / total * 100).toFixed(1) : 0,
-    totalLeads: parseInt(total)
+    conversionRate: total > 0 ? ((converted / total) * 100).toFixed(1) : 0,
+    totalLeads: parseInt(total),
   };
 };
 
@@ -298,10 +332,7 @@ export const getPatientsByLifecycle = async (clinicId, options = {}) => {
     params.push(stage);
   }
 
-  const countResult = await query(
-    `SELECT COUNT(*) as total FROM patients ${whereClause}`,
-    params
-  );
+  const countResult = await query(`SELECT COUNT(*) as total FROM patients ${whereClause}`, params);
 
   params.push(limit, offset);
   const result = await query(
@@ -320,8 +351,8 @@ export const getPatientsByLifecycle = async (clinicId, options = {}) => {
       page,
       limit,
       total: parseInt(countResult.rows[0].total),
-      totalPages: Math.ceil(countResult.rows[0].total / limit)
-    }
+      totalPages: Math.ceil(countResult.rows[0].total / limit),
+    },
   };
 };
 
@@ -428,8 +459,8 @@ export const getReferrals = async (clinicId, options = {}) => {
       page,
       limit,
       total: parseInt(countResult.rows[0].total),
-      totalPages: Math.ceil(countResult.rows[0].total / limit)
-    }
+      totalPages: Math.ceil(countResult.rows[0].total / limit),
+    },
   };
 };
 
@@ -438,9 +469,18 @@ export const getReferrals = async (clinicId, options = {}) => {
  */
 export const createReferral = async (data) => {
   const {
-    organization_id, referrer_patient_id, referrer_name, referrer_email, referrer_phone,
-    referred_name, referred_email, referred_phone, reward_type, reward_amount,
-    reward_description, notes
+    organization_id,
+    referrer_patient_id,
+    referrer_name,
+    referrer_email,
+    referrer_phone,
+    referred_name,
+    referred_email,
+    referred_phone,
+    reward_type,
+    reward_amount,
+    reward_description,
+    notes,
   } = data;
 
   const result = await query(
@@ -450,17 +490,27 @@ export const createReferral = async (data) => {
       reward_description, notes
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
     RETURNING *`,
-    [organization_id, referrer_patient_id, referrer_name, referrer_email, referrer_phone,
-     referred_name, referred_email, referred_phone, reward_type, reward_amount,
-     reward_description, notes]
+    [
+      organization_id,
+      referrer_patient_id,
+      referrer_name,
+      referrer_email,
+      referrer_phone,
+      referred_name,
+      referred_email,
+      referred_phone,
+      reward_type,
+      reward_amount,
+      reward_description,
+      notes,
+    ]
   );
 
   // Update referrer's referral count
   if (referrer_patient_id) {
-    await query(
-      `UPDATE patients SET referral_count = referral_count + 1 WHERE id = $1`,
-      [referrer_patient_id]
-    );
+    await query(`UPDATE patients SET referral_count = referral_count + 1 WHERE id = $1`, [
+      referrer_patient_id,
+    ]);
   }
 
   return result.rows[0];
@@ -549,13 +599,22 @@ export const getSurveys = async (clinicId) => {
  * Create survey
  */
 export const createSurvey = async (data) => {
-  const { organization_id, name, description, survey_type, questions, auto_send, send_after_days } = data;
+  const { organization_id, name, description, survey_type, questions, auto_send, send_after_days } =
+    data;
 
   const result = await query(
     `INSERT INTO surveys (organization_id, name, description, survey_type, questions, auto_send, send_after_days)
      VALUES ($1, $2, $3, $4, $5, $6, $7)
      RETURNING *`,
-    [organization_id, name, description, survey_type, JSON.stringify(questions || []), auto_send, send_after_days]
+    [
+      organization_id,
+      name,
+      description,
+      survey_type,
+      JSON.stringify(questions || []),
+      auto_send,
+      send_after_days,
+    ]
   );
 
   return result.rows[0];
@@ -593,8 +652,8 @@ export const getSurveyResponses = async (clinicId, surveyId, options = {}) => {
       page,
       limit,
       total: parseInt(countResult.rows[0].total),
-      totalPages: Math.ceil(countResult.rows[0].total / limit)
-    }
+      totalPages: Math.ceil(countResult.rows[0].total / limit),
+    },
   };
 };
 
@@ -615,13 +674,13 @@ export const getNPSStats = async (clinicId, period = '30d') => {
      JOIN surveys s ON sr.survey_id = s.id
      WHERE s.organization_id = $1
        AND sr.nps_score IS NOT NULL
-       AND sr.completed_at >= CURRENT_DATE - INTERVAL '${days} days'`,
-    [clinicId]
+       AND sr.completed_at >= CURRENT_DATE - make_interval(days => $2)`,
+    [clinicId, days]
   );
 
   const data = result.rows[0];
   const total = parseInt(data.total) || 1;
-  const nps = ((data.promoters / total) - (data.detractors / total)) * 100;
+  const nps = (data.promoters / total - data.detractors / total) * 100;
 
   return {
     nps: Math.round(nps),
@@ -629,7 +688,7 @@ export const getNPSStats = async (clinicId, period = '30d') => {
     passives: parseInt(data.passives),
     detractors: parseInt(data.detractors),
     total: parseInt(data.total),
-    avgScore: parseFloat(data.avg_score) || 0
+    avgScore: parseFloat(data.avg_score) || 0,
   };
 };
 
@@ -697,8 +756,8 @@ export const getCommunicationHistory = async (clinicId, options = {}) => {
       page,
       limit,
       total: parseInt(countResult.rows[0].total),
-      totalPages: Math.ceil(countResult.rows[0].total / limit)
-    }
+      totalPages: Math.ceil(countResult.rows[0].total / limit),
+    },
   };
 };
 
@@ -707,8 +766,18 @@ export const getCommunicationHistory = async (clinicId, options = {}) => {
  */
 export const logCommunication = async (data) => {
   const {
-    organization_id, patient_id, lead_id, user_id, channel, direction,
-    subject, message, template_used, contact_value, status, campaign_id
+    organization_id,
+    patient_id,
+    lead_id,
+    user_id,
+    channel,
+    direction,
+    subject,
+    message,
+    template_used,
+    contact_value,
+    status,
+    campaign_id,
   } = data;
 
   const result = await query(
@@ -717,16 +786,27 @@ export const logCommunication = async (data) => {
       subject, message, template_used, contact_value, status, campaign_id
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
     RETURNING *`,
-    [organization_id, patient_id, lead_id, user_id, channel, direction,
-     subject, message, template_used, contact_value, status || 'SENT', campaign_id]
+    [
+      organization_id,
+      patient_id,
+      lead_id,
+      user_id,
+      channel,
+      direction,
+      subject,
+      message,
+      template_used,
+      contact_value,
+      status || 'SENT',
+      campaign_id,
+    ]
   );
 
   // Update patient last contact date
   if (patient_id) {
-    await query(
-      `UPDATE patients SET last_contact_date = CURRENT_TIMESTAMP WHERE id = $1`,
-      [patient_id]
-    );
+    await query(`UPDATE patients SET last_contact_date = CURRENT_TIMESTAMP WHERE id = $1`, [
+      patient_id,
+    ]);
   }
 
   return result.rows[0];
@@ -759,10 +839,7 @@ export const getCampaigns = async (clinicId, options = {}) => {
     params.push(type);
   }
 
-  const countResult = await query(
-    `SELECT COUNT(*) as total FROM campaigns ${whereClause}`,
-    params
-  );
+  const countResult = await query(`SELECT COUNT(*) as total FROM campaigns ${whereClause}`, params);
 
   params.push(limit, offset);
   const result = await query(
@@ -779,8 +856,8 @@ export const getCampaigns = async (clinicId, options = {}) => {
       page,
       limit,
       total: parseInt(countResult.rows[0].total),
-      totalPages: Math.ceil(countResult.rows[0].total / limit)
-    }
+      totalPages: Math.ceil(countResult.rows[0].total / limit),
+    },
   };
 };
 
@@ -788,10 +865,10 @@ export const getCampaigns = async (clinicId, options = {}) => {
  * Get campaign by ID
  */
 export const getCampaignById = async (clinicId, campaignId) => {
-  const result = await query(
-    `SELECT * FROM campaigns WHERE organization_id = $1 AND id = $2`,
-    [clinicId, campaignId]
-  );
+  const result = await query(`SELECT * FROM campaigns WHERE organization_id = $1 AND id = $2`, [
+    clinicId,
+    campaignId,
+  ]);
   return result.rows[0] || null;
 };
 
@@ -800,9 +877,17 @@ export const getCampaignById = async (clinicId, campaignId) => {
  */
 export const createCampaign = async (data) => {
   const {
-    organization_id, name, description, campaign_type, channels,
-    sms_template, email_subject, email_template, target_segment,
-    scheduled_at, created_by
+    organization_id,
+    name,
+    description,
+    campaign_type,
+    channels,
+    sms_template,
+    email_subject,
+    email_template,
+    target_segment,
+    scheduled_at,
+    created_by,
   } = data;
 
   const result = await query(
@@ -812,9 +897,19 @@ export const createCampaign = async (data) => {
       scheduled_at, created_by
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
     RETURNING *`,
-    [organization_id, name, description, campaign_type, JSON.stringify(channels || ['SMS']),
-     sms_template, email_subject, email_template, JSON.stringify(target_segment || {}),
-     scheduled_at, created_by]
+    [
+      organization_id,
+      name,
+      description,
+      campaign_type,
+      JSON.stringify(channels || ['SMS']),
+      sms_template,
+      email_subject,
+      email_template,
+      JSON.stringify(target_segment || {}),
+      scheduled_at,
+      created_by,
+    ]
   );
 
   return result.rows[0];
@@ -829,8 +924,16 @@ export const updateCampaign = async (clinicId, campaignId, data) => {
   let paramCount = 2;
 
   const allowedFields = [
-    'name', 'description', 'campaign_type', 'channels', 'sms_template',
-    'email_subject', 'email_template', 'target_segment', 'status', 'scheduled_at'
+    'name',
+    'description',
+    'campaign_type',
+    'channels',
+    'sms_template',
+    'email_subject',
+    'email_template',
+    'target_segment',
+    'status',
+    'scheduled_at',
   ];
 
   for (const [key, value] of Object.entries(data)) {
@@ -894,7 +997,7 @@ export const getCampaignStats = async (clinicId, campaignId) => {
 
   return {
     campaign,
-    stats: recipientStats.rows[0]
+    stats: recipientStats.rows[0],
   };
 };
 
@@ -925,10 +1028,10 @@ export const getWorkflows = async (clinicId) => {
  * Get workflow by ID
  */
 export const getWorkflowById = async (clinicId, workflowId) => {
-  const result = await query(
-    `SELECT * FROM workflows WHERE organization_id = $1 AND id = $2`,
-    [clinicId, workflowId]
-  );
+  const result = await query(`SELECT * FROM workflows WHERE organization_id = $1 AND id = $2`, [
+    clinicId,
+    workflowId,
+  ]);
   return result.rows[0] || null;
 };
 
@@ -937,8 +1040,15 @@ export const getWorkflowById = async (clinicId, workflowId) => {
  */
 export const createWorkflow = async (data) => {
   const {
-    organization_id, name, description, trigger_type, trigger_config,
-    actions, conditions, max_runs_per_patient, created_by
+    organization_id,
+    name,
+    description,
+    trigger_type,
+    trigger_config,
+    actions,
+    conditions,
+    max_runs_per_patient,
+    created_by,
   } = data;
 
   const result = await query(
@@ -947,11 +1057,17 @@ export const createWorkflow = async (data) => {
       actions, conditions, max_runs_per_patient, created_by
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     RETURNING *`,
-    [organization_id, name, description, trigger_type,
-     JSON.stringify(trigger_config || {}),
-     JSON.stringify(actions || []),
-     JSON.stringify(conditions || []),
-     max_runs_per_patient || 1, created_by]
+    [
+      organization_id,
+      name,
+      description,
+      trigger_type,
+      JSON.stringify(trigger_config || {}),
+      JSON.stringify(actions || []),
+      JSON.stringify(conditions || []),
+      max_runs_per_patient || 1,
+      created_by,
+    ]
   );
 
   return result.rows[0];
@@ -966,8 +1082,13 @@ export const updateWorkflow = async (clinicId, workflowId, data) => {
   let paramCount = 2;
 
   const allowedFields = [
-    'name', 'description', 'trigger_type', 'trigger_config',
-    'actions', 'conditions', 'max_runs_per_patient'
+    'name',
+    'description',
+    'trigger_type',
+    'trigger_config',
+    'actions',
+    'conditions',
+    'max_runs_per_patient',
   ];
 
   for (const [key, value] of Object.entries(data)) {
@@ -1030,17 +1151,18 @@ export const getRetentionDashboard = async (clinicId, period = '30d') => {
   // Retention rate (patients with visit in last X days vs total active)
   const retentionResult = await query(
     `SELECT
-      COUNT(*) FILTER (WHERE last_visit_date >= CURRENT_DATE - INTERVAL '${days} days') as retained,
+      COUNT(*) FILTER (WHERE last_visit_date >= CURRENT_DATE - make_interval(days => $2)) as retained,
       COUNT(*) FILTER (WHERE lifecycle_stage IN ('ACTIVE', 'AT_RISK')) as total_trackable
      FROM patients
      WHERE organization_id = $1`,
-    [clinicId]
+    [clinicId, days]
   );
 
   const retention = retentionResult.rows[0];
-  const retentionRate = retention.total_trackable > 0
-    ? (retention.retained / retention.total_trackable * 100).toFixed(1)
-    : 0;
+  const retentionRate =
+    retention.total_trackable > 0
+      ? ((retention.retained / retention.total_trackable) * 100).toFixed(1)
+      : 0;
 
   // Average visit frequency
   const frequencyResult = await query(
@@ -1054,7 +1176,7 @@ export const getRetentionDashboard = async (clinicId, period = '30d') => {
     lifecycleDistribution: lifecycleResult.rows,
     retentionRate: parseFloat(retentionRate),
     retainedPatients: parseInt(retention.retained),
-    avgVisitFrequency: parseFloat(frequencyResult.rows[0].avg_frequency) || 0
+    avgVisitFrequency: parseFloat(frequencyResult.rows[0].avg_frequency) || 0,
   };
 };
 
@@ -1090,7 +1212,7 @@ export const getChurnAnalysis = async (clinicId) => {
 
   return {
     current: churnResult.rows[0],
-    trend: monthlyChurn.rows
+    trend: monthlyChurn.rows,
   };
 };
 
@@ -1105,7 +1227,7 @@ export const getCohortRetention = async (clinicId, months = 6) => {
         id as patient_id
       FROM patients
       WHERE organization_id = $1
-        AND first_visit_date >= CURRENT_DATE - INTERVAL '${months} months'
+        AND first_visit_date >= CURRENT_DATE - make_interval(months => $2)
     )
     SELECT
       cohort_month,
@@ -1115,14 +1237,13 @@ export const getCohortRetention = async (clinicId, months = 6) => {
     JOIN patients p ON c.patient_id = p.id
     GROUP BY cohort_month
     ORDER BY cohort_month`,
-    [clinicId]
+    [clinicId, months]
   );
 
-  return result.rows.map(row => ({
+  return result.rows.map((row) => ({
     ...row,
-    retention_rate: row.cohort_size > 0
-      ? (row.still_active / row.cohort_size * 100).toFixed(1)
-      : 0
+    retention_rate:
+      row.cohort_size > 0 ? ((row.still_active / row.cohort_size) * 100).toFixed(1) : 0,
   }));
 };
 
@@ -1172,8 +1293,8 @@ export const getWaitlist = async (clinicId, options = {}) => {
       page,
       limit,
       total: parseInt(countResult.rows[0].total),
-      totalPages: Math.ceil(countResult.rows[0].total / limit)
-    }
+      totalPages: Math.ceil(countResult.rows[0].total / limit),
+    },
   };
 };
 
@@ -1182,9 +1303,17 @@ export const getWaitlist = async (clinicId, options = {}) => {
  */
 export const addToWaitlist = async (data) => {
   const {
-    organization_id, patient_id, preferred_practitioner_id, preferred_days,
-    preferred_time_start, preferred_time_end, service_type, duration_minutes,
-    priority, notes, expires_at
+    organization_id,
+    patient_id,
+    preferred_practitioner_id,
+    preferred_days,
+    preferred_time_start,
+    preferred_time_end,
+    service_type,
+    duration_minutes,
+    priority,
+    notes,
+    expires_at,
   } = data;
 
   const result = await query(
@@ -1199,10 +1328,19 @@ export const addToWaitlist = async (data) => {
       preferred_days = EXCLUDED.preferred_days,
       notes = EXCLUDED.notes
     RETURNING *`,
-    [organization_id, patient_id, preferred_practitioner_id,
-     JSON.stringify(preferred_days || []),
-     preferred_time_start, preferred_time_end, service_type,
-     duration_minutes || 30, priority || 'NORMAL', notes, expires_at]
+    [
+      organization_id,
+      patient_id,
+      preferred_practitioner_id,
+      JSON.stringify(preferred_days || []),
+      preferred_time_start,
+      preferred_time_end,
+      service_type,
+      duration_minutes || 30,
+      priority || 'NORMAL',
+      notes,
+      expires_at,
+    ]
   );
 
   return result.rows[0];
@@ -1217,8 +1355,13 @@ export const updateWaitlistEntry = async (clinicId, entryId, data) => {
   let paramCount = 2;
 
   const allowedFields = [
-    'status', 'priority', 'preferred_days', 'preferred_time_start',
-    'preferred_time_end', 'notes', 'booked_appointment_id'
+    'status',
+    'priority',
+    'preferred_days',
+    'preferred_time_start',
+    'preferred_time_end',
+    'notes',
+    'booked_appointment_id',
   ];
 
   for (const [key, value] of Object.entries(data)) {
@@ -1269,7 +1412,7 @@ export const notifyWaitlistPatients = async (clinicId, slotInfo) => {
   );
 
   // Update notification count
-  const entryIds = entries.rows.map(e => e.id);
+  const entryIds = entries.rows.map((e) => e.id);
   if (entryIds.length > 0) {
     await query(
       `UPDATE waitlist SET
@@ -1283,12 +1426,12 @@ export const notifyWaitlistPatients = async (clinicId, slotInfo) => {
 
   return {
     notified: entries.rows.length,
-    patients: entries.rows.map(e => ({
+    patients: entries.rows.map((e) => ({
       id: e.patient_id,
       name: `${e.first_name} ${e.last_name}`,
       phone: e.phone,
-      email: e.email
-    }))
+      email: e.email,
+    })),
   };
 };
 
@@ -1302,15 +1445,27 @@ export const notifyWaitlistPatients = async (clinicId, slotInfo) => {
 export const getCRMOverview = async (clinicId) => {
   // Run queries in parallel
   const [leads, lifecycle, referrals, nps, waitlist] = await Promise.all([
-    query(`SELECT COUNT(*) FILTER (WHERE status = 'NEW') as new_leads FROM leads WHERE organization_id = $1`, [clinicId]),
-    query(`SELECT lifecycle_stage, COUNT(*) as count FROM patients WHERE organization_id = $1 GROUP BY lifecycle_stage`, [clinicId]),
-    query(`SELECT COUNT(*) FILTER (WHERE status = 'PENDING') as pending FROM referrals WHERE organization_id = $1`, [clinicId]),
+    query(
+      `SELECT COUNT(*) FILTER (WHERE status = 'NEW') as new_leads FROM leads WHERE organization_id = $1`,
+      [clinicId]
+    ),
+    query(
+      `SELECT lifecycle_stage, COUNT(*) as count FROM patients WHERE organization_id = $1 GROUP BY lifecycle_stage`,
+      [clinicId]
+    ),
+    query(
+      `SELECT COUNT(*) FILTER (WHERE status = 'PENDING') as pending FROM referrals WHERE organization_id = $1`,
+      [clinicId]
+    ),
     getNPSStats(clinicId, '30d'),
-    query(`SELECT COUNT(*) as count FROM waitlist WHERE organization_id = $1 AND status = 'ACTIVE'`, [clinicId])
+    query(
+      `SELECT COUNT(*) as count FROM waitlist WHERE organization_id = $1 AND status = 'ACTIVE'`,
+      [clinicId]
+    ),
   ]);
 
   const lifecycleMap = {};
-  lifecycle.rows.forEach(row => {
+  lifecycle.rows.forEach((row) => {
     lifecycleMap[row.lifecycle_stage] = parseInt(row.count);
   });
 
@@ -1320,7 +1475,7 @@ export const getCRMOverview = async (clinicId) => {
     atRiskPatients: lifecycleMap['AT_RISK'] || 0,
     pendingReferrals: parseInt(referrals.rows[0].pending) || 0,
     avgNPS: nps.nps,
-    waitlistCount: parseInt(waitlist.rows[0].count) || 0
+    waitlistCount: parseInt(waitlist.rows[0].count) || 0,
   };
 };
 
@@ -1344,7 +1499,7 @@ export const getCRMSettings = async (clinicId) => {
     enableReferralProgram: true,
     defaultReferralReward: { type: 'DISCOUNT', amount: 20, description: '20% rabatt' },
     enableWaitlist: true,
-    maxWaitlistNotifications: 3
+    maxWaitlistNotifications: 3,
   };
 };
 
