@@ -5,6 +5,7 @@
 import * as appointmentService from '../services/appointments.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
+import { broadcastToOrg } from '../services/websocket.js';
 
 export const getAppointmentById = async (req, res) => {
   try {
@@ -34,7 +35,7 @@ export const getAppointments = async (req, res) => {
       endDate: req.query.endDate,
       practitionerId: req.query.practitionerId,
       patientId: req.query.patientId,
-      status: req.query.status
+      status: req.query.status,
     };
 
     const result = await appointmentService.getAllAppointments(organizationId, options);
@@ -59,8 +60,10 @@ export const createAppointment = async (req, res) => {
       resourceType: 'APPOINTMENT',
       resourceId: appointment.id,
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
+
+    broadcastToOrg(organizationId, 'appointment:created', { appointment });
 
     res.status(201).json(appointment);
   } catch (error) {
@@ -89,8 +92,10 @@ export const updateAppointment = async (req, res) => {
       resourceType: 'APPOINTMENT',
       resourceId: id,
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
+
+    broadcastToOrg(organizationId, 'appointment:updated', { appointment });
 
     res.json(appointment);
   } catch (error) {
@@ -110,6 +115,8 @@ export const confirmAppointment = async (req, res) => {
       return res.status(404).json({ error: 'Appointment not found' });
     }
 
+    broadcastToOrg(organizationId, 'appointment:updated', { appointment });
+
     res.json({ success: true, data: appointment, message: 'Appointment confirmed' });
   } catch (error) {
     logger.error('Error in confirmAppointment controller:', error);
@@ -127,6 +134,8 @@ export const checkInAppointment = async (req, res) => {
     if (!appointment) {
       return res.status(404).json({ error: 'Appointment not found' });
     }
+
+    broadcastToOrg(organizationId, 'appointment:updated', { appointment });
 
     res.json({ success: true, data: appointment, message: 'Patient checked in' });
   } catch (error) {
@@ -161,8 +170,10 @@ export const updateStatus = async (req, res) => {
       resourceType: 'APPOINTMENT',
       resourceId: id,
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
+
+    broadcastToOrg(organizationId, 'appointment:updated', { appointment });
 
     res.json(appointment);
   } catch (error) {
@@ -202,14 +213,16 @@ export const cancelAppointment = async (req, res) => {
     if (!appointment) {
       return res.status(404).json({
         success: false,
-        error: 'Appointment not found'
+        error: 'Appointment not found',
       });
     }
+
+    broadcastToOrg(organizationId, 'appointment:cancelled', { appointmentId: id });
 
     res.json({
       success: true,
       data: appointment,
-      message: 'Appointment cancelled successfully'
+      message: 'Appointment cancelled successfully',
     });
   } catch (error) {
     logger.error('Error in cancelAppointment controller:', error);
@@ -226,5 +239,5 @@ export default {
   confirmAppointment,
   checkInAppointment,
   cancelAppointment,
-  getStats
+  getStats,
 };

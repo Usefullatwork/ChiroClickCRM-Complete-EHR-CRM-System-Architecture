@@ -19,6 +19,7 @@ let automationsService = null;
 let bulkCommunicationService = null;
 let communicationsService = null;
 let smartSchedulerService = null;
+let recallEngine = null;
 
 // Track running jobs to prevent overlap
 const runningJobs = new Map();
@@ -71,6 +72,13 @@ const loadServices = async () => {
   } catch (e) {
     logger.warn('Smart Scheduler service not available:', e.message);
   }
+
+  try {
+    recallEngine = await import('../services/recallEngine.js');
+    logger.info('Recall Engine service loaded');
+  } catch (e) {
+    logger.warn('Recall Engine service not available:', e.message);
+  }
 };
 
 /**
@@ -96,10 +104,7 @@ const executeJob = async (jobName, handler, timeout = 300000) => {
     });
 
     // Execute job with timeout
-    const result = await Promise.race([
-      handler(),
-      timeoutPromise
-    ]);
+    const result = await Promise.race([handler(), timeoutPromise]);
 
     const duration = Date.now() - startTime.getTime();
 
@@ -182,7 +187,7 @@ const processCommunicationQueue = async () => {
     processed: 0,
     sent: 0,
     failed: 0,
-    skipped: 0
+    skipped: 0,
   };
 
   try {
@@ -233,7 +238,7 @@ const processCommunicationQueue = async () => {
               patient_id: item.patient_id,
               recipient_phone: item.phone,
               content: item.content,
-              template_id: item.template_id
+              template_id: item.template_id,
             },
             null // System user
           );
@@ -245,7 +250,7 @@ const processCommunicationQueue = async () => {
               recipient_email: item.email,
               subject: item.subject,
               content: item.content,
-              template_id: item.template_id
+              template_id: item.template_id,
             },
             null // System user
           );
@@ -320,7 +325,7 @@ const updateDailyAIMetrics = async () => {
 
     const result = {
       date: yesterday.toISOString().split('T')[0],
-      metrics: metricsResult.rows
+      metrics: metricsResult.rows,
     };
 
     logger.info('Daily AI metrics updated:', result);
@@ -377,6 +382,27 @@ const processAutomations = async () => {
     return result;
   } catch (error) {
     logger.error('Error processing automations:', error);
+    throw error;
+  }
+};
+
+/**
+ * Process condition-based recall schedules
+ * DAILY: At 08:00 Europe/Oslo
+ */
+const processRecallSchedules = async () => {
+  if (!recallEngine) {
+    logger.debug('Recall Engine service not available');
+    return { skipped: true, reason: 'service_not_available' };
+  }
+
+  try {
+    logger.info('Processing recall schedules...');
+    const result = await recallEngine.processRecalls();
+    logger.info('Recall processing complete:', result);
+    return result;
+  } catch (error) {
+    logger.error('Error processing recall schedules:', error);
     throw error;
   }
 };
@@ -470,7 +496,7 @@ const cleanupOldLogs = async () => {
     const result = {
       auditLogs: 0,
       jobLogs: 0,
-      sessions: 0
+      sessions: 0,
     };
 
     // Keep audit logs for 2 years (GDPR compliance)
@@ -541,7 +567,7 @@ const backupTrainingData = async () => {
     // Export current feedback data
     const feedbackData = await aiLearningService.exportFeedbackForTraining({
       days: 30,
-      format: 'json'
+      format: 'json',
     });
 
     // Write backup file
@@ -551,8 +577,9 @@ const backupTrainingData = async () => {
     fs.default.writeFileSync(backupPath, JSON.stringify(feedbackData, null, 2));
 
     // Clean up old backups (keep 7 days)
-    const backupFiles = fs.default.readdirSync(BACKUP_DIR)
-      .filter(f => f.startsWith('feedback_backup_'))
+    const backupFiles = fs.default
+      .readdirSync(BACKUP_DIR)
+      .filter((f) => f.startsWith('feedback_backup_'))
       .sort()
       .reverse();
 
@@ -565,7 +592,7 @@ const backupTrainingData = async () => {
     const result = {
       backupPath,
       recordsBackedUp: Array.isArray(feedbackData) ? feedbackData.length : 0,
-      oldBackupsRemoved: removed
+      oldBackupsRemoved: removed,
     };
 
     logger.info('Training data backup complete:', result);
@@ -584,7 +611,7 @@ const healthCheck = async () => {
   const result = {
     database: false,
     communications: false,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
 
   try {
@@ -630,51 +657,68 @@ export const initializeScheduler = async () => {
   // =====================================================
 
   // Process communication queue - At minute 0 of every hour
-  const commQueueJob = cron.schedule('0 * * * *', () => {
-    executeJob('processCommunicationQueue', processCommunicationQueue, 300000);
-  }, { timezone: TIMEZONE });
+  const commQueueJob = cron.schedule(
+    '0 * * * *',
+    () => {
+      executeJob('processCommunicationQueue', processCommunicationQueue, 300000);
+    },
+    { timezone: TIMEZONE }
+  );
   scheduledJobs.set('processCommunicationQueue', {
     job: commQueueJob,
     description: 'Process pending communication queue (SMS, Email)',
     schedule: '0 * * * *',
     lastRun: null,
-    lastStatus: null
+    lastStatus: null,
   });
 
   // Process automations - At minute 0 of every hour
-  const automationsJob = cron.schedule('0 * * * *', () => {
-    executeJob('processAutomations', processAutomations, 300000);
-  }, { timezone: TIMEZONE });
+  const automationsJob = cron.schedule(
+    '0 * * * *',
+    () => {
+      executeJob('processAutomations', processAutomations, 300000);
+    },
+    { timezone: TIMEZONE }
+  );
   scheduledJobs.set('processAutomations', {
     job: automationsJob,
     description: 'Process automation triggers',
     schedule: '0 * * * *',
     lastRun: null,
-    lastStatus: null
+    lastStatus: null,
   });
 
   // Send appointment reminders - At minute 0 of every hour
-  const appointmentJob = cron.schedule('0 * * * *', () => {
-    executeJob('sendAppointmentReminders', sendAppointmentReminders, 300000);
-  }, { timezone: TIMEZONE });
+  const appointmentJob = cron.schedule(
+    '0 * * * *',
+    () => {
+      executeJob('sendAppointmentReminders', sendAppointmentReminders, 300000);
+    },
+    { timezone: TIMEZONE }
+  );
   scheduledJobs.set('sendAppointmentReminders', {
     job: appointmentJob,
     description: 'Send scheduled appointment reminders',
     schedule: '0 * * * *',
     lastRun: null,
-    lastStatus: null
+    lastStatus: null,
   });
 
   // Process smart scheduled communications - At minute 30 of every hour
-  const smartSchedulerJob = cron.schedule('30 * * * *', () => {
-    executeJob('processSmartScheduledComms', processSmartScheduledComms, 300000);
-  }, { timezone: TIMEZONE });
+  const smartSchedulerJob = cron.schedule(
+    '30 * * * *',
+    () => {
+      executeJob('processSmartScheduledComms', processSmartScheduledComms, 300000);
+    },
+    { timezone: TIMEZONE }
+  );
   scheduledJobs.set('processSmartScheduledComms', {
     job: smartSchedulerJob,
-    description: 'Process appointment-aware scheduled communications (follow-ups with conflict detection)',
+    description:
+      'Process appointment-aware scheduled communications (follow-ups with conflict detection)',
     schedule: '30 * * * *',
     lastRun: null,
-    lastStatus: null
+    lastStatus: null,
   });
 
   // =====================================================
@@ -682,39 +726,67 @@ export const initializeScheduler = async () => {
   // =====================================================
 
   // Update daily AI metrics - Daily at midnight (00:00)
-  const metricsJob = cron.schedule('0 0 * * *', () => {
-    executeJob('updateDailyAIMetrics', updateDailyAIMetrics, 600000);
-  }, { timezone: TIMEZONE });
+  const metricsJob = cron.schedule(
+    '0 0 * * *',
+    () => {
+      executeJob('updateDailyAIMetrics', updateDailyAIMetrics, 600000);
+    },
+    { timezone: TIMEZONE }
+  );
   scheduledJobs.set('updateDailyAIMetrics', {
     job: metricsJob,
     description: 'Update daily AI performance metrics',
     schedule: '0 0 * * *',
     lastRun: null,
-    lastStatus: null
+    lastStatus: null,
   });
 
   // Backup training data - Daily at 01:00
-  const backupJob = cron.schedule('0 1 * * *', () => {
-    executeJob('backupTrainingData', backupTrainingData, 900000);
-  }, { timezone: TIMEZONE });
+  const backupJob = cron.schedule(
+    '0 1 * * *',
+    () => {
+      executeJob('backupTrainingData', backupTrainingData, 900000);
+    },
+    { timezone: TIMEZONE }
+  );
   scheduledJobs.set('backupTrainingData', {
     job: backupJob,
     description: 'Backup AI training data and model files',
     schedule: '0 1 * * *',
     lastRun: null,
-    lastStatus: null
+    lastStatus: null,
   });
 
   // Generate follow-up reminders - Daily at 08:00
-  const followUpJob = cron.schedule('0 8 * * *', () => {
-    executeJob('generateFollowUpReminders', generateFollowUpReminders, 600000);
-  }, { timezone: TIMEZONE });
+  const followUpJob = cron.schedule(
+    '0 8 * * *',
+    () => {
+      executeJob('generateFollowUpReminders', generateFollowUpReminders, 600000);
+    },
+    { timezone: TIMEZONE }
+  );
   scheduledJobs.set('generateFollowUpReminders', {
     job: followUpJob,
     description: 'Generate daily patient follow-up reminders',
     schedule: '0 8 * * *',
     lastRun: null,
-    lastStatus: null
+    lastStatus: null,
+  });
+
+  // Process recall schedules - Daily at 08:00
+  const recallJob = cron.schedule(
+    '0 8 * * *',
+    () => {
+      executeJob('processRecallSchedules', processRecallSchedules, 600000);
+    },
+    { timezone: TIMEZONE }
+  );
+  scheduledJobs.set('processRecallSchedules', {
+    job: recallJob,
+    description: 'Process condition-based recall schedules and create follow-ups',
+    schedule: '0 8 * * *',
+    lastRun: null,
+    lastStatus: null,
   });
 
   // =====================================================
@@ -722,15 +794,19 @@ export const initializeScheduler = async () => {
   // =====================================================
 
   // Check retraining threshold - Weekly Monday at 06:00
-  const retrainingJob = cron.schedule('0 6 * * 1', () => {
-    executeJob('checkRetrainingNeeded', checkRetrainingNeeded, 1800000);
-  }, { timezone: TIMEZONE });
+  const retrainingJob = cron.schedule(
+    '0 6 * * 1',
+    () => {
+      executeJob('checkRetrainingNeeded', checkRetrainingNeeded, 1800000);
+    },
+    { timezone: TIMEZONE }
+  );
   scheduledJobs.set('checkRetrainingNeeded', {
     job: retrainingJob,
     description: 'Check if AI retraining threshold is reached',
     schedule: '0 6 * * 1',
     lastRun: null,
-    lastStatus: null
+    lastStatus: null,
   });
 
   // =====================================================
@@ -738,15 +814,19 @@ export const initializeScheduler = async () => {
   // =====================================================
 
   // Clean up old logs - Monthly on the 1st at 03:00
-  const cleanupJob = cron.schedule('0 3 1 * *', () => {
-    executeJob('cleanupOldLogs', cleanupOldLogs, 1200000);
-  }, { timezone: TIMEZONE });
+  const cleanupJob = cron.schedule(
+    '0 3 1 * *',
+    () => {
+      executeJob('cleanupOldLogs', cleanupOldLogs, 1200000);
+    },
+    { timezone: TIMEZONE }
+  );
   scheduledJobs.set('cleanupOldLogs', {
     job: cleanupJob,
     description: 'Clean up old audit logs and expired sessions',
     schedule: '0 3 1 * *',
     lastRun: null,
-    lastStatus: null
+    lastStatus: null,
   });
 
   // =====================================================
@@ -754,15 +834,19 @@ export const initializeScheduler = async () => {
   // =====================================================
 
   // Health check - Every 15 minutes
-  const healthJob = cron.schedule('*/15 * * * *', () => {
-    executeJob('healthCheck', healthCheck, 60000);
-  }, { timezone: TIMEZONE });
+  const healthJob = cron.schedule(
+    '*/15 * * * *',
+    () => {
+      executeJob('healthCheck', healthCheck, 60000);
+    },
+    { timezone: TIMEZONE }
+  );
   scheduledJobs.set('healthCheck', {
     job: healthJob,
     description: 'System health check and monitoring',
     schedule: '*/15 * * * *',
     lastRun: null,
-    lastStatus: null
+    lastStatus: null,
   });
 
   logger.info(`Scheduled jobs initialized successfully (${scheduledJobs.size} jobs)`);
@@ -770,7 +854,7 @@ export const initializeScheduler = async () => {
   return {
     jobCount: scheduledJobs.size,
     timezone: TIMEZONE,
-    jobs: Array.from(scheduledJobs.keys())
+    jobs: Array.from(scheduledJobs.keys()),
   };
 };
 
@@ -793,7 +877,7 @@ export const getSchedulerStatus = () => {
       lastStatus: jobInfo.lastStatus,
       lastDuration: jobInfo.lastDuration,
       lastError: jobInfo.lastError,
-      isRunning: runningJobs.has(jobName)
+      isRunning: runningJobs.has(jobName),
     });
   }
 
@@ -801,7 +885,7 @@ export const getSchedulerStatus = () => {
     timezone: TIMEZONE,
     totalJobs: scheduledJobs.size,
     runningJobs: runningJobs.size,
-    jobs: status
+    jobs: status,
   };
 };
 
@@ -815,11 +899,12 @@ export const runJob = async (jobName) => {
     updateDailyAIMetrics,
     checkRetrainingNeeded,
     generateFollowUpReminders,
+    processRecallSchedules,
     sendAppointmentReminders,
     processSmartScheduledComms,
     cleanupOldLogs,
     backupTrainingData,
-    healthCheck
+    healthCheck,
   };
 
   if (!jobs[jobName]) {
@@ -889,5 +974,5 @@ export default {
   triggerJob,
   stopJob,
   startJob,
-  shutdownScheduler
+  shutdownScheduler,
 };

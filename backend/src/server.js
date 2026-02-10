@@ -4,6 +4,7 @@
  */
 
 import express from 'express';
+import { createServer } from 'http';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -19,12 +20,14 @@ import { healthCheck } from './config/database.js';
 import logger from './utils/logger.js';
 import { scheduleKeyRotation, createKeyRotationTable } from './utils/keyRotation.js';
 import { initializeScheduler, shutdownScheduler } from './jobs/scheduler.js';
+import { initializeWebSocket, getIO } from './services/websocket.js';
 
 // Load environment variables
 const result = dotenv.config();
 
 // Initialize Express app
 const app = express();
+const httpServer = createServer(app);
 const PORT = process.env.PORT || 3000;
 const API_VERSION = process.env.API_VERSION || 'v1';
 
@@ -170,6 +173,8 @@ app.get(`/api/${API_VERSION}`, (req, res) => {
       spineTemplates: `/api/${API_VERSION}/spine-templates`,
       clinicalSettings: `/api/${API_VERSION}/clinical-settings`,
       training: `/api/${API_VERSION}/training`,
+      treatmentPlans: `/api/${API_VERSION}/treatment-plans`,
+      macros: `/api/${API_VERSION}/macros`,
     },
   });
 });
@@ -212,6 +217,8 @@ import progressRoutes from './routes/progress.js';
 import notificationRoutes from './routes/notifications.js';
 import spineTemplatesRoutes from './routes/spineTemplates.js';
 import clinicalSettingsRoutes from './routes/clinicalSettings.js';
+import treatmentPlanRoutes from './routes/treatmentPlans.js';
+import macroRoutes from './routes/macros.js';
 
 // Mount routes
 app.use(`/api/${API_VERSION}/auth`, authRoutes);
@@ -248,6 +255,8 @@ app.use(`/api/${API_VERSION}/progress`, progressRoutes);
 app.use(`/api/${API_VERSION}/notifications`, notificationRoutes);
 app.use(`/api/${API_VERSION}/spine-templates`, spineTemplatesRoutes);
 app.use(`/api/${API_VERSION}/clinical-settings`, clinicalSettingsRoutes);
+app.use(`/api/${API_VERSION}/treatment-plans`, treatmentPlanRoutes);
+app.use(`/api/${API_VERSION}/macros`, macroRoutes);
 
 // Portal routes (public - no auth required for patient access)
 app.use(`/api/${API_VERSION}/portal`, portalRoutes);
@@ -332,7 +341,7 @@ let server;
 
 if (process.env.NODE_ENV !== 'test') {
   try {
-    server = app.listen(PORT, async () => {
+    server = httpServer.listen(PORT, async () => {
       logger.info(`🚀 ChiroClickCRM API Server started`);
       logger.info(`📍 Environment: ${process.env.NODE_ENV}`);
       logger.info(`📍 Port: ${PORT}`);
@@ -361,6 +370,14 @@ if (process.env.NODE_ENV !== 'test') {
       } catch (error) {
         logger.warn('⚠️  Job scheduler initialization skipped:', error.message);
       }
+
+      // Initialize WebSocket server
+      try {
+        initializeWebSocket(httpServer);
+        logger.info('WebSocket server initialized on same port');
+      } catch (error) {
+        logger.warn('WebSocket initialization skipped:', error.message);
+      }
     });
     server.on('error', (e) => {
       logger.error('Server error:', e);
@@ -380,6 +397,17 @@ const gracefulShutdown = async (signal) => {
     logger.info('Job scheduler stopped');
   } catch (error) {
     logger.warn('Error stopping scheduler:', error.message);
+  }
+
+  // Close WebSocket connections
+  try {
+    const wsIO = getIO();
+    if (wsIO) {
+      wsIO.close();
+      logger.info('WebSocket server closed');
+    }
+  } catch (error) {
+    logger.warn('Error closing WebSocket:', error.message);
   }
 
   server.close(async () => {

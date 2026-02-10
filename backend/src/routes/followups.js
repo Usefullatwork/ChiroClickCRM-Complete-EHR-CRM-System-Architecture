@@ -10,7 +10,7 @@ import {
   createFollowUpSchema,
   updateFollowUpSchema,
   completeFollowUpSchema,
-  getFollowUpsSchema
+  getFollowUpsSchema,
 } from '../validators/followup.validators.js';
 
 const router = express.Router();
@@ -23,7 +23,8 @@ router.use(requireOrganization);
  * @desc    Get all follow-ups with filters
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.get('/',
+router.get(
+  '/',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   validate(getFollowUpsSchema),
   followUpController.getFollowUps
@@ -34,7 +35,8 @@ router.get('/',
  * @desc    Get overdue follow-ups
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.get('/overdue',
+router.get(
+  '/overdue',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   followUpController.getOverdue
 );
@@ -44,7 +46,8 @@ router.get('/overdue',
  * @desc    Get upcoming follow-ups
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.get('/upcoming',
+router.get(
+  '/upcoming',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   followUpController.getUpcoming
 );
@@ -54,17 +57,15 @@ router.get('/upcoming',
  * @desc    Get follow-up statistics
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/stats',
-  requireRole(['ADMIN', 'PRACTITIONER']),
-  followUpController.getStats
-);
+router.get('/stats', requireRole(['ADMIN', 'PRACTITIONER']), followUpController.getStats);
 
 /**
  * @route   GET /api/v1/followups/patients/needingFollowUp
  * @desc    Get patients needing follow-up based on should_be_followed_up field
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.get('/patients/needingFollowUp',
+router.get(
+  '/patients/needingFollowUp',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   followUpController.getPatientsNeedingFollowUp
 );
@@ -74,17 +75,48 @@ router.get('/patients/needingFollowUp',
  * @desc    Mark patient as contacted for follow-up
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.post('/patients/:patientId/contacted',
+router.post(
+  '/patients/:patientId/contacted',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   followUpController.markPatientAsContacted
 );
+
+/**
+ * @route   GET /api/v1/followups/recall-schedule/:patientId
+ * @desc    Get recall schedule for a patient
+ * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ */
+router.get(
+  '/recall-schedule/:patientId',
+  requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  followUpController.getRecallSchedule
+);
+
+/**
+ * @route   GET /api/v1/followups/recall-rules
+ * @desc    Get organization recall rules
+ * @access  Private (ADMIN, PRACTITIONER)
+ */
+router.get(
+  '/recall-rules',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  followUpController.getRecallRules
+);
+
+/**
+ * @route   POST /api/v1/followups/recall-rules
+ * @desc    Update organization recall rules
+ * @access  Private (ADMIN)
+ */
+router.post('/recall-rules', requireRole(['ADMIN']), followUpController.updateRecallRules);
 
 /**
  * @route   GET /api/v1/followups/:id
  * @desc    Get follow-up by ID
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.get('/:id',
+router.get(
+  '/:id',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   followUpController.getFollowUp
 );
@@ -94,7 +126,8 @@ router.get('/:id',
  * @desc    Create new follow-up
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.post('/',
+router.post(
+  '/',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   validate(createFollowUpSchema),
   followUpController.createFollowUp
@@ -105,7 +138,8 @@ router.post('/',
  * @desc    Update follow-up
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.patch('/:id',
+router.patch(
+  '/:id',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   validate(updateFollowUpSchema),
   followUpController.updateFollowUp
@@ -116,7 +150,8 @@ router.patch('/:id',
  * @desc    Complete follow-up
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.post('/:id/complete',
+router.post(
+  '/:id/complete',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   validate(completeFollowUpSchema),
   followUpController.completeFollowUp
@@ -127,7 +162,8 @@ router.post('/:id/complete',
  * @desc    Skip follow-up with reason
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.post('/:id/skip',
+router.post(
+  '/:id/skip',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   followUpController.skipFollowUp
 );

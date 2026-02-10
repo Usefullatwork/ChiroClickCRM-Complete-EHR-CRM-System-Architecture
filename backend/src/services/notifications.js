@@ -5,6 +5,7 @@
 
 import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
+import { sendToUser } from './websocket.js';
 
 /**
  * Create a notification
@@ -29,6 +30,14 @@ export async function createNotification({
     `,
       [organizationId, userId, type, title, message, link, JSON.stringify(metadata), priority]
     );
+
+    // Push notification via WebSocket
+    try {
+      sendToUser(userId, 'notification:new', result.rows[0]);
+    } catch (wsError) {
+      // WebSocket push is best-effort, don't fail the notification
+      logger.debug('WebSocket notification push failed:', wsError.message);
+    }
 
     return result.rows[0];
   } catch (error) {

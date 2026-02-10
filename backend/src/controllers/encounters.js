@@ -7,6 +7,7 @@ import * as encounterService from '../services/encounters.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 import { NotFoundError, BusinessLogicError } from '../utils/errors.js';
+import { broadcastToOrg } from '../services/websocket.js';
 
 /**
  * Get all encounters
@@ -23,7 +24,7 @@ export const getEncounters = async (req, res) => {
       startDate: req.query.startDate || null,
       endDate: req.query.endDate || null,
       encounterType: req.query.encounterType || null,
-      signed: req.query.signed === 'true' ? true : req.query.signed === 'false' ? false : null
+      signed: req.query.signed === 'true' ? true : req.query.signed === 'false' ? false : null,
     };
 
     const result = await encounterService.getAllEncounters(organizationId, options);
@@ -38,7 +39,7 @@ export const getEncounters = async (req, res) => {
       resourceType: 'ENCOUNTER',
       resourceId: null,
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json(result);
@@ -46,7 +47,7 @@ export const getEncounters = async (req, res) => {
     logger.error('Error in getEncounters controller:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to retrieve encounters'
+      message: 'Failed to retrieve encounters',
     });
   }
 };
@@ -82,13 +83,13 @@ export const getEncounter = async (req, res) => {
       resourceType: 'ENCOUNTER',
       resourceId: id,
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json({
       ...encounter,
       redFlagAlerts: alerts,
-      clinicalWarnings: warnings
+      clinicalWarnings: warnings,
     });
   } catch (error) {
     // Re-throw custom errors to be handled by centralized error handler
@@ -99,7 +100,7 @@ export const getEncounter = async (req, res) => {
     logger.error('Error in getEncounter controller:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to retrieve encounter'
+      message: 'Failed to retrieve encounter',
     });
   }
 };
@@ -125,7 +126,7 @@ export const getPatientEncounters = async (req, res) => {
     logger.error('Error in getPatientEncounters controller:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to retrieve patient encounters'
+      message: 'Failed to retrieve patient encounters',
     });
   }
 };
@@ -139,7 +140,7 @@ export const createEncounter = async (req, res) => {
     const { organizationId, user } = req;
     const encounterData = {
       ...req.body,
-      practitioner_id: user.id // Use authenticated user as practitioner
+      practitioner_id: user.id, // Use authenticated user as practitioner
     };
 
     // Check for red flags before creating
@@ -161,19 +162,19 @@ export const createEncounter = async (req, res) => {
       resourceId: encounter.id,
       changes: { new: encounterData },
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.status(201).json({
       ...encounter,
       redFlagAlerts: alerts,
-      clinicalWarnings: warnings
+      clinicalWarnings: warnings,
     });
   } catch (error) {
     logger.error('Error in createEncounter controller:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to create encounter'
+      message: 'Failed to create encounter',
     });
   }
 };
@@ -209,7 +210,7 @@ export const updateEncounter = async (req, res) => {
       resourceId: id,
       changes: { new: encounterData },
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json(updatedEncounter);
@@ -222,7 +223,7 @@ export const updateEncounter = async (req, res) => {
     logger.error('Error in updateEncounter controller:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to update encounter'
+      message: 'Failed to update encounter',
     });
   }
 };
@@ -236,11 +237,7 @@ export const signEncounter = async (req, res) => {
     const { organizationId, user } = req;
     const { id } = req.params;
 
-    const signedEncounter = await encounterService.signEncounter(
-      organizationId,
-      id,
-      user.id
-    );
+    const signedEncounter = await encounterService.signEncounter(organizationId, id, user.id);
 
     // Log audit
     await logAudit({
@@ -253,15 +250,17 @@ export const signEncounter = async (req, res) => {
       resourceId: id,
       reason: 'Encounter signed - now immutable',
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
+
+    broadcastToOrg(organizationId, 'encounter:locked', { encounterId: id, lockedBy: user.id });
 
     res.json(signedEncounter);
   } catch (error) {
     logger.error('Error in signEncounter controller:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: error.message || 'Failed to sign encounter'
+      message: error.message || 'Failed to sign encounter',
     });
   }
 };
@@ -282,7 +281,7 @@ export const generateNote = async (req, res) => {
     logger.error('Error in generateNote controller:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to generate note'
+      message: 'Failed to generate note',
     });
   }
 };
@@ -296,17 +295,14 @@ export const getEncounterHistory = async (req, res) => {
     const { organizationId } = req;
     const { patientId } = req.params;
 
-    const history = await encounterService.getPatientEncounterHistory(
-      organizationId,
-      patientId
-    );
+    const history = await encounterService.getPatientEncounterHistory(organizationId, patientId);
 
     res.json(history);
   } catch (error) {
     logger.error('Error in getEncounterHistory controller:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to retrieve encounter history'
+      message: 'Failed to retrieve encounter history',
     });
   }
 };
@@ -326,7 +322,7 @@ export const checkRedFlags = async (req, res) => {
     logger.error('Error in checkRedFlags controller:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to check red flags'
+      message: 'Failed to check red flags',
     });
   }
 };
@@ -349,7 +345,7 @@ export const getLastSimilarEncounter = async (req, res) => {
       patientId,
       signed: true,
       limit: 10, // Get last 10 to find best match
-      page: 1
+      page: 1,
     });
 
     if (!result.encounters || result.encounters.length === 0) {
@@ -357,12 +353,12 @@ export const getLastSimilarEncounter = async (req, res) => {
     }
 
     // Filter out current encounter if specified
-    let candidates = result.encounters.filter(e => e.id !== excludeId);
+    let candidates = result.encounters.filter((e) => e.id !== excludeId);
 
     // Filter by age
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - parseInt(maxAgeDays));
-    candidates = candidates.filter(e => new Date(e.created_at) >= cutoffDate);
+    candidates = candidates.filter((e) => new Date(e.created_at) >= cutoffDate);
 
     if (candidates.length === 0) {
       return res.json({ encounter: null, matchScore: 0 });
@@ -383,16 +379,19 @@ export const getLastSimilarEncounter = async (req, res) => {
           bestMatch = encounter;
           matchScore = 1.0;
           break;
-        } else if (encComplaint.includes(normalizedComplaint) || normalizedComplaint.includes(encComplaint)) {
+        } else if (
+          encComplaint.includes(normalizedComplaint) ||
+          normalizedComplaint.includes(encComplaint)
+        ) {
           if (matchScore < 0.8) {
             bestMatch = encounter;
             matchScore = 0.8;
           }
         } else {
           // Check for shared keywords
-          const complaintWords = normalizedComplaint.split(/\s+/).filter(w => w.length > 3);
-          const encWords = encComplaint.split(/\s+/).filter(w => w.length > 3);
-          const sharedWords = complaintWords.filter(w => encWords.includes(w));
+          const complaintWords = normalizedComplaint.split(/\s+/).filter((w) => w.length > 3);
+          const encWords = encComplaint.split(/\s+/).filter((w) => w.length > 3);
+          const sharedWords = complaintWords.filter((w) => encWords.includes(w));
 
           if (sharedWords.length > 0) {
             const keywordScore = 0.5 + (sharedWords.length / complaintWords.length) * 0.3;
@@ -421,7 +420,7 @@ export const getLastSimilarEncounter = async (req, res) => {
       resourceId: bestMatch.id,
       ipAddress: req.ip,
       userAgent: req.get('user-agent'),
-      details: { purpose: 'SALT_LOOKUP' }
+      details: { purpose: 'SALT_LOOKUP' },
     });
 
     res.json({
@@ -435,16 +434,16 @@ export const getLastSimilarEncounter = async (req, res) => {
         plan: bestMatch.plan,
         icpc_codes: bestMatch.icpc_codes,
         vas_pain_start: bestMatch.vas_pain_start,
-        vas_pain_end: bestMatch.vas_pain_end
+        vas_pain_end: bestMatch.vas_pain_end,
       },
       matchScore,
-      daysSince
+      daysSince,
     });
   } catch (error) {
     logger.error('Error in getLastSimilarEncounter controller:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to retrieve similar encounter'
+      message: 'Failed to retrieve similar encounter',
     });
   }
 };
@@ -459,5 +458,5 @@ export default {
   generateNote,
   getEncounterHistory,
   checkRedFlags,
-  getLastSimilarEncounter
+  getLastSimilarEncounter,
 };

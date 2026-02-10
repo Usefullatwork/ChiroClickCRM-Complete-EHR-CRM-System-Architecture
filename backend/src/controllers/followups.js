@@ -3,6 +3,7 @@
  */
 
 import * as followUpService from '../services/followups.js';
+import * as recallEngine from '../services/recallEngine.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 
@@ -15,7 +16,7 @@ export const getFollowUps = async (req, res) => {
       patientId: req.query.patientId,
       status: req.query.status,
       priority: req.query.priority,
-      dueDate: req.query.dueDate
+      dueDate: req.query.dueDate,
     };
 
     const result = await followUpService.getAllFollowUps(organizationId, options);
@@ -58,7 +59,7 @@ export const createFollowUp = async (req, res) => {
       resourceType: 'FOLLOWUP',
       resourceId: followUp.id,
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.status(201).json(followUp);
@@ -84,7 +85,7 @@ export const updateFollowUp = async (req, res) => {
       resourceType: 'FOLLOWUP',
       resourceId: id,
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json(followUp);
@@ -112,7 +113,7 @@ export const completeFollowUp = async (req, res) => {
       resourceId: id,
       changes: { status: 'COMPLETED' },
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json(followUp);
@@ -140,7 +141,7 @@ export const skipFollowUp = async (req, res) => {
       resourceId: id,
       changes: { status: 'SKIPPED', reason },
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json({ success: true, data: followUp, message: 'Follow-up skipped' });
@@ -213,13 +214,51 @@ export const markPatientAsContacted = async (req, res) => {
       resourceId: patientId,
       changes: { follow_up_contacted: method },
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json({ success: true, data: patient });
   } catch (error) {
     logger.error('Error in markPatientAsContacted controller:', error);
     res.status(500).json({ success: false, error: 'Failed to mark patient as contacted' });
+  }
+};
+
+export const getRecallSchedule = async (req, res) => {
+  try {
+    const { organizationId } = req;
+    const { patientId } = req.params;
+
+    const schedule = await recallEngine.getRecallSchedule(organizationId, patientId);
+    res.json({ success: true, data: schedule });
+  } catch (error) {
+    logger.error('Error in getRecallSchedule controller:', error);
+    res.status(500).json({ success: false, error: 'Failed to get recall schedule' });
+  }
+};
+
+export const getRecallRules = async (req, res) => {
+  try {
+    const { organizationId } = req;
+
+    const rules = await recallEngine.getRecallRules(organizationId);
+    res.json({ success: true, data: rules });
+  } catch (error) {
+    logger.error('Error in getRecallRules controller:', error);
+    res.status(500).json({ success: false, error: 'Failed to get recall rules' });
+  }
+};
+
+export const updateRecallRules = async (req, res) => {
+  try {
+    const { organizationId } = req;
+    const rules = req.body;
+
+    const updated = await recallEngine.updateRecallRules(organizationId, rules);
+    res.json({ success: true, data: updated });
+  } catch (error) {
+    logger.error('Error in updateRecallRules controller:', error);
+    res.status(500).json({ success: false, error: 'Failed to update recall rules' });
   }
 };
 
@@ -234,5 +273,8 @@ export default {
   getUpcoming,
   getStats,
   getPatientsNeedingFollowUp,
-  markPatientAsContacted
+  markPatientAsContacted,
+  getRecallSchedule,
+  getRecallRules,
+  updateRecallRules,
 };

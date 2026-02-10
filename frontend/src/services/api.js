@@ -245,6 +245,9 @@ export const followUpsAPI = {
   getPatientsNeedingFollowUp: () => apiClient.get('/followups/patients/needingFollowUp'),
   markPatientAsContacted: (patientId, method) =>
     apiClient.post(`/followups/patients/${patientId}/contacted`, { method }),
+  getRecallSchedule: (patientId) => apiClient.get(`/followups/recall-schedule/${patientId}`),
+  getRecallRules: () => apiClient.get('/followups/recall-rules'),
+  updateRecallRules: (rules) => apiClient.post('/followups/recall-rules', rules),
 };
 
 // Financial
@@ -759,6 +762,11 @@ export const trainingAPI = {
   backup: () => apiClient.post('/training/backup'),
   restore: () => apiClient.post('/training/restore'),
   testModel: (model, prompt) => apiClient.get(`/training/test/${model}`, { params: { prompt } }),
+  getAnalyticsPerformance: (params) => apiClient.get('/training/analytics/performance', { params }),
+  getAnalyticsUsage: (params) => apiClient.get('/training/analytics/usage', { params }),
+  getAnalyticsSuggestions: (params) => apiClient.get('/training/analytics/suggestions', { params }),
+  getAnalyticsRedFlags: () => apiClient.get('/training/analytics/red-flags'),
+  getAnalyticsComparison: () => apiClient.get('/training/analytics/comparison'),
 };
 
 // AI Service
@@ -778,6 +786,17 @@ export const aiAPI = {
   // Feedback on AI suggestions (thumbs up/down, corrections)
   submitFeedback: (data) => apiClient.post('/ai/feedback', data),
   recordOutcomeFeedback: (data) => apiClient.post('/ai/outcome-feedback', data),
+};
+
+// Macros API - Clinical text hot buttons
+export const macrosAPI = {
+  getMatrix: () => apiClient.get('/macros'),
+  search: (query) => apiClient.get('/macros/search', { params: { q: query } }),
+  getFavorites: () => apiClient.get('/macros/favorites'),
+  create: (data) => apiClient.post('/macros', data),
+  expand: (id, patientContext) => apiClient.post(`/macros/${id}/expand`, { patientContext }),
+  toggleFavorite: (id) => apiClient.post(`/macros/${id}/favorite`),
+  recordUsage: (id) => apiClient.post(`/macros/${id}/usage`),
 };
 
 // Exercise Library API
@@ -898,6 +917,36 @@ export const kioskAPI = {
   submitIntake: (appointmentId, data) => apiClient.post(`/kiosk/intake/${appointmentId}`, data),
   submitConsent: (appointmentId, data) => apiClient.post(`/kiosk/consent/${appointmentId}`, data),
   getQueue: () => apiClient.get('/kiosk/queue'),
+};
+
+export const treatmentPlansAPI = {
+  getPatientPlans: (patientId, status) =>
+    apiClient.get(`/treatment-plans/patient/${patientId}`, { params: { status } }),
+  getPlan: (id) => apiClient.get(`/treatment-plans/${id}`),
+  createPlan: (data) => apiClient.post('/treatment-plans', data),
+  updatePlan: (id, data) => apiClient.patch(`/treatment-plans/${id}`, data),
+  getPlanProgress: (id) => apiClient.get(`/treatment-plans/${id}/progress`),
+  addMilestone: (planId, data) => apiClient.post(`/treatment-plans/${planId}/milestones`, data),
+  updateMilestone: (milestoneId, data) =>
+    apiClient.patch(`/treatment-plans/milestones/${milestoneId}`, data),
+  addSession: (planId, data) => apiClient.post(`/treatment-plans/${planId}/sessions`, data),
+  completeSession: (sessionId, data) =>
+    apiClient.post(`/treatment-plans/sessions/${sessionId}/complete`, data),
+};
+
+// Outcomes / Questionnaires API
+export const outcomesAPI = {
+  submitQuestionnaire: (data) => apiClient.post('/outcomes/questionnaires', data),
+  getPatientQuestionnaires: (patientId, params) =>
+    apiClient.get(`/outcomes/questionnaires/patient/${patientId}`, { params }),
+  getQuestionnaireById: (id) => apiClient.get(`/outcomes/questionnaires/${id}`),
+  getPatientTrend: (patientId, params) =>
+    apiClient.get(`/outcomes/questionnaires/patient/${patientId}/trend`, { params }),
+  deleteQuestionnaire: (id) => apiClient.delete(`/outcomes/questionnaires/${id}`),
+  // Existing outcome endpoints
+  getPatientSummary: (patientId) => apiClient.get(`/outcomes/patient/${patientId}/summary`),
+  getPatientLongitudinal: (patientId) =>
+    apiClient.get(`/outcomes/patient/${patientId}/longitudinal`),
 };
 
 // Export API URL for streaming endpoints
