@@ -6,107 +6,74 @@
  * - All SOAP sections visible at once
  * - Quick phrase chips & Takster auto-totaling
  * - Full API integration, save/load, AI assistant, exam panels
+ *
+ * Refactored: Components extracted to components/encounter/ and hooks/
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { encountersAPI, patientsAPI, diagnosisAPI, treatmentsAPI, aiAPI } from '../services/api';
 import {
-  AlertTriangle,
   Calendar,
   Check,
   ChevronDown,
   ChevronUp,
   FileText,
   Save,
-  User,
   Activity,
   Clock,
-  Phone,
-  Mail,
   Search,
   X,
   Sparkles,
-  ArrowLeft,
   Brain,
   BookOpen,
-  Bone,
   Loader2,
   Lock,
-  Ruler,
-  PersonStanding,
-  ClipboardList,
   Target,
   Settings,
 } from 'lucide-react';
 import TemplatePicker from '../components/TemplatePicker';
-import { NeurologicalExamCompact } from '../components/neuroexam';
-import { OrthopedicExamCompact } from '../components/orthoexam';
 import { usePatientIntake } from '../hooks/usePatientIntake';
-import { useClinicalPreferences, NOTATION_METHODS } from '../hooks';
+import { useClinicalPreferences } from '../hooks';
 import {
-  ExaminationProtocol,
-  ClusterTestPanel,
-  BodyDiagram,
-  ROMTable,
-  RegionalExamination,
-  VisualROMSelector,
-  ManualMuscleTesting,
-  CranialNervePanel,
-  SensoryExamination,
-  PainAssessmentPanel,
-  DeepTendonReflexPanel,
-  CoordinationTestPanel,
-  NerveTensionTests,
-  HeadacheAssessment,
-  TissueAbnormalityMarkers,
   BodyChartPanel,
   AnatomicalBodyChart,
   ActivatorMethodPanel,
   FacialLinesChart,
-  // Bilateral body diagrams
-  LowerExtremityDiagram,
-  UpperExtremityDiagram,
-  RegionalBodyDiagram,
 } from '../components/examination';
-import NeurologicalExam from '../components/examination/NeurologicalExam';
-import OutcomeMeasures, { OutcomeMeasureSelector } from '../components/examination/OutcomeMeasures';
 import { ExercisePanel } from '../components/exercises';
 import QuickPalpationSpine from '../components/clinical/QuickPalpationSpine';
-// Healthcare UX Components
-import { SALTBanner, AIDiagnosisSidebar, EnhancedClinicalTextarea } from '../components/clinical';
+import { SALTBanner, EnhancedClinicalTextarea } from '../components/clinical';
+import { AIDiagnosisSidebar } from '../components/clinical';
 import { ConnectionStatus } from '../components/common';
 import toast from '../utils/toast';
 
+// Extracted components
+import { useClinicalEncounterState } from '../hooks/useClinicalEncounterState';
+import { PatientInfoSidebar } from '../components/encounter/PatientInfoSidebar';
+import { DiagnosisPanel } from '../components/encounter/DiagnosisPanel';
+import { TaksterPanel, taksterNorwegian } from '../components/encounter/TaksterPanel';
+import { ExamPanelManager } from '../components/encounter/ExamPanelManager';
+
 // --- STATIC DATA ---
-const taksterNorwegian = [
-  { id: 'l214', code: 'L214', name: 'Manipulasjonsbehandling', price: 450 },
-  { id: 'l215', code: 'L215', name: 'Bløtvevsbehandling', price: 350 },
-  { id: 'l220', code: 'L220', name: 'Tillegg for øvelser/veiledning', price: 150 },
-  { id: 'akutt', code: 'AKUTT', name: 'Akutt-tillegg (samme dag)', price: 200 },
-];
 
 // Enhanced quick phrases - expanded based on competitor analysis (ChiroTouch, ChiroSpring)
 const quickPhrases = {
   subjective: [
-    // Progress
     'Bedring siden sist',
     'Betydelig bedring',
     'Ingen endring',
     'Noe verre',
     'Betydelig verre',
-    // Timing
     'Verre om morgenen',
     'Verre om kvelden',
     'Varierende gjennom dagen',
     'Konstante smerter',
-    // Activities
-    'Smerter ved løft',
+    'Smerter ved l\u00F8ft',
     'Smerter ved sitting',
     'Smerter ved gange',
-    'Smerter ved bøying',
-    // Symptoms
+    'Smerter ved b\u00F8ying',
     'Stivhet etter hvile',
     'Utstråling til ben',
     'Utstråling til arm',
@@ -114,26 +81,23 @@ const quickPhrases = {
     'Hodepine assosiert',
   ],
   objective: [
-    // ROM
     'Normal ROM alle retninger',
     'Redusert fleksjon',
     'Redusert ekstensjon',
     'Redusert rotasjon bilat',
     'Redusert lateralfleksjon',
-    // Palpation
     'Muskelspasme palperes',
     'Triggerpunkt identifisert',
-    'Ømhet over fasettledd',
+    '\u00D8mhet over fasettledd',
     'Segmentell dysfunksjon',
-    // Tests
     'Positiv SLR venstre',
-    'Positiv SLR høyre',
+    'Positiv SLR h\u00F8yre',
     'Negativ SLR bilat',
     "Positiv Kemp's test",
     'Positiv facettbelastning',
   ],
   assessment: [
-    'God respons på behandling',
+    'God respons p\u00E5 behandling',
     'Moderat respons',
     'Begrenset respons',
     'Stabil tilstand',
@@ -141,67 +105,56 @@ const quickPhrases = {
     'Vurderer henvisning',
   ],
   plan: [
-    'Fortsett nåværende behandlingsplan',
-    'Økt behandlingsfrekvens',
+    'Fortsett n\u00E5v\u00E6rende behandlingsplan',
+    '\u00D8kt behandlingsfrekvens',
     'Redusert behandlingsfrekvens',
-    'Hjemmeøvelser gjennomgått',
+    'Hjemme\u00F8velser gjennomg\u00E5tt',
     'Ergonomisk veiledning gitt',
     'Kontroll om 1 uke',
   ],
 };
 
-// Macro system - Type ".xx" to expand (inspired by ChiroTouch EasyTouch macros)
+// Macro system - Type ".xx" to expand
 const macros = {
-  // Subjective macros
   '.bs': 'Bedring siden sist. ',
   '.ie': 'Ingen endring siden forrige konsultasjon. ',
   '.vm': 'Verre om morgenen, bedre utover dagen. ',
   '.kons': 'Konstante smerter, VAS ',
   '.ust': 'Utstråling til ',
-
-  // Objective macros
   '.nrom': 'Normal ROM i alle retninger. ',
   '.rrom': 'Redusert ROM: ',
   '.palp': 'Ved palpasjon: ',
   '.spasme': 'Muskelspasme palperes paravertebralt. ',
   '.trigger': 'Triggerpunkt identifisert i ',
   '.seg': 'Segmentell dysfunksjon ',
-
-  // Common segments
   '.c': 'Cervical ',
   '.t': 'Thorakal ',
   '.l': 'Lumbal ',
   '.si': 'SI-ledd ',
-
-  // Treatment macros
   '.hvla': 'HVLA manipulasjon ',
   '.mob': 'Mobilisering ',
-  '.soft': 'Bløtvevsbehandling ',
+  '.soft': 'Bl\u00F8tvevsbehandling ',
   '.dry': 'Dry needling ',
   '.tape': 'Kinesiotaping ',
-
-  // Plan macros
-  '.fu1': 'Oppfølging om 1 uke. ',
-  '.fu2': 'Oppfølging om 2 uker. ',
-  '.øv': 'Hjemmeøvelser gjennomgått og demonstrert. ',
+  '.fu1': 'Oppf\u00F8lging om 1 uke. ',
+  '.fu2': 'Oppf\u00F8lging om 2 uker. ',
+  '.\u00F8v': 'Hjemme\u00F8velser gjennomg\u00E5tt og demonstrert. ',
   '.erg': 'Ergonomisk veiledning gitt. ',
   '.hen': 'Henvisning vurderes til ',
-
-  // Quick assessments
-  '.godr': 'God respons på behandling. Fortsetter nåværende plan. ',
+  '.godr': 'God respons p\u00E5 behandling. Fortsetter n\u00E5v\u00E6rende plan. ',
   '.modr': 'Moderat respons. Justerer behandlingsplan. ',
-  '.begr': 'Begrenset respons. Vurderer alternativ tilnærming. ',
+  '.begr': 'Begrenset respons. Vurderer alternativ tiln\u00E6rming. ',
 };
 
 // Keyboard shortcuts reference
 const keyboardShortcuts = {
   'Ctrl+S': 'Lagre notat',
   'Ctrl+Shift+S': 'Lagre og signer',
-  'Ctrl+1': 'Gå til Subjektivt',
-  'Ctrl+2': 'Gå til Objektivt',
-  'Ctrl+3': 'Gå til Vurdering',
-  'Ctrl+4': 'Gå til Plan',
-  'Ctrl+T': 'Åpne maler',
+  'Ctrl+1': 'G\u00E5 til Subjektivt',
+  'Ctrl+2': 'G\u00E5 til Objektivt',
+  'Ctrl+3': 'G\u00E5 til Vurdering',
+  'Ctrl+4': 'G\u00E5 til Plan',
+  'Ctrl+T': '\u00C5pne maler',
   'Ctrl+L': 'SALT - Kopier fra forrige',
   Esc: 'Lukk dialoger',
 };
@@ -212,70 +165,82 @@ export default function ClinicalEncounter() {
   const { patientId, encounterId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const textAreaRefs = useRef({});
-  const palpationRef = useRef(null);
 
-  // UI State
-  const [showAIAssistant, setShowAIAssistant] = useState(false);
-  const [showTemplatePicker, setShowTemplatePicker] = useState(false);
-  const [showNeuroExam, setShowNeuroExam] = useState(false);
-  const [showOrthoExam, setShowOrthoExam] = useState(false);
-  const [showExamProtocol, setShowExamProtocol] = useState(false);
-  const [showClusterTests, setShowClusterTests] = useState(false);
-  const [showBodyDiagram, setShowBodyDiagram] = useState(false);
-  const [showROMTable, setShowROMTable] = useState(false);
-  const [activeField, setActiveField] = useState(null);
-  const [diagnosisSearch, setDiagnosisSearch] = useState('');
-  const [showDiagnosisDropdown, setShowDiagnosisDropdown] = useState(false);
+  // All local state from custom hook
+  const state = useClinicalEncounterState(patientId);
 
-  // Clinical State
-  const [redFlagAlerts, setRedFlagAlerts] = useState([]);
-  const [clinicalWarnings, setClinicalWarnings] = useState([]);
-  const [aiSuggestions, setAiSuggestions] = useState(null);
-  const [aiLoading, setAiLoading] = useState(false);
-  const [neuroExamData, setNeuroExamData] = useState(null);
-  const [orthoExamData, setOrthoExamData] = useState(null);
-  const [examProtocolData, setExamProtocolData] = useState({});
-  const [clusterTestData, setClusterTestData] = useState({});
-  const [bodyDiagramMarkers, setBodyDiagramMarkers] = useState([]);
-  const [romTableData, setRomTableData] = useState({});
-  const [showNeurologicalExam, setShowNeurologicalExam] = useState(false);
-  const [neurologicalExamData, setNeurologicalExamData] = useState({});
-  const [showOutcomeMeasures, setShowOutcomeMeasures] = useState(false);
-  const [outcomeMeasureType, setOutcomeMeasureType] = useState('ndi');
-  const [outcomeMeasureData, setOutcomeMeasureData] = useState({});
-  const [showRegionalExam, setShowRegionalExam] = useState(false);
-  const [regionalExamData, setRegionalExamData] = useState({});
-  const [showExercisePanel, setShowExercisePanel] = useState(false);
-
-  // Healthcare UX State
-  const [showSALTBanner, setShowSALTBanner] = useState(true); // Show SALT banner when previous encounter found
-  const [saltBannerExpanded, setSaltBannerExpanded] = useState(false);
-  const [showAIDiagnosisSidebar, setShowAIDiagnosisSidebar] = useState(false); // Collapsed by default
-  const [syncStatus, setSyncStatus] = useState({ pending: 0, lastSync: null, error: null });
-
-  // New Examination Components State
-  const [showMMT, setShowMMT] = useState(false);
-  const [mmtData, setMmtData] = useState({});
-  const [showCranialNerves, setShowCranialNerves] = useState(false);
-  const [cranialNerveData, setCranialNerveData] = useState({});
-  const [showSensoryExam, setShowSensoryExam] = useState(false);
-  const [sensoryExamData, setSensoryExamData] = useState({});
-  const [showPainAssessment, setShowPainAssessment] = useState(false);
-  const [painAssessmentData, setPainAssessmentData] = useState({});
-  const [showDTR, setShowDTR] = useState(false);
-  const [dtrData, setDtrData] = useState({});
-  const [showCoordination, setShowCoordination] = useState(false);
-  const [coordinationData, setCoordinationData] = useState({});
-  const [showNerveTension, setShowNerveTension] = useState(false);
-  const [nerveTensionData, setNerveTensionData] = useState({});
-  const [showRegionalDiagrams, setShowRegionalDiagrams] = useState(false);
-  const [regionalDiagramData, setRegionalDiagramData] = useState({});
-  const [selectedRegion, setSelectedRegion] = useState('shoulder');
-  const [showHeadacheAssessment, setShowHeadacheAssessment] = useState(false);
-  const [headacheData, setHeadacheData] = useState({});
-  const [showTissueMarkers, setShowTissueMarkers] = useState(false);
-  const [tissueMarkerData, setTissueMarkerData] = useState({});
+  // Destructure for convenience
+  const {
+    encounterData,
+    setEncounterData,
+    redFlagAlerts,
+    setRedFlagAlerts,
+    clinicalWarnings,
+    aiSuggestions,
+    setAiSuggestions,
+    aiLoading,
+    setAiLoading,
+    neuroExamData,
+    setNeuroExamData,
+    orthoExamData,
+    setOrthoExamData,
+    activeField,
+    setActiveField,
+    diagnosisSearch,
+    setDiagnosisSearch,
+    showDiagnosisDropdown,
+    setShowDiagnosisDropdown,
+    showAIAssistant,
+    setShowAIAssistant,
+    showTemplatePicker,
+    setShowTemplatePicker,
+    showKeyboardHelp,
+    setShowKeyboardHelp,
+    showMacroHint,
+    setShowMacroHint,
+    currentMacroMatch,
+    setCurrentMacroMatch,
+    showSALTBanner,
+    setShowSALTBanner,
+    saltBannerExpanded,
+    setSaltBannerExpanded,
+    showAIDiagnosisSidebar,
+    setShowAIDiagnosisSidebar,
+    selectedTakster,
+    setSelectedTakster,
+    showTakster,
+    setShowTakster,
+    autoSaveStatus,
+    setAutoSaveStatus,
+    lastSaved,
+    setLastSaved,
+    elapsedTime,
+    setElapsedTime,
+    encounterStartTime,
+    showAmendmentForm,
+    setShowAmendmentForm,
+    amendmentContent,
+    setAmendmentContent,
+    amendmentType,
+    setAmendmentType,
+    amendmentReason,
+    setAmendmentReason,
+    showExercisePanel,
+    setShowExercisePanel,
+    kioskDataApplied,
+    setKioskDataApplied,
+    // Notation
+    notationData,
+    setNotationData,
+    notationNarrative,
+    setNotationNarrative,
+    // Refs
+    textAreaRefs,
+    palpationRef,
+    autoSaveTimerRef,
+    sectionRefs,
+    timerIntervalRef,
+  } = state;
 
   // Clinical Preferences (notation method selection)
   const {
@@ -285,74 +250,6 @@ export default function ClinicalEncounter() {
     isVisualNotation,
     language: clinicalLang,
   } = useClinicalPreferences();
-  const [notationData, setNotationData] = useState({ markers: [], selectedPoints: [] });
-  const [notationNarrative, setNotationNarrative] = useState('');
-
-  // Amendment State (for signed encounters)
-  const [showAmendmentForm, setShowAmendmentForm] = useState(false);
-  const [amendmentContent, setAmendmentContent] = useState('');
-  const [amendmentType, setAmendmentType] = useState('ADDENDUM');
-  const [amendmentReason, setAmendmentReason] = useState('');
-
-  // Efficiency Features State
-  const [autoSaveStatus, setAutoSaveStatus] = useState('saved'); // 'saved', 'saving', 'unsaved'
-  const [lastSaved, setLastSaved] = useState(null);
-  const [showMacroHint, setShowMacroHint] = useState(false);
-  const [currentMacroMatch, setCurrentMacroMatch] = useState('');
-  const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
-  const autoSaveTimerRef = useRef(null);
-  const sectionRefs = useRef({});
-
-  // Treatment State
-  const [selectedTakster, setSelectedTakster] = useState(['l214']);
-  const [showTakster, setShowTakster] = useState(false); // Hidden by default for students/limited users
-
-  // Encounter Timer State
-  const [encounterStartTime] = useState(() => new Date());
-  const [elapsedTime, setElapsedTime] = useState('00:00');
-  const timerIntervalRef = useRef(null);
-
-  // Form State - SOAP format
-  const [encounterData, setEncounterData] = useState({
-    patient_id: patientId,
-    encounter_date: new Date().toISOString().split('T')[0],
-    encounter_type: 'FOLLOWUP',
-    duration_minutes: 30,
-    subjective: {
-      chief_complaint: '',
-      history: '',
-      onset: '',
-      pain_description: '',
-      aggravating_factors: '',
-      relieving_factors: '',
-    },
-    objective: {
-      observation: '',
-      palpation: '',
-      rom: '',
-      ortho_tests: '',
-      neuro_tests: '',
-      posture: '',
-    },
-    assessment: {
-      clinical_reasoning: '',
-      differential_diagnosis: '',
-      prognosis: '',
-      red_flags_checked: true,
-    },
-    plan: {
-      treatment: '',
-      exercises: '',
-      advice: '',
-      follow_up: '',
-      referrals: '',
-    },
-    icpc_codes: [],
-    icd10_codes: [],
-    treatments: [],
-    vas_pain_start: 5,
-    vas_pain_end: 3,
-  });
 
   // Fetch patient data
   const { data: patient, isLoading: patientLoading } = useQuery({
@@ -362,16 +259,12 @@ export default function ClinicalEncounter() {
   });
 
   // Fetch kiosk intake data if patient checked in via kiosk
-  // This will pre-populate the subjective section
   const appointmentId = patient?.currentAppointmentId || null;
   const {
     intake: kioskIntake,
     subjectiveNarrative: kioskSubjective,
     hasIntake: hasKioskIntake,
   } = usePatientIntake(appointmentId);
-
-  // Track if we've applied kiosk data (to avoid overwriting user edits)
-  const [kioskDataApplied, setKioskDataApplied] = useState(false);
 
   // Pre-populate from kiosk check-in data
   useEffect(() => {
@@ -385,9 +278,6 @@ export default function ClinicalEncounter() {
         vas_pain_start: kioskIntake?.painLevel ?? prev.vas_pain_start,
       }));
       setKioskDataApplied(true);
-
-      // Show notification to user
-      // Kiosk data pre-populated
     }
   }, [hasKioskIntake, kioskSubjective, kioskIntake, kioskDataApplied, encounterId]);
 
@@ -407,7 +297,7 @@ export default function ClinicalEncounter() {
         encounter_date: new Date(existingEncounter.data.encounter_date).toISOString().split('T')[0],
       }));
       setRedFlagAlerts(existingEncounter.data.redFlagAlerts || []);
-      setClinicalWarnings(existingEncounter.data.clinicalWarnings || []);
+      state.setClinicalWarnings(existingEncounter.data.clinicalWarnings || []);
     }
   }, [existingEncounter]);
 
@@ -423,13 +313,11 @@ export default function ClinicalEncounter() {
     queryFn: () => treatmentsAPI.getCommon(),
   });
 
-  // SALT: Fetch previous encounter for this patient (Same As Last Time feature)
+  // SALT: Fetch previous encounter for this patient
   const { data: previousEncounters } = useQuery({
     queryKey: ['encounters', 'patient', patientId, 'previous'],
     queryFn: async () => {
-      // Use the main encounters API with patientId filter
       const response = await encountersAPI.getAll({ patientId, signed: true, limit: 10 });
-      // API returns { encounters: [...], pagination: {...} }
       const encounters = response?.data?.encounters || response?.data?.data || response?.data || [];
       const previous = encounters
         .filter((e) => e.id !== encounterId)
@@ -450,7 +338,6 @@ export default function ClinicalEncounter() {
     onSuccess: (response) => {
       queryClient.invalidateQueries(['encounters']);
       queryClient.invalidateQueries(['patient', patientId]);
-      // Update auto-save status
       setAutoSaveStatus('saved');
       setLastSaved(new Date());
       if (!encounterId && response?.data?.id) {
@@ -465,8 +352,7 @@ export default function ClinicalEncounter() {
   // Sign encounter mutation
   const signMutation = useMutation({
     mutationFn: (id) => encountersAPI.sign(id),
-    onSuccess: (response) => {
-      // Update local state with signed timestamp
+    onSuccess: () => {
       setEncounterData((prev) => ({
         ...prev,
         signed_at: new Date().toISOString(),
@@ -476,7 +362,7 @@ export default function ClinicalEncounter() {
     },
   });
 
-  // Check if encounter is signed (immutable) - must be defined before amendments query
+  // Check if encounter is signed (immutable)
   const isSigned = !!encounterData.signed_at;
 
   // Fetch amendments for signed encounter
@@ -507,7 +393,6 @@ export default function ClinicalEncounter() {
     },
   });
 
-  // Handle create amendment
   const handleCreateAmendment = () => {
     if (!amendmentContent.trim()) return;
     createAmendmentMutation.mutate({
@@ -560,16 +445,12 @@ export default function ClinicalEncounter() {
 
   // === EFFICIENCY FEATURES ===
 
-  // Macro expansion - expands ".xx" shortcuts to full text
   const expandMacro = (text, cursorPosition) => {
-    // Find the word before cursor that starts with "."
     const beforeCursor = text.substring(0, cursorPosition);
-    const macroMatch = beforeCursor.match(/(\.[a-zøæå0-9]+)$/i);
-
+    const macroMatch = beforeCursor.match(/(\.[a-z\u00F8\u00E6\u00E50-9]+)$/i);
     if (macroMatch) {
       const macroKey = macroMatch[1].toLowerCase();
       const expansion = macros[macroKey];
-
       if (expansion) {
         const newText =
           text.substring(0, cursorPosition - macroKey.length) +
@@ -585,12 +466,9 @@ export default function ClinicalEncounter() {
     return { expanded: false, text, newCursorPosition: cursorPosition };
   };
 
-  // Handle text input with macro detection
   const handleTextInputWithMacros = (e, section, field) => {
     const value = e.target.value;
     const cursorPos = e.target.selectionStart;
-
-    // Check for space or enter after potential macro
     if (e.nativeEvent.data === ' ' || e.nativeEvent.inputType === 'insertLineBreak') {
       const result = expandMacro(value.slice(0, -1), cursorPos - 1);
       if (result.expanded) {
@@ -601,7 +479,6 @@ export default function ClinicalEncounter() {
             [section]: { ...prev[section], [field]: finalValue },
           }));
         }
-        // Set cursor position after expansion
         setTimeout(() => {
           if (e.target) {
             e.target.selectionStart = result.newCursorPosition + 1;
@@ -612,15 +489,13 @@ export default function ClinicalEncounter() {
         return true;
       }
     }
-
-    // Check for matching macros to show hint
     const beforeCursor = value.substring(0, cursorPos);
-    const partialMatch = beforeCursor.match(/(\.[a-zøæå0-9]*)$/i);
+    const partialMatch = beforeCursor.match(/(\.[a-z\u00F8\u00E6\u00E50-9]*)$/i);
     if (partialMatch && partialMatch[1].length > 1) {
       const partial = partialMatch[1].toLowerCase();
       const matches = Object.keys(macros).filter((k) => k.startsWith(partial));
       if (matches.length > 0 && matches[0] !== partial) {
-        setCurrentMacroMatch(matches[0] + ' → ' + macros[matches[0]].substring(0, 30) + '...');
+        setCurrentMacroMatch(matches[0] + ' \u2192 ' + macros[matches[0]].substring(0, 30) + '...');
         setShowMacroHint(true);
       } else {
         setShowMacroHint(false);
@@ -628,21 +503,17 @@ export default function ClinicalEncounter() {
     } else {
       setShowMacroHint(false);
     }
-
     return false;
   };
 
-  // SALT - Same As Last Time: Copy from previous encounter
+  // SALT - Same As Last Time
   const handleSALT = (section = null) => {
     if (!previousEncounters) {
       toast.info('Ingen tidligere konsultasjon funnet for denne pasienten.');
       return;
     }
-
     const prev = previousEncounters;
-
     if (section) {
-      // Copy specific section
       if (prev[section]) {
         setEncounterData((current) => ({
           ...current,
@@ -650,16 +521,14 @@ export default function ClinicalEncounter() {
         }));
       }
     } else {
-      // Copy all SOAP sections
       setEncounterData((current) => ({
         ...current,
         subjective: prev.subjective || current.subjective,
         objective: prev.objective || current.objective,
         assessment: prev.assessment || current.assessment,
         plan: prev.plan || current.plan,
-        vas_pain_start: prev.vas_pain_end || current.vas_pain_start, // Use previous end as new start
+        vas_pain_start: prev.vas_pain_end || current.vas_pain_start,
       }));
-      // Copy treatments
       if (prev.treatments?.length > 0) {
         const prevTakstIds = prev.treatments
           .map((t) => taksterNorwegian.find((tak) => tak.code === t.code)?.id)
@@ -675,13 +544,7 @@ export default function ClinicalEncounter() {
   // Auto-save functionality
   const triggerAutoSave = () => {
     if (isSigned || autoSaveStatus === 'saved') return;
-
-    // Clear existing timer
-    if (autoSaveTimerRef.current) {
-      clearTimeout(autoSaveTimerRef.current);
-    }
-
-    // Set new timer for auto-save (3 seconds after last change)
+    if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
     autoSaveTimerRef.current = setTimeout(() => {
       if (encounterId && !isSigned) {
         setAutoSaveStatus('saving');
@@ -693,12 +556,10 @@ export default function ClinicalEncounter() {
   // Keyboard shortcuts handler
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Ctrl+S: Save
       if (e.ctrlKey && e.key === 's' && !e.shiftKey) {
         e.preventDefault();
         if (!isSigned) handleSave();
       }
-      // Ctrl+Shift+S: Save and Sign
       if (e.ctrlKey && e.shiftKey && e.key === 'S') {
         e.preventDefault();
         if (!isSigned && encounterId) {
@@ -706,7 +567,6 @@ export default function ClinicalEncounter() {
           setTimeout(() => signMutation.mutate(encounterId), 500);
         }
       }
-      // Ctrl+1-4: Jump to SOAP sections
       if (e.ctrlKey && ['1', '2', '3', '4'].includes(e.key)) {
         e.preventDefault();
         const sections = ['subjective', 'objective', 'assessment', 'plan'];
@@ -714,56 +574,47 @@ export default function ClinicalEncounter() {
         const ref = sectionRefs.current[section];
         if (ref) ref.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-      // Ctrl+T: Open templates
       if (e.ctrlKey && e.key === 't') {
         e.preventDefault();
         setShowTemplatePicker(true);
       }
-      // Ctrl+L: SALT - Copy from last visit
       if (e.ctrlKey && e.key === 'l') {
         e.preventDefault();
         if (!isSigned) handleSALT();
       }
-      // Escape: Close dialogs
       if (e.key === 'Escape') {
         setShowTemplatePicker(false);
         setShowAIAssistant(false);
         setShowKeyboardHelp(false);
         setShowAmendmentForm(false);
       }
-      // F1: Show keyboard shortcuts
       if (e.key === 'F1') {
         e.preventDefault();
         setShowKeyboardHelp((prev) => !prev);
       }
     };
-
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isSigned, encounterId]);
 
-  // Auto-save effect - trigger on data changes
+  // Auto-save effect
   useEffect(() => {
     if (encounterId && !isSigned) {
       setAutoSaveStatus('unsaved');
       triggerAutoSave();
     }
     return () => {
-      if (autoSaveTimerRef.current) {
-        clearTimeout(autoSaveTimerRef.current);
-      }
+      if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
     };
   }, [encounterData, selectedTakster]);
 
-  // Helper functions
-  // Remove empty strings from object (backend validation rejects empty strings)
+  // Helper: Remove empty strings from object
   const cleanEmptyStrings = (obj) => {
     if (typeof obj !== 'object' || obj === null) return obj;
     const cleaned = {};
     for (const [key, value] of Object.entries(obj)) {
       if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
         const cleanedNested = cleanEmptyStrings(value);
-        // Only include if nested object has values
         if (Object.keys(cleanedNested).length > 0) {
           cleaned[key] = cleanedNested;
         }
@@ -775,10 +626,9 @@ export default function ClinicalEncounter() {
   };
 
   const handleSave = () => {
-    // Build base data with required fields
     const baseData = {
       patient_id: patientId,
-      practitioner_id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', // Dev user ID
+      practitioner_id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22',
       encounter_date: encounterData.encounter_date,
       encounter_type: encounterData.encounter_type,
       duration_minutes: encounterData.duration_minutes,
@@ -786,28 +636,18 @@ export default function ClinicalEncounter() {
       vas_pain_end: encounterData.vas_pain_end,
       status: 'DRAFT',
     };
-
-    // Clean SOAP sections - remove empty strings
     const subjective = cleanEmptyStrings(encounterData.subjective);
     const objective = cleanEmptyStrings(encounterData.objective);
     const assessment = cleanEmptyStrings(encounterData.assessment);
     const plan = cleanEmptyStrings(encounterData.plan);
-
-    // Build treatments with required type field
     const treatments = selectedTakster
       .map((id) => {
         const takst = taksterNorwegian.find((t) => t.id === id);
         return takst
-          ? {
-              code: takst.code,
-              name: takst.name,
-              price: takst.price,
-              type: 'CHIROPRACTIC', // Required field
-            }
+          ? { code: takst.code, name: takst.name, price: takst.price, type: 'CHIROPRACTIC' }
           : null;
       })
       .filter(Boolean);
-
     const dataToSave = {
       ...baseData,
       ...(Object.keys(subjective).length > 0 && { subjective }),
@@ -818,15 +658,11 @@ export default function ClinicalEncounter() {
       icpc_codes: encounterData.icpc_codes || [],
       icd10_codes: encounterData.icd10_codes || [],
     };
-
-    // Save encounter data
     saveMutation.mutate(dataToSave);
   };
 
   const handleSignAndLock = async () => {
-    // First save, then sign
     if (!encounterId) {
-      // Need to create first, then sign
       const baseData = {
         patient_id: patientId,
         practitioner_id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22',
@@ -849,7 +685,6 @@ export default function ClinicalEncounter() {
             : null;
         })
         .filter(Boolean);
-
       const dataToSave = {
         ...baseData,
         ...(Object.keys(subjective).length > 0 && { subjective }),
@@ -860,7 +695,6 @@ export default function ClinicalEncounter() {
         icpc_codes: encounterData.icpc_codes || [],
         icd10_codes: encounterData.icd10_codes || [],
       };
-
       try {
         const response = await encountersAPI.create(dataToSave);
         const newId = response?.data?.id;
@@ -873,28 +707,21 @@ export default function ClinicalEncounter() {
         // Error handled by mutation onError callback
       }
     } else {
-      // Save current changes first, then sign
       handleSave();
-      // Sign after a brief delay to ensure save completes
-      setTimeout(() => {
-        signMutation.mutate(encounterId);
-      }, 500);
+      setTimeout(() => signMutation.mutate(encounterId), 500);
     }
   };
 
   const updateField = (section, field, value) => {
     setEncounterData((prev) => ({
       ...prev,
-      [section]: {
-        ...prev[section],
-        [field]: value,
-      },
+      [section]: { ...prev[section], [field]: value },
     }));
   };
 
   const handleQuickPhrase = (phrase, section, field) => {
     const currentValue = encounterData[section][field] || '';
-    const newValue = currentValue + (currentValue ? '\n' : '') + '• ' + phrase;
+    const newValue = currentValue + (currentValue ? '\n' : '') + '\u2022 ' + phrase;
     updateField(section, field, newValue);
   };
 
@@ -935,7 +762,6 @@ export default function ClinicalEncounter() {
         assessment: encounterData.assessment,
         icpc_codes: encounterData.icpc_codes,
       };
-
       const patientContext = {
         age: patient?.data?.date_of_birth
           ? Math.floor((new Date() - new Date(patient.data.date_of_birth)) / 31557600000)
@@ -946,44 +772,30 @@ export default function ClinicalEncounter() {
         red_flags: patient?.data?.red_flags,
         contraindications: patient?.data?.contraindications,
       };
-
       const [diagnosisResponse, redFlagResponse] = await Promise.allSettled([
         aiAPI.suggestDiagnosis(soapData),
         aiAPI.analyzeRedFlags(patientContext, soapData),
       ]);
-
-      const suggestions = {
-        diagnosis: [],
-        treatment: [],
-        followUp: [],
-        clinicalReasoning: '',
-      };
-
+      const suggestions = { diagnosis: [], treatment: [], followUp: [], clinicalReasoning: '' };
       if (diagnosisResponse.status === 'fulfilled' && diagnosisResponse.value?.data) {
         const diagData = diagnosisResponse.value.data;
         suggestions.diagnosis = diagData.codes || [];
         suggestions.clinicalReasoning = diagData.reasoning || diagData.suggestion || '';
       }
-
       if (redFlagResponse.status === 'fulfilled' && redFlagResponse.value?.data) {
         const redFlagData = redFlagResponse.value.data;
         if (redFlagData.recommendReferral) {
-          suggestions.followUp.push(`⚠️ ${redFlagData.analysis}`);
+          suggestions.followUp.push(`\u26A0\uFE0F ${redFlagData.analysis}`);
         }
         if (redFlagData.riskLevel && redFlagData.riskLevel !== 'LOW') {
-          suggestions.clinicalReasoning += `\n\nRisikonivå: ${redFlagData.riskLevel}`;
+          suggestions.clinicalReasoning += `\n\nRisikoniv\u00E5: ${redFlagData.riskLevel}`;
         }
       }
-
-      // Fallback to mock suggestions if AI unavailable
       if (suggestions.diagnosis.length === 0 && !suggestions.clinicalReasoning) {
-        const mockSuggestions = generateMockSuggestions(encounterData.subjective);
-        Object.assign(suggestions, mockSuggestions);
+        Object.assign(suggestions, generateMockSuggestions(encounterData.subjective));
       }
-
       setAiSuggestions(suggestions);
     } catch (error) {
-      // AI suggestion failed, fall back to mock suggestions
       setAiSuggestions(generateMockSuggestions(encounterData.subjective));
     } finally {
       setAiLoading(false);
@@ -991,47 +803,35 @@ export default function ClinicalEncounter() {
   };
 
   const generateMockSuggestions = (subjective) => {
-    const suggestions = {
-      diagnosis: [],
-      treatment: [],
-      followUp: [],
-      clinicalReasoning: '',
-    };
-
+    const suggestions = { diagnosis: [], treatment: [], followUp: [], clinicalReasoning: '' };
     const complaint = (subjective.chief_complaint || '').toLowerCase();
     const history = (subjective.history || '').toLowerCase();
     const combined = complaint + ' ' + history;
-
     if (combined.includes('rygg') || combined.includes('back')) {
       suggestions.diagnosis.push('L03 - Korsryggsmerter');
       suggestions.diagnosis.push('L84 - Ryggsyndrom uten utstråling');
       suggestions.treatment.push('HVLA manipulasjon lumbal');
-      suggestions.treatment.push('Bløtvevsbehandling');
+      suggestions.treatment.push('Bl\u00F8tvevsbehandling');
       suggestions.clinicalReasoning =
-        'Basert på lumbal smertepresentasjon, vurder mekanisk korsryggsmerte. Utelukk røde flagg.';
+        'Basert p\u00E5 lumbal smertepresentasjon, vurder mekanisk korsryggsmerte. Utelukk r\u00F8de flagg.';
     }
-
     if (combined.includes('nakke') || combined.includes('neck')) {
       suggestions.diagnosis.push('L01 - Nakkesmerter');
       suggestions.diagnosis.push('L83 - Nakkesyndrom');
       suggestions.treatment.push('Cervical mobilisering');
       suggestions.clinicalReasoning =
-        'Nakkesmertepresentasjon tyder på cervikal facettdysfunksjon eller muskelspenning.';
+        'Nakkesmertepresentasjon tyder p\u00E5 cervikal facettdysfunksjon eller muskelspenning.';
     }
-
     if (suggestions.diagnosis.length === 0) {
       suggestions.clinicalReasoning = 'Fyll ut subjektive og objektive funn for AI-forslag.';
     }
-
     return suggestions;
   };
 
   // Exam handlers
   const handleNeuroExamChange = (examData) => {
     setNeuroExamData(examData);
-    if (examData?.narrative) {
-      updateField('objective', 'neuro_tests', examData.narrative);
-    }
+    if (examData?.narrative) updateField('objective', 'neuro_tests', examData.narrative);
     if (examData?.redFlags?.length > 0) {
       const neuroRedFlags = examData.redFlags.map(
         (rf) => `NEURO: ${rf.description} - ${rf.action}`
@@ -1045,9 +845,7 @@ export default function ClinicalEncounter() {
 
   const handleOrthoExamChange = (examData) => {
     setOrthoExamData(examData);
-    if (examData?.narrative) {
-      updateField('objective', 'ortho_tests', examData.narrative);
-    }
+    if (examData?.narrative) updateField('objective', 'ortho_tests', examData.narrative);
     if (examData?.redFlags?.length > 0) {
       const orthoRedFlags = examData.redFlags.map(
         (rf) => `ORTHO: ${rf.testName?.no || rf.clusterName?.no} - ${rf.action}`
@@ -1066,20 +864,16 @@ export default function ClinicalEncounter() {
     updateField(section, field, currentValue + (currentValue ? '\n' : '') + templateText);
   };
 
-  // Handler for spine quick-click text insertion (palpation only)
   const handleSpineTextInsert = (text) => {
     const currentValue = encounterData.objective.palpation || '';
-    // Append text with proper spacing
     const newValue = currentValue + (currentValue && !currentValue.endsWith(' ') ? ' ' : '') + text;
     setEncounterData((prev) => ({
       ...prev,
       objective: { ...prev.objective, palpation: newValue },
     }));
     setAutoSaveStatus('unsaved');
-    // Optionally refocus the palpation textarea
     if (palpationRef.current) {
       palpationRef.current.focus();
-      // Move cursor to end
       setTimeout(() => {
         if (palpationRef.current) {
           palpationRef.current.selectionStart = palpationRef.current.value.length;
@@ -1094,21 +888,13 @@ export default function ClinicalEncounter() {
     .filter((t) => selectedTakster.includes(t.id))
     .reduce((sum, t) => sum + t.price, 0);
 
-  const currentDate = new Date().toLocaleDateString('no-NO', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
-
   const patientData = patient?.data;
   const patientAge = patientData?.date_of_birth
     ? Math.floor((new Date() - new Date(patientData.date_of_birth)) / 31557600000)
     : null;
-
   const patientInitials = patientData
     ? `${patientData.first_name?.[0] || ''}${patientData.last_name?.[0] || ''}`.toUpperCase()
     : '??';
-
   const patientRedFlags = patientData?.red_flags || [];
   const patientContraindications = patientData?.contraindications || [];
 
@@ -1120,9 +906,9 @@ export default function ClinicalEncounter() {
       d.description_no?.toLowerCase().includes(diagnosisSearch.toLowerCase())
   );
 
-  // ═══════════════════════════════════════════════════════════════════
+  // ===============================================================
   // RENDER
-  // ═══════════════════════════════════════════════════════════════════
+  // ===============================================================
   return (
     <div className="flex h-screen bg-slate-50 text-slate-900 overflow-hidden font-sans">
       {/* Quick Palpation Spine Sidebar - Always visible right side */}
@@ -1132,176 +918,23 @@ export default function ClinicalEncounter() {
 
       {/* Main content wrapper with right margin to accommodate spine sidebar */}
       <div className="flex flex-1 mr-44">
-        {/* ═══════════════════════════════════════════════════════════════════
-          1. LEFT SIDEBAR - PATIENT CONTEXT & SAFETY
-          ═══════════════════════════════════════════════════════════════════ */}
-        <aside className="w-80 bg-white border-r border-slate-200 flex flex-col h-full shadow-sm z-10">
-          {/* Back Button & Patient Header */}
-          <div className="p-4 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
-            <button
-              onClick={() => navigate(`/patients/${patientId}`)}
-              className="flex items-center text-sm text-slate-500 hover:text-slate-700 mb-3"
-            >
-              <ArrowLeft className="h-4 w-4 mr-1" />
-              Tilbake til pasient
-            </button>
+        {/* 1. LEFT SIDEBAR - PATIENT CONTEXT & SAFETY */}
+        <PatientInfoSidebar
+          patientData={patientData}
+          patientLoading={patientLoading}
+          patientInitials={patientInitials}
+          patientAge={patientAge}
+          patientRedFlags={patientRedFlags}
+          patientContraindications={patientContraindications}
+          redFlagAlerts={redFlagAlerts}
+          clinicalWarnings={clinicalWarnings}
+          aiSuggestions={aiSuggestions}
+          onNavigateBack={() => navigate(`/patients/${patientId}`)}
+          onOpenAIAssistant={() => setShowAIAssistant(true)}
+          onOpenTemplatePicker={() => setShowTemplatePicker(true)}
+        />
 
-            {patientLoading ? (
-              <div className="flex items-center justify-center py-4">
-                <Loader2 className="h-6 w-6 animate-spin text-teal-600" />
-              </div>
-            ) : (
-              <>
-                <div className="flex items-center space-x-3">
-                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center text-white font-semibold text-lg shadow-sm">
-                    {patientInitials}
-                  </div>
-                  <div>
-                    <h2 className="font-semibold text-lg text-slate-800">
-                      {patientData?.first_name} {patientData?.last_name}
-                    </h2>
-                    <p className="text-sm text-slate-500">
-                      {patientAge ? `${patientAge} år` : ''}
-                      {patientData?.national_id &&
-                        ` • Fnr: ${patientData.national_id.substring(0, 6)}-*****`}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Quick Contact */}
-                <div className="flex gap-2 mt-3">
-                  <button className="flex-1 flex items-center justify-center gap-1 text-xs py-1.5 px-2 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">
-                    <Phone className="h-3 w-3" />
-                    Ring
-                  </button>
-                  <button className="flex-1 flex items-center justify-center gap-1 text-xs py-1.5 px-2 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">
-                    <Mail className="h-3 w-3" />
-                    SMS
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-
-          {/* Scrollable Content */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {/* RED FLAG ALERTS */}
-            {(redFlagAlerts.length > 0 || patientRedFlags.length > 0) && (
-              <div className="rounded-lg bg-rose-50 border border-rose-200 p-3">
-                <div className="flex items-center gap-2 text-rose-700 font-semibold text-sm mb-2">
-                  <AlertTriangle className="h-4 w-4" />
-                  Kliniske Varsler
-                </div>
-                <ul className="space-y-1">
-                  {patientRedFlags.map((flag, idx) => (
-                    <li
-                      key={`patient-${idx}`}
-                      className="text-sm text-rose-600 flex items-start gap-2"
-                    >
-                      <span className="text-rose-400 mt-1">•</span>
-                      {flag}
-                    </li>
-                  ))}
-                  {redFlagAlerts.map((alert, idx) => (
-                    <li
-                      key={`alert-${idx}`}
-                      className="text-sm text-rose-600 flex items-start gap-2"
-                    >
-                      <span className="text-rose-400 mt-1">•</span>
-                      {alert}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* CONTRAINDICATIONS */}
-            {patientContraindications.length > 0 && (
-              <div className="rounded-lg bg-amber-50 border border-amber-200 p-3">
-                <div className="flex items-center gap-2 text-amber-700 font-semibold text-sm mb-2">
-                  <AlertTriangle className="h-4 w-4" />
-                  Kontraindikasjoner
-                </div>
-                <ul className="space-y-1">
-                  {patientContraindications.map((item, idx) => (
-                    <li key={idx} className="text-sm text-amber-600 flex items-start gap-2">
-                      <span className="text-amber-400 mt-1">•</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* CLINICAL WARNINGS */}
-            {clinicalWarnings.length > 0 && (
-              <div className="rounded-lg bg-yellow-50 border border-yellow-200 p-3">
-                <div className="flex items-center gap-2 text-yellow-700 font-semibold text-sm mb-2">
-                  <AlertTriangle className="h-4 w-4" />
-                  Kliniske Advarsler
-                </div>
-                <ul className="space-y-1">
-                  {clinicalWarnings.map((warning, idx) => (
-                    <li key={idx} className="text-sm text-yellow-600 flex items-start gap-2">
-                      <span className="text-yellow-400 mt-1">•</span>
-                      {warning}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* PATIENT MEDICAL HISTORY */}
-            {patientData?.medical_history && (
-              <div className="rounded-lg bg-white border border-slate-200 shadow-sm">
-                <div className="px-3 py-2 border-b border-slate-100 bg-slate-50 rounded-t-lg">
-                  <h3 className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                    <Activity className="h-4 w-4 text-teal-600" />
-                    Sykehistorie
-                  </h3>
-                </div>
-                <div className="p-3">
-                  <p className="text-sm text-slate-600 leading-relaxed">
-                    {patientData.medical_history}
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* AI SUGGESTIONS PREVIEW */}
-            <div className="rounded-lg bg-purple-50 border border-purple-200 p-3">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2 text-purple-700 font-semibold text-sm">
-                  <Sparkles className="h-4 w-4" />
-                  AI-forslag
-                </div>
-                <button
-                  onClick={() => setShowAIAssistant(true)}
-                  className="text-xs text-purple-600 hover:text-purple-800"
-                >
-                  Åpne →
-                </button>
-              </div>
-              <p className="text-sm text-purple-600">
-                {aiSuggestions?.clinicalReasoning ||
-                  'Klikk "Åpne" for AI-assistert analyse basert på SOAP-notater.'}
-              </p>
-            </div>
-
-            {/* TEMPLATE PICKER BUTTON */}
-            <button
-              onClick={() => setShowTemplatePicker(true)}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-green-50 border border-green-200 text-green-700 hover:bg-green-100 transition-colors text-sm font-medium"
-            >
-              <BookOpen className="h-4 w-4" />
-              Kliniske Maler
-            </button>
-          </div>
-        </aside>
-
-        {/* ═══════════════════════════════════════════════════════════════════
-          2. MAIN CONTENT - SOAP DOCUMENTATION
-          ═══════════════════════════════════════════════════════════════════ */}
+        {/* 2. MAIN CONTENT - SOAP DOCUMENTATION */}
         <main className="flex-1 flex flex-col h-full overflow-hidden">
           {/* Header Bar */}
           <header className="bg-white border-b border-slate-200 px-6 py-3 flex justify-between items-center flex-shrink-0">
@@ -1326,10 +959,10 @@ export default function ClinicalEncounter() {
                 disabled={isSigned}
                 className="text-sm text-slate-600 bg-transparent border border-slate-200 rounded-lg px-2 py-1 focus:ring-2 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <option value="INITIAL">Førstegangs</option>
-                <option value="FOLLOWUP">Oppfølging</option>
+                <option value="INITIAL">F\u00F8rstegangs</option>
+                <option value="FOLLOWUP">Oppf\u00F8lging</option>
                 <option value="MAINTENANCE">Vedlikehold</option>
-                <option value="REEXAM">Re-undersøkelse</option>
+                <option value="REEXAM">Re-unders\u00F8kelse</option>
                 <option value="EMERGENCY">Akutt</option>
               </select>
               <span className="text-sm text-slate-500 flex items-center gap-1">
@@ -1348,7 +981,6 @@ export default function ClinicalEncounter() {
                 />{' '}
                 min
               </span>
-              {/* Encounter Timer */}
               <span
                 className="text-sm text-slate-500 flex items-center gap-1 bg-slate-50 px-2 py-1 rounded-md border border-slate-200"
                 title="Tid brukt"
@@ -1356,7 +988,6 @@ export default function ClinicalEncounter() {
                 <Clock className="h-3.5 w-3.5 text-teal-600" />
                 <span className="font-mono text-teal-700 font-medium">{elapsedTime}</span>
               </span>
-              {/* Running Billing Total */}
               <span
                 className="text-sm font-medium flex items-center gap-1 bg-green-50 px-2 py-1 rounded-md border border-green-200 text-green-700"
                 title="Takster total"
@@ -1365,7 +996,6 @@ export default function ClinicalEncounter() {
               </span>
             </div>
             <div className="flex items-center gap-2">
-              {/* SALT Button - Copy from last visit */}
               {!isSigned && previousEncounters && (
                 <button
                   onClick={() => handleSALT()}
@@ -1376,15 +1006,13 @@ export default function ClinicalEncounter() {
                   SALT
                 </button>
               )}
-              {/* Keyboard shortcuts help */}
               <button
                 onClick={() => setShowKeyboardHelp(true)}
                 className="text-xs px-2 py-1 rounded bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors"
                 title="Tastatursnarveier (F1)"
               >
-                ⌨️
+                {'\u2328\uFE0F'}
               </button>
-              {/* Auto-save indicator */}
               {autoSaveStatus === 'saving' && (
                 <span className="text-xs text-slate-500 flex items-center gap-1">
                   <Loader2 className="h-3 w-3 animate-spin" />
@@ -1409,7 +1037,7 @@ export default function ClinicalEncounter() {
               {isSigned ? (
                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-green-100 text-green-700 text-xs font-medium">
                   <Lock className="h-3 w-3" />
-                  Signert & Låst
+                  Signert & L\u00E5st
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-amber-50 text-amber-600 text-xs">
@@ -1431,7 +1059,9 @@ export default function ClinicalEncounter() {
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-slate-800">⌨️ Tastatursnarveier</h3>
+                  <h3 className="text-lg font-semibold text-slate-800">
+                    {'\u2328\uFE0F'} Tastatursnarveier
+                  </h3>
                   <button
                     onClick={() => setShowKeyboardHelp(false)}
                     className="text-slate-400 hover:text-slate-600"
@@ -1451,7 +1081,7 @@ export default function ClinicalEncounter() {
                 </div>
                 <div className="mt-4 pt-4 border-t border-slate-200">
                   <h4 className="font-medium text-slate-700 mb-2">
-                    📝 Makroer (skriv og trykk mellomrom)
+                    {'\uD83D\uDCDD'} Makroer (skriv og trykk mellomrom)
                   </h4>
                   <div className="grid grid-cols-2 gap-1 text-xs max-h-40 overflow-y-auto">
                     {Object.entries(macros)
@@ -1471,16 +1101,14 @@ export default function ClinicalEncounter() {
           {/* Macro hint tooltip */}
           {showMacroHint && currentMacroMatch && (
             <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50 bg-slate-800 text-white text-xs px-3 py-1.5 rounded-full shadow-lg">
-              💡 {currentMacroMatch}
+              {'\uD83D\uDCA1'} {currentMacroMatch}
             </div>
           )}
 
-          {/* ═══════════════════════════════════════════════════════════════════
-            SCROLLABLE SOAP FORM
-            ═══════════════════════════════════════════════════════════════════ */}
+          {/* SCROLLABLE SOAP FORM */}
           <div className="flex-1 overflow-y-auto">
             <div className="max-w-4xl mx-auto p-6 space-y-6">
-              {/* SALT Banner - Shows when similar previous encounter found */}
+              {/* SALT Banner */}
               {!isSigned && previousEncounters && showSALTBanner && (
                 <SALTBanner
                   previousEncounter={previousEncounters}
@@ -1488,18 +1116,14 @@ export default function ClinicalEncounter() {
                     handleSALT();
                     setShowSALTBanner(false);
                   }}
-                  onApplySection={(section) => {
-                    handleSALT(section);
-                  }}
+                  onApplySection={(section) => handleSALT(section)}
                   onDismiss={() => setShowSALTBanner(false)}
                   isExpanded={saltBannerExpanded}
                   onToggleExpand={() => setSaltBannerExpanded(!saltBannerExpanded)}
                 />
               )}
 
-              {/* ─────────────────────────────────────────────────────────────────
-                S - SUBJECTIVE
-                ───────────────────────────────────────────────────────────────── */}
+              {/* S - SUBJECTIVE */}
               <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="px-4 py-3 bg-gradient-to-r from-blue-50 to-white border-b border-slate-100 flex items-center justify-between">
                   <h3 className="font-semibold text-slate-800 flex items-center gap-2">
@@ -1554,7 +1178,7 @@ export default function ClinicalEncounter() {
                   <div className="grid grid-cols-2 gap-3">
                     <input
                       type="text"
-                      placeholder="Debut (når startet det?)"
+                      placeholder="Debut (n\u00E5r startet det?)"
                       value={encounterData.subjective.onset}
                       onChange={(e) => updateField('subjective', 'onset', e.target.value)}
                       disabled={isSigned}
@@ -1574,9 +1198,7 @@ export default function ClinicalEncounter() {
                 </div>
               </section>
 
-              {/* ─────────────────────────────────────────────────────────────────
-                O - OBJECTIVE
-                ───────────────────────────────────────────────────────────────── */}
+              {/* O - OBJECTIVE */}
               <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="px-4 py-3 bg-gradient-to-r from-emerald-50 to-white border-b border-slate-100">
                   <h3 className="font-semibold text-slate-800 flex items-center gap-2">
@@ -1604,7 +1226,7 @@ export default function ClinicalEncounter() {
                     <EnhancedClinicalTextarea
                       value={encounterData.objective.palpation}
                       onChange={(val) => updateField('objective', 'palpation', val)}
-                      placeholder="Palpasjon (ømhet, spenninger)..."
+                      placeholder="Palpasjon (\u00F8mhet, spenninger)..."
                       label="Palpasjon"
                       section="objective"
                       field="palpation"
@@ -1624,38 +1246,94 @@ export default function ClinicalEncounter() {
                     className="w-full min-h-[60px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-500 resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
                   />
 
-                  {/* Orthopedic Exam Panel */}
-                  <div className="border border-blue-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setShowOrthoExam(!showOrthoExam)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-blue-50 hover:bg-blue-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Bone className="w-5 h-5 text-blue-600" />
-                        <span className="font-medium text-blue-900">Ortopedisk Undersøkelse</span>
-                        {orthoExamData?.clusterScores && (
-                          <span className="text-xs bg-blue-200 text-blue-800 px-2 py-0.5 rounded-full">
-                            {Object.keys(orthoExamData.clusterScores).length} tester
-                          </span>
-                        )}
-                      </div>
-                      {showOrthoExam ? (
-                        <ChevronUp className="w-5 h-5 text-blue-600" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-blue-600" />
-                      )}
-                    </button>
-                    {showOrthoExam && (
-                      <div className="p-4 bg-white">
-                        <OrthopedicExamCompact
-                          patientId={patientId}
-                          encounterId={encounterId}
-                          onExamChange={handleOrthoExamChange}
-                          initialData={orthoExamData}
-                        />
-                      </div>
-                    )}
-                  </div>
+                  {/* All exam panels via ExamPanelManager */}
+                  <ExamPanelManager
+                    patientId={patientId}
+                    encounterId={encounterId}
+                    isSigned={isSigned}
+                    showOrthoExam={state.showOrthoExam}
+                    setShowOrthoExam={state.setShowOrthoExam}
+                    orthoExamData={state.orthoExamData}
+                    onOrthoExamChange={handleOrthoExamChange}
+                    showNeuroExam={state.showNeuroExam}
+                    setShowNeuroExam={state.setShowNeuroExam}
+                    neuroExamData={state.neuroExamData}
+                    onNeuroExamChange={handleNeuroExamChange}
+                    showROMTable={state.showROMTable}
+                    setShowROMTable={state.setShowROMTable}
+                    romTableData={state.romTableData}
+                    setRomTableData={state.setRomTableData}
+                    showBodyDiagram={state.showBodyDiagram}
+                    setShowBodyDiagram={state.setShowBodyDiagram}
+                    bodyDiagramMarkers={state.bodyDiagramMarkers}
+                    setBodyDiagramMarkers={state.setBodyDiagramMarkers}
+                    showExamProtocol={state.showExamProtocol}
+                    setShowExamProtocol={state.setShowExamProtocol}
+                    examProtocolData={state.examProtocolData}
+                    setExamProtocolData={state.setExamProtocolData}
+                    showClusterTests={state.showClusterTests}
+                    setShowClusterTests={state.setShowClusterTests}
+                    clusterTestData={state.clusterTestData}
+                    setClusterTestData={state.setClusterTestData}
+                    showRegionalExam={state.showRegionalExam}
+                    setShowRegionalExam={state.setShowRegionalExam}
+                    regionalExamData={state.regionalExamData}
+                    setRegionalExamData={state.setRegionalExamData}
+                    showNeurologicalExam={state.showNeurologicalExam}
+                    setShowNeurologicalExam={state.setShowNeurologicalExam}
+                    neurologicalExamData={state.neurologicalExamData}
+                    setNeurologicalExamData={state.setNeurologicalExamData}
+                    showOutcomeMeasures={state.showOutcomeMeasures}
+                    setShowOutcomeMeasures={state.setShowOutcomeMeasures}
+                    outcomeMeasureType={state.outcomeMeasureType}
+                    setOutcomeMeasureType={state.setOutcomeMeasureType}
+                    outcomeMeasureData={state.outcomeMeasureData}
+                    setOutcomeMeasureData={state.setOutcomeMeasureData}
+                    showMMT={state.showMMT}
+                    setShowMMT={state.setShowMMT}
+                    mmtData={state.mmtData}
+                    setMmtData={state.setMmtData}
+                    showDTR={state.showDTR}
+                    setShowDTR={state.setShowDTR}
+                    dtrData={state.dtrData}
+                    setDtrData={state.setDtrData}
+                    showSensoryExam={state.showSensoryExam}
+                    setShowSensoryExam={state.setShowSensoryExam}
+                    sensoryExamData={state.sensoryExamData}
+                    setSensoryExamData={state.setSensoryExamData}
+                    showCranialNerves={state.showCranialNerves}
+                    setShowCranialNerves={state.setShowCranialNerves}
+                    cranialNerveData={state.cranialNerveData}
+                    setCranialNerveData={state.setCranialNerveData}
+                    showCoordination={state.showCoordination}
+                    setShowCoordination={state.setShowCoordination}
+                    coordinationData={state.coordinationData}
+                    setCoordinationData={state.setCoordinationData}
+                    showNerveTension={state.showNerveTension}
+                    setShowNerveTension={state.setShowNerveTension}
+                    nerveTensionData={state.nerveTensionData}
+                    setNerveTensionData={state.setNerveTensionData}
+                    showRegionalDiagrams={state.showRegionalDiagrams}
+                    setShowRegionalDiagrams={state.setShowRegionalDiagrams}
+                    regionalDiagramData={state.regionalDiagramData}
+                    setRegionalDiagramData={state.setRegionalDiagramData}
+                    selectedRegion={state.selectedRegion}
+                    setSelectedRegion={state.setSelectedRegion}
+                    showPainAssessment={state.showPainAssessment}
+                    setShowPainAssessment={state.setShowPainAssessment}
+                    painAssessmentData={state.painAssessmentData}
+                    setPainAssessmentData={state.setPainAssessmentData}
+                    showHeadacheAssessment={state.showHeadacheAssessment}
+                    setShowHeadacheAssessment={state.setShowHeadacheAssessment}
+                    headacheData={state.headacheData}
+                    setHeadacheData={state.setHeadacheData}
+                    showTissueMarkers={state.showTissueMarkers}
+                    setShowTissueMarkers={state.setShowTissueMarkers}
+                    tissueMarkerData={state.tissueMarkerData}
+                    setTissueMarkerData={state.setTissueMarkerData}
+                    updateField={updateField}
+                    encounterData={encounterData}
+                  />
 
                   <textarea
                     ref={(el) => (textAreaRefs.current['objective.ortho_tests'] = el)}
@@ -1667,41 +1345,6 @@ export default function ClinicalEncounter() {
                     className="w-full min-h-[60px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-500 resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
                   />
 
-                  {/* Neurological Exam Panel */}
-                  <div className="border border-purple-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setShowNeuroExam(!showNeuroExam)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-purple-50 hover:bg-purple-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Activity className="w-5 h-5 text-purple-600" />
-                        <span className="font-medium text-purple-900">
-                          Nevrologisk Undersøkelse
-                        </span>
-                        {neuroExamData?.clusterScores && (
-                          <span className="text-xs bg-purple-200 text-purple-800 px-2 py-0.5 rounded-full">
-                            {Object.keys(neuroExamData.clusterScores).length} tester
-                          </span>
-                        )}
-                      </div>
-                      {showNeuroExam ? (
-                        <ChevronUp className="w-5 h-5 text-purple-600" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-purple-600" />
-                      )}
-                    </button>
-                    {showNeuroExam && (
-                      <div className="p-4 bg-white">
-                        <NeurologicalExamCompact
-                          patientId={patientId}
-                          encounterId={encounterId}
-                          onExamChange={handleNeuroExamChange}
-                          initialData={neuroExamData}
-                        />
-                      </div>
-                    )}
-                  </div>
-
                   <textarea
                     ref={(el) => (textAreaRefs.current['objective.neuro_tests'] = el)}
                     placeholder="Nevrologiske tester (sammendrag)..."
@@ -1711,779 +1354,6 @@ export default function ClinicalEncounter() {
                     disabled={isSigned}
                     className="w-full min-h-[60px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-500 resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
                   />
-
-                  {/* ROM Table Panel - Visual Region Selector */}
-                  <div className="border border-teal-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setShowROMTable(!showROMTable)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-teal-50 hover:bg-teal-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Ruler className="w-5 h-5 text-teal-600" />
-                        <span className="font-medium text-teal-900">Leddutslag (ROM)</span>
-                        {Object.keys(romTableData).length > 0 && (
-                          <span className="text-xs bg-teal-200 text-teal-800 px-2 py-0.5 rounded-full">
-                            {Object.keys(romTableData).length} regioner
-                          </span>
-                        )}
-                      </div>
-                      {showROMTable ? (
-                        <ChevronUp className="w-5 h-5 text-teal-600" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-teal-600" />
-                      )}
-                    </button>
-                    {showROMTable && (
-                      <div className="p-4 bg-white">
-                        <VisualROMSelector
-                          values={romTableData}
-                          onChange={setRomTableData}
-                          readOnly={isSigned}
-                          onGenerateReport={(report) => {
-                            updateField(
-                              'objective',
-                              'rom',
-                              encounterData.objective.rom +
-                                (encounterData.objective.rom ? '\n\n' : '') +
-                                report
-                            );
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Body Diagram Panel */}
-                  <div className="border border-rose-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setShowBodyDiagram(!showBodyDiagram)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-rose-50 hover:bg-rose-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <PersonStanding className="w-5 h-5 text-rose-600" />
-                        <span className="font-medium text-rose-900">
-                          Smertekart & Vevsmarkering
-                        </span>
-                        {bodyDiagramMarkers.length > 0 && (
-                          <span className="text-xs bg-rose-200 text-rose-800 px-2 py-0.5 rounded-full">
-                            {bodyDiagramMarkers.length} markeringer
-                          </span>
-                        )}
-                      </div>
-                      {showBodyDiagram ? (
-                        <ChevronUp className="w-5 h-5 text-rose-600" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-rose-600" />
-                      )}
-                    </button>
-                    {showBodyDiagram && (
-                      <div className="p-4 bg-white">
-                        <BodyDiagram
-                          markers={bodyDiagramMarkers}
-                          onChange={setBodyDiagramMarkers}
-                          lang="no"
-                          view="posterior"
-                          readOnly={isSigned}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Examination Protocol Panel */}
-                  <div className="border border-orange-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setShowExamProtocol(!showExamProtocol)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-orange-50 hover:bg-orange-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <ClipboardList className="w-5 h-5 text-orange-600" />
-                        <span className="font-medium text-orange-900">Undersøkelsesprotokoll</span>
-                        {Object.keys(examProtocolData).length > 0 && (
-                          <span className="text-xs bg-orange-200 text-orange-800 px-2 py-0.5 rounded-full">
-                            {Object.keys(examProtocolData).length} funn
-                          </span>
-                        )}
-                      </div>
-                      {showExamProtocol ? (
-                        <ChevronUp className="w-5 h-5 text-orange-600" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-orange-600" />
-                      )}
-                    </button>
-                    {showExamProtocol && (
-                      <div className="p-4 bg-white">
-                        <ExaminationProtocol
-                          values={examProtocolData}
-                          onChange={setExamProtocolData}
-                          lang="no"
-                          readOnly={isSigned}
-                          onGenerateNarrative={(narrative) => {
-                            updateField(
-                              'objective',
-                              'palpation',
-                              encounterData.objective.palpation +
-                                (encounterData.objective.palpation ? '\n' : '') +
-                                narrative
-                            );
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Cluster Tests Panel */}
-                  <div className="border border-red-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setShowClusterTests(!showClusterTests)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-red-50 hover:bg-red-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Target className="w-5 h-5 text-red-600" />
-                        <span className="font-medium text-red-900">Diagnostiske Klyngetester</span>
-                        {Object.keys(clusterTestData).length > 0 && (
-                          <span className="text-xs bg-red-200 text-red-800 px-2 py-0.5 rounded-full">
-                            {Object.keys(clusterTestData).length} tester
-                          </span>
-                        )}
-                      </div>
-                      {showClusterTests ? (
-                        <ChevronUp className="w-5 h-5 text-red-600" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-red-600" />
-                      )}
-                    </button>
-                    {showClusterTests && (
-                      <div className="p-4 bg-white">
-                        <ClusterTestPanel
-                          values={clusterTestData}
-                          onChange={setClusterTestData}
-                          lang="no"
-                          readOnly={isSigned}
-                          onGenerateReport={(report) => {
-                            updateField(
-                              'objective',
-                              'ortho_tests',
-                              encounterData.objective.ortho_tests +
-                                (encounterData.objective.ortho_tests ? '\n\n' : '') +
-                                report
-                            );
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Regional Examination Panel */}
-                  <div className="border border-teal-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setShowRegionalExam(!showRegionalExam)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-teal-50 hover:bg-teal-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <PersonStanding className="w-5 h-5 text-teal-600" />
-                        <span className="font-medium text-teal-900">Regional undersøkelse</span>
-                        {Object.keys(regionalExamData).length > 0 && (
-                          <span className="text-xs bg-teal-200 text-teal-800 px-2 py-0.5 rounded-full">
-                            Data registrert
-                          </span>
-                        )}
-                      </div>
-                      {showRegionalExam ? (
-                        <ChevronUp className="w-5 h-5 text-teal-600" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-teal-600" />
-                      )}
-                    </button>
-                    {showRegionalExam && (
-                      <div className="p-4 bg-white">
-                        <RegionalExamination
-                          values={regionalExamData}
-                          onChange={setRegionalExamData}
-                          readOnly={isSigned}
-                          onGenerateReport={(report) => {
-                            updateField(
-                              'objective',
-                              'ortho_tests',
-                              encounterData.objective.ortho_tests +
-                                (encounterData.objective.ortho_tests ? '\n\n' : '') +
-                                report
-                            );
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Neurological Exam Panel */}
-                  <div className="border border-purple-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setShowNeurologicalExam(!showNeurologicalExam)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-purple-50 hover:bg-purple-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Brain className="w-5 h-5 text-purple-600" />
-                        <span className="font-medium text-purple-900">
-                          Nevrologisk undersøkelse
-                        </span>
-                        {Object.keys(neurologicalExamData).length > 0 && (
-                          <span className="text-xs bg-purple-200 text-purple-800 px-2 py-0.5 rounded-full">
-                            Data registrert
-                          </span>
-                        )}
-                      </div>
-                      {showNeurologicalExam ? (
-                        <ChevronUp className="w-5 h-5 text-purple-600" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-purple-600" />
-                      )}
-                    </button>
-                    {showNeurologicalExam && (
-                      <div className="p-4 bg-white">
-                        <NeurologicalExam
-                          values={neurologicalExamData}
-                          onChange={setNeurologicalExamData}
-                          lang="no"
-                          readOnly={isSigned}
-                          onGenerateReport={(report) => {
-                            updateField(
-                              'objective',
-                              'neuro_tests',
-                              encounterData.objective.neuro_tests +
-                                (encounterData.objective.neuro_tests ? '\n\n' : '') +
-                                report
-                            );
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Outcome Measures Panel */}
-                  <div className="border border-indigo-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setShowOutcomeMeasures(!showOutcomeMeasures)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-indigo-50 hover:bg-indigo-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <ClipboardList className="w-5 h-5 text-indigo-600" />
-                        <span className="font-medium text-indigo-900">Utfallsmål (NDI/ODI)</span>
-                        {Object.keys(outcomeMeasureData).length > 0 && (
-                          <span className="text-xs bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded-full">
-                            {outcomeMeasureType.toUpperCase()} registrert
-                          </span>
-                        )}
-                      </div>
-                      {showOutcomeMeasures ? (
-                        <ChevronUp className="w-5 h-5 text-indigo-600" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-indigo-600" />
-                      )}
-                    </button>
-                    {showOutcomeMeasures && (
-                      <div className="p-4 bg-white space-y-4">
-                        <OutcomeMeasureSelector
-                          value={outcomeMeasureType}
-                          onChange={setOutcomeMeasureType}
-                          lang="no"
-                        />
-                        <OutcomeMeasures
-                          type={outcomeMeasureType}
-                          values={outcomeMeasureData[outcomeMeasureType] || {}}
-                          onChange={(values) =>
-                            setOutcomeMeasureData((prev) => ({
-                              ...prev,
-                              [outcomeMeasureType]: values,
-                            }))
-                          }
-                          lang="no"
-                          readOnly={isSigned}
-                          onComplete={(result) => {
-                            updateField(
-                              'assessment',
-                              'clinical_reasoning',
-                              encounterData.assessment.clinical_reasoning +
-                                (encounterData.assessment.clinical_reasoning ? '\n\n' : '') +
-                                `${result.type.toUpperCase()}: ${result.score} poeng (${result.percentage}%)`
-                            );
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Manual Muscle Testing Panel */}
-                  <div className="border border-blue-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setShowMMT(!showMMT)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-blue-50 hover:bg-blue-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Activity className="w-5 h-5 text-blue-600" />
-                        <span className="font-medium text-blue-900">
-                          Manuell Muskeltesting (MMT)
-                        </span>
-                        {Object.keys(mmtData).length > 0 && (
-                          <span className="text-xs bg-blue-200 text-blue-800 px-2 py-0.5 rounded-full">
-                            Data registrert
-                          </span>
-                        )}
-                      </div>
-                      {showMMT ? (
-                        <ChevronUp className="w-5 h-5 text-blue-600" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-blue-600" />
-                      )}
-                    </button>
-                    {showMMT && (
-                      <div className="p-4 bg-white">
-                        <ManualMuscleTesting
-                          values={mmtData}
-                          onChange={setMmtData}
-                          lang="no"
-                          readOnly={isSigned}
-                          onGenerateNarrative={(narrative) => {
-                            updateField(
-                              'objective',
-                              'neuro_tests',
-                              encounterData.objective.neuro_tests +
-                                (encounterData.objective.neuro_tests ? '\n\n' : '') +
-                                narrative
-                            );
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Deep Tendon Reflexes Panel */}
-                  <div className="border border-green-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setShowDTR(!showDTR)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-green-50 hover:bg-green-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Activity className="w-5 h-5 text-green-600" />
-                        <span className="font-medium text-green-900">Dype Senereflekser (DTR)</span>
-                        {Object.keys(dtrData).length > 0 && (
-                          <span className="text-xs bg-green-200 text-green-800 px-2 py-0.5 rounded-full">
-                            Data registrert
-                          </span>
-                        )}
-                      </div>
-                      {showDTR ? (
-                        <ChevronUp className="w-5 h-5 text-green-600" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-green-600" />
-                      )}
-                    </button>
-                    {showDTR && (
-                      <div className="p-4 bg-white">
-                        <DeepTendonReflexPanel
-                          values={dtrData}
-                          onChange={setDtrData}
-                          lang="no"
-                          readOnly={isSigned}
-                          onGenerateNarrative={(narrative) => {
-                            updateField(
-                              'objective',
-                              'neuro_tests',
-                              encounterData.objective.neuro_tests +
-                                (encounterData.objective.neuro_tests ? '\n\n' : '') +
-                                narrative
-                            );
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Sensory Examination Panel */}
-                  <div className="border border-amber-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setShowSensoryExam(!showSensoryExam)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-amber-50 hover:bg-amber-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Activity className="w-5 h-5 text-amber-600" />
-                        <span className="font-medium text-amber-900">
-                          Sensibilitetsundersøkelse
-                        </span>
-                        {Object.keys(sensoryExamData).length > 0 && (
-                          <span className="text-xs bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full">
-                            Data registrert
-                          </span>
-                        )}
-                      </div>
-                      {showSensoryExam ? (
-                        <ChevronUp className="w-5 h-5 text-amber-600" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-amber-600" />
-                      )}
-                    </button>
-                    {showSensoryExam && (
-                      <div className="p-4 bg-white">
-                        <SensoryExamination
-                          values={sensoryExamData}
-                          onChange={setSensoryExamData}
-                          lang="no"
-                          readOnly={isSigned}
-                          onGenerateNarrative={(narrative) => {
-                            updateField(
-                              'objective',
-                              'neuro_tests',
-                              encounterData.objective.neuro_tests +
-                                (encounterData.objective.neuro_tests ? '\n\n' : '') +
-                                narrative
-                            );
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Cranial Nerve Panel */}
-                  <div className="border border-violet-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setShowCranialNerves(!showCranialNerves)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-violet-50 hover:bg-violet-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Brain className="w-5 h-5 text-violet-600" />
-                        <span className="font-medium text-violet-900">Hjernenerver (CN I-XII)</span>
-                        {Object.keys(cranialNerveData).length > 0 && (
-                          <span className="text-xs bg-violet-200 text-violet-800 px-2 py-0.5 rounded-full">
-                            Data registrert
-                          </span>
-                        )}
-                      </div>
-                      {showCranialNerves ? (
-                        <ChevronUp className="w-5 h-5 text-violet-600" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-violet-600" />
-                      )}
-                    </button>
-                    {showCranialNerves && (
-                      <div className="p-4 bg-white">
-                        <CranialNervePanel
-                          values={cranialNerveData}
-                          onChange={setCranialNerveData}
-                          lang="no"
-                          readOnly={isSigned}
-                          onGenerateNarrative={(narrative) => {
-                            updateField(
-                              'objective',
-                              'neuro_tests',
-                              encounterData.objective.neuro_tests +
-                                (encounterData.objective.neuro_tests ? '\n\n' : '') +
-                                narrative
-                            );
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Coordination Tests Panel */}
-                  <div className="border border-indigo-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setShowCoordination(!showCoordination)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-indigo-50 hover:bg-indigo-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Activity className="w-5 h-5 text-indigo-600" />
-                        <span className="font-medium text-indigo-900">Koordinasjonstester</span>
-                        {Object.keys(coordinationData).length > 0 && (
-                          <span className="text-xs bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded-full">
-                            Data registrert
-                          </span>
-                        )}
-                      </div>
-                      {showCoordination ? (
-                        <ChevronUp className="w-5 h-5 text-indigo-600" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-indigo-600" />
-                      )}
-                    </button>
-                    {showCoordination && (
-                      <div className="p-4 bg-white">
-                        <CoordinationTestPanel
-                          values={coordinationData}
-                          onChange={setCoordinationData}
-                          lang="no"
-                          readOnly={isSigned}
-                          onGenerateNarrative={(narrative) => {
-                            updateField(
-                              'objective',
-                              'neuro_tests',
-                              encounterData.objective.neuro_tests +
-                                (encounterData.objective.neuro_tests ? '\n\n' : '') +
-                                narrative
-                            );
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Nerve Tension Tests Panel */}
-                  <div className="border border-orange-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setShowNerveTension(!showNerveTension)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-orange-50 hover:bg-orange-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Activity className="w-5 h-5 text-orange-600" />
-                        <span className="font-medium text-orange-900">Nervestrekkstester</span>
-                        {Object.keys(nerveTensionData).length > 0 && (
-                          <span className="text-xs bg-orange-200 text-orange-800 px-2 py-0.5 rounded-full">
-                            Data registrert
-                          </span>
-                        )}
-                      </div>
-                      {showNerveTension ? (
-                        <ChevronUp className="w-5 h-5 text-orange-600" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-orange-600" />
-                      )}
-                    </button>
-                    {showNerveTension && (
-                      <div className="p-4 bg-white">
-                        <NerveTensionTests
-                          values={nerveTensionData}
-                          onChange={setNerveTensionData}
-                          lang="no"
-                          readOnly={isSigned}
-                          onGenerateNarrative={(narrative) => {
-                            updateField(
-                              'objective',
-                              'neuro_tests',
-                              encounterData.objective.neuro_tests +
-                                (encounterData.objective.neuro_tests ? '\n\n' : '') +
-                                narrative
-                            );
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Regional Body Diagrams - Bilateral Joint Examination */}
-                  <div className="border border-amber-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setShowRegionalDiagrams(!showRegionalDiagrams)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-amber-50 hover:bg-amber-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Activity className="w-5 h-5 text-amber-600" />
-                        <span className="font-medium text-amber-900">
-                          Leddundersøkelse (Bilateral)
-                        </span>
-                        {Object.keys(regionalDiagramData).length > 0 && (
-                          <span className="text-xs bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full">
-                            {Object.keys(regionalDiagramData).length} markering(er)
-                          </span>
-                        )}
-                      </div>
-                      {showRegionalDiagrams ? (
-                        <ChevronUp className="w-5 h-5 text-amber-600" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-amber-600" />
-                      )}
-                    </button>
-                    {showRegionalDiagrams && (
-                      <div className="p-4 bg-white">
-                        <p className="text-sm text-gray-600 mb-3">
-                          Velg region og marker funn på venstre og høyre side.
-                        </p>
-
-                        {/* Region selector */}
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          {[
-                            'shoulder',
-                            'knee',
-                            'ankle',
-                            'wrist',
-                            'elbow',
-                            'cervical',
-                            'lumbar',
-                            'hip',
-                            'head',
-                          ].map((region) => (
-                            <button
-                              key={region}
-                              onClick={() => setSelectedRegion(region)}
-                              className={`px-3 py-1.5 text-sm rounded-lg transition-colors
-                                       ${
-                                         selectedRegion === region
-                                           ? 'bg-amber-600 text-white'
-                                           : 'bg-gray-100 text-gray-700 hover:bg-amber-100'
-                                       }`}
-                            >
-                              {region === 'shoulder'
-                                ? 'Skulder'
-                                : region === 'knee'
-                                  ? 'Kne'
-                                  : region === 'ankle'
-                                    ? 'Ankel'
-                                    : region === 'wrist'
-                                      ? 'Håndledd'
-                                      : region === 'elbow'
-                                        ? 'Albue'
-                                        : region === 'cervical'
-                                          ? 'Nakke'
-                                          : region === 'lumbar'
-                                            ? 'Korsrygg'
-                                            : region === 'hip'
-                                              ? 'Hofte'
-                                              : 'Hode/TMJ'}
-                            </button>
-                          ))}
-                        </div>
-
-                        {/* Selected region diagram */}
-                        <RegionalBodyDiagram
-                          region={selectedRegion}
-                          side="bilateral"
-                          markers={regionalDiagramData[selectedRegion] || []}
-                          onChange={(markers) =>
-                            setRegionalDiagramData((prev) => ({
-                              ...prev,
-                              [selectedRegion]: markers,
-                            }))
-                          }
-                          lang="no"
-                          readOnly={isSigned}
-                          compact={false}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Pain Assessment Panel */}
-                  <div className="border border-red-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setShowPainAssessment(!showPainAssessment)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-red-50 hover:bg-red-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Target className="w-5 h-5 text-red-600" />
-                        <span className="font-medium text-red-900">Smertevurdering</span>
-                        {Object.keys(painAssessmentData).length > 0 && (
-                          <span className="text-xs bg-red-200 text-red-800 px-2 py-0.5 rounded-full">
-                            Data registrert
-                          </span>
-                        )}
-                      </div>
-                      {showPainAssessment ? (
-                        <ChevronUp className="w-5 h-5 text-red-600" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-red-600" />
-                      )}
-                    </button>
-                    {showPainAssessment && (
-                      <div className="p-4 bg-white">
-                        <PainAssessmentPanel
-                          values={painAssessmentData}
-                          onChange={setPainAssessmentData}
-                          lang="no"
-                          readOnly={isSigned}
-                          onGenerateNarrative={(narrative) => {
-                            updateField(
-                              'subjective',
-                              'pain_description',
-                              encounterData.subjective.pain_description +
-                                (encounterData.subjective.pain_description ? '\n\n' : '') +
-                                narrative
-                            );
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Headache Assessment Panel */}
-                  <div className="border border-pink-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setShowHeadacheAssessment(!showHeadacheAssessment)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-pink-50 hover:bg-pink-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Brain className="w-5 h-5 text-pink-600" />
-                        <span className="font-medium text-pink-900">Hodepineutredning</span>
-                        {Object.keys(headacheData).length > 0 && (
-                          <span className="text-xs bg-pink-200 text-pink-800 px-2 py-0.5 rounded-full">
-                            Data registrert
-                          </span>
-                        )}
-                      </div>
-                      {showHeadacheAssessment ? (
-                        <ChevronUp className="w-5 h-5 text-pink-600" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-pink-600" />
-                      )}
-                    </button>
-                    {showHeadacheAssessment && (
-                      <div className="p-4 bg-white">
-                        <HeadacheAssessment
-                          values={headacheData}
-                          onChange={setHeadacheData}
-                          lang="no"
-                          readOnly={isSigned}
-                          onGenerateNarrative={(narrative) => {
-                            updateField(
-                              'subjective',
-                              'chief_complaint',
-                              encounterData.subjective.chief_complaint +
-                                (encounterData.subjective.chief_complaint ? '\n\n' : '') +
-                                narrative
-                            );
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Tissue Abnormality Markers Panel */}
-                  <div className="border border-cyan-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setShowTissueMarkers(!showTissueMarkers)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-cyan-50 hover:bg-cyan-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Target className="w-5 h-5 text-cyan-600" />
-                        <span className="font-medium text-cyan-900">Vevsabnormaliteter</span>
-                        {Object.keys(tissueMarkerData).length > 0 && (
-                          <span className="text-xs bg-cyan-200 text-cyan-800 px-2 py-0.5 rounded-full">
-                            Data registrert
-                          </span>
-                        )}
-                      </div>
-                      {showTissueMarkers ? (
-                        <ChevronUp className="w-5 h-5 text-cyan-600" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-cyan-600" />
-                      )}
-                    </button>
-                    {showTissueMarkers && (
-                      <div className="p-4 bg-white">
-                        <TissueAbnormalityMarkers
-                          values={tissueMarkerData}
-                          onChange={setTissueMarkerData}
-                          lang="no"
-                          readOnly={isSigned}
-                          onGenerateNarrative={(narrative) => {
-                            updateField(
-                              'objective',
-                              'palpation',
-                              encounterData.objective.palpation +
-                                (encounterData.objective.palpation ? '\n\n' : '') +
-                                narrative
-                            );
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
 
                   {!isSigned && (
                     <div className="flex flex-wrap gap-1.5">
@@ -2501,9 +1371,7 @@ export default function ClinicalEncounter() {
                 </div>
               </section>
 
-              {/* ─────────────────────────────────────────────────────────────────
-                A - ASSESSMENT / DIAGNOSIS
-                ───────────────────────────────────────────────────────────────── */}
+              {/* A - ASSESSMENT / DIAGNOSIS */}
               <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="px-4 py-3 bg-gradient-to-r from-amber-50 to-white border-b border-slate-100">
                   <h3 className="font-semibold text-slate-800 flex items-center gap-2">
@@ -2514,72 +1382,17 @@ export default function ClinicalEncounter() {
                   </h3>
                 </div>
                 <div className="p-4 space-y-4">
-                  {/* Diagnosis Search */}
-                  <div className="relative">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-                      <input
-                        type="text"
-                        placeholder="Søk ICPC-2 kode eller diagnose (f.eks. L02, rygg)..."
-                        className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
-                        value={diagnosisSearch}
-                        onChange={(e) => {
-                          setDiagnosisSearch(e.target.value);
-                          setShowDiagnosisDropdown(true);
-                        }}
-                        onFocus={() => setShowDiagnosisDropdown(true)}
-                        disabled={isSigned}
-                      />
-                    </div>
-
-                    {showDiagnosisDropdown && diagnosisSearch && (
-                      <div className="absolute z-10 w-full mt-1 bg-white rounded-lg border border-slate-200 shadow-lg max-h-60 overflow-y-auto">
-                        {filteredDiagnoses.length > 0 ? (
-                          filteredDiagnoses.slice(0, 10).map((diagnosis) => (
-                            <button
-                              key={diagnosis.code}
-                              onClick={() => toggleDiagnosis(diagnosis)}
-                              className="w-full px-4 py-2 text-left text-sm hover:bg-amber-50 flex items-center justify-between"
-                            >
-                              <span>
-                                <span className="font-mono font-medium text-amber-600">
-                                  {diagnosis.code}
-                                </span>
-                                <span className="text-slate-600 ml-2">
-                                  - {diagnosis.description_no}
-                                </span>
-                              </span>
-                              {encounterData.icpc_codes.includes(diagnosis.code) && (
-                                <Check className="h-4 w-4 text-amber-600" />
-                              )}
-                            </button>
-                          ))
-                        ) : (
-                          <p className="px-4 py-3 text-sm text-slate-500">Ingen diagnose funnet</p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Selected Diagnoses */}
-                  {encounterData.icpc_codes.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {encounterData.icpc_codes.map((code) => (
-                        <span
-                          key={code}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-100 text-amber-800 text-sm font-medium"
-                        >
-                          <span className="font-mono">{code}</span>
-                          <button
-                            onClick={() => removeDiagnosisCode(code)}
-                            className="ml-1 hover:text-amber-900"
-                          >
-                            <X className="h-3.5 w-3.5" />
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                  <DiagnosisPanel
+                    diagnosisSearch={diagnosisSearch}
+                    onSearchChange={setDiagnosisSearch}
+                    showDropdown={showDiagnosisDropdown}
+                    onShowDropdown={setShowDiagnosisDropdown}
+                    filteredDiagnoses={filteredDiagnoses}
+                    selectedCodes={encounterData.icpc_codes}
+                    onToggleDiagnosis={toggleDiagnosis}
+                    onRemoveCode={removeDiagnosisCode}
+                    isSigned={isSigned}
+                  />
 
                   <EnhancedClinicalTextarea
                     value={encounterData.assessment.clinical_reasoning}
@@ -2592,10 +1405,7 @@ export default function ClinicalEncounter() {
                     rows={3}
                     showVoiceInput={true}
                     showAIButton={true}
-                    aiContext={{
-                      soapData: encounterData,
-                      patientId: patientId,
-                    }}
+                    aiContext={{ soapData: encounterData, patientId }}
                   />
 
                   <input
@@ -2611,9 +1421,7 @@ export default function ClinicalEncounter() {
                 </div>
               </section>
 
-              {/* ─────────────────────────────────────────────────────────────────
-                P - PLAN & TREATMENT (TAKSTER)
-                ───────────────────────────────────────────────────────────────── */}
+              {/* P - PLAN & TREATMENT (TAKSTER) */}
               <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="px-4 py-3 bg-gradient-to-r from-purple-50 to-white border-b border-slate-100 flex items-center justify-between">
                   <h3 className="font-semibold text-slate-800 flex items-center gap-2">
@@ -2731,7 +1539,7 @@ export default function ClinicalEncounter() {
                               ? 'Diversifisert: beskriv manipulasjoner og mobiliseringer...'
                               : currentNotationMethod.id === 'soap_narrative'
                                 ? 'SOAP narrativ: beskriv behandlingen i detalj...'
-                                : 'Utført behandling...'
+                                : 'Utf\u00F8rt behandling...'
                       }
                       label="Behandling"
                       section="plan"
@@ -2743,102 +1551,35 @@ export default function ClinicalEncounter() {
                     />
                   )}
 
-                  {/* Takster Selection - Toggle to show/hide for practitioners */}
-                  <div className="border border-purple-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setShowTakster(!showTakster)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-purple-50 hover:bg-purple-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <FileText className="w-5 h-5 text-purple-600" />
-                        <span className="font-medium text-purple-900">
-                          Takster (behandlingskoder)
-                        </span>
-                        <span className="text-xs text-purple-600">(Kun for behandlere)</span>
-                      </div>
-                      {showTakster ? (
-                        <ChevronUp className="w-5 h-5 text-purple-600" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-purple-600" />
-                      )}
-                    </button>
-
-                    {showTakster && (
-                      <div className="p-4 bg-white">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {taksterNorwegian.map((takst) => (
-                            <button
-                              key={takst.id}
-                              onClick={() => toggleTakst(takst.id)}
-                              disabled={isSigned}
-                              className={`
-                              flex items-center justify-between p-3 rounded-lg border-2 text-left transition-all
-                              ${
-                                selectedTakster.includes(takst.id)
-                                  ? 'border-purple-500 bg-purple-50'
-                                  : 'border-slate-200 bg-white hover:border-slate-300'
-                              }
-                              ${isSigned ? 'opacity-60 cursor-not-allowed' : ''}
-                            `}
-                            >
-                              <div className="flex items-center gap-3">
-                                <div
-                                  className={`
-                                h-5 w-5 rounded flex items-center justify-center
-                                ${
-                                  selectedTakster.includes(takst.id)
-                                    ? 'bg-purple-600 text-white'
-                                    : 'border-2 border-slate-300'
-                                }
-                              `}
-                                >
-                                  {selectedTakster.includes(takst.id) && (
-                                    <Check className="h-3 w-3" />
-                                  )}
-                                </div>
-                                <div>
-                                  <p className="font-semibold text-slate-800">{takst.code}</p>
-                                  <p className="text-xs text-slate-500">{takst.name}</p>
-                                </div>
-                              </div>
-                              <span className="text-sm font-medium text-slate-600">
-                                {takst.price} kr
-                              </span>
-                            </button>
-                          ))}
-                        </div>
-
-                        <div className="mt-3 flex justify-end">
-                          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-100 text-purple-800">
-                            <span className="text-sm">Totalt:</span>
-                            <span className="font-bold">{totalPrice} kr</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  {/* Takster Panel */}
+                  <TaksterPanel
+                    selectedTakster={selectedTakster}
+                    onToggleTakst={toggleTakst}
+                    showTakster={showTakster}
+                    onToggleShow={() => setShowTakster(!showTakster)}
+                    totalPrice={totalPrice}
+                    isSigned={isSigned}
+                  />
 
                   {/* Exercises & Advice */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-slate-700">Hjemmeøvelser</span>
+                      <span className="text-sm font-medium text-slate-700">Hjemme\u00F8velser</span>
                       <button
                         onClick={() => setShowExercisePanel(!showExercisePanel)}
                         disabled={isSigned}
                         className="px-3 py-1.5 text-xs font-medium rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition-colors disabled:opacity-50 flex items-center gap-1.5"
                       >
                         <Activity className="w-3.5 h-3.5" />
-                        {showExercisePanel ? 'Skjul øvelsesbibliotek' : 'Velg fra bibliotek'}
+                        {showExercisePanel ? 'Skjul \u00F8velsesbibliotek' : 'Velg fra bibliotek'}
                       </button>
                     </div>
-
                     {showExercisePanel && (
                       <div className="border border-green-200 rounded-lg overflow-hidden">
                         <ExercisePanel
                           patientId={patientId}
                           encounterId={encounterId}
                           onExercisesChange={(exercises) => {
-                            // Update the exercises text field with selected exercises
                             const exerciseText = exercises
                               .map(
                                 (e) =>
@@ -2851,12 +1592,11 @@ export default function ClinicalEncounter() {
                         />
                       </div>
                     )}
-
                     <EnhancedClinicalTextarea
                       value={encounterData.plan.exercises}
                       onChange={(val) => updateField('plan', 'exercises', val)}
-                      placeholder="Hjemmeøvelser og råd... (eller velg fra biblioteket over)"
-                      label="Hjemmeøvelser"
+                      placeholder="Hjemme\u00F8velser og r\u00E5d... (eller velg fra biblioteket over)"
+                      label="Hjemme\u00F8velser"
                       section="plan"
                       field="exercises"
                       disabled={isSigned}
@@ -2868,7 +1608,7 @@ export default function ClinicalEncounter() {
 
                   {/* Follow-up */}
                   <div className="flex items-center gap-4 pt-3 border-t border-slate-100">
-                    <span className="text-sm font-medium text-slate-700">Oppfølging:</span>
+                    <span className="text-sm font-medium text-slate-700">Oppf\u00F8lging:</span>
                     <input
                       type="text"
                       placeholder="f.eks. 1 uke, 3 behandlinger"
@@ -2881,9 +1621,7 @@ export default function ClinicalEncounter() {
                 </div>
               </section>
 
-              {/* ═══════════════════════════════════════════════════════════════════
-                AMENDMENTS SECTION (Only shown for signed encounters)
-                ═══════════════════════════════════════════════════════════════════ */}
+              {/* AMENDMENTS SECTION (Only shown for signed encounters) */}
               {isSigned && (
                 <section className="bg-amber-50 rounded-xl border border-amber-200 p-5 shadow-sm">
                   <div className="flex items-center justify-between mb-4">
@@ -2902,7 +1640,6 @@ export default function ClinicalEncounter() {
                     )}
                   </div>
 
-                  {/* Amendment Form */}
                   {showAmendmentForm && (
                     <div className="bg-white rounded-lg border border-amber-200 p-4 mb-4">
                       <div className="flex gap-4 mb-3">
@@ -2930,7 +1667,7 @@ export default function ClinicalEncounter() {
                               type="text"
                               value={amendmentReason}
                               onChange={(e) => setAmendmentReason(e.target.value)}
-                              placeholder="Begrunn hvorfor rettelsen er nødvendig"
+                              placeholder="Begrunn hvorfor rettelsen er n\u00F8dvendig"
                               className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-amber-500"
                             />
                           </div>
@@ -2979,7 +1716,6 @@ export default function ClinicalEncounter() {
                     </div>
                   )}
 
-                  {/* Existing Amendments List */}
                   {amendments?.data && amendments.data.length > 0 && (
                     <div className="space-y-3">
                       {amendments.data.map((amendment, index) => (
@@ -3017,8 +1753,7 @@ export default function ClinicalEncounter() {
                             <div className="flex items-center gap-2">
                               {amendment.signed_at ? (
                                 <span className="flex items-center gap-1 text-xs text-green-600">
-                                  <Lock className="h-3 w-3" />
-                                  Signert
+                                  <Lock className="h-3 w-3" /> Signert
                                 </span>
                               ) : (
                                 <button
@@ -3051,8 +1786,8 @@ export default function ClinicalEncounter() {
 
                   {(!amendments?.data || amendments.data.length === 0) && !showAmendmentForm && (
                     <p className="text-sm text-amber-700 text-center py-4">
-                      Ingen tillegg eller rettelser ennå. Klikk "Legg til Tillegg" for å dokumentere
-                      endringer.
+                      Ingen tillegg eller rettelser enn\u00E5. Klikk "Legg til Tillegg" for \u00E5
+                      dokumentere endringer.
                     </p>
                   )}
                 </section>
@@ -3060,9 +1795,7 @@ export default function ClinicalEncounter() {
             </div>
           </div>
 
-          {/* ═══════════════════════════════════════════════════════════════════
-            STICKY FOOTER - ACTIONS
-            ═══════════════════════════════════════════════════════════════════ */}
+          {/* STICKY FOOTER - ACTIONS */}
           <footer className="bg-white border-t border-slate-200 px-6 py-3 flex justify-between items-center flex-shrink-0 shadow-[0_-2px_10px_rgba(0,0,0,0.03)]">
             <div className="flex items-center gap-4">
               <span className="text-sm text-slate-500 flex items-center gap-1">
@@ -3101,15 +1834,13 @@ export default function ClinicalEncounter() {
                 ) : (
                   <FileText className="h-4 w-4" />
                 )}
-                {isSigned ? 'Signert' : 'Signer og Lås'}
+                {isSigned ? 'Signert' : 'Signer og L\u00E5s'}
               </button>
             </div>
           </footer>
         </main>
 
-        {/* ═══════════════════════════════════════════════════════════════════
-          AI ASSISTANT PANEL (Floating)
-          ═══════════════════════════════════════════════════════════════════ */}
+        {/* AI ASSISTANT PANEL (Floating) */}
         {showAIAssistant && (
           <div className="fixed bottom-6 right-6 w-96 bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden z-50">
             <div className="bg-gradient-to-r from-purple-600 to-purple-700 px-4 py-3 flex items-center justify-between">
@@ -3124,13 +1855,12 @@ export default function ClinicalEncounter() {
                 <X className="w-5 h-5" />
               </button>
             </div>
-
             <div className="p-4 max-h-96 overflow-y-auto">
               {!aiSuggestions ? (
                 <div className="text-center py-8">
                   <Brain className="w-12 h-12 text-purple-300 mx-auto mb-3" />
                   <p className="text-sm text-gray-600 mb-4">
-                    Få AI-drevne kliniske forslag basert på SOAP-notatene
+                    F\u00E5 AI-drevne kliniske forslag basert p\u00E5 SOAP-notatene
                   </p>
                   <button
                     onClick={getAISuggestions}
@@ -3145,7 +1875,7 @@ export default function ClinicalEncounter() {
                     ) : (
                       <>
                         <Sparkles className="w-4 h-4" />
-                        Få AI-forslag
+                        F\u00E5 AI-forslag
                       </>
                     )}
                   </button>
@@ -3162,11 +1892,10 @@ export default function ClinicalEncounter() {
                       </p>
                     </div>
                   )}
-
                   {aiSuggestions.diagnosis?.length > 0 && (
                     <div>
                       <h4 className="text-sm font-semibold text-gray-900 mb-2">
-                        Foreslåtte Diagnoser
+                        Foresl\u00E5tte Diagnoser
                       </h4>
                       <ul className="space-y-2">
                         {aiSuggestions.diagnosis.map((diag, i) => (
@@ -3174,18 +1903,17 @@ export default function ClinicalEncounter() {
                             key={i}
                             className="text-sm text-gray-700 bg-blue-50 px-3 py-2 rounded-lg flex items-start gap-2"
                           >
-                            <span className="text-blue-600 mt-0.5">•</span>
+                            <span className="text-blue-600 mt-0.5">{'\u2022'}</span>
                             <span>{diag}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
                   )}
-
                   {aiSuggestions.treatment?.length > 0 && (
                     <div>
                       <h4 className="text-sm font-semibold text-gray-900 mb-2">
-                        Foreslått Behandling
+                        Foresl\u00E5tt Behandling
                       </h4>
                       <ul className="space-y-2">
                         {aiSuggestions.treatment.map((treatment, i) => (
@@ -3193,14 +1921,13 @@ export default function ClinicalEncounter() {
                             key={i}
                             className="text-sm text-gray-700 bg-green-50 px-3 py-2 rounded-lg flex items-start gap-2"
                           >
-                            <span className="text-green-600 mt-0.5">•</span>
+                            <span className="text-green-600 mt-0.5">{'\u2022'}</span>
                             <span>{treatment}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
                   )}
-
                   <button
                     onClick={getAISuggestions}
                     disabled={aiLoading}
@@ -3211,24 +1938,19 @@ export default function ClinicalEncounter() {
                 </div>
               )}
             </div>
-
             <div className="bg-gray-50 px-4 py-2 border-t border-gray-200">
               <p className="text-xs text-gray-500 text-center">
-                AI-forslag er kun veiledende. Bruk alltid klinisk skjønn.
+                AI-forslag er kun veiledende. Bruk alltid klinisk skj\u00F8nn.
               </p>
             </div>
           </div>
         )}
       </div>
-      {/* End of main content wrapper with margin */}
 
-      {/* ═══════════════════════════════════════════════════════════════════
-          AI DIAGNOSIS SIDEBAR (Collapsible)
-          ═══════════════════════════════════════════════════════════════════ */}
+      {/* AI DIAGNOSIS SIDEBAR (Collapsible) */}
       <AIDiagnosisSidebar
         soapData={encounterData}
         onSelectCode={(suggestion) => {
-          // Add the selected code to ICPC codes
           if (suggestion.code && !encounterData.icpc_codes.includes(suggestion.code)) {
             setEncounterData((prev) => ({
               ...prev,
@@ -3242,9 +1964,7 @@ export default function ClinicalEncounter() {
         disabled={isSigned}
       />
 
-      {/* ═══════════════════════════════════════════════════════════════════
-          TEMPLATE PICKER SIDEBAR
-          ═══════════════════════════════════════════════════════════════════ */}
+      {/* TEMPLATE PICKER SIDEBAR */}
       <TemplatePicker
         isOpen={showTemplatePicker}
         onClose={() => setShowTemplatePicker(false)}
@@ -3252,9 +1972,7 @@ export default function ClinicalEncounter() {
         soapSection={activeField?.split('.')[0] || 'subjective'}
       />
 
-      {/* ═══════════════════════════════════════════════════════════════════
-          CONNECTION STATUS INDICATOR
-          ═══════════════════════════════════════════════════════════════════ */}
+      {/* CONNECTION STATUS INDICATOR */}
       <ConnectionStatus
         pendingChanges={autoSaveStatus === 'unsaved' ? 1 : 0}
         lastSyncTime={lastSaved}
