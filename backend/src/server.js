@@ -332,19 +332,35 @@ app.use((req, res) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
-  logger.error('Unhandled error:', {
+  // Log with correlation ID if available
+  const logMeta = {
     error: err.message,
     stack: err.stack,
     path: req.path,
     method: req.method,
-  });
+    correlationId: req.correlationId,
+  };
+
+  if (err.isOperational) {
+    // Known operational errors (AppError subclasses)
+    logger.warn('Operational error:', logMeta);
+  } else {
+    // Unknown/programming errors
+    logger.error('Unhandled error:', logMeta);
+  }
 
   // Don't leak error details in production
-  const message = process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message;
+  const statusCode = err.statusCode || err.status || 500;
+  const message =
+    process.env.NODE_ENV === 'production' && statusCode === 500
+      ? 'Internal server error'
+      : err.message;
 
-  res.status(err.status || 500).json({
+  res.status(statusCode).json({
     error: err.name || 'Error',
     message,
+    ...(err.code && { code: err.code }),
+    ...(err.details && { details: err.details }),
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
   });
 });

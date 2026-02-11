@@ -87,10 +87,25 @@ describe('Exercise Routes', () => {
 
     // Prescription routes
     app.post('/api/v1/exercises/prescriptions', exerciseController.createPrescription);
-    app.get('/api/v1/exercises/prescriptions/patient/:patientId', exerciseController.getPatientPrescriptions);
+    app.get(
+      '/api/v1/exercises/prescriptions/patient/:patientId',
+      exerciseController.getPatientPrescriptions
+    );
     app.get('/api/v1/exercises/prescriptions/:id', exerciseController.getPrescriptionById);
-    app.patch('/api/v1/exercises/prescriptions/:id/status', exerciseController.updatePrescriptionStatus);
+    app.patch(
+      '/api/v1/exercises/prescriptions/:id/status',
+      exerciseController.updatePrescriptionStatus
+    );
     app.get('/api/v1/exercises/prescriptions/:id/progress', exerciseController.getProgressHistory);
+
+    // Error handler (matches global error handler in server.js)
+    app.use((err, req, res, next) => {
+      const statusCode = err.statusCode || err.status || 500;
+      res.status(statusCode).json({
+        error: err.name || 'Error',
+        message: err.message,
+      });
+    });
   });
 
   beforeEach(() => {
@@ -106,9 +121,7 @@ describe('Exercise Routes', () => {
       const mockExercises = createMany(createTestExercise, 5);
       mockExerciseLibraryService.getExercises.mockResolvedValue(mockExercises);
 
-      const response = await request(app)
-        .get('/api/v1/exercises')
-        .expect(200);
+      const response = await request(app).get('/api/v1/exercises').expect(200);
 
       expect(response.body.success).toBe(true);
       expect(response.body.data).toHaveLength(5);
@@ -144,20 +157,14 @@ describe('Exercise Routes', () => {
     it('should handle isActive filter correctly', async () => {
       mockExerciseLibraryService.getExercises.mockResolvedValue([]);
 
-      await request(app)
-        .get('/api/v1/exercises')
-        .query({ isActive: 'true' })
-        .expect(200);
+      await request(app).get('/api/v1/exercises').query({ isActive: 'true' }).expect(200);
 
       expect(mockExerciseLibraryService.getExercises).toHaveBeenCalledWith(
         organizationId,
         expect.objectContaining({ isActive: true })
       );
 
-      await request(app)
-        .get('/api/v1/exercises')
-        .query({ isActive: 'false' })
-        .expect(200);
+      await request(app).get('/api/v1/exercises').query({ isActive: 'false' }).expect(200);
 
       expect(mockExerciseLibraryService.getExercises).toHaveBeenCalledWith(
         organizationId,
@@ -166,15 +173,11 @@ describe('Exercise Routes', () => {
     });
 
     it('should return 500 on service error', async () => {
-      mockExerciseLibraryService.getExercises.mockRejectedValue(
-        new Error('Database error')
-      );
+      mockExerciseLibraryService.getExercises.mockRejectedValue(new Error('Database error'));
 
-      const response = await request(app)
-        .get('/api/v1/exercises')
-        .expect(500);
+      const response = await request(app).get('/api/v1/exercises').expect(500);
 
-      expect(response.body.error).toBe('Failed to retrieve exercises');
+      expect(response.body.message).toBe('Database error');
     });
   });
 
@@ -187,9 +190,7 @@ describe('Exercise Routes', () => {
       const mockExercise = createTestExercise();
       mockExerciseLibraryService.getExerciseById.mockResolvedValue(mockExercise);
 
-      const response = await request(app)
-        .get(`/api/v1/exercises/${mockExercise.id}`)
-        .expect(200);
+      const response = await request(app).get(`/api/v1/exercises/${mockExercise.id}`).expect(200);
 
       expect(response.body.success).toBe(true);
       expect(response.body.data.id).toBe(mockExercise.id);
@@ -198,23 +199,17 @@ describe('Exercise Routes', () => {
     it('should return 404 when exercise not found', async () => {
       mockExerciseLibraryService.getExerciseById.mockResolvedValue(null);
 
-      const response = await request(app)
-        .get('/api/v1/exercises/non-existent-id')
-        .expect(404);
+      const response = await request(app).get('/api/v1/exercises/non-existent-id').expect(404);
 
       expect(response.body.error).toBe('Exercise not found');
     });
 
     it('should return 500 on service error', async () => {
-      mockExerciseLibraryService.getExerciseById.mockRejectedValue(
-        new Error('Database error')
-      );
+      mockExerciseLibraryService.getExerciseById.mockRejectedValue(new Error('Database error'));
 
-      const response = await request(app)
-        .get('/api/v1/exercises/test-id')
-        .expect(500);
+      const response = await request(app).get('/api/v1/exercises/test-id').expect(500);
 
-      expect(response.body.error).toBe('Failed to retrieve exercise');
+      expect(response.body.message).toBe('Database error');
     });
   });
 
@@ -234,24 +229,16 @@ describe('Exercise Routes', () => {
       const createdExercise = createTestExercise(exerciseData);
       mockExerciseLibraryService.createExercise.mockResolvedValue(createdExercise);
 
-      const response = await request(app)
-        .post('/api/v1/exercises')
-        .send(exerciseData)
-        .expect(201);
+      const response = await request(app).post('/api/v1/exercises').send(exerciseData).expect(201);
 
       expect(response.body.success).toBe(true);
       expect(response.body.data.name).toBe(exerciseData.name);
     });
 
     it('should pass user ID to service', async () => {
-      mockExerciseLibraryService.createExercise.mockResolvedValue(
-        createTestExercise()
-      );
+      mockExerciseLibraryService.createExercise.mockResolvedValue(createTestExercise());
 
-      await request(app)
-        .post('/api/v1/exercises')
-        .send({ name: 'Test' })
-        .expect(201);
+      await request(app).post('/api/v1/exercises').send({ name: 'Test' }).expect(201);
 
       expect(mockExerciseLibraryService.createExercise).toHaveBeenCalledWith(
         organizationId,
@@ -261,16 +248,14 @@ describe('Exercise Routes', () => {
     });
 
     it('should return 500 on service error', async () => {
-      mockExerciseLibraryService.createExercise.mockRejectedValue(
-        new Error('Insert failed')
-      );
+      mockExerciseLibraryService.createExercise.mockRejectedValue(new Error('Insert failed'));
 
       const response = await request(app)
         .post('/api/v1/exercises')
         .send({ name: 'Test' })
         .expect(500);
 
-      expect(response.body.error).toBe('Failed to create exercise');
+      expect(response.body.message).toBe('Insert failed');
     });
   });
 
@@ -305,16 +290,14 @@ describe('Exercise Routes', () => {
     });
 
     it('should return 500 on service error', async () => {
-      mockExerciseLibraryService.updateExercise.mockRejectedValue(
-        new Error('Update failed')
-      );
+      mockExerciseLibraryService.updateExercise.mockRejectedValue(new Error('Update failed'));
 
       const response = await request(app)
         .put('/api/v1/exercises/test-id')
         .send({ name: 'Updated' })
         .expect(500);
 
-      expect(response.body.error).toBe('Failed to update exercise');
+      expect(response.body.message).toBe('Update failed');
     });
   });
 
@@ -326,9 +309,7 @@ describe('Exercise Routes', () => {
     it('should delete an exercise', async () => {
       mockExerciseLibraryService.deleteExercise.mockResolvedValue(true);
 
-      const response = await request(app)
-        .delete('/api/v1/exercises/test-id')
-        .expect(200);
+      const response = await request(app).delete('/api/v1/exercises/test-id').expect(200);
 
       expect(response.body.success).toBe(true);
       expect(response.body.message).toBe('Exercise deleted successfully');
@@ -337,23 +318,17 @@ describe('Exercise Routes', () => {
     it('should return 404 when exercise not found', async () => {
       mockExerciseLibraryService.deleteExercise.mockResolvedValue(false);
 
-      const response = await request(app)
-        .delete('/api/v1/exercises/non-existent-id')
-        .expect(404);
+      const response = await request(app).delete('/api/v1/exercises/non-existent-id').expect(404);
 
       expect(response.body.error).toBe('Exercise not found');
     });
 
     it('should return 500 on service error', async () => {
-      mockExerciseLibraryService.deleteExercise.mockRejectedValue(
-        new Error('Delete failed')
-      );
+      mockExerciseLibraryService.deleteExercise.mockRejectedValue(new Error('Delete failed'));
 
-      const response = await request(app)
-        .delete('/api/v1/exercises/test-id')
-        .expect(500);
+      const response = await request(app).delete('/api/v1/exercises/test-id').expect(500);
 
-      expect(response.body.error).toBe('Failed to delete exercise');
+      expect(response.body.message).toBe('Delete failed');
     });
   });
 
@@ -369,24 +344,18 @@ describe('Exercise Routes', () => {
       ];
       mockExerciseLibraryService.getCategories.mockResolvedValue(mockCategories);
 
-      const response = await request(app)
-        .get('/api/v1/exercises/categories')
-        .expect(200);
+      const response = await request(app).get('/api/v1/exercises/categories').expect(200);
 
       expect(response.body.success).toBe(true);
       expect(response.body.data).toHaveLength(2);
     });
 
     it('should return 500 on service error', async () => {
-      mockExerciseLibraryService.getCategories.mockRejectedValue(
-        new Error('Database error')
-      );
+      mockExerciseLibraryService.getCategories.mockRejectedValue(new Error('Database error'));
 
-      const response = await request(app)
-        .get('/api/v1/exercises/categories')
-        .expect(500);
+      const response = await request(app).get('/api/v1/exercises/categories').expect(500);
 
-      expect(response.body.error).toBe('Failed to retrieve categories');
+      expect(response.body.message).toBe('Database error');
     });
   });
 
@@ -398,15 +367,11 @@ describe('Exercise Routes', () => {
     it('should create a prescription', async () => {
       const prescriptionData = {
         patientId: 'patient-123',
-        exercises: [
-          { exerciseId: 'ex-1', sets: 3, reps: 10 },
-        ],
+        exercises: [{ exerciseId: 'ex-1', sets: 3, reps: 10 }],
       };
 
       const createdPrescription = createTestPrescription();
-      mockExerciseLibraryService.createPrescription.mockResolvedValue(
-        createdPrescription
-      );
+      mockExerciseLibraryService.createPrescription.mockResolvedValue(createdPrescription);
 
       const response = await request(app)
         .post('/api/v1/exercises/prescriptions')
@@ -418,9 +383,7 @@ describe('Exercise Routes', () => {
     });
 
     it('should pass prescribedBy from user', async () => {
-      mockExerciseLibraryService.createPrescription.mockResolvedValue(
-        createTestPrescription()
-      );
+      mockExerciseLibraryService.createPrescription.mockResolvedValue(createTestPrescription());
 
       await request(app)
         .post('/api/v1/exercises/prescriptions')
@@ -434,16 +397,14 @@ describe('Exercise Routes', () => {
     });
 
     it('should return 500 on service error', async () => {
-      mockExerciseLibraryService.createPrescription.mockRejectedValue(
-        new Error('Insert failed')
-      );
+      mockExerciseLibraryService.createPrescription.mockRejectedValue(new Error('Insert failed'));
 
       const response = await request(app)
         .post('/api/v1/exercises/prescriptions')
         .send({ patientId: 'patient-123' })
         .expect(500);
 
-      expect(response.body.error).toBe('Failed to create prescription');
+      expect(response.body.message).toBe('Insert failed');
     });
   });
 
@@ -453,13 +414,8 @@ describe('Exercise Routes', () => {
 
   describe('GET /api/v1/exercises/prescriptions/patient/:patientId', () => {
     it('should return prescriptions for a patient', async () => {
-      const mockPrescriptions = [
-        createTestPrescription(),
-        createTestPrescription({ id: 'rx-2' }),
-      ];
-      mockExerciseLibraryService.getPatientPrescriptions.mockResolvedValue(
-        mockPrescriptions
-      );
+      const mockPrescriptions = [createTestPrescription(), createTestPrescription({ id: 'rx-2' })];
+      mockExerciseLibraryService.getPatientPrescriptions.mockResolvedValue(mockPrescriptions);
 
       const response = await request(app)
         .get('/api/v1/exercises/prescriptions/patient/patient-123')
@@ -493,7 +449,7 @@ describe('Exercise Routes', () => {
         .get('/api/v1/exercises/prescriptions/patient/patient-123')
         .expect(500);
 
-      expect(response.body.error).toBe('Failed to retrieve prescriptions');
+      expect(response.body.message).toBe('Database error');
     });
   });
 
@@ -504,13 +460,9 @@ describe('Exercise Routes', () => {
   describe('GET /api/v1/exercises/prescriptions/:id', () => {
     it('should return prescription by ID', async () => {
       const mockPrescription = createTestPrescription();
-      mockExerciseLibraryService.getPrescriptionById.mockResolvedValue(
-        mockPrescription
-      );
+      mockExerciseLibraryService.getPrescriptionById.mockResolvedValue(mockPrescription);
 
-      const response = await request(app)
-        .get('/api/v1/exercises/prescriptions/rx-123')
-        .expect(200);
+      const response = await request(app).get('/api/v1/exercises/prescriptions/rx-123').expect(200);
 
       expect(response.body.success).toBe(true);
       expect(response.body.data).toHaveProperty('id');
@@ -527,15 +479,11 @@ describe('Exercise Routes', () => {
     });
 
     it('should return 500 on service error', async () => {
-      mockExerciseLibraryService.getPrescriptionById.mockRejectedValue(
-        new Error('Database error')
-      );
+      mockExerciseLibraryService.getPrescriptionById.mockRejectedValue(new Error('Database error'));
 
-      const response = await request(app)
-        .get('/api/v1/exercises/prescriptions/rx-123')
-        .expect(500);
+      const response = await request(app).get('/api/v1/exercises/prescriptions/rx-123').expect(500);
 
-      expect(response.body.error).toBe('Failed to retrieve prescription');
+      expect(response.body.message).toBe('Database error');
     });
   });
 
@@ -546,9 +494,7 @@ describe('Exercise Routes', () => {
   describe('PATCH /api/v1/exercises/prescriptions/:id/status', () => {
     it('should update prescription status', async () => {
       const updatedPrescription = createTestPrescription({ status: 'completed' });
-      mockExerciseLibraryService.updatePrescriptionStatus.mockResolvedValue(
-        updatedPrescription
-      );
+      mockExerciseLibraryService.updatePrescriptionStatus.mockResolvedValue(updatedPrescription);
 
       const response = await request(app)
         .patch('/api/v1/exercises/prescriptions/rx-123/status')
@@ -580,7 +526,7 @@ describe('Exercise Routes', () => {
         .send({ status: 'completed' })
         .expect(500);
 
-      expect(response.body.error).toBe('Failed to update prescription status');
+      expect(response.body.message).toBe('Update failed');
     });
   });
 
@@ -604,15 +550,13 @@ describe('Exercise Routes', () => {
     });
 
     it('should return 500 on service error', async () => {
-      mockExerciseLibraryService.getProgressHistory.mockRejectedValue(
-        new Error('Database error')
-      );
+      mockExerciseLibraryService.getProgressHistory.mockRejectedValue(new Error('Database error'));
 
       const response = await request(app)
         .get('/api/v1/exercises/prescriptions/rx-123/progress')
         .expect(500);
 
-      expect(response.body.error).toBe('Failed to retrieve progress history');
+      expect(response.body.message).toBe('Database error');
     });
   });
 
@@ -628,24 +572,18 @@ describe('Exercise Routes', () => {
         total: 12,
       });
 
-      const response = await request(app)
-        .post('/api/v1/exercises/seed')
-        .expect(200);
+      const response = await request(app).post('/api/v1/exercises/seed').expect(200);
 
       expect(response.body.success).toBe(true);
       expect(response.body.message).toBe('Default exercises seeded successfully');
     });
 
     it('should return 500 on service error', async () => {
-      mockExerciseLibraryService.seedDefaultExercises.mockRejectedValue(
-        new Error('Seed failed')
-      );
+      mockExerciseLibraryService.seedDefaultExercises.mockRejectedValue(new Error('Seed failed'));
 
-      const response = await request(app)
-        .post('/api/v1/exercises/seed')
-        .expect(500);
+      const response = await request(app).post('/api/v1/exercises/seed').expect(500);
 
-      expect(response.body.error).toBe('Failed to seed default exercises');
+      expect(response.body.message).toBe('Seed failed');
     });
   });
 });

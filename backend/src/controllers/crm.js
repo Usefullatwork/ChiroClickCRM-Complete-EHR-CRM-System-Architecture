@@ -3,9 +3,10 @@
  * Handles HTTP requests for Customer Relationship Management features
  */
 
-import * as crmService from '../services/crm.js';
+import * as crmService from '../services/crm/index.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
+import { asyncRoute } from '../utils/asyncRoute.js';
 
 // =============================================================================
 // LEADS
@@ -15,147 +16,117 @@ import logger from '../utils/logger.js';
  * Get all leads with filters
  * GET /api/v1/crm/leads
  */
-export const getLeads = async (req, res) => {
-  try {
-    const { organizationId } = req;
-    const options = {
-      page: parseInt(req.query.page) || 1,
-      limit: parseInt(req.query.limit) || 20,
-      status: req.query.status,
-      source: req.query.source,
-      assignedTo: req.query.assignedTo,
-      temperature: req.query.temperature,
-      search: req.query.search,
-      sortBy: req.query.sortBy || 'created_at',
-      sortOrder: req.query.sortOrder || 'desc'
-    };
+export const getLeads = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const options = {
+    page: parseInt(req.query.page) || 1,
+    limit: parseInt(req.query.limit) || 20,
+    status: req.query.status,
+    source: req.query.source,
+    assignedTo: req.query.assignedTo,
+    temperature: req.query.temperature,
+    search: req.query.search,
+    sortBy: req.query.sortBy || 'created_at',
+    sortOrder: req.query.sortOrder || 'desc',
+  };
 
-    const result = await crmService.getLeads(organizationId, options);
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in getLeads:', error);
-    res.status(500).json({ error: 'Failed to retrieve leads' });
-  }
-};
+  const result = await crmService.getLeads(organizationId, options);
+  res.json(result);
+});
 
 /**
  * Get lead by ID
  * GET /api/v1/crm/leads/:id
  */
-export const getLead = async (req, res) => {
-  try {
-    const { organizationId } = req;
-    const { id } = req.params;
+export const getLead = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const { id } = req.params;
 
-    const lead = await crmService.getLeadById(organizationId, id);
-    if (!lead) {
-      return res.status(404).json({ error: 'Lead not found' });
-    }
-    res.json(lead);
-  } catch (error) {
-    logger.error('Error in getLead:', error);
-    res.status(500).json({ error: 'Failed to retrieve lead' });
+  const lead = await crmService.getLeadById(organizationId, id);
+  if (!lead) {
+    return res.status(404).json({ error: 'Lead not found' });
   }
-};
+  res.json(lead);
+});
 
 /**
  * Create new lead
  * POST /api/v1/crm/leads
  */
-export const createLead = async (req, res) => {
-  try {
-    const { organizationId, user } = req;
-    const leadData = { ...req.body, organization_id: organizationId };
+export const createLead = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const leadData = { ...req.body, organization_id: organizationId };
 
-    const lead = await crmService.createLead(leadData);
+  const lead = await crmService.createLead(leadData);
 
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'CREATE',
-      resourceType: 'LEAD',
-      resourceId: lead.id,
-      ipAddress: req.ip
-    });
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'CREATE',
+    resourceType: 'LEAD',
+    resourceId: lead.id,
+    ipAddress: req.ip,
+  });
 
-    res.status(201).json(lead);
-  } catch (error) {
-    logger.error('Error in createLead:', error);
-    res.status(500).json({ error: 'Failed to create lead' });
-  }
-};
+  res.status(201).json(lead);
+});
 
 /**
  * Update lead
  * PUT /api/v1/crm/leads/:id
  */
-export const updateLead = async (req, res) => {
-  try {
-    const { organizationId, user } = req;
-    const { id } = req.params;
+export const updateLead = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const { id } = req.params;
 
-    const lead = await crmService.updateLead(organizationId, id, req.body);
-    if (!lead) {
-      return res.status(404).json({ error: 'Lead not found' });
-    }
-
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'UPDATE',
-      resourceType: 'LEAD',
-      resourceId: id,
-      ipAddress: req.ip
-    });
-
-    res.json(lead);
-  } catch (error) {
-    logger.error('Error in updateLead:', error);
-    res.status(500).json({ error: 'Failed to update lead' });
+  const lead = await crmService.updateLead(organizationId, id, req.body);
+  if (!lead) {
+    return res.status(404).json({ error: 'Lead not found' });
   }
-};
+
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'UPDATE',
+    resourceType: 'LEAD',
+    resourceId: id,
+    ipAddress: req.ip,
+  });
+
+  res.json(lead);
+});
 
 /**
  * Convert lead to patient
  * POST /api/v1/crm/leads/:id/convert
  */
-export const convertLead = async (req, res) => {
-  try {
-    const { organizationId, user } = req;
-    const { id } = req.params;
+export const convertLead = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const { id } = req.params;
 
-    const result = await crmService.convertLeadToPatient(organizationId, id, req.body);
+  const result = await crmService.convertLeadToPatient(organizationId, id, req.body);
 
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'CONVERT',
-      resourceType: 'LEAD',
-      resourceId: id,
-      ipAddress: req.ip
-    });
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'CONVERT',
+    resourceType: 'LEAD',
+    resourceId: id,
+    ipAddress: req.ip,
+  });
 
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in convertLead:', error);
-    res.status(500).json({ error: 'Failed to convert lead' });
-  }
-};
+  res.json(result);
+});
 
 /**
  * Get lead pipeline stats
  * GET /api/v1/crm/leads/pipeline
  */
-export const getLeadPipeline = async (req, res) => {
-  try {
-    const { organizationId } = req;
-    const result = await crmService.getLeadPipelineStats(organizationId);
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in getLeadPipeline:', error);
-    res.status(500).json({ error: 'Failed to retrieve pipeline stats' });
-  }
-};
+export const getLeadPipeline = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const result = await crmService.getLeadPipelineStats(organizationId);
+  res.json(result);
+});
 
 // =============================================================================
 // PATIENT LIFECYCLE
@@ -165,69 +136,54 @@ export const getLeadPipeline = async (req, res) => {
  * Get patients by lifecycle stage
  * GET /api/v1/crm/lifecycle
  */
-export const getPatientsByLifecycle = async (req, res) => {
-  try {
-    const { organizationId } = req;
-    const options = {
-      stage: req.query.stage,
-      page: parseInt(req.query.page) || 1,
-      limit: parseInt(req.query.limit) || 20
-    };
+export const getPatientsByLifecycle = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const options = {
+    stage: req.query.stage,
+    page: parseInt(req.query.page) || 1,
+    limit: parseInt(req.query.limit) || 20,
+  };
 
-    const result = await crmService.getPatientsByLifecycle(organizationId, options);
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in getPatientsByLifecycle:', error);
-    res.status(500).json({ error: 'Failed to retrieve lifecycle data' });
-  }
-};
+  const result = await crmService.getPatientsByLifecycle(organizationId, options);
+  res.json(result);
+});
 
 /**
  * Get lifecycle stats
  * GET /api/v1/crm/lifecycle/stats
  */
-export const getLifecycleStats = async (req, res) => {
-  try {
-    const { organizationId } = req;
-    const result = await crmService.getLifecycleStats(organizationId);
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in getLifecycleStats:', error);
-    res.status(500).json({ error: 'Failed to retrieve lifecycle stats' });
-  }
-};
+export const getLifecycleStats = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const result = await crmService.getLifecycleStats(organizationId);
+  res.json(result);
+});
 
 /**
  * Update patient lifecycle stage
  * PUT /api/v1/crm/lifecycle/:patientId
  */
-export const updatePatientLifecycle = async (req, res) => {
-  try {
-    const { organizationId, user } = req;
-    const { patientId } = req.params;
-    const { stage, engagementScore, tags } = req.body;
+export const updatePatientLifecycle = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const { patientId } = req.params;
+  const { stage, engagementScore, tags } = req.body;
 
-    const result = await crmService.updatePatientLifecycle(organizationId, patientId, {
-      stage,
-      engagementScore,
-      tags
-    });
+  const result = await crmService.updatePatientLifecycle(organizationId, patientId, {
+    stage,
+    engagementScore,
+    tags,
+  });
 
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'UPDATE',
-      resourceType: 'PATIENT_LIFECYCLE',
-      resourceId: patientId,
-      ipAddress: req.ip
-    });
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'UPDATE',
+    resourceType: 'PATIENT_LIFECYCLE',
+    resourceId: patientId,
+    ipAddress: req.ip,
+  });
 
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in updatePatientLifecycle:', error);
-    res.status(500).json({ error: 'Failed to update lifecycle' });
-  }
-};
+  res.json(result);
+});
 
 // =============================================================================
 // REFERRALS
@@ -237,94 +193,74 @@ export const updatePatientLifecycle = async (req, res) => {
  * Get all referrals
  * GET /api/v1/crm/referrals
  */
-export const getReferrals = async (req, res) => {
-  try {
-    const { organizationId } = req;
-    const options = {
-      page: parseInt(req.query.page) || 1,
-      limit: parseInt(req.query.limit) || 20,
-      status: req.query.status
-    };
+export const getReferrals = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const options = {
+    page: parseInt(req.query.page) || 1,
+    limit: parseInt(req.query.limit) || 20,
+    status: req.query.status,
+  };
 
-    const result = await crmService.getReferrals(organizationId, options);
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in getReferrals:', error);
-    res.status(500).json({ error: 'Failed to retrieve referrals' });
-  }
-};
+  const result = await crmService.getReferrals(organizationId, options);
+  res.json(result);
+});
 
 /**
  * Create referral
  * POST /api/v1/crm/referrals
  */
-export const createReferral = async (req, res) => {
-  try {
-    const { organizationId, user } = req;
-    const referralData = { ...req.body, organization_id: organizationId };
+export const createReferral = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const referralData = { ...req.body, organization_id: organizationId };
 
-    const referral = await crmService.createReferral(referralData);
+  const referral = await crmService.createReferral(referralData);
 
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'CREATE',
-      resourceType: 'REFERRAL',
-      resourceId: referral.id,
-      ipAddress: req.ip
-    });
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'CREATE',
+    resourceType: 'REFERRAL',
+    resourceId: referral.id,
+    ipAddress: req.ip,
+  });
 
-    res.status(201).json(referral);
-  } catch (error) {
-    logger.error('Error in createReferral:', error);
-    res.status(500).json({ error: 'Failed to create referral' });
-  }
-};
+  res.status(201).json(referral);
+});
 
 /**
  * Update referral status
  * PUT /api/v1/crm/referrals/:id
  */
-export const updateReferral = async (req, res) => {
-  try {
-    const { organizationId, user } = req;
-    const { id } = req.params;
+export const updateReferral = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const { id } = req.params;
 
-    const referral = await crmService.updateReferral(organizationId, id, req.body);
-    if (!referral) {
-      return res.status(404).json({ error: 'Referral not found' });
-    }
-
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'UPDATE',
-      resourceType: 'REFERRAL',
-      resourceId: id,
-      ipAddress: req.ip
-    });
-
-    res.json(referral);
-  } catch (error) {
-    logger.error('Error in updateReferral:', error);
-    res.status(500).json({ error: 'Failed to update referral' });
+  const referral = await crmService.updateReferral(organizationId, id, req.body);
+  if (!referral) {
+    return res.status(404).json({ error: 'Referral not found' });
   }
-};
+
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'UPDATE',
+    resourceType: 'REFERRAL',
+    resourceId: id,
+    ipAddress: req.ip,
+  });
+
+  res.json(referral);
+});
 
 /**
  * Get referral stats
  * GET /api/v1/crm/referrals/stats
  */
-export const getReferralStats = async (req, res) => {
-  try {
-    const { organizationId } = req;
-    const result = await crmService.getReferralStats(organizationId);
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in getReferralStats:', error);
-    res.status(500).json({ error: 'Failed to retrieve referral stats' });
-  }
-};
+export const getReferralStats = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const result = await crmService.getReferralStats(organizationId);
+  res.json(result);
+});
 
 // =============================================================================
 // SURVEYS
@@ -334,80 +270,60 @@ export const getReferralStats = async (req, res) => {
  * Get all surveys
  * GET /api/v1/crm/surveys
  */
-export const getSurveys = async (req, res) => {
-  try {
-    const { organizationId } = req;
-    const result = await crmService.getSurveys(organizationId);
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in getSurveys:', error);
-    res.status(500).json({ error: 'Failed to retrieve surveys' });
-  }
-};
+export const getSurveys = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const result = await crmService.getSurveys(organizationId);
+  res.json(result);
+});
 
 /**
  * Create survey
  * POST /api/v1/crm/surveys
  */
-export const createSurvey = async (req, res) => {
-  try {
-    const { organizationId, user } = req;
-    const surveyData = { ...req.body, organization_id: organizationId };
+export const createSurvey = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const surveyData = { ...req.body, organization_id: organizationId };
 
-    const survey = await crmService.createSurvey(surveyData);
+  const survey = await crmService.createSurvey(surveyData);
 
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'CREATE',
-      resourceType: 'SURVEY',
-      resourceId: survey.id,
-      ipAddress: req.ip
-    });
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'CREATE',
+    resourceType: 'SURVEY',
+    resourceId: survey.id,
+    ipAddress: req.ip,
+  });
 
-    res.status(201).json(survey);
-  } catch (error) {
-    logger.error('Error in createSurvey:', error);
-    res.status(500).json({ error: 'Failed to create survey' });
-  }
-};
+  res.status(201).json(survey);
+});
 
 /**
  * Get survey responses
  * GET /api/v1/crm/surveys/:id/responses
  */
-export const getSurveyResponses = async (req, res) => {
-  try {
-    const { organizationId } = req;
-    const { id } = req.params;
-    const options = {
-      page: parseInt(req.query.page) || 1,
-      limit: parseInt(req.query.limit) || 20
-    };
+export const getSurveyResponses = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const { id } = req.params;
+  const options = {
+    page: parseInt(req.query.page) || 1,
+    limit: parseInt(req.query.limit) || 20,
+  };
 
-    const result = await crmService.getSurveyResponses(organizationId, id, options);
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in getSurveyResponses:', error);
-    res.status(500).json({ error: 'Failed to retrieve survey responses' });
-  }
-};
+  const result = await crmService.getSurveyResponses(organizationId, id, options);
+  res.json(result);
+});
 
 /**
  * Get NPS stats
  * GET /api/v1/crm/surveys/nps/stats
  */
-export const getNPSStats = async (req, res) => {
-  try {
-    const { organizationId } = req;
-    const period = req.query.period || '30d';
-    const result = await crmService.getNPSStats(organizationId, period);
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in getNPSStats:', error);
-    res.status(500).json({ error: 'Failed to retrieve NPS stats' });
-  }
-};
+export const getNPSStats = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const period = req.query.period || '30d';
+  const result = await crmService.getNPSStats(organizationId, period);
+  res.json(result);
+});
 
 // =============================================================================
 // COMMUNICATIONS
@@ -417,46 +333,36 @@ export const getNPSStats = async (req, res) => {
  * Get communication history
  * GET /api/v1/crm/communications
  */
-export const getCommunications = async (req, res) => {
-  try {
-    const { organizationId } = req;
-    const options = {
-      page: parseInt(req.query.page) || 1,
-      limit: parseInt(req.query.limit) || 50,
-      patientId: req.query.patientId,
-      leadId: req.query.leadId,
-      channel: req.query.channel,
-      direction: req.query.direction
-    };
+export const getCommunications = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const options = {
+    page: parseInt(req.query.page) || 1,
+    limit: parseInt(req.query.limit) || 50,
+    patientId: req.query.patientId,
+    leadId: req.query.leadId,
+    channel: req.query.channel,
+    direction: req.query.direction,
+  };
 
-    const result = await crmService.getCommunicationHistory(organizationId, options);
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in getCommunications:', error);
-    res.status(500).json({ error: 'Failed to retrieve communications' });
-  }
-};
+  const result = await crmService.getCommunicationHistory(organizationId, options);
+  res.json(result);
+});
 
 /**
  * Log communication
  * POST /api/v1/crm/communications
  */
-export const logCommunication = async (req, res) => {
-  try {
-    const { organizationId, user } = req;
-    const commData = {
-      ...req.body,
-      organization_id: organizationId,
-      user_id: user.id
-    };
+export const logCommunication = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const commData = {
+    ...req.body,
+    organization_id: organizationId,
+    user_id: user.id,
+  };
 
-    const comm = await crmService.logCommunication(commData);
-    res.status(201).json(comm);
-  } catch (error) {
-    logger.error('Error in logCommunication:', error);
-    res.status(500).json({ error: 'Failed to log communication' });
-  }
-};
+  const comm = await crmService.logCommunication(commData);
+  res.status(201).json(comm);
+});
 
 // =============================================================================
 // CAMPAIGNS
@@ -466,148 +372,118 @@ export const logCommunication = async (req, res) => {
  * Get all campaigns
  * GET /api/v1/crm/campaigns
  */
-export const getCampaigns = async (req, res) => {
-  try {
-    const { organizationId } = req;
-    const options = {
-      page: parseInt(req.query.page) || 1,
-      limit: parseInt(req.query.limit) || 20,
-      status: req.query.status,
-      type: req.query.type
-    };
+export const getCampaigns = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const options = {
+    page: parseInt(req.query.page) || 1,
+    limit: parseInt(req.query.limit) || 20,
+    status: req.query.status,
+    type: req.query.type,
+  };
 
-    const result = await crmService.getCampaigns(organizationId, options);
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in getCampaigns:', error);
-    res.status(500).json({ error: 'Failed to retrieve campaigns' });
-  }
-};
+  const result = await crmService.getCampaigns(organizationId, options);
+  res.json(result);
+});
 
 /**
  * Get campaign by ID
  * GET /api/v1/crm/campaigns/:id
  */
-export const getCampaign = async (req, res) => {
-  try {
-    const { organizationId } = req;
-    const { id } = req.params;
+export const getCampaign = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const { id } = req.params;
 
-    const campaign = await crmService.getCampaignById(organizationId, id);
-    if (!campaign) {
-      return res.status(404).json({ error: 'Campaign not found' });
-    }
-    res.json(campaign);
-  } catch (error) {
-    logger.error('Error in getCampaign:', error);
-    res.status(500).json({ error: 'Failed to retrieve campaign' });
+  const campaign = await crmService.getCampaignById(organizationId, id);
+  if (!campaign) {
+    return res.status(404).json({ error: 'Campaign not found' });
   }
-};
+  res.json(campaign);
+});
 
 /**
  * Create campaign
  * POST /api/v1/crm/campaigns
  */
-export const createCampaign = async (req, res) => {
-  try {
-    const { organizationId, user } = req;
-    const campaignData = {
-      ...req.body,
-      organization_id: organizationId,
-      created_by: user.id
-    };
+export const createCampaign = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const campaignData = {
+    ...req.body,
+    organization_id: organizationId,
+    created_by: user.id,
+  };
 
-    const campaign = await crmService.createCampaign(campaignData);
+  const campaign = await crmService.createCampaign(campaignData);
 
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'CREATE',
-      resourceType: 'CAMPAIGN',
-      resourceId: campaign.id,
-      ipAddress: req.ip
-    });
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'CREATE',
+    resourceType: 'CAMPAIGN',
+    resourceId: campaign.id,
+    ipAddress: req.ip,
+  });
 
-    res.status(201).json(campaign);
-  } catch (error) {
-    logger.error('Error in createCampaign:', error);
-    res.status(500).json({ error: 'Failed to create campaign' });
-  }
-};
+  res.status(201).json(campaign);
+});
 
 /**
  * Update campaign
  * PUT /api/v1/crm/campaigns/:id
  */
-export const updateCampaign = async (req, res) => {
-  try {
-    const { organizationId, user } = req;
-    const { id } = req.params;
+export const updateCampaign = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const { id } = req.params;
 
-    const campaign = await crmService.updateCampaign(organizationId, id, req.body);
-    if (!campaign) {
-      return res.status(404).json({ error: 'Campaign not found' });
-    }
-
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'UPDATE',
-      resourceType: 'CAMPAIGN',
-      resourceId: id,
-      ipAddress: req.ip
-    });
-
-    res.json(campaign);
-  } catch (error) {
-    logger.error('Error in updateCampaign:', error);
-    res.status(500).json({ error: 'Failed to update campaign' });
+  const campaign = await crmService.updateCampaign(organizationId, id, req.body);
+  if (!campaign) {
+    return res.status(404).json({ error: 'Campaign not found' });
   }
-};
+
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'UPDATE',
+    resourceType: 'CAMPAIGN',
+    resourceId: id,
+    ipAddress: req.ip,
+  });
+
+  res.json(campaign);
+});
 
 /**
  * Launch campaign
  * POST /api/v1/crm/campaigns/:id/launch
  */
-export const launchCampaign = async (req, res) => {
-  try {
-    const { organizationId, user } = req;
-    const { id } = req.params;
+export const launchCampaign = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const { id } = req.params;
 
-    const campaign = await crmService.launchCampaign(organizationId, id);
+  const campaign = await crmService.launchCampaign(organizationId, id);
 
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'LAUNCH',
-      resourceType: 'CAMPAIGN',
-      resourceId: id,
-      ipAddress: req.ip
-    });
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'LAUNCH',
+    resourceType: 'CAMPAIGN',
+    resourceId: id,
+    ipAddress: req.ip,
+  });
 
-    res.json(campaign);
-  } catch (error) {
-    logger.error('Error in launchCampaign:', error);
-    res.status(500).json({ error: 'Failed to launch campaign' });
-  }
-};
+  res.json(campaign);
+});
 
 /**
  * Get campaign stats
  * GET /api/v1/crm/campaigns/:id/stats
  */
-export const getCampaignStats = async (req, res) => {
-  try {
-    const { organizationId } = req;
-    const { id } = req.params;
+export const getCampaignStats = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const { id } = req.params;
 
-    const stats = await crmService.getCampaignStats(organizationId, id);
-    res.json(stats);
-  } catch (error) {
-    logger.error('Error in getCampaignStats:', error);
-    res.status(500).json({ error: 'Failed to retrieve campaign stats' });
-  }
-};
+  const stats = await crmService.getCampaignStats(organizationId, id);
+  res.json(stats);
+});
 
 // =============================================================================
 // WORKFLOWS
@@ -617,124 +493,99 @@ export const getCampaignStats = async (req, res) => {
  * Get all workflows
  * GET /api/v1/crm/workflows
  */
-export const getWorkflows = async (req, res) => {
-  try {
-    const { organizationId } = req;
-    const result = await crmService.getWorkflows(organizationId);
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in getWorkflows:', error);
-    res.status(500).json({ error: 'Failed to retrieve workflows' });
-  }
-};
+export const getWorkflows = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const result = await crmService.getWorkflows(organizationId);
+  res.json(result);
+});
 
 /**
  * Get workflow by ID
  * GET /api/v1/crm/workflows/:id
  */
-export const getWorkflow = async (req, res) => {
-  try {
-    const { organizationId } = req;
-    const { id } = req.params;
+export const getWorkflow = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const { id } = req.params;
 
-    const workflow = await crmService.getWorkflowById(organizationId, id);
-    if (!workflow) {
-      return res.status(404).json({ error: 'Workflow not found' });
-    }
-    res.json(workflow);
-  } catch (error) {
-    logger.error('Error in getWorkflow:', error);
-    res.status(500).json({ error: 'Failed to retrieve workflow' });
+  const workflow = await crmService.getWorkflowById(organizationId, id);
+  if (!workflow) {
+    return res.status(404).json({ error: 'Workflow not found' });
   }
-};
+  res.json(workflow);
+});
 
 /**
  * Create workflow
  * POST /api/v1/crm/workflows
  */
-export const createWorkflow = async (req, res) => {
-  try {
-    const { organizationId, user } = req;
-    const workflowData = {
-      ...req.body,
-      organization_id: organizationId,
-      created_by: user.id
-    };
+export const createWorkflow = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const workflowData = {
+    ...req.body,
+    organization_id: organizationId,
+    created_by: user.id,
+  };
 
-    const workflow = await crmService.createWorkflow(workflowData);
+  const workflow = await crmService.createWorkflow(workflowData);
 
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'CREATE',
-      resourceType: 'WORKFLOW',
-      resourceId: workflow.id,
-      ipAddress: req.ip
-    });
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'CREATE',
+    resourceType: 'WORKFLOW',
+    resourceId: workflow.id,
+    ipAddress: req.ip,
+  });
 
-    res.status(201).json(workflow);
-  } catch (error) {
-    logger.error('Error in createWorkflow:', error);
-    res.status(500).json({ error: 'Failed to create workflow' });
-  }
-};
+  res.status(201).json(workflow);
+});
 
 /**
  * Update workflow
  * PUT /api/v1/crm/workflows/:id
  */
-export const updateWorkflow = async (req, res) => {
-  try {
-    const { organizationId, user } = req;
-    const { id } = req.params;
+export const updateWorkflow = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const { id } = req.params;
 
-    const workflow = await crmService.updateWorkflow(organizationId, id, req.body);
-    if (!workflow) {
-      return res.status(404).json({ error: 'Workflow not found' });
-    }
-
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'UPDATE',
-      resourceType: 'WORKFLOW',
-      resourceId: id,
-      ipAddress: req.ip
-    });
-
-    res.json(workflow);
-  } catch (error) {
-    logger.error('Error in updateWorkflow:', error);
-    res.status(500).json({ error: 'Failed to update workflow' });
+  const workflow = await crmService.updateWorkflow(organizationId, id, req.body);
+  if (!workflow) {
+    return res.status(404).json({ error: 'Workflow not found' });
   }
-};
+
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'UPDATE',
+    resourceType: 'WORKFLOW',
+    resourceId: id,
+    ipAddress: req.ip,
+  });
+
+  res.json(workflow);
+});
 
 /**
  * Toggle workflow active status
  * POST /api/v1/crm/workflows/:id/toggle
  */
-export const toggleWorkflow = async (req, res) => {
-  try {
-    const { organizationId, user } = req;
-    const { id } = req.params;
+export const toggleWorkflow = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const { id } = req.params;
 
-    const workflow = await crmService.toggleWorkflowActive(organizationId, id);
+  const workflow = await crmService.toggleWorkflowActive(organizationId, id);
 
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'TOGGLE',
-      resourceType: 'WORKFLOW',
-      resourceId: id,
-      ipAddress: req.ip
-    });
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'TOGGLE',
+    resourceType: 'WORKFLOW',
+    resourceId: id,
+    ipAddress: req.ip,
+  });
 
-    res.json(workflow);
-  } catch (error) {
-    logger.error('Error in toggleWorkflow:', error);
-    res.status(500).json({ error: 'Failed to toggle workflow' });
-  }
-};
+  res.json(workflow);
+});
 
 // =============================================================================
 // RETENTION
@@ -744,50 +595,35 @@ export const toggleWorkflow = async (req, res) => {
  * Get retention dashboard data
  * GET /api/v1/crm/retention
  */
-export const getRetentionDashboard = async (req, res) => {
-  try {
-    const { organizationId } = req;
-    const period = req.query.period || '30d';
+export const getRetentionDashboard = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const period = req.query.period || '30d';
 
-    const result = await crmService.getRetentionDashboard(organizationId, period);
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in getRetentionDashboard:', error);
-    res.status(500).json({ error: 'Failed to retrieve retention data' });
-  }
-};
+  const result = await crmService.getRetentionDashboard(organizationId, period);
+  res.json(result);
+});
 
 /**
  * Get churn analysis
  * GET /api/v1/crm/retention/churn
  */
-export const getChurnAnalysis = async (req, res) => {
-  try {
-    const { organizationId } = req;
-    const result = await crmService.getChurnAnalysis(organizationId);
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in getChurnAnalysis:', error);
-    res.status(500).json({ error: 'Failed to retrieve churn analysis' });
-  }
-};
+export const getChurnAnalysis = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const result = await crmService.getChurnAnalysis(organizationId);
+  res.json(result);
+});
 
 /**
  * Get cohort retention
  * GET /api/v1/crm/retention/cohorts
  */
-export const getCohortRetention = async (req, res) => {
-  try {
-    const { organizationId } = req;
-    const months = parseInt(req.query.months) || 6;
+export const getCohortRetention = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const months = parseInt(req.query.months) || 6;
 
-    const result = await crmService.getCohortRetention(organizationId, months);
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in getCohortRetention:', error);
-    res.status(500).json({ error: 'Failed to retrieve cohort data' });
-  }
-};
+  const result = await crmService.getCohortRetention(organizationId, months);
+  res.json(result);
+});
 
 // =============================================================================
 // WAITLIST
@@ -797,110 +633,90 @@ export const getCohortRetention = async (req, res) => {
  * Get waitlist
  * GET /api/v1/crm/waitlist
  */
-export const getWaitlist = async (req, res) => {
-  try {
-    const { organizationId } = req;
-    const options = {
-      page: parseInt(req.query.page) || 1,
-      limit: parseInt(req.query.limit) || 20,
-      status: req.query.status || 'ACTIVE',
-      practitionerId: req.query.practitionerId
-    };
+export const getWaitlist = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const options = {
+    page: parseInt(req.query.page) || 1,
+    limit: parseInt(req.query.limit) || 20,
+    status: req.query.status || 'ACTIVE',
+    practitionerId: req.query.practitionerId,
+  };
 
-    const result = await crmService.getWaitlist(organizationId, options);
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in getWaitlist:', error);
-    res.status(500).json({ error: 'Failed to retrieve waitlist' });
-  }
-};
+  const result = await crmService.getWaitlist(organizationId, options);
+  res.json(result);
+});
 
 /**
  * Add to waitlist
  * POST /api/v1/crm/waitlist
  */
-export const addToWaitlist = async (req, res) => {
-  try {
-    const { organizationId, user } = req;
-    const data = { ...req.body, organization_id: organizationId };
+export const addToWaitlist = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const data = { ...req.body, organization_id: organizationId };
 
-    const entry = await crmService.addToWaitlist(data);
+  const entry = await crmService.addToWaitlist(data);
 
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'CREATE',
-      resourceType: 'WAITLIST',
-      resourceId: entry.id,
-      ipAddress: req.ip
-    });
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'CREATE',
+    resourceType: 'WAITLIST',
+    resourceId: entry.id,
+    ipAddress: req.ip,
+  });
 
-    res.status(201).json(entry);
-  } catch (error) {
-    logger.error('Error in addToWaitlist:', error);
-    res.status(500).json({ error: 'Failed to add to waitlist' });
-  }
-};
+  res.status(201).json(entry);
+});
 
 /**
  * Update waitlist entry
  * PUT /api/v1/crm/waitlist/:id
  */
-export const updateWaitlistEntry = async (req, res) => {
-  try {
-    const { organizationId, user } = req;
-    const { id } = req.params;
+export const updateWaitlistEntry = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const { id } = req.params;
 
-    const entry = await crmService.updateWaitlistEntry(organizationId, id, req.body);
-    if (!entry) {
-      return res.status(404).json({ error: 'Waitlist entry not found' });
-    }
-
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'UPDATE',
-      resourceType: 'WAITLIST',
-      resourceId: id,
-      ipAddress: req.ip
-    });
-
-    res.json(entry);
-  } catch (error) {
-    logger.error('Error in updateWaitlistEntry:', error);
-    res.status(500).json({ error: 'Failed to update waitlist entry' });
+  const entry = await crmService.updateWaitlistEntry(organizationId, id, req.body);
+  if (!entry) {
+    return res.status(404).json({ error: 'Waitlist entry not found' });
   }
-};
+
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'UPDATE',
+    resourceType: 'WAITLIST',
+    resourceId: id,
+    ipAddress: req.ip,
+  });
+
+  res.json(entry);
+});
 
 /**
  * Notify waitlist patients
  * POST /api/v1/crm/waitlist/notify
  */
-export const notifyWaitlist = async (req, res) => {
-  try {
-    const { organizationId, user } = req;
-    const { slotDate, slotTime, practitionerId } = req.body;
+export const notifyWaitlist = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const { slotDate, slotTime, practitionerId } = req.body;
 
-    const result = await crmService.notifyWaitlistPatients(organizationId, {
-      slotDate,
-      slotTime,
-      practitionerId
-    });
+  const result = await crmService.notifyWaitlistPatients(organizationId, {
+    slotDate,
+    slotTime,
+    practitionerId,
+  });
 
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'NOTIFY',
-      resourceType: 'WAITLIST',
-      ipAddress: req.ip
-    });
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'NOTIFY',
+    resourceType: 'WAITLIST',
+    ipAddress: req.ip,
+  });
 
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in notifyWaitlist:', error);
-    res.status(500).json({ error: 'Failed to notify waitlist' });
-  }
-};
+  res.json(result);
+});
 
 // =============================================================================
 // CRM OVERVIEW
@@ -910,16 +726,11 @@ export const notifyWaitlist = async (req, res) => {
  * Get CRM dashboard overview
  * GET /api/v1/crm/overview
  */
-export const getCRMOverview = async (req, res) => {
-  try {
-    const { organizationId } = req;
-    const result = await crmService.getCRMOverview(organizationId);
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in getCRMOverview:', error);
-    res.status(500).json({ error: 'Failed to retrieve CRM overview' });
-  }
-};
+export const getCRMOverview = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const result = await crmService.getCRMOverview(organizationId);
+  res.json(result);
+});
 
 // =============================================================================
 // CRM SETTINGS
@@ -929,38 +740,28 @@ export const getCRMOverview = async (req, res) => {
  * Get CRM settings
  * GET /api/v1/crm/settings
  */
-export const getCRMSettings = async (req, res) => {
-  try {
-    const { organizationId } = req;
-    const result = await crmService.getCRMSettings(organizationId);
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in getCRMSettings:', error);
-    res.status(500).json({ error: 'Failed to retrieve CRM settings' });
-  }
-};
+export const getCRMSettings = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const result = await crmService.getCRMSettings(organizationId);
+  res.json(result);
+});
 
 /**
  * Update CRM settings
  * PUT /api/v1/crm/settings
  */
-export const updateCRMSettings = async (req, res) => {
-  try {
-    const { organizationId, user } = req;
+export const updateCRMSettings = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
 
-    const result = await crmService.updateCRMSettings(organizationId, req.body);
+  const result = await crmService.updateCRMSettings(organizationId, req.body);
 
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'UPDATE',
-      resourceType: 'CRM_SETTINGS',
-      ipAddress: req.ip
-    });
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'UPDATE',
+    resourceType: 'CRM_SETTINGS',
+    ipAddress: req.ip,
+  });
 
-    res.json(result);
-  } catch (error) {
-    logger.error('Error in updateCRMSettings:', error);
-    res.status(500).json({ error: 'Failed to update CRM settings' });
-  }
-};
+  res.json(result);
+});

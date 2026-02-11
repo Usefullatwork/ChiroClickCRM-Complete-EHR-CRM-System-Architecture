@@ -46,7 +46,7 @@ const loadServices = async () => {
   }
 
   try {
-    automationsService = await import('../services/automations.js');
+    automationsService = await import('../services/automations/index.js');
     logger.info('Automations service loaded');
   } catch (e) {
     logger.warn('Automations service not available:', e.message);

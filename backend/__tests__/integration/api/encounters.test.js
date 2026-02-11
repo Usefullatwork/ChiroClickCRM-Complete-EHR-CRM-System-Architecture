@@ -262,7 +262,7 @@ describe('Encounters API Integration Tests', () => {
         .patch(`/api/v1/encounters/${unsignedEncounter.id}`)
         .send({ subjective: { note: 'Attempted modification' } });
 
-      expect([403, 500]).toContain(response.status);
+      expect([403, 422, 500]).toContain(response.status);
     });
 
     it('should not allow re-signing a signed encounter', async () => {

@@ -5,10 +5,11 @@
  * @module controllers/exercises
  */
 
-import exerciseLibraryService from '../services/exerciseLibrary.js'
-import exerciseDeliveryService from '../services/exerciseDelivery.js'
-import logger from '../utils/logger.js'
-import { logAudit } from '../utils/audit.js'
+import exerciseLibraryService from '../services/exerciseLibrary.js';
+import exerciseDeliveryService from '../services/exerciseDelivery.js';
+import logger from '../utils/logger.js';
+import { logAudit } from '../utils/audit.js';
+import { asyncRoute } from '../utils/asyncRoute.js';
 
 // ============================================================================
 // EXERCISE LIBRARY CRUD
@@ -18,226 +19,175 @@ import { logAudit } from '../utils/audit.js'
  * Get all exercises
  * @route GET /api/v1/exercises
  */
-export const getExercises = async (req, res) => {
-  try {
-    const { organizationId } = req
-    const {
-      category,
-      subcategory,
-      bodyRegion,
-      difficultyLevel,
-      search,
-      isActive,
-      limit,
-      offset
-    } = req.query
+export const getExercises = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const { category, subcategory, bodyRegion, difficultyLevel, search, isActive, limit, offset } =
+    req.query;
 
-    const exercises = await exerciseLibraryService.getExercises(organizationId, {
-      category,
-      subcategory,
-      bodyRegion,
-      difficultyLevel,
-      search,
-      isActive: isActive === 'false' ? false : isActive === 'true' ? true : null,
-      limit: parseInt(limit) || 100,
-      offset: parseInt(offset) || 0
-    })
+  const exercises = await exerciseLibraryService.getExercises(organizationId, {
+    category,
+    subcategory,
+    bodyRegion,
+    difficultyLevel,
+    search,
+    isActive: isActive === 'false' ? false : isActive === 'true' ? true : null,
+    limit: parseInt(limit) || 100,
+    offset: parseInt(offset) || 0,
+  });
 
-    res.json({
-      success: true,
-      data: exercises,
-      count: exercises.length
-    })
-  } catch (error) {
-    logger.error('Error getting exercises:', error)
-    res.status(500).json({ error: 'Failed to retrieve exercises' })
-  }
-}
+  res.json({
+    success: true,
+    data: exercises,
+    count: exercises.length,
+  });
+});
 
 /**
  * Get exercise by ID
  * @route GET /api/v1/exercises/:id
  */
-export const getExerciseById = async (req, res) => {
-  try {
-    const { organizationId } = req
-    const { id } = req.params
+export const getExerciseById = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const { id } = req.params;
 
-    const exercise = await exerciseLibraryService.getExerciseById(organizationId, id)
+  const exercise = await exerciseLibraryService.getExerciseById(organizationId, id);
 
-    if (!exercise) {
-      return res.status(404).json({ error: 'Exercise not found' })
-    }
-
-    res.json({
-      success: true,
-      data: exercise
-    })
-  } catch (error) {
-    logger.error('Error getting exercise by ID:', error)
-    res.status(500).json({ error: 'Failed to retrieve exercise' })
+  if (!exercise) {
+    return res.status(404).json({ error: 'Exercise not found' });
   }
-}
+
+  res.json({
+    success: true,
+    data: exercise,
+  });
+});
 
 /**
  * Create a new exercise
  * @route POST /api/v1/exercises
  */
-export const createExercise = async (req, res) => {
-  try {
-    const { organizationId, user } = req
+export const createExercise = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
 
-    const exercise = await exerciseLibraryService.createExercise(
-      organizationId,
-      user.id,
-      req.body
-    )
+  const exercise = await exerciseLibraryService.createExercise(organizationId, user.id, req.body);
 
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'CREATE',
-      resourceType: 'EXERCISE',
-      resourceId: exercise.id,
-      details: { name: exercise.name },
-      ipAddress: req.ip,
-      userAgent: req.get('user-agent')
-    })
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'CREATE',
+    resourceType: 'EXERCISE',
+    resourceId: exercise.id,
+    details: { name: exercise.name },
+    ipAddress: req.ip,
+    userAgent: req.get('user-agent'),
+  });
 
-    res.status(201).json({
-      success: true,
-      data: exercise
-    })
-  } catch (error) {
-    logger.error('Error creating exercise:', error)
-    res.status(500).json({ error: 'Failed to create exercise' })
-  }
-}
+  res.status(201).json({
+    success: true,
+    data: exercise,
+  });
+});
 
 /**
  * Update an exercise
  * @route PUT /api/v1/exercises/:id
  */
-export const updateExercise = async (req, res) => {
-  try {
-    const { organizationId, user } = req
-    const { id } = req.params
+export const updateExercise = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const { id } = req.params;
 
-    const exercise = await exerciseLibraryService.updateExercise(
-      organizationId,
-      id,
-      req.body
-    )
+  const exercise = await exerciseLibraryService.updateExercise(organizationId, id, req.body);
 
-    if (!exercise) {
-      return res.status(404).json({ error: 'Exercise not found' })
-    }
-
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'UPDATE',
-      resourceType: 'EXERCISE',
-      resourceId: id,
-      details: req.body,
-      ipAddress: req.ip,
-      userAgent: req.get('user-agent')
-    })
-
-    res.json({
-      success: true,
-      data: exercise
-    })
-  } catch (error) {
-    logger.error('Error updating exercise:', error)
-    res.status(500).json({ error: 'Failed to update exercise' })
+  if (!exercise) {
+    return res.status(404).json({ error: 'Exercise not found' });
   }
-}
+
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'UPDATE',
+    resourceType: 'EXERCISE',
+    resourceId: id,
+    details: req.body,
+    ipAddress: req.ip,
+    userAgent: req.get('user-agent'),
+  });
+
+  res.json({
+    success: true,
+    data: exercise,
+  });
+});
 
 /**
  * Delete an exercise (soft delete)
  * @route DELETE /api/v1/exercises/:id
  */
-export const deleteExercise = async (req, res) => {
-  try {
-    const { organizationId, user } = req
-    const { id } = req.params
+export const deleteExercise = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const { id } = req.params;
 
-    const deleted = await exerciseLibraryService.deleteExercise(organizationId, id)
+  const deleted = await exerciseLibraryService.deleteExercise(organizationId, id);
 
-    if (!deleted) {
-      return res.status(404).json({ error: 'Exercise not found' })
-    }
-
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'DELETE',
-      resourceType: 'EXERCISE',
-      resourceId: id,
-      ipAddress: req.ip,
-      userAgent: req.get('user-agent')
-    })
-
-    res.json({
-      success: true,
-      message: 'Exercise deleted successfully'
-    })
-  } catch (error) {
-    logger.error('Error deleting exercise:', error)
-    res.status(500).json({ error: 'Failed to delete exercise' })
+  if (!deleted) {
+    return res.status(404).json({ error: 'Exercise not found' });
   }
-}
+
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'DELETE',
+    resourceType: 'EXERCISE',
+    resourceId: id,
+    ipAddress: req.ip,
+    userAgent: req.get('user-agent'),
+  });
+
+  res.json({
+    success: true,
+    message: 'Exercise deleted successfully',
+  });
+});
 
 /**
  * Get exercise categories
  * @route GET /api/v1/exercises/categories
  */
-export const getCategories = async (req, res) => {
-  try {
-    const { organizationId } = req
+export const getCategories = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
 
-    const categories = await exerciseLibraryService.getCategories(organizationId)
+  const categories = await exerciseLibraryService.getCategories(organizationId);
 
-    res.json({
-      success: true,
-      data: categories
-    })
-  } catch (error) {
-    logger.error('Error getting exercise categories:', error)
-    res.status(500).json({ error: 'Failed to retrieve categories' })
-  }
-}
+  res.json({
+    success: true,
+    data: categories,
+  });
+});
 
 /**
  * Seed default exercises for organization
  * @route POST /api/v1/exercises/seed
  */
-export const seedDefaultExercises = async (req, res) => {
-  try {
-    const { organizationId, user } = req
+export const seedDefaultExercises = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
 
-    await exerciseLibraryService.seedDefaultExercises(organizationId)
+  await exerciseLibraryService.seedDefaultExercises(organizationId);
 
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'SEED',
-      resourceType: 'EXERCISE_LIBRARY',
-      details: { action: 'Seeded default exercises' },
-      ipAddress: req.ip,
-      userAgent: req.get('user-agent')
-    })
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'SEED',
+    resourceType: 'EXERCISE_LIBRARY',
+    details: { action: 'Seeded default exercises' },
+    ipAddress: req.ip,
+    userAgent: req.get('user-agent'),
+  });
 
-    res.json({
-      success: true,
-      message: 'Default exercises seeded successfully'
-    })
-  } catch (error) {
-    logger.error('Error seeding default exercises:', error)
-    res.status(500).json({ error: 'Failed to seed default exercises' })
-  }
-}
+  res.json({
+    success: true,
+    message: 'Default exercises seeded successfully',
+  });
+});
 
 // ============================================================================
 // TEMPLATES
@@ -247,130 +197,110 @@ export const seedDefaultExercises = async (req, res) => {
  * Get all exercise program templates
  * @route GET /api/v1/exercises/templates
  */
-export const getTemplates = async (req, res) => {
-  try {
-    const { organizationId } = req
-    const { category, search } = req.query
+export const getTemplates = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const { category, search } = req.query;
 
-    const templates = await exerciseLibraryService.getTemplates(organizationId, {
-      category,
-      search
-    })
+  const templates = await exerciseLibraryService.getTemplates(organizationId, {
+    category,
+    search,
+  });
 
-    res.json({
-      success: true,
-      data: templates
-    })
-  } catch (error) {
-    logger.error('Error getting templates:', error)
-    res.status(500).json({ error: 'Failed to retrieve templates' })
-  }
-}
+  res.json({
+    success: true,
+    data: templates,
+  });
+});
 
 /**
  * Create a new exercise program template
  * @route POST /api/v1/exercises/templates
  */
-export const createTemplate = async (req, res) => {
-  try {
-    const { organizationId, user } = req
+export const createTemplate = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
 
-    const template = await exerciseLibraryService.createTemplate(organizationId, {
-      ...req.body,
-      createdBy: user.id
-    })
+  const template = await exerciseLibraryService.createTemplate(organizationId, {
+    ...req.body,
+    createdBy: user.id,
+  });
 
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'CREATE',
-      resourceType: 'EXERCISE_TEMPLATE',
-      resourceId: template.id,
-      details: { name: template.name },
-      ipAddress: req.ip,
-      userAgent: req.get('user-agent')
-    })
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'CREATE',
+    resourceType: 'EXERCISE_TEMPLATE',
+    resourceId: template.id,
+    details: { name: template.name },
+    ipAddress: req.ip,
+    userAgent: req.get('user-agent'),
+  });
 
-    res.status(201).json({
-      success: true,
-      data: template
-    })
-  } catch (error) {
-    logger.error('Error creating template:', error)
-    res.status(500).json({ error: 'Failed to create template' })
-  }
-}
+  res.status(201).json({
+    success: true,
+    data: template,
+  });
+});
 
 /**
  * Update an exercise program template
  * @route PUT /api/v1/exercises/templates/:id
  */
-export const updateTemplate = async (req, res) => {
-  try {
-    const { organizationId, user } = req
-    const { id } = req.params
+export const updateTemplate = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const { id } = req.params;
 
-    const template = await exerciseLibraryService.updateTemplate(organizationId, id, req.body)
+  const template = await exerciseLibraryService.updateTemplate(organizationId, id, req.body);
 
-    if (!template) {
-      return res.status(404).json({ error: 'Template not found' })
-    }
-
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'UPDATE',
-      resourceType: 'EXERCISE_TEMPLATE',
-      resourceId: id,
-      details: req.body,
-      ipAddress: req.ip,
-      userAgent: req.get('user-agent')
-    })
-
-    res.json({
-      success: true,
-      data: template
-    })
-  } catch (error) {
-    logger.error('Error updating template:', error)
-    res.status(500).json({ error: 'Failed to update template' })
+  if (!template) {
+    return res.status(404).json({ error: 'Template not found' });
   }
-}
+
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'UPDATE',
+    resourceType: 'EXERCISE_TEMPLATE',
+    resourceId: id,
+    details: req.body,
+    ipAddress: req.ip,
+    userAgent: req.get('user-agent'),
+  });
+
+  res.json({
+    success: true,
+    data: template,
+  });
+});
 
 /**
  * Delete an exercise program template
  * @route DELETE /api/v1/exercises/templates/:id
  */
-export const deleteTemplate = async (req, res) => {
-  try {
-    const { organizationId, user } = req
-    const { id } = req.params
+export const deleteTemplate = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const { id } = req.params;
 
-    const deleted = await exerciseLibraryService.deleteTemplate(organizationId, id)
+  const deleted = await exerciseLibraryService.deleteTemplate(organizationId, id);
 
-    if (!deleted) {
-      return res.status(404).json({ error: 'Template not found' })
-    }
-
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'DELETE',
-      resourceType: 'EXERCISE_TEMPLATE',
-      resourceId: id,
-      ipAddress: req.ip,
-      userAgent: req.get('user-agent')
-    })
-
-    res.json({
-      success: true,
-      message: 'Template deleted successfully'
-    })
-  } catch (error) {
-    logger.error('Error deleting template:', error)
-    res.status(500).json({ error: 'Failed to delete template' })
+  if (!deleted) {
+    return res.status(404).json({ error: 'Template not found' });
   }
-}
+
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'DELETE',
+    resourceType: 'EXERCISE_TEMPLATE',
+    resourceId: id,
+    ipAddress: req.ip,
+    userAgent: req.get('user-agent'),
+  });
+
+  res.json({
+    success: true,
+    message: 'Template deleted successfully',
+  });
+});
 
 // ============================================================================
 // PRESCRIPTIONS
@@ -380,230 +310,199 @@ export const deleteTemplate = async (req, res) => {
  * Create a new prescription
  * @route POST /api/v1/exercises/prescriptions
  */
-export const createPrescription = async (req, res) => {
-  try {
-    const { organizationId, user } = req
+export const createPrescription = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
 
-    const prescription = await exerciseLibraryService.createPrescription(organizationId, {
-      ...req.body,
-      prescribedBy: user.id
-    })
+  const prescription = await exerciseLibraryService.createPrescription(organizationId, {
+    ...req.body,
+    prescribedBy: user.id,
+  });
 
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'CREATE',
-      resourceType: 'EXERCISE_PRESCRIPTION',
-      resourceId: prescription.id,
-      details: {
-        patientId: req.body.patientId,
-        exerciseCount: req.body.exercises?.length || 0
-      },
-      ipAddress: req.ip,
-      userAgent: req.get('user-agent')
-    })
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'CREATE',
+    resourceType: 'EXERCISE_PRESCRIPTION',
+    resourceId: prescription.id,
+    details: {
+      patientId: req.body.patientId,
+      exerciseCount: req.body.exercises?.length || 0,
+    },
+    ipAddress: req.ip,
+    userAgent: req.get('user-agent'),
+  });
 
-    res.status(201).json({
-      success: true,
-      data: prescription
-    })
-  } catch (error) {
-    logger.error('Error creating prescription:', error)
-    res.status(500).json({ error: 'Failed to create prescription' })
-  }
-}
+  res.status(201).json({
+    success: true,
+    data: prescription,
+  });
+});
 
 /**
  * Get prescriptions for a patient
  * @route GET /api/v1/exercises/prescriptions/patient/:patientId
  */
-export const getPatientPrescriptions = async (req, res) => {
-  try {
-    const { organizationId } = req
-    const { patientId } = req.params
-    const { status } = req.query
+export const getPatientPrescriptions = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const { patientId } = req.params;
+  const { status } = req.query;
 
-    const prescriptions = await exerciseLibraryService.getPatientPrescriptions(
-      organizationId,
-      patientId,
-      status
-    )
+  const prescriptions = await exerciseLibraryService.getPatientPrescriptions(
+    organizationId,
+    patientId,
+    status
+  );
 
-    res.json({
-      success: true,
-      data: prescriptions
-    })
-  } catch (error) {
-    logger.error('Error getting patient prescriptions:', error)
-    res.status(500).json({ error: 'Failed to retrieve prescriptions' })
-  }
-}
+  res.json({
+    success: true,
+    data: prescriptions,
+  });
+});
 
 /**
  * Get prescription by ID
  * @route GET /api/v1/exercises/prescriptions/:id
  */
-export const getPrescriptionById = async (req, res) => {
-  try {
-    const { organizationId } = req
-    const { id } = req.params
+export const getPrescriptionById = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const { id } = req.params;
 
-    const prescription = await exerciseLibraryService.getPrescriptionById(organizationId, id)
+  const prescription = await exerciseLibraryService.getPrescriptionById(organizationId, id);
 
-    if (!prescription) {
-      return res.status(404).json({ error: 'Prescription not found' })
-    }
-
-    res.json({
-      success: true,
-      data: prescription
-    })
-  } catch (error) {
-    logger.error('Error getting prescription by ID:', error)
-    res.status(500).json({ error: 'Failed to retrieve prescription' })
+  if (!prescription) {
+    return res.status(404).json({ error: 'Prescription not found' });
   }
-}
+
+  res.json({
+    success: true,
+    data: prescription,
+  });
+});
 
 /**
  * Update an existing prescription
  * @route PUT /api/v1/exercises/prescriptions/:id
  */
-export const updatePrescription = async (req, res) => {
-  try {
-    const { organizationId, user } = req
-    const { id } = req.params
+export const updatePrescription = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const { id } = req.params;
 
-    const prescription = await exerciseLibraryService.updatePrescription(organizationId, id, req.body)
+  const prescription = await exerciseLibraryService.updatePrescription(
+    organizationId,
+    id,
+    req.body
+  );
 
-    if (!prescription) {
-      return res.status(404).json({ error: 'Prescription not found' })
-    }
-
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'UPDATE',
-      resourceType: 'EXERCISE_PRESCRIPTION',
-      resourceId: id,
-      details: {
-        exerciseCount: req.body.exercises?.length || 0
-      },
-      ipAddress: req.ip,
-      userAgent: req.get('user-agent')
-    })
-
-    res.json({
-      success: true,
-      data: prescription
-    })
-  } catch (error) {
-    logger.error('Error updating prescription:', error)
-    res.status(500).json({ error: 'Failed to update prescription' })
+  if (!prescription) {
+    return res.status(404).json({ error: 'Prescription not found' });
   }
-}
+
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'UPDATE',
+    resourceType: 'EXERCISE_PRESCRIPTION',
+    resourceId: id,
+    details: {
+      exerciseCount: req.body.exercises?.length || 0,
+    },
+    ipAddress: req.ip,
+    userAgent: req.get('user-agent'),
+  });
+
+  res.json({
+    success: true,
+    data: prescription,
+  });
+});
 
 /**
  * Duplicate a prescription for the same or another patient
  * @route POST /api/v1/exercises/prescriptions/:id/duplicate
  */
-export const duplicatePrescription = async (req, res) => {
-  try {
-    const { organizationId, user } = req
-    const { id } = req.params
-    const { targetPatientId } = req.body
+export const duplicatePrescription = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const { id } = req.params;
+  const { targetPatientId } = req.body;
 
-    const prescription = await exerciseLibraryService.duplicatePrescription(
-      organizationId,
-      id,
+  const prescription = await exerciseLibraryService.duplicatePrescription(
+    organizationId,
+    id,
+    targetPatientId,
+    user.id
+  );
+
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'DUPLICATE',
+    resourceType: 'EXERCISE_PRESCRIPTION',
+    resourceId: prescription.id,
+    details: {
+      sourceId: id,
       targetPatientId,
-      user.id
-    )
+    },
+    ipAddress: req.ip,
+    userAgent: req.get('user-agent'),
+  });
 
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'DUPLICATE',
-      resourceType: 'EXERCISE_PRESCRIPTION',
-      resourceId: prescription.id,
-      details: {
-        sourceId: id,
-        targetPatientId
-      },
-      ipAddress: req.ip,
-      userAgent: req.get('user-agent')
-    })
-
-    res.status(201).json({
-      success: true,
-      data: prescription
-    })
-  } catch (error) {
-    logger.error('Error duplicating prescription:', error)
-    res.status(500).json({ error: 'Failed to duplicate prescription' })
-  }
-}
+  res.status(201).json({
+    success: true,
+    data: prescription,
+  });
+});
 
 /**
  * Update prescription status
  * @route PATCH /api/v1/exercises/prescriptions/:id/status
  */
-export const updatePrescriptionStatus = async (req, res) => {
-  try {
-    const { organizationId, user } = req
-    const { id } = req.params
-    const { status } = req.body
+export const updatePrescriptionStatus = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const { id } = req.params;
+  const { status } = req.body;
 
-    const prescription = await exerciseLibraryService.updatePrescriptionStatus(
-      organizationId,
-      id,
-      status
-    )
+  const prescription = await exerciseLibraryService.updatePrescriptionStatus(
+    organizationId,
+    id,
+    status
+  );
 
-    if (!prescription) {
-      return res.status(404).json({ error: 'Prescription not found' })
-    }
-
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'UPDATE_STATUS',
-      resourceType: 'EXERCISE_PRESCRIPTION',
-      resourceId: id,
-      details: { status },
-      ipAddress: req.ip,
-      userAgent: req.get('user-agent')
-    })
-
-    res.json({
-      success: true,
-      data: prescription
-    })
-  } catch (error) {
-    logger.error('Error updating prescription status:', error)
-    res.status(500).json({ error: 'Failed to update prescription status' })
+  if (!prescription) {
+    return res.status(404).json({ error: 'Prescription not found' });
   }
-}
+
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'UPDATE_STATUS',
+    resourceType: 'EXERCISE_PRESCRIPTION',
+    resourceId: id,
+    details: { status },
+    ipAddress: req.ip,
+    userAgent: req.get('user-agent'),
+  });
+
+  res.json({
+    success: true,
+    data: prescription,
+  });
+});
 
 /**
  * Get progress history for a prescription
  * @route GET /api/v1/exercises/prescriptions/:id/progress
  */
-export const getProgressHistory = async (req, res) => {
-  try {
-    const { organizationId } = req
-    const { id } = req.params
+export const getProgressHistory = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const { id } = req.params;
 
-    const progress = await exerciseLibraryService.getProgressHistory(organizationId, id)
+  const progress = await exerciseLibraryService.getProgressHistory(organizationId, id);
 
-    res.json({
-      success: true,
-      data: progress
-    })
-  } catch (error) {
-    logger.error('Error getting progress history:', error)
-    res.status(500).json({ error: 'Failed to retrieve progress history' })
-  }
-}
+  res.json({
+    success: true,
+    data: progress,
+  });
+});
 
 // ============================================================================
 // DELIVERY
@@ -613,117 +512,97 @@ export const getProgressHistory = async (req, res) => {
  * Generate prescription PDF
  * @route GET /api/v1/exercises/prescriptions/:id/pdf
  */
-export const generatePDF = async (req, res) => {
-  try {
-    const { organizationId } = req
-    const { id } = req.params
+export const generatePDF = asyncRoute(async (req, res) => {
+  const { organizationId } = req;
+  const { id } = req.params;
 
-    const pdfBuffer = await exerciseDeliveryService.generatePrescriptionPDF(organizationId, id)
+  const pdfBuffer = await exerciseDeliveryService.generatePrescriptionPDF(organizationId, id);
 
-    res.setHeader('Content-Type', 'application/pdf')
-    res.setHeader('Content-Disposition', `attachment; filename="exercise-program-${id}.pdf"`)
-    res.send(pdfBuffer)
-  } catch (error) {
-    logger.error('Error generating prescription PDF:', error)
-    res.status(500).json({ error: 'Failed to generate PDF' })
-  }
-}
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `attachment; filename="exercise-program-${id}.pdf"`);
+  res.send(pdfBuffer);
+});
 
 /**
  * Send prescription via email
  * @route POST /api/v1/exercises/prescriptions/:id/send-email
  */
-export const sendEmail = async (req, res) => {
-  try {
-    const { organizationId, user } = req
-    const { id } = req.params
+export const sendEmail = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const { id } = req.params;
 
-    const result = await exerciseDeliveryService.sendPrescriptionEmail(organizationId, id)
+  const result = await exerciseDeliveryService.sendPrescriptionEmail(organizationId, id);
 
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'SEND_EMAIL',
-      resourceType: 'EXERCISE_PRESCRIPTION',
-      resourceId: id,
-      ipAddress: req.ip,
-      userAgent: req.get('user-agent')
-    })
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'SEND_EMAIL',
+    resourceType: 'EXERCISE_PRESCRIPTION',
+    resourceId: id,
+    ipAddress: req.ip,
+    userAgent: req.get('user-agent'),
+  });
 
-    res.json({
-      success: true,
-      message: 'Email sent successfully',
-      data: result
-    })
-  } catch (error) {
-    logger.error('Error sending prescription email:', error)
-    res.status(500).json({ error: error.message || 'Failed to send email' })
-  }
-}
+  res.json({
+    success: true,
+    message: 'Email sent successfully',
+    data: result,
+  });
+});
 
 /**
  * Send exercise reminder
  * @route POST /api/v1/exercises/prescriptions/:id/send-reminder
  */
-export const sendReminder = async (req, res) => {
-  try {
-    const { organizationId, user } = req
-    const { id } = req.params
+export const sendReminder = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const { id } = req.params;
 
-    const result = await exerciseDeliveryService.sendExerciseReminder(organizationId, id)
+  const result = await exerciseDeliveryService.sendExerciseReminder(organizationId, id);
 
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'SEND_REMINDER',
-      resourceType: 'EXERCISE_PRESCRIPTION',
-      resourceId: id,
-      ipAddress: req.ip,
-      userAgent: req.get('user-agent')
-    })
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'SEND_REMINDER',
+    resourceType: 'EXERCISE_PRESCRIPTION',
+    resourceId: id,
+    ipAddress: req.ip,
+    userAgent: req.get('user-agent'),
+  });
 
-    res.json({
-      success: true,
-      message: 'Reminder sent successfully',
-      data: result
-    })
-  } catch (error) {
-    logger.error('Error sending exercise reminder:', error)
-    res.status(500).json({ error: error.message || 'Failed to send reminder' })
-  }
-}
+  res.json({
+    success: true,
+    message: 'Reminder sent successfully',
+    data: result,
+  });
+});
 
 /**
  * Send portal link via SMS
  * @route POST /api/v1/exercises/prescriptions/:id/send-sms
  */
-export const sendSMS = async (req, res) => {
-  try {
-    const { organizationId, user } = req
-    const { id } = req.params
+export const sendSMS = asyncRoute(async (req, res) => {
+  const { organizationId, user } = req;
+  const { id } = req.params;
 
-    const result = await exerciseDeliveryService.sendPortalSMS(organizationId, id)
+  const result = await exerciseDeliveryService.sendPortalSMS(organizationId, id);
 
-    await logAudit({
-      organizationId,
-      userId: user.id,
-      action: 'SEND_SMS',
-      resourceType: 'EXERCISE_PRESCRIPTION',
-      resourceId: id,
-      ipAddress: req.ip,
-      userAgent: req.get('user-agent')
-    })
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'SEND_SMS',
+    resourceType: 'EXERCISE_PRESCRIPTION',
+    resourceId: id,
+    ipAddress: req.ip,
+    userAgent: req.get('user-agent'),
+  });
 
-    res.json({
-      success: true,
-      message: 'SMS sent successfully',
-      data: result
-    })
-  } catch (error) {
-    logger.error('Error sending portal SMS:', error)
-    res.status(500).json({ error: error.message || 'Failed to send SMS' })
-  }
-}
+  res.json({
+    success: true,
+    message: 'SMS sent successfully',
+    data: result,
+  });
+});
 
 export default {
   // Library
@@ -754,5 +633,5 @@ export default {
   generatePDF,
   sendEmail,
   sendReminder,
-  sendSMS
-}
+  sendSMS,
+};

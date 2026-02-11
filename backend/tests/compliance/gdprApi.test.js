@@ -381,7 +381,7 @@ describe('GDPR Compliance API Tests', () => {
 
           // Should reject or create amendment, not silently modify
           // 500 = server throws on signed encounter modification (still prevents mutation)
-          expect([400, 403, 409, 500]).toContain(updateResponse.status);
+          expect([400, 403, 409, 422, 500]).toContain(updateResponse.status);
         }
       }
     });

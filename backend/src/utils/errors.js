@@ -22,7 +22,7 @@ export class AppError extends Error {
       error: this.name,
       code: this.code,
       message: this.message,
-      ...(this.details && { details: this.details })
+      ...(this.details && { details: this.details }),
     };
   }
 }
@@ -71,12 +71,11 @@ export class AuthorizationError extends AppError {
  */
 export class ConflictError extends AppError {
   constructor(resource, field, value) {
-    super(
-      `${resource} with ${field} '${value}' already exists`,
-      409,
-      'RESOURCE_CONFLICT',
-      { resource, field, value }
-    );
+    super(`${resource} with ${field} '${value}' already exists`, 409, 'RESOURCE_CONFLICT', {
+      resource,
+      field,
+      value,
+    });
   }
 }
 
@@ -149,6 +148,41 @@ export class GDPRError extends AppError {
   }
 }
 
+/**
+ * Gone Error (410)
+ */
+export class GoneError extends AppError {
+  constructor(resource, identifier = null) {
+    const message = identifier
+      ? `${resource} '${identifier}' has been permanently removed`
+      : `${resource} has been permanently removed`;
+    super(message, 410, 'RESOURCE_GONE', { resource, identifier });
+  }
+}
+
+/**
+ * Unprocessable Entity Error (422)
+ */
+export class UnprocessableError extends AppError {
+  constructor(message, details = null) {
+    super(message, 422, 'UNPROCESSABLE_ENTITY', details);
+  }
+}
+
+/**
+ * Service Unavailable Error (503)
+ */
+export class ServiceUnavailableError extends AppError {
+  constructor(service, retryAfter = null) {
+    super(
+      `${service} is temporarily unavailable`,
+      503,
+      'SERVICE_UNAVAILABLE',
+      retryAfter ? { retryAfter } : null
+    );
+  }
+}
+
 export default {
   AppError,
   NotFoundError,
@@ -161,5 +195,8 @@ export default {
   ExternalServiceError,
   RateLimitError,
   BusinessLogicError,
-  GDPRError
+  GDPRError,
+  GoneError,
+  UnprocessableError,
+  ServiceUnavailableError,
 };
