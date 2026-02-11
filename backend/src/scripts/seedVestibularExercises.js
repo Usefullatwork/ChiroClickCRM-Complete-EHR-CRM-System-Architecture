@@ -5,35 +5,37 @@
  * Run with: node src/scripts/seedVestibularExercises.js <organizationId>
  */
 
-import fs from 'fs'
-import path from 'path'
-import { fileURLToPath } from 'url'
-import { query, transaction } from '../config/database.js'
-import logger from '../utils/logger.js'
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { query, transaction } from '../config/database.js';
+import logger from '../utils/logger.js';
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load seed data
-const seedDataPath = path.join(__dirname, '../data/vestibular-exercises-seed.json')
+const seedDataPath = path.join(__dirname, '../data/vestibular-exercises-seed.json');
 
 async function seedVestibularExercises(organizationId) {
   if (!organizationId) {
-    console.error('Usage: node seedVestibularExercises.js <organizationId>')
-    process.exit(1)
+    logger.error('Usage: node seedVestibularExercises.js <organizationId>');
+    process.exit(1);
   }
 
-  console.log(`Seeding vestibular exercises for organization ${organizationId}...`)
+  logger.info(`Seeding vestibular exercises for organization ${organizationId}...`);
 
   // Read seed data
-  const seedData = JSON.parse(fs.readFileSync(seedDataPath, 'utf8'))
-  console.log(`Loaded ${seedData.exercises.length} exercises in ${seedData.categories.length} categories`)
+  const seedData = JSON.parse(fs.readFileSync(seedDataPath, 'utf8'));
+  logger.info(
+    `Loaded ${seedData.exercises.length} exercises in ${seedData.categories.length} categories`
+  );
 
-  const client = await transaction.start()
+  const client = await transaction.start();
 
   try {
-    let inserted = 0
-    let skipped = 0
+    let inserted = 0;
+    let skipped = 0;
 
     for (const exercise of seedData.exercises) {
       // Check if exercise already exists (by name)
@@ -41,22 +43,22 @@ async function seedVestibularExercises(organizationId) {
         `SELECT id FROM exercise_library
          WHERE organization_id = $1 AND name = $2`,
         [organizationId, exercise.name]
-      )
+      );
 
       if (existing.rows.length > 0) {
-        skipped++
-        continue
+        skipped++;
+        continue;
       }
 
       // Build Vimeo embed URL
       const videoUrl = exercise.vimeoId
         ? `https://player.vimeo.com/video/${exercise.vimeoId}`
-        : null
+        : null;
 
       // Build thumbnail URL (from POP CDN if available)
       const thumbnailUrl = exercise.thumbnailId
         ? `https://pop.gpm.as/images/exercises/${exercise.thumbnailId}`
-        : null
+        : null;
 
       // Insert exercise
       await client.query(
@@ -79,55 +81,47 @@ async function seedVestibularExercises(organizationId) {
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`,
         [
           organizationId,
-          exercise.name,               // name (English - same as Norwegian for these)
-          exercise.name,               // name_norwegian
-          exercise.description,        // description (English - same as Norwegian)
-          exercise.description,        // description_norwegian
-          exercise.category,           // category (parent)
-          exercise.subcategory,        // subcategory
+          exercise.name, // name (English - same as Norwegian for these)
+          exercise.name, // name_norwegian
+          exercise.description, // description (English - same as Norwegian)
+          exercise.description, // description_norwegian
+          exercise.category, // category (parent)
+          exercise.subcategory, // subcategory
           exercise.bodyRegion || 'vestibular',
           exercise.difficultyLevel || 'beginner',
           videoUrl,
           thumbnailUrl,
-          true,                        // is_active
-          true,                        // is_system (system exercises)
+          true, // is_active
+          true, // is_system (system exercises)
           JSON.stringify(['vestibular', 'BPPV', 'VRT', 'neurological']),
-          null                         // created_by (system)
+          null, // created_by (system)
         ]
-      )
+      );
 
-      inserted++
+      inserted++;
     }
 
-    await transaction.commit(client)
+    await transaction.commit(client);
 
-    console.log(`\nSeeding complete!`)
-    console.log(`  Inserted: ${inserted} exercises`)
-    console.log(`  Skipped (already exist): ${skipped} exercises`)
-    console.log(`  Total: ${seedData.exercises.length} exercises`)
+    logger.info('Seeding complete', { inserted, skipped, total: seedData.exercises.length });
 
-    logger.info('Vestibular exercises seeded', {
-      organizationId,
-      inserted,
-      skipped,
-      total: seedData.exercises.length
-    })
-
-    return { inserted, skipped }
+    return { inserted, skipped };
   } catch (error) {
-    await transaction.rollback(client)
-    console.error('Error seeding exercises:', error)
-    logger.error('Error seeding vestibular exercises:', error)
-    throw error
+    await transaction.rollback(client);
+    logger.error('Error seeding vestibular exercises', {
+      error: error.message,
+      stack: error.stack,
+    });
+    throw error;
   }
 }
 
 // Run if called directly
-const args = process.argv.slice(2)
+const args = process.argv.slice(2);
 if (args[0]) {
   seedVestibularExercises(args[0])
     .then(() => process.exit(0))
-    .catch(() => process.exit(1))
+    .catch(() => process.exit(1));
 }
 
-export default seedVestibularExercises
+export default seedVestibularExercises;

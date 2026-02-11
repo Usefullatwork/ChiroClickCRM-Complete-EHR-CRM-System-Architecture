@@ -7,6 +7,8 @@ import express from 'express';
 import * as authService from '../auth/authService.js';
 import { validateSession, getUserSessions, refreshSessionFreshness } from '../auth/sessions.js';
 import { requireLocalAuth, requireFreshSession } from '../middleware/auth.js';
+import { loginLimiter } from '../middleware/rateLimiting.js';
+import { authBruteForceLimit } from '../middleware/security.js';
 import logger from '../utils/logger.js';
 
 const router = express.Router();
@@ -48,7 +50,7 @@ const router = express.Router();
  *       400:
  *         description: Validation error or registration failed
  */
-router.post('/register', async (req, res) => {
+router.post('/register', loginLimiter, async (req, res) => {
   try {
     const { email, password, firstName, lastName, organizationId, role, hprNumber } = req.body;
 
@@ -119,7 +121,7 @@ router.post('/register', async (req, res) => {
  *       401:
  *         description: Invalid credentials
  */
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, authBruteForceLimit, async (req, res) => {
   try {
     const { email, password } = req.body;
 

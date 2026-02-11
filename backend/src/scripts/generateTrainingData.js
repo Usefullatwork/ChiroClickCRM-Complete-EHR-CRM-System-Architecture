@@ -6,11 +6,12 @@
 
 import fs from 'fs/promises';
 import path from 'path';
+import logger from '../utils/logger.js';
 import {
   parseClinicalCase,
   classifyCase,
   convertToTrainingExample,
-  convertToJSONL
+  convertToJSONL,
 } from '../services/clinicalDataParser.js';
 
 /**
@@ -30,7 +31,8 @@ const splitIntoCases = (text) => {
 
   // If no matches, try category-based split
   if (cases.length === 0) {
-    const categoryRegex = /(?:Kategori \d+:|KATEGORI \d+:)([^]*?)(?=(?:Kategori \d+:|KATEGORI \d+:)|$)/gi;
+    const categoryRegex =
+      /(?:Kategori \d+:|KATEGORI \d+:)([^]*?)(?=(?:Kategori \d+:|KATEGORI \d+:)|$)/gi;
     const categoryMatches = text.matchAll(categoryRegex);
 
     for (const match of categoryMatches) {
@@ -58,7 +60,7 @@ const generateStatistics = (trainingExamples) => {
     with_followup: 0,
     with_positive_outcome: 0,
     average_symptoms: 0,
-    average_findings: 0
+    average_findings: 0,
   };
 
   for (const example of trainingExamples) {
@@ -106,30 +108,30 @@ const main = async () => {
     const inputFile = args[0] || 'clinical_notes.txt';
     const outputDir = args[1] || './training_output';
 
-    console.log('🔬 Generating Training Data from Clinical Notes');
-    console.log('================================================\n');
-    console.log(`Input file: ${inputFile}`);
-    console.log(`Output directory: ${outputDir}\n`);
+    logger.info('Generating Training Data from Clinical Notes');
+    logger.info('================================================');
+    logger.info(`Input file: ${inputFile}`);
+    logger.info(`Output directory: ${outputDir}`);
 
     // Read input file
-    console.log('📖 Reading input file...');
+    logger.info('Reading input file...');
     const rawText = await fs.readFile(inputFile, 'utf-8');
-    console.log(`   Read ${rawText.length} characters\n`);
+    logger.info(`Read ${rawText.length} characters`);
 
     // Split into cases
-    console.log('✂️  Splitting into individual cases...');
+    logger.info('Splitting into individual cases...');
     const cases = splitIntoCases(rawText);
-    console.log(`   Found ${cases.length} clinical cases\n`);
+    logger.info(`Found ${cases.length} clinical cases`);
 
     // Parse each case
-    console.log('🧪 Parsing clinical cases...');
+    logger.info('Parsing clinical cases...');
     const trainingExamples = [];
     let successCount = 0;
     let failCount = 0;
 
     for (let i = 0; i < cases.length; i++) {
       const caseText = cases[i];
-      console.log(`   Processing case ${i + 1}/${cases.length}...`);
+      logger.info(`Processing case ${i + 1}/${cases.length}...`);
 
       try {
         const example = convertToTrainingExample(caseText);
@@ -140,67 +142,57 @@ const main = async () => {
           failCount++;
         }
       } catch (error) {
-        console.error(`   ❌ Failed to parse case ${i + 1}:`, error.message);
+        logger.error(`Failed to parse case ${i + 1}`, { error: error.message });
         failCount++;
       }
     }
 
-    console.log(`\n   ✅ Successfully parsed: ${successCount}`);
-    console.log(`   ❌ Failed to parse: ${failCount}\n`);
+    logger.info(`Successfully parsed: ${successCount}`);
+    logger.info(`Failed to parse: ${failCount}`);
 
     // Generate statistics
-    console.log('📊 Generating statistics...');
+    logger.info('Generating statistics...');
     const stats = generateStatistics(trainingExamples);
-    console.log('   Statistics:');
-    console.log(`   - Total cases: ${stats.total_cases}`);
-    console.log(`   - Cases with follow-up: ${stats.with_followup}`);
-    console.log(`   - Cases with positive outcome: ${stats.with_positive_outcome}`);
-    console.log(`   - Average symptoms per case: ${stats.average_symptoms}`);
-    console.log(`   - Average findings per case: ${stats.average_findings}`);
-    console.log('\n   By Region:');
-    for (const [region, count] of Object.entries(stats.by_region)) {
-      console.log(`     - ${region}: ${count}`);
-    }
-    console.log('\n   By Pathology:');
-    for (const [pathology, count] of Object.entries(stats.by_pathology)) {
-      console.log(`     - ${pathology}: ${count}`);
-    }
-    console.log('');
+    logger.info('Statistics', {
+      total_cases: stats.total_cases,
+      with_followup: stats.with_followup,
+      with_positive_outcome: stats.with_positive_outcome,
+      average_symptoms: stats.average_symptoms,
+      average_findings: stats.average_findings,
+      by_region: stats.by_region,
+      by_pathology: stats.by_pathology,
+    });
 
     // Create output directory
-    console.log('📁 Creating output directory...');
+    logger.info('Creating output directory...');
     await fs.mkdir(outputDir, { recursive: true });
 
     // Save structured JSON
-    console.log('💾 Saving structured training data...');
+    logger.info('Saving structured training data...');
     await fs.writeFile(
       path.join(outputDir, 'training_data.json'),
       JSON.stringify(trainingExamples, null, 2),
       'utf-8'
     );
-    console.log(`   ✅ Saved: ${outputDir}/training_data.json\n`);
+    logger.info(`Saved: ${outputDir}/training_data.json`);
 
     // Save JSONL format for fine-tuning
-    console.log('💾 Saving JSONL format for fine-tuning...');
+    logger.info('Saving JSONL format for fine-tuning...');
     const jsonl = convertToJSONL(trainingExamples);
-    await fs.writeFile(
-      path.join(outputDir, 'training_data.jsonl'),
-      jsonl,
-      'utf-8'
-    );
-    console.log(`   ✅ Saved: ${outputDir}/training_data.jsonl\n`);
+    await fs.writeFile(path.join(outputDir, 'training_data.jsonl'), jsonl, 'utf-8');
+    logger.info(`Saved: ${outputDir}/training_data.jsonl`);
 
     // Save statistics
-    console.log('💾 Saving statistics...');
+    logger.info('Saving statistics...');
     await fs.writeFile(
       path.join(outputDir, 'statistics.json'),
       JSON.stringify(stats, null, 2),
       'utf-8'
     );
-    console.log(`   ✅ Saved: ${outputDir}/statistics.json\n`);
+    logger.info(`Saved: ${outputDir}/statistics.json`);
 
     // Save by category
-    console.log('💾 Saving cases by category...');
+    logger.info('Saving cases by category...');
     const byCategory = {};
     for (const example of trainingExamples) {
       const category = example.metadata.classification.category || 'Uncategorized';
@@ -217,19 +209,12 @@ const main = async () => {
         JSON.stringify(examples, null, 2),
         'utf-8'
       );
-      console.log(`   ✅ Saved: ${outputDir}/${filename} (${examples.length} cases)`);
+      logger.info(`Saved: ${outputDir}/${filename} (${examples.length} cases)`);
     }
 
-    console.log('\n✨ Training data generation complete!');
-    console.log('================================================\n');
-    console.log('Next steps:');
-    console.log('1. Review the generated files in:', outputDir);
-    console.log('2. Use training_data.jsonl for model fine-tuning');
-    console.log('3. Import structured data into your database');
-    console.log('4. Update AI prompts with category-specific examples\n');
-
+    logger.info('Training data generation complete');
   } catch (error) {
-    console.error('❌ Error:', error);
+    logger.error('Error generating training data', { error: error.message, stack: error.stack });
     process.exit(1);
   }
 };

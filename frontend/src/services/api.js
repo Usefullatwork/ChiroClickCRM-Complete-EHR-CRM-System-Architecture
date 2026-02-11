@@ -101,6 +101,15 @@ const apiClient = axios.create({
   withCredentials: true, // Enable cookies for secure session handling
 });
 
+// CSRF token interceptor - reads XSRF-TOKEN cookie and sends as header
+apiClient.interceptors.request.use((config) => {
+  const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+  if (match) {
+    config.headers['X-XSRF-TOKEN'] = match[1];
+  }
+  return config;
+});
+
 // Request interceptor - Add organization ID header
 apiClient.interceptors.request.use(
   async (config) => {

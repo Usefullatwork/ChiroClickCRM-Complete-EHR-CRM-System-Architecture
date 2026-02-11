@@ -7,7 +7,6 @@ import express from 'express';
 import { createServer } from 'http';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
@@ -18,9 +17,11 @@ import swaggerUi from 'swagger-ui-express';
 
 import { healthCheck } from './config/database.js';
 import logger from './utils/logger.js';
+import { securityHeaders, csrfProtection, sendCsrfToken } from './middleware/security.js';
 import { scheduleKeyRotation, createKeyRotationTable } from './utils/keyRotation.js';
 import { initializeScheduler, shutdownScheduler } from './jobs/scheduler.js';
 import { initializeWebSocket, getIO } from './services/websocket.js';
+import { correlationId } from './middleware/correlationId.js';
 
 // Load environment variables
 const result = dotenv.config();
@@ -35,8 +36,11 @@ const API_VERSION = process.env.API_VERSION || 'v1';
 // MIDDLEWARE
 // ============================================================================
 
+// Request correlation IDs for distributed tracing
+app.use(correlationId);
+
 // Security headers
-app.use(helmet());
+app.use(securityHeaders);
 
 // CORS configuration - supports multiple origins
 const corsOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173,http://localhost:5174')
@@ -48,7 +52,13 @@ app.use(
     origin: corsOrigins.length === 1 ? corsOrigins[0] : corsOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Organization-Id', 'X-Dev-Bypass'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Organization-Id',
+      'X-Dev-Bypass',
+      'X-XSRF-TOKEN',
+    ],
   })
 );
 
@@ -58,6 +68,12 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Cookie parsing (for session auth)
 app.use(cookieParser());
+
+// CSRF protection (skip in desktop/test mode)
+if (process.env.DESKTOP_MODE !== 'true' && process.env.NODE_ENV !== 'test') {
+  app.use(csrfProtection);
+  app.use(sendCsrfToken);
+}
 
 // Compression
 app.use(compression());

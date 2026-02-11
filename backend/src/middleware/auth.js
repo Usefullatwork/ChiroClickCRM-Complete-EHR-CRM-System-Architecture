@@ -80,8 +80,8 @@ export const requireFreshSession = (req, res, next) => {
  */
 export const requireAuth = (req, res, next) => {
   // Desktop mode - auto-authenticate as seeded practitioner
-  const DESKTOP_ORG_ID = 'a0000000-0000-0000-0000-000000000001';
-  const DESKTOP_USER_ID = 'b0000000-0000-0000-0000-000000000099';
+  const DESKTOP_ORG_ID = process.env.DESKTOP_ORG_ID || 'a0000000-0000-0000-0000-000000000001';
+  const DESKTOP_USER_ID = process.env.DESKTOP_USER_ID || 'b0000000-0000-0000-0000-000000000099';
 
   if (process.env.DESKTOP_MODE === 'true') {
     req.user = {
@@ -99,10 +99,13 @@ export const requireAuth = (req, res, next) => {
   }
 
   // Dev mode bypass - only in development with special header
-  const DEV_ORG_ID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+  const DEV_ORG_ID = process.env.DEV_ORG_ID || 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
   const DEV_USER_ID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12';
 
-  if (process.env.NODE_ENV === 'development' && req.headers['x-dev-bypass'] === 'true') {
+  if (
+    process.env.NODE_ENV === 'development' &&
+    req.headers['x-dev-bypass'] === (process.env.DEV_BYPASS_SECRET || 'true')
+  ) {
     req.user = {
       id: DEV_USER_ID,
       email: 'dev@chiroclickcrm.local',
@@ -149,12 +152,12 @@ export const requireAuth = (req, res, next) => {
 export const requireOrganization = async (req, res, next) => {
   // Desktop mode - always use seeded org
   if (process.env.DESKTOP_MODE === 'true') {
-    req.organizationId = 'a0000000-0000-0000-0000-000000000001';
+    req.organizationId = process.env.DESKTOP_ORG_ID || 'a0000000-0000-0000-0000-000000000001';
     return next();
   }
 
   // Dev mode bypass - use valid UUID
-  const DEV_ORG_ID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+  const DEV_ORG_ID = process.env.DEV_ORG_ID || 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
 
   if (process.env.NODE_ENV === 'development' && req.headers['x-dev-bypass'] === 'true') {
     req.organizationId = DEV_ORG_ID;

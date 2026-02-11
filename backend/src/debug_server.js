@@ -1,17 +1,19 @@
+import logger from './utils/logger.js';
 
-console.log('Current NODE_ENV:', process.env.NODE_ENV);
+logger.info('Current NODE_ENV:', { NODE_ENV: process.env.NODE_ENV });
 try {
-    console.log('Attempting to import server...');
-    import('./server.js').then((module) => {
-        console.log('Import successful.');
-        console.log('Export keys:', Object.keys(module));
-        // Keep alive to see if it stays up
-        setTimeout(() => {
-            console.log('Debug timeout reached (10s), exiting check.');
-        }, 10000);
-    }).catch(err => {
-        console.error('Import failed promise:', err);
+  logger.info('Attempting to import server...');
+  import('./server.js')
+    .then((module) => {
+      logger.info('Import successful.', { exportKeys: Object.keys(module) });
+      // Keep alive to see if it stays up
+      setTimeout(() => {
+        logger.info('Debug timeout reached (10s), exiting check.');
+      }, 10000);
+    })
+    .catch((err) => {
+      logger.error('Import failed promise:', { error: err.message, stack: err.stack });
     });
 } catch (error) {
-    console.error('Synchronous error:', error);
+  logger.error('Synchronous error:', { error: error.message, stack: error.stack });
 }

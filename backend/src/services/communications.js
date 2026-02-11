@@ -1,13 +1,27 @@
 /**
  * Communications Service
  * SMS and Email communications with tracking
- * Uses local phone bridge for SMS and Outlook for email
+ * Uses provider abstraction for SMS and Email — supports mock, phoneBridge, outlook, smtp
  */
 
 import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
-import * as phoneBridge from './phoneBridge.js';
-import * as outlookBridge from './outlookBridge.js';
+import { createSmsProvider } from './providers/smsProvider.js';
+import { createEmailProvider } from './providers/emailProvider.js';
+
+// Provider selection — defaults to 'mock' when DESKTOP_MODE is true
+const DESKTOP_MODE = process.env.DESKTOP_MODE === 'true';
+const SMS_PROVIDER_TYPE = process.env.SMS_PROVIDER || (DESKTOP_MODE ? 'mock' : 'phonebridge');
+const EMAIL_PROVIDER_TYPE = process.env.EMAIL_PROVIDER || (DESKTOP_MODE ? 'mock' : 'outlook');
+
+const smsProvider = createSmsProvider(SMS_PROVIDER_TYPE);
+const emailProvider = createEmailProvider(EMAIL_PROVIDER_TYPE);
+
+logger.info('Communications providers initialized', {
+  sms: smsProvider.name,
+  email: emailProvider.name,
+  desktopMode: DESKTOP_MODE,
+});
 
 /**
  * Get all communications
@@ -19,7 +33,7 @@ export const getAllCommunications = async (organizationId, options = {}) => {
     patientId = null,
     type = null,
     startDate = null,
-    endDate = null
+    endDate = null,
   } = options;
 
   const offset = (page - 1) * limit;
@@ -53,10 +67,7 @@ export const getAllCommunications = async (organizationId, options = {}) => {
       paramIndex++;
     }
 
-    const countResult = await query(
-      `SELECT COUNT(*) FROM communications c ${whereClause}`,
-      params
-    );
+    const countResult = await query(`SELECT COUNT(*) FROM communications c ${whereClause}`, params);
     const total = parseInt(countResult.rows[0].count);
 
     params.push(limit, offset);
@@ -80,8 +91,8 @@ export const getAllCommunications = async (organizationId, options = {}) => {
         page: parseInt(page),
         limit: parseInt(limit),
         total,
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     };
   } catch (error) {
     logger.error('Error getting communications:', error);
@@ -90,12 +101,12 @@ export const getAllCommunications = async (organizationId, options = {}) => {
 };
 
 /**
- * Send SMS via connected phone (KDE Connect, ADB, or Phone API)
+ * Send SMS via configured provider
  */
 export const sendSMS = async (organizationId, smsData, userId) => {
   try {
-    // Send SMS through phone bridge
-    const sendResult = await phoneBridge.sendSMS(smsData.recipient_phone, smsData.content);
+    // Send SMS through provider
+    const sendResult = await smsProvider.send(smsData.recipient_phone, smsData.content);
 
     // Log communication in database
     const result = await query(
@@ -122,20 +133,22 @@ export const sendSMS = async (organizationId, smsData, userId) => {
         userId,
         smsData.recipient_phone,
         sendResult.externalId,
-        0 // No cost for local phone
+        0, // No cost for local phone / mock
       ]
     );
 
-    logger.info('SMS sent via phone bridge:', {
+    logger.info('SMS sent', {
       organizationId,
       patientId: smsData.patient_id,
       phone: smsData.recipient_phone,
-      method: sendResult.method
+      provider: smsProvider.name,
+      method: sendResult.method,
     });
 
     return {
       ...result.rows[0],
-      sendMethod: sendResult.method
+      sendMethod: sendResult.method,
+      provider: smsProvider.name,
     };
   } catch (error) {
     logger.error('Error sending SMS:', error);
@@ -160,7 +173,7 @@ export const sendSMS = async (organizationId, smsData, userId) => {
         smsData.content,
         userId,
         smsData.recipient_phone,
-        error.message
+        error.message,
       ]
     );
 
@@ -169,17 +182,17 @@ export const sendSMS = async (organizationId, smsData, userId) => {
 };
 
 /**
- * Send Email via Outlook
+ * Send Email via configured provider
  */
 export const sendEmail = async (organizationId, emailData, userId) => {
   try {
-    // Send email through Outlook
-    const sendResult = await outlookBridge.sendEmail({
+    // Send email through provider
+    const sendResult = await emailProvider.send({
       to: emailData.recipient_email,
       subject: emailData.subject,
       body: emailData.content,
       cc: emailData.cc || null,
-      bcc: emailData.bcc || null
+      bcc: emailData.bcc || null,
     });
 
     // Log communication in database
@@ -207,19 +220,21 @@ export const sendEmail = async (organizationId, emailData, userId) => {
         emailData.content,
         userId,
         emailData.recipient_email,
-        sendResult.messageId
+        sendResult.messageId,
       ]
     );
 
-    logger.info('Email sent via Outlook:', {
+    logger.info('Email sent', {
       organizationId,
       patientId: emailData.patient_id,
-      email: emailData.recipient_email
+      email: emailData.recipient_email,
+      provider: emailProvider.name,
     });
 
     return {
       ...result.rows[0],
-      sendMethod: 'outlook'
+      sendMethod: emailProvider.name,
+      provider: emailProvider.name,
     };
   } catch (error) {
     logger.error('Error sending email:', error);
@@ -246,7 +261,7 @@ export const sendEmail = async (organizationId, emailData, userId) => {
         emailData.content,
         userId,
         emailData.recipient_email,
-        error.message
+        error.message,
       ]
     );
 
@@ -304,7 +319,7 @@ export const createTemplate = async (organizationId, templateData) => {
         templateData.language || 'NO',
         templateData.subject || null,
         templateData.body,
-        templateData.available_variables || []
+        templateData.available_variables || [],
       ]
     );
 
@@ -344,24 +359,24 @@ export const getCommunicationStats = async (organizationId, startDate, endDate) 
 };
 
 /**
- * Check phone and email connectivity
+ * Check provider connectivity
  */
 export const checkConnectivity = async () => {
   try {
-    const phoneStatus = await phoneBridge.checkPhoneConnection();
-    const emailStatus = await outlookBridge.checkConnection();
+    const phoneStatus = await smsProvider.checkConnection();
+    const emailStatus = await emailProvider.checkConnection();
 
     return {
-      phone: phoneStatus,
-      email: emailStatus,
-      overall: phoneStatus.connected && emailStatus.connected
+      phone: { ...phoneStatus, provider: smsProvider.name },
+      email: { ...emailStatus, provider: emailProvider.name },
+      overall: phoneStatus.connected && emailStatus.connected,
     };
   } catch (error) {
     logger.error('Error checking connectivity:', error);
     return {
-      phone: { connected: false, error: 'Check failed' },
-      email: { connected: false, error: 'Check failed' },
-      overall: false
+      phone: { connected: false, provider: smsProvider.name, error: 'Check failed' },
+      email: { connected: false, provider: emailProvider.name, error: 'Check failed' },
+      overall: false,
     };
   }
 };
@@ -373,5 +388,5 @@ export default {
   getTemplates,
   createTemplate,
   getCommunicationStats,
-  checkConnectivity
+  checkConnectivity,
 };
