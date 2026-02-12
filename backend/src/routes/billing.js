@@ -7,6 +7,27 @@ import express from 'express';
 import * as claimsService from '../services/claims.js';
 import * as episodesService from '../services/episodes.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
+import validate from '../middleware/validation.js';
+import {
+  createEpisodeSchema,
+  getPatientEpisodesSchema,
+  getEpisodeSchema,
+  updateEpisodeProgressSchema,
+  episodeReevalSchema,
+  episodeMaintenanceSchema,
+  episodeABNSchema,
+  episodeDischargeSchema,
+  getBillingModifierSchema,
+  listClaimsSchema,
+  createClaimSchema,
+  getClaimSchema,
+  updateClaimLineItemsSchema,
+  submitClaimSchema,
+  processRemittanceSchema,
+  appealClaimSchema,
+  writeOffClaimSchema,
+  suggestCMTSchema,
+} from '../validators/billing.validators.js';
 import logger from '../utils/logger.js';
 
 const router = express.Router();
@@ -46,7 +67,7 @@ router.use(requireOrganization);
  *       400:
  *         description: Validation error
  */
-router.post('/episodes', async (req, res) => {
+router.post('/episodes', validate(createEpisodeSchema), async (req, res) => {
   try {
     const episode = await episodesService.createEpisode(req.organizationId, req.body);
     res.status(201).json(episode);
@@ -60,7 +81,7 @@ router.post('/episodes', async (req, res) => {
  * GET /billing/episodes/patient/:patientId
  * Get all episodes for a patient
  */
-router.get('/episodes/patient/:patientId', async (req, res) => {
+router.get('/episodes/patient/:patientId', validate(getPatientEpisodesSchema), async (req, res) => {
   try {
     const episodes = await episodesService.getPatientEpisodes(
       req.organizationId,
@@ -77,27 +98,31 @@ router.get('/episodes/patient/:patientId', async (req, res) => {
  * GET /billing/episodes/patient/:patientId/active
  * Get active episode for a patient
  */
-router.get('/episodes/patient/:patientId/active', async (req, res) => {
-  try {
-    const episode = await episodesService.getActiveEpisode(
-      req.organizationId,
-      req.params.patientId
-    );
-    if (!episode) {
-      return res.status(404).json({ error: 'No active episode found' });
+router.get(
+  '/episodes/patient/:patientId/active',
+  validate(getPatientEpisodesSchema),
+  async (req, res) => {
+    try {
+      const episode = await episodesService.getActiveEpisode(
+        req.organizationId,
+        req.params.patientId
+      );
+      if (!episode) {
+        return res.status(404).json({ error: 'No active episode found' });
+      }
+      res.json(episode);
+    } catch (error) {
+      logger.error('Get active episode error:', error);
+      res.status(500).json({ error: 'Failed to retrieve episode', message: error.message });
     }
-    res.json(episode);
-  } catch (error) {
-    logger.error('Get active episode error:', error);
-    res.status(500).json({ error: 'Failed to retrieve episode', message: error.message });
   }
-});
+);
 
 /**
  * GET /billing/episodes/:episodeId
  * Get episode details with billing info
  */
-router.get('/episodes/:episodeId', async (req, res) => {
+router.get('/episodes/:episodeId', validate(getEpisodeSchema), async (req, res) => {
   try {
     const summary = await episodesService.getEpisodeSummary(
       req.organizationId,
@@ -117,25 +142,29 @@ router.get('/episodes/:episodeId', async (req, res) => {
  * PATCH /billing/episodes/:episodeId/progress
  * Update episode progress after a visit
  */
-router.patch('/episodes/:episodeId/progress', async (req, res) => {
-  try {
-    const episode = await episodesService.updateEpisodeProgress(
-      req.organizationId,
-      req.params.episodeId,
-      req.body
-    );
-    res.json(episode);
-  } catch (error) {
-    logger.error('Update episode progress error:', error);
-    res.status(400).json({ error: 'Failed to update episode', message: error.message });
+router.patch(
+  '/episodes/:episodeId/progress',
+  validate(updateEpisodeProgressSchema),
+  async (req, res) => {
+    try {
+      const episode = await episodesService.updateEpisodeProgress(
+        req.organizationId,
+        req.params.episodeId,
+        req.body
+      );
+      res.json(episode);
+    } catch (error) {
+      logger.error('Update episode progress error:', error);
+      res.status(400).json({ error: 'Failed to update episode', message: error.message });
+    }
   }
-});
+);
 
 /**
  * POST /billing/episodes/:episodeId/reeval
  * Perform re-evaluation
  */
-router.post('/episodes/:episodeId/reeval', async (req, res) => {
+router.post('/episodes/:episodeId/reeval', validate(episodeReevalSchema), async (req, res) => {
   try {
     const episode = await episodesService.performReEvaluation(
       req.organizationId,
@@ -156,6 +185,7 @@ router.post('/episodes/:episodeId/reeval', async (req, res) => {
 router.post(
   '/episodes/:episodeId/maintenance',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(episodeMaintenanceSchema),
   async (req, res) => {
     try {
       const episode = await episodesService.transitionToMaintenance(
@@ -175,7 +205,7 @@ router.post(
  * POST /billing/episodes/:episodeId/abn
  * Record ABN signature
  */
-router.post('/episodes/:episodeId/abn', async (req, res) => {
+router.post('/episodes/:episodeId/abn', validate(episodeABNSchema), async (req, res) => {
   try {
     const episode = await episodesService.recordABN(
       req.organizationId,
@@ -196,6 +226,7 @@ router.post('/episodes/:episodeId/abn', async (req, res) => {
 router.post(
   '/episodes/:episodeId/discharge',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(episodeDischargeSchema),
   async (req, res) => {
     try {
       const episode = await episodesService.dischargeEpisode(
@@ -229,21 +260,25 @@ router.get('/episodes-needing-reeval', async (req, res) => {
  * GET /billing/modifier/:episodeId/:patientId
  * Get billing modifier for episode/patient
  */
-router.get('/modifier/:episodeId/:patientId', async (req, res) => {
-  try {
-    const modifier = await episodesService.getBillingModifier(
-      req.params.episodeId,
-      req.params.patientId
-    );
-    res.json({
-      modifier,
-      description: getModifierDescription(modifier),
-    });
-  } catch (error) {
-    logger.error('Get billing modifier error:', error);
-    res.status(500).json({ error: 'Failed to get modifier', message: error.message });
+router.get(
+  '/modifier/:episodeId/:patientId',
+  validate(getBillingModifierSchema),
+  async (req, res) => {
+    try {
+      const modifier = await episodesService.getBillingModifier(
+        req.params.episodeId,
+        req.params.patientId
+      );
+      res.json({
+        modifier,
+        description: getModifierDescription(modifier),
+      });
+    } catch (error) {
+      logger.error('Get billing modifier error:', error);
+      res.status(500).json({ error: 'Failed to get modifier', message: error.message });
+    }
   }
-});
+);
 
 // Helper function for modifier descriptions
 const getModifierDescription = (modifier) => {
@@ -299,7 +334,7 @@ const getModifierDescription = (modifier) => {
  *       401:
  *         description: Unauthorized
  */
-router.get('/claims', async (req, res) => {
+router.get('/claims', validate(listClaimsSchema), async (req, res) => {
   try {
     const result = await claimsService.getClaims(req.organizationId, {
       page: parseInt(req.query.page) || 1,
@@ -321,7 +356,7 @@ router.get('/claims', async (req, res) => {
  * POST /billing/claims
  * Create a new claim
  */
-router.post('/claims', async (req, res) => {
+router.post('/claims', validate(createClaimSchema), async (req, res) => {
   try {
     const claim = await claimsService.createClaim(req.organizationId, req.body);
     res.status(201).json(claim);
@@ -371,7 +406,7 @@ router.get('/claims/outstanding', async (req, res) => {
  * GET /billing/claims/:claimId
  * Get claim details
  */
-router.get('/claims/:claimId', async (req, res) => {
+router.get('/claims/:claimId', validate(getClaimSchema), async (req, res) => {
   try {
     const claim = await claimsService.getClaimById(req.organizationId, req.params.claimId);
     if (!claim) {
@@ -388,87 +423,115 @@ router.get('/claims/:claimId', async (req, res) => {
  * PUT /billing/claims/:claimId/line-items
  * Update claim line items
  */
-router.put('/claims/:claimId/line-items', async (req, res) => {
-  try {
-    const claim = await claimsService.updateClaimLineItems(
-      req.organizationId,
-      req.params.claimId,
-      req.body.line_items
-    );
-    res.json(claim);
-  } catch (error) {
-    logger.error('Update line items error:', error);
-    res.status(400).json({ error: 'Failed to update line items', message: error.message });
+router.put(
+  '/claims/:claimId/line-items',
+  validate(updateClaimLineItemsSchema),
+  async (req, res) => {
+    try {
+      const claim = await claimsService.updateClaimLineItems(
+        req.organizationId,
+        req.params.claimId,
+        req.body.line_items
+      );
+      res.json(claim);
+    } catch (error) {
+      logger.error('Update line items error:', error);
+      res.status(400).json({ error: 'Failed to update line items', message: error.message });
+    }
   }
-});
+);
 
 /**
  * POST /billing/claims/:claimId/submit
  * Submit claim for processing
  */
-router.post('/claims/:claimId/submit', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
-  try {
-    const claim = await claimsService.submitClaim(
-      req.organizationId,
-      req.params.claimId,
-      req.user.id
-    );
-    res.json(claim);
-  } catch (error) {
-    logger.error('Submit claim error:', error);
-    res.status(400).json({ error: 'Failed to submit claim', message: error.message });
+router.post(
+  '/claims/:claimId/submit',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(submitClaimSchema),
+  async (req, res) => {
+    try {
+      const claim = await claimsService.submitClaim(
+        req.organizationId,
+        req.params.claimId,
+        req.user.id
+      );
+      res.json(claim);
+    } catch (error) {
+      logger.error('Submit claim error:', error);
+      res.status(400).json({ error: 'Failed to submit claim', message: error.message });
+    }
   }
-});
+);
 
 /**
  * POST /billing/claims/:claimId/remittance
  * Process payment/remittance
  */
-router.post('/claims/:claimId/remittance', requireRole(['ADMIN']), async (req, res) => {
-  try {
-    const claim = await claimsService.processRemittance(
-      req.organizationId,
-      req.params.claimId,
-      req.body
-    );
-    res.json(claim);
-  } catch (error) {
-    logger.error('Process remittance error:', error);
-    res.status(400).json({ error: 'Failed to process remittance', message: error.message });
+router.post(
+  '/claims/:claimId/remittance',
+  requireRole(['ADMIN']),
+  validate(processRemittanceSchema),
+  async (req, res) => {
+    try {
+      const claim = await claimsService.processRemittance(
+        req.organizationId,
+        req.params.claimId,
+        req.body
+      );
+      res.json(claim);
+    } catch (error) {
+      logger.error('Process remittance error:', error);
+      res.status(400).json({ error: 'Failed to process remittance', message: error.message });
+    }
   }
-});
+);
 
 /**
  * POST /billing/claims/:claimId/appeal
  * Appeal a denied claim
  */
-router.post('/claims/:claimId/appeal', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
-  try {
-    const claim = await claimsService.appealClaim(req.organizationId, req.params.claimId, req.body);
-    res.json(claim);
-  } catch (error) {
-    logger.error('Appeal claim error:', error);
-    res.status(400).json({ error: 'Failed to appeal claim', message: error.message });
+router.post(
+  '/claims/:claimId/appeal',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(appealClaimSchema),
+  async (req, res) => {
+    try {
+      const claim = await claimsService.appealClaim(
+        req.organizationId,
+        req.params.claimId,
+        req.body
+      );
+      res.json(claim);
+    } catch (error) {
+      logger.error('Appeal claim error:', error);
+      res.status(400).json({ error: 'Failed to appeal claim', message: error.message });
+    }
   }
-});
+);
 
 /**
  * POST /billing/claims/:claimId/write-off
  * Write off a claim
  */
-router.post('/claims/:claimId/write-off', requireRole(['ADMIN']), async (req, res) => {
-  try {
-    const claim = await claimsService.writeOffClaim(
-      req.organizationId,
-      req.params.claimId,
-      req.body.reason
-    );
-    res.json(claim);
-  } catch (error) {
-    logger.error('Write off claim error:', error);
-    res.status(400).json({ error: 'Failed to write off claim', message: error.message });
+router.post(
+  '/claims/:claimId/write-off',
+  requireRole(['ADMIN']),
+  validate(writeOffClaimSchema),
+  async (req, res) => {
+    try {
+      const claim = await claimsService.writeOffClaim(
+        req.organizationId,
+        req.params.claimId,
+        req.body.reason
+      );
+      res.json(claim);
+    } catch (error) {
+      logger.error('Write off claim error:', error);
+      res.status(400).json({ error: 'Failed to write off claim', message: error.message });
+    }
   }
-});
+);
 
 // ============================================================================
 // HELPER ENDPOINTS
@@ -534,7 +597,7 @@ router.get('/modifiers', (req, res) => {
  * POST /billing/suggest-cmt
  * Get suggested CMT code based on regions
  */
-router.post('/suggest-cmt', async (req, res) => {
+router.post('/suggest-cmt', validate(suggestCMTSchema), async (req, res) => {
   try {
     const { regions_count } = req.body;
     if (!regions_count || regions_count < 1) {

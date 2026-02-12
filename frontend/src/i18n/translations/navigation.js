@@ -10,6 +10,7 @@ export const navigation = {
     crm: 'CRM',
     financial: 'Financial',
     kpi: 'KPI',
+    macros: 'Macros',
     templates: 'Templates',
     import: 'Import',
     aiTraining: 'AI Training',
@@ -28,11 +29,12 @@ export const navigation = {
     crm: 'CRM',
     financial: 'Økonomi',
     kpi: 'KPI',
+    macros: 'Makroer',
     templates: 'Maler',
     import: 'Import',
     aiTraining: 'AI-trening',
     auditLogs: 'Revisjonslogg',
     settings: 'Innstillinger',
     practitioner: 'Behandler',
-  }
-}
+  },
+};

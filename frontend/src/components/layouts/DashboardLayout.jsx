@@ -19,6 +19,7 @@ import {
   HeartHandshake,
   Menu,
   X,
+  Zap,
 } from 'lucide-react';
 import { useTranslation } from '../../i18n';
 import LanguageSwitcher from '../LanguageSwitcher';
@@ -48,6 +49,7 @@ const NAV_ITEMS = [
   { key: 'crm', href: '/crm', icon: HeartHandshake },
   { key: 'financial', href: '/financial', icon: DollarSign },
   { key: 'kpi', href: '/kpi', icon: TrendingUp },
+  { key: 'macros', href: '/macros', icon: Zap },
   { key: 'templates', href: '/templates', icon: BookOpen },
   { key: 'import', href: '/import', icon: Upload },
   { key: 'aiTraining', href: '/training', icon: Brain },

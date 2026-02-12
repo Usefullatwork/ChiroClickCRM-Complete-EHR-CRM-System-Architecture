@@ -28,6 +28,7 @@ const Templates = lazy(() => import('./pages/Templates'));
 const Settings = lazy(() => import('./pages/Settings'));
 const PatientFlow = lazy(() => import('./pages/PatientFlow'));
 const CRM = lazy(() => import('./pages/CRM'));
+const Macros = lazy(() => import('./pages/Macros'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Patient Portal (public, no auth required)
@@ -275,6 +276,14 @@ function App() {
             element={
               <Suspense fallback={<PageLoader />}>
                 <CRM />
+              </Suspense>
+            }
+          />
+          <Route
+            path="macros"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <Macros />
               </Suspense>
             }
           />

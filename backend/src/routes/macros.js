@@ -6,6 +6,13 @@
 import express from 'express';
 import * as macroController from '../controllers/macros.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
+import validate from '../middleware/validation.js';
+import {
+  searchMacrosSchema,
+  createMacroSchema,
+  macroIdSchema,
+  expandMacroSchema,
+} from '../validators/macro.validators.js';
 
 const router = express.Router();
 
@@ -31,6 +38,7 @@ router.get(
 router.get(
   '/search',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  validate(searchMacrosSchema),
   macroController.searchMacros
 );
 
@@ -50,7 +58,26 @@ router.get(
  * @desc    Create a new macro
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.post('/', requireRole(['ADMIN', 'PRACTITIONER']), macroController.createMacro);
+router.post(
+  '/',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(createMacroSchema),
+  macroController.createMacro
+);
+
+/**
+ * @route   PATCH /api/v1/macros/:id
+ * @desc    Update an existing macro
+ * @access  Private (ADMIN, PRACTITIONER)
+ */
+router.patch('/:id', requireRole(['ADMIN', 'PRACTITIONER']), macroController.updateMacro);
+
+/**
+ * @route   DELETE /api/v1/macros/:id
+ * @desc    Soft-delete a macro
+ * @access  Private (ADMIN, PRACTITIONER)
+ */
+router.delete('/:id', requireRole(['ADMIN', 'PRACTITIONER']), macroController.deleteMacro);
 
 /**
  * @route   POST /api/v1/macros/:id/expand
@@ -60,6 +87,7 @@ router.post('/', requireRole(['ADMIN', 'PRACTITIONER']), macroController.createM
 router.post(
   '/:id/expand',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  validate(expandMacroSchema),
   macroController.expandMacro
 );
 
@@ -71,6 +99,7 @@ router.post(
 router.post(
   '/:id/favorite',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  validate(macroIdSchema),
   macroController.toggleFavorite
 );
 
@@ -82,6 +111,7 @@ router.post(
 router.post(
   '/:id/usage',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  validate(macroIdSchema),
   macroController.recordUsage
 );
 

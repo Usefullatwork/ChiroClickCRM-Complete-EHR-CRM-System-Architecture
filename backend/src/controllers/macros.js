@@ -138,6 +138,44 @@ export const toggleFavorite = async (req, res) => {
 };
 
 /**
+ * Update a macro
+ * @route PATCH /api/v1/macros/:id
+ */
+export const updateMacro = async (req, res) => {
+  try {
+    const { organizationId } = req;
+    const { id } = req.params;
+    const macro = await macroService.updateMacro(organizationId, id, req.body);
+    if (!macro) {
+      return res.status(404).json({ error: 'Macro not found' });
+    }
+    res.json({ success: true, data: macro });
+  } catch (error) {
+    logger.error('Error updating macro:', error);
+    res.status(500).json({ error: 'Failed to update macro' });
+  }
+};
+
+/**
+ * Delete a macro (soft delete)
+ * @route DELETE /api/v1/macros/:id
+ */
+export const deleteMacro = async (req, res) => {
+  try {
+    const { organizationId } = req;
+    const { id } = req.params;
+    const result = await macroService.deleteMacro(organizationId, id);
+    if (!result) {
+      return res.status(404).json({ error: 'Macro not found' });
+    }
+    res.json({ success: true, message: 'Macro deleted' });
+  } catch (error) {
+    logger.error('Error deleting macro:', error);
+    res.status(500).json({ error: 'Failed to delete macro' });
+  }
+};
+
+/**
  * Record macro usage for analytics
  * @route POST /api/v1/macros/:id/usage
  */
@@ -158,6 +196,8 @@ export default {
   searchMacros,
   getFavorites,
   createMacro,
+  updateMacro,
+  deleteMacro,
   expandMacro,
   toggleFavorite,
   recordUsage,
