@@ -5,6 +5,16 @@
 import express from 'express';
 import * as appointmentController from '../controllers/appointments.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
+import validate from '../middleware/validation.js';
+import {
+  listAppointmentsSchema,
+  createAppointmentSchema,
+  getAppointmentSchema,
+  updateAppointmentSchema,
+  updateStatusSchema,
+  cancelAppointmentSchema,
+  confirmAppointmentSchema,
+} from '../validators/appointment.validators.js';
 
 const router = express.Router();
 
@@ -42,6 +52,7 @@ router.use(requireOrganization);
 router.get(
   '/',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  validate(listAppointmentsSchema),
   appointmentController.getAppointments
 );
 
@@ -84,6 +95,7 @@ router.get(
 router.post(
   '/',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  validate(createAppointmentSchema),
   appointmentController.createAppointment
 );
 
@@ -95,6 +107,7 @@ router.post(
 router.patch(
   '/:id/status',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  validate(updateStatusSchema),
   appointmentController.updateStatus
 );
 
@@ -128,6 +141,7 @@ router.patch(
 router.post(
   '/:id/cancel',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  validate(cancelAppointmentSchema),
   appointmentController.cancelAppointment
 );
 
@@ -146,6 +160,7 @@ router.get('/stats', requireRole(['ADMIN', 'PRACTITIONER']), appointmentControll
 router.get(
   '/:id',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  validate(getAppointmentSchema),
   appointmentController.getAppointmentById
 );
 
@@ -157,6 +172,7 @@ router.get(
 router.patch(
   '/:id',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  validate(updateAppointmentSchema),
   appointmentController.updateAppointment
 );
 
@@ -168,6 +184,7 @@ router.patch(
 router.post(
   '/:id/confirm',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  validate(confirmAppointmentSchema),
   appointmentController.confirmAppointment
 );
 
@@ -193,6 +210,7 @@ router.post(
 router.post(
   '/:id/check-in',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  validate(getAppointmentSchema),
   appointmentController.checkInAppointment
 );
 

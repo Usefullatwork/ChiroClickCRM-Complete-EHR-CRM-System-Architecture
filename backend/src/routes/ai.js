@@ -6,6 +6,17 @@
 import express from 'express';
 import * as aiController from '../controllers/ai.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
+import validate from '../middleware/validation.js';
+import {
+  recordFeedbackSchema,
+  spellCheckSchema,
+  soapSuggestionSchema,
+  suggestDiagnosisSchema,
+  analyzeRedFlagsSchema,
+  clinicalSummarySchema,
+  outcomeFeedbackSchema,
+  circuitResetSchema,
+} from '../validators/ai.validators.js';
 
 const router = express.Router();
 
@@ -21,8 +32,10 @@ router.use(requireOrganization);
  * @desc    Record feedback on AI suggestion
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.post('/feedback',
+router.post(
+  '/feedback',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(recordFeedbackSchema),
   aiController.recordFeedback
 );
 
@@ -31,17 +44,15 @@ router.post('/feedback',
  * @desc    Get AI performance metrics
  * @access  Private (ADMIN)
  */
-router.get('/metrics',
-  requireRole(['ADMIN']),
-  aiController.getAIMetrics
-);
+router.get('/metrics', requireRole(['ADMIN']), aiController.getAIMetrics);
 
 /**
  * @route   GET /api/v1/ai/circuit-status
  * @desc    Get circuit breaker health status
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/circuit-status',
+router.get(
+  '/circuit-status',
   requireRole(['ADMIN', 'PRACTITIONER']),
   aiController.getCircuitStatus
 );
@@ -51,8 +62,10 @@ router.get('/circuit-status',
  * @desc    Reset circuit breaker for a service
  * @access  Private (ADMIN)
  */
-router.post('/circuit-reset/:service',
+router.post(
+  '/circuit-reset/:service',
   requireRole(['ADMIN']),
+  validate(circuitResetSchema),
   aiController.resetCircuitBreaker
 );
 
@@ -61,20 +74,14 @@ router.post('/circuit-reset/:service',
  * @desc    Check if AI retraining is needed
  * @access  Private (ADMIN)
  */
-router.get('/retraining-status',
-  requireRole(['ADMIN']),
-  aiController.getRetrainingStatus
-);
+router.get('/retraining-status', requireRole(['ADMIN']), aiController.getRetrainingStatus);
 
 /**
  * @route   POST /api/v1/ai/trigger-retraining
  * @desc    Manually trigger AI retraining
  * @access  Private (ADMIN)
  */
-router.post('/trigger-retraining',
-  requireRole(['ADMIN']),
-  aiController.triggerRetraining
-);
+router.post('/trigger-retraining', requireRole(['ADMIN']), aiController.triggerRetraining);
 
 // =================================================================
 // Original AI Endpoints
@@ -85,8 +92,10 @@ router.post('/trigger-retraining',
  * @desc    Norwegian spell check for clinical notes
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.post('/spell-check',
+router.post(
+  '/spell-check',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  validate(spellCheckSchema),
   aiController.spellCheck
 );
 
@@ -96,12 +105,16 @@ router.post('/spell-check',
  * @desc    Generate SOAP note suggestions based on chief complaint
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.post('/soap-suggestion',
+router.post(
+  '/soap-suggestion',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(soapSuggestionSchema),
   aiController.generateSOAPSuggestion
 );
-router.post('/soap-suggestions',
+router.post(
+  '/soap-suggestions',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(soapSuggestionSchema),
   aiController.generateSOAPSuggestion
 );
 
@@ -110,8 +123,10 @@ router.post('/soap-suggestions',
  * @desc    Suggest ICPC-2 diagnosis codes based on clinical presentation
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.post('/suggest-diagnosis',
+router.post(
+  '/suggest-diagnosis',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(suggestDiagnosisSchema),
   aiController.suggestDiagnosis
 );
 
@@ -120,8 +135,10 @@ router.post('/suggest-diagnosis',
  * @desc    Analyze patient data for red flags and safety concerns
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.post('/analyze-red-flags',
+router.post(
+  '/analyze-red-flags',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(analyzeRedFlagsSchema),
   aiController.analyzeRedFlags
 );
 
@@ -131,12 +148,16 @@ router.post('/analyze-red-flags',
  * @desc    Generate clinical summary from encounter
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.post('/clinical-summary',
+router.post(
+  '/clinical-summary',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(clinicalSummarySchema),
   aiController.generateClinicalSummary
 );
-router.post('/generate-summary',
+router.post(
+  '/generate-summary',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(clinicalSummarySchema),
   aiController.generateClinicalSummary
 );
 
@@ -145,8 +166,10 @@ router.post('/generate-summary',
  * @desc    Record outcome feedback for AI learning
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.post('/outcome-feedback',
+router.post(
+  '/outcome-feedback',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(outcomeFeedbackSchema),
   aiController.recordOutcomeFeedback
 );
 
@@ -155,17 +178,15 @@ router.post('/outcome-feedback',
  * @desc    Get AI service status
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/status',
-  requireRole(['ADMIN', 'PRACTITIONER']),
-  aiController.getAIStatus
-);
+router.get('/status', requireRole(['ADMIN', 'PRACTITIONER']), aiController.getAIStatus);
 
 /**
  * @route   GET /api/v1/ai/metrics/dashboard
  * @desc    Get simplified AI metrics for dashboard display
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/metrics/dashboard',
+router.get(
+  '/metrics/dashboard',
   requireRole(['ADMIN', 'PRACTITIONER']),
   aiController.getAIDashboardMetrics
 );
@@ -175,19 +196,13 @@ router.get('/metrics/dashboard',
  * @desc    Get AI model training history
  * @access  Private (ADMIN)
  */
-router.get('/training/history',
-  requireRole(['ADMIN']),
-  aiController.getTrainingHistory
-);
+router.get('/training/history', requireRole(['ADMIN']), aiController.getTrainingHistory);
 
 /**
  * @route   POST /api/v1/ai/training/trigger
  * @desc    Manually trigger model retraining
  * @access  Private (ADMIN)
  */
-router.post('/training/trigger',
-  requireRole(['ADMIN']),
-  aiController.triggerRetraining
-);
+router.post('/training/trigger', requireRole(['ADMIN']), aiController.triggerRetraining);
 
 export default router;

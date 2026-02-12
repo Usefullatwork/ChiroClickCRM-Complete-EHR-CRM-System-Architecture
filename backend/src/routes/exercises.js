@@ -6,6 +6,21 @@
 import express from 'express';
 import * as exerciseController from '../controllers/exercises.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
+import validate from '../middleware/validation.js';
+import {
+  listExercisesSchema,
+  createExerciseSchema,
+  updateExerciseSchema,
+  getExerciseSchema,
+  createPrescriptionSchema,
+  getPatientPrescriptionsSchema,
+  getPrescriptionSchema,
+  updatePrescriptionSchema,
+  updatePrescriptionStatusSchema,
+  createTemplateSchema as createExerciseTemplateSchema,
+  updateTemplateSchema as updateExerciseTemplateSchema,
+  deleteTemplateSchema,
+} from '../validators/exercise.validators.js';
 
 const router = express.Router();
 
@@ -29,6 +44,7 @@ router.use(requireOrganization);
 router.get(
   '/',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  validate(listExercisesSchema),
   exerciseController.getExercises
 );
 
@@ -106,6 +122,7 @@ router.post('/seed', requireRole(['ADMIN']), exerciseController.seedDefaultExerc
 router.post(
   '/prescriptions',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(createPrescriptionSchema),
   exerciseController.createPrescription
 );
 
@@ -117,6 +134,7 @@ router.post(
 router.get(
   '/prescriptions/patient/:patientId',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  validate(getPatientPrescriptionsSchema),
   exerciseController.getPatientPrescriptions
 );
 
@@ -128,6 +146,7 @@ router.get(
 router.get(
   '/prescriptions/:id',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  validate(getPrescriptionSchema),
   exerciseController.getPrescriptionById
 );
 
@@ -139,6 +158,7 @@ router.get(
 router.patch(
   '/prescriptions/:id',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(updatePrescriptionSchema),
   exerciseController.updatePrescription
 );
 
@@ -161,6 +181,7 @@ router.post(
 router.patch(
   '/prescriptions/:id/status',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(updatePrescriptionStatusSchema),
   exerciseController.updatePrescriptionStatus
 );
 
@@ -232,14 +253,24 @@ router.post(
  * @desc    Create a new exercise
  * @access  Private (ADMIN)
  */
-router.post('/', requireRole(['ADMIN']), exerciseController.createExercise);
+router.post(
+  '/',
+  requireRole(['ADMIN']),
+  validate(createExerciseSchema),
+  exerciseController.createExercise
+);
 
 /**
  * @route   PATCH /api/v1/exercises/:id
  * @desc    Update an exercise
  * @access  Private (ADMIN)
  */
-router.patch('/:id', requireRole(['ADMIN']), exerciseController.updateExercise);
+router.patch(
+  '/:id',
+  requireRole(['ADMIN']),
+  validate(updateExerciseSchema),
+  exerciseController.updateExercise
+);
 
 /**
  * @route   DELETE /api/v1/exercises/:id
@@ -256,6 +287,7 @@ router.delete('/:id', requireRole(['ADMIN']), exerciseController.deleteExercise)
 router.get(
   '/:id',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  validate(getExerciseSchema),
   exerciseController.getExerciseById
 );
 

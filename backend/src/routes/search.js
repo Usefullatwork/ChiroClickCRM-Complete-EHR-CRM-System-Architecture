@@ -7,6 +7,14 @@ import express from 'express';
 import { requireAuth, requireOrganization } from '../middleware/auth.js';
 import * as searchService from '../services/search.js';
 import logger from '../utils/logger.js';
+import validate from '../middleware/validation.js';
+import {
+  searchPatientsSchema,
+  searchDiagnosisSchema,
+  searchEncountersSchema,
+  globalSearchSchema,
+  suggestSchema,
+} from '../validators/search.validators.js';
 
 const router = express.Router();
 
@@ -19,7 +27,7 @@ router.use(requireOrganization);
  * @desc    Search patients using full-text search
  * @access  Private
  */
-router.get('/patients', async (req, res) => {
+router.get('/patients', validate(searchPatientsSchema), async (req, res) => {
   try {
     const { q, limit = 20, offset = 0, status, includeInactive } = req.query;
 
@@ -49,7 +57,7 @@ router.get('/patients', async (req, res) => {
  * @desc    Search diagnosis codes (ICPC-2, ICD-10)
  * @access  Private
  */
-router.get('/diagnosis', async (req, res) => {
+router.get('/diagnosis', validate(searchDiagnosisSchema), async (req, res) => {
   try {
     const { q, limit = 30, system } = req.query;
 
@@ -77,7 +85,7 @@ router.get('/diagnosis', async (req, res) => {
  * @desc    Search clinical encounters (SOAP notes)
  * @access  Private
  */
-router.get('/encounters', async (req, res) => {
+router.get('/encounters', validate(searchEncountersSchema), async (req, res) => {
   try {
     const { q, limit = 20, offset = 0, patientId, practitionerId } = req.query;
 
@@ -107,7 +115,7 @@ router.get('/encounters', async (req, res) => {
  * @desc    Global search across all entities
  * @access  Private
  */
-router.get('/global', async (req, res) => {
+router.get('/global', validate(globalSearchSchema), async (req, res) => {
   try {
     const { q, limit = 10 } = req.query;
 
@@ -134,7 +142,7 @@ router.get('/global', async (req, res) => {
  * @desc    Get search suggestions (autocomplete)
  * @access  Private
  */
-router.get('/suggest', async (req, res) => {
+router.get('/suggest', validate(suggestSchema), async (req, res) => {
   try {
     const { q, limit = 5, entity = 'patient' } = req.query;
 

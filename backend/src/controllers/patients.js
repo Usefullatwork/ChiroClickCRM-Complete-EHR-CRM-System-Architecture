@@ -16,12 +16,12 @@ export const getPatients = async (req, res) => {
     const { organizationId, user } = req;
     const options = {
       page: parseInt(req.query.page) || 1,
-      limit: parseInt(req.query.limit) || 20,
+      limit: Math.min(parseInt(req.query.limit) || 20, 1000),
       search: req.query.search || '',
       status: req.query.status || '',
       category: req.query.category || '',
       sortBy: req.query.sortBy || 'last_name',
-      sortOrder: req.query.sortOrder || 'asc'
+      sortOrder: req.query.sortOrder || 'asc',
     };
 
     const result = await patientService.getAllPatients(organizationId, options);
@@ -36,7 +36,7 @@ export const getPatients = async (req, res) => {
       resourceType: 'PATIENT',
       resourceId: null,
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json(result);
@@ -44,7 +44,7 @@ export const getPatients = async (req, res) => {
     logger.error('Error in getPatients controller:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to retrieve patients'
+      message: 'Failed to retrieve patients',
     });
   }
 };
@@ -63,7 +63,7 @@ export const getPatient = async (req, res) => {
     if (!patient) {
       return res.status(404).json({
         error: 'Not Found',
-        message: 'Patient not found'
+        message: 'Patient not found',
       });
     }
 
@@ -77,7 +77,7 @@ export const getPatient = async (req, res) => {
       resourceType: 'PATIENT',
       resourceId: id,
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json(patient);
@@ -85,7 +85,7 @@ export const getPatient = async (req, res) => {
     logger.error('Error in getPatient controller:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to retrieve patient'
+      message: 'Failed to retrieve patient',
     });
   }
 };
@@ -100,16 +100,12 @@ export const createPatient = async (req, res) => {
     const patientData = req.body;
 
     // Check if solvit_id already exists
-    const existing = await patientService.searchPatients(
-      organizationId,
-      patientData.solvit_id,
-      1
-    );
+    const existing = await patientService.searchPatients(organizationId, patientData.solvit_id, 1);
 
     if (existing.length > 0 && existing[0].solvit_id === patientData.solvit_id) {
       return res.status(409).json({
         error: 'Conflict',
-        message: 'Patient with this SolvIt ID already exists'
+        message: 'Patient with this SolvIt ID already exists',
       });
     }
 
@@ -126,23 +122,24 @@ export const createPatient = async (req, res) => {
       resourceId: patient.id,
       changes: { new: patientData },
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.status(201).json(patient);
   } catch (error) {
     logger.error('Error in createPatient controller:', error);
 
-    if (error.code === '23505') { // Unique constraint violation
+    if (error.code === '23505') {
+      // Unique constraint violation
       return res.status(409).json({
         error: 'Conflict',
-        message: 'Patient with this information already exists'
+        message: 'Patient with this information already exists',
       });
     }
 
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to create patient'
+      message: 'Failed to create patient',
     });
   }
 };
@@ -163,15 +160,11 @@ export const updatePatient = async (req, res) => {
     if (!oldPatient) {
       return res.status(404).json({
         error: 'Not Found',
-        message: 'Patient not found'
+        message: 'Patient not found',
       });
     }
 
-    const updatedPatient = await patientService.updatePatient(
-      organizationId,
-      id,
-      patientData
-    );
+    const updatedPatient = await patientService.updatePatient(organizationId, id, patientData);
 
     // Log audit
     await logAudit({
@@ -184,10 +177,10 @@ export const updatePatient = async (req, res) => {
       resourceId: id,
       changes: {
         old: oldPatient,
-        new: patientData
+        new: patientData,
       },
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json(updatedPatient);
@@ -195,7 +188,7 @@ export const updatePatient = async (req, res) => {
     logger.error('Error in updatePatient controller:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to update patient'
+      message: 'Failed to update patient',
     });
   }
 };
@@ -214,7 +207,7 @@ export const deletePatient = async (req, res) => {
     if (!patient) {
       return res.status(404).json({
         error: 'Not Found',
-        message: 'Patient not found'
+        message: 'Patient not found',
       });
     }
 
@@ -229,18 +222,18 @@ export const deletePatient = async (req, res) => {
       resourceId: id,
       reason: 'Soft delete - status changed to INACTIVE',
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json({
       message: 'Patient successfully deactivated',
-      patient
+      patient,
     });
   } catch (error) {
     logger.error('Error in deletePatient controller:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to delete patient'
+      message: 'Failed to delete patient',
     });
   }
 };
@@ -257,22 +250,18 @@ export const searchPatients = async (req, res) => {
     if (!q || q.length < 2) {
       return res.status(400).json({
         error: 'Bad Request',
-        message: 'Search query must be at least 2 characters'
+        message: 'Search query must be at least 2 characters',
       });
     }
 
-    const patients = await patientService.searchPatients(
-      organizationId,
-      q,
-      parseInt(limit) || 10
-    );
+    const patients = await patientService.searchPatients(organizationId, q, parseInt(limit) || 10);
 
     res.json(patients);
   } catch (error) {
     logger.error('Error in searchPatients controller:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to search patients'
+      message: 'Failed to search patients',
     });
   }
 };
@@ -289,10 +278,7 @@ export const advancedSearchPatients = async (req, res) => {
     // All query params are passed as filters (already validated by Joi schema)
     const filters = req.query;
 
-    const result = await patientService.advancedSearchPatients(
-      organizationId,
-      filters
-    );
+    const result = await patientService.advancedSearchPatients(organizationId, filters);
 
     // Log audit for advanced search
     await logAudit({
@@ -305,12 +291,12 @@ export const advancedSearchPatients = async (req, res) => {
       resourceId: null,
       details: {
         search_type: 'advanced',
-        filters_used: Object.keys(filters).filter(k => filters[k] !== undefined),
+        filters_used: Object.keys(filters).filter((k) => filters[k] !== undefined),
         results_count: result.patients.length,
-        total_matches: result.pagination.total
+        total_matches: result.pagination.total,
       },
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json(result);
@@ -318,7 +304,7 @@ export const advancedSearchPatients = async (req, res) => {
     logger.error('Error in advancedSearchPatients controller:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to perform advanced search'
+      message: 'Failed to perform advanced search',
     });
   }
 };
@@ -339,7 +325,7 @@ export const getPatientStatistics = async (req, res) => {
     logger.error('Error in getPatientStatistics controller:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to retrieve patient statistics'
+      message: 'Failed to retrieve patient statistics',
     });
   }
 };
@@ -353,17 +339,14 @@ export const getPatientsNeedingFollowUp = async (req, res) => {
     const { organizationId } = req;
     const daysInactive = parseInt(req.query.days) || 90;
 
-    const patients = await patientService.getPatientsNeedingFollowUp(
-      organizationId,
-      daysInactive
-    );
+    const patients = await patientService.getPatientsNeedingFollowUp(organizationId, daysInactive);
 
     res.json(patients);
   } catch (error) {
     logger.error('Error in getPatientsNeedingFollowUp controller:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to retrieve patients needing follow-up'
+      message: 'Failed to retrieve patients needing follow-up',
     });
   }
 };
@@ -377,5 +360,5 @@ export default {
   searchPatients,
   advancedSearchPatients,
   getPatientStatistics,
-  getPatientsNeedingFollowUp
+  getPatientsNeedingFollowUp,
 };

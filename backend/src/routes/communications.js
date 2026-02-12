@@ -6,6 +6,13 @@ import express from 'express';
 import * as communicationController from '../controllers/communications.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
 import { smsLimiter, emailLimiter, perPatientLimiter } from '../middleware/rateLimiting.js';
+import validate from '../middleware/validation.js';
+import {
+  sendSMSSchema,
+  sendEmailSchema,
+  getCommunicationHistorySchema,
+  createTemplateSchema,
+} from '../validators/communication.validators.js';
 
 const router = express.Router();
 
@@ -17,8 +24,10 @@ router.use(requireOrganization);
  * @desc    Get all communications with filters
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.get('/',
+router.get(
+  '/',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  validate(getCommunicationHistorySchema),
   communicationController.getCommunications
 );
 
@@ -27,10 +36,12 @@ router.get('/',
  * @desc    Send SMS to patient
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.post('/sms',
+router.post(
+  '/sms',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   smsLimiter, // 10 SMS per hour per user
   perPatientLimiter, // 3 messages per patient per day
+  validate(sendSMSSchema),
   communicationController.sendSMS
 );
 
@@ -39,10 +50,12 @@ router.post('/sms',
  * @desc    Send email to patient
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.post('/email',
+router.post(
+  '/email',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   emailLimiter, // 20 emails per hour per user
   perPatientLimiter, // 3 messages per patient per day
+  validate(sendEmailSchema),
   communicationController.sendEmail
 );
 
@@ -51,7 +64,8 @@ router.post('/email',
  * @desc    Get message templates
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.get('/templates',
+router.get(
+  '/templates',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   communicationController.getTemplates
 );
@@ -61,8 +75,10 @@ router.get('/templates',
  * @desc    Create message template
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.post('/templates',
+router.post(
+  '/templates',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(createTemplateSchema),
   communicationController.createTemplate
 );
 
@@ -71,9 +87,6 @@ router.post('/templates',
  * @desc    Get communication statistics
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/stats',
-  requireRole(['ADMIN', 'PRACTITIONER']),
-  communicationController.getStats
-);
+router.get('/stats', requireRole(['ADMIN', 'PRACTITIONER']), communicationController.getStats);
 
 export default router;

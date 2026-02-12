@@ -1,0 +1,13 @@
+# Virtual environment (non-portable, must be recreated)
+ml-env/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Training checkpoints (large, intermediate)
+checkpoints/
+
+# HuggingFace cache
+.cache/
+llama-cpp-convert/

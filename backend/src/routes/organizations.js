@@ -5,6 +5,15 @@
 import express from 'express';
 import * as organizationController from '../controllers/organizations.js';
 import { requireAuth, requireRole } from '../middleware/auth.js';
+import validate from '../middleware/validation.js';
+import {
+  getOrganizationSchema,
+  createOrganizationSchema,
+  updateOrganizationSchema,
+  updateCurrentOrganizationSchema,
+  inviteUserSchema,
+  updateOrganizationSettingsSchema,
+} from '../validators/organization.validators.js';
 
 const router = express.Router();
 
@@ -15,17 +24,17 @@ router.use(requireAuth);
  * @desc    Get current user's organization
  * @access  Private (All authenticated users)
  */
-router.get('/current',
-  organizationController.getCurrentOrganization
-);
+router.get('/current', organizationController.getCurrentOrganization);
 
 /**
  * @route   PATCH /api/v1/organizations/current
  * @desc    Update current organization
  * @access  Private (ADMIN)
  */
-router.patch('/current',
+router.patch(
+  '/current',
   requireRole(['ADMIN']),
+  validate(updateCurrentOrganizationSchema),
   organizationController.updateCurrentOrganization
 );
 
@@ -34,7 +43,8 @@ router.patch('/current',
  * @desc    Get users in current organization
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/current/users',
+router.get(
+  '/current/users',
   requireRole(['ADMIN', 'PRACTITIONER']),
   organizationController.getCurrentOrganizationUsers
 );
@@ -44,8 +54,10 @@ router.get('/current/users',
  * @desc    Invite user to current organization
  * @access  Private (ADMIN)
  */
-router.post('/current/invite',
+router.post(
+  '/current/invite',
   requireRole(['ADMIN']),
+  validate(inviteUserSchema),
   organizationController.inviteUser
 );
 
@@ -54,18 +66,17 @@ router.post('/current/invite',
  * @desc    Get all organizations
  * @access  Private (ADMIN only - super admin)
  */
-router.get('/',
-  requireRole(['ADMIN']),
-  organizationController.getOrganizations
-);
+router.get('/', requireRole(['ADMIN']), organizationController.getOrganizations);
 
 /**
  * @route   GET /api/v1/organizations/:id
  * @desc    Get organization by ID
  * @access  Private (ADMIN)
  */
-router.get('/:id',
+router.get(
+  '/:id',
   requireRole(['ADMIN']),
+  validate(getOrganizationSchema),
   organizationController.getOrganization
 );
 
@@ -74,8 +85,10 @@ router.get('/:id',
  * @desc    Create new organization
  * @access  Private (ADMIN only - super admin)
  */
-router.post('/',
+router.post(
+  '/',
   requireRole(['ADMIN']),
+  validate(createOrganizationSchema),
   organizationController.createOrganization
 );
 
@@ -84,8 +97,10 @@ router.post('/',
  * @desc    Update organization
  * @access  Private (ADMIN)
  */
-router.patch('/:id',
+router.patch(
+  '/:id',
   requireRole(['ADMIN']),
+  validate(updateOrganizationSchema),
   organizationController.updateOrganization
 );
 
@@ -94,8 +109,10 @@ router.patch('/:id',
  * @desc    Get organization settings
  * @access  Private (ADMIN)
  */
-router.get('/:id/settings',
+router.get(
+  '/:id/settings',
   requireRole(['ADMIN']),
+  validate(getOrganizationSchema),
   organizationController.getOrganizationSettings
 );
 
@@ -104,8 +121,10 @@ router.get('/:id/settings',
  * @desc    Update organization settings
  * @access  Private (ADMIN)
  */
-router.patch('/:id/settings',
+router.patch(
+  '/:id/settings',
   requireRole(['ADMIN']),
+  validate(updateOrganizationSettingsSchema),
   organizationController.updateOrganizationSettings
 );
 
@@ -114,8 +133,10 @@ router.patch('/:id/settings',
  * @desc    Get organization statistics
  * @access  Private (ADMIN)
  */
-router.get('/:id/stats',
+router.get(
+  '/:id/stats',
   requireRole(['ADMIN']),
+  validate(getOrganizationSchema),
   organizationController.getOrganizationStats
 );
 
@@ -124,8 +145,10 @@ router.get('/:id/stats',
  * @desc    Check organization limits
  * @access  Private (ADMIN)
  */
-router.get('/:id/limits',
+router.get(
+  '/:id/limits',
   requireRole(['ADMIN']),
+  validate(getOrganizationSchema),
   organizationController.checkOrganizationLimits
 );
 

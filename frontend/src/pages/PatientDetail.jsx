@@ -27,6 +27,7 @@ import { patientsAPI, encountersAPI, appointmentsAPI } from '../services/api';
 import { formatDate, formatPhone, calculateAge } from '../lib/utils';
 import GDPRExportModal from '../components/GDPRExportModal';
 import PatientSummaryCard from '../components/patients/PatientSummaryCard';
+import TreatmentPlanProgress from '../components/treatment/TreatmentPlanProgress';
 import Breadcrumbs from '../components/common/Breadcrumbs';
 import { useTranslation } from '../i18n';
 
@@ -701,6 +702,13 @@ export default function PatientDetail() {
               </div>
             </div>
           </div>
+
+          {/* Treatment Plan Progress */}
+          <TreatmentPlanProgress
+            patientId={id}
+            onNewPlan={() => navigate(`/patients/${id}/treatment-plan/new`)}
+            lang={lang === 'en' ? 'en' : 'no'}
+          />
 
           {/* Follow-up Alert */}
           {patient.should_be_followed_up && (

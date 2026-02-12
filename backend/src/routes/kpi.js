@@ -5,6 +5,8 @@
 import express from 'express';
 import * as kpiController from '../controllers/kpi.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
+import validate from '../middleware/validation.js';
+import { dateRangeQuerySchema, importKPIDataSchema } from '../validators/kpi.validators.js';
 
 const router = express.Router();
 
@@ -16,8 +18,10 @@ router.use(requireOrganization);
  * @desc    Get dashboard KPIs
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/dashboard',
+router.get(
+  '/dashboard',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(dateRangeQuerySchema),
   kpiController.getDashboard
 );
 
@@ -26,8 +30,10 @@ router.get('/dashboard',
  * @desc    Get patient retention metrics
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/retention',
+router.get(
+  '/retention',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(dateRangeQuerySchema),
   kpiController.getRetention
 );
 
@@ -36,8 +42,10 @@ router.get('/retention',
  * @desc    Get rebooking rate
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/rebooking-rate',
+router.get(
+  '/rebooking-rate',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(dateRangeQuerySchema),
   kpiController.getRebookingRate
 );
 
@@ -46,8 +54,10 @@ router.get('/rebooking-rate',
  * @desc    Get top diagnoses
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/top-diagnoses',
+router.get(
+  '/top-diagnoses',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(dateRangeQuerySchema),
   kpiController.getTopDiagnoses
 );
 
@@ -56,8 +66,10 @@ router.get('/top-diagnoses',
  * @desc    Get detailed KPI tracking dashboard (rebooking, categories, geography)
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/detailed',
+router.get(
+  '/detailed',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(dateRangeQuerySchema),
   kpiController.getDetailedKPIs
 );
 
@@ -66,8 +78,10 @@ router.get('/detailed',
  * @desc    Get patient category breakdown with rebooking rates
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/category-breakdown',
+router.get(
+  '/category-breakdown',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(dateRangeQuerySchema),
   kpiController.getCategoryBreakdown
 );
 
@@ -76,8 +90,10 @@ router.get('/category-breakdown',
  * @desc    Get geographic distribution (Oslo vs Outside vs Traveling)
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/geographic',
+router.get(
+  '/geographic',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(dateRangeQuerySchema),
   kpiController.getGeographicDistribution
 );
 
@@ -86,8 +102,10 @@ router.get('/geographic',
  * @desc    Import KPI data from Excel spreadsheet
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.post('/import',
+router.post(
+  '/import',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(importKPIDataSchema),
   kpiController.importKPIData
 );
 
@@ -96,8 +114,10 @@ router.post('/import',
  * @desc    Get daily KPIs for a specific date
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/daily',
+router.get(
+  '/daily',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(dateRangeQuerySchema),
   kpiController.getDailyKPIs
 );
 
@@ -106,8 +126,10 @@ router.get('/daily',
  * @desc    Get weekly KPIs for a date range
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/weekly',
+router.get(
+  '/weekly',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(dateRangeQuerySchema),
   kpiController.getWeeklyKPIs
 );
 
@@ -116,8 +138,10 @@ router.get('/weekly',
  * @desc    Get monthly KPIs for a specific month
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/monthly',
+router.get(
+  '/monthly',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(dateRangeQuerySchema),
   kpiController.getMonthlyKPIs
 );
 

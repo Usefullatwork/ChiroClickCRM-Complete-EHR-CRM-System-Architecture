@@ -17,9 +17,9 @@ export const sendSMSSchema = {
     send_immediately: Joi.boolean().default(true),
     scheduled_at: Joi.date().iso().when('send_immediately', {
       is: false,
-      then: Joi.required()
-    })
-  })
+      then: Joi.required(),
+    }),
+  }),
 };
 
 /**
@@ -34,9 +34,9 @@ export const sendEmailSchema = {
     send_immediately: Joi.boolean().default(true),
     scheduled_at: Joi.date().iso().when('send_immediately', {
       is: false,
-      then: Joi.required()
-    })
-  })
+      then: Joi.required(),
+    }),
+  }),
 };
 
 /**
@@ -47,10 +47,10 @@ export const getCommunicationHistorySchema = {
     page: Joi.number().integer().min(1).default(1),
     limit: Joi.number().integer().min(1).max(100).default(20),
     patientId: uuidSchema,
-    type: Joi.string().valid('SMS', 'EMAIL', 'PHONE', 'LETTER'),
+    type: Joi.string().valid('SMS', 'EMAIL', 'PHONE', 'LETTER', 'sms', 'email', 'phone', 'letter'),
     startDate: Joi.date().iso(),
-    endDate: Joi.date().iso()
-  })
+    endDate: Joi.date().iso(),
+  }),
 };
 
 /**
@@ -64,13 +64,13 @@ export const createTemplateSchema = {
     language: Joi.string().valid('NO', 'EN').default('NO'),
     subject: Joi.string().max(255).when('type', {
       is: 'EMAIL',
-      then: Joi.required()
+      then: Joi.required(),
     }),
     body: Joi.string().required(),
     available_variables: Joi.array().items(Joi.string()),
     is_active: Joi.boolean().default(true),
-    is_default: Joi.boolean().default(false)
-  })
+    is_default: Joi.boolean().default(false),
+  }),
 };
 
 /**
@@ -78,7 +78,7 @@ export const createTemplateSchema = {
  */
 export const updateTemplateSchema = {
   params: Joi.object({
-    id: uuidSchema.required()
+    id: uuidSchema.required(),
   }),
   body: Joi.object({
     name: Joi.string().max(100),
@@ -87,6 +87,6 @@ export const updateTemplateSchema = {
     body: Joi.string(),
     available_variables: Joi.array().items(Joi.string()),
     is_active: Joi.boolean(),
-    is_default: Joi.boolean()
-  }).min(1)
+    is_default: Joi.boolean(),
+  }).min(1),
 };

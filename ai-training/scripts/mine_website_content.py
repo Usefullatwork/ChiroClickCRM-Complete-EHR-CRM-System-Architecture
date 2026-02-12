@@ -552,12 +552,11 @@ def find_html_files(website_dir):
 
 
 def main():
-    # Default website path
-    website_dir = r'E:\0 - 0 - Totall Clarity\0 - 0 - Nettside code – Kopi\website'
-
-    # Allow override via command line
-    if len(sys.argv) > 1:
-        website_dir = sys.argv[1]
+    if len(sys.argv) < 2:
+        print("Usage: python mine_website_content.py <website_directory>")
+        print("Example: python mine_website_content.py /path/to/website")
+        sys.exit(1)
+    website_dir = sys.argv[1]
 
     if not Path(website_dir).exists():
         print(f"ERROR: Website directory not found: {website_dir}")

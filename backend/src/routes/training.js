@@ -6,6 +6,15 @@ import express from 'express';
 import * as trainingController from '../controllers/training.js';
 import * as aiAnalyticsController from '../controllers/aiAnalytics.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
+import validate from '../middleware/validation.js';
+import {
+  addExamplesSchema,
+  testModelSchema,
+  parseJournalEntrySchema,
+  detectStyleSchema,
+  combinedJournalsSchema,
+  analyticsQuerySchema,
+} from '../validators/training.validators.js';
 
 const router = express.Router();
 
@@ -35,7 +44,12 @@ router.get('/data', requireRole(['ADMIN', 'PRACTITIONER']), trainingController.g
  * @desc    Add new JSONL examples to training data
  * @access  Private (ADMIN only)
  */
-router.post('/add-examples', requireRole(['ADMIN']), trainingController.addExamples);
+router.post(
+  '/add-examples',
+  requireRole(['ADMIN']),
+  validate(addExamplesSchema),
+  trainingController.addExamples
+);
 
 /**
  * @route   POST /api/v1/training/rebuild
@@ -63,7 +77,12 @@ router.post('/restore', requireRole(['ADMIN']), trainingController.restoreModels
  * @desc    Run test prompt against a model
  * @access  Private (ADMIN only)
  */
-router.get('/test/:model', requireRole(['ADMIN']), trainingController.testModel);
+router.get(
+  '/test/:model',
+  requireRole(['ADMIN']),
+  validate(testModelSchema),
+  trainingController.testModel
+);
 
 // ============================================================================
 // LEGACY PIPELINE ENDPOINTS
@@ -137,7 +156,12 @@ router.post('/follow-ups', requireRole(['ADMIN']), trainingController.extractFol
  * @desc    Parse individual journal entry
  * @access  Private (ADMIN only)
  */
-router.post('/parse-entry', requireRole(['ADMIN']), trainingController.parseJournalEntry);
+router.post(
+  '/parse-entry',
+  requireRole(['ADMIN']),
+  validate(parseJournalEntrySchema),
+  trainingController.parseJournalEntry
+);
 
 /**
  * @route   POST /api/v1/training/sigrun-journals
@@ -154,6 +178,7 @@ router.post('/sigrun-journals', requireRole(['ADMIN']), trainingController.proce
 router.post(
   '/combined-journals',
   requireRole(['ADMIN']),
+  validate(combinedJournalsSchema),
   trainingController.processCombinedJournals
 );
 
@@ -162,7 +187,12 @@ router.post(
  * @desc    Detect practitioner style from journal text
  * @access  Private (ADMIN only)
  */
-router.post('/detect-style', requireRole(['ADMIN']), trainingController.detectPractitionerStyle);
+router.post(
+  '/detect-style',
+  requireRole(['ADMIN']),
+  validate(detectStyleSchema),
+  trainingController.detectPractitionerStyle
+);
 
 // ============================================================================
 // AI ANALYTICS ENDPOINTS
@@ -176,6 +206,7 @@ router.post('/detect-style', requireRole(['ADMIN']), trainingController.detectPr
 router.get(
   '/analytics/performance',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(analyticsQuerySchema),
   aiAnalyticsController.getModelPerformance
 );
 
@@ -187,6 +218,7 @@ router.get(
 router.get(
   '/analytics/usage',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(analyticsQuerySchema),
   aiAnalyticsController.getUsageStats
 );
 

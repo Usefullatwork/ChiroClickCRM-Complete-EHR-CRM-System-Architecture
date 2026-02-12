@@ -7,7 +7,7 @@
 
 import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
-import * as automationService from './automations.js';
+import * as automationService from './automations/index.js';
 
 const { TRIGGER_TYPES } = automationService;
 
@@ -26,7 +26,7 @@ export const processTimeTriggers = async (organizationId = null) => {
     const results = {
       daysSinceVisit: await checkDaysSinceVisitTriggers(organizationId),
       birthday: await checkBirthdayTriggers(organizationId),
-      total: 0
+      total: 0,
     };
 
     results.total = results.daysSinceVisit.processed + results.birthday.processed;
@@ -112,7 +112,7 @@ export const checkDaysSinceVisitTriggers = async (organizationId = null) => {
           daysThreshold,
           excludeStatuses,
           workflow.max_runs_per_patient || 1,
-          workflow.id
+          workflow.id,
         ]
       );
 
@@ -121,7 +121,7 @@ export const checkDaysSinceVisitTriggers = async (organizationId = null) => {
       logger.info(`Found ${patients.length} patients for DAYS_SINCE_VISIT workflow`, {
         workflowId: workflow.id,
         daysThreshold,
-        organizationId: workflow.organization_id
+        organizationId: workflow.organization_id,
       });
 
       // Trigger workflow for each patient
@@ -132,7 +132,7 @@ export const checkDaysSinceVisitTriggers = async (organizationId = null) => {
             TRIGGER_TYPES.DAYS_SINCE_VISIT,
             {
               patient_id: patient.id,
-              days_since_visit: parseInt(patient.days_since_visit)
+              days_since_visit: parseInt(patient.days_since_visit),
             }
           );
           processedCount++;
@@ -140,7 +140,7 @@ export const checkDaysSinceVisitTriggers = async (organizationId = null) => {
           logger.error('Error triggering workflow for patient:', {
             workflowId: workflow.id,
             patientId: patient.id,
-            error: triggerError.message
+            error: triggerError.message,
           });
         }
       }
@@ -163,7 +163,7 @@ export const getPatientsNeedingRecall = async (organizationId, options = {}) => 
     excludeStatuses = ['INACTIVE', 'DECEASED'],
     includeLifecycleStages = null,
     sortBy = 'last_visit_date',
-    sortOrder = 'ASC'
+    sortOrder = 'ASC',
   } = options;
 
   try {
@@ -291,7 +291,7 @@ export const checkBirthdayTriggers = async (organizationId = null) => {
           daysBefore,
           workflow.max_runs_per_patient || 1,
           workflow.id,
-          TRIGGER_TYPES.BIRTHDAY
+          TRIGGER_TYPES.BIRTHDAY,
         ]
       );
 
@@ -300,7 +300,7 @@ export const checkBirthdayTriggers = async (organizationId = null) => {
       logger.info(`Found ${patients.length} patients for BIRTHDAY workflow`, {
         workflowId: workflow.id,
         daysBefore,
-        organizationId: workflow.organization_id
+        organizationId: workflow.organization_id,
       });
 
       // Trigger workflow for each patient
@@ -313,7 +313,7 @@ export const checkBirthdayTriggers = async (organizationId = null) => {
               patient_id: patient.id,
               is_birthday: true,
               age: parseInt(patient.age) + 1, // Age they're turning
-              birth_date: patient.date_of_birth
+              birth_date: patient.date_of_birth,
             }
           );
           processedCount++;
@@ -321,7 +321,7 @@ export const checkBirthdayTriggers = async (organizationId = null) => {
           logger.error('Error triggering birthday workflow for patient:', {
             workflowId: workflow.id,
             patientId: patient.id,
-            error: triggerError.message
+            error: triggerError.message,
           });
         }
       }
@@ -338,11 +338,7 @@ export const checkBirthdayTriggers = async (organizationId = null) => {
  * Get patients with upcoming birthdays
  */
 export const getUpcomingBirthdays = async (organizationId, options = {}) => {
-  const {
-    daysAhead = 7,
-    limit = 50,
-    excludeStatuses = ['INACTIVE', 'DECEASED']
-  } = options;
+  const { daysAhead = 7, limit = 50, excludeStatuses = ['INACTIVE', 'DECEASED'] } = options;
 
   try {
     const result = await query(
@@ -417,24 +413,20 @@ export const checkAppointmentTriggers = async (organizationId, appointment, prev
     if (!triggerType) {
       logger.debug('No trigger type for appointment status change', {
         status: appointment.status,
-        previousStatus
+        previousStatus,
       });
       return { triggered: 0 };
     }
 
-    const result = await automationService.triggerWorkflow(
-      organizationId,
-      triggerType,
-      {
-        appointment_id: appointment.id,
-        patient_id: appointment.patient_id,
-        status: appointment.status,
-        previous_status: previousStatus,
-        appointment_type: appointment.appointment_type,
-        practitioner_id: appointment.practitioner_id,
-        start_time: appointment.start_time
-      }
-    );
+    const result = await automationService.triggerWorkflow(organizationId, triggerType, {
+      appointment_id: appointment.id,
+      patient_id: appointment.patient_id,
+      status: appointment.status,
+      previous_status: previousStatus,
+      appointment_type: appointment.appointment_type,
+      practitioner_id: appointment.practitioner_id,
+      start_time: appointment.start_time,
+    });
 
     return result;
   } catch (error) {
@@ -473,11 +465,7 @@ const mapAppointmentStatusToTrigger = (newStatus, previousStatus) => {
  * Get appointments needing follow-up based on status
  */
 export const getAppointmentsNeedingFollowUp = async (organizationId, options = {}) => {
-  const {
-    status = 'NO_SHOW',
-    daysAgo = 7,
-    limit = 50
-  } = options;
+  const { status = 'NO_SHOW', daysAgo = 7, limit = 50 } = options;
 
   try {
     const result = await query(
@@ -523,11 +511,9 @@ export const getAppointmentsNeedingFollowUp = async (organizationId, options = {
  */
 export const checkPatientCreatedTrigger = async (organizationId, patientId) => {
   try {
-    return await automationService.triggerWorkflow(
-      organizationId,
-      TRIGGER_TYPES.PATIENT_CREATED,
-      { patient_id: patientId }
-    );
+    return await automationService.triggerWorkflow(organizationId, TRIGGER_TYPES.PATIENT_CREATED, {
+      patient_id: patientId,
+    });
   } catch (error) {
     logger.error('Error checking patient created trigger:', error);
     throw error;
@@ -537,22 +523,23 @@ export const checkPatientCreatedTrigger = async (organizationId, patientId) => {
 /**
  * Check patient lifecycle change trigger
  */
-export const checkLifecycleChangeTrigger = async (organizationId, patientId, previousLifecycle, newLifecycle) => {
+export const checkLifecycleChangeTrigger = async (
+  organizationId,
+  patientId,
+  previousLifecycle,
+  newLifecycle
+) => {
   try {
     if (previousLifecycle === newLifecycle) {
       return { triggered: 0 };
     }
 
-    return await automationService.triggerWorkflow(
-      organizationId,
-      TRIGGER_TYPES.LIFECYCLE_CHANGE,
-      {
-        patient_id: patientId,
-        lifecycle_changed: true,
-        previous_lifecycle: previousLifecycle,
-        new_lifecycle: newLifecycle
-      }
-    );
+    return await automationService.triggerWorkflow(organizationId, TRIGGER_TYPES.LIFECYCLE_CHANGE, {
+      patient_id: patientId,
+      lifecycle_changed: true,
+      previous_lifecycle: previousLifecycle,
+      new_lifecycle: newLifecycle,
+    });
   } catch (error) {
     logger.error('Error checking lifecycle change trigger:', error);
     throw error;
@@ -620,14 +607,14 @@ export const getUpcomingTriggers = async (organizationId, options = {}) => {
       birthdays: {
         count: birthdays.length,
         patients: birthdays,
-        has_active_workflow: !!activeWorkflows[TRIGGER_TYPES.BIRTHDAY]
+        has_active_workflow: !!activeWorkflows[TRIGGER_TYPES.BIRTHDAY],
       },
       recalls: {
         count: recalls.length,
         patients: recalls,
-        has_active_workflow: !!activeWorkflows[TRIGGER_TYPES.DAYS_SINCE_VISIT]
+        has_active_workflow: !!activeWorkflows[TRIGGER_TYPES.DAYS_SINCE_VISIT],
       },
-      active_workflows: activeWorkflows
+      active_workflows: activeWorkflows,
     };
   } catch (error) {
     logger.error('Error getting upcoming triggers:', error);
@@ -646,5 +633,5 @@ export default {
   checkPatientCreatedTrigger,
   checkLifecycleChangeTrigger,
   getTriggerStats,
-  getUpcomingTriggers
+  getUpcomingTriggers,
 };

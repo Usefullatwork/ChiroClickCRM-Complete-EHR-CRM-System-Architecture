@@ -22,7 +22,11 @@
 import axios from 'axios';
 import logger from '../utils/logger.js';
 import { query } from '../config/database.js';
-import { validateClinicalContent, checkRedFlagsInContent, checkMedicationWarnings } from './clinicalValidation.js';
+import {
+  validateClinicalContent,
+  checkRedFlagsInContent,
+  checkMedicationWarnings,
+} from './clinicalValidation.js';
 
 // Import guardrails for input validation and output filtering
 let guardrailsService = null;
@@ -106,10 +110,21 @@ const AI_ENABLED = process.env.AI_ENABLED !== 'false'; // Default: true unless e
 const GUARDRAILS_ENABLED = process.env.GUARDRAILS_ENABLED !== 'false'; // Default: true
 const RAG_ENABLED = process.env.RAG_ENABLED !== 'false'; // Default: true
 
+// Per-task model env var overrides
+const AI_MODEL_SOAP = process.env.AI_MODEL_SOAP || null;
+const AI_MODEL_REDFLAGS = process.env.AI_MODEL_REDFLAGS || null;
+const AI_MODEL_FAST = process.env.AI_MODEL_FAST || null;
+const AI_MODEL_MEDICAL = process.env.AI_MODEL_MEDICAL || null;
+
 // Smart model lifecycle: keep_alive controls how long models stay in VRAM
 // On 16GB systems, only 1 model should be resident at a time
 const KEEP_ALIVE = process.env.AI_KEEP_ALIVE || '2m'; // Unload after 2 min idle
 let currentLoadedModel = null;
+
+// Model availability cache — refreshed every 5 minutes
+let availableModelsCache = null;
+let availableModelsCacheTime = 0;
+const MODEL_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 /**
  * Model configurations with metadata
@@ -152,6 +167,49 @@ const MODEL_CONFIG = {
     temperature: 0.2, // Lower for safety-critical tasks
     expectedAccuracy: '85-88%',
   },
+
+  // LoRA fine-tuned variants (deployed to Ollama)
+  // Key finding: 7B LoRA > originals; 1.5B/3B LoRA < originals
+  'chiro-fast-lora': {
+    name: 'chiro-fast-lora',
+    base: 'Llama 3.2 1.5B + LoRA',
+    description: 'LoRA variant of fast model (NOT recommended - LoRA hurts small models)',
+    size: '~3.1GB',
+    maxTokens: 2048,
+    temperature: 0.5,
+    expectedAccuracy: '< chiro-fast original',
+    fallbackModel: 'chiro-fast',
+  },
+  'chiro-medical-lora': {
+    name: 'chiro-medical-lora',
+    base: 'MedGemma 3B + LoRA',
+    description: 'LoRA variant of medical model (NOT recommended - LoRA hurts small models)',
+    size: '~6.2GB',
+    maxTokens: 2048,
+    temperature: 0.2,
+    expectedAccuracy: '< chiro-medical original',
+    fallbackModel: 'chiro-medical',
+  },
+  'chiro-norwegian-lora': {
+    name: 'chiro-norwegian-lora',
+    base: 'NorwAI-Mistral-7B + LoRA',
+    description: 'Best SOAP accuracy (89.8%) - recommended for clinical documentation',
+    size: '~14.2GB',
+    maxTokens: 4096,
+    temperature: 0.3,
+    expectedAccuracy: '89.8%',
+    fallbackModel: 'chiro-norwegian',
+  },
+  'chiro-no-lora': {
+    name: 'chiro-no-lora',
+    base: 'Mistral 7B + LoRA',
+    description: '100% red flag detection - recommended for safety analysis',
+    size: '~15GB',
+    maxTokens: 4096,
+    temperature: 0.2,
+    expectedAccuracy: '85.6% (100% red flag detection)',
+    fallbackModel: 'chiro-no',
+  },
 };
 
 /**
@@ -165,43 +223,125 @@ const MODEL_CONFIG = {
  * - General clinical → chiro-no (Mistral 7B)
  */
 const MODEL_ROUTING = {
-  // chiro-no (Mistral 7B) - Primary clinical model for structured documentation
-  'soap_notes': 'chiro-no',
-  'clinical_summary': 'chiro-no',
-  'journal_organization': 'chiro-no',
-  'diagnosis_suggestion': 'chiro-no',
-  'sick_leave': 'chiro-no',
+  // SOAP & clinical documentation → chiro-norwegian-lora (89.8% SOAP accuracy)
+  // Falls back to chiro-norwegian if LoRA unavailable
+  soap_notes: 'chiro-norwegian-lora',
+  clinical_summary: 'chiro-norwegian-lora',
+  journal_organization: 'chiro-norwegian-lora',
+  diagnosis_suggestion: 'chiro-no',
+  sick_leave: 'chiro-no',
 
-  // chiro-fast (Llama 3.2 3B) - Fast autocomplete and short suggestions
-  'autocomplete': 'chiro-fast',
-  'spell_check': 'chiro-fast',
-  'abbreviation': 'chiro-fast',
-  'quick_suggestion': 'chiro-fast',
+  // Fast autocomplete → chiro-fast ORIGINAL (LoRA hurts small models)
+  autocomplete: 'chiro-fast',
+  spell_check: 'chiro-fast',
+  abbreviation: 'chiro-fast',
+  quick_suggestion: 'chiro-fast',
 
-  // chiro-norwegian (NorwAI-Mistral-7B) - Norwegian language specialist
-  // Changed from Viking 7B based on 2025 research showing 95% accuracy
-  'norwegian_text': 'chiro-norwegian',
-  'patient_communication': 'chiro-norwegian',
-  'referral_letter': 'chiro-norwegian',
-  'report_writing': 'chiro-norwegian',
-  'patient_education': 'chiro-norwegian',
-  'consent_form': 'chiro-norwegian',
+  // Norwegian language specialist
+  norwegian_text: 'chiro-norwegian',
+  patient_communication: 'chiro-norwegian',
+  referral_letter: 'chiro-norwegian',
+  report_writing: 'chiro-norwegian',
+  patient_education: 'chiro-norwegian',
+  consent_form: 'chiro-norwegian',
 
-  // chiro-medical (MedGemma 4B) - Clinical reasoning and safety
-  'red_flag_analysis': 'chiro-medical',
-  'differential_diagnosis': 'chiro-medical',
-  'treatment_safety': 'chiro-medical',
-  'clinical_reasoning': 'chiro-medical',
-  'medication_interaction': 'chiro-medical',
-  'contraindication_check': 'chiro-medical',
+  // Safety & red flags → chiro-no-lora (100% red flag detection)
+  // Falls back to chiro-medical if LoRA unavailable
+  red_flag_analysis: 'chiro-no-lora',
+  differential_diagnosis: 'chiro-medical',
+  treatment_safety: 'chiro-no-lora',
+  clinical_reasoning: 'chiro-medical',
+  medication_interaction: 'chiro-medical',
+  contraindication_check: 'chiro-no-lora',
+};
+
+/**
+ * Env var override mapping for task categories
+ * Maps task types to their env var override
+ */
+const TASK_ENV_OVERRIDES = {
+  soap_notes: AI_MODEL_SOAP,
+  clinical_summary: AI_MODEL_SOAP,
+  journal_organization: AI_MODEL_SOAP,
+  red_flag_analysis: AI_MODEL_REDFLAGS,
+  treatment_safety: AI_MODEL_REDFLAGS,
+  contraindication_check: AI_MODEL_REDFLAGS,
+  autocomplete: AI_MODEL_FAST,
+  spell_check: AI_MODEL_FAST,
+  abbreviation: AI_MODEL_FAST,
+  quick_suggestion: AI_MODEL_FAST,
+  differential_diagnosis: AI_MODEL_MEDICAL,
+  clinical_reasoning: AI_MODEL_MEDICAL,
+  medication_interaction: AI_MODEL_MEDICAL,
+};
+
+/**
+ * Refresh the available models cache from Ollama
+ */
+const refreshAvailableModels = async () => {
+  try {
+    const response = await axios.get(`${OLLAMA_BASE_URL}/api/tags`, { timeout: 5000 });
+    const models = response.data.models?.map((m) => m.name.split(':')[0]) || [];
+    availableModelsCache = new Set(models);
+    availableModelsCacheTime = Date.now();
+    logger.debug('Model availability cache refreshed', { models: [...availableModelsCache] });
+  } catch (error) {
+    logger.warn('Failed to refresh model availability cache:', error.message);
+    // Keep stale cache if we had one
+    if (!availableModelsCache) {
+      availableModelsCache = new Set();
+    }
+  }
+};
+
+/**
+ * Check if a model is available in Ollama (uses cache)
+ */
+const isModelAvailable = async (modelName) => {
+  if (!availableModelsCache || Date.now() - availableModelsCacheTime > MODEL_CACHE_TTL) {
+    await refreshAvailableModels();
+  }
+  return availableModelsCache.has(modelName);
 };
 
 /**
  * Get the appropriate model for a given task type
- * Falls back to AI_MODEL env var or chiro-no if task not mapped
+ * Priority: env var override > MODEL_ROUTING > AI_MODEL fallback
+ * If selected model is unavailable, falls back to its base model
  */
-const getModelForTask = (taskType) => {
-  return MODEL_ROUTING[taskType] || AI_MODEL;
+const getModelForTask = async (taskType) => {
+  // 1. Check env var override
+  const envOverride = TASK_ENV_OVERRIDES[taskType];
+  if (envOverride) {
+    const available = await isModelAvailable(envOverride);
+    if (available) return envOverride;
+    logger.warn(
+      `Env override model "${envOverride}" unavailable for task "${taskType}", using routing`
+    );
+  }
+
+  // 2. Check MODEL_ROUTING
+  const routedModel = MODEL_ROUTING[taskType] || AI_MODEL;
+
+  // 3. Check availability and fall back if needed
+  const available = await isModelAvailable(routedModel);
+  if (available) return routedModel;
+
+  // 4. Check if model config has a fallback
+  const config = MODEL_CONFIG[routedModel];
+  if (config?.fallbackModel) {
+    const fallbackAvailable = await isModelAvailable(config.fallbackModel);
+    if (fallbackAvailable) {
+      logger.info(
+        `Model "${routedModel}" unavailable, falling back to "${config.fallbackModel}" for task "${taskType}"`
+      );
+      return config.fallbackModel;
+    }
+  }
+
+  // 5. Ultimate fallback to AI_MODEL
+  logger.warn(`No available model found for task "${taskType}", using default "${AI_MODEL}"`);
+  return AI_MODEL;
 };
 
 /**
@@ -232,7 +372,7 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
     clinicalContext = null,
   } = options;
 
-  const model = taskType ? getModelForTask(taskType) : AI_MODEL;
+  const model = taskType ? await getModelForTask(taskType) : AI_MODEL;
   const modelConfig = MODEL_CONFIG[model] || MODEL_CONFIG['chiro-no'];
   const effectiveTemperature = temperature ?? modelConfig.temperature ?? 0.3;
 
@@ -245,7 +385,7 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
     });
     throw new Error(
       `Safety-critical task "${taskType}" blocked: ${guardrailsCheck.reason}. ` +
-      'Contact administrator to enable guardrails service.'
+        'Contact administrator to enable guardrails service.'
     );
   }
 
@@ -263,7 +403,9 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
 
       if (!inputValidation.proceed) {
         logger.warn('Input blocked by guardrails', { issues: inputValidation.issues });
-        throw new Error('Input validation failed: ' + inputValidation.issues.map(i => i.message).join('; '));
+        throw new Error(
+          'Input validation failed: ' + inputValidation.issues.map((i) => i.message).join('; ')
+        );
       }
 
       sanitizedPrompt = inputValidation.sanitized;
@@ -278,7 +420,7 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
         });
         throw new Error(
           `Safety validation failed for "${taskType}": ${guardrailError.message}. ` +
-          'Cannot proceed without successful validation.'
+            'Cannot proceed without successful validation.'
         );
       }
       logger.warn('Guardrails validation error, proceeding with caution:', guardrailError.message);
@@ -329,8 +471,8 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
         keep_alive: KEEP_ALIVE, // Auto-unload after idle period
         options: {
           temperature: effectiveTemperature,
-          num_predict: maxTokens
-        }
+          num_predict: maxTokens,
+        },
       },
       { timeout: 60000 } // 60s for model loading + generation
     );
@@ -353,7 +495,7 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
 
       if (outputResult.requiresReview) {
         logger.warn('Output flagged for review', {
-          flags: outputResult.flags.map(f => f.type),
+          flags: outputResult.flags.map((f) => f.type),
           hallucinationRisk: outputResult.hallucinationRisk.level,
         });
       }
@@ -370,7 +512,7 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
           ragContext,
           requiresReview: outputResult.requiresReview,
           guardrailsApplied: true,
-        }
+        },
       };
     } catch (guardrailError) {
       // For safety-critical tasks, fail if output filtering fails
@@ -381,7 +523,7 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
         });
         throw new Error(
           `Safety output filtering failed for "${taskType}": ${guardrailError.message}. ` +
-          'Cannot return unvalidated output for safety-critical tasks.'
+            'Cannot return unvalidated output for safety-critical tasks.'
         );
       }
       logger.warn('Output guardrails error, returning raw:', guardrailError.message);
@@ -390,7 +532,8 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
 
   // For safety-critical tasks without guardrails, add mandatory disclaimer
   if (guardrailsCheck.required && !guardrailsCheck.available) {
-    const disclaimer = '\n\n⚠️ ADVARSEL: Dette resultatet er ikke validert av sikkerhetssystemet. ' +
+    const disclaimer =
+      '\n\n⚠️ ADVARSEL: Dette resultatet er ikke validert av sikkerhetssystemet. ' +
       'Klinisk gjennomgang er PÅKREVD før bruk.';
     return {
       text: rawOutput + disclaimer,
@@ -401,7 +544,7 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
         guardrailsApplied: false,
         requiresReview: true,
         safetyWarning: 'Output not validated - manual review required',
-      }
+      },
     };
   }
 
@@ -451,11 +594,17 @@ Behold alle medisinske fagtermer. Svar kun med den korrigerte teksten uten forkl
       original: text,
       corrected: correctedText.trim(),
       hasChanges: text.trim() !== correctedText.trim(),
-      aiAvailable: true
+      aiAvailable: true,
     };
   } catch (error) {
     logger.error('Spell check error:', error);
-    return { original: text, corrected: text, hasChanges: false, aiAvailable: false, error: error.message };
+    return {
+      original: text,
+      corrected: text,
+      hasChanges: false,
+      aiAvailable: false,
+      error: error.message,
+    };
   }
 };
 
@@ -501,7 +650,13 @@ export const generateSOAPSuggestions = async (chiefComplaint, section = 'subject
       break;
 
     default:
-      return { section, chiefComplaint, suggestion: '', error: 'Invalid section', aiAvailable: false };
+      return {
+        section,
+        chiefComplaint,
+        suggestion: '',
+        error: 'Invalid section',
+        aiAvailable: false,
+      };
   }
 
   try {
@@ -549,10 +704,16 @@ export const suggestDiagnosisCodes = async (soapData) => {
     availableCodes = codesResult.rows;
   } catch (dbError) {
     logger.error('Database error fetching diagnosis codes:', dbError);
-    return { suggestion: '', codes: [], reasoning: '', aiAvailable: false, error: 'Database unavailable' };
+    return {
+      suggestion: '',
+      codes: [],
+      reasoning: '',
+      aiAvailable: false,
+      error: 'Database unavailable',
+    };
   }
 
-  const codesText = availableCodes.map(c => `${c.code} - ${c.description_no}`).join('\n');
+  const codesText = availableCodes.map((c) => `${c.code} - ${c.description_no}`).join('\n');
 
   const systemPrompt = `Du er en kiropraktor-assistent. Basert på kliniske funn, foreslå de mest relevante ICPC-2 diagnosekodene.
 
@@ -569,7 +730,11 @@ Vurdering: ${assessment?.clinical_reasoning || ''}
 Foreslå ICPC-2 koder:`;
 
   try {
-    const suggestion = await generateCompletion(prompt, systemPrompt, { maxTokens: 300, temperature: 0.5, taskType: 'diagnosis_suggestion' });
+    const suggestion = await generateCompletion(prompt, systemPrompt, {
+      maxTokens: 300,
+      temperature: 0.5,
+      taskType: 'diagnosis_suggestion',
+    });
 
     // Extract codes from response
     const suggestedCodes = [];
@@ -583,7 +748,7 @@ Foreslå ICPC-2 koder:`;
       suggestion: suggestion.trim(),
       codes: suggestedCodes,
       reasoning: suggestion,
-      aiAvailable: true
+      aiAvailable: true,
     };
   } catch (error) {
     logger.error('Diagnosis suggestion error:', error);
@@ -602,7 +767,7 @@ export const analyzeRedFlags = async (patientData, soapData) => {
     soapData.subjective?.history || '',
     soapData.objective?.observation || '',
     soapData.objective?.ortho_tests || '',
-    soapData.assessment?.clinical_reasoning || ''
+    soapData.assessment?.clinical_reasoning || '',
   ].join(' ');
 
   // Rule-based red flag detection (works without AI)
@@ -617,19 +782,23 @@ export const analyzeRedFlags = async (patientData, soapData) => {
 
   // Comprehensive validation with patient context
   const validationResult = await validateClinicalContent(clinicalContent, {
-    patient: patientData
+    patient: patientData,
   });
 
   // If critical flags detected by rules, return immediately
   if (validationResult.riskLevel === 'CRITICAL') {
     logger.warn('CRITICAL red flags detected by clinical validation', {
-      flags: redFlagsDetected.map(f => f.flag),
-      patient: patientData.id
+      flags: redFlagsDetected.map((f) => f.flag),
+      patient: patientData.id,
     });
 
     return {
-      analysis: 'KRITISKE RØDE FLAGG OPPDAGET. ' +
-        redFlagsDetected.filter(f => f.severity === 'CRITICAL').map(f => f.message).join(' '),
+      analysis:
+        'KRITISKE RØDE FLAGG OPPDAGET. ' +
+        redFlagsDetected
+          .filter((f) => f.severity === 'CRITICAL')
+          .map((f) => f.message)
+          .join(' '),
       riskLevel: 'CRITICAL',
       canTreat: false,
       recommendReferral: true,
@@ -637,16 +806,17 @@ export const analyzeRedFlags = async (patientData, soapData) => {
       medicationWarnings,
       requiresImmediateAction: true,
       source: 'clinical_validation',
-      aiAvailable: isAIAvailable()
+      aiAvailable: isAIAvailable(),
     };
   }
 
   // If AI is disabled, return rule-based results only
   if (!isAIAvailable()) {
     return {
-      analysis: redFlagsDetected.length > 0
-        ? `Automatisk oppdagede røde flagg: ${redFlagsDetected.map(f => f.message).join('; ')}`
-        : 'AI-analyse deaktivert. Regelbasert sjekk fullført.',
+      analysis:
+        redFlagsDetected.length > 0
+          ? `Automatisk oppdagede røde flagg: ${redFlagsDetected.map((f) => f.message).join('; ')}`
+          : 'AI-analyse deaktivert. Regelbasert sjekk fullført.',
       riskLevel: validationResult.riskLevel,
       canTreat: !validationResult.hasRedFlags,
       recommendReferral: validationResult.requiresReview,
@@ -654,7 +824,7 @@ export const analyzeRedFlags = async (patientData, soapData) => {
       medicationWarnings,
       confidence: validationResult.confidence,
       source: 'clinical_validation_only',
-      aiAvailable: false
+      aiAvailable: false,
     };
   }
 
@@ -681,21 +851,34 @@ Kliniske funn:
 ${soapData.subjective?.chief_complaint || ''}
 ${soapData.objective?.ortho_tests || ''}
 
-${redFlagsDetected.length > 0 ? `MERK: Følgende røde flagg ble oppdaget automatisk: ${redFlagsDetected.map(f => f.flag).join(', ')}` : ''}
+${redFlagsDetected.length > 0 ? `MERK: Følgende røde flagg ble oppdaget automatisk: ${redFlagsDetected.map((f) => f.flag).join(', ')}` : ''}
 
 Analyser røde flagg og gi anbefaling:`;
 
   try {
-    const analysis = await generateCompletion(prompt, systemPrompt, { maxTokens: 400, temperature: 0.4, taskType: 'red_flag_analysis' });
+    const analysis = await generateCompletion(prompt, systemPrompt, {
+      maxTokens: 400,
+      temperature: 0.4,
+      taskType: 'red_flag_analysis',
+    });
 
     // Combine AI analysis with rule-based detection
     let riskLevel = validationResult.riskLevel;
 
     // AI can upgrade but not downgrade risk level
     const lowercaseAnalysis = analysis.toLowerCase();
-    if (lowercaseAnalysis.includes('akutt henvisning') || lowercaseAnalysis.includes('øyeblikkelig') || lowercaseAnalysis.includes('cauda equina')) {
+    if (
+      lowercaseAnalysis.includes('akutt henvisning') ||
+      lowercaseAnalysis.includes('øyeblikkelig') ||
+      lowercaseAnalysis.includes('cauda equina')
+    ) {
       riskLevel = 'CRITICAL';
-    } else if (riskLevel !== 'CRITICAL' && (lowercaseAnalysis.includes('henvise') || lowercaseAnalysis.includes('lege') || lowercaseAnalysis.includes('utredning'))) {
+    } else if (
+      riskLevel !== 'CRITICAL' &&
+      (lowercaseAnalysis.includes('henvise') ||
+        lowercaseAnalysis.includes('lege') ||
+        lowercaseAnalysis.includes('utredning'))
+    ) {
       riskLevel = 'HIGH';
     }
 
@@ -708,16 +891,17 @@ Analyser røde flagg og gi anbefaling:`;
       medicationWarnings,
       confidence: validationResult.confidence,
       source: 'combined',
-      aiAvailable: true
+      aiAvailable: true,
     };
   } catch (error) {
     logger.error('Red flag analysis error:', error);
 
     // Fall back to rule-based results if AI fails
     return {
-      analysis: redFlagsDetected.length > 0
-        ? `Automatisk oppdagede røde flagg: ${redFlagsDetected.map(f => f.message).join('; ')}`
-        : 'AI-analyse utilgjengelig. Vennligst gjennomgå manuelt.',
+      analysis:
+        redFlagsDetected.length > 0
+          ? `Automatisk oppdagede røde flagg: ${redFlagsDetected.map((f) => f.message).join('; ')}`
+          : 'AI-analyse utilgjengelig. Vennligst gjennomgå manuelt.',
       riskLevel: validationResult.riskLevel,
       canTreat: !validationResult.hasRedFlags,
       recommendReferral: validationResult.requiresReview,
@@ -726,7 +910,7 @@ Analyser røde flagg og gi anbefaling:`;
       confidence: validationResult.confidence,
       source: 'clinical_validation_only',
       aiAvailable: false,
-      error: error.message
+      error: error.message,
     };
   }
 };
@@ -765,12 +949,16 @@ Oppfølging: ${encounter.plan?.follow_up || ''}
 Generer kort sammendrag (2-3 setninger):`;
 
   try {
-    const summary = await generateCompletion(prompt, systemPrompt, { maxTokens: 200, temperature: 0.6, taskType: 'clinical_summary' });
+    const summary = await generateCompletion(prompt, systemPrompt, {
+      maxTokens: 200,
+      temperature: 0.6,
+      taskType: 'clinical_summary',
+    });
 
     return {
       summary: summary.trim(),
       encounterId: encounter.id,
-      aiAvailable: true
+      aiAvailable: true,
     };
   } catch (error) {
     logger.error('Clinical summary error:', error);
@@ -810,7 +998,7 @@ export const organizeOldJournalNotes = async (noteContent, patientContext = {}) 
       success: false,
       organizedData: null,
       aiAvailable: false,
-      error: 'AI is disabled'
+      error: 'AI is disabled',
     };
   }
 
@@ -953,7 +1141,7 @@ Svar kun med JSON.`;
     const response = await generateCompletion(prompt, systemPrompt, {
       maxTokens: 2000,
       temperature: 0.4, // Lower temperature for more consistent structured output
-      taskType: 'journal_organization'
+      taskType: 'journal_organization',
     });
 
     // Parse JSON response
@@ -972,20 +1160,21 @@ Svar kun med JSON.`;
       organizedData = {
         structured_data: {
           raw_content: noteContent,
-          parsing_error: true
+          parsing_error: true,
         },
         soap: {
           subjective: { chief_complaint: noteContent.substring(0, 500) },
           objective: {},
           assessment: {},
-          plan: {}
+          plan: {},
         },
         actionable_items: [],
         communication_history: [],
         missing_information: [],
         tags: [],
         confidence_score: 0.3,
-        notes: 'Kunne ikke fullstendig strukturere notatet automatisk. Manuell gjennomgang anbefales.'
+        notes:
+          'Kunne ikke fullstendig strukturere notatet automatisk. Manuell gjennomgang anbefales.',
       };
     }
 
@@ -995,16 +1184,15 @@ Svar kun med JSON.`;
       rawResponse: response,
       model: AI_MODEL,
       provider: 'ollama',
-      aiAvailable: true
+      aiAvailable: true,
     };
-
   } catch (error) {
     logger.error('Organize old journal notes error:', error);
     return {
       success: false,
       error: error.message,
       organizedData: null,
-      aiAvailable: false
+      aiAvailable: false,
     };
   }
 };
@@ -1019,13 +1207,13 @@ export const organizeMultipleNotes = async (notes, patientContext = {}) => {
     return {
       totalNotes: notes.length,
       successfullyProcessed: 0,
-      results: notes.map(note => ({
+      results: notes.map((note) => ({
         noteId: note.id || null,
         filename: note.filename || null,
         success: false,
-        error: 'AI is disabled'
+        error: 'AI is disabled',
       })),
-      aiAvailable: false
+      aiAvailable: false,
     };
   }
 
@@ -1037,25 +1225,25 @@ export const organizeMultipleNotes = async (notes, patientContext = {}) => {
       results.push({
         noteId: note.id || null,
         filename: note.filename || null,
-        ...result
+        ...result,
       });
 
       // Add small delay to avoid overwhelming the AI service
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
     } catch (error) {
       results.push({
         noteId: note.id || null,
         filename: note.filename || null,
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
 
   return {
     totalNotes: notes.length,
-    successfullyProcessed: results.filter(r => r.success).length,
-    results
+    successfullyProcessed: results.filter((r) => r.success).length,
+    results,
   };
 };
 
@@ -1071,7 +1259,7 @@ export const mergeOrganizedNotes = async (organizedNotes, patientContext = {}) =
       mergedNote: '',
       sourceNotesCount: organizedNotes.length,
       aiAvailable: false,
-      error: 'AI is disabled'
+      error: 'AI is disabled',
     };
   }
 
@@ -1086,9 +1274,12 @@ Prinsipper:
 
 Svar i SOAP-format på norsk, med tydelig tidslinje.`;
 
-  const notesText = organizedNotes.map((note, index) =>
-    `=== Notat ${index + 1} (${note.suggested_date || 'ukjent dato'}) ===\n${JSON.stringify(note.soap, null, 2)}`
-  ).join('\n\n');
+  const notesText = organizedNotes
+    .map(
+      (note, index) =>
+        `=== Notat ${index + 1} (${note.suggested_date || 'ukjent dato'}) ===\n${JSON.stringify(note.soap, null, 2)}`
+    )
+    .join('\n\n');
 
   const prompt = `Pasientkontekst:
 Navn: ${patientContext.first_name || ''} ${patientContext.last_name || ''}
@@ -1102,7 +1293,7 @@ Lag ett samlet, kronologisk SOAP-notat som fanger hele pasienthistorikken.`;
     const merged = await generateCompletion(prompt, systemPrompt, {
       maxTokens: 2000,
       temperature: 0.5,
-      taskType: 'clinical_summary'
+      taskType: 'clinical_summary',
     });
 
     return {
@@ -1110,19 +1301,25 @@ Lag ett samlet, kronologisk SOAP-notat som fanger hele pasienthistorikken.`;
       mergedNote: merged.trim(),
       sourceNotesCount: organizedNotes.length,
       dateRange: {
-        earliest: organizedNotes.reduce((min, n) =>
-          !min || (n.suggested_date && n.suggested_date < min) ? n.suggested_date : min, null),
-        latest: organizedNotes.reduce((max, n) =>
-          !max || (n.suggested_date && n.suggested_date > max) ? n.suggested_date : max, null)
+        earliest: organizedNotes.reduce(
+          (min, n) =>
+            !min || (n.suggested_date && n.suggested_date < min) ? n.suggested_date : min,
+          null
+        ),
+        latest: organizedNotes.reduce(
+          (max, n) =>
+            !max || (n.suggested_date && n.suggested_date > max) ? n.suggested_date : max,
+          null
+        ),
       },
-      aiAvailable: true
+      aiAvailable: true,
     };
   } catch (error) {
     logger.error('Merge organized notes error:', error);
     return {
       success: false,
       error: error.message,
-      aiAvailable: false
+      aiAvailable: false,
     };
   }
 };
@@ -1138,11 +1335,20 @@ export const getAIStatus = async () => {
       available: false,
       enabled: false,
       model: AI_MODEL,
-      message: 'AI is disabled via AI_ENABLED=false'
+      message: 'AI is disabled via AI_ENABLED=false',
     };
   }
 
-  const expectedModels = ['chiro-no', 'chiro-fast', 'chiro-norwegian', 'chiro-medical'];
+  const expectedModels = [
+    'chiro-no',
+    'chiro-fast',
+    'chiro-norwegian',
+    'chiro-medical',
+    'chiro-fast-lora',
+    'chiro-medical-lora',
+    'chiro-norwegian-lora',
+    'chiro-no-lora',
+  ];
 
   // Get guardrails and RAG status
   const guardrailsStatus = guardrailsService
@@ -1161,10 +1367,10 @@ export const getAIStatus = async () => {
 
   try {
     const response = await axios.get(`${OLLAMA_BASE_URL}/api/tags`, { timeout: 5000 });
-    const installedModels = response.data.models?.map(m => m.name) || [];
+    const installedModels = response.data.models?.map((m) => m.name) || [];
     const modelStatus = {};
     for (const name of expectedModels) {
-      const installed = installedModels.some(m => m.startsWith(name));
+      const installed = installedModels.some((m) => m.startsWith(name));
       modelStatus[name] = {
         installed,
         config: MODEL_CONFIG[name] || null,
@@ -1194,25 +1400,36 @@ export const getAIStatus = async () => {
   }
 };
 
-export { getModelForTask, MODEL_ROUTING, MODEL_CONFIG, extractCompletionText };
+export {
+  getModelForTask,
+  isModelAvailable,
+  refreshAvailableModels,
+  MODEL_ROUTING,
+  MODEL_CONFIG,
+  extractCompletionText,
+};
 
 /**
  * Get the appropriate model for a clinical field type
  */
-export const getModelForField = (fieldType) => {
-  const fieldModelMap = {
-    'spell-check': 'chiro-fast',
-    'autocomplete': 'chiro-fast',
-    'soap-subjective': 'chiro-no',
-    'soap-objective': 'chiro-no',
-    'soap-assessment': 'chiro-no',
-    'soap-plan': 'chiro-no',
-    'diagnosis': 'chiro-no',
-    'red-flag': 'chiro-medical',
-    'letter': 'chiro-norwegian',
-    'communication': 'chiro-norwegian',
+export const getModelForField = async (fieldType) => {
+  const fieldTaskMap = {
+    'spell-check': 'spell_check',
+    autocomplete: 'autocomplete',
+    'soap-subjective': 'soap_notes',
+    'soap-objective': 'soap_notes',
+    'soap-assessment': 'soap_notes',
+    'soap-plan': 'soap_notes',
+    diagnosis: 'diagnosis_suggestion',
+    'red-flag': 'red_flag_analysis',
+    letter: 'referral_letter',
+    communication: 'patient_communication',
   };
-  return fieldModelMap[fieldType] || AI_MODEL || 'chiro-no';
+  const taskType = fieldTaskMap[fieldType];
+  if (taskType) {
+    return await getModelForTask(taskType);
+  }
+  return AI_MODEL || 'chiro-no';
 };
 
 /**
@@ -1230,12 +1447,16 @@ export const buildFieldPrompt = (fieldType, context = {}, language = 'no') => {
  */
 export const generateCompletionStream = async (model, prompt, res) => {
   try {
-    const response = await axios.post(`${OLLAMA_BASE_URL}/api/generate`, {
-      model: model || AI_MODEL,
-      prompt,
-      stream: true,
-      keep_alive: KEEP_ALIVE,
-    }, { responseType: 'stream', timeout: 60000 });
+    const response = await axios.post(
+      `${OLLAMA_BASE_URL}/api/generate`,
+      {
+        model: model || AI_MODEL,
+        prompt,
+        stream: true,
+        keep_alive: KEEP_ALIVE,
+      },
+      { responseType: 'stream', timeout: 60000 }
+    );
 
     response.data.on('data', (chunk) => {
       try {
@@ -1274,5 +1495,5 @@ export default {
   mergeOrganizedNotes,
   getAIStatus,
   getModelForTask,
-  MODEL_ROUTING
+  MODEL_ROUTING,
 };

@@ -586,7 +586,7 @@ def export_to_gguf(model, tokenizer, output_dir, model_key, quantization, logger
     export_time = time.time() - export_start
     logger.info(f"Export completed in {export_time/60:.1f} minutes")
 
-    return gguf_path if converted else merged_dir
+    return lora_dir
 
 
 # ============================================================
