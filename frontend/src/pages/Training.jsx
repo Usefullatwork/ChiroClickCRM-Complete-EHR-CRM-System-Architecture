@@ -621,6 +621,90 @@ function AnalyticsTab() {
         )}
       </div>
 
+      {/* A/B Model Routing View */}
+      {comparison.length > 0 && (
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+            <BarChart3 className="w-5 h-5" />
+            A/B Modellsammenligning - Detaljert
+          </h2>
+
+          {comparison.some((c) => parseInt(c.total_feedback) < 30) && (
+            <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <p className="text-sm text-amber-800">
+                <AlertCircle className="w-4 h-4 inline mr-1" />
+                Statistisk usikre resultater — noen modeller har under 30 tilbakemeldinger. Vent til
+                flere data er samlet inn for palitelige sammenligninger.
+              </p>
+            </div>
+          )}
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead>
+                <tr className="border-b bg-gray-50">
+                  <th className="text-left py-3 px-4 font-medium text-gray-600">Modell</th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600">Totale forslag</th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600">
+                    Godkjenningsrate
+                  </th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600">
+                    Gj.sn. vurdering
+                  </th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600">Gj.sn. latens</th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600">
+                    Tilbakemeldinger
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {comparison.map((c) => (
+                  <tr key={c.model_name} className="border-b hover:bg-gray-50">
+                    <td className="py-3 px-4 font-mono text-sm font-medium">{c.model_name}</td>
+                    <td className="py-3 px-4 text-right">{c.total_suggestions}</td>
+                    <td className="py-3 px-4 text-right">
+                      <span
+                        className={`px-2 py-0.5 rounded text-xs font-medium ${
+                          parseFloat(c.approval_rate) >= 80
+                            ? 'bg-green-100 text-green-700'
+                            : parseFloat(c.approval_rate) >= 60
+                              ? 'bg-yellow-100 text-yellow-700'
+                              : 'bg-red-100 text-red-700'
+                        }`}
+                      >
+                        {c.approval_rate}%
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-right">{c.avg_user_rating || '-'}</td>
+                    <td className="py-3 px-4 text-right text-gray-600">
+                      {c.avg_latency_ms ? `${c.avg_latency_ms}ms` : '-'}
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      <span
+                        className={
+                          parseInt(c.total_feedback) < 30 ? 'text-amber-600 font-medium' : ''
+                        }
+                      >
+                        {c.total_feedback}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-800 font-medium mb-1">Modellruting (MODEL_ROUTING)</p>
+            <p className="text-xs text-blue-700">
+              Oppgaver rutes automatisk til den best egnede modellen basert pa type: Norsk tekst
+              &rarr; chiro-norwegian, Medisinsk &rarr; chiro-medical, Hurtig &rarr; chiro-fast,
+              Generell &rarr; chiro-no. Konfigureres via miljovaribler.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Usage Volume + Task Distribution */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Daily Request Volume */}
