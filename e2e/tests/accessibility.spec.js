@@ -70,10 +70,37 @@ test.describe('ARIA Labels', () => {
     // Navigate via SPA to avoid full-page-reload auth issues in CI
     await authenticatedPage.goto('/patients');
     await authenticatedPage.waitForSelector('[data-testid="patients-add-button"]', { timeout: 15000 });
+
+    // Capture console errors BEFORE navigation
+    const consoleErrors = [];
+    authenticatedPage.on('console', msg => {
+      if (msg.type() === 'error') consoleErrors.push(msg.text());
+    });
+    authenticatedPage.on('pageerror', err => consoleErrors.push(err.message));
+
     await authenticatedPage.locator('[data-testid="patients-add-button"]').click();
 
+    // Check if the form appeared OR if ErrorBoundary caught a crash
+    const formOrError = await Promise.race([
+      authenticatedPage.waitForSelector('[data-testid="new-patient-first-name"]', { timeout: 15000 })
+        .then(() => 'form'),
+      authenticatedPage.waitForSelector('[data-testid="error-boundary"]', { timeout: 15000 })
+        .then(() => 'error-boundary'),
+    ]);
+
+    if (formOrError === 'error-boundary') {
+      const errorMsg = await authenticatedPage.locator('[data-testid="error-boundary-message"]')
+        .textContent()
+        .catch(() => 'Could not read error message');
+      console.error('=== NewPatient CRASH DIAGNOSTICS ===');
+      console.error('Error message:', errorMsg);
+      console.error('Console errors:', JSON.stringify(consoleErrors));
+      console.error('=== END DIAGNOSTICS ===');
+      throw new Error(`NewPatient crashed: ${errorMsg}`);
+    }
+
     // Verify key inputs have labels via data-testid
-    await expect(authenticatedPage.locator('[data-testid="new-patient-first-name"]')).toBeVisible({ timeout: 15000 });
+    await expect(authenticatedPage.locator('[data-testid="new-patient-first-name"]')).toBeVisible();
     await expect(authenticatedPage.locator('[data-testid="new-patient-last-name"]')).toBeVisible();
     await expect(authenticatedPage.locator('[data-testid="new-patient-dob"]')).toBeVisible();
   });

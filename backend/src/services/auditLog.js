@@ -357,7 +357,7 @@ export const auditMiddleware = (actionType) => async (req, res, next) => {
  * Extract resource type from URL path
  */
 const extractResourceType = (path) => {
-  const match = path.match(/\/api\/([^\/]+)/);
+  const match = path.match(/\/api\/([^/]+)/);
   return match ? match[1] : 'unknown';
 };
 

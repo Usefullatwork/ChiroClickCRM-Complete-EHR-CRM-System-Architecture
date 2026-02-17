@@ -16,13 +16,14 @@ try {
   getDatabaseCredentials = vaultModule.getDatabaseCredentials;
 } catch {
   // Fallback to env vars if Vault not configured
-  getDatabaseCredentials = async () => ({
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '5432'),
-    database: process.env.DB_NAME || 'chiroclickcrm',
-    user: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD,
-  });
+  getDatabaseCredentials = () =>
+    Promise.resolve({
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || '5432'),
+      database: process.env.DB_NAME || 'chiroclickcrm',
+      user: process.env.DB_USER || 'postgres',
+      password: process.env.DB_PASSWORD,
+    });
 }
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -119,13 +120,13 @@ export const query = async (text, params) => {
  */
 export const queryRead = async (text, params) => {
   const targetPool = readReplicaPool || pool;
-  return await targetPool.query(text, params);
+  return targetPool.query(text, params);
 };
 
 /**
  * Get client for transactions
  */
-export const getClient = async () => await getPool().connect();
+export const getClient = () => getPool().connect();
 
 /**
  * Transaction helper

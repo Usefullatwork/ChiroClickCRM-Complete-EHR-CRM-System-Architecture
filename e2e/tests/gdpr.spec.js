@@ -105,8 +105,36 @@ test.describe('New Patient Consent Fields', () => {
   async function navigateToNewPatient(page) {
     await page.goto('/patients');
     await page.waitForSelector('[data-testid="patients-add-button"]', { timeout: 15000 });
+
+    // Capture console errors BEFORE navigation
+    const consoleErrors = [];
+    page.on('console', msg => {
+      if (msg.type() === 'error') consoleErrors.push(msg.text());
+    });
+    page.on('pageerror', err => consoleErrors.push(err.message));
+
     await page.locator('[data-testid="patients-add-button"]').click();
-    await page.waitForSelector('[data-testid="new-patient-first-name"]', { timeout: 15000 });
+
+    // Check if the form appeared OR if ErrorBoundary caught a crash
+    const formOrError = await Promise.race([
+      page.waitForSelector('[data-testid="new-patient-first-name"]', { timeout: 15000 })
+        .then(() => 'form'),
+      page.waitForSelector('[data-testid="error-boundary"]', { timeout: 15000 })
+        .then(() => 'error-boundary'),
+    ]);
+
+    if (formOrError === 'error-boundary') {
+      const errorMsg = await page.locator('[data-testid="error-boundary-message"]')
+        .textContent()
+        .catch(() => 'Could not read error message');
+      const bodyText = await page.locator('body').innerText().catch(() => '');
+      console.error('=== NewPatient CRASH DIAGNOSTICS ===');
+      console.error('Error message:', errorMsg);
+      console.error('Console errors:', JSON.stringify(consoleErrors));
+      console.error('Body text:', bodyText.substring(0, 500));
+      console.error('=== END DIAGNOSTICS ===');
+      throw new Error(`NewPatient crashed: ${errorMsg}`);
+    }
   }
 
   test('should have consent checkboxes on new patient form', async ({ authenticatedPage }) => {

@@ -149,7 +149,7 @@ const validatePatientData = (patient, index) => {
 
   // Validate phone format (Norwegian)
   if (patient.phone) {
-    const cleanPhone = patient.phone.replace(/[\s\-]/g, '');
+    const cleanPhone = patient.phone.replace(/[\s-]/g, '');
     if (!/^(\+47)?[4-9]\d{7}$/.test(cleanPhone)) {
       errors.push(`Patient ${index}: Invalid Norwegian phone number: ${patient.phone}`);
     } else {
@@ -216,7 +216,7 @@ const findExistingPatient = async (organizationId, patient) => {
 
   // Check by phone
   if (patient.phone) {
-    const cleanPhone = patient.phone.replace(/[\s\-\+]/g, '').replace(/^47/, '');
+    const cleanPhone = patient.phone.replace(/[\s+-]/g, '').replace(/^47/, '');
     const result = await query(
       `SELECT id, first_name, last_name FROM patients
        WHERE organization_id = $1

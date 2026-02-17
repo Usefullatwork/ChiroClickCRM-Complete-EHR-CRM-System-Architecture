@@ -13,7 +13,7 @@ const SALT_ROUNDS = 12;
  * @param {string} password - Plain text password
  * @returns {Promise<string>} - Hashed password
  */
-export const hashPassword = async (password) => bcrypt.hash(password, SALT_ROUNDS);
+export const hashPassword = async (password) => await bcrypt.hash(password, SALT_ROUNDS);
 
 /**
  * Verify a password against a hash
@@ -21,7 +21,7 @@ export const hashPassword = async (password) => bcrypt.hash(password, SALT_ROUND
  * @param {string} hash - Hashed password
  * @returns {Promise<boolean>} - True if password matches
  */
-export const verifyPassword = async (password, hash) => bcrypt.compare(password, hash);
+export const verifyPassword = async (password, hash) => await bcrypt.compare(password, hash);
 
 /**
  * Generate a secure random token

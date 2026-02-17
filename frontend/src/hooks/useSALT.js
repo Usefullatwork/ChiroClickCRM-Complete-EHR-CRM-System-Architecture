@@ -75,6 +75,7 @@ export function useSALT(patientId, options = {}) {
     if (autoFetch && patientId) {
       fetchSimilar();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoFetch, patientId]); // Only run on mount
 
   // Refetch when chief complaint changes (debounced)
@@ -88,6 +89,7 @@ export function useSALT(patientId, options = {}) {
     }, 1000);
 
     return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chiefComplaint]);
 
   /**

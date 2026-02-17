@@ -11,7 +11,7 @@ import {
   screenPatient,
   screenAge,
   screenExaminationFindings,
-  SEVERITY
+  SEVERITY,
 } from '../services/redFlagScreeningService';
 
 /**
@@ -27,7 +27,7 @@ export function useRedFlagScreening({
   lang = 'en',
   autoScreen = true,
   debounceMs = 500,
-  onCriticalFlag
+  onCriticalFlag,
 } = {}) {
   const [flags, setFlags] = useState([]);
   const [summary, setSummary] = useState({
@@ -37,7 +37,7 @@ export function useRedFlagScreening({
     medium: 0,
     low: 0,
     requiresImmediateAction: false,
-    categories: []
+    categories: [],
   });
   const [isScreening, setIsScreening] = useState(false);
   const [lastScreened, setLastScreened] = useState(null);
@@ -46,80 +46,98 @@ export function useRedFlagScreening({
   const previousCriticalRef = useRef(false);
 
   // Screen text with debouncing
-  const screenTextDebounced = useCallback((text) => {
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-    }
+  const screenTextDebounced = useCallback(
+    (text) => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
 
-    debounceTimerRef.current = setTimeout(() => {
+      debounceTimerRef.current = setTimeout(() => {
+        setIsScreening(true);
+        const results = screenText(text, lang);
+        updateFlags(results);
+        setIsScreening(false);
+      }, debounceMs);
+    },
+    [lang, debounceMs, updateFlags]
+  );
+
+  // Update flags and trigger callbacks
+  const updateFlags = useCallback(
+    (newFlags) => {
+      setFlags(newFlags);
+      setLastScreened(new Date().toISOString());
+
+      const newSummary = {
+        total: newFlags.length,
+        critical: newFlags.filter((f) => f.severity === SEVERITY.CRITICAL).length,
+        high: newFlags.filter((f) => f.severity === SEVERITY.HIGH).length,
+        medium: newFlags.filter((f) => f.severity === SEVERITY.MEDIUM).length,
+        low: newFlags.filter((f) => f.severity === SEVERITY.LOW).length,
+        requiresImmediateAction: newFlags.some((f) => f.severity === SEVERITY.CRITICAL),
+        categories: [...new Set(newFlags.map((f) => f.category))],
+      };
+      setSummary(newSummary);
+
+      // Trigger callback for new critical flags
+      const hasCritical = newSummary.critical > 0;
+      if (hasCritical && !previousCriticalRef.current && onCriticalFlag) {
+        const criticalFlags = newFlags.filter((f) => f.severity === SEVERITY.CRITICAL);
+        onCriticalFlag(criticalFlags);
+      }
+      previousCriticalRef.current = hasCritical;
+    },
+    [onCriticalFlag]
+  );
+
+  // Screen full patient data
+  const screenFullPatient = useCallback(
+    (patientData) => {
+      setIsScreening(true);
+      const results = screenPatient(patientData, lang);
+      updateFlags(results.flags);
+      setIsScreening(false);
+      return results;
+    },
+    [lang, updateFlags]
+  );
+
+  // Screen specific text immediately
+  const screenTextImmediate = useCallback(
+    (text) => {
       setIsScreening(true);
       const results = screenText(text, lang);
       updateFlags(results);
       setIsScreening(false);
-    }, debounceMs);
-  }, [lang, debounceMs]);
-
-  // Update flags and trigger callbacks
-  const updateFlags = useCallback((newFlags) => {
-    setFlags(newFlags);
-    setLastScreened(new Date().toISOString());
-
-    const newSummary = {
-      total: newFlags.length,
-      critical: newFlags.filter(f => f.severity === SEVERITY.CRITICAL).length,
-      high: newFlags.filter(f => f.severity === SEVERITY.HIGH).length,
-      medium: newFlags.filter(f => f.severity === SEVERITY.MEDIUM).length,
-      low: newFlags.filter(f => f.severity === SEVERITY.LOW).length,
-      requiresImmediateAction: newFlags.some(f => f.severity === SEVERITY.CRITICAL),
-      categories: [...new Set(newFlags.map(f => f.category))]
-    };
-    setSummary(newSummary);
-
-    // Trigger callback for new critical flags
-    const hasCritical = newSummary.critical > 0;
-    if (hasCritical && !previousCriticalRef.current && onCriticalFlag) {
-      const criticalFlags = newFlags.filter(f => f.severity === SEVERITY.CRITICAL);
-      onCriticalFlag(criticalFlags);
-    }
-    previousCriticalRef.current = hasCritical;
-  }, [onCriticalFlag]);
-
-  // Screen full patient data
-  const screenFullPatient = useCallback((patientData) => {
-    setIsScreening(true);
-    const results = screenPatient(patientData, lang);
-    updateFlags(results.flags);
-    setIsScreening(false);
-    return results;
-  }, [lang, updateFlags]);
-
-  // Screen specific text immediately
-  const screenTextImmediate = useCallback((text) => {
-    setIsScreening(true);
-    const results = screenText(text, lang);
-    updateFlags(results);
-    setIsScreening(false);
-    return results;
-  }, [lang, updateFlags]);
+      return results;
+    },
+    [lang, updateFlags]
+  );
 
   // Screen age
-  const screenPatientAge = useCallback((age) => {
-    return screenAge(age, lang);
-  }, [lang]);
+  const screenPatientAge = useCallback(
+    (age) => {
+      return screenAge(age, lang);
+    },
+    [lang]
+  );
 
   // Screen examination
-  const screenExam = useCallback((findings) => {
-    return screenExaminationFindings(findings, lang);
-  }, [lang]);
+  const screenExam = useCallback(
+    (findings) => {
+      return screenExaminationFindings(findings, lang);
+    },
+    [lang]
+  );
 
   // Acknowledge a flag
   const acknowledgeFlag = useCallback((flagId) => {
-    setAcknowledgedFlags(prev => new Set([...prev, flagId]));
+    setAcknowledgedFlags((prev) => new Set([...prev, flagId]));
   }, []);
 
   // Acknowledge all flags
   const acknowledgeAllFlags = useCallback(() => {
-    setAcknowledgedFlags(new Set(flags.map(f => f.id)));
+    setAcknowledgedFlags(new Set(flags.map((f) => f.id)));
   }, [flags]);
 
   // Reset acknowledgements
@@ -137,7 +155,7 @@ export function useRedFlagScreening({
       medium: 0,
       low: 0,
       requiresImmediateAction: false,
-      categories: []
+      categories: [],
     });
     setAcknowledgedFlags(new Set());
   }, []);
@@ -153,12 +171,12 @@ export function useRedFlagScreening({
 
   // Unacknowledged flags
   const unacknowledgedFlags = useMemo(() => {
-    return flags.filter(f => !acknowledgedFlags.has(f.id));
+    return flags.filter((f) => !acknowledgedFlags.has(f.id));
   }, [flags, acknowledgedFlags]);
 
   // Has unacknowledged critical
   const hasUnacknowledgedCritical = useMemo(() => {
-    return unacknowledgedFlags.some(f => f.severity === SEVERITY.CRITICAL);
+    return unacknowledgedFlags.some((f) => f.severity === SEVERITY.CRITICAL);
   }, [unacknowledgedFlags]);
 
   return {
@@ -184,7 +202,7 @@ export function useRedFlagScreening({
     resetAcknowledgements,
 
     // Utility
-    clearFlags
+    clearFlags,
   };
 }
 
@@ -197,7 +215,8 @@ export function useTextFieldScreening(initialValue = '', lang = 'en') {
   const [flags, setFlags] = useState([]);
 
   useEffect(() => {
-    if (value.length > 10) { // Only screen if meaningful text
+    if (value.length > 10) {
+      // Only screen if meaningful text
       const timer = setTimeout(() => {
         const results = screenText(value, lang);
         setFlags(results);
@@ -208,8 +227,8 @@ export function useTextFieldScreening(initialValue = '', lang = 'en') {
     }
   }, [value, lang]);
 
-  const hasCritical = flags.some(f => f.severity === SEVERITY.CRITICAL);
-  const hasHigh = flags.some(f => f.severity === SEVERITY.HIGH);
+  const hasCritical = flags.some((f) => f.severity === SEVERITY.CRITICAL);
+  const hasHigh = flags.some((f) => f.severity === SEVERITY.HIGH);
 
   return {
     value,
@@ -217,7 +236,7 @@ export function useTextFieldScreening(initialValue = '', lang = 'en') {
     flags,
     hasCritical,
     hasHigh,
-    hasFlags: flags.length > 0
+    hasFlags: flags.length > 0,
   };
 }
 

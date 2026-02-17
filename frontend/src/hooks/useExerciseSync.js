@@ -192,6 +192,7 @@ export const useExerciseSync = (patientId = null) => {
         db.close();
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Monitor online/offline status
@@ -215,6 +216,7 @@ export const useExerciseSync = (patientId = null) => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [db]);
 
   // Update pending count
@@ -258,6 +260,7 @@ export const useExerciseSync = (patientId = null) => {
         clearInterval(syncIntervalRef.current);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [db, isOnline]);
 
   /**

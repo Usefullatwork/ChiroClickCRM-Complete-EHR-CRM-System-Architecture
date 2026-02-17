@@ -1,7 +1,9 @@
+/* eslint-disable require-await */
 /**
  * In-Memory Cache
  * Map-based cache with TTL support. Drop-in replacement for Redis cache.
  * Used in desktop/standalone mode when Redis is not available.
+ * Methods are intentionally async to match the Redis API interface.
  */
 
 import logger from '../utils/logger.js';

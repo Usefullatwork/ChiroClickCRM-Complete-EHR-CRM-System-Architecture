@@ -142,25 +142,25 @@ export const extractTreatment = (behandlingText) => {
   };
 
   // Leddjustering/manipulation
-  const manipMatches = behandlingText.matchAll(/Leddjustering ([^\.]+)/gi);
+  const manipMatches = behandlingText.matchAll(/Leddjustering ([^.]+)/gi);
   for (const match of manipMatches) {
     treatment.manipulation.push(match[1].trim());
   }
 
   // Soft tissue (Trp, bvm, ART)
-  const softTissueMatches = behandlingText.matchAll(/(?:Trp|bvm|ART)[\/]?\s*([^\.]+)/gi);
+  const softTissueMatches = behandlingText.matchAll(/(?:Trp|bvm|ART)[/]?\s*([^.]+)/gi);
   for (const match of softTissueMatches) {
     treatment.soft_tissue.push(match[1].trim());
   }
 
   // Øvelser
-  const exerciseMatches = behandlingText.matchAll(/Øvelse[rs]?:([^\.]+)/gi);
+  const exerciseMatches = behandlingText.matchAll(/Øvelse[rs]?:([^.]+)/gi);
   for (const match of exerciseMatches) {
     treatment.exercises.push(match[1].trim());
   }
 
   // Råd
-  const adviceMatches = behandlingText.matchAll(/Råd om ([^\.]+)/gi);
+  const adviceMatches = behandlingText.matchAll(/Råd om ([^.]+)/gi);
   for (const match of adviceMatches) {
     treatment.advice.push(match[1].trim());
   }
@@ -337,10 +337,10 @@ const extractSymptoms = (anamneseText) => {
 
   const symptoms = [];
   const symptomPatterns = [
-    /smerte i ([^,\.]+)/gi,
-    /vondt i ([^,\.]+)/gi,
-    /stiv[t]? ([^,\.]+)/gi,
-    /utstråling ([^,\.]+)/gi,
+    /smerte i ([^,.]+)/gi,
+    /vondt i ([^,.]+)/gi,
+    /stiv[t]? ([^,.]+)/gi,
+    /utstråling ([^,.]+)/gi,
   ];
 
   for (const pattern of symptomPatterns) {

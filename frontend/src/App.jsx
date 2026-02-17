@@ -124,9 +124,30 @@ function App() {
           <Route
             path="patients/new"
             element={
-              <Suspense fallback={<PageLoader />}>
-                <NewPatient />
-              </Suspense>
+              <ErrorBoundary
+                fallback={
+                  <div className="p-6 max-w-5xl mx-auto">
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+                      <h2 className="text-lg font-semibold text-red-900 mb-2">
+                        Could not load form
+                      </h2>
+                      <p className="text-red-700 mb-4">
+                        An error occurred loading the new patient form.
+                      </p>
+                      <button
+                        onClick={() => window.location.reload()}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      >
+                        Reload Page
+                      </button>
+                    </div>
+                  </div>
+                }
+              >
+                <Suspense fallback={<PageLoader />}>
+                  <NewPatient />
+                </Suspense>
+              </ErrorBoundary>
             }
           />
           <Route

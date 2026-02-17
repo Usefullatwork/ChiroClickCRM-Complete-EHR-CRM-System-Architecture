@@ -10,7 +10,7 @@
  * Bilingual: English/Norwegian
  */
 
-import { useEffect, useCallback, useState, createContext, useContext } from 'react';
+import { useEffect, useCallback, useMemo, useState, createContext, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // =============================================================================
@@ -134,44 +134,50 @@ export function KeyboardShortcutsProvider({ children, lang = 'en' }) {
   }, []);
 
   // Default handlers
-  const defaultHandlers = useCallback({
-    GO_DASHBOARD: () => navigate('/'),
-    GO_PATIENTS: () => navigate('/patients'),
-    GO_CALENDAR: () => navigate('/appointments'),
-    GO_MESSAGES: () => navigate('/communications'),
-    GO_SETTINGS: () => navigate('/settings'),
-    GO_KPI: () => navigate('/kpi'),
-    NEW_PATIENT: () => navigate('/patients/new'),
-    NEW_APPOINTMENT: () => navigate('/appointments/new'),
-    QUICK_SEARCH: () => {
-      // Focus the search input if it exists
-      const searchInput = document.querySelector('[data-search-input]');
-      if (searchInput) {
-        searchInput.focus();
-      }
-    },
-    COMMAND_PALETTE: () => setCommandPalette(true),
-    SHOW_SHORTCUTS: () => setShowHelp(true),
-    CANCEL: () => {
-      setShowHelp(false);
-      setCommandPalette(false);
-    },
-  }, [navigate]);
+  const defaultHandlers = useMemo(
+    () => ({
+      GO_DASHBOARD: () => navigate('/'),
+      GO_PATIENTS: () => navigate('/patients'),
+      GO_CALENDAR: () => navigate('/appointments'),
+      GO_MESSAGES: () => navigate('/communications'),
+      GO_SETTINGS: () => navigate('/settings'),
+      GO_KPI: () => navigate('/kpi'),
+      NEW_PATIENT: () => navigate('/patients/new'),
+      NEW_APPOINTMENT: () => navigate('/appointments/new'),
+      QUICK_SEARCH: () => {
+        // Focus the search input if it exists
+        const searchInput = document.querySelector('[data-search-input]');
+        if (searchInput) {
+          searchInput.focus();
+        }
+      },
+      COMMAND_PALETTE: () => setCommandPalette(true),
+      SHOW_SHORTCUTS: () => setShowHelp(true),
+      CANCEL: () => {
+        setShowHelp(false);
+        setCommandPalette(false);
+      },
+    }),
+    [navigate]
+  );
 
   // Execute a shortcut
-  const executeShortcut = useCallback((shortcutId) => {
-    // Check for custom handler first
-    if (customHandlers[shortcutId]) {
-      customHandlers[shortcutId]();
-      return true;
-    }
-    // Fall back to default handler
-    if (defaultHandlers[shortcutId]) {
-      defaultHandlers[shortcutId]();
-      return true;
-    }
-    return false;
-  }, [customHandlers, defaultHandlers]);
+  const executeShortcut = useCallback(
+    (shortcutId) => {
+      // Check for custom handler first
+      if (customHandlers[shortcutId]) {
+        customHandlers[shortcutId]();
+        return true;
+      }
+      // Fall back to default handler
+      if (defaultHandlers[shortcutId]) {
+        defaultHandlers[shortcutId]();
+        return true;
+      }
+      return false;
+    },
+    [customHandlers, defaultHandlers]
+  );
 
   // Main keyboard handler
   useEffect(() => {
@@ -371,9 +377,7 @@ function ShortcutsHelpModal({ lang = 'en', onClose }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
         <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {t.title}
-          </h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t.title}</h2>
           <button
             onClick={onClose}
             className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400"
@@ -472,14 +476,42 @@ function CommandPalette({ lang = 'en', onClose }) {
   }[lang];
 
   const commands = [
-    { id: 'dashboard', label: { en: 'Go to Dashboard', no: 'Gå til kontrollpanel' }, action: () => navigate('/') },
-    { id: 'patients', label: { en: 'Go to Patients', no: 'Gå til pasienter' }, action: () => navigate('/patients') },
-    { id: 'calendar', label: { en: 'Go to Calendar', no: 'Gå til kalender' }, action: () => navigate('/appointments') },
-    { id: 'messages', label: { en: 'Go to Messages', no: 'Gå til meldinger' }, action: () => navigate('/communications') },
-    { id: 'settings', label: { en: 'Go to Settings', no: 'Gå til innstillinger' }, action: () => navigate('/settings') },
+    {
+      id: 'dashboard',
+      label: { en: 'Go to Dashboard', no: 'Gå til kontrollpanel' },
+      action: () => navigate('/'),
+    },
+    {
+      id: 'patients',
+      label: { en: 'Go to Patients', no: 'Gå til pasienter' },
+      action: () => navigate('/patients'),
+    },
+    {
+      id: 'calendar',
+      label: { en: 'Go to Calendar', no: 'Gå til kalender' },
+      action: () => navigate('/appointments'),
+    },
+    {
+      id: 'messages',
+      label: { en: 'Go to Messages', no: 'Gå til meldinger' },
+      action: () => navigate('/communications'),
+    },
+    {
+      id: 'settings',
+      label: { en: 'Go to Settings', no: 'Gå til innstillinger' },
+      action: () => navigate('/settings'),
+    },
     { id: 'kpi', label: { en: 'Go to KPI', no: 'Gå til KPI' }, action: () => navigate('/kpi') },
-    { id: 'new-patient', label: { en: 'Create New Patient', no: 'Opprett ny pasient' }, action: () => navigate('/patients/new') },
-    { id: 'new-appointment', label: { en: 'Create New Appointment', no: 'Opprett ny avtale' }, action: () => navigate('/appointments/new') },
+    {
+      id: 'new-patient',
+      label: { en: 'Create New Patient', no: 'Opprett ny pasient' },
+      action: () => navigate('/patients/new'),
+    },
+    {
+      id: 'new-appointment',
+      label: { en: 'Create New Appointment', no: 'Opprett ny avtale' },
+      action: () => navigate('/appointments/new'),
+    },
   ];
 
   const filteredCommands = commands.filter((cmd) =>
@@ -518,9 +550,7 @@ function CommandPalette({ lang = 'en', onClose }) {
 
         <div className="max-h-80 overflow-y-auto">
           {filteredCommands.length === 0 ? (
-            <div className="p-4 text-center text-gray-500 dark:text-gray-400">
-              {t.noResults}
-            </div>
+            <div className="p-4 text-center text-gray-500 dark:text-gray-400">{t.noResults}</div>
           ) : (
             <div className="p-2">
               {filteredCommands.map((command) => (
@@ -529,9 +559,7 @@ function CommandPalette({ lang = 'en', onClose }) {
                   onClick={() => handleSelect(command)}
                   className="w-full px-4 py-3 text-left rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 >
-                  <span className="text-gray-900 dark:text-white">
-                    {command.label[lang]}
-                  </span>
+                  <span className="text-gray-900 dark:text-white">{command.label[lang]}</span>
                 </button>
               ))}
             </div>

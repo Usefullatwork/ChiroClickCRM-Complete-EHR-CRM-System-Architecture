@@ -27,8 +27,12 @@ module.exports = {
     'brace-style': ['error', '1tbs'],
     'no-throw-literal': 'error',
     'prefer-promise-reject-errors': 'error',
-    'no-return-await': 'warn',
-    'require-await': 'warn',
+    // Disabled: no-return-await is deprecated in ESLint 8.46+ and return await
+    // is required inside try-catch for proper stack traces
+    'no-return-await': 'off',
+    // Disabled: many services are stubs/fallbacks that must maintain async
+    // interfaces for API compatibility (memory-cache, vault, email, sms, etc.)
+    'require-await': 'off',
 
     // Code quality
     'no-duplicate-imports': 'error',

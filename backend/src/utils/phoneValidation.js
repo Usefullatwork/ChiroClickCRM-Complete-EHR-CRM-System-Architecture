@@ -267,7 +267,7 @@ export const cleanPhoneNumber = (phone) => {
   if (!phone) {
     return '';
   }
-  return phone.replace(/[\s\-\(\)\.]/g, '');
+  return phone.replace(/[\s().-]/g, '');
 };
 
 /**

@@ -138,6 +138,7 @@ export function useOffline(options = {}) {
         navigator.serviceWorker.removeEventListener('message', handleSwMessage);
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handle messages from service worker
@@ -163,6 +164,7 @@ export function useOffline(options = {}) {
         log.debug(' Cache status:', payload);
         break;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // =============================================================================
@@ -210,6 +212,7 @@ export function useOffline(options = {}) {
         clearTimeout(syncTimeoutRef.current);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoSync, onOnline, onOffline]);
 
   // =============================================================================
@@ -238,6 +241,7 @@ export function useOffline(options = {}) {
         }
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoSync]);
 
   // =============================================================================

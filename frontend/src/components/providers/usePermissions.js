@@ -21,7 +21,7 @@ const PermissionsContext = createContext(null);
  */
 export function PermissionsProvider({ children, currentUser }) {
   const userRole = currentUser?.role || 'STAFF';
-  const rolePermissions = ROLES[userRole]?.permissions || [];
+  const rolePermissions = useMemo(() => ROLES[userRole]?.permissions || [], [userRole]);
 
   // Check if user has a specific permission
   const hasPermission = useCallback(

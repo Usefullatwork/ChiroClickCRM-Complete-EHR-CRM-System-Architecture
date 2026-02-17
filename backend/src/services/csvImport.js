@@ -463,7 +463,7 @@ const normalizePhone = (value) => {
   }
 
   // Remove common formatting characters
-  let cleaned = value.replace(/[\s\-\(\)\.]/g, '');
+  let cleaned = value.replace(/[\s().-]/g, '');
 
   // Remove Norwegian country code if present
   if (cleaned.startsWith('+47')) {
