@@ -14,7 +14,7 @@
  * - Exercise PDF Templates
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { crmAPI, patientsAPI } from '../services/api';
 import logger from '../utils/logger';
 import { useTranslation } from '../i18n';
@@ -38,18 +38,18 @@ import {
   ListChecks,
 } from 'lucide-react';
 
-// Import CRM sub-components
-import LeadManagement from '../components/crm/LeadManagement';
-import PatientLifecycle from '../components/crm/PatientLifecycle';
-import ReferralProgram from '../components/crm/ReferralProgram';
-import SurveyManager from '../components/crm/SurveyManager';
-import CommunicationHistory from '../components/crm/CommunicationHistory';
-import CampaignManager from '../components/crm/CampaignManager';
-import WorkflowBuilder from '../components/crm/WorkflowBuilder';
-import RetentionDashboard from '../components/crm/RetentionDashboard';
-import WaitlistManager from '../components/crm/WaitlistManager';
-import ExerciseTemplates from '../components/crm/ExerciseTemplates';
-import CRMSettings from '../components/crm/CRMSettings';
+// Lazy-load CRM sub-components (only one shown at a time via tab switching)
+const LeadManagement = lazy(() => import('../components/crm/LeadManagement'));
+const PatientLifecycle = lazy(() => import('../components/crm/PatientLifecycle'));
+const ReferralProgram = lazy(() => import('../components/crm/ReferralProgram'));
+const SurveyManager = lazy(() => import('../components/crm/SurveyManager'));
+const CommunicationHistory = lazy(() => import('../components/crm/CommunicationHistory'));
+const CampaignManager = lazy(() => import('../components/crm/CampaignManager'));
+const WorkflowBuilder = lazy(() => import('../components/crm/WorkflowBuilder'));
+const RetentionDashboard = lazy(() => import('../components/crm/RetentionDashboard'));
+const WaitlistManager = lazy(() => import('../components/crm/WaitlistManager'));
+const ExerciseTemplates = lazy(() => import('../components/crm/ExerciseTemplates'));
+const CRMSettings = lazy(() => import('../components/crm/CRMSettings'));
 
 const CRM_MODULES = [
   {
@@ -617,7 +617,11 @@ export default function CRM() {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-6">{renderModuleContent()}</div>
+        <div className="flex-1 p-6">
+          <Suspense fallback={<div className="p-6 text-gray-500">Laster modul...</div>}>
+            {renderModuleContent()}
+          </Suspense>
+        </div>
       </div>
     </div>
   );
