@@ -91,8 +91,8 @@ if (process.env.NODE_ENV === 'development') {
   );
 }
 
-// Rate limiting (skip in test/e2e to avoid 429s during Playwright runs)
-if (!['test', 'e2e'].includes(process.env.NODE_ENV)) {
+// Rate limiting (skip only in e2e to avoid 429s during Playwright runs)
+if (process.env.NODE_ENV !== 'e2e') {
   const limiter = rateLimit({
     windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'), // 15 minutes
     max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'),

@@ -11,6 +11,14 @@ const log = logger.scope('API');
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 const API_TIMEOUT = import.meta.env.VITE_API_TIMEOUT || 30000;
 
+/**
+ * Get the base API URL (without /api/v1 suffix) for use outside the axios client
+ */
+export const getApiBaseUrl = () => {
+  const url = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+  return url.replace(/\/api\/v1\/?$/, '');
+};
+
 // Secure organization storage using sessionStorage (more secure than localStorage)
 // Organization ID is cleared when browser tab is closed
 const ORG_STORAGE_KEY = 'org_session';

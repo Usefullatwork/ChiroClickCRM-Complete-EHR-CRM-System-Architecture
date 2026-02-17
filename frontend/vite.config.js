@@ -8,8 +8,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  // Use relative asset paths so desktop mode (Electron) can load from localhost
-  base: './',
+  // Use absolute paths for proper SPA routing; relative './' breaks nested routes
+  // served by static servers (e.g., /patients/new resolves ./assets to /patients/assets/)
+  base: '/',
   plugins: [react(), visualizer({ open: false, filename: 'dist/stats.html' })],
   esbuild: {
     loader: 'jsx',

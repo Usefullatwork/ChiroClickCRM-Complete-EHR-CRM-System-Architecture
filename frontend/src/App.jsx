@@ -3,7 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import DashboardLayout from './components/layouts/DashboardLayout';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { setOrganizationId } from './services/api';
+import { setOrganizationId, getApiBaseUrl } from './services/api';
 import useGlobalKeyboardShortcuts from './hooks/useGlobalKeyboardShortcuts';
 import KeyboardShortcutsModal from './components/common/KeyboardShortcutsModal';
 
@@ -64,7 +64,9 @@ function App() {
     const autoLogin = async () => {
       try {
         // Check if already logged in
-        const checkRes = await fetch('/api/v1/auth/me', { credentials: 'include' });
+        const checkRes = await fetch(`${getApiBaseUrl()}/api/v1/auth/me`, {
+          credentials: 'include',
+        });
         if (checkRes.ok) {
           const data = await checkRes.json();
           const orgId = data.user?.organization_id || data.user?.organizationId || DESKTOP_ORG_ID;

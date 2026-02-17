@@ -44,7 +44,7 @@ test.describe('Appointments Page', () => {
 
     // Either the list or empty state should be visible
     const list = authenticatedPage.locator('[data-testid="appointments-list"]');
-    const emptyState = authenticatedPage.locator('text=/No appointments|Ingen timer/i');
+    const emptyState = authenticatedPage.locator('text=/No appointments|Ingen avtaler/i');
 
     const listVisible = await list.isVisible().catch(() => false);
     const emptyVisible = await emptyState.isVisible().catch(() => false);
