@@ -2,33 +2,33 @@
  * API Client Tests
  */
 
-import { describe, it, expect, beforeEach, jest } from '@jest/globals';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 // Setup mocks
 const mockSessionStorage = {
   store: {},
-  getItem: jest.fn((key) => mockSessionStorage.store[key] || null),
-  setItem: jest.fn((key, value) => {
+  getItem: vi.fn((key) => mockSessionStorage.store[key] || null),
+  setItem: vi.fn((key, value) => {
     mockSessionStorage.store[key] = value;
   }),
-  removeItem: jest.fn((key) => {
+  removeItem: vi.fn((key) => {
     delete mockSessionStorage.store[key];
   }),
-  clear: jest.fn(() => {
+  clear: vi.fn(() => {
     mockSessionStorage.store = {};
   }),
 };
 
 const mockLocalStorage = {
   store: {},
-  getItem: jest.fn((key) => mockLocalStorage.store[key] || null),
-  setItem: jest.fn((key, value) => {
+  getItem: vi.fn((key) => mockLocalStorage.store[key] || null),
+  setItem: vi.fn((key, value) => {
     mockLocalStorage.store[key] = value;
   }),
-  removeItem: jest.fn((key) => {
+  removeItem: vi.fn((key) => {
     delete mockLocalStorage.store[key];
   }),
-  clear: jest.fn(() => {
+  clear: vi.fn(() => {
     mockLocalStorage.store = {};
   }),
 };
@@ -43,7 +43,7 @@ describe('API Client', () => {
   beforeEach(() => {
     mockSessionStorage.clear();
     mockLocalStorage.clear();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Organization ID Storage', () => {
@@ -57,7 +57,7 @@ describe('API Client', () => {
     });
 
     it('should clear organization ID when null is passed', async () => {
-      const { setOrganizationId, _getOrganizationId } = await import('../../src/services/api.js');
+      const { setOrganizationId } = await import('../../src/services/api.js');
 
       setOrganizationId('test-org-123');
       setOrganizationId(null);
@@ -68,12 +68,12 @@ describe('API Client', () => {
     it('should migrate from localStorage to sessionStorage', async () => {
       mockLocalStorage.store['organizationId'] = 'legacy-org-id';
 
-      const { _getOrganizationId } = await import('../../src/services/api.js');
+      await import('../../src/services/api.js');
 
       // Clear module cache to force re-import
-      jest.resetModules();
+      vi.resetModules();
 
-      const { getOrganizationId: _freshGetOrgId } = await import('../../src/services/api.js');
+      await import('../../src/services/api.js');
 
       // Should attempt to read from localStorage as fallback
       expect(mockLocalStorage.getItem).toHaveBeenCalledWith('organizationId');
@@ -92,7 +92,7 @@ describe('API Client', () => {
     it('should handle corrupted storage data gracefully', async () => {
       mockSessionStorage.store['org_session'] = 'invalid-base64-!!!';
 
-      jest.resetModules();
+      vi.resetModules();
       const { getOrganizationId } = await import('../../src/services/api.js');
 
       const result = getOrganizationId();
