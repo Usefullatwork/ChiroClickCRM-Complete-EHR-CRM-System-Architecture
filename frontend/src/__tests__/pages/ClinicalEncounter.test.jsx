@@ -154,7 +154,7 @@ vi.mock('../../components/TemplatePicker', () => ({
 }));
 
 vi.mock('../../components/clinical/QuickPalpationSpine', () => ({
-  default: ({ onInsertText }) => <div data-testid="quick-palpation">QuickPalpation</div>,
+  default: () => <div data-testid="quick-palpation">QuickPalpation</div>,
 }));
 
 vi.mock('../../components/clinical', () => ({

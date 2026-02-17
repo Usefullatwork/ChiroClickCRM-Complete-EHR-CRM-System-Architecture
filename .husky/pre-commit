@@ -11,7 +11,7 @@ npx lint-staged
 # - Skips test files, portal, database, migrations, and logger utility
 # - Skips files with /* eslint-disable no-console */ (explicitly opted out)
 echo "🔍 Checking for console.log statements..."
-STAGED_JS=$(git diff --cached --name-only | grep -E '\.(js|jsx|ts|tsx)$' | grep -v -E '(desktop/|tests/|__tests__/|\.test\.|portal/|database/|migrations/|utils/logger\.js|public/|scripts/)')
+STAGED_JS=$(git diff --cached --name-only | grep -E '\.(js|jsx|ts|tsx)$' | grep -v -E '(desktop/|tests/|__tests__/|\.test\.|portal/|database/|migrations/|utils/logger\.js|public/|scripts/)' || true)
 if [ -n "$STAGED_JS" ]; then
   # Filter out files that have eslint-disable no-console
   FILES_TO_CHECK=""

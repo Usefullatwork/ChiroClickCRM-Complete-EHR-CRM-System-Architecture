@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import axios from 'axios';
+import _axios from 'axios';
 
 // Mock axios
 vi.mock('axios', () => ({
