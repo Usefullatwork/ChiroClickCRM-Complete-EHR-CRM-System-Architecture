@@ -153,7 +153,7 @@ describe('ExerciseCard Component', () => {
 
       // Find and click the complete button
       await waitFor(() => {
-        const completeButton = screen.getByText('Marker som fullfort');
+        const completeButton = screen.getByText('Marker som fullført');
         expect(completeButton).toBeInTheDocument();
         fireEvent.click(completeButton);
       });
@@ -168,7 +168,7 @@ describe('ExerciseCard Component', () => {
       fireEvent.click(screen.getByText(mockExercise.name));
 
       await waitFor(() => {
-        expect(screen.getByText('Fullfort')).toBeInTheDocument();
+        expect(screen.getByText('Fullført')).toBeInTheDocument();
       });
     });
   });
@@ -253,7 +253,7 @@ describe('ExerciseCard Component', () => {
       fireEvent.click(screen.getByText(mockExercise.name));
 
       await waitFor(() => {
-        expect(screen.getByText('Marker som fullfort')).toBeInTheDocument();
+        expect(screen.getByText('Marker som fullført')).toBeInTheDocument();
       });
     });
 
@@ -266,7 +266,7 @@ describe('ExerciseCard Component', () => {
       fireEvent.click(screen.getByText(mockExercise.name));
 
       await waitFor(() => {
-        expect(screen.queryByText('Marker som fullfort')).not.toBeInTheDocument();
+        expect(screen.queryByText('Marker som fullført')).not.toBeInTheDocument();
       });
     });
 
@@ -317,12 +317,12 @@ describe('ExerciseCard Component', () => {
   describe('Edge Cases', () => {
     it('should handle missing exercise data gracefully', () => {
       render(<ExerciseCard exercise={{}} />);
-      expect(screen.getByText('Ukjent ovelse')).toBeInTheDocument();
+      expect(screen.getByText('Ukjent øvelse')).toBeInTheDocument();
     });
 
     it('should handle null exercise gracefully', () => {
       render(<ExerciseCard exercise={null} />);
-      expect(screen.getByText('Ukjent ovelse')).toBeInTheDocument();
+      expect(screen.getByText('Ukjent øvelse')).toBeInTheDocument();
     });
 
     it('should handle exercise without video URL', () => {

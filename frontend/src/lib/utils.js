@@ -131,6 +131,42 @@ export function getStatusColor(status) {
 }
 
 /**
+ * Format Norwegian phone number for display
+ */
+export function formatNorwegianPhone(phone) {
+  if (!phone) {
+    return '';
+  }
+
+  const str = String(phone).replace(/\s/g, '');
+  const hasCountryCode = str.startsWith('+47');
+  const cleaned = str.replace(/^\+47/, '');
+
+  if (cleaned.length === 8) {
+    const formatted = `${cleaned.slice(0, 3)} ${cleaned.slice(3, 5)} ${cleaned.slice(5)}`;
+    return hasCountryCode ? `+47 ${formatted}` : formatted;
+  }
+
+  return String(phone);
+}
+
+/**
+ * Format personnummer for display (mask last 5 digits)
+ */
+export function formatPersonnummer(personnummer) {
+  if (!personnummer) {
+    return '';
+  }
+
+  const str = String(personnummer);
+  if (str.length === 11) {
+    return `${str.slice(0, 6)}***`;
+  }
+
+  return str;
+}
+
+/**
  * Debounce function
  */
 export function debounce(func, wait) {

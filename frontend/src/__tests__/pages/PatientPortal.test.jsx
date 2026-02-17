@@ -29,7 +29,7 @@ describe('PatientPortal Page', () => {
     clinicPhone: '+47 22 33 44 55',
     prescribedBy: 'Dr. Hansen',
     prescribedAt: new Date().toISOString(),
-    patientInstructions: 'Utfor ovelsene 2 ganger daglig',
+    patientInstructions: 'Utfør øvelsene 2 ganger daglig',
     exercises: [
       {
         ...createMockExercise(),
@@ -98,7 +98,7 @@ describe('PatientPortal Page', () => {
 
       renderWithRouter(<PatientPortal />);
 
-      expect(screen.getByText('Laster ovelser...')).toBeInTheDocument();
+      expect(screen.getByText('Laster øvelser...')).toBeInTheDocument();
     });
 
     it('should show loading animation', () => {
@@ -125,7 +125,7 @@ describe('PatientPortal Page', () => {
       renderWithRouter(<PatientPortal />);
 
       await waitFor(() => {
-        expect(screen.getByText('Ovelsene er ikke tilgjengelige')).toBeInTheDocument();
+        expect(screen.getByText('Øvelsene er ikke tilgjengelige')).toBeInTheDocument();
       });
     });
 
@@ -135,7 +135,9 @@ describe('PatientPortal Page', () => {
       renderWithRouter(<PatientPortal />);
 
       await waitFor(() => {
-        expect(screen.getByText(/Kontakt klinikken for a fa en ny lenke/)).toBeInTheDocument();
+        expect(
+          screen.getByText(/Kontakt klinikken for å få en ny lenke til øvelsene dine./)
+        ).toBeInTheDocument();
       });
     });
 
@@ -165,11 +167,11 @@ describe('PatientPortal Page', () => {
       });
     });
 
-    it('should display "Ditt ovelsesprogram" subtitle', async () => {
+    it('should display "Ditt øvelsesprogram" subtitle', async () => {
       renderWithRouter(<PatientPortal />);
 
       await waitFor(() => {
-        expect(screen.getByText('Ditt ovelsesprogram')).toBeInTheDocument();
+        expect(screen.getByText('Ditt øvelsesprogram')).toBeInTheDocument();
       });
     });
 
@@ -253,7 +255,7 @@ describe('PatientPortal Page', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(`Ovelser (${mockPrescription.exercises.length})`)
+          screen.getByText(`Øvelser (${mockPrescription.exercises.length})`)
         ).toBeInTheDocument();
       });
     });
@@ -372,11 +374,11 @@ describe('PatientPortal Page', () => {
       fireEvent.click(screen.getByText('Skulderrotasjon'));
 
       await waitFor(() => {
-        expect(screen.getByText('Marker som fullfort')).toBeInTheDocument();
+        expect(screen.getByText('Marker som fullført')).toBeInTheDocument();
       });
     });
 
-    it('should show "Fullfort i dag" for completed exercises', async () => {
+    it('should show "Fullført i dag" for completed exercises', async () => {
       renderWithRouter(<PatientPortal />);
 
       await waitFor(() => {
@@ -387,7 +389,7 @@ describe('PatientPortal Page', () => {
       fireEvent.click(screen.getByText('Nakkestrekning'));
 
       await waitFor(() => {
-        expect(screen.getByText('Fullfort i dag')).toBeInTheDocument();
+        expect(screen.getByText('Fullført i dag')).toBeInTheDocument();
       });
     });
   });
@@ -408,14 +410,15 @@ describe('PatientPortal Page', () => {
       fireEvent.click(screen.getByText('Skulderrotasjon'));
 
       await waitFor(() => {
-        expect(screen.getByText('Marker som fullfort')).toBeInTheDocument();
+        expect(screen.getByText('Marker som fullført')).toBeInTheDocument();
       });
 
       // Click complete button
-      fireEvent.click(screen.getByText('Marker som fullfort'));
+      fireEvent.click(screen.getByText('Marker som fullført'));
 
       await waitFor(() => {
-        expect(screen.getByText('Registrer fremgang')).toBeInTheDocument();
+        // Modal title and submit button both say 'Registrer fremgang'
+        expect(screen.getByRole('heading', { name: 'Registrer fremgang' })).toBeInTheDocument();
       });
     });
 
@@ -429,7 +432,7 @@ describe('PatientPortal Page', () => {
       fireEvent.click(screen.getByText('Skulderrotasjon'));
 
       await waitFor(() => {
-        fireEvent.click(screen.getByText('Marker som fullfort'));
+        fireEvent.click(screen.getByText('Marker som fullført'));
       });
 
       await waitFor(() => {
@@ -447,10 +450,10 @@ describe('PatientPortal Page', () => {
       });
 
       fireEvent.click(screen.getByText('Skulderrotasjon'));
-      await waitFor(() => fireEvent.click(screen.getByText('Marker som fullfort')));
+      await waitFor(() => fireEvent.click(screen.getByText('Marker som fullført')));
 
       await waitFor(() => {
-        expect(screen.getByText('Sett fullfort')).toBeInTheDocument();
+        expect(screen.getByText('Sett fullført')).toBeInTheDocument();
       });
     });
 
@@ -462,7 +465,7 @@ describe('PatientPortal Page', () => {
       });
 
       fireEvent.click(screen.getByText('Skulderrotasjon'));
-      await waitFor(() => fireEvent.click(screen.getByText('Marker som fullfort')));
+      await waitFor(() => fireEvent.click(screen.getByText('Marker som fullført')));
 
       await waitFor(() => {
         expect(screen.getByText('Repetisjoner')).toBeInTheDocument();
@@ -477,10 +480,10 @@ describe('PatientPortal Page', () => {
       });
 
       fireEvent.click(screen.getByText('Skulderrotasjon'));
-      await waitFor(() => fireEvent.click(screen.getByText('Marker som fullfort')));
+      await waitFor(() => fireEvent.click(screen.getByText('Marker som fullført')));
 
       await waitFor(() => {
-        expect(screen.getByText('Hvor vanskelig var ovelsen?')).toBeInTheDocument();
+        expect(screen.getByText('Hvor vanskelig var øvelsen?')).toBeInTheDocument();
         // Check for rating buttons 1-5
         expect(screen.getByText('1')).toBeInTheDocument();
         expect(screen.getByText('5')).toBeInTheDocument();
@@ -495,10 +498,10 @@ describe('PatientPortal Page', () => {
       });
 
       fireEvent.click(screen.getByText('Skulderrotasjon'));
-      await waitFor(() => fireEvent.click(screen.getByText('Marker som fullfort')));
+      await waitFor(() => fireEvent.click(screen.getByText('Marker som fullført')));
 
       await waitFor(() => {
-        expect(screen.getByText('Smerteniva under ovelsen (0-10)')).toBeInTheDocument();
+        expect(screen.getByText('Smertenivå under øvelsen (0-10)')).toBeInTheDocument();
         const slider = document.querySelector('input[type="range"]');
         expect(slider).toBeInTheDocument();
       });
@@ -512,20 +515,21 @@ describe('PatientPortal Page', () => {
       });
 
       fireEvent.click(screen.getByText('Skulderrotasjon'));
-      await waitFor(() => fireEvent.click(screen.getByText('Marker som fullfort')));
+      await waitFor(() => fireEvent.click(screen.getByText('Marker som fullført')));
 
       await waitFor(() => {
-        expect(screen.getByText('Registrer fremgang')).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Registrer fremgang' })).toBeInTheDocument();
       });
 
-      // Find and click close button
-      const closeButton = document.querySelector('button svg');
-      if (closeButton) {
-        fireEvent.click(closeButton.closest('button'));
-      }
+      // Find and click close button in the modal
+      const modal = document.querySelector('.fixed');
+      const closeButton = modal.querySelector('button');
+      fireEvent.click(closeButton);
 
       await waitFor(() => {
-        expect(screen.queryByText('Registrer fremgang')).not.toBeInTheDocument();
+        expect(
+          screen.queryByRole('heading', { name: 'Registrer fremgang' })
+        ).not.toBeInTheDocument();
       });
     });
 
@@ -537,10 +541,10 @@ describe('PatientPortal Page', () => {
       });
 
       fireEvent.click(screen.getByText('Skulderrotasjon'));
-      await waitFor(() => fireEvent.click(screen.getByText('Marker som fullfort')));
+      await waitFor(() => fireEvent.click(screen.getByText('Marker som fullført')));
 
       await waitFor(() => {
-        expect(screen.getByText('Registrer fremgang')).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Registrer fremgang' })).toBeInTheDocument();
       });
 
       // Click submit button
@@ -563,7 +567,7 @@ describe('PatientPortal Page', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Stopp ovelsene hvis du opplever okt smerte og kontakt klinikken.')
+          screen.getByText('Stopp øvelsene hvis du opplever økt smerte og kontakt klinikken.')
         ).toBeInTheDocument();
       });
     });
@@ -608,10 +612,10 @@ describe('PatientPortal Page', () => {
       });
 
       fireEvent.click(screen.getByText('Skulderrotasjon'));
-      await waitFor(() => fireEvent.click(screen.getByText('Marker som fullfort')));
+      await waitFor(() => fireEvent.click(screen.getByText('Marker som fullført')));
 
       await waitFor(() => {
-        expect(screen.getByText('Registrer fremgang')).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Registrer fremgang' })).toBeInTheDocument();
       });
 
       const submitButton = screen.getByRole('button', { name: 'Registrer fremgang' });

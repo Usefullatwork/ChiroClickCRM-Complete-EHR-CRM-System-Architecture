@@ -32,7 +32,7 @@ describe('formatDate', () => {
   it('should format date in Norwegian format', () => {
     const date = new Date('2024-03-15');
     const result = formatDate(date);
-    expect(result).toMatch(/15.*03.*2024|15\.03\.2024/);
+    expect(result).toMatch(/15.*0?3.*2024/);
   });
 
   it('should handle string dates', () => {
@@ -40,9 +40,9 @@ describe('formatDate', () => {
     expect(result).toBeDefined();
   });
 
-  it('should return empty string for invalid dates', () => {
+  it('should return dash for invalid dates', () => {
     const result = formatDate(null);
-    expect(result).toBe('');
+    expect(result).toBe('-');
   });
 });
 

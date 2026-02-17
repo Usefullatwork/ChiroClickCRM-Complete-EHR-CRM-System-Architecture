@@ -29,13 +29,13 @@ describe('AnatomicalSpine Component', () => {
     it('should render all vertebra labels', () => {
       render(<AnatomicalSpine showLabels onChange={mockOnChange} />);
 
-      // Check for key vertebrae
-      expect(screen.getByText('C1')).toBeInTheDocument();
-      expect(screen.getByText('C7')).toBeInTheDocument();
-      expect(screen.getByText('T1')).toBeInTheDocument();
-      expect(screen.getByText('T12')).toBeInTheDocument();
-      expect(screen.getByText('L1')).toBeInTheDocument();
-      expect(screen.getByText('L5')).toBeInTheDocument();
+      // Check for key vertebrae (may appear in both SVG labels and quick select)
+      expect(screen.getAllByText('C1').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText('C7').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText('T1').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText('T12').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText('L1').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText('L5').length).toBeGreaterThanOrEqual(1);
     });
 
     it('should render region labels', () => {
@@ -143,8 +143,8 @@ describe('AnatomicalSpine Component', () => {
 
       render(<AnatomicalSpine findings={findings} onChange={mockOnChange} />);
 
-      expect(screen.getByText('L4')).toBeInTheDocument();
-      expect(screen.getByText(/Subluksasjon/)).toBeInTheDocument();
+      expect(screen.getAllByText('L4').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText(/Subluksasjon/).length).toBeGreaterThanOrEqual(1);
     });
 
     it('should clear findings when clicking Nullstill', async () => {

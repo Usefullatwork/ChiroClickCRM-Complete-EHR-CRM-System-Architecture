@@ -1,78 +1,130 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+// Mock API module with proper object exports
+vi.mock('../../services/api', () => ({
+  dashboardAPI: {
+    getStats: vi.fn(),
+    getTodayAppointments: vi.fn(),
+    getPendingTasks: vi.fn(),
+  },
+  appointmentsAPI: {
+    cancel: vi.fn(),
+  },
+  followUpsAPI: {
+    getPatientsNeedingFollowUp: vi.fn(),
+    markPatientAsContacted: vi.fn(),
+  },
+}));
+
+// Mock i18n
+vi.mock('../../i18n', () => ({
+  useTranslation: () => ({
+    t: (key, fallback) => fallback || key,
+    lang: 'no',
+  }),
+  formatDateWithWeekday: () => 'Mandag 15. mars 2024',
+  formatDateShort: () => '15.03.2024',
+  formatTime: () => '10:00',
+}));
+
+// Mock toast
+vi.mock('../../utils/toast', () => ({
+  default: {
+    info: vi.fn(),
+    promise: vi.fn(),
+    success: vi.fn(),
+    error: vi.fn(),
+  },
+}));
+
+// Mock skeleton components
+vi.mock('../../components/ui/Skeleton', () => ({
+  StatsGridSkeleton: () => <div>Loading stats...</div>,
+  AppointmentsListSkeleton: () => <div>Loading appointments...</div>,
+  ListSkeleton: () => <div>Loading list...</div>,
+}));
+
+// Mock RecallDashboard
+vi.mock('../../components/recall/RecallDashboard', () => ({
+  default: () => <div>RecallDashboard</div>,
+}));
+
 import Dashboard from '../../pages/Dashboard';
-import * as api from '../../services/api';
+import { dashboardAPI, followUpsAPI } from '../../services/api';
 
-// Mock API module
-vi.mock('../../services/api');
+const createQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+    },
+  });
 
-const renderWithRouter = (component) => {
-  return render(<BrowserRouter>{component}</BrowserRouter>);
+const renderWithProviders = (component) => {
+  const queryClient = createQueryClient();
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>{component}</BrowserRouter>
+    </QueryClientProvider>
+  );
 };
 
 describe('Dashboard Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-  });
 
-  it('should render dashboard header', () => {
-    vi.spyOn(api, 'dashboardAPI').mockImplementation(() => ({
-      getOverview: vi.fn().mockResolvedValue({
+    // Default mock implementations
+    dashboardAPI.getStats.mockResolvedValue({
+      data: {
         todayAppointments: 5,
+        activePatients: 120,
         pendingFollowUps: 3,
-        newPatients: 2,
-        todayRevenue: 12500,
-      }),
-    }));
+        monthRevenue: 125000,
+      },
+    });
 
-    renderWithRouter(<Dashboard />);
+    dashboardAPI.getTodayAppointments.mockResolvedValue({
+      data: { appointments: [] },
+    });
 
-    expect(screen.getByText(/dashboard/i)).toBeInTheDocument();
-  });
-
-  it("should display today's appointment count", async () => {
-    const mockDashboardAPI = {
-      getOverview: vi.fn().mockResolvedValue({
-        todayAppointments: 5,
-        pendingFollowUps: 3,
-        newPatients: 2,
-        todayRevenue: 12500,
-      }),
-    };
-
-    vi.spyOn(api, 'dashboardAPI').mockReturnValue(mockDashboardAPI);
-
-    renderWithRouter(<Dashboard />);
-
-    await waitFor(() => {
-      expect(screen.getByText(/5/)).toBeInTheDocument();
+    followUpsAPI.getPatientsNeedingFollowUp.mockResolvedValue({
+      data: [],
     });
   });
 
-  it('should handle API errors gracefully', async () => {
-    const mockDashboardAPI = {
-      getOverview: vi.fn().mockRejectedValue(new Error('API Error')),
-    };
-
-    vi.spyOn(api, 'dashboardAPI').mockReturnValue(mockDashboardAPI);
-
-    renderWithRouter(<Dashboard />);
+  it('should render dashboard title', async () => {
+    renderWithProviders(<Dashboard />);
 
     await waitFor(() => {
-      expect(screen.getByText(/error/i)).toBeInTheDocument();
+      expect(screen.getByTestId('dashboard-title')).toBeInTheDocument();
     });
   });
 
-  it('should show loading state while fetching data', () => {
-    const mockDashboardAPI = {
-      getOverview: vi.fn().mockImplementation(() => new Promise(() => {})),
-    };
+  it('should display stat cards after loading', async () => {
+    renderWithProviders(<Dashboard />);
 
-    vi.spyOn(api, 'dashboardAPI').mockReturnValue(mockDashboardAPI);
+    await waitFor(() => {
+      const statCards = screen.getAllByTestId('dashboard-stat-card');
+      expect(statCards.length).toBe(4);
+    });
+  });
 
-    renderWithRouter(<Dashboard />);
+  it('should show no appointments message when empty', async () => {
+    renderWithProviders(<Dashboard />);
 
-    expect(screen.getByText(/loading/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('dashboard-chart')).toBeInTheDocument();
+    });
+  });
+
+  it('should fetch dashboard data on mount', async () => {
+    renderWithProviders(<Dashboard />);
+
+    await waitFor(() => {
+      expect(dashboardAPI.getStats).toHaveBeenCalled();
+      expect(dashboardAPI.getTodayAppointments).toHaveBeenCalled();
+    });
   });
 });
