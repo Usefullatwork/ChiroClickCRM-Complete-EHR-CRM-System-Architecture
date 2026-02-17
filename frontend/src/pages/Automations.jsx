@@ -22,32 +22,32 @@ import {
   Plus,
   Play,
   Pause,
-  Settings,
+  _Settings,
   Clock,
   CheckCircle,
   XCircle,
-  AlertCircle,
+  _AlertCircle,
   Calendar,
   Gift,
   UserPlus,
   RefreshCw,
   Filter,
   Search,
-  MoreVertical,
+  _MoreVertical,
   Edit,
   Trash2,
   History,
-  ChevronDown,
-  ChevronRight,
+  _ChevronDown,
+  _ChevronRight,
   BarChart2,
-  Users,
-  MessageSquare,
-  Mail,
-  Bell
+  _Users,
+  _MessageSquare,
+  _Mail,
+  _Bell,
 } from 'lucide-react';
 import WorkflowBuilder from '../components/workflows/WorkflowBuilder';
 import { automationsAPI, patientsAPI, usersAPI } from '../services/api';
-import { formatDate, formatRelativeTime } from '../lib/utils';
+import { _formatDate, formatRelativeTime } from '../lib/utils';
 import toast from '../utils/toast';
 
 // =============================================================================
@@ -56,30 +56,40 @@ import toast from '../utils/toast';
 
 // Add automations API if not in api.js
 const automationsAPILocal = {
-  getWorkflows: (params) => fetch(`/api/v1/automations/workflows?${new URLSearchParams(params)}`).then(r => r.json()),
-  getWorkflow: (id) => fetch(`/api/v1/automations/workflows/${id}`).then(r => r.json()),
-  createWorkflow: (data) => fetch('/api/v1/automations/workflows', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  }).then(r => r.json()),
-  updateWorkflow: (id, data) => fetch(`/api/v1/automations/workflows/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  }).then(r => r.json()),
-  deleteWorkflow: (id) => fetch(`/api/v1/automations/workflows/${id}`, { method: 'DELETE' }).then(r => r.json()),
-  toggleWorkflow: (id) => fetch(`/api/v1/automations/workflows/${id}/toggle`, { method: 'POST' }).then(r => r.json()),
-  getExecutions: (params) => fetch(`/api/v1/automations/executions?${new URLSearchParams(params)}`).then(r => r.json()),
-  getWorkflowExecutions: (id, params) => fetch(`/api/v1/automations/workflows/${id}/executions?${new URLSearchParams(params)}`).then(r => r.json()),
-  testWorkflow: (data) => fetch('/api/v1/automations/workflows/test', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  }).then(r => r.json()),
-  getStats: () => fetch('/api/v1/automations/stats').then(r => r.json()),
-  getTriggerTypes: () => fetch('/api/v1/automations/triggers').then(r => r.json()),
-  getActionTypes: () => fetch('/api/v1/automations/actions').then(r => r.json())
+  getWorkflows: (params) =>
+    fetch(`/api/v1/automations/workflows?${new URLSearchParams(params)}`).then((r) => r.json()),
+  getWorkflow: (id) => fetch(`/api/v1/automations/workflows/${id}`).then((r) => r.json()),
+  createWorkflow: (data) =>
+    fetch('/api/v1/automations/workflows', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    }).then((r) => r.json()),
+  updateWorkflow: (id, data) =>
+    fetch(`/api/v1/automations/workflows/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    }).then((r) => r.json()),
+  deleteWorkflow: (id) =>
+    fetch(`/api/v1/automations/workflows/${id}`, { method: 'DELETE' }).then((r) => r.json()),
+  toggleWorkflow: (id) =>
+    fetch(`/api/v1/automations/workflows/${id}/toggle`, { method: 'POST' }).then((r) => r.json()),
+  getExecutions: (params) =>
+    fetch(`/api/v1/automations/executions?${new URLSearchParams(params)}`).then((r) => r.json()),
+  getWorkflowExecutions: (id, params) =>
+    fetch(`/api/v1/automations/workflows/${id}/executions?${new URLSearchParams(params)}`).then(
+      (r) => r.json()
+    ),
+  testWorkflow: (data) =>
+    fetch('/api/v1/automations/workflows/test', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    }).then((r) => r.json()),
+  getStats: () => fetch('/api/v1/automations/stats').then((r) => r.json()),
+  getTriggerTypes: () => fetch('/api/v1/automations/triggers').then((r) => r.json()),
+  getActionTypes: () => fetch('/api/v1/automations/actions').then((r) => r.json()),
 };
 
 // Use real API if available, otherwise use local
@@ -98,7 +108,7 @@ const TRIGGER_ICONS = {
   DAYS_SINCE_VISIT: Clock,
   BIRTHDAY: Gift,
   LIFECYCLE_CHANGE: RefreshCw,
-  CUSTOM: Zap
+  CUSTOM: Zap,
 };
 
 const TRIGGER_COLORS = {
@@ -110,7 +120,7 @@ const TRIGGER_COLORS = {
   DAYS_SINCE_VISIT: 'yellow',
   BIRTHDAY: 'purple',
   LIFECYCLE_CHANGE: 'indigo',
-  CUSTOM: 'gray'
+  CUSTOM: 'gray',
 };
 
 const STATUS_COLORS = {
@@ -119,7 +129,7 @@ const STATUS_COLORS = {
   COMPLETED: 'green',
   FAILED: 'red',
   CANCELLED: 'gray',
-  PAUSED: 'orange'
+  PAUSED: 'orange',
 };
 
 // =============================================================================
@@ -134,15 +144,15 @@ export default function Automations() {
   const [activeTab, setActiveTab] = useState('workflows');
   const [showBuilder, setShowBuilder] = useState(false);
   const [editingWorkflow, setEditingWorkflow] = useState(null);
-  const [selectedWorkflowId, setSelectedWorkflowId] = useState(null);
+  const [_selectedWorkflowId, setSelectedWorkflowId] = useState(null);
   const [filters, setFilters] = useState({
     isActive: '',
     triggerType: '',
-    search: ''
+    search: '',
   });
   const [executionFilters, setExecutionFilters] = useState({
     status: '',
-    workflowId: ''
+    workflowId: '',
   });
 
   // Labels
@@ -186,7 +196,7 @@ export default function Automations() {
       birthdays: 'Birthdays',
       recalls: 'Recalls',
       hasActiveWorkflow: 'Has active workflow',
-      noActiveWorkflow: 'No active workflow'
+      noActiveWorkflow: 'No active workflow',
     },
     no: {
       title: 'Automatiserte Arbeidsflyter',
@@ -227,8 +237,8 @@ export default function Automations() {
       birthdays: 'Bursdager',
       recalls: 'Tilbakekallinger',
       hasActiveWorkflow: 'Har aktiv arbeidsflyt',
-      noActiveWorkflow: 'Ingen aktiv arbeidsflyt'
-    }
+      noActiveWorkflow: 'Ingen aktiv arbeidsflyt',
+    },
   };
 
   const t = labels[language] || labels.no;
@@ -236,39 +246,41 @@ export default function Automations() {
   // Queries
   const { data: workflowsData, isLoading: workflowsLoading } = useQuery({
     queryKey: ['workflows', filters],
-    queryFn: () => api.getWorkflows({
-      isActive: filters.isActive || undefined,
-      triggerType: filters.triggerType || undefined,
-      limit: 100
-    })
+    queryFn: () =>
+      api.getWorkflows({
+        isActive: filters.isActive || undefined,
+        triggerType: filters.triggerType || undefined,
+        limit: 100,
+      }),
   });
 
   const { data: executionsData, isLoading: executionsLoading } = useQuery({
     queryKey: ['workflow-executions', executionFilters],
-    queryFn: () => api.getExecutions({
-      status: executionFilters.status || undefined,
-      workflowId: executionFilters.workflowId || undefined,
-      limit: 50
-    }),
-    enabled: activeTab === 'executions'
+    queryFn: () =>
+      api.getExecutions({
+        status: executionFilters.status || undefined,
+        workflowId: executionFilters.workflowId || undefined,
+        limit: 50,
+      }),
+    enabled: activeTab === 'executions',
   });
 
   const { data: statsData, isLoading: statsLoading } = useQuery({
     queryKey: ['workflow-stats'],
     queryFn: () => api.getStats(),
-    enabled: activeTab === 'stats'
+    enabled: activeTab === 'stats',
   });
 
   const { data: patientsData } = useQuery({
     queryKey: ['patients-for-test'],
     queryFn: () => patientsAPI.getAll({ limit: 50 }),
-    enabled: showBuilder
+    enabled: showBuilder,
   });
 
   const { data: staffData } = useQuery({
     queryKey: ['staff'],
     queryFn: () => usersAPI.getAll(),
-    enabled: showBuilder
+    enabled: showBuilder,
   });
 
   const workflows = workflowsData?.workflows || [];
@@ -287,7 +299,7 @@ export default function Automations() {
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to create workflow');
-    }
+    },
   });
 
   const updateMutation = useMutation({
@@ -300,7 +312,7 @@ export default function Automations() {
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to update workflow');
-    }
+    },
   });
 
   const deleteMutation = useMutation({
@@ -311,7 +323,7 @@ export default function Automations() {
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to delete workflow');
-    }
+    },
   });
 
   const toggleMutation = useMutation({
@@ -322,7 +334,7 @@ export default function Automations() {
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to toggle workflow');
-    }
+    },
   });
 
   // Handlers
@@ -356,7 +368,7 @@ export default function Automations() {
   };
 
   // Filter workflows by search
-  const filteredWorkflows = workflows.filter(w => {
+  const filteredWorkflows = workflows.filter((w) => {
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
       return (
@@ -379,7 +391,7 @@ export default function Automations() {
         DAYS_SINCE_VISIT: 'Recall',
         BIRTHDAY: 'Birthday',
         LIFECYCLE_CHANGE: 'Lifecycle',
-        CUSTOM: 'Custom'
+        CUSTOM: 'Custom',
       },
       no: {
         PATIENT_CREATED: 'Ny pasient',
@@ -390,8 +402,8 @@ export default function Automations() {
         DAYS_SINCE_VISIT: 'Tilbakekalling',
         BIRTHDAY: 'Bursdag',
         LIFECYCLE_CHANGE: 'Livssyklus',
-        CUSTOM: 'Egendefinert'
-      }
+        CUSTOM: 'Egendefinert',
+      },
     };
     return triggerLabels[language]?.[triggerType] || triggerType;
   };
@@ -451,8 +463,8 @@ export default function Automations() {
           {[
             { id: 'workflows', label: t.workflows, icon: Zap },
             { id: 'executions', label: t.executions, icon: History },
-            { id: 'stats', label: t.stats, icon: BarChart2 }
-          ].map(tab => (
+            { id: 'stats', label: t.stats, icon: BarChart2 },
+          ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
@@ -484,7 +496,7 @@ export default function Automations() {
 
               <select
                 value={filters.isActive}
-                onChange={(e) => setFilters(prev => ({ ...prev, isActive: e.target.value }))}
+                onChange={(e) => setFilters((prev) => ({ ...prev, isActive: e.target.value }))}
                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">{t.allStatuses}</option>
@@ -494,12 +506,14 @@ export default function Automations() {
 
               <select
                 value={filters.triggerType}
-                onChange={(e) => setFilters(prev => ({ ...prev, triggerType: e.target.value }))}
+                onChange={(e) => setFilters((prev) => ({ ...prev, triggerType: e.target.value }))}
                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">{t.allTriggers}</option>
-                {Object.keys(TRIGGER_ICONS).map(type => (
-                  <option key={type} value={type}>{getTriggerLabel(type)}</option>
+                {Object.keys(TRIGGER_ICONS).map((type) => (
+                  <option key={type} value={type}>
+                    {getTriggerLabel(type)}
+                  </option>
                 ))}
               </select>
 
@@ -509,7 +523,7 @@ export default function Automations() {
                   type="text"
                   placeholder={t.searchPlaceholder}
                   value={filters.search}
-                  onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                  onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
                   className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -527,22 +541,22 @@ export default function Automations() {
               </div>
             ) : filteredWorkflows.length > 0 ? (
               <div className="divide-y divide-gray-100">
-                {filteredWorkflows.map(workflow => {
+                {filteredWorkflows.map((workflow) => {
                   const TriggerIcon = TRIGGER_ICONS[workflow.trigger_type] || Zap;
                   const triggerColor = TRIGGER_COLORS[workflow.trigger_type] || 'gray';
-                  const successRate = workflow.total_runs > 0
-                    ? Math.round((workflow.successful_count / workflow.execution_count) * 100)
-                    : 0;
+                  const successRate =
+                    workflow.total_runs > 0
+                      ? Math.round((workflow.successful_count / workflow.execution_count) * 100)
+                      : 0;
 
                   return (
-                    <div
-                      key={workflow.id}
-                      className="px-6 py-4 hover:bg-gray-50 transition-colors"
-                    >
+                    <div key={workflow.id} className="px-6 py-4 hover:bg-gray-50 transition-colors">
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-4 flex-1">
                           {/* Trigger Icon */}
-                          <div className={`w-12 h-12 rounded-lg bg-${triggerColor}-100 flex items-center justify-center`}>
+                          <div
+                            className={`w-12 h-12 rounded-lg bg-${triggerColor}-100 flex items-center justify-center`}
+                          >
                             <TriggerIcon className={`w-6 h-6 text-${triggerColor}-600`} />
                           </div>
 
@@ -550,11 +564,13 @@ export default function Automations() {
                           <div className="flex-1">
                             <div className="flex items-center gap-3">
                               <h3 className="font-medium text-gray-900">{workflow.name}</h3>
-                              <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                                workflow.is_active
-                                  ? 'bg-green-100 text-green-700'
-                                  : 'bg-gray-100 text-gray-600'
-                              }`}>
+                              <span
+                                className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                                  workflow.is_active
+                                    ? 'bg-green-100 text-green-700'
+                                    : 'bg-gray-100 text-gray-600'
+                                }`}
+                              >
                                 {workflow.is_active ? t.enabled : t.disabled}
                               </span>
                             </div>
@@ -570,7 +586,8 @@ export default function Automations() {
                               </span>
                               <span className="flex items-center gap-1">
                                 <Clock className="w-3 h-3" />
-                                {t.lastRun}: {workflow.last_execution
+                                {t.lastRun}:{' '}
+                                {workflow.last_execution
                                   ? formatRelativeTime(workflow.last_execution)
                                   : t.never}
                               </span>
@@ -676,7 +693,9 @@ export default function Automations() {
 
               <select
                 value={executionFilters.status}
-                onChange={(e) => setExecutionFilters(prev => ({ ...prev, status: e.target.value }))}
+                onChange={(e) =>
+                  setExecutionFilters((prev) => ({ ...prev, status: e.target.value }))
+                }
                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">{t.allStatuses}</option>
@@ -688,12 +707,18 @@ export default function Automations() {
 
               <select
                 value={executionFilters.workflowId}
-                onChange={(e) => setExecutionFilters(prev => ({ ...prev, workflowId: e.target.value }))}
+                onChange={(e) =>
+                  setExecutionFilters((prev) => ({ ...prev, workflowId: e.target.value }))
+                }
                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">{language === 'no' ? 'Alle arbeidsflyter' : 'All Workflows'}</option>
-                {workflows.map(w => (
-                  <option key={w.id} value={w.id}>{w.name}</option>
+                <option value="">
+                  {language === 'no' ? 'Alle arbeidsflyter' : 'All Workflows'}
+                </option>
+                {workflows.map((w) => (
+                  <option key={w.id} value={w.id}>
+                    {w.name}
+                  </option>
                 ))}
               </select>
 
@@ -738,7 +763,7 @@ export default function Automations() {
                     </td>
                   </tr>
                 ) : executions.length > 0 ? (
-                  executions.map(execution => {
+                  executions.map((execution) => {
                     const statusColor = STATUS_COLORS[execution.status] || 'gray';
 
                     return (
@@ -757,7 +782,9 @@ export default function Automations() {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full bg-${statusColor}-100 text-${statusColor}-700`}>
+                          <span
+                            className={`px-2 py-1 text-xs font-medium rounded-full bg-${statusColor}-100 text-${statusColor}-700`}
+                          >
                             {execution.status}
                           </span>
                         </td>
@@ -796,7 +823,7 @@ export default function Automations() {
               </div>
             ) : stats.trigger_stats?.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {stats.trigger_stats.map(stat => {
+                {stats.trigger_stats.map((stat) => {
                   const TriggerIcon = TRIGGER_ICONS[stat.trigger_type] || Zap;
                   const triggerColor = TRIGGER_COLORS[stat.trigger_type] || 'gray';
 
@@ -820,18 +847,16 @@ export default function Automations() {
                         </div>
                         <div>
                           <span className="font-medium text-gray-900">{stat.active_workflows}</span>
-                          <span className="ml-1">
-                            {language === 'no' ? 'aktive' : 'active'}
-                          </span>
+                          <span className="ml-1">{language === 'no' ? 'aktive' : 'active'}</span>
                         </div>
                         <div>
                           <span className="font-medium text-gray-900">{stat.total_executions}</span>
-                          <span className="ml-1">
-                            {language === 'no' ? 'utforelser' : 'runs'}
-                          </span>
+                          <span className="ml-1">{language === 'no' ? 'utforelser' : 'runs'}</span>
                         </div>
                         <div>
-                          <span className="font-medium text-green-600">{stat.successful_executions}</span>
+                          <span className="font-medium text-green-600">
+                            {stat.successful_executions}
+                          </span>
                           <span className="ml-1">
                             {language === 'no' ? 'vellykket' : 'success'}
                           </span>
@@ -860,11 +885,13 @@ export default function Automations() {
                       <Gift className="w-5 h-5 text-purple-600" />
                       <span className="font-medium text-gray-700">{t.birthdays}</span>
                     </div>
-                    <span className={`px-2 py-0.5 text-xs rounded-full ${
-                      stats.upcoming_triggers.birthdays?.has_active_workflow
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-gray-100 text-gray-600'
-                    }`}>
+                    <span
+                      className={`px-2 py-0.5 text-xs rounded-full ${
+                        stats.upcoming_triggers.birthdays?.has_active_workflow
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-gray-100 text-gray-600'
+                      }`}
+                    >
                       {stats.upcoming_triggers.birthdays?.has_active_workflow
                         ? t.hasActiveWorkflow
                         : t.noActiveWorkflow}
@@ -874,9 +901,11 @@ export default function Automations() {
                     {stats.upcoming_triggers.birthdays?.count || 0}
                   </div>
                   <div className="space-y-1 text-sm text-gray-500">
-                    {stats.upcoming_triggers.birthdays?.patients?.slice(0, 3).map(p => (
+                    {stats.upcoming_triggers.birthdays?.patients?.slice(0, 3).map((p) => (
                       <div key={p.id} className="flex items-center justify-between">
-                        <span>{p.first_name} {p.last_name}</span>
+                        <span>
+                          {p.first_name} {p.last_name}
+                        </span>
                         <span>{p.days_until_birthday}d</span>
                       </div>
                     ))}
@@ -890,11 +919,13 @@ export default function Automations() {
                       <Clock className="w-5 h-5 text-orange-600" />
                       <span className="font-medium text-gray-700">{t.recalls}</span>
                     </div>
-                    <span className={`px-2 py-0.5 text-xs rounded-full ${
-                      stats.upcoming_triggers.recalls?.has_active_workflow
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-gray-100 text-gray-600'
-                    }`}>
+                    <span
+                      className={`px-2 py-0.5 text-xs rounded-full ${
+                        stats.upcoming_triggers.recalls?.has_active_workflow
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-gray-100 text-gray-600'
+                      }`}
+                    >
                       {stats.upcoming_triggers.recalls?.has_active_workflow
                         ? t.hasActiveWorkflow
                         : t.noActiveWorkflow}
@@ -904,9 +935,11 @@ export default function Automations() {
                     {stats.upcoming_triggers.recalls?.count || 0}
                   </div>
                   <div className="space-y-1 text-sm text-gray-500">
-                    {stats.upcoming_triggers.recalls?.patients?.slice(0, 3).map(p => (
+                    {stats.upcoming_triggers.recalls?.patients?.slice(0, 3).map((p) => (
                       <div key={p.id} className="flex items-center justify-between">
-                        <span>{p.first_name} {p.last_name}</span>
+                        <span>
+                          {p.first_name} {p.last_name}
+                        </span>
                         <span>{p.days_since_visit}d</span>
                       </div>
                     ))}
@@ -929,21 +962,4 @@ export default function Automations() {
 // HELPER FUNCTIONS
 // =============================================================================
 
-// Add formatRelativeTime if not in utils
-function formatRelativeTime(dateString) {
-  if (!dateString) return '-';
-
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now - date;
-  const diffMins = Math.floor(diffMs / (1000 * 60));
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-  if (diffMins < 1) return 'Just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
-
-  return date.toLocaleDateString();
-}
+// formatRelativeTime is imported from ../lib/utils

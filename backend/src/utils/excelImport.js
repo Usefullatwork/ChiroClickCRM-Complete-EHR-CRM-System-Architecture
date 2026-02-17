@@ -6,7 +6,7 @@
 import { readFile } from 'fs/promises';
 import ExcelJS from 'exceljs';
 import { createPatient } from '../services/patients.js';
-import { encrypt } from './encryption.js';
+import { _encrypt } from './encryption.js';
 import logger from './logger.js';
 
 /**
@@ -58,76 +58,82 @@ export const parseExcelFile = async (filePath) => {
  * Map Excel columns to patient object
  * Adjust column names based on your Excel structure
  */
-const mapExcelRowToPatient = (row) => {
-  return {
-    solvit_id:
-      row['SolvIt ID'] ||
-      row['Patient ID'] ||
-      `IMPORT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-    first_name: row['First Name'] || row['Fornavn'] || '',
-    last_name: row['Last Name'] || row['Etternavn'] || '',
-    date_of_birth: row['Date of Birth'] || row['Fødselsdato'] || null,
-    gender: normalizeGender(row['Gender'] || row['Kjønn']),
-    email: row['Email'] || row['E-post'] || null,
-    phone: normalizePhone(row['Phone'] || row['Telefon']),
-    personal_number: row['Personal Number'] || row['Fødselsnummer'] || null,
+const mapExcelRowToPatient = (row) => ({
+  solvit_id:
+    row['SolvIt ID'] ||
+    row['Patient ID'] ||
+    `IMPORT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+  first_name: row['First Name'] || row['Fornavn'] || '',
+  last_name: row['Last Name'] || row['Etternavn'] || '',
+  date_of_birth: row['Date of Birth'] || row['Fødselsdato'] || null,
+  gender: normalizeGender(row['Gender'] || row['Kjønn']),
+  email: row['Email'] || row['E-post'] || null,
+  phone: normalizePhone(row['Phone'] || row['Telefon']),
+  personal_number: row['Personal Number'] || row['Fødselsnummer'] || null,
 
-    // Address
-    address: {
-      street: row['Address'] || row['Adresse'] || '',
-      postal_code: row['Postal Code'] || row['Postnummer'] || '',
-      city: row['City'] || row['Poststed'] || '',
-      country: row['Country'] || 'Norway',
-    },
+  // Address
+  address: {
+    street: row['Address'] || row['Adresse'] || '',
+    postal_code: row['Postal Code'] || row['Postnummer'] || '',
+    city: row['City'] || row['Poststed'] || '',
+    country: row['Country'] || 'Norway',
+  },
 
-    // Medical information
-    red_flags: parseArray(row['Red Flags'] || row['Røde Flagg']),
-    contraindications: parseArray(row['Contraindications'] || row['Kontraindikasjoner']),
-    allergies: parseArray(row['Allergies'] || row['Allergier']),
-    current_medications: parseArray(row['Medications'] || row['Medisiner']),
-    medical_history: row['Medical History'] || row['Medisinsk Historie'] || null,
+  // Medical information
+  red_flags: parseArray(row['Red Flags'] || row['Røde Flagg']),
+  contraindications: parseArray(row['Contraindications'] || row['Kontraindikasjoner']),
+  allergies: parseArray(row['Allergies'] || row['Allergier']),
+  current_medications: parseArray(row['Medications'] || row['Medisiner']),
+  medical_history: row['Medical History'] || row['Medisinsk Historie'] || null,
 
-    // Status and category
-    status: normalizeStatus(row['Status']),
-    category: normalizeCategory(row['Category'] || row['Kategori']),
+  // Status and category
+  status: normalizeStatus(row['Status']),
+  category: normalizeCategory(row['Category'] || row['Kategori']),
 
-    // Referral
-    referral_source: row['Referral Source'] || row['Henvisning Fra'] || null,
-    referring_doctor: row['Referring Doctor'] || row['Henvisende Lege'] || null,
+  // Referral
+  referral_source: row['Referral Source'] || row['Henvisning Fra'] || null,
+  referring_doctor: row['Referring Doctor'] || row['Henvisende Lege'] || null,
 
-    // Insurance
-    insurance_type: row['Insurance Type'] || row['Forsikring'] || null,
-    insurance_number: row['Insurance Number'] || row['Forsikringsnummer'] || null,
-    has_nav_rights: parseBoolean(row['NAV Rights'] || row['NAV Rettigheter']),
+  // Insurance
+  insurance_type: row['Insurance Type'] || row['Forsikring'] || null,
+  insurance_number: row['Insurance Number'] || row['Forsikringsnummer'] || null,
+  has_nav_rights: parseBoolean(row['NAV Rights'] || row['NAV Rettigheter']),
 
-    // Consent (default to true for data storage, false for communications)
-    consent_sms: parseBoolean(row['SMS Consent'] || row['SMS Samtykke']),
-    consent_email: parseBoolean(row['Email Consent'] || row['Epost Samtykke']),
-    consent_data_storage: true, // Always true for imported patients
-    consent_marketing: false, // Default false
-    consent_date: new Date(),
+  // Consent (default to true for data storage, false for communications)
+  consent_sms: parseBoolean(row['SMS Consent'] || row['SMS Samtykke']),
+  consent_email: parseBoolean(row['Email Consent'] || row['Epost Samtykke']),
+  consent_data_storage: true, // Always true for imported patients
+  consent_marketing: false, // Default false
+  consent_date: new Date(),
 
-    // Notes
-    internal_notes: row['Notes'] || row['Notater'] || null,
+  // Notes
+  internal_notes: row['Notes'] || row['Notater'] || null,
 
-    // First visit
-    first_visit_date: row['First Visit'] || row['Første Besøk'] || null,
-  };
-};
+  // First visit
+  first_visit_date: row['First Visit'] || row['Første Besøk'] || null,
+});
 
 /**
  * Helper functions for data normalization
  */
 const normalizeGender = (gender) => {
-  if (!gender) return 'OTHER';
+  if (!gender) {
+    return 'OTHER';
+  }
   const normalized = gender.toString().toUpperCase();
-  if (['M', 'MALE', 'MANN', 'MAN'].includes(normalized)) return 'MALE';
-  if (['F', 'FEMALE', 'KVINNE', 'WOMAN'].includes(normalized)) return 'FEMALE';
+  if (['M', 'MALE', 'MANN', 'MAN'].includes(normalized)) {
+    return 'MALE';
+  }
+  if (['F', 'FEMALE', 'KVINNE', 'WOMAN'].includes(normalized)) {
+    return 'FEMALE';
+  }
   return 'OTHER';
 };
 
 const normalizePhone = (phone) => {
-  if (!phone) return null;
+  if (!phone) {
+    return null;
+  }
   // Remove all non-numeric characters
   const cleaned = phone.toString().replace(/\D/g, '');
   // Add +47 if Norwegian number without country code
@@ -138,7 +144,9 @@ const normalizePhone = (phone) => {
 };
 
 const normalizeStatus = (status) => {
-  if (!status) return 'ACTIVE';
+  if (!status) {
+    return 'ACTIVE';
+  }
   const normalized = status.toString().toUpperCase();
   if (['ACTIVE', 'INACTIVE', 'FINISHED', 'DECEASED'].includes(normalized)) {
     return normalized;
@@ -147,7 +155,9 @@ const normalizeStatus = (status) => {
 };
 
 const normalizeCategory = (category) => {
-  if (!category) return null;
+  if (!category) {
+    return null;
+  }
   const normalized = category.toString().toUpperCase();
   if (['OSLO', 'OUTSIDE_OSLO', 'TRAVELING', 'REFERRED'].includes(normalized)) {
     return normalized;
@@ -156,8 +166,12 @@ const normalizeCategory = (category) => {
 };
 
 const parseArray = (value) => {
-  if (!value) return [];
-  if (Array.isArray(value)) return value;
+  if (!value) {
+    return [];
+  }
+  if (Array.isArray(value)) {
+    return value;
+  }
   // Split by comma, semicolon, or newline
   return value
     .toString()
@@ -167,8 +181,12 @@ const parseArray = (value) => {
 };
 
 const parseBoolean = (value) => {
-  if (typeof value === 'boolean') return value;
-  if (!value) return false;
+  if (typeof value === 'boolean') {
+    return value;
+  }
+  if (!value) {
+    return false;
+  }
   const normalized = value.toString().toLowerCase();
   return ['yes', 'true', '1', 'ja', 'y'].includes(normalized);
 };

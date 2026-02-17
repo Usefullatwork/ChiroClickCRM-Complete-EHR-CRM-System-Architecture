@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Frontend Logger Utility
  * Centralized logging with environment-aware output control
@@ -55,7 +56,9 @@ const formatMessage = (level, message, context = null) => {
  * Check if a log level should be output
  */
 const shouldLog = (level) => {
-  if (!config.enabled) return false;
+  if (!config.enabled) {
+    return false;
+  }
   return LOG_LEVELS[level] >= LOG_LEVELS[config.minLevel];
 };
 
@@ -63,7 +66,9 @@ const shouldLog = (level) => {
  * Send error to remote logging service
  */
 const sendToRemote = async (level, message, data = null, context = null) => {
-  if (!config.remoteLogging || level !== 'error') return;
+  if (!config.remoteLogging || level !== 'error') {
+    return;
+  }
 
   try {
     await fetch(config.remoteEndpoint, {
@@ -95,7 +100,9 @@ const logger = {
    * @param {string} context - Optional context tag (e.g., 'AIScribe', 'Auth')
    */
   debug(message, data = null, context = null) {
-    if (!shouldLog('debug')) return;
+    if (!shouldLog('debug')) {
+      return;
+    }
     const formatted = formatMessage('debug', message, context);
     if (data !== null) {
       console.debug(formatted, data);
@@ -108,7 +115,9 @@ const logger = {
    * Info level - general information
    */
   info(message, data = null, context = null) {
-    if (!shouldLog('info')) return;
+    if (!shouldLog('info')) {
+      return;
+    }
     const formatted = formatMessage('info', message, context);
     if (data !== null) {
       console.info(formatted, data);
@@ -121,7 +130,9 @@ const logger = {
    * Warn level - warnings that don't stop execution
    */
   warn(message, data = null, context = null) {
-    if (!shouldLog('warn')) return;
+    if (!shouldLog('warn')) {
+      return;
+    }
     const formatted = formatMessage('warn', message, context);
     if (data !== null) {
       console.warn(formatted, data);
@@ -134,7 +145,9 @@ const logger = {
    * Error level - errors that need attention
    */
   error(message, data = null, context = null) {
-    if (!shouldLog('error')) return;
+    if (!shouldLog('error')) {
+      return;
+    }
     const formatted = formatMessage('error', message, context);
     if (data !== null) {
       console.error(formatted, data);

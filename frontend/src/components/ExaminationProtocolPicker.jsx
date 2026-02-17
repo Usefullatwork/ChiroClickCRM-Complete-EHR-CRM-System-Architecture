@@ -33,9 +33,9 @@ export default function ExaminationProtocolPicker({ onSelectProtocol, isOpen, on
   };
 
   const toggleCategory = (category) => {
-    setExpandedCategories(prev => ({
+    setExpandedCategories((prev) => ({
       ...prev,
-      [category]: !prev[category]
+      [category]: !prev[category],
     }));
   };
 
@@ -57,9 +57,7 @@ export default function ExaminationProtocolPicker({ onSelectProtocol, isOpen, on
             )}
           </div>
           {protocol.description_no && (
-            <p className="text-xs text-gray-600 line-clamp-2 ml-6">
-              {protocol.description_no}
-            </p>
+            <p className="text-xs text-gray-600 line-clamp-2 ml-6">{protocol.description_no}</p>
           )}
           {protocol.positive_indication_no && (
             <p className="text-xs text-blue-600 mt-1 ml-6">
@@ -72,7 +70,9 @@ export default function ExaminationProtocolPicker({ onSelectProtocol, isOpen, on
   );
 
   const renderSearchResults = () => {
-    if (!searchResults?.data) return null;
+    if (!searchResults?.data) {
+      return null;
+    }
 
     return (
       <div className="divide-y divide-gray-200">
@@ -82,14 +82,16 @@ export default function ExaminationProtocolPicker({ onSelectProtocol, isOpen, on
           </p>
         </div>
         <div className="divide-y divide-gray-100">
-          {searchResults.data.map(protocol => renderProtocolItem(protocol))}
+          {searchResults.data.map((protocol) => renderProtocolItem(protocol))}
         </div>
       </div>
     );
   };
 
   const renderProtocolsByRegion = () => {
-    if (!protocolsByRegion?.data) return null;
+    if (!protocolsByRegion?.data) {
+      return null;
+    }
 
     const grouped = protocolsByRegion.data;
 
@@ -114,7 +116,7 @@ export default function ExaminationProtocolPicker({ onSelectProtocol, isOpen, on
 
             {expandedCategories[category] && (
               <div className="bg-white">
-                {protocols.map(protocol => renderProtocolItem(protocol))}
+                {protocols.map((protocol) => renderProtocolItem(protocol))}
               </div>
             )}
           </div>
@@ -124,7 +126,9 @@ export default function ExaminationProtocolPicker({ onSelectProtocol, isOpen, on
   };
 
   const renderBodyRegions = () => {
-    if (!bodyRegions?.data) return null;
+    if (!bodyRegions?.data) {
+      return null;
+    }
 
     return (
       <div className="divide-y divide-gray-200">
@@ -147,7 +151,9 @@ export default function ExaminationProtocolPicker({ onSelectProtocol, isOpen, on
     );
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <div className="fixed right-0 top-0 h-full w-96 bg-white shadow-2xl border-l border-gray-200 z-50 flex flex-col">
@@ -155,10 +161,7 @@ export default function ExaminationProtocolPicker({ onSelectProtocol, isOpen, on
       <div className="px-4 py-3 border-b border-gray-200 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold">Undersøkelsesprotokoll</h3>
-          <button
-            onClick={onClose}
-            className="p-1 hover:bg-blue-700 rounded transition-colors"
-          >
+          <button onClick={onClose} className="p-1 hover:bg-blue-700 rounded transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -192,7 +195,7 @@ export default function ExaminationProtocolPicker({ onSelectProtocol, isOpen, on
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto">
-        {(searchLoading || regionsLoading) ? (
+        {searchLoading || regionsLoading ? (
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           </div>

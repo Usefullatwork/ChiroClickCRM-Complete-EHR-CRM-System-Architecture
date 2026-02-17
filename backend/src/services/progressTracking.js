@@ -310,8 +310,11 @@ export const getPainHistory = async (organizationId, patientId, days = 90) => {
         dataPoints.slice(0, 7).reduce((sum, d) => sum + parseFloat(d.avg_pain), 0) / 7;
       const lastWeek = dataPoints.slice(-7).reduce((sum, d) => sum + parseFloat(d.avg_pain), 0) / 7;
       const diff = lastWeek - firstWeek;
-      if (diff < -1) trend = 'improving';
-      else if (diff > 1) trend = 'worsening';
+      if (diff < -1) {
+        trend = 'improving';
+      } else if (diff > 1) {
+        trend = 'worsening';
+      }
     }
 
     return {
@@ -436,10 +439,18 @@ export const getAllPatientsCompliance = async (organizationId, options = {}) => 
  * Henter overholdelsesstatus basert pa rate
  */
 const getComplianceStatus = (rate) => {
-  if (rate >= 80) return { label: 'Utmerket', labelEn: 'Excellent', color: 'green' };
-  if (rate >= 60) return { label: 'Bra', labelEn: 'Good', color: 'blue' };
-  if (rate >= 40) return { label: 'Middels', labelEn: 'Fair', color: 'yellow' };
-  if (rate >= 20) return { label: 'Lav', labelEn: 'Low', color: 'orange' };
+  if (rate >= 80) {
+    return { label: 'Utmerket', labelEn: 'Excellent', color: 'green' };
+  }
+  if (rate >= 60) {
+    return { label: 'Bra', labelEn: 'Good', color: 'blue' };
+  }
+  if (rate >= 40) {
+    return { label: 'Middels', labelEn: 'Fair', color: 'yellow' };
+  }
+  if (rate >= 20) {
+    return { label: 'Lav', labelEn: 'Low', color: 'orange' };
+  }
   return { label: 'Trenger oppfolging', labelEn: 'Needs follow-up', color: 'red' };
 };
 

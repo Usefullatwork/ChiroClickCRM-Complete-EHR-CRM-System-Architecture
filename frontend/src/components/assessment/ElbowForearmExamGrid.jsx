@@ -7,7 +7,7 @@ import QuickCheckboxGrid, {
   ELBOW_STABILITY_OPTIONS,
   ELBOW_CUBITAL_TUNNEL_OPTIONS,
   ELBOW_BURSITIS_OPTIONS,
-  ELBOW_TREATMENT_OPTIONS
+  ELBOW_TREATMENT_OPTIONS,
 } from './QuickCheckboxGrid';
 
 /**
@@ -24,11 +24,11 @@ import QuickCheckboxGrid, {
 const EXAM_SECTIONS = [
   { id: 'rom', title: 'Range of Motion', icon: '🔄' },
   { id: 'lateral_epicondylitis', title: 'Lateral Epicondylitis (Tennis Elbow)', icon: '🎾' },
-  { id: 'medial_epicondylitis', title: 'Medial Epicondylitis (Golfer\'s Elbow)', icon: '⛳' },
+  { id: 'medial_epicondylitis', title: "Medial Epicondylitis (Golfer's Elbow)", icon: '⛳' },
   { id: 'stability', title: 'Ligament Stability (UCL/LCL)', icon: '🔗' },
   { id: 'cubital_tunnel', title: 'Cubital Tunnel Syndrome', icon: '⚡' },
   { id: 'bursitis', title: 'Olecranon Bursitis', icon: '💧' },
-  { id: 'treatment', title: 'Treatment Plan', icon: '📋' }
+  { id: 'treatment', title: 'Treatment Plan', icon: '📋' },
 ];
 
 const SECTION_OPTIONS = {
@@ -38,7 +38,7 @@ const SECTION_OPTIONS = {
   stability: ELBOW_STABILITY_OPTIONS,
   cubital_tunnel: ELBOW_CUBITAL_TUNNEL_OPTIONS,
   bursitis: ELBOW_BURSITIS_OPTIONS,
-  treatment: ELBOW_TREATMENT_OPTIONS
+  treatment: ELBOW_TREATMENT_OPTIONS,
 };
 
 // Clinical impression suggestions based on positive findings
@@ -46,59 +46,57 @@ const CLINICAL_IMPRESSIONS = {
   lateral_epicondylitis: {
     pattern: ['cozen_pos', 'mill_pos', 'mid_finger_ext_pos', 'lat_epic_tender'],
     diagnosis: 'Lateral Epicondylitis (Tennis Elbow)',
-    icd10: 'M77.1'
+    icd10: 'M77.1',
   },
   medial_epicondylitis: {
     pattern: ['rev_cozen_pos', 'rev_mill_pos', 'med_epic_tender'],
-    diagnosis: 'Medial Epicondylitis (Golfer\'s Elbow)',
-    icd10: 'M77.0'
+    diagnosis: "Medial Epicondylitis (Golfer's Elbow)",
+    icd10: 'M77.0',
   },
   ucl_sprain: {
     pattern: ['valgus_30_pos', 'moving_valgus_pos', 'milking_maneuver_pos'],
     diagnosis: 'Ulnar Collateral Ligament Sprain',
-    icd10: 'S53.44'
+    icd10: 'S53.44',
   },
   cubital_tunnel: {
     pattern: ['elbow_flex_test_pos', 'tinel_elbow_pos', 'froment_pos', 'cubital_4th_5th_numb'],
     diagnosis: 'Cubital Tunnel Syndrome (Ulnar Neuropathy)',
-    icd10: 'G56.2'
+    icd10: 'G56.2',
   },
   olecranon_bursitis: {
     pattern: ['bursa_swelling', 'bursa_goose_egg', 'bursa_tender'],
     diagnosis: 'Olecranon Bursitis',
-    icd10: 'M70.2'
+    icd10: 'M70.2',
   },
   septic_bursitis: {
     pattern: ['bursa_warm_red', 'bursa_swelling'],
     diagnosis: 'Possible Septic Bursitis - REFER',
     icd10: 'M70.2',
-    urgent: true
-  }
+    urgent: true,
+  },
 };
 
 export default function ElbowForearmExamGrid({
   side = 'right', // 'left', 'right', or 'bilateral'
   selectedValues = {},
   onChange,
-  showNarrative = true,
-  language = 'EN',
-  className = ''
+  _showNarrative = true,
+  _language = 'EN',
+  className = '',
 }) {
   const [expandedSections, setExpandedSections] = useState(['rom']);
   const [activeTab, setActiveTab] = useState('exam');
 
   const toggleSection = (sectionId) => {
-    setExpandedSections(prev =>
-      prev.includes(sectionId)
-        ? prev.filter(s => s !== sectionId)
-        : [...prev, sectionId]
+    setExpandedSections((prev) =>
+      prev.includes(sectionId) ? prev.filter((s) => s !== sectionId) : [...prev, sectionId]
     );
   };
 
   const handleSectionChange = (sectionId, values) => {
     onChange({
       ...selectedValues,
-      [sectionId]: values
+      [sectionId]: values,
     });
   };
 
@@ -112,12 +110,12 @@ export default function ElbowForearmExamGrid({
     const allSelected = getAllSelectedValues();
     const suggestions = [];
 
-    Object.entries(CLINICAL_IMPRESSIONS).forEach(([key, impression]) => {
-      const matchCount = impression.pattern.filter(p => allSelected.includes(p)).length;
+    Object.entries(CLINICAL_IMPRESSIONS).forEach(([_key, impression]) => {
+      const matchCount = impression.pattern.filter((p) => allSelected.includes(p)).length;
       if (matchCount >= 2) {
         suggestions.push({
           ...impression,
-          confidence: Math.round((matchCount / impression.pattern.length) * 100)
+          confidence: Math.round((matchCount / impression.pattern.length) * 100),
         });
       }
     });
@@ -128,7 +126,9 @@ export default function ElbowForearmExamGrid({
   // Generate narrative documentation
   const generateNarrative = () => {
     const allSelected = getAllSelectedValues();
-    if (allSelected.length === 0) return '';
+    if (allSelected.length === 0) {
+      return '';
+    }
 
     const sideText = side === 'bilateral' ? 'bilateral' : `${side}`;
     let narrative = `ELBOW EXAMINATION - ${sideText.toUpperCase()}\n\n`;
@@ -137,11 +137,13 @@ export default function ElbowForearmExamGrid({
     const romFindings = selectedValues.rom || [];
     if (romFindings.length > 0) {
       narrative += 'Range of Motion:\n';
-      romFindings.forEach(finding => {
+      romFindings.forEach((finding) => {
         const option = Object.values(ELBOW_ROM_OPTIONS)
           .flat()
-          .find(opt => opt.value === finding);
-        if (option) narrative += `- ${option.label}\n`;
+          .find((opt) => opt.value === finding);
+        if (option) {
+          narrative += `- ${option.label}\n`;
+        }
       });
       narrative += '\n';
     }
@@ -152,7 +154,7 @@ export default function ElbowForearmExamGrid({
       { id: 'medial_epicondylitis', title: 'Medial Epicondylitis Tests' },
       { id: 'stability', title: 'Ligament Stability Tests' },
       { id: 'cubital_tunnel', title: 'Cubital Tunnel Tests' },
-      { id: 'bursitis', title: 'Bursitis Findings' }
+      { id: 'bursitis', title: 'Bursitis Findings' },
     ];
 
     conditionSections.forEach(({ id, title }) => {
@@ -163,10 +165,10 @@ export default function ElbowForearmExamGrid({
         const negativeFindings = [];
         const otherFindings = [];
 
-        findings.forEach(finding => {
+        findings.forEach((finding) => {
           const option = Object.values(options)
             .flat()
-            .find(opt => opt.value === finding);
+            .find((opt) => opt.value === finding);
           if (option) {
             if (finding.includes('_pos')) {
               positiveFindings.push(option.label);
@@ -178,11 +180,15 @@ export default function ElbowForearmExamGrid({
           }
         });
 
-        if (positiveFindings.length > 0 || negativeFindings.length > 0 || otherFindings.length > 0) {
+        if (
+          positiveFindings.length > 0 ||
+          negativeFindings.length > 0 ||
+          otherFindings.length > 0
+        ) {
           narrative += `${title}:\n`;
-          positiveFindings.forEach(f => narrative += `- ${f}\n`);
-          negativeFindings.forEach(f => narrative += `- ${f}\n`);
-          otherFindings.forEach(f => narrative += `- ${f}\n`);
+          positiveFindings.forEach((f) => (narrative += `- ${f}\n`));
+          negativeFindings.forEach((f) => (narrative += `- ${f}\n`));
+          otherFindings.forEach((f) => (narrative += `- ${f}\n`));
           narrative += '\n';
         }
       }
@@ -192,7 +198,7 @@ export default function ElbowForearmExamGrid({
     const diagnoses = getSuggestedDiagnoses();
     if (diagnoses.length > 0) {
       narrative += 'Clinical Impression:\n';
-      diagnoses.forEach(dx => {
+      diagnoses.forEach((dx) => {
         const urgentTag = dx.urgent ? ' [URGENT]' : '';
         narrative += `- ${dx.diagnosis} (${dx.icd10})${urgentTag} - ${dx.confidence}% match\n`;
       });
@@ -203,11 +209,13 @@ export default function ElbowForearmExamGrid({
     const treatmentFindings = selectedValues.treatment || [];
     if (treatmentFindings.length > 0) {
       narrative += 'Treatment Plan:\n';
-      treatmentFindings.forEach(finding => {
+      treatmentFindings.forEach((finding) => {
         const option = Object.values(ELBOW_TREATMENT_OPTIONS)
           .flat()
-          .find(opt => opt.value === finding);
-        if (option) narrative += `- ${option.label}\n`;
+          .find((opt) => opt.value === finding);
+        if (option) {
+          narrative += `- ${option.label}\n`;
+        }
       });
     }
 
@@ -216,7 +224,7 @@ export default function ElbowForearmExamGrid({
 
   const totalSelected = getAllSelectedValues().length;
   const suggestedDiagnoses = getSuggestedDiagnoses();
-  const hasUrgentFinding = suggestedDiagnoses.some(dx => dx.urgent);
+  const hasUrgentFinding = suggestedDiagnoses.some((dx) => dx.urgent);
 
   return (
     <div className={`bg-white rounded-lg border border-gray-200 shadow-sm ${className}`}>
@@ -228,7 +236,9 @@ export default function ElbowForearmExamGrid({
             <div>
               <h2 className="font-semibold text-gray-900">Elbow & Forearm Examination</h2>
               <p className="text-sm text-gray-500">
-                {side === 'bilateral' ? 'Bilateral' : `${side.charAt(0).toUpperCase() + side.slice(1)} side`}
+                {side === 'bilateral'
+                  ? 'Bilateral'
+                  : `${side.charAt(0).toUpperCase() + side.slice(1)} side`}
                 {totalSelected > 0 && ` • ${totalSelected} findings selected`}
               </p>
             </div>
@@ -238,7 +248,7 @@ export default function ElbowForearmExamGrid({
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-500">Side:</span>
             <div className="flex rounded-lg overflow-hidden border border-gray-300">
-              {['left', 'right', 'bilateral'].map(s => (
+              {['left', 'right', 'bilateral'].map((s) => (
                 <button
                   key={s}
                   onClick={() => onChange({ ...selectedValues, _side: s })}
@@ -290,9 +300,12 @@ export default function ElbowForearmExamGrid({
               <div className="flex items-start gap-2">
                 <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-red-800">URGENT: Possible Infection Detected</p>
+                  <p className="text-sm font-medium text-red-800">
+                    URGENT: Possible Infection Detected
+                  </p>
                   <p className="text-sm text-red-700 mt-1">
-                    Warm, red bursitis may indicate septic bursitis. Consider immediate referral for aspiration and culture.
+                    Warm, red bursitis may indicate septic bursitis. Consider immediate referral for
+                    aspiration and culture.
                   </p>
                 </div>
               </div>
@@ -319,10 +332,10 @@ export default function ElbowForearmExamGrid({
           )}
 
           {/* Exam Sections */}
-          {EXAM_SECTIONS.map(section => {
+          {EXAM_SECTIONS.map((section) => {
             const isExpanded = expandedSections.includes(section.id);
             const sectionValues = selectedValues[section.id] || [];
-            const positiveCount = sectionValues.filter(v => v.includes('_pos')).length;
+            const positiveCount = sectionValues.filter((v) => v.includes('_pos')).length;
 
             return (
               <div key={section.id}>
@@ -381,7 +394,8 @@ export default function ElbowForearmExamGrid({
               </button>
             </div>
             <pre className="whitespace-pre-wrap text-sm text-gray-700 font-mono bg-white p-4 rounded border border-gray-200 max-h-96 overflow-y-auto">
-              {generateNarrative() || 'No findings selected. Select examination findings to generate documentation.'}
+              {generateNarrative() ||
+                'No findings selected. Select examination findings to generate documentation.'}
             </pre>
           </div>
         </div>
@@ -391,13 +405,14 @@ export default function ElbowForearmExamGrid({
       {totalSelected > 0 && (
         <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 rounded-b-lg">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">
-              {totalSelected} findings documented
-            </span>
+            <span className="text-gray-600">{totalSelected} findings documented</span>
             <div className="flex items-center gap-4">
               {suggestedDiagnoses.length > 0 && (
-                <span className={`font-medium ${hasUrgentFinding ? 'text-red-600' : 'text-amber-600'}`}>
-                  {suggestedDiagnoses.length} suggested {suggestedDiagnoses.length === 1 ? 'diagnosis' : 'diagnoses'}
+                <span
+                  className={`font-medium ${hasUrgentFinding ? 'text-red-600' : 'text-amber-600'}`}
+                >
+                  {suggestedDiagnoses.length} suggested{' '}
+                  {suggestedDiagnoses.length === 1 ? 'diagnosis' : 'diagnoses'}
                   {hasUrgentFinding && ' (URGENT)'}
                 </span>
               )}
@@ -414,33 +429,40 @@ export const ELBOW_EXAM_PRESETS = {
   lateralEpicondylitis: {
     name: 'Tennis Elbow Screen',
     sections: ['rom', 'lateral_epicondylitis'],
-    description: 'Quick screen for lateral epicondylitis'
+    description: 'Quick screen for lateral epicondylitis',
   },
   medialEpicondylitis: {
-    name: 'Golfer\'s Elbow Screen',
+    name: "Golfer's Elbow Screen",
     sections: ['rom', 'medial_epicondylitis'],
-    description: 'Quick screen for medial epicondylitis'
+    description: 'Quick screen for medial epicondylitis',
   },
   uclScreen: {
     name: 'UCL Injury Screen',
     sections: ['rom', 'stability'],
-    description: 'Ulnar collateral ligament evaluation (throwers)'
+    description: 'Ulnar collateral ligament evaluation (throwers)',
   },
   cubitalTunnelScreen: {
     name: 'Cubital Tunnel Screen',
     sections: ['rom', 'cubital_tunnel'],
-    description: 'Ulnar nerve compression evaluation'
+    description: 'Ulnar nerve compression evaluation',
   },
   bursitisScreen: {
     name: 'Bursitis Screen',
     sections: ['rom', 'bursitis'],
-    description: 'Olecranon bursitis evaluation'
+    description: 'Olecranon bursitis evaluation',
   },
   comprehensiveExam: {
     name: 'Comprehensive Exam',
-    sections: ['rom', 'lateral_epicondylitis', 'medial_epicondylitis', 'stability', 'cubital_tunnel', 'bursitis'],
-    description: 'Full elbow examination'
-  }
+    sections: [
+      'rom',
+      'lateral_epicondylitis',
+      'medial_epicondylitis',
+      'stability',
+      'cubital_tunnel',
+      'bursitis',
+    ],
+    description: 'Full elbow examination',
+  },
 };
 
 // Export Norwegian terminology mappings
@@ -451,5 +473,5 @@ export const ELBOW_NORWEGIAN_TERMS = {
   'Cubital Tunnel Syndrome': 'Kubitaltunnelsyndrom',
   'Olecranon Bursitis': 'Olekranonbursitt',
   'Range of Motion': 'Bevegelsesutslag',
-  'Treatment Plan': 'Behandlingsplan'
+  'Treatment Plan': 'Behandlingsplan',
 };

@@ -8,12 +8,23 @@
  * for musculoskeletal conditions within their scope of practice.
  */
 
-import React, { useState, useCallback, useMemo } from 'react';
+import _React, { useState, useCallback, useMemo } from 'react';
 import { t } from '../assessment/translations';
 import {
-  FileText, User, Calendar, Building2, Stethoscope,
-  Clock, AlertTriangle, CheckCircle, Printer, Download,
-  Copy, Send, ChevronDown, ChevronUp
+  FileText,
+  User,
+  Calendar,
+  Building2,
+  Stethoscope,
+  Clock,
+  AlertTriangle,
+  CheckCircle,
+  Printer,
+  _Download,
+  Copy,
+  _Send,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 
 // Common ICPC-2 codes for chiropractic practice
@@ -29,13 +40,19 @@ const COMMON_DIAGNOSES = [
   { code: 'L14', name: { en: 'Leg/thigh symptoms/complaints', no: 'Ben/lårplager' } },
   { code: 'L15', name: { en: 'Knee symptoms/complaints', no: 'Kneplager' } },
   { code: 'L83', name: { en: 'Neck syndrome', no: 'Nakkesyndrom' } },
-  { code: 'L84', name: { en: 'Back syndrome without radiating pain', no: 'Ryggsyndrom uten utstråling' } },
-  { code: 'L86', name: { en: 'Back syndrome with radiating pain', no: 'Ryggsyndrom med utstråling' } },
+  {
+    code: 'L84',
+    name: { en: 'Back syndrome without radiating pain', no: 'Ryggsyndrom uten utstråling' },
+  },
+  {
+    code: 'L86',
+    name: { en: 'Back syndrome with radiating pain', no: 'Ryggsyndrom med utstråling' },
+  },
   { code: 'L87', name: { en: 'Bursitis/tendinitis/synovitis', no: 'Bursitt/tendinitt/synovitt' } },
   { code: 'L92', name: { en: 'Shoulder syndrome', no: 'Skuldersyndrom' } },
   { code: 'N01', name: { en: 'Headache', no: 'Hodepine' } },
   { code: 'N89', name: { en: 'Migraine', no: 'Migrene' } },
-  { code: 'H82', name: { en: 'Vertigo syndrome/dizziness', no: 'Svimmelhetsyndrom' } }
+  { code: 'H82', name: { en: 'Vertigo syndrome/dizziness', no: 'Svimmelhetsyndrom' } },
 ];
 
 // Work capacity options
@@ -45,7 +62,7 @@ const WORK_CAPACITY_OPTIONS = [
   { value: 60, label: { en: '60% absence', no: '60% sykemelding' } },
   { value: 50, label: { en: '50% absence', no: '50% sykemelding' } },
   { value: 40, label: { en: '40% absence', no: '40% sykemelding' } },
-  { value: 20, label: { en: '20% absence', no: '20% sykemelding' } }
+  { value: 20, label: { en: '20% absence', no: '20% sykemelding' } },
 ];
 
 // Default sick note data
@@ -58,7 +75,7 @@ const getDefaultSickNoteData = () => ({
     address: '',
     phone: '',
     employer: '',
-    occupation: ''
+    occupation: '',
   },
 
   // Clinical info
@@ -68,7 +85,7 @@ const getDefaultSickNoteData = () => ({
     secondaryDiagnosis: '',
     secondaryDiagnosisCode: '',
     clinicalFindings: '',
-    treatmentGiven: ''
+    treatmentGiven: '',
   },
 
   // Sick note period
@@ -78,7 +95,7 @@ const getDefaultSickNoteData = () => ({
     workCapacity: 100,
     isRetroactive: false,
     retroactiveFrom: '',
-    firstDayAbsent: ''
+    firstDayAbsent: '',
   },
 
   // Work restrictions
@@ -87,7 +104,7 @@ const getDefaultSickNoteData = () => ({
     restrictedDuties: false,
     restrictionDetails: '',
     ergonomicAdvice: '',
-    activityRestrictions: ''
+    activityRestrictions: '',
   },
 
   // Follow-up
@@ -96,7 +113,7 @@ const getDefaultSickNoteData = () => ({
     followUpDate: '',
     treatmentPlan: '',
     referralNeeded: false,
-    referralTo: ''
+    referralTo: '',
   },
 
   // Practitioner info (typically pre-filled from settings)
@@ -106,8 +123,8 @@ const getDefaultSickNoteData = () => ({
     clinicName: '',
     clinicAddress: '',
     phone: '',
-    email: ''
-  }
+    email: '',
+  },
 });
 
 // Section Component
@@ -131,17 +148,21 @@ function Section({ title, icon: Icon, children, defaultOpen = true }) {
           <ChevronDown className="w-5 h-5 text-gray-500" />
         )}
       </button>
-      {isOpen && (
-        <div className="p-4 bg-white">
-          {children}
-        </div>
-      )}
+      {isOpen && <div className="p-4 bg-white">{children}</div>}
     </div>
   );
 }
 
 // Input Field Component
-function InputField({ label, value, onChange, type = 'text', placeholder = '', required = false, disabled = false }) {
+function InputField({
+  label,
+  value,
+  onChange,
+  type = 'text',
+  placeholder = '',
+  required = false,
+  disabled = false,
+}) {
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -171,7 +192,7 @@ export default function SickNoteGenerator({
   patientData = null,
   practitionerData = null,
   onSave,
-  onSubmitToNav
+  _onSubmitToNav,
 }) {
   const [data, setData] = useState(() => {
     const defaultData = initialData || getDefaultSickNoteData();
@@ -193,18 +214,20 @@ export default function SickNoteGenerator({
 
   // Update nested data
   const updateSection = useCallback((section, key, value) => {
-    setData(prev => ({
+    setData((prev) => ({
       ...prev,
       [section]: {
         ...prev[section],
-        [key]: value
-      }
+        [key]: value,
+      },
     }));
   }, []);
 
   // Calculate duration in days
   const durationDays = useMemo(() => {
-    if (!data.period.startDate || !data.period.endDate) return 0;
+    if (!data.period.startDate || !data.period.endDate) {
+      return 0;
+    }
     const start = new Date(data.period.startDate);
     const end = new Date(data.period.endDate);
     const diff = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
@@ -212,10 +235,13 @@ export default function SickNoteGenerator({
   }, [data.period.startDate, data.period.endDate]);
 
   // Get diagnosis display name
-  const getDiagnosisName = useCallback((code) => {
-    const diagnosis = COMMON_DIAGNOSES.find(d => d.code === code);
-    return diagnosis ? diagnosis.name[language] : code;
-  }, [language]);
+  const getDiagnosisName = useCallback(
+    (code) => {
+      const diagnosis = COMMON_DIAGNOSES.find((d) => d.code === code);
+      return diagnosis ? diagnosis.name[language] : code;
+    },
+    [language]
+  );
 
   // Generate printable document
   const generateDocument = useCallback(() => {
@@ -253,9 +279,15 @@ ${data.period.isRetroactive ? `${t('sickNote', 'retroactive', language)}: ${data
 
 ${language === 'no' ? 'ARBEIDSEVNE' : 'WORK CAPACITY'}
 ${'-'.repeat(30)}
-${data.restrictions.cannotWork
-  ? (language === 'no' ? 'Pasienten kan ikke jobbe i sykmeldingsperioden.' : 'Patient cannot work during sick leave period.')
-  : (language === 'no' ? 'Pasienten kan jobbe med tilrettelegging.' : 'Patient can work with accommodations.')}
+${
+  data.restrictions.cannotWork
+    ? language === 'no'
+      ? 'Pasienten kan ikke jobbe i sykmeldingsperioden.'
+      : 'Patient cannot work during sick leave period.'
+    : language === 'no'
+      ? 'Pasienten kan jobbe med tilrettelegging.'
+      : 'Patient can work with accommodations.'
+}
 
 ${data.restrictions.restrictionDetails ? `${t('sickNote', 'activityRestrictions', language)}:\n${data.restrictions.restrictionDetails}` : ''}
 
@@ -325,9 +357,7 @@ ${'='.repeat(60)}
               <FileText className="w-7 h-7 text-blue-600" />
               {t('sickNote', 'title', language)}
             </h2>
-            <p className="text-sm text-gray-500 mt-1">
-              {t('sickNote', 'subtitle', language)}
-            </p>
+            <p className="text-sm text-gray-500 mt-1">{t('sickNote', 'subtitle', language)}</p>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -407,11 +437,15 @@ ${'='.repeat(60)}
                     </label>
                     <select
                       value={data.clinical.mainDiagnosisCode}
-                      onChange={(e) => updateSection('clinical', 'mainDiagnosisCode', e.target.value)}
+                      onChange={(e) =>
+                        updateSection('clinical', 'mainDiagnosisCode', e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     >
-                      <option value="">{language === 'no' ? 'Velg diagnose...' : 'Select diagnosis...'}</option>
-                      {COMMON_DIAGNOSES.map(d => (
+                      <option value="">
+                        {language === 'no' ? 'Velg diagnose...' : 'Select diagnosis...'}
+                      </option>
+                      {COMMON_DIAGNOSES.map((d) => (
                         <option key={d.code} value={d.code}>
                           {d.code} - {d.name[language]}
                         </option>
@@ -424,11 +458,13 @@ ${'='.repeat(60)}
                     </label>
                     <select
                       value={data.clinical.secondaryDiagnosisCode}
-                      onChange={(e) => updateSection('clinical', 'secondaryDiagnosisCode', e.target.value)}
+                      onChange={(e) =>
+                        updateSection('clinical', 'secondaryDiagnosisCode', e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     >
                       <option value="">{language === 'no' ? 'Ingen' : 'None'}</option>
-                      {COMMON_DIAGNOSES.map(d => (
+                      {COMMON_DIAGNOSES.map((d) => (
                         <option key={d.code} value={d.code}>
                           {d.code} - {d.name[language]}
                         </option>
@@ -445,9 +481,10 @@ ${'='.repeat(60)}
                     onChange={(e) => updateSection('clinical', 'clinicalFindings', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     rows={3}
-                    placeholder={language === 'no'
-                      ? 'Beskriv kliniske funn som støtter diagnosen...'
-                      : 'Describe clinical findings supporting the diagnosis...'
+                    placeholder={
+                      language === 'no'
+                        ? 'Beskriv kliniske funn som støtter diagnosen...'
+                        : 'Describe clinical findings supporting the diagnosis...'
                     }
                   />
                 </div>
@@ -487,7 +524,7 @@ ${'='.repeat(60)}
                     {t('sickNote', 'workCapacity', language)}
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    {WORK_CAPACITY_OPTIONS.map(option => (
+                    {WORK_CAPACITY_OPTIONS.map((option) => (
                       <button
                         key={option.value}
                         type="button"
@@ -565,12 +602,15 @@ ${'='.repeat(60)}
                 {data.restrictions.restrictedDuties && (
                   <textarea
                     value={data.restrictions.restrictionDetails}
-                    onChange={(e) => updateSection('restrictions', 'restrictionDetails', e.target.value)}
+                    onChange={(e) =>
+                      updateSection('restrictions', 'restrictionDetails', e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     rows={2}
-                    placeholder={language === 'no'
-                      ? 'Beskriv hvilke arbeidsoppgaver pasienten kan utføre...'
-                      : 'Describe what work tasks the patient can perform...'
+                    placeholder={
+                      language === 'no'
+                        ? 'Beskriv hvilke arbeidsoppgaver pasienten kan utføre...'
+                        : 'Describe what work tasks the patient can perform...'
                     }
                   />
                 )}
@@ -581,12 +621,15 @@ ${'='.repeat(60)}
                   </label>
                   <textarea
                     value={data.restrictions.ergonomicAdvice}
-                    onChange={(e) => updateSection('restrictions', 'ergonomicAdvice', e.target.value)}
+                    onChange={(e) =>
+                      updateSection('restrictions', 'ergonomicAdvice', e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     rows={2}
-                    placeholder={language === 'no'
-                      ? 'Ergonomiske råd til arbeidsgiver...'
-                      : 'Ergonomic advice for employer...'
+                    placeholder={
+                      language === 'no'
+                        ? 'Ergonomiske råd til arbeidsgiver...'
+                        : 'Ergonomic advice for employer...'
                     }
                   />
                 </div>
@@ -607,15 +650,27 @@ ${'='.repeat(60)}
                     </label>
                     <select
                       value={data.followUp.expectedRecovery}
-                      onChange={(e) => updateSection('followUp', 'expectedRecovery', e.target.value)}
+                      onChange={(e) =>
+                        updateSection('followUp', 'expectedRecovery', e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     >
                       <option value="">{language === 'no' ? 'Velg...' : 'Select...'}</option>
-                      <option value="1-2-weeks">{language === 'no' ? '1-2 uker' : '1-2 weeks'}</option>
-                      <option value="2-4-weeks">{language === 'no' ? '2-4 uker' : '2-4 weeks'}</option>
-                      <option value="4-8-weeks">{language === 'no' ? '4-8 uker' : '4-8 weeks'}</option>
-                      <option value="8-12-weeks">{language === 'no' ? '8-12 uker' : '8-12 weeks'}</option>
-                      <option value="uncertain">{language === 'no' ? 'Usikkert' : 'Uncertain'}</option>
+                      <option value="1-2-weeks">
+                        {language === 'no' ? '1-2 uker' : '1-2 weeks'}
+                      </option>
+                      <option value="2-4-weeks">
+                        {language === 'no' ? '2-4 uker' : '2-4 weeks'}
+                      </option>
+                      <option value="4-8-weeks">
+                        {language === 'no' ? '4-8 uker' : '4-8 weeks'}
+                      </option>
+                      <option value="8-12-weeks">
+                        {language === 'no' ? '8-12 uker' : '8-12 weeks'}
+                      </option>
+                      <option value="uncertain">
+                        {language === 'no' ? 'Usikkert' : 'Uncertain'}
+                      </option>
                     </select>
                   </div>
                   <InputField
@@ -634,9 +689,8 @@ ${'='.repeat(60)}
                     onChange={(e) => updateSection('followUp', 'treatmentPlan', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     rows={2}
-                    placeholder={language === 'no'
-                      ? 'Videre behandlingsplan...'
-                      : 'Further treatment plan...'
+                    placeholder={
+                      language === 'no' ? 'Videre behandlingsplan...' : 'Further treatment plan...'
                     }
                   />
                 </div>

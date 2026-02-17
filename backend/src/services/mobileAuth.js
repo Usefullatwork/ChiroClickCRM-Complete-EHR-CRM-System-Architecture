@@ -18,7 +18,7 @@ try {
 // Configuration
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';
 const JWT_ACCESS_EXPIRY = '15m';
-const JWT_REFRESH_EXPIRY = '30d';
+const _JWT_REFRESH_EXPIRY = '30d';
 const OTP_EXPIRY_MINUTES = 10;
 const MAX_OTP_ATTEMPTS = 5;
 
@@ -146,7 +146,7 @@ async function verifyOTP(db, phoneNumber, code) {
   );
 
   // Find or create mobile user
-  let userResult = await db.query(
+  const userResult = await db.query(
     `
     SELECT * FROM mobile_users WHERE phone_number = $1
   `,
@@ -215,12 +215,12 @@ async function verifyGoogleToken(db, idToken) {
 
     const payload = ticket.getPayload();
     const googleId = payload.sub;
-    const email = payload.email;
+    const _email = payload.email;
     const name = payload.name;
     const picture = payload.picture;
 
     // Find or create user
-    let userResult = await db.query(
+    const userResult = await db.query(
       `
       SELECT * FROM mobile_users WHERE google_id = $1
     `,
@@ -286,7 +286,9 @@ async function verifyAppleToken(db, identityToken, appleUser) {
   try {
     // Decode token header to get key id
     const decoded = jwt.decode(identityToken, { complete: true });
-    if (!decoded) throw new Error('Invalid token');
+    if (!decoded) {
+      throw new Error('Invalid token');
+    }
 
     // Get Apple's public key
     const client = jwksClient({
@@ -304,13 +306,13 @@ async function verifyAppleToken(db, identityToken, appleUser) {
     });
 
     const appleId = payload.sub;
-    const email = payload.email || appleUser?.email;
+    const _email = payload.email || appleUser?.email;
     const name = appleUser?.fullName
       ? `${appleUser.fullName.givenName || ''} ${appleUser.fullName.familyName || ''}`.trim()
       : null;
 
     // Find or create user
-    let userResult = await db.query(
+    const userResult = await db.query(
       `
       SELECT * FROM mobile_users WHERE apple_id = $1
     `,
@@ -499,7 +501,7 @@ function verifyAccessToken(token) {
 /**
  * Register device token for push notifications
  */
-async function registerDeviceToken(db, userId, deviceToken, deviceInfo = {}) {
+async function registerDeviceToken(db, userId, deviceToken, _deviceInfo = {}) {
   await db.query(
     `
     UPDATE mobile_users
@@ -541,12 +543,12 @@ function normalizePhoneNumber(phone) {
   // Add Norway country code if missing
   if (!normalized.startsWith('+')) {
     if (normalized.startsWith('00')) {
-      normalized = '+' + normalized.slice(2);
+      normalized = `+${normalized.slice(2)}`;
     } else if (normalized.length === 8) {
       // Assume Norwegian number
-      normalized = '+47' + normalized;
+      normalized = `+47${normalized}`;
     } else {
-      normalized = '+' + normalized;
+      normalized = `+${normalized}`;
     }
   }
 

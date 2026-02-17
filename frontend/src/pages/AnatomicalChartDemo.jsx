@@ -5,7 +5,7 @@
  * muscles, and trigger points.
  */
 
-import React, { useState, useCallback } from 'react';
+import _React, { useState, useCallback } from 'react';
 import { Globe, Copy, Layers, Zap, Activity, Info } from 'lucide-react';
 import { AnatomicalBodyChart, DERMATOMES, MUSCLES } from '../components/examination';
 
@@ -25,12 +25,12 @@ export default function AnatomicalChartDemo() {
         'View trigger point locations for major muscle groups',
         'Click trigger points to mark symptoms with referral patterns',
         'Bilingual support (Norwegian/English)',
-        'Generate clinical narratives'
+        'Generate clinical narratives',
       ],
       dermatomeGuide: 'Dermatome Quick Reference',
       muscleGuide: 'Trigger Point Quick Reference',
       generatedNarrative: 'Generated Narrative',
-      copyNarrative: 'Copy'
+      copyNarrative: 'Copy',
     },
     no: {
       title: 'Anatomisk Kroppskart Demo',
@@ -41,13 +41,13 @@ export default function AnatomicalChartDemo() {
         'Se triggerpunktlokasjoner for store muskelgrupper',
         'Klikk triggerpunkter for å markere symptomer med referansemønstre',
         'Tospråklig støtte (Norsk/Engelsk)',
-        'Generer kliniske narrativer'
+        'Generer kliniske narrativer',
       ],
       dermatomeGuide: 'Dermatom Hurtigreferanse',
       muscleGuide: 'Triggerpunkt Hurtigreferanse',
       generatedNarrative: 'Generert Narrativ',
-      copyNarrative: 'Kopier'
-    }
+      copyNarrative: 'Kopier',
+    },
   };
 
   const t = labels[lang];
@@ -71,9 +71,13 @@ export default function AnatomicalChartDemo() {
 
   // Key muscles for quick reference
   const keyMuscles = [
-    'upper_trapezius', 'levator_scapulae', 'infraspinatus',
-    'quadratus_lumborum', 'piriformis', 'gluteus_medius',
-    'gastrocnemius'
+    'upper_trapezius',
+    'levator_scapulae',
+    'infraspinatus',
+    'quadratus_lumborum',
+    'piriformis',
+    'gluteus_medius',
+    'gastrocnemius',
   ];
 
   return (
@@ -96,7 +100,9 @@ export default function AnatomicalChartDemo() {
               <button
                 onClick={() => setShowInfo(!showInfo)}
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm ${
-                  showInfo ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  showInfo
+                    ? 'bg-indigo-100 text-indigo-700'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
                 <Info className="w-4 h-4" />
@@ -143,17 +149,11 @@ export default function AnatomicalChartDemo() {
                 {t.dermatomeGuide}
               </h3>
               <div className="grid grid-cols-2 gap-2">
-                {keyDermatomes.map(id => {
+                {keyDermatomes.map((id) => {
                   const d = DERMATOMES[id];
                   return (
-                    <div
-                      key={id}
-                      className="flex items-center gap-2 p-1.5 bg-gray-50 rounded"
-                    >
-                      <span
-                        className="w-4 h-4 rounded"
-                        style={{ backgroundColor: d.color }}
-                      />
+                    <div key={id} className="flex items-center gap-2 p-1.5 bg-gray-50 rounded">
+                      <span className="w-4 h-4 rounded" style={{ backgroundColor: d.color }} />
                       <div>
                         <span className="text-xs font-bold text-gray-700">{id}</span>
                         <span className="text-xs text-gray-500 ml-1">
@@ -173,17 +173,11 @@ export default function AnatomicalChartDemo() {
                 {t.muscleGuide}
               </h3>
               <div className="space-y-1.5">
-                {keyMuscles.map(id => {
+                {keyMuscles.map((id) => {
                   const m = MUSCLES[id];
                   return (
-                    <div
-                      key={id}
-                      className="flex items-center gap-2 p-1.5 bg-gray-50 rounded"
-                    >
-                      <span
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: m.color }}
-                      />
+                    <div key={id} className="flex items-center gap-2 p-1.5 bg-gray-50 rounded">
+                      <span className="w-3 h-3 rounded-full" style={{ backgroundColor: m.color }} />
                       <span className="text-xs font-medium text-gray-700">
                         {m[lang]?.name || m.en?.name}
                       </span>

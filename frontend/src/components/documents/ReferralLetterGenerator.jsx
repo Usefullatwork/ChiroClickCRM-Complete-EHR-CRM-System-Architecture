@@ -10,12 +10,22 @@
  * Supports bilingual output (English/Norwegian).
  */
 
-import React, { useState, useCallback, useMemo } from 'react';
+import _React, { useState, useCallback, _useMemo } from 'react';
 import { t } from '../assessment/translations';
 import {
-  FileText, User, Building2, Send, Stethoscope,
-  ImageIcon, Activity, ChevronDown, ChevronUp,
-  Printer, Copy, AlertCircle, Clock
+  FileText,
+  User,
+  Building2,
+  Send,
+  Stethoscope,
+  ImageIcon,
+  Activity,
+  ChevronDown,
+  ChevronUp,
+  Printer,
+  Copy,
+  AlertCircle,
+  Clock,
 } from 'lucide-react';
 
 // Referral types
@@ -24,7 +34,7 @@ const REFERRAL_TYPES = {
   orthopedic: { icon: Activity, color: 'purple' },
   neurology: { icon: Activity, color: 'indigo' },
   radiology: { icon: ImageIcon, color: 'green' },
-  physio: { icon: Activity, color: 'orange' }
+  physio: { icon: Activity, color: 'orange' },
 };
 
 // Common imaging request options
@@ -43,14 +53,14 @@ const IMAGING_OPTIONS = [
   { value: 'mri_brain', label: { en: 'MRI Brain', no: 'MR caput' } },
   { value: 'ct_cervical', label: { en: 'CT Cervical Spine', no: 'CT cervicalcolumna' } },
   { value: 'ct_lumbar', label: { en: 'CT Lumbar Spine', no: 'CT lumbalcolumna' } },
-  { value: 'ultrasound_shoulder', label: { en: 'Ultrasound Shoulder', no: 'Ultralyd skulder' } }
+  { value: 'ultrasound_shoulder', label: { en: 'Ultrasound Shoulder', no: 'Ultralyd skulder' } },
 ];
 
 // Priority levels
 const PRIORITY_OPTIONS = [
   { value: 'routine', label: { en: 'Routine', no: 'Rutinemessig' }, color: 'gray' },
   { value: 'soon', label: { en: 'Soon (2-4 weeks)', no: 'Snart (2-4 uker)' }, color: 'yellow' },
-  { value: 'urgent', label: { en: 'Urgent', no: 'Haster' }, color: 'red' }
+  { value: 'urgent', label: { en: 'Urgent', no: 'Haster' }, color: 'red' },
 ];
 
 // Default referral data
@@ -66,7 +76,7 @@ const getDefaultReferralData = () => ({
     clinic: '',
     address: '',
     phone: '',
-    fax: ''
+    fax: '',
   },
 
   // Patient info
@@ -75,7 +85,7 @@ const getDefaultReferralData = () => ({
     personalId: '',
     dateOfBirth: '',
     address: '',
-    phone: ''
+    phone: '',
   },
 
   // Clinical information
@@ -86,7 +96,7 @@ const getDefaultReferralData = () => ({
     relevantHistory: '',
     examinationFindings: '',
     treatmentToDate: '',
-    response: ''
+    response: '',
   },
 
   // For radiology referrals
@@ -96,13 +106,13 @@ const getDefaultReferralData = () => ({
     clinicalIndication: '',
     specificQuestions: '',
     contrast: false,
-    urgency: ''
+    urgency: '',
   },
 
   // Request
   request: {
     action: 'opinion', // opinion, investigation, sharedCare, takeOver
-    specificRequest: ''
+    specificRequest: '',
   },
 
   // Sender info
@@ -113,11 +123,11 @@ const getDefaultReferralData = () => ({
     clinicName: '',
     clinicAddress: '',
     phone: '',
-    email: ''
+    email: '',
   },
 
   // Date
-  date: new Date().toISOString().split('T')[0]
+  date: new Date().toISOString().split('T')[0],
 });
 
 // Section Component
@@ -135,7 +145,11 @@ function Section({ title, icon: Icon, children, defaultOpen = true }) {
           <Icon className="w-5 h-5 text-blue-600" />
           <span className="font-medium text-gray-900">{title}</span>
         </div>
-        {isOpen ? <ChevronUp className="w-5 h-5 text-gray-500" /> : <ChevronDown className="w-5 h-5 text-gray-500" />}
+        {isOpen ? (
+          <ChevronUp className="w-5 h-5 text-gray-500" />
+        ) : (
+          <ChevronDown className="w-5 h-5 text-gray-500" />
+        )}
       </button>
       {isOpen && <div className="p-4 bg-white">{children}</div>}
     </div>
@@ -143,7 +157,15 @@ function Section({ title, icon: Icon, children, defaultOpen = true }) {
 }
 
 // Input Field Component
-function InputField({ label, value, onChange, type = 'text', placeholder = '', required = false, rows }) {
+function InputField({
+  label,
+  value,
+  onChange,
+  type = 'text',
+  placeholder = '',
+  required = false,
+  rows,
+}) {
   const Component = rows ? 'textarea' : 'input';
 
   return (
@@ -171,12 +193,16 @@ export default function ReferralLetterGenerator({
   patientData = null,
   senderData = null,
   onSave,
-  onSend
+  _onSend,
 }) {
   const [data, setData] = useState(() => {
     const defaultData = initialData || getDefaultReferralData();
-    if (patientData) defaultData.patient = { ...defaultData.patient, ...patientData };
-    if (senderData) defaultData.sender = { ...defaultData.sender, ...senderData };
+    if (patientData) {
+      defaultData.patient = { ...defaultData.patient, ...patientData };
+    }
+    if (senderData) {
+      defaultData.sender = { ...defaultData.sender, ...senderData };
+    }
     return defaultData;
   });
 
@@ -184,30 +210,34 @@ export default function ReferralLetterGenerator({
 
   // Update nested data
   const updateSection = useCallback((section, key, value) => {
-    setData(prev => ({
+    setData((prev) => ({
       ...prev,
-      [section]: { ...prev[section], [key]: value }
+      [section]: { ...prev[section], [key]: value },
     }));
   }, []);
 
   // Get referral type label
-  const getTypeLabel = useCallback((type) => {
-    const labels = {
-      gp: { en: 'General Practitioner', no: 'Fastlege' },
-      orthopedic: { en: 'Orthopedic Specialist', no: 'Ortoped' },
-      neurology: { en: 'Neurologist', no: 'Nevrolog' },
-      radiology: { en: 'Radiology/Imaging', no: 'Bildediagnostikk' },
-      physio: { en: 'Physiotherapist', no: 'Fysioterapeut' }
-    };
-    return labels[type]?.[language] || type;
-  }, [language]);
+  const getTypeLabel = useCallback(
+    (type) => {
+      const labels = {
+        gp: { en: 'General Practitioner', no: 'Fastlege' },
+        orthopedic: { en: 'Orthopedic Specialist', no: 'Ortoped' },
+        neurology: { en: 'Neurologist', no: 'Nevrolog' },
+        radiology: { en: 'Radiology/Imaging', no: 'Bildediagnostikk' },
+        physio: { en: 'Physiotherapist', no: 'Fysioterapeut' },
+      };
+      return labels[type]?.[language] || type;
+    },
+    [language]
+  );
 
   // Generate document text
   const generateDocument = useCallback(() => {
     const isRadiology = data.type === 'radiology';
     const today = new Date().toLocaleDateString(language === 'no' ? 'nb-NO' : 'en-GB');
 
-    const priorityLabel = PRIORITY_OPTIONS.find(p => p.value === data.priority)?.label[language] || '';
+    const priorityLabel =
+      PRIORITY_OPTIONS.find((p) => p.value === data.priority)?.label[language] || '';
 
     let document = `
 ${language === 'no' ? 'HENVISNING' : 'REFERRAL LETTER'}
@@ -234,7 +264,9 @@ ${data.clinical.reasonForReferral}
 `;
 
     if (isRadiology) {
-      const imagingLabel = IMAGING_OPTIONS.find(i => i.value === data.imaging.type)?.label[language] || data.imaging.type;
+      const imagingLabel =
+        IMAGING_OPTIONS.find((i) => i.value === data.imaging.type)?.label[language] ||
+        data.imaging.type;
       document += `
 ${language === 'no' ? 'ØNSKET UNDERSØKELSE' : 'REQUESTED IMAGING'}
 ${'-'.repeat(30)}
@@ -250,25 +282,37 @@ ${'-'.repeat(30)}
 ${data.clinical.currentComplaints}
 ${data.clinical.duration ? `${language === 'no' ? 'Varighet' : 'Duration'}: ${data.clinical.duration}` : ''}
 
-${data.clinical.relevantHistory ? `${t('referral', 'relevantHistory', language).toUpperCase()}
+${
+  data.clinical.relevantHistory
+    ? `${t('referral', 'relevantHistory', language).toUpperCase()}
 ${'-'.repeat(30)}
 ${data.clinical.relevantHistory}
-` : ''}
+`
+    : ''
+}
 
 ${t('referral', 'examinationFindings', language).toUpperCase()}
 ${'-'.repeat(30)}
 ${data.clinical.examinationFindings}
 
-${data.clinical.treatmentToDate ? `${t('referral', 'treatmentToDate', language).toUpperCase()}
+${
+  data.clinical.treatmentToDate
+    ? `${t('referral', 'treatmentToDate', language).toUpperCase()}
 ${'-'.repeat(30)}
 ${data.clinical.treatmentToDate}
 ${data.clinical.response ? `${t('referral', 'response', language)}: ${data.clinical.response}` : ''}
-` : ''}
+`
+    : ''
+}
 
-${data.request.specificRequest ? `${t('referral', 'requestedAction', language).toUpperCase()}
+${
+  data.request.specificRequest
+    ? `${t('referral', 'requestedAction', language).toUpperCase()}
 ${'-'.repeat(30)}
 ${data.request.specificRequest}
-` : ''}
+`
+    : ''
+}
 
 ${t('referral', 'thankYou', language)}.
 ${t('referral', 'availableForDiscussion', language)}.
@@ -329,7 +373,9 @@ ${language === 'no' ? 'Dato' : 'Date'}: ${today}
           <button
             onClick={() => setShowPreview(!showPreview)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              showPreview ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+              showPreview
+                ? 'bg-indigo-600 text-white'
+                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
             }`}
           >
             {language === 'no' ? 'Forhåndsvis' : 'Preview'}
@@ -343,13 +389,17 @@ ${language === 'no' ? 'Dato' : 'Date'}: ${today}
             return (
               <button
                 key={type}
-                onClick={() => setData(prev => ({ ...prev, type }))}
+                onClick={() => setData((prev) => ({ ...prev, type }))}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   data.type === type
                     ? `bg-${config.color}-600 text-white`
                     : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
                 }`}
-                style={data.type === type ? { backgroundColor: `var(--${config.color}-600, #4f46e5)` } : {}}
+                style={
+                  data.type === type
+                    ? { backgroundColor: `var(--${config.color}-600, #4f46e5)` }
+                    : {}
+                }
               >
                 <Icon className="w-4 h-4" />
                 {getTypeLabel(type)}
@@ -360,17 +410,17 @@ ${language === 'no' ? 'Dato' : 'Date'}: ${today}
 
         {/* Priority */}
         <div className="flex gap-2 mt-3">
-          {PRIORITY_OPTIONS.map(option => (
+          {PRIORITY_OPTIONS.map((option) => (
             <button
               key={option.value}
-              onClick={() => setData(prev => ({ ...prev, priority: option.value }))}
+              onClick={() => setData((prev) => ({ ...prev, priority: option.value }))}
               className={`flex items-center gap-1 px-3 py-1 rounded text-xs font-medium transition-colors ${
                 data.priority === option.value
                   ? option.value === 'urgent'
                     ? 'bg-red-100 text-red-700 ring-1 ring-red-500'
                     : option.value === 'soon'
-                    ? 'bg-yellow-100 text-yellow-700 ring-1 ring-yellow-500'
-                    : 'bg-gray-100 text-gray-700 ring-1 ring-gray-400'
+                      ? 'bg-yellow-100 text-yellow-700 ring-1 ring-yellow-500'
+                      : 'bg-gray-100 text-gray-700 ring-1 ring-gray-400'
                   : 'bg-white text-gray-500 border border-gray-200'
               }`}
             >
@@ -386,12 +436,18 @@ ${language === 'no' ? 'Dato' : 'Date'}: ${today}
       <div className="p-6">
         {showPreview ? (
           <div className="bg-gray-50 rounded-lg p-6">
-            <pre className="whitespace-pre-wrap text-sm text-gray-800 font-sans">{generateDocument()}</pre>
+            <pre className="whitespace-pre-wrap text-sm text-gray-800 font-sans">
+              {generateDocument()}
+            </pre>
           </div>
         ) : (
           <>
             {/* Recipient */}
-            <Section title={t('referral', 'to', language)} icon={Building2} defaultOpen={data.type !== 'radiology'}>
+            <Section
+              title={t('referral', 'to', language)}
+              icon={Building2}
+              defaultOpen={data.type !== 'radiology'}
+            >
               <div className="grid grid-cols-2 gap-4">
                 <InputField
                   label={language === 'no' ? 'Navn/Avdeling' : 'Name/Department'}
@@ -438,7 +494,10 @@ ${language === 'no' ? 'Dato' : 'Date'}: ${today}
 
             {/* Imaging (for radiology) */}
             {data.type === 'radiology' && (
-              <Section title={language === 'no' ? 'Bildediagnostikk' : 'Imaging Request'} icon={ImageIcon}>
+              <Section
+                title={language === 'no' ? 'Bildediagnostikk' : 'Imaging Request'}
+                icon={ImageIcon}
+              >
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -451,8 +510,10 @@ ${language === 'no' ? 'Dato' : 'Date'}: ${today}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     >
                       <option value="">{language === 'no' ? 'Velg...' : 'Select...'}</option>
-                      {IMAGING_OPTIONS.map(option => (
-                        <option key={option.value} value={option.value}>{option.label[language]}</option>
+                      {IMAGING_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label[language]}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -468,7 +529,9 @@ ${language === 'no' ? 'Dato' : 'Date'}: ${today}
                     value={data.imaging.specificQuestions}
                     onChange={(v) => updateSection('imaging', 'specificQuestions', v)}
                     rows={2}
-                    placeholder={language === 'no' ? 'Hva ønsker du svar på?' : 'What do you want answered?'}
+                    placeholder={
+                      language === 'no' ? 'Hva ønsker du svar på?' : 'What do you want answered?'
+                    }
                   />
                 </div>
               </Section>

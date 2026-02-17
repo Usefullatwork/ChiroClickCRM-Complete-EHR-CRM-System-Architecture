@@ -3,7 +3,7 @@
  * Provides response caching and cache headers for API endpoints
  */
 
-import cache, { CacheKeys } from '../utils/cache.js';
+import cache, { _CacheKeys } from '../utils/cache.js';
 import logger from '../utils/logger.js';
 
 /**
@@ -16,11 +16,7 @@ import logger from '../utils/logger.js';
  * @param {Function} options.condition - Condition function to determine if response should be cached
  */
 export const cacheResponse = (options = {}) => {
-  const {
-    ttl = 300,
-    keyGenerator = null,
-    condition = () => true,
-  } = options;
+  const { ttl = 300, keyGenerator = null, condition = () => true } = options;
 
   return async (req, res, next) => {
     // Only cache GET requests
@@ -69,12 +65,7 @@ export const cacheResponse = (options = {}) => {
  * @param {boolean} options.noCache - Disable caching entirely
  */
 export const cacheControl = (options = {}) => {
-  const {
-    maxAge = 0,
-    isPrivate = true,
-    noCache = false,
-    mustRevalidate = true,
-  } = options;
+  const { maxAge = 0, isPrivate = true, noCache = false, mustRevalidate = true } = options;
 
   return (req, res, next) => {
     if (noCache) {
@@ -86,7 +77,9 @@ export const cacheControl = (options = {}) => {
         isPrivate ? 'private' : 'public',
         `max-age=${maxAge}`,
         mustRevalidate ? 'must-revalidate' : '',
-      ].filter(Boolean).join(', ');
+      ]
+        .filter(Boolean)
+        .join(', ');
 
       res.set('Cache-Control', directives);
     } else {
@@ -101,28 +94,26 @@ export const cacheControl = (options = {}) => {
  * ETag middleware
  * Generates and validates ETags for response caching
  */
-export const etag = () => {
-  return (req, res, next) => {
-    const originalJson = res.json.bind(res);
+export const etag = () => (req, res, next) => {
+  const originalJson = res.json.bind(res);
 
-    res.json = (data) => {
-      // Generate simple ETag based on JSON content
-      const content = JSON.stringify(data);
-      const hash = Buffer.from(content).toString('base64').slice(0, 27);
-      const etagValue = `"${hash}"`;
+  res.json = (data) => {
+    // Generate simple ETag based on JSON content
+    const content = JSON.stringify(data);
+    const hash = Buffer.from(content).toString('base64').slice(0, 27);
+    const etagValue = `"${hash}"`;
 
-      // Check If-None-Match header
-      const ifNoneMatch = req.get('If-None-Match');
-      if (ifNoneMatch === etagValue) {
-        return res.status(304).end();
-      }
+    // Check If-None-Match header
+    const ifNoneMatch = req.get('If-None-Match');
+    if (ifNoneMatch === etagValue) {
+      return res.status(304).end();
+    }
 
-      res.set('ETag', etagValue);
-      return originalJson(data);
-    };
-
-    next();
+    res.set('ETag', etagValue);
+    return originalJson(data);
   };
+
+  next();
 };
 
 /**

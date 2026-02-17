@@ -48,7 +48,9 @@ export default function Appointments() {
   });
 
   const handleCancel = (appointment) => {
-    if (!confirm(t('cancelConfirmPrompt').replace('{name}', appointment.patient_name))) return;
+    if (!confirm(t('cancelConfirmPrompt').replace('{name}', appointment.patient_name))) {
+      return;
+    }
     const reason = prompt(t('cancellationReasonPrompt'));
     if (reason) {
       cancelMutation.mutate({ id: appointment.id, reason });

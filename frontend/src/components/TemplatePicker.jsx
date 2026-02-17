@@ -3,11 +3,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { templatesAPI } from '../services/api';
 import { Search, Star, ChevronRight, ChevronDown, Copy, Heart, X } from 'lucide-react';
 
-export default function TemplatePicker({ onSelectTemplate, soapSection, isOpen, onClose }) {
+export default function TemplatePicker({ onSelectTemplate, _soapSection, isOpen, onClose }) {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedCategories, setExpandedCategories] = useState({});
-  const [activeCategory, setActiveCategory] = useState(null);
+  const [_activeCategory, _setActiveCategory] = useState(null);
 
   // Fetch templates by category
   const { data: templatesData, isLoading } = useQuery({
@@ -27,7 +27,7 @@ export default function TemplatePicker({ onSelectTemplate, soapSection, isOpen, 
     mutationFn: (templateId) => templatesAPI.toggleFavorite(templateId),
     onSuccess: () => {
       queryClient.invalidateQueries(['templates-by-category']);
-    }
+    },
   });
 
   const handleTemplateClick = async (template) => {
@@ -42,9 +42,9 @@ export default function TemplatePicker({ onSelectTemplate, soapSection, isOpen, 
   };
 
   const toggleCategory = (category) => {
-    setExpandedCategories(prev => ({
+    setExpandedCategories((prev) => ({
       ...prev,
-      [category]: !prev[category]
+      [category]: !prev[category],
     }));
   };
 
@@ -71,9 +71,7 @@ export default function TemplatePicker({ onSelectTemplate, soapSection, isOpen, 
                       <Heart className="w-3 h-3 text-red-500 fill-red-500 flex-shrink-0" />
                     )}
                   </div>
-                  <p className="text-xs text-gray-600 line-clamp-2">
-                    {template.template_text}
-                  </p>
+                  <p className="text-xs text-gray-600 line-clamp-2">{template.template_text}</p>
                   <span className="text-xs text-gray-400 mt-1 inline-block">
                     {template.category} • {template.subcategory}
                   </span>
@@ -86,7 +84,9 @@ export default function TemplatePicker({ onSelectTemplate, soapSection, isOpen, 
       );
     }
 
-    if (!templatesData?.data) return null;
+    if (!templatesData?.data) {
+      return null;
+    }
 
     return (
       <div className="divide-y divide-gray-200">
@@ -136,9 +136,7 @@ export default function TemplatePicker({ onSelectTemplate, soapSection, isOpen, 
                                   <Star className="w-3 h-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
                                 )}
                               </div>
-                              <p className="text-xs text-gray-600 line-clamp-2">
-                                {template.text}
-                              </p>
+                              <p className="text-xs text-gray-600 line-clamp-2">{template.text}</p>
                             </div>
                             <button
                               onClick={(e) => {
@@ -170,7 +168,9 @@ export default function TemplatePicker({ onSelectTemplate, soapSection, isOpen, 
     );
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <div className="fixed right-0 top-0 h-full w-96 bg-white shadow-2xl border-l border-gray-200 z-50 flex flex-col">
@@ -178,10 +178,7 @@ export default function TemplatePicker({ onSelectTemplate, soapSection, isOpen, 
       <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold text-gray-900">Kliniske Maler</h3>
-          <button
-            onClick={onClose}
-            className="p-1 hover:bg-gray-200 rounded transition-colors"
-          >
+          <button onClick={onClose} className="p-1 hover:bg-gray-200 rounded transition-colors">
             <X className="w-5 h-5 text-gray-500" />
           </button>
         </div>
@@ -212,9 +209,7 @@ export default function TemplatePicker({ onSelectTemplate, soapSection, isOpen, 
 
       {/* Footer */}
       <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
-        <p className="text-xs text-gray-500 text-center">
-          Klikk på en mal for å sette inn teksten
-        </p>
+        <p className="text-xs text-gray-500 text-center">Klikk på en mal for å sette inn teksten</p>
       </div>
     </div>
   );

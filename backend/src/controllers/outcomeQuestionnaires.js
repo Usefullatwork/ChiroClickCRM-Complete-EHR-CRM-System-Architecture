@@ -170,7 +170,9 @@ export const getPatientTrend = async (req, res) => {
     const grouped = {};
     for (const row of result.rows) {
       const t = row.questionnaire_type;
-      if (!grouped[t]) grouped[t] = [];
+      if (!grouped[t]) {
+        grouped[t] = [];
+      }
       grouped[t].push({
         id: row.id,
         score: parseFloat(row.calculated_score),

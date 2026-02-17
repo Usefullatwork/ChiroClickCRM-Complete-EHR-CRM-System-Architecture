@@ -5,17 +5,13 @@
  */
 
 import { query } from '../config/database.js';
-import logger from '../config/logger.js';
+import _logger from '../config/logger.js';
 
 /**
  * Get all available questionnaires
  */
 export const getAllQuestionnaires = async (organizationId, options = {}) => {
-  const {
-    bodyRegion,
-    language = 'NO',
-    activeOnly = true
-  } = options;
+  const { bodyRegion, language = 'NO', activeOnly = true } = options;
 
   let sql = `
     SELECT
@@ -67,10 +63,9 @@ export const getAllQuestionnaires = async (organizationId, options = {}) => {
  * Get a specific questionnaire by code
  */
 export const getQuestionnaireByCode = async (code) => {
-  const result = await query(
-    `SELECT * FROM questionnaires WHERE code = $1 AND is_active = true`,
-    [code]
-  );
+  const result = await query(`SELECT * FROM questionnaires WHERE code = $1 AND is_active = true`, [
+    code,
+  ]);
 
   if (result.rows.length === 0) {
     throw new Error(`Questionnaire ${code} not found`);
@@ -83,19 +78,12 @@ export const getQuestionnaireByCode = async (code) => {
  * Submit a questionnaire response and calculate scores
  */
 export const submitQuestionnaireResponse = async (responseData) => {
-  const {
-    patientId,
-    encounterId,
-    questionnaireId,
-    responses,
-    administeredBy
-  } = responseData;
+  const { patientId, encounterId, questionnaireId, responses, administeredBy } = responseData;
 
   // Get questionnaire definition
-  const questionnaireResult = await query(
-    `SELECT * FROM questionnaires WHERE id = $1`,
-    [questionnaireId]
-  );
+  const questionnaireResult = await query(`SELECT * FROM questionnaires WHERE id = $1`, [
+    questionnaireId,
+  ]);
 
   if (questionnaireResult.rows.length === 0) {
     throw new Error('Questionnaire not found');
@@ -104,10 +92,7 @@ export const submitQuestionnaireResponse = async (responseData) => {
   const questionnaire = questionnaireResult.rows[0];
 
   // Calculate scores based on questionnaire type
-  const scoreData = await calculateQuestionnaireScore(
-    questionnaire,
-    responses
-  );
+  const scoreData = await calculateQuestionnaireScore(questionnaire, responses);
 
   // Get previous score for comparison
   const previousResult = await query(
@@ -120,9 +105,7 @@ export const submitQuestionnaireResponse = async (responseData) => {
     [patientId, questionnaireId]
   );
 
-  const previousScore = previousResult.rows.length > 0
-    ? previousResult.rows[0].total_score
-    : null;
+  const previousScore = previousResult.rows.length > 0 ? previousResult.rows[0].total_score : null;
 
   let scoreChange = null;
   let changePercentage = null;
@@ -172,7 +155,7 @@ export const submitQuestionnaireResponse = async (responseData) => {
       scoreChange,
       changePercentage,
       clinicallySignificantChange,
-      administeredBy
+      administeredBy,
     ]
   );
 
@@ -185,9 +168,9 @@ export const submitQuestionnaireResponse = async (responseData) => {
 const calculateQuestionnaireScore = async (questionnaire, responses) => {
   const { code, scoring_method, min_score, max_score, score_interpretation } = questionnaire;
 
-  let totalScore = 0;
-  let percentageScore = 0;
-  let severityLevel = 'None';
+  const _totalScore = 0;
+  const _percentageScore = 0;
+  const _severityLevel = 'None';
 
   switch (code) {
     case 'NDI':
@@ -218,11 +201,11 @@ const calculateQuestionnaireScore = async (questionnaire, responses) => {
  * Calculate NDI (Neck Disability Index) score
  * 10 sections, each 0-5 points, total 0-50
  */
-const calculateNDI = (responses, interpretation) => {
+const calculateNDI = (responses, _interpretation) => {
   let totalScore = 0;
   const questions = Object.keys(responses);
 
-  questions.forEach(questionId => {
+  questions.forEach((questionId) => {
     totalScore += parseInt(responses[questionId]) || 0;
   });
 
@@ -244,7 +227,7 @@ const calculateNDI = (responses, interpretation) => {
   return {
     totalScore,
     percentageScore: parseFloat(percentageScore.toFixed(2)),
-    severityLevel
+    severityLevel,
   };
 };
 
@@ -252,11 +235,11 @@ const calculateNDI = (responses, interpretation) => {
  * Calculate Oswestry Disability Index score
  * 10 sections, each 0-5 points, total 0-50
  */
-const calculateOswestry = (responses, interpretation) => {
+const calculateOswestry = (responses, _interpretation) => {
   let totalScore = 0;
   let validSections = 0;
 
-  Object.keys(responses).forEach(questionId => {
+  Object.keys(responses).forEach((questionId) => {
     const value = parseInt(responses[questionId]);
     if (!isNaN(value)) {
       totalScore += value;
@@ -266,9 +249,7 @@ const calculateOswestry = (responses, interpretation) => {
 
   // If not all sections completed, calculate proportionally
   const maxPossibleScore = validSections * 5;
-  const percentageScore = validSections > 0
-    ? (totalScore / maxPossibleScore) * 100
-    : 0;
+  const percentageScore = validSections > 0 ? (totalScore / maxPossibleScore) * 100 : 0;
 
   // Determine severity
   let severityLevel = 'Minimal disability';
@@ -285,7 +266,7 @@ const calculateOswestry = (responses, interpretation) => {
   return {
     totalScore,
     percentageScore: parseFloat(percentageScore.toFixed(2)),
-    severityLevel
+    severityLevel,
   };
 };
 
@@ -297,7 +278,7 @@ const calculatePSFS = (responses) => {
   let totalScore = 0;
   let activityCount = 0;
 
-  Object.keys(responses).forEach(questionId => {
+  Object.keys(responses).forEach((questionId) => {
     const value = parseInt(responses[questionId]);
     if (!isNaN(value)) {
       totalScore += value;
@@ -305,9 +286,7 @@ const calculatePSFS = (responses) => {
     }
   });
 
-  const averageScore = activityCount > 0
-    ? totalScore / activityCount
-    : 0;
+  const averageScore = activityCount > 0 ? totalScore / activityCount : 0;
 
   // PSFS: Higher score = better function (0-10 scale)
   const percentageScore = (averageScore / 10) * 100;
@@ -322,7 +301,7 @@ const calculatePSFS = (responses) => {
   return {
     totalScore: parseFloat(averageScore.toFixed(2)),
     percentageScore: parseFloat(percentageScore.toFixed(2)),
-    severityLevel
+    severityLevel,
   };
 };
 
@@ -331,10 +310,16 @@ const calculatePSFS = (responses) => {
  * 5 dimensions, each 1-5 levels
  */
 const calculateEQ5D = (responses) => {
-  const dimensions = ['mobility', 'self_care', 'usual_activities', 'pain_discomfort', 'anxiety_depression'];
+  const dimensions = [
+    'mobility',
+    'self_care',
+    'usual_activities',
+    'pain_discomfort',
+    'anxiety_depression',
+  ];
   let healthState = '';
 
-  dimensions.forEach(dim => {
+  dimensions.forEach((dim) => {
     const value = responses[dim] || 1;
     healthState += value;
   });
@@ -345,7 +330,7 @@ const calculateEQ5D = (responses) => {
   // Calculate index score (requires country-specific tariff)
   // Simplified version - full implementation would use value sets
   let indexScore = 1.0;
-  dimensions.forEach(dim => {
+  dimensions.forEach((dim) => {
     const level = parseInt(responses[dim]) || 1;
     if (level > 1) {
       indexScore -= 0.05 * (level - 1); // Simplified penalty
@@ -368,7 +353,7 @@ const calculateEQ5D = (responses) => {
     percentageScore: parseFloat(percentageScore.toFixed(2)),
     severityLevel,
     healthState,
-    vasScore
+    vasScore,
   };
 };
 
@@ -376,10 +361,10 @@ const calculateEQ5D = (responses) => {
  * Calculate LEFS (Lower Extremity Functional Scale) score
  * 20 items, each 0-4, total 0-80
  */
-const calculateLEFS = (responses, interpretation) => {
+const calculateLEFS = (responses, _interpretation) => {
   let totalScore = 0;
 
-  Object.keys(responses).forEach(questionId => {
+  Object.keys(responses).forEach((questionId) => {
     totalScore += parseInt(responses[questionId]) || 0;
   });
 
@@ -395,7 +380,7 @@ const calculateLEFS = (responses, interpretation) => {
   return {
     totalScore,
     percentageScore: parseFloat(percentageScore.toFixed(2)),
-    severityLevel
+    severityLevel,
   };
 };
 
@@ -403,11 +388,11 @@ const calculateLEFS = (responses, interpretation) => {
  * Calculate DASH (Disabilities of Arm, Shoulder, and Hand) score
  * 30 items, each 1-5, converted to 0-100 scale
  */
-const calculateDASH = (responses, interpretation) => {
+const calculateDASH = (responses, _interpretation) => {
   let totalScore = 0;
   let validItems = 0;
 
-  Object.keys(responses).forEach(questionId => {
+  Object.keys(responses).forEach((questionId) => {
     const value = parseInt(responses[questionId]);
     if (!isNaN(value)) {
       totalScore += value;
@@ -421,7 +406,7 @@ const calculateDASH = (responses, interpretation) => {
   }
 
   // DASH formula: ((sum of responses / number of items) - 1) × 25
-  const dashScore = ((totalScore / validItems) - 1) * 25;
+  const dashScore = (totalScore / validItems - 1) * 25;
 
   const percentageScore = dashScore;
 
@@ -437,7 +422,7 @@ const calculateDASH = (responses, interpretation) => {
   return {
     totalScore: parseFloat(dashScore.toFixed(2)),
     percentageScore: parseFloat(percentageScore.toFixed(2)),
-    severityLevel
+    severityLevel,
   };
 };
 
@@ -448,23 +433,21 @@ const calculateGenericScore = (responses, scoring_method, min_score, max_score, 
   let totalScore = 0;
 
   if (scoring_method === 'SUM') {
-    Object.values(responses).forEach(value => {
+    Object.values(responses).forEach((value) => {
       totalScore += parseInt(value) || 0;
     });
   } else if (scoring_method === 'AVERAGE') {
-    const values = Object.values(responses).map(v => parseInt(v) || 0);
+    const values = Object.values(responses).map((v) => parseInt(v) || 0);
     totalScore = values.reduce((a, b) => a + b, 0) / values.length;
   }
 
   const range = max_score - min_score;
-  const percentageScore = range > 0
-    ? ((totalScore - min_score) / range) * 100
-    : 0;
+  const percentageScore = range > 0 ? ((totalScore - min_score) / range) * 100 : 0;
 
   // Determine severity based on interpretation ranges
   let severityLevel = 'Unknown';
   if (interpretation?.ranges) {
-    interpretation.ranges.forEach(range => {
+    interpretation.ranges.forEach((range) => {
       if (totalScore >= range.min && totalScore <= range.max) {
         severityLevel = range.severity;
       }
@@ -474,7 +457,7 @@ const calculateGenericScore = (responses, scoring_method, min_score, max_score, 
   return {
     totalScore: parseFloat(totalScore.toFixed(2)),
     percentageScore: parseFloat(percentageScore.toFixed(2)),
-    severityLevel
+    severityLevel,
   };
 };
 
@@ -595,5 +578,5 @@ export default {
   getPatientQuestionnaireHistory,
   getQuestionnaireResponse,
   getOutcomesByDiagnosis,
-  calculateTreatmentEffectiveness
+  calculateTreatmentEffectiveness,
 };

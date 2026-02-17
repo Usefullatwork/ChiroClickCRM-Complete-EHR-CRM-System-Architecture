@@ -12,9 +12,9 @@
  * Bilingual: English/Norwegian
  */
 
-import React, { useState, useEffect } from 'react';
+import _React, { useState, useEffect } from 'react';
 import {
-  Wifi,
+  _Wifi,
   WifiOff,
   Cloud,
   CloudOff,
@@ -23,7 +23,7 @@ import {
   AlertTriangle,
   X,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
 } from 'lucide-react';
 import { useOffline } from '../../hooks/useOffline';
 
@@ -50,7 +50,7 @@ const TRANSLATIONS = {
     offlineFeatures: 'Tilgjengelig offline:',
     viewExercises: 'Se ovelser',
     trackProgress: 'Registrer fremgang',
-    cachedVideos: 'bufrede videoer'
+    cachedVideos: 'bufrede videoer',
   },
   en: {
     offline: 'You are offline',
@@ -70,8 +70,8 @@ const TRANSLATIONS = {
     offlineFeatures: 'Available offline:',
     viewExercises: 'View exercises',
     trackProgress: 'Track progress',
-    cachedVideos: 'cached videos'
-  }
+    cachedVideos: 'cached videos',
+  },
 };
 
 // =============================================================================
@@ -97,7 +97,7 @@ export function OfflineIndicator({
   showWhenOnline = true,
   dismissable = true,
   onSync,
-  className = ''
+  className = '',
 }) {
   const t = TRANSLATIONS[lang] || TRANSLATIONS.no;
 
@@ -107,9 +107,9 @@ export function OfflineIndicator({
     pendingSyncCount,
     isSyncing,
     syncStatus,
-    lastSyncTime,
+    _lastSyncTime,
     cachedVideoCount,
-    triggerSync
+    triggerSync,
   } = useOffline();
 
   const [dismissed, setDismissed] = useState(false);
@@ -144,8 +144,12 @@ export function OfflineIndicator({
   };
 
   // Don't render if dismissed or online (and not showing notification)
-  if (dismissed) return null;
-  if (isOnline && !showOnlineNotification && !isSyncing && syncStatus !== 'error') return null;
+  if (dismissed) {
+    return null;
+  }
+  if (isOnline && !showOnlineNotification && !isSyncing && syncStatus !== 'error') {
+    return null;
+  }
 
   // Render based on variant
   switch (variant) {
@@ -230,17 +234,18 @@ function OfflineBanner({
   dismissable,
   onDismiss,
   onSync,
-  className
+  className,
 }) {
   return (
     <div
       className={`
         w-full px-4 py-3 transition-all duration-300
-        ${isOffline
-          ? 'bg-amber-50 border-b border-amber-200'
-          : syncStatus === 'error'
-            ? 'bg-red-50 border-b border-red-200'
-            : 'bg-green-50 border-b border-green-200'
+        ${
+          isOffline
+            ? 'bg-amber-50 border-b border-amber-200'
+            : syncStatus === 'error'
+              ? 'bg-red-50 border-b border-red-200'
+              : 'bg-green-50 border-b border-green-200'
         }
         ${className}
       `}
@@ -249,15 +254,12 @@ function OfflineBanner({
         <div className="flex items-center justify-between gap-4">
           {/* Status Icon & Text */}
           <div className="flex items-center gap-3">
-            <div className={`
+            <div
+              className={`
               w-10 h-10 rounded-full flex items-center justify-center
-              ${isOffline
-                ? 'bg-amber-100'
-                : syncStatus === 'error'
-                  ? 'bg-red-100'
-                  : 'bg-green-100'
-              }
-            `}>
+              ${isOffline ? 'bg-amber-100' : syncStatus === 'error' ? 'bg-red-100' : 'bg-green-100'}
+            `}
+            >
               {isSyncing ? (
                 <RefreshCw className="w-5 h-5 text-blue-600 animate-spin" />
               ) : isOffline ? (
@@ -270,25 +272,24 @@ function OfflineBanner({
             </div>
 
             <div>
-              <p className={`font-medium ${
-                isOffline
-                  ? 'text-amber-800'
-                  : syncStatus === 'error'
-                    ? 'text-red-800'
-                    : 'text-green-800'
-              }`}>
+              <p
+                className={`font-medium ${
+                  isOffline
+                    ? 'text-amber-800'
+                    : syncStatus === 'error'
+                      ? 'text-red-800'
+                      : 'text-green-800'
+                }`}
+              >
                 {isSyncing
                   ? t.syncing
                   : isOffline
                     ? t.offline
                     : syncStatus === 'error'
                       ? t.syncFailed
-                      : t.syncComplete
-                }
+                      : t.syncComplete}
               </p>
-              {isOffline && (
-                <p className="text-sm text-amber-600">{t.offlineDesc}</p>
-              )}
+              {isOffline && <p className="text-sm text-amber-600">{t.offlineDesc}</p>}
               {pendingSyncCount > 0 && !isOffline && (
                 <p className="text-sm text-amber-600">
                   {pendingSyncCount} {pendingSyncCount === 1 ? t.pendingSyncSingle : t.pendingSync}
@@ -373,7 +374,7 @@ function OfflineBanner({
 function OfflineToast({
   t,
   isOffline,
-  isOnline,
+  _isOnline,
   isSyncing,
   syncStatus,
   pendingSyncCount,
@@ -382,11 +383,10 @@ function OfflineToast({
   dismissable,
   onDismiss,
   onSync,
-  className
+  className,
 }) {
-  const positionClasses = position === 'top'
-    ? 'top-4 left-1/2 -translate-x-1/2'
-    : 'bottom-4 left-1/2 -translate-x-1/2';
+  const positionClasses =
+    position === 'top' ? 'top-4 left-1/2 -translate-x-1/2' : 'bottom-4 left-1/2 -translate-x-1/2';
 
   return (
     <div
@@ -394,13 +394,14 @@ function OfflineToast({
         fixed z-50 ${positionClasses}
         flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg
         transition-all duration-300 transform
-        ${isOffline
-          ? 'bg-amber-600 text-white'
-          : showOnlineNotification || isSyncing
-            ? 'bg-green-600 text-white'
-            : syncStatus === 'error'
-              ? 'bg-red-600 text-white'
-              : 'opacity-0 pointer-events-none'
+        ${
+          isOffline
+            ? 'bg-amber-600 text-white'
+            : showOnlineNotification || isSyncing
+              ? 'bg-green-600 text-white'
+              : syncStatus === 'error'
+                ? 'bg-red-600 text-white'
+                : 'opacity-0 pointer-events-none'
         }
         ${className}
       `}
@@ -424,15 +425,12 @@ function OfflineToast({
               ? t.online
               : syncStatus === 'error'
                 ? t.syncFailed
-                : ''
-        }
+                : ''}
       </span>
 
       {/* Pending count */}
       {pendingSyncCount > 0 && isOffline && (
-        <span className="px-2 py-0.5 bg-white/20 rounded-full text-sm">
-          {pendingSyncCount}
-        </span>
+        <span className="px-2 py-0.5 bg-white/20 rounded-full text-sm">{pendingSyncCount}</span>
       )}
 
       {/* Retry button */}
@@ -463,17 +461,20 @@ function OfflineToast({
  * Badge variant - Compact status badge
  */
 function OfflineBadge({ t, isOffline, isSyncing, pendingSyncCount, className }) {
-  if (!isOffline && pendingSyncCount === 0 && !isSyncing) return null;
+  if (!isOffline && pendingSyncCount === 0 && !isSyncing) {
+    return null;
+  }
 
   return (
     <div
       className={`
         inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
-        ${isOffline
-          ? 'bg-amber-100 text-amber-800'
-          : isSyncing
-            ? 'bg-blue-100 text-blue-800'
-            : 'bg-yellow-100 text-yellow-800'
+        ${
+          isOffline
+            ? 'bg-amber-100 text-amber-800'
+            : isSyncing
+              ? 'bg-blue-100 text-blue-800'
+              : 'bg-yellow-100 text-yellow-800'
         }
         ${className}
       `}
@@ -486,12 +487,7 @@ function OfflineBadge({ t, isOffline, isSyncing, pendingSyncCount, className }) 
         <Cloud className="w-3 h-3" />
       )}
       <span>
-        {isOffline
-          ? t.offline
-          : isSyncing
-            ? t.syncing
-            : `${pendingSyncCount} ${t.pendingSync}`
-        }
+        {isOffline ? t.offline : isSyncing ? t.syncing : `${pendingSyncCount} ${t.pendingSync}`}
       </span>
     </div>
   );
@@ -501,13 +497,12 @@ function OfflineBadge({ t, isOffline, isSyncing, pendingSyncCount, className }) 
  * Minimal variant - Just an icon
  */
 function OfflineMinimal({ t, isOffline, pendingSyncCount, className }) {
-  if (!isOffline) return null;
+  if (!isOffline) {
+    return null;
+  }
 
   return (
-    <div
-      className={`relative ${className}`}
-      title={t.offline}
-    >
+    <div className={`relative ${className}`} title={t.offline}>
       <WifiOff className="w-5 h-5 text-amber-600" />
       {pendingSyncCount > 0 && (
         <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-white text-xs rounded-full flex items-center justify-center">

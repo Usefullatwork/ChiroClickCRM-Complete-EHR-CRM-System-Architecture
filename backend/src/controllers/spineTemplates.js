@@ -76,14 +76,14 @@ export const getAll = async (req, res) => {
     res.json({
       success: true,
       data: result.rows,
-      count: result.rows.length
+      count: result.rows.length,
     });
   } catch (error) {
     logger.error('Error fetching spine templates:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch spine templates',
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -135,14 +135,14 @@ export const getGroupedBySegment = async (req, res) => {
     res.json({
       success: true,
       data: grouped,
-      segments: Object.keys(grouped)
+      segments: Object.keys(grouped),
     });
   } catch (error) {
     logger.error('Error fetching grouped spine templates:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch spine templates',
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -183,20 +183,20 @@ export const getBySegmentDirection = async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        error: 'Template not found'
+        error: 'Template not found',
       });
     }
 
     res.json({
       success: true,
-      data: result.rows[0]
+      data: result.rows[0],
     });
   } catch (error) {
     logger.error('Error fetching spine template:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch spine template',
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -207,12 +207,19 @@ export const getBySegmentDirection = async (req, res) => {
 export const create = async (req, res) => {
   try {
     const organizationId = req.organizationId;
-    const { segment, direction, finding_type = 'palpation', text_template, language = 'NO', sort_order = 0 } = req.body;
+    const {
+      segment,
+      direction,
+      finding_type = 'palpation',
+      text_template,
+      language = 'NO',
+      sort_order = 0,
+    } = req.body;
 
     if (!segment || !direction || !text_template) {
       return res.status(400).json({
         success: false,
-        error: 'segment, direction, and text_template are required'
+        error: 'segment, direction, and text_template are required',
       });
     }
 
@@ -235,19 +242,19 @@ export const create = async (req, res) => {
       finding_type,
       text_template,
       language,
-      sort_order
+      sort_order,
     ]);
 
     res.status(201).json({
       success: true,
-      data: result.rows[0]
+      data: result.rows[0],
     });
   } catch (error) {
     logger.error('Error creating spine template:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to create spine template',
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -264,7 +271,7 @@ export const update = async (req, res) => {
     if (!text_template) {
       return res.status(400).json({
         success: false,
-        error: 'text_template is required'
+        error: 'text_template is required',
       });
     }
 
@@ -287,7 +294,7 @@ export const update = async (req, res) => {
       if (checkResult.rows.length === 0) {
         return res.status(404).json({
           success: false,
-          error: 'Template not found'
+          error: 'Template not found',
         });
       }
 
@@ -312,20 +319,20 @@ export const update = async (req, res) => {
         defaultTemplate.finding_type,
         text_template,
         defaultTemplate.language,
-        sort_order || defaultTemplate.sort_order
+        sort_order || defaultTemplate.sort_order,
       ]);
     }
 
     res.json({
       success: true,
-      data: result.rows[0]
+      data: result.rows[0],
     });
   } catch (error) {
     logger.error('Error updating spine template:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to update spine template',
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -349,20 +356,20 @@ export const remove = async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        error: 'Template not found, not owned by organization, or is a default template'
+        error: 'Template not found, not owned by organization, or is a default template',
       });
     }
 
     res.json({
       success: true,
-      message: 'Template deleted, will revert to default'
+      message: 'Template deleted, will revert to default',
     });
   } catch (error) {
     logger.error('Error deleting spine template:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to delete spine template',
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -378,15 +385,24 @@ export const bulkUpdate = async (req, res) => {
     if (!Array.isArray(templates)) {
       return res.status(400).json({
         success: false,
-        error: 'templates array is required'
+        error: 'templates array is required',
       });
     }
 
     const results = [];
     for (const template of templates) {
-      const { segment, direction, finding_type = 'palpation', text_template, language = 'NO', sort_order = 0 } = template;
+      const {
+        segment,
+        direction,
+        finding_type = 'palpation',
+        text_template,
+        language = 'NO',
+        sort_order = 0,
+      } = template;
 
-      if (!segment || !direction || !text_template) continue;
+      if (!segment || !direction || !text_template) {
+        continue;
+      }
 
       const sql = `
         INSERT INTO spine_text_templates
@@ -407,7 +423,7 @@ export const bulkUpdate = async (req, res) => {
         finding_type,
         text_template,
         language,
-        sort_order
+        sort_order,
       ]);
 
       if (result.rows.length > 0) {
@@ -418,14 +434,14 @@ export const bulkUpdate = async (req, res) => {
     res.json({
       success: true,
       data: results,
-      count: results.length
+      count: results.length,
     });
   } catch (error) {
     logger.error('Error bulk updating spine templates:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to bulk update spine templates',
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -447,14 +463,14 @@ export const resetToDefaults = async (req, res) => {
 
     res.json({
       success: true,
-      message: 'All custom templates deleted, reverted to defaults'
+      message: 'All custom templates deleted, reverted to defaults',
     });
   } catch (error) {
     logger.error('Error resetting spine templates:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to reset spine templates',
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -476,14 +492,14 @@ export const getSegments = async (req, res) => {
 
     res.json({
       success: true,
-      data: result.rows.map(r => r.segment)
+      data: result.rows.map((r) => r.segment),
     });
   } catch (error) {
     logger.error('Error fetching segments:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch segments',
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -504,14 +520,14 @@ export const getDirections = async (req, res) => {
 
     res.json({
       success: true,
-      data: result.rows.map(r => r.direction)
+      data: result.rows.map((r) => r.direction),
     });
   } catch (error) {
     logger.error('Error fetching directions:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch directions',
-      message: error.message
+      message: error.message,
     });
   }
 };

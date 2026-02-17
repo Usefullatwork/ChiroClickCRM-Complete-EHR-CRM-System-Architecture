@@ -7,7 +7,7 @@
  * Based on standardized neurological examination protocols.
  */
 
-import React, { useMemo, useState } from 'react';
+import _React, { useMemo, useState } from 'react';
 import {
   Eye,
   Ear,
@@ -20,15 +20,30 @@ import {
   CheckCircle,
   XCircle,
   MinusCircle,
-  Info
+  Info,
 } from 'lucide-react';
 
 // Finding states
 const FINDING_STATES = {
   NOT_TESTED: { value: 'NT', label: 'NT', labelNo: 'IT', color: 'bg-gray-100 text-gray-500' },
-  NORMAL: { value: 'normal', label: 'Normal', labelNo: 'Normal', color: 'bg-green-100 text-green-700' },
-  ABNORMAL: { value: 'abnormal', label: 'Abnormal', labelNo: 'Patologisk', color: 'bg-red-100 text-red-700' },
-  EQUIVOCAL: { value: 'equivocal', label: 'Equivocal', labelNo: 'Usikker', color: 'bg-amber-100 text-amber-700' }
+  NORMAL: {
+    value: 'normal',
+    label: 'Normal',
+    labelNo: 'Normal',
+    color: 'bg-green-100 text-green-700',
+  },
+  ABNORMAL: {
+    value: 'abnormal',
+    label: 'Abnormal',
+    labelNo: 'Patologisk',
+    color: 'bg-red-100 text-red-700',
+  },
+  EQUIVOCAL: {
+    value: 'equivocal',
+    label: 'Equivocal',
+    labelNo: 'Usikker',
+    color: 'bg-amber-100 text-amber-700',
+  },
 };
 
 // Complete Cranial Nerve data with all 12 nerves
@@ -47,13 +62,14 @@ const CRANIAL_NERVES = [
         id: 'smell_identification',
         name: 'Smell Identification',
         nameNo: 'Luktidentifikasjon',
-        description: 'Test each nostril separately with familiar scents (coffee, vanilla, peppermint)',
+        description:
+          'Test each nostril separately with familiar scents (coffee, vanilla, peppermint)',
         descriptionNo: 'Test hvert nesebor separat med kjente lukter (kaffe, vanilje, peppermynte)',
-        findings: ['normal', 'anosmia', 'hyposmia', 'parosmia']
-      }
+        findings: ['normal', 'anosmia', 'hyposmia', 'parosmia'],
+      },
     ],
     redFlags: ['Anosmia after head trauma', 'Unilateral loss (tumor)'],
-    redFlagsNo: ['Anosmi etter hodeskade', 'Unilateral tap (tumor)']
+    redFlagsNo: ['Anosmi etter hodeskade', 'Unilateral tap (tumor)'],
   },
   {
     id: 'cn2',
@@ -70,46 +86,46 @@ const CRANIAL_NERVES = [
         name: 'Visual Acuity',
         nameNo: 'Visus',
         description: 'Snellen chart or finger counting',
-        descriptionNo: 'Snellen-tavle eller fingertelling'
+        descriptionNo: 'Snellen-tavle eller fingertelling',
       },
       {
         id: 'visual_fields',
         name: 'Visual Fields',
         nameNo: 'Synsfelt',
         description: 'Confrontation testing in all quadrants',
-        descriptionNo: 'Konfrontasjonstest i alle kvadranter'
+        descriptionNo: 'Konfrontasjonstest i alle kvadranter',
       },
       {
         id: 'pupil_direct',
         name: 'Pupil Direct Response',
         nameNo: 'Direkte pupillrefleks',
         description: 'Shine light in eye, observe ipsilateral constriction',
-        descriptionNo: 'Lys i øyet, observer ipsilateral konstriksjon'
+        descriptionNo: 'Lys i øyet, observer ipsilateral konstriksjon',
       },
       {
         id: 'pupil_consensual',
         name: 'Pupil Consensual Response',
         nameNo: 'Konsensuel pupillrefleks',
         description: 'Shine light in one eye, observe contralateral constriction',
-        descriptionNo: 'Lys i ett øye, observer kontralateral konstriksjon'
+        descriptionNo: 'Lys i ett øye, observer kontralateral konstriksjon',
       },
       {
         id: 'rapd',
         name: 'RAPD (Swinging Flashlight)',
         nameNo: 'RAPD (Svingende lommelykt)',
         description: 'Relative afferent pupillary defect test',
-        descriptionNo: 'Relativ afferent pupilldefekt-test'
+        descriptionNo: 'Relativ afferent pupilldefekt-test',
       },
       {
         id: 'fundoscopy',
         name: 'Fundoscopy',
         nameNo: 'Fundoskopi',
         description: 'Examine optic disc and retina',
-        descriptionNo: 'Undersøk papillen og retina'
-      }
+        descriptionNo: 'Undersøk papillen og retina',
+      },
     ],
     redFlags: ['Papilledema', 'Optic atrophy', 'RAPD positive'],
-    redFlagsNo: ['Papilleødem', 'Optikusatrofi', 'RAPD positiv']
+    redFlagsNo: ['Papilleødem', 'Optikusatrofi', 'RAPD positiv'],
   },
   {
     id: 'cn3',
@@ -126,46 +142,52 @@ const CRANIAL_NERVES = [
         name: 'Eyelid Position (Ptosis)',
         nameNo: 'Øyelokksposisjon (Ptose)',
         description: 'Observe for drooping eyelid',
-        descriptionNo: 'Observer hengende øyelokk'
+        descriptionNo: 'Observer hengende øyelokk',
       },
       {
         id: 'pupil_size',
         name: 'Pupil Size',
         nameNo: 'Pupillstørrelse',
         description: 'Compare pupil size bilaterally',
-        descriptionNo: 'Sammenlign pupillstørrelse bilateralt'
+        descriptionNo: 'Sammenlign pupillstørrelse bilateralt',
       },
       {
         id: 'eye_movement_up',
         name: 'Eye Movement - Up',
         nameNo: 'Øyebevegelse - Opp',
         description: 'Superior rectus and inferior oblique',
-        descriptionNo: 'Superior rektus og inferior oblikus'
+        descriptionNo: 'Superior rektus og inferior oblikus',
       },
       {
         id: 'eye_movement_down',
         name: 'Eye Movement - Down',
         nameNo: 'Øyebevegelse - Ned',
         description: 'Inferior rectus',
-        descriptionNo: 'Inferior rektus'
+        descriptionNo: 'Inferior rektus',
       },
       {
         id: 'eye_movement_medial',
         name: 'Eye Movement - Medial',
         nameNo: 'Øyebevegelse - Medialt',
         description: 'Medial rectus (adduction)',
-        descriptionNo: 'Medial rektus (adduksjon)'
+        descriptionNo: 'Medial rektus (adduksjon)',
       },
       {
         id: 'accommodation',
         name: 'Accommodation',
         nameNo: 'Akkommodasjon',
         description: 'Near response - pupil constriction and convergence',
-        descriptionNo: 'Nærrespons - pupillkonstriksjon og konvergens'
-      }
+        descriptionNo: 'Nærrespons - pupillkonstriksjon og konvergens',
+      },
     ],
-    redFlags: ['Complete CN III palsy with pupil involvement (aneurysm)', 'Painful ophthalmoplegia'],
-    redFlagsNo: ['Komplett CN III parese med pupillaffeksjon (aneurisme)', 'Smertefull oftalmoplegi']
+    redFlags: [
+      'Complete CN III palsy with pupil involvement (aneurysm)',
+      'Painful ophthalmoplegia',
+    ],
+    redFlagsNo: [
+      'Komplett CN III parese med pupillaffeksjon (aneurisme)',
+      'Smertefull oftalmoplegi',
+    ],
   },
   {
     id: 'cn4',
@@ -182,18 +204,18 @@ const CRANIAL_NERVES = [
         name: 'Eye Movement - Down and In',
         nameNo: 'Øyebevegelse - Ned og inn',
         description: 'Superior oblique - look down and medially',
-        descriptionNo: 'Superior oblikus - se ned og medialt'
+        descriptionNo: 'Superior oblikus - se ned og medialt',
       },
       {
         id: 'head_tilt',
         name: 'Head Tilt Test',
         nameNo: 'Hodehelningstest',
         description: 'Bielschowsky head tilt test for SO palsy',
-        descriptionNo: 'Bielschowsky hodehelningstest for SO parese'
-      }
+        descriptionNo: 'Bielschowsky hodehelningstest for SO parese',
+      },
     ],
     redFlags: ['Vertical diplopia worse looking down (reading, stairs)'],
-    redFlagsNo: ['Vertikal diplopi verre ved å se ned (lesing, trapper)']
+    redFlagsNo: ['Vertikal diplopi verre ved å se ned (lesing, trapper)'],
   },
   {
     id: 'cn5',
@@ -210,53 +232,53 @@ const CRANIAL_NERVES = [
         name: 'Sensation V1 (Ophthalmic)',
         nameNo: 'Sensibilitet V1 (Oftalmisk)',
         description: 'Light touch forehead, upper eyelid',
-        descriptionNo: 'Lett berøring panne, øvre øyelokk'
+        descriptionNo: 'Lett berøring panne, øvre øyelokk',
       },
       {
         id: 'sensation_v2',
         name: 'Sensation V2 (Maxillary)',
         nameNo: 'Sensibilitet V2 (Maksillær)',
         description: 'Light touch cheek, upper lip, lateral nose',
-        descriptionNo: 'Lett berøring kinn, overleppe, lateral nese'
+        descriptionNo: 'Lett berøring kinn, overleppe, lateral nese',
       },
       {
         id: 'sensation_v3',
         name: 'Sensation V3 (Mandibular)',
         nameNo: 'Sensibilitet V3 (Mandibulær)',
         description: 'Light touch jaw, lower lip, chin',
-        descriptionNo: 'Lett berøring kjeve, underleppe, hake'
+        descriptionNo: 'Lett berøring kjeve, underleppe, hake',
       },
       {
         id: 'corneal_reflex',
         name: 'Corneal Reflex',
         nameNo: 'Kornealrefleks',
         description: 'Touch cornea with cotton wisp - blink response',
-        descriptionNo: 'Berør kornea med bomullsdott - blunkerespons'
+        descriptionNo: 'Berør kornea med bomullsdott - blunkerespons',
       },
       {
         id: 'jaw_clench',
         name: 'Jaw Clench (Masseter)',
         nameNo: 'Kjevesammenbitn (Masseter)',
         description: 'Palpate masseter during clenching',
-        descriptionNo: 'Palper masseter under sammenbiting'
+        descriptionNo: 'Palper masseter under sammenbiting',
       },
       {
         id: 'jaw_jerk',
         name: 'Jaw Jerk Reflex',
         nameNo: 'Kjeverefleks',
         description: 'Tap chin with mouth slightly open',
-        descriptionNo: 'Bank på haken med munnen litt åpen'
+        descriptionNo: 'Bank på haken med munnen litt åpen',
       },
       {
         id: 'jaw_deviation',
         name: 'Jaw Opening Deviation',
         nameNo: 'Kjeveåpningsdeviasjon',
         description: 'Observe jaw deviation on opening (pterygoids)',
-        descriptionNo: 'Observer kjevedeviasjon ved åpning (pterygoideus)'
-      }
+        descriptionNo: 'Observer kjevedeviasjon ved åpning (pterygoideus)',
+      },
     ],
     redFlags: ['Trigeminal neuralgia', 'Numbness with CN V, VI, VII (cavernous sinus)'],
-    redFlagsNo: ['Trigeminusnevralgi', 'Nummenhet med CN V, VI, VII (sinus cavernosus)']
+    redFlagsNo: ['Trigeminusnevralgi', 'Nummenhet med CN V, VI, VII (sinus cavernosus)'],
   },
   {
     id: 'cn6',
@@ -273,18 +295,18 @@ const CRANIAL_NERVES = [
         name: 'Eye Abduction',
         nameNo: 'Øyeabduksjon',
         description: 'Lateral rectus - look laterally',
-        descriptionNo: 'Lateral rektus - se lateralt'
+        descriptionNo: 'Lateral rektus - se lateralt',
       },
       {
         id: 'horizontal_diplopia',
         name: 'Horizontal Diplopia Assessment',
         nameNo: 'Horisontal diplopivurdering',
         description: 'Worse at distance, looking toward affected side',
-        descriptionNo: 'Verre på avstand, ser mot affisert side'
-      }
+        descriptionNo: 'Verre på avstand, ser mot affisert side',
+      },
     ],
     redFlags: ['Isolated CN VI palsy in elderly (microvascular)', 'With papilledema (raised ICP)'],
-    redFlagsNo: ['Isolert CN VI parese hos eldre (mikrovaskulær)', 'Med papilleødem (økt ICP)']
+    redFlagsNo: ['Isolert CN VI parese hos eldre (mikrovaskulær)', 'Med papilleødem (økt ICP)'],
   },
   {
     id: 'cn7',
@@ -301,39 +323,42 @@ const CRANIAL_NERVES = [
         name: 'Raise Eyebrows',
         nameNo: 'Løft øyenbryn',
         description: 'Frontalis muscle - forehead wrinkling',
-        descriptionNo: 'Frontalismuskel - pannerynking'
+        descriptionNo: 'Frontalismuskel - pannerynking',
       },
       {
         id: 'close_eyes_tight',
         name: 'Close Eyes Tightly',
         nameNo: 'Lukk øynene stramt',
         description: 'Orbicularis oculi - resist opening',
-        descriptionNo: 'Orbicularis oculi - motstå åpning'
+        descriptionNo: 'Orbicularis oculi - motstå åpning',
       },
       {
         id: 'puff_cheeks',
         name: 'Puff Out Cheeks',
         nameNo: 'Blås ut kinnene',
         description: 'Buccinator - check for air leak',
-        descriptionNo: 'Buccinator - sjekk for luftlekkasje'
+        descriptionNo: 'Buccinator - sjekk for luftlekkasje',
       },
       {
         id: 'show_teeth',
         name: 'Show Teeth / Smile',
         nameNo: 'Vis tenner / Smil',
         description: 'Observe symmetry of nasolabial folds',
-        descriptionNo: 'Observer symmetri av nasolabialfolder'
+        descriptionNo: 'Observer symmetri av nasolabialfolder',
       },
       {
         id: 'taste_anterior',
         name: 'Taste (Anterior 2/3 Tongue)',
         nameNo: 'Smak (Fremre 2/3 tunge)',
         description: 'Test with sugar, salt, citric acid',
-        descriptionNo: 'Test med sukker, salt, sitronsyre'
-      }
+        descriptionNo: 'Test med sukker, salt, sitronsyre',
+      },
     ],
     redFlags: ['Upper vs Lower motor neuron pattern', 'Bells palsy - exclude Lyme, Ramsay Hunt'],
-    redFlagsNo: ['Øvre vs nedre motornevron mønster', 'Bells parese - utelukk Borrelia, Ramsay Hunt']
+    redFlagsNo: [
+      'Øvre vs nedre motornevron mønster',
+      'Bells parese - utelukk Borrelia, Ramsay Hunt',
+    ],
   },
   {
     id: 'cn8',
@@ -350,53 +375,53 @@ const CRANIAL_NERVES = [
         name: 'Whisper Test',
         nameNo: 'Hvisketest',
         description: 'Whisper numbers/letters at 60cm, occlude opposite ear',
-        descriptionNo: 'Hvisk tall/bokstaver på 60cm, okkluder motsatt øre'
+        descriptionNo: 'Hvisk tall/bokstaver på 60cm, okkluder motsatt øre',
       },
       {
         id: 'finger_rub',
         name: 'Finger Rub Test',
         nameNo: 'Fingergnidningstest',
         description: 'Rub fingers near each ear',
-        descriptionNo: 'Gni fingre nær hvert øre'
+        descriptionNo: 'Gni fingre nær hvert øre',
       },
       {
         id: 'rinne_test',
         name: 'Rinne Test',
         nameNo: 'Rinnes prøve',
         description: '512Hz tuning fork: air vs bone conduction',
-        descriptionNo: '512Hz stemmegaffel: luft vs beinledning'
+        descriptionNo: '512Hz stemmegaffel: luft vs beinledning',
       },
       {
         id: 'weber_test',
         name: 'Weber Test',
         nameNo: 'Webers prøve',
         description: '512Hz tuning fork on vertex - lateralization',
-        descriptionNo: '512Hz stemmegaffel på vertex - lateralisering'
+        descriptionNo: '512Hz stemmegaffel på vertex - lateralisering',
       },
       {
         id: 'nystagmus',
         name: 'Nystagmus Assessment',
         nameNo: 'Nystagmusvurdering',
         description: 'Observe for spontaneous or gaze-evoked nystagmus',
-        descriptionNo: 'Observer for spontan eller blikkutløst nystagmus'
+        descriptionNo: 'Observer for spontan eller blikkutløst nystagmus',
       },
       {
         id: 'head_impulse',
         name: 'Head Impulse Test (HIT)',
         nameNo: 'Hodeimpulstest (HIT)',
         description: 'Rapid head turn while fixating on nose',
-        descriptionNo: 'Rask hodedreining mens pasienten fikserer på nesen'
+        descriptionNo: 'Rask hodedreining mens pasienten fikserer på nesen',
       },
       {
         id: 'dix_hallpike',
         name: 'Dix-Hallpike Test',
         nameNo: 'Dix-Hallpike test',
         description: 'BPPV assessment - posterior canal',
-        descriptionNo: 'BPPV-vurdering - bakre buegang'
-      }
+        descriptionNo: 'BPPV-vurdering - bakre buegang',
+      },
     ],
     redFlags: ['Sudden unilateral hearing loss (emergency)', 'Vertigo with neurological signs'],
-    redFlagsNo: ['Plutselig unilateralt hørselstap (ø-hjelp)', 'Svimmelhet med nevrologiske tegn']
+    redFlagsNo: ['Plutselig unilateralt hørselstap (ø-hjelp)', 'Svimmelhet med nevrologiske tegn'],
   },
   {
     id: 'cn9',
@@ -413,25 +438,25 @@ const CRANIAL_NERVES = [
         name: 'Gag Reflex (Afferent)',
         nameNo: 'Brekningsrefleks (Afferent)',
         description: 'Touch posterior pharynx with tongue depressor - sensation',
-        descriptionNo: 'Berør bakre svelg med tungespattel - sensibilitet'
+        descriptionNo: 'Berør bakre svelg med tungespattel - sensibilitet',
       },
       {
         id: 'taste_posterior',
         name: 'Taste (Posterior 1/3 Tongue)',
         nameNo: 'Smak (Bakre 1/3 tunge)',
         description: 'Test bitter taste on posterior tongue',
-        descriptionNo: 'Test bitter smak på bakre tunge'
+        descriptionNo: 'Test bitter smak på bakre tunge',
       },
       {
         id: 'palatal_sensation',
         name: 'Palatal Sensation',
         nameNo: 'Palatal sensibilitet',
         description: 'Light touch to soft palate',
-        descriptionNo: 'Lett berøring av bløte gane'
-      }
+        descriptionNo: 'Lett berøring av bløte gane',
+      },
     ],
     redFlags: ['Glossopharyngeal neuralgia', 'Absent gag with swallowing difficulty'],
-    redFlagsNo: ['Glossopharyngeusnevralgi', 'Fraværende brekningsrefleks med svelgevansker']
+    redFlagsNo: ['Glossopharyngeusnevralgi', 'Fraværende brekningsrefleks med svelgevansker'],
   },
   {
     id: 'cn10',
@@ -448,46 +473,46 @@ const CRANIAL_NERVES = [
         name: 'Voice Quality',
         nameNo: 'Stemmekvalitet',
         description: 'Listen for hoarseness, nasal speech, bovine cough',
-        descriptionNo: 'Lytt etter heshet, nasal tale, \"ku-hoste\"'
+        descriptionNo: 'Lytt etter heshet, nasal tale, \"ku-hoste\"',
       },
       {
         id: 'palate_elevation',
         name: 'Palate Elevation',
         nameNo: 'Ganehevning',
         description: 'Say "Aah" - observe uvula and soft palate',
-        descriptionNo: 'Si \"Aah\" - observer uvula og bløte gane'
+        descriptionNo: 'Si \"Aah\" - observer uvula og bløte gane',
       },
       {
         id: 'uvula_deviation',
         name: 'Uvula Deviation',
         nameNo: 'Uvuladeviasjon',
         description: 'Uvula deviates away from lesion side',
-        descriptionNo: 'Uvula devierer bort fra lesjonssiden'
+        descriptionNo: 'Uvula devierer bort fra lesjonssiden',
       },
       {
         id: 'gag_reflex_efferent',
         name: 'Gag Reflex (Efferent)',
         nameNo: 'Brekningsrefleks (Efferent)',
         description: 'Motor response to gag - palate elevation',
-        descriptionNo: 'Motorisk respons på brekningsrefleks - ganehevning'
+        descriptionNo: 'Motorisk respons på brekningsrefleks - ganehevning',
       },
       {
         id: 'cough_strength',
         name: 'Cough Strength',
         nameNo: 'Hostekraft',
         description: 'Ask patient to cough - assess strength',
-        descriptionNo: 'Be pasienten hoste - vurder styrke'
+        descriptionNo: 'Be pasienten hoste - vurder styrke',
       },
       {
         id: 'swallowing',
         name: 'Swallowing Assessment',
         nameNo: 'Svelgevurdering',
         description: 'Observe swallowing water - any coughing/choking',
-        descriptionNo: 'Observer svelging av vann - hoste/kvelning'
-      }
+        descriptionNo: 'Observer svelging av vann - hoste/kvelning',
+      },
     ],
     redFlags: ['Dysphagia with aspiration', 'Vocal cord paralysis'],
-    redFlagsNo: ['Dysfagi med aspirasjon', 'Stemmebåndsparese']
+    redFlagsNo: ['Dysfagi med aspirasjon', 'Stemmebåndsparese'],
   },
   {
     id: 'cn11',
@@ -504,32 +529,32 @@ const CRANIAL_NERVES = [
         name: 'SCM Strength',
         nameNo: 'SCM-styrke',
         description: 'Turn head against resistance - palpate SCM',
-        descriptionNo: 'Drei hodet mot motstand - palper SCM'
+        descriptionNo: 'Drei hodet mot motstand - palper SCM',
       },
       {
         id: 'trapezius_strength',
         name: 'Trapezius Strength',
         nameNo: 'Trapezius-styrke',
         description: 'Shrug shoulders against resistance',
-        descriptionNo: 'Trekk skuldrene mot motstand'
+        descriptionNo: 'Trekk skuldrene mot motstand',
       },
       {
         id: 'trapezius_bulk',
         name: 'Trapezius Bulk/Wasting',
         nameNo: 'Trapezius bulk/atrofi',
         description: 'Inspect for asymmetry or wasting',
-        descriptionNo: 'Inspiser for asymmetri eller atrofi'
+        descriptionNo: 'Inspiser for asymmetri eller atrofi',
       },
       {
         id: 'shoulder_drop',
         name: 'Shoulder Drop',
         nameNo: 'Skulderfall',
         description: 'Observe for unilateral shoulder droop',
-        descriptionNo: 'Observer for unilateralt skulderfall'
-      }
+        descriptionNo: 'Observer for unilateralt skulderfall',
+      },
     ],
     redFlags: ['Wasting after neck surgery/dissection', 'Torticollis'],
-    redFlagsNo: ['Atrofi etter nakkekirurgi/disseksjon', 'Torticollis']
+    redFlagsNo: ['Atrofi etter nakkekirurgi/disseksjon', 'Torticollis'],
   },
   {
     id: 'cn12',
@@ -546,40 +571,46 @@ const CRANIAL_NERVES = [
         name: 'Tongue Inspection at Rest',
         nameNo: 'Tungeinspeksjon i hvile',
         description: 'Look for wasting, fasciculations',
-        descriptionNo: 'Se etter atrofi, fascikulasjoner'
+        descriptionNo: 'Se etter atrofi, fascikulasjoner',
       },
       {
         id: 'tongue_protrusion',
         name: 'Tongue Protrusion',
         nameNo: 'Tungeprotrusjon',
         description: 'Stick out tongue - observe for deviation',
-        descriptionNo: 'Stikk ut tungen - observer for deviasjon'
+        descriptionNo: 'Stikk ut tungen - observer for deviasjon',
       },
       {
         id: 'tongue_strength',
         name: 'Tongue Strength',
         nameNo: 'Tungestyrke',
         description: 'Push tongue against cheek against resistance',
-        descriptionNo: 'Dytt tungen mot kinnet mot motstand'
+        descriptionNo: 'Dytt tungen mot kinnet mot motstand',
       },
       {
         id: 'tongue_movements',
         name: 'Rapid Tongue Movements',
         nameNo: 'Raske tungebevegelser',
         description: 'Move tongue rapidly side to side',
-        descriptionNo: 'Beveg tungen raskt fra side til side'
+        descriptionNo: 'Beveg tungen raskt fra side til side',
       },
       {
         id: 'dysarthria',
         name: 'Dysarthria Assessment',
         nameNo: 'Dysartrivurdering',
         description: 'Repeat "la-la-la", "baby hippopotamus"',
-        descriptionNo: 'Gjenta "la-la-la", "British constitution"'
-      }
+        descriptionNo: 'Gjenta "la-la-la", "British constitution"',
+      },
     ],
-    redFlags: ['LMN: wasting, fasciculations, deviation TO lesion', 'UMN: spastic, slow, deviation AWAY'],
-    redFlagsNo: ['Nedre motornevron: atrofi, fascikulasjoner, deviasjon MOT lesjon', 'Øvre motornevron: spastisk, langsom, deviasjon BORT']
-  }
+    redFlags: [
+      'LMN: wasting, fasciculations, deviation TO lesion',
+      'UMN: spastic, slow, deviation AWAY',
+    ],
+    redFlagsNo: [
+      'Nedre motornevron: atrofi, fascikulasjoner, deviasjon MOT lesjon',
+      'Øvre motornevron: spastisk, langsom, deviasjon BORT',
+    ],
+  },
 ];
 
 /**
@@ -590,15 +621,17 @@ function FindingToggle({ value, onChange, disabled = false, lang = 'no' }) {
     { ...FINDING_STATES.NOT_TESTED, icon: MinusCircle },
     { ...FINDING_STATES.NORMAL, icon: CheckCircle },
     { ...FINDING_STATES.ABNORMAL, icon: XCircle },
-    { ...FINDING_STATES.EQUIVOCAL, icon: AlertTriangle }
+    { ...FINDING_STATES.EQUIVOCAL, icon: AlertTriangle },
   ];
 
-  const currentIndex = states.findIndex(s => s.value === value) || 0;
+  const currentIndex = states.findIndex((s) => s.value === value) || 0;
   const current = states[currentIndex] || states[0];
   const Icon = current.icon;
 
   const handleClick = () => {
-    if (disabled) return;
+    if (disabled) {
+      return;
+    }
     const nextIndex = (currentIndex + 1) % states.length;
     onChange(states[nextIndex].value);
   };
@@ -628,7 +661,7 @@ function TestItem({ test, nerve, values, onChange, lang, showDescription = true 
 
   const leftValue = values[leftKey] || 'NT';
   const rightValue = values[rightKey] || 'NT';
-  const notes = values[notesKey] || '';
+  const _notes = values[notesKey] || '';
 
   const handleChange = (key, value) => {
     onChange({ ...values, [key]: value });
@@ -672,11 +705,7 @@ function TestItem({ test, nerve, values, onChange, lang, showDescription = true 
             </div>
           </>
         ) : (
-          <FindingToggle
-            value={leftValue}
-            onChange={(v) => handleChange(leftKey, v)}
-            lang={lang}
-          />
+          <FindingToggle value={leftValue} onChange={(v) => handleChange(leftKey, v)} lang={lang} />
         )}
       </div>
     </div>
@@ -693,36 +722,46 @@ function CranialNerveSection({
   lang,
   expanded,
   onToggle,
-  showDescription
+  showDescription,
 }) {
   const Icon = nerve.icon;
 
   // Calculate summary for this nerve
   const abnormalCount = useMemo(() => {
     let count = 0;
-    nerve.tests.forEach(test => {
+    nerve.tests.forEach((test) => {
       const leftKey = `${nerve.id}_${test.id}_left`;
       const rightKey = `${nerve.id}_${test.id}_right`;
-      if (values[leftKey] === 'abnormal') count++;
-      if (nerve.bilateral && values[rightKey] === 'abnormal') count++;
+      if (values[leftKey] === 'abnormal') {
+        count++;
+      }
+      if (nerve.bilateral && values[rightKey] === 'abnormal') {
+        count++;
+      }
     });
     return count;
   }, [values, nerve]);
 
   const testedCount = useMemo(() => {
     let count = 0;
-    nerve.tests.forEach(test => {
+    nerve.tests.forEach((test) => {
       const leftKey = `${nerve.id}_${test.id}_left`;
       const rightKey = `${nerve.id}_${test.id}_right`;
-      if (values[leftKey] && values[leftKey] !== 'NT') count++;
-      if (nerve.bilateral && values[rightKey] && values[rightKey] !== 'NT') count++;
+      if (values[leftKey] && values[leftKey] !== 'NT') {
+        count++;
+      }
+      if (nerve.bilateral && values[rightKey] && values[rightKey] !== 'NT') {
+        count++;
+      }
     });
     return count;
   }, [values, nerve]);
 
   return (
-    <div className={`border rounded-lg overflow-hidden
-                    ${abnormalCount > 0 ? 'border-red-200 bg-red-50/30' : 'border-gray-200'}`}>
+    <div
+      className={`border rounded-lg overflow-hidden
+                    ${abnormalCount > 0 ? 'border-red-200 bg-red-50/30' : 'border-gray-200'}`}
+    >
       <button
         type="button"
         onClick={onToggle}
@@ -730,8 +769,10 @@ function CranialNerveSection({
                    hover:bg-gray-100 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center
-                          ${abnormalCount > 0 ? 'bg-red-100' : 'bg-teal-100'}`}>
+          <div
+            className={`w-8 h-8 rounded-full flex items-center justify-center
+                          ${abnormalCount > 0 ? 'bg-red-100' : 'bg-teal-100'}`}
+          >
             <Icon className={`w-4 h-4 ${abnormalCount > 0 ? 'text-red-600' : 'text-teal-600'}`} />
           </div>
           <div className="text-left">
@@ -823,12 +864,22 @@ function QuickScreeningPanel({ values, onChange, lang }) {
   const screeningTests = [
     { nerveId: 'cn2', testId: 'visual_acuity', label: 'Visual Acuity', labelNo: 'Visus' },
     { nerveId: 'cn3', testId: 'pupil_direct', label: 'Pupils', labelNo: 'Pupiller' },
-    { nerveId: 'cn5', testId: 'sensation_v1', label: 'V1-V3 Sensation', labelNo: 'V1-V3 Sensibilitet' },
+    {
+      nerveId: 'cn5',
+      testId: 'sensation_v1',
+      label: 'V1-V3 Sensation',
+      labelNo: 'V1-V3 Sensibilitet',
+    },
     { nerveId: 'cn7', testId: 'show_teeth', label: 'Facial Symmetry', labelNo: 'Ansiktssymmetri' },
     { nerveId: 'cn8', testId: 'whisper_test', label: 'Hearing', labelNo: 'Hørsel' },
-    { nerveId: 'cn9', testId: 'gag_reflex_afferent', label: 'Gag Reflex', labelNo: 'Brekningsrefleks' },
+    {
+      nerveId: 'cn9',
+      testId: 'gag_reflex_afferent',
+      label: 'Gag Reflex',
+      labelNo: 'Brekningsrefleks',
+    },
     { nerveId: 'cn11', testId: 'trapezius_strength', label: 'Trapezius', labelNo: 'Trapezius' },
-    { nerveId: 'cn12', testId: 'tongue_protrusion', label: 'Tongue', labelNo: 'Tunge' }
+    { nerveId: 'cn12', testId: 'tongue_protrusion', label: 'Tongue', labelNo: 'Tunge' },
   ];
 
   const setAllNormal = () => {
@@ -864,9 +915,13 @@ function QuickScreeningPanel({ values, onChange, lang }) {
             <div
               key={`${nerveId}_${testId}`}
               className={`px-2 py-1 rounded text-xs
-                         ${isNormal ? 'bg-green-100 text-green-700' :
-                           isAbnormal ? 'bg-red-100 text-red-700' :
-                           'bg-gray-100 text-gray-600'}`}
+                         ${
+                           isNormal
+                             ? 'bg-green-100 text-green-700'
+                             : isAbnormal
+                               ? 'bg-red-100 text-red-700'
+                               : 'bg-gray-100 text-gray-600'
+                         }`}
             >
               {lang === 'no' ? labelNo : label}
             </div>
@@ -884,10 +939,10 @@ export default function CranialNervePanel({
   values = {},
   onChange,
   lang = 'no',
-  readOnly = false,
+  _readOnly = false,
   showDescription = true,
   onGenerateNarrative,
-  defaultExpanded = []
+  defaultExpanded = [],
 }) {
   const [expandedNerves, setExpandedNerves] = useState(new Set(defaultExpanded));
   const [expandAll, setExpandAll] = useState(false);
@@ -906,7 +961,7 @@ export default function CranialNervePanel({
     if (expandAll) {
       setExpandedNerves(new Set());
     } else {
-      setExpandedNerves(new Set(CRANIAL_NERVES.map(n => n.id)));
+      setExpandedNerves(new Set(CRANIAL_NERVES.map((n) => n.id)));
     }
     setExpandAll(!expandAll);
   };
@@ -918,17 +973,21 @@ export default function CranialNervePanel({
     let abnormal = 0;
     let equivocal = 0;
 
-    CRANIAL_NERVES.forEach(nerve => {
-      nerve.tests.forEach(test => {
+    CRANIAL_NERVES.forEach((nerve) => {
+      nerve.tests.forEach((test) => {
         const leftKey = `${nerve.id}_${test.id}_left`;
         const rightKey = `${nerve.id}_${test.id}_right`;
 
-        [leftKey, rightKey].forEach(key => {
+        [leftKey, rightKey].forEach((key) => {
           if (values[key] && values[key] !== 'NT') {
             tested++;
-            if (values[key] === 'normal') normal++;
-            else if (values[key] === 'abnormal') abnormal++;
-            else if (values[key] === 'equivocal') equivocal++;
+            if (values[key] === 'normal') {
+              normal++;
+            } else if (values[key] === 'abnormal') {
+              abnormal++;
+            } else if (values[key] === 'equivocal') {
+              equivocal++;
+            }
           }
         });
       });
@@ -939,13 +998,13 @@ export default function CranialNervePanel({
 
   // Generate narrative text
   const generateNarrative = useMemo(() => {
-    const findings = [];
+    const _findings = [];
     const abnormalFindings = [];
 
-    CRANIAL_NERVES.forEach(nerve => {
+    CRANIAL_NERVES.forEach((nerve) => {
       const nerveFindings = [];
 
-      nerve.tests.forEach(test => {
+      nerve.tests.forEach((test) => {
         const leftKey = `${nerve.id}_${test.id}_left`;
         const rightKey = `${nerve.id}_${test.id}_right`;
         const leftVal = values[leftKey];
@@ -993,7 +1052,9 @@ export default function CranialNervePanel({
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-gray-800">
-            {lang === 'no' ? 'Hjernenerveundersøkelse (CN I-XII)' : 'Cranial Nerve Examination (CN I-XII)'}
+            {lang === 'no'
+              ? 'Hjernenerveundersøkelse (CN I-XII)'
+              : 'Cranial Nerve Examination (CN I-XII)'}
           </h3>
           {summary.tested > 0 && (
             <p className="text-sm text-gray-500">
@@ -1025,8 +1086,12 @@ export default function CranialNervePanel({
                       hover:bg-gray-50 transition-colors"
           >
             {expandAll
-              ? (lang === 'no' ? 'Lukk alle' : 'Collapse All')
-              : (lang === 'no' ? 'Åpne alle' : 'Expand All')}
+              ? lang === 'no'
+                ? 'Lukk alle'
+                : 'Collapse All'
+              : lang === 'no'
+                ? 'Åpne alle'
+                : 'Expand All'}
           </button>
 
           {onGenerateNarrative && (
@@ -1084,19 +1149,26 @@ export default function CranialNervePanel({
       <div className="flex items-start gap-2 p-3 bg-blue-50 rounded-lg border border-blue-100 text-xs text-blue-700">
         <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
         <div>
-          <p className="font-medium">
-            {lang === 'no' ? 'Klinisk tips' : 'Clinical Tips'}
-          </p>
+          <p className="font-medium">{lang === 'no' ? 'Klinisk tips' : 'Clinical Tips'}</p>
           <ul className="mt-1 space-y-0.5 text-blue-600">
-            <li>• {lang === 'no'
-              ? 'Klikk på status-knappen for å bla gjennom: IT → Normal → Patologisk → Usikker'
-              : 'Click status button to cycle through: NT → Normal → Abnormal → Equivocal'}</li>
-            <li>• {lang === 'no'
-              ? 'CN II, III, IV, VI testes sammen med øyebevegelser'
-              : 'CN II, III, IV, VI tested together with eye movements'}</li>
-            <li>• {lang === 'no'
-              ? 'CN IX og X testes sammen med svelgfunksjon'
-              : 'CN IX and X tested together with swallowing function'}</li>
+            <li>
+              •{' '}
+              {lang === 'no'
+                ? 'Klikk på status-knappen for å bla gjennom: IT → Normal → Patologisk → Usikker'
+                : 'Click status button to cycle through: NT → Normal → Abnormal → Equivocal'}
+            </li>
+            <li>
+              •{' '}
+              {lang === 'no'
+                ? 'CN II, III, IV, VI testes sammen med øyebevegelser'
+                : 'CN II, III, IV, VI tested together with eye movements'}
+            </li>
+            <li>
+              •{' '}
+              {lang === 'no'
+                ? 'CN IX og X testes sammen med svelgfunksjon'
+                : 'CN IX and X tested together with swallowing function'}
+            </li>
           </ul>
         </div>
       </div>

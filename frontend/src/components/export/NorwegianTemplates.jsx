@@ -16,16 +16,16 @@
 import { useState } from 'react';
 import {
   FileText,
-  Calendar,
-  User,
-  Building,
-  Clipboard,
-  Send,
-  AlertCircle,
+  _Calendar,
+  _User,
+  _Building,
+  _Clipboard,
+  _Send,
+  _AlertCircle,
   Check,
   Copy,
   Download,
-  Eye,
+  _Eye,
 } from 'lucide-react';
 
 // =============================================================================
@@ -42,7 +42,8 @@ export const DOCUMENT_TEMPLATES = {
       no: 'Standard klinisk notat for pasientkonsultasjoner',
     },
     sections: ['header', 'patient', 'soap', 'codes', 'signature'],
-    template: (data, lang) => `
+    template: (data, lang) =>
+      `
 ${data.practice?.name || 'Klinikk'}
 ${data.practice?.address || ''}
 Tlf: ${data.practice?.phone || ''}
@@ -92,7 +93,8 @@ Signert elektronisk: ${formatNorwegianDate(new Date())}
       no: 'Henvisning til spesialist eller bildediagnostikk',
     },
     sections: ['header', 'recipient', 'patient', 'reason', 'history', 'findings', 'request'],
-    template: (data, lang) => `
+    template: (data, _lang) =>
+      `
 ${data.practice?.name || 'Klinikk'}
 ${data.practice?.address || ''}
 Tlf: ${data.practice?.phone || ''}
@@ -147,8 +149,17 @@ HPR-nr: ${data.provider?.hprNumber || ''}
       en: 'Summary of treatment course for patient or third party',
       no: 'Oppsummering av behandlingsforløp for pasient eller tredjepart',
     },
-    sections: ['header', 'patient', 'period', 'diagnosis', 'treatment', 'outcome', 'recommendations'],
-    template: (data, lang) => `
+    sections: [
+      'header',
+      'patient',
+      'period',
+      'diagnosis',
+      'treatment',
+      'outcome',
+      'recommendations',
+    ],
+    template: (data, _lang) =>
+      `
 ${data.practice?.name || 'Klinikk'}
 ${data.practice?.address || ''}
 ${'─'.repeat(50)}
@@ -198,7 +209,8 @@ Dato: ${formatNorwegianDate(new Date())}
       no: 'Detaljert rapport for forsikringskrav',
     },
     sections: ['header', 'patient', 'injury', 'treatment', 'prognosis', 'functional'],
-    template: (data, lang) => `
+    template: (data, _lang) =>
+      `
 ${data.practice?.name || 'Klinikk'}
 ${data.practice?.address || ''}
 Org.nr: ${data.practice?.orgNumber || ''}
@@ -279,9 +291,13 @@ Signatur: _______________________________
  * Format date in Norwegian format (DD.MM.YYYY)
  */
 export function formatNorwegianDate(date) {
-  if (!date) return '';
+  if (!date) {
+    return '';
+  }
   const d = new Date(date);
-  if (isNaN(d.getTime())) return '';
+  if (isNaN(d.getTime())) {
+    return '';
+  }
 
   return d.toLocaleDateString('nb-NO', {
     day: '2-digit',
@@ -294,7 +310,9 @@ export function formatNorwegianDate(date) {
  * Format Norwegian phone number
  */
 export function formatNorwegianPhone(phone) {
-  if (!phone) return '';
+  if (!phone) {
+    return '';
+  }
 
   // Remove non-digits
   const digits = phone.replace(/\D/g, '');
@@ -315,7 +333,9 @@ export function formatNorwegianPhone(phone) {
  * Format Norwegian personnummer (national ID)
  */
 export function formatPersonnummer(personnummer) {
-  if (!personnummer) return '';
+  if (!personnummer) {
+    return '';
+  }
 
   const digits = personnummer.replace(/\D/g, '');
 
@@ -379,7 +399,7 @@ export default function NorwegianDocumentTemplates({
     request: '',
   });
 
-  const [insuranceData, setInsuranceData] = useState({
+  const [insuranceData, _setInsuranceData] = useState({
     injuryDate: '',
     incidentDescription: '',
     functionalStatus: '',
@@ -494,12 +514,18 @@ export default function NorwegianDocumentTemplates({
                 key={key}
                 onClick={() => setSelectedTemplate(key)}
                 className={`p-4 rounded-lg border text-left transition-colors
-                  ${selectedTemplate === key
-                    ? 'border-blue-300 bg-blue-50'
-                    : 'border-gray-200 hover:bg-gray-50'}`}
+                  ${
+                    selectedTemplate === key
+                      ? 'border-blue-300 bg-blue-50'
+                      : 'border-gray-200 hover:bg-gray-50'
+                  }`}
               >
-                <p className="font-medium text-gray-900">{template.name[language] || template.name.no}</p>
-                <p className="text-xs text-gray-500 mt-1">{template.description[language] || template.description.no}</p>
+                <p className="font-medium text-gray-900">
+                  {template.name[language] || template.name.no}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {template.description[language] || template.description.no}
+                </p>
               </button>
             ))}
           </div>
@@ -524,7 +550,9 @@ export default function NorwegianDocumentTemplates({
               >
                 <option value="Normal">Normal</option>
                 <option value="Haster">{language === 'no' ? 'Haster' : 'Urgent'}</option>
-                <option value="Øyeblikkelig">{language === 'no' ? 'Øyeblikkelig' : 'Immediate'}</option>
+                <option value="Øyeblikkelig">
+                  {language === 'no' ? 'Øyeblikkelig' : 'Immediate'}
+                </option>
               </select>
             </div>
             <textarea
@@ -556,7 +584,11 @@ export default function NorwegianDocumentTemplates({
                   onClick={handleCopy}
                   className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 bg-gray-100 rounded-lg"
                 >
-                  {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                  {copied ? (
+                    <Check className="w-4 h-4 text-green-500" />
+                  ) : (
+                    <Copy className="w-4 h-4" />
+                  )}
                   {copied ? t.copied : t.copy}
                 </button>
                 <button
@@ -583,41 +615,73 @@ export default function NorwegianDocumentTemplates({
 // =============================================================================
 
 function formatSOAPSection(data, section) {
-  if (!data) return '';
+  if (!data) {
+    return '';
+  }
 
   const parts = [];
 
   if (section === 'subjective') {
-    if (data.subjective?.chief_complaint) parts.push(data.subjective.chief_complaint);
-    if (data.pain_qualities?.length) parts.push(`Smertekvalitet: ${data.pain_qualities.join(', ')}`);
-    if (data.pain_locations?.length) parts.push(`Lokalisering: ${data.pain_locations.join(', ')}`);
-    if (data.subjective?.history) parts.push(data.subjective.history);
+    if (data.subjective?.chief_complaint) {
+      parts.push(data.subjective.chief_complaint);
+    }
+    if (data.pain_qualities?.length) {
+      parts.push(`Smertekvalitet: ${data.pain_qualities.join(', ')}`);
+    }
+    if (data.pain_locations?.length) {
+      parts.push(`Lokalisering: ${data.pain_locations.join(', ')}`);
+    }
+    if (data.subjective?.history) {
+      parts.push(data.subjective.history);
+    }
     if (data.vas_pain_start !== null && data.vas_pain_start !== undefined) {
       parts.push(`VAS ved start: ${data.vas_pain_start}/10`);
     }
   }
 
   if (section === 'objective') {
-    if (data.observation_findings?.length) parts.push(`Observasjon: ${data.observation_findings.join(', ')}`);
-    if (data.palpation_findings?.length) parts.push(`Palpasjon: ${data.palpation_findings.join(', ')}`);
-    if (data.rom_findings?.length) parts.push(`ROM: ${data.rom_findings.join(', ')}`);
-    if (data.objective?.observation) parts.push(data.objective.observation);
-    if (data.objective?.palpation) parts.push(data.objective.palpation);
+    if (data.observation_findings?.length) {
+      parts.push(`Observasjon: ${data.observation_findings.join(', ')}`);
+    }
+    if (data.palpation_findings?.length) {
+      parts.push(`Palpasjon: ${data.palpation_findings.join(', ')}`);
+    }
+    if (data.rom_findings?.length) {
+      parts.push(`ROM: ${data.rom_findings.join(', ')}`);
+    }
+    if (data.objective?.observation) {
+      parts.push(data.objective.observation);
+    }
+    if (data.objective?.palpation) {
+      parts.push(data.objective.palpation);
+    }
     if (data.vas_pain_end !== null && data.vas_pain_end !== undefined) {
       parts.push(`VAS ved slutt: ${data.vas_pain_end}/10`);
     }
   }
 
   if (section === 'assessment') {
-    if (data.assessment?.clinical_reasoning) parts.push(data.assessment.clinical_reasoning);
-    if (data.assessment?.prognosis) parts.push(`Prognose: ${data.assessment.prognosis}`);
+    if (data.assessment?.clinical_reasoning) {
+      parts.push(data.assessment.clinical_reasoning);
+    }
+    if (data.assessment?.prognosis) {
+      parts.push(`Prognose: ${data.assessment.prognosis}`);
+    }
   }
 
   if (section === 'plan') {
-    if (data.treatments_selected?.length) parts.push(`Behandling: ${data.treatments_selected.join(', ')}`);
-    if (data.plan?.treatment) parts.push(data.plan.treatment);
-    if (data.exercises_selected?.length) parts.push(`Øvelser: ${data.exercises_selected.join(', ')}`);
-    if (data.plan?.follow_up) parts.push(`Oppfølging: ${data.plan.follow_up}`);
+    if (data.treatments_selected?.length) {
+      parts.push(`Behandling: ${data.treatments_selected.join(', ')}`);
+    }
+    if (data.plan?.treatment) {
+      parts.push(data.plan.treatment);
+    }
+    if (data.exercises_selected?.length) {
+      parts.push(`Øvelser: ${data.exercises_selected.join(', ')}`);
+    }
+    if (data.plan?.follow_up) {
+      parts.push(`Oppfølging: ${data.plan.follow_up}`);
+    }
   }
 
   return parts.join('\n');

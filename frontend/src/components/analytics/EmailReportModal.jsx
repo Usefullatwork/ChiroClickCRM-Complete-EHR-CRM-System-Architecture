@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Mail, Send, AlertCircle } from 'lucide-react';
+import _React, { useState } from 'react';
+import { _Mail, Send, AlertCircle } from 'lucide-react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
@@ -27,9 +27,9 @@ export const EmailReportModal = ({ isOpen, onClose, kpiData, dateRange, timeRang
       newErrors.recipients = 'At least one recipient email is required';
     } else {
       // Validate email format
-      const emails = recipients.split(',').map(e => e.trim());
+      const emails = recipients.split(',').map((e) => e.trim());
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      const invalidEmails = emails.filter(e => !emailRegex.test(e));
+      const invalidEmails = emails.filter((e) => !emailRegex.test(e));
       if (invalidEmails.length > 0) {
         newErrors.recipients = `Invalid email format: ${invalidEmails.join(', ')}`;
       }
@@ -44,10 +44,12 @@ export const EmailReportModal = ({ isOpen, onClose, kpiData, dateRange, timeRang
   };
 
   const handleSend = async () => {
-    if (!validate()) return;
+    if (!validate()) {
+      return;
+    }
 
     try {
-      const emailList = recipients.split(',').map(e => e.trim());
+      const emailList = recipients.split(',').map((e) => e.trim());
 
       await sendReport.mutateAsync({
         recipients: emailList,
@@ -55,7 +57,7 @@ export const EmailReportModal = ({ isOpen, onClose, kpiData, dateRange, timeRang
         message,
         kpiData,
         dateRange,
-        timeRange
+        timeRange,
       });
 
       // Success - close modal
@@ -92,12 +94,7 @@ ${message ? `\nAdditional Notes:\n${message}` : ''}
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Email KPI Report"
-      size="lg"
-    >
+    <Modal isOpen={isOpen} onClose={onClose} title="Email KPI Report" size="lg">
       <div className="space-y-6">
         {/* Info alert */}
         <Alert variant="info">
@@ -125,9 +122,7 @@ ${message ? `\nAdditional Notes:\n${message}` : ''}
               placeholder="email1@example.com, email2@example.com"
               error={errors.recipients}
             />
-            <p className="text-xs text-slate-500 mt-1">
-              Separate multiple emails with commas
-            </p>
+            <p className="text-xs text-slate-500 mt-1">Separate multiple emails with commas</p>
           </div>
 
           {/* Subject */}
@@ -160,9 +155,7 @@ ${message ? `\nAdditional Notes:\n${message}` : ''}
 
           {/* Preview */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Email Preview
-            </label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Email Preview</label>
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
               <pre className="text-xs text-slate-700 whitespace-pre-wrap font-mono">
                 {generatePreview()}
@@ -181,19 +174,10 @@ ${message ? `\nAdditional Notes:\n${message}` : ''}
 
         {/* Actions */}
         <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            disabled={sendReport.isLoading}
-          >
+          <Button variant="outline" onClick={onClose} disabled={sendReport.isLoading}>
             Cancel
           </Button>
-          <Button
-            variant="primary"
-            onClick={handleSend}
-            loading={sendReport.isLoading}
-            icon={Send}
-          >
+          <Button variant="primary" onClick={handleSend} loading={sendReport.isLoading} icon={Send}>
             Send Report
           </Button>
         </div>

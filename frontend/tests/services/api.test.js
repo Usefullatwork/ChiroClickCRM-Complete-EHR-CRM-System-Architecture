@@ -57,7 +57,7 @@ describe('API Client', () => {
     });
 
     it('should clear organization ID when null is passed', async () => {
-      const { setOrganizationId, getOrganizationId } = await import('../../src/services/api.js');
+      const { setOrganizationId, _getOrganizationId } = await import('../../src/services/api.js');
 
       setOrganizationId('test-org-123');
       setOrganizationId(null);
@@ -68,12 +68,12 @@ describe('API Client', () => {
     it('should migrate from localStorage to sessionStorage', async () => {
       mockLocalStorage.store['organizationId'] = 'legacy-org-id';
 
-      const { getOrganizationId } = await import('../../src/services/api.js');
+      const { _getOrganizationId } = await import('../../src/services/api.js');
 
       // Clear module cache to force re-import
       jest.resetModules();
 
-      const { getOrganizationId: freshGetOrgId } = await import('../../src/services/api.js');
+      const { getOrganizationId: _freshGetOrgId } = await import('../../src/services/api.js');
 
       // Should attempt to read from localStorage as fallback
       expect(mockLocalStorage.getItem).toHaveBeenCalledWith('organizationId');

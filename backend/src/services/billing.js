@@ -6,10 +6,12 @@
  * and payment tracking for Norwegian chiropractic clinics
  */
 
-import { query, transaction } from '../config/database.js';
+import { createRequire } from 'module';
+import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
-import takstCodes from '../data/takst-codes.json' with { type: 'json' };
-import PDFDocument from 'pdfkit';
+
+const require = createRequire(import.meta.url);
+const takstCodes = require('../data/takst-codes.json');
 
 // Invoice statuses
 export const INVOICE_STATUS = {
@@ -20,7 +22,7 @@ export const INVOICE_STATUS = {
   PARTIAL: 'partial',
   OVERDUE: 'overdue',
   CANCELLED: 'cancelled',
-  CREDITED: 'credited'
+  CREDITED: 'credited',
 };
 
 // Payment methods
@@ -30,23 +32,21 @@ export const PAYMENT_METHODS = {
   VIPPS: 'vipps',
   BANK_TRANSFER: 'bank_transfer',
   HELFO: 'helfo',
-  INSURANCE: 'insurance'
+  INSURANCE: 'insurance',
 };
 
 /**
  * Get all Norwegian takst codes
  * @returns {Object} Takst codes with metadata
  */
-export const getTakstCodes = () => {
-  return {
-    codes: takstCodes.codes,
-    additionalCodes: takstCodes.additionalCodes,
-    categories: takstCodes.categories,
-    exemptions: takstCodes.exemptions,
-    version: takstCodes.version,
-    lastUpdated: takstCodes.lastUpdated
-  };
-};
+export const getTakstCodes = () => ({
+  codes: takstCodes.codes,
+  additionalCodes: takstCodes.additionalCodes,
+  categories: takstCodes.categories,
+  exemptions: takstCodes.exemptions,
+  version: takstCodes.version,
+  lastUpdated: takstCodes.lastUpdated,
+});
 
 /**
  * Get a specific takst code by ID
@@ -104,7 +104,7 @@ export const calculateInvoiceTotals = (items, options = {}) => {
       unitPrice: code.price,
       lineTotal: lineGross,
       helfoRefund: lineHelfo,
-      patientShare: linePatientShare
+      patientShare: linePatientShare,
     });
   }
 
@@ -114,7 +114,7 @@ export const calculateInvoiceTotals = (items, options = {}) => {
     totalHelfoRefund,
     totalPatientShare,
     totalDue: totalPatientShare,
-    currency: 'NOK'
+    currency: 'NOK',
   };
 };
 
@@ -157,7 +157,7 @@ export const createInvoice = async (organizationId, invoiceData) => {
     notes = null,
     due_days = 14,
     is_child = false,
-    has_exemption = false
+    has_exemption = false,
   } = invoiceData;
 
   // Calculate totals
@@ -209,7 +209,7 @@ export const createInvoice = async (organizationId, invoiceData) => {
       INVOICE_STATUS.DRAFT,
       notes,
       is_child,
-      has_exemption
+      has_exemption,
     ]
   );
 
@@ -271,12 +271,12 @@ export const getInvoices = async (organizationId, options = {}) => {
     end_date = null,
     search = null,
     sort_by = 'invoice_date',
-    sort_order = 'DESC'
+    sort_order = 'DESC',
   } = options;
 
   const offset = (page - 1) * limit;
-  let whereConditions = ['i.organization_id = $1'];
-  let params = [organizationId];
+  const whereConditions = ['i.organization_id = $1'];
+  const params = [organizationId];
   let paramIndex = 2;
 
   if (status) {
@@ -316,7 +316,14 @@ export const getInvoices = async (organizationId, options = {}) => {
   const whereClause = whereConditions.join(' AND ');
 
   // Validate sort column
-  const validSortColumns = ['invoice_date', 'due_date', 'invoice_number', 'patient_amount', 'status', 'created_at'];
+  const validSortColumns = [
+    'invoice_date',
+    'due_date',
+    'invoice_number',
+    'patient_amount',
+    'status',
+    'created_at',
+  ];
   const sortColumn = validSortColumns.includes(sort_by) ? sort_by : 'invoice_date';
   const sortDir = sort_order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
@@ -347,8 +354,8 @@ export const getInvoices = async (organizationId, options = {}) => {
       page,
       limit,
       total: parseInt(countResult.rows[0].count),
-      pages: Math.ceil(countResult.rows[0].count / limit)
-    }
+      pages: Math.ceil(countResult.rows[0].count / limit),
+    },
   };
 };
 
@@ -433,7 +440,7 @@ export const recordPayment = async (organizationId, invoiceId, paymentData) => {
     payment_method,
     payment_reference = null,
     payment_date = new Date(),
-    notes = null
+    notes = null,
   } = paymentData;
 
   // Get current invoice
@@ -485,7 +492,7 @@ export const recordPayment = async (organizationId, invoiceId, paymentData) => {
 
   return {
     invoice: invoiceResult.rows[0],
-    payment: paymentResult.rows[0]
+    payment: paymentResult.rows[0],
   };
 };
 
@@ -610,15 +617,16 @@ export const generateInvoiceHTML = (invoice) => {
   const invoiceDate = new Date(invoice.invoice_date).toLocaleDateString('no-NO');
   const dueDate = new Date(invoice.due_date).toLocaleDateString('no-NO');
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('no-NO', {
+  const formatCurrency = (amount) =>
+    new Intl.NumberFormat('no-NO', {
       style: 'currency',
       currency: 'NOK',
-      minimumFractionDigits: 0
+      minimumFractionDigits: 0,
     }).format(amount);
-  };
 
-  const itemsHTML = items.map(item => `
+  const itemsHTML = items
+    .map(
+      (item) => `
     <tr>
       <td style="padding: 8px; border-bottom: 1px solid #e5e5e5;">${item.code}</td>
       <td style="padding: 8px; border-bottom: 1px solid #e5e5e5;">${item.name}</td>
@@ -626,7 +634,9 @@ export const generateInvoiceHTML = (invoice) => {
       <td style="padding: 8px; border-bottom: 1px solid #e5e5e5; text-align: right;">${formatCurrency(item.unitPrice)}</td>
       <td style="padding: 8px; border-bottom: 1px solid #e5e5e5; text-align: right;">${formatCurrency(item.lineTotal)}</td>
     </tr>
-  `).join('');
+  `
+    )
+    .join('');
 
   return `
     <!DOCTYPE html>
@@ -771,7 +781,7 @@ export const getHelfoReportData = async (organizationId, startDate, endDate) => 
     period: { startDate, endDate },
     invoices: result.rows,
     totalRefund,
-    invoiceCount: result.rows.length
+    invoiceCount: result.rows.length,
   };
 };
 
@@ -793,5 +803,5 @@ export default {
   getInvoiceStatistics,
   updateOverdueInvoices,
   generateInvoiceHTML,
-  getHelfoReportData
+  getHelfoReportData,
 };

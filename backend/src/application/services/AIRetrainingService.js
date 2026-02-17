@@ -28,10 +28,10 @@ class AIRetrainingService {
     // Configuration thresholds
     this.config = {
       minExamplesForRetraining: 100,
-      acceptanceRateDropThreshold: 0.1,  // 10% drop triggers retraining
+      acceptanceRateDropThreshold: 0.1, // 10% drop triggers retraining
       maxDaysBetweenTraining: 7,
       validationSplitRatio: 0.2,
-      minValidationAccuracy: 0.75
+      minValidationAccuracy: 0.75,
     };
 
     // Initialize event handlers
@@ -45,7 +45,7 @@ class AIRetrainingService {
    */
   initEventHandlers() {
     registerEventHandlers({
-      [DOMAIN_EVENTS.TRAINING_THRESHOLD_REACHED]: this.handleTrainingThresholdReached.bind(this)
+      [DOMAIN_EVENTS.TRAINING_THRESHOLD_REACHED]: this.handleTrainingThresholdReached.bind(this),
     });
 
     logger.debug('AI retraining event handlers registered');
@@ -86,13 +86,17 @@ class AIRetrainingService {
     // Check days since last training
     const lastTraining = await this.getLastTrainingRun();
     const daysSinceTraining = lastTraining
-      ? Math.floor((Date.now() - new Date(lastTraining.completed_at).getTime()) / (1000 * 60 * 60 * 24))
+      ? Math.floor(
+          (Date.now() - new Date(lastTraining.completed_at).getTime()) / (1000 * 60 * 60 * 24)
+        )
       : Infinity;
 
     const reasons = [];
 
     if (stats.newExamples >= this.config.minExamplesForRetraining) {
-      reasons.push(`New examples threshold (${stats.newExamples} >= ${this.config.minExamplesForRetraining})`);
+      reasons.push(
+        `New examples threshold (${stats.newExamples} >= ${this.config.minExamplesForRetraining})`
+      );
     }
 
     if (rateDrop >= this.config.acceptanceRateDropThreshold * 100) {
@@ -100,7 +104,9 @@ class AIRetrainingService {
     }
 
     if (daysSinceTraining >= this.config.maxDaysBetweenTraining) {
-      reasons.push(`Days since training (${daysSinceTraining} >= ${this.config.maxDaysBetweenTraining})`);
+      reasons.push(
+        `Days since training (${daysSinceTraining} >= ${this.config.maxDaysBetweenTraining})`
+      );
     }
 
     if (reasons.length > 0) {
@@ -132,7 +138,7 @@ class AIRetrainingService {
       // Emit training started event
       await eventBus.emit(DOMAIN_EVENTS.MODEL_TRAINING_STARTED, {
         trainingRunId,
-        startedAt: new Date().toISOString()
+        startedAt: new Date().toISOString(),
       });
 
       logger.info('Starting model retraining pipeline', { trainingRunId });
@@ -152,9 +158,9 @@ class AIRetrainingService {
       const modelfile = await this.createModelfile(trainingData, newModelVersion);
 
       // Step 4: Train model via Ollama (using circuit breaker)
-      const trainResult = await CircuitBreakers.ollama.execute(async () => {
-        return await this.trainModel(newModelVersion, modelfile);
-      });
+      const _trainResult = await CircuitBreakers.ollama.execute(
+        async () => await this.trainModel(newModelVersion, modelfile)
+      );
 
       // Step 5: Validate new model
       const validation = await this.validateModel(newModelVersion);
@@ -164,13 +170,13 @@ class AIRetrainingService {
         await this.rollbackModel(newModelVersion);
         await this.recordTrainingRun(trainingRunId, 'VALIDATION_FAILED', {
           validation,
-          duration: Date.now() - startTime
+          duration: Date.now() - startTime,
         });
 
         return {
           success: false,
           reason: 'Validation failed',
-          validation
+          validation,
         };
       }
 
@@ -183,7 +189,7 @@ class AIRetrainingService {
         modelVersion: newModelVersion,
         trainingExamples: trainingData.count,
         validation,
-        duration
+        duration,
       });
 
       // Emit training completed event
@@ -191,14 +197,14 @@ class AIRetrainingService {
         EventFactory.modelTrainingCompleted(newModelVersion, {
           trainingExamples: trainingData.count,
           validation,
-          duration
+          duration,
         })
       );
 
       logger.info('Model retraining completed successfully', {
         trainingRunId,
         modelVersion: newModelVersion,
-        duration: `${(duration / 1000).toFixed(2)}s`
+        duration: `${(duration / 1000).toFixed(2)}s`,
       });
 
       return {
@@ -207,29 +213,27 @@ class AIRetrainingService {
         modelVersion: newModelVersion,
         trainingExamples: trainingData.count,
         validation,
-        duration
+        duration,
       };
-
     } catch (error) {
       logger.error('Model retraining failed:', error);
 
       await this.recordTrainingRun(trainingRunId, 'FAILED', {
         error: error.message,
-        duration: Date.now() - startTime
+        duration: Date.now() - startTime,
       });
 
       // Emit training failed event
       await eventBus.emit(DOMAIN_EVENTS.MODEL_TRAINING_FAILED, {
         trainingRunId,
-        error: error.message
+        error: error.message,
       });
 
       return {
         success: false,
         trainingRunId,
-        error: error.message
+        error: error.message,
       };
-
     } finally {
       this.isRetraining = false;
     }
@@ -242,7 +246,7 @@ class AIRetrainingService {
     return await aiFeedbackService.exportTrainingData({
       startDate: await this.getLastTrainingDate(),
       includeRejected: false,
-      minConfidence: 0.7
+      minConfidence: 0.7,
     });
   }
 
@@ -273,9 +277,13 @@ Vær konsis og presis. Følg norske retningslinjer for journalføring.
 """
 
 # Training examples incorporated via ADAPTER
-${trainingData.data ? `
+${
+  trainingData.data
+    ? `
 # Training data hash: ${this.hashTrainingData(trainingData.data)}
-` : ''}
+`
+    : ''
+}
 `.trim();
 
     // Save Modelfile
@@ -296,8 +304,8 @@ ${trainingData.data ? `
       body: JSON.stringify({
         name: modelVersion,
         modelfile: modelfile,
-        stream: false
-      })
+        stream: false,
+      }),
     });
 
     if (!response.ok) {
@@ -332,8 +340,8 @@ ${trainingData.data ? `
             body: JSON.stringify({
               model: modelVersion,
               prompt: example.input,
-              stream: false
-            })
+              stream: false,
+            }),
           });
           return await res.json();
         });
@@ -348,7 +356,7 @@ ${trainingData.data ? `
         results.push({
           input: example.input.substring(0, 100),
           similarity,
-          passed: similarity >= 0.7
+          passed: similarity >= 0.7,
         });
       } catch (error) {
         logger.warn('Validation example failed:', error.message);
@@ -363,7 +371,7 @@ ${trainingData.data ? `
       totalExamples: validationExamples.length,
       testedExamples: Math.min(validationExamples.length, 20),
       correctPredictions: correct,
-      results
+      results,
     };
   }
 
@@ -396,18 +404,21 @@ ${trainingData.data ? `
    */
   async activateModel(modelVersion) {
     // Update active model in config
-    await query(`
+    await query(
+      `
       INSERT INTO system_config (key, value, updated_at)
       VALUES ('active_ai_model', $1, NOW())
       ON CONFLICT (key) DO UPDATE SET value = $1, updated_at = NOW()
-    `, [modelVersion]);
+    `,
+      [modelVersion]
+    );
 
     this.currentModelVersion = modelVersion;
 
     // Emit model activated event
     await eventBus.emit(DOMAIN_EVENTS.MODEL_ACTIVATED, {
       modelVersion,
-      activatedAt: new Date().toISOString()
+      activatedAt: new Date().toISOString(),
     });
 
     logger.info(`Model ${modelVersion} activated as primary`);
@@ -424,7 +435,7 @@ ${trainingData.data ? `
       await fetch(`${OLLAMA_HOST}/api/delete`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: failedModelVersion })
+        body: JSON.stringify({ name: failedModelVersion }),
       });
     } catch (error) {
       logger.warn('Error deleting failed model:', error.message);
@@ -433,7 +444,7 @@ ${trainingData.data ? `
     // Emit rollback event
     await eventBus.emit(DOMAIN_EVENTS.MODEL_ROLLED_BACK, {
       failedModelVersion,
-      rolledBackAt: new Date().toISOString()
+      rolledBackAt: new Date().toISOString(),
     });
   }
 
@@ -442,14 +453,17 @@ ${trainingData.data ? `
    */
   async recordTrainingRun(runId, status, metadata = {}) {
     try {
-      await query(`
+      await query(
+        `
         INSERT INTO ai_training_runs (id, status, metadata, created_at, completed_at)
         VALUES ($1, $2, $3, NOW(), ${status === 'COMPLETED' || status === 'FAILED' ? 'NOW()' : 'NULL'})
         ON CONFLICT (id) DO UPDATE SET
           status = $2,
           metadata = $3,
           completed_at = ${status === 'COMPLETED' || status === 'FAILED' ? 'NOW()' : 'ai_training_runs.completed_at'}
-      `, [runId, status, JSON.stringify(metadata)]);
+      `,
+        [runId, status, JSON.stringify(metadata)]
+      );
     } catch (error) {
       logger.warn('Error recording training run:', error.message);
     }
@@ -484,12 +498,14 @@ ${trainingData.data ? `
    * Calculate text similarity (simple implementation)
    */
   calculateSimilarity(text1, text2) {
-    if (!text1 || !text2) return 0;
+    if (!text1 || !text2) {
+      return 0;
+    }
 
     const words1 = new Set(text1.toLowerCase().split(/\s+/));
     const words2 = new Set(text2.toLowerCase().split(/\s+/));
 
-    const intersection = new Set([...words1].filter(w => words2.has(w)));
+    const intersection = new Set([...words1].filter((w) => words2.has(w)));
     const union = new Set([...words1, ...words2]);
 
     return intersection.size / union.size;
@@ -502,7 +518,7 @@ ${trainingData.data ? `
     let hash = 0;
     for (let i = 0; i < data.length; i++) {
       const char = data.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash;
     }
     return Math.abs(hash).toString(16);
@@ -523,14 +539,14 @@ ${trainingData.data ? `
       const response = await fetch(`${OLLAMA_HOST}/api/show`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: modelVersion })
+        body: JSON.stringify({ name: modelVersion }),
       });
 
       if (response.ok) {
         const modelInfo = await response.json();
         return {
           version: modelVersion,
-          ...modelInfo
+          ...modelInfo,
         };
       }
 
@@ -546,12 +562,15 @@ ${trainingData.data ? `
    */
   async getTrainingHistory(limit = 10) {
     try {
-      const result = await query(`
+      const result = await query(
+        `
         SELECT id, status, metadata, created_at, completed_at
         FROM ai_training_runs
         ORDER BY created_at DESC
         LIMIT $1
-      `, [limit]);
+      `,
+        [limit]
+      );
 
       return result.rows;
     } catch (error) {

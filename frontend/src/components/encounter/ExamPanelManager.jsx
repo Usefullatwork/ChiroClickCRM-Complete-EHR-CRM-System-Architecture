@@ -1,4 +1,4 @@
-import React from 'react';
+import _React from 'react';
 import {
   ChevronDown,
   ChevronUp,
@@ -410,9 +410,10 @@ export function ExamPanelManager({
               updateField(
                 'assessment',
                 'clinical_reasoning',
-                encounterData.assessment.clinical_reasoning +
-                  (encounterData.assessment.clinical_reasoning ? '\n\n' : '') +
-                  `${result.type.toUpperCase()}: ${result.score} poeng (${result.percentage}%)`
+                `${
+                  encounterData.assessment.clinical_reasoning +
+                  (encounterData.assessment.clinical_reasoning ? '\n\n' : '')
+                }${result.type.toUpperCase()}: ${result.score} poeng (${result.percentage}%)`
               );
             }}
           />

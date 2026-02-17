@@ -3,7 +3,7 @@
  * Business logic for SOAP notes and clinical documentation
  */
 
-import { query, transaction } from '../config/database.js';
+import { query, _transaction } from '../config/database.js';
 import logger from '../utils/logger.js';
 import { BusinessLogicError } from '../utils/errors.js';
 import { validate as validateNote } from './noteValidator.js';
@@ -374,21 +374,40 @@ export const generateFormattedNote = async (organizationId, encounterId) => {
 
     // Subjective
     note += `SUBJEKTIVT (S):\n`;
-    if (subjective.chief_complaint) note += `Hovedplage: ${subjective.chief_complaint}\n`;
-    if (subjective.history) note += `Anamnese: ${subjective.history}\n`;
-    if (subjective.onset) note += `Debut: ${subjective.onset}\n`;
-    if (subjective.pain_description) note += `Smertebeskrivelse: ${subjective.pain_description}\n`;
-    if (encounter.vas_pain_start !== null)
+    if (subjective.chief_complaint) {
+      note += `Hovedplage: ${subjective.chief_complaint}\n`;
+    }
+    if (subjective.history) {
+      note += `Anamnese: ${subjective.history}\n`;
+    }
+    if (subjective.onset) {
+      note += `Debut: ${subjective.onset}\n`;
+    }
+    if (subjective.pain_description) {
+      note += `Smertebeskrivelse: ${subjective.pain_description}\n`;
+    }
+    if (encounter.vas_pain_start !== null) {
       note += `VAS ved start: ${encounter.vas_pain_start}/10\n`;
+    }
     note += `\n`;
 
     // Objective
     note += `OBJEKTIVT (O):\n`;
-    if (objective.observation) note += `Observasjon: ${objective.observation}\n`;
-    if (objective.palpation) note += `Palpasjon: ${objective.palpation}\n`;
-    if (objective.rom) note += `Bevegelighet: ${objective.rom}\n`;
-    if (objective.ortho_tests) note += `Ortopediske tester: ${objective.ortho_tests}\n`;
-    if (objective.neuro_tests) note += `Nevrologiske tester: ${objective.neuro_tests}\n`;
+    if (objective.observation) {
+      note += `Observasjon: ${objective.observation}\n`;
+    }
+    if (objective.palpation) {
+      note += `Palpasjon: ${objective.palpation}\n`;
+    }
+    if (objective.rom) {
+      note += `Bevegelighet: ${objective.rom}\n`;
+    }
+    if (objective.ortho_tests) {
+      note += `Ortopediske tester: ${objective.ortho_tests}\n`;
+    }
+    if (objective.neuro_tests) {
+      note += `Nevrologiske tester: ${objective.neuro_tests}\n`;
+    }
     note += `\n`;
 
     // Assessment
@@ -399,18 +418,31 @@ export const generateFormattedNote = async (organizationId, encounterId) => {
     if (encounter.icd10_codes && encounter.icd10_codes.length > 0) {
       note += `Diagnose (ICD-10): ${encounter.icd10_codes.join(', ')}\n`;
     }
-    if (assessment.clinical_reasoning)
+    if (assessment.clinical_reasoning) {
       note += `Klinisk resonnement: ${assessment.clinical_reasoning}\n`;
-    if (assessment.prognosis) note += `Prognose: ${assessment.prognosis}\n`;
+    }
+    if (assessment.prognosis) {
+      note += `Prognose: ${assessment.prognosis}\n`;
+    }
     note += `\n`;
 
     // Plan
     note += `PLAN (P):\n`;
-    if (plan.treatment) note += `Behandling: ${plan.treatment}\n`;
-    if (plan.exercises) note += `Hjemmeøvelser: ${plan.exercises}\n`;
-    if (plan.advice) note += `Råd: ${plan.advice}\n`;
-    if (plan.follow_up) note += `Oppfølging: ${plan.follow_up}\n`;
-    if (encounter.vas_pain_end !== null) note += `VAS ved slutt: ${encounter.vas_pain_end}/10\n`;
+    if (plan.treatment) {
+      note += `Behandling: ${plan.treatment}\n`;
+    }
+    if (plan.exercises) {
+      note += `Hjemmeøvelser: ${plan.exercises}\n`;
+    }
+    if (plan.advice) {
+      note += `Råd: ${plan.advice}\n`;
+    }
+    if (plan.follow_up) {
+      note += `Oppfølging: ${plan.follow_up}\n`;
+    }
+    if (encounter.vas_pain_end !== null) {
+      note += `VAS ved slutt: ${encounter.vas_pain_end}/10\n`;
+    }
 
     // Update encounter with generated note
     await query('UPDATE clinical_encounters SET generated_note = $1 WHERE id = $2', [
@@ -458,7 +490,7 @@ export const getPatientEncounterHistory = async (organizationId, patientId) => {
 /**
  * Check for clinical red flags
  */
-export const checkRedFlags = async (patientId, encounterData) => {
+export const checkRedFlags = async (patientId, _encounterData) => {
   try {
     // Get patient data
     const patientResult = await query(

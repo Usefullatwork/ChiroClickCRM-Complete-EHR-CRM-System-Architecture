@@ -323,14 +323,24 @@ export const submitIntakeForm = async (patientId, formData) => {
 
   // Update patient record with new medical info
   const updates = {};
-  if (formData.allergies) updates.allergies = formData.allergies;
-  if (formData.medications) updates.current_medications = formData.medications;
-  if (formData.phone) updates.phone = formData.phone;
-  if (formData.email) updates.email = formData.email;
-  if (formData.emergency_contact_name)
+  if (formData.allergies) {
+    updates.allergies = formData.allergies;
+  }
+  if (formData.medications) {
+    updates.current_medications = formData.medications;
+  }
+  if (formData.phone) {
+    updates.phone = formData.phone;
+  }
+  if (formData.email) {
+    updates.email = formData.email;
+  }
+  if (formData.emergency_contact_name) {
     updates.emergency_contact_name = formData.emergency_contact_name;
-  if (formData.emergency_contact_phone)
+  }
+  if (formData.emergency_contact_phone) {
     updates.emergency_contact_phone = formData.emergency_contact_phone;
+  }
 
   if (Object.keys(updates).length > 0) {
     const setClauses = [];

@@ -155,11 +155,7 @@ export async function generateText(prompt, options = {}) {
  */
 export async function chatCompletion(messages, options = {}) {
   const config = getAIConfig();
-  const {
-    model = config.model,
-    temperature = config.temperature,
-    stream = false,
-  } = options;
+  const { model = config.model, temperature = config.temperature, stream = false } = options;
 
   try {
     const response = await fetch(`${config.baseUrl}/api/chat`, {
@@ -312,8 +308,9 @@ List eventuelle overholdelsesproblem funnet.`,
  * Parse intake form data into a Subjective narrative
  */
 export async function parseIntakeToSubjective(intakeData, language = 'en') {
-  const config = getAIConfig();
-  const promptTemplate = CLINICAL_PROMPTS.intakeToSubjective[language] || CLINICAL_PROMPTS.intakeToSubjective.en;
+  const _config = getAIConfig();
+  const promptTemplate =
+    CLINICAL_PROMPTS.intakeToSubjective[language] || CLINICAL_PROMPTS.intakeToSubjective.en;
 
   // Format intake data for the prompt
   const formattedIntake = formatIntakeData(intakeData, language);
@@ -378,19 +375,45 @@ function formatIntakeData(data, language = 'en') {
   const l = labels[language] || labels.en;
   const lines = [];
 
-  if (data.chiefComplaint) lines.push(`${l.chiefComplaint}: ${data.chiefComplaint}`);
-  if (data.painLevel) lines.push(`${l.painLevel}: ${data.painLevel}/10`);
-  if (data.onset) lines.push(`${l.onset}: ${data.onset}`);
-  if (data.duration) lines.push(`${l.duration}: ${data.duration}`);
-  if (data.painQuality?.length) lines.push(`${l.painQuality}: ${data.painQuality.join(', ')}`);
-  if (data.location?.length) lines.push(`${l.location}: ${data.location.join(', ')}`);
-  if (data.radiation) lines.push(`${l.radiation}: ${data.radiation}`);
-  if (data.aggravatingFactors?.length) lines.push(`${l.aggravatingFactors}: ${data.aggravatingFactors.join(', ')}`);
-  if (data.relievingFactors?.length) lines.push(`${l.relievingFactors}: ${data.relievingFactors.join(', ')}`);
-  if (data.previousTreatment) lines.push(`${l.previousTreatment}: ${data.previousTreatment}`);
-  if (data.medicalHistory) lines.push(`${l.medicalHistory}: ${data.medicalHistory}`);
-  if (data.medications) lines.push(`${l.medications}: ${data.medications}`);
-  if (data.goals) lines.push(`${l.goals}: ${data.goals}`);
+  if (data.chiefComplaint) {
+    lines.push(`${l.chiefComplaint}: ${data.chiefComplaint}`);
+  }
+  if (data.painLevel) {
+    lines.push(`${l.painLevel}: ${data.painLevel}/10`);
+  }
+  if (data.onset) {
+    lines.push(`${l.onset}: ${data.onset}`);
+  }
+  if (data.duration) {
+    lines.push(`${l.duration}: ${data.duration}`);
+  }
+  if (data.painQuality?.length) {
+    lines.push(`${l.painQuality}: ${data.painQuality.join(', ')}`);
+  }
+  if (data.location?.length) {
+    lines.push(`${l.location}: ${data.location.join(', ')}`);
+  }
+  if (data.radiation) {
+    lines.push(`${l.radiation}: ${data.radiation}`);
+  }
+  if (data.aggravatingFactors?.length) {
+    lines.push(`${l.aggravatingFactors}: ${data.aggravatingFactors.join(', ')}`);
+  }
+  if (data.relievingFactors?.length) {
+    lines.push(`${l.relievingFactors}: ${data.relievingFactors.join(', ')}`);
+  }
+  if (data.previousTreatment) {
+    lines.push(`${l.previousTreatment}: ${data.previousTreatment}`);
+  }
+  if (data.medicalHistory) {
+    lines.push(`${l.medicalHistory}: ${data.medicalHistory}`);
+  }
+  if (data.medications) {
+    lines.push(`${l.medications}: ${data.medications}`);
+  }
+  if (data.goals) {
+    lines.push(`${l.goals}: ${data.goals}`);
+  }
 
   return lines.join('\n');
 }
@@ -427,11 +450,15 @@ function generateFallbackSubjective(data, language = 'en') {
 
   if (data.chiefComplaint) {
     let complaint = `${t.presents} ${data.chiefComplaint}`;
-    if (data.painLevel) complaint += ` ${t.rated} ${data.painLevel} ${t.outOf}`;
-    parts.push(complaint + '.');
+    if (data.painLevel) {
+      complaint += ` ${t.rated} ${data.painLevel} ${t.outOf}`;
+    }
+    parts.push(`${complaint}.`);
   }
 
-  if (data.onset) parts.push(`${t.onset} ${data.onset}.`);
+  if (data.onset) {
+    parts.push(`${t.onset} ${data.onset}.`);
+  }
 
   if (data.painQuality?.length) {
     parts.push(`${t.quality} ${data.painQuality.join(', ')}.`);
@@ -449,7 +476,7 @@ function generateFallbackSubjective(data, language = 'en') {
     if (data.relievingFactors?.length) {
       factors += ` ${t.relieved} ${data.relievingFactors.join(', ')}`;
     }
-    parts.push(factors + '.');
+    parts.push(`${factors}.`);
   }
 
   return parts.join(' ');
@@ -463,8 +490,9 @@ function generateFallbackSubjective(data, language = 'en') {
  * Parse transcription text into SOAP structure
  */
 export async function parseTranscriptionToSOAP(transcription, language = 'en') {
-  const config = getAIConfig();
-  const promptTemplate = CLINICAL_PROMPTS.transcriptionToSOAP[language] || CLINICAL_PROMPTS.transcriptionToSOAP.en;
+  const _config = getAIConfig();
+  const promptTemplate =
+    CLINICAL_PROMPTS.transcriptionToSOAP[language] || CLINICAL_PROMPTS.transcriptionToSOAP.en;
   const prompt = promptTemplate.replace('{transcription}', transcription);
 
   try {
@@ -506,7 +534,8 @@ export async function parseTranscriptionToSOAP(transcription, language = 'en') {
  * Convert objective findings to narrative text
  */
 export async function convertFindingsToNarrative(findings, language = 'en') {
-  const promptTemplate = CLINICAL_PROMPTS.findingsToNarrative[language] || CLINICAL_PROMPTS.findingsToNarrative.en;
+  const promptTemplate =
+    CLINICAL_PROMPTS.findingsToNarrative[language] || CLINICAL_PROMPTS.findingsToNarrative.en;
 
   const formattedFindings = Object.entries(findings)
     .filter(([_, value]) => value && (Array.isArray(value) ? value.length > 0 : true))
@@ -542,7 +571,7 @@ export async function convertFindingsToNarrative(findings, language = 'en') {
  */
 export async function transcribeAudio(audioBlob, options = {}) {
   const config = getAIConfig();
-  const { language = 'en' } = options;
+  const { _language = 'en' } = options;
 
   // Check for Web Speech API as fallback
   if (!window.webkitSpeechRecognition && !window.SpeechRecognition) {
@@ -590,9 +619,15 @@ export function createSpeechRecognition(options = {}) {
   recognition.interimResults = interimResults;
   recognition.lang = language === 'no' ? 'nb-NO' : 'en-US';
 
-  if (onResult) recognition.onresult = onResult;
-  if (onError) recognition.onerror = onError;
-  if (onEnd) recognition.onend = onEnd;
+  if (onResult) {
+    recognition.onresult = onResult;
+  }
+  if (onError) {
+    recognition.onerror = onError;
+  }
+  if (onEnd) {
+    recognition.onend = onEnd;
+  }
 
   return recognition;
 }

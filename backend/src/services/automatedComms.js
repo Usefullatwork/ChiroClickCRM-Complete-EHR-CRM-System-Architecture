@@ -11,7 +11,7 @@
  * Norwegian text as default language.
  */
 
-import { query, transaction } from '../config/database.js';
+import { query, _transaction } from '../config/database.js';
 import logger from '../utils/logger.js';
 
 // Default templates (Norwegian)
@@ -21,50 +21,52 @@ const DEFAULT_TEMPLATES = {
     category: 'appointment_reminder',
     type: 'SMS',
     subject: null,
-    body: 'Hei {{patient_first_name}}! Paminnelse om time i morgen {{appointment_date}} kl {{appointment_time}} hos {{provider_name}}. Avbud? Ring {{clinic_phone}}.'
+    body: 'Hei {{patient_first_name}}! Paminnelse om time i morgen {{appointment_date}} kl {{appointment_time}} hos {{provider_name}}. Avbud? Ring {{clinic_phone}}.',
   },
   APPOINTMENT_1H: {
     name: '1-times paminnelse',
     category: 'appointment_reminder',
     type: 'SMS',
     subject: null,
-    body: 'Hei {{patient_first_name}}! Husk timen din i dag kl {{appointment_time}} hos {{clinic_name}}. Vi gleder oss til a se deg!'
+    body: 'Hei {{patient_first_name}}! Husk timen din i dag kl {{appointment_time}} hos {{clinic_name}}. Vi gleder oss til a se deg!',
   },
   EXERCISE_INACTIVE: {
     name: 'Ovelsesprogram paminnelse',
     category: 'exercise_reminder',
     type: 'SMS',
     subject: null,
-    body: 'Hei {{patient_first_name}}! Vi savner deg! Det er {{days_since_login}} dager siden sist du logget inn pa ovelsesprogrammet. Logg inn her: {{portal_link}}'
+    body: 'Hei {{patient_first_name}}! Vi savner deg! Det er {{days_since_login}} dager siden sist du logget inn pa ovelsesprogrammet. Logg inn her: {{portal_link}}',
   },
   FOLLOWUP_DUE: {
     name: 'Oppfolging - bestill ny time',
     category: 'followup_reminder',
     type: 'SMS',
     subject: null,
-    body: 'Hei {{patient_first_name}}! Det er pa tide med en oppfolgingstime. Ring oss pa {{clinic_phone}} eller bestill online. Hilsen {{clinic_name}}'
+    body: 'Hei {{patient_first_name}}! Det er pa tide med en oppfolgingstime. Ring oss pa {{clinic_phone}} eller bestill online. Hilsen {{clinic_name}}',
   },
   BIRTHDAY: {
     name: 'Gratulerer med dagen!',
     category: 'birthday',
     type: 'SMS',
     subject: null,
-    body: 'Gratulerer med dagen, {{patient_first_name}}! Vi onsker deg en fantastisk dag! Hilsen alle oss pa {{clinic_name}}'
+    body: 'Gratulerer med dagen, {{patient_first_name}}! Vi onsker deg en fantastisk dag! Hilsen alle oss pa {{clinic_name}}',
   },
   DAYS_SINCE_VISIT: {
     name: 'Innkalling etter X dager',
     category: 'followup_reminder',
     type: 'SMS',
     subject: null,
-    body: 'Hei {{patient_first_name}}! Det er {{days_since_visit}} dager siden siste besok. Er det pa tide med en ny time? Ring oss pa {{clinic_phone}} eller bestill online. Hilsen {{clinic_name}}'
-  }
+    body: 'Hei {{patient_first_name}}! Det er {{days_since_visit}} dager siden siste besok. Er det pa tide med en ny time? Ring oss pa {{clinic_phone}} eller bestill online. Hilsen {{clinic_name}}',
+  },
 };
 
 /**
  * Replace template variables with actual values
  */
 export const substituteVariables = (template, variables) => {
-  if (!template) return '';
+  if (!template) {
+    return '';
+  }
 
   let result = template;
   Object.entries(variables).forEach(([key, value]) => {
@@ -80,8 +82,18 @@ export const substituteVariables = (template, variables) => {
  */
 const formatNorwegianDate = (date) => {
   const months = [
-    'januar', 'februar', 'mars', 'april', 'mai', 'juni',
-    'juli', 'august', 'september', 'oktober', 'november', 'desember'
+    'januar',
+    'februar',
+    'mars',
+    'april',
+    'mai',
+    'juni',
+    'juli',
+    'august',
+    'september',
+    'oktober',
+    'november',
+    'desember',
   ];
   const d = new Date(date);
   return `${d.getDate()}. ${months[d.getMonth()]} ${d.getFullYear()}`;
@@ -170,7 +182,7 @@ export const queueMessage = async (organizationId, patientId, messageData, sched
         messageData.templateId || null,
         messageData.triggerType || null,
         scheduledAt || new Date(),
-        messageData.priority || 'normal'
+        messageData.priority || 'normal',
       ]
     );
 
@@ -216,7 +228,7 @@ export const logSentMessage = async (organizationId, data) => {
         data.triggerType || null,
         data.isAutomated !== false,
         data.sentBy || null,
-        data.status || 'SENT'
+        data.status || 'SENT',
       ]
     );
 
@@ -280,7 +292,7 @@ export const checkAppointmentReminders24h = async () => {
           ? `${apt.provider_first_name} ${apt.provider_last_name}`
           : 'din behandler',
         clinic_name: apt.clinic_name,
-        clinic_phone: apt.clinic_phone
+        clinic_phone: apt.clinic_phone,
       };
 
       const content = substituteVariables(template.body, variables);
@@ -290,7 +302,7 @@ export const checkAppointmentReminders24h = async () => {
         content,
         subject: template.subject ? substituteVariables(template.subject, variables) : null,
         triggerType: 'APPOINTMENT_24H',
-        priority: 'high'
+        priority: 'high',
       });
 
       queued.push({ queueId, patientId: apt.patient_id, appointmentId: apt.appointment_id });
@@ -343,7 +355,7 @@ export const checkAppointmentReminders1h = async () => {
       const variables = {
         patient_first_name: apt.first_name,
         appointment_time: formatTime(apt.start_time),
-        clinic_name: apt.clinic_name
+        clinic_name: apt.clinic_name,
       };
 
       const content = substituteVariables(template.body, variables);
@@ -352,7 +364,7 @@ export const checkAppointmentReminders1h = async () => {
         type: template.type || 'SMS',
         content,
         triggerType: 'APPOINTMENT_1H',
-        priority: 'high'
+        priority: 'high',
       });
 
       queued.push({ queueId, patientId: apt.patient_id, appointmentId: apt.appointment_id });
@@ -407,7 +419,7 @@ export const checkExerciseInactivity = async (daysThreshold = 7) => {
         patient_first_name: patient.first_name,
         days_since_login: Math.floor(patient.days_since_login),
         clinic_name: patient.clinic_name,
-        portal_link: patient.portal_link || 'https://portal.chiroclick.no'
+        portal_link: patient.portal_link || 'https://portal.chiroclick.no',
       };
 
       const content = substituteVariables(template.body, variables);
@@ -416,7 +428,7 @@ export const checkExerciseInactivity = async (daysThreshold = 7) => {
         type: template.type || 'SMS',
         content,
         triggerType: 'EXERCISE_INACTIVE',
-        priority: 'normal'
+        priority: 'normal',
       });
 
       queued.push({ queueId, patientId: patient.patient_id });
@@ -470,7 +482,7 @@ export const checkFollowUpReminders = async () => {
       const variables = {
         patient_first_name: fu.first_name,
         clinic_name: fu.clinic_name,
-        clinic_phone: fu.clinic_phone
+        clinic_phone: fu.clinic_phone,
       };
 
       const content = substituteVariables(template.body, variables);
@@ -479,7 +491,7 @@ export const checkFollowUpReminders = async () => {
         type: template.type || 'SMS',
         content,
         triggerType: 'FOLLOWUP_DUE',
-        priority: 'normal'
+        priority: 'normal',
       });
 
       queued.push({ queueId, patientId: fu.patient_id, followupId: fu.followup_id });
@@ -529,7 +541,7 @@ export const checkBirthdayGreetings = async () => {
 
       const variables = {
         patient_first_name: patient.first_name,
-        clinic_name: patient.clinic_name
+        clinic_name: patient.clinic_name,
       };
 
       const content = substituteVariables(template.body, variables);
@@ -538,7 +550,7 @@ export const checkBirthdayGreetings = async () => {
         type: template.type || 'SMS',
         content,
         triggerType: 'BIRTHDAY',
-        priority: 'low'
+        priority: 'low',
       });
 
       queued.push({ queueId, patientId: patient.patient_id });
@@ -596,7 +608,7 @@ export const checkDaysSinceVisit = async (daysThreshold = 90) => {
         patient_first_name: patient.first_name,
         days_since_visit: Math.floor(patient.days_since_visit),
         clinic_name: patient.clinic_name,
-        clinic_phone: patient.clinic_phone
+        clinic_phone: patient.clinic_phone,
       };
 
       const content = substituteVariables(template.body, variables);
@@ -605,7 +617,7 @@ export const checkDaysSinceVisit = async (daysThreshold = 90) => {
         type: template.type || 'SMS',
         content,
         triggerType: 'DAYS_SINCE_VISIT',
-        priority: 'normal'
+        priority: 'normal',
       });
 
       queued.push({ queueId, patientId: patient.patient_id });
@@ -630,7 +642,7 @@ export const runAutomatedChecks = async () => {
     exerciseInactive: { count: 0, error: null },
     followupDue: { count: 0, error: null },
     birthday: { count: 0, error: null },
-    daysSinceVisit: { count: 0, error: null }
+    daysSinceVisit: { count: 0, error: null },
   };
 
   try {
@@ -720,5 +732,5 @@ export default {
   checkBirthdayGreetings,
   checkDaysSinceVisit,
   runAutomatedChecks,
-  getAutomationStats
+  getAutomationStats,
 };

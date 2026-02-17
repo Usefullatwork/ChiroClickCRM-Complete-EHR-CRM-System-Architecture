@@ -25,7 +25,9 @@ if (!ENCRYPTION_KEY || ENCRYPTION_KEY.length !== 32) {
  * @returns {string} Encrypted text with IV prepended (hex format)
  */
 export const encrypt = (text) => {
-  if (!text) return null;
+  if (!text) {
+    return null;
+  }
 
   try {
     // Generate random initialization vector
@@ -39,7 +41,7 @@ export const encrypt = (text) => {
     encrypted += cipher.final('hex');
 
     // Return IV + encrypted data (IV is needed for decryption)
-    return iv.toString('hex') + ':' + encrypted;
+    return `${iv.toString('hex')}:${encrypted}`;
   } catch (error) {
     logger.error('Encryption error:', error);
     throw new Error('Failed to encrypt data');
@@ -52,7 +54,9 @@ export const encrypt = (text) => {
  * @returns {string} Decrypted plain text
  */
 export const decrypt = (encryptedText) => {
-  if (!encryptedText) return null;
+  if (!encryptedText) {
+    return null;
+  }
 
   try {
     // Split IV and encrypted data
@@ -85,7 +89,9 @@ export const decrypt = (encryptedText) => {
  * @returns {string} SHA-256 hash (hex format)
  */
 export const hash = (text) => {
-  if (!text) return null;
+  if (!text) {
+    return null;
+  }
 
   return crypto.createHash('sha256').update(text).digest('hex');
 };
@@ -97,7 +103,9 @@ export const hash = (text) => {
  * @returns {boolean} True if valid format and checksum
  */
 export const validateFodselsnummer = (fodselsnummer) => {
-  if (!fodselsnummer) return false;
+  if (!fodselsnummer) {
+    return false;
+  }
 
   // Remove any spaces or dashes
   const cleaned = fodselsnummer.replace(/[\s-]/g, '');
@@ -224,25 +232,35 @@ export const validateFodselsnummerDetailed = (fodselsnummer) => {
  * @returns {boolean} True if valid and matches DOB
  */
 export const validateFodselsnummerWithDOB = (fodselsnummer, dateOfBirth) => {
-  if (!validateFodselsnummer(fodselsnummer)) return false;
-  if (!dateOfBirth) return true; // If no DOB to check, just validate the fnr
+  if (!validateFodselsnummer(fodselsnummer)) {
+    return false;
+  }
+  if (!dateOfBirth) {
+    return true;
+  } // If no DOB to check, just validate the fnr
 
   const cleaned = fodselsnummer.replace(/[\s-]/g, '');
   const dob = new Date(dateOfBirth);
 
-  if (isNaN(dob.getTime())) return false;
+  if (isNaN(dob.getTime())) {
+    return false;
+  }
 
   // Extract date from fødselsnummer (DDMMYY)
   let day = parseInt(cleaned.substring(0, 2));
   const month = parseInt(cleaned.substring(2, 4));
-  const yearDigits = parseInt(cleaned.substring(4, 6));
+  const _yearDigits = parseInt(cleaned.substring(4, 6));
 
   // Handle D-numbers (temporary ID for foreigners: day += 40)
-  if (day > 40) day -= 40;
+  if (day > 40) {
+    day -= 40;
+  }
 
   // Get birth year using century calculation
   const birthYear = getBirthYearFromFodselsnummer(fodselsnummer);
-  if (!birthYear) return false;
+  if (!birthYear) {
+    return false;
+  }
 
   // Compare with provided DOB
   return dob.getDate() === day && dob.getMonth() + 1 === month && dob.getFullYear() === birthYear;
@@ -254,7 +272,9 @@ export const validateFodselsnummerWithDOB = (fodselsnummer, dateOfBirth) => {
  * @returns {number|null} Full 4-digit birth year or null if invalid
  */
 export const getBirthYearFromFodselsnummer = (fodselsnummer) => {
-  if (!validateFodselsnummer(fodselsnummer)) return null;
+  if (!validateFodselsnummer(fodselsnummer)) {
+    return null;
+  }
 
   const cleaned = fodselsnummer.replace(/[\s-]/g, '');
   const yearDigits = parseInt(cleaned.substring(4, 6));

@@ -42,7 +42,7 @@ export const calculateRebookingRate = async (organizationId, startDate, endDate)
       total_patients: parseInt(result.rows[0].total_patients),
       rebooked_patients: parseInt(result.rows[0].rebooked_patients),
       rebooking_rate: parseFloat(result.rows[0].rebooking_rate) || 0,
-      period: { startDate, endDate }
+      period: { startDate, endDate },
     };
   } catch (error) {
     logger.error('Error calculating rebooking rate:', error);
@@ -78,12 +78,12 @@ export const getPatientCategoryBreakdown = async (organizationId, startDate, end
       [organizationId, startDate, endDate]
     );
 
-    return result.rows.map(row => ({
+    return result.rows.map((row) => ({
       category: row.category || 'Unknown',
       patient_count: parseInt(row.patient_count),
       total_treatments: parseInt(row.total_treatments),
       rebooked_count: parseInt(row.rebooked_count),
-      rebooking_rate: parseFloat(row.rebooking_rate) || 0
+      rebooking_rate: parseFloat(row.rebooking_rate) || 0,
     }));
   } catch (error) {
     logger.error('Error getting category breakdown:', error);
@@ -124,12 +124,12 @@ export const getGeographicDistribution = async (organizationId, startDate, endDa
       [organizationId, startDate, endDate]
     );
 
-    return result.rows.map(row => ({
+    return result.rows.map((row) => ({
       type: row.geographic_type,
       patient_count: parseInt(row.patient_count),
       total_treatments: parseInt(row.total_treatments),
       rebooked_count: parseInt(row.rebooked_count),
-      rebooking_rate: parseFloat(row.rebooking_rate) || 0
+      rebooking_rate: parseFloat(row.rebooking_rate) || 0,
     }));
   } catch (error) {
     logger.error('Error getting geographic distribution:', error);
@@ -157,10 +157,10 @@ export const getTreatmentTypeBreakdown = async (organizationId, startDate, endDa
       [organizationId, startDate, endDate]
     );
 
-    return result.rows.map(row => ({
+    return result.rows.map((row) => ({
       type: row.appointment_type || 'Kiropraktor',
       patient_count: parseInt(row.patient_count),
-      total_treatments: parseInt(row.total_treatments)
+      total_treatments: parseInt(row.total_treatments),
     }));
   } catch (error) {
     logger.error('Error getting treatment type breakdown:', error);
@@ -190,11 +190,11 @@ export const getFollowUpStatus = async (organizationId) => {
     const total = result.rows.reduce((sum, row) => sum + parseInt(row.count), 0);
 
     return {
-      breakdown: result.rows.map(row => ({
+      breakdown: result.rows.map((row) => ({
         method: row.contact_method || 'Ikke kontaktet',
-        count: parseInt(row.count)
+        count: parseInt(row.count),
       })),
-      total_to_follow_up: total
+      total_to_follow_up: total,
     };
   } catch (error) {
     logger.error('Error getting follow-up status:', error);
@@ -223,10 +223,10 @@ export const getReferralSourceBreakdown = async (organizationId, startDate, endD
       [organizationId, startDate, endDate]
     );
 
-    return result.rows.map(row => ({
+    return result.rows.map((row) => ({
       source: row.referral_source || 'Unknown',
       patient_count: parseInt(row.patient_count),
-      total_treatments: parseInt(row.total_treatments)
+      total_treatments: parseInt(row.total_treatments),
     }));
   } catch (error) {
     logger.error('Error getting referral source breakdown:', error);
@@ -246,14 +246,14 @@ export const getKPIDashboard = async (organizationId, startDate, endDate) => {
       geographicDistribution,
       treatmentTypes,
       followUpStatus,
-      referralSources
+      referralSources,
     ] = await Promise.all([
       calculateRebookingRate(organizationId, startDate, endDate),
       getPatientCategoryBreakdown(organizationId, startDate, endDate),
       getGeographicDistribution(organizationId, startDate, endDate),
       getTreatmentTypeBreakdown(organizationId, startDate, endDate),
       getFollowUpStatus(organizationId),
-      getReferralSourceBreakdown(organizationId, startDate, endDate)
+      getReferralSourceBreakdown(organizationId, startDate, endDate),
     ]);
 
     return {
@@ -261,13 +261,13 @@ export const getKPIDashboard = async (organizationId, startDate, endDate) => {
       overview: {
         rebooking_rate: rebookingRate.rebooking_rate,
         total_patients: rebookingRate.total_patients,
-        rebooked_patients: rebookingRate.rebooked_patients
+        rebooked_patients: rebookingRate.rebooked_patients,
       },
       by_category: categoryBreakdown,
       by_geography: geographicDistribution,
       by_treatment_type: treatmentTypes,
       follow_up_status: followUpStatus,
-      by_referral_source: referralSources
+      by_referral_source: referralSources,
     };
   } catch (error) {
     logger.error('Error getting KPI dashboard:', error);
@@ -279,25 +279,25 @@ export const getKPIDashboard = async (organizationId, startDate, endDate) => {
  * Import KPI data from Excel spreadsheet
  * Maps spreadsheet format to database
  */
-export const importKPIData = async (organizationId, excelData, userId) => {
+export const importKPIData = async (organizationId, excelData, _userId) => {
   try {
     const results = {
       imported: 0,
-      errors: []
+      errors: [],
     };
 
     for (const row of excelData) {
       try {
         // Extract data from spreadsheet format
-        const appointmentDate = row['Dato'];
+        const _appointmentDate = row['Dato'];
         const patientId = row['Pasient ID'];
         const treatmentCount = parseInt(row['Antall behandlinger']) || 1;
         const category = row['Pasientkategori'];
-        const treatmentType = row['Behandlingstype'];
+        const _treatmentType = row['Behandlingstype'];
         const referralSource = row['Henvist fra/Hvordan funnet'];
-        const referralDestination = row['Henvist videre til'];
-        const rebooking = row['Rebooking'];
-        const contacted = row['Kontaktet'];
+        const _referralDestination = row['Henvist videre til'];
+        const _rebooking = row['Rebooking'];
+        const _contacted = row['Kontaktet'];
 
         // Update patient record with KPI data
         if (patientId) {
@@ -334,5 +334,5 @@ export default {
   getFollowUpStatus,
   getReferralSourceBreakdown,
   getKPIDashboard,
-  importKPIData
+  importKPIData,
 };

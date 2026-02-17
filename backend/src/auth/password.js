@@ -13,9 +13,7 @@ const SALT_ROUNDS = 12;
  * @param {string} password - Plain text password
  * @returns {Promise<string>} - Hashed password
  */
-export const hashPassword = async (password) => {
-  return bcrypt.hash(password, SALT_ROUNDS);
-};
+export const hashPassword = async (password) => bcrypt.hash(password, SALT_ROUNDS);
 
 /**
  * Verify a password against a hash
@@ -23,27 +21,21 @@ export const hashPassword = async (password) => {
  * @param {string} hash - Hashed password
  * @returns {Promise<boolean>} - True if password matches
  */
-export const verifyPassword = async (password, hash) => {
-  return bcrypt.compare(password, hash);
-};
+export const verifyPassword = async (password, hash) => bcrypt.compare(password, hash);
 
 /**
  * Generate a secure random token
  * @param {number} length - Token length in bytes (default 32)
  * @returns {string} - Hex-encoded token
  */
-export const generateToken = (length = 32) => {
-  return crypto.randomBytes(length).toString('hex');
-};
+export const generateToken = (length = 32) => crypto.randomBytes(length).toString('hex');
 
 /**
  * Hash a token for storage
  * @param {string} token - Plain token
  * @returns {string} - SHA-256 hash of token
  */
-export const hashToken = (token) => {
-  return crypto.createHash('sha256').update(token).digest('hex');
-};
+export const hashToken = (token) => crypto.createHash('sha256').update(token).digest('hex');
 
 /**
  * Validate password strength
@@ -71,7 +63,7 @@ export const validatePasswordStrength = (password) => {
 
   return {
     valid: errors.length === 0,
-    errors
+    errors,
   };
 };
 
@@ -87,7 +79,7 @@ export const generateApiKey = () => {
   return {
     key,
     prefix: `cck_${prefix}`,
-    hash: hashToken(key)
+    hash: hashToken(key),
   };
 };
 
@@ -97,5 +89,5 @@ export default {
   generateToken,
   hashToken,
   validatePasswordStrength,
-  generateApiKey
+  generateApiKey,
 };

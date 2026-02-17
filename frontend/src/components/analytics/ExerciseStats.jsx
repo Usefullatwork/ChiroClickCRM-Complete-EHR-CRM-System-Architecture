@@ -5,7 +5,7 @@
  * @module components/analytics/ExerciseStats
  */
 
-import React, { useMemo, useState } from 'react';
+import _React, { useMemo, useState } from 'react';
 import {
   BarChart,
   Bar,
@@ -14,7 +14,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Cell
+  Cell,
 } from 'recharts';
 import { Dumbbell, Users, TrendingUp, Activity } from 'lucide-react';
 
@@ -31,7 +31,7 @@ const COLORS = [
   '#ec4899', // pink
   '#14b8a6', // teal
   '#6366f1', // indigo
-  '#84cc16'  // lime
+  '#84cc16', // lime
 ];
 
 /**
@@ -41,37 +41,41 @@ const COLORS = [
  * @param {boolean} loading - Loading state
  * @param {number} limit - Number of exercises to show
  */
-export const ExerciseStats = ({
-  data = [],
-  loading = false,
-  limit = 10
-}) => {
+export const ExerciseStats = ({ data = [], loading = false, limit = 10 }) => {
   const [viewMode, setViewMode] = useState('chart'); // 'chart' or 'list'
 
   // Format data for chart
   const chartData = useMemo(() => {
-    if (!data || data.length === 0) return [];
+    if (!data || data.length === 0) {
+      return [];
+    }
 
     return data.slice(0, limit).map((item, index) => ({
       name: item.nameNo || item.nameEn || item.name || `Ovelse ${index + 1}`,
-      shortName: (item.nameNo || item.nameEn || item.name || '').substring(0, 20) +
+      shortName:
+        (item.nameNo || item.nameEn || item.name || '').substring(0, 20) +
         ((item.nameNo || item.nameEn || item.name || '').length > 20 ? '...' : ''),
       foreskrivninger: item.prescriptionCount || 0,
       pasienter: item.patientCount || 0,
       category: item.category || 'Annet',
       bodyRegion: item.bodyRegion || 'Ukjent',
-      color: COLORS[index % COLORS.length]
+      color: COLORS[index % COLORS.length],
     }));
   }, [data, limit]);
 
   // Calculate totals
   const totals = useMemo(() => {
-    if (!data || data.length === 0) return { prescriptions: 0, patients: 0 };
+    if (!data || data.length === 0) {
+      return { prescriptions: 0, patients: 0 };
+    }
 
-    return data.reduce((acc, item) => ({
-      prescriptions: acc.prescriptions + (item.prescriptionCount || 0),
-      patients: acc.patients + (item.patientCount || 0)
-    }), { prescriptions: 0, patients: 0 });
+    return data.reduce(
+      (acc, item) => ({
+        prescriptions: acc.prescriptions + (item.prescriptionCount || 0),
+        patients: acc.patients + (item.patientCount || 0),
+      }),
+      { prescriptions: 0, patients: 0 }
+    );
   }, [data]);
 
   // Custom tooltip
@@ -183,11 +187,7 @@ export const ExerciseStats = ({
                   width={140}
                 />
                 <Tooltip content={<CustomTooltip />} />
-                <Bar
-                  dataKey="foreskrivninger"
-                  name="Foreskrivninger"
-                  radius={[0, 4, 4, 0]}
-                >
+                <Bar dataKey="foreskrivninger" name="Foreskrivninger" radius={[0, 4, 4, 0]}>
                   {chartData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
@@ -206,9 +206,7 @@ export const ExerciseStats = ({
                     style={{ backgroundColor: item.color }}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">
-                      {item.name}
-                    </p>
+                    <p className="text-sm font-medium text-gray-900 truncate">{item.name}</p>
                     <p className="text-xs text-gray-500">
                       {item.category} - {item.bodyRegion}
                     </p>
@@ -277,7 +275,7 @@ export const ExerciseStatsCompact = ({ data = [], loading = false }) => {
   if (loading) {
     return (
       <div className="space-y-2">
-        {[1, 2, 3, 4, 5].map(i => (
+        {[1, 2, 3, 4, 5].map((i) => (
           <div key={i} className="animate-pulse flex items-center gap-2">
             <div className="w-2 h-6 bg-gray-200 rounded"></div>
             <div className="flex-1 h-4 bg-gray-200 rounded"></div>
@@ -292,16 +290,11 @@ export const ExerciseStatsCompact = ({ data = [], loading = false }) => {
     <div className="space-y-2">
       {data.slice(0, 5).map((item, index) => (
         <div key={index} className="flex items-center gap-2">
-          <div
-            className="w-2 h-6 rounded-full"
-            style={{ backgroundColor: COLORS[index] }}
-          />
+          <div className="w-2 h-6 rounded-full" style={{ backgroundColor: COLORS[index] }} />
           <span className="flex-1 text-sm text-gray-700 truncate">
             {item.nameNo || item.nameEn || item.name}
           </span>
-          <span className="text-sm font-medium text-gray-900">
-            {item.prescriptionCount}
-          </span>
+          <span className="text-sm font-medium text-gray-900">{item.prescriptionCount}</span>
         </div>
       ))}
     </div>

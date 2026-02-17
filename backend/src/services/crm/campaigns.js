@@ -137,7 +137,9 @@ export const updateCampaign = async (clinicId, campaignId, data) => {
     }
   }
 
-  if (fields.length === 0) return null;
+  if (fields.length === 0) {
+    return null;
+  }
 
   fields.push('updated_at = CURRENT_TIMESTAMP');
 
@@ -172,7 +174,9 @@ export const launchCampaign = async (clinicId, campaignId) => {
  */
 export const getCampaignStats = async (clinicId, campaignId) => {
   const campaign = await getCampaignById(clinicId, campaignId);
-  if (!campaign) return null;
+  if (!campaign) {
+    return null;
+  }
 
   const recipientStats = await query(
     `SELECT
@@ -292,7 +296,9 @@ export const updateWorkflow = async (clinicId, workflowId, data) => {
     }
   }
 
-  if (fields.length === 0) return null;
+  if (fields.length === 0) {
+    return null;
+  }
 
   fields.push('updated_at = CURRENT_TIMESTAMP');
 

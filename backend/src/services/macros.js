@@ -4,7 +4,7 @@
  * Target: <100ms insertion time
  */
 
-import { query, transaction } from '../config/database.js';
+import { query, _transaction } from '../config/database.js';
 import logger from '../utils/logger.js';
 
 // ============================================================================
@@ -50,23 +50,31 @@ const VARIABLE_PATTERNS = {
 // ============================================================================
 
 function calculateAge(birthDate) {
-  if (!birthDate) return '';
+  if (!birthDate) {
+    return '';
+  }
   const today = new Date();
   const birth = new Date(birthDate);
   let age = today.getFullYear() - birth.getFullYear();
   const m = today.getMonth() - birth.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
   return age.toString();
 }
 
 function formatNorwegianDate(date) {
-  if (!date) return '';
+  if (!date) {
+    return '';
+  }
   const d = new Date(date);
   return d.toLocaleDateString('nb-NO', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
 function formatNorwegianTime(date) {
-  if (!date) return '';
+  if (!date) {
+    return '';
+  }
   const d = new Date(date);
   return d.toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' });
 }
@@ -83,10 +91,16 @@ function addDays(date, days) {
 }
 
 function calculateDaysAgo(date) {
-  if (!date) return '';
+  if (!date) {
+    return '';
+  }
   const diff = Math.floor((new Date() - new Date(date)) / (1000 * 60 * 60 * 24));
-  if (diff === 0) return 'i dag';
-  if (diff === 1) return 'i går';
+  if (diff === 0) {
+    return 'i dag';
+  }
+  if (diff === 1) {
+    return 'i går';
+  }
   return `${diff} dager siden`;
 }
 
@@ -466,7 +480,7 @@ class MacroService {
    * Get recommended macros based on context
    */
   async getRecommendations(organizationId, context) {
-    const { soapSection, bodyRegion, diagnosis } = context;
+    const { soapSection, bodyRegion, _diagnosis } = context;
 
     const result = await query(
       `

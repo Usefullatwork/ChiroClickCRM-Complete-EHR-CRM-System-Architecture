@@ -5,7 +5,7 @@
  * @module components/analytics/PatientMetrics
  */
 
-import React, { useMemo } from 'react';
+import _React, { useMemo } from 'react';
 import {
   LineChart,
   Line,
@@ -16,7 +16,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend
+  Legend,
 } from 'recharts';
 import { Users, UserPlus, Activity, TrendingUp } from 'lucide-react';
 
@@ -27,21 +27,19 @@ import { Users, UserPlus, Activity, TrendingUp } from 'lucide-react';
  * @param {Object} stats - Patient statistics
  * @param {boolean} loading - Loading state
  */
-export const PatientMetrics = ({
-  data = [],
-  stats = {},
-  loading = false
-}) => {
+export const PatientMetrics = ({ data = [], stats = {}, loading = false }) => {
   // Format data for chart
   const chartData = useMemo(() => {
-    if (!data || data.length === 0) return [];
+    if (!data || data.length === 0) {
+      return [];
+    }
 
-    return data.map(item => ({
+    return data.map((item) => ({
       month: item.month
         ? new Date(item.month).toLocaleDateString('no-NO', { month: 'short', year: '2-digit' })
         : item.label,
-      'Besok': item.totalVisits || item.visits || 0,
-      'Unike pasienter': item.uniquePatients || item.patients || 0
+      Besok: item.totalVisits || item.visits || 0,
+      'Unike pasienter': item.uniquePatients || item.patients || 0,
     }));
   }, [data]);
 
@@ -53,10 +51,7 @@ export const PatientMetrics = ({
           <p className="text-sm font-semibold text-gray-900 mb-2">{label}</p>
           {payload.map((entry, index) => (
             <div key={index} className="flex items-center gap-2 text-sm">
-              <div
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: entry.color }}
-              />
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
               <span className="text-gray-600">{entry.name}:</span>
               <span className="font-semibold text-gray-900">{entry.value}</span>
             </div>
@@ -97,15 +92,11 @@ export const PatientMetrics = ({
           <div className="hidden md:flex items-center gap-6">
             <div className="text-right">
               <p className="text-xs text-gray-500">Totalt aktive</p>
-              <p className="text-lg font-bold text-gray-900">
-                {stats.activePatients || 0}
-              </p>
+              <p className="text-lg font-bold text-gray-900">{stats.activePatients || 0}</p>
             </div>
             <div className="text-right">
               <p className="text-xs text-gray-500">Nye denne mnd</p>
-              <p className="text-lg font-bold text-green-600">
-                +{stats.newPatientsThisMonth || 0}
-              </p>
+              <p className="text-lg font-bold text-green-600">+{stats.newPatientsThisMonth || 0}</p>
             </div>
           </div>
         </div>
@@ -202,8 +193,11 @@ export const PatientMetrics = ({
               <TrendingUp size={14} />
               <span className="text-xs">Endring</span>
             </div>
-            <p className={`text-xl font-bold ${(stats.changePercent || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {(stats.changePercent || 0) >= 0 ? '+' : ''}{stats.changePercent || 0}%
+            <p
+              className={`text-xl font-bold ${(stats.changePercent || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}
+            >
+              {(stats.changePercent || 0) >= 0 ? '+' : ''}
+              {stats.changePercent || 0}%
             </p>
           </div>
         </div>
@@ -217,37 +211,31 @@ export const PatientMetrics = ({
  */
 export const PatientMetricsCompact = ({ data = [], loading = false }) => {
   const chartData = useMemo(() => {
-    if (!data || data.length === 0) return [];
-    return data.slice(-6).map(item => ({
+    if (!data || data.length === 0) {
+      return [];
+    }
+    return data.slice(-6).map((item) => ({
       name: item.month
         ? new Date(item.month).toLocaleDateString('no-NO', { month: 'short' })
         : item.label,
-      value: item.totalVisits || item.visits || 0
+      value: item.totalVisits || item.visits || 0,
     }));
   }, [data]);
 
   if (loading) {
-    return (
-      <div className="h-32 bg-gray-100 rounded animate-pulse"></div>
-    );
+    return <div className="h-32 bg-gray-100 rounded animate-pulse"></div>;
   }
 
   return (
     <ResponsiveContainer width="100%" height={120}>
       <LineChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-        <Line
-          type="monotone"
-          dataKey="value"
-          stroke="#3b82f6"
-          strokeWidth={2}
-          dot={false}
-        />
+        <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} dot={false} />
         <Tooltip
           contentStyle={{
             backgroundColor: 'white',
             border: '1px solid #e5e7eb',
             borderRadius: '8px',
-            fontSize: '12px'
+            fontSize: '12px',
           }}
           formatter={(value) => [value, 'Besok']}
         />

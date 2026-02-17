@@ -73,7 +73,9 @@ class HelseIdClient {
    * Initialize the client and fetch JWKS
    */
   async initialize() {
-    if (this.initialized) return;
+    if (this.initialized) {
+      return;
+    }
 
     try {
       // Get client secret from Vault
@@ -384,7 +386,9 @@ class HelseIdClient {
     const hprClaim =
       claims['helseid://claims/hpr/hpr_number'] || claims['hpr_number'] || claims.hpr_number;
 
-    if (!hprClaim) return null;
+    if (!hprClaim) {
+      return null;
+    }
 
     return {
       hprNumber: hprClaim,
@@ -497,16 +501,14 @@ export const helseIdAuth = (options = {}) => {
  * Require HPR number middleware
  * Use after helseIdAuth to ensure user has valid HPR registration
  */
-export const requireHprNumber = () => {
-  return (req, res, next) => {
-    if (!req.helseIdUser?.hpr?.hprNumber) {
-      return res.status(403).json({
-        error: 'Forbidden',
-        message: 'Valid HPR registration required for this action',
-      });
-    }
-    next();
-  };
+export const requireHprNumber = () => (req, res, next) => {
+  if (!req.helseIdUser?.hpr?.hprNumber) {
+    return res.status(403).json({
+      error: 'Forbidden',
+      message: 'Valid HPR registration required for this action',
+    });
+  }
+  next();
 };
 
 // ============================================================================
@@ -519,7 +521,7 @@ export const requireHprNumber = () => {
  * @returns {Object} { valid, birthDate, gender, isDNumber, error }
  */
 export function validateFodselsnummer(fnr) {
-  if (fnr == null) {
+  if (fnr === null || fnr === undefined) {
     return { valid: false, error: 'Fødselsnummer not provided' };
   }
 
@@ -579,7 +581,9 @@ export function validateFodselsnummer(fnr) {
 
   // Checksum validation (weighted modulus 11)
   let sum1 = 0;
-  for (let i = 0; i < 9; i++) sum1 += digits[i] * w1[i];
+  for (let i = 0; i < 9; i++) {
+    sum1 += digits[i] * w1[i];
+  }
   const r1 = 11 - (sum1 % 11);
   const k1 = r1 === 11 ? 0 : r1;
   if (k1 === 10 || k1 !== digits[9]) {
@@ -587,7 +591,9 @@ export function validateFodselsnummer(fnr) {
   }
 
   let sum2 = 0;
-  for (let i = 0; i < 10; i++) sum2 += digits[i] * w2[i];
+  for (let i = 0; i < 10; i++) {
+    sum2 += digits[i] * w2[i];
+  }
   const r2 = 11 - (sum2 % 11);
   const k2 = r2 === 11 ? 0 : r2;
   if (k2 === 10 || k2 !== digits[10]) {
@@ -608,7 +614,7 @@ export function validateFodselsnummer(fnr) {
  * @returns {Object} { valid, error }
  */
 export async function validateHprNumber(hprNumber) {
-  if (hprNumber == null) {
+  if (hprNumber === null || hprNumber === undefined) {
     return { valid: false, error: 'HPR number not provided' };
   }
 
@@ -631,7 +637,9 @@ export async function validateHprNumber(hprNumber) {
  * @returns {string|null} HPR number or null
  */
 export function extractHprNumber(claims) {
-  if (!claims) return null;
+  if (!claims) {
+    return null;
+  }
   return claims['helseid://claims/hpr/hpr_number'] || claims['hpr_number'] || null;
 }
 
@@ -641,7 +649,9 @@ export function extractHprNumber(claims) {
  * @returns {string|null} Personal number or null
  */
 export function extractPersonalNumber(claims) {
-  if (!claims) return null;
+  if (!claims) {
+    return null;
+  }
   return claims['helseid://claims/identity/pid'] || claims['pid'] || null;
 }
 

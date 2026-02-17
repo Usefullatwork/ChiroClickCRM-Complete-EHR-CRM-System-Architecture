@@ -36,7 +36,9 @@ class TemplateService {
    * Initialize the template service and preload common templates
    */
   async initialize() {
-    if (this.initialized) return;
+    if (this.initialized) {
+      return;
+    }
 
     try {
       // Preload base templates

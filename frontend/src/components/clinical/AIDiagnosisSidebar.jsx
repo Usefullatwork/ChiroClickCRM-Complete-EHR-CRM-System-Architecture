@@ -3,8 +3,17 @@
  * Non-intrusive way to show ICPC-2 code suggestions based on clinical findings
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Brain, X, ChevronRight, ChevronLeft, ThumbsUp, ThumbsDown, Loader2, RefreshCw } from 'lucide-react';
+import _React, { useState, useEffect, useCallback } from 'react';
+import {
+  Brain,
+  _X,
+  ChevronRight,
+  _ChevronLeft,
+  ThumbsUp,
+  ThumbsDown,
+  Loader2,
+  RefreshCw,
+} from 'lucide-react';
 import { aiAPI } from '../../services/api';
 import AIConfidenceBadge from './AIConfidenceBadge';
 
@@ -13,7 +22,7 @@ export default function AIDiagnosisSidebar({
   onSelectCode,
   isCollapsed,
   onToggle,
-  disabled = false
+  disabled = false,
 }) {
   const [suggestions, setSuggestions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -54,9 +63,9 @@ export default function AIDiagnosisSidebar({
       codes = codes.map((code, i) => ({
         code: code.code || code.icpc_code || `UKJ${i}`,
         description: code.description || code.name || code.text || 'Ukjent diagnose',
-        confidence: code.confidence || 0.7 - (i * 0.1), // Decrease confidence for lower-ranked
+        confidence: code.confidence || 0.7 - i * 0.1, // Decrease confidence for lower-ranked
         reasoning: code.reasoning || code.explanation ? [code.reasoning || code.explanation] : [],
-        ...code
+        ...code,
       }));
 
       setSuggestions(codes.slice(0, 5)); // Max 5 suggestions
@@ -75,12 +84,12 @@ export default function AIDiagnosisSidebar({
   }, [fetchSuggestions]);
 
   const handleFeedback = async (code, isPositive) => {
-    setFeedback(prev => ({ ...prev, [code]: isPositive ? 'positive' : 'negative' }));
+    setFeedback((prev) => ({ ...prev, [code]: isPositive ? 'positive' : 'negative' }));
 
     // Track feedback (could be sent to backend for ML improvement)
     try {
       // await aiAPI.recordFeedback({ type: 'diagnosis', code, positive: isPositive });
-      console.log('Feedback recorded:', code, isPositive);
+      // Feedback recorded successfully
     } catch (err) {
       console.error('Failed to record feedback:', err);
     }
@@ -141,10 +150,7 @@ export default function AIDiagnosisSidebar({
         ) : error ? (
           <div className="text-center py-8">
             <p className="text-sm text-red-600 mb-2">{error}</p>
-            <button
-              onClick={fetchSuggestions}
-              className="text-sm text-indigo-600 hover:underline"
-            >
+            <button onClick={fetchSuggestions} className="text-sm text-indigo-600 hover:underline">
               Prøv igjen
             </button>
           </div>
@@ -157,20 +163,19 @@ export default function AIDiagnosisSidebar({
           </div>
         ) : (
           <div className="space-y-3">
-            <p className="text-xs text-gray-500 font-medium">
-              Foreslåtte ICPC-2 koder:
-            </p>
+            <p className="text-xs text-gray-500 font-medium">Foreslåtte ICPC-2 koder:</p>
 
-            {suggestions.map((suggestion, index) => (
+            {suggestions.map((suggestion, _index) => (
               <div
                 key={suggestion.code}
                 className={`
                   border rounded-lg p-3 cursor-pointer transition-all
-                  ${feedback[suggestion.code] === 'positive'
-                    ? 'border-green-300 bg-green-50'
-                    : feedback[suggestion.code] === 'negative'
-                    ? 'border-red-200 bg-red-50 opacity-60'
-                    : 'border-gray-200 hover:border-indigo-300 hover:shadow-sm'
+                  ${
+                    feedback[suggestion.code] === 'positive'
+                      ? 'border-green-300 bg-green-50'
+                      : feedback[suggestion.code] === 'negative'
+                        ? 'border-red-200 bg-red-50 opacity-60'
+                        : 'border-gray-200 hover:border-indigo-300 hover:shadow-sm'
                   }
                 `}
                 onClick={() => onSelectCode(suggestion)}
@@ -187,14 +192,10 @@ export default function AIDiagnosisSidebar({
                   />
                 </div>
 
-                <p className="text-sm font-medium text-gray-800 mb-1">
-                  {suggestion.description}
-                </p>
+                <p className="text-sm font-medium text-gray-800 mb-1">{suggestion.description}</p>
 
                 {suggestion.explanation && (
-                  <p className="text-xs text-gray-500">
-                    {suggestion.explanation}
-                  </p>
+                  <p className="text-xs text-gray-500">{suggestion.explanation}</p>
                 )}
 
                 {/* Feedback buttons */}
@@ -232,8 +233,8 @@ export default function AIDiagnosisSidebar({
       {/* Footer hint */}
       <div className="border-t border-gray-200 p-3 bg-gray-50">
         <p className="text-xs text-gray-500">
-          Klikk på en kode for å legge til i konsultasjonen.
-          AI-forslag skal alltid verifiseres klinisk.
+          Klikk på en kode for å legge til i konsultasjonen. AI-forslag skal alltid verifiseres
+          klinisk.
         </p>
       </div>
     </div>
@@ -250,7 +251,7 @@ function parseTextSuggestion(text) {
   while ((match = codeRegex.exec(text)) !== null) {
     codes.push({
       code: match[1],
-      description: match[2].trim()
+      description: match[2].trim(),
     });
   }
 

@@ -16,7 +16,7 @@ const __dirname = path.dirname(__filename);
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 const AI_TRAINING_DIR = path.join(PROJECT_ROOT, 'ai-training');
 const MODELS_CACHE_DIR = path.join(AI_TRAINING_DIR, 'models-cache');
-const SCRIPTS_DIR = path.join(PROJECT_ROOT, 'scripts');
+const _SCRIPTS_DIR = path.join(PROJECT_ROOT, 'scripts');
 
 const MODEL_NAMES = ['chiro-no', 'chiro-fast', 'chiro-norwegian', 'chiro-medical'];
 
@@ -44,13 +44,18 @@ export async function getStatus() {
         for (const line of lines) {
           if (line.toLowerCase().includes(name)) {
             const match = line.match(/(\d+\.?\d*\s*[GMKT]B)/i);
-            if (match) size = match[1];
+            if (match) {
+              size = match[1];
+            }
           }
         }
       }
       result.models[name] = { exists: found, size };
-      if (found) result.totalModels++;
-      else result.missingModels++;
+      if (found) {
+        result.totalModels++;
+      } else {
+        result.missingModels++;
+      }
     }
   } catch (error) {
     logger.warn('Ollama not running or not installed:', error.message);
@@ -67,13 +72,12 @@ export function getTrainingData() {
   let totalExamples = 0;
 
   try {
-    const jsonlFiles = fs.readdirSync(AI_TRAINING_DIR)
-      .filter(f => f.endsWith('.jsonl'));
+    const jsonlFiles = fs.readdirSync(AI_TRAINING_DIR).filter((f) => f.endsWith('.jsonl'));
 
     for (const file of jsonlFiles) {
       const filePath = path.join(AI_TRAINING_DIR, file);
       const content = fs.readFileSync(filePath, 'utf-8');
-      const lines = content.split('\n').filter(l => l.trim());
+      const lines = content.split('\n').filter((l) => l.trim());
       const exampleCount = lines.length;
       const stat = fs.statSync(filePath);
 
@@ -98,7 +102,10 @@ export function getTrainingData() {
  */
 export function addExamples(jsonlContent, targetFile = 'training-data.jsonl') {
   // Validate JSONL format
-  const lines = jsonlContent.trim().split('\n').filter(l => l.trim());
+  const lines = jsonlContent
+    .trim()
+    .split('\n')
+    .filter((l) => l.trim());
   const validLines = [];
   const errors = [];
 
@@ -121,7 +128,7 @@ export function addExamples(jsonlContent, targetFile = 'training-data.jsonl') {
 
   // Append to target file
   const filePath = path.join(AI_TRAINING_DIR, targetFile);
-  const appendContent = '\n' + validLines.join('\n') + '\n';
+  const appendContent = `\n${validLines.join('\n')}\n`;
   fs.appendFileSync(filePath, appendContent, 'utf-8');
 
   return {
@@ -172,7 +179,7 @@ export async function rebuild() {
     }
   }
 
-  const allSuccess = steps.every(s => s.success);
+  const allSuccess = steps.every((s) => s.success);
   return { success: allSuccess, steps };
 }
 
@@ -260,7 +267,7 @@ export async function restore() {
     }
   }
 
-  return { success: results.every(r => r.success), results };
+  return { success: results.every((r) => r.success), results };
 }
 
 /**
@@ -274,10 +281,10 @@ export async function testModel(modelName, prompt) {
   const testPrompt = prompt || 'Hva er de vanligste årsaker til korsryggsmerter?';
 
   return new Promise((resolve, reject) => {
-    const child = exec(
+    const _child = exec(
       `echo ${testPrompt.replace(/"/g, '\\"')} | ollama run ${modelName} --nowordwrap`,
       { encoding: 'utf-8', timeout: 60000 },
-      (error, stdout, stderr) => {
+      (error, stdout, _stderr) => {
         if (error) {
           reject(new Error(`Model test failed: ${error.message}`));
           return;

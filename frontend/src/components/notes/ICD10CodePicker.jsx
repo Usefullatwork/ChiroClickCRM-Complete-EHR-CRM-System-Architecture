@@ -5,16 +5,8 @@
  * Searchable ICD-10 code picker with common chiropractic codes
  */
 
-import React, { useState, useEffect, useMemo } from 'react'
-import {
-  Search,
-  X,
-  ChevronDown,
-  ChevronRight,
-  Star,
-  Clock,
-  CheckCircle
-} from 'lucide-react'
+import _React, { useState, useEffect, useMemo } from 'react';
+import { Search, X, ChevronDown, ChevronRight, Star, Clock, CheckCircle } from 'lucide-react';
 
 /**
  * Common ICD-10 codes for chiropractic practice
@@ -27,45 +19,101 @@ const ICD10_CODES = {
     codes: [
       { code: 'M54.2', description: 'Cervikalgi', descriptionNo: 'Nakkesmerter' },
       { code: 'M54.5', description: 'Low back pain', descriptionNo: 'Korsryggsmerter' },
-      { code: 'M54.6', description: 'Pain in thoracic spine', descriptionNo: 'Smerter i thorakalcolumna' },
+      {
+        code: 'M54.6',
+        description: 'Pain in thoracic spine',
+        descriptionNo: 'Smerter i thorakalcolumna',
+      },
       { code: 'M54.4', description: 'Lumbago with sciatica', descriptionNo: 'Lumbago med isjias' },
       { code: 'M54.1', description: 'Radiculopathy', descriptionNo: 'Radikulopati' },
       { code: 'M54.3', description: 'Sciatica', descriptionNo: 'Isjias' },
       { code: 'M47.8', description: 'Other spondylosis', descriptionNo: 'Annen spondylose' },
-      { code: 'M47.9', description: 'Spondylosis, unspecified', descriptionNo: 'Spondylose, uspesifisert' },
-      { code: 'M51.1', description: 'Lumbar disc disorder with radiculopathy', descriptionNo: 'Lumbal skivesykdom med radikulopati' },
-      { code: 'M51.2', description: 'Other specified intervertebral disc displacement', descriptionNo: 'Annen spesifisert mellomvirvelskiveforskyvning' },
-      { code: 'M53.1', description: 'Cervicobrachial syndrome', descriptionNo: 'Cervikobrakialt syndrom' },
-      { code: 'M53.3', description: 'Sacrococcygeal disorders', descriptionNo: 'Lidelser i sacrococcygealregionen' },
+      {
+        code: 'M47.9',
+        description: 'Spondylosis, unspecified',
+        descriptionNo: 'Spondylose, uspesifisert',
+      },
+      {
+        code: 'M51.1',
+        description: 'Lumbar disc disorder with radiculopathy',
+        descriptionNo: 'Lumbal skivesykdom med radikulopati',
+      },
+      {
+        code: 'M51.2',
+        description: 'Other specified intervertebral disc displacement',
+        descriptionNo: 'Annen spesifisert mellomvirvelskiveforskyvning',
+      },
+      {
+        code: 'M53.1',
+        description: 'Cervicobrachial syndrome',
+        descriptionNo: 'Cervikobrakialt syndrom',
+      },
+      {
+        code: 'M53.3',
+        description: 'Sacrococcygeal disorders',
+        descriptionNo: 'Lidelser i sacrococcygealregionen',
+      },
       { code: 'M48.0', description: 'Spinal stenosis', descriptionNo: 'Spinal stenose' },
-      { code: 'M50.1', description: 'Cervical disc disorder with radiculopathy', descriptionNo: 'Cervikal skivesykdom med radikulopati' },
-      { code: 'M50.2', description: 'Other cervical disc displacement', descriptionNo: 'Annen cervikal skiveforskyvning' },
-      { code: 'M43.1', description: 'Spondylolisthesis', descriptionNo: 'Spondylolistese' }
-    ]
+      {
+        code: 'M50.1',
+        description: 'Cervical disc disorder with radiculopathy',
+        descriptionNo: 'Cervikal skivesykdom med radikulopati',
+      },
+      {
+        code: 'M50.2',
+        description: 'Other cervical disc displacement',
+        descriptionNo: 'Annen cervikal skiveforskyvning',
+      },
+      { code: 'M43.1', description: 'Spondylolisthesis', descriptionNo: 'Spondylolistese' },
+    ],
   },
   // Hodepine / Headache
   headache: {
     label: 'Hodepine',
     codes: [
       { code: 'G44.2', description: 'Tension-type headache', descriptionNo: 'Spenningshodepine' },
-      { code: 'G43.9', description: 'Migraine, unspecified', descriptionNo: 'Migrene, uspesifisert' },
+      {
+        code: 'G43.9',
+        description: 'Migraine, unspecified',
+        descriptionNo: 'Migrene, uspesifisert',
+      },
       { code: 'G44.0', description: 'Cluster headache syndrome', descriptionNo: 'Klasehodepine' },
-      { code: 'M53.0', description: 'Cervicocranial syndrome', descriptionNo: 'Cervikokranialt syndrom' },
-      { code: 'R51', description: 'Headache', descriptionNo: 'Hodepine' }
-    ]
+      {
+        code: 'M53.0',
+        description: 'Cervicocranial syndrome',
+        descriptionNo: 'Cervikokranialt syndrom',
+      },
+      { code: 'R51', description: 'Headache', descriptionNo: 'Hodepine' },
+    ],
   },
   // Skulder / Shoulder
   shoulder: {
     label: 'Skulder',
     codes: [
-      { code: 'M75.1', description: 'Rotator cuff syndrome', descriptionNo: 'Rotatormansjett-syndrom' },
-      { code: 'M75.0', description: 'Adhesive capsulitis of shoulder', descriptionNo: 'Frossen skulder' },
+      {
+        code: 'M75.1',
+        description: 'Rotator cuff syndrome',
+        descriptionNo: 'Rotatormansjett-syndrom',
+      },
+      {
+        code: 'M75.0',
+        description: 'Adhesive capsulitis of shoulder',
+        descriptionNo: 'Frossen skulder',
+      },
       { code: 'M75.2', description: 'Bicipital tendinitis', descriptionNo: 'Bicepstendinitt' },
-      { code: 'M75.3', description: 'Calcific tendinitis of shoulder', descriptionNo: 'Kalktendinitt i skulder' },
-      { code: 'M75.4', description: 'Impingement syndrome of shoulder', descriptionNo: 'Impingement-syndrom i skulder' },
+      {
+        code: 'M75.3',
+        description: 'Calcific tendinitis of shoulder',
+        descriptionNo: 'Kalktendinitt i skulder',
+      },
+      {
+        code: 'M75.4',
+        description: 'Impingement syndrome of shoulder',
+        descriptionNo: 'Impingement-syndrom i skulder',
+      },
       { code: 'M75.5', description: 'Bursitis of shoulder', descriptionNo: 'Bursitt i skulder' },
-      { code: 'M25.51', description: 'Pain in shoulder', descriptionNo: 'Smerter i skulder' }
-    ]
+      { code: 'M25.51', description: 'Pain in shoulder', descriptionNo: 'Smerter i skulder' },
+    ],
   },
   // Hofte og bekken / Hip and pelvis
   hip: {
@@ -75,8 +123,8 @@ const ICD10_CODES = {
       { code: 'M70.6', description: 'Trochanteric bursitis', descriptionNo: 'Trokanteritt' },
       { code: 'M76.1', description: 'Psoas tendinitis', descriptionNo: 'Psoastendinitt' },
       { code: 'M53.2', description: 'Spinal instabilities', descriptionNo: 'Spinal instabilitet' },
-      { code: 'M53.86', description: 'SI-joint dysfunction', descriptionNo: 'SI-ledd dysfunksjon' }
-    ]
+      { code: 'M53.86', description: 'SI-joint dysfunction', descriptionNo: 'SI-ledd dysfunksjon' },
+    ],
   },
   // Kne / Knee
   knee: {
@@ -84,10 +132,18 @@ const ICD10_CODES = {
     codes: [
       { code: 'M25.56', description: 'Pain in knee', descriptionNo: 'Smerter i kne' },
       { code: 'M76.5', description: 'Patellar tendinitis', descriptionNo: 'Patellartendinitt' },
-      { code: 'M22.2', description: 'Patellofemoral disorders', descriptionNo: 'Patellofemoralt syndrom' },
+      {
+        code: 'M22.2',
+        description: 'Patellofemoral disorders',
+        descriptionNo: 'Patellofemoralt syndrom',
+      },
       { code: 'M70.4', description: 'Prepatellar bursitis', descriptionNo: 'Prepatellar bursitt' },
-      { code: 'M23.5', description: 'Chronic instability of knee', descriptionNo: 'Kronisk kneinstabilitet' }
-    ]
+      {
+        code: 'M23.5',
+        description: 'Chronic instability of knee',
+        descriptionNo: 'Kronisk kneinstabilitet',
+      },
+    ],
   },
   // Albue og handledd / Elbow and wrist
   elbow: {
@@ -95,20 +151,32 @@ const ICD10_CODES = {
     codes: [
       { code: 'M77.1', description: 'Lateral epicondylitis', descriptionNo: 'Tennisalbue' },
       { code: 'M77.0', description: 'Medial epicondylitis', descriptionNo: 'Golferalbue' },
-      { code: 'G56.0', description: 'Carpal tunnel syndrome', descriptionNo: 'Karpaltunnelsyndrom' },
+      {
+        code: 'G56.0',
+        description: 'Carpal tunnel syndrome',
+        descriptionNo: 'Karpaltunnelsyndrom',
+      },
       { code: 'M25.53', description: 'Pain in wrist', descriptionNo: 'Smerter i handledd' },
-      { code: 'M65.4', description: 'Radial styloid tenosynovitis', descriptionNo: 'De Quervains tendinose' }
-    ]
+      {
+        code: 'M65.4',
+        description: 'Radial styloid tenosynovitis',
+        descriptionNo: 'De Quervains tendinose',
+      },
+    ],
   },
   // Ankel og fot / Ankle and foot
   ankle: {
     label: 'Ankel og fot',
     codes: [
-      { code: 'M25.57', description: 'Pain in ankle and joints of foot', descriptionNo: 'Smerter i ankel og fotledd' },
+      {
+        code: 'M25.57',
+        description: 'Pain in ankle and joints of foot',
+        descriptionNo: 'Smerter i ankel og fotledd',
+      },
       { code: 'M77.3', description: 'Calcaneal spur', descriptionNo: 'Helespore' },
       { code: 'M72.2', description: 'Plantar fasciitis', descriptionNo: 'Plantar fascitt' },
-      { code: 'M76.6', description: 'Achilles tendinitis', descriptionNo: 'Akillestendinitt' }
-    ]
+      { code: 'M76.6', description: 'Achilles tendinitis', descriptionNo: 'Akillestendinitt' },
+    ],
   },
   // Myalgi og muskelsmerter / Myalgia and muscle pain
   muscle: {
@@ -118,8 +186,12 @@ const ICD10_CODES = {
       { code: 'M79.3', description: 'Panniculitis, unspecified', descriptionNo: 'Panniculitt' },
       { code: 'M62.83', description: 'Muscle spasm', descriptionNo: 'Muskelspasme' },
       { code: 'M79.7', description: 'Fibromyalgia', descriptionNo: 'Fibromyalgi' },
-      { code: 'M60.9', description: 'Myositis, unspecified', descriptionNo: 'Myositt, uspesifisert' }
-    ]
+      {
+        code: 'M60.9',
+        description: 'Myositis, unspecified',
+        descriptionNo: 'Myositt, uspesifisert',
+      },
+    ],
   },
   // Svimmelhet / Dizziness
   vestibular: {
@@ -127,23 +199,47 @@ const ICD10_CODES = {
     codes: [
       { code: 'H81.1', description: 'BPPV', descriptionNo: 'Benign paroksysmal posisjonsvertigo' },
       { code: 'R42', description: 'Dizziness and giddiness', descriptionNo: 'Svimmelhet' },
-      { code: 'H81.3', description: 'Other peripheral vertigo', descriptionNo: 'Annen perifer vertigo' },
-      { code: 'H81.9', description: 'Vestibular function disorder', descriptionNo: 'Vestibular funksjonforstyrrelse' },
-      { code: 'R26.2', description: 'Difficulty in walking', descriptionNo: 'Gangvansker' }
-    ]
+      {
+        code: 'H81.3',
+        description: 'Other peripheral vertigo',
+        descriptionNo: 'Annen perifer vertigo',
+      },
+      {
+        code: 'H81.9',
+        description: 'Vestibular function disorder',
+        descriptionNo: 'Vestibular funksjonforstyrrelse',
+      },
+      { code: 'R26.2', description: 'Difficulty in walking', descriptionNo: 'Gangvansker' },
+    ],
   },
   // Skader / Injuries
   trauma: {
     label: 'Skader og traumer',
     codes: [
-      { code: 'S13.4', description: 'Sprain of cervical spine', descriptionNo: 'Forstuvning av nakke (whiplash)' },
-      { code: 'S33.5', description: 'Sprain of lumbar spine', descriptionNo: 'Forstuvning av lumbalcolumna' },
-      { code: 'S33.6', description: 'Sprain of sacroiliac joint', descriptionNo: 'Forstuvning av SI-ledd' },
-      { code: 'S43.4', description: 'Sprain of shoulder joint', descriptionNo: 'Forstuvning av skulder' },
-      { code: 'S93.4', description: 'Sprain of ankle', descriptionNo: 'Ankelforstuvning' }
-    ]
-  }
-}
+      {
+        code: 'S13.4',
+        description: 'Sprain of cervical spine',
+        descriptionNo: 'Forstuvning av nakke (whiplash)',
+      },
+      {
+        code: 'S33.5',
+        description: 'Sprain of lumbar spine',
+        descriptionNo: 'Forstuvning av lumbalcolumna',
+      },
+      {
+        code: 'S33.6',
+        description: 'Sprain of sacroiliac joint',
+        descriptionNo: 'Forstuvning av SI-ledd',
+      },
+      {
+        code: 'S43.4',
+        description: 'Sprain of shoulder joint',
+        descriptionNo: 'Forstuvning av skulder',
+      },
+      { code: 'S93.4', description: 'Sprain of ankle', descriptionNo: 'Ankelforstuvning' },
+    ],
+  },
+};
 
 /**
  * ICD10CodePicker Component
@@ -155,64 +251,60 @@ const ICD10_CODES = {
  * @param {Array} props.selectedCodes - Already selected codes
  * @returns {JSX.Element} ICD-10 code picker modal
  */
-export default function ICD10CodePicker({
-  onSelect,
-  onClose,
-  selectedCodes = []
-}) {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [expandedCategories, setExpandedCategories] = useState(['spine'])
-  const [recentCodes, setRecentCodes] = useState([])
-  const [favoriteCodes, setFavoriteCodes] = useState([])
+export default function ICD10CodePicker({ onSelect, onClose, selectedCodes = [] }) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [expandedCategories, setExpandedCategories] = useState(['spine']);
+  const [recentCodes, setRecentCodes] = useState([]);
+  const [favoriteCodes, setFavoriteCodes] = useState([]);
 
   // Load recent and favorite codes from localStorage
   useEffect(() => {
     try {
-      const recent = JSON.parse(localStorage.getItem('recentICD10Codes') || '[]')
-      const favorites = JSON.parse(localStorage.getItem('favoriteICD10Codes') || '[]')
-      setRecentCodes(recent)
-      setFavoriteCodes(favorites)
+      const recent = JSON.parse(localStorage.getItem('recentICD10Codes') || '[]');
+      const favorites = JSON.parse(localStorage.getItem('favoriteICD10Codes') || '[]');
+      setRecentCodes(recent);
+      setFavoriteCodes(favorites);
     } catch {
       // Ignore localStorage errors
     }
-  }, [])
+  }, []);
 
   /**
    * Filter codes based on search term
    * Filtrer koder basert pa sokord
    */
   const filteredCodes = useMemo(() => {
-    if (!searchTerm) return null
+    if (!searchTerm) {
+      return null;
+    }
 
-    const term = searchTerm.toLowerCase()
-    const results = []
+    const term = searchTerm.toLowerCase();
+    const results = [];
 
     Object.entries(ICD10_CODES).forEach(([category, { codes }]) => {
-      codes.forEach(code => {
+      codes.forEach((code) => {
         if (
           code.code.toLowerCase().includes(term) ||
           code.description.toLowerCase().includes(term) ||
           code.descriptionNo.toLowerCase().includes(term)
         ) {
-          results.push({ ...code, category })
+          results.push({ ...code, category });
         }
-      })
-    })
+      });
+    });
 
-    return results
-  }, [searchTerm])
+    return results;
+  }, [searchTerm]);
 
   /**
    * Toggle category expansion
    * Veksle kategoriutvidelse
    */
   const toggleCategory = (category) => {
-    setExpandedCategories(prev =>
-      prev.includes(category)
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
-    )
-  }
+    setExpandedCategories((prev) =>
+      prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]
+    );
+  };
 
   /**
    * Handle code selection
@@ -220,39 +312,39 @@ export default function ICD10CodePicker({
    */
   const handleSelect = (code) => {
     // Add to recent codes
-    const updatedRecent = [code, ...recentCodes.filter(c => c.code !== code.code)].slice(0, 10)
-    setRecentCodes(updatedRecent)
-    localStorage.setItem('recentICD10Codes', JSON.stringify(updatedRecent))
+    const updatedRecent = [code, ...recentCodes.filter((c) => c.code !== code.code)].slice(0, 10);
+    setRecentCodes(updatedRecent);
+    localStorage.setItem('recentICD10Codes', JSON.stringify(updatedRecent));
 
-    onSelect(code)
-  }
+    onSelect(code);
+  };
 
   /**
    * Toggle favorite status
    * Veksle favorittstatus
    */
   const toggleFavorite = (code, e) => {
-    e.stopPropagation()
-    const isFavorite = favoriteCodes.some(c => c.code === code.code)
+    e.stopPropagation();
+    const isFavorite = favoriteCodes.some((c) => c.code === code.code);
     const updatedFavorites = isFavorite
-      ? favoriteCodes.filter(c => c.code !== code.code)
-      : [...favoriteCodes, code]
+      ? favoriteCodes.filter((c) => c.code !== code.code)
+      : [...favoriteCodes, code];
 
-    setFavoriteCodes(updatedFavorites)
-    localStorage.setItem('favoriteICD10Codes', JSON.stringify(updatedFavorites))
-  }
+    setFavoriteCodes(updatedFavorites);
+    localStorage.setItem('favoriteICD10Codes', JSON.stringify(updatedFavorites));
+  };
 
   /**
    * Check if code is selected
    * Sjekk om kode er valgt
    */
-  const isSelected = (code) => selectedCodes.includes(code.code)
+  const isSelected = (code) => selectedCodes.includes(code.code);
 
   /**
    * Check if code is favorite
    * Sjekk om kode er favoritt
    */
-  const isFavorite = (code) => favoriteCodes.some(c => c.code === code.code)
+  const isFavorite = (code) => favoriteCodes.some((c) => c.code === code.code);
 
   /**
    * Code item component
@@ -276,14 +368,13 @@ export default function ICD10CodePicker({
         <p className="text-sm text-gray-900">{code.descriptionNo}</p>
         <p className="text-xs text-gray-500">{code.description}</p>
       </div>
-      <button
-        onClick={(e) => toggleFavorite(code, e)}
-        className="p-1 hover:bg-gray-100 rounded"
-      >
-        <Star className={`w-4 h-4 ${isFavorite(code) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`} />
+      <button onClick={(e) => toggleFavorite(code, e)} className="p-1 hover:bg-gray-100 rounded">
+        <Star
+          className={`w-4 h-4 ${isFavorite(code) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
+        />
       </button>
     </button>
-  )
+  );
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -292,10 +383,7 @@ export default function ICD10CodePicker({
         <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">Velg ICD-10 kode</h3>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg"
-            >
+            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
               <X className="w-5 h-5 text-gray-500" />
             </button>
           </div>
@@ -320,9 +408,7 @@ export default function ICD10CodePicker({
             /* Search Results / Sokeresultater */
             <div className="space-y-2">
               {filteredCodes && filteredCodes.length > 0 ? (
-                filteredCodes.map((code) => (
-                  <CodeItem key={code.code} code={code} />
-                ))
+                filteredCodes.map((code) => <CodeItem key={code.code} code={code} />)
               ) : (
                 <div className="text-center py-8 text-gray-500">
                   Ingen koder funnet for "{searchTerm}"
@@ -409,5 +495,5 @@ export default function ICD10CodePicker({
         </div>
       </div>
     </div>
-  )
+  );
 }

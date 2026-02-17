@@ -5,9 +5,9 @@
  * @module services/autoAccept
  */
 
-import { query, transaction } from '../config/database.js'
-import logger from '../utils/logger.js'
-import { sendEmail } from './email.js'
+import { query, transaction } from '../config/database.js';
+import logger from '../utils/logger.js';
+import { sendEmail } from './email.js';
 
 // ============================================================================
 // SETTINGS MANAGEMENT
@@ -18,16 +18,15 @@ import { sendEmail } from './email.js'
  */
 export const getSettings = async (organizationId) => {
   try {
-    const result = await query(
-      `SELECT * FROM auto_accept_settings WHERE organization_id = $1`,
-      [organizationId]
-    )
-    return result.rows[0] || null
+    const result = await query(`SELECT * FROM auto_accept_settings WHERE organization_id = $1`, [
+      organizationId,
+    ]);
+    return result.rows[0] || null;
   } catch (error) {
-    logger.error('Error getting auto-accept settings:', error)
-    throw error
+    logger.error('Error getting auto-accept settings:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Create or update auto-accept settings
@@ -48,8 +47,8 @@ export const upsertSettings = async (organizationId, userId, settings) => {
       referralRequireCompleteInfo,
       notifyOnAutoAccept,
       notificationEmail,
-      notificationSms
-    } = settings
+      notificationSms,
+    } = settings;
 
     const result = await query(
       `INSERT INTO auto_accept_settings (
@@ -103,17 +102,17 @@ export const upsertSettings = async (organizationId, userId, settings) => {
         notifyOnAutoAccept ?? true,
         notificationEmail || null,
         notificationSms || null,
-        userId
+        userId,
       ]
-    )
+    );
 
-    logger.info('Auto-accept settings updated:', { organizationId })
-    return result.rows[0]
+    logger.info('Auto-accept settings updated:', { organizationId });
+    return result.rows[0];
   } catch (error) {
-    logger.error('Error upserting auto-accept settings:', error)
-    throw error
+    logger.error('Error upserting auto-accept settings:', error);
+    throw error;
   }
-}
+};
 
 // ============================================================================
 // APPOINTMENT AUTO-ACCEPT
@@ -124,90 +123,90 @@ export const upsertSettings = async (organizationId, userId, settings) => {
  */
 export const shouldAutoAcceptAppointment = async (organizationId, appointment) => {
   try {
-    const settings = await getSettings(organizationId)
+    const settings = await getSettings(organizationId);
 
     if (!settings || !settings.auto_accept_appointments) {
-      return { shouldAccept: false, reason: 'Auto-accept not enabled' }
+      return { shouldAccept: false, reason: 'Auto-accept not enabled' };
     }
 
     // Check if appointment type is excluded
     if (settings.appointment_types_excluded && settings.appointment_types_excluded.length > 0) {
       if (settings.appointment_types_excluded.includes(appointment.appointment_type)) {
-        return { shouldAccept: false, reason: 'Appointment type is excluded' }
+        return { shouldAccept: false, reason: 'Appointment type is excluded' };
       }
     }
 
     // Check if appointment type is in included list (if specified)
     if (settings.appointment_types_included && settings.appointment_types_included.length > 0) {
       if (!settings.appointment_types_included.includes(appointment.appointment_type)) {
-        return { shouldAccept: false, reason: 'Appointment type not in included list' }
+        return { shouldAccept: false, reason: 'Appointment type not in included list' };
       }
     }
 
     // Check daily limit
     if (settings.appointment_max_daily_limit) {
-      const todayCount = await getDailyAutoAcceptCount(organizationId, 'appointment')
+      const todayCount = await getDailyAutoAcceptCount(organizationId, 'appointment');
       if (todayCount >= settings.appointment_max_daily_limit) {
-        return { shouldAccept: false, reason: 'Daily auto-accept limit reached' }
+        return { shouldAccept: false, reason: 'Daily auto-accept limit reached' };
       }
     }
 
     // Check business hours (if enabled)
     if (settings.appointment_business_hours_only) {
-      const appointmentTime = new Date(appointment.start_time)
-      const hour = appointmentTime.getHours()
-      const dayOfWeek = appointmentTime.getDay()
+      const appointmentTime = new Date(appointment.start_time);
+      const hour = appointmentTime.getHours();
+      const dayOfWeek = appointmentTime.getDay();
 
       // Weekend check
       if (dayOfWeek === 0 || dayOfWeek === 6) {
-        return { shouldAccept: false, reason: 'Appointment is on weekend' }
+        return { shouldAccept: false, reason: 'Appointment is on weekend' };
       }
 
       // Business hours check (8 AM - 6 PM)
       if (hour < 8 || hour >= 18) {
-        return { shouldAccept: false, reason: 'Appointment is outside business hours' }
+        return { shouldAccept: false, reason: 'Appointment is outside business hours' };
       }
     }
 
-    return { shouldAccept: true, reason: null }
+    return { shouldAccept: true, reason: null };
   } catch (error) {
-    logger.error('Error checking if should auto-accept appointment:', error)
-    return { shouldAccept: false, reason: 'Error checking auto-accept rules' }
+    logger.error('Error checking if should auto-accept appointment:', error);
+    return { shouldAccept: false, reason: 'Error checking auto-accept rules' };
   }
-}
+};
 
 /**
  * Auto-accept an appointment
  */
 export const autoAcceptAppointment = async (organizationId, appointmentId) => {
-  const client = await transaction.start()
+  const client = await transaction.start();
 
   try {
     // Get the appointment
     const appointmentResult = await client.query(
       `SELECT * FROM appointments WHERE organization_id = $1 AND id = $2`,
       [organizationId, appointmentId]
-    )
+    );
 
     if (appointmentResult.rows.length === 0) {
-      throw new Error('Appointment not found')
+      throw new Error('Appointment not found');
     }
 
-    const appointment = appointmentResult.rows[0]
+    const appointment = appointmentResult.rows[0];
 
     // Check if should auto-accept
-    const { shouldAccept, reason } = await shouldAutoAcceptAppointment(organizationId, appointment)
+    const { shouldAccept, reason } = await shouldAutoAcceptAppointment(organizationId, appointment);
 
     // Log the action
     await client.query(
       `INSERT INTO auto_accept_log (organization_id, resource_type, resource_id, action, reason, processed_at)
        VALUES ($1, 'appointment', $2, $3, $4, CURRENT_TIMESTAMP)`,
       [organizationId, appointmentId, shouldAccept ? 'accepted' : 'rejected', reason]
-    )
+    );
 
     if (!shouldAccept) {
-      await transaction.commit(client)
-      return { accepted: false, reason }
+      await transaction.commit(client);
+      return { accepted: false, reason };
     }
 
     // Update appointment status to confirmed
@@ -216,24 +215,24 @@ export const autoAcceptAppointment = async (organizationId, appointmentId) => {
        SET status = 'confirmed', updated_at = CURRENT_TIMESTAMP
        WHERE id = $1`,
       [appointmentId]
-    )
+    );
 
-    await transaction.commit(client)
+    await transaction.commit(client);
 
     // Send notifications
-    const settings = await getSettings(organizationId)
+    const settings = await getSettings(organizationId);
     if (settings?.notify_on_auto_accept) {
-      await sendAutoAcceptNotification(organizationId, 'appointment', appointment, settings)
+      await sendAutoAcceptNotification(organizationId, 'appointment', appointment, settings);
     }
 
-    logger.info('Appointment auto-accepted:', { organizationId, appointmentId })
-    return { accepted: true, reason: null }
+    logger.info('Appointment auto-accepted:', { organizationId, appointmentId });
+    return { accepted: true, reason: null };
   } catch (error) {
-    await transaction.rollback(client)
-    logger.error('Error auto-accepting appointment:', error)
-    throw error
+    await transaction.rollback(client);
+    logger.error('Error auto-accepting appointment:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Process pending appointments for auto-accept (called by scheduler)
@@ -245,7 +244,7 @@ export const processPendingAppointments = async () => {
       `SELECT organization_id, appointment_accept_delay_minutes
        FROM auto_accept_settings
        WHERE auto_accept_appointments = true`
-    )
+    );
 
     for (const org of orgsResult.rows) {
       // Get pending appointments that are past the delay period
@@ -255,23 +254,23 @@ export const processPendingAppointments = async () => {
            AND status = 'pending'
            AND created_at <= NOW() - INTERVAL '1 minute' * $2`,
         [org.organization_id, org.appointment_accept_delay_minutes || 0]
-      )
+      );
 
       for (const apt of appointmentsResult.rows) {
         try {
-          await autoAcceptAppointment(org.organization_id, apt.id)
+          await autoAcceptAppointment(org.organization_id, apt.id);
         } catch (err) {
           logger.error('Error processing auto-accept for appointment:', {
             appointmentId: apt.id,
-            error: err.message
-          })
+            error: err.message,
+          });
         }
       }
     }
   } catch (error) {
-    logger.error('Error processing pending appointments:', error)
+    logger.error('Error processing pending appointments:', error);
   }
-}
+};
 
 // ============================================================================
 // REFERRAL AUTO-ACCEPT
@@ -282,78 +281,78 @@ export const processPendingAppointments = async () => {
  */
 export const shouldAutoAcceptReferral = async (organizationId, referral) => {
   try {
-    const settings = await getSettings(organizationId)
+    const settings = await getSettings(organizationId);
 
     if (!settings || !settings.auto_accept_referrals) {
-      return { shouldAccept: false, reason: 'Auto-accept not enabled for referrals' }
+      return { shouldAccept: false, reason: 'Auto-accept not enabled for referrals' };
     }
 
     // Check if referral source is excluded
     if (settings.referral_sources_excluded && settings.referral_sources_excluded.length > 0) {
       if (settings.referral_sources_excluded.includes(referral.source)) {
-        return { shouldAccept: false, reason: 'Referral source is excluded' }
+        return { shouldAccept: false, reason: 'Referral source is excluded' };
       }
     }
 
     // Check if referral source is in included list (if specified)
     if (settings.referral_sources_included && settings.referral_sources_included.length > 0) {
       if (!settings.referral_sources_included.includes(referral.source)) {
-        return { shouldAccept: false, reason: 'Referral source not in included list' }
+        return { shouldAccept: false, reason: 'Referral source not in included list' };
       }
     }
 
     // Check if referral has complete required information
     if (settings.referral_require_complete_info) {
-      const requiredFields = ['patient_name', 'referring_provider', 'reason']
-      const missingFields = requiredFields.filter(field => !referral[field])
+      const requiredFields = ['patient_name', 'referring_provider', 'reason'];
+      const missingFields = requiredFields.filter((field) => !referral[field]);
 
       if (missingFields.length > 0) {
         return {
           shouldAccept: false,
-          reason: `Missing required information: ${missingFields.join(', ')}`
-        }
+          reason: `Missing required information: ${missingFields.join(', ')}`,
+        };
       }
     }
 
-    return { shouldAccept: true, reason: null }
+    return { shouldAccept: true, reason: null };
   } catch (error) {
-    logger.error('Error checking if should auto-accept referral:', error)
-    return { shouldAccept: false, reason: 'Error checking auto-accept rules' }
+    logger.error('Error checking if should auto-accept referral:', error);
+    return { shouldAccept: false, reason: 'Error checking auto-accept rules' };
   }
-}
+};
 
 /**
  * Auto-accept a referral
  */
 export const autoAcceptReferral = async (organizationId, referralId) => {
-  const client = await transaction.start()
+  const client = await transaction.start();
 
   try {
     // Get the referral
     const referralResult = await client.query(
       `SELECT * FROM referrals WHERE organization_id = $1 AND id = $2`,
       [organizationId, referralId]
-    )
+    );
 
     if (referralResult.rows.length === 0) {
-      throw new Error('Referral not found')
+      throw new Error('Referral not found');
     }
 
-    const referral = referralResult.rows[0]
+    const referral = referralResult.rows[0];
 
     // Check if should auto-accept
-    const { shouldAccept, reason } = await shouldAutoAcceptReferral(organizationId, referral)
+    const { shouldAccept, reason } = await shouldAutoAcceptReferral(organizationId, referral);
 
     // Log the action
     await client.query(
       `INSERT INTO auto_accept_log (organization_id, resource_type, resource_id, action, reason, processed_at)
        VALUES ($1, 'referral', $2, $3, $4, CURRENT_TIMESTAMP)`,
       [organizationId, referralId, shouldAccept ? 'accepted' : 'rejected', reason]
-    )
+    );
 
     if (!shouldAccept) {
-      await transaction.commit(client)
-      return { accepted: false, reason }
+      await transaction.commit(client);
+      return { accepted: false, reason };
     }
 
     // Update referral status to accepted
@@ -362,43 +361,43 @@ export const autoAcceptReferral = async (organizationId, referralId) => {
        SET status = 'accepted', updated_at = CURRENT_TIMESTAMP
        WHERE id = $1`,
       [referralId]
-    )
+    );
 
     // Create a patient record if needed
     if (referral.patient_name && !referral.patient_id) {
-      const [firstName, ...lastNameParts] = referral.patient_name.split(' ')
-      const lastName = lastNameParts.join(' ')
+      const [firstName, ...lastNameParts] = referral.patient_name.split(' ');
+      const lastName = lastNameParts.join(' ');
 
       const patientResult = await client.query(
         `INSERT INTO patients (organization_id, first_name, last_name, referral_source, status)
          VALUES ($1, $2, $3, 'referral', 'active')
          RETURNING id`,
         [organizationId, firstName, lastName || '']
-      )
+      );
 
       // Link patient to referral
-      await client.query(
-        `UPDATE referrals SET patient_id = $1 WHERE id = $2`,
-        [patientResult.rows[0].id, referralId]
-      )
+      await client.query(`UPDATE referrals SET patient_id = $1 WHERE id = $2`, [
+        patientResult.rows[0].id,
+        referralId,
+      ]);
     }
 
-    await transaction.commit(client)
+    await transaction.commit(client);
 
     // Send notifications
-    const settings = await getSettings(organizationId)
+    const settings = await getSettings(organizationId);
     if (settings?.notify_on_auto_accept) {
-      await sendAutoAcceptNotification(organizationId, 'referral', referral, settings)
+      await sendAutoAcceptNotification(organizationId, 'referral', referral, settings);
     }
 
-    logger.info('Referral auto-accepted:', { organizationId, referralId })
-    return { accepted: true, reason: null }
+    logger.info('Referral auto-accepted:', { organizationId, referralId });
+    return { accepted: true, reason: null };
   } catch (error) {
-    await transaction.rollback(client)
-    logger.error('Error auto-accepting referral:', error)
-    throw error
+    await transaction.rollback(client);
+    logger.error('Error auto-accepting referral:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Process pending referrals for auto-accept (called by scheduler)
@@ -410,7 +409,7 @@ export const processPendingReferrals = async () => {
       `SELECT organization_id, referral_accept_delay_minutes
        FROM auto_accept_settings
        WHERE auto_accept_referrals = true`
-    )
+    );
 
     for (const org of orgsResult.rows) {
       // Get pending referrals that are past the delay period
@@ -420,23 +419,23 @@ export const processPendingReferrals = async () => {
            AND status = 'pending'
            AND created_at <= NOW() - INTERVAL '1 minute' * $2`,
         [org.organization_id, org.referral_accept_delay_minutes || 0]
-      )
+      );
 
       for (const ref of referralsResult.rows) {
         try {
-          await autoAcceptReferral(org.organization_id, ref.id)
+          await autoAcceptReferral(org.organization_id, ref.id);
         } catch (err) {
           logger.error('Error processing auto-accept for referral:', {
             referralId: ref.id,
-            error: err.message
-          })
+            error: err.message,
+          });
         }
       }
     }
   } catch (error) {
-    logger.error('Error processing pending referrals:', error)
+    logger.error('Error processing pending referrals:', error);
   }
-}
+};
 
 // ============================================================================
 // HELPER FUNCTIONS
@@ -453,20 +452,23 @@ const getDailyAutoAcceptCount = async (organizationId, resourceType) => {
        AND action = 'accepted'
        AND DATE(created_at) = CURRENT_DATE`,
     [organizationId, resourceType]
-  )
-  return parseInt(result.rows[0].count, 10)
-}
+  );
+  return parseInt(result.rows[0].count, 10);
+};
 
 /**
  * Send auto-accept notification
  */
 const sendAutoAcceptNotification = async (organizationId, resourceType, resource, settings) => {
   try {
-    if (!settings.notification_email) return
+    if (!settings.notification_email) {
+      return;
+    }
 
-    const subject = resourceType === 'appointment'
-      ? `Avtale automatisk bekreftet - ${resource.patient_name || 'Pasient'}`
-      : `Henvisning automatisk godtatt - ${resource.patient_name || 'Pasient'}`
+    const subject =
+      resourceType === 'appointment'
+        ? `Avtale automatisk bekreftet - ${resource.patient_name || 'Pasient'}`
+        : `Henvisning automatisk godtatt - ${resource.patient_name || 'Pasient'}`;
 
     const html = `
       <div style="font-family: Arial, sans-serif;">
@@ -481,54 +483,54 @@ const sendAutoAcceptNotification = async (organizationId, resourceType, resource
         </ul>
         <p>Logg inn for å se flere detaljer.</p>
       </div>
-    `
+    `;
 
     await sendEmail({
       to: settings.notification_email,
       subject,
-      html
-    })
+      html,
+    });
   } catch (error) {
-    logger.error('Error sending auto-accept notification:', error)
+    logger.error('Error sending auto-accept notification:', error);
   }
-}
+};
 
 /**
  * Get auto-accept log
  */
 export const getAutoAcceptLog = async (organizationId, filters = {}) => {
   try {
-    const { resourceType, action, limit = 50, offset = 0 } = filters
+    const { resourceType, action, limit = 50, offset = 0 } = filters;
 
     let sql = `
       SELECT * FROM auto_accept_log
       WHERE organization_id = $1
-    `
-    const params = [organizationId]
-    let paramIndex = 2
+    `;
+    const params = [organizationId];
+    let paramIndex = 2;
 
     if (resourceType) {
-      sql += ` AND resource_type = $${paramIndex}`
-      params.push(resourceType)
-      paramIndex++
+      sql += ` AND resource_type = $${paramIndex}`;
+      params.push(resourceType);
+      paramIndex++;
     }
 
     if (action) {
-      sql += ` AND action = $${paramIndex}`
-      params.push(action)
-      paramIndex++
+      sql += ` AND action = $${paramIndex}`;
+      params.push(action);
+      paramIndex++;
     }
 
-    sql += ` ORDER BY created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`
-    params.push(limit, offset)
+    sql += ` ORDER BY created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
+    params.push(limit, offset);
 
-    const result = await query(sql, params)
-    return result.rows
+    const result = await query(sql, params);
+    return result.rows;
   } catch (error) {
-    logger.error('Error getting auto-accept log:', error)
-    throw error
+    logger.error('Error getting auto-accept log:', error);
+    throw error;
   }
-}
+};
 
 export default {
   getSettings,
@@ -539,5 +541,5 @@ export default {
   shouldAutoAcceptReferral,
   autoAcceptReferral,
   processPendingReferrals,
-  getAutoAcceptLog
-}
+  getAutoAcceptLog,
+};

@@ -4,18 +4,13 @@
  */
 
 import { query } from '../config/database.js';
-import logger from '../config/logger.js';
+import _logger from '../config/logger.js';
 
 /**
  * Get all test batteries
  */
 export const getAllTestBatteries = async (organizationId, options = {}) => {
-  const {
-    bodyRegion,
-    targetPopulation,
-    systemOnly = false,
-    activeOnly = true
-  } = options;
+  const { bodyRegion, targetPopulation, systemOnly = false, activeOnly = true } = options;
 
   let sql = `
     SELECT
@@ -76,10 +71,9 @@ export const getAllTestBatteries = async (organizationId, options = {}) => {
  * Get test battery by code
  */
 export const getTestBatteryByCode = async (code) => {
-  const result = await query(
-    `SELECT * FROM test_batteries WHERE code = $1 AND is_active = true`,
-    [code]
-  );
+  const result = await query(`SELECT * FROM test_batteries WHERE code = $1 AND is_active = true`, [
+    code,
+  ]);
 
   if (result.rows.length === 0) {
     throw new Error(`Test battery ${code} not found`);
@@ -103,7 +97,7 @@ export const createTestBattery = async (organizationId, userId, batteryData) => 
     scoringMethod,
     compositeScoreCalculation,
     indicatedFor,
-    contraindications
+    contraindications,
   } = batteryData;
 
   // Validate required fields
@@ -143,7 +137,7 @@ export const createTestBattery = async (organizationId, userId, batteryData) => 
       JSON.stringify(compositeScoreCalculation || {}),
       indicatedFor || [],
       contraindications || [],
-      userId
+      userId,
     ]
   );
 
@@ -162,7 +156,7 @@ export const updateTestBattery = async (batteryId, organizationId, updates) => {
     compositeScoreCalculation,
     indicatedFor,
     contraindications,
-    isActive
+    isActive,
   } = updates;
 
   const result = await query(
@@ -190,7 +184,7 @@ export const updateTestBattery = async (batteryId, organizationId, updates) => {
       contraindications,
       isActive,
       batteryId,
-      organizationId
+      organizationId,
     ]
   );
 
@@ -213,14 +207,11 @@ export const submitBatteryResults = async (resultData) => {
     testDurationMinutes,
     clinicalFindings,
     recommendations,
-    administeredBy
+    administeredBy,
   } = resultData;
 
   // Get battery definition
-  const batteryResult = await query(
-    `SELECT * FROM test_batteries WHERE id = $1`,
-    [batteryId]
-  );
+  const batteryResult = await query(`SELECT * FROM test_batteries WHERE id = $1`, [batteryId]);
 
   if (batteryResult.rows.length === 0) {
     throw new Error('Test battery not found');
@@ -232,10 +223,9 @@ export const submitBatteryResults = async (resultData) => {
   const scoreData = calculateCompositeScore(battery, testResults);
 
   // Get normative comparison if applicable
-  const patientData = await query(
-    `SELECT date_of_birth, gender FROM patients WHERE id = $1`,
-    [patientId]
-  );
+  const patientData = await query(`SELECT date_of_birth, gender FROM patients WHERE id = $1`, [
+    patientId,
+  ]);
 
   let normativePercentile = null;
   if (patientData.rows.length > 0) {
@@ -260,13 +250,10 @@ export const submitBatteryResults = async (resultData) => {
     [patientId, batteryId]
   );
 
-  const previousScore = previousResult.rows.length > 0
-    ? previousResult.rows[0].composite_score
-    : null;
+  const previousScore =
+    previousResult.rows.length > 0 ? previousResult.rows[0].composite_score : null;
 
-  const scoreChange = previousScore !== null
-    ? scoreData.compositeScore - previousScore
-    : null;
+  const scoreChange = previousScore !== null ? scoreData.compositeScore - previousScore : null;
 
   // Insert results
   const insertResult = await query(
@@ -303,7 +290,7 @@ export const submitBatteryResults = async (resultData) => {
       testDurationMinutes,
       clinicalFindings,
       recommendations,
-      administeredBy
+      administeredBy,
     ]
   );
 
@@ -330,13 +317,13 @@ const calculateCompositeScore = (battery, testResults) => {
 
   if (scoring_method === 'SUM') {
     // Sum all test scores
-    testResults.forEach(result => {
+    testResults.forEach((result) => {
       compositeScore += parseFloat(result.score) || 0;
     });
   } else if (scoring_method === 'WEIGHTED') {
     // Weighted sum based on battery configuration
     const weights = composite_score_calculation?.weights || {};
-    testResults.forEach(result => {
+    testResults.forEach((result) => {
       const weight = weights[result.test_id] || 1;
       compositeScore += (parseFloat(result.score) || 0) * weight;
     });
@@ -359,7 +346,7 @@ const calculateCompositeScore = (battery, testResults) => {
 
   return {
     compositeScore: parseFloat(compositeScore.toFixed(2)),
-    interpretation
+    interpretation,
   };
 };
 
@@ -484,5 +471,5 @@ export default {
   submitBatteryResults,
   getPatientBatteryHistory,
   getBatteryResult,
-  deleteTestBattery
+  deleteTestBattery,
 };

@@ -1,9 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import _React, { useState, useEffect } from 'react';
 import {
-  Users, UserPlus, UserCheck, AlertTriangle, UserX, RefreshCw,
-  TrendingUp, TrendingDown, Filter, Search, Star, Calendar,
-  Activity, Clock, ChevronRight, MoreVertical, Mail, Phone,
-  MessageSquare, Award, Loader2, AlertCircle
+  Users,
+  UserPlus,
+  UserCheck,
+  AlertTriangle,
+  UserX,
+  RefreshCw,
+  TrendingUp,
+  TrendingDown,
+  Filter,
+  Search,
+  Star,
+  Calendar,
+  Activity,
+  Clock,
+  ChevronRight,
+  MoreVertical,
+  Mail,
+  Phone,
+  MessageSquare,
+  Award,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
 import { crmAPI } from '../../services/api';
 
@@ -21,13 +39,62 @@ const PatientLifecycle = () => {
   // Lifecycle stages with Norwegian labels
   const lifecycleStages = [
     { id: 'ALL', label: 'Alle', labelEn: 'All', icon: Users, color: 'bg-gray-500' },
-    { id: 'NEW', label: 'Ny', labelEn: 'New', icon: UserPlus, color: 'bg-blue-500', description: 'Første 30 dager' },
-    { id: 'ONBOARDING', label: 'Onboarding', labelEn: 'Onboarding', icon: Activity, color: 'bg-purple-500', description: '1-3 konsultasjoner' },
-    { id: 'ACTIVE', label: 'Aktiv', labelEn: 'Active', icon: UserCheck, color: 'bg-green-500', description: 'Regelmessige besøk' },
-    { id: 'AT_RISK', label: 'I Fare', labelEn: 'At Risk', icon: AlertTriangle, color: 'bg-yellow-500', description: '45+ dager siden sist' },
-    { id: 'INACTIVE', label: 'Inaktiv', labelEn: 'Inactive', icon: Clock, color: 'bg-orange-500', description: '90+ dager siden sist' },
-    { id: 'LOST', label: 'Tapt', labelEn: 'Lost', icon: UserX, color: 'bg-red-500', description: '180+ dager siden sist' },
-    { id: 'REACTIVATED', label: 'Reaktivert', labelEn: 'Reactivated', icon: RefreshCw, color: 'bg-teal-500', description: 'Kom tilbake' }
+    {
+      id: 'NEW',
+      label: 'Ny',
+      labelEn: 'New',
+      icon: UserPlus,
+      color: 'bg-blue-500',
+      description: 'Første 30 dager',
+    },
+    {
+      id: 'ONBOARDING',
+      label: 'Onboarding',
+      labelEn: 'Onboarding',
+      icon: Activity,
+      color: 'bg-purple-500',
+      description: '1-3 konsultasjoner',
+    },
+    {
+      id: 'ACTIVE',
+      label: 'Aktiv',
+      labelEn: 'Active',
+      icon: UserCheck,
+      color: 'bg-green-500',
+      description: 'Regelmessige besøk',
+    },
+    {
+      id: 'AT_RISK',
+      label: 'I Fare',
+      labelEn: 'At Risk',
+      icon: AlertTriangle,
+      color: 'bg-yellow-500',
+      description: '45+ dager siden sist',
+    },
+    {
+      id: 'INACTIVE',
+      label: 'Inaktiv',
+      labelEn: 'Inactive',
+      icon: Clock,
+      color: 'bg-orange-500',
+      description: '90+ dager siden sist',
+    },
+    {
+      id: 'LOST',
+      label: 'Tapt',
+      labelEn: 'Lost',
+      icon: UserX,
+      color: 'bg-red-500',
+      description: '180+ dager siden sist',
+    },
+    {
+      id: 'REACTIVATED',
+      label: 'Reaktivert',
+      labelEn: 'Reactivated',
+      icon: RefreshCw,
+      color: 'bg-teal-500',
+      description: 'Kom tilbake',
+    },
   ];
 
   // Fetch patients from API
@@ -41,11 +108,11 @@ const PatientLifecycle = () => {
         const stage = selectedStage === 'ALL' ? undefined : selectedStage;
         const [patientsRes, statsRes] = await Promise.all([
           crmAPI.getPatientsByLifecycle(stage),
-          crmAPI.getLifecycleStats()
+          crmAPI.getLifecycleStats(),
         ]);
 
         // Map patient data to expected format
-        const patientData = (patientsRes.data?.patients || patientsRes.data || []).map(p => ({
+        const patientData = (patientsRes.data?.patients || patientsRes.data || []).map((p) => ({
           id: p.id,
           name: `${p.first_name || ''} ${p.last_name || ''}`.trim(),
           stage: p.lifecycle_stage || 'NEW',
@@ -58,7 +125,7 @@ const PatientLifecycle = () => {
           phone: p.phone,
           email: p.email,
           referrals: p.referral_count || 0,
-          isVip: p.is_vip || false
+          isVip: p.is_vip || false,
         }));
 
         setPatients(patientData);
@@ -74,41 +141,51 @@ const PatientLifecycle = () => {
   }, [selectedStage]);
 
   // Filter patients
-  const filteredPatients = patients.filter(p => {
+  const filteredPatients = patients.filter((p) => {
     const matchesStage = selectedStage === 'ALL' || p.stage === selectedStage;
-    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          p.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.email.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesStage && matchesSearch;
   });
 
   // Calculate stage counts - use API stats if available
-  const stageCounts = stats?.stageCounts || lifecycleStages.reduce((acc, stage) => {
-    acc[stage.id] = stage.id === 'ALL'
-      ? patients.length
-      : patients.filter(p => p.stage === stage.id).length;
-    return acc;
-  }, {});
+  const stageCounts =
+    stats?.stageCounts ||
+    lifecycleStages.reduce((acc, stage) => {
+      acc[stage.id] =
+        stage.id === 'ALL' ? patients.length : patients.filter((p) => p.stage === stage.id).length;
+      return acc;
+    }, {});
 
   // Get stage info
-  const getStageInfo = (stageId) => lifecycleStages.find(s => s.id === stageId);
+  const getStageInfo = (stageId) => lifecycleStages.find((s) => s.id === stageId);
 
   // Format date
   const formatDate = (dateStr) => {
-    if (!dateStr) return '-';
+    if (!dateStr) {
+      return '-';
+    }
     return new Date(dateStr).toLocaleDateString('nb-NO');
   };
 
   // Calculate days since last visit
   const daysSinceVisit = (dateStr) => {
-    if (!dateStr) return 999;
+    if (!dateStr) {
+      return 999;
+    }
     const days = Math.floor((new Date() - new Date(dateStr)) / (1000 * 60 * 60 * 24));
     return days;
   };
 
   // Get engagement color
   const getEngagementColor = (score) => {
-    if (score >= 70) return 'text-green-600 bg-green-100';
-    if (score >= 40) return 'text-yellow-600 bg-yellow-100';
+    if (score >= 70) {
+      return 'text-green-600 bg-green-100';
+    }
+    if (score >= 40) {
+      return 'text-yellow-600 bg-yellow-100';
+    }
     return 'text-red-600 bg-red-100';
   };
 
@@ -117,7 +194,7 @@ const PatientLifecycle = () => {
     { id: 'email', label: 'Send E-post', icon: Mail },
     { id: 'sms', label: 'Send SMS', icon: MessageSquare },
     { id: 'call', label: 'Ring', icon: Phone },
-    { id: 'book', label: 'Bestill Time', icon: Calendar }
+    { id: 'book', label: 'Bestill Time', icon: Calendar },
   ];
 
   // Loading state
@@ -169,7 +246,7 @@ const PatientLifecycle = () => {
 
       {/* Stage Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
-        {lifecycleStages.map(stage => {
+        {lifecycleStages.map((stage) => {
           const Icon = stage.icon;
           const isSelected = selectedStage === stage.id;
           return (
@@ -182,7 +259,9 @@ const PatientLifecycle = () => {
                   : 'border-gray-200 bg-white hover:border-gray-300'
               }`}
             >
-              <div className={`w-8 h-8 rounded-lg ${stage.color} flex items-center justify-center mb-2`}>
+              <div
+                className={`w-8 h-8 rounded-lg ${stage.color} flex items-center justify-center mb-2`}
+              >
                 <Icon className="w-4 h-4 text-white" />
               </div>
               <div className="text-left">
@@ -227,18 +306,34 @@ const PatientLifecycle = () => {
         <table className="w-full">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pasient</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Engasjement</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Siste Besøk</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Neste Time</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Besøk</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Livstidsverdi</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Handlinger</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Pasient
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Status
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Engasjement
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Siste Besøk
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Neste Time
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Besøk
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Livstidsverdi
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Handlinger
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {filteredPatients.map(patient => {
+            {filteredPatients.map((patient) => {
               const stageInfo = getStageInfo(patient.stage);
               const StageIcon = stageInfo?.icon;
               const days = daysSinceVisit(patient.lastVisit);
@@ -252,7 +347,10 @@ const PatientLifecycle = () => {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-medium">
-                        {patient.name.split(' ').map(n => n[0]).join('')}
+                        {patient.name
+                          .split(' ')
+                          .map((n) => n[0])
+                          .join('')}
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
@@ -262,8 +360,11 @@ const PatientLifecycle = () => {
                           )}
                         </div>
                         <div className="flex gap-1 mt-1">
-                          {patient.tags.slice(0, 2).map(tag => (
-                            <span key={tag} className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
+                          {patient.tags.slice(0, 2).map((tag) => (
+                            <span
+                              key={tag}
+                              className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full"
+                            >
                               {tag}
                             </span>
                           ))}
@@ -272,13 +373,17 @@ const PatientLifecycle = () => {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full ${stageInfo?.color} bg-opacity-20`}>
+                    <div
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full ${stageInfo?.color} bg-opacity-20`}
+                    >
                       {StageIcon && <StageIcon className="w-3.5 h-3.5" />}
                       <span className="text-sm font-medium">{stageInfo?.label}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full ${getEngagementColor(patient.engagementScore)}`}>
+                    <div
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full ${getEngagementColor(patient.engagementScore)}`}
+                    >
                       {patient.engagementScore >= 50 ? (
                         <TrendingUp className="w-3.5 h-3.5" />
                       ) : (
@@ -290,14 +395,18 @@ const PatientLifecycle = () => {
                   <td className="px-4 py-3">
                     <div>
                       <span className="text-gray-900">{formatDate(patient.lastVisit)}</span>
-                      <span className={`block text-xs ${days > 45 ? 'text-red-500' : 'text-gray-500'}`}>
+                      <span
+                        className={`block text-xs ${days > 45 ? 'text-red-500' : 'text-gray-500'}`}
+                      >
                         {days === 0 ? 'I dag' : `${days} dager siden`}
                       </span>
                     </div>
                   </td>
                   <td className="px-4 py-3">
                     {patient.nextAppointment ? (
-                      <span className="text-green-600 font-medium">{formatDate(patient.nextAppointment)}</span>
+                      <span className="text-green-600 font-medium">
+                        {formatDate(patient.nextAppointment)}
+                      </span>
                     ) : (
                       <span className="text-red-500">Ingen time</span>
                     )}
@@ -312,14 +421,14 @@ const PatientLifecycle = () => {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
-                      {quickActions.slice(0, 3).map(action => {
+                      {quickActions.slice(0, 3).map((action) => {
                         const Icon = action.icon;
                         return (
                           <button
                             key={action.id}
                             onClick={(e) => {
                               e.stopPropagation();
-                              console.log(`${action.id} for ${patient.name}`);
+                              // Action handler placeholder
                             }}
                             className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             title={action.label}
@@ -411,14 +520,18 @@ const PatientLifecycle = () => {
                 <span className="font-medium">
                   {Math.round(
                     filteredPatients.reduce((sum, p) => sum + p.engagementScore, 0) /
-                    (filteredPatients.length || 1)
-                  )}%
+                      (filteredPatients.length || 1)
+                  )}
+                  %
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Total livstidsverdi</span>
                 <span className="font-medium">
-                  {filteredPatients.reduce((sum, p) => sum + p.lifetimeValue, 0).toLocaleString('nb-NO')} kr
+                  {filteredPatients
+                    .reduce((sum, p) => sum + p.lifetimeValue, 0)
+                    .toLocaleString('nb-NO')}{' '}
+                  kr
                 </span>
               </div>
             </div>
@@ -457,7 +570,10 @@ const PatientLifecycle = () => {
             {/* Patient Header */}
             <div className="text-center mb-6">
               <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-2xl font-bold mx-auto mb-3">
-                {selectedPatient.name.split(' ').map(n => n[0]).join('')}
+                {selectedPatient.name
+                  .split(' ')
+                  .map((n) => n[0])
+                  .join('')}
               </div>
               <h4 className="text-xl font-bold text-gray-900">{selectedPatient.name}</h4>
               {selectedPatient.isVip && (
@@ -469,11 +585,17 @@ const PatientLifecycle = () => {
 
             {/* Contact Info */}
             <div className="space-y-3 mb-6">
-              <a href={`tel:${selectedPatient.phone}`} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
+              <a
+                href={`tel:${selectedPatient.phone}`}
+                className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100"
+              >
                 <Phone className="w-5 h-5 text-gray-500" />
                 <span>{selectedPatient.phone}</span>
               </a>
-              <a href={`mailto:${selectedPatient.email}`} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
+              <a
+                href={`mailto:${selectedPatient.email}`}
+                className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100"
+              >
                 <Mail className="w-5 h-5 text-gray-500" />
                 <span>{selectedPatient.email}</span>
               </a>
@@ -486,11 +608,15 @@ const PatientLifecycle = () => {
                 <p className="text-xs text-blue-600">Besøk</p>
               </div>
               <div className="p-3 bg-green-50 rounded-lg text-center">
-                <p className="text-2xl font-bold text-green-600">{selectedPatient.lifetimeValue.toLocaleString('nb-NO')}</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {selectedPatient.lifetimeValue.toLocaleString('nb-NO')}
+                </p>
                 <p className="text-xs text-green-600">Livstidsverdi (kr)</p>
               </div>
               <div className="p-3 bg-purple-50 rounded-lg text-center">
-                <p className="text-2xl font-bold text-purple-600">{selectedPatient.engagementScore}%</p>
+                <p className="text-2xl font-bold text-purple-600">
+                  {selectedPatient.engagementScore}%
+                </p>
                 <p className="text-xs text-purple-600">Engasjement</p>
               </div>
               <div className="p-3 bg-orange-50 rounded-lg text-center">

@@ -8,7 +8,7 @@
  * - Touch-optimized for kiosk
  */
 
-import React, { useState } from 'react';
+import _React, { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 
 const TRANSLATIONS = {
@@ -33,7 +33,7 @@ const TRANSLATIONS = {
     continueButton: 'Fortsett',
     back: 'Tilbake',
     skipButton: 'Hopp over dette steget',
-  }
+  },
 };
 
 const BODY_REGIONS = {
@@ -68,7 +68,7 @@ const BODY_REGIONS = {
     { id: 'pelvis', label: 'Bekken/Korsben', row: 5, col: 1 },
     { id: 'leg_l', label: 'V. Ben', row: 6, col: 0 },
     { id: 'leg_r', label: 'H. Ben', row: 6, col: 2 },
-  ]
+  ],
 };
 
 const DURATION_OPTIONS = {
@@ -85,7 +85,7 @@ const DURATION_OPTIONS = {
     { id: 'week', label: 'Ca. en uke' },
     { id: 'month', label: 'Ca. en måned' },
     { id: 'chronic', label: 'Måneder/år' },
-  ]
+  ],
 };
 
 export default function PainAssessment({ onNext, onBack, lang = 'no' }) {
@@ -98,33 +98,31 @@ export default function PainAssessment({ onNext, onBack, lang = 'no' }) {
   const [painDuration, setPainDuration] = useState('');
 
   const toggleRegion = (id) => {
-    setPainLocations(prev =>
-      prev.includes(id)
-        ? prev.filter(x => x !== id)
-        : [...prev, id]
-    );
+    setPainLocations((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
 
   const handleNext = () => {
     onNext({
       painLocations,
       painLevel,
-      painDuration
+      painDuration,
     });
   };
 
   // Get pain level color
   const getPainColor = (level) => {
-    if (level <= 3) return 'from-green-400 to-green-500';
-    if (level <= 6) return 'from-yellow-400 to-orange-500';
+    if (level <= 3) {
+      return 'from-green-400 to-green-500';
+    }
+    if (level <= 6) {
+      return 'from-yellow-400 to-orange-500';
+    }
     return 'from-orange-500 to-red-600';
   };
 
   // Group regions by row for grid layout
-  const maxRow = Math.max(...regions.map(r => r.row));
-  const rows = Array.from({ length: maxRow + 1 }, (_, i) =>
-    regions.filter(r => r.row === i)
-  );
+  const maxRow = Math.max(...regions.map((r) => r.row));
+  const rows = Array.from({ length: maxRow + 1 }, (_, i) => regions.filter((r) => r.row === i));
 
   return (
     <div className="flex flex-col h-full">
@@ -140,12 +138,8 @@ export default function PainAssessment({ onNext, onBack, lang = 'no' }) {
 
       {/* Header */}
       <div className="text-center mb-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mb-1">
-          {t.title}
-        </h1>
-        <p className="text-base text-slate-500">
-          {t.subtitle}
-        </p>
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mb-1">{t.title}</h1>
+        <p className="text-base text-slate-500">{t.subtitle}</p>
       </div>
 
       {/* Body map - Grid layout */}
@@ -153,8 +147,8 @@ export default function PainAssessment({ onNext, onBack, lang = 'no' }) {
         <div className="flex flex-col gap-2">
           {rows.map((rowRegions, rowIndex) => (
             <div key={rowIndex} className="grid grid-cols-3 gap-2">
-              {[0, 1, 2].map(col => {
-                const region = rowRegions.find(r => r.col === col);
+              {[0, 1, 2].map((col) => {
+                const region = rowRegions.find((r) => r.col === col);
                 if (!region) {
                   return <div key={col} className="h-12" />;
                 }
@@ -164,9 +158,10 @@ export default function PainAssessment({ onNext, onBack, lang = 'no' }) {
                     onClick={() => toggleRegion(region.id)}
                     className={`h-12 rounded-xl border-2 text-sm font-medium
                       transition-all active:scale-95 transform
-                      ${painLocations.includes(region.id)
-                        ? 'bg-red-500 border-red-600 text-white shadow-lg'
-                        : 'bg-white border-slate-200 text-slate-700 hover:border-teal-400'
+                      ${
+                        painLocations.includes(region.id)
+                          ? 'bg-red-500 border-red-600 text-white shadow-lg'
+                          : 'bg-white border-slate-200 text-slate-700 hover:border-teal-400'
                       }`}
                   >
                     {region.label}
@@ -180,15 +175,15 @@ export default function PainAssessment({ onNext, onBack, lang = 'no' }) {
 
       {/* VAS Pain Scale */}
       <div className="mb-4">
-        <h2 className="text-lg font-medium text-slate-700 mb-3 text-center">
-          {t.painLevel}
-        </h2>
+        <h2 className="text-lg font-medium text-slate-700 mb-3 text-center">{t.painLevel}</h2>
 
         <div className="px-2">
           {/* Pain level display */}
           <div className="flex justify-center mb-3">
-            <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${getPainColor(painLevel)}
-                           flex items-center justify-center shadow-lg`}>
+            <div
+              className={`w-20 h-20 rounded-full bg-gradient-to-br ${getPainColor(painLevel)}
+                           flex items-center justify-center shadow-lg`}
+            >
               <span className="text-4xl font-bold text-white">{painLevel}</span>
             </div>
           </div>
@@ -216,19 +211,18 @@ export default function PainAssessment({ onNext, onBack, lang = 'no' }) {
 
       {/* Duration selection */}
       <div className="mb-4">
-        <h2 className="text-lg font-medium text-slate-700 mb-3 text-center">
-          {t.duration}
-        </h2>
+        <h2 className="text-lg font-medium text-slate-700 mb-3 text-center">{t.duration}</h2>
         <div className="flex flex-wrap gap-2 justify-center">
-          {durations.map(d => (
+          {durations.map((d) => (
             <button
               key={d.id}
               onClick={() => setPainDuration(d.id)}
               className={`px-4 py-2 rounded-xl border-2 text-sm font-medium
                 transition-all active:scale-95
-                ${painDuration === d.id
-                  ? 'bg-teal-500 border-teal-600 text-white'
-                  : 'bg-white border-slate-200 text-slate-700 hover:border-teal-400'
+                ${
+                  painDuration === d.id
+                    ? 'bg-teal-500 border-teal-600 text-white'
+                    : 'bg-white border-slate-200 text-slate-700 hover:border-teal-400'
                 }`}
             >
               {d.label}

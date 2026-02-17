@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
+import _React, { useMemo } from 'react';
 import { Calendar, MapPin, TrendingUp, Users, Clock } from 'lucide-react';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { useWeekendDifferentials } from '../../hooks/useAnalytics';
-import { getDistanceCategory, isSaturday } from '../../utils/geographicUtils';
+import { _getDistanceCategory, _isSaturday } from '../../utils/geographicUtils';
 
 /**
  * Weekend Differential Analysis Component
@@ -21,7 +21,9 @@ export const WeekendDifferentialAnalysis = ({ timeRange, selectedDate }) => {
   const { data, isLoading } = useWeekendDifferentials(timeRange, selectedDate);
 
   const analysis = useMemo(() => {
-    if (!data) return null;
+    if (!data) {
+      return null;
+    }
 
     const {
       totalVisits,
@@ -33,19 +35,20 @@ export const WeekendDifferentialAnalysis = ({ timeRange, selectedDate }) => {
       saturdayNonOsloVisits,
       weekdayPVA,
       saturdayPVA,
-      overallPVA
+      overallPVA,
     } = data;
 
     // Calculate percentages
-    const saturdayPercentage = totalVisits > 0 ? (saturdayVisits / totalVisits * 100).toFixed(1) : 0;
-    const nonOsloPercentage = totalVisits > 0 ? (nonOsloPatients.visits / totalVisits * 100).toFixed(1) : 0;
-    const saturdayNonOsloPercentage = saturdayVisits > 0
-      ? (saturdayNonOsloVisits / saturdayVisits * 100).toFixed(1)
-      : 0;
+    const saturdayPercentage =
+      totalVisits > 0 ? ((saturdayVisits / totalVisits) * 100).toFixed(1) : 0;
+    const nonOsloPercentage =
+      totalVisits > 0 ? ((nonOsloPatients.visits / totalVisits) * 100).toFixed(1) : 0;
+    const saturdayNonOsloPercentage =
+      saturdayVisits > 0 ? ((saturdayNonOsloVisits / saturdayVisits) * 100).toFixed(1) : 0;
 
     // Calculate PVA impact
     const pvaImpact = saturdayPVA && weekdayPVA ? saturdayPVA - weekdayPVA : 0;
-    const pvaImpactPercentage = weekdayPVA > 0 ? (pvaImpact / weekdayPVA * 100).toFixed(1) : 0;
+    const pvaImpactPercentage = weekdayPVA > 0 ? ((pvaImpact / weekdayPVA) * 100).toFixed(1) : 0;
 
     return {
       totalVisits,
@@ -62,7 +65,7 @@ export const WeekendDifferentialAnalysis = ({ timeRange, selectedDate }) => {
       saturdayPVA,
       overallPVA,
       pvaImpact,
-      pvaImpactPercentage
+      pvaImpactPercentage,
     };
   }, [data]);
 
@@ -105,13 +108,14 @@ export const WeekendDifferentialAnalysis = ({ timeRange, selectedDate }) => {
             <div className="flex-1">
               <h3 className="font-semibold text-slate-900 text-lg">Saturday Impact on PVA</h3>
               <p className="text-sm text-slate-700 mt-2">
-                <strong>{analysis.saturdayNonOsloPercentage}%</strong> of Saturday visits are from non-Oslo patients.
-                Saturday PVA ({analysis.saturdayPVA ? analysis.saturdayPVA.toFixed(2) : 'N/A'}) is{' '}
+                <strong>{analysis.saturdayNonOsloPercentage}%</strong> of Saturday visits are from
+                non-Oslo patients. Saturday PVA (
+                {analysis.saturdayPVA ? analysis.saturdayPVA.toFixed(2) : 'N/A'}) is{' '}
                 <strong className={analysis.pvaImpact > 0 ? 'text-red-600' : 'text-green-600'}>
                   {analysis.pvaImpact > 0 ? 'higher' : 'lower'}
                 </strong>{' '}
-                than weekday PVA ({analysis.weekdayPVA ? analysis.weekdayPVA.toFixed(2) : 'N/A'})
-                by <strong>{Math.abs(analysis.pvaImpactPercentage)}%</strong>.
+                than weekday PVA ({analysis.weekdayPVA ? analysis.weekdayPVA.toFixed(2) : 'N/A'}) by{' '}
+                <strong>{Math.abs(analysis.pvaImpactPercentage)}%</strong>.
               </p>
             </div>
           </div>
@@ -126,9 +130,7 @@ export const WeekendDifferentialAnalysis = ({ timeRange, selectedDate }) => {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm font-medium text-slate-600">Saturday Visits</p>
-                <p className="text-3xl font-bold text-slate-900 mt-2">
-                  {analysis.saturdayVisits}
-                </p>
+                <p className="text-3xl font-bold text-slate-900 mt-2">{analysis.saturdayVisits}</p>
                 <p className="text-sm text-slate-500 mt-1">
                   {analysis.saturdayPercentage}% of total visits
                 </p>
@@ -146,11 +148,14 @@ export const WeekendDifferentialAnalysis = ({ timeRange, selectedDate }) => {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm font-medium text-slate-600">Weekday Visits</p>
-                <p className="text-3xl font-bold text-slate-900 mt-2">
-                  {analysis.weekdayVisits}
-                </p>
+                <p className="text-3xl font-bold text-slate-900 mt-2">{analysis.weekdayVisits}</p>
                 <p className="text-sm text-slate-500 mt-1">
-                  {(100 - analysis.saturdayPercentage - (analysis.sundayVisits / analysis.totalVisits * 100)).toFixed(1)}% of total
+                  {(
+                    100 -
+                    analysis.saturdayPercentage -
+                    (analysis.sundayVisits / analysis.totalVisits) * 100
+                  ).toFixed(1)}
+                  % of total
                 </p>
               </div>
               <div className="p-3 bg-blue-100 rounded-lg">
@@ -237,13 +242,16 @@ export const WeekendDifferentialAnalysis = ({ timeRange, selectedDate }) => {
           </Card.Header>
           <Card.Body>
             <div className="text-center">
-              <p className={`text-4xl font-bold ${
-                analysis.pvaImpact > 0 ? 'text-red-600' : 'text-green-600'
-              }`}>
+              <p
+                className={`text-4xl font-bold ${
+                  analysis.pvaImpact > 0 ? 'text-red-600' : 'text-green-600'
+                }`}
+              >
                 {analysis.saturdayPVA ? analysis.saturdayPVA.toFixed(2) : '0.00'}
               </p>
               <p className="text-sm text-slate-600 mt-2">
-                {analysis.pvaImpact > 0 ? '+' : ''}{analysis.pvaImpactPercentage}% vs weekday
+                {analysis.pvaImpact > 0 ? '+' : ''}
+                {analysis.pvaImpactPercentage}% vs weekday
               </p>
             </div>
           </Card.Body>
@@ -277,7 +285,7 @@ export const WeekendDifferentialAnalysis = ({ timeRange, selectedDate }) => {
                 <div
                   className="bg-teal-600 h-2 rounded-full transition-all"
                   style={{
-                    width: `${100 - analysis.nonOsloPercentage}%`
+                    width: `${100 - analysis.nonOsloPercentage}%`,
                   }}
                 ></div>
               </div>
@@ -303,7 +311,7 @@ export const WeekendDifferentialAnalysis = ({ timeRange, selectedDate }) => {
                 <div
                   className="bg-orange-600 h-2 rounded-full transition-all"
                   style={{
-                    width: `${analysis.nonOsloPercentage}%`
+                    width: `${analysis.nonOsloPercentage}%`,
                   }}
                 ></div>
               </div>
@@ -320,7 +328,8 @@ export const WeekendDifferentialAnalysis = ({ timeRange, selectedDate }) => {
                   {analysis.saturdayVisits - analysis.saturdayNonOsloVisits}
                 </p>
                 <p className="text-xs text-slate-500 mt-1">
-                  {((1 - analysis.saturdayNonOsloPercentage / 100) * 100).toFixed(1)}% of Saturday visits
+                  {((1 - analysis.saturdayNonOsloPercentage / 100) * 100).toFixed(1)}% of Saturday
+                  visits
                 </p>
               </div>
               <div className="bg-orange-50 rounded-lg p-4">
@@ -345,24 +354,31 @@ export const WeekendDifferentialAnalysis = ({ timeRange, selectedDate }) => {
         <Card.Body>
           <ul className="space-y-3 text-sm text-slate-700">
             <li className="flex items-start gap-2">
-              <Badge variant="info" className="mt-0.5">TIP</Badge>
+              <Badge variant="info" className="mt-0.5">
+                TIP
+              </Badge>
               <span>
-                When reporting clinic performance, consider excluding Saturday visits or reporting them separately
-                to get a true "regular patient" PVA metric.
+                When reporting clinic performance, consider excluding Saturday visits or reporting
+                them separately to get a true "regular patient" PVA metric.
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <Badge variant="info" className="mt-0.5">TIP</Badge>
+              <Badge variant="info" className="mt-0.5">
+                TIP
+              </Badge>
               <span>
-                Non-Oslo patients visiting on Saturdays likely have different visit patterns (less frequent)
-                which naturally lowers PVA. Track these cohorts separately for accurate benchmarking.
+                Non-Oslo patients visiting on Saturdays likely have different visit patterns (less
+                frequent) which naturally lowers PVA. Track these cohorts separately for accurate
+                benchmarking.
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <Badge variant="info" className="mt-0.5">TIP</Badge>
+              <Badge variant="info" className="mt-0.5">
+                TIP
+              </Badge>
               <span>
-                Use "Weekday PVA" ({analysis.weekdayPVA ? analysis.weekdayPVA.toFixed(2) : 'N/A'}) for
-                email reports to clinic leads as it represents your core Oslo patient base.
+                Use "Weekday PVA" ({analysis.weekdayPVA ? analysis.weekdayPVA.toFixed(2) : 'N/A'})
+                for email reports to clinic leads as it represents your core Oslo patient base.
               </span>
             </li>
           </ul>

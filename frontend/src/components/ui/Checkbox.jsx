@@ -1,13 +1,7 @@
-import React from 'react';
+import _React from 'react';
 import { Check } from 'lucide-react';
 
-export const Checkbox = ({
-  id,
-  checked,
-  onChange,
-  className = '',
-  disabled = false
-}) => {
+export const Checkbox = ({ id, checked, onChange, className = '', disabled = false }) => {
   return (
     <button
       type="button"

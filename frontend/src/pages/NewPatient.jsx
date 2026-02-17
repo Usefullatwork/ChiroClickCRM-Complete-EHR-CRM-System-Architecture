@@ -13,9 +13,9 @@ import {
   AlertCircle,
   User,
   Phone,
-  Mail,
+  _Mail,
   MapPin,
-  Calendar,
+  _Calendar,
   FileText,
 } from 'lucide-react';
 import { useTranslation } from '../i18n';
@@ -25,7 +25,7 @@ import Breadcrumbs from '../components/common/Breadcrumbs';
 
 export default function NewPatient() {
   const navigate = useNavigate();
-  const { t, lang } = useTranslation('patients');
+  const { t, _lang } = useTranslation('patients');
   const [errors, setErrors] = useState({});
   const [isDirty, setIsDirty] = useState(false);
   const { isBlocked, proceed, reset } = useUnsavedChanges(isDirty);
@@ -114,11 +114,21 @@ export default function NewPatient() {
     const newErrors = {};
 
     // Required fields
-    if (!formData.solvit_id?.trim()) newErrors.solvit_id = 'SolvIt ID is required';
-    if (!formData.first_name?.trim()) newErrors.first_name = 'First name is required';
-    if (!formData.last_name?.trim()) newErrors.last_name = 'Last name is required';
-    if (!formData.date_of_birth) newErrors.date_of_birth = 'Date of birth is required';
-    if (!formData.gender) newErrors.gender = 'Gender is required';
+    if (!formData.solvit_id?.trim()) {
+      newErrors.solvit_id = 'SolvIt ID is required';
+    }
+    if (!formData.first_name?.trim()) {
+      newErrors.first_name = 'First name is required';
+    }
+    if (!formData.last_name?.trim()) {
+      newErrors.last_name = 'Last name is required';
+    }
+    if (!formData.date_of_birth) {
+      newErrors.date_of_birth = 'Date of birth is required';
+    }
+    if (!formData.gender) {
+      newErrors.gender = 'Gender is required';
+    }
 
     // Date validation
     if (formData.date_of_birth && new Date(formData.date_of_birth) > new Date()) {

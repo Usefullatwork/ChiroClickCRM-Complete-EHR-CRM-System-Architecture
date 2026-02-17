@@ -24,16 +24,16 @@ import {
   FolderOpen,
   RefreshCw,
   GripVertical,
-  ChevronDown,
+  _ChevronDown,
   Trash2,
   Eye,
-  Download,
-  Info,
-  AlertCircle,
+  _Download,
+  _Info,
+  _AlertCircle,
   CheckCircle2,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { Card, CardHeader, CardBody, CardFooter } from '../ui/Card';
+import { Card, CardHeader, CardBody, _CardFooter } from '../ui/Card';
 import { Alert } from '../ui/Alert';
 import { Input } from '../ui/Input';
 import { Modal } from '../ui/Modal';
@@ -44,145 +44,193 @@ export const PATIENT_FIELDS = [
   { field: 'last_name', label: 'Last Name', labelNo: 'Etternavn', required: true, group: 'basic' },
   { field: 'email', label: 'Email', labelNo: 'E-post', required: false, group: 'contact' },
   { field: 'phone', label: 'Mobile Phone', labelNo: 'Mobil', required: false, group: 'contact' },
-  { field: 'home_phone', label: 'Home Phone', labelNo: 'Hjemmetelefon', required: false, group: 'contact' },
-  { field: 'work_phone', label: 'Work Phone', labelNo: 'Arbeidstelefon', required: false, group: 'contact' },
-  { field: 'address_street', label: 'Street Address', labelNo: 'Gateadresse', required: false, group: 'address' },
+  {
+    field: 'home_phone',
+    label: 'Home Phone',
+    labelNo: 'Hjemmetelefon',
+    required: false,
+    group: 'contact',
+  },
+  {
+    field: 'work_phone',
+    label: 'Work Phone',
+    labelNo: 'Arbeidstelefon',
+    required: false,
+    group: 'contact',
+  },
+  {
+    field: 'address_street',
+    label: 'Street Address',
+    labelNo: 'Gateadresse',
+    required: false,
+    group: 'address',
+  },
   { field: 'address_city', label: 'City', labelNo: 'Poststed', required: false, group: 'address' },
-  { field: 'address_postal_code', label: 'Postal Code', labelNo: 'Postnummer', required: false, group: 'address' },
+  {
+    field: 'address_postal_code',
+    label: 'Postal Code',
+    labelNo: 'Postnummer',
+    required: false,
+    group: 'address',
+  },
   { field: 'country', label: 'Country', labelNo: 'Land', required: false, group: 'address' },
-  { field: 'date_of_birth', label: 'Date of Birth', labelNo: 'Fodselsdato', required: false, group: 'personal' },
+  {
+    field: 'date_of_birth',
+    label: 'Date of Birth',
+    labelNo: 'Fodselsdato',
+    required: false,
+    group: 'personal',
+  },
   { field: 'gender', label: 'Gender', labelNo: 'Kjonn', required: false, group: 'personal' },
-  { field: 'personal_number', label: 'National ID', labelNo: 'Fodselsnummer', required: false, group: 'personal' },
+  {
+    field: 'personal_number',
+    label: 'National ID',
+    labelNo: 'Fodselsnummer',
+    required: false,
+    group: 'personal',
+  },
   { field: 'notes', label: 'Notes', labelNo: 'Notater', required: false, group: 'other' },
-  { field: 'solvit_id', label: 'External ID', labelNo: 'Ekstern ID', required: false, group: 'other' },
+  {
+    field: 'solvit_id',
+    label: 'External ID',
+    labelNo: 'Ekstern ID',
+    required: false,
+    group: 'other',
+  },
   { field: 'category', label: 'Category', labelNo: 'Kategori', required: false, group: 'other' },
   { field: 'status', label: 'Status', labelNo: 'Status', required: false, group: 'other' },
-  { field: 'referral_source', label: 'Referral Source', labelNo: 'Henvist av', required: false, group: 'other' },
+  {
+    field: 'referral_source',
+    label: 'Referral Source',
+    labelNo: 'Henvist av',
+    required: false,
+    group: 'other',
+  },
 ];
 
 // Standard column name mappings for auto-detection
 const STANDARD_MAPPINGS = {
   // First name variations
-  'first_name': 'first_name',
-  'firstname': 'first_name',
+  first_name: 'first_name',
+  firstname: 'first_name',
   'first name': 'first_name',
-  'fornavn': 'first_name',
+  fornavn: 'first_name',
   'given name': 'first_name',
-  'givenname': 'first_name',
+  givenname: 'first_name',
 
   // Last name variations
-  'last_name': 'last_name',
-  'lastname': 'last_name',
+  last_name: 'last_name',
+  lastname: 'last_name',
   'last name': 'last_name',
-  'etternavn': 'last_name',
+  etternavn: 'last_name',
   'family name': 'last_name',
-  'familyname': 'last_name',
-  'surname': 'last_name',
+  familyname: 'last_name',
+  surname: 'last_name',
 
   // Email variations
-  'email': 'email',
+  email: 'email',
   'e-mail': 'email',
-  'epost': 'email',
+  epost: 'email',
   'e-post': 'email',
   'email address': 'email',
 
   // Phone variations
-  'phone': 'phone',
-  'telefon': 'phone',
-  'mobile': 'phone',
-  'mobil': 'phone',
-  'cell': 'phone',
-  'mobiltelefon': 'phone',
+  phone: 'phone',
+  telefon: 'phone',
+  mobile: 'phone',
+  mobil: 'phone',
+  cell: 'phone',
+  mobiltelefon: 'phone',
   'phone number': 'phone',
-  'phonenumber': 'phone',
-  'telefonnummer': 'phone',
+  phonenumber: 'phone',
+  telefonnummer: 'phone',
 
   // Home phone
-  'home_phone': 'home_phone',
+  home_phone: 'home_phone',
   'home phone': 'home_phone',
-  'hjemmetelefon': 'home_phone',
+  hjemmetelefon: 'home_phone',
 
   // Work phone
-  'work_phone': 'work_phone',
+  work_phone: 'work_phone',
   'work phone': 'work_phone',
-  'arbeidstelefon': 'work_phone',
+  arbeidstelefon: 'work_phone',
   'jobb telefon': 'work_phone',
 
   // Address
-  'address': 'address_street',
-  'street': 'address_street',
+  address: 'address_street',
+  street: 'address_street',
   'street address': 'address_street',
-  'adresse': 'address_street',
-  'gateadresse': 'address_street',
+  adresse: 'address_street',
+  gateadresse: 'address_street',
 
   // City
-  'city': 'address_city',
-  'by': 'address_city',
-  'sted': 'address_city',
-  'poststed': 'address_city',
+  city: 'address_city',
+  by: 'address_city',
+  sted: 'address_city',
+  poststed: 'address_city',
 
   // Postal code
-  'postal_code': 'address_postal_code',
-  'postalcode': 'address_postal_code',
-  'zip': 'address_postal_code',
-  'zipcode': 'address_postal_code',
-  'postnummer': 'address_postal_code',
+  postal_code: 'address_postal_code',
+  postalcode: 'address_postal_code',
+  zip: 'address_postal_code',
+  zipcode: 'address_postal_code',
+  postnummer: 'address_postal_code',
   'post code': 'address_postal_code',
 
   // Country
-  'country': 'country',
-  'land': 'country',
+  country: 'country',
+  land: 'country',
 
   // Date of birth
-  'date_of_birth': 'date_of_birth',
-  'dateofbirth': 'date_of_birth',
-  'dob': 'date_of_birth',
-  'birthday': 'date_of_birth',
-  'birthdate': 'date_of_birth',
+  date_of_birth: 'date_of_birth',
+  dateofbirth: 'date_of_birth',
+  dob: 'date_of_birth',
+  birthday: 'date_of_birth',
+  birthdate: 'date_of_birth',
   'birth date': 'date_of_birth',
-  'fodselsdato': 'date_of_birth',
+  fodselsdato: 'date_of_birth',
 
   // Gender
-  'gender': 'gender',
-  'sex': 'gender',
-  'kjonn': 'gender',
+  gender: 'gender',
+  sex: 'gender',
+  kjonn: 'gender',
 
   // National ID
-  'national_id': 'personal_number',
-  'nationalid': 'personal_number',
-  'personal_number': 'personal_number',
-  'personnummer': 'personal_number',
-  'fodselsnummer': 'personal_number',
-  'fnr': 'personal_number',
-  'ssn': 'personal_number',
+  national_id: 'personal_number',
+  nationalid: 'personal_number',
+  personal_number: 'personal_number',
+  personnummer: 'personal_number',
+  fodselsnummer: 'personal_number',
+  fnr: 'personal_number',
+  ssn: 'personal_number',
 
   // Notes
-  'notes': 'notes',
-  'notat': 'notes',
-  'notater': 'notes',
-  'comments': 'notes',
-  'kommentar': 'notes',
+  notes: 'notes',
+  notat: 'notes',
+  notater: 'notes',
+  comments: 'notes',
+  kommentar: 'notes',
 
   // External IDs
-  'solvit_id': 'solvit_id',
-  'solvitid': 'solvit_id',
-  'external_id': 'solvit_id',
-  'externalid': 'solvit_id',
+  solvit_id: 'solvit_id',
+  solvitid: 'solvit_id',
+  external_id: 'solvit_id',
+  externalid: 'solvit_id',
   'pasient id': 'solvit_id',
 
   // Category
-  'category': 'category',
-  'kategori': 'category',
+  category: 'category',
+  kategori: 'category',
 
   // Status
-  'status': 'status',
+  status: 'status',
   'pasient status': 'status',
 
   // Referral
-  'referral_source': 'referral_source',
-  'referred_by': 'referral_source',
-  'henvist_av': 'referral_source',
-  'henvisningskilde': 'referral_source',
+  referral_source: 'referral_source',
+  referred_by: 'referral_source',
+  henvist_av: 'referral_source',
+  henvisningskilde: 'referral_source',
 };
 
 // Group definitions for better organization
@@ -308,7 +356,7 @@ const detectDelimiter = (content) => {
   let detected = ',';
 
   for (const delimiter of delimiters) {
-    const count = (firstLine.match(new RegExp('\\' + delimiter, 'g')) || []).length;
+    const count = (firstLine.match(new RegExp(`\\${delimiter}`, 'g')) || []).length;
     if (count > maxCount) {
       maxCount = count;
       detected = delimiter;
@@ -351,7 +399,7 @@ const parseCSV = (content, options = {}) => {
 
   const normalizedContent = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   const actualDelimiter = delimiter || detectDelimiter(normalizedContent);
-  const lines = normalizedContent.split('\n').filter(line => line.trim());
+  const lines = normalizedContent.split('\n').filter((line) => line.trim());
 
   if (lines.length === 0) {
     return { headers: [], rows: [], delimiter: actualDelimiter };
@@ -366,7 +414,9 @@ const parseCSV = (content, options = {}) => {
 
   for (let i = startIndex; i < lines.length; i++) {
     const values = parseCSVLine(lines[i], actualDelimiter);
-    if (values.every(v => !v)) continue;
+    if (values.every((v) => !v)) {
+      continue;
+    }
 
     const row = {};
     headers.forEach((header, index) => {
@@ -443,31 +493,41 @@ export default function CSVColumnMapper({
   }, []);
 
   // Get field label based on language
-  const getFieldLabel = useCallback((field) => {
-    const fieldDef = PATIENT_FIELDS.find(f => f.field === field);
-    if (!fieldDef) return field;
-    return language === 'no' ? fieldDef.labelNo : fieldDef.label;
-  }, [language]);
+  const getFieldLabel = useCallback(
+    (field) => {
+      const fieldDef = PATIENT_FIELDS.find((f) => f.field === field);
+      if (!fieldDef) {
+        return field;
+      }
+      return language === 'no' ? fieldDef.labelNo : fieldDef.label;
+    },
+    [language]
+  );
 
   // Get group label based on language
-  const getGroupLabel = useCallback((group) => {
-    const groupDef = FIELD_GROUPS[group];
-    if (!groupDef) return group;
-    return language === 'no' ? groupDef.labelNo : groupDef.label;
-  }, [language]);
+  const getGroupLabel = useCallback(
+    (group) => {
+      const groupDef = FIELD_GROUPS[group];
+      if (!groupDef) {
+        return group;
+      }
+      return language === 'no' ? groupDef.labelNo : groupDef.label;
+    },
+    [language]
+  );
 
   // Check which required fields are missing
   const missingRequiredFields = useMemo(() => {
     const mappedFields = new Set(Object.values(mappings));
-    return PATIENT_FIELDS
-      .filter(f => f.required && !mappedFields.has(f.field))
-      .map(f => f.field);
+    return PATIENT_FIELDS.filter((f) => f.required && !mappedFields.has(f.field)).map(
+      (f) => f.field
+    );
   }, [mappings]);
 
   // Group fields by category
   const groupedFields = useMemo(() => {
     const groups = {};
-    PATIENT_FIELDS.forEach(field => {
+    PATIENT_FIELDS.forEach((field) => {
       if (!groups[field.group]) {
         groups[field.group] = [];
       }
@@ -478,14 +538,18 @@ export default function CSVColumnMapper({
 
   // Get unmapped columns
   const unmappedColumns = useMemo(() => {
-    if (!parsedData) return [];
-    return parsedData.headers.filter(header => !mappings[header]);
+    if (!parsedData) {
+      return [];
+    }
+    return parsedData.headers.filter((header) => !mappings[header]);
   }, [parsedData, mappings]);
 
   // Get mapped columns
-  const mappedColumns = useMemo(() => {
-    if (!parsedData) return [];
-    return parsedData.headers.filter(header => mappings[header]);
+  const _mappedColumns = useMemo(() => {
+    if (!parsedData) {
+      return [];
+    }
+    return parsedData.headers.filter((header) => mappings[header]);
   }, [parsedData, mappings]);
 
   // Handle file drop
@@ -515,39 +579,42 @@ export default function CSVColumnMapper({
     }
   }, []);
 
-  const handleFile = useCallback((selectedFile) => {
-    if (!selectedFile.name.match(/\.csv$/i)) {
-      setErrors([t.invalidFile]);
-      return;
-    }
-
-    setFile(selectedFile);
-    setErrors([]);
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const content = e.target.result;
-        const parsed = parseCSV(content);
-        setParsedData(parsed);
-
-        // Auto-detect mappings
-        const detectedMappings = autoDetectMappings(parsed.headers);
-        setMappings(prev => ({ ...detectedMappings, ...prev }));
-      } catch (error) {
-        setErrors([t.parseError + ': ' + error.message]);
+  const handleFile = useCallback(
+    (selectedFile) => {
+      if (!selectedFile.name.match(/\.csv$/i)) {
+        setErrors([t.invalidFile]);
+        return;
       }
-    };
-    reader.readAsText(selectedFile);
-  }, [t]);
+
+      setFile(selectedFile);
+      setErrors([]);
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const content = e.target.result;
+          const parsed = parseCSV(content);
+          setParsedData(parsed);
+
+          // Auto-detect mappings
+          const detectedMappings = autoDetectMappings(parsed.headers);
+          setMappings((prev) => ({ ...detectedMappings, ...prev }));
+        } catch (error) {
+          setErrors([`${t.parseError}: ${error.message}`]);
+        }
+      };
+      reader.readAsText(selectedFile);
+    },
+    [t]
+  );
 
   // Handle column mapping change
   const handleMappingChange = useCallback((csvColumn, patientField) => {
-    setMappings(prev => {
+    setMappings((prev) => {
       const newMappings = { ...prev };
 
       // Remove any existing mapping to this patient field
-      Object.keys(newMappings).forEach(key => {
+      Object.keys(newMappings).forEach((key) => {
         if (newMappings[key] === patientField) {
           delete newMappings[key];
         }
@@ -570,12 +637,15 @@ export default function CSVColumnMapper({
   }, []);
 
   // Handle drop on patient field
-  const handleFieldDrop = useCallback((field) => {
-    if (draggedColumn) {
-      handleMappingChange(draggedColumn, field);
-      setDraggedColumn(null);
-    }
-  }, [draggedColumn, handleMappingChange]);
+  const handleFieldDrop = useCallback(
+    (field) => {
+      if (draggedColumn) {
+        handleMappingChange(draggedColumn, field);
+        setDraggedColumn(null);
+      }
+    },
+    [draggedColumn, handleMappingChange]
+  );
 
   // Auto-detect all mappings
   const handleAutoDetect = useCallback(() => {
@@ -592,7 +662,9 @@ export default function CSVColumnMapper({
 
   // Save template
   const handleSaveTemplate = useCallback(() => {
-    if (!templateName.trim()) return;
+    if (!templateName.trim()) {
+      return;
+    }
 
     const template = {
       id: Date.now().toString(),
@@ -615,15 +687,20 @@ export default function CSVColumnMapper({
   }, []);
 
   // Delete template
-  const handleDeleteTemplate = useCallback((templateId) => {
-    const newTemplates = savedTemplates.filter(t => t.id !== templateId);
-    setSavedTemplates(newTemplates);
-    localStorage.setItem('csvMappingTemplates', JSON.stringify(newTemplates));
-  }, [savedTemplates]);
+  const handleDeleteTemplate = useCallback(
+    (templateId) => {
+      const newTemplates = savedTemplates.filter((t) => t.id !== templateId);
+      setSavedTemplates(newTemplates);
+      localStorage.setItem('csvMappingTemplates', JSON.stringify(newTemplates));
+    },
+    [savedTemplates]
+  );
 
   // Apply mappings and parse data
   const applyMappings = useCallback(() => {
-    if (!parsedData) return [];
+    if (!parsedData) {
+      return [];
+    }
 
     return parsedData.rows.map((row, index) => {
       const patient = { _sourceRowIndex: index + 1 };
@@ -694,19 +771,11 @@ export default function CSVColumnMapper({
           <p className="text-slate-500">{t.subtitle}</p>
         </div>
         <div className="flex gap-2">
-          <Button
-            variant="secondary"
-            icon={FolderOpen}
-            onClick={() => setShowTemplateModal(true)}
-          >
+          <Button variant="secondary" icon={FolderOpen} onClick={() => setShowTemplateModal(true)}>
             {t.loadTemplate}
           </Button>
           {Object.keys(mappings).length > 0 && (
-            <Button
-              variant="secondary"
-              icon={Save}
-              onClick={() => setShowTemplateModal(true)}
-            >
+            <Button variant="secondary" icon={Save} onClick={() => setShowTemplateModal(true)}>
               {t.saveTemplate}
             </Button>
           )}
@@ -730,9 +799,10 @@ export default function CSVColumnMapper({
           <CardBody>
             <div
               className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors cursor-pointer
-                ${dragActive
-                  ? 'border-teal-500 bg-teal-50'
-                  : 'border-slate-300 hover:border-slate-400 hover:bg-slate-50'
+                ${
+                  dragActive
+                    ? 'border-teal-500 bg-teal-50'
+                    : 'border-slate-300 hover:border-slate-400 hover:bg-slate-50'
                 }`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
@@ -741,12 +811,8 @@ export default function CSVColumnMapper({
               onClick={() => fileInputRef.current?.click()}
             >
               <Upload className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-              <p className="text-lg font-medium text-slate-700 mb-2">
-                {t.dropHere}
-              </p>
-              <p className="text-sm text-slate-500 mb-4">
-                {t.supportedFormats}
-              </p>
+              <p className="text-lg font-medium text-slate-700 mb-2">{t.dropHere}</p>
+              <p className="text-sm text-slate-500 mb-4">{t.supportedFormats}</p>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -774,25 +840,16 @@ export default function CSVColumnMapper({
                   <div>
                     <p className="font-medium text-slate-900">{file?.name}</p>
                     <p className="text-sm text-slate-500">
-                      {parsedData.rowCount} {t.rows} | {parsedData.headers.length} {t.csvColumn.toLowerCase()}s
+                      {parsedData.rowCount} {t.rows} | {parsedData.headers.length}{' '}
+                      {t.csvColumn.toLowerCase()}s
                     </p>
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    icon={RefreshCw}
-                    onClick={handleAutoDetect}
-                  >
+                  <Button variant="ghost" size="sm" icon={RefreshCw} onClick={handleAutoDetect}>
                     {t.autoDetect}
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    icon={Trash2}
-                    onClick={handleClearMappings}
-                  >
+                  <Button variant="ghost" size="sm" icon={Trash2} onClick={handleClearMappings}>
                     {t.clearMappings}
                   </Button>
                   <Button
@@ -848,10 +905,7 @@ export default function CSVColumnMapper({
                     {parsedData.rows.slice(0, 5).map((row, rowIdx) => (
                       <tr key={rowIdx} className="hover:bg-slate-50">
                         {parsedData.headers.map((header, colIdx) => (
-                          <td
-                            key={colIdx}
-                            className="px-4 py-3 text-slate-600 whitespace-nowrap"
-                          >
+                          <td key={colIdx} className="px-4 py-3 text-slate-600 whitespace-nowrap">
                             {row[header] || '-'}
                           </td>
                         ))}
@@ -879,9 +933,10 @@ export default function CSVColumnMapper({
                     onDragStart={() => handleColumnDragStart(header)}
                     onDragEnd={() => setDraggedColumn(null)}
                     className={`p-3 border rounded-lg cursor-move transition-colors
-                      ${mappings[header]
-                        ? 'bg-teal-50 border-teal-200'
-                        : 'bg-white border-slate-200 hover:border-slate-300'
+                      ${
+                        mappings[header]
+                          ? 'bg-teal-50 border-teal-200'
+                          : 'bg-white border-slate-200 hover:border-slate-300'
                       }
                       ${draggedColumn === header ? 'opacity-50' : ''}`}
                   >
@@ -913,7 +968,7 @@ export default function CSVColumnMapper({
                             <option value="">{t.selectField}</option>
                             {Object.entries(groupedFields).map(([group, fields]) => (
                               <optgroup key={group} label={getGroupLabel(group)}>
-                                {fields.map(field => (
+                                {fields.map((field) => (
                                   <option
                                     key={field.field}
                                     value={field.field}
@@ -950,10 +1005,10 @@ export default function CSVColumnMapper({
                       {getGroupLabel(group)}
                     </h4>
                     <div className="space-y-1">
-                      {fields.map(field => {
+                      {fields.map((field) => {
                         const isMapped = Object.values(mappings).includes(field.field);
                         const mappedFromColumn = Object.keys(mappings).find(
-                          k => mappings[k] === field.field
+                          (k) => mappings[k] === field.field
                         );
 
                         return (
@@ -962,11 +1017,12 @@ export default function CSVColumnMapper({
                             onDragOver={(e) => e.preventDefault()}
                             onDrop={() => handleFieldDrop(field.field)}
                             className={`p-2 rounded-lg border transition-colors
-                              ${isMapped
-                                ? 'bg-teal-50 border-teal-200'
-                                : field.required
-                                  ? 'bg-amber-50 border-amber-200'
-                                  : 'bg-white border-slate-200'
+                              ${
+                                isMapped
+                                  ? 'bg-teal-50 border-teal-200'
+                                  : field.required
+                                    ? 'bg-amber-50 border-amber-200'
+                                    : 'bg-white border-slate-200'
                               }
                               ${draggedColumn && !isMapped ? 'border-dashed border-teal-400' : ''}`}
                           >
@@ -985,9 +1041,7 @@ export default function CSVColumnMapper({
                                 </span>
                               </div>
                               {isMapped && (
-                                <span className="text-xs text-slate-500">
-                                  {mappedFromColumn}
-                                </span>
+                                <span className="text-xs text-slate-500">{mappedFromColumn}</span>
                               )}
                             </div>
                           </div>
@@ -1010,7 +1064,7 @@ export default function CSVColumnMapper({
               {missingRequiredFields.length > 0 ? (
                 <Alert variant="warning" title={t.missingRequired}>
                   <ul className="list-disc list-inside">
-                    {missingRequiredFields.map(field => (
+                    {missingRequiredFields.map((field) => (
                       <li key={field}>{getFieldLabel(field)}</li>
                     ))}
                   </ul>
@@ -1027,15 +1081,11 @@ export default function CSVColumnMapper({
               {/* Mapping summary */}
               <div className="mt-4 grid grid-cols-2 gap-4">
                 <div className="p-4 bg-teal-50 rounded-lg">
-                  <p className="text-2xl font-bold text-teal-600">
-                    {Object.keys(mappings).length}
-                  </p>
+                  <p className="text-2xl font-bold text-teal-600">{Object.keys(mappings).length}</p>
                   <p className="text-sm text-teal-700">{t.mappedFields}</p>
                 </div>
                 <div className="p-4 bg-slate-50 rounded-lg">
-                  <p className="text-2xl font-bold text-slate-600">
-                    {unmappedColumns.length}
-                  </p>
+                  <p className="text-2xl font-bold text-slate-600">{unmappedColumns.length}</p>
                   <p className="text-sm text-slate-700">{t.unmappedColumns}</p>
                 </div>
               </div>
@@ -1048,11 +1098,7 @@ export default function CSVColumnMapper({
               {t.cancel}
             </Button>
             <div className="flex gap-2">
-              <Button
-                variant="secondary"
-                icon={Eye}
-                onClick={() => setShowPreviewModal(true)}
-              >
+              <Button variant="secondary" icon={Eye} onClick={() => setShowPreviewModal(true)}>
                 {t.previewMapped}
               </Button>
               <Button
@@ -1107,7 +1153,7 @@ export default function CSVColumnMapper({
             </div>
           ) : (
             <div className="space-y-2">
-              {savedTemplates.map(template => (
+              {savedTemplates.map((template) => (
                 <div
                   key={template.id}
                   className="flex items-center justify-between p-3 border border-slate-200 rounded-lg hover:bg-slate-50"
@@ -1156,15 +1202,11 @@ export default function CSVColumnMapper({
                 {/* Summary */}
                 <div className="grid grid-cols-3 gap-4">
                   <div className="p-4 bg-teal-50 rounded-lg text-center">
-                    <p className="text-2xl font-bold text-teal-600">
-                      {validation.valid.length}
-                    </p>
+                    <p className="text-2xl font-bold text-teal-600">{validation.valid.length}</p>
                     <p className="text-sm text-teal-700">{t.parsedRows}</p>
                   </div>
                   <div className="p-4 bg-red-50 rounded-lg text-center">
-                    <p className="text-2xl font-bold text-red-600">
-                      {validation.invalid.length}
-                    </p>
+                    <p className="text-2xl font-bold text-red-600">{validation.invalid.length}</p>
                     <p className="text-sm text-red-700">{t.errors}</p>
                   </div>
                   <div className="p-4 bg-amber-50 rounded-lg text-center">
@@ -1195,8 +1237,13 @@ export default function CSVColumnMapper({
                     <thead className="bg-slate-50 sticky top-0">
                       <tr>
                         <th className="px-3 py-2 text-left font-medium text-slate-700">Row</th>
-                        {PATIENT_FIELDS.filter(f => Object.values(mappings).includes(f.field)).map(f => (
-                          <th key={f.field} className="px-3 py-2 text-left font-medium text-slate-700">
+                        {PATIENT_FIELDS.filter((f) =>
+                          Object.values(mappings).includes(f.field)
+                        ).map((f) => (
+                          <th
+                            key={f.field}
+                            className="px-3 py-2 text-left font-medium text-slate-700"
+                          >
                             {getFieldLabel(f.field)}
                           </th>
                         ))}
@@ -1206,7 +1253,9 @@ export default function CSVColumnMapper({
                       {validation.valid.slice(0, 20).map((patient, idx) => (
                         <tr key={idx} className="hover:bg-slate-50">
                           <td className="px-3 py-2 text-slate-500">{patient._sourceRowIndex}</td>
-                          {PATIENT_FIELDS.filter(f => Object.values(mappings).includes(f.field)).map(f => (
+                          {PATIENT_FIELDS.filter((f) =>
+                            Object.values(mappings).includes(f.field)
+                          ).map((f) => (
                             <td key={f.field} className="px-3 py-2 text-slate-600">
                               {patient[f.field] || '-'}
                             </td>

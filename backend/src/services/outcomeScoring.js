@@ -30,11 +30,17 @@ export function scoreODI(answers) {
   const percentage = Math.round((score / maxScore) * 10000) / 100;
 
   let severity;
-  if (percentage <= 20) severity = 'Minimal disability';
-  else if (percentage <= 40) severity = 'Moderate disability';
-  else if (percentage <= 60) severity = 'Severe disability';
-  else if (percentage <= 80) severity = 'Crippled';
-  else severity = 'Bed-bound';
+  if (percentage <= 20) {
+    severity = 'Minimal disability';
+  } else if (percentage <= 40) {
+    severity = 'Moderate disability';
+  } else if (percentage <= 60) {
+    severity = 'Severe disability';
+  } else if (percentage <= 80) {
+    severity = 'Crippled';
+  } else {
+    severity = 'Bed-bound';
+  }
 
   return { score, maxScore, percentage, severity };
 }
@@ -66,11 +72,17 @@ export function scoreNDI(answers) {
   const percentage = Math.round((score / maxScore) * 10000) / 100;
 
   let severity;
-  if (score <= 4) severity = 'No disability';
-  else if (score <= 14) severity = 'Mild disability';
-  else if (score <= 24) severity = 'Moderate disability';
-  else if (score <= 34) severity = 'Severe disability';
-  else severity = 'Complete disability';
+  if (score <= 4) {
+    severity = 'No disability';
+  } else if (score <= 14) {
+    severity = 'Mild disability';
+  } else if (score <= 24) {
+    severity = 'Moderate disability';
+  } else if (score <= 34) {
+    severity = 'Severe disability';
+  } else {
+    severity = 'Complete disability';
+  }
 
   return { score, maxScore, percentage, severity };
 }
@@ -91,10 +103,15 @@ export function scoreVAS(value) {
   const percentage = score;
 
   let severity;
-  if (score === 0) severity = 'No pain';
-  else if (score <= 30) severity = 'Mild pain';
-  else if (score <= 60) severity = 'Moderate pain';
-  else severity = 'Severe pain';
+  if (score === 0) {
+    severity = 'No pain';
+  } else if (score <= 30) {
+    severity = 'Mild pain';
+  } else if (score <= 60) {
+    severity = 'Moderate pain';
+  } else {
+    severity = 'Severe pain';
+  }
 
   return { score, maxScore, percentage, severity };
 }
@@ -130,10 +147,15 @@ export function scoreDASH(answers) {
   const percentage = score;
 
   let severity;
-  if (score <= 15) severity = 'No difficulty';
-  else if (score <= 40) severity = 'Mild difficulty';
-  else if (score <= 60) severity = 'Moderate difficulty';
-  else severity = 'Severe difficulty';
+  if (score <= 15) {
+    severity = 'No difficulty';
+  } else if (score <= 40) {
+    severity = 'Mild difficulty';
+  } else if (score <= 60) {
+    severity = 'Moderate difficulty';
+  } else {
+    severity = 'Severe difficulty';
+  }
 
   return { score, maxScore, percentage, severity };
 }
@@ -154,10 +176,15 @@ export function scoreNPRS(value) {
   const percentage = (score / maxScore) * 100;
 
   let severity;
-  if (score === 0) severity = 'No pain';
-  else if (score <= 3) severity = 'Mild pain';
-  else if (score <= 6) severity = 'Moderate pain';
-  else severity = 'Severe pain';
+  if (score === 0) {
+    severity = 'No pain';
+  } else if (score <= 3) {
+    severity = 'Mild pain';
+  } else if (score <= 6) {
+    severity = 'Moderate pain';
+  } else {
+    severity = 'Severe pain';
+  }
 
   return { score, maxScore, percentage, severity };
 }

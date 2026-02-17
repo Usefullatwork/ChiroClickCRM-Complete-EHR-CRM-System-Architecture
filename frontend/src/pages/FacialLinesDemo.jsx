@@ -5,13 +5,13 @@
  * trigger points, and nerve zones for facial treatment.
  */
 
-import React, { useState, useCallback } from 'react';
+import _React, { useState, useCallback } from 'react';
 import { Globe, Copy, Info, User, Zap, Activity, Layers } from 'lucide-react';
 import {
   FacialLinesChart,
   FASCIAL_LINES,
   FACIAL_MUSCLES,
-  NERVE_ZONES
+  NERVE_ZONES,
 } from '../components/examination';
 
 export default function FacialLinesDemo() {
@@ -31,7 +31,7 @@ export default function FacialLinesDemo() {
         'Trigeminal nerve distribution zones (V1, V2, V3)',
         'Click points to mark treatment areas',
         'Bilingual support (Norwegian/English)',
-        'Generate clinical narratives'
+        'Generate clinical narratives',
       ],
       fascialLineGuide: 'Fascial Line Quick Reference',
       muscleGuide: 'Key Facial Muscles',
@@ -42,8 +42,8 @@ export default function FacialLinesDemo() {
       conditions: [
         { name: 'TMJ Dysfunction', muscles: ['Masseter', 'Temporalis', 'Medial Pterygoid'] },
         { name: 'Tension Headache', muscles: ['Frontalis', 'Temporalis', 'Corrugator'] },
-        { name: 'Facial Pain/Neuralgia', muscles: ['Trigeminal zones', 'SCM upper'] }
-      ]
+        { name: 'Facial Pain/Neuralgia', muscles: ['Trigeminal zones', 'SCM upper'] },
+      ],
     },
     no: {
       title: 'Ansiktslinjer Kart Demo',
@@ -55,7 +55,7 @@ export default function FacialLinesDemo() {
         'Trigeminus nervedistribusjon (V1, V2, V3)',
         'Klikk punkter for å markere behandlingsområder',
         'Tospråklig støtte (Norsk/Engelsk)',
-        'Generer kliniske narrativer'
+        'Generer kliniske narrativer',
       ],
       fascialLineGuide: 'Fascielinje Hurtigreferanse',
       muscleGuide: 'Viktige Ansiktsmuskler',
@@ -66,9 +66,9 @@ export default function FacialLinesDemo() {
       conditions: [
         { name: 'TMJ Dysfunksjon', muscles: ['Masseter', 'Temporalis', 'Medial Pterygoid'] },
         { name: 'Spenningshodepine', muscles: ['Frontalis', 'Temporalis', 'Corrugator'] },
-        { name: 'Ansiktssmerte/Nevralgi', muscles: ['Trigeminus-soner', 'SCM øvre'] }
-      ]
-    }
+        { name: 'Ansiktssmerte/Nevralgi', muscles: ['Trigeminus-soner', 'SCM øvre'] },
+      ],
+    },
   };
 
   const t = labels[lang];
@@ -88,10 +88,22 @@ export default function FacialLinesDemo() {
   };
 
   // Key fascial lines for quick reference
-  const keyLines = ['superficial_frontal', 'temporal_masseteric', 'nasolabial', 'mandibular', 'supraorbital'];
+  const keyLines = [
+    'superficial_frontal',
+    'temporal_masseteric',
+    'nasolabial',
+    'mandibular',
+    'supraorbital',
+  ];
 
   // Key muscles for quick reference
-  const keyMuscles = ['temporalis', 'masseter', 'frontalis', 'orbicularis_oculi', 'pterygoid_medial'];
+  const keyMuscles = [
+    'temporalis',
+    'masseter',
+    'frontalis',
+    'orbicularis_oculi',
+    'pterygoid_medial',
+  ];
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -113,7 +125,9 @@ export default function FacialLinesDemo() {
               <button
                 onClick={() => setShowInfo(!showInfo)}
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm ${
-                  showInfo ? 'bg-rose-100 text-rose-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  showInfo
+                    ? 'bg-rose-100 text-rose-700'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
                 <Info className="w-4 h-4" />
@@ -160,18 +174,14 @@ export default function FacialLinesDemo() {
                 {t.fascialLineGuide}
               </h3>
               <div className="space-y-2">
-                {keyLines.map(id => {
+                {keyLines.map((id) => {
                   const line = FASCIAL_LINES[id];
-                  if (!line) return null;
+                  if (!line) {
+                    return null;
+                  }
                   return (
-                    <div
-                      key={id}
-                      className="flex items-center gap-2 p-1.5 bg-gray-50 rounded"
-                    >
-                      <span
-                        className="w-6 h-1 rounded"
-                        style={{ backgroundColor: line.color }}
-                      />
+                    <div key={id} className="flex items-center gap-2 p-1.5 bg-gray-50 rounded">
+                      <span className="w-6 h-1 rounded" style={{ backgroundColor: line.color }} />
                       <span className="text-xs text-gray-700">
                         {line[lang]?.name || line.en?.name}
                       </span>
@@ -188,18 +198,14 @@ export default function FacialLinesDemo() {
                 {t.muscleGuide}
               </h3>
               <div className="space-y-2">
-                {keyMuscles.map(id => {
+                {keyMuscles.map((id) => {
                   const m = FACIAL_MUSCLES[id];
-                  if (!m) return null;
+                  if (!m) {
+                    return null;
+                  }
                   return (
-                    <div
-                      key={id}
-                      className="flex items-center gap-2 p-1.5 bg-gray-50 rounded"
-                    >
-                      <span
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: m.color }}
-                      />
+                    <div key={id} className="flex items-center gap-2 p-1.5 bg-gray-50 rounded">
+                      <span className="w-3 h-3 rounded-full" style={{ backgroundColor: m.color }} />
                       <span className="text-xs font-medium text-gray-700">
                         {m[lang]?.name || m.en?.name}
                       </span>
@@ -217,10 +223,7 @@ export default function FacialLinesDemo() {
               </h3>
               <div className="space-y-2">
                 {Object.entries(NERVE_ZONES).map(([id, zone]) => (
-                  <div
-                    key={id}
-                    className="p-2 bg-gray-50 rounded"
-                  >
+                  <div key={id} className="p-2 bg-gray-50 rounded">
                     <div className="flex items-center gap-2">
                       <span
                         className="w-3 h-3 rounded"

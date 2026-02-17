@@ -17,12 +17,12 @@ export const getAllFinancialMetrics = async (organizationId, options = {}) => {
     endDate = null,
     patientId = null,
     encounterId = null,
-    paymentStatus = null
+    paymentStatus = null,
   } = options;
 
   const offset = (page - 1) * limit;
-  let whereConditions = ['f.organization_id = $1'];
-  let params = [organizationId];
+  const whereConditions = ['f.organization_id = $1'];
+  const params = [organizationId];
   let paramIndex = 2;
 
   if (startDate) {
@@ -84,8 +84,8 @@ export const getAllFinancialMetrics = async (organizationId, options = {}) => {
       page,
       limit,
       total,
-      pages: Math.ceil(total / limit)
-    }
+      pages: Math.ceil(total / limit),
+    },
   };
 };
 
@@ -123,7 +123,7 @@ export const createFinancialMetric = async (organizationId, metricData) => {
     payment_method = null,
     payment_status = 'PENDING',
     invoice_number = null,
-    notes = ''
+    notes = '',
   } = metricData;
 
   const result = await query(
@@ -152,7 +152,7 @@ export const createFinancialMetric = async (organizationId, metricData) => {
       payment_method,
       payment_status,
       invoice_number,
-      notes
+      notes,
     ]
   );
 
@@ -164,12 +164,7 @@ export const createFinancialMetric = async (organizationId, metricData) => {
  * Update payment status
  */
 export const updatePaymentStatus = async (organizationId, metricId, updateData) => {
-  const {
-    payment_status,
-    payment_method = null,
-    paid_at = null,
-    notes = null
-  } = updateData;
+  const { payment_status, payment_method = null, paid_at = null, notes = null } = updateData;
 
   const updates = ['payment_status = $3'];
   const params = [metricId, organizationId, payment_status];
@@ -346,7 +341,7 @@ export const generateInvoiceNumber = async (organizationId) => {
  * Record payment for a financial metric
  */
 export const recordPayment = async (organizationId, metricId, paymentData) => {
-  const { amount, payment_method, notes, recorded_by } = paymentData;
+  const { amount, payment_method, notes, _recorded_by } = paymentData;
 
   const result = await query(
     `UPDATE financial_metrics
@@ -416,5 +411,5 @@ export default {
   getOutstandingInvoices,
   getPatientPaymentHistory,
   generateInvoiceNumber,
-  getDailyRevenueChart
+  getDailyRevenueChart,
 };

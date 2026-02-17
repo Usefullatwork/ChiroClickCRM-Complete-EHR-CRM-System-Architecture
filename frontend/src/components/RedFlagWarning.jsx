@@ -4,7 +4,7 @@
  * Critical for patient safety in Norwegian chiropractic practice
  */
 
-import React, { useState, useCallback } from 'react';
+import _React, { useState, useCallback } from 'react';
 
 // Severity level configurations
 const SEVERITY_CONFIG = {
@@ -15,7 +15,7 @@ const SEVERITY_CONFIG = {
     iconBg: 'bg-red-500',
     icon: '🚨',
     label: 'KRITISK',
-    description: 'Krever umiddelbar handling'
+    description: 'Krever umiddelbar handling',
   },
   HIGH: {
     bgColor: 'bg-orange-100',
@@ -24,7 +24,7 @@ const SEVERITY_CONFIG = {
     iconBg: 'bg-orange-500',
     icon: '⚠️',
     label: 'HØY',
-    description: 'Krever vurdering før behandling'
+    description: 'Krever vurdering før behandling',
   },
   MEDIUM: {
     bgColor: 'bg-yellow-100',
@@ -33,7 +33,7 @@ const SEVERITY_CONFIG = {
     iconBg: 'bg-yellow-500',
     icon: '⚡',
     label: 'MODERAT',
-    description: 'Bør vurderes'
+    description: 'Bør vurderes',
   },
   LOW: {
     bgColor: 'bg-blue-50',
@@ -42,8 +42,8 @@ const SEVERITY_CONFIG = {
     iconBg: 'bg-blue-400',
     icon: 'ℹ️',
     label: 'LAV',
-    description: 'Informasjon'
-  }
+    description: 'Informasjon',
+  },
 };
 
 /**
@@ -54,21 +54,17 @@ const RedFlagItem = ({ flag, onAcknowledge }) => {
 
   return (
     <div className={`flex items-start gap-3 p-3 rounded-lg ${config.bgColor}`}>
-      <div className={`flex-shrink-0 w-8 h-8 rounded-full ${config.iconBg} flex items-center justify-center text-white text-sm`}>
+      <div
+        className={`flex-shrink-0 w-8 h-8 rounded-full ${config.iconBg} flex items-center justify-center text-white text-sm`}
+      >
         {config.icon}
       </div>
       <div className="flex-grow min-w-0">
-        <div className={`font-medium ${config.textColor}`}>
-          {flag.description}
-        </div>
+        <div className={`font-medium ${config.textColor}`}>{flag.description}</div>
         {flag.details && (
-          <div className={`text-sm ${config.textColor} opacity-75 mt-1`}>
-            {flag.details}
-          </div>
+          <div className={`text-sm ${config.textColor} opacity-75 mt-1`}>{flag.details}</div>
         )}
-        <div className="text-xs text-gray-500 mt-1">
-          Kategori: {flag.category}
-        </div>
+        <div className="text-xs text-gray-500 mt-1">Kategori: {flag.category}</div>
       </div>
       {onAcknowledge && (
         <button
@@ -86,15 +82,19 @@ const RedFlagItem = ({ flag, onAcknowledge }) => {
  * Red Flag Banner (for top of encounter)
  */
 export const RedFlagBanner = ({ flags, onViewAll, onAcknowledgeAll }) => {
-  if (!flags || flags.length === 0) return null;
+  if (!flags || flags.length === 0) {
+    return null;
+  }
 
-  const criticalCount = flags.filter(f => f.severity === 'CRITICAL').length;
-  const highCount = flags.filter(f => f.severity === 'HIGH').length;
+  const criticalCount = flags.filter((f) => f.severity === 'CRITICAL').length;
+  const highCount = flags.filter((f) => f.severity === 'HIGH').length;
 
   const bannerConfig = criticalCount > 0 ? SEVERITY_CONFIG.CRITICAL : SEVERITY_CONFIG.HIGH;
 
   return (
-    <div className={`${bannerConfig.bgColor} ${bannerConfig.borderColor} border-l-4 p-4 mb-4 rounded-r-lg`}>
+    <div
+      className={`${bannerConfig.bgColor} ${bannerConfig.borderColor} border-l-4 p-4 mb-4 rounded-r-lg`}
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="text-2xl">{bannerConfig.icon}</span>
@@ -140,30 +140,35 @@ export const RedFlagModal = ({
   patientName,
   onClose,
   onAcknowledge,
-  onReferral
+  onReferral,
 }) => {
   const [acknowledgedFlags, setAcknowledgedFlags] = useState(new Set());
   const [referralNotes, setReferralNotes] = useState('');
 
-  const handleAcknowledge = useCallback((flag) => {
-    setAcknowledgedFlags(prev => new Set([...prev, flag.id || flag.description]));
-    if (onAcknowledge) {
-      onAcknowledge(flag);
-    }
-  }, [onAcknowledge]);
+  const handleAcknowledge = useCallback(
+    (flag) => {
+      setAcknowledgedFlags((prev) => new Set([...prev, flag.id || flag.description]));
+      if (onAcknowledge) {
+        onAcknowledge(flag);
+      }
+    },
+    [onAcknowledge]
+  );
 
   const handleAcknowledgeAll = useCallback(() => {
-    const allIds = flags.map(f => f.id || f.description);
+    const allIds = flags.map((f) => f.id || f.description);
     setAcknowledgedFlags(new Set(allIds));
     if (onAcknowledge) {
-      flags.forEach(f => onAcknowledge(f));
+      flags.forEach((f) => onAcknowledge(f));
     }
   }, [flags, onAcknowledge]);
 
-  const hasCritical = flags?.some(f => f.severity === 'CRITICAL');
-  const allAcknowledged = flags?.every(f => acknowledgedFlags.has(f.id || f.description));
+  const hasCritical = flags?.some((f) => f.severity === 'CRITICAL');
+  const allAcknowledged = flags?.every((f) => acknowledgedFlags.has(f.id || f.description));
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -191,18 +196,22 @@ export const RedFlagModal = ({
           {/* Critical warning */}
           {hasCritical && (
             <div className="bg-red-50 border border-red-300 rounded-lg p-4 mb-4">
-              <div className="font-bold text-red-800 mb-2">⚠️ Kritiske funn krever umiddelbar vurdering</div>
+              <div className="font-bold text-red-800 mb-2">
+                ⚠️ Kritiske funn krever umiddelbar vurdering
+              </div>
               <div className="text-sm text-red-700">
-                Følgende symptomer/funn kan indikere alvorlig patologi.
-                Vurder henvisning til spesialist eller akuttmottak.
+                Følgende symptomer/funn kan indikere alvorlig patologi. Vurder henvisning til
+                spesialist eller akuttmottak.
               </div>
             </div>
           )}
 
           {/* Grouped by severity */}
-          {['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map(severity => {
-            const severityFlags = flags?.filter(f => f.severity === severity) || [];
-            if (severityFlags.length === 0) return null;
+          {['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map((severity) => {
+            const severityFlags = flags?.filter((f) => f.severity === severity) || [];
+            if (severityFlags.length === 0) {
+              return null;
+            }
 
             return (
               <div key={severity} className="mb-4">
@@ -305,11 +314,13 @@ export const InlineRedFlagIndicator = ({ flag, onClick }) => {
 /**
  * Red Flag Summary Card (for dashboard)
  */
-export const RedFlagSummaryCard = ({ patientId, patientName, flags, onClick }) => {
-  if (!flags || flags.length === 0) return null;
+export const RedFlagSummaryCard = ({ _patientId, patientName, flags, onClick }) => {
+  if (!flags || flags.length === 0) {
+    return null;
+  }
 
-  const criticalCount = flags.filter(f => f.severity === 'CRITICAL').length;
-  const highCount = flags.filter(f => f.severity === 'HIGH').length;
+  const criticalCount = flags.filter((f) => f.severity === 'CRITICAL').length;
+  const highCount = flags.filter((f) => f.severity === 'HIGH').length;
 
   return (
     <div
@@ -322,7 +333,9 @@ export const RedFlagSummaryCard = ({ patientId, patientName, flags, onClick }) =
         <div>
           <div className="font-medium">{patientName}</div>
           <div className="text-sm text-gray-600">
-            {criticalCount > 0 && <span className="text-red-600 font-medium">{criticalCount} kritisk </span>}
+            {criticalCount > 0 && (
+              <span className="text-red-600 font-medium">{criticalCount} kritisk </span>
+            )}
             {highCount > 0 && <span className="text-orange-600">{highCount} høy </span>}
             <span className="text-gray-500">røde flagg</span>
           </div>
@@ -338,5 +351,5 @@ export default {
   RedFlagModal,
   RedFlagItem,
   InlineRedFlagIndicator,
-  RedFlagSummaryCard
+  RedFlagSummaryCard,
 };

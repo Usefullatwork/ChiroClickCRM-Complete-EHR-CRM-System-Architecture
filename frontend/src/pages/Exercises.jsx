@@ -3,266 +3,278 @@
  * Standalone exercise library management and prescription history
  */
 
-import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { useTranslation } from '../i18n'
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from '../i18n';
 import {
   ArrowLeft,
   Plus,
   Dumbbell,
-  Search,
-  Filter,
-  Grid,
-  List,
+  _Search,
+  _Filter,
+  _Grid,
+  _List,
   Loader2,
   AlertCircle,
-  Play,
-  Edit,
-  Trash2,
+  _Play,
+  _Edit,
+  _Trash2,
   FileText,
-  ChevronDown,
-  Target,
-  Activity,
-  Clock,
+  _ChevronDown,
+  _Target,
+  _Activity,
+  _Clock,
   Check,
-  Upload,
+  _Upload,
   Download,
-  Users,
+  _Users,
   History,
   Mail,
   MessageSquare,
   Eye,
-  X
-} from 'lucide-react'
-import { exercisesApi } from '../api/exercises'
-import ExerciseLibrary from '../components/exercises/ExerciseLibrary'
-import ExercisePrescription from '../components/exercises/ExercisePrescription'
+  X,
+} from 'lucide-react';
+import { exercisesApi } from '../api/exercises';
+import ExerciseLibrary from '../components/exercises/ExerciseLibrary';
+import ExercisePrescription from '../components/exercises/ExercisePrescription';
 
 export default function Exercises() {
-  const { patientId } = useParams()
-  const navigate = useNavigate()
+  const { patientId } = useParams();
+  const navigate = useNavigate();
 
   // View state
-  const [activeTab, setActiveTab] = useState('library') // library, prescriptions, create
-  const { lang: language, setLang: setLanguage } = useTranslation()
+  const [activeTab, setActiveTab] = useState('library'); // library, prescriptions, create
+  const { lang: language, setLang: setLanguage } = useTranslation();
 
   // Data state
-  const [exercises, setExercises] = useState([])
-  const [categories, setCategories] = useState([])
-  const [prescriptions, setPrescriptions] = useState([])
-  const [selectedExercises, setSelectedExercises] = useState([])
+  const [exercises, setExercises] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [selectedExercises, setSelectedExercises] = useState([]);
 
   // UI state
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [sending, setSending] = useState(false)
-  const [error, setError] = useState(null)
-  const [success, setSuccess] = useState(null)
-  const [showCreateModal, setShowCreateModal] = useState(false)
-  const [selectedPrescription, setSelectedPrescription] = useState(null)
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const [_showCreateModal, _setShowCreateModal] = useState(false);
+  const [selectedPrescription, setSelectedPrescription] = useState(null);
 
   // Mock patient data (would come from context in real app)
-  const patient = patientId ? {
-    id: patientId,
-    first_name: 'Demo',
-    last_name: 'Pasient',
-    email: 'demo@example.com',
-    phone: '+4712345678'
-  } : null
+  const patient = patientId
+    ? {
+        id: patientId,
+        first_name: 'Demo',
+        last_name: 'Pasient',
+        email: 'demo@example.com',
+        phone: '+4712345678',
+      }
+    : null;
 
   // Load data on mount
   useEffect(() => {
-    loadData()
-  }, [patientId])
+    loadData();
+  }, [patientId]);
 
   const loadData = async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
       // Load exercises and categories in parallel
       const [exercisesRes, categoriesRes] = await Promise.all([
         exercisesApi.getExercises({ limit: 500 }),
-        exercisesApi.getCategories()
-      ])
+        exercisesApi.getCategories(),
+      ]);
 
-      setExercises(exercisesRes.data || [])
-      setCategories(categoriesRes.data || [])
+      setExercises(exercisesRes.data || []);
+      setCategories(categoriesRes.data || []);
 
       // Load prescriptions if we have a patient
       if (patientId) {
-        const prescriptionsRes = await exercisesApi.getPatientPrescriptions(patientId)
-        setPrescriptions(prescriptionsRes.data || [])
+        const prescriptionsRes = await exercisesApi.getPatientPrescriptions(patientId);
+        setPrescriptions(prescriptionsRes.data || []);
       }
     } catch (err) {
-      console.error('Failed to load exercises:', err)
-      setError(language === 'no' ? 'Kunne ikke laste øvelser' : 'Failed to load exercises')
+      console.error('Failed to load exercises:', err);
+      setError(language === 'no' ? 'Kunne ikke laste øvelser' : 'Failed to load exercises');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Handle exercise selection for prescription
   const handleSelectExercise = (exercise) => {
     const isAlreadySelected = selectedExercises.some(
-      ex => ex.id === exercise.id || ex.exerciseId === exercise.id
-    )
+      (ex) => ex.id === exercise.id || ex.exerciseId === exercise.id
+    );
 
     if (isAlreadySelected) {
-      setSelectedExercises(prev =>
-        prev.filter(ex => ex.id !== exercise.id && ex.exerciseId !== exercise.id)
-      )
+      setSelectedExercises((prev) =>
+        prev.filter((ex) => ex.id !== exercise.id && ex.exerciseId !== exercise.id)
+      );
     } else {
-      setSelectedExercises(prev => [...prev, {
-        ...exercise,
-        exerciseId: exercise.id,
-        sets: exercise.sets_default || 3,
-        reps: exercise.reps_default || 10,
-        holdSeconds: exercise.hold_seconds || 0,
-        frequencyPerDay: exercise.frequency_per_day || 1,
-        frequencyPerWeek: exercise.frequency_per_week || 7
-      }])
+      setSelectedExercises((prev) => [
+        ...prev,
+        {
+          ...exercise,
+          exerciseId: exercise.id,
+          sets: exercise.sets_default || 3,
+          reps: exercise.reps_default || 10,
+          holdSeconds: exercise.hold_seconds || 0,
+          frequencyPerDay: exercise.frequency_per_day || 1,
+          frequencyPerWeek: exercise.frequency_per_week || 7,
+        },
+      ]);
     }
-  }
+  };
 
   // Save prescription
   const handleSavePrescription = async (prescriptionData) => {
     try {
-      setSaving(true)
-      setError(null)
+      setSaving(true);
+      setError(null);
 
       const response = await exercisesApi.createPrescription({
         patientId,
         ...prescriptionData,
-        deliveryMethod: 'portal'
-      })
+        deliveryMethod: 'portal',
+      });
 
-      setSuccess(language === 'no' ? 'Øvelsesprogram lagret!' : 'Exercise program saved!')
-      setTimeout(() => setSuccess(null), 3000)
+      setSuccess(language === 'no' ? 'Øvelsesprogram lagret!' : 'Exercise program saved!');
+      setTimeout(() => setSuccess(null), 3000);
 
       // Refresh prescriptions list
       if (patientId) {
-        const prescriptionsRes = await exercisesApi.getPatientPrescriptions(patientId)
-        setPrescriptions(prescriptionsRes.data || [])
+        const prescriptionsRes = await exercisesApi.getPatientPrescriptions(patientId);
+        setPrescriptions(prescriptionsRes.data || []);
       }
 
       // Reset selection
-      setSelectedExercises([])
-      setActiveTab('prescriptions')
+      setSelectedExercises([]);
+      setActiveTab('prescriptions');
 
-      return response.data
+      return response.data;
     } catch (err) {
-      console.error('Save failed:', err)
-      setError(language === 'no' ? 'Kunne ikke lagre øvelsesprogram' : 'Failed to save program')
-      throw err
+      console.error('Save failed:', err);
+      setError(language === 'no' ? 'Kunne ikke lagre øvelsesprogram' : 'Failed to save program');
+      throw err;
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   // Send email
   const handleSendEmail = async (prescriptionId) => {
     try {
-      setSending(true)
-      setError(null)
-      await exercisesApi.sendEmail(prescriptionId)
-      setSuccess(language === 'no' ? 'E-post sendt!' : 'Email sent!')
-      setTimeout(() => setSuccess(null), 3000)
+      setSending(true);
+      setError(null);
+      await exercisesApi.sendEmail(prescriptionId);
+      setSuccess(language === 'no' ? 'E-post sendt!' : 'Email sent!');
+      setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      console.error('Send email failed:', err)
-      setError(language === 'no' ? 'Kunne ikke sende e-post' : 'Failed to send email')
+      console.error('Send email failed:', err);
+      setError(language === 'no' ? 'Kunne ikke sende e-post' : 'Failed to send email');
     } finally {
-      setSending(false)
+      setSending(false);
     }
-  }
+  };
 
   // Send SMS
   const handleSendSMS = async (prescriptionId) => {
     try {
-      setSending(true)
-      setError(null)
-      await exercisesApi.sendSMS(prescriptionId)
-      setSuccess(language === 'no' ? 'SMS sendt!' : 'SMS sent!')
-      setTimeout(() => setSuccess(null), 3000)
+      setSending(true);
+      setError(null);
+      await exercisesApi.sendSMS(prescriptionId);
+      setSuccess(language === 'no' ? 'SMS sendt!' : 'SMS sent!');
+      setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      console.error('Send SMS failed:', err)
-      setError(language === 'no' ? 'Kunne ikke sende SMS' : 'Failed to send SMS')
+      console.error('Send SMS failed:', err);
+      setError(language === 'no' ? 'Kunne ikke sende SMS' : 'Failed to send SMS');
     } finally {
-      setSending(false)
+      setSending(false);
     }
-  }
+  };
 
   // Download PDF
   const handleDownloadPDF = async (prescriptionId) => {
     try {
-      setSending(true)
-      const blob = await exercisesApi.generatePDF(prescriptionId)
+      setSending(true);
+      const blob = await exercisesApi.generatePDF(prescriptionId);
 
       // Create download link
-      const url = window.URL.createObjectURL(new Blob([blob]))
-      const link = document.createElement('a')
-      link.href = url
-      link.setAttribute('download', `ovelsesprogram_${new Date().toISOString().split('T')[0]}.pdf`)
-      document.body.appendChild(link)
-      link.click()
-      link.remove()
-      window.URL.revokeObjectURL(url)
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `ovelsesprogram_${new Date().toISOString().split('T')[0]}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
 
-      setSuccess(language === 'no' ? 'PDF lastet ned!' : 'PDF downloaded!')
-      setTimeout(() => setSuccess(null), 3000)
+      setSuccess(language === 'no' ? 'PDF lastet ned!' : 'PDF downloaded!');
+      setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      console.error('PDF generation failed:', err)
-      setError(language === 'no' ? 'Kunne ikke generere PDF' : 'Failed to generate PDF')
+      console.error('PDF generation failed:', err);
+      setError(language === 'no' ? 'Kunne ikke generere PDF' : 'Failed to generate PDF');
     } finally {
-      setSending(false)
+      setSending(false);
     }
-  }
+  };
 
   // Seed default exercises
   const handleSeedExercises = async () => {
     try {
-      setLoading(true)
-      await exercisesApi.seedDefaultExercises()
-      setSuccess(language === 'no' ? 'Standard øvelser lagt til!' : 'Default exercises added!')
-      setTimeout(() => setSuccess(null), 3000)
-      await loadData()
+      setLoading(true);
+      await exercisesApi.seedDefaultExercises();
+      setSuccess(language === 'no' ? 'Standard øvelser lagt til!' : 'Default exercises added!');
+      setTimeout(() => setSuccess(null), 3000);
+      await loadData();
     } catch (err) {
-      console.error('Seed failed:', err)
-      setError(language === 'no' ? 'Kunne ikke legge til øvelser' : 'Failed to add exercises')
+      console.error('Seed failed:', err);
+      setError(language === 'no' ? 'Kunne ikke legge til øvelser' : 'Failed to add exercises');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Format date
   const formatDate = (dateStr) => {
-    if (!dateStr) return '-'
+    if (!dateStr) {
+      return '-';
+    }
     return new Date(dateStr).toLocaleDateString('nb-NO', {
       day: 'numeric',
       month: 'short',
-      year: 'numeric'
-    })
-  }
+      year: 'numeric',
+    });
+  };
 
   // Get status color
   const getStatusColor = (status) => {
     switch (status) {
-      case 'active': return 'bg-green-100 text-green-800'
-      case 'completed': return 'bg-blue-100 text-blue-800'
-      case 'paused': return 'bg-yellow-100 text-yellow-800'
-      case 'cancelled': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'active':
+        return 'bg-green-100 text-green-800';
+      case 'completed':
+        return 'bg-blue-100 text-blue-800';
+      case 'paused':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
-  }
+  };
 
   // Get status label
   const getStatusLabel = (status) => {
     const labels = {
       no: { active: 'Aktiv', completed: 'Fullført', paused: 'Pauset', cancelled: 'Avbrutt' },
-      en: { active: 'Active', completed: 'Completed', paused: 'Paused', cancelled: 'Cancelled' }
-    }
-    return labels[language][status] || status
-  }
+      en: { active: 'Active', completed: 'Completed', paused: 'Paused', cancelled: 'Cancelled' },
+    };
+    return labels[language][status] || status;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -453,25 +465,31 @@ export default function Exercises() {
                 <FileText className="w-12 h-12 text-gray-300 mb-3" />
                 <p>{language === 'no' ? 'Ingen programmer opprettet' : 'No programs created'}</p>
                 <p className="text-sm text-gray-400">
-                  {language === 'no' ? 'Velg øvelser fra biblioteket for å opprette et program' : 'Select exercises from the library to create a program'}
+                  {language === 'no'
+                    ? 'Velg øvelser fra biblioteket for å opprette et program'
+                    : 'Select exercises from the library to create a program'}
                 </p>
               </div>
             ) : (
               <div className="divide-y divide-gray-200">
-                {prescriptions.map(prescription => (
+                {prescriptions.map((prescription) => (
                   <div key={prescription.id} className="p-4 hover:bg-gray-50">
                     <div className="flex items-start justify-between">
                       <div>
                         <div className="flex items-center gap-2">
                           <h3 className="font-medium text-gray-900">
-                            {prescription.exercises?.length || 0} {language === 'no' ? 'øvelser' : 'exercises'}
+                            {prescription.exercises?.length || 0}{' '}
+                            {language === 'no' ? 'øvelser' : 'exercises'}
                           </h3>
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(prescription.status)}`}>
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(prescription.status)}`}
+                          >
                             {getStatusLabel(prescription.status)}
                           </span>
                         </div>
                         <p className="text-sm text-gray-500 mt-1">
-                          {language === 'no' ? 'Opprettet' : 'Created'}: {formatDate(prescription.created_at)}
+                          {language === 'no' ? 'Opprettet' : 'Created'}:{' '}
+                          {formatDate(prescription.created_at)}
                         </p>
                         {prescription.patient_instructions && (
                           <p className="text-sm text-gray-600 mt-2 italic">
@@ -519,13 +537,17 @@ export default function Exercises() {
                     {prescription.exercises && prescription.exercises.length > 0 && (
                       <div className="mt-3 flex flex-wrap gap-2">
                         {prescription.exercises.slice(0, 5).map((ex, i) => (
-                          <span key={i} className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-600">
+                          <span
+                            key={i}
+                            className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-600"
+                          >
                             {ex.name_norwegian || ex.name}
                           </span>
                         ))}
                         {prescription.exercises.length > 5 && (
                           <span className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-500">
-                            +{prescription.exercises.length - 5} {language === 'no' ? 'til' : 'more'}
+                            +{prescription.exercises.length - 5}{' '}
+                            {language === 'no' ? 'til' : 'more'}
                           </span>
                         )}
                       </div>
@@ -571,21 +593,29 @@ export default function Exercises() {
       {/* Prescription Detail Modal */}
       {selectedPrescription && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setSelectedPrescription(null)} />
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setSelectedPrescription(null)}
+          />
           <div className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">
                   {language === 'no' ? 'Programdetaljer' : 'Program Details'}
                 </h3>
-                <button onClick={() => setSelectedPrescription(null)} className="p-2 hover:bg-gray-100 rounded-lg">
+                <button
+                  onClick={() => setSelectedPrescription(null)}
+                  className="p-2 hover:bg-gray-100 rounded-lg"
+                >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(selectedPrescription.status)}`}>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(selectedPrescription.status)}`}
+                  >
                     {getStatusLabel(selectedPrescription.status)}
                   </span>
                   <span className="text-sm text-gray-500">
@@ -645,5 +675,5 @@ export default function Exercises() {
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -21,8 +21,8 @@ const ROM_REGIONS = {
       { id: 'lat_flex_left', name: 'Left Lat Flex', nameNo: 'Lateral fleksjon V', normal: 45 },
       { id: 'lat_flex_right', name: 'Right Lat Flex', nameNo: 'Lateral fleksjon H', normal: 45 },
       { id: 'rotation_left', name: 'Left Rotation', nameNo: 'Rotasjon V', normal: 80 },
-      { id: 'rotation_right', name: 'Right Rotation', nameNo: 'Rotasjon H', normal: 80 }
-    ]
+      { id: 'rotation_right', name: 'Right Rotation', nameNo: 'Rotasjon H', normal: 80 },
+    ],
   },
   thoracic: {
     name: 'Thoracic Spine',
@@ -33,8 +33,8 @@ const ROM_REGIONS = {
       { id: 'flexion', name: 'Flexion', nameNo: 'Fleksjon', normal: 40 },
       { id: 'extension', name: 'Extension', nameNo: 'Ekstensjon', normal: 25 },
       { id: 'rotation_left', name: 'Left Rotation', nameNo: 'Rotasjon V', normal: 35 },
-      { id: 'rotation_right', name: 'Right Rotation', nameNo: 'Rotasjon H', normal: 35 }
-    ]
+      { id: 'rotation_right', name: 'Right Rotation', nameNo: 'Rotasjon H', normal: 35 },
+    ],
   },
   lumbar: {
     name: 'Lumbar Spine',
@@ -47,8 +47,8 @@ const ROM_REGIONS = {
       { id: 'lat_flex_left', name: 'Left Lat Flex', nameNo: 'Lateral fleksjon V', normal: 25 },
       { id: 'lat_flex_right', name: 'Right Lat Flex', nameNo: 'Lateral fleksjon H', normal: 25 },
       { id: 'rotation_left', name: 'Left Rotation', nameNo: 'Rotasjon V', normal: 30 },
-      { id: 'rotation_right', name: 'Right Rotation', nameNo: 'Rotasjon H', normal: 30 }
-    ]
+      { id: 'rotation_right', name: 'Right Rotation', nameNo: 'Rotasjon H', normal: 30 },
+    ],
   },
   shoulder_left: {
     name: 'Left Shoulder',
@@ -61,8 +61,13 @@ const ROM_REGIONS = {
       { id: 'abduction', name: 'Abduction', nameNo: 'Abduksjon', normal: 180 },
       { id: 'adduction', name: 'Adduction', nameNo: 'Adduksjon', normal: 50 },
       { id: 'internal_rotation', name: 'Internal Rotation', nameNo: 'Intern rotasjon', normal: 70 },
-      { id: 'external_rotation', name: 'External Rotation', nameNo: 'Ekstern rotasjon', normal: 90 }
-    ]
+      {
+        id: 'external_rotation',
+        name: 'External Rotation',
+        nameNo: 'Ekstern rotasjon',
+        normal: 90,
+      },
+    ],
   },
   shoulder_right: {
     name: 'Right Shoulder',
@@ -75,8 +80,13 @@ const ROM_REGIONS = {
       { id: 'abduction', name: 'Abduction', nameNo: 'Abduksjon', normal: 180 },
       { id: 'adduction', name: 'Adduction', nameNo: 'Adduksjon', normal: 50 },
       { id: 'internal_rotation', name: 'Internal Rotation', nameNo: 'Intern rotasjon', normal: 70 },
-      { id: 'external_rotation', name: 'External Rotation', nameNo: 'Ekstern rotasjon', normal: 90 }
-    ]
+      {
+        id: 'external_rotation',
+        name: 'External Rotation',
+        nameNo: 'Ekstern rotasjon',
+        normal: 90,
+      },
+    ],
   },
   elbow_left: {
     name: 'Left Elbow',
@@ -87,8 +97,8 @@ const ROM_REGIONS = {
       { id: 'flexion', name: 'Flexion', nameNo: 'Fleksjon', normal: 145 },
       { id: 'extension', name: 'Extension', nameNo: 'Ekstensjon', normal: 0 },
       { id: 'pronation', name: 'Pronation', nameNo: 'Pronasjon', normal: 80 },
-      { id: 'supination', name: 'Supination', nameNo: 'Supinasjon', normal: 80 }
-    ]
+      { id: 'supination', name: 'Supination', nameNo: 'Supinasjon', normal: 80 },
+    ],
   },
   elbow_right: {
     name: 'Right Elbow',
@@ -99,8 +109,8 @@ const ROM_REGIONS = {
       { id: 'flexion', name: 'Flexion', nameNo: 'Fleksjon', normal: 145 },
       { id: 'extension', name: 'Extension', nameNo: 'Ekstensjon', normal: 0 },
       { id: 'pronation', name: 'Pronation', nameNo: 'Pronasjon', normal: 80 },
-      { id: 'supination', name: 'Supination', nameNo: 'Supinasjon', normal: 80 }
-    ]
+      { id: 'supination', name: 'Supination', nameNo: 'Supinasjon', normal: 80 },
+    ],
   },
   wrist_left: {
     name: 'Left Wrist',
@@ -111,8 +121,8 @@ const ROM_REGIONS = {
       { id: 'flexion', name: 'Flexion', nameNo: 'Fleksjon', normal: 80 },
       { id: 'extension', name: 'Extension', nameNo: 'Ekstensjon', normal: 70 },
       { id: 'radial_deviation', name: 'Radial Deviation', nameNo: 'Radial deviasjon', normal: 20 },
-      { id: 'ulnar_deviation', name: 'Ulnar Deviation', nameNo: 'Ulnar deviasjon', normal: 30 }
-    ]
+      { id: 'ulnar_deviation', name: 'Ulnar Deviation', nameNo: 'Ulnar deviasjon', normal: 30 },
+    ],
   },
   wrist_right: {
     name: 'Right Wrist',
@@ -123,8 +133,8 @@ const ROM_REGIONS = {
       { id: 'flexion', name: 'Flexion', nameNo: 'Fleksjon', normal: 80 },
       { id: 'extension', name: 'Extension', nameNo: 'Ekstensjon', normal: 70 },
       { id: 'radial_deviation', name: 'Radial Deviation', nameNo: 'Radial deviasjon', normal: 20 },
-      { id: 'ulnar_deviation', name: 'Ulnar Deviation', nameNo: 'Ulnar deviasjon', normal: 30 }
-    ]
+      { id: 'ulnar_deviation', name: 'Ulnar Deviation', nameNo: 'Ulnar deviasjon', normal: 30 },
+    ],
   },
   hip_left: {
     name: 'Left Hip',
@@ -137,8 +147,13 @@ const ROM_REGIONS = {
       { id: 'abduction', name: 'Abduction', nameNo: 'Abduksjon', normal: 45 },
       { id: 'adduction', name: 'Adduction', nameNo: 'Adduksjon', normal: 30 },
       { id: 'internal_rotation', name: 'Internal Rotation', nameNo: 'Intern rotasjon', normal: 35 },
-      { id: 'external_rotation', name: 'External Rotation', nameNo: 'Ekstern rotasjon', normal: 45 }
-    ]
+      {
+        id: 'external_rotation',
+        name: 'External Rotation',
+        nameNo: 'Ekstern rotasjon',
+        normal: 45,
+      },
+    ],
   },
   hip_right: {
     name: 'Right Hip',
@@ -151,8 +166,13 @@ const ROM_REGIONS = {
       { id: 'abduction', name: 'Abduction', nameNo: 'Abduksjon', normal: 45 },
       { id: 'adduction', name: 'Adduction', nameNo: 'Adduksjon', normal: 30 },
       { id: 'internal_rotation', name: 'Internal Rotation', nameNo: 'Intern rotasjon', normal: 35 },
-      { id: 'external_rotation', name: 'External Rotation', nameNo: 'Ekstern rotasjon', normal: 45 }
-    ]
+      {
+        id: 'external_rotation',
+        name: 'External Rotation',
+        nameNo: 'Ekstern rotasjon',
+        normal: 45,
+      },
+    ],
   },
   knee_left: {
     name: 'Left Knee',
@@ -161,8 +181,8 @@ const ROM_REGIONS = {
     position: { top: '62%', left: '40%' },
     movements: [
       { id: 'flexion', name: 'Flexion', nameNo: 'Fleksjon', normal: 135 },
-      { id: 'extension', name: 'Extension', nameNo: 'Ekstensjon', normal: 0 }
-    ]
+      { id: 'extension', name: 'Extension', nameNo: 'Ekstensjon', normal: 0 },
+    ],
   },
   knee_right: {
     name: 'Right Knee',
@@ -171,8 +191,8 @@ const ROM_REGIONS = {
     position: { top: '62%', left: '60%' },
     movements: [
       { id: 'flexion', name: 'Flexion', nameNo: 'Fleksjon', normal: 135 },
-      { id: 'extension', name: 'Extension', nameNo: 'Ekstensjon', normal: 0 }
-    ]
+      { id: 'extension', name: 'Extension', nameNo: 'Ekstensjon', normal: 0 },
+    ],
   },
   ankle_left: {
     name: 'Left Ankle',
@@ -183,8 +203,8 @@ const ROM_REGIONS = {
       { id: 'dorsiflexion', name: 'Dorsiflexion', nameNo: 'Dorsalfleksjon', normal: 20 },
       { id: 'plantarflexion', name: 'Plantarflexion', nameNo: 'Plantarfleksjon', normal: 50 },
       { id: 'inversion', name: 'Inversion', nameNo: 'Inversjon', normal: 35 },
-      { id: 'eversion', name: 'Eversion', nameNo: 'Eversjon', normal: 15 }
-    ]
+      { id: 'eversion', name: 'Eversion', nameNo: 'Eversjon', normal: 15 },
+    ],
   },
   ankle_right: {
     name: 'Right Ankle',
@@ -195,15 +215,15 @@ const ROM_REGIONS = {
       { id: 'dorsiflexion', name: 'Dorsiflexion', nameNo: 'Dorsalfleksjon', normal: 20 },
       { id: 'plantarflexion', name: 'Plantarflexion', nameNo: 'Plantarfleksjon', normal: 50 },
       { id: 'inversion', name: 'Inversion', nameNo: 'Inversjon', normal: 35 },
-      { id: 'eversion', name: 'Eversion', nameNo: 'Eversjon', normal: 15 }
-    ]
-  }
+      { id: 'eversion', name: 'Eversion', nameNo: 'Eversjon', normal: 15 },
+    ],
+  },
 };
 
 /**
  * Visual ROM Arc Slider - Draggable arc/bar for setting ROM angles
  */
-function ROMArcSlider({ value, onChange, normal, readOnly, movementName }) {
+function ROMArcSlider({ value, onChange, normal, readOnly, _movementName }) {
   const [isDragging, setIsDragging] = useState(false);
   const svgRef = React.useRef(null);
 
@@ -212,9 +232,15 @@ function ROMArcSlider({ value, onChange, normal, readOnly, movementName }) {
 
   // Color based on percentage
   const getColor = () => {
-    if (percentage === 0) return { fill: '#e5e7eb', stroke: '#9ca3af', text: '#6b7280' };
-    if (percentage < 70) return { fill: '#fecaca', stroke: '#ef4444', text: '#dc2626' };
-    if (percentage < 90) return { fill: '#fef3c7', stroke: '#f59e0b', text: '#d97706' };
+    if (percentage === 0) {
+      return { fill: '#e5e7eb', stroke: '#9ca3af', text: '#6b7280' };
+    }
+    if (percentage < 70) {
+      return { fill: '#fecaca', stroke: '#ef4444', text: '#dc2626' };
+    }
+    if (percentage < 90) {
+      return { fill: '#fef3c7', stroke: '#f59e0b', text: '#d97706' };
+    }
     return { fill: '#bbf7d0', stroke: '#22c55e', text: '#16a34a' };
   };
 
@@ -238,7 +264,7 @@ function ROMArcSlider({ value, onChange, normal, readOnly, movementName }) {
     const rad = ((180 - angle) * Math.PI) / 180;
     return {
       x: cx + Math.cos(rad) * r,
-      y: cy - Math.sin(rad) * r
+      y: cy - Math.sin(rad) * r,
     };
   };
 
@@ -262,10 +288,14 @@ function ROMArcSlider({ value, onChange, normal, readOnly, movementName }) {
 
   // Handle drag
   const handleMouseMove = (e) => {
-    if (!isDragging || readOnly) return;
+    if (!isDragging || readOnly) {
+      return;
+    }
 
     const svg = svgRef.current;
-    if (!svg) return;
+    if (!svg) {
+      return;
+    }
 
     const rect = svg.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -282,8 +312,12 @@ function ROMArcSlider({ value, onChange, normal, readOnly, movementName }) {
 
     // Convert to 0-180 range (left to right)
     angle = 180 - angle;
-    if (angle < 0) angle = 0;
-    if (angle > 180) angle = 180;
+    if (angle < 0) {
+      angle = 0;
+    }
+    if (angle > 180) {
+      angle = 180;
+    }
 
     // Convert display angle to actual ROM value
     const romValue = Math.round((angle / maxDisplayAngle) * Math.max(normal, 180));
@@ -293,7 +327,9 @@ function ROMArcSlider({ value, onChange, normal, readOnly, movementName }) {
   };
 
   const handleMouseDown = (e) => {
-    if (readOnly) return;
+    if (readOnly) {
+      return;
+    }
     setIsDragging(true);
     handleMouseMove(e);
   };
@@ -387,13 +423,7 @@ function ROMArcSlider({ value, onChange, normal, readOnly, movementName }) {
         </text>
 
         {/* Normal value indicator */}
-        <text
-          x={cx}
-          y={cy + 2}
-          fontSize="7"
-          fill="#9ca3af"
-          textAnchor="middle"
-        >
+        <text x={cx} y={cy + 2} fontSize="7" fill="#9ca3af" textAnchor="middle">
           /{normal}°
         </text>
       </svg>
@@ -404,7 +434,7 @@ function ROMArcSlider({ value, onChange, normal, readOnly, movementName }) {
 /**
  * ROM Input with visual feedback (legacy number input as fallback)
  */
-function ROMInput({ value, onChange, normal, readOnly }) {
+function _ROMInput({ value, onChange, normal, readOnly }) {
   const percentage = value ? (parseInt(value) / normal) * 100 : null;
   const isRestricted = percentage !== null && percentage < 70;
   const isMildlyRestricted = percentage !== null && percentage >= 70 && percentage < 90;
@@ -418,16 +448,20 @@ function ROMInput({ value, onChange, normal, readOnly }) {
         disabled={readOnly}
         className={`w-16 px-2 py-1.5 text-center text-sm border rounded-lg
                    focus:ring-2 focus:ring-teal-500 focus:border-teal-500
-                   ${isRestricted
-                     ? 'border-red-400 bg-red-50 text-red-700'
-                     : isMildlyRestricted
-                       ? 'border-amber-400 bg-amber-50 text-amber-700'
-                       : 'border-gray-300 bg-white'}`}
+                   ${
+                     isRestricted
+                       ? 'border-red-400 bg-red-50 text-red-700'
+                       : isMildlyRestricted
+                         ? 'border-amber-400 bg-amber-50 text-amber-700'
+                         : 'border-gray-300 bg-white'
+                   }`}
         placeholder="—"
       />
       <span className="text-xs text-gray-400">°</span>
       {isRestricted && <AlertTriangle className="w-4 h-4 text-red-500" />}
-      {percentage !== null && percentage >= 90 && <CheckCircle className="w-4 h-4 text-green-500" />}
+      {percentage !== null && percentage >= 90 && (
+        <CheckCircle className="w-4 h-4 text-green-500" />
+      )}
     </div>
   );
 }
@@ -435,7 +469,7 @@ function ROMInput({ value, onChange, normal, readOnly }) {
 /**
  * Single Region ROM Panel
  */
-function RegionROMPanel({ regionId, regionData, values = {}, onChange, onRemove, readOnly }) {
+function RegionROMPanel({ _regionId, regionData, values = {}, onChange, onRemove, readOnly }) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const handleMovementChange = (movementId, field, value) => {
@@ -443,8 +477,8 @@ function RegionROMPanel({ regionId, regionData, values = {}, onChange, onRemove,
       ...values,
       [movementId]: {
         ...(values[movementId] || {}),
-        [field]: value
-      }
+        [field]: value,
+      },
     };
     onChange(newValues);
   };
@@ -455,13 +489,17 @@ function RegionROMPanel({ regionId, regionData, values = {}, onChange, onRemove,
     let restricted = 0;
     let painful = 0;
 
-    regionData.movements.forEach(movement => {
+    regionData.movements.forEach((movement) => {
       const mv = values[movement.id];
       if (mv?.value) {
         measured++;
         const percentage = (parseInt(mv.value) / movement.normal) * 100;
-        if (percentage < 70) restricted++;
-        if (mv.pain) painful++;
+        if (percentage < 70) {
+          restricted++;
+        }
+        if (mv.pain) {
+          painful++;
+        }
       }
     });
 
@@ -480,8 +518,10 @@ function RegionROMPanel({ regionId, regionData, values = {}, onChange, onRemove,
           <span className="text-lg">{regionData.icon}</span>
           <span className="font-medium text-gray-800">{regionData.nameNo}</span>
           {summary.measured > 0 && (
-            <span className={`text-xs px-2 py-0.5 rounded-full
-                           ${summary.restricted > 0 ? 'bg-red-200 text-red-800' : 'bg-green-200 text-green-800'}`}>
+            <span
+              className={`text-xs px-2 py-0.5 rounded-full
+                           ${summary.restricted > 0 ? 'bg-red-200 text-red-800' : 'bg-green-200 text-green-800'}`}
+            >
               {summary.measured} målt{summary.restricted > 0 && `, ${summary.restricted} redusert`}
             </span>
           )}
@@ -489,14 +529,21 @@ function RegionROMPanel({ regionId, regionData, values = {}, onChange, onRemove,
         <div className="flex items-center gap-2">
           {!readOnly && (
             <button
-              onClick={(e) => { e.stopPropagation(); onRemove(); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove();
+              }}
               className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded"
               title="Fjern region"
             >
               <Trash2 className="w-4 h-4" />
             </button>
           )}
-          {isExpanded ? <ChevronUp className="w-5 h-5 text-gray-500" /> : <ChevronDown className="w-5 h-5 text-gray-500" />}
+          {isExpanded ? (
+            <ChevronUp className="w-5 h-5 text-gray-500" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-gray-500" />
+          )}
         </div>
       </div>
 
@@ -513,11 +560,17 @@ function RegionROMPanel({ regionId, regionData, values = {}, onChange, onRemove,
                 <div
                   key={movement.id}
                   className={`p-3 rounded-lg border-2 transition-colors
-                             ${hasPain ? 'border-red-300 bg-red-50' :
-                               percentage > 0 && percentage < 70 ? 'border-red-200 bg-red-50' :
-                               percentage >= 70 && percentage < 90 ? 'border-amber-200 bg-amber-50' :
-                               percentage >= 90 ? 'border-green-200 bg-green-50' :
-                               'border-gray-200 bg-white'}`}
+                             ${
+                               hasPain
+                                 ? 'border-red-300 bg-red-50'
+                                 : percentage > 0 && percentage < 70
+                                   ? 'border-red-200 bg-red-50'
+                                   : percentage >= 70 && percentage < 90
+                                     ? 'border-amber-200 bg-amber-50'
+                                     : percentage >= 90
+                                       ? 'border-green-200 bg-green-50'
+                                       : 'border-gray-200 bg-white'
+                             }`}
                 >
                   {/* Movement name */}
                   <div className="text-xs font-medium text-gray-600 text-center mb-2">
@@ -536,12 +589,16 @@ function RegionROMPanel({ regionId, regionData, values = {}, onChange, onRemove,
                   <div className="flex items-center justify-center gap-1 mt-2">
                     <button
                       type="button"
-                      onClick={() => !readOnly && handleMovementChange(movement.id, 'pain', !mv.pain)}
+                      onClick={() =>
+                        !readOnly && handleMovementChange(movement.id, 'pain', !mv.pain)
+                      }
                       disabled={readOnly}
                       className={`px-2 py-1 text-xs rounded-full transition-colors
-                                 ${mv.pain
-                                   ? 'bg-red-500 text-white'
-                                   : 'bg-gray-100 text-gray-500 hover:bg-red-100'}`}
+                                 ${
+                                   mv.pain
+                                     ? 'bg-red-500 text-white'
+                                     : 'bg-gray-100 text-gray-500 hover:bg-red-100'
+                                 }`}
                     >
                       {mv.pain ? '⚡ Smerte' : '+ Smerte'}
                     </button>
@@ -573,13 +630,33 @@ function BodyDiagram({ selectedRegions, onSelectRegion, availableRegions }) {
         {/* Pelvis */}
         <path d="M25 80 L75 80 L72 100 L28 100 Z" fill="#f3f4f6" stroke="#d1d5db" strokeWidth="1" />
         {/* Left arm */}
-        <path d="M30 35 L20 38 L12 65 L15 80 L20 80 L25 65 L30 45" fill="#f3f4f6" stroke="#d1d5db" strokeWidth="1" />
+        <path
+          d="M30 35 L20 38 L12 65 L15 80 L20 80 L25 65 L30 45"
+          fill="#f3f4f6"
+          stroke="#d1d5db"
+          strokeWidth="1"
+        />
         {/* Right arm */}
-        <path d="M70 35 L80 38 L88 65 L85 80 L80 80 L75 65 L70 45" fill="#f3f4f6" stroke="#d1d5db" strokeWidth="1" />
+        <path
+          d="M70 35 L80 38 L88 65 L85 80 L80 80 L75 65 L70 45"
+          fill="#f3f4f6"
+          stroke="#d1d5db"
+          strokeWidth="1"
+        />
         {/* Left leg */}
-        <path d="M32 100 L38 100 L40 140 L42 175 L35 175 L33 140 L28 100" fill="#f3f4f6" stroke="#d1d5db" strokeWidth="1" />
+        <path
+          d="M32 100 L38 100 L40 140 L42 175 L35 175 L33 140 L28 100"
+          fill="#f3f4f6"
+          stroke="#d1d5db"
+          strokeWidth="1"
+        />
         {/* Right leg */}
-        <path d="M62 100 L68 100 L72 100 L67 140 L65 175 L58 175 L60 140 L62 100" fill="#f3f4f6" stroke="#d1d5db" strokeWidth="1" />
+        <path
+          d="M62 100 L68 100 L72 100 L67 140 L65 175 L58 175 L60 140 L62 100"
+          fill="#f3f4f6"
+          stroke="#d1d5db"
+          strokeWidth="1"
+        />
       </svg>
 
       {/* Clickable region markers */}
@@ -594,11 +671,13 @@ function BodyDiagram({ selectedRegions, onSelectRegion, availableRegions }) {
             disabled={!isAvailable}
             className={`absolute w-6 h-6 rounded-full transform -translate-x-1/2 -translate-y-1/2
                        flex items-center justify-center text-xs font-bold transition-all
-                       ${isSelected
-                         ? 'bg-teal-500 text-white scale-110 ring-2 ring-teal-300'
-                         : isAvailable
-                           ? 'bg-white border-2 border-teal-400 text-teal-600 hover:bg-teal-50 hover:scale-110'
-                           : 'bg-gray-100 border border-gray-300 text-gray-400 cursor-not-allowed'}`}
+                       ${
+                         isSelected
+                           ? 'bg-teal-500 text-white scale-110 ring-2 ring-teal-300'
+                           : isAvailable
+                             ? 'bg-white border-2 border-teal-400 text-teal-600 hover:bg-teal-50 hover:scale-110'
+                             : 'bg-gray-100 border border-gray-300 text-gray-400 cursor-not-allowed'
+                       }`}
             style={{ top: region.position.top, left: region.position.left }}
             title={region.nameNo}
           >
@@ -617,13 +696,13 @@ export default function VisualROMSelector({
   values = {},
   onChange,
   readOnly = false,
-  onGenerateReport
+  onGenerateReport,
 }) {
   const [showBodySelector, setShowBodySelector] = useState(false);
 
   // Get list of selected regions from values
   const selectedRegions = Object.keys(values);
-  const availableRegions = Object.keys(ROM_REGIONS).filter(r => !selectedRegions.includes(r));
+  const _availableRegions = Object.keys(ROM_REGIONS).filter((r) => !selectedRegions.includes(r));
 
   const handleSelectRegion = (regionId) => {
     if (selectedRegions.includes(regionId)) {
@@ -635,7 +714,7 @@ export default function VisualROMSelector({
       // Add region
       onChange({
         ...values,
-        [regionId]: {}
+        [regionId]: {},
       });
     }
   };
@@ -643,7 +722,7 @@ export default function VisualROMSelector({
   const handleRegionChange = (regionId, regionValues) => {
     onChange({
       ...values,
-      [regionId]: regionValues
+      [regionId]: regionValues,
     });
   };
 
@@ -662,10 +741,12 @@ export default function VisualROMSelector({
 
     Object.entries(values).forEach(([regionId, regionValues]) => {
       const region = ROM_REGIONS[regionId];
-      if (!region) return;
+      if (!region) {
+        return;
+      }
 
       const findings = [];
-      region.movements.forEach(movement => {
+      region.movements.forEach((movement) => {
         const mv = regionValues[movement.id];
         if (mv?.value) {
           totalMeasured++;
@@ -693,7 +774,9 @@ export default function VisualROMSelector({
       lines.push('Ingen ROM-målinger registrert.');
     } else {
       lines.push('OPPSUMMERING:');
-      lines.push(`Totalt ${totalMeasured} bevegelser målt, ${totalRestricted} med betydelig reduksjon.`);
+      lines.push(
+        `Totalt ${totalMeasured} bevegelser målt, ${totalRestricted} med betydelig reduksjon.`
+      );
     }
 
     return lines.join('\n');
@@ -707,15 +790,21 @@ export default function VisualROMSelector({
 
     Object.entries(values).forEach(([regionId, regionValues]) => {
       const region = ROM_REGIONS[regionId];
-      if (!region) return;
+      if (!region) {
+        return;
+      }
 
-      region.movements.forEach(movement => {
+      region.movements.forEach((movement) => {
         const mv = regionValues[movement.id];
         if (mv?.value) {
           totalMeasured++;
           const percentage = (parseInt(mv.value) / movement.normal) * 100;
-          if (percentage < 70) totalRestricted++;
-          if (mv.pain) totalPainful++;
+          if (percentage < 70) {
+            totalRestricted++;
+          }
+          if (mv.pain) {
+            totalPainful++;
+          }
         }
       });
     });
@@ -729,9 +818,7 @@ export default function VisualROMSelector({
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-gray-800">Leddutslag (ROM)</h3>
-          <p className="text-sm text-gray-500">
-            Klikk på kroppen for å legge til regioner
-          </p>
+          <p className="text-sm text-gray-500">Klikk på kroppen for å legge til regioner</p>
         </div>
         <div className="flex items-center gap-2">
           {!readOnly && (
@@ -759,9 +846,7 @@ export default function VisualROMSelector({
       {/* Summary stats */}
       {summary.totalMeasured > 0 && (
         <div className="flex items-center gap-4 text-sm">
-          <span className="text-gray-600">
-            {summary.totalMeasured} målinger
-          </span>
+          <span className="text-gray-600">{summary.totalMeasured} målinger</span>
           {summary.totalRestricted > 0 && (
             <span className="text-red-600 flex items-center gap-1">
               <AlertTriangle className="w-4 h-4" />
@@ -769,9 +854,7 @@ export default function VisualROMSelector({
             </span>
           )}
           {summary.totalPainful > 0 && (
-            <span className="text-amber-600">
-              {summary.totalPainful} med smerte
-            </span>
+            <span className="text-amber-600">{summary.totalPainful} med smerte</span>
           )}
         </div>
       )}
@@ -810,9 +893,11 @@ export default function VisualROMSelector({
                       key={regionId}
                       onClick={() => handleSelectRegion(regionId)}
                       className={`text-left px-3 py-2 rounded-lg text-sm transition-colors
-                                ${isSelected
-                                  ? 'bg-teal-100 text-teal-800 border border-teal-300'
-                                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'}`}
+                                ${
+                                  isSelected
+                                    ? 'bg-teal-100 text-teal-800 border border-teal-300'
+                                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'
+                                }`}
                     >
                       <span className="mr-2">{region.icon}</span>
                       {region.nameNo.split(' ')[0]}
@@ -858,9 +943,11 @@ export default function VisualROMSelector({
         </div>
       ) : (
         <div className="space-y-3">
-          {selectedRegions.map(regionId => {
+          {selectedRegions.map((regionId) => {
             const region = ROM_REGIONS[regionId];
-            if (!region) return null;
+            if (!region) {
+              return null;
+            }
             return (
               <RegionROMPanel
                 key={regionId}

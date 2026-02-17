@@ -88,10 +88,13 @@ export function saveSyncConfig(config) {
  * Check if a provider is connected
  */
 export function isProviderConnected(providerId) {
-  const tokenKey = providerId === 'google' ? STORAGE_KEYS.GOOGLE_TOKEN : STORAGE_KEYS.MICROSOFT_TOKEN;
+  const tokenKey =
+    providerId === 'google' ? STORAGE_KEYS.GOOGLE_TOKEN : STORAGE_KEYS.MICROSOFT_TOKEN;
   const token = localStorage.getItem(tokenKey);
 
-  if (!token) return false;
+  if (!token) {
+    return false;
+  }
 
   try {
     const parsed = JSON.parse(token);
@@ -114,7 +117,9 @@ export function isProviderConnected(providerId) {
  */
 export function getOAuthUrl(providerId, clientId, redirectUri) {
   const provider = SYNC_PROVIDERS[providerId.toUpperCase()];
-  if (!provider) throw new Error('Unknown provider');
+  if (!provider) {
+    throw new Error('Unknown provider');
+  }
 
   const state = generateRandomState();
   localStorage.setItem('oauth_state', state);
@@ -137,7 +142,9 @@ export function getOAuthUrl(providerId, clientId, redirectUri) {
  */
 export async function handleOAuthCallback(providerId, code, clientId, clientSecret, redirectUri) {
   const provider = SYNC_PROVIDERS[providerId.toUpperCase()];
-  if (!provider) throw new Error('Unknown provider');
+  if (!provider) {
+    throw new Error('Unknown provider');
+  }
 
   // Exchange code for token
   // In production, this should go through your backend to protect the client secret
@@ -160,7 +167,8 @@ export async function handleOAuthCallback(providerId, code, clientId, clientSecr
   }
 
   // Store token
-  const tokenKey = providerId === 'google' ? STORAGE_KEYS.GOOGLE_TOKEN : STORAGE_KEYS.MICROSOFT_TOKEN;
+  const tokenKey =
+    providerId === 'google' ? STORAGE_KEYS.GOOGLE_TOKEN : STORAGE_KEYS.MICROSOFT_TOKEN;
   const tokenInfo = {
     accessToken: tokenData.access_token,
     refreshToken: tokenData.refresh_token,
@@ -176,7 +184,8 @@ export async function handleOAuthCallback(providerId, code, clientId, clientSecr
  * Disconnect provider
  */
 export function disconnectProvider(providerId) {
-  const tokenKey = providerId === 'google' ? STORAGE_KEYS.GOOGLE_TOKEN : STORAGE_KEYS.MICROSOFT_TOKEN;
+  const tokenKey =
+    providerId === 'google' ? STORAGE_KEYS.GOOGLE_TOKEN : STORAGE_KEYS.MICROSOFT_TOKEN;
   localStorage.removeItem(tokenKey);
 }
 
@@ -189,7 +198,9 @@ export function disconnectProvider(providerId) {
  */
 export async function fetchGoogleContacts() {
   const tokenData = getToken('google');
-  if (!tokenData) throw new Error('Not authenticated with Google');
+  if (!tokenData) {
+    throw new Error('Not authenticated with Google');
+  }
 
   const response = await fetch(
     `${SYNC_PROVIDERS.GOOGLE.apiUrl}/people/me/connections?personFields=names,emailAddresses,phoneNumbers,addresses,birthdays&pageSize=1000`,
@@ -218,16 +229,15 @@ export async function fetchGoogleContacts() {
  */
 export async function fetchMicrosoftContacts() {
   const tokenData = getToken('microsoft');
-  if (!tokenData) throw new Error('Not authenticated with Microsoft');
+  if (!tokenData) {
+    throw new Error('Not authenticated with Microsoft');
+  }
 
-  const response = await fetch(
-    `${SYNC_PROVIDERS.MICROSOFT.apiUrl}/me/contacts?$top=1000`,
-    {
-      headers: {
-        Authorization: `Bearer ${tokenData.accessToken}`,
-      },
-    }
-  );
+  const response = await fetch(`${SYNC_PROVIDERS.MICROSOFT.apiUrl}/me/contacts?$top=1000`, {
+    headers: {
+      Authorization: `Bearer ${tokenData.accessToken}`,
+    },
+  });
 
   if (!response.ok) {
     if (response.status === 401) {
@@ -299,7 +309,9 @@ function parseGoogleContact(contact) {
     city: address.city || '',
     postal_code: address.postalCode || '',
     country: address.country || 'Norway',
-    date_of_birth: birthday ? `${birthday.year}-${String(birthday.month).padStart(2, '0')}-${String(birthday.day).padStart(2, '0')}` : null,
+    date_of_birth: birthday
+      ? `${birthday.year}-${String(birthday.month).padStart(2, '0')}-${String(birthday.day).padStart(2, '0')}`
+      : null,
     raw: contact,
   };
 }
@@ -330,18 +342,20 @@ function parseMicrosoftContact(contact) {
  * Format phone number for import (Norwegian format)
  */
 function formatPhoneForImport(phone) {
-  if (!phone) return '';
+  if (!phone) {
+    return '';
+  }
 
   // Remove all non-digits except +
-  let cleaned = phone.replace(/[^\d+]/g, '');
+  const cleaned = phone.replace(/[^\d+]/g, '');
 
   // Ensure Norwegian country code
   if (cleaned.startsWith('+47')) {
     return cleaned;
   } else if (cleaned.startsWith('47') && cleaned.length === 10) {
-    return '+' + cleaned;
+    return `+${cleaned}`;
   } else if (cleaned.length === 8 && !cleaned.startsWith('+')) {
-    return '+47' + cleaned;
+    return `+47${cleaned}`;
   }
 
   return phone;
@@ -387,7 +401,10 @@ export function findDuplicates(importedContact, existingPatients) {
     if (importedContact.phone && patient.phone) {
       const normalizedImport = importedContact.phone.replace(/\D/g, '');
       const normalizedExisting = patient.phone.replace(/\D/g, '');
-      if (normalizedImport.endsWith(normalizedExisting) || normalizedExisting.endsWith(normalizedImport)) {
+      if (
+        normalizedImport.endsWith(normalizedExisting) ||
+        normalizedExisting.endsWith(normalizedImport)
+      ) {
         score += 50;
       }
     }
@@ -432,7 +449,9 @@ export function parseVCF(vcfContent) {
   const cards = vcfContent.split('END:VCARD');
 
   for (const card of cards) {
-    if (!card.includes('BEGIN:VCARD')) continue;
+    if (!card.includes('BEGIN:VCARD')) {
+      continue;
+    }
 
     const contact = {
       first_name: '',
@@ -501,7 +520,9 @@ export function exportToVCF(contacts) {
     }
 
     if (contact.address || contact.city || contact.postal_code) {
-      lines.push(`ADR:;;${contact.address || ''};${contact.city || ''};;${contact.postal_code || ''};${contact.country || 'Norway'}`);
+      lines.push(
+        `ADR:;;${contact.address || ''};${contact.city || ''};;${contact.postal_code || ''};${contact.country || 'Norway'}`
+      );
     }
 
     if (contact.date_of_birth) {
@@ -524,10 +545,13 @@ export function exportToVCF(contacts) {
  * Get stored token for provider
  */
 function getToken(providerId) {
-  const tokenKey = providerId === 'google' ? STORAGE_KEYS.GOOGLE_TOKEN : STORAGE_KEYS.MICROSOFT_TOKEN;
+  const tokenKey =
+    providerId === 'google' ? STORAGE_KEYS.GOOGLE_TOKEN : STORAGE_KEYS.MICROSOFT_TOKEN;
   const stored = localStorage.getItem(tokenKey);
 
-  if (!stored) return null;
+  if (!stored) {
+    return null;
+  }
 
   try {
     return JSON.parse(stored);

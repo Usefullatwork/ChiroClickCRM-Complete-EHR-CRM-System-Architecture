@@ -11,12 +11,12 @@ import {
   Clock,
   ArrowRight,
   X,
-  Phone,
+  _Phone,
   ChevronDown,
   ChevronUp,
   Bell,
 } from 'lucide-react';
-import { formatDate, formatTime } from '../lib/utils';
+import { _formatDate, _formatTime } from '../lib/utils';
 import { dashboardAPI, appointmentsAPI, followUpsAPI } from '../services/api';
 import {
   useTranslation,
@@ -69,7 +69,7 @@ export default function Dashboard() {
     // Use toast confirmation instead of browser confirm
     toast.promise(
       new Promise((resolve, reject) => {
-        const toastId = toast.info(
+        const _toastId = toast.info(
           `${t('cancelAppointmentConfirm').replace('{name}', patientName)}`,
           {
             action: {

@@ -290,21 +290,39 @@ function mapFindingsToObjective(existingObjective, examData, storedFindings) {
   const objective = { ...existingObjective };
 
   // Merge free-text fields from examData
-  if (examData.observation) objective.observation = examData.observation;
-  if (examData.palpation) objective.palpation = examData.palpation;
-  if (examData.rom) objective.rom = examData.rom;
-  if (examData.ortho_tests) objective.ortho_tests = examData.ortho_tests;
-  if (examData.neuro_tests) objective.neuro_tests = examData.neuro_tests;
-  if (examData.vital_signs) objective.vital_signs = examData.vital_signs;
+  if (examData.observation) {
+    objective.observation = examData.observation;
+  }
+  if (examData.palpation) {
+    objective.palpation = examData.palpation;
+  }
+  if (examData.rom) {
+    objective.rom = examData.rom;
+  }
+  if (examData.ortho_tests) {
+    objective.ortho_tests = examData.ortho_tests;
+  }
+  if (examData.neuro_tests) {
+    objective.neuro_tests = examData.neuro_tests;
+  }
+  if (examData.vital_signs) {
+    objective.vital_signs = examData.vital_signs;
+  }
 
   // Build structured findings summary
   if (storedFindings.length > 0) {
     const findingsSummary = storedFindings
       .map((f) => {
         let text = f.test_name || '';
-        if (f.result) text += `: ${f.result}`;
-        if (f.laterality) text += ` (${f.laterality})`;
-        if (f.findings_text) text += ` - ${f.findings_text}`;
+        if (f.result) {
+          text += `: ${f.result}`;
+        }
+        if (f.laterality) {
+          text += ` (${f.laterality})`;
+        }
+        if (f.findings_text) {
+          text += ` - ${f.findings_text}`;
+        }
         return text;
       })
       .filter(Boolean);
@@ -333,8 +351,12 @@ function mapTreatmentsToPlan(existingPlan, treatmentData) {
     const treatmentDescriptions = treatmentData.treatments
       .map((t) => {
         let desc = t.description || t.code || '';
-        if (t.region) desc += ` (${t.region})`;
-        if (t.notes) desc += ` - ${t.notes}`;
+        if (t.region) {
+          desc += ` (${t.region})`;
+        }
+        if (t.notes) {
+          desc += ` - ${t.notes}`;
+        }
         return desc;
       })
       .filter(Boolean);
@@ -345,10 +367,18 @@ function mapTreatmentsToPlan(existingPlan, treatmentData) {
     ];
   }
 
-  if (treatmentData.exercises) plan.exercises = treatmentData.exercises;
-  if (treatmentData.advice) plan.advice = treatmentData.advice;
-  if (treatmentData.follow_up) plan.follow_up = treatmentData.follow_up;
-  if (treatmentData.referral) plan.referral = treatmentData.referral;
+  if (treatmentData.exercises) {
+    plan.exercises = treatmentData.exercises;
+  }
+  if (treatmentData.advice) {
+    plan.advice = treatmentData.advice;
+  }
+  if (treatmentData.follow_up) {
+    plan.follow_up = treatmentData.follow_up;
+  }
+  if (treatmentData.referral) {
+    plan.referral = treatmentData.referral;
+  }
 
   return plan;
 }
@@ -404,7 +434,7 @@ function generateExamSuggestions(findings, examData) {
  */
 function suggestFollowUp(encounter) {
   const plan = encounter.plan || {};
-  const vasStart = encounter.vas_pain_start;
+  const _vasStart = encounter.vas_pain_start;
   const vasEnd = encounter.vas_pain_end;
 
   // If VAS is still high at end of treatment, recommend follow-up

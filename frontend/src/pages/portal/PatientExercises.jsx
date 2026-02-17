@@ -16,9 +16,9 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import {
   Play,
   Check,
-  X,
+  _X,
   Calendar,
-  Clock,
+  _Clock,
   Download,
   Star,
   ChevronDown,
@@ -65,7 +65,9 @@ const PinEntry = ({ onSubmit, error, isLoading }) => {
   const inputRefs = [React.useRef(), React.useRef(), React.useRef(), React.useRef()];
 
   const handlePinChange = (index, value) => {
-    if (!/^\d*$/.test(value)) return;
+    if (!/^\d*$/.test(value)) {
+      return;
+    }
 
     const newPin = [...pin];
     newPin[index] = value.slice(-1);
@@ -146,14 +148,18 @@ const PinEntry = ({ onSubmit, error, isLoading }) => {
  */
 const ExerciseCard = ({ prescription, onLogCompliance, onRate, todayCompleted }) => {
   const [expanded, setExpanded] = useState(false);
-  const [showRating, setShowRating] = useState(false);
+  const [_showRating, _setShowRating] = useState(false);
   const [painLevel, setPainLevel] = useState(0);
   const [notes, setNotes] = useState('');
 
   const compliancePercent = useMemo(() => {
-    if (!prescription.compliance_log) return 0;
+    if (!prescription.compliance_log) {
+      return 0;
+    }
     const entries = Object.values(prescription.compliance_log);
-    if (entries.length === 0) return 0;
+    if (entries.length === 0) {
+      return 0;
+    }
     const completed = entries.filter((e) => e.completed).length;
     return Math.round((completed / entries.length) * 100);
   }, [prescription.compliance_log]);
@@ -559,10 +565,27 @@ const PatientExercises = () => {
 
   // Check if exercise was completed today
   const isCompletedToday = (prescription) => {
-    if (!prescription.compliance_log) return false;
+    if (!prescription.compliance_log) {
+      return false;
+    }
     const today = new Date().toISOString().split('T')[0];
     return prescription.compliance_log[today]?.completed === true;
   };
+
+  // Calculate stats (hooks must be called before any early returns)
+  const overallCompliance = useMemo(() => {
+    if (prescriptions.length === 0) {
+      return 0;
+    }
+    let total = 0;
+    let completed = 0;
+    prescriptions.forEach((p) => {
+      const entries = Object.values(p.compliance_log || {});
+      total += entries.length;
+      completed += entries.filter((e) => e.completed).length;
+    });
+    return total > 0 ? Math.round((completed / total) * 100) : 0;
+  }, [prescriptions]);
 
   // Show PIN entry if not authenticated
   if (!isAuthenticated && !token) {
@@ -603,17 +626,6 @@ const PatientExercises = () => {
   // Calculate stats
   const totalExercises = prescriptions.length;
   const completedToday = prescriptions.filter(isCompletedToday).length;
-  const overallCompliance = useMemo(() => {
-    if (prescriptions.length === 0) return 0;
-    let total = 0;
-    let completed = 0;
-    prescriptions.forEach((p) => {
-      const entries = Object.values(p.compliance_log || {});
-      total += entries.length;
-      completed += entries.filter((e) => e.completed).length;
-    });
-    return total > 0 ? Math.round((completed / total) * 100) : 0;
-  }, [prescriptions]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">

@@ -5,10 +5,10 @@
  * Template for follow-up consultation / return visit
  */
 
-import React, { useState, useCallback, useEffect, useRef } from 'react'
+import _React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
   User,
-  FileText,
+  _FileText,
   Stethoscope,
   ClipboardCheck,
   Target,
@@ -24,9 +24,9 @@ import {
   Minus,
   Activity,
   CheckCircle,
-  ArrowRight
-} from 'lucide-react'
-import ICD10CodePicker from './ICD10CodePicker'
+  _ArrowRight,
+} from 'lucide-react';
+import ICD10CodePicker from './ICD10CodePicker';
 
 /**
  * FollowUpTemplate Component
@@ -45,78 +45,80 @@ export default function FollowUpTemplate({
   patient,
   onSave,
   onLock,
-  readOnly = false
+  readOnly = false,
 }) {
   // Auto-save timer ref
-  const autoSaveTimerRef = useRef(null)
-  const [lastAutoSave, setLastAutoSave] = useState(null)
-  const [hasChanges, setHasChanges] = useState(false)
+  const autoSaveTimerRef = useRef(null);
+  const [lastAutoSave, setLastAutoSave] = useState(null);
+  const [hasChanges, setHasChanges] = useState(false);
 
   // State for follow-up data
   // Tilstand for oppfolgingsdata
-  const [followUpData, setFollowUpData] = useState(initialData || {
-    // Tidligere konsultasjon referanse / Previous consultation reference
-    previousConsultation: {
-      date: '',
-      treatmentGiven: '',
-      recommendations: ''
-    },
-    // Subjektiv - Fremgang siden sist / Subjective - Progress since last visit
-    subjective: {
-      overallProgress: '', // improved, same, worse
-      progressDescription: '',
-      chiefComplaint: '',
-      currentPainIntensity: 0,
-      comparedToLastVisit: '', // better, same, worse
-      functionalChanges: '',
-      complianceWithExercises: '', // excellent, good, fair, poor
-      complianceNotes: '',
-      newSymptoms: '',
-      sideEffects: '',
-      questionsOrConcerns: ''
-    },
-    // Objektiv - Endringer i funn / Objective - Changes in findings
-    objective: {
-      generalObservation: '',
-      posturalChanges: '',
-      rangeOfMotionChanges: '',
-      palpationFindings: '',
-      neurologicalStatus: '',
-      functionalTests: '',
-      comparisonToPrevious: ''
-    },
-    // Vurdering - Oppdatert status / Assessment - Updated status
-    assessment: {
-      progressAssessment: '', // on_track, slower_than_expected, faster_than_expected, no_progress
-      responseToTreatment: '',
-      diagnosisUpdate: '',
-      clinicalReasoning: '',
-      redFlags: [],
-      prognosis: '',
-      revisedExpectations: ''
-    },
-    // Plan - Videre behandling / Plan - Continued treatment
-    plan: {
-      treatmentToday: '',
-      techniqueModifications: '',
-      updatedExercises: '',
-      patientEducation: '',
-      homeAdvice: '',
-      nextAppointment: '',
-      treatmentPlanAdjustments: '',
-      referrals: '',
-      dischargeConsideration: false,
-      dischargeNotes: ''
-    },
-    // Diagnosekoder / Diagnosis codes
-    icd10_codes: [],
-    icpc_codes: [],
-    // Metadata
-    vas_pain_start: 0,
-    vas_pain_end: 0,
-    duration_minutes: 30,
-    visit_number: 2
-  })
+  const [followUpData, setFollowUpData] = useState(
+    initialData || {
+      // Tidligere konsultasjon referanse / Previous consultation reference
+      previousConsultation: {
+        date: '',
+        treatmentGiven: '',
+        recommendations: '',
+      },
+      // Subjektiv - Fremgang siden sist / Subjective - Progress since last visit
+      subjective: {
+        overallProgress: '', // improved, same, worse
+        progressDescription: '',
+        chiefComplaint: '',
+        currentPainIntensity: 0,
+        comparedToLastVisit: '', // better, same, worse
+        functionalChanges: '',
+        complianceWithExercises: '', // excellent, good, fair, poor
+        complianceNotes: '',
+        newSymptoms: '',
+        sideEffects: '',
+        questionsOrConcerns: '',
+      },
+      // Objektiv - Endringer i funn / Objective - Changes in findings
+      objective: {
+        generalObservation: '',
+        posturalChanges: '',
+        rangeOfMotionChanges: '',
+        palpationFindings: '',
+        neurologicalStatus: '',
+        functionalTests: '',
+        comparisonToPrevious: '',
+      },
+      // Vurdering - Oppdatert status / Assessment - Updated status
+      assessment: {
+        progressAssessment: '', // on_track, slower_than_expected, faster_than_expected, no_progress
+        responseToTreatment: '',
+        diagnosisUpdate: '',
+        clinicalReasoning: '',
+        redFlags: [],
+        prognosis: '',
+        revisedExpectations: '',
+      },
+      // Plan - Videre behandling / Plan - Continued treatment
+      plan: {
+        treatmentToday: '',
+        techniqueModifications: '',
+        updatedExercises: '',
+        patientEducation: '',
+        homeAdvice: '',
+        nextAppointment: '',
+        treatmentPlanAdjustments: '',
+        referrals: '',
+        dischargeConsideration: false,
+        dischargeNotes: '',
+      },
+      // Diagnosekoder / Diagnosis codes
+      icd10_codes: [],
+      icpc_codes: [],
+      // Metadata
+      vas_pain_start: 0,
+      vas_pain_end: 0,
+      duration_minutes: 30,
+      visit_number: 2,
+    }
+  );
 
   const [expandedSections, setExpandedSections] = useState({
     progress: true,
@@ -124,22 +126,24 @@ export default function FollowUpTemplate({
     objective: true,
     assessment: true,
     plan: true,
-    codes: true
-  })
+    codes: true,
+  });
 
-  const [saving, setSaving] = useState(false)
-  const [showCodePicker, setShowCodePicker] = useState(false)
+  const [saving, setSaving] = useState(false);
+  const [showCodePicker, setShowCodePicker] = useState(false);
 
   /**
    * Auto-save effect
    * Auto-lagring effekt
    */
   useEffect(() => {
-    if (!hasChanges || readOnly) return
+    if (!hasChanges || readOnly) {
+      return;
+    }
 
     // Clear existing timer
     if (autoSaveTimerRef.current) {
-      clearTimeout(autoSaveTimerRef.current)
+      clearTimeout(autoSaveTimerRef.current);
     }
 
     // Set new timer for auto-save (30 seconds)
@@ -148,120 +152,138 @@ export default function FollowUpTemplate({
         if (onSave) {
           await onSave({
             ...followUpData,
-            auto_save_data: followUpData
-          })
-          setLastAutoSave(new Date())
-          setHasChanges(false)
+            auto_save_data: followUpData,
+          });
+          setLastAutoSave(new Date());
+          setHasChanges(false);
         }
       } catch (error) {
-        console.error('Auto-save failed:', error)
+        console.error('Auto-save failed:', error);
       }
-    }, 30000)
+    }, 30000);
 
     return () => {
       if (autoSaveTimerRef.current) {
-        clearTimeout(autoSaveTimerRef.current)
+        clearTimeout(autoSaveTimerRef.current);
       }
-    }
-  }, [followUpData, hasChanges, readOnly, onSave])
+    };
+  }, [followUpData, hasChanges, readOnly, onSave]);
 
   /**
    * Toggle section expansion
    * Veksle seksjonsutviding
    */
   const toggleSection = (section) => {
-    setExpandedSections(prev => ({
+    setExpandedSections((prev) => ({
       ...prev,
-      [section]: !prev[section]
-    }))
-  }
+      [section]: !prev[section],
+    }));
+  };
 
   /**
    * Update field with change tracking
    * Oppdater felt med endringsregistrering
    */
-  const updateField = useCallback((section, field, value) => {
-    if (readOnly) return
-    setFollowUpData(prev => ({
-      ...prev,
-      [section]: {
-        ...prev[section],
-        [field]: value
+  const updateField = useCallback(
+    (section, field, value) => {
+      if (readOnly) {
+        return;
       }
-    }))
-    setHasChanges(true)
-  }, [readOnly])
+      setFollowUpData((prev) => ({
+        ...prev,
+        [section]: {
+          ...prev[section],
+          [field]: value,
+        },
+      }));
+      setHasChanges(true);
+    },
+    [readOnly]
+  );
 
   /**
    * Update root level field
    * Oppdater rotnivafeld
    */
-  const updateRootField = useCallback((field, value) => {
-    if (readOnly) return
-    setFollowUpData(prev => ({
-      ...prev,
-      [field]: value
-    }))
-    setHasChanges(true)
-  }, [readOnly])
+  const updateRootField = useCallback(
+    (field, value) => {
+      if (readOnly) {
+        return;
+      }
+      setFollowUpData((prev) => ({
+        ...prev,
+        [field]: value,
+      }));
+      setHasChanges(true);
+    },
+    [readOnly]
+  );
 
   /**
    * Add red flag
    * Legg til rodt flagg
    */
   const addRedFlag = (flag) => {
-    if (readOnly || !flag) return
-    setFollowUpData(prev => ({
+    if (readOnly || !flag) {
+      return;
+    }
+    setFollowUpData((prev) => ({
       ...prev,
       assessment: {
         ...prev.assessment,
-        redFlags: [...(prev.assessment.redFlags || []), flag]
-      }
-    }))
-    setHasChanges(true)
-  }
+        redFlags: [...(prev.assessment.redFlags || []), flag],
+      },
+    }));
+    setHasChanges(true);
+  };
 
   /**
    * Remove red flag
    * Fjern rodt flagg
    */
   const removeRedFlag = (index) => {
-    if (readOnly) return
-    setFollowUpData(prev => ({
+    if (readOnly) {
+      return;
+    }
+    setFollowUpData((prev) => ({
       ...prev,
       assessment: {
         ...prev.assessment,
-        redFlags: prev.assessment.redFlags.filter((_, i) => i !== index)
-      }
-    }))
-    setHasChanges(true)
-  }
+        redFlags: prev.assessment.redFlags.filter((_, i) => i !== index),
+      },
+    }));
+    setHasChanges(true);
+  };
 
   /**
    * Handle ICD-10 code selection
    * Handter ICD-10 kodevalg
    */
   const handleCodeSelect = (code) => {
-    if (readOnly) return
-    setFollowUpData(prev => ({
+    if (readOnly) {
+      return;
+    }
+    setFollowUpData((prev) => ({
       ...prev,
-      icd10_codes: [...(prev.icd10_codes || []), code.code]
-    }))
-    setHasChanges(true)
-  }
+      icd10_codes: [...(prev.icd10_codes || []), code.code],
+    }));
+    setHasChanges(true);
+  };
 
   /**
    * Remove ICD-10 code
    * Fjern ICD-10 kode
    */
   const removeCode = (codeToRemove) => {
-    if (readOnly) return
-    setFollowUpData(prev => ({
+    if (readOnly) {
+      return;
+    }
+    setFollowUpData((prev) => ({
       ...prev,
-      icd10_codes: prev.icd10_codes.filter(code => code !== codeToRemove)
-    }))
-    setHasChanges(true)
-  }
+      icd10_codes: prev.icd10_codes.filter((code) => code !== codeToRemove),
+    }));
+    setHasChanges(true);
+  };
 
   /**
    * Handle save
@@ -269,15 +291,15 @@ export default function FollowUpTemplate({
    */
   const handleSave = async () => {
     try {
-      setSaving(true)
+      setSaving(true);
       if (onSave) {
-        await onSave(followUpData)
-        setHasChanges(false)
+        await onSave(followUpData);
+        setHasChanges(false);
       }
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   /**
    * Handle lock/sign
@@ -285,25 +307,25 @@ export default function FollowUpTemplate({
    */
   const handleLock = async () => {
     if (onLock) {
-      await onLock(followUpData)
+      await onLock(followUpData);
     }
-  }
+  };
 
   /**
    * Get progress indicator
    * Hent fremdriftsindikator
    */
-  const getProgressIcon = (progress) => {
+  const _getProgressIcon = (progress) => {
     switch (progress) {
       case 'improved':
       case 'better':
-        return <TrendingUp className="w-5 h-5 text-green-500" />
+        return <TrendingUp className="w-5 h-5 text-green-500" />;
       case 'worse':
-        return <TrendingDown className="w-5 h-5 text-red-500" />
+        return <TrendingDown className="w-5 h-5 text-red-500" />;
       default:
-        return <Minus className="w-5 h-5 text-yellow-500" />
+        return <Minus className="w-5 h-5 text-yellow-500" />;
     }
-  }
+  };
 
   /**
    * Section component
@@ -327,13 +349,9 @@ export default function FollowUpTemplate({
           <ChevronDown className="w-5 h-5 text-gray-500" />
         )}
       </button>
-      {expandedSections[id] && (
-        <div className="p-4 space-y-4">
-          {children}
-        </div>
-      )}
+      {expandedSections[id] && <div className="p-4 space-y-4">{children}</div>}
     </div>
-  )
+  );
 
   /**
    * Text field component
@@ -351,7 +369,7 @@ export default function FollowUpTemplate({
         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500 resize-none"
       />
     </div>
-  )
+  );
 
   /**
    * Input field component
@@ -369,7 +387,7 @@ export default function FollowUpTemplate({
         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
       />
     </div>
-  )
+  );
 
   /**
    * Progress option button component
@@ -388,7 +406,7 @@ export default function FollowUpTemplate({
       <Icon className="w-4 h-4" />
       {label}
     </button>
-  )
+  );
 
   return (
     <div className="space-y-4">
@@ -408,7 +426,8 @@ export default function FollowUpTemplate({
           {lastAutoSave && (
             <span className="text-xs text-gray-500 flex items-center gap-1">
               <CheckCircle className="w-3 h-3 text-green-500" />
-              Autolagret {lastAutoSave.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}
+              Autolagret{' '}
+              {lastAutoSave.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}
             </span>
           )}
           {hasChanges && !readOnly && (
@@ -442,7 +461,9 @@ export default function FollowUpTemplate({
         <div className="grid grid-cols-3 gap-4">
           {/* Overall Progress */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Generell fremgang</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Generell fremgang
+            </label>
             <div className="flex gap-2">
               <ProgressButton
                 value="improved"
@@ -482,8 +503,8 @@ export default function FollowUpTemplate({
               max="10"
               value={followUpData.subjective.currentPainIntensity || 0}
               onChange={(e) => {
-                updateField('subjective', 'currentPainIntensity', parseInt(e.target.value))
-                updateRootField('vas_pain_start', parseInt(e.target.value))
+                updateField('subjective', 'currentPainIntensity', parseInt(e.target.value));
+                updateRootField('vas_pain_start', parseInt(e.target.value));
               }}
               disabled={readOnly}
               className="w-full"
@@ -546,12 +567,14 @@ export default function FollowUpTemplate({
                     : 'bg-white border-gray-300 text-gray-600 hover:border-gray-400'
                 }`}
               >
-                {{
-                  excellent: 'Utmerket',
-                  good: 'God',
-                  fair: 'Moderat',
-                  poor: 'Darlig'
-                }[level]}
+                {
+                  {
+                    excellent: 'Utmerket',
+                    good: 'God',
+                    fair: 'Moderat',
+                    poor: 'Darlig',
+                  }[level]
+                }
               </button>
             ))}
           </div>
@@ -633,7 +656,12 @@ export default function FollowUpTemplate({
       </Section>
 
       {/* Assessment Section / Vurderingsseksjon */}
-      <Section id="assessment" title="Vurdering - Oppdatert status" icon={ClipboardCheck} color="purple">
+      <Section
+        id="assessment"
+        title="Vurdering - Oppdatert status"
+        icon={ClipboardCheck}
+        color="purple"
+      >
         {/* Progress Assessment */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Fremgangsvurdering</label>
@@ -642,7 +670,7 @@ export default function FollowUpTemplate({
               { value: 'on_track', label: 'Pa sporet', color: 'green' },
               { value: 'faster_than_expected', label: 'Raskere enn forventet', color: 'blue' },
               { value: 'slower_than_expected', label: 'Tregere enn forventet', color: 'yellow' },
-              { value: 'no_progress', label: 'Ingen fremgang', color: 'red' }
+              { value: 'no_progress', label: 'Ingen fremgang', color: 'red' },
             ].map(({ value, label, color }) => (
               <button
                 key={value}
@@ -683,12 +711,13 @@ export default function FollowUpTemplate({
 
         {/* Red Flags / Rode flagg */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Rode flagg
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Rode flagg</label>
           <div className="space-y-2">
             {(followUpData.assessment.redFlags || []).map((flag, index) => (
-              <div key={index} className="flex items-center gap-2 p-2 bg-red-50 border border-red-200 rounded-lg">
+              <div
+                key={index}
+                className="flex items-center gap-2 p-2 bg-red-50 border border-red-200 rounded-lg"
+              >
                 <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
                 <span className="flex-1 text-sm text-red-700">{flag}</span>
                 {!readOnly && (
@@ -704,8 +733,10 @@ export default function FollowUpTemplate({
             {!readOnly && (
               <button
                 onClick={() => {
-                  const flag = prompt('Legg til rodt flagg:')
-                  if (flag) addRedFlag(flag)
+                  const flag = prompt('Legg til rodt flagg:');
+                  if (flag) {
+                    addRedFlag(flag);
+                  }
                 }}
                 className="flex items-center gap-2 text-sm text-red-600 hover:text-red-700"
               >
@@ -759,10 +790,7 @@ export default function FollowUpTemplate({
                 >
                   {code}
                   {!readOnly && (
-                    <button
-                      onClick={() => removeCode(code)}
-                      className="ml-1 hover:text-blue-600"
-                    >
+                    <button onClick={() => removeCode(code)} className="ml-1 hover:text-blue-600">
                       <X className="w-3 h-3" />
                     </button>
                   )}
@@ -896,7 +924,7 @@ export default function FollowUpTemplate({
         />
       )}
     </div>
-  )
+  );
 }
 
 // X icon component for removing codes
@@ -904,4 +932,4 @@ const X = ({ className }) => (
   <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
   </svg>
-)
+);

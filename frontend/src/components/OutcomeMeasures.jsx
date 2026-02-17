@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import _React, { useState, useEffect } from 'react';
 
 /**
  * Outcome Measures Tracking Component
  * Standardized patient-reported outcome measures for tracking clinical progress
  * Includes: Oswestry (ODI), Neck Disability Index (NDI), PSFS, NPRS, EQ-5D
  */
-const OutcomeMeasures = ({ patientId, onSave }) => {
+const OutcomeMeasures = ({ _patientId, onSave }) => {
   const [activeScale, setActiveScale] = useState('oswestry');
   const [responses, setResponses] = useState({});
   const [score, setScore] = useState(null);
@@ -22,8 +22,8 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
         { value: 2, label: 'The pain is moderate at the moment' },
         { value: 3, label: 'The pain is fairly severe at the moment' },
         { value: 4, label: 'The pain is very severe at the moment' },
-        { value: 5, label: 'The pain is the worst imaginable at the moment' }
-      ]
+        { value: 5, label: 'The pain is the worst imaginable at the moment' },
+      ],
     },
     {
       id: 'personal_care',
@@ -34,8 +34,8 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
         { value: 2, label: 'It is painful to look after myself and I am slow and careful' },
         { value: 3, label: 'I need some help but manage most of my personal care' },
         { value: 4, label: 'I need help every day in most aspects of self-care' },
-        { value: 5, label: 'I do not get dressed, wash with difficulty, and stay in bed' }
-      ]
+        { value: 5, label: 'I do not get dressed, wash with difficulty, and stay in bed' },
+      ],
     },
     {
       id: 'lifting',
@@ -43,11 +43,19 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
       options: [
         { value: 0, label: 'I can lift heavy weights without extra pain' },
         { value: 1, label: 'I can lift heavy weights but it gives extra pain' },
-        { value: 2, label: 'Pain prevents me from lifting heavy weights off the floor, but I can manage if they are conveniently positioned' },
-        { value: 3, label: 'Pain prevents me from lifting heavy weights but I can manage light to medium weights if they are conveniently positioned' },
+        {
+          value: 2,
+          label:
+            'Pain prevents me from lifting heavy weights off the floor, but I can manage if they are conveniently positioned',
+        },
+        {
+          value: 3,
+          label:
+            'Pain prevents me from lifting heavy weights but I can manage light to medium weights if they are conveniently positioned',
+        },
         { value: 4, label: 'I can lift only very light weights' },
-        { value: 5, label: 'I cannot lift or carry anything at all' }
-      ]
+        { value: 5, label: 'I cannot lift or carry anything at all' },
+      ],
     },
     {
       id: 'walking',
@@ -58,8 +66,8 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
         { value: 2, label: 'Pain prevents me walking more than ½ mile' },
         { value: 3, label: 'Pain prevents me walking more than ¼ mile' },
         { value: 4, label: 'I can only walk using a stick or crutches' },
-        { value: 5, label: 'I am in bed most of the time and have to crawl to the toilet' }
-      ]
+        { value: 5, label: 'I am in bed most of the time and have to crawl to the toilet' },
+      ],
     },
     {
       id: 'sitting',
@@ -70,8 +78,8 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
         { value: 2, label: 'Pain prevents me sitting more than 1 hour' },
         { value: 3, label: 'Pain prevents me sitting more than ½ hour' },
         { value: 4, label: 'Pain prevents me sitting more than 10 minutes' },
-        { value: 5, label: 'Pain prevents me from sitting at all' }
-      ]
+        { value: 5, label: 'Pain prevents me from sitting at all' },
+      ],
     },
     {
       id: 'standing',
@@ -82,8 +90,8 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
         { value: 2, label: 'Pain prevents me from standing for more than 1 hour' },
         { value: 3, label: 'Pain prevents me from standing for more than ½ hour' },
         { value: 4, label: 'Pain prevents me from standing for more than 10 minutes' },
-        { value: 5, label: 'Pain prevents me from standing at all' }
-      ]
+        { value: 5, label: 'Pain prevents me from standing at all' },
+      ],
     },
     {
       id: 'sleeping',
@@ -94,8 +102,8 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
         { value: 2, label: 'Because of pain I have less than 6 hours sleep' },
         { value: 3, label: 'Because of pain I have less than 4 hours sleep' },
         { value: 4, label: 'Because of pain I have less than 2 hours sleep' },
-        { value: 5, label: 'Pain prevents me from sleeping at all' }
-      ]
+        { value: 5, label: 'Pain prevents me from sleeping at all' },
+      ],
     },
     {
       id: 'social_life',
@@ -103,11 +111,15 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
       options: [
         { value: 0, label: 'My social life is normal and gives me no extra pain' },
         { value: 1, label: 'My social life is normal but increases the degree of pain' },
-        { value: 2, label: 'Pain has no significant effect on my social life apart from limiting energetic interests' },
+        {
+          value: 2,
+          label:
+            'Pain has no significant effect on my social life apart from limiting energetic interests',
+        },
         { value: 3, label: 'Pain has restricted my social life and I do not go out as often' },
         { value: 4, label: 'Pain has restricted social life to my home' },
-        { value: 5, label: 'I have no social life because of pain' }
-      ]
+        { value: 5, label: 'I have no social life because of pain' },
+      ],
     },
     {
       id: 'traveling',
@@ -118,21 +130,29 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
         { value: 2, label: 'Pain is bad but I manage journeys over 2 hours' },
         { value: 3, label: 'Pain restricts me to journeys of less than 1 hour' },
         { value: 4, label: 'Pain restricts me to short necessary journeys under 30 minutes' },
-        { value: 5, label: 'Pain prevents me from traveling except to receive treatment' }
-      ]
+        { value: 5, label: 'Pain prevents me from traveling except to receive treatment' },
+      ],
     },
     {
       id: 'employment',
       question: '10. Employment/Homemaking',
       options: [
         { value: 0, label: 'My normal homemaking/job activities do not cause pain' },
-        { value: 1, label: 'My normal homemaking/job activities increase my pain, but I can still perform all that is required of me' },
-        { value: 2, label: 'I can perform most of my homemaking/job duties, but pain prevents me from performing more physically stressful activities' },
+        {
+          value: 1,
+          label:
+            'My normal homemaking/job activities increase my pain, but I can still perform all that is required of me',
+        },
+        {
+          value: 2,
+          label:
+            'I can perform most of my homemaking/job duties, but pain prevents me from performing more physically stressful activities',
+        },
         { value: 3, label: 'Pain prevents me from doing anything but light duties' },
         { value: 4, label: 'Pain prevents me from doing even light duties' },
-        { value: 5, label: 'Pain prevents me from performing any job or homemaking chores' }
-      ]
-    }
+        { value: 5, label: 'Pain prevents me from performing any job or homemaking chores' },
+      ],
+    },
   ];
 
   // Neck Disability Index (NDI) - Neck Pain
@@ -146,8 +166,8 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
         { value: 2, label: 'The pain is moderate at the moment' },
         { value: 3, label: 'The pain is fairly severe at the moment' },
         { value: 4, label: 'The pain is very severe at the moment' },
-        { value: 5, label: 'The pain is the worst imaginable at the moment' }
-      ]
+        { value: 5, label: 'The pain is the worst imaginable at the moment' },
+      ],
     },
     {
       id: 'personal_care',
@@ -158,8 +178,8 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
         { value: 2, label: 'It is painful to look after myself and I am slow and careful' },
         { value: 3, label: 'I need some help but manage most of my personal care' },
         { value: 4, label: 'I need help every day in most aspects of self-care' },
-        { value: 5, label: 'I do not get dressed, wash with difficulty, and stay in bed' }
-      ]
+        { value: 5, label: 'I do not get dressed, wash with difficulty, and stay in bed' },
+      ],
     },
     {
       id: 'lifting',
@@ -167,11 +187,19 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
       options: [
         { value: 0, label: 'I can lift heavy weights without extra pain' },
         { value: 1, label: 'I can lift heavy weights but it gives extra pain' },
-        { value: 2, label: 'Pain prevents me from lifting heavy weights off the floor, but I can manage if they are conveniently positioned' },
-        { value: 3, label: 'Pain prevents me from lifting heavy weights but I can manage light to medium weights if they are conveniently positioned' },
+        {
+          value: 2,
+          label:
+            'Pain prevents me from lifting heavy weights off the floor, but I can manage if they are conveniently positioned',
+        },
+        {
+          value: 3,
+          label:
+            'Pain prevents me from lifting heavy weights but I can manage light to medium weights if they are conveniently positioned',
+        },
         { value: 4, label: 'I can lift only very light weights' },
-        { value: 5, label: 'I cannot lift or carry anything at all' }
-      ]
+        { value: 5, label: 'I cannot lift or carry anything at all' },
+      ],
     },
     {
       id: 'reading',
@@ -182,8 +210,8 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
         { value: 2, label: 'I can read as much as I want with moderate pain in my neck' },
         { value: 3, label: 'I cannot read as much as I want because of moderate pain in my neck' },
         { value: 4, label: 'I cannot read as much as I want because of severe pain in my neck' },
-        { value: 5, label: 'I cannot read at all because of pain in my neck' }
-      ]
+        { value: 5, label: 'I cannot read at all because of pain in my neck' },
+      ],
     },
     {
       id: 'headaches',
@@ -194,8 +222,8 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
         { value: 2, label: 'I have moderate headaches which come infrequently' },
         { value: 3, label: 'I have moderate headaches which come frequently' },
         { value: 4, label: 'I have severe headaches which come frequently' },
-        { value: 5, label: 'I have headaches almost all the time' }
-      ]
+        { value: 5, label: 'I have headaches almost all the time' },
+      ],
     },
     {
       id: 'concentration',
@@ -206,8 +234,8 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
         { value: 2, label: 'I have a fair degree of difficulty concentrating when I want' },
         { value: 3, label: 'I have a lot of difficulty concentrating when I want' },
         { value: 4, label: 'I have a great deal of difficulty concentrating when I want' },
-        { value: 5, label: 'I cannot concentrate at all' }
-      ]
+        { value: 5, label: 'I cannot concentrate at all' },
+      ],
     },
     {
       id: 'work',
@@ -218,8 +246,8 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
         { value: 2, label: 'I can only do most of my usual work but no more' },
         { value: 3, label: 'I cannot do my usual work' },
         { value: 4, label: 'I can hardly do any work at all' },
-        { value: 5, label: 'I cannot do any work at all' }
-      ]
+        { value: 5, label: 'I cannot do any work at all' },
+      ],
     },
     {
       id: 'driving',
@@ -228,10 +256,13 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
         { value: 0, label: 'I can drive my car without any neck pain' },
         { value: 1, label: 'I can drive my car as long as I want with slight neck pain' },
         { value: 2, label: 'I can drive my car as long as I want with moderate neck pain' },
-        { value: 3, label: 'I cannot drive my car as long as I want because of moderate neck pain' },
+        {
+          value: 3,
+          label: 'I cannot drive my car as long as I want because of moderate neck pain',
+        },
         { value: 4, label: 'I can hardly drive at all because of severe neck pain' },
-        { value: 5, label: 'I cannot drive my car at all because of neck pain' }
-      ]
+        { value: 5, label: 'I cannot drive my car at all because of neck pain' },
+      ],
     },
     {
       id: 'sleeping',
@@ -242,21 +273,35 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
         { value: 2, label: 'My sleep is mildly disturbed (1-2 hours sleepless)' },
         { value: 3, label: 'My sleep is moderately disturbed (2-3 hours sleepless)' },
         { value: 4, label: 'My sleep is greatly disturbed (3-5 hours sleepless)' },
-        { value: 5, label: 'My sleep is completely disturbed (5-7 hours sleepless)' }
-      ]
+        { value: 5, label: 'My sleep is completely disturbed (5-7 hours sleepless)' },
+      ],
     },
     {
       id: 'recreation',
       question: '10. Recreation',
       options: [
-        { value: 0, label: 'I am able to engage in all my recreation activities without neck pain' },
-        { value: 1, label: 'I am able to engage in all my usual recreation activities with some neck pain' },
-        { value: 2, label: 'I am able to engage in most but not all my usual recreation activities because of neck pain' },
-        { value: 3, label: 'I am only able to engage in a few of my usual recreation activities because of neck pain' },
+        {
+          value: 0,
+          label: 'I am able to engage in all my recreation activities without neck pain',
+        },
+        {
+          value: 1,
+          label: 'I am able to engage in all my usual recreation activities with some neck pain',
+        },
+        {
+          value: 2,
+          label:
+            'I am able to engage in most but not all my usual recreation activities because of neck pain',
+        },
+        {
+          value: 3,
+          label:
+            'I am only able to engage in a few of my usual recreation activities because of neck pain',
+        },
         { value: 4, label: 'I can hardly do any recreation activities because of neck pain' },
-        { value: 5, label: 'I cannot do any recreation activities at all' }
-      ]
-    }
+        { value: 5, label: 'I cannot do any recreation activities at all' },
+      ],
+    },
   ];
 
   const calculateScore = () => {
@@ -270,15 +315,20 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
     // Interpretation
     let interp = '';
     if (percentage <= 20) {
-      interp = 'Minimal Disability: Patient can cope with most activities of daily living. No treatment may be indicated except for suggestions on lifting, posture, diet, and exercise.';
+      interp =
+        'Minimal Disability: Patient can cope with most activities of daily living. No treatment may be indicated except for suggestions on lifting, posture, diet, and exercise.';
     } else if (percentage <= 40) {
-      interp = 'Moderate Disability: Patient experiences more pain and difficulty sitting, lifting, and standing. Travel and social life are more difficult. Patient may be disabled from work. Treatment should be considered.';
+      interp =
+        'Moderate Disability: Patient experiences more pain and difficulty sitting, lifting, and standing. Travel and social life are more difficult. Patient may be disabled from work. Treatment should be considered.';
     } else if (percentage <= 60) {
-      interp = 'Severe Disability: Pain remains the main problem, but activities of daily living are also affected. These patients require detailed investigation.';
+      interp =
+        'Severe Disability: Pain remains the main problem, but activities of daily living are also affected. These patients require detailed investigation.';
     } else if (percentage <= 80) {
-      interp = 'Crippled: Back or neck pain impinges on all aspects of the patient\'s life. Positive intervention is required.';
+      interp =
+        "Crippled: Back or neck pain impinges on all aspects of the patient's life. Positive intervention is required.";
     } else {
-      interp = 'Bed-bound or Exaggerating: Patient is either bed-bound or exaggerating symptoms. Careful assessment is needed.';
+      interp =
+        'Bed-bound or Exaggerating: Patient is either bed-bound or exaggerating symptoms. Careful assessment is needed.';
     }
 
     setInterpretation(interp);
@@ -290,7 +340,7 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
         score: percentage,
         responses: responses,
         interpretation: interp,
-        date: new Date().toISOString()
+        date: new Date().toISOString(),
       });
     }
   };
@@ -304,17 +354,17 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
   const handleResponse = (questionId, value) => {
     setResponses({
       ...responses,
-      [questionId]: value
+      [questionId]: value,
     });
   };
 
   const renderQuestions = (questions) => (
     <div className="questions-container">
-      {questions.map((q, idx) => (
+      {questions.map((q, _idx) => (
         <div key={q.id} className="question-block">
           <h4 className="question-text">{q.question}</h4>
           <div className="options-list">
-            {q.options.map(opt => (
+            {q.options.map((opt) => (
               <label key={opt.value} className="option-label">
                 <input
                   type="radio"
@@ -512,13 +562,21 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
       <div className="scale-selector">
         <button
           className={`scale-btn ${activeScale === 'oswestry' ? 'active' : ''}`}
-          onClick={() => { setActiveScale('oswestry'); setResponses({}); setScore(null); }}
+          onClick={() => {
+            setActiveScale('oswestry');
+            setResponses({});
+            setScore(null);
+          }}
         >
           Oswestry (ODI) - Low Back
         </button>
         <button
           className={`scale-btn ${activeScale === 'ndi' ? 'active' : ''}`}
-          onClick={() => { setActiveScale('ndi'); setResponses({}); setScore(null); }}
+          onClick={() => {
+            setActiveScale('ndi');
+            setResponses({});
+            setScore(null);
+          }}
         >
           Neck Disability Index (NDI)
         </button>
@@ -529,8 +587,8 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
           <h3>Oswestry Disability Index (ODI)</h3>
           <p>
             The ODI is a validated questionnaire for assessing disability related to low back pain.
-            It measures the impact of back pain on daily activities and quality of life.
-            Scores range from 0-100%, with higher scores indicating greater disability.
+            It measures the impact of back pain on daily activities and quality of life. Scores
+            range from 0-100%, with higher scores indicating greater disability.
           </p>
         </div>
       )}
@@ -539,9 +597,9 @@ const OutcomeMeasures = ({ patientId, onSave }) => {
         <div className="scale-description">
           <h3>Neck Disability Index (NDI)</h3>
           <p>
-            The NDI is a validated questionnaire for assessing disability related to neck pain.
-            It evaluates how neck pain affects daily activities, work, and quality of life.
-            Scores range from 0-100%, with higher scores indicating greater disability.
+            The NDI is a validated questionnaire for assessing disability related to neck pain. It
+            evaluates how neck pain affects daily activities, work, and quality of life. Scores
+            range from 0-100%, with higher scores indicating greater disability.
           </p>
         </div>
       )}

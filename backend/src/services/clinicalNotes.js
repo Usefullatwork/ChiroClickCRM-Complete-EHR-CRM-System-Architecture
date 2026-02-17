@@ -3,7 +3,7 @@
  * Business logic for SOAP documentation and clinical note management
  */
 
-import { query, transaction } from '../config/database.js';
+import { query, _transaction } from '../config/database.js';
 import logger from '../utils/logger.js';
 import { BusinessLogicError } from '../utils/errors.js';
 import { validate as validateNote } from './noteValidator.js';
@@ -526,26 +526,49 @@ export const generateFormattedNote = async (organizationId, noteId) => {
 
     // Subjective
     formattedNote += `SUBJEKTIVT (S):\n`;
-    if (subjective.chief_complaint) formattedNote += `Hovedplage: ${subjective.chief_complaint}\n`;
-    if (subjective.history) formattedNote += `Anamnese: ${subjective.history}\n`;
-    if (subjective.onset) formattedNote += `Debut: ${subjective.onset}\n`;
-    if (subjective.pain_description)
+    if (subjective.chief_complaint) {
+      formattedNote += `Hovedplage: ${subjective.chief_complaint}\n`;
+    }
+    if (subjective.history) {
+      formattedNote += `Anamnese: ${subjective.history}\n`;
+    }
+    if (subjective.onset) {
+      formattedNote += `Debut: ${subjective.onset}\n`;
+    }
+    if (subjective.pain_description) {
       formattedNote += `Smertebeskrivelse: ${subjective.pain_description}\n`;
-    if (subjective.aggravating_factors)
+    }
+    if (subjective.aggravating_factors) {
       formattedNote += `Forverrende faktorer: ${subjective.aggravating_factors}\n`;
-    if (subjective.relieving_factors)
+    }
+    if (subjective.relieving_factors) {
       formattedNote += `Lindrende faktorer: ${subjective.relieving_factors}\n`;
-    if (note.vas_pain_start !== null) formattedNote += `VAS ved start: ${note.vas_pain_start}/10\n`;
+    }
+    if (note.vas_pain_start !== null) {
+      formattedNote += `VAS ved start: ${note.vas_pain_start}/10\n`;
+    }
     formattedNote += `\n`;
 
     // Objective
     formattedNote += `OBJEKTIVT (O):\n`;
-    if (objective.observation) formattedNote += `Observasjon: ${objective.observation}\n`;
-    if (objective.palpation) formattedNote += `Palpasjon: ${objective.palpation}\n`;
-    if (objective.rom) formattedNote += `Bevegelighet: ${objective.rom}\n`;
-    if (objective.ortho_tests) formattedNote += `Ortopediske tester: ${objective.ortho_tests}\n`;
-    if (objective.neuro_tests) formattedNote += `Nevrologiske tester: ${objective.neuro_tests}\n`;
-    if (objective.vital_signs) formattedNote += `Vitale tegn: ${objective.vital_signs}\n`;
+    if (objective.observation) {
+      formattedNote += `Observasjon: ${objective.observation}\n`;
+    }
+    if (objective.palpation) {
+      formattedNote += `Palpasjon: ${objective.palpation}\n`;
+    }
+    if (objective.rom) {
+      formattedNote += `Bevegelighet: ${objective.rom}\n`;
+    }
+    if (objective.ortho_tests) {
+      formattedNote += `Ortopediske tester: ${objective.ortho_tests}\n`;
+    }
+    if (objective.neuro_tests) {
+      formattedNote += `Nevrologiske tester: ${objective.neuro_tests}\n`;
+    }
+    if (objective.vital_signs) {
+      formattedNote += `Vitale tegn: ${objective.vital_signs}\n`;
+    }
     formattedNote += `\n`;
 
     // Assessment
@@ -556,26 +579,42 @@ export const generateFormattedNote = async (organizationId, noteId) => {
     if (note.icd10_codes && note.icd10_codes.length > 0) {
       formattedNote += `Diagnose (ICD-10): ${note.icd10_codes.join(', ')}\n`;
     }
-    if (assessment.clinical_reasoning)
+    if (assessment.clinical_reasoning) {
       formattedNote += `Klinisk resonnement: ${assessment.clinical_reasoning}\n`;
-    if (assessment.prognosis) formattedNote += `Prognose: ${assessment.prognosis}\n`;
+    }
+    if (assessment.prognosis) {
+      formattedNote += `Prognose: ${assessment.prognosis}\n`;
+    }
     formattedNote += `\n`;
 
     // Plan
     formattedNote += `PLAN (P):\n`;
-    if (plan.treatment) formattedNote += `Behandling: ${plan.treatment}\n`;
-    if (plan.exercises) formattedNote += `Hjemmeovelser: ${plan.exercises}\n`;
-    if (plan.advice) formattedNote += `Rad: ${plan.advice}\n`;
-    if (plan.follow_up) formattedNote += `Oppfolging: ${plan.follow_up}\n`;
-    if (note.vas_pain_end !== null) formattedNote += `VAS ved slutt: ${note.vas_pain_end}/10\n`;
+    if (plan.treatment) {
+      formattedNote += `Behandling: ${plan.treatment}\n`;
+    }
+    if (plan.exercises) {
+      formattedNote += `Hjemmeovelser: ${plan.exercises}\n`;
+    }
+    if (plan.advice) {
+      formattedNote += `Rad: ${plan.advice}\n`;
+    }
+    if (plan.follow_up) {
+      formattedNote += `Oppfolging: ${plan.follow_up}\n`;
+    }
+    if (note.vas_pain_end !== null) {
+      formattedNote += `VAS ved slutt: ${note.vas_pain_end}/10\n`;
+    }
 
     // Vestibular specific
     if (note.vestibular_data && note.template_type === 'VESTIBULAR') {
       formattedNote += `\nVESTIBULAR VURDERING:\n`;
       const vestibular = note.vestibular_data;
-      if (vestibular.primary_diagnosis)
+      if (vestibular.primary_diagnosis) {
         formattedNote += `Diagnose: ${vestibular.primary_diagnosis}\n`;
-      if (vestibular.dhi_score) formattedNote += `DHI Score: ${vestibular.dhi_score}/100\n`;
+      }
+      if (vestibular.dhi_score) {
+        formattedNote += `DHI Score: ${vestibular.dhi_score}/100\n`;
+      }
       if (vestibular.maneuvers_performed?.length > 0) {
         formattedNote += `Utforte manovrer: ${vestibular.maneuvers_performed.map((m) => m.type).join(', ')}\n`;
       }
@@ -712,7 +751,7 @@ export const searchNotes = async (organizationId, searchQuery, options = {}) => 
  * Generate PDF document for clinical note
  * Generates a professional PDF with Norwegian formatting
  */
-export const generateNotePDF = async (organizationId, noteId, options = {}) => {
+export const generateNotePDF = async (organizationId, noteId, _options = {}) => {
   // Dynamic import for PDFKit
   const PDFDocument = (await import('pdfkit')).default;
 
@@ -860,11 +899,21 @@ export const generateNotePDF = async (organizationId, noteId, options = {}) => {
     if (objective.vitalSigns || objective.vital_signs) {
       const vitals = objective.vitalSigns || objective.vital_signs;
       let vitalStr = '';
-      if (vitals.bloodPressure) vitalStr += `BT: ${vitals.bloodPressure} mmHg  `;
-      if (vitals.pulse) vitalStr += `Puls: ${vitals.pulse}/min  `;
-      if (vitals.temperature) vitalStr += `Temp: ${vitals.temperature}°C  `;
-      if (vitals.respiration) vitalStr += `Resp: ${vitals.respiration}/min`;
-      if (vitalStr) addField('Vitale tegn', vitalStr.trim());
+      if (vitals.bloodPressure) {
+        vitalStr += `BT: ${vitals.bloodPressure} mmHg  `;
+      }
+      if (vitals.pulse) {
+        vitalStr += `Puls: ${vitals.pulse}/min  `;
+      }
+      if (vitals.temperature) {
+        vitalStr += `Temp: ${vitals.temperature}°C  `;
+      }
+      if (vitals.respiration) {
+        vitalStr += `Resp: ${vitals.respiration}/min`;
+      }
+      if (vitalStr) {
+        addField('Vitale tegn', vitalStr.trim());
+      }
     }
 
     addField('Funn', objective.findings || objective.funn);

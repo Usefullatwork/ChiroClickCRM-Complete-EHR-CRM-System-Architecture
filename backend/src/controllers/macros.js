@@ -96,7 +96,9 @@ export const expandMacro = async (req, res) => {
           break;
         }
       }
-      if (macroText) break;
+      if (macroText) {
+        break;
+      }
       for (const subcatMacros of Object.values(category.subcategories || {})) {
         for (const macro of subcatMacros) {
           if (macro.id === id) {
@@ -104,9 +106,13 @@ export const expandMacro = async (req, res) => {
             break;
           }
         }
-        if (macroText) break;
+        if (macroText) {
+          break;
+        }
       }
-      if (macroText) break;
+      if (macroText) {
+        break;
+      }
     }
 
     if (!macroText) {

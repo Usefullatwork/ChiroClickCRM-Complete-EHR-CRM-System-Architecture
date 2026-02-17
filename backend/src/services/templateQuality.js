@@ -15,7 +15,7 @@ const QUALITY_WEIGHTS = {
   STRUCTURE: 0.15,
   COMPLETENESS: 0.15,
   USAGE_HISTORY: 0.15,
-  PII_CHECK: 0.1  // Negative score if PII found
+  PII_CHECK: 0.1, // Negative score if PII found
 };
 
 /**
@@ -29,7 +29,7 @@ const MEDICAL_TERMS = {
     /rom|bevegelsesutslag|mobilitet/gi,
     /motorikk|muskelstyrke|kraft/gi,
     /sensibilitet|følelse/gi,
-    /refleks(er)?/gi
+    /refleks(er)?/gi,
   ],
 
   // Pain descriptors
@@ -38,7 +38,7 @@ const MEDICAL_TERMS = {
     /vas|nrs|smerte.*?skala/gi,
     /akutt|kronisk|subakutt/gi,
     /radierende|utstrålende/gi,
-    /konstant|intermitterende/gi
+    /konstant|intermitterende/gi,
   ],
 
   // Anatomical regions
@@ -47,7 +47,7 @@ const MEDICAL_TERMS = {
     /nakke|rygg|skulder|hofte|kne/gi,
     /(c\d|th\d|l\d|s\d)/gi, // Vertebral levels
     /bilateral|unilateral|venstre|høyre/gi,
-    /paravertebral|facett/gi
+    /paravertebral|facett/gi,
   ],
 
   // Treatment techniques
@@ -57,7 +57,7 @@ const MEDICAL_TERMS = {
     /myofascial|triggerpunkt/gi,
     /tøyning|stretch/gi,
     /aktivering|stabilisering/gi,
-    /tape|taping/gi
+    /tape|taping/gi,
   ],
 
   // Clinical findings
@@ -66,8 +66,8 @@ const MEDICAL_TERMS = {
     /hypo.*?mobil|restrik(sjon|tert)/gi,
     /pareser?|svakhet|kraftnedsettelse/gi,
     /inflammasjon|betennelse|ery tem/gi,
-    /ødem|hevelse/gi
-  ]
+    /ødem|hevelse/gi,
+  ],
 };
 
 /**
@@ -81,7 +81,7 @@ export const scoreTemplateQuality = (template) => {
     completeness: 0,
     usageHistory: 0,
     piiCheck: 1, // Start at 1, deduct if PII found
-    details: {}
+    details: {},
   };
 
   const text = template.template_text || '';
@@ -105,36 +105,48 @@ export const scoreTemplateQuality = (template) => {
   let termCategories = 0;
   let totalTermsFound = 0;
 
-  Object.entries(MEDICAL_TERMS).forEach(([category, patterns]) => {
+  Object.entries(MEDICAL_TERMS).forEach(([_category, patterns]) => {
     let categoryMatches = 0;
-    patterns.forEach(pattern => {
+    patterns.forEach((pattern) => {
       const matches = text.match(pattern);
       if (matches) {
         categoryMatches += matches.length;
         totalTermsFound += matches.length;
       }
     });
-    if (categoryMatches > 0) termCategories++;
+    if (categoryMatches > 0) {
+      termCategories++;
+    }
   });
 
   scores.medicalTerminology = Math.min(
-    (termCategories / Object.keys(MEDICAL_TERMS).length) + (totalTermsFound * 0.05),
+    termCategories / Object.keys(MEDICAL_TERMS).length + totalTermsFound * 0.05,
     1.0
   );
   scores.details.medicalTerminology = {
     categories: termCategories,
     totalTerms: totalTermsFound,
-    score: scores.medicalTerminology
+    score: scores.medicalTerminology,
   };
 
   // 3. Structure Score (lists, colons, organization)
   let structurePoints = 0;
 
-  if (text.includes(':')) structurePoints += 0.3; // Has labels
-  if (text.includes('\n') || text.includes('\\n')) structurePoints += 0.2; // Multi-line
-  if (/\d+/.test(text)) structurePoints += 0.2; // Contains numbers (measurements, scores)
-  if (/[-•*]/.test(text)) structurePoints += 0.2; // Has bullet points
-  if (/[A-ZÆØÅ][a-zæøå]+:/.test(text)) structurePoints += 0.1; // Proper labeling
+  if (text.includes(':')) {
+    structurePoints += 0.3;
+  } // Has labels
+  if (text.includes('\n') || text.includes('\\n')) {
+    structurePoints += 0.2;
+  } // Multi-line
+  if (/\d+/.test(text)) {
+    structurePoints += 0.2;
+  } // Contains numbers (measurements, scores)
+  if (/[-•*]/.test(text)) {
+    structurePoints += 0.2;
+  } // Has bullet points
+  if (/[A-ZÆØÅ][a-zæøå]+:/.test(text)) {
+    structurePoints += 0.1;
+  } // Proper labeling
 
   scores.structure = Math.min(structurePoints, 1.0);
   scores.details.structure = { points: structurePoints };
@@ -144,29 +156,44 @@ export const scoreTemplateQuality = (template) => {
 
   // Should have some description
   const wordCount = text.split(/\s+/).length;
-  if (wordCount >= 10) completenessPoints += 0.3;
-  if (wordCount >= 20) completenessPoints += 0.2;
+  if (wordCount >= 10) {
+    completenessPoints += 0.3;
+  }
+  if (wordCount >= 20) {
+    completenessPoints += 0.2;
+  }
 
   // Should have clinical context
-  if (/smerte|vondt|plager/gi.test(text)) completenessPoints += 0.2;
+  if (/smerte|vondt|plager/gi.test(text)) {
+    completenessPoints += 0.2;
+  }
 
   // Should have some anatomical reference
-  if (/(cervical|thorakal|lumbal|nakke|rygg|skulder)/gi.test(text)) completenessPoints += 0.2;
+  if (/(cervical|thorakal|lumbal|nakke|rygg|skulder)/gi.test(text)) {
+    completenessPoints += 0.2;
+  }
 
   // Should not be too repetitive
   const uniqueWords = new Set(text.toLowerCase().split(/\s+/));
   const repetitionRatio = uniqueWords.size / wordCount;
-  if (repetitionRatio > 0.5) completenessPoints += 0.1;
+  if (repetitionRatio > 0.5) {
+    completenessPoints += 0.1;
+  }
 
   scores.completeness = Math.min(completenessPoints, 1.0);
   scores.details.completeness = { wordCount, uniqueRatio: repetitionRatio };
 
   // 5. Usage History Score (if available)
   if (template.usage_count !== undefined) {
-    if (template.usage_count >= 10) scores.usageHistory = 1.0;
-    else if (template.usage_count >= 5) scores.usageHistory = 0.7;
-    else if (template.usage_count >= 2) scores.usageHistory = 0.4;
-    else scores.usageHistory = 0.1;
+    if (template.usage_count >= 10) {
+      scores.usageHistory = 1.0;
+    } else if (template.usage_count >= 5) {
+      scores.usageHistory = 0.7;
+    } else if (template.usage_count >= 2) {
+      scores.usageHistory = 0.4;
+    } else {
+      scores.usageHistory = 0.1;
+    }
   } else {
     scores.usageHistory = 0.5; // Neutral if no data
   }
@@ -176,8 +203,16 @@ export const scoreTemplateQuality = (template) => {
   const piiPatterns = [
     { pattern: /\b\d{11}\b/g, type: 'Personnummer', severity: 'CRITICAL' },
     { pattern: /\b\d{8}\b/g, type: 'Telefonnummer', severity: 'MODERATE' },
-    { pattern: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, type: 'E-post', severity: 'MODERATE' },
-    { pattern: /\b[A-ZÆØÅ][a-zæøå]+ [A-ZÆØÅ][a-zæøå]+\b/g, type: 'Mulig fullt navn', severity: 'LOW' }
+    {
+      pattern: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
+      type: 'E-post',
+      severity: 'MODERATE',
+    },
+    {
+      pattern: /\b[A-ZÆØÅ][a-zæøå]+ [A-ZÆØÅ][a-zæøå]+\b/g,
+      type: 'Mulig fullt navn',
+      severity: 'LOW',
+    },
   ];
 
   const piiIssues = [];
@@ -211,7 +246,7 @@ export const scoreTemplateQuality = (template) => {
     totalScore: Math.max(0, Math.min(1, totalScore)),
     scores,
     recommendation: getRecommendation(totalScore, scores),
-    requiresReview: totalScore < 0.6 || scores.piiCheck < 1.0
+    requiresReview: totalScore < 0.6 || scores.piiCheck < 1.0,
   };
 };
 
@@ -223,7 +258,7 @@ const getRecommendation = (totalScore, scores) => {
     return {
       status: 'REJECT',
       reason: 'PII oppdaget - må fjernes før bruk',
-      action: 'REMOVE_PII'
+      action: 'REMOVE_PII',
     };
   }
 
@@ -231,7 +266,7 @@ const getRecommendation = (totalScore, scores) => {
     return {
       status: 'APPROVED',
       reason: 'Høy kvalitet - klar for bruk',
-      action: 'AUTO_APPROVE'
+      action: 'AUTO_APPROVE',
     };
   }
 
@@ -239,7 +274,7 @@ const getRecommendation = (totalScore, scores) => {
     return {
       status: 'REVIEW',
       reason: 'God kvalitet - anbefaler manuell gjennomgang',
-      action: 'MANUAL_REVIEW'
+      action: 'MANUAL_REVIEW',
     };
   }
 
@@ -247,14 +282,14 @@ const getRecommendation = (totalScore, scores) => {
     return {
       status: 'NEEDS_IMPROVEMENT',
       reason: 'Lav kvalitet - trenger forbedring',
-      action: 'REQUEST_REVISION'
+      action: 'REQUEST_REVISION',
     };
   }
 
   return {
     status: 'REJECT',
     reason: 'For lav kvalitet for bruk i AI-trening',
-    action: 'REJECT'
+    action: 'REJECT',
   };
 };
 
@@ -280,7 +315,7 @@ export const scoreBatchTemplates = async (templateIds = null) => {
 
   const result = await pool.query(query, params);
 
-  const scoredTemplates = result.rows.map(template => {
+  const scoredTemplates = result.rows.map((template) => {
     const score = scoreTemplateQuality(template);
     return {
       id: template.id,
@@ -289,7 +324,7 @@ export const scoreBatchTemplates = async (templateIds = null) => {
       newScore: score.totalScore,
       recommendation: score.recommendation,
       requiresReview: score.requiresReview,
-      details: score.scores.details
+      details: score.scores.details,
     };
   });
 
@@ -313,11 +348,7 @@ export const updateTemplateScores = async (scoredTemplates) => {
            review_status = $2,
            updated_at = NOW()
          WHERE id = $3`,
-        [
-          template.newScore,
-          template.recommendation.status.toLowerCase(),
-          template.id
-        ]
+        [template.newScore, template.recommendation.status.toLowerCase(), template.id]
       );
     }
 
@@ -325,9 +356,9 @@ export const updateTemplateScores = async (scoredTemplates) => {
 
     return {
       updated: scoredTemplates.length,
-      approved: scoredTemplates.filter(t => t.recommendation.status === 'APPROVED').length,
-      needsReview: scoredTemplates.filter(t => t.requiresReview).length,
-      rejected: scoredTemplates.filter(t => t.recommendation.status === 'REJECT').length
+      approved: scoredTemplates.filter((t) => t.recommendation.status === 'APPROVED').length,
+      needsReview: scoredTemplates.filter((t) => t.requiresReview).length,
+      rejected: scoredTemplates.filter((t) => t.recommendation.status === 'REJECT').length,
     };
   } catch (error) {
     await client.query('ROLLBACK');
@@ -358,9 +389,9 @@ export const getTemplatesNeedingReview = async (limit = 50) => {
     [limit]
   );
 
-  return result.rows.map(template => ({
+  return result.rows.map((template) => ({
     ...template,
-    scoreAnalysis: scoreTemplateQuality(template)
+    scoreAnalysis: scoreTemplateQuality(template),
   }));
 };
 
@@ -440,5 +471,5 @@ export default {
   updateTemplateScores,
   getTemplatesNeedingReview,
   approveTemplate,
-  rejectTemplate
+  rejectTemplate,
 };

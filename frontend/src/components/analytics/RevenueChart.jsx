@@ -5,7 +5,7 @@
  * @module components/analytics/RevenueChart
  */
 
-import React, { useMemo } from 'react';
+import _React, { useMemo } from 'react';
 import {
   AreaChart,
   Area,
@@ -16,20 +16,22 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend
+  _Legend,
 } from 'recharts';
-import { DollarSign, TrendingUp, TrendingDown, Calendar } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, _Calendar } from 'lucide-react';
 
 /**
  * Format currency in Norwegian format
  */
 const formatCurrency = (value) => {
-  if (value === null || value === undefined) return '0 kr';
+  if (value === null || value === undefined) {
+    return '0 kr';
+  }
   return new Intl.NumberFormat('no-NO', {
     style: 'currency',
     currency: 'NOK',
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0
+    maximumFractionDigits: 0,
   }).format(value);
 };
 
@@ -54,21 +56,18 @@ const formatShortNumber = (value) => {
  * @param {string} chartType - 'area' or 'bar'
  * @param {boolean} loading - Loading state
  */
-export const RevenueChart = ({
-  data = [],
-  stats = {},
-  chartType = 'area',
-  loading = false
-}) => {
+export const RevenueChart = ({ data = [], stats = {}, chartType = 'area', loading = false }) => {
   // Format data for chart
   const chartData = useMemo(() => {
-    if (!data || data.length === 0) return [];
+    if (!data || data.length === 0) {
+      return [];
+    }
 
-    return data.map(item => ({
+    return data.map((item) => ({
       date: item.date
         ? new Date(item.date).toLocaleDateString('no-NO', { day: 'numeric', month: 'short' })
         : item.label,
-      'Inntekt': item.revenue || 0
+      Inntekt: item.revenue || 0,
     }));
   }, [data]);
 
@@ -80,14 +79,9 @@ export const RevenueChart = ({
           <p className="text-sm font-semibold text-gray-900 mb-2">{label}</p>
           {payload.map((entry, index) => (
             <div key={index} className="flex items-center gap-2 text-sm">
-              <div
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: entry.color }}
-              />
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
               <span className="text-gray-600">{entry.name}:</span>
-              <span className="font-semibold text-gray-900">
-                {formatCurrency(entry.value)}
-              </span>
+              <span className="font-semibold text-gray-900">{formatCurrency(entry.value)}</span>
             </div>
           ))}
         </div>
@@ -135,10 +129,13 @@ export const RevenueChart = ({
             </div>
             <div className="text-right">
               <p className="text-xs text-gray-500">Endring</p>
-              <div className={`flex items-center gap-1 justify-end ${isPositiveChange ? 'text-green-600' : 'text-red-600'}`}>
+              <div
+                className={`flex items-center gap-1 justify-end ${isPositiveChange ? 'text-green-600' : 'text-red-600'}`}
+              >
                 {isPositiveChange ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
                 <span className="text-lg font-bold">
-                  {isPositiveChange ? '+' : ''}{changePercent}%
+                  {isPositiveChange ? '+' : ''}
+                  {changePercent}%
                 </span>
               </div>
             </div>
@@ -169,11 +166,7 @@ export const RevenueChart = ({
                   tickFormatter={formatShortNumber}
                 />
                 <Tooltip content={<CustomTooltip />} />
-                <Bar
-                  dataKey="Inntekt"
-                  fill="#10b981"
-                  radius={[4, 4, 0, 0]}
-                />
+                <Bar dataKey="Inntekt" fill="#10b981" radius={[4, 4, 0, 0]} />
               </BarChart>
             ) : (
               <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
@@ -257,11 +250,7 @@ export const RevenueChart = ({
 /**
  * RevenueCompact - Compact revenue display for smaller spaces
  */
-export const RevenueCompact = ({
-  totalRevenue = 0,
-  changePercent = 0,
-  loading = false
-}) => {
+export const RevenueCompact = ({ totalRevenue = 0, changePercent = 0, loading = false }) => {
   if (loading) {
     return (
       <div className="animate-pulse">
@@ -273,13 +262,14 @@ export const RevenueCompact = ({
 
   return (
     <div>
-      <p className="text-2xl font-bold text-gray-900">
-        {formatCurrency(totalRevenue)}
-      </p>
-      <div className={`flex items-center gap-1 text-sm ${changePercent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+      <p className="text-2xl font-bold text-gray-900">{formatCurrency(totalRevenue)}</p>
+      <div
+        className={`flex items-center gap-1 text-sm ${changePercent >= 0 ? 'text-green-600' : 'text-red-600'}`}
+      >
         {changePercent >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
         <span className="font-medium">
-          {changePercent >= 0 ? '+' : ''}{changePercent}%
+          {changePercent >= 0 ? '+' : ''}
+          {changePercent}%
         </span>
         <span className="text-gray-500">vs forrige mnd</span>
       </div>

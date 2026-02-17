@@ -8,9 +8,9 @@
  * - Muscle group highlighting
  * - Integration with text insertion system
  */
-import React, { useState, useCallback, useRef, useMemo } from 'react';
+import _React, { useState, useCallback, useRef, useMemo } from 'react';
 import Model from 'react-body-highlighter';
-import { RotateCcw, User, Maximize2 } from 'lucide-react';
+import { RotateCcw, User, _Maximize2 } from 'lucide-react';
 
 // Map our region IDs to react-body-highlighter muscle names
 const REGION_TO_MUSCLES = {
@@ -58,7 +58,7 @@ const REGION_TO_MUSCLES = {
   r_calf: ['right-calves'],
   l_calf: ['left-calves'],
   r_foot: ['right-foot'],
-  l_foot: ['left-foot']
+  l_foot: ['left-foot'],
 };
 
 // Norwegian labels for regions
@@ -94,15 +94,35 @@ const REGION_LABELS = {
   r_calf: 'Høyre legg',
   l_calf: 'Venstre legg',
   r_foot: 'Høyre fot',
-  l_foot: 'Venstre fot'
+  l_foot: 'Venstre fot',
 };
 
 // Chiropractic-specific region groupings
 const CHIRO_REGIONS = {
   spine: ['neck_back', 'upper_back', 'mid_back', 'lower_back'],
-  upper_extremity: ['r_shoulder', 'l_shoulder', 'r_arm_upper', 'l_arm_upper', 'r_arm_lower', 'l_arm_lower', 'r_hand', 'l_hand'],
-  lower_extremity: ['r_hip', 'l_hip', 'r_thigh', 'l_thigh', 'r_knee', 'l_knee', 'r_leg', 'l_leg', 'r_foot', 'l_foot'],
-  pelvis: ['r_glute', 'l_glute', 'r_hip', 'l_hip']
+  upper_extremity: [
+    'r_shoulder',
+    'l_shoulder',
+    'r_arm_upper',
+    'l_arm_upper',
+    'r_arm_lower',
+    'l_arm_lower',
+    'r_hand',
+    'l_hand',
+  ],
+  lower_extremity: [
+    'r_hip',
+    'l_hip',
+    'r_thigh',
+    'l_thigh',
+    'r_knee',
+    'l_knee',
+    'r_leg',
+    'l_leg',
+    'r_foot',
+    'l_foot',
+  ],
+  pelvis: ['r_glute', 'l_glute', 'r_hip', 'l_hip'],
 };
 
 export default function EnhancedBodyDiagram({
@@ -112,25 +132,25 @@ export default function EnhancedBodyDiagram({
   showLabels = true,
   showQuickSelect = true,
   compact = false,
-  className = ''
+  className = '',
 }) {
   const [view, setView] = useState('anterior'); // anterior, posterior
-  const [hoveredMuscle, setHoveredMuscle] = useState(null);
+  const [hoveredMuscle, _setHoveredMuscle] = useState(null);
   const containerRef = useRef(null);
 
   // Convert selected regions to highlight data for react-body-highlighter
   const highlightData = useMemo(() => {
     const data = [];
 
-    selectedRegions.forEach(regionId => {
+    selectedRegions.forEach((regionId) => {
       const muscles = REGION_TO_MUSCLES[regionId] || [regionId];
-      muscles.forEach(muscle => {
+      muscles.forEach((muscle) => {
         // Check if already in data
-        const existing = data.find(d => d.name === muscle);
+        const existing = data.find((d) => d.name === muscle);
         if (!existing) {
           data.push({
             name: muscle,
-            muscles: [muscle]
+            muscles: [muscle],
           });
         }
       });
@@ -140,55 +160,63 @@ export default function EnhancedBodyDiagram({
   }, [selectedRegions]);
 
   // Handle click on body part
-  const handleClick = useCallback((data) => {
-    const muscleName = data.muscle;
+  const handleClick = useCallback(
+    (data) => {
+      const muscleName = data.muscle;
 
-    // Find which region this muscle belongs to
-    let regionId = null;
-    for (const [region, muscles] of Object.entries(REGION_TO_MUSCLES)) {
-      if (muscles.includes(muscleName)) {
-        regionId = region;
-        break;
+      // Find which region this muscle belongs to
+      let regionId = null;
+      for (const [region, muscles] of Object.entries(REGION_TO_MUSCLES)) {
+        if (muscles.includes(muscleName)) {
+          regionId = region;
+          break;
+        }
       }
-    }
 
-    if (!regionId) {
-      regionId = muscleName; // Use muscle name as fallback
-    }
+      if (!regionId) {
+        regionId = muscleName; // Use muscle name as fallback
+      }
 
-    // If onRegionClick provided, use it for popup flow
-    if (onRegionClick) {
-      onRegionClick({
-        regionId,
-        muscle: muscleName,
-        label: REGION_LABELS[regionId] || regionId,
-        view
-      });
-      return;
-    }
+      // If onRegionClick provided, use it for popup flow
+      if (onRegionClick) {
+        onRegionClick({
+          regionId,
+          muscle: muscleName,
+          label: REGION_LABELS[regionId] || regionId,
+          view,
+        });
+        return;
+      }
 
-    // Otherwise toggle selection
-    if (onChange) {
+      // Otherwise toggle selection
+      if (onChange) {
+        const isSelected = selectedRegions.includes(regionId);
+        if (isSelected) {
+          onChange(selectedRegions.filter((r) => r !== regionId));
+        } else {
+          onChange([...selectedRegions, regionId]);
+        }
+      }
+    },
+    [selectedRegions, onChange, onRegionClick, view]
+  );
+
+  // Toggle region selection
+  const toggleRegion = useCallback(
+    (regionId) => {
+      if (!onChange) {
+        return;
+      }
+
       const isSelected = selectedRegions.includes(regionId);
       if (isSelected) {
-        onChange(selectedRegions.filter(r => r !== regionId));
+        onChange(selectedRegions.filter((r) => r !== regionId));
       } else {
         onChange([...selectedRegions, regionId]);
       }
-    }
-  }, [selectedRegions, onChange, onRegionClick, view]);
-
-  // Toggle region selection
-  const toggleRegion = useCallback((regionId) => {
-    if (!onChange) return;
-
-    const isSelected = selectedRegions.includes(regionId);
-    if (isSelected) {
-      onChange(selectedRegions.filter(r => r !== regionId));
-    } else {
-      onChange([...selectedRegions, regionId]);
-    }
-  }, [selectedRegions, onChange]);
+    },
+    [selectedRegions, onChange]
+  );
 
   // Clear all
   const clearAll = useCallback(() => {
@@ -199,8 +227,10 @@ export default function EnhancedBodyDiagram({
 
   // Generate location text
   const generateLocationText = useCallback(() => {
-    if (selectedRegions.length === 0) return '';
-    return selectedRegions.map(r => REGION_LABELS[r] || r).join(', ');
+    if (selectedRegions.length === 0) {
+      return '';
+    }
+    return selectedRegions.map((r) => REGION_LABELS[r] || r).join(', ');
   }, [selectedRegions]);
 
   // Quick select buttons for common chiropractic regions
@@ -211,7 +241,7 @@ export default function EnhancedBodyDiagram({
     { id: 'r_shoulder', label: 'H. Skulder' },
     { id: 'l_shoulder', label: 'V. Skulder' },
     { id: 'r_hip', label: 'H. Hofte' },
-    { id: 'l_hip', label: 'V. Hofte' }
+    { id: 'l_hip', label: 'V. Hofte' },
   ];
 
   return (
@@ -233,9 +263,7 @@ export default function EnhancedBodyDiagram({
             <button
               onClick={() => setView('anterior')}
               className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
-                view === 'anterior'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 hover:bg-gray-100'
+                view === 'anterior' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
               Foran
@@ -243,9 +271,7 @@ export default function EnhancedBodyDiagram({
             <button
               onClick={() => setView('posterior')}
               className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
-                view === 'posterior'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 hover:bg-gray-100'
+                view === 'posterior' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
               Bak
@@ -295,7 +321,7 @@ export default function EnhancedBodyDiagram({
               <div className="mb-4">
                 <h4 className="text-xs font-medium text-gray-500 mb-2">Hurtigvalg</h4>
                 <div className="flex flex-wrap gap-1.5">
-                  {quickSelectRegions.map(region => (
+                  {quickSelectRegions.map((region) => (
                     <button
                       key={region.id}
                       onClick={() => toggleRegion(region.id)}
@@ -317,16 +343,13 @@ export default function EnhancedBodyDiagram({
               <div className="mb-4">
                 <h4 className="text-xs font-medium text-gray-500 mb-2">Valgte områder</h4>
                 <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto">
-                  {selectedRegions.map(regionId => (
+                  {selectedRegions.map((regionId) => (
                     <span
                       key={regionId}
                       className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full"
                     >
                       {REGION_LABELS[regionId] || regionId}
-                      <button
-                        onClick={() => toggleRegion(regionId)}
-                        className="hover:text-red-600"
-                      >
+                      <button onClick={() => toggleRegion(regionId)} className="hover:text-red-600">
                         ×
                       </button>
                     </span>
@@ -342,13 +365,16 @@ export default function EnhancedBodyDiagram({
                 {Object.entries(CHIRO_REGIONS).map(([groupName, regions]) => (
                   <div key={groupName}>
                     <span className="text-xs text-gray-400 uppercase">
-                      {groupName === 'spine' ? 'Ryggrad' :
-                       groupName === 'upper_extremity' ? 'Overekstremitet' :
-                       groupName === 'lower_extremity' ? 'Underekstremitet' :
-                       'Bekken'}
+                      {groupName === 'spine'
+                        ? 'Ryggrad'
+                        : groupName === 'upper_extremity'
+                          ? 'Overekstremitet'
+                          : groupName === 'lower_extremity'
+                            ? 'Underekstremitet'
+                            : 'Bekken'}
                     </span>
                     <div className="flex flex-wrap gap-1 mt-1">
-                      {regions.slice(0, 4).map(regionId => (
+                      {regions.slice(0, 4).map((regionId) => (
                         <button
                           key={regionId}
                           onClick={() => toggleRegion(regionId)}

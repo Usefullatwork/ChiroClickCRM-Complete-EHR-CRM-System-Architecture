@@ -3,10 +3,12 @@
  * Exports all domain entities for easy importing
  */
 
-export { Patient } from './Patient.js';
-export { Encounter } from './Encounter.js';
-export { Appointment } from './Appointment.js';
-export { Communication } from './Communication.js';
+import { Patient } from './Patient.js';
+import { Encounter } from './Encounter.js';
+import { Appointment } from './Appointment.js';
+import { Communication } from './Communication.js';
+
+export { Patient, Encounter, Appointment, Communication };
 
 export default {
   Patient,

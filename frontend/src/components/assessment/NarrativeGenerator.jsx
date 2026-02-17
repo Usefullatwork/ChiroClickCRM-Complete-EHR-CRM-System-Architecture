@@ -16,18 +16,20 @@ export function generateSubjectiveNarrative(data) {
 
   // Pain description with VAS
   if (data.vas_pain_start !== null && data.vas_pain_start !== undefined) {
-    narratives.push(`Pain Scale: currently rated ${data.vas_pain_start}/10, with 10 being the worst.`);
+    narratives.push(
+      `Pain Scale: currently rated ${data.vas_pain_start}/10, with 10 being the worst.`
+    );
   }
 
   // Pain quality
   if (data.pain_qualities && data.pain_qualities.length > 0) {
-    const qualities = data.pain_qualities.map(q => PAIN_QUALITY_LABELS[q] || q);
+    const qualities = data.pain_qualities.map((q) => PAIN_QUALITY_LABELS[q] || q);
     narratives.push(`Pain Character: Patient describes pain as ${formatList(qualities)}.`);
   }
 
   // Pain location
   if (data.pain_locations && data.pain_locations.length > 0) {
-    const locations = data.pain_locations.map(l => LOCATION_LABELS[l] || l);
+    const locations = data.pain_locations.map((l) => LOCATION_LABELS[l] || l);
     narratives.push(`Pain Location: ${formatList(locations)}.`);
   }
 
@@ -46,13 +48,13 @@ export function generateSubjectiveNarrative(data) {
 
   // Aggravating factors
   if (data.aggravating_factors_selected && data.aggravating_factors_selected.length > 0) {
-    const factors = data.aggravating_factors_selected.map(f => AGGRAVATING_LABELS[f] || f);
+    const factors = data.aggravating_factors_selected.map((f) => AGGRAVATING_LABELS[f] || f);
     narratives.push(`Aggravating Factors: Pain is worsened by ${formatList(factors)}.`);
   }
 
   // Relieving factors
   if (data.relieving_factors_selected && data.relieving_factors_selected.length > 0) {
-    const factors = data.relieving_factors_selected.map(f => RELIEVING_LABELS[f] || f);
+    const factors = data.relieving_factors_selected.map((f) => RELIEVING_LABELS[f] || f);
     narratives.push(`Relieving Factors: Pain is improved by ${formatList(factors)}.`);
   }
 
@@ -78,89 +80,97 @@ export function generateObjectiveNarrative(data) {
     const findingsList = Object.values(data.spinal_findings);
 
     // Group by type
-    const subluxations = findingsList.filter(f => f.type === 'subluxation');
-    const fixations = findingsList.filter(f => f.type === 'fixation');
-    const restrictions = findingsList.filter(f => f.type === 'restriction');
-    const tenderness = findingsList.filter(f => f.type === 'tenderness');
-    const spasms = findingsList.filter(f => f.type === 'spasm');
+    const subluxations = findingsList.filter((f) => f.type === 'subluxation');
+    const fixations = findingsList.filter((f) => f.type === 'fixation');
+    const _restrictions = findingsList.filter((f) => f.type === 'restriction');
+    const tenderness = findingsList.filter((f) => f.type === 'tenderness');
+    const spasms = findingsList.filter((f) => f.type === 'spasm');
 
     if (subluxations.length > 0) {
-      const subs = subluxations.map(f => formatVertebra(f));
+      const subs = subluxations.map((f) => formatVertebra(f));
       narratives.push(`Spinal Restrictions/Subluxations: ${subs.join(', ')}.`);
     }
 
     if (fixations.length > 0) {
-      const fixes = fixations.map(f => formatVertebra(f));
+      const fixes = fixations.map((f) => formatVertebra(f));
       narratives.push(`Segmental Fixations: ${fixes.join(', ')}.`);
     }
 
     if (tenderness.length > 0) {
-      const tends = tenderness.map(f => formatVertebra(f));
+      const tends = tenderness.map((f) => formatVertebra(f));
       narratives.push(`Pain/Tenderness: ${tends.join(', ')}.`);
     }
 
     if (spasms.length > 0) {
-      const spas = spasms.map(f => f.vertebra);
+      const spas = spasms.map((f) => f.vertebra);
       narratives.push(`Muscle Spasm(s): Hypertonic tissue tone at ${spas.join(', ')}.`);
     }
   }
 
   // Observation findings
   if (data.observation_findings && data.observation_findings.length > 0) {
-    const observations = data.observation_findings.map(f => OBSERVATION_LABELS[f] || f);
+    const _observations = data.observation_findings.map((f) => OBSERVATION_LABELS[f] || f);
 
     // Check for specific posture findings
-    const postureFindings = data.observation_findings.filter(f =>
-      ['forward_head', 'rounded_shoulders', 'increased_kyphosis', 'increased_lordosis',
-        'decreased_lordosis', 'scoliosis', 'pelvic_tilt', 'leg_length_diff'].includes(f)
+    const postureFindings = data.observation_findings.filter((f) =>
+      [
+        'forward_head',
+        'rounded_shoulders',
+        'increased_kyphosis',
+        'increased_lordosis',
+        'decreased_lordosis',
+        'scoliosis',
+        'pelvic_tilt',
+        'leg_length_diff',
+      ].includes(f)
     );
 
     if (postureFindings.length > 0) {
-      const postureLabels = postureFindings.map(f => OBSERVATION_LABELS[f] || f);
+      const postureLabels = postureFindings.map((f) => OBSERVATION_LABELS[f] || f);
       narratives.push(`Postural Analysis: ${formatList(postureLabels)}.`);
     }
 
-    const gaitFindings = data.observation_findings.filter(f =>
+    const gaitFindings = data.observation_findings.filter((f) =>
       ['gait_normal', 'antalgic_gait', 'limping', 'shuffling', 'guarded_movement'].includes(f)
     );
 
     if (gaitFindings.length > 0) {
-      const gaitLabels = gaitFindings.map(f => OBSERVATION_LABELS[f] || f);
+      const gaitLabels = gaitFindings.map((f) => OBSERVATION_LABELS[f] || f);
       narratives.push(`Gait: ${formatList(gaitLabels)}.`);
     }
   }
 
   // Palpation findings
   if (data.palpation_findings && data.palpation_findings.length > 0) {
-    const palpations = data.palpation_findings.map(f => PALPATION_LABELS[f] || f);
+    const palpations = data.palpation_findings.map((f) => PALPATION_LABELS[f] || f);
     narratives.push(`Palpation: ${formatList(palpations)} noted.`);
   }
 
   // ROM findings
   if (data.rom_findings && data.rom_findings.length > 0) {
-    const romNotes = data.rom_findings.map(f => ROM_LABELS[f] || f);
+    const romNotes = data.rom_findings.map((f) => ROM_LABELS[f] || f);
     narratives.push(`ROM Concern(s): ${formatList(romNotes)}.`);
   }
 
   // Ortho tests
   if (data.ortho_tests_selected && data.ortho_tests_selected.length > 0) {
-    const positiveTests = data.ortho_tests_selected.filter(t => t.includes('pos'));
-    const negativeTests = data.ortho_tests_selected.filter(t => t.includes('neg'));
+    const positiveTests = data.ortho_tests_selected.filter((t) => t.includes('pos'));
+    const negativeTests = data.ortho_tests_selected.filter((t) => t.includes('neg'));
 
     if (positiveTests.length > 0) {
-      const positiveLabels = positiveTests.map(t => ORTHO_LABELS[t] || t);
+      const positiveLabels = positiveTests.map((t) => ORTHO_LABELS[t] || t);
       narratives.push(`Orthopedic Tests - Positive: ${formatList(positiveLabels)}.`);
     }
 
     if (negativeTests.length > 0) {
-      const negativeLabels = negativeTests.map(t => ORTHO_LABELS[t] || t);
+      const negativeLabels = negativeTests.map((t) => ORTHO_LABELS[t] || t);
       narratives.push(`Orthopedic Tests - Negative: ${formatList(negativeLabels)}.`);
     }
   }
 
   // Neuro tests
   if (data.neuro_tests_selected && data.neuro_tests_selected.length > 0) {
-    const neuroNotes = data.neuro_tests_selected.map(t => NEURO_LABELS[t] || t);
+    const neuroNotes = data.neuro_tests_selected.map((t) => NEURO_LABELS[t] || t);
     narratives.push(`Neurological Findings: ${formatList(neuroNotes)}.`);
   }
 
@@ -188,7 +198,9 @@ export function generateAssessmentNarrative(data) {
 
   // Red flags
   if (data.red_flags_checked) {
-    narratives.push(`Red Flags: Reviewed and none identified. Safe to proceed with conservative care.`);
+    narratives.push(
+      `Red Flags: Reviewed and none identified. Safe to proceed with conservative care.`
+    );
   }
 
   return narratives;
@@ -200,7 +212,7 @@ export function generatePlanNarrative(data) {
 
   // Treatment performed
   if (data.treatments_selected && data.treatments_selected.length > 0) {
-    const treatments = data.treatments_selected.map(t => TREATMENT_LABELS[t] || t);
+    const treatments = data.treatments_selected.map((t) => TREATMENT_LABELS[t] || t);
     narratives.push(`Treatment Performed: ${formatList(treatments)}.`);
   }
 
@@ -210,7 +222,7 @@ export function generatePlanNarrative(data) {
 
   // Exercises
   if (data.exercises_selected && data.exercises_selected.length > 0) {
-    const exercises = data.exercises_selected.map(e => EXERCISE_LABELS[e] || e);
+    const exercises = data.exercises_selected.map((e) => EXERCISE_LABELS[e] || e);
     narratives.push(`Home Exercise Program: Patient instructed in ${formatList(exercises)}.`);
   }
 
@@ -223,9 +235,13 @@ export function generatePlanNarrative(data) {
   if (data.vas_pain_start !== null && data.vas_pain_end !== null) {
     const improvement = data.vas_pain_start - data.vas_pain_end;
     if (improvement > 0) {
-      narratives.push(`Post-Treatment Response: Pain reduced from ${data.vas_pain_start}/10 to ${data.vas_pain_end}/10 (${improvement} point improvement).`);
+      narratives.push(
+        `Post-Treatment Response: Pain reduced from ${data.vas_pain_start}/10 to ${data.vas_pain_end}/10 (${improvement} point improvement).`
+      );
     } else if (improvement < 0) {
-      narratives.push(`Post-Treatment Response: Pain changed from ${data.vas_pain_start}/10 to ${data.vas_pain_end}/10.`);
+      narratives.push(
+        `Post-Treatment Response: Pain changed from ${data.vas_pain_start}/10 to ${data.vas_pain_end}/10.`
+      );
     } else {
       narratives.push(`Post-Treatment Response: Pain remained at ${data.vas_pain_end}/10.`);
     }
@@ -245,7 +261,7 @@ export function generateFullNarrative(data) {
     subjective: generateSubjectiveNarrative(data),
     objective: generateObjectiveNarrative(data),
     assessment: generateAssessmentNarrative(data),
-    plan: generatePlanNarrative(data)
+    plan: generatePlanNarrative(data),
   };
 
   return sections;
@@ -256,7 +272,9 @@ export function generateEncounterSummary(data, visitNumber, totalVisits) {
   const parts = [];
 
   if (visitNumber && totalVisits) {
-    parts.push(`Today's Daily Encounter: treatment for ${data.encounter_type?.toLowerCase() || 'follow-up'} care on visit ${visitNumber} out of a projected ${totalVisits} visits.`);
+    parts.push(
+      `Today's Daily Encounter: treatment for ${data.encounter_type?.toLowerCase() || 'follow-up'} care on visit ${visitNumber} out of a projected ${totalVisits} visits.`
+    );
   }
 
   if (data.chief_complaint) {
@@ -272,9 +290,15 @@ export function generateEncounterSummary(data, visitNumber, totalVisits) {
 
 // Helper function to format list with proper grammar
 function formatList(items) {
-  if (!items || items.length === 0) return '';
-  if (items.length === 1) return items[0];
-  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  if (!items || items.length === 0) {
+    return '';
+  }
+  if (items.length === 1) {
+    return items[0];
+  }
+  if (items.length === 2) {
+    return `${items[0]} and ${items[1]}`;
+  }
   return `${items.slice(0, -1).join(', ')}, and ${items[items.length - 1]}`;
 }
 
@@ -284,7 +308,7 @@ function formatVertebra(finding) {
     L: 'left',
     R: 'right',
     B: 'bilateral',
-    C: ''
+    C: '',
   };
   const prefix = sidePrefix[finding.side] || '';
   return prefix ? `${prefix} ${finding.vertebra}` : finding.vertebra;
@@ -303,7 +327,7 @@ const PAIN_QUALITY_LABELS = {
   radiating: 'radiating',
   localized: 'localized',
   referred: 'referred',
-  numbness: 'numbness and tingling'
+  numbness: 'numbness and tingling',
 };
 
 const LOCATION_LABELS = {
@@ -322,7 +346,7 @@ const LOCATION_LABELS = {
   r_hip: 'right hip',
   l_hip: 'left hip',
   r_glute: 'right gluteal region',
-  l_glute: 'left gluteal region'
+  l_glute: 'left gluteal region',
 };
 
 const AGGRAVATING_LABELS = {
@@ -339,7 +363,7 @@ const AGGRAVATING_LABELS = {
   driving: 'driving',
   computer_work: 'computer work',
   physical_activity: 'physical activity',
-  coughing: 'coughing or sneezing'
+  coughing: 'coughing or sneezing',
 };
 
 const RELIEVING_LABELS = {
@@ -352,7 +376,7 @@ const RELIEVING_LABELS = {
   ice: 'ice application',
   medication: 'medication',
   stretching: 'stretching',
-  massage: 'massage'
+  massage: 'massage',
 };
 
 const OBSERVATION_LABELS = {
@@ -373,7 +397,7 @@ const OBSERVATION_LABELS = {
   bruising: 'bruising',
   muscle_atrophy: 'muscle atrophy',
   muscle_spasm: 'visible muscle spasm',
-  skin_changes: 'skin changes'
+  skin_changes: 'skin changes',
 };
 
 const PALPATION_LABELS = {
@@ -390,7 +414,7 @@ const PALPATION_LABELS = {
   warm: 'warm to touch',
   cool: 'cool to touch',
   edema: 'edema',
-  fibrosis: 'fibrotic changes'
+  fibrosis: 'fibrotic changes',
 };
 
 const ROM_LABELS = {
@@ -410,7 +434,7 @@ const ROM_LABELS = {
   pain_throughout: 'pain throughout range',
   deviation: 'deviation during movement',
   centralization: 'centralization noted',
-  peripheralization: 'peripheralization noted'
+  peripheralization: 'peripheralization noted',
 };
 
 const ORTHO_LABELS = {
@@ -432,7 +456,7 @@ const ORTHO_LABELS = {
   faber_pos_l: 'FABER positive left',
   gaenslen_pos: "Gaenslen's positive",
   si_compression_pos: 'SI compression positive',
-  si_distraction_pos: 'SI distraction positive'
+  si_distraction_pos: 'SI distraction positive',
 };
 
 const NEURO_LABELS = {
@@ -451,7 +475,7 @@ const NEURO_LABELS = {
   strength_reduced: 'motor strength reduced',
   myotomal_weakness: 'myotomal weakness',
   foot_drop: 'foot drop noted',
-  grip_weakness: 'grip weakness noted'
+  grip_weakness: 'grip weakness noted',
 };
 
 const TREATMENT_LABELS = {
@@ -476,7 +500,7 @@ const TREATMENT_LABELS = {
   heat_therapy: 'moist heat therapy',
   ice_therapy: 'cryotherapy',
   laser_therapy: 'laser therapy',
-  traction: 'mechanical traction'
+  traction: 'mechanical traction',
 };
 
 const EXERCISE_LABELS = {
@@ -501,7 +525,7 @@ const EXERCISE_LABELS = {
   activity_modification: 'activity modification strategies',
   walking_program: 'progressive walking program',
   ice_at_home: 'ice application 15-20 minutes as needed',
-  heat_at_home: 'heat application for muscle relaxation'
+  heat_at_home: 'heat application for muscle relaxation',
 };
 
 export default {
@@ -510,5 +534,5 @@ export default {
   generateAssessmentNarrative,
   generatePlanNarrative,
   generateFullNarrative,
-  generateEncounterSummary
+  generateEncounterSummary,
 };

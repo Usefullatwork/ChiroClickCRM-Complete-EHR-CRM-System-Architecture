@@ -450,7 +450,7 @@ export const RED_FLAG_RULES = [
  */
 export const scanForRedFlags = (text, context = {}) => {
   const detectedFlags = [];
-  const textLower = text.toLowerCase();
+  const _textLower = text.toLowerCase();
 
   for (const rule of RED_FLAG_RULES) {
     for (const pattern of rule.patterns) {
@@ -459,8 +459,12 @@ export const scanForRedFlags = (text, context = {}) => {
 
         // Check age threshold if applicable
         if (rule.ageThreshold && context.age) {
-          if (rule.ageLessThan && context.age >= rule.ageThreshold) continue;
-          if (!rule.ageLessThan && context.age < rule.ageThreshold) continue;
+          if (rule.ageLessThan && context.age >= rule.ageThreshold) {
+            continue;
+          }
+          if (!rule.ageLessThan && context.age < rule.ageThreshold) {
+            continue;
+          }
         }
 
         detectedFlags.push({

@@ -52,7 +52,9 @@ const PATHS = {
  */
 export const ensureDataDirectories = () => {
   for (const [name, dirPath] of Object.entries(PATHS)) {
-    if (name === 'root') continue; // Don't create root
+    if (name === 'root') {
+      continue;
+    } // Don't create root
     try {
       if (!fs.existsSync(dirPath)) {
         fs.mkdirSync(dirPath, { recursive: true });
@@ -67,10 +69,8 @@ export const ensureDataDirectories = () => {
 /**
  * Check if this is a first run (no PGlite database exists)
  */
-export const isFirstRun = () => {
-  return !fs.existsSync(PATHS.pglite) ||
-    fs.readdirSync(PATHS.pglite).length === 0;
-};
+export const isFirstRun = () =>
+  !fs.existsSync(PATHS.pglite) || fs.readdirSync(PATHS.pglite).length === 0;
 
 /**
  * Get the PGlite data directory path

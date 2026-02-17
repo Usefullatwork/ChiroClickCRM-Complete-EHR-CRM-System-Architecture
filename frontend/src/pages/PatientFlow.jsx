@@ -5,26 +5,19 @@
  * for easy patient status tracking and workflow management.
  */
 
-import React, { useState, useMemo } from 'react';
+import _React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import {
-  Calendar,
-  ChevronLeft,
-  ChevronRight,
-  Filter,
-  Monitor,
-  Users
-} from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, _Filter, Monitor, Users } from 'lucide-react';
 import PatientFlowBoard from '../components/PatientFlowBoard';
 import { appointmentsAPI } from '../services/api';
-import { useTranslation, formatDate, formatTime } from '../i18n';
+import { useTranslation, formatDate, _formatTime } from '../i18n';
 
 export default function PatientFlow() {
   const queryClient = useQueryClient();
   const { t, lang } = useTranslation('appointments');
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedProvider, setSelectedProvider] = useState(null);
+  const [selectedProvider, _setSelectedProvider] = useState(null);
 
   // Format date for API
   const dateString = selectedDate.toISOString().split('T')[0];
@@ -33,13 +26,13 @@ export default function PatientFlow() {
   const {
     data: appointmentsResponse,
     isLoading,
-    refetch
+    refetch,
   } = useQuery({
     queryKey: ['appointments', 'flow', dateString],
     queryFn: async () => {
       const response = await appointmentsAPI.getAll({
         date: dateString,
-        includePatient: true
+        includePatient: true,
       });
       return response;
     },
@@ -58,15 +51,17 @@ export default function PatientFlow() {
       const previousData = queryClient.getQueryData(['appointments', 'flow', dateString]);
 
       queryClient.setQueryData(['appointments', 'flow', dateString], (old) => {
-        if (!old?.data?.appointments) return old;
+        if (!old?.data?.appointments) {
+          return old;
+        }
         return {
           ...old,
           data: {
             ...old.data,
-            appointments: old.data.appointments.map(apt =>
+            appointments: old.data.appointments.map((apt) =>
               apt.id === appointmentId ? { ...apt, status } : apt
-            )
-          }
+            ),
+          },
         };
       });
 
@@ -82,28 +77,26 @@ export default function PatientFlow() {
       // Refetch to ensure consistency
       queryClient.invalidateQueries(['appointments', 'flow', dateString]);
       queryClient.invalidateQueries(['dashboard-stats']);
-    }
+    },
   });
 
   // Get appointments from response
   const appointments = useMemo(() => {
-    const data = appointmentsResponse?.data?.appointments ||
-                 appointmentsResponse?.data?.data ||
-                 appointmentsResponse?.data ||
-                 [];
+    const data =
+      appointmentsResponse?.data?.appointments ||
+      appointmentsResponse?.data?.data ||
+      appointmentsResponse?.data ||
+      [];
 
     // Filter by provider if selected
     if (selectedProvider) {
-      return data.filter(apt =>
-        apt.practitioner_id === selectedProvider ||
-        apt.providerId === selectedProvider
+      return data.filter(
+        (apt) => apt.practitioner_id === selectedProvider || apt.providerId === selectedProvider
       );
     }
 
     // Filter out cancelled/no-show for main view
-    return data.filter(apt =>
-      !['CANCELLED', 'NO_SHOW'].includes(apt.status)
-    );
+    return data.filter((apt) => !['CANCELLED', 'NO_SHOW'].includes(apt.status));
   }, [appointmentsResponse, selectedProvider]);
 
   // Handle status change
@@ -135,7 +128,7 @@ export default function PatientFlow() {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
   });
 
   return (
@@ -155,10 +148,7 @@ export default function PatientFlow() {
             <button
               onClick={goToToday}
               className={`px-4 py-2 rounded-lg font-medium transition-colors
-                ${isToday
-                  ? 'bg-teal-100 text-teal-700'
-                  : 'hover:bg-gray-100 text-gray-700'
-                }`}
+                ${isToday ? 'bg-teal-100 text-teal-700' : 'hover:bg-gray-100 text-gray-700'}`}
             >
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
@@ -175,11 +165,7 @@ export default function PatientFlow() {
           </div>
 
           {/* Date display when not today */}
-          {!isToday && (
-            <span className="text-lg font-medium text-gray-700">
-              {formattedDate}
-            </span>
-          )}
+          {!isToday && <span className="text-lg font-medium text-gray-700">{formattedDate}</span>}
         </div>
 
         <div className="flex items-center gap-3">
@@ -210,11 +196,11 @@ export default function PatientFlow() {
       {isLoading ? (
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <div className="w-12 h-12 border-4 border-teal-500 border-t-transparent
-                           rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-500">
-              {t('loadingPatientFlow')}
-            </p>
+            <div
+              className="w-12 h-12 border-4 border-teal-500 border-t-transparent
+                           rounded-full animate-spin mx-auto mb-4"
+            />
+            <p className="text-gray-500">{t('loadingPatientFlow')}</p>
           </div>
         </div>
       ) : appointments.length === 0 ? (
@@ -222,11 +208,12 @@ export default function PatientFlow() {
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-gray-700 mb-2">
-              {t('noAppointments')}
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-700 mb-2">{t('noAppointments')}</h2>
             <p className="text-gray-500 mb-4">
-              {t('noAppointmentsScheduledFor').replace('{date}', isToday ? t('today').toLowerCase() : formattedDate)}
+              {t('noAppointmentsScheduledFor').replace(
+                '{date}',
+                isToday ? t('today').toLowerCase() : formattedDate
+              )}
             </p>
             <Link
               to="/appointments/new"

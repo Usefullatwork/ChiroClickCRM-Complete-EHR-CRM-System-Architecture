@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * PWA Hook
  *
@@ -63,9 +64,12 @@ export async function registerServiceWorker() {
       console.log('[PWA] Service worker registered:', registration.scope);
 
       // Check for updates periodically
-      setInterval(() => {
-        registration.update();
-      }, 60 * 60 * 1000); // Every hour
+      setInterval(
+        () => {
+          registration.update();
+        },
+        60 * 60 * 1000
+      ); // Every hour
 
       return registration;
     } catch (error) {
@@ -183,7 +187,9 @@ export function usePWA(lang = 'en') {
 
   // Install the PWA
   const install = useCallback(async () => {
-    if (!deferredPrompt) return false;
+    if (!deferredPrompt) {
+      return false;
+    }
 
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
@@ -211,7 +217,9 @@ export function usePWA(lang = 'en') {
 
   // Check if we should show install prompt
   const shouldShowInstall = useCallback(() => {
-    if (!isInstallable || isInstalled) return false;
+    if (!isInstallable || isInstalled) {
+      return false;
+    }
 
     const dismissed = localStorage.getItem('pwa_install_dismissed');
     if (dismissed) {
@@ -409,9 +417,7 @@ export async function offlineFetch(url, options = {}) {
         timestamp: Date.now(),
       };
 
-      const storeName = url.includes('/appointments')
-        ? 'pending-appointments'
-        : 'pending-notes';
+      const storeName = url.includes('/appointments') ? 'pending-appointments' : 'pending-notes';
 
       await saveOffline(storeName, pendingItem);
 

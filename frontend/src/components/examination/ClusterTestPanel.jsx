@@ -5,7 +5,7 @@
  * Implements evidence-based test clusters with automatic scoring and alerts.
  */
 
-import React, { useState, useMemo, useCallback } from 'react';
+import _React, { useState, useMemo, useCallback } from 'react';
 import {
   AlertTriangle,
   AlertCircle,
@@ -19,9 +19,9 @@ import {
   Skull,
   FileText,
   RefreshCw,
-  Smile
+  Smile,
 } from 'lucide-react';
-import { CLUSTER_TESTS, CLUSTER_THRESHOLDS, SEVERITY } from '../../data/examinationProtocols';
+import { CLUSTER_TESTS, _CLUSTER_THRESHOLDS, SEVERITY } from '../../data/examinationProtocols';
 
 // Cluster type icons
 const CLUSTER_ICONS = {
@@ -30,7 +30,7 @@ const CLUSTER_ICONS = {
   cervicogenic: Activity,
   myelopathy: AlertTriangle,
   upperCervicalInstability: Skull,
-  tmj: Smile
+  tmj: Smile,
 };
 
 /**
@@ -38,20 +38,25 @@ const CLUSTER_ICONS = {
  */
 function ClusterTestItem({ test, value, onChange, readOnly = false }) {
   return (
-    <div className={`p-3 border rounded-lg ${value === true
-      ? 'border-amber-300 bg-amber-50'
-      : value === false
-        ? 'border-gray-200 bg-gray-50'
-        : 'border-gray-200'}`}
+    <div
+      className={`p-3 border rounded-lg ${
+        value === true
+          ? 'border-amber-300 bg-amber-50'
+          : value === false
+            ? 'border-gray-200 bg-gray-50'
+            : 'border-gray-200'
+      }`}
     >
       <div className="flex items-start gap-3">
         <div className="flex gap-2 mt-0.5">
           <button
             onClick={() => onChange(test.id, true)}
             disabled={readOnly}
-            className={`p-1 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${value === true
-              ? 'bg-amber-500 text-white'
-              : 'bg-gray-200 text-gray-500 hover:bg-amber-200'}`}
+            className={`p-1 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+              value === true
+                ? 'bg-amber-500 text-white'
+                : 'bg-gray-200 text-gray-500 hover:bg-amber-200'
+            }`}
             title="Positiv"
           >
             <CheckCircle className="w-4 h-4" />
@@ -59,9 +64,11 @@ function ClusterTestItem({ test, value, onChange, readOnly = false }) {
           <button
             onClick={() => onChange(test.id, false)}
             disabled={readOnly}
-            className={`p-1 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${value === false
-              ? 'bg-green-500 text-white'
-              : 'bg-gray-200 text-gray-500 hover:bg-green-200'}`}
+            className={`p-1 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+              value === false
+                ? 'bg-green-500 text-white'
+                : 'bg-gray-200 text-gray-500 hover:bg-green-200'
+            }`}
             title="Negativ"
           >
             <XCircle className="w-4 h-4" />
@@ -69,14 +76,14 @@ function ClusterTestItem({ test, value, onChange, readOnly = false }) {
         </div>
 
         <div className="flex-1">
-          <h4 className={`font-medium text-sm ${value === true ? 'text-amber-700' : 'text-gray-700'}`}>
+          <h4
+            className={`font-medium text-sm ${value === true ? 'text-amber-700' : 'text-gray-700'}`}
+          >
             {test.name}
           </h4>
           <p className="text-xs text-gray-500 mt-0.5">{test.criteria}</p>
           {value === true && test.interpretation && (
-            <p className="text-xs text-amber-600 mt-1 italic">
-              → {test.interpretation}
-            </p>
+            <p className="text-xs text-amber-600 mt-1 italic">→ {test.interpretation}</p>
           )}
         </div>
       </div>
@@ -95,15 +102,16 @@ function ClusterScoreIndicator({ score, threshold, total, critical }) {
     <div className="flex items-center gap-3">
       <div className="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
         <div
-          className={`h-full transition-all duration-300 ${isPositive
-            ? critical ? 'bg-red-500' : 'bg-amber-500'
-            : 'bg-green-500'}`}
+          className={`h-full transition-all duration-300 ${
+            isPositive ? (critical ? 'bg-red-500' : 'bg-amber-500') : 'bg-green-500'
+          }`}
           style={{ width: `${percentage}%` }}
         />
       </div>
-      <div className={`text-sm font-bold ${isPositive
-        ? critical ? 'text-red-600' : 'text-amber-600'
-        : 'text-green-600'}`}
+      <div
+        className={`text-sm font-bold ${
+          isPositive ? (critical ? 'text-red-600' : 'text-amber-600') : 'text-green-600'
+        }`}
       >
         {score}/{total}
       </div>
@@ -114,12 +122,20 @@ function ClusterScoreIndicator({ score, threshold, total, critical }) {
 /**
  * Single cluster test panel
  */
-function ClusterPanel({ cluster, values = {}, onChange, lang = 'no', expanded, onToggle, readOnly = false }) {
+function ClusterPanel({
+  cluster,
+  values = {},
+  onChange,
+  lang = 'no',
+  expanded,
+  onToggle,
+  readOnly = false,
+}) {
   const Icon = CLUSTER_ICONS[cluster.id] || Activity;
 
   // Calculate score
   const score = useMemo(() => {
-    return cluster.tests.filter(test => {
+    return cluster.tests.filter((test) => {
       const val = values[test.id];
       // Handle inverted logic (e.g., skew deviation test)
       if (test.invertedLogic) {
@@ -130,12 +146,12 @@ function ClusterPanel({ cluster, values = {}, onChange, lang = 'no', expanded, o
   }, [cluster.tests, values]);
 
   const isPositive = score >= cluster.threshold;
-  const severity = cluster.critical ? SEVERITY.CRITICAL : SEVERITY.HIGH;
+  const _severity = cluster.critical ? SEVERITY.CRITICAL : SEVERITY.HIGH;
 
   const handleTestChange = (testId, value) => {
     onChange({
       ...values,
-      [testId]: value
+      [testId]: value,
     });
   };
 
@@ -155,34 +171,40 @@ function ClusterPanel({ cluster, values = {}, onChange, lang = 'no', expanded, o
   const assessment = getAssessment();
 
   return (
-    <div className={`border rounded-lg overflow-hidden ${isPositive
-      ? cluster.critical ? 'border-red-300' : 'border-amber-300'
-      : 'border-gray-200'}`}
+    <div
+      className={`border rounded-lg overflow-hidden ${
+        isPositive ? (cluster.critical ? 'border-red-300' : 'border-amber-300') : 'border-gray-200'
+      }`}
     >
       {/* Header */}
       <button
         onClick={onToggle}
         className={`w-full px-4 py-3 flex items-center justify-between
-                   ${isPositive
-                     ? cluster.critical ? 'bg-red-50' : 'bg-amber-50'
-                     : 'bg-gray-50'}`}
+                   ${isPositive ? (cluster.critical ? 'bg-red-50' : 'bg-amber-50') : 'bg-gray-50'}`}
       >
         <div className="flex items-center gap-3">
           {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-          <Icon className={`w-5 h-5 ${isPositive
-            ? cluster.critical ? 'text-red-500' : 'text-amber-500'
-            : 'text-gray-500'}`}
+          <Icon
+            className={`w-5 h-5 ${
+              isPositive ? (cluster.critical ? 'text-red-500' : 'text-amber-500') : 'text-gray-500'
+            }`}
           />
           <div className="text-left">
-            <h3 className={`font-medium ${isPositive
-              ? cluster.critical ? 'text-red-700' : 'text-amber-700'
-              : 'text-gray-700'}`}
+            <h3
+              className={`font-medium ${
+                isPositive
+                  ? cluster.critical
+                    ? 'text-red-700'
+                    : 'text-amber-700'
+                  : 'text-gray-700'
+              }`}
             >
               {lang === 'no' ? cluster.name : cluster.nameEn}
             </h3>
             <p className="text-xs text-gray-500">
               {lang === 'no' ? 'Terskel' : 'Threshold'}: ≥{cluster.threshold}/{cluster.total}
-              {cluster.sensitivity && ` | Sens: ${cluster.sensitivity}%, Spes: ${cluster.specificity}%`}
+              {cluster.sensitivity &&
+                ` | Sens: ${cluster.sensitivity}%, Spes: ${cluster.specificity}%`}
             </p>
           </div>
         </div>
@@ -195,7 +217,9 @@ function ClusterPanel({ cluster, values = {}, onChange, lang = 'no', expanded, o
             critical={cluster.critical}
           />
           {isPositive && (
-            <AlertTriangle className={`w-5 h-5 ${cluster.critical ? 'text-red-500' : 'text-amber-500'}`} />
+            <AlertTriangle
+              className={`w-5 h-5 ${cluster.critical ? 'text-red-500' : 'text-amber-500'}`}
+            />
           )}
         </div>
       </button>
@@ -227,24 +251,28 @@ function ClusterPanel({ cluster, values = {}, onChange, lang = 'no', expanded, o
 
           {/* Assessment result */}
           {assessment && (
-            <div className={`p-3 rounded-lg ${assessment.level === 'high'
-              ? 'bg-red-50 border border-red-200'
-              : assessment.level === 'moderate'
-                ? 'bg-amber-50 border border-amber-200'
-                : 'bg-green-50 border border-green-200'}`}
+            <div
+              className={`p-3 rounded-lg ${
+                assessment.level === 'high'
+                  ? 'bg-red-50 border border-red-200'
+                  : assessment.level === 'moderate'
+                    ? 'bg-amber-50 border border-amber-200'
+                    : 'bg-green-50 border border-green-200'
+              }`}
             >
-              <p className={`text-sm font-medium ${assessment.level === 'high'
-                ? 'text-red-700'
-                : assessment.level === 'moderate'
-                  ? 'text-amber-700'
-                  : 'text-green-700'}`}
+              <p
+                className={`text-sm font-medium ${
+                  assessment.level === 'high'
+                    ? 'text-red-700'
+                    : assessment.level === 'moderate'
+                      ? 'text-amber-700'
+                      : 'text-green-700'
+                }`}
               >
                 {assessment.message}
               </p>
               {assessment.action && (
-                <p className="text-xs mt-1 text-gray-600">
-                  → {assessment.action}
-                </p>
+                <p className="text-xs mt-1 text-gray-600">→ {assessment.action}</p>
               )}
             </div>
           )}
@@ -306,15 +334,18 @@ function ClusterPanel({ cluster, values = {}, onChange, lang = 'no', expanded, o
               </h4>
               <ul className="mt-2 space-y-1">
                 {cluster.hintsPlus.redFlags.map((flag, idx) => (
-                  <li key={idx} className={`text-xs flex items-start gap-2 ${flag.good ? 'text-green-600' : 'text-purple-600'}`}>
+                  <li
+                    key={idx}
+                    className={`text-xs flex items-start gap-2 ${flag.good ? 'text-green-600' : 'text-purple-600'}`}
+                  >
                     <span>{flag.good ? '✓' : '⚠'}</span>
-                    <span><strong>{flag.name}:</strong> {flag.meaning}</span>
+                    <span>
+                      <strong>{flag.name}:</strong> {flag.meaning}
+                    </span>
                   </li>
                 ))}
               </ul>
-              <p className="mt-2 text-xs font-medium text-purple-700">
-                {cluster.hintsPlus.action}
-              </p>
+              <p className="mt-2 text-xs font-medium text-purple-700">{cluster.hintsPlus.action}</p>
             </div>
           )}
         </div>
@@ -331,21 +362,21 @@ export default function ClusterTestPanel({
   onChange,
   lang = 'no',
   readOnly = false,
-  onGenerateReport
+  onGenerateReport,
 }) {
   const [expandedClusters, setExpandedClusters] = useState({});
 
   const handleClusterToggle = (clusterId) => {
-    setExpandedClusters(prev => ({
+    setExpandedClusters((prev) => ({
       ...prev,
-      [clusterId]: !prev[clusterId]
+      [clusterId]: !prev[clusterId],
     }));
   };
 
   const handleClusterChange = (clusterId, clusterValues) => {
     onChange({
       ...values,
-      [clusterId]: clusterValues
+      [clusterId]: clusterValues,
     });
   };
 
@@ -360,9 +391,11 @@ export default function ClusterTestPanel({
 
     Object.entries(CLUSTER_TESTS).forEach(([key, cluster]) => {
       const clusterValues = values[key] || {};
-      const score = cluster.tests.filter(test => {
+      const score = cluster.tests.filter((test) => {
         const val = clusterValues[test.id];
-        if (test.invertedLogic) return val === false;
+        if (test.invertedLogic) {
+          return val === false;
+        }
         return val === true;
       }).length;
 
@@ -372,7 +405,7 @@ export default function ClusterTestPanel({
           name: lang === 'no' ? cluster.name : cluster.nameEn,
           score,
           total: cluster.total,
-          critical: cluster.critical
+          critical: cluster.critical,
         });
       }
     });
@@ -390,27 +423,35 @@ export default function ClusterTestPanel({
       const clusterValues = values[key] || {};
       const testedCount = Object.keys(clusterValues).length;
 
-      if (testedCount === 0) return;
+      if (testedCount === 0) {
+        return;
+      }
 
-      const score = cluster.tests.filter(test => {
+      const score = cluster.tests.filter((test) => {
         const val = clusterValues[test.id];
-        if (test.invertedLogic) return val === false;
+        if (test.invertedLogic) {
+          return val === false;
+        }
         return val === true;
       }).length;
 
       const isPositive = score >= cluster.threshold;
       const clusterName = lang === 'no' ? cluster.name : cluster.nameEn;
 
-      lines.push(`\n${clusterName}: ${score}/${cluster.total} ${isPositive ? '(POSITIV)' : '(Negativ)'}`);
+      lines.push(
+        `\n${clusterName}: ${score}/${cluster.total} ${isPositive ? '(POSITIV)' : '(Negativ)'}`
+      );
 
       if (isPositive) {
-        const positiveTests = cluster.tests.filter(test => {
+        const positiveTests = cluster.tests.filter((test) => {
           const val = clusterValues[test.id];
-          if (test.invertedLogic) return val === false;
+          if (test.invertedLogic) {
+            return val === false;
+          }
           return val === true;
         });
 
-        positiveTests.forEach(test => {
+        positiveTests.forEach((test) => {
           lines.push(`  • ${test.name}`);
         });
 
@@ -422,7 +463,7 @@ export default function ClusterTestPanel({
 
     if (summary.length > 0) {
       lines.push('\n\nKONKLUSJON:');
-      summary.forEach(s => {
+      summary.forEach((s) => {
         lines.push(`• ${s.name}: ${s.score}/${s.total} ${s.critical ? '(KRITISK)' : ''}`);
       });
     } else {
@@ -475,20 +516,27 @@ export default function ClusterTestPanel({
 
       {/* Summary alert */}
       {summary.length > 0 && (
-        <div className={`p-4 rounded-lg border ${summary.some(s => s.critical)
-          ? 'bg-red-50 border-red-300'
-          : 'bg-amber-50 border-amber-300'}`}
+        <div
+          className={`p-4 rounded-lg border ${
+            summary.some((s) => s.critical)
+              ? 'bg-red-50 border-red-300'
+              : 'bg-amber-50 border-amber-300'
+          }`}
         >
-          <h3 className={`font-semibold flex items-center gap-2 ${summary.some(s => s.critical)
-            ? 'text-red-700'
-            : 'text-amber-700'}`}
+          <h3
+            className={`font-semibold flex items-center gap-2 ${
+              summary.some((s) => s.critical) ? 'text-red-700' : 'text-amber-700'
+            }`}
           >
             <AlertTriangle className="w-5 h-5" />
             {lang === 'no' ? 'Positive klustere funnet' : 'Positive Clusters Found'}
           </h3>
           <ul className="mt-2 space-y-1">
-            {summary.map(s => (
-              <li key={s.id} className={`text-sm ${s.critical ? 'text-red-600 font-medium' : 'text-amber-600'}`}>
+            {summary.map((s) => (
+              <li
+                key={s.id}
+                className={`text-sm ${s.critical ? 'text-red-600 font-medium' : 'text-amber-600'}`}
+              >
                 • {s.name}: {s.score}/{s.total} {s.critical && '⚠ KRITISK'}
               </li>
             ))}
@@ -514,4 +562,3 @@ export default function ClusterTestPanel({
     </div>
   );
 }
-

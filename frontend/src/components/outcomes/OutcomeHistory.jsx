@@ -10,7 +10,7 @@
  * Bilingual: English/Norwegian
  */
 
-import React, { useState, useMemo } from 'react';
+import _React, { useState, useMemo } from 'react';
 import { QUESTIONNAIRES, calculateChange } from './questionnaires';
 
 // =============================================================================
@@ -119,7 +119,9 @@ const MOCK_HISTORY = {
  * Simple Line Chart (SVG-based, no external dependencies)
  */
 function SimpleLineChart({ data, maxValue, lang, color = '#3b82f6' }) {
-  if (!data || data.length === 0) return null;
+  if (!data || data.length === 0) {
+    return null;
+  }
 
   const width = 400;
   const height = 200;
@@ -136,9 +138,7 @@ function SimpleLineChart({ data, maxValue, lang, color = '#3b82f6' }) {
   }));
 
   // Generate path
-  const linePath = points
-    .map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`)
-    .join(' ');
+  const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
 
   // Generate area path
   const areaPath = `${linePath} L ${points[points.length - 1].x} ${padding.top + chartHeight} L ${points[0].x} ${padding.top + chartHeight} Z`;
@@ -182,12 +182,7 @@ function SimpleLineChart({ data, maxValue, lang, color = '#3b82f6' }) {
           <circle cx={p.x} cy={p.y} r="6" fill="white" stroke={color} strokeWidth="2" />
           {/* Date label */}
           {(i === 0 || i === points.length - 1 || i === Math.floor(points.length / 2)) && (
-            <text
-              x={p.x}
-              y={height - 10}
-              textAnchor="middle"
-              className="text-xs fill-gray-500"
-            >
+            <text x={p.x} y={height - 10} textAnchor="middle" className="text-xs fill-gray-500">
               {new Date(p.date).toLocaleDateString(lang === 'no' ? 'nb-NO' : 'en-US', {
                 month: 'short',
                 day: 'numeric',
@@ -201,11 +196,17 @@ function SimpleLineChart({ data, maxValue, lang, color = '#3b82f6' }) {
       {data.length >= 2 && (
         <g>
           {data[0].percentage > data[data.length - 1].percentage ? (
-            <text x={width - 30} y={30} className="text-2xl fill-green-500">↓</text>
+            <text x={width - 30} y={30} className="text-2xl fill-green-500">
+              ↓
+            </text>
           ) : data[0].percentage < data[data.length - 1].percentage ? (
-            <text x={width - 30} y={30} className="text-2xl fill-red-500">↑</text>
+            <text x={width - 30} y={30} className="text-2xl fill-red-500">
+              ↑
+            </text>
           ) : (
-            <text x={width - 30} y={30} className="text-2xl fill-gray-500">→</text>
+            <text x={width - 30} y={30} className="text-2xl fill-gray-500">
+              →
+            </text>
           )}
         </g>
       )}
@@ -220,11 +221,17 @@ function SummaryCard({ questionnaireId, history, lang }) {
   const t = TRANSLATIONS[lang];
   const questionnaire = QUESTIONNAIRES[questionnaireId];
 
-  if (!history || history.length === 0) return null;
+  if (!history || history.length === 0) {
+    return null;
+  }
 
   const baseline = history[0];
   const latest = history[history.length - 1];
-  const change = calculateChange(baseline.percentage, latest.percentage, questionnaire.scoring.mcid);
+  const change = calculateChange(
+    baseline.percentage,
+    latest.percentage,
+    questionnaire.scoring.mcid
+  );
   const daysSinceBaseline = Math.floor(
     (new Date(latest.date) - new Date(baseline.date)) / (1000 * 60 * 60 * 24)
   );
@@ -246,7 +253,13 @@ function SummaryCard({ questionnaireId, history, lang }) {
           data={history}
           maxValue={100}
           lang={lang}
-          color={change.absoluteChange > 0 ? '#22c55e' : change.absoluteChange < 0 ? '#ef4444' : '#6b7280'}
+          color={
+            change.absoluteChange > 0
+              ? '#22c55e'
+              : change.absoluteChange < 0
+                ? '#ef4444'
+                : '#6b7280'
+          }
         />
       </div>
 
@@ -266,11 +279,15 @@ function SummaryCard({ questionnaireId, history, lang }) {
         </div>
         <div>
           <div className="text-sm text-gray-500 dark:text-gray-400">{t.change}</div>
-          <div className={`text-xl font-bold ${
-            change.absoluteChange > 0 ? 'text-green-600' :
-            change.absoluteChange < 0 ? 'text-red-600' :
-            'text-gray-600'
-          }`}>
+          <div
+            className={`text-xl font-bold ${
+              change.absoluteChange > 0
+                ? 'text-green-600'
+                : change.absoluteChange < 0
+                  ? 'text-red-600'
+                  : 'text-gray-600'
+            }`}
+          >
             {change.absoluteChange > 0 ? '-' : change.absoluteChange < 0 ? '+' : ''}
             {Math.abs(change.absoluteChange)}%
           </div>
@@ -279,11 +296,13 @@ function SummaryCard({ questionnaireId, history, lang }) {
 
       {/* Clinical Significance */}
       {change.clinicallySignificant && (
-        <div className={`mt-4 p-3 rounded-lg text-center text-sm font-medium ${
-          change.significance === 'improved'
-            ? 'bg-green-50 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-            : 'bg-red-50 text-red-800 dark:bg-red-900/20 dark:text-red-400'
-        }`}>
+        <div
+          className={`mt-4 p-3 rounded-lg text-center text-sm font-medium ${
+            change.significance === 'improved'
+              ? 'bg-green-50 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+              : 'bg-red-50 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+          }`}
+        >
           {change.significance === 'improved' ? '✓ ' : '⚠ '}
           {change.significance === 'improved' ? t.significantImprovement : t.significantWorsening}
         </div>
@@ -304,7 +323,9 @@ function HistoryTable({ questionnaireId, history, lang }) {
   const t = TRANSLATIONS[lang];
   const questionnaire = QUESTIONNAIRES[questionnaireId];
 
-  if (!history || history.length === 0) return null;
+  if (!history || history.length === 0) {
+    return null;
+  }
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -335,7 +356,11 @@ function HistoryTable({ questionnaireId, history, lang }) {
             {history.map((entry, index) => {
               const prevEntry = index > 0 ? history[index - 1] : null;
               const change = prevEntry
-                ? calculateChange(prevEntry.percentage, entry.percentage, questionnaire.scoring.mcid)
+                ? calculateChange(
+                    prevEntry.percentage,
+                    entry.percentage,
+                    questionnaire.scoring.mcid
+                  )
                 : null;
 
               const interpretation = questionnaire.scoring.interpretation.find(
@@ -355,32 +380,40 @@ function HistoryTable({ questionnaireId, history, lang }) {
                     )}
                   </td>
                   <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
-                    {entry.percentage}%
-                    <span className="ml-1 text-gray-500">({entry.score})</span>
+                    {entry.percentage}%<span className="ml-1 text-gray-500">({entry.score})</span>
                   </td>
                   <td className="px-6 py-4">
                     {change ? (
-                      <span className={`inline-flex items-center text-sm font-medium ${
-                        change.absoluteChange > 0 ? 'text-green-600' :
-                        change.absoluteChange < 0 ? 'text-red-600' :
-                        'text-gray-500'
-                      }`}>
+                      <span
+                        className={`inline-flex items-center text-sm font-medium ${
+                          change.absoluteChange > 0
+                            ? 'text-green-600'
+                            : change.absoluteChange < 0
+                              ? 'text-red-600'
+                              : 'text-gray-500'
+                        }`}
+                      >
                         {change.absoluteChange > 0 ? '↓ -' : change.absoluteChange < 0 ? '↑ +' : ''}
-                        {Math.abs(change.absoluteChange)}%
-                        {change.clinicallySignificant && ' *'}
+                        {Math.abs(change.absoluteChange)}%{change.clinicallySignificant && ' *'}
                       </span>
                     ) : (
                       <span className="text-gray-400">—</span>
                     )}
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                      interpretation?.color === 'green' ? 'bg-green-100 text-green-800' :
-                      interpretation?.color === 'yellow' ? 'bg-yellow-100 text-yellow-800' :
-                      interpretation?.color === 'orange' ? 'bg-orange-100 text-orange-800' :
-                      interpretation?.color === 'red' ? 'bg-red-100 text-red-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
+                    <span
+                      className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                        interpretation?.color === 'green'
+                          ? 'bg-green-100 text-green-800'
+                          : interpretation?.color === 'yellow'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : interpretation?.color === 'orange'
+                              ? 'bg-orange-100 text-orange-800'
+                              : interpretation?.color === 'red'
+                                ? 'bg-red-100 text-red-800'
+                                : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
                       {interpretation?.label[lang]}
                     </span>
                   </td>
@@ -399,7 +432,7 @@ function HistoryTable({ questionnaireId, history, lang }) {
 // =============================================================================
 
 export default function OutcomeHistory({
-  patientId,
+  _patientId,
   history = MOCK_HISTORY,
   onStartNew,
   lang = 'en',
@@ -425,9 +458,7 @@ export default function OutcomeHistory({
     return (
       <div className="text-center py-12">
         <div className="text-6xl mb-4">📊</div>
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-          {t.noData}
-        </h3>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">{t.noData}</h3>
         <button
           onClick={onStartNew}
           className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -442,9 +473,7 @@ export default function OutcomeHistory({
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {t.outcomeHistory}
-        </h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t.outcomeHistory}</h2>
         <div className="flex items-center gap-3">
           {/* Measure Filter */}
           <select
@@ -497,29 +526,23 @@ export default function OutcomeHistory({
       {/* Content */}
       {viewMode === 'cards' ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {Object.entries(filteredHistory).map(([id, data]) => (
-            data && data.length > 0 && (
-              <SummaryCard
-                key={id}
-                questionnaireId={id}
-                history={data}
-                lang={lang}
-              />
-            )
-          ))}
+          {Object.entries(filteredHistory).map(
+            ([id, data]) =>
+              data &&
+              data.length > 0 && (
+                <SummaryCard key={id} questionnaireId={id} history={data} lang={lang} />
+              )
+          )}
         </div>
       ) : (
         <div className="space-y-6">
-          {Object.entries(filteredHistory).map(([id, data]) => (
-            data && data.length > 0 && (
-              <HistoryTable
-                key={id}
-                questionnaireId={id}
-                history={data}
-                lang={lang}
-              />
-            )
-          ))}
+          {Object.entries(filteredHistory).map(
+            ([id, data]) =>
+              data &&
+              data.length > 0 && (
+                <HistoryTable key={id} questionnaireId={id} history={data} lang={lang} />
+              )
+          )}
         </div>
       )}
     </div>

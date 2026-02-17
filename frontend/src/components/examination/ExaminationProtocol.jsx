@@ -5,7 +5,7 @@
  * for each body region. Supports Norwegian and English labels.
  */
 
-import React, { useState, useCallback, useMemo } from 'react';
+import _React, { useState, useCallback, useMemo } from 'react';
 import {
   ChevronDown,
   ChevronRight,
@@ -14,9 +14,9 @@ import {
   CheckCircle,
   Info,
   Clipboard,
-  FileText
+  FileText,
 } from 'lucide-react';
-import { EXAMINATION_REGIONS, SEVERITY } from '../../data/examinationProtocols';
+import { EXAMINATION_REGIONS, _SEVERITY } from '../../data/examinationProtocols';
 
 // Region icons mapping
 const REGION_ICONS = {
@@ -26,20 +26,22 @@ const REGION_ICONS = {
   hip: '🦵',
   knee: '🦵',
   ankle: '🦶',
-  tmj: '😬'
+  tmj: '😬',
 };
 
 /**
  * Individual examination item renderer
  */
 function ExaminationItem({ item, value, onChange, lang = 'no', readOnly = false }) {
-  const label = lang === 'no' ? item.label : (item.labelEn || item.label);
+  const label = lang === 'no' ? item.label : item.labelEn || item.label;
 
   const renderInput = () => {
     switch (item.type) {
       case 'checkbox':
         return (
-          <label className={`flex items-center gap-2 ${readOnly ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+          <label
+            className={`flex items-center gap-2 ${readOnly ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+          >
             <input
               type="checkbox"
               checked={value || false}
@@ -47,7 +49,9 @@ function ExaminationItem({ item, value, onChange, lang = 'no', readOnly = false 
               disabled={readOnly}
               className="w-4 h-4 text-teal-600 rounded border-gray-300 focus:ring-teal-500 disabled:opacity-50"
             />
-            <span className={`text-sm ${item.redFlag ? 'text-red-600 font-medium' : 'text-gray-700'}`}>
+            <span
+              className={`text-sm ${item.redFlag ? 'text-red-600 font-medium' : 'text-gray-700'}`}
+            >
               {label}
               {item.redFlag && <AlertTriangle className="inline w-3 h-3 ml-1 text-red-500" />}
             </span>
@@ -67,7 +71,9 @@ function ExaminationItem({ item, value, onChange, lang = 'no', readOnly = false 
             >
               <option value="">-- Velg --</option>
               {item.options.map((opt) => (
-                <option key={opt} value={opt}>{opt}</option>
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
               ))}
             </select>
           </div>
@@ -87,7 +93,9 @@ function ExaminationItem({ item, value, onChange, lang = 'no', readOnly = false 
               >
                 <option value="">-- Velg --</option>
                 {item.options.map((opt) => (
-                  <option key={opt} value={opt}>{opt}</option>
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
                 ))}
               </select>
               {item.redFlag && value && value !== 'Negativ' && (
@@ -95,9 +103,7 @@ function ExaminationItem({ item, value, onChange, lang = 'no', readOnly = false 
               )}
             </div>
             {item.interpretation && value && value !== 'Negativ' && (
-              <p className="text-xs text-gray-500 ml-[188px] italic">
-                → {item.interpretation}
-              </p>
+              <p className="text-xs text-gray-500 ml-[188px] italic">→ {item.interpretation}</p>
             )}
           </div>
         );
@@ -113,9 +119,11 @@ function ExaminationItem({ item, value, onChange, lang = 'no', readOnly = false 
               disabled={readOnly}
               className={`w-16 px-2 py-1 text-sm border rounded-md text-center
                         focus:ring-1 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed
-                        ${value && item.normal && parseInt(value) < item.normal * 0.7
-                          ? 'border-amber-400 bg-amber-50'
-                          : 'border-gray-300'}`}
+                        ${
+                          value && item.normal && parseInt(value) < item.normal * 0.7
+                            ? 'border-amber-400 bg-amber-50'
+                            : 'border-gray-300'
+                        }`}
               placeholder="°"
             />
             <span className="text-xs text-gray-400">/ {item.normal}° normal</span>
@@ -139,9 +147,7 @@ function ExaminationItem({ item, value, onChange, lang = 'no', readOnly = false 
               placeholder={item.unit}
             />
             <span className="text-xs text-gray-400">{item.unit}</span>
-            {item.normal && (
-              <span className="text-xs text-gray-400">(normal: {item.normal})</span>
-            )}
+            {item.normal && <span className="text-xs text-gray-400">(normal: {item.normal})</span>}
           </div>
         );
 
@@ -187,11 +193,7 @@ function ExaminationItem({ item, value, onChange, lang = 'no', readOnly = false 
     }
   };
 
-  return (
-    <div className="py-1">
-      {renderInput()}
-    </div>
-  );
+  return <div className="py-1">{renderInput()}</div>;
 }
 
 /**
@@ -199,16 +201,22 @@ function ExaminationItem({ item, value, onChange, lang = 'no', readOnly = false 
  */
 function ExaminationSection({ section, values, onChange, lang = 'no', readOnly = false }) {
   const [expanded, setExpanded] = useState(true);
-  const title = lang === 'no' ? section.title : (section.titleEn || section.title);
+  const title = lang === 'no' ? section.title : section.titleEn || section.title;
 
   // Calculate if alert condition is met
   const alertTriggered = useMemo(() => {
-    if (!section.alert) return false;
+    if (!section.alert) {
+      return false;
+    }
 
-    const positiveCount = section.items.filter(item => {
+    const positiveCount = section.items.filter((item) => {
       const val = values[item.id];
-      if (item.type === 'checkbox') return val === true;
-      if (item.type === 'test') return val && val !== 'Negativ';
+      if (item.type === 'checkbox') {
+        return val === true;
+      }
+      if (item.type === 'test') {
+        return val && val !== 'Negativ';
+      }
       return false;
     }).length;
 
@@ -216,7 +224,9 @@ function ExaminationSection({ section, values, onChange, lang = 'no', readOnly =
   }, [section, values]);
 
   return (
-    <div className={`border rounded-lg mb-2 ${alertTriggered ? 'border-red-300 bg-red-50' : 'border-gray-200'}`}>
+    <div
+      className={`border rounded-lg mb-2 ${alertTriggered ? 'border-red-300 bg-red-50' : 'border-gray-200'}`}
+    >
       <button
         onClick={() => setExpanded(!expanded)}
         className={`w-full px-3 py-2 flex items-center justify-between text-left
@@ -224,7 +234,9 @@ function ExaminationSection({ section, values, onChange, lang = 'no', readOnly =
       >
         <div className="flex items-center gap-2">
           {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-          <span className={`font-medium text-sm ${section.redFlag ? 'text-red-700' : 'text-gray-700'}`}>
+          <span
+            className={`font-medium text-sm ${section.redFlag ? 'text-red-700' : 'text-gray-700'}`}
+          >
             {title}
           </span>
           {section.redFlag && <AlertTriangle className="w-4 h-4 text-red-500" />}
@@ -265,52 +277,63 @@ export default function ExaminationProtocol({
   onChange,
   lang = 'no',
   readOnly = false,
-  onGenerateNarrative
+  onGenerateNarrative,
 }) {
   const [activeRegion, setActiveRegion] = useState(selectedRegion);
 
   const handleRegionSelect = (regionId) => {
     setActiveRegion(regionId);
-    if (onRegionChange) onRegionChange(regionId);
+    if (onRegionChange) {
+      onRegionChange(regionId);
+    }
   };
 
-  const handleItemChange = useCallback((itemId, value) => {
-    if (onChange) {
-      onChange({
-        ...values,
-        [activeRegion]: {
-          ...(values[activeRegion] || {}),
-          [itemId]: value
-        }
-      });
-    }
-  }, [activeRegion, values, onChange]);
+  const handleItemChange = useCallback(
+    (itemId, value) => {
+      if (onChange) {
+        onChange({
+          ...values,
+          [activeRegion]: {
+            ...(values[activeRegion] || {}),
+            [itemId]: value,
+          },
+        });
+      }
+    },
+    [activeRegion, values, onChange]
+  );
 
   const currentRegion = activeRegion ? EXAMINATION_REGIONS[activeRegion] : null;
   const currentValues = values[activeRegion] || {};
 
   // Count findings
   const findingsCount = useMemo(() => {
-    if (!currentValues) return 0;
-    return Object.values(currentValues).filter(v =>
-      v === true || (typeof v === 'string' && v && v !== 'Negativ' && v !== '')
+    if (!currentValues) {
+      return 0;
+    }
+    return Object.values(currentValues).filter(
+      (v) => v === true || (typeof v === 'string' && v && v !== 'Negativ' && v !== '')
     ).length;
   }, [currentValues]);
 
   // Generate narrative from findings
   const generateNarrative = useCallback(() => {
-    if (!currentRegion || !currentValues) return '';
+    if (!currentRegion || !currentValues) {
+      return '';
+    }
 
     const findings = [];
     const regionName = lang === 'no' ? currentRegion.name : currentRegion.nameEn;
 
-    currentRegion.sections.forEach(section => {
+    currentRegion.sections.forEach((section) => {
       const sectionFindings = [];
-      section.items.forEach(item => {
+      section.items.forEach((item) => {
         const val = currentValues[item.id];
-        if (!val || val === 'Negativ' || val === '') return;
+        if (!val || val === 'Negativ' || val === '') {
+          return;
+        }
 
-        const label = lang === 'no' ? item.label : (item.labelEn || item.label);
+        const label = lang === 'no' ? item.label : item.labelEn || item.label;
 
         if (item.type === 'checkbox' && val === true) {
           sectionFindings.push(label);
@@ -325,7 +348,7 @@ export default function ExaminationProtocol({
       });
 
       if (sectionFindings.length > 0) {
-        const sectionTitle = lang === 'no' ? section.title : (section.titleEn || section.title);
+        const sectionTitle = lang === 'no' ? section.title : section.titleEn || section.title;
         findings.push(`${sectionTitle}: ${sectionFindings.join(', ')}`);
       }
     });
@@ -362,17 +385,17 @@ export default function ExaminationProtocol({
                 onClick={() => handleRegionSelect(key)}
                 className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors
                           flex items-center justify-between
-                          ${activeRegion === key
-                            ? 'bg-teal-100 text-teal-700 font-medium'
-                            : 'text-gray-600 hover:bg-gray-100'}`}
+                          ${
+                            activeRegion === key
+                              ? 'bg-teal-100 text-teal-700 font-medium'
+                              : 'text-gray-600 hover:bg-gray-100'
+                          }`}
               >
                 <span className="flex items-center gap-2">
                   <span>{REGION_ICONS[key] || '📋'}</span>
                   <span>{lang === 'no' ? region.name : region.nameEn}</span>
                 </span>
-                {hasFindings && (
-                  <CheckCircle className="w-4 h-4 text-teal-500" />
-                )}
+                {hasFindings && <CheckCircle className="w-4 h-4 text-teal-500" />}
               </button>
             );
           })}
@@ -387,7 +410,8 @@ export default function ExaminationProtocol({
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-lg font-semibold text-gray-800">
-                  {REGION_ICONS[activeRegion]} {lang === 'no' ? currentRegion.name : currentRegion.nameEn}
+                  {REGION_ICONS[activeRegion]}{' '}
+                  {lang === 'no' ? currentRegion.name : currentRegion.nameEn}
                 </h2>
                 {findingsCount > 0 && (
                   <p className="text-sm text-gray-500">
@@ -431,7 +455,9 @@ export default function ExaminationProtocol({
                   <Info className="w-5 h-5 text-blue-500 mt-0.5" />
                   <div>
                     <h4 className="font-medium text-blue-700 text-sm">
-                      {lang === 'no' ? currentRegion.ottawaRules.title : currentRegion.ottawaRules.titleEn}
+                      {lang === 'no'
+                        ? currentRegion.ottawaRules.title
+                        : currentRegion.ottawaRules.titleEn}
                     </h4>
                     <div className="text-xs text-blue-600 mt-1 space-y-2">
                       <div>
@@ -472,7 +498,11 @@ export default function ExaminationProtocol({
           <div className="flex items-center justify-center h-full text-gray-400">
             <div className="text-center">
               <Clipboard className="w-12 h-12 mx-auto mb-2 opacity-50" />
-              <p>{lang === 'no' ? 'Velg en kroppsregion for å starte undersøkelsen' : 'Select a body region to start examination'}</p>
+              <p>
+                {lang === 'no'
+                  ? 'Velg en kroppsregion for å starte undersøkelsen'
+                  : 'Select a body region to start examination'}
+              </p>
             </div>
           </div>
         )}

@@ -19,18 +19,18 @@ import {
   FileText,
   FileJson,
   Table,
-  Printer,
+  _Printer,
   Check,
-  AlertCircle,
-  Calendar,
-  User,
-  Clipboard,
+  _AlertCircle,
+  _Calendar,
+  _User,
+  _Clipboard,
   ChevronDown,
   ChevronUp,
-  Settings,
-  Eye,
+  _Settings,
+  _Eye,
   Copy,
-  X,
+  _X,
 } from 'lucide-react';
 
 // Export formats
@@ -89,7 +89,10 @@ export const EXPORT_TEMPLATES = {
   SOAP_NOTE: {
     id: 'soap_note',
     name: { en: 'SOAP Note', no: 'SOAP Notat' },
-    description: { en: 'Subjective, Objective, Assessment, Plan', no: 'Subjektiv, Objektiv, Vurdering, Plan' },
+    description: {
+      en: 'Subjective, Objective, Assessment, Plan',
+      no: 'Subjektiv, Objektiv, Vurdering, Plan',
+    },
   },
   REFERRAL: {
     id: 'referral',
@@ -200,7 +203,9 @@ export default function NorwegianExport({
 
   // Format date according to Norwegian standards
   const formatNorwegianDate = (dateString) => {
-    if (!dateString) return '';
+    if (!dateString) {
+      return '';
+    }
     const date = new Date(dateString);
 
     if (dateFormat === 'iso') {
@@ -227,11 +232,13 @@ export default function NorwegianExport({
         date: formatNorwegianDate(encounterData?.encounter_date || new Date()),
         practice: practiceInfo.name || 'ChiroClick Clinic',
       },
-      patient: includePatientInfo ? {
-        name: `${patientData?.first_name || ''} ${patientData?.last_name || ''}`.trim(),
-        dob: patientData?.date_of_birth ? formatNorwegianDate(patientData.date_of_birth) : '',
-        id: patientData?.national_id || patientData?.id || '',
-      } : null,
+      patient: includePatientInfo
+        ? {
+            name: `${patientData?.first_name || ''} ${patientData?.last_name || ''}`.trim(),
+            dob: patientData?.date_of_birth ? formatNorwegianDate(patientData.date_of_birth) : '',
+            id: patientData?.national_id || patientData?.id || '',
+          }
+        : null,
       encounter: {
         type: encounterData?.encounter_type || 'FOLLOWUP',
         duration: encounterData?.duration_minutes || 30,
@@ -242,16 +249,20 @@ export default function NorwegianExport({
         assessment: formatAssessment(encounterData),
         plan: formatPlan(encounterData),
       },
-      codes: includeCodes ? {
-        icpc: encounterData?.icpc_codes || [],
-        icd10: encounterData?.icd10_codes || [],
-        takster: encounterData?.takster_codes || [],
-      } : null,
-      signature: includeSignature ? {
-        provider: practiceInfo.provider || 'Behandler',
-        credentials: practiceInfo.credentials || 'Kiropraktor',
-        date: formatNorwegianDate(new Date()),
-      } : null,
+      codes: includeCodes
+        ? {
+            icpc: encounterData?.icpc_codes || [],
+            icd10: encounterData?.icd10_codes || [],
+            takster: encounterData?.takster_codes || [],
+          }
+        : null,
+      signature: includeSignature
+        ? {
+            provider: practiceInfo.provider || 'Behandler',
+            credentials: practiceInfo.credentials || 'Kiropraktor',
+            date: formatNorwegianDate(new Date()),
+          }
+        : null,
     };
 
     return content;
@@ -259,7 +270,9 @@ export default function NorwegianExport({
 
   // Format helpers for SOAP sections
   const formatSubjective = (data) => {
-    if (!data) return '';
+    if (!data) {
+      return '';
+    }
     const parts = [];
 
     if (data.subjective?.chief_complaint) {
@@ -286,7 +299,9 @@ export default function NorwegianExport({
   };
 
   const formatObjective = (data) => {
-    if (!data) return '';
+    if (!data) {
+      return '';
+    }
     const parts = [];
 
     if (data.observation_findings?.length) {
@@ -306,8 +321,12 @@ export default function NorwegianExport({
         .filter(([_, v]) => v.subluxation)
         .map(([segment, findings]) => {
           let desc = segment;
-          if (findings.tenderness) desc += ' (øm)';
-          if (findings.restricted) desc += ' (begr.)';
+          if (findings.tenderness) {
+            desc += ' (øm)';
+          }
+          if (findings.restricted) {
+            desc += ' (begr.)';
+          }
           return desc;
         });
       if (spinalParts.length) {
@@ -327,7 +346,9 @@ export default function NorwegianExport({
   };
 
   const formatAssessment = (data) => {
-    if (!data) return '';
+    if (!data) {
+      return '';
+    }
     const parts = [];
 
     if (data.icpc_codes?.length) {
@@ -346,7 +367,9 @@ export default function NorwegianExport({
   };
 
   const formatPlan = (data) => {
-    if (!data) return '';
+    if (!data) {
+      return '';
+    }
     const parts = [];
 
     if (data.treatments_selected?.length) {
@@ -516,9 +539,11 @@ export default function NorwegianExport({
                   key={format.id}
                   onClick={() => setSelectedFormat(format.id)}
                   className={`flex flex-col items-center gap-1 p-3 rounded-lg border transition-colors
-                    ${selectedFormat === format.id
-                      ? 'border-green-300 bg-green-50 text-green-700'
-                      : 'border-gray-200 hover:bg-gray-50'}`}
+                    ${
+                      selectedFormat === format.id
+                        ? 'border-green-300 bg-green-50 text-green-700'
+                        : 'border-gray-200 hover:bg-gray-50'
+                    }`}
                 >
                   <Icon className="w-5 h-5" />
                   <span className="text-xs font-medium">{format.name}</span>
@@ -538,7 +563,8 @@ export default function NorwegianExport({
           >
             {Object.values(EXPORT_TEMPLATES).map((template) => (
               <option key={template.id} value={template.id}>
-                {template.name[language] || template.name.no} - {template.description[language] || template.description.no}
+                {template.name[language] || template.name.no} -{' '}
+                {template.description[language] || template.description.no}
               </option>
             ))}
           </select>
@@ -599,7 +625,9 @@ export default function NorwegianExport({
                   onChange={(e) => setExportAll(e.target.checked)}
                   className="rounded border-gray-300 text-green-600 focus:ring-green-500"
                 />
-                <span className="text-sm">{t.exportAll} ({allEncounters.length})</span>
+                <span className="text-sm">
+                  {t.exportAll} ({allEncounters.length})
+                </span>
               </label>
             )}
           </div>
@@ -623,7 +651,11 @@ export default function NorwegianExport({
                 className="p-1.5 text-gray-400 hover:text-gray-600 bg-white rounded shadow-sm"
                 title={t.copyToClipboard}
               >
-                {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                {copied ? (
+                  <Check className="w-4 h-4 text-green-500" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
               </button>
             </div>
             <pre className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-xs overflow-x-auto whitespace-pre-wrap font-mono max-h-80">
@@ -698,29 +730,41 @@ function generateXML(content) {
     <Date>${content.header.date}</Date>
     <Practice>${content.header.practice}</Practice>
   </Header>
-  ${content.patient ? `
+  ${
+    content.patient
+      ? `
   <Patient>
     <Name>${content.patient.name}</Name>
     <DateOfBirth>${content.patient.dob}</DateOfBirth>
     <ID>${content.patient.id}</ID>
-  </Patient>` : ''}
+  </Patient>`
+      : ''
+  }
   <SOAP>
     <Subjective><![CDATA[${content.soap.subjective}]]></Subjective>
     <Objective><![CDATA[${content.soap.objective}]]></Objective>
     <Assessment><![CDATA[${content.soap.assessment}]]></Assessment>
     <Plan><![CDATA[${content.soap.plan}]]></Plan>
   </SOAP>
-  ${content.codes ? `
+  ${
+    content.codes
+      ? `
   <Diagnoses>
     ${content.codes.icpc.map((c) => `<ICPC2>${c}</ICPC2>`).join('\n    ')}
     ${content.codes.icd10.map((c) => `<ICD10>${c}</ICD10>`).join('\n    ')}
-  </Diagnoses>` : ''}
-  ${content.signature ? `
+  </Diagnoses>`
+      : ''
+  }
+  ${
+    content.signature
+      ? `
   <Signature>
     <Provider>${content.signature.provider}</Provider>
     <Credentials>${content.signature.credentials}</Credentials>
     <Date>${content.signature.date}</Date>
-  </Signature>` : ''}
+  </Signature>`
+      : ''
+  }
 </JournalNotat>`;
 }
 
@@ -728,11 +772,7 @@ function generateXML(content) {
 // COMPACT EXPORT BUTTON
 // =============================================================================
 
-export function ExportButton({
-  onClick,
-  language = 'no',
-  className = '',
-}) {
+export function ExportButton({ onClick, language = 'no', className = '' }) {
   const label = language === 'no' ? 'Eksporter' : 'Export';
 
   return (

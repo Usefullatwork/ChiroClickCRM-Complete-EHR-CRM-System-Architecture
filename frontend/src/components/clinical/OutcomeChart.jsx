@@ -3,7 +3,7 @@
  * Uses recharts LineChart with color-coded severity zones
  */
 
-import React, { useState, useEffect } from 'react';
+import _React, { useState, useEffect } from 'react';
 import {
   LineChart,
   Line,
@@ -48,7 +48,9 @@ function formatDate(dateStr) {
 }
 
 function CustomTooltip({ active, payload, label }) {
-  if (!active || !payload?.length) return null;
+  if (!active || !payload?.length) {
+    return null;
+  }
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3 text-sm">
@@ -74,7 +76,9 @@ export default function OutcomeChart({ patientId, typeFilter }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!patientId) return;
+    if (!patientId) {
+      return;
+    }
 
     let cancelled = false;
     setLoading(true);
@@ -83,17 +87,23 @@ export default function OutcomeChart({ patientId, typeFilter }) {
     outcomesAPI
       .getPatientTrend(patientId, { type: typeFilter })
       .then((res) => {
-        if (cancelled) return;
+        if (cancelled) {
+          return;
+        }
         setTrendData(res.data);
         // Auto-select all types present
         setSelectedTypes(Object.keys(res.data));
       })
       .catch((err) => {
-        if (cancelled) return;
+        if (cancelled) {
+          return;
+        }
         setError(err.response?.data?.error || err.message);
       })
       .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       });
 
     return () => {
@@ -148,7 +158,9 @@ export default function OutcomeChart({ patientId, typeFilter }) {
     const points = trendData[type] || [];
     for (const pt of points) {
       const dateKey = formatDate(pt.date);
-      if (!dateMap[dateKey]) dateMap[dateKey] = { date: dateKey, _ts: new Date(pt.date).getTime() };
+      if (!dateMap[dateKey]) {
+        dateMap[dateKey] = { date: dateKey, _ts: new Date(pt.date).getTime() };
+      }
       dateMap[dateKey][type] = pt.percentage;
     }
   }

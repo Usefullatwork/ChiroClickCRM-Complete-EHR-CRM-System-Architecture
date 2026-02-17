@@ -3,28 +3,25 @@
  * Displays Vimeo videos in an embedded player
  */
 
-import React from 'react'
-import { X, ExternalLink } from 'lucide-react'
+import _React from 'react';
+import { X, ExternalLink } from 'lucide-react';
 
-const VimeoPlayer = ({
-  videoUrl,
-  title,
-  onClose,
-  autoplay = true
-}) => {
+const VimeoPlayer = ({ videoUrl, title, onClose, autoplay = true }) => {
   // Extract Vimeo ID from URL
   const getVimeoId = (url) => {
-    if (!url) return null
+    if (!url) {
+      return null;
+    }
 
     // Handle various Vimeo URL formats
     // https://vimeo.com/817620934
     // https://player.vimeo.com/video/817620934
     // https://vimeo.com/817620934?share=copy
-    const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/)
-    return match ? match[1] : null
-  }
+    const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+    return match ? match[1] : null;
+  };
 
-  const vimeoId = getVimeoId(videoUrl)
+  const vimeoId = getVimeoId(videoUrl);
 
   if (!vimeoId) {
     return (
@@ -39,11 +36,11 @@ const VimeoPlayer = ({
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   // Build embed URL with parameters
-  const embedUrl = `https://player.vimeo.com/video/${vimeoId}?autoplay=${autoplay ? 1 : 0}&title=0&byline=0&portrait=0&dnt=1`
+  const embedUrl = `https://player.vimeo.com/video/${vimeoId}?autoplay=${autoplay ? 1 : 0}&title=0&byline=0&portrait=0&dnt=1`;
 
   return (
     <div
@@ -56,9 +53,7 @@ const VimeoPlayer = ({
       >
         {/* Header */}
         <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 bg-gradient-to-b from-black/60 to-transparent">
-          <h3 className="text-white font-medium truncate pr-4">
-            {title || 'Øvelse video'}
-          </h3>
+          <h3 className="text-white font-medium truncate pr-4">{title || 'Øvelse video'}</h3>
           <div className="flex items-center gap-2">
             <a
               href={`https://vimeo.com/${vimeoId}`}
@@ -91,7 +86,7 @@ const VimeoPlayer = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default VimeoPlayer
+export default VimeoPlayer;

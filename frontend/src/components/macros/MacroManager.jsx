@@ -89,7 +89,9 @@ export default function MacroManager() {
 
   // Flatten matrix into array for display
   const allMacros = useMemo(() => {
-    if (!matrixData) return [];
+    if (!matrixData) {
+      return [];
+    }
     const macros = [];
     for (const [category, catData] of Object.entries(matrixData)) {
       for (const macro of catData.macros || []) {
@@ -191,7 +193,9 @@ export default function MacroManager() {
     const groups = {};
     for (const macro of filteredMacros) {
       const cat = macro.category || 'General';
-      if (!groups[cat]) groups[cat] = [];
+      if (!groups[cat]) {
+        groups[cat] = [];
+      }
       groups[cat].push(macro);
     }
     return groups;
@@ -213,7 +217,9 @@ export default function MacroManager() {
   // Keyboard shortcuts: Ctrl+1 through Ctrl+9 to copy the first 9 macros
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (!e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) return;
+      if (!e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) {
+        return;
+      }
       const num = parseInt(e.key);
       if (num >= 1 && num <= 9) {
         const index = num - 1;
@@ -323,7 +329,9 @@ export default function MacroManager() {
             let globalIndexOffset = 0;
             const categoryOrder = Object.keys(groupedMacros);
             for (const cat of categoryOrder) {
-              if (cat === category) break;
+              if (cat === category) {
+                break;
+              }
               globalIndexOffset += groupedMacros[cat].length;
             }
 

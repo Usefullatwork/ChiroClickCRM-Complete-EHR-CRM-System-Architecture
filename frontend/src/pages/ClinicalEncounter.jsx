@@ -5,10 +5,10 @@
  * UI sections are extracted to components/encounter/.
  */
 
-import React, { useEffect } from 'react';
+import _React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { encountersAPI, patientsAPI, diagnosisAPI, treatmentsAPI, aiAPI } from '../services/api';
+import { encountersAPI, patientsAPI, diagnosisAPI, _treatmentsAPI, aiAPI } from '../services/api';
 import TemplatePicker from '../components/TemplatePicker';
 import { usePatientIntake } from '../hooks/usePatientIntake';
 import { useClinicalPreferences } from '../hooks';
@@ -161,9 +161,9 @@ export default function ClinicalEncounter() {
     showKeyboardHelp,
     setShowKeyboardHelp,
     showMacroHint,
-    setShowMacroHint,
+    _setShowMacroHint,
     currentMacroMatch,
-    setCurrentMacroMatch,
+    _setCurrentMacroMatch,
     showSALTBanner,
     setShowSALTBanner,
     saltBannerExpanded,
@@ -279,7 +279,9 @@ export default function ClinicalEncounter() {
 
   const saveMutation = useMutation({
     mutationFn: (data) => {
-      if (encounterId) return encountersAPI.update(encounterId, data);
+      if (encounterId) {
+        return encountersAPI.update(encounterId, data);
+      }
       return encountersAPI.create(data);
     },
     onSuccess: (response) => {
@@ -333,7 +335,9 @@ export default function ClinicalEncounter() {
   // === HANDLERS ===
 
   const handleCreateAmendment = () => {
-    if (!amendmentContent.trim()) return;
+    if (!amendmentContent.trim()) {
+      return;
+    }
     createAmendmentMutation.mutate({
       amendment_type: amendmentType,
       reason: amendmentReason,
@@ -351,7 +355,9 @@ export default function ClinicalEncounter() {
       setElapsedTime(`${mins}:${secs}`);
     }, 1000);
     return () => {
-      if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+      }
     };
   }, [encounterStartTime]);
 
@@ -408,7 +414,9 @@ export default function ClinicalEncounter() {
         const prevTakstIds = prev.treatments
           .map((t) => taksterNorwegian.find((tak) => tak.code === t.code)?.id)
           .filter(Boolean);
-        if (prevTakstIds.length > 0) setSelectedTakster(prevTakstIds);
+        if (prevTakstIds.length > 0) {
+          setSelectedTakster(prevTakstIds);
+        }
       }
     }
     setAutoSaveStatus('unsaved');
@@ -416,8 +424,12 @@ export default function ClinicalEncounter() {
 
   // Auto-save
   const triggerAutoSave = () => {
-    if (isSigned || autoSaveStatus === 'saved') return;
-    if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+    if (isSigned || autoSaveStatus === 'saved') {
+      return;
+    }
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
     autoSaveTimerRef.current = setTimeout(() => {
       if (encounterId && !isSigned) {
         setAutoSaveStatus('saving');
@@ -431,7 +443,9 @@ export default function ClinicalEncounter() {
     const handleKeyDown = (e) => {
       if (e.ctrlKey && e.key === 's' && !e.shiftKey) {
         e.preventDefault();
-        if (!isSigned) handleSave();
+        if (!isSigned) {
+          handleSave();
+        }
       }
       if (e.ctrlKey && e.shiftKey && e.key === 'S') {
         e.preventDefault();
@@ -444,7 +458,9 @@ export default function ClinicalEncounter() {
         e.preventDefault();
         const sections = ['subjective', 'objective', 'assessment', 'plan'];
         const ref = sectionRefs.current[sections[parseInt(e.key) - 1]];
-        if (ref) ref.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (ref) {
+          ref.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       }
       if (e.ctrlKey && e.key === 't') {
         e.preventDefault();
@@ -452,7 +468,9 @@ export default function ClinicalEncounter() {
       }
       if (e.ctrlKey && e.key === 'l') {
         e.preventDefault();
-        if (!isSigned) handleSALT();
+        if (!isSigned) {
+          handleSALT();
+        }
       }
       if (e.key === 'Escape') {
         setShowTemplatePicker(false);
@@ -475,18 +493,24 @@ export default function ClinicalEncounter() {
       triggerAutoSave();
     }
     return () => {
-      if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
     };
   }, [encounterData, selectedTakster]);
 
   // Clean empty strings helper
   const cleanEmptyStrings = (obj) => {
-    if (typeof obj !== 'object' || obj === null) return obj;
+    if (typeof obj !== 'object' || obj === null) {
+      return obj;
+    }
     const cleaned = {};
     for (const [key, value] of Object.entries(obj)) {
       if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
         const cleanedNested = cleanEmptyStrings(value);
-        if (Object.keys(cleanedNested).length > 0) cleaned[key] = cleanedNested;
+        if (Object.keys(cleanedNested).length > 0) {
+          cleaned[key] = cleanedNested;
+        }
       } else if (value !== '' && value !== null && value !== undefined) {
         cleaned[key] = value;
       }
@@ -559,7 +583,7 @@ export default function ClinicalEncounter() {
 
   const handleQuickPhrase = (phrase, section, field) => {
     const currentValue = encounterData[section][field] || '';
-    updateField(section, field, currentValue + (currentValue ? '\n' : '') + '\u2022 ' + phrase);
+    updateField(section, field, `${currentValue + (currentValue ? '\n' : '')}\u2022 ${phrase}`);
   };
 
   const toggleDiagnosis = (diagnosis) => {
@@ -641,11 +665,9 @@ export default function ClinicalEncounter() {
 
   const generateMockSuggestions = (subjective) => {
     const suggestions = { diagnosis: [], treatment: [], followUp: [], clinicalReasoning: '' };
-    const combined = (
-      (subjective.chief_complaint || '') +
-      ' ' +
-      (subjective.history || '')
-    ).toLowerCase();
+    const combined = `${subjective.chief_complaint || ''} ${
+      subjective.history || ''
+    }`.toLowerCase();
     if (combined.includes('rygg') || combined.includes('back')) {
       suggestions.diagnosis.push('L03 - Korsryggsmerter', 'L84 - Ryggsyndrom uten utstråling');
       suggestions.treatment.push('HVLA manipulasjon lumbal', 'Bl\u00F8tvevsbehandling');
@@ -667,7 +689,9 @@ export default function ClinicalEncounter() {
   // Exam handlers
   const handleNeuroExamChange = (examData) => {
     state.setNeuroExamData(examData);
-    if (examData?.narrative) updateField('objective', 'neuro_tests', examData.narrative);
+    if (examData?.narrative) {
+      updateField('objective', 'neuro_tests', examData.narrative);
+    }
     if (examData?.redFlags?.length > 0) {
       const neuroRedFlags = examData.redFlags.map(
         (rf) => `NEURO: ${rf.description} - ${rf.action}`
@@ -681,7 +705,9 @@ export default function ClinicalEncounter() {
 
   const handleOrthoExamChange = (examData) => {
     state.setOrthoExamData(examData);
-    if (examData?.narrative) updateField('objective', 'ortho_tests', examData.narrative);
+    if (examData?.narrative) {
+      updateField('objective', 'ortho_tests', examData.narrative);
+    }
     if (examData?.redFlags?.length > 0) {
       const orthoRedFlags = examData.redFlags.map(
         (rf) => `ORTHO: ${rf.testName?.no || rf.clusterName?.no} - ${rf.action}`
@@ -694,7 +720,9 @@ export default function ClinicalEncounter() {
   };
 
   const handleTemplateSelect = (templateText) => {
-    if (!activeField) return;
+    if (!activeField) {
+      return;
+    }
     const [section, field] = activeField.split('.');
     const currentValue = encounterData[section]?.[field] || '';
     updateField(section, field, currentValue + (currentValue ? '\n' : '') + templateText);

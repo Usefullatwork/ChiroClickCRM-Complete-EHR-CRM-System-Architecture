@@ -3,9 +3,9 @@
  * Compact neurological examination components
  */
 
-import React from 'react';
+import _React from 'react';
 
-export const NeurologicalExamCompact = ({ patientId, encounterId, onDataChange }) => {
+export const NeurologicalExamCompact = ({ _patientId, _encounterId, _onDataChange }) => {
   return (
     <div className="p-3 border rounded-lg bg-white">
       <h4 className="text-md font-medium mb-2">Neuro (kompakt)</h4>

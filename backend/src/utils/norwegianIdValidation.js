@@ -20,7 +20,9 @@
  * @returns {boolean} - True if valid
  */
 export const validateFodselsnummer = (fnr) => {
-  if (!fnr || typeof fnr !== 'string') return false;
+  if (!fnr || typeof fnr !== 'string') {
+    return false;
+  }
 
   // Remove any spaces or dashes
   fnr = fnr.replace(/[\s-]/g, '');
@@ -46,16 +48,16 @@ export const validateFodselsnummer = (fnr) => {
     return false;
   }
 
-  // Determine century from individnummer
-  let century;
+  // Determine century from individnummer (used for range validation)
+  let _century;
   if (individnummer >= 0 && individnummer <= 499) {
-    century = 1900;
+    _century = 1900;
   } else if (individnummer >= 500 && individnummer <= 749 && year >= 54) {
-    century = 1800;
+    _century = 1800;
   } else if (individnummer >= 500 && individnummer <= 999 && year <= 39) {
-    century = 2000;
+    _century = 2000;
   } else if (individnummer >= 900 && individnummer <= 999 && year >= 40) {
-    century = 1900;
+    _century = 1900;
   } else {
     return false;
   }

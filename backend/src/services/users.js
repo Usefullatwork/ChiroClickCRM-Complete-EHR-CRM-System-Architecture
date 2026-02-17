@@ -14,8 +14,8 @@ export const getAllUsers = async (organizationId, options = {}) => {
   const { page = 1, limit = 50, search = '', role = null, status = null } = options;
 
   const offset = (page - 1) * limit;
-  let whereConditions = ['organization_id = $1'];
-  let params = [organizationId];
+  const whereConditions = ['organization_id = $1'];
+  const params = [organizationId];
   let paramIndex = 2;
 
   if (search) {

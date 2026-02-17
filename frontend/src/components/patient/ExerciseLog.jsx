@@ -5,7 +5,7 @@
  * Log of patient's completed exercises
  */
 
-import React, { useState } from 'react';
+import _React, { useState } from 'react';
 import {
   Calendar,
   Clock,
@@ -34,7 +34,7 @@ import {
 export default function ExerciseLog({ logs = [], isLoading = false, onLoadMore, onFilterChange }) {
   const [expandedEntry, setExpandedEntry] = useState(null);
   const [filter, setFilter] = useState('all');
-  const [sortOrder, setSortOrder] = useState('desc');
+  const [sortOrder, _setSortOrder] = useState('desc');
 
   /**
    * Format date in Norwegian
@@ -67,8 +67,12 @@ export default function ExerciseLog({ logs = [], isLoading = false, onLoadMore, 
    * Henter smerteniva-farge
    */
   const getPainColor = (level) => {
-    if (level <= 3) return 'text-green-600 bg-green-100';
-    if (level <= 6) return 'text-yellow-600 bg-yellow-100';
+    if (level <= 3) {
+      return 'text-green-600 bg-green-100';
+    }
+    if (level <= 6) {
+      return 'text-yellow-600 bg-yellow-100';
+    }
     return 'text-red-600 bg-red-100';
   };
 
@@ -114,7 +118,9 @@ export default function ExerciseLog({ logs = [], isLoading = false, onLoadMore, 
    * Eksporterer logger som CSV
    */
   const handleExport = () => {
-    if (!logs || logs.length === 0) return;
+    if (!logs || logs.length === 0) {
+      return;
+    }
 
     const headers = [
       'Dato',
@@ -144,7 +150,7 @@ export default function ExerciseLog({ logs = [], isLoading = false, onLoadMore, 
     const csv = [headers.join(';'), ...rows.map((r) => r.map((v) => `"${v}"`).join(';'))].join(
       '\n'
     );
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;

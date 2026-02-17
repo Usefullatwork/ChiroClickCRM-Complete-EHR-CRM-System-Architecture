@@ -2,7 +2,7 @@
  * AmendmentSection - Extracted from ClinicalEncounter.jsx
  * Shows amendments/corrections for signed encounters
  */
-import React from 'react';
+import _React from 'react';
 import { FileText, Save, Loader2, Lock } from 'lucide-react';
 
 export function AmendmentSection({
@@ -20,7 +20,9 @@ export function AmendmentSection({
   createAmendmentMutation,
   signAmendmentMutation,
 }) {
-  if (!isSigned) return null;
+  if (!isSigned) {
+    return null;
+  }
 
   return (
     <section className="bg-amber-50 rounded-xl border border-amber-200 p-5 shadow-sm">

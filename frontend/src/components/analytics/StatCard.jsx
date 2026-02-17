@@ -5,7 +5,7 @@
  * @module components/analytics/StatCard
  */
 
-import React from 'react';
+import _React from 'react';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 /**
@@ -32,14 +32,11 @@ export const StatCard = ({
   changeLabel = 'vs forrige maned',
   trend,
   loading = false,
-  className = ''
+  className = '',
 }) => {
   // Determine trend direction if not provided
-  const trendDirection = trend || (
-    changePercent > 0 ? 'up' :
-    changePercent < 0 ? 'down' :
-    'neutral'
-  );
+  const trendDirection =
+    trend || (changePercent > 0 ? 'up' : changePercent < 0 ? 'down' : 'neutral');
 
   // Trend color based on direction
   const getTrendColor = () => {
@@ -83,27 +80,26 @@ export const StatCard = ({
   }
 
   return (
-    <div className={`bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow ${className}`}>
+    <div
+      className={`bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow ${className}`}
+    >
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           <p className="text-sm font-medium text-gray-600">{title}</p>
           <p className="text-3xl font-bold text-gray-900">{value}</p>
 
           {/* Subtitle */}
-          {subtitle && (
-            <p className="text-sm text-gray-500">{subtitle}</p>
-          )}
+          {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
 
           {/* Change indicator */}
           {changePercent !== undefined && (
             <div className="flex items-center gap-1.5 pt-1">
               <TrendIcon />
               <span className={`text-sm font-medium ${getTrendColor()}`}>
-                {changePercent > 0 ? '+' : ''}{changePercent}%
+                {changePercent > 0 ? '+' : ''}
+                {changePercent}%
               </span>
-              <span className="text-xs text-gray-500">
-                {changeLabel}
-              </span>
+              <span className="text-xs text-gray-500">{changeLabel}</span>
             </div>
           )}
         </div>
@@ -128,7 +124,7 @@ export const StatCardGrid = ({ children, columns = 4, className = '' }) => {
     3: 'md:grid-cols-3',
     4: 'md:grid-cols-2 lg:grid-cols-4',
     5: 'md:grid-cols-3 lg:grid-cols-5',
-    6: 'md:grid-cols-3 lg:grid-cols-6'
+    6: 'md:grid-cols-3 lg:grid-cols-6',
   };
 
   return (
@@ -147,12 +143,14 @@ export const MiniStatCard = ({
   icon: Icon,
   iconColor = 'text-blue-600',
   changePercent,
-  className = ''
+  className = '',
 }) => {
   return (
     <div className={`flex items-center gap-3 p-3 bg-gray-50 rounded-lg ${className}`}>
       {Icon && (
-        <div className={`w-10 h-10 rounded-lg bg-white flex items-center justify-center shadow-sm ${iconColor}`}>
+        <div
+          className={`w-10 h-10 rounded-lg bg-white flex items-center justify-center shadow-sm ${iconColor}`}
+        >
           <Icon size={20} />
         </div>
       )}
@@ -161,8 +159,11 @@ export const MiniStatCard = ({
         <div className="flex items-baseline gap-2">
           <p className="text-lg font-bold text-gray-900">{value}</p>
           {changePercent !== undefined && (
-            <span className={`text-xs font-medium ${changePercent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {changePercent >= 0 ? '+' : ''}{changePercent}%
+            <span
+              className={`text-xs font-medium ${changePercent >= 0 ? 'text-green-600' : 'text-red-600'}`}
+            >
+              {changePercent >= 0 ? '+' : ''}
+              {changePercent}%
             </span>
           )}
         </div>

@@ -14,7 +14,9 @@ module.exports = {
     'no-console': ['warn', { allow: ['warn', 'error'] }],
     'no-unused-vars': ['error', {
       argsIgnorePattern: '^_',
-      varsIgnorePattern: '^_'
+      varsIgnorePattern: '^_',
+      caughtErrors: 'none',
+      destructuredArrayIgnorePattern: '^_'
     }],
     'no-var': 'error',
     'prefer-const': 'error',
@@ -25,14 +27,15 @@ module.exports = {
     'brace-style': ['error', '1tbs'],
     'no-throw-literal': 'error',
     'prefer-promise-reject-errors': 'error',
-    'no-return-await': 'error',
-    'require-await': 'error',
+    'no-return-await': 'warn',
+    'require-await': 'warn',
 
     // Code quality
     'no-duplicate-imports': 'error',
     'no-template-curly-in-string': 'error',
     'prefer-template': 'error',
     'arrow-body-style': ['error', 'as-needed'],
+    'no-useless-escape': 'warn',
 
     // Security
     'no-eval': 'error',

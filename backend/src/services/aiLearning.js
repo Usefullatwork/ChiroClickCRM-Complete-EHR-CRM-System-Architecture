@@ -161,8 +161,8 @@ export const getPerformanceMetrics = async (options = {}) => {
     month: "DATE_TRUNC('month', created_at)::DATE",
   }[groupBy];
 
-  let whereConditions = [];
-  let params = [];
+  const whereConditions = [];
+  const params = [];
   let paramCount = 0;
 
   if (suggestionType) {
@@ -183,7 +183,7 @@ export const getPerformanceMetrics = async (options = {}) => {
     params.push(endDate);
   }
 
-  const whereClause = whereConditions.length > 0 ? 'WHERE ' + whereConditions.join(' AND ') : '';
+  const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
 
   const result = await pool.query(
     `SELECT

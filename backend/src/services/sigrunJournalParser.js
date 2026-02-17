@@ -33,27 +33,27 @@ export const SIGRUN_TREATMENT_PATTERNS = {
   'lx mob': 'Lumbar mobilization',
 
   // Common Sigrun abbreviations
-  'tp': 'Trigger point behandling',
-  'trp': 'Trigger point',
-  'beh': 'Behandling',
-  'rep': 'Repeterer/samme behandling',
+  tp: 'Trigger point behandling',
+  trp: 'Trigger point',
+  beh: 'Behandling',
+  rep: 'Repeterer/samme behandling',
   'som sist': 'Samme behandling som sist',
-  'oppf': 'Oppfølging',
+  oppf: 'Oppfølging',
 
   // Position-specific
-  'supine': 'Ryggleie (supine)',
-  'prone': 'mageleie (prone)',
-  'side': 'sideleie',
+  supine: 'Ryggleie (supine)',
+  prone: 'mageleie (prone)',
+  side: 'sideleie',
 
   // Muscle work
-  'mass': 'Massasje',
-  'tøy': 'Tøying/stretching',
-  'løsgjøring': 'Mobilisering/løsgjøring',
+  mass: 'Massasje',
+  tøy: 'Tøying/stretching',
+  løsgjøring: 'Mobilisering/løsgjøring',
 
   // Common patterns
-  'bilat': 'Bilateral',
-  've': 'Venstre',
-  'hø': 'Høyre'
+  bilat: 'Bilateral',
+  ve: 'Venstre',
+  hø: 'Høyre',
 };
 
 /**
@@ -61,23 +61,38 @@ export const SIGRUN_TREATMENT_PATTERNS = {
  */
 export const SIGRUN_ASSESSMENT_PATTERNS = {
   improvement: [
-    'bedre', 'mye bedre', 'klart bedre', 'gått bedre',
-    'føler seg bedre', 'kjenner seg bedre', 'betydelig bedre',
-    'slapp', 'løsnet', 'mindre vondt'
+    'bedre',
+    'mye bedre',
+    'klart bedre',
+    'gått bedre',
+    'føler seg bedre',
+    'kjenner seg bedre',
+    'betydelig bedre',
+    'slapp',
+    'løsnet',
+    'mindre vondt',
   ],
-  no_change: [
-    'som sist', 'likt', 'samme', 'ikke noe endring',
-    'fortsatt', 'fremdeles'
-  ],
-  worsening: [
-    'verre', 'mer vondt', 'økt', 'tilbake til start'
-  ],
+  no_change: ['som sist', 'likt', 'samme', 'ikke noe endring', 'fortsatt', 'fremdeles'],
+  worsening: ['verre', 'mer vondt', 'økt', 'tilbake til start'],
   location_descriptors: [
-    'nakke', 'cx', 'c-col', 'cervical',
-    'rygg', 'tx', 't-col', 'thoracic',
-    'korsrygg', 'lx', 'l-col', 'lumbar',
-    'skulder', 'arm', 'hofte', 'bekken', 'sete'
-  ]
+    'nakke',
+    'cx',
+    'c-col',
+    'cervical',
+    'rygg',
+    'tx',
+    't-col',
+    'thoracic',
+    'korsrygg',
+    'lx',
+    'l-col',
+    'lumbar',
+    'skulder',
+    'arm',
+    'hofte',
+    'bekken',
+    'sete',
+  ],
 };
 
 /**
@@ -85,7 +100,9 @@ export const SIGRUN_ASSESSMENT_PATTERNS = {
  * Example: "beh cx mob supine. t5p. c2 prs"
  */
 export const parseSigrunTreatment = (treatmentText) => {
-  if (!treatmentText) return [];
+  if (!treatmentText) {
+    return [];
+  }
 
   const techniques = [];
   const lowerText = treatmentText.toLowerCase();
@@ -98,19 +115,18 @@ export const parseSigrunTreatment = (treatmentText) => {
       segment: match[1].toUpperCase(),
       direction: match[2].toUpperCase(),
       intensity: match[3] ? match[3].length : 1,
-      practitioner: 'Sigrun'
+      practitioner: 'Sigrun',
     });
   }
 
   // Pattern 2: Mobilization patterns (cx mob, tx mob, lx mob)
   const mobMatches = lowerText.matchAll(/(cx|tx|lx)\s+mob(?:ilization)?/g);
   for (const match of mobMatches) {
-    const region = match[1] === 'cx' ? 'Cervical' :
-                   match[1] === 'tx' ? 'Thoracic' : 'Lumbar';
+    const region = match[1] === 'cx' ? 'Cervical' : match[1] === 'tx' ? 'Thoracic' : 'Lumbar';
     techniques.push({
       type: 'Mobilization',
       region,
-      practitioner: 'Sigrun'
+      practitioner: 'Sigrun',
     });
   }
 
@@ -120,7 +136,7 @@ export const parseSigrunTreatment = (treatmentText) => {
     techniques.push({
       type: 'TriggerPoint',
       target: match[1].trim(),
-      practitioner: 'Sigrun'
+      practitioner: 'Sigrun',
     });
   }
 
@@ -130,7 +146,7 @@ export const parseSigrunTreatment = (treatmentText) => {
     techniques.push({
       type: 'IS-ledd',
       side: match[1] || 'bilateral',
-      practitioner: 'Sigrun'
+      practitioner: 'Sigrun',
     });
   }
 
@@ -140,7 +156,7 @@ export const parseSigrunTreatment = (treatmentText) => {
     techniques.push({
       type: 'Massage',
       target: match[1].trim(),
-      practitioner: 'Sigrun'
+      practitioner: 'Sigrun',
     });
   }
 
@@ -150,7 +166,7 @@ export const parseSigrunTreatment = (treatmentText) => {
     techniques.push({
       type: 'Stretching',
       target: match[1].trim(),
-      practitioner: 'Sigrun'
+      practitioner: 'Sigrun',
     });
   }
 
@@ -162,28 +178,30 @@ export const parseSigrunTreatment = (treatmentText) => {
  * She often uses brief phrases about improvement
  */
 export const parseSigrunAnamnese = (anamneseText) => {
-  if (!anamneseText) return null;
+  if (!anamneseText) {
+    return null;
+  }
 
   const assessment = {
     raw: anamneseText,
     improvement_status: null,
     locations: [],
-    symptoms: []
+    symptoms: [],
   };
 
   const lowerText = anamneseText.toLowerCase();
 
   // Determine improvement status
-  if (SIGRUN_ASSESSMENT_PATTERNS.improvement.some(phrase => lowerText.includes(phrase))) {
+  if (SIGRUN_ASSESSMENT_PATTERNS.improvement.some((phrase) => lowerText.includes(phrase))) {
     assessment.improvement_status = 'improved';
-  } else if (SIGRUN_ASSESSMENT_PATTERNS.no_change.some(phrase => lowerText.includes(phrase))) {
+  } else if (SIGRUN_ASSESSMENT_PATTERNS.no_change.some((phrase) => lowerText.includes(phrase))) {
     assessment.improvement_status = 'unchanged';
-  } else if (SIGRUN_ASSESSMENT_PATTERNS.worsening.some(phrase => lowerText.includes(phrase))) {
+  } else if (SIGRUN_ASSESSMENT_PATTERNS.worsening.some((phrase) => lowerText.includes(phrase))) {
     assessment.improvement_status = 'worsened';
   }
 
   // Extract body locations mentioned
-  SIGRUN_ASSESSMENT_PATTERNS.location_descriptors.forEach(location => {
+  SIGRUN_ASSESSMENT_PATTERNS.location_descriptors.forEach((location) => {
     if (lowerText.includes(location)) {
       assessment.locations.push(location);
     }
@@ -205,23 +223,27 @@ export const parseSigrunEntry = (journalText) => {
     behandling: null,
     notat: null,
     practitioner: 'Sigrun',
-    raw: journalText
+    raw: journalText,
   };
 
   // Sigrun often uses lowercase "beh" or "Behandling"
-  const behandlingMatch = journalText.match(/(?:beh|Behandling)[:\s]+(.*?)(?=\n(?:Anamnese|Notat|$)|$)/si);
+  const behandlingMatch = journalText.match(
+    /(?:beh|Behandling)[:\s]+(.*?)(?=\n(?:Anamnese|Notat|$)|$)/is
+  );
   if (behandlingMatch) {
     entry.behandling = behandlingMatch[1].trim();
   }
 
   // Standard Anamnese
-  const anamneseMatch = journalText.match(/Anamnese[:\s]+(.*?)(?=\n(?:beh|Behandling|Notat|$)|$)/si);
+  const anamneseMatch = journalText.match(
+    /Anamnese[:\s]+(.*?)(?=\n(?:beh|Behandling|Notat|$)|$)/is
+  );
   if (anamneseMatch) {
     entry.anamnese = anamneseMatch[1].trim();
   }
 
   // Notat
-  const notatMatch = journalText.match(/Notat[:\s]+(.*?)(?=\n(?:Anamnese|beh|Behandling|$)|$)/si);
+  const notatMatch = journalText.match(/Notat[:\s]+(.*?)(?=\n(?:Anamnese|beh|Behandling|$)|$)/is);
   if (notatMatch) {
     entry.notat = notatMatch[1].trim();
   }
@@ -246,8 +268,8 @@ export const createSigrunTrainingExamples = (entry) => {
       practitioner: 'Sigrun',
       metadata: {
         improvement_status: assessment?.improvement_status,
-        locations: assessment?.locations
-      }
+        locations: assessment?.locations,
+      },
     });
   }
 
@@ -259,7 +281,7 @@ export const createSigrunTrainingExamples = (entry) => {
         prompt: `Ekstraher behandlingsteknikker fra følgende behandlingsnotat (Sigrun stil):\n\n${entry.behandling}`,
         response: JSON.stringify(techniques, null, 2),
         type: 'treatment_extraction_sigrun',
-        practitioner: 'Sigrun'
+        practitioner: 'Sigrun',
       });
     }
   }
@@ -272,7 +294,7 @@ export const createSigrunTrainingExamples = (entry) => {
         prompt: `Vurder pasientens fremgang fra følgende oppfølgingsnotat:\n\n${entry.anamnese}`,
         response: `Status: ${assessment.improvement_status}\nLokasjoner: ${assessment.locations.join(', ')}\nSymptomer: ${JSON.stringify(assessment.symptoms)}`,
         type: 'progress_assessment',
-        practitioner: 'Sigrun'
+        practitioner: 'Sigrun',
       });
     }
   }
@@ -289,7 +311,7 @@ export const parseSigrunEntries = (journalText) => {
   // Sigrun's entries are often separated by date patterns or "Anamnese"
   const sections = journalText.split(/(?=Anamnese|(?:\d{2}\.\d{2}\.\d{4}))/);
 
-  sections.forEach(section => {
+  sections.forEach((section) => {
     if (section.trim().length > 15) {
       const parsed = parseSigrunEntry(section);
       if (parsed.anamnese || parsed.behandling) {
@@ -319,7 +341,9 @@ export const createSigrunTrainingDataset = (journalsText) => {
     }
   });
 
-  logger.info(`Created ${allExamples.length} training examples from ${entries.length} Sigrun entries`);
+  logger.info(
+    `Created ${allExamples.length} training examples from ${entries.length} Sigrun entries`
+  );
 
   return {
     examples: allExamples,
@@ -328,11 +352,12 @@ export const createSigrunTrainingDataset = (journalsText) => {
       total_entries: entries.length,
       total_examples: allExamples.length,
       example_types: {
-        followup_to_treatment: allExamples.filter(e => e.type === 'followup_to_treatment').length,
-        treatment_extraction: allExamples.filter(e => e.type === 'treatment_extraction_sigrun').length,
-        progress_assessment: allExamples.filter(e => e.type === 'progress_assessment').length
-      }
-    }
+        followup_to_treatment: allExamples.filter((e) => e.type === 'followup_to_treatment').length,
+        treatment_extraction: allExamples.filter((e) => e.type === 'treatment_extraction_sigrun')
+          .length,
+        progress_assessment: allExamples.filter((e) => e.type === 'progress_assessment').length,
+      },
+    },
   };
 };
 
@@ -347,7 +372,7 @@ export const detectPractitionerStyle = (journalText) => {
     lowerText.includes('cx mob'),
     lowerText.includes('tp '),
     lowerText.includes('som sist'),
-    /[ct]\d+\s*p[rls]{1,2}/.test(lowerText) // lowercase spinal patterns
+    /[ct]\d+\s*p[rls]{1,2}/.test(lowerText), // lowercase spinal patterns
   ];
 
   const sindreIndicators = [
@@ -355,7 +380,7 @@ export const detectPractitionerStyle = (journalText) => {
     journalText.includes('EMT'),
     journalText.includes('IMS'),
     journalText.includes('Sykdommer/Skader/Operasjoner'),
-    journalText.includes('Pasienten er informert')
+    journalText.includes('Pasienten er informert'),
   ];
 
   const sigrunScore = sigrunIndicators.filter(Boolean).length;
@@ -379,5 +404,5 @@ export default {
   createSigrunTrainingDataset,
   detectPractitionerStyle,
   SIGRUN_TREATMENT_PATTERNS,
-  SIGRUN_ASSESSMENT_PATTERNS
+  SIGRUN_ASSESSMENT_PATTERNS,
 };

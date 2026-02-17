@@ -6,8 +6,8 @@
  * and tracks payment history for Norwegian healthcare invoices
  */
 
-import React, { useState } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import _React, { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   CreditCard,
   Banknote,
@@ -19,9 +19,9 @@ import {
   Loader2,
   Calendar,
   Receipt,
-  FileText
-} from 'lucide-react'
-import { billingAPI } from '../../services/api'
+  _FileText,
+} from 'lucide-react';
+import { billingAPI } from '../../services/api';
 
 /**
  * Payment method configurations
@@ -31,27 +31,27 @@ const PAYMENT_METHODS = [
     id: 'card',
     name: 'Kort',
     icon: CreditCard,
-    description: 'Debet- eller kreditkort'
+    description: 'Debet- eller kreditkort',
   },
   {
     id: 'cash',
     name: 'Kontant',
     icon: Banknote,
-    description: 'Kontant betaling'
+    description: 'Kontant betaling',
   },
   {
     id: 'vipps',
     name: 'Vipps',
     icon: Smartphone,
-    description: 'Vipps mobilbetaling'
+    description: 'Vipps mobilbetaling',
   },
   {
     id: 'bank_transfer',
     name: 'Bankoverføring',
     icon: Building2,
-    description: 'Overføring til bankkonto'
-  }
-]
+    description: 'Overføring til bankkonto',
+  },
+];
 
 /**
  * PaymentTracker Component
@@ -60,34 +60,30 @@ const PAYMENT_METHODS = [
  * @param {Function} props.onClose - Callback when closing
  * @param {Function} props.onPaymentRecorded - Callback when payment is recorded
  */
-export default function PaymentTracker({
-  invoice,
-  onClose,
-  onPaymentRecorded
-}) {
-  const queryClient = useQueryClient()
+export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) {
+  const queryClient = useQueryClient();
 
   // Form state
-  const [amount, setAmount] = useState(invoice?.amount_due?.toString() || '')
-  const [paymentMethod, setPaymentMethod] = useState('card')
-  const [paymentReference, setPaymentReference] = useState('')
-  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0])
-  const [notes, setNotes] = useState('')
-  const [errors, setErrors] = useState({})
+  const [amount, setAmount] = useState(invoice?.amount_due?.toString() || '');
+  const [paymentMethod, setPaymentMethod] = useState('card');
+  const [paymentReference, setPaymentReference] = useState('');
+  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0]);
+  const [notes, setNotes] = useState('');
+  const [errors, setErrors] = useState({});
 
   // Record payment mutation
   const recordMutation = useMutation({
     mutationFn: (data) => billingAPI.recordPayment(invoice.id, data),
     onSuccess: (response) => {
-      queryClient.invalidateQueries(['invoice', invoice.id])
-      queryClient.invalidateQueries(['invoice-payments', invoice.id])
-      queryClient.invalidateQueries(['invoices'])
-      queryClient.invalidateQueries(['invoice-statistics'])
+      queryClient.invalidateQueries(['invoice', invoice.id]);
+      queryClient.invalidateQueries(['invoice-payments', invoice.id]);
+      queryClient.invalidateQueries(['invoices']);
+      queryClient.invalidateQueries(['invoice-statistics']);
       if (onPaymentRecorded) {
-        onPaymentRecorded(response.data)
+        onPaymentRecorded(response.data);
       }
-    }
-  })
+    },
+  });
 
   /**
    * Format currency in NOK
@@ -96,42 +92,44 @@ export default function PaymentTracker({
     return new Intl.NumberFormat('no-NO', {
       style: 'currency',
       currency: 'NOK',
-      minimumFractionDigits: 0
-    }).format(value || 0)
-  }
+      minimumFractionDigits: 0,
+    }).format(value || 0);
+  };
 
   /**
    * Validate form
    */
   const validateForm = () => {
-    const newErrors = {}
+    const newErrors = {};
 
-    const numAmount = parseFloat(amount)
+    const numAmount = parseFloat(amount);
     if (!amount || isNaN(numAmount) || numAmount <= 0) {
-      newErrors.amount = 'Angi et gyldig belop'
+      newErrors.amount = 'Angi et gyldig belop';
     } else if (numAmount > parseFloat(invoice.amount_due)) {
-      newErrors.amount = 'Belopet kan ikke overstige utstaende belop'
+      newErrors.amount = 'Belopet kan ikke overstige utstaende belop';
     }
 
     if (!paymentMethod) {
-      newErrors.paymentMethod = 'Velg betalingsmetode'
+      newErrors.paymentMethod = 'Velg betalingsmetode';
     }
 
     if (!paymentDate) {
-      newErrors.paymentDate = 'Velg betalingsdato'
+      newErrors.paymentDate = 'Velg betalingsdato';
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   /**
    * Handle form submission
    */
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (!validateForm()) return
+    if (!validateForm()) {
+      return;
+    }
 
     try {
       await recordMutation.mutateAsync({
@@ -139,25 +137,25 @@ export default function PaymentTracker({
         payment_method: paymentMethod,
         payment_reference: paymentReference || null,
         payment_date: paymentDate,
-        notes: notes || null
-      })
+        notes: notes || null,
+      });
     } catch (error) {
-      console.error('Failed to record payment:', error)
+      console.error('Failed to record payment:', error);
     }
-  }
+  };
 
   /**
    * Set amount to full due amount
    */
   const handleFullPayment = () => {
-    setAmount(invoice.amount_due.toString())
-  }
+    setAmount(invoice.amount_due.toString());
+  };
 
   if (!invoice) {
-    return null
+    return null;
   }
 
-  const selectedMethod = PAYMENT_METHODS.find(m => m.id === paymentMethod)
+  const _selectedMethod = PAYMENT_METHODS.find((m) => m.id === paymentMethod);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -173,10 +171,7 @@ export default function PaymentTracker({
               <p className="text-sm text-gray-500">Faktura {invoice.invoice_number}</p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
             <X className="w-5 h-5 text-gray-500" />
           </button>
         </div>
@@ -206,9 +201,7 @@ export default function PaymentTracker({
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {/* Amount */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Belop (NOK) *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Belop (NOK) *</label>
             <div className="flex gap-2">
               <div className="flex-1 relative">
                 <input
@@ -250,8 +243,8 @@ export default function PaymentTracker({
             </label>
             <div className="grid grid-cols-2 gap-2">
               {PAYMENT_METHODS.map((method) => {
-                const Icon = method.icon
-                const isSelected = paymentMethod === method.id
+                const Icon = method.icon;
+                const isSelected = paymentMethod === method.id;
 
                 return (
                   <button
@@ -264,22 +257,26 @@ export default function PaymentTracker({
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                      isSelected ? 'bg-green-100' : 'bg-gray-100'
-                    }`}>
-                      <Icon className={`w-5 h-5 ${isSelected ? 'text-green-600' : 'text-gray-600'}`} />
+                    <div
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                        isSelected ? 'bg-green-100' : 'bg-gray-100'
+                      }`}
+                    >
+                      <Icon
+                        className={`w-5 h-5 ${isSelected ? 'text-green-600' : 'text-gray-600'}`}
+                      />
                     </div>
                     <div className="text-left">
-                      <p className={`font-medium ${isSelected ? 'text-green-700' : 'text-gray-900'}`}>
+                      <p
+                        className={`font-medium ${isSelected ? 'text-green-700' : 'text-gray-900'}`}
+                      >
                         {method.name}
                       </p>
                       <p className="text-xs text-gray-500">{method.description}</p>
                     </div>
-                    {isSelected && (
-                      <Check className="w-5 h-5 text-green-600 ml-auto" />
-                    )}
+                    {isSelected && <Check className="w-5 h-5 text-green-600 ml-auto" />}
                   </button>
-                )
+                );
               })}
             </div>
             {errors.paymentMethod && (
@@ -292,9 +289,7 @@ export default function PaymentTracker({
 
           {/* Payment Date */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Betalingsdato *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Betalingsdato *</label>
             <div className="relative">
               <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
@@ -363,9 +358,7 @@ export default function PaymentTracker({
               <Check className="w-5 h-5 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-medium">Betaling registrert</p>
-                <p className="text-sm">
-                  {formatCurrency(amount)} er registrert som betalt
-                </p>
+                <p className="text-sm">{formatCurrency(amount)} er registrert som betalt</p>
               </div>
             </div>
           )}
@@ -402,5 +395,5 @@ export default function PaymentTracker({
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -217,88 +217,79 @@ const executeWorkflow = async (workflow, data) => {
 /**
  * Called when a new patient is created
  */
-export const onPatientCreated = async (organizationId, patientId) => {
-  return await detectAndTriggerWorkflows(organizationId, 'NEW_PATIENT', { patientId });
-};
+export const onPatientCreated = async (organizationId, patientId) =>
+  await detectAndTriggerWorkflows(organizationId, 'NEW_PATIENT', { patientId });
 
 /**
  * Called when an appointment is booked
  */
-export const onAppointmentBooked = async (organizationId, patientId, appointmentId) => {
-  return await detectAndTriggerWorkflows(organizationId, 'APPOINTMENT_BOOKED', {
+export const onAppointmentBooked = async (organizationId, patientId, appointmentId) =>
+  await detectAndTriggerWorkflows(organizationId, 'APPOINTMENT_BOOKED', {
     patientId,
     appointmentId,
   });
-};
 
 /**
  * Called when an encounter is completed/signed
  */
-export const onAppointmentCompleted = async (organizationId, patientId, encounterId) => {
-  return await detectAndTriggerWorkflows(organizationId, 'APPOINTMENT_COMPLETED', {
+export const onAppointmentCompleted = async (organizationId, patientId, encounterId) =>
+  await detectAndTriggerWorkflows(organizationId, 'APPOINTMENT_COMPLETED', {
     patientId,
     encounterId,
   });
-};
 
 /**
  * Called when an appointment is cancelled
  */
-export const onAppointmentCancelled = async (organizationId, patientId, appointmentId) => {
-  return await detectAndTriggerWorkflows(organizationId, 'APPOINTMENT_CANCELLED', {
+export const onAppointmentCancelled = async (organizationId, patientId, appointmentId) =>
+  await detectAndTriggerWorkflows(organizationId, 'APPOINTMENT_CANCELLED', {
     patientId,
     appointmentId,
   });
-};
 
 /**
  * Called when patient doesn't show
  */
-export const onAppointmentNoShow = async (organizationId, patientId, appointmentId) => {
-  return await detectAndTriggerWorkflows(organizationId, 'APPOINTMENT_NO_SHOW', {
+export const onAppointmentNoShow = async (organizationId, patientId, appointmentId) =>
+  await detectAndTriggerWorkflows(organizationId, 'APPOINTMENT_NO_SHOW', {
     patientId,
     appointmentId,
   });
-};
 
 /**
  * Called when a lead is created
  */
-export const onLeadCreated = async (organizationId, leadId) => {
-  return await detectAndTriggerWorkflows(organizationId, 'LEAD_CREATED', { leadId });
-};
+export const onLeadCreated = async (organizationId, leadId) =>
+  await detectAndTriggerWorkflows(organizationId, 'LEAD_CREATED', { leadId });
 
 /**
  * Called when patient lifecycle changes
  */
-export const onLifecycleChange = async (organizationId, patientId, oldStage, newStage) => {
-  return await detectAndTriggerWorkflows(organizationId, 'LIFECYCLE_CHANGE', {
+export const onLifecycleChange = async (organizationId, patientId, oldStage, newStage) =>
+  await detectAndTriggerWorkflows(organizationId, 'LIFECYCLE_CHANGE', {
     patientId,
     oldStage,
     newStage,
   });
-};
 
 /**
  * Called when a survey is completed
  */
-export const onSurveyCompleted = async (organizationId, patientId, surveyId, responseId) => {
-  return await detectAndTriggerWorkflows(organizationId, 'SURVEY_COMPLETED', {
+export const onSurveyCompleted = async (organizationId, patientId, surveyId, responseId) =>
+  await detectAndTriggerWorkflows(organizationId, 'SURVEY_COMPLETED', {
     patientId,
     surveyId,
     responseId,
   });
-};
 
 /**
  * Called when a referral is received
  */
-export const onReferralReceived = async (organizationId, referralId, referredPatientId) => {
-  return await detectAndTriggerWorkflows(organizationId, 'REFERRAL_RECEIVED', {
+export const onReferralReceived = async (organizationId, referralId, referredPatientId) =>
+  await detectAndTriggerWorkflows(organizationId, 'REFERRAL_RECEIVED', {
     referralId,
     patientId: referredPatientId,
   });
-};
 
 // ============================================================================
 // BATCH TRIGGER DETECTION (for scheduled checks)

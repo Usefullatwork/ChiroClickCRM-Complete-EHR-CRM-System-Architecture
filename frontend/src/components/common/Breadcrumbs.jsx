@@ -29,7 +29,9 @@ export default function Breadcrumbs({ items }) {
   // Auto-generate from path if no explicit items provided
   const breadcrumbs = items || generateBreadcrumbs(location.pathname, t);
 
-  if (breadcrumbs.length <= 1) return null;
+  if (breadcrumbs.length <= 1) {
+    return null;
+  }
 
   return (
     <nav aria-label="Breadcrumb" className="mb-4">

@@ -164,7 +164,9 @@ class AIFeedbackService {
    * Flush feedback buffer to database
    */
   async flushFeedbackBuffer() {
-    if (this.feedbackBuffer.length === 0) return;
+    if (this.feedbackBuffer.length === 0) {
+      return;
+    }
 
     const batch = [...this.feedbackBuffer];
     this.feedbackBuffer = [];
@@ -389,7 +391,7 @@ class AIFeedbackService {
    * Export training data as JSONL for model fine-tuning
    */
   async exportTrainingData(options = {}) {
-    const { startDate, endDate, minConfidence = 0.7, includeRejected = false } = options;
+    const { startDate, endDate, _minConfidence = 0.7, includeRejected = false } = options;
 
     try {
       let whereClause = 'WHERE 1=1';

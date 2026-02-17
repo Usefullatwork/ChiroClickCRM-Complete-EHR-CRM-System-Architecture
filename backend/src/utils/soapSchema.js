@@ -207,10 +207,14 @@ const ALIAS_MAP = buildAliasMap();
  * Normalize a single SOAP section's data by mapping aliased keys to canonical names
  */
 function normalizeSection(sectionName, data) {
-  if (!data || typeof data !== 'object') return data;
+  if (!data || typeof data !== 'object') {
+    return data;
+  }
 
   const section = SOAP_FIELDS[sectionName];
-  if (!section || !section.subfields) return data;
+  if (!section || !section.subfields) {
+    return data;
+  }
 
   const normalized = {};
 
@@ -233,7 +237,9 @@ function normalizeSection(sectionName, data) {
  * @returns {Object} Normalized data with canonical field names
  */
 export function normalizeSoapData(data) {
-  if (!data || typeof data !== 'object') return data;
+  if (!data || typeof data !== 'object') {
+    return data;
+  }
 
   const normalized = {};
 

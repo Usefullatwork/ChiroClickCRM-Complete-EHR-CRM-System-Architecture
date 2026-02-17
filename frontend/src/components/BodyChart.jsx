@@ -4,12 +4,15 @@
  * Allows clicking/drawing to mark pain locations and patterns
  */
 
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import _React, { useState, _useRef, useCallback, useEffect } from 'react';
 
 // Body region definitions with SVG path coordinates
 const BODY_REGIONS = {
   anterior: {
-    head: { label: 'Hode', path: 'M150,20 C180,20 200,50 200,80 C200,110 180,130 150,130 C120,130 100,110 100,80 C100,50 120,20 150,20' },
+    head: {
+      label: 'Hode',
+      path: 'M150,20 C180,20 200,50 200,80 C200,110 180,130 150,130 C120,130 100,110 100,80 C100,50 120,20 150,20',
+    },
     neck: { label: 'Nakke', path: 'M135,130 L165,130 L170,160 L130,160 Z' },
     rightShoulder: { label: 'Høyre skulder', path: 'M170,160 L220,180 L210,210 L165,195 Z' },
     leftShoulder: { label: 'Venstre skulder', path: 'M130,160 L80,180 L90,210 L135,195 Z' },
@@ -27,10 +30,13 @@ const BODY_REGIONS = {
     rightLeg: { label: 'Høyre legg', path: 'M157,560 L183,560 L180,680 L160,680 Z' },
     leftLeg: { label: 'Venstre legg', path: 'M117,560 L143,560 L140,680 L120,680 Z' },
     rightFoot: { label: 'Høyre fot', path: 'M160,680 L180,680 L185,720 L155,720 Z' },
-    leftFoot: { label: 'Venstre fot', path: 'M120,680 L140,680 L145,720 L115,720 Z' }
+    leftFoot: { label: 'Venstre fot', path: 'M120,680 L140,680 L145,720 L115,720 Z' },
   },
   posterior: {
-    headBack: { label: 'Bakhode', path: 'M150,20 C180,20 200,50 200,80 C200,110 180,130 150,130 C120,130 100,110 100,80 C100,50 120,20 150,20' },
+    headBack: {
+      label: 'Bakhode',
+      path: 'M150,20 C180,20 200,50 200,80 C200,110 180,130 150,130 C120,130 100,110 100,80 C100,50 120,20 150,20',
+    },
     neckBack: { label: 'Nakke bak', path: 'M135,130 L165,130 L170,160 L130,160 Z' },
     upperBack: { label: 'Øvre rygg', path: 'M120,160 L180,160 L185,250 L115,250 Z' },
     middleBack: { label: 'Midtre rygg', path: 'M115,250 L185,250 L188,320 L112,320 Z' },
@@ -42,8 +48,8 @@ const BODY_REGIONS = {
     rightHamstring: { label: 'Høyre bakside lår', path: 'M152,450 L188,450 L185,520 L155,520 Z' },
     leftHamstring: { label: 'Venstre bakside lår', path: 'M112,450 L148,450 L145,520 L115,520 Z' },
     rightCalf: { label: 'Høyre legg bak', path: 'M157,560 L183,560 L180,680 L160,680 Z' },
-    leftCalf: { label: 'Venstre legg bak', path: 'M117,560 L143,560 L140,680 L120,680 Z' }
-  }
+    leftCalf: { label: 'Venstre legg bak', path: 'M117,560 L143,560 L140,680 L120,680 Z' },
+  },
 };
 
 // Pain types with colors
@@ -53,7 +59,7 @@ const PAIN_TYPES = [
   { id: 'burning', label: 'Brennende', color: '#eab308', icon: '🔥' },
   { id: 'numbness', label: 'Nummenhet', color: '#3b82f6', icon: '◇' },
   { id: 'tingling', label: 'Prikking', color: '#8b5cf6', icon: '✦' },
-  { id: 'radiation', label: 'Utstråling', color: '#ec4899', icon: '→' }
+  { id: 'radiation', label: 'Utstråling', color: '#ec4899', icon: '→' },
 ];
 
 // Pain intensity scale
@@ -62,7 +68,7 @@ const INTENSITY_LEVELS = [
   { level: 2, label: 'Lett', color: '#fde047' },
   { level: 3, label: 'Moderat', color: '#fb923c' },
   { level: 4, label: 'Sterk', color: '#f87171' },
-  { level: 5, label: 'Ekstrem', color: '#dc2626' }
+  { level: 5, label: 'Ekstrem', color: '#dc2626' },
 ];
 
 /**
@@ -76,7 +82,7 @@ const BodyOutline = ({ view, markers, onRegionClick, selectedRegion, highlighted
       {/* Background body silhouette */}
       <defs>
         <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.2"/>
+          <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.2" />
         </filter>
       </defs>
 
@@ -87,15 +93,17 @@ const BodyOutline = ({ view, markers, onRegionClick, selectedRegion, highlighted
       {Object.entries(regions).map(([regionId, region]) => {
         const isSelected = selectedRegion === regionId;
         const isHighlighted = highlightedRegions?.includes(regionId);
-        const regionMarkers = markers?.filter(m => m.region === regionId) || [];
+        const regionMarkers = markers?.filter((m) => m.region === regionId) || [];
         const hasMarkers = regionMarkers.length > 0;
 
         return (
           <g key={regionId}>
             <path
               d={region.path}
-              fill={hasMarkers ? regionMarkers[0].color + '40' : (isHighlighted ? '#bfdbfe' : '#e5e7eb')}
-              stroke={isSelected ? '#2563eb' : (hasMarkers ? regionMarkers[0].color : '#9ca3af')}
+              fill={
+                hasMarkers ? `${regionMarkers[0].color}40` : isHighlighted ? '#bfdbfe' : '#e5e7eb'
+              }
+              stroke={isSelected ? '#2563eb' : hasMarkers ? regionMarkers[0].color : '#9ca3af'}
               strokeWidth={isSelected ? 3 : 1}
               className="cursor-pointer transition-all duration-150 hover:fill-blue-100"
               onClick={() => onRegionClick(regionId, region.label)}
@@ -137,15 +145,13 @@ const PainTypeSelector = ({ selected, onSelect }) => {
           onClick={() => onSelect(type)}
           className={`
             px-3 py-1.5 rounded-full text-sm font-medium transition-all
-            ${selected?.id === type.id
-              ? 'ring-2 ring-offset-2 ring-blue-500'
-              : 'hover:bg-gray-100'}
+            ${selected?.id === type.id ? 'ring-2 ring-offset-2 ring-blue-500' : 'hover:bg-gray-100'}
           `}
           style={{
-            backgroundColor: selected?.id === type.id ? type.color + '20' : undefined,
+            backgroundColor: selected?.id === type.id ? `${type.color}20` : undefined,
             borderColor: type.color,
             borderWidth: '2px',
-            color: type.color
+            color: type.color,
           }}
         >
           {type.icon} {type.label}
@@ -186,14 +192,14 @@ export const BodyChart = ({
   initialMarkers = [],
   onChange,
   readOnly = false,
-  showLegend = true
+  showLegend = true,
 }) => {
   const [view, setView] = useState('anterior');
   const [markers, setMarkers] = useState(initialMarkers);
   const [selectedRegion, setSelectedRegion] = useState(null);
   const [selectedPainType, setSelectedPainType] = useState(PAIN_TYPES[0]);
   const [selectedIntensity, setSelectedIntensity] = useState(INTENSITY_LEVELS[2]);
-  const [notes, setNotes] = useState('');
+  const [_notes, _setNotes] = useState('');
 
   // Notify parent of changes
   useEffect(() => {
@@ -203,50 +209,58 @@ export const BodyChart = ({
   }, [markers, onChange]);
 
   // Handle region click
-  const handleRegionClick = useCallback((regionId, regionLabel) => {
-    if (readOnly) return;
+  const handleRegionClick = useCallback(
+    (regionId, regionLabel) => {
+      if (readOnly) {
+        return;
+      }
 
-    setSelectedRegion(regionId);
+      setSelectedRegion(regionId);
 
-    // Add or update marker
-    const existingMarkerIndex = markers.findIndex(
-      m => m.region === regionId && m.view === view
-    );
+      // Add or update marker
+      const existingMarkerIndex = markers.findIndex(
+        (m) => m.region === regionId && m.view === view
+      );
 
-    if (existingMarkerIndex >= 0) {
-      // Update existing marker
-      const newMarkers = [...markers];
-      newMarkers[existingMarkerIndex] = {
-        ...newMarkers[existingMarkerIndex],
-        painType: selectedPainType.id,
-        color: selectedPainType.color,
-        intensity: selectedIntensity.level
-      };
-      setMarkers(newMarkers);
-    } else {
-      // Add new marker
-      setMarkers([
-        ...markers,
-        {
-          id: `${Date.now()}`,
-          region: regionId,
-          regionLabel,
-          view,
+      if (existingMarkerIndex >= 0) {
+        // Update existing marker
+        const newMarkers = [...markers];
+        newMarkers[existingMarkerIndex] = {
+          ...newMarkers[existingMarkerIndex],
           painType: selectedPainType.id,
-          painTypeLabel: selectedPainType.label,
           color: selectedPainType.color,
           intensity: selectedIntensity.level,
-          intensityLabel: selectedIntensity.label,
-          notes: ''
-        }
-      ]);
-    }
-  }, [view, selectedPainType, selectedIntensity, markers, readOnly]);
+        };
+        setMarkers(newMarkers);
+      } else {
+        // Add new marker
+        setMarkers([
+          ...markers,
+          {
+            id: `${Date.now()}`,
+            region: regionId,
+            regionLabel,
+            view,
+            painType: selectedPainType.id,
+            painTypeLabel: selectedPainType.label,
+            color: selectedPainType.color,
+            intensity: selectedIntensity.level,
+            intensityLabel: selectedIntensity.label,
+            notes: '',
+          },
+        ]);
+      }
+    },
+    [view, selectedPainType, selectedIntensity, markers, readOnly]
+  );
 
   // Remove marker
-  const handleRemoveMarker = useCallback((markerId) => {
-    setMarkers(markers.filter(m => m.id !== markerId));
-  }, [markers]);
+  const handleRemoveMarker = useCallback(
+    (markerId) => {
+      setMarkers(markers.filter((m) => m.id !== markerId));
+    },
+    [markers]
+  );
 
   // Clear all markers
   const handleClearAll = useCallback(() => {
@@ -256,13 +270,15 @@ export const BodyChart = ({
 
   // Generate text summary
   const generateSummary = useCallback(() => {
-    if (markers.length === 0) return '';
+    if (markers.length === 0) {
+      return '';
+    }
 
-    const summary = markers.map(m =>
-      `${m.regionLabel}: ${m.painTypeLabel} smerte, intensitet ${m.intensity}/5`
-    ).join('. ');
+    const summary = markers
+      .map((m) => `${m.regionLabel}: ${m.painTypeLabel} smerte, intensitet ${m.intensity}/5`)
+      .join('. ');
 
-    return summary + '.';
+    return `${summary}.`;
   }, [markers]);
 
   return (
@@ -291,7 +307,7 @@ export const BodyChart = ({
         <div className="flex justify-center">
           <BodyOutline
             view={view}
-            markers={markers.filter(m => m.view === view)}
+            markers={markers.filter((m) => m.view === view)}
             onRegionClick={handleRegionClick}
             selectedRegion={selectedRegion}
           />
@@ -303,13 +319,8 @@ export const BodyChart = ({
             <>
               {/* Pain type selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Smertetype
-                </label>
-                <PainTypeSelector
-                  selected={selectedPainType}
-                  onSelect={setSelectedPainType}
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Smertetype</label>
+                <PainTypeSelector selected={selectedPainType} onSelect={setSelectedPainType} />
               </div>
 
               {/* Intensity selection */}
@@ -317,10 +328,7 @@ export const BodyChart = ({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Intensitet (1-5)
                 </label>
-                <IntensitySelector
-                  selected={selectedIntensity}
-                  onSelect={setSelectedIntensity}
-                />
+                <IntensitySelector selected={selectedIntensity} onSelect={setSelectedIntensity} />
               </div>
             </>
           )}
@@ -382,9 +390,7 @@ export const BodyChart = ({
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Tekstsammendrag
               </label>
-              <div className="p-3 bg-blue-50 rounded-lg text-sm">
-                {generateSummary()}
-              </div>
+              <div className="p-3 bg-blue-50 rounded-lg text-sm">{generateSummary()}</div>
             </div>
           )}
         </div>

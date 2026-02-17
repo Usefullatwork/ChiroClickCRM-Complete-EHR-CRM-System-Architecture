@@ -30,7 +30,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { Card, CardHeader, CardBody, CardFooter } from '../ui/Card';
+import { Card, _CardHeader, CardBody, _CardFooter } from '../ui/Card';
 import { Alert } from '../ui/Alert';
 import { Modal } from '../ui/Modal';
 import logger from '../../utils/logger';
@@ -140,10 +140,14 @@ const parseVCardEntry = (vcardText) => {
   const lines = vcardText.split(/\r?\n/);
 
   for (const line of lines) {
-    if (!line.trim()) continue;
+    if (!line.trim()) {
+      continue;
+    }
 
     const colonIndex = line.indexOf(':');
-    if (colonIndex === -1) continue;
+    if (colonIndex === -1) {
+      continue;
+    }
 
     let property = line.substring(0, colonIndex).toUpperCase();
     let value = line.substring(colonIndex + 1).trim();
@@ -153,7 +157,7 @@ const parseVCardEntry = (vcardText) => {
     if (property.includes(';')) {
       const parts = property.split(';');
       property = parts[0];
-      parts.slice(1).forEach(param => {
+      parts.slice(1).forEach((param) => {
         const [key, val] = param.split('=');
         params[key?.toUpperCase()] = val?.toUpperCase() || true;
       });
@@ -167,19 +171,21 @@ const parseVCardEntry = (vcardText) => {
       .replace(/\\\\/g, '\\');
 
     switch (property) {
-      case 'N':
+      case 'N': {
         const nameParts = value.split(';');
         contact.last_name = nameParts[0] || '';
         contact.first_name = nameParts[1] || '';
         break;
+      }
 
-      case 'FN':
+      case 'FN': {
         if (!contact.first_name && !contact.last_name) {
           const fullNameParts = value.split(' ');
           contact.first_name = fullNameParts[0] || '';
           contact.last_name = fullNameParts.slice(1).join(' ') || '';
         }
         break;
+      }
 
       case 'EMAIL':
         if (!contact.email) {
@@ -187,7 +193,7 @@ const parseVCardEntry = (vcardText) => {
         }
         break;
 
-      case 'TEL':
+      case 'TEL': {
         const phoneType = params.TYPE || '';
         const cleanPhone = value.replace(/[\s\-\(\)]/g, '');
 
@@ -201,18 +207,20 @@ const parseVCardEntry = (vcardText) => {
           contact.phone = cleanPhone;
         }
         break;
+      }
 
-      case 'ADR':
+      case 'ADR': {
         const addrParts = value.split(';');
         contact.address_street = addrParts[2] || '';
         contact.address_city = addrParts[3] || '';
         contact.address_postal_code = addrParts[5] || '';
         contact.country = addrParts[6] || '';
         break;
+      }
 
       case 'BDAY':
         try {
-          let dateStr = value.replace(/\D/g, '');
+          const dateStr = value.replace(/\D/g, '');
           if (dateStr.length === 8) {
             contact.date_of_birth = `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`;
           }
@@ -299,15 +307,15 @@ export default function VCardImport({
 
   // Validate all contacts
   const validatedContacts = useMemo(() => {
-    return contacts.map(contact => ({
+    return contacts.map((contact) => ({
       ...contact,
       validation: validateContact(contact),
     }));
   }, [contacts]);
 
   // Count valid contacts
-  const validCount = useMemo(() => {
-    return validatedContacts.filter(c => c.validation.isValid).length;
+  const _validCount = useMemo(() => {
+    return validatedContacts.filter((c) => c.validation.isValid).length;
   }, [validatedContacts]);
 
   // Handle file drop
@@ -331,44 +339,47 @@ export default function VCardImport({
     }
   }, []);
 
-  const handleFile = useCallback((selectedFile) => {
-    if (!selectedFile.name.match(/\.vcf$/i)) {
-      setError(t.parseError);
-      return;
-    }
-
-    setFile(selectedFile);
-    setError(null);
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const content = e.target.result;
-        const parsed = parseVCard(content);
-
-        if (parsed.length === 0) {
-          setError(t.noContacts);
-          setContacts([]);
-        } else {
-          setContacts(parsed);
-          // Select all valid contacts by default
-          const validIds = parsed
-            .map((c, i) => ({ contact: c, index: i }))
-            .filter(({ contact }) => validateContact(contact).isValid)
-            .map(({ index }) => index);
-          setSelectedContacts(new Set(validIds));
-        }
-      } catch (err) {
-        setError(t.parseError + ': ' + err.message);
-        setContacts([]);
+  const handleFile = useCallback(
+    (selectedFile) => {
+      if (!selectedFile.name.match(/\.vcf$/i)) {
+        setError(t.parseError);
+        return;
       }
-    };
-    reader.readAsText(selectedFile);
-  }, [t]);
+
+      setFile(selectedFile);
+      setError(null);
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const content = e.target.result;
+          const parsed = parseVCard(content);
+
+          if (parsed.length === 0) {
+            setError(t.noContacts);
+            setContacts([]);
+          } else {
+            setContacts(parsed);
+            // Select all valid contacts by default
+            const validIds = parsed
+              .map((c, i) => ({ contact: c, index: i }))
+              .filter(({ contact }) => validateContact(contact).isValid)
+              .map(({ index }) => index);
+            setSelectedContacts(new Set(validIds));
+          }
+        } catch (err) {
+          setError(`${t.parseError}: ${err.message}`);
+          setContacts([]);
+        }
+      };
+      reader.readAsText(selectedFile);
+    },
+    [t]
+  );
 
   // Toggle contact selection
   const toggleContact = useCallback((index) => {
-    setSelectedContacts(prev => {
+    setSelectedContacts((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(index)) {
         newSet.delete(index);
@@ -395,8 +406,8 @@ export default function VCardImport({
 
   // Remove contact
   const handleRemoveContact = useCallback((index) => {
-    setContacts(prev => prev.filter((_, i) => i !== index));
-    setSelectedContacts(prev => {
+    setContacts((prev) => prev.filter((_, i) => i !== index));
+    setSelectedContacts((prev) => {
       const newSet = new Set(prev);
       newSet.delete(index);
       return newSet;
@@ -414,7 +425,7 @@ export default function VCardImport({
   // Handle import
   const handleImport = useCallback(() => {
     const selectedPatients = Array.from(selectedContacts)
-      .map(i => contacts[i])
+      .map((i) => contacts[i])
       .filter(Boolean);
 
     onImportComplete?.(selectedPatients);
@@ -456,19 +467,16 @@ export default function VCardImport({
       </div>
 
       {/* Error display */}
-      {error && (
-        <Alert variant="danger">
-          {error}
-        </Alert>
-      )}
+      {error && <Alert variant="danger">{error}</Alert>}
 
       {/* File upload area */}
       {contacts.length === 0 && (
         <div
           className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors cursor-pointer
-            ${dragActive
-              ? 'border-purple-500 bg-purple-50'
-              : 'border-slate-300 hover:border-slate-400 hover:bg-slate-50'
+            ${
+              dragActive
+                ? 'border-purple-500 bg-purple-50'
+                : 'border-slate-300 hover:border-slate-400 hover:bg-slate-50'
             }`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
@@ -477,12 +485,8 @@ export default function VCardImport({
           onClick={() => document.getElementById('vcard-file-input')?.click()}
         >
           <Upload className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-          <p className="text-lg font-medium text-slate-700 mb-2">
-            {t.dropzone}
-          </p>
-          <p className="text-sm text-slate-500">
-            {t.supportedFormats}
-          </p>
+          <p className="text-lg font-medium text-slate-700 mb-2">{t.dropzone}</p>
+          <p className="text-sm text-slate-500">{t.supportedFormats}</p>
           <input
             id="vcard-file-input"
             type="file"
@@ -527,9 +531,10 @@ export default function VCardImport({
               <div
                 key={index}
                 className={`p-4 border rounded-lg transition-colors cursor-pointer
-                  ${selectedContacts.has(index)
-                    ? 'bg-purple-50 border-purple-200'
-                    : 'bg-white border-slate-200 hover:border-slate-300'
+                  ${
+                    selectedContacts.has(index)
+                      ? 'bg-purple-50 border-purple-200'
+                      : 'bg-white border-slate-200 hover:border-slate-300'
                   }
                   ${!contact.validation.isValid ? 'opacity-60' : ''}`}
                 onClick={() => contact.validation.isValid && toggleContact(index)}
@@ -598,7 +603,7 @@ export default function VCardImport({
                         contact.validation.warnings.length > 0 ? (
                           <span className="inline-flex items-center gap-1 text-xs text-amber-600">
                             <AlertTriangle className="w-3.5 h-3.5" />
-                            {contact.validation.warnings.map(w => t.validation[w]).join(', ')}
+                            {contact.validation.warnings.map((w) => t.validation[w]).join(', ')}
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 text-xs text-green-600">
@@ -609,7 +614,7 @@ export default function VCardImport({
                       ) : (
                         <span className="inline-flex items-center gap-1 text-xs text-red-600">
                           <X className="w-3.5 h-3.5" />
-                          {contact.validation.errors.map(e => t.validation[e]).join(', ')}
+                          {contact.validation.errors.map((e) => t.validation[e]).join(', ')}
                         </span>
                       )}
                     </div>
@@ -778,7 +783,7 @@ export default function VCardImport({
                 <Alert variant="danger">
                   <div className="flex items-center gap-2">
                     <X className="w-4 h-4" />
-                    {previewContact.validation?.errors.map(e => t.validation[e]).join(', ')}
+                    {previewContact.validation?.errors.map((e) => t.validation[e]).join(', ')}
                   </div>
                 </Alert>
               )}

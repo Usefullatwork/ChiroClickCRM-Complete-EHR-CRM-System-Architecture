@@ -59,9 +59,15 @@ export const getPatientStats = async (organizationId) => {
       newPatientsThisMonth: parseInt(newThisMonthResult.rows[0]?.new_patients || 0),
       newPatientsLastMonth: parseInt(newLastMonthResult.rows[0]?.new_patients || 0),
       activePatients: parseInt(activeResult.rows[0]?.active_patients || 0),
-      changePercent: newLastMonthResult.rows[0]?.new_patients > 0
-        ? Math.round(((newThisMonthResult.rows[0]?.new_patients - newLastMonthResult.rows[0]?.new_patients) / newLastMonthResult.rows[0]?.new_patients) * 100)
-        : 0
+      changePercent:
+        newLastMonthResult.rows[0]?.new_patients > 0
+          ? Math.round(
+              ((newThisMonthResult.rows[0]?.new_patients -
+                newLastMonthResult.rows[0]?.new_patients) /
+                newLastMonthResult.rows[0]?.new_patients) *
+                100
+            )
+          : 0,
     };
   } catch (error) {
     logger.error('Error getting patient stats:', error);
@@ -147,23 +153,23 @@ export const getAppointmentStats = async (organizationId) => {
         total: parseInt(todayResult.rows[0]?.total || 0),
         confirmed: parseInt(todayResult.rows[0]?.confirmed || 0),
         completed: parseInt(todayResult.rows[0]?.completed || 0),
-        pending: parseInt(todayResult.rows[0]?.pending || 0)
+        pending: parseInt(todayResult.rows[0]?.pending || 0),
       },
       thisWeek: {
         total: parseInt(weekResult.rows[0]?.total || 0),
         completed: parseInt(weekResult.rows[0]?.completed || 0),
         cancelled: parseInt(weekResult.rows[0]?.cancelled || 0),
-        noShow: parseInt(weekResult.rows[0]?.no_show || 0)
+        noShow: parseInt(weekResult.rows[0]?.no_show || 0),
       },
-      upcomingToday: upcomingTodayResult.rows.map(apt => ({
+      upcomingToday: upcomingTodayResult.rows.map((apt) => ({
         id: apt.id,
         startTime: apt.start_time,
         durationMinutes: apt.duration_minutes,
         appointmentType: apt.appointment_type,
         status: apt.status,
         patientName: `${apt.first_name} ${apt.last_name}`,
-        patientPhone: apt.phone
-      }))
+        patientPhone: apt.phone,
+      })),
     };
   } catch (error) {
     logger.error('Error getting appointment stats:', error);
@@ -177,7 +183,8 @@ export const getAppointmentStats = async (organizationId) => {
 export const getRevenueStats = async (organizationId, startDate, endDate) => {
   try {
     const now = new Date();
-    const thisMonthStart = startDate || new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    const thisMonthStart =
+      startDate || new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
     const thisMonthEnd = endDate || now.toISOString();
     const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
     const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0).toISOString();
@@ -228,18 +235,19 @@ export const getRevenueStats = async (organizationId, startDate, endDate) => {
         totalRevenue: thisMonthRevenue,
         patientRevenue: parseFloat(thisMonthResult.rows[0]?.patient_revenue || 0),
         insuranceRevenue: parseFloat(thisMonthResult.rows[0]?.insurance_revenue || 0),
-        transactionCount: parseInt(thisMonthResult.rows[0]?.transaction_count || 0)
+        transactionCount: parseInt(thisMonthResult.rows[0]?.transaction_count || 0),
       },
       lastMonth: {
-        totalRevenue: lastMonthRevenue
+        totalRevenue: lastMonthRevenue,
       },
-      changePercent: lastMonthRevenue > 0
-        ? Math.round(((thisMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100)
-        : 0,
-      dailyRevenue: dailyRevenueResult.rows.map(row => ({
+      changePercent:
+        lastMonthRevenue > 0
+          ? Math.round(((thisMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100)
+          : 0,
+      dailyRevenue: dailyRevenueResult.rows.map((row) => ({
         date: row.date,
-        revenue: parseFloat(row.revenue)
-      }))
+        revenue: parseFloat(row.revenue),
+      })),
     };
   } catch (error) {
     logger.error('Error getting revenue stats:', error);
@@ -273,7 +281,7 @@ export const getTopExercises = async (organizationId, limit = 10) => {
       [organizationId, limit]
     );
 
-    return result.rows.map(row => ({
+    return result.rows.map((row) => ({
       id: row.id,
       nameNo: row.name_no,
       nameEn: row.name_en,
@@ -281,7 +289,7 @@ export const getTopExercises = async (organizationId, limit = 10) => {
       subcategory: row.subcategory,
       bodyRegion: row.body_region,
       prescriptionCount: parseInt(row.prescription_count),
-      patientCount: parseInt(row.patient_count)
+      patientCount: parseInt(row.patient_count),
     }));
   } catch (error) {
     logger.error('Error getting top exercises:', error);
@@ -358,12 +366,12 @@ export const getExerciseCompliance = async (organizationId) => {
       cancelled: parseInt(overallResult.rows[0]?.cancelled || 0),
       completionRate: total > 0 ? Math.round((completed / total) * 100) : 0,
       avgProgressRate: Math.round(parseFloat(progressResult.rows[0]?.avg_completion_rate || 0)),
-      weeklyTrend: weeklyResult.rows.map(row => ({
+      weeklyTrend: weeklyResult.rows.map((row) => ({
         week: row.week,
         total: parseInt(row.total),
         completed: parseInt(row.completed),
-        avgRate: Math.round(parseFloat(row.avg_rate || 0))
-      }))
+        avgRate: Math.round(parseFloat(row.avg_rate || 0)),
+      })),
     };
   } catch (error) {
     logger.error('Error getting exercise compliance:', error);
@@ -376,7 +384,7 @@ export const getExerciseCompliance = async (organizationId) => {
       cancelled: 0,
       completionRate: 0,
       avgProgressRate: 0,
-      weeklyTrend: []
+      weeklyTrend: [],
     };
   }
 };
@@ -399,10 +407,10 @@ export const getPatientVolumeTrends = async (organizationId) => {
       [organizationId]
     );
 
-    return result.rows.map(row => ({
+    return result.rows.map((row) => ({
       month: row.month,
       totalVisits: parseInt(row.total_visits),
-      uniquePatients: parseInt(row.unique_patients)
+      uniquePatients: parseInt(row.unique_patients),
     }));
   } catch (error) {
     logger.error('Error getting patient volume trends:', error);
@@ -421,14 +429,14 @@ export const getDashboardAnalytics = async (organizationId, dateRange = {}) => {
       revenueStats,
       topExercises,
       exerciseCompliance,
-      patientVolumeTrends
+      patientVolumeTrends,
     ] = await Promise.all([
       getPatientStats(organizationId),
       getAppointmentStats(organizationId),
       getRevenueStats(organizationId, dateRange.startDate, dateRange.endDate),
       getTopExercises(organizationId),
       getExerciseCompliance(organizationId),
-      getPatientVolumeTrends(organizationId)
+      getPatientVolumeTrends(organizationId),
     ]);
 
     return {
@@ -437,11 +445,11 @@ export const getDashboardAnalytics = async (organizationId, dateRange = {}) => {
       revenue: revenueStats,
       exercises: {
         topPrescribed: topExercises,
-        compliance: exerciseCompliance
+        compliance: exerciseCompliance,
       },
       trends: {
-        patientVolume: patientVolumeTrends
-      }
+        patientVolume: patientVolumeTrends,
+      },
     };
   } catch (error) {
     logger.error('Error getting dashboard analytics:', error);
@@ -458,7 +466,7 @@ export const exportAnalyticsCSV = async (organizationId, type, dateRange = {}) =
     let headers = [];
 
     switch (type) {
-      case 'patients':
+      case 'patients': {
         const patientStats = await getPatientStats(organizationId);
         headers = ['Metrikk', 'Verdi'];
         data = [
@@ -466,23 +474,35 @@ export const exportAnalyticsCSV = async (organizationId, type, dateRange = {}) =
           ['Nye pasienter denne maneden', patientStats.newPatientsThisMonth],
           ['Nye pasienter forrige maned', patientStats.newPatientsLastMonth],
           ['Aktive pasienter', patientStats.activePatients],
-          ['Endring (%)', patientStats.changePercent]
+          ['Endring (%)', patientStats.changePercent],
         ];
         break;
+      }
 
-      case 'revenue':
-        const revenueStats = await getRevenueStats(organizationId, dateRange.startDate, dateRange.endDate);
+      case 'revenue': {
+        const revenueStats = await getRevenueStats(
+          organizationId,
+          dateRange.startDate,
+          dateRange.endDate
+        );
         headers = ['Dato', 'Inntekt (NOK)'];
-        data = revenueStats.dailyRevenue.map(d => [d.date, d.revenue]);
+        data = revenueStats.dailyRevenue.map((d) => [d.date, d.revenue]);
         break;
+      }
 
-      case 'exercises':
+      case 'exercises': {
         const topExercises = await getTopExercises(organizationId, 50);
         headers = ['Ovelse', 'Kategori', 'Antall foreskrivninger', 'Antall pasienter'];
-        data = topExercises.map(e => [e.nameNo || e.nameEn, e.category, e.prescriptionCount, e.patientCount]);
+        data = topExercises.map((e) => [
+          e.nameNo || e.nameEn,
+          e.category,
+          e.prescriptionCount,
+          e.patientCount,
+        ]);
         break;
+      }
 
-      case 'appointments':
+      case 'appointments': {
         const appointmentStats = await getAppointmentStats(organizationId);
         headers = ['Metrikk', 'Verdi'];
         data = [
@@ -492,11 +512,12 @@ export const exportAnalyticsCSV = async (organizationId, type, dateRange = {}) =
           ['Denne uken - totalt', appointmentStats.thisWeek.total],
           ['Denne uken - fullfort', appointmentStats.thisWeek.completed],
           ['Denne uken - avlyst', appointmentStats.thisWeek.cancelled],
-          ['Denne uken - ikke mott', appointmentStats.thisWeek.noShow]
+          ['Denne uken - ikke mott', appointmentStats.thisWeek.noShow],
         ];
         break;
+      }
 
-      case 'compliance':
+      case 'compliance': {
         const complianceStats = await getExerciseCompliance(organizationId);
         headers = ['Metrikk', 'Verdi'];
         data = [
@@ -506,9 +527,10 @@ export const exportAnalyticsCSV = async (organizationId, type, dateRange = {}) =
           ['Pa pause', complianceStats.paused],
           ['Avbrutt', complianceStats.cancelled],
           ['Fullforingsrate (%)', complianceStats.completionRate],
-          ['Gjennomsnittlig fremgang (%)', complianceStats.avgProgressRate]
+          ['Gjennomsnittlig fremgang (%)', complianceStats.avgProgressRate],
         ];
         break;
+      }
 
       default:
         throw new Error(`Unknown export type: ${type}`);
@@ -517,7 +539,7 @@ export const exportAnalyticsCSV = async (organizationId, type, dateRange = {}) =
     // Convert to CSV
     const csvContent = [
       headers.join(','),
-      ...data.map(row => row.map(cell => `"${cell}"`).join(','))
+      ...data.map((row) => row.map((cell) => `"${cell}"`).join(',')),
     ].join('\n');
 
     return csvContent;
@@ -535,5 +557,5 @@ export default {
   getExerciseCompliance,
   getPatientVolumeTrends,
   getDashboardAnalytics,
-  exportAnalyticsCSV
+  exportAnalyticsCSV,
 };

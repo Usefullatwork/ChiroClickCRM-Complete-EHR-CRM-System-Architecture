@@ -7,7 +7,7 @@
  * - Auto-reset after timeout
  */
 
-import React, { useEffect, useState } from 'react';
+import _React, { useEffect, useState } from 'react';
 import { CheckCircle2, Clock, MapPin } from 'lucide-react';
 
 const TRANSLATIONS = {
@@ -32,7 +32,7 @@ const TRANSLATIONS = {
     newCheckIn: 'Ny innsjekking',
     autoResetMessage: 'Denne skjermen tilbakestilles om',
     seconds: 'sekunder',
-  }
+  },
 };
 
 const AUTO_RESET_SECONDS = 15;
@@ -41,7 +41,7 @@ export default function CheckInConfirmation({
   appointment,
   onReset,
   lang = 'no',
-  estimatedWaitMinutes = 5
+  estimatedWaitMinutes = 5,
 }) {
   const t = TRANSLATIONS[lang];
   const [countdown, setCountdown] = useState(AUTO_RESET_SECONDS);
@@ -50,7 +50,7 @@ export default function CheckInConfirmation({
   // Auto-reset countdown
   useEffect(() => {
     const timer = setInterval(() => {
-      setCountdown(prev => {
+      setCountdown((prev) => {
         if (prev <= 1) {
           onReset();
           return AUTO_RESET_SECONDS;
@@ -80,7 +80,9 @@ export default function CheckInConfirmation({
               style={{
                 left: `${Math.random() * 100}%`,
                 animationDelay: `${Math.random() * 0.5}s`,
-                backgroundColor: ['#14b8a6', '#f59e0b', '#3b82f6', '#ec4899'][Math.floor(Math.random() * 4)]
+                backgroundColor: ['#14b8a6', '#f59e0b', '#3b82f6', '#ec4899'][
+                  Math.floor(Math.random() * 4)
+                ],
               }}
             />
           ))}
@@ -89,12 +91,16 @@ export default function CheckInConfirmation({
 
       {/* Success icon */}
       <div className="relative mb-6">
-        <div className="w-28 h-28 bg-green-100 rounded-full flex items-center justify-center
-                        animate-scale-in">
+        <div
+          className="w-28 h-28 bg-green-100 rounded-full flex items-center justify-center
+                        animate-scale-in"
+        >
           <CheckCircle2 className="w-16 h-16 text-green-600" />
         </div>
-        <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-teal-500 rounded-full
-                        flex items-center justify-center text-white text-xl animate-bounce">
+        <div
+          className="absolute -bottom-2 -right-2 w-10 h-10 bg-teal-500 rounded-full
+                        flex items-center justify-center text-white text-xl animate-bounce"
+        >
           ✓
         </div>
       </div>

@@ -10,7 +10,7 @@ import logger from '../utils/logger.js';
 /**
  * Parse Excel/CSV file
  */
-export const parseExcelFile = async (buffer, fileType) => {
+export const parseExcelFile = async (buffer, _fileType) => {
   try {
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(buffer);
@@ -54,7 +54,9 @@ const mapExcelRowToPatient = (row) => {
   const findColumn = (row, ...names) => {
     for (const name of names) {
       const key = Object.keys(row).find((k) => k.toLowerCase().trim() === name.toLowerCase());
-      if (key && row[key]) return row[key];
+      if (key && row[key]) {
+        return row[key];
+      }
     }
     return null;
   };
@@ -170,24 +172,36 @@ const mapExcelRowToPatient = (row) => {
   };
 
   // Normalize status
-  if (patient.patient_status === 'Inaktiv') patient.status = 'INACTIVE';
-  else if (patient.patient_status === 'Ferdig') patient.status = 'FINISHED';
-  else if (patient.patient_status) patient.status = 'ACTIVE';
+  if (patient.patient_status === 'Inaktiv') {
+    patient.status = 'INACTIVE';
+  } else if (patient.patient_status === 'Ferdig') {
+    patient.status = 'FINISHED';
+  } else if (patient.patient_status) {
+    patient.status = 'ACTIVE';
+  }
 
   // Normalize language
-  if (patient.language === 'Norsk') patient.language = 'NO';
-  else if (patient.language === 'Engelsk') patient.language = 'EN';
+  if (patient.language === 'Norsk') {
+    patient.language = 'NO';
+  } else if (patient.language === 'Engelsk') {
+    patient.language = 'EN';
+  }
 
   // Normalize treatment type
-  if (patient.treatment_type === 'Kiropraktor') patient.treatment_type = 'KIROPRAKTOR';
-  else if (patient.treatment_type === 'Nevrobehandling') patient.treatment_type = 'NEVROBEHANDLING';
-  else if (patient.treatment_type === 'Muskelbehandling')
+  if (patient.treatment_type === 'Kiropraktor') {
+    patient.treatment_type = 'KIROPRAKTOR';
+  } else if (patient.treatment_type === 'Nevrobehandling') {
+    patient.treatment_type = 'NEVROBEHANDLING';
+  } else if (patient.treatment_type === 'Muskelbehandling') {
     patient.treatment_type = 'MUSKELBEHANDLING';
+  }
 
   // Normalize contact method
-  if (patient.preferred_contact_method === 'Melding') patient.preferred_contact_method = 'SMS';
-  else if (patient.preferred_contact_method?.includes('BARN'))
+  if (patient.preferred_contact_method === 'Melding') {
+    patient.preferred_contact_method = 'SMS';
+  } else if (patient.preferred_contact_method?.includes('BARN')) {
     patient.preferred_contact_method = 'NO_CONTACT';
+  }
 
   return patient;
 };
@@ -199,8 +213,12 @@ const validatePatient = (patient, rowIndex) => {
   const errors = [];
 
   // Required fields
-  if (!patient.first_name) errors.push(`Row ${rowIndex}: Missing first name`);
-  if (!patient.last_name) errors.push(`Row ${rowIndex}: Missing last name`);
+  if (!patient.first_name) {
+    errors.push(`Row ${rowIndex}: Missing first name`);
+  }
+  if (!patient.last_name) {
+    errors.push(`Row ${rowIndex}: Missing last name`);
+  }
 
   // Phone or email required
   if (!patient.phone && !patient.email) {

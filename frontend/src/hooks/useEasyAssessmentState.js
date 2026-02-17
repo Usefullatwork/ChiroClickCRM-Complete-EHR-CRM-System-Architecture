@@ -231,7 +231,9 @@ export default function useEasyAssessmentState() {
 
   // Helpers
   const calculateAge = (dateOfBirth) => {
-    if (!dateOfBirth) return null;
+    if (!dateOfBirth) {
+      return null;
+    }
     const today = new Date();
     const birthDate = new Date(dateOfBirth);
     let age = today.getFullYear() - birthDate.getFullYear();
@@ -242,7 +244,7 @@ export default function useEasyAssessmentState() {
     return age;
   };
 
-  const buildAIContext = (fieldType) => ({
+  const buildAIContext = (_fieldType) => ({
     patientAge: patient?.data?.date_of_birth ? calculateAge(patient.data.date_of_birth) : null,
     patientGender: patient?.data?.gender,
     chiefComplaint: encounterData.subjective.chief_complaint,
@@ -301,20 +303,20 @@ export default function useEasyAssessmentState() {
     }));
   };
 
-  const handleMacroInsert = (text, targetField = 'current') => {
+  const handleMacroInsert = (text, _targetField = 'current') => {
     if (activeTab === 'subjective') {
       updateField(
         'subjective',
         'chief_complaint',
         (encounterData.subjective.chief_complaint
-          ? encounterData.subjective.chief_complaint + ' '
+          ? `${encounterData.subjective.chief_complaint} `
           : '') + text
       );
     } else if (activeTab === 'objective') {
       updateField(
         'objective',
         'observation',
-        (encounterData.objective.observation ? encounterData.objective.observation + ' ' : '') +
+        (encounterData.objective.observation ? `${encounterData.objective.observation} ` : '') +
           text
       );
     } else if (activeTab === 'assessment') {
@@ -322,14 +324,14 @@ export default function useEasyAssessmentState() {
         'assessment',
         'clinical_reasoning',
         (encounterData.assessment.clinical_reasoning
-          ? encounterData.assessment.clinical_reasoning + ' '
+          ? `${encounterData.assessment.clinical_reasoning} `
           : '') + text
       );
     } else if (activeTab === 'plan') {
       updateField(
         'plan',
         'treatment',
-        (encounterData.plan.treatment ? encounterData.plan.treatment + ' ' : '') + text
+        (encounterData.plan.treatment ? `${encounterData.plan.treatment} ` : '') + text
       );
     }
     setShowMacroMatrix(false);
@@ -341,14 +343,14 @@ export default function useEasyAssessmentState() {
         updateField(
           'objective',
           'palpation',
-          (encounterData.objective.palpation ? encounterData.objective.palpation + ' ' : '') +
+          (encounterData.objective.palpation ? `${encounterData.objective.palpation} ` : '') +
             issue.suggestion
         );
       } else if (issue.section === 'plan') {
         updateField(
           'plan',
           'treatment',
-          (encounterData.plan.treatment ? encounterData.plan.treatment + ' ' : '') +
+          (encounterData.plan.treatment ? `${encounterData.plan.treatment} ` : '') +
             issue.suggestion
         );
       }
@@ -375,11 +377,15 @@ export default function useEasyAssessmentState() {
   const canGoForward = currentTabIndex < tabs.length - 1;
 
   const goToNextTab = () => {
-    if (canGoForward) setActiveTab(tabs[currentTabIndex + 1].id);
+    if (canGoForward) {
+      setActiveTab(tabs[currentTabIndex + 1].id);
+    }
   };
 
   const goToPrevTab = () => {
-    if (canGoBack) setActiveTab(tabs[currentTabIndex - 1].id);
+    if (canGoBack) {
+      setActiveTab(tabs[currentTabIndex - 1].id);
+    }
   };
 
   return {

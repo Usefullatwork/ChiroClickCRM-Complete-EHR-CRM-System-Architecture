@@ -3,7 +3,7 @@
  *
  * Used by both 2D and 3D spine components for consistent UX
  */
-import React, { useRef, useEffect, useMemo } from 'react';
+import _React, { useRef, useEffect, useMemo } from 'react';
 import { STANDARD_DIRECTIONS, SI_DIRECTIONS, FINDING_TYPES } from '../hooks/useAnatomyClick';
 
 export default function DirectionPopup({
@@ -13,7 +13,7 @@ export default function DirectionPopup({
   onSelect,
   onClose,
   mode = 'direction', // 'direction' for text insertion, 'finding' for examination
-  language = 'NO'
+  language = 'NO',
 }) {
   const popupRef = useRef(null);
 
@@ -27,8 +27,8 @@ export default function DirectionPopup({
     // If we have templates, filter to only those with templates
     const segmentTemplates = templates?.[segment] || [];
     if (segmentTemplates.length > 0) {
-      const templateDirections = new Set(segmentTemplates.map(t => t.direction));
-      return allDirections.filter(d => templateDirections.has(d.id));
+      const templateDirections = new Set(segmentTemplates.map((t) => t.direction));
+      return allDirections.filter((d) => templateDirections.has(d.id));
     }
 
     return allDirections;
@@ -37,7 +37,7 @@ export default function DirectionPopup({
   // Get template text for direction
   const getTemplateText = (directionId) => {
     const segmentTemplates = templates?.[segment] || [];
-    const template = segmentTemplates.find(t => t.direction === directionId);
+    const template = segmentTemplates.find((t) => t.direction === directionId);
     return template?.text_template || `${segment} ${directionId}. `;
   };
 
@@ -64,13 +64,15 @@ export default function DirectionPopup({
     };
   }, [onClose]);
 
-  if (!segment) return null;
+  if (!segment) {
+    return null;
+  }
 
   const positionStyle = {
     top: position.top,
-    ...(position.left != null ? { left: position.left } : {}),
-    ...(position.right != null ? { right: position.right } : {}),
-    transform: 'translateY(-50%)'
+    ...(position.left !== null ? { left: position.left } : {}),
+    ...(position.right !== null ? { right: position.right } : {}),
+    transform: 'translateY(-50%)',
   };
 
   return (
@@ -124,16 +126,13 @@ export default function DirectionPopup({
           {Object.entries(FINDING_TYPES).map(([key, type]) => (
             <div key={key}>
               <div className="flex items-center gap-1.5 mb-1">
-                <div
-                  className="w-2.5 h-2.5 rounded"
-                  style={{ backgroundColor: type.color }}
-                />
+                <div className="w-2.5 h-2.5 rounded" style={{ backgroundColor: type.color }} />
                 <span className="text-[10px] font-medium text-slate-600">
                   {language === 'NO' ? type.labelNo : type.label}
                 </span>
               </div>
               <div className="flex gap-1">
-                {['left', 'right', 'bilateral', 'central'].map(side => (
+                {['left', 'right', 'bilateral', 'central'].map((side) => (
                   <button
                     key={side}
                     onClick={() => {
@@ -142,9 +141,13 @@ export default function DirectionPopup({
                     }}
                     className="flex-1 px-1.5 py-1 text-[10px] font-medium rounded bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
                   >
-                    {side === 'left' ? 'V' :
-                     side === 'right' ? 'H' :
-                     side === 'bilateral' ? 'B' : 'S'}
+                    {side === 'left'
+                      ? 'V'
+                      : side === 'right'
+                        ? 'H'
+                        : side === 'bilateral'
+                          ? 'B'
+                          : 'S'}
                   </button>
                 ))}
               </div>
@@ -157,20 +160,13 @@ export default function DirectionPopup({
 }
 
 // Compact direction buttons (inline, no popup)
-export function InlineDirectionSelect({
-  segment,
-  templates = {},
-  onSelect,
-  language = 'NO'
-}) {
+export function InlineDirectionSelect({ segment, templates = {}, onSelect, language = 'NO' }) {
   const isSIJoint = segment?.startsWith('SI-');
-  const directions = isSIJoint
-    ? [...STANDARD_DIRECTIONS, ...SI_DIRECTIONS]
-    : STANDARD_DIRECTIONS;
+  const directions = isSIJoint ? [...STANDARD_DIRECTIONS, ...SI_DIRECTIONS] : STANDARD_DIRECTIONS;
 
   const getTemplateText = (directionId) => {
     const segmentTemplates = templates?.[segment] || [];
-    const template = segmentTemplates.find(t => t.direction === directionId);
+    const template = segmentTemplates.find((t) => t.direction === directionId);
     return template?.text_template || `${segment} ${directionId}. `;
   };
 

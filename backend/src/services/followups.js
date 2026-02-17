@@ -20,8 +20,8 @@ export const getAllFollowUps = async (organizationId, options = {}) => {
   } = options;
 
   const offset = (page - 1) * limit;
-  let whereConditions = ['f.organization_id = $1'];
-  let params = [organizationId];
+  const whereConditions = ['f.organization_id = $1'];
+  const params = [organizationId];
   let paramIndex = 2;
 
   if (patientId) {

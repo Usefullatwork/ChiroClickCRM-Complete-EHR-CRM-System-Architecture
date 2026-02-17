@@ -24,18 +24,22 @@ const parseVCardEntry = (vcardText) => {
     country: '',
     date_of_birth: null,
     notes: '',
-    organization: ''
+    organization: '',
   };
 
   const lines = vcardText.split(/\r?\n/);
 
   for (const line of lines) {
     // Skip empty lines
-    if (!line.trim()) continue;
+    if (!line.trim()) {
+      continue;
+    }
 
     // Parse property and value
     const colonIndex = line.indexOf(':');
-    if (colonIndex === -1) continue;
+    if (colonIndex === -1) {
+      continue;
+    }
 
     let property = line.substring(0, colonIndex).toUpperCase();
     let value = line.substring(colonIndex + 1).trim();
@@ -45,7 +49,7 @@ const parseVCardEntry = (vcardText) => {
     if (property.includes(';')) {
       const parts = property.split(';');
       property = parts[0];
-      parts.slice(1).forEach(param => {
+      parts.slice(1).forEach((param) => {
         const [key, val] = param.split('=');
         params[key?.toUpperCase()] = val?.toUpperCase() || true;
       });
@@ -59,12 +63,13 @@ const parseVCardEntry = (vcardText) => {
       .replace(/\\\\/g, '\\');
 
     switch (property) {
-      case 'N':
+      case 'N': {
         // N:Last;First;Middle;Prefix;Suffix
         const nameParts = value.split(';');
         patient.last_name = nameParts[0] || '';
         patient.first_name = nameParts[1] || '';
         break;
+      }
 
       case 'FN':
         // Full name - use as fallback if N is not present
@@ -81,9 +86,9 @@ const parseVCardEntry = (vcardText) => {
         }
         break;
 
-      case 'TEL':
+      case 'TEL': {
         const phoneType = params.TYPE || '';
-        const cleanPhone = value.replace(/[\s\-\(\)]/g, '');
+        const cleanPhone = value.replace(/[\s\-()]/g, '');
 
         if (phoneType.includes('CELL') || phoneType.includes('MOBILE')) {
           patient.phone = cleanPhone;
@@ -96,8 +101,9 @@ const parseVCardEntry = (vcardText) => {
           patient.phone = cleanPhone;
         }
         break;
+      }
 
-      case 'ADR':
+      case 'ADR': {
         // ADR:;;Street;City;State;PostalCode;Country
         const addrParts = value.split(';');
         patient.address_street = addrParts[2] || '';
@@ -106,11 +112,12 @@ const parseVCardEntry = (vcardText) => {
         patient.address_postal_code = addrParts[5] || '';
         patient.country = addrParts[6] || '';
         break;
+      }
 
       case 'BDAY':
         // Birthday in format YYYYMMDD or YYYY-MM-DD
         try {
-          let dateStr = value.replace(/\D/g, ''); // Remove non-digits
+          const dateStr = value.replace(/\D/g, ''); // Remove non-digits
           if (dateStr.length === 8) {
             patient.date_of_birth = `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`;
           }
@@ -174,7 +181,7 @@ export const patientToVCard = (patient) => {
     'BEGIN:VCARD',
     'VERSION:3.0',
     `N:${patient.last_name || ''};${patient.first_name || ''};;;`,
-    `FN:${patient.first_name || ''} ${patient.last_name || ''}`.trim()
+    `FN:${patient.first_name || ''} ${patient.last_name || ''}`.trim(),
   ];
 
   if (patient.email) {
@@ -194,7 +201,9 @@ export const patientToVCard = (patient) => {
   }
 
   if (patient.address_street || patient.address_city || patient.address_postal_code) {
-    lines.push(`ADR;TYPE=HOME:;;${patient.address_street || ''};${patient.address_city || ''};;${patient.address_postal_code || ''};${patient.country || 'Norway'}`);
+    lines.push(
+      `ADR;TYPE=HOME:;;${patient.address_street || ''};${patient.address_city || ''};;${patient.address_postal_code || ''};${patient.country || 'Norway'}`
+    );
   }
 
   if (patient.date_of_birth) {
@@ -217,9 +226,8 @@ export const patientToVCard = (patient) => {
  * @param {Array} patients - Array of patient objects
  * @returns {string} vCard file content
  */
-export const patientsToVCard = (patients) => {
-  return patients.map(patient => patientToVCard(patient)).join('\r\n\r\n');
-};
+export const patientsToVCard = (patients) =>
+  patients.map((patient) => patientToVCard(patient)).join('\r\n\r\n');
 
 /**
  * Validate and normalize phone number for Norway
@@ -227,7 +235,9 @@ export const patientsToVCard = (patients) => {
  * @returns {string} Normalized phone number
  */
 export const normalizeNorwegianPhone = (phone) => {
-  if (!phone) return '';
+  if (!phone) {
+    return '';
+  }
 
   // Remove all non-digit characters except +
   let cleaned = phone.replace(/[^\d+]/g, '');
@@ -254,5 +264,5 @@ export default {
   parseVCard,
   patientToVCard,
   patientsToVCard,
-  normalizeNorwegianPhone
+  normalizeNorwegianPhone,
 };

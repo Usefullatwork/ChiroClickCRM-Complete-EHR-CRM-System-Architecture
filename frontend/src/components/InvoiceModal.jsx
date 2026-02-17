@@ -30,7 +30,9 @@ export default function InvoiceModal({ transaction, onClose }) {
   };
 
   const handleDownload = () => {
-    if (!invoiceData?.html) return;
+    if (!invoiceData?.html) {
+      return;
+    }
 
     // Convert HTML to downloadable PDF
     // In a real app, you'd use a library like html2pdf.js or jsPDF

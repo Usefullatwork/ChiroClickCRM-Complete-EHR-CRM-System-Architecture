@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import _React, { useState, useEffect } from 'react';
 
 /**
  * Clinical Progress Tracking Component
  * Visual tracking of patient outcomes over time
  * Tracks pain levels, functional scores, ROM, and treatment response
  */
-const ClinicalProgressTracking = ({ patientId, encountersData = [] }) => {
+const ClinicalProgressTracking = ({ _patientId, encountersData = [] }) => {
   const [chartData, setChartData] = useState({
     painScores: [],
     functionalScores: [],
-    visitDates: []
+    visitDates: [],
   });
 
   useEffect(() => {
@@ -20,24 +20,24 @@ const ClinicalProgressTracking = ({ patientId, encountersData = [] }) => {
 
   const processEncounterData = (encounters) => {
     // Extract pain scores and dates from encounters
-    const sortedEncounters = [...encounters].sort((a, b) =>
-      new Date(a.encounter_date) - new Date(b.encounter_date)
+    const sortedEncounters = [...encounters].sort(
+      (a, b) => new Date(a.encounter_date) - new Date(b.encounter_date)
     );
 
-    const painScores = sortedEncounters.map(e => ({
+    const painScores = sortedEncounters.map((e) => ({
       date: new Date(e.encounter_date).toLocaleDateString(),
       start: e.vas_pain_start || 0,
-      end: e.vas_pain_end || 0
+      end: e.vas_pain_end || 0,
     }));
 
-    const visitDates = sortedEncounters.map(e =>
+    const visitDates = sortedEncounters.map((e) =>
       new Date(e.encounter_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
     );
 
     setChartData({
       painScores,
       visitDates,
-      encounters: sortedEncounters
+      encounters: sortedEncounters,
     });
   };
 
@@ -46,14 +46,12 @@ const ClinicalProgressTracking = ({ patientId, encountersData = [] }) => {
     const width = 600;
     const height = 300;
     const padding = 50;
-    const chartWidth = width - (padding * 2);
-    const chartHeight = height - (padding * 2);
+    const chartWidth = width - padding * 2;
+    const chartHeight = height - padding * 2;
 
     if (!data || data.length === 0) {
       return (
-        <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-          No data available
-        </div>
+        <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>No data available</div>
       );
     }
 
@@ -63,16 +61,14 @@ const ClinicalProgressTracking = ({ patientId, encountersData = [] }) => {
       return { x, y, value };
     });
 
-    const pathStart = points.map((p, i) =>
-      `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`
-    ).join(' ');
+    const pathStart = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
 
     return (
       <div className="chart-container">
         <h3 className="chart-title">{title}</h3>
         <svg width={width} height={height} className="line-chart">
           {/* Grid lines */}
-          {[0, 2.5, 5, 7.5, 10].map(val => {
+          {[0, 2.5, 5, 7.5, 10].map((val) => {
             const y = height - padding - (val / maxValue) * chartHeight;
             return (
               <g key={val}>
@@ -84,13 +80,7 @@ const ClinicalProgressTracking = ({ patientId, encountersData = [] }) => {
                   stroke="#e0e0e0"
                   strokeDasharray="4"
                 />
-                <text
-                  x={padding - 10}
-                  y={y + 4}
-                  textAnchor="end"
-                  fontSize="12"
-                  fill="#666"
-                >
+                <text x={padding - 10} y={y + 4} textAnchor="end" fontSize="12" fill="#666">
                   {val}
                 </text>
               </g>
@@ -135,12 +125,7 @@ const ClinicalProgressTracking = ({ patientId, encountersData = [] }) => {
                 stroke="#2196F3"
                 strokeWidth="3"
               />
-              <circle
-                cx={point.x}
-                cy={point.y}
-                r="2"
-                fill="#2196F3"
-              />
+              <circle cx={point.x} cy={point.y} r="2" fill="#2196F3" />
               {/* Tooltip */}
               <title>{`Visit ${i + 1}: ${point.value}`}</title>
             </g>
@@ -166,10 +151,14 @@ const ClinicalProgressTracking = ({ patientId, encountersData = [] }) => {
   // Progress summary cards
   const ProgressCard = ({ title, value, change, icon, color }) => (
     <div className="progress-card" style={{ borderLeftColor: color }}>
-      <div className="card-icon" style={{ color: color }}>{icon}</div>
+      <div className="card-icon" style={{ color: color }}>
+        {icon}
+      </div>
       <div className="card-content">
         <div className="card-title">{title}</div>
-        <div className="card-value" style={{ color: color }}>{value}</div>
+        <div className="card-value" style={{ color: color }}>
+          {value}
+        </div>
         {change !== undefined && (
           <div className={`card-change ${change < 0 ? 'positive' : 'negative'}`}>
             {change < 0 ? '↓' : '↑'} {Math.abs(change)}
@@ -187,7 +176,7 @@ const ClinicalProgressTracking = ({ patientId, encountersData = [] }) => {
         currentPain: 0,
         painChange: 0,
         totalVisits: 0,
-        averagePainReduction: 0
+        averagePainReduction: 0,
       };
     }
 
@@ -196,16 +185,15 @@ const ClinicalProgressTracking = ({ patientId, encountersData = [] }) => {
 
     const currentPain = lastVisit.end || lastVisit.start;
     const painChange = firstVisit.start - currentPain;
-    const percentImprovement = firstVisit.start > 0
-      ? Math.round((painChange / firstVisit.start) * 100)
-      : 0;
+    const percentImprovement =
+      firstVisit.start > 0 ? Math.round((painChange / firstVisit.start) * 100) : 0;
 
     return {
       currentPain: currentPain.toFixed(1),
       painChange: painChange.toFixed(1),
       percentImprovement,
       totalVisits: chartData.painScores.length,
-      initialPain: firstVisit.start
+      initialPain: firstVisit.start,
     };
   };
 
@@ -229,7 +217,7 @@ const ClinicalProgressTracking = ({ patientId, encountersData = [] }) => {
                   {new Date(encounter.encounter_date).toLocaleDateString('en-US', {
                     month: 'long',
                     day: 'numeric',
-                    year: 'numeric'
+                    year: 'numeric',
                   })}
                 </div>
                 <div className="timeline-details">
@@ -244,7 +232,7 @@ const ClinicalProgressTracking = ({ patientId, encountersData = [] }) => {
                   )}
                   {encounter.treatments && encounter.treatments.length > 0 && (
                     <div className="timeline-treatments">
-                      Treatments: {encounter.treatments.map(t => t.type || t).join(', ')}
+                      Treatments: {encounter.treatments.map((t) => t.type || t).join(', ')}
                     </div>
                   )}
                 </div>
@@ -480,7 +468,9 @@ const ClinicalProgressTracking = ({ patientId, encountersData = [] }) => {
             <div className="improvement-indicator">
               <h3>Overall Improvement</h3>
               <div className="percentage">{metrics.percentImprovement}%</div>
-              <div>Pain reduction from {metrics.initialPain}/10 to {metrics.currentPain}/10</div>
+              <div>
+                Pain reduction from {metrics.initialPain}/10 to {metrics.currentPain}/10
+              </div>
             </div>
           )}
 
@@ -501,8 +491,8 @@ const ClinicalProgressTracking = ({ patientId, encountersData = [] }) => {
             <ProgressCard
               title="Pain Reduction"
               value={`${metrics.painChange} points`}
-              icon={metrics.painChange > 0 ? "📉" : "📊"}
-              color={metrics.painChange > 0 ? "#4CAF50" : "#FF9800"}
+              icon={metrics.painChange > 0 ? '📉' : '📊'}
+              color={metrics.painChange > 0 ? '#4CAF50' : '#FF9800'}
             />
             <ProgressCard
               title="Improvement"
@@ -513,7 +503,7 @@ const ClinicalProgressTracking = ({ patientId, encountersData = [] }) => {
           </div>
 
           <LineChart
-            data={chartData.painScores.map(p => p.start)}
+            data={chartData.painScores.map((p) => p.start)}
             title="Pain Levels Over Time (VAS)"
             yAxisLabel="Pain Score (0-10)"
             maxValue={10}

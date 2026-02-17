@@ -36,7 +36,15 @@ export class Appointment {
    * Valid statuses
    */
   static get STATUSES() {
-    return ['SCHEDULED', 'CONFIRMED', 'CHECKED_IN', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'NO_SHOW'];
+    return [
+      'SCHEDULED',
+      'CONFIRMED',
+      'CHECKED_IN',
+      'IN_PROGRESS',
+      'COMPLETED',
+      'CANCELLED',
+      'NO_SHOW',
+    ];
   }
 
   /**
@@ -64,7 +72,9 @@ export class Appointment {
    * Get duration in minutes
    */
   getDurationMinutes() {
-    if (!this.startTime || !this.endTime) return 0;
+    if (!this.startTime || !this.endTime) {
+      return 0;
+    }
     return Math.round((this.endTime - this.startTime) / 60000);
   }
 
@@ -79,7 +89,9 @@ export class Appointment {
    * Check if appointment is today
    */
   isToday() {
-    if (!this.startTime) return false;
+    if (!this.startTime) {
+      return false;
+    }
     const today = new Date();
     return this.startTime.toDateString() === today.toDateString();
   }
@@ -103,7 +115,9 @@ export class Appointment {
    * Check if patient can check in
    */
   canCheckIn() {
-    if (this.status !== 'SCHEDULED' && this.status !== 'CONFIRMED') return false;
+    if (this.status !== 'SCHEDULED' && this.status !== 'CONFIRMED') {
+      return false;
+    }
 
     // Can check in up to 15 minutes before appointment
     const checkInWindow = new Date(this.startTime);
@@ -175,8 +189,12 @@ export class Appointment {
    * Check for scheduling conflicts
    */
   conflictsWith(otherAppointment) {
-    if (!this.startTime || !this.endTime ||
-        !otherAppointment.startTime || !otherAppointment.endTime) {
+    if (
+      !this.startTime ||
+      !this.endTime ||
+      !otherAppointment.startTime ||
+      !otherAppointment.endTime
+    ) {
       return false;
     }
 
@@ -186,8 +204,7 @@ export class Appointment {
     }
 
     // Check for time overlap
-    return this.startTime < otherAppointment.endTime &&
-           this.endTime > otherAppointment.startTime;
+    return this.startTime < otherAppointment.endTime && this.endTime > otherAppointment.startTime;
   }
 
   /**
@@ -204,16 +221,22 @@ export class Appointment {
       minute: '2-digit',
     });
 
-    return `Hei ${patientName}! Du har time ${dateStr} kl. ${timeStr}. ` +
-           `Vennligst bekreft eller avbestill minst 24 timer før.`;
+    return (
+      `Hei ${patientName}! Du har time ${dateStr} kl. ${timeStr}. ` +
+      `Vennligst bekreft eller avbestill minst 24 timer før.`
+    );
   }
 
   /**
    * Check if reminder should be sent
    */
   shouldSendReminder() {
-    if (this.reminderSent) return false;
-    if (this.status !== 'SCHEDULED') return false;
+    if (this.reminderSent) {
+      return false;
+    }
+    if (this.status !== 'SCHEDULED') {
+      return false;
+    }
 
     // Send reminder 24 hours before
     const reminderTime = new Date(this.startTime);

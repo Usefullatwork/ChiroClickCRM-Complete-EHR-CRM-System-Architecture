@@ -1,5 +1,5 @@
-import { useState, useRef, forwardRef } from 'react';
-import { Printer, Download, Copy, Check, FileText, Settings, X, ChevronDown } from 'lucide-react';
+import { useState, useRef, _forwardRef } from 'react';
+import { Printer, _Download, Copy, Check, FileText, _Settings, X, ChevronDown } from 'lucide-react';
 
 /**
  * PrintPreview - Professional narrative document generator
@@ -102,11 +102,17 @@ function generateObjectiveNarrative(data) {
 
   // Orthopedic tests
   if (data.ortho_tests_selected?.length > 0) {
-    const positiveTests = data.ortho_tests_selected.filter(t => !t.toLowerCase().includes('negative'));
-    const negativeTests = data.ortho_tests_selected.filter(t => t.toLowerCase().includes('negative'));
+    const positiveTests = data.ortho_tests_selected.filter(
+      (t) => !t.toLowerCase().includes('negative')
+    );
+    const negativeTests = data.ortho_tests_selected.filter((t) =>
+      t.toLowerCase().includes('negative')
+    );
 
     if (positiveTests.length > 0) {
-      sentences.push(`Orthopedic testing revealed positive findings for: ${positiveTests.join(', ')}.`);
+      sentences.push(
+        `Orthopedic testing revealed positive findings for: ${positiveTests.join(', ')}.`
+      );
     }
     if (negativeTests.length > 0) {
       sentences.push(`The following tests were negative: ${negativeTests.join(', ')}.`);
@@ -141,12 +147,14 @@ function generateObjectiveNarrative(data) {
 
 // Generate spinal findings narrative
 function generateSpinalNarrative(spinalFindings) {
-  if (!spinalFindings || Object.keys(spinalFindings).length === 0) return '';
+  if (!spinalFindings || Object.keys(spinalFindings).length === 0) {
+    return '';
+  }
 
   const findingsByType = {};
 
   Object.entries(spinalFindings).forEach(([vertebra, findings]) => {
-    findings.forEach(finding => {
+    findings.forEach((finding) => {
       const key = `${finding.type}_${finding.side}`;
       if (!findingsByType[key]) {
         findingsByType[key] = [];
@@ -160,19 +168,18 @@ function generateSpinalNarrative(spinalFindings) {
   // Group subluxations
   Object.entries(findingsByType).forEach(([key, vertebrae]) => {
     const [type, side] = key.split('_');
-    const sideText = side === 'bilateral' ? 'bilaterally' : side === 'central' ? '' : `on the ${side}`;
+    const sideText =
+      side === 'bilateral' ? 'bilaterally' : side === 'central' ? '' : `on the ${side}`;
     const typeText = type.charAt(0).toUpperCase() + type.slice(1);
 
     if (vertebrae.length === 1) {
-      sentences.push(`${typeText} noted at ${vertebrae[0]} ${sideText}`.trim() + '.');
+      sentences.push(`${`${typeText} noted at ${vertebrae[0]} ${sideText}`.trim()}.`);
     } else {
-      sentences.push(`${typeText} noted at ${vertebrae.join(', ')} ${sideText}`.trim() + '.');
+      sentences.push(`${`${typeText} noted at ${vertebrae.join(', ')} ${sideText}`.trim()}.`);
     }
   });
 
-  return sentences.length > 0
-    ? `Spinal examination findings: ${sentences.join(' ')}`
-    : '';
+  return sentences.length > 0 ? `Spinal examination findings: ${sentences.join(' ')}` : '';
 }
 
 // Generate assessment narrative
@@ -202,9 +209,7 @@ function generateAssessmentNarrative(data) {
 
   // Outcome assessment scores
   if (data.outcome_assessment?.score !== null && data.outcome_assessment?.score !== undefined) {
-    sentences.push(
-      `${data.outcome_assessment.type} score: ${data.outcome_assessment.score}%.`
-    );
+    sentences.push(`${data.outcome_assessment.type} score: ${data.outcome_assessment.score}%.`);
   }
 
   return sentences.join(' ');
@@ -255,7 +260,9 @@ function generatePlanNarrative(data) {
   if (data.vas_pain_start !== null && data.vas_pain_end !== null) {
     const improvement = data.vas_pain_start - data.vas_pain_end;
     if (improvement > 0) {
-      sentences.push(`Patient experienced ${improvement} point improvement in pain level during this visit.`);
+      sentences.push(
+        `Patient experienced ${improvement} point improvement in pain level during this visit.`
+      );
     }
   }
 
@@ -270,23 +277,23 @@ const DOCUMENT_TEMPLATES = {
   standard: {
     name: 'Standard SOAP',
     description: 'Professional SOAP format with clear sections',
-    headerStyle: 'formal'
+    headerStyle: 'formal',
   },
   narrative: {
     name: 'Narrative Report',
     description: 'Flowing narrative style for legal/insurance',
-    headerStyle: 'formal'
+    headerStyle: 'formal',
   },
   compact: {
     name: 'Compact',
     description: 'Condensed format for internal use',
-    headerStyle: 'minimal'
+    headerStyle: 'minimal',
   },
   pi: {
     name: 'Personal Injury',
     description: 'Detailed format for PI cases',
-    headerStyle: 'legal'
-  }
+    headerStyle: 'legal',
+  },
 };
 
 // =============================================================================
@@ -298,7 +305,7 @@ export default function PrintPreview({
   patientData,
   practiceInfo = {},
   isOpen,
-  onClose
+  onClose,
 }) {
   const [template, setTemplate] = useState('standard');
   const [showHeader, setShowHeader] = useState(true);
@@ -306,7 +313,9 @@ export default function PrintPreview({
   const [copied, setCopied] = useState(false);
   const printRef = useRef(null);
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   // Generate narratives
   const subjective = generateSubjectiveNarrative(encounterData);
@@ -320,7 +329,7 @@ export default function PrintPreview({
         weekday: 'long',
         year: 'numeric',
         month: 'long',
-        day: 'numeric'
+        day: 'numeric',
       })
     : new Date().toLocaleDateString();
 
@@ -453,7 +462,9 @@ ${plan || 'No plan documented.'}
                 className="px-3 py-2 pr-8 text-sm border border-gray-300 rounded-lg appearance-none bg-white"
               >
                 {Object.entries(DOCUMENT_TEMPLATES).map(([key, tmpl]) => (
-                  <option key={key} value={key}>{tmpl.name}</option>
+                  <option key={key} value={key}>
+                    {tmpl.name}
+                  </option>
                 ))}
               </select>
               <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -499,10 +510,7 @@ ${plan || 'No plan documented.'}
               Print
             </button>
 
-            <button
-              onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
-            >
+            <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-lg">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -518,15 +526,13 @@ ${plan || 'No plan documented.'}
             {/* Practice Header */}
             {showHeader && (
               <div className="text-center border-b-2 border-black pb-4 mb-6">
-                <div className="text-xl font-bold">
-                  {practiceInfo.name || 'ChiroClick Clinic'}
-                </div>
+                <div className="text-xl font-bold">{practiceInfo.name || 'ChiroClick Clinic'}</div>
                 <div className="text-sm text-gray-600">
                   {practiceInfo.address || '123 Health Street, Medical City, MC 12345'}
                 </div>
                 <div className="text-sm text-gray-600">
-                  Phone: {practiceInfo.phone || '(555) 123-4567'} |
-                  Fax: {practiceInfo.fax || '(555) 123-4568'}
+                  Phone: {practiceInfo.phone || '(555) 123-4567'} | Fax:{' '}
+                  {practiceInfo.fax || '(555) 123-4568'}
                 </div>
               </div>
             )}
@@ -534,7 +540,8 @@ ${plan || 'No plan documented.'}
             {/* Patient Info Bar */}
             <div className="flex justify-between bg-gray-100 p-3 mb-6 text-sm">
               <div>
-                <strong>Patient:</strong> {patientData?.first_name || ''} {patientData?.last_name || ''}
+                <strong>Patient:</strong> {patientData?.first_name || ''}{' '}
+                {patientData?.last_name || ''}
                 {patientData?.date_of_birth && (
                   <span className="ml-4">
                     <strong>DOB:</strong> {new Date(patientData.date_of_birth).toLocaleDateString()}
@@ -562,7 +569,9 @@ ${plan || 'No plan documented.'}
                 SUBJECTIVE
               </div>
               <div className="text-justify leading-relaxed">
-                {subjective || <em className="text-gray-400">No subjective findings documented.</em>}
+                {subjective || (
+                  <em className="text-gray-400">No subjective findings documented.</em>
+                )}
               </div>
             </div>
 
@@ -588,9 +597,7 @@ ${plan || 'No plan documented.'}
 
             {/* PLAN */}
             <div className="mb-6">
-              <div className="font-bold text-base border-b border-gray-300 pb-1 mb-2">
-                PLAN
-              </div>
+              <div className="font-bold text-base border-b border-gray-300 pb-1 mb-2">PLAN</div>
               <div className="text-justify leading-relaxed">
                 {plan || <em className="text-gray-400">No plan documented.</em>}
               </div>
@@ -601,10 +608,10 @@ ${plan || 'No plan documented.'}
               <div className="mt-12">
                 <div className="border-t border-black w-72 pt-2">
                   <div className="font-bold">{practiceInfo.provider || 'Provider Name, DC'}</div>
-                  <div className="text-sm text-gray-600">{practiceInfo.credentials || 'Doctor of Chiropractic'}</div>
-                  <div className="text-sm text-gray-600 mt-2">
-                    Date: ________________
+                  <div className="text-sm text-gray-600">
+                    {practiceInfo.credentials || 'Doctor of Chiropractic'}
                   </div>
+                  <div className="text-sm text-gray-600 mt-2">Date: ________________</div>
                 </div>
               </div>
             )}
@@ -628,5 +635,5 @@ export {
   generateObjectiveNarrative,
   generateAssessmentNarrative,
   generatePlanNarrative,
-  generateSpinalNarrative
+  generateSpinalNarrative,
 };

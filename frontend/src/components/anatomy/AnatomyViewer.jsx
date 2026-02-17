@@ -4,7 +4,7 @@
  * Provides a unified interface for spine and body visualization
  * with the ability to switch between 2D SVG and 3D WebGL modes.
  */
-import React, { useState, useCallback, useMemo } from 'react';
+import _React, { useState, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { spineTemplatesAPI } from '../../services/api';
 import { Layers, Box, User, Activity, RotateCcw, Settings } from 'lucide-react';
@@ -19,7 +19,7 @@ export const VIEW_MODES = {
   SPINE_2D: 'spine_2d',
   SPINE_3D: 'spine_3d',
   BODY_2D: 'body_2d',
-  COMBINED: 'combined'
+  COMBINED: 'combined',
 };
 
 // Mode configurations
@@ -27,23 +27,23 @@ const MODE_CONFIG = {
   [VIEW_MODES.SPINE_2D]: {
     label: 'Ryggrad 2D',
     icon: Layers,
-    description: 'SVG ryggraddiagram'
+    description: 'SVG ryggraddiagram',
   },
   [VIEW_MODES.SPINE_3D]: {
     label: 'Ryggrad 3D',
     icon: Box,
-    description: '3D interaktiv modell'
+    description: '3D interaktiv modell',
   },
   [VIEW_MODES.BODY_2D]: {
     label: 'Kropp',
     icon: User,
-    description: 'Kroppskart for smertelokalisering'
+    description: 'Kroppskart for smertelokalisering',
   },
   [VIEW_MODES.COMBINED]: {
     label: 'Kombinert',
     icon: Activity,
-    description: 'Ryggrad og kropp side om side'
-  }
+    description: 'Ryggrad og kropp side om side',
+  },
 };
 
 export default function AnatomyViewer({
@@ -67,7 +67,7 @@ export default function AnatomyViewer({
   compact = false,
   language = 'NO',
 
-  className = ''
+  className = '',
 }) {
   const [mode, setMode] = useState(initialMode);
   const [showSettings, setShowSettings] = useState(false);
@@ -78,7 +78,7 @@ export default function AnatomyViewer({
     queryFn: () => spineTemplatesAPI.getGrouped(language),
     staleTime: 5 * 60 * 1000,
     cacheTime: 30 * 60 * 1000,
-    retry: 1
+    retry: 1,
   });
 
   const templates = useMemo(() => {
@@ -87,15 +87,18 @@ export default function AnatomyViewer({
 
   // Filter allowed modes
   const availableModes = useMemo(() => {
-    return allowedModes.filter(m => Object.values(VIEW_MODES).includes(m));
+    return allowedModes.filter((m) => Object.values(VIEW_MODES).includes(m));
   }, [allowedModes]);
 
   // Handle mode change
-  const handleModeChange = useCallback((newMode) => {
-    if (availableModes.includes(newMode)) {
-      setMode(newMode);
-    }
-  }, [availableModes]);
+  const handleModeChange = useCallback(
+    (newMode) => {
+      if (availableModes.includes(newMode)) {
+        setMode(newMode);
+      }
+    },
+    [availableModes]
+  );
 
   // Clear all findings
   const handleClearAll = useCallback(() => {
@@ -150,10 +153,7 @@ export default function AnatomyViewer({
 
       case VIEW_MODES.BODY_2D:
         return compact ? (
-          <CompactBodyDiagram
-            selectedRegions={bodyRegions}
-            onChange={onBodyRegionsChange}
-          />
+          <CompactBodyDiagram selectedRegions={bodyRegions} onChange={onBodyRegionsChange} />
         ) : (
           <EnhancedBodyDiagram
             selectedRegions={bodyRegions}
@@ -195,7 +195,7 @@ export default function AnatomyViewer({
         {/* Minimal mode toggle */}
         {allowModeSwitch && availableModes.length > 1 && (
           <div className="flex items-center justify-center gap-1 p-2 border-b border-gray-100">
-            {availableModes.map(m => {
+            {availableModes.map((m) => {
               const config = MODE_CONFIG[m];
               const Icon = config.icon;
               return (
@@ -250,7 +250,7 @@ export default function AnatomyViewer({
           {/* Mode toggle */}
           {allowModeSwitch && availableModes.length > 1 && (
             <div className="inline-flex rounded-lg border border-gray-200 bg-white p-0.5">
-              {availableModes.map(m => {
+              {availableModes.map((m) => {
                 const config = MODE_CONFIG[m];
                 const Icon = config.icon;
                 return (
@@ -258,9 +258,7 @@ export default function AnatomyViewer({
                     key={m}
                     onClick={() => handleModeChange(m)}
                     className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                      mode === m
-                        ? 'bg-emerald-600 text-white'
-                        : 'text-gray-600 hover:bg-gray-100'
+                      mode === m ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'
                     }`}
                     title={config.description}
                   >
@@ -288,7 +286,9 @@ export default function AnatomyViewer({
           <button
             onClick={() => setShowSettings(!showSettings)}
             className={`p-1.5 rounded transition-colors ${
-              showSettings ? 'bg-gray-200 text-gray-700' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+              showSettings
+                ? 'bg-gray-200 text-gray-700'
+                : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
             }`}
             title="Innstillinger"
           >
@@ -338,18 +338,21 @@ export default function AnatomyViewer({
       </div>
 
       {/* Combined narrative footer */}
-      {showNarrative && mode === VIEW_MODES.COMBINED && (totalFindings > 0) && (
+      {showNarrative && mode === VIEW_MODES.COMBINED && totalFindings > 0 && (
         <div className="px-4 py-3 bg-green-50 border-t border-green-200 rounded-b-lg">
           <label className="block text-xs font-medium text-green-800 mb-2">
             Sammendrag av funn:
           </label>
           <div className="space-y-1 text-sm text-green-900">
             {Object.keys(spineFindings).length > 0 && (
-              <p>• Spinalfunn: {Object.values(spineFindings).map(f => `${f.vertebra} (${f.type})`).join(', ')}</p>
+              <p>
+                • Spinalfunn:{' '}
+                {Object.values(spineFindings)
+                  .map((f) => `${f.vertebra} (${f.type})`)
+                  .join(', ')}
+              </p>
             )}
-            {bodyRegions.length > 0 && (
-              <p>• Smerteområder: {bodyRegions.join(', ')}</p>
-            )}
+            {bodyRegions.length > 0 && <p>• Smerteområder: {bodyRegions.join(', ')}</p>}
           </div>
         </div>
       )}

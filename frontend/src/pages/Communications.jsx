@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useState, _useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   MessageSquare,
   Send,
@@ -12,137 +12,141 @@ import {
   User,
   Filter,
   Mail,
-  Smartphone
-} from 'lucide-react'
-import { communicationsAPI, patientsAPI } from '../services/api'
-import { formatPhone } from '../lib/utils'
-import { useTranslation, formatDate } from '../i18n'
-import toast from '../utils/toast'
+  Smartphone,
+} from 'lucide-react';
+import { communicationsAPI, patientsAPI } from '../services/api';
+import { formatPhone } from '../lib/utils';
+import { useTranslation, formatDate } from '../i18n';
+import toast from '../utils/toast';
 
 export default function Communications() {
-  const { t, lang } = useTranslation('communications')
-  const queryClient = useQueryClient()
-  const [activeTab, setActiveTab] = useState('compose')
-  const [messageType, setMessageType] = useState('sms')
-  const [selectedPatient, setSelectedPatient] = useState(null)
-  const [selectedTemplate, setSelectedTemplate] = useState(null)
-  const [message, setMessage] = useState('')
-  const [searchTerm, setSearchTerm] = useState('')
-  const [showPatientSearch, setShowPatientSearch] = useState(false)
-  const [copied, setCopied] = useState(false)
-  const [historyFilter, setHistoryFilter] = useState('')
+  const { t, lang } = useTranslation('communications');
+  const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState('compose');
+  const [messageType, setMessageType] = useState('sms');
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [message, setMessage] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showPatientSearch, setShowPatientSearch] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [historyFilter, setHistoryFilter] = useState('');
 
   // Fetch templates
   const { data: templatesResponse } = useQuery({
     queryKey: ['communication-templates'],
     queryFn: () => communicationsAPI.getTemplates(),
-  })
+  });
 
-  const templates = templatesResponse?.data?.templates || []
+  const templates = templatesResponse?.data?.templates || [];
 
   // Fetch communications history
   const { data: historyResponse, isLoading: historyLoading } = useQuery({
     queryKey: ['communications-history', historyFilter],
-    queryFn: () => communicationsAPI.getAll({
-      type: historyFilter || undefined,
-      limit: 50,
-      sortBy: 'created_at',
-      sortOrder: 'desc'
-    }),
+    queryFn: () =>
+      communicationsAPI.getAll({
+        type: historyFilter || undefined,
+        limit: 50,
+        sortBy: 'created_at',
+        sortOrder: 'desc',
+      }),
     enabled: activeTab === 'history',
-  })
+  });
 
-  const history = historyResponse?.data?.communications || []
+  const history = historyResponse?.data?.communications || [];
 
   // Search patients
   const { data: searchResponse, isLoading: searchLoading } = useQuery({
     queryKey: ['patient-search', searchTerm],
     queryFn: () => patientsAPI.search(searchTerm),
     enabled: searchTerm.length >= 2,
-  })
+  });
 
-  const searchResults = searchResponse?.data?.patients || []
+  const searchResults = searchResponse?.data?.patients || [];
 
   // Character counter for SMS
-  const maxSmsLength = 160
-  const remainingChars = maxSmsLength - message.length
-  const smsCount = Math.ceil(message.length / maxSmsLength) || 1
+  const maxSmsLength = 160;
+  const remainingChars = maxSmsLength - message.length;
+  const smsCount = Math.ceil(message.length / maxSmsLength) || 1;
 
   // Apply template
   const applyTemplate = (template) => {
-    setSelectedTemplate(template)
-    let content = template.content
+    setSelectedTemplate(template);
+    let content = template.content;
 
     // Replace placeholders with patient data
     if (selectedPatient) {
-      content = content.replace('{{first_name}}', selectedPatient.first_name)
-      content = content.replace('{{last_name}}', selectedPatient.last_name)
-      content = content.replace('{{full_name}}', `${selectedPatient.first_name} ${selectedPatient.last_name}`)
+      content = content.replace('{{first_name}}', selectedPatient.first_name);
+      content = content.replace('{{last_name}}', selectedPatient.last_name);
+      content = content.replace(
+        '{{full_name}}',
+        `${selectedPatient.first_name} ${selectedPatient.last_name}`
+      );
     }
 
-    setMessage(content)
-  }
+    setMessage(content);
+  };
 
   // Copy to clipboard
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(message)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      await navigator.clipboard.writeText(message);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy:', err)
+      console.error('Failed to copy:', err);
     }
-  }
+  };
 
   // Send message mutation
   const sendMutation = useMutation({
     mutationFn: (data) => {
       if (messageType === 'sms') {
-        return communicationsAPI.sendSMS(data)
+        return communicationsAPI.sendSMS(data);
       } else {
-        return communicationsAPI.sendEmail(data)
+        return communicationsAPI.sendEmail(data);
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['communications-history'])
-      setMessage('')
-      setSelectedPatient(null)
-      setSelectedTemplate(null)
-      toast.success(t('loggedSuccess').replace('{type}', messageType.toUpperCase()))
+      queryClient.invalidateQueries(['communications-history']);
+      setMessage('');
+      setSelectedPatient(null);
+      setSelectedTemplate(null);
+      toast.success(t('loggedSuccess').replace('{type}', messageType.toUpperCase()));
     },
     onError: (error) => {
-      toast.error(`${t('logFailed').replace('{type}', messageType)}: ${error.response?.data?.message || error.message}`)
+      toast.error(
+        `${t('logFailed').replace('{type}', messageType)}: ${error.response?.data?.message || error.message}`
+      );
     },
-  })
+  });
 
   const handleSend = () => {
     if (!selectedPatient) {
-      toast.warning(t('selectPatientWarning'))
-      return
+      toast.warning(t('selectPatientWarning'));
+      return;
     }
 
     if (!message.trim()) {
-      toast.warning(t('enterMessageWarning'))
-      return
+      toast.warning(t('enterMessageWarning'));
+      return;
     }
 
     const data = {
       patient_id: selectedPatient.id,
       message: message.trim(),
       template_id: selectedTemplate?.id,
-    }
+    };
 
-    sendMutation.mutate(data)
-  }
+    sendMutation.mutate(data);
+  };
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">{t('title')}</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          {t('subtitle')}
-        </p>
+        <p className="text-sm text-gray-500 mt-1">{t('subtitle')}</p>
       </div>
 
       {/* Tabs */}
@@ -252,8 +256,8 @@ export default function Communications() {
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={searchTerm}
                     onChange={(e) => {
-                      setSearchTerm(e.target.value)
-                      setShowPatientSearch(true)
+                      setSearchTerm(e.target.value);
+                      setShowPatientSearch(true);
                     }}
                     onFocus={() => setShowPatientSearch(true)}
                   />
@@ -270,9 +274,9 @@ export default function Communications() {
                           <button
                             key={patient.id}
                             onClick={() => {
-                              setSelectedPatient(patient)
-                              setSearchTerm('')
-                              setShowPatientSearch(false)
+                              setSelectedPatient(patient);
+                              setSearchTerm('');
+                              setShowPatientSearch(false);
                             }}
                             className="w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
                           >
@@ -297,9 +301,7 @@ export default function Communications() {
 
             {/* Message Composer */}
             <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                {t('message')}
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-3">{t('message')}</label>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -311,13 +313,15 @@ export default function Communications() {
               {/* Character Counter (SMS only) */}
               {messageType === 'sms' && (
                 <div className="flex items-center justify-between mt-3 text-sm">
-                  <span className={`${
-                    remainingChars < 0
-                      ? 'text-red-600 font-medium'
-                      : remainingChars < 20
-                      ? 'text-orange-600'
-                      : 'text-gray-500'
-                  }`}>
+                  <span
+                    className={`${
+                      remainingChars < 0
+                        ? 'text-red-600 font-medium'
+                        : remainingChars < 20
+                          ? 'text-orange-600'
+                          : 'text-gray-500'
+                    }`}
+                  >
                     {t('charactersRemaining').replace('{count}', remainingChars)}
                   </span>
                   <span className="text-gray-500">
@@ -358,9 +362,7 @@ export default function Communications() {
               </div>
 
               {messageType === 'sms' && (
-                <p className="text-xs text-gray-500 mt-3">
-                  {t('smsNote')}
-                </p>
+                <p className="text-xs text-gray-500 mt-3">{t('smsNote')}</p>
               )}
             </div>
           </div>
@@ -376,7 +378,7 @@ export default function Communications() {
               <div className="space-y-2">
                 {templates.length > 0 ? (
                   templates
-                    .filter(tmpl => !messageType || tmpl.type === messageType.toUpperCase())
+                    .filter((tmpl) => !messageType || tmpl.type === messageType.toUpperCase())
                     .map((template) => (
                       <button
                         key={template.id}
@@ -387,18 +389,14 @@ export default function Communications() {
                             : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                         }`}
                       >
-                        <div className="font-medium text-sm text-gray-900">
-                          {template.name}
-                        </div>
+                        <div className="font-medium text-sm text-gray-900">{template.name}</div>
                         <div className="text-xs text-gray-500 mt-1 line-clamp-2">
                           {template.content}
                         </div>
                       </button>
                     ))
                 ) : (
-                  <div className="text-center py-6 text-sm text-gray-500">
-                    {t('noTemplates')}
-                  </div>
+                  <div className="text-center py-6 text-sm text-gray-500">{t('noTemplates')}</div>
                 )}
               </div>
             </div>
@@ -437,9 +435,11 @@ export default function Communications() {
                 <div key={comm.id} className="px-6 py-4 hover:bg-gray-50">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3 flex-1">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                        comm.type === 'SMS' ? 'bg-purple-50' : 'bg-blue-50'
-                      }`}>
+                      <div
+                        className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                          comm.type === 'SMS' ? 'bg-purple-50' : 'bg-blue-50'
+                        }`}
+                      >
                         {comm.type === 'SMS' ? (
                           <Smartphone className="w-5 h-5 text-purple-600" />
                         ) : (
@@ -451,23 +451,35 @@ export default function Communications() {
                           <span className="text-sm font-medium text-gray-900">
                             {comm.patient_name}
                           </span>
-                          <span className={`px-2 py-0.5 text-xs font-medium rounded ${
-                            comm.type === 'SMS'
-                              ? 'bg-purple-100 text-purple-700'
-                              : 'bg-blue-100 text-blue-700'
-                          }`}>
+                          <span
+                            className={`px-2 py-0.5 text-xs font-medium rounded ${
+                              comm.type === 'SMS'
+                                ? 'bg-purple-100 text-purple-700'
+                                : 'bg-blue-100 text-blue-700'
+                            }`}
+                          >
                             {comm.type}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {comm.message}
-                        </p>
+                        <p className="text-sm text-gray-600 mt-1">{comm.message}</p>
                         <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                          <span>{formatDate(comm.created_at, lang, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                          <span>
+                            {formatDate(comm.created_at, lang, {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </span>
                           {comm.template_name && (
-                            <span>{t('templateLabel')}: {comm.template_name}</span>
+                            <span>
+                              {t('templateLabel')}: {comm.template_name}
+                            </span>
                           )}
-                          <span>{t('byLabel')}: {comm.sent_by_name || t('system')}</span>
+                          <span>
+                            {t('byLabel')}: {comm.sent_by_name || t('system')}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -484,5 +496,5 @@ export default function Communications() {
         </div>
       )}
     </div>
-  )
+  );
 }

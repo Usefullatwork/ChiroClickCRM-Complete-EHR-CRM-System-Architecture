@@ -5,13 +5,13 @@
  * Filtrer og velg ovelser for treningsforskrivninger
  */
 
-import React, { useState, useMemo } from 'react'
+import _React, { useState, useMemo } from 'react';
 import {
   Search,
   Filter,
   Grid,
   List,
-  ChevronDown,
+  _ChevronDown,
   Dumbbell,
   Play,
   Check,
@@ -20,8 +20,8 @@ import {
   Activity,
   Clock,
   Info,
-  X
-} from 'lucide-react'
+  X,
+} from 'lucide-react';
 
 /**
  * ExerciseSelector Component
@@ -39,77 +39,83 @@ const ExerciseSelector = ({
   categories = [],
   selectedExercises = [],
   onSelectExercise,
-  loading = false
+  loading = false,
 }) => {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('all')
-  const [selectedDifficulty, setSelectedDifficulty] = useState('all')
-  const [viewMode, setViewMode] = useState('grid')
-  const [detailExercise, setDetailExercise] = useState(null)
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedDifficulty, setSelectedDifficulty] = useState('all');
+  const [viewMode, setViewMode] = useState('grid');
+  const [detailExercise, setDetailExercise] = useState(null);
 
   // Difficulty levels
   const difficultyLevels = [
     { value: 'all', label: 'Alle nivaer' },
     { value: 'beginner', label: 'Nybegynner' },
     { value: 'intermediate', label: 'Middels' },
-    { value: 'advanced', label: 'Avansert' }
-  ]
+    { value: 'advanced', label: 'Avansert' },
+  ];
 
   // Filter exercises
   const filteredExercises = useMemo(() => {
-    return exercises.filter(exercise => {
+    return exercises.filter((exercise) => {
       // Search filter
       if (searchTerm) {
-        const search = searchTerm.toLowerCase()
+        const search = searchTerm.toLowerCase();
         const matchesSearch =
           exercise.name?.toLowerCase().includes(search) ||
           exercise.name_norwegian?.toLowerCase().includes(search) ||
           exercise.description?.toLowerCase().includes(search) ||
-          exercise.category?.toLowerCase().includes(search)
-        if (!matchesSearch) return false
+          exercise.category?.toLowerCase().includes(search);
+        if (!matchesSearch) {
+          return false;
+        }
       }
 
       // Category filter
       if (selectedCategory !== 'all' && exercise.category !== selectedCategory) {
-        return false
+        return false;
       }
 
       // Difficulty filter
       if (selectedDifficulty !== 'all' && exercise.difficulty_level !== selectedDifficulty) {
-        return false
+        return false;
       }
 
-      return true
-    })
-  }, [exercises, searchTerm, selectedCategory, selectedDifficulty])
+      return true;
+    });
+  }, [exercises, searchTerm, selectedCategory, selectedDifficulty]);
 
   // Check if exercise is selected
   const isSelected = (exerciseId) => {
-    return selectedExercises.some(ex => ex.id === exerciseId || ex.exerciseId === exerciseId)
-  }
+    return selectedExercises.some((ex) => ex.id === exerciseId || ex.exerciseId === exerciseId);
+  };
 
   // Get difficulty color
   const getDifficultyColor = (level) => {
     switch (level) {
-      case 'beginner': return 'bg-green-100 text-green-700'
-      case 'intermediate': return 'bg-yellow-100 text-yellow-700'
-      case 'advanced': return 'bg-red-100 text-red-700'
-      default: return 'bg-gray-100 text-gray-700'
+      case 'beginner':
+        return 'bg-green-100 text-green-700';
+      case 'intermediate':
+        return 'bg-yellow-100 text-yellow-700';
+      case 'advanced':
+        return 'bg-red-100 text-red-700';
+      default:
+        return 'bg-gray-100 text-gray-700';
     }
-  }
+  };
 
   // Get difficulty label
   const getDifficultyLabel = (level) => {
-    const found = difficultyLevels.find(d => d.value === level)
-    return found?.label || level
-  }
+    const found = difficultyLevels.find((d) => d.value === level);
+    return found?.label || level;
+  };
 
   // Handle exercise click
   const handleExerciseClick = (exercise) => {
     if (onSelectExercise) {
-      onSelectExercise(exercise)
+      onSelectExercise(exercise);
     }
-  }
+  };
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 h-full flex flex-col max-h-[calc(100vh-180px)]">
@@ -120,9 +126,7 @@ const ExerciseSelector = ({
             <Dumbbell className="w-5 h-5 text-blue-600" />
             <h2 className="text-lg font-semibold text-gray-900">Ovelsesbibliotek</h2>
           </div>
-          <span className="text-sm text-gray-500">
-            {filteredExercises.length} ovelser
-          </span>
+          <span className="text-sm text-gray-500">{filteredExercises.length} ovelser</span>
         </div>
 
         {/* Search */}
@@ -157,7 +161,7 @@ const ExerciseSelector = ({
           >
             Alle
           </button>
-          {categories.map(cat => (
+          {categories.map((cat) => (
             <button
               key={cat.category}
               onClick={() => setSelectedCategory(cat.category)}
@@ -184,7 +188,7 @@ const ExerciseSelector = ({
               onChange={(e) => setSelectedDifficulty(e.target.value)}
               className="text-sm border-0 bg-transparent text-gray-600 focus:outline-none focus:ring-0 cursor-pointer"
             >
-              {difficultyLevels.map(level => (
+              {difficultyLevels.map((level) => (
                 <option key={level.value} value={level.value}>
                   {level.label}
                 </option>
@@ -225,7 +229,7 @@ const ExerciseSelector = ({
         ) : viewMode === 'grid' ? (
           /* Grid View */
           <div className="grid grid-cols-2 gap-3">
-            {filteredExercises.map(exercise => (
+            {filteredExercises.map((exercise) => (
               <div
                 key={exercise.id}
                 onClick={() => handleExerciseClick(exercise)}
@@ -261,7 +265,9 @@ const ExerciseSelector = ({
                 </h3>
 
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className={`px-1.5 py-0.5 rounded text-xs ${getDifficultyColor(exercise.difficulty_level)}`}>
+                  <span
+                    className={`px-1.5 py-0.5 rounded text-xs ${getDifficultyColor(exercise.difficulty_level)}`}
+                  >
                     {getDifficultyLabel(exercise.difficulty_level)}
                   </span>
                   {exercise.video_url && (
@@ -273,17 +279,16 @@ const ExerciseSelector = ({
 
                 {/* Quick stats */}
                 <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
-                  {exercise.sets_default && (
-                    <span>{exercise.sets_default} sett</span>
-                  )}
-                  {exercise.reps_default && (
-                    <span>{exercise.reps_default} rep</span>
-                  )}
+                  {exercise.sets_default && <span>{exercise.sets_default} sett</span>}
+                  {exercise.reps_default && <span>{exercise.reps_default} rep</span>}
                 </div>
 
                 {/* Info button */}
                 <button
-                  onClick={(e) => { e.stopPropagation(); setDetailExercise(exercise); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDetailExercise(exercise);
+                  }}
                   className="absolute bottom-2 right-2 p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded"
                 >
                   <Info className="w-3.5 h-3.5" />
@@ -294,7 +299,7 @@ const ExerciseSelector = ({
         ) : (
           /* List View */
           <div className="space-y-2">
-            {filteredExercises.map(exercise => (
+            {filteredExercises.map((exercise) => (
               <div
                 key={exercise.id}
                 onClick={() => handleExerciseClick(exercise)}
@@ -305,11 +310,11 @@ const ExerciseSelector = ({
                 }`}
               >
                 {/* Selection checkbox */}
-                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
-                  isSelected(exercise.id)
-                    ? 'bg-blue-600 border-blue-600'
-                    : 'border-gray-300'
-                }`}>
+                <div
+                  className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+                    isSelected(exercise.id) ? 'bg-blue-600 border-blue-600' : 'border-gray-300'
+                  }`}
+                >
                   {isSelected(exercise.id) && <Check className="w-3 h-3 text-white" />}
                 </div>
 
@@ -335,7 +340,9 @@ const ExerciseSelector = ({
                   </h3>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="text-xs text-gray-500">{exercise.category}</span>
-                    <span className={`px-1.5 py-0.5 rounded text-xs ${getDifficultyColor(exercise.difficulty_level)}`}>
+                    <span
+                      className={`px-1.5 py-0.5 rounded text-xs ${getDifficultyColor(exercise.difficulty_level)}`}
+                    >
                       {getDifficultyLabel(exercise.difficulty_level)}
                     </span>
                   </div>
@@ -343,11 +350,12 @@ const ExerciseSelector = ({
 
                 {/* Quick Actions */}
                 <div className="flex items-center gap-1">
-                  {exercise.video_url && (
-                    <Play className="w-4 h-4 text-blue-500" />
-                  )}
+                  {exercise.video_url && <Play className="w-4 h-4 text-blue-500" />}
                   <button
-                    onClick={(e) => { e.stopPropagation(); setDetailExercise(exercise); }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDetailExercise(exercise);
+                    }}
                     className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded"
                   >
                     <Info className="w-4 h-4" />
@@ -367,7 +375,7 @@ const ExerciseSelector = ({
               <strong>{selectedExercises.length}</strong> ovelser valgt
             </span>
             <button
-              onClick={() => selectedExercises.forEach(ex => onSelectExercise(ex))}
+              onClick={() => selectedExercises.forEach((ex) => onSelectExercise(ex))}
               className="text-xs text-blue-600 hover:text-blue-700"
             >
               Fjern alle
@@ -411,7 +419,9 @@ const ExerciseSelector = ({
                     {detailExercise.subcategory}
                   </span>
                 )}
-                <span className={`px-3 py-1 rounded-full text-sm ${getDifficultyColor(detailExercise.difficulty_level)}`}>
+                <span
+                  className={`px-3 py-1 rounded-full text-sm ${getDifficultyColor(detailExercise.difficulty_level)}`}
+                >
                   {getDifficultyLabel(detailExercise.difficulty_level)}
                 </span>
               </div>
@@ -457,7 +467,10 @@ const ExerciseSelector = ({
                 <div />
               )}
               <button
-                onClick={() => { onSelectExercise(detailExercise); setDetailExercise(null); }}
+                onClick={() => {
+                  onSelectExercise(detailExercise);
+                  setDetailExercise(null);
+                }}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                   isSelected(detailExercise.id)
                     ? 'bg-red-100 text-red-700 hover:bg-red-200'
@@ -481,7 +494,7 @@ const ExerciseSelector = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default ExerciseSelector
+export default ExerciseSelector;

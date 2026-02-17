@@ -4,7 +4,7 @@
  * Supports Norwegian healthcare integration requirements
  */
 
-import logger from '../utils/logger.js';
+import _logger from '../utils/logger.js';
 
 // FHIR R4 Resource Types used
 const FHIR_RESOURCE_TYPES = {
@@ -563,8 +563,12 @@ class FHIRAdapter {
   }
 
   mapEncounterStatus(encounter) {
-    if (encounter.is_locked) return 'finished';
-    if (encounter.encounter_date > new Date().toISOString().split('T')[0]) return 'planned';
+    if (encounter.is_locked) {
+      return 'finished';
+    }
+    if (encounter.encounter_date > new Date().toISOString().split('T')[0]) {
+      return 'planned';
+    }
     return 'in-progress';
   }
 
@@ -686,14 +690,18 @@ class FHIRAdapter {
     // SOAP sections as contained Composition
     if (encounter.subjective || encounter.objective || encounter.assessment || encounter.plan) {
       const sections = [];
-      if (encounter.subjective)
+      if (encounter.subjective) {
         sections.push({ title: 'Subjective', text: { div: JSON.stringify(encounter.subjective) } });
-      if (encounter.objective)
+      }
+      if (encounter.objective) {
         sections.push({ title: 'Objective', text: { div: JSON.stringify(encounter.objective) } });
-      if (encounter.assessment)
+      }
+      if (encounter.assessment) {
         sections.push({ title: 'Assessment', text: { div: JSON.stringify(encounter.assessment) } });
-      if (encounter.plan)
+      }
+      if (encounter.plan) {
         sections.push({ title: 'Plan', text: { div: JSON.stringify(encounter.plan) } });
+      }
       fhir.contained.push({
         resourceType: 'Composition',
         id: `soap-${encounter.id}`,
@@ -764,7 +772,7 @@ class FHIRAdapter {
     const observations = [];
 
     // VAS pain score
-    if (measurement.pain_intensity != null) {
+    if (measurement.pain_intensity !== null && measurement.pain_intensity !== undefined) {
       const obs = {
         resourceType: 'Observation',
         status: 'final',
@@ -789,7 +797,9 @@ class FHIRAdapter {
           },
         ],
       };
-      if (encounterId) obs.encounter = { reference: `Encounter/${encounterId}` };
+      if (encounterId) {
+        obs.encounter = { reference: `Encounter/${encounterId}` };
+      }
       observations.push(obs);
     }
 
@@ -815,14 +825,20 @@ class FHIRAdapter {
               code: 'deg',
             },
           };
-          if (encounterId) obs.encounter = { reference: `Encounter/${encounterId}` };
+          if (encounterId) {
+            obs.encounter = { reference: `Encounter/${encounterId}` };
+          }
           observations.push(obs);
         }
       }
     }
 
     // Outcome measures (NDI, ODI, etc.)
-    if (measurement.outcome_measure_type && measurement.outcome_score != null) {
+    if (
+      measurement.outcome_measure_type &&
+      measurement.outcome_score !== null &&
+      measurement.outcome_score !== undefined
+    ) {
       const obs = {
         resourceType: 'Observation',
         status: 'final',
@@ -838,7 +854,9 @@ class FHIRAdapter {
           code: '%',
         },
       };
-      if (encounterId) obs.encounter = { reference: `Encounter/${encounterId}` };
+      if (encounterId) {
+        obs.encounter = { reference: `Encounter/${encounterId}` };
+      }
       observations.push(obs);
     }
 

@@ -16,8 +16,8 @@ import {
   Search,
   RefreshCw,
   CheckCircle2,
-  XCircle,
-  Filter,
+  _XCircle,
+  _Filter,
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
@@ -77,10 +77,18 @@ export default function RecallDashboard() {
     result.sort((a, b) => {
       let aVal = a[sortField];
       let bVal = b[sortField];
-      if (typeof aVal === 'string') aVal = aVal.toLowerCase();
-      if (typeof bVal === 'string') bVal = bVal.toLowerCase();
-      if (aVal < bVal) return sortDir === 'asc' ? -1 : 1;
-      if (aVal > bVal) return sortDir === 'asc' ? 1 : -1;
+      if (typeof aVal === 'string') {
+        aVal = aVal.toLowerCase();
+      }
+      if (typeof bVal === 'string') {
+        bVal = bVal.toLowerCase();
+      }
+      if (aVal < bVal) {
+        return sortDir === 'asc' ? -1 : 1;
+      }
+      if (aVal > bVal) {
+        return sortDir === 'asc' ? 1 : -1;
+      }
       return 0;
     });
     return result;
@@ -88,15 +96,19 @@ export default function RecallDashboard() {
 
   // Stats
   const stats = useMemo(() => {
-    const now = new Date();
+    const _now = new Date();
     let overdue = 0;
     let dueToday = 0;
     let dueSoon = 0;
     for (const p of patients) {
       const daysOverdue = p.days_overdue || 0;
-      if (daysOverdue > 0) overdue++;
-      else if (daysOverdue === 0) dueToday++;
-      else dueSoon++;
+      if (daysOverdue > 0) {
+        overdue++;
+      } else if (daysOverdue === 0) {
+        dueToday++;
+      } else {
+        dueSoon++;
+      }
     }
     return { total: patients.length, overdue, dueToday, dueSoon };
   }, [patients]);
@@ -111,7 +123,9 @@ export default function RecallDashboard() {
   };
 
   const SortIcon = ({ field }) => {
-    if (sortField !== field) return null;
+    if (sortField !== field) {
+      return null;
+    }
     return sortDir === 'asc' ? (
       <ChevronUp className="w-3 h-3 inline ml-1" />
     ) : (
@@ -301,7 +315,7 @@ export default function RecallDashboard() {
 }
 
 function PatientRow({ patient, onContact, isContacting }) {
-  const [showActions, setShowActions] = useState(false);
+  const [_showActions, _setShowActions] = useState(false);
   const daysOverdue = patient.days_overdue || 0;
 
   const urgencyColor =

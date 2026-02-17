@@ -8,7 +8,7 @@
  * - Optionally send SMS/email (queues for approval)
  * - View history of notes
  */
-import React, { useState, useCallback, useMemo } from 'react';
+import _React, { useState, useCallback, _useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   MessageSquare,
@@ -25,9 +25,9 @@ import {
   X,
   Plus,
   Calendar,
-  User,
+  _User,
 } from 'lucide-react';
-import { format, formatDistanceToNow, addDays, addWeeks } from 'date-fns';
+import { format, _formatDistanceToNow, addDays, addWeeks } from 'date-fns';
 import { nb } from 'date-fns/locale';
 import { followUpsAPI } from '../../services/api';
 
@@ -82,7 +82,7 @@ const QUICK_TEMPLATES = [
 export default function QuickNotePanel({
   patientId,
   encounterId = null,
-  patientName = '',
+  _patientName = '',
   patientPhone = '',
   patientEmail = '',
   onNoteSaved,
@@ -122,7 +122,9 @@ export default function QuickNotePanel({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['patient-notes', patientId] });
       resetForm();
-      if (onNoteSaved) onNoteSaved();
+      if (onNoteSaved) {
+        onNoteSaved();
+      }
     },
   });
 
@@ -154,7 +156,9 @@ export default function QuickNotePanel({
     (e) => {
       e?.preventDefault();
 
-      if (!content.trim()) return;
+      if (!content.trim()) {
+        return;
+      }
 
       const noteData = {
         patient_id: patientId,
@@ -200,7 +204,7 @@ export default function QuickNotePanel({
     [completeMutation]
   );
 
-  const NoteTypeConfig = NOTE_TYPES[noteType];
+  const _NoteTypeConfig = NOTE_TYPES[noteType];
 
   return (
     <div className={`bg-white border border-gray-200 rounded-lg ${className}`}>
@@ -325,7 +329,9 @@ export default function QuickNotePanel({
                       checked={sendSms}
                       onChange={(e) => {
                         setSendSms(e.target.checked);
-                        if (e.target.checked) setSendEmail(false);
+                        if (e.target.checked) {
+                          setSendEmail(false);
+                        }
                       }}
                       className="rounded text-blue-600"
                     />
@@ -340,7 +346,9 @@ export default function QuickNotePanel({
                       checked={sendEmail}
                       onChange={(e) => {
                         setSendEmail(e.target.checked);
-                        if (e.target.checked) setSendSms(false);
+                        if (e.target.checked) {
+                          setSendSms(false);
+                        }
                       }}
                       className="rounded text-blue-600"
                     />
@@ -468,7 +476,7 @@ export default function QuickNotePanel({
 }
 
 // Compact inline version for SOAP note footer
-export function QuickNoteInline({ patientId, encounterId, onAction }) {
+export function QuickNoteInline({ _patientId, _encounterId, onAction }) {
   return (
     <div className="flex items-center gap-2 text-sm">
       <span className="text-gray-500">Hurtighandlinger:</span>

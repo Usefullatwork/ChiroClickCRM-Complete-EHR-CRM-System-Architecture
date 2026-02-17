@@ -4,7 +4,7 @@
  * Future SaaS mode can swap this for Vault/AWS/Azure
  */
 
-let secretsCache = new Map();
+const secretsCache = new Map();
 const CACHE_TTL = 3600000; // 1 hour
 
 /**
@@ -42,7 +42,7 @@ export const getSecret = async (path, options = {}) => {
   if (useCache) {
     secretsCache.set(path, {
       value: secretValue,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
@@ -52,34 +52,28 @@ export const getSecret = async (path, options = {}) => {
 /**
  * Get encryption key for database fields
  */
-export const getEncryptionKey = async () => {
-  return process.env.ENCRYPTION_KEY;
-};
+export const getEncryptionKey = async () => process.env.ENCRYPTION_KEY;
 
 /**
  * Get database credentials
  */
-export const getDatabaseCredentials = async () => {
-  return {
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '5432'),
-    database: process.env.DB_NAME || 'chiroclickcrm',
-    user: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || 'postgres'
-  };
-};
+export const getDatabaseCredentials = async () => ({
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT || '5432'),
+  database: process.env.DB_NAME || 'chiroclickcrm',
+  user: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASSWORD || 'postgres',
+});
 
 /**
  * Get JWT secrets
  */
-export const getJWTSecrets = async () => {
-  return {
-    accessTokenSecret: process.env.JWT_ACCESS_SECRET || process.env.JWT_SECRET,
-    refreshTokenSecret: process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET,
-    expiresIn: '15m',
-    refreshExpiresIn: '7d'
-  };
-};
+export const getJWTSecrets = async () => ({
+  accessTokenSecret: process.env.JWT_ACCESS_SECRET || process.env.JWT_SECRET,
+  refreshTokenSecret: process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET,
+  expiresIn: '15m',
+  refreshExpiresIn: '7d',
+});
 
 /**
  * Get external API keys
@@ -106,9 +100,7 @@ export const rotateSecrets = async () => {
 /**
  * Health check
  */
-export const healthCheck = async () => {
-  return { healthy: true, provider: 'env' };
-};
+export const healthCheck = async () => ({ healthy: true, provider: 'env' });
 
 /**
  * Initialize secrets on startup
@@ -126,5 +118,5 @@ export default {
   clearSecretsCache,
   rotateSecrets,
   healthCheck,
-  initializeSecrets
+  initializeSecrets,
 };

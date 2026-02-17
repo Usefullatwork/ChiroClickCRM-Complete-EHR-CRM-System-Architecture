@@ -120,13 +120,12 @@ export const logAction = async (actionType, userId, details = {}) => {
 /**
  * Log clinical encounter action with full context
  */
-export const logEncounterAction = async (action, userId, encounterId, details = {}) => {
-  return await logAction(action, userId, {
+export const logEncounterAction = async (action, userId, encounterId, details = {}) =>
+  await logAction(action, userId, {
     resourceType: 'clinical_encounter',
     resourceId: encounterId,
     ...details,
   });
-};
 
 /**
  * Log AI suggestion with full context for quality tracking
@@ -173,15 +172,14 @@ export const logAISuggestion = async (userId, suggestionDetails) => {
 /**
  * Log patient data access (GDPR requirement)
  */
-export const logPatientAccess = async (userId, patientId, reason, ipAddress, userAgent) => {
-  return await logAction(ACTION_TYPES.PATIENT_READ, userId, {
+export const logPatientAccess = async (userId, patientId, reason, ipAddress, userAgent) =>
+  await logAction(ACTION_TYPES.PATIENT_READ, userId, {
     resourceType: 'patient',
     resourceId: patientId,
     metadata: { reason },
     ipAddress,
     userAgent,
   });
-};
 
 /**
  * Get audit trail for a specific resource
@@ -322,39 +320,37 @@ const alertAuditFailure = async (error, context) => {
 /**
  * Express middleware for automatic audit logging
  */
-export const auditMiddleware = (actionType) => {
-  return async (req, res, next) => {
-    // Capture original res.json to log after response
-    const originalJson = res.json.bind(res);
+export const auditMiddleware = (actionType) => async (req, res, next) => {
+  // Capture original res.json to log after response
+  const originalJson = res.json.bind(res);
 
-    res.json = async (data) => {
-      // Log the action
-      await logAction(actionType, req.user?.id, {
-        resourceType: req.params.resourceType || extractResourceType(req.path),
-        resourceId: req.params.id || data?.id,
-        changes:
-          req.method === 'PUT' || req.method === 'PATCH'
-            ? {
-                before: req.originalData,
-                after: data,
-              }
-            : null,
-        metadata: {
-          method: req.method,
-          path: req.path,
-          query: req.query,
-        },
-        ipAddress: req.ip,
-        userAgent: req.headers['user-agent'],
-        sessionId: req.session?.id,
-        success: res.statusCode < 400,
-      });
+  res.json = async (data) => {
+    // Log the action
+    await logAction(actionType, req.user?.id, {
+      resourceType: req.params.resourceType || extractResourceType(req.path),
+      resourceId: req.params.id || data?.id,
+      changes:
+        req.method === 'PUT' || req.method === 'PATCH'
+          ? {
+              before: req.originalData,
+              after: data,
+            }
+          : null,
+      metadata: {
+        method: req.method,
+        path: req.path,
+        query: req.query,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      sessionId: req.session?.id,
+      success: res.statusCode < 400,
+    });
 
-      return originalJson(data);
-    };
-
-    next();
+    return originalJson(data);
   };
+
+  next();
 };
 
 /**

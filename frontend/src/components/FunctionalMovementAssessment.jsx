@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import _React, { useState } from 'react';
 
 /**
  * Functional Movement Assessment Component
@@ -17,53 +17,70 @@ const FunctionalMovementAssessment = ({ onSave }) => {
       name: 'Deep Squat',
       description: 'Bilateral, symmetrical, functional mobility of hips, knees, and ankles',
       scoring: [
-        { value: 3, label: '3 - Upper torso parallel with tibia, femur below horizontal, knees over feet, dowel aligned over feet' },
+        {
+          value: 3,
+          label:
+            '3 - Upper torso parallel with tibia, femur below horizontal, knees over feet, dowel aligned over feet',
+        },
         { value: 2, label: '2 - Same as above with 2x6 board under heels' },
         { value: 1, label: '1 - Tibia and torso not parallel OR femur not below horizontal' },
-        { value: 0, label: '0 - Pain during movement' }
+        { value: 0, label: '0 - Pain during movement' },
       ],
       keyPoints: [
         'Heels must stay on floor',
         'Knees should track over toes',
         'Dowel should stay overhead',
-        'Assess compensations'
-      ]
+        'Assess compensations',
+      ],
     },
     {
       id: 'hurdle_step',
       name: 'Hurdle Step',
       description: 'Step and stride mechanics with stability and control',
       scoring: [
-        { value: 3, label: '3 - Hips, knees, ankles aligned in sagittal plane, minimal torso movement, dowel stays level' },
-        { value: 2, label: '2 - Alignment maintained with dowel/balance loss OR stepping foot contact' },
+        {
+          value: 3,
+          label:
+            '3 - Hips, knees, ankles aligned in sagittal plane, minimal torso movement, dowel stays level',
+        },
+        {
+          value: 2,
+          label: '2 - Alignment maintained with dowel/balance loss OR stepping foot contact',
+        },
         { value: 1, label: '1 - Alignment not maintained OR loss of balance' },
-        { value: 0, label: '0 - Pain during movement' }
+        { value: 0, label: '0 - Pain during movement' },
       ],
       bilateral: true,
       keyPoints: [
         'Test both sides',
         'Score is lowest of two sides',
         'Watch for knee valgus',
-        'Maintain upright posture'
-      ]
+        'Maintain upright posture',
+      ],
     },
     {
       id: 'inline_lunge',
       name: 'In-Line Lunge',
       description: 'Rotary stability, deceleration, and lateral/medial stability',
       scoring: [
-        { value: 3, label: '3 - Knee touches board behind heel, torso vertical, dowel remains vertical' },
-        { value: 2, label: '2 - Alignment not maintained OR dowel not vertical OR loss of balance' },
+        {
+          value: 3,
+          label: '3 - Knee touches board behind heel, torso vertical, dowel remains vertical',
+        },
+        {
+          value: 2,
+          label: '2 - Alignment not maintained OR dowel not vertical OR loss of balance',
+        },
         { value: 1, label: '1 - Unable to touch knee to board OR loss of balance' },
-        { value: 0, label: '0 - Pain during movement' }
+        { value: 0, label: '0 - Pain during movement' },
       ],
       bilateral: true,
       keyPoints: [
         'Test both sides',
         'Score is lowest of two sides',
         'Maintain vertical torso',
-        'Watch for rotation'
-      ]
+        'Watch for rotation',
+      ],
     },
     {
       id: 'shoulder_mobility',
@@ -73,7 +90,7 @@ const FunctionalMovementAssessment = ({ onSave }) => {
         { value: 3, label: '3 - Fists within one hand length' },
         { value: 2, label: '2 - Fists within one and a half hand lengths' },
         { value: 1, label: '1 - Fists more than one and a half hand lengths apart' },
-        { value: 0, label: '0 - Pain during movement' }
+        { value: 0, label: '0 - Pain during movement' },
       ],
       bilateral: true,
       clearingTest: 'Shoulder Clearing Test (hand to opposite shoulder blade)',
@@ -81,8 +98,8 @@ const FunctionalMovementAssessment = ({ onSave }) => {
         'Test both sides',
         'Score is lowest of two sides',
         'Measure fist-to-fist distance',
-        'Perform clearing test'
-      ]
+        'Perform clearing test',
+      ],
     },
     {
       id: 'active_slr',
@@ -92,42 +109,51 @@ const FunctionalMovementAssessment = ({ onSave }) => {
         { value: 3, label: '3 - Malleolus passes vertical line at mid-patella' },
         { value: 2, label: '2 - Malleolus passes vertical line between mid-patella and ASIS' },
         { value: 1, label: '1 - Malleolus does not reach mid-patella line' },
-        { value: 0, label: '0 - Pain during movement' }
+        { value: 0, label: '0 - Pain during movement' },
       ],
       bilateral: true,
       keyPoints: [
         'Test both sides',
         'Score is lowest of two sides',
         'Maintain opposite leg flat',
-        'Keep knee extended'
-      ]
+        'Keep knee extended',
+      ],
     },
     {
       id: 'trunk_stability_pushup',
       name: 'Trunk Stability Push-Up',
       description: 'Trunk stability in sagittal plane during closed-chain upper extremity movement',
       scoring: [
-        { value: 3, label: '3 - (M: thumbs at forehead, F: thumbs at clavicle) 1 rep, body lifts as unit' },
-        { value: 2, label: '2 - (M: thumbs at chin, F: thumbs at forehead) 1 rep, body lifts as unit' },
+        {
+          value: 3,
+          label: '3 - (M: thumbs at forehead, F: thumbs at clavicle) 1 rep, body lifts as unit',
+        },
+        {
+          value: 2,
+          label: '2 - (M: thumbs at chin, F: thumbs at forehead) 1 rep, body lifts as unit',
+        },
         { value: 1, label: '1 - Unable to perform 1 rep with proper form' },
-        { value: 0, label: '0 - Pain during movement' }
+        { value: 0, label: '0 - Pain during movement' },
       ],
       keyPoints: [
         'Males: hands at forehead (score 3) or chin (score 2)',
         'Females: hands at clavicle (score 3) or forehead (score 2)',
         'Body must lift as one unit',
-        'No hip hinging'
-      ]
+        'No hip hinging',
+      ],
     },
     {
       id: 'rotary_stability',
       name: 'Rotary Stability',
       description: 'Multi-planar trunk stability during combined upper/lower extremity movement',
       scoring: [
-        { value: 3, label: '3 - Diagonal pattern: one rep, unison movement, board contact maintained' },
+        {
+          value: 3,
+          label: '3 - Diagonal pattern: one rep, unison movement, board contact maintained',
+        },
         { value: 2, label: '2 - Ipsilateral pattern: one rep, unison movement' },
         { value: 1, label: '1 - Unable to perform ipsilateral pattern' },
-        { value: 0, label: '0 - Pain during movement' }
+        { value: 0, label: '0 - Pain during movement' },
       ],
       bilateral: true,
       clearingTest: 'Spinal Extension Clearing Test',
@@ -135,9 +161,9 @@ const FunctionalMovementAssessment = ({ onSave }) => {
         'Test both sides',
         'Score is lowest of two sides',
         'Attempt diagonal first',
-        'Perform clearing test'
-      ]
-    }
+        'Perform clearing test',
+      ],
+    },
   ];
 
   // Additional Functional Assessments
@@ -145,13 +171,29 @@ const FunctionalMovementAssessment = ({ onSave }) => {
     posture: {
       name: 'Postural Assessment',
       items: [
-        { id: 'forward_head', label: 'Forward Head Posture', options: ['Normal', 'Mild', 'Moderate', 'Severe'] },
-        { id: 'shoulder_protraction', label: 'Shoulder Protraction', options: ['Normal', 'Mild', 'Moderate', 'Severe'] },
-        { id: 'thoracic_kyphosis', label: 'Increased Thoracic Kyphosis', options: ['Normal', 'Mild', 'Moderate', 'Severe'] },
-        { id: 'lumbar_lordosis', label: 'Lumbar Lordosis', options: ['Normal', 'Decreased', 'Increased'] },
+        {
+          id: 'forward_head',
+          label: 'Forward Head Posture',
+          options: ['Normal', 'Mild', 'Moderate', 'Severe'],
+        },
+        {
+          id: 'shoulder_protraction',
+          label: 'Shoulder Protraction',
+          options: ['Normal', 'Mild', 'Moderate', 'Severe'],
+        },
+        {
+          id: 'thoracic_kyphosis',
+          label: 'Increased Thoracic Kyphosis',
+          options: ['Normal', 'Mild', 'Moderate', 'Severe'],
+        },
+        {
+          id: 'lumbar_lordosis',
+          label: 'Lumbar Lordosis',
+          options: ['Normal', 'Decreased', 'Increased'],
+        },
         { id: 'pelvic_tilt', label: 'Pelvic Tilt', options: ['Neutral', 'Anterior', 'Posterior'] },
-        { id: 'scoliosis', label: 'Scoliosis', options: ['None', 'Mild', 'Moderate', 'Severe'] }
-      ]
+        { id: 'scoliosis', label: 'Scoliosis', options: ['None', 'Mild', 'Moderate', 'Severe'] },
+      ],
     },
     gait: {
       name: 'Gait Analysis',
@@ -161,17 +203,26 @@ const FunctionalMovementAssessment = ({ onSave }) => {
         { id: 'push_off', label: 'Push Off', options: ['Normal', 'Weak', 'Absent'] },
         { id: 'arm_swing', label: 'Arm Swing', options: ['Normal', 'Reduced', 'Asymmetric'] },
         { id: 'step_length', label: 'Step Length', options: ['Normal', 'Short', 'Asymmetric'] },
-        { id: 'trendelenburg', label: 'Trendelenburg Sign', options: ['Negative', 'Positive Left', 'Positive Right', 'Bilateral'] }
-      ]
+        {
+          id: 'trendelenburg',
+          label: 'Trendelenburg Sign',
+          options: ['Negative', 'Positive Left', 'Positive Right', 'Bilateral'],
+        },
+      ],
     },
     balance: {
       name: 'Balance Assessment',
       items: [
-        { id: 'single_leg_stance', label: 'Single Leg Stance (seconds)', type: 'number', bilateral: true },
+        {
+          id: 'single_leg_stance',
+          label: 'Single Leg Stance (seconds)',
+          type: 'number',
+          bilateral: true,
+        },
         { id: 'tandem_stance', label: 'Tandem Stance (seconds)', type: 'number' },
-        { id: 'star_excursion', label: 'Star Excursion Reach', type: 'number', bilateral: true }
-      ]
-    }
+        { id: 'star_excursion', label: 'Star Excursion Reach', type: 'number', bilateral: true },
+      ],
+    },
   };
 
   const handleScoreChange = (testId, value) => {
@@ -197,7 +248,7 @@ const FunctionalMovementAssessment = ({ onSave }) => {
         scores: currentScores,
         notes: notes,
         date: new Date().toISOString(),
-        interpretation: getInterpretation(fmsScore)
+        interpretation: getInterpretation(fmsScore),
       });
     }
   };
@@ -217,10 +268,18 @@ const FunctionalMovementAssessment = ({ onSave }) => {
   };
 
   const getScoreColor = (score) => {
-    if (score >= 21) return '#4CAF50';
-    if (score >= 18) return '#8BC34A';
-    if (score >= 15) return '#FF9800';
-    if (score >= 14) return '#FF5722';
+    if (score >= 21) {
+      return '#4CAF50';
+    }
+    if (score >= 18) {
+      return '#8BC34A';
+    }
+    if (score >= 15) {
+      return '#FF9800';
+    }
+    if (score >= 14) {
+      return '#FF5722';
+    }
     return '#F44336';
   };
 
@@ -468,7 +527,12 @@ const FunctionalMovementAssessment = ({ onSave }) => {
       <h1 style={{ marginTop: 0, color: '#1976D2' }}>Functional Movement Assessment</h1>
 
       {totalScore > 0 && (
-        <div className="score-header" style={{ background: `linear-gradient(135deg, ${getScoreColor(totalScore)} 0%, ${getScoreColor(totalScore)}dd 100%)` }}>
+        <div
+          className="score-header"
+          style={{
+            background: `linear-gradient(135deg, ${getScoreColor(totalScore)} 0%, ${getScoreColor(totalScore)}dd 100%)`,
+          }}
+        >
           <div className="max-score">Functional Movement Screen Score</div>
           <div className="total-score">{totalScore}/21</div>
           <div className="interpretation">{getInterpretation(totalScore)}</div>
@@ -478,12 +542,14 @@ const FunctionalMovementAssessment = ({ onSave }) => {
       <div className="test-section">
         <h2 className="section-title">Functional Movement Screen (FMS)</h2>
 
-        {fmsTests.map(test => (
+        {fmsTests.map((test) => (
           <div key={test.id} className="test-card">
             <div className="test-header">
               <div className="test-name">
                 {test.name}
-                {test.bilateral && <span className="bilateral-badge">BILATERAL - Score Lowest Side</span>}
+                {test.bilateral && (
+                  <span className="bilateral-badge">BILATERAL - Score Lowest Side</span>
+                )}
                 {scores[test.id] > 0 && (
                   <span className="current-score-badge">Score: {scores[test.id]}/3</span>
                 )}
@@ -492,7 +558,7 @@ const FunctionalMovementAssessment = ({ onSave }) => {
             </div>
 
             <div className="scoring-options">
-              {test.scoring.map(option => (
+              {test.scoring.map((option) => (
                 <label
                   key={option.value}
                   className={`score-option ${scores[test.id] === option.value ? 'selected' : ''}`}
@@ -542,7 +608,7 @@ const FunctionalMovementAssessment = ({ onSave }) => {
           <div key={category} className="test-section">
             <h2 className="section-title">{data.name}</h2>
             <div className="additional-test-grid">
-              {data.items.map(item => (
+              {data.items.map((item) => (
                 <div key={item.id} className="additional-item">
                   <label>{item.label}</label>
                   {item.options ? (
@@ -551,8 +617,10 @@ const FunctionalMovementAssessment = ({ onSave }) => {
                       onChange={(e) => handleScoreChange(item.id, e.target.value)}
                     >
                       <option value="">Select...</option>
-                      {item.options.map(opt => (
-                        <option key={opt} value={opt}>{opt}</option>
+                      {item.options.map((opt) => (
+                        <option key={opt} value={opt}>
+                          {opt}
+                        </option>
                       ))}
                     </select>
                   ) : (

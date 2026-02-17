@@ -22,7 +22,7 @@ export const LETTER_TYPES = {
     nameEn: 'Medical Certificate',
     description: 'General medical declaration for university, employer, or other institutions',
     requiredFields: ['patient', 'diagnosis', 'purpose'],
-    template: 'medical_certificate'
+    template: 'medical_certificate',
   },
   UNIVERSITY_LETTER: {
     id: 'UNIVERSITY_LETTER',
@@ -30,7 +30,7 @@ export const LETTER_TYPES = {
     nameEn: 'University Letter',
     description: 'Letter for exam deferral or study modifications',
     requiredFields: ['patient', 'diagnosis', 'institution', 'examDate'],
-    template: 'university_letter'
+    template: 'university_letter',
   },
   VESTIBULAR_REFERRAL: {
     id: 'VESTIBULAR_REFERRAL',
@@ -38,7 +38,7 @@ export const LETTER_TYPES = {
     nameEn: 'Vestibular Referral',
     description: 'Referral for vestibular disorders including BPPV and vestibular neuritis',
     requiredFields: ['patient', 'symptoms', 'findings', 'vngResults'],
-    template: 'vestibular_referral'
+    template: 'vestibular_referral',
   },
   HEADACHE_REFERRAL: {
     id: 'HEADACHE_REFERRAL',
@@ -46,7 +46,7 @@ export const LETTER_TYPES = {
     nameEn: 'Headache Referral',
     description: 'Referral for headache investigation including migraine studies',
     requiredFields: ['patient', 'headacheType', 'frequency', 'triggers'],
-    template: 'headache_referral'
+    template: 'headache_referral',
   },
   MEMBERSHIP_FREEZE: {
     id: 'MEMBERSHIP_FREEZE',
@@ -54,7 +54,7 @@ export const LETTER_TYPES = {
     nameEn: 'Gym Membership Freeze',
     description: 'Medical declaration for freezing gym or sports membership',
     requiredFields: ['patient', 'diagnosis', 'duration'],
-    template: 'membership_freeze'
+    template: 'membership_freeze',
   },
   CLINICAL_NOTE: {
     id: 'CLINICAL_NOTE',
@@ -62,7 +62,7 @@ export const LETTER_TYPES = {
     nameEn: 'Clinical Note',
     description: 'Detailed clinical note for specialists or other healthcare providers',
     requiredFields: ['patient', 'findings', 'assessment'],
-    template: 'clinical_note'
+    template: 'clinical_note',
   },
   WORK_DECLARATION: {
     id: 'WORK_DECLARATION',
@@ -70,8 +70,8 @@ export const LETTER_TYPES = {
     nameEn: 'Work Declaration',
     description: 'Declaration for employer regarding work capacity and restrictions',
     requiredFields: ['patient', 'diagnosis', 'workCapacity', 'restrictions'],
-    template: 'work_declaration'
-  }
+    template: 'work_declaration',
+  },
 };
 
 // =============================================================================
@@ -201,7 +201,7 @@ FORMAT:
 8. Forventet varighet
 9. Signatur
 
-Beskytt sensitiv medisinsk informasjon - gi kun arbeidsrelevant info.`
+Beskytt sensitiv medisinsk informasjon - gi kun arbeidsrelevant info.`,
 };
 
 // =============================================================================
@@ -227,8 +227,8 @@ const generateCompletion = async (prompt, systemPrompt, options = {}) => {
         stream: false,
         options: {
           temperature,
-          num_predict: maxTokens
-        }
+          num_predict: maxTokens,
+        },
       },
       { timeout: 60000 }
     );
@@ -260,7 +260,7 @@ export const generateLetter = async (letterType, data) => {
   try {
     const generatedContent = await generateCompletion(prompt, systemPrompt, {
       maxTokens: 2000,
-      temperature: 0.3
+      temperature: 0.3,
     });
 
     // Post-process the generated letter
@@ -273,14 +273,14 @@ export const generateLetter = async (letterType, data) => {
       content: processedLetter,
       rawContent: generatedContent,
       generatedAt: new Date().toISOString(),
-      model: AI_MODEL
+      model: AI_MODEL,
     };
   } catch (error) {
     logger.error('Letter generation error:', error);
     return {
       success: false,
       letterType,
-      error: error.message
+      error: error.message,
     };
   }
 };
@@ -300,7 +300,9 @@ const buildLetterPrompt = (letterType, data) => {
     prompt += `PASIENT:\n`;
     prompt += `- Navn: ${patient.name || '[Navn]'}\n`;
     prompt += `- Fødselsdato: ${patient.dateOfBirth || '[Fødselsdato]'}\n`;
-    if (patient.address) prompt += `- Adresse: ${patient.address}\n`;
+    if (patient.address) {
+      prompt += `- Adresse: ${patient.address}\n`;
+    }
     prompt += '\n';
   }
 
@@ -390,7 +392,7 @@ const postProcessLetter = (content, data) => {
   const today = new Date().toLocaleDateString('nb-NO', {
     day: '2-digit',
     month: '2-digit',
-    year: 'numeric'
+    year: 'numeric',
   });
   processed = processed.replace(/\[dato\]/gi, today);
   processed = processed.replace(/\[today\]/gi, today);
@@ -424,7 +426,7 @@ const postProcessLetter = (content, data) => {
  * @returns {Promise<Object>} Suggested letter content
  */
 export const suggestLetterContent = async (clinicalContext) => {
-  const { soap, patient, diagnosis } = clinicalContext;
+  const { soap, _patient, diagnosis } = clinicalContext;
 
   const systemPrompt = `${LETTER_SYSTEM_PROMPTS.base}
 
@@ -455,18 +457,18 @@ Foreslå:
   try {
     const suggestion = await generateCompletion(prompt, systemPrompt, {
       maxTokens: 800,
-      temperature: 0.5
+      temperature: 0.5,
     });
 
     return {
       success: true,
-      suggestion: suggestion.trim()
+      suggestion: suggestion.trim(),
     };
   } catch (error) {
     logger.error('Letter suggestion error:', error);
     return {
       success: false,
-      error: error.message
+      error: error.message,
     };
   }
 };
@@ -475,15 +477,14 @@ Foreslå:
  * Get available letter types
  * @returns {Array} List of available letter types
  */
-export const getLetterTypes = () => {
-  return Object.values(LETTER_TYPES).map(type => ({
+export const getLetterTypes = () =>
+  Object.values(LETTER_TYPES).map((type) => ({
     id: type.id,
     name: type.name,
     nameEn: type.nameEn,
     description: type.description,
-    requiredFields: type.requiredFields
+    requiredFields: type.requiredFields,
   }));
-};
 
 /**
  * Save generated letter to database
@@ -507,8 +508,8 @@ export const saveLetter = async (organizationId, patientId, letterData) => {
         JSON.stringify({
           letterTypeName: letterData.letterTypeName,
           generatedAt: letterData.generatedAt,
-          model: letterData.model
-        })
+          model: letterData.model,
+        }),
       ]
     );
 
@@ -548,5 +549,5 @@ export default {
   suggestLetterContent,
   getLetterTypes,
   saveLetter,
-  getLetterHistory
+  getLetterHistory,
 };

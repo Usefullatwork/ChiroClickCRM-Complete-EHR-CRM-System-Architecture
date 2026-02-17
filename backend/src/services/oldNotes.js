@@ -5,11 +5,7 @@
 
 import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
-import {
-  organizeOldJournalNotes,
-  organizeMultipleNotes,
-  mergeOrganizedNotes
-} from './ai.js';
+import { organizeOldJournalNotes, _organizeMultipleNotes, _mergeOrganizedNotes } from './ai.js';
 
 /**
  * Create a new batch for importing notes
@@ -36,7 +32,7 @@ export const importJournalNote = async (data) => {
     originalContent,
     originalFilename,
     uploadedBy,
-    batchId = null
+    batchId = null,
   } = data;
 
   try {
@@ -54,10 +50,10 @@ export const importJournalNote = async (data) => {
 
     // Link to batch if provided
     if (batchId) {
-      await query(
-        `INSERT INTO batch_notes (batch_id, note_id) VALUES ($1, $2)`,
-        [batchId, note.id]
-      );
+      await query(`INSERT INTO batch_notes (batch_id, note_id) VALUES ($1, $2)`, [
+        batchId,
+        note.id,
+      ]);
 
       // Update batch totals
       await query(
@@ -70,7 +66,6 @@ export const importJournalNote = async (data) => {
 
     logger.info(`Imported journal note ${note.id} for patient ${patientId}`);
     return note;
-
   } catch (error) {
     logger.error('Error importing journal note:', error);
     throw error;
@@ -80,10 +75,21 @@ export const importJournalNote = async (data) => {
 /**
  * Import multiple journal notes at once
  */
-export const importMultipleNotes = async (notes, patientId, organizationId, uploadedBy, batchName = null) => {
+export const importMultipleNotes = async (
+  notes,
+  patientId,
+  organizationId,
+  uploadedBy,
+  batchName = null
+) => {
   try {
     // Create batch
-    const batch = await createBatch(organizationId, patientId, batchName || `Import ${new Date().toISOString()}`, uploadedBy);
+    const batch = await createBatch(
+      organizationId,
+      patientId,
+      batchName || `Import ${new Date().toISOString()}`,
+      uploadedBy
+    );
 
     const importedNotes = [];
     for (const note of notes) {
@@ -93,7 +99,7 @@ export const importMultipleNotes = async (notes, patientId, organizationId, uplo
         originalContent: note.content,
         originalFilename: note.filename,
         uploadedBy,
-        batchId: batch.id
+        batchId: batch.id,
       });
       importedNotes.push(imported);
     }
@@ -108,9 +114,8 @@ export const importMultipleNotes = async (notes, patientId, organizationId, uplo
 
     return {
       batch,
-      notes: importedNotes
+      notes: importedNotes,
     };
-
   } catch (error) {
     logger.error('Error importing multiple notes:', error);
     throw error;
@@ -123,10 +128,7 @@ export const importMultipleNotes = async (notes, patientId, organizationId, uplo
 export const processNoteWithAI = async (noteId, patientContext = {}) => {
   try {
     // Get the note
-    const noteResult = await query(
-      `SELECT * FROM imported_journal_notes WHERE id = $1`,
-      [noteId]
-    );
+    const noteResult = await query(`SELECT * FROM imported_journal_notes WHERE id = $1`, [noteId]);
 
     if (noteResult.rows.length === 0) {
       throw new Error('Note not found');
@@ -174,8 +176,8 @@ export const processNoteWithAI = async (noteId, patientContext = {}) => {
           aiResult.model,
           noteId,
           organizedData.tags || [],
-          (organizedData.actionable_items || []).some(item => item.type === 'FOLLOW_UP'),
-          (organizedData.communication_history || []).length > 0
+          (organizedData.actionable_items || []).some((item) => item.type === 'FOLLOW_UP'),
+          (organizedData.communication_history || []).length > 0,
         ]
       );
 
@@ -197,7 +199,7 @@ export const processNoteWithAI = async (noteId, patientContext = {}) => {
               item.due_date || null,
               item.priority || 'MEDIUM',
               item.original_text || null,
-              organizedData.confidence_score || 0.5
+              organizedData.confidence_score || 0.5,
             ]
           );
         }
@@ -220,7 +222,7 @@ export const processNoteWithAI = async (noteId, patientContext = {}) => {
               comm.subject || null,
               comm.content || null,
               comm.direction || 'OUTGOING',
-              comm.original_text || null
+              comm.original_text || null,
             ]
           );
         }
@@ -237,26 +239,24 @@ export const processNoteWithAI = async (noteId, patientContext = {}) => {
               noteId,
               missing.field,
               missing.importance || 'MEDIUM',
-              missing.can_be_inferred || false
+              missing.can_be_inferred || false,
             ]
           );
         }
       }
 
       // Get updated note with counts
-      const updatedResult = await query(
-        `SELECT * FROM imported_journal_notes WHERE id = $1`,
-        [noteId]
-      );
+      const updatedResult = await query(`SELECT * FROM imported_journal_notes WHERE id = $1`, [
+        noteId,
+      ]);
 
       return {
         success: true,
         note: updatedResult.rows[0],
         aiResult,
         actionableItemsCount: organizedData.actionable_items?.length || 0,
-        communicationHistoryCount: organizedData.communication_history?.length || 0
+        communicationHistoryCount: organizedData.communication_history?.length || 0,
       };
-
     } else {
       // Mark as failed
       await query(
@@ -268,10 +268,9 @@ export const processNoteWithAI = async (noteId, patientContext = {}) => {
 
       return {
         success: false,
-        error: aiResult.error
+        error: aiResult.error,
       };
     }
-
   } catch (error) {
     logger.error(`Error processing note ${noteId}:`, error);
 
@@ -314,13 +313,12 @@ export const processBatchWithAI = async (batchId, patientContext = {}) => {
            WHERE id = $1`,
           [batchId]
         );
-
       } catch (error) {
         logger.error(`Failed to process note ${note.id} in batch ${batchId}:`, error);
         results.push({
           success: false,
           noteId: note.id,
-          error: error.message
+          error: error.message,
         });
       }
     }
@@ -336,11 +334,10 @@ export const processBatchWithAI = async (batchId, patientContext = {}) => {
     return {
       batchId,
       totalProcessed: results.length,
-      successCount: results.filter(r => r.success).length,
-      failureCount: results.filter(r => !r.success).length,
-      results
+      successCount: results.filter((r) => r.success).length,
+      failureCount: results.filter((r) => !r.success).length,
+      results,
     };
-
   } catch (error) {
     logger.error(`Error processing batch ${batchId}:`, error);
     throw error;
@@ -386,7 +383,7 @@ export const getPatientImportedNotes = async (patientId, organizationId, filters
     notes: result.rows,
     total: parseInt(countResult.rows[0].count),
     limit,
-    offset
+    offset,
   };
 };
 
@@ -484,7 +481,7 @@ export const convertToEncounter = async (noteId, userId, organizationId) => {
         note.generated_soap?.assessment || {},
         note.generated_soap?.plan || {},
         note.suggested_diagnosis_codes || [],
-        userId
+        userId,
       ]
     );
 
@@ -504,9 +501,8 @@ export const convertToEncounter = async (noteId, userId, organizationId) => {
     return {
       success: true,
       encounter,
-      noteId
+      noteId,
     };
-
   } catch (error) {
     logger.error(`Error converting note ${noteId} to encounter:`, error);
     throw error;
@@ -540,7 +536,7 @@ export const getBatchInfo = async (batchId, organizationId) => {
 
   return {
     ...batch,
-    notes: notesResult.rows
+    notes: notesResult.rows,
   };
 };
 
@@ -661,7 +657,7 @@ export const getActionableItemsByPatient = async (patientId, organizationId, fil
 /**
  * Update actionable item status
  */
-export const updateActionableItemStatus = async (itemId, status, userId = null) => {
+export const updateActionableItemStatus = async (itemId, status, _userId = null) => {
   const result = await query(
     `UPDATE old_note_actionable_items
      SET status = $1, updated_at = NOW()
@@ -748,10 +744,7 @@ export const assignActionableItem = async (itemId, userId) => {
  * Delete an actionable item
  */
 export const deleteActionableItem = async (itemId) => {
-  await query(
-    `DELETE FROM old_note_actionable_items WHERE id = $1`,
-    [itemId]
-  );
+  await query(`DELETE FROM old_note_actionable_items WHERE id = $1`, [itemId]);
 
   return { success: true };
 };
@@ -791,10 +784,7 @@ export const getCommunicationHistoryByPatient = async (patientId, organizationId
  */
 export const createFollowUpFromActionableItem = async (itemId, userId) => {
   // Get the actionable item
-  const itemResult = await query(
-    `SELECT * FROM old_note_actionable_items WHERE id = $1`,
-    [itemId]
-  );
+  const itemResult = await query(`SELECT * FROM old_note_actionable_items WHERE id = $1`, [itemId]);
 
   if (itemResult.rows.length === 0) {
     throw new Error('Actionable item not found');
@@ -814,7 +804,7 @@ export const createFollowUpFromActionableItem = async (itemId, userId) => {
       item.due_date || new Date(),
       item.description || item.title,
       item.priority,
-      userId
+      userId,
     ]
   );
 
@@ -855,5 +845,5 @@ export default {
   deleteActionableItem,
   getCommunicationHistoryByNote,
   getCommunicationHistoryByPatient,
-  createFollowUpFromActionableItem
+  createFollowUpFromActionableItem,
 };

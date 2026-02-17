@@ -46,7 +46,9 @@ const bodyRegionLabels = {
 
 // Helper to extract YouTube video ID
 const getYouTubeVideoId = (url) => {
-  if (!url) return null;
+  if (!url) {
+    return null;
+  }
   const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&?/]+)/);
   return match ? match[1] : null;
 };

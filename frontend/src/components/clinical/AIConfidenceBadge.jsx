@@ -3,7 +3,7 @@
  * Shows confidence level with optional expandable reasoning
  */
 
-import React, { useState } from 'react';
+import _React, { useState } from 'react';
 import { Info, ChevronDown, ChevronUp } from 'lucide-react';
 
 const CONFIDENCE_LEVELS = {
@@ -15,17 +15,17 @@ const CONFIDENCE_LEVELS = {
     textColor: 'text-green-700',
     dotColor: 'bg-green-500',
     label: 'Høy sikkerhet',
-    description: 'AI er sikker på dette forslaget'
+    description: 'AI er sikker på dette forslaget',
   },
   medium: {
-    threshold: 0.60,
+    threshold: 0.6,
     color: 'yellow',
     bgColor: 'bg-yellow-50',
     borderColor: 'border-yellow-200',
     textColor: 'text-yellow-700',
     dotColor: 'bg-yellow-500',
     label: 'Gjennomgang anbefalt',
-    description: 'Vennligst verifiser før bruk'
+    description: 'Vennligst verifiser før bruk',
   },
   low: {
     threshold: 0,
@@ -35,13 +35,17 @@ const CONFIDENCE_LEVELS = {
     textColor: 'text-red-700',
     dotColor: 'bg-red-500',
     label: 'Manuell verifisering',
-    description: 'AI er usikker - krever klinisk vurdering'
-  }
+    description: 'AI er usikker - krever klinisk vurdering',
+  },
 };
 
 function getConfidenceLevel(score) {
-  if (score >= CONFIDENCE_LEVELS.high.threshold) return CONFIDENCE_LEVELS.high;
-  if (score >= CONFIDENCE_LEVELS.medium.threshold) return CONFIDENCE_LEVELS.medium;
+  if (score >= CONFIDENCE_LEVELS.high.threshold) {
+    return CONFIDENCE_LEVELS.high;
+  }
+  if (score >= CONFIDENCE_LEVELS.medium.threshold) {
+    return CONFIDENCE_LEVELS.medium;
+  }
   return CONFIDENCE_LEVELS.low;
 }
 
@@ -50,7 +54,7 @@ export default function AIConfidenceBadge({
   reasoning = [], // Array of strings explaining the confidence
   compact = false, // Show only dot without label
   showDetails = true, // Allow expansion to show reasoning
-  className = ''
+  className = '',
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const level = getConfidenceLevel(confidence);
@@ -77,19 +81,19 @@ export default function AIConfidenceBadge({
       >
         <span className={`w-2 h-2 rounded-full ${level.dotColor}`} />
         <span>{level.label}</span>
-        {showDetails && reasoning.length > 0 && (
-          isExpanded
-            ? <ChevronUp className="w-3 h-3" />
-            : <ChevronDown className="w-3 h-3" />
-        )}
+        {showDetails &&
+          reasoning.length > 0 &&
+          (isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
       </button>
 
       {/* Expanded reasoning */}
       {isExpanded && reasoning.length > 0 && (
-        <div className={`
+        <div
+          className={`
           mt-1 p-2 rounded-md text-xs
           ${level.bgColor} ${level.borderColor} border
-        `}>
+        `}
+        >
           <p className="font-medium text-gray-700 mb-1 flex items-center gap-1">
             <Info className="w-3 h-3" />
             Basert på:
@@ -115,7 +119,7 @@ export function AIConfidenceDot({ confidence, size = 'sm' }) {
     xs: 'w-1.5 h-1.5',
     sm: 'w-2 h-2',
     md: 'w-2.5 h-2.5',
-    lg: 'w-3 h-3'
+    lg: 'w-3 h-3',
   };
 
   return (
@@ -131,7 +135,7 @@ export function calculateConfidence({
   matchingSimilarCases = 0,
   templateMatch = 0,
   contentLength = 0,
-  medicalTermsPresent = 0
+  medicalTermsPresent = 0,
 }) {
   const factors = [];
   let score = 0.5; // Base confidence
@@ -161,6 +165,6 @@ export function calculateConfidence({
 
   return {
     score: Math.min(score, 0.98),
-    factors
+    factors,
   };
 }

@@ -440,12 +440,10 @@ const processScheduledActions = async (organizationId = null) => {
 /**
  * Process time-based triggers
  */
-const processTimeTriggers = async (organizationId = null) => {
+const processTimeTriggers = async (_organizationId = null) =>
   // This is handled by automationTriggers.js
   // Called separately to check DAYS_SINCE_VISIT and BIRTHDAY triggers
-  return { processed: 0 };
-};
-
+  ({ processed: 0 });
 /**
  * Trigger a workflow based on an event
  */

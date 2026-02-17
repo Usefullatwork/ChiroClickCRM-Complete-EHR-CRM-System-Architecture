@@ -24,12 +24,7 @@ import { encountersAPI } from '../services/api';
  * @param {boolean} options.autoFetch - Whether to fetch on mount (default true)
  */
 export function useSALT(patientId, options = {}) {
-  const {
-    currentEncounterId,
-    chiefComplaint,
-    maxAgeDays = 365,
-    autoFetch = true
-  } = options;
+  const { currentEncounterId, chiefComplaint, maxAgeDays = 365, autoFetch = true } = options;
 
   // State
   const [previousEncounter, setPreviousEncounter] = useState(null);
@@ -40,35 +35,40 @@ export function useSALT(patientId, options = {}) {
   const [isDismissed, setIsDismissed] = useState(false);
 
   // Fetch last similar encounter
-  const fetchSimilar = useCallback(async (complaint = chiefComplaint) => {
-    if (!patientId) return null;
+  const fetchSimilar = useCallback(
+    async (complaint = chiefComplaint) => {
+      if (!patientId) {
+        return null;
+      }
 
-    setIsLoading(true);
-    setError(null);
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      const response = await encountersAPI.getLastSimilar(patientId, {
-        chiefComplaint: complaint,
-        excludeId: currentEncounterId,
-        maxAgeDays
-      });
+      try {
+        const response = await encountersAPI.getLastSimilar(patientId, {
+          chiefComplaint: complaint,
+          excludeId: currentEncounterId,
+          maxAgeDays,
+        });
 
-      const { encounter, matchScore: score, daysSince: days } = response.data;
+        const { encounter, matchScore: score, daysSince: days } = response.data;
 
-      setPreviousEncounter(encounter);
-      setMatchScore(score || 0);
-      setDaysSince(days);
-      setIsDismissed(false);
+        setPreviousEncounter(encounter);
+        setMatchScore(score || 0);
+        setDaysSince(days);
+        setIsDismissed(false);
 
-      return encounter;
-    } catch (err) {
-      console.error('SALT fetch failed:', err);
-      setError(err.message || 'Failed to fetch similar encounter');
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [patientId, currentEncounterId, chiefComplaint, maxAgeDays]);
+        return encounter;
+      } catch (err) {
+        console.error('SALT fetch failed:', err);
+        setError(err.message || 'Failed to fetch similar encounter');
+        return null;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [patientId, currentEncounterId, chiefComplaint, maxAgeDays]
+  );
 
   // Auto-fetch on mount if enabled
   useEffect(() => {
@@ -79,7 +79,9 @@ export function useSALT(patientId, options = {}) {
 
   // Refetch when chief complaint changes (debounced)
   useEffect(() => {
-    if (!autoFetch || !chiefComplaint || chiefComplaint.length < 3) return;
+    if (!autoFetch || !chiefComplaint || chiefComplaint.length < 3) {
+      return;
+    }
 
     const timeout = setTimeout(() => {
       fetchSimilar(chiefComplaint);
@@ -93,14 +95,16 @@ export function useSALT(patientId, options = {}) {
    * @returns {object} All SOAP sections from previous encounter
    */
   const applyAll = useCallback(() => {
-    if (!previousEncounter) return null;
+    if (!previousEncounter) {
+      return null;
+    }
 
     return {
       subjective: previousEncounter.subjective || {},
       objective: previousEncounter.objective || {},
       assessment: previousEncounter.assessment || {},
       plan: previousEncounter.plan || {},
-      icpc_codes: previousEncounter.icpc_codes || []
+      icpc_codes: previousEncounter.icpc_codes || [],
     };
   }, [previousEncounter]);
 
@@ -109,25 +113,30 @@ export function useSALT(patientId, options = {}) {
    * @param {string} section - 'subjective', 'objective', 'assessment', or 'plan'
    * @returns {object} The requested section data
    */
-  const applySection = useCallback((section) => {
-    if (!previousEncounter) return null;
-
-    switch (section) {
-      case 'subjective':
-        return previousEncounter.subjective || {};
-      case 'objective':
-        return previousEncounter.objective || {};
-      case 'assessment':
-        return {
-          ...previousEncounter.assessment,
-          icpc_codes: previousEncounter.icpc_codes
-        };
-      case 'plan':
-        return previousEncounter.plan || {};
-      default:
+  const applySection = useCallback(
+    (section) => {
+      if (!previousEncounter) {
         return null;
-    }
-  }, [previousEncounter]);
+      }
+
+      switch (section) {
+        case 'subjective':
+          return previousEncounter.subjective || {};
+        case 'objective':
+          return previousEncounter.objective || {};
+        case 'assessment':
+          return {
+            ...previousEncounter.assessment,
+            icpc_codes: previousEncounter.icpc_codes,
+          };
+        case 'plan':
+          return previousEncounter.plan || {};
+        default:
+          return null;
+      }
+    },
+    [previousEncounter]
+  );
 
   /**
    * Get specific field from previous encounter
@@ -135,10 +144,15 @@ export function useSALT(patientId, options = {}) {
    * @param {string} field - Field name within section
    * @returns {any} Field value
    */
-  const getField = useCallback((section, field) => {
-    if (!previousEncounter || !previousEncounter[section]) return null;
-    return previousEncounter[section][field];
-  }, [previousEncounter]);
+  const getField = useCallback(
+    (section, field) => {
+      if (!previousEncounter || !previousEncounter[section]) {
+        return null;
+      }
+      return previousEncounter[section][field];
+    },
+    [previousEncounter]
+  );
 
   /**
    * Dismiss the SALT suggestion
@@ -162,9 +176,14 @@ export function useSALT(patientId, options = {}) {
   const isLowConfidence = matchScore > 0 && matchScore < 0.5;
 
   // Format days since for display
-  const daysSinceText = daysSince !== null
-    ? daysSince === 0 ? 'I dag' : daysSince === 1 ? '1 dag siden' : `${daysSince} dager siden`
-    : null;
+  const daysSinceText =
+    daysSince !== null
+      ? daysSince === 0
+        ? 'I dag'
+        : daysSince === 1
+          ? '1 dag siden'
+          : `${daysSince} dager siden`
+      : null;
 
   return {
     // State
@@ -188,7 +207,7 @@ export function useSALT(patientId, options = {}) {
     applySection,
     getField,
     dismiss,
-    reset
+    reset,
   };
 }
 

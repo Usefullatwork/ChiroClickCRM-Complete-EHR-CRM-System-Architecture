@@ -40,7 +40,9 @@ export class Patient {
    * Check if patient needs follow-up
    */
   needsFollowUp() {
-    if (!this.shouldBeFollowedUp) return false;
+    if (!this.shouldBeFollowedUp) {
+      return false;
+    }
     const followUpDate = new Date(this.shouldBeFollowedUp);
     const today = new Date();
     return followUpDate <= today;
@@ -58,7 +60,9 @@ export class Patient {
    * Business rule: No visits in last 6 months
    */
   isAtRiskOfChurning(lastVisitDate) {
-    if (!lastVisitDate) return true;
+    if (!lastVisitDate) {
+      return true;
+    }
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
     return new Date(lastVisitDate) < sixMonthsAgo;
@@ -72,8 +76,12 @@ export class Patient {
       return this.preferredContactMethod;
     }
     // Default business rule: prefer SMS for patients with phone
-    if (this.phone) return 'SMS';
-    if (this.email) return 'EMAIL';
+    if (this.phone) {
+      return 'SMS';
+    }
+    if (this.email) {
+      return 'EMAIL';
+    }
     return 'PHONE';
   }
 
@@ -81,7 +89,9 @@ export class Patient {
    * Calculate age
    */
   getAge() {
-    if (!this.dateOfBirth) return null;
+    if (!this.dateOfBirth) {
+      return null;
+    }
     const today = new Date();
     const birthDate = new Date(this.dateOfBirth);
     let age = today.getFullYear() - birthDate.getFullYear();
@@ -121,7 +131,7 @@ export class Patient {
 
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
@@ -144,7 +154,7 @@ export class Patient {
       lifetime_value: this.lifetimeValue,
       should_be_followed_up: this.shouldBeFollowedUp,
       main_problem: this.mainProblem,
-      preferred_contact_method: this.preferredContactMethod
+      preferred_contact_method: this.preferredContactMethod,
     };
   }
 

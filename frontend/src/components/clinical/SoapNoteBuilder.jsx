@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import _React, { useState } from 'react';
 import { X, AlertTriangle, CheckCircle2, Save, Loader2 } from 'lucide-react';
 import DOMPurify from 'dompurify';
 import { Button } from '../ui/Button';
@@ -99,7 +99,7 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSave = async (signNow = false) => {
+  const handleSave = async (_signNow = false) => {
     if (!validate()) {
       toast.warning('Please complete all required fields');
       return;
@@ -123,7 +123,9 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
 
       await createEncounter.mutateAsync(encounterData);
 
-      if (onSave) onSave();
+      if (onSave) {
+        onSave();
+      }
       onCancel();
     } catch (error) {
       toast.error(`Failed to save encounter: ${error.message}`);

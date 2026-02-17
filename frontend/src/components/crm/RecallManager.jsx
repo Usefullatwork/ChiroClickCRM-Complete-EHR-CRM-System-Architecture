@@ -14,28 +14,28 @@
  * - Bilingual support (EN/NO)
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, _useEffect, useMemo } from 'react';
 import {
   Bell,
   Calendar,
-  User,
+  _User,
   Phone,
-  Mail,
+  _Mail,
   MessageSquare,
   Send,
-  Settings,
+  _Settings,
   Clock,
   CheckCircle,
   XCircle,
-  AlertCircle,
+  _AlertCircle,
   Plus,
   Edit3,
   Trash2,
   Play,
   Pause,
   BarChart2,
-  Filter,
-  RefreshCw,
+  _Filter,
+  _RefreshCw,
   Gift,
   Heart,
 } from 'lucide-react';
@@ -47,7 +47,10 @@ export const RECALL_TYPES = {
     label: { en: 'Overdue Patients', no: 'Forfalt Pasienter' },
     icon: Clock,
     color: 'red',
-    description: { en: 'Patients who missed appointments', no: 'Pasienter som har gått glipp av timer' },
+    description: {
+      en: 'Patients who missed appointments',
+      no: 'Pasienter som har gått glipp av timer',
+    },
   },
   REACTIVATION: {
     id: 'reactivation',
@@ -210,35 +213,42 @@ export default function RecallManager({
     const now = new Date();
     const sixWeeksAgo = new Date(now.getTime() - 42 * 24 * 60 * 60 * 1000);
 
-    return patients.map((patient) => {
-      const patientAppointments = appointments.filter((a) => a.patient_id === patient.id);
-      const lastAppointment = patientAppointments.sort(
-        (a, b) => new Date(b.date) - new Date(a.date)
-      )[0];
+    return patients
+      .map((patient) => {
+        const patientAppointments = appointments.filter((a) => a.patient_id === patient.id);
+        const lastAppointment = patientAppointments.sort(
+          (a, b) => new Date(b.date) - new Date(a.date)
+        )[0];
 
-      const lastVisitDate = lastAppointment ? new Date(lastAppointment.date) : null;
-      const daysSinceVisit = lastVisitDate
-        ? Math.floor((now - lastVisitDate) / (1000 * 60 * 60 * 24))
-        : null;
+        const lastVisitDate = lastAppointment ? new Date(lastAppointment.date) : null;
+        const daysSinceVisit = lastVisitDate
+          ? Math.floor((now - lastVisitDate) / (1000 * 60 * 60 * 24))
+          : null;
 
-      const needsReactivation = lastVisitDate && lastVisitDate < sixWeeksAgo;
-      const isBirthdayThisWeek = patient.date_of_birth && isUpcomingBirthday(patient.date_of_birth);
+        const needsReactivation = lastVisitDate && lastVisitDate < sixWeeksAgo;
+        const isBirthdayThisWeek =
+          patient.date_of_birth && isUpcomingBirthday(patient.date_of_birth);
 
-      return {
-        ...patient,
-        lastVisitDate,
-        daysSinceVisit,
-        needsReactivation,
-        isBirthdayThisWeek,
-        recallType: needsReactivation ? 'reactivation' : isBirthdayThisWeek ? 'birthday' : null,
-      };
-    }).filter((p) => p.recallType);
+        return {
+          ...patient,
+          lastVisitDate,
+          daysSinceVisit,
+          needsReactivation,
+          isBirthdayThisWeek,
+          recallType: needsReactivation ? 'reactivation' : isBirthdayThisWeek ? 'birthday' : null,
+        };
+      })
+      .filter((p) => p.recallType);
   }, [patients, appointments]);
 
   // Filter by selected type
   const filteredPatients = recallPatients.filter((p) => {
-    if (selectedType === 'reactivation') return p.needsReactivation;
-    if (selectedType === 'birthday') return p.isBirthdayThisWeek;
+    if (selectedType === 'reactivation') {
+      return p.needsReactivation;
+    }
+    if (selectedType === 'birthday') {
+      return p.isBirthdayThisWeek;
+    }
     return true;
   });
 
@@ -259,15 +269,14 @@ export default function RecallManager({
 
   const togglePatientSelection = (patientId) => {
     setSelectedPatients((prev) =>
-      prev.includes(patientId)
-        ? prev.filter((id) => id !== patientId)
-        : [...prev, patientId]
+      prev.includes(patientId) ? prev.filter((id) => id !== patientId) : [...prev, patientId]
     );
   };
 
   const handleSendRecalls = () => {
     const patientsToSend = filteredPatients.filter((p) => selectedPatients.includes(p.id));
-    const template = MESSAGE_TEMPLATES[language][selectedType] || MESSAGE_TEMPLATES.en[selectedType];
+    const template =
+      MESSAGE_TEMPLATES[language][selectedType] || MESSAGE_TEMPLATES.en[selectedType];
 
     patientsToSend.forEach((patient) => {
       const message = formatMessage(template, patient, clinicInfo);
@@ -352,31 +361,37 @@ export default function RecallManager({
         <div className="p-6">
           {/* Type Filters */}
           <div className="flex gap-2 mb-4">
-            {Object.values(RECALL_TYPES).slice(0, 3).map((type) => {
-              const Icon = type.icon;
-              const count = counts[type.id] || 0;
-              const isSelected = selectedType === type.id;
+            {Object.values(RECALL_TYPES)
+              .slice(0, 3)
+              .map((type) => {
+                const Icon = type.icon;
+                const count = counts[type.id] || 0;
+                const isSelected = selectedType === type.id;
 
-              return (
-                <button
-                  key={type.id}
-                  onClick={() => setSelectedType(type.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors
-                    ${isSelected
-                      ? `border-${type.color}-300 bg-${type.color}-50 text-${type.color}-700`
-                      : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'}`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span>{type.label[language] || type.label.en}</span>
-                  {count > 0 && (
-                    <span className={`px-1.5 py-0.5 text-xs rounded-full
-                      ${isSelected ? `bg-${type.color}-200` : 'bg-gray-200'}`}>
-                      {count}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
+                return (
+                  <button
+                    key={type.id}
+                    onClick={() => setSelectedType(type.id)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors
+                    ${
+                      isSelected
+                        ? `border-${type.color}-300 bg-${type.color}-50 text-${type.color}-700`
+                        : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span>{type.label[language] || type.label.en}</span>
+                    {count > 0 && (
+                      <span
+                        className={`px-1.5 py-0.5 text-xs rounded-full
+                      ${isSelected ? `bg-${type.color}-200` : 'bg-gray-200'}`}
+                      >
+                        {count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
           </div>
 
           {/* Patient List */}
@@ -386,7 +401,10 @@ export default function RecallManager({
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
-                    checked={selectedPatients.length === filteredPatients.length && filteredPatients.length > 0}
+                    checked={
+                      selectedPatients.length === filteredPatients.length &&
+                      filteredPatients.length > 0
+                    }
                     onChange={handleSelectAll}
                     className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
                   />
@@ -416,7 +434,10 @@ export default function RecallManager({
                 </div>
               ) : (
                 filteredPatients.map((patient) => (
-                  <div key={patient.id} className="px-4 py-3 flex items-center gap-4 hover:bg-gray-50">
+                  <div
+                    key={patient.id}
+                    className="px-4 py-3 flex items-center gap-4 hover:bg-gray-50"
+                  >
                     <input
                       type="checkbox"
                       checked={selectedPatients.includes(patient.id)}
@@ -429,7 +450,12 @@ export default function RecallManager({
                         {patient.first_name} {patient.last_name}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {patient.phone && <span className="mr-3"><Phone className="w-3 h-3 inline mr-1" />{patient.phone}</span>}
+                        {patient.phone && (
+                          <span className="mr-3">
+                            <Phone className="w-3 h-3 inline mr-1" />
+                            {patient.phone}
+                          </span>
+                        )}
                         {patient.daysSinceVisit !== null && (
                           <span>
                             {t.lastVisit}: {patient.daysSinceVisit} {t.daysSince}
@@ -479,16 +505,23 @@ export default function RecallManager({
                     <div>
                       <h4 className="font-medium text-gray-900">{campaign.name}</h4>
                       <p className="text-sm text-gray-500">
-                        {RECALL_TYPES[campaign.type.toUpperCase()]?.label[language] || campaign.type}
+                        {RECALL_TYPES[campaign.type.toUpperCase()]?.label[language] ||
+                          campaign.type}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className={`px-2 py-1 text-xs rounded-full
-                        ${campaign.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                      <span
+                        className={`px-2 py-1 text-xs rounded-full
+                        ${campaign.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}
+                      >
                         {campaign.active ? t.active : t.paused}
                       </span>
                       <button className="p-1.5 text-gray-400 hover:text-gray-600">
-                        {campaign.active ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                        {campaign.active ? (
+                          <Pause className="w-4 h-4" />
+                        ) : (
+                          <Play className="w-4 h-4" />
+                        )}
                       </button>
                       <button className="p-1.5 text-gray-400 hover:text-gray-600">
                         <Edit3 className="w-4 h-4" />
@@ -499,9 +532,15 @@ export default function RecallManager({
                     </div>
                   </div>
                   <div className="mt-3 flex gap-6 text-sm">
-                    <span className="text-gray-500">{t.sent}: <strong>{campaign.stats.sent}</strong></span>
-                    <span className="text-gray-500">{t.delivered}: <strong>{campaign.stats.delivered}</strong></span>
-                    <span className="text-gray-500">{t.responded}: <strong>{campaign.stats.responded}</strong></span>
+                    <span className="text-gray-500">
+                      {t.sent}: <strong>{campaign.stats.sent}</strong>
+                    </span>
+                    <span className="text-gray-500">
+                      {t.delivered}: <strong>{campaign.stats.delivered}</strong>
+                    </span>
+                    <span className="text-gray-500">
+                      {t.responded}: <strong>{campaign.stats.responded}</strong>
+                    </span>
                   </div>
                 </div>
               ))}
@@ -516,21 +555,31 @@ export default function RecallManager({
           <div className="grid grid-cols-3 gap-4 mb-6">
             <div className="bg-blue-50 rounded-lg p-4 text-center">
               <p className="text-3xl font-bold text-blue-600">{counts.total}</p>
-              <p className="text-sm text-blue-700">{language === 'no' ? 'Totalt Tilbakekall' : 'Total Recalls Needed'}</p>
+              <p className="text-sm text-blue-700">
+                {language === 'no' ? 'Totalt Tilbakekall' : 'Total Recalls Needed'}
+              </p>
             </div>
             <div className="bg-orange-50 rounded-lg p-4 text-center">
               <p className="text-3xl font-bold text-orange-600">{counts.reactivation}</p>
-              <p className="text-sm text-orange-700">{language === 'no' ? 'Reaktiveringer' : 'Reactivations'}</p>
+              <p className="text-sm text-orange-700">
+                {language === 'no' ? 'Reaktiveringer' : 'Reactivations'}
+              </p>
             </div>
             <div className="bg-purple-50 rounded-lg p-4 text-center">
               <p className="text-3xl font-bold text-purple-600">{counts.birthday}</p>
-              <p className="text-sm text-purple-700">{language === 'no' ? 'Bursdager' : 'Birthdays'}</p>
+              <p className="text-sm text-purple-700">
+                {language === 'no' ? 'Bursdager' : 'Birthdays'}
+              </p>
             </div>
           </div>
 
           <div className="text-center py-8 text-gray-500">
             <BarChart2 className="w-8 h-8 mx-auto mb-2 opacity-50" />
-            <p>{language === 'no' ? 'Detaljert analyse kommer snart' : 'Detailed analytics coming soon'}</p>
+            <p>
+              {language === 'no'
+                ? 'Detaljert analyse kommer snart'
+                : 'Detailed analytics coming soon'}
+            </p>
           </div>
         </div>
       )}
@@ -541,14 +590,19 @@ export default function RecallManager({
           <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full">
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <h3 className="font-semibold text-gray-900">{t.createCampaign}</h3>
-              <button onClick={() => setShowCampaignForm(false)} className="p-2 text-gray-400 hover:text-gray-600">
+              <button
+                onClick={() => setShowCampaignForm(false)}
+                className="p-2 text-gray-400 hover:text-gray-600"
+              >
                 <XCircle className="w-5 h-5" />
               </button>
             </div>
 
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t.campaignName}</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t.campaignName}
+                </label>
                 <input
                   type="text"
                   value={campaignForm.name}
@@ -594,7 +648,9 @@ export default function RecallManager({
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t.channel}</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t.channel}
+                  </label>
                   <select
                     value={campaignForm.channel}
                     onChange={(e) => setCampaignForm({ ...campaignForm, channel: e.target.value })}
@@ -607,7 +663,9 @@ export default function RecallManager({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t.schedule}</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t.schedule}
+                  </label>
                   <select
                     value={campaignForm.schedule}
                     onChange={(e) => setCampaignForm({ ...campaignForm, schedule: e.target.value })}
@@ -656,12 +714,7 @@ function isUpcomingBirthday(dateOfBirth) {
 // RECALL COMPACT - For dashboard widget
 // =============================================================================
 
-export function RecallCompact({
-  count = 0,
-  onClick,
-  language = 'en',
-  className = '',
-}) {
+export function RecallCompact({ count = 0, onClick, language = 'en', className = '' }) {
   const labels = {
     en: { title: 'Need Recall', viewAll: 'View All' },
     no: { title: 'Trenger Tilbakekalling', viewAll: 'Se Alle' },

@@ -3,7 +3,7 @@
  * Business logic for exercise management, prescriptions, and programs
  */
 
-import { query, transaction } from '../config/database.js';
+import { query, _transaction } from '../config/database.js';
 import logger from '../utils/logger.js';
 
 // ============================================================================
@@ -23,7 +23,7 @@ export const getAllExercises = async (organizationId, options = {}) => {
     search = null,
     tags = null,
     includeGlobal = true,
-    activeOnly = true
+    activeOnly = true,
   } = options;
 
   const offset = (page - 1) * limit;
@@ -64,7 +64,9 @@ export const getAllExercises = async (organizationId, options = {}) => {
   // Search filter (name and instructions)
   if (search) {
     params.push(`%${search}%`);
-    conditions.push(`(e.name_no ILIKE $${paramIndex} OR e.name_en ILIKE $${paramIndex} OR e.code ILIKE $${paramIndex})`);
+    conditions.push(
+      `(e.name_no ILIKE $${paramIndex} OR e.name_en ILIKE $${paramIndex} OR e.code ILIKE $${paramIndex})`
+    );
     paramIndex++;
   }
 
@@ -103,8 +105,8 @@ export const getAllExercises = async (organizationId, options = {}) => {
         total,
         page,
         limit,
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     };
   } catch (error) {
     logger.error('Error fetching exercises:', error);
@@ -181,7 +183,7 @@ export const createExercise = async (organizationId, exerciseData, createdBy) =>
     requires_supervision = false,
     source = 'custom',
     tags = [],
-    is_global = false
+    is_global = false,
   } = exerciseData;
 
   try {
@@ -197,11 +199,32 @@ export const createExercise = async (organizationId, exerciseData, createdBy) =>
         $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26
       ) RETURNING *`,
       [
-        organizationId, code, name_no, name_en, category, body_region, difficulty,
-        instructions_no, instructions_en, contraindications, precautions, common_errors,
-        video_url, image_url, thumbnail_url,
-        default_sets, default_reps, default_hold_seconds, default_rest_seconds, default_frequency,
-        equipment_needed, requires_supervision, source, tags, is_global, createdBy
+        organizationId,
+        code,
+        name_no,
+        name_en,
+        category,
+        body_region,
+        difficulty,
+        instructions_no,
+        instructions_en,
+        contraindications,
+        precautions,
+        common_errors,
+        video_url,
+        image_url,
+        thumbnail_url,
+        default_sets,
+        default_reps,
+        default_hold_seconds,
+        default_rest_seconds,
+        default_frequency,
+        equipment_needed,
+        requires_supervision,
+        source,
+        tags,
+        is_global,
+        createdBy,
       ]
     );
 
@@ -220,11 +243,28 @@ export const updateExercise = async (exerciseId, organizationId, updates) => {
   try {
     // Build dynamic update query
     const allowedFields = [
-      'name_no', 'name_en', 'category', 'body_region', 'difficulty',
-      'instructions_no', 'instructions_en', 'contraindications', 'precautions', 'common_errors',
-      'video_url', 'image_url', 'thumbnail_url',
-      'default_sets', 'default_reps', 'default_hold_seconds', 'default_rest_seconds', 'default_frequency',
-      'equipment_needed', 'requires_supervision', 'tags', 'is_active'
+      'name_no',
+      'name_en',
+      'category',
+      'body_region',
+      'difficulty',
+      'instructions_no',
+      'instructions_en',
+      'contraindications',
+      'precautions',
+      'common_errors',
+      'video_url',
+      'image_url',
+      'thumbnail_url',
+      'default_sets',
+      'default_reps',
+      'default_hold_seconds',
+      'default_rest_seconds',
+      'default_frequency',
+      'equipment_needed',
+      'requires_supervision',
+      'tags',
+      'is_active',
     ];
 
     const updateFields = [];
@@ -293,37 +333,33 @@ export const deleteExercise = async (exerciseId, organizationId) => {
 /**
  * Get available categories
  */
-export const getCategories = async () => {
-  return [
-    { id: 'stretching', name_no: 'Tøyning', name_en: 'Stretching' },
-    { id: 'strengthening', name_no: 'Styrke', name_en: 'Strengthening' },
-    { id: 'mobility', name_no: 'Mobilitet', name_en: 'Mobility' },
-    { id: 'balance', name_no: 'Balanse', name_en: 'Balance' },
-    { id: 'vestibular', name_no: 'Vestibulær', name_en: 'Vestibular' },
-    { id: 'breathing', name_no: 'Pust', name_en: 'Breathing' },
-    { id: 'posture', name_no: 'Holdning', name_en: 'Posture' },
-    { id: 'nerve_glide', name_no: 'Nervegliding', name_en: 'Nerve Glide' }
-  ];
-};
+export const getCategories = async () => [
+  { id: 'stretching', name_no: 'Tøyning', name_en: 'Stretching' },
+  { id: 'strengthening', name_no: 'Styrke', name_en: 'Strengthening' },
+  { id: 'mobility', name_no: 'Mobilitet', name_en: 'Mobility' },
+  { id: 'balance', name_no: 'Balanse', name_en: 'Balance' },
+  { id: 'vestibular', name_no: 'Vestibulær', name_en: 'Vestibular' },
+  { id: 'breathing', name_no: 'Pust', name_en: 'Breathing' },
+  { id: 'posture', name_no: 'Holdning', name_en: 'Posture' },
+  { id: 'nerve_glide', name_no: 'Nervegliding', name_en: 'Nerve Glide' },
+];
 
 /**
  * Get available body regions
  */
-export const getBodyRegions = async () => {
-  return [
-    { id: 'cervical', name_no: 'Nakke', name_en: 'Neck' },
-    { id: 'thoracic', name_no: 'Brystsøyle', name_en: 'Thoracic' },
-    { id: 'lumbar', name_no: 'Korsrygg', name_en: 'Lower Back' },
-    { id: 'shoulder', name_no: 'Skulder', name_en: 'Shoulder' },
-    { id: 'hip', name_no: 'Hofte', name_en: 'Hip' },
-    { id: 'knee', name_no: 'Kne', name_en: 'Knee' },
-    { id: 'ankle', name_no: 'Ankel', name_en: 'Ankle' },
-    { id: 'core', name_no: 'Kjerne', name_en: 'Core' },
-    { id: 'full_body', name_no: 'Helkropp', name_en: 'Full Body' },
-    { id: 'upper_extremity', name_no: 'Overekstremitet', name_en: 'Upper Extremity' },
-    { id: 'lower_extremity', name_no: 'Underekstremitet', name_en: 'Lower Extremity' }
-  ];
-};
+export const getBodyRegions = async () => [
+  { id: 'cervical', name_no: 'Nakke', name_en: 'Neck' },
+  { id: 'thoracic', name_no: 'Brystsøyle', name_en: 'Thoracic' },
+  { id: 'lumbar', name_no: 'Korsrygg', name_en: 'Lower Back' },
+  { id: 'shoulder', name_no: 'Skulder', name_en: 'Shoulder' },
+  { id: 'hip', name_no: 'Hofte', name_en: 'Hip' },
+  { id: 'knee', name_no: 'Kne', name_en: 'Knee' },
+  { id: 'ankle', name_no: 'Ankel', name_en: 'Ankle' },
+  { id: 'core', name_no: 'Kjerne', name_en: 'Core' },
+  { id: 'full_body', name_no: 'Helkropp', name_en: 'Full Body' },
+  { id: 'upper_extremity', name_no: 'Overekstremitet', name_en: 'Upper Extremity' },
+  { id: 'lower_extremity', name_no: 'Underekstremitet', name_en: 'Lower Extremity' },
+];
 
 // ============================================================================
 // PATIENT PRESCRIPTIONS
@@ -352,7 +388,7 @@ export const prescribeExercise = async (organizationId, prescriptionData) => {
     start_date,
     specific_days,
     reminder_enabled = false,
-    reminder_time
+    reminder_time,
   } = prescriptionData;
 
   try {
@@ -367,11 +403,26 @@ export const prescribeExercise = async (organizationId, prescriptionData) => {
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20
       ) RETURNING *`,
       [
-        organizationId, patient_id, encounter_id, prescribed_by,
-        exercise_id, exercise_code, exercise_name, exercise_instructions,
-        sets, reps, hold_seconds, rest_seconds, frequency, duration_weeks,
-        custom_instructions, progression_notes, start_date || new Date(), specific_days,
-        reminder_enabled, reminder_time
+        organizationId,
+        patient_id,
+        encounter_id,
+        prescribed_by,
+        exercise_id,
+        exercise_code,
+        exercise_name,
+        exercise_instructions,
+        sets,
+        reps,
+        hold_seconds,
+        rest_seconds,
+        frequency,
+        duration_weeks,
+        custom_instructions,
+        progression_notes,
+        start_date || new Date(),
+        specific_days,
+        reminder_enabled,
+        reminder_time,
       ]
     );
 
@@ -448,8 +499,8 @@ export const getPatientExercises = async (patientId, organizationId, options = {
         total,
         page,
         limit,
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     };
   } catch (error) {
     logger.error('Error fetching patient exercises:', error);
@@ -496,10 +547,22 @@ export const getPrescriptionById = async (prescriptionId, organizationId) => {
 export const updatePrescription = async (prescriptionId, organizationId, updates) => {
   try {
     const allowedFields = [
-      'sets', 'reps', 'hold_seconds', 'rest_seconds', 'frequency', 'duration_weeks',
-      'custom_instructions', 'progression_notes', 'end_date', 'specific_days',
-      'reminder_enabled', 'reminder_time', 'patient_rating', 'patient_feedback',
-      'clinician_rating', 'clinician_notes'
+      'sets',
+      'reps',
+      'hold_seconds',
+      'rest_seconds',
+      'frequency',
+      'duration_weeks',
+      'custom_instructions',
+      'progression_notes',
+      'end_date',
+      'specific_days',
+      'reminder_enabled',
+      'reminder_time',
+      'patient_rating',
+      'patient_feedback',
+      'clinician_rating',
+      'clinician_notes',
     ];
 
     const updateFields = [];
@@ -544,14 +607,7 @@ export const updatePrescription = async (prescriptionId, organizationId, updates
  * Log compliance for a prescription
  */
 export const logCompliance = async (prescriptionId, organizationId, complianceData) => {
-  const {
-    date,
-    completed,
-    pain_level,
-    notes,
-    sets_completed,
-    difficulty_rating
-  } = complianceData;
+  const { date, completed, pain_level, notes, sets_completed, difficulty_rating } = complianceData;
 
   const logDate = date || new Date().toISOString().split('T')[0];
 
@@ -570,11 +626,11 @@ export const logCompliance = async (prescriptionId, organizationId, complianceDa
             notes,
             sets_completed,
             difficulty_rating,
-            logged_at: new Date().toISOString()
-          }
+            logged_at: new Date().toISOString(),
+          },
         }),
         prescriptionId,
-        organizationId
+        organizationId,
       ]
     );
 
@@ -660,7 +716,7 @@ export const getAllPrograms = async (organizationId, options = {}) => {
     targetCondition = null,
     bodyRegion = null,
     includeGlobal = true,
-    activeOnly = true
+    activeOnly = true,
   } = options;
 
   const offset = (page - 1) * limit;
@@ -716,8 +772,8 @@ export const getAllPrograms = async (organizationId, options = {}) => {
         total,
         page,
         limit,
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     };
   } catch (error) {
     logger.error('Error fetching exercise programs:', error);
@@ -762,7 +818,7 @@ export const createProgram = async (organizationId, programData, createdBy) => {
     exercises = [],
     duration_weeks = 6,
     phases = 1,
-    is_global = false
+    is_global = false,
   } = programData;
 
   try {
@@ -774,9 +830,19 @@ export const createProgram = async (organizationId, programData, createdBy) => {
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
       RETURNING *`,
       [
-        organizationId, name_no, name_en, description_no, description_en,
-        target_condition, body_region, difficulty, JSON.stringify(exercises), duration_weeks,
-        phases, is_global, createdBy
+        organizationId,
+        name_no,
+        name_en,
+        description_no,
+        description_en,
+        target_condition,
+        body_region,
+        difficulty,
+        JSON.stringify(exercises),
+        duration_weeks,
+        phases,
+        is_global,
+        createdBy,
       ]
     );
 
@@ -794,9 +860,17 @@ export const createProgram = async (organizationId, programData, createdBy) => {
 export const updateProgram = async (programId, organizationId, updates) => {
   try {
     const allowedFields = [
-      'name_no', 'name_en', 'description_no', 'description_en',
-      'target_condition', 'body_region', 'difficulty', 'exercises',
-      'duration_weeks', 'phases', 'is_active'
+      'name_no',
+      'name_en',
+      'description_no',
+      'description_en',
+      'target_condition',
+      'body_region',
+      'difficulty',
+      'exercises',
+      'duration_weeks',
+      'phases',
+      'is_active',
     ];
 
     const updateFields = [];
@@ -872,7 +946,7 @@ export const assignProgramToPatient = async (organizationId, assignmentData) => 
     encounter_id,
     prescribed_by,
     custom_exercises,
-    custom_duration_weeks
+    custom_duration_weeks,
   } = assignmentData;
 
   try {
@@ -890,10 +964,15 @@ export const assignProgramToPatient = async (organizationId, assignmentData) => 
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING *`,
       [
-        organizationId, patient_id, program_id, encounter_id, prescribed_by,
-        program.name_no, program.description_no,
+        organizationId,
+        patient_id,
+        program_id,
+        encounter_id,
+        prescribed_by,
+        program.name_no,
+        program.description_no,
         custom_exercises ? JSON.stringify(custom_exercises) : null,
-        custom_duration_weeks || program.duration_weeks
+        custom_duration_weeks || program.duration_weeks,
       ]
     );
 
@@ -912,15 +991,14 @@ export const assignProgramToPatient = async (organizationId, assignmentData) => 
         hold_seconds: exercise.hold_seconds,
         frequency: exercise.frequency,
         duration_weeks: custom_duration_weeks || program.duration_weeks,
-        custom_instructions: exercise.notes
+        custom_instructions: exercise.notes,
       });
     }
 
     // Increment program usage count
-    await query(
-      `UPDATE exercise_programs SET usage_count = usage_count + 1 WHERE id = $1`,
-      [program_id]
-    );
+    await query(`UPDATE exercise_programs SET usage_count = usage_count + 1 WHERE id = $1`, [
+      program_id,
+    ]);
 
     logger.info(`Program ${program_id} assigned to patient ${patient_id}`);
     return result.rows[0];
@@ -1097,5 +1175,5 @@ export default {
   // Statistics
   getExerciseStats,
   getTopPrescribedExercises,
-  getComplianceStats
+  getComplianceStats,
 };

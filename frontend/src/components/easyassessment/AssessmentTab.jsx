@@ -1,14 +1,14 @@
 import {
   SmartTextInput,
   VASComparisonDisplay,
-  OutcomeAssessment,
+  _OutcomeAssessment,
   CLINICAL_REASONING_PHRASES,
   QUESTIONNAIRE_TYPES,
 } from '../assessment';
 
 export default function AssessmentTab({
   encounterData,
-  setEncounterData,
+  _setEncounterData,
   language,
   aiAvailable,
   updateField,
@@ -16,9 +16,9 @@ export default function AssessmentTab({
   removeDiagnosisCode,
   commonDiagnoses,
   buildAIContext,
-  showOutcomeAssessment,
+  _showOutcomeAssessment,
   setShowOutcomeAssessment,
-  outcomeType,
+  _outcomeType,
   setOutcomeType,
 }) {
   return (

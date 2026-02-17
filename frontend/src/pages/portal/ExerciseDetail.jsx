@@ -4,8 +4,8 @@
  * Mobile-responsive with Norwegian text
  */
 
-import React, { useState, useEffect } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import _React, { useState, useEffect } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
   ArrowLeft,
   Loader2,
@@ -20,24 +20,24 @@ import {
   X,
   ChevronDown,
   ChevronUp,
-  History
-} from 'lucide-react'
-import { patientApi, getStoredToken, clearStoredToken } from '../../api/patientApi'
-import VimeoPlayer from '../../components/exercises/VimeoPlayer'
+  History,
+} from 'lucide-react';
+import { patientApi, getStoredToken, clearStoredToken } from '../../api/patientApi';
+import VimeoPlayer from '../../components/exercises/VimeoPlayer';
 
 const ExerciseDetail = () => {
-  const navigate = useNavigate()
-  const { prescriptionId, exerciseId } = useParams()
-  const [searchParams] = useSearchParams()
+  const navigate = useNavigate();
+  const { prescriptionId, exerciseId } = useParams();
+  const [searchParams] = useSearchParams();
 
   // State
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [data, setData] = useState(null)
-  const [showVideo, setShowVideo] = useState(false)
-  const [showFeedbackModal, setShowFeedbackModal] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
-  const [showHistory, setShowHistory] = useState(false)
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [data, setData] = useState(null);
+  const [showVideo, setShowVideo] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
   // Feedback form state
   const [feedbackData, setFeedbackData] = useState({
@@ -45,100 +45,108 @@ const ExerciseDetail = () => {
     repsCompleted: 10,
     difficultyRating: 3,
     painRating: 0,
-    notes: ''
-  })
+    notes: '',
+  });
 
   // Get token
-  const token = searchParams.get('token') || getStoredToken()
+  const token = searchParams.get('token') || getStoredToken();
 
   // Load exercise data on mount
   useEffect(() => {
     if (!token) {
-      navigate('/portal/login')
-      return
+      navigate('/portal/login');
+      return;
     }
-    loadExercise()
-  }, [token, prescriptionId, exerciseId])
+    loadExercise();
+  }, [token, prescriptionId, exerciseId]);
 
   // Load exercise detail
   const loadExercise = async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
-      const response = await patientApi.getExercise(token, prescriptionId, exerciseId)
+      const response = await patientApi.getExercise(token, prescriptionId, exerciseId);
 
       if (response.success) {
-        setData(response.data)
+        setData(response.data);
         // Pre-fill feedback with exercise defaults
-        setFeedbackData(prev => ({
+        setFeedbackData((prev) => ({
           ...prev,
           setsCompleted: response.data.exercise.sets || 3,
-          repsCompleted: response.data.exercise.reps || 10
-        }))
+          repsCompleted: response.data.exercise.reps || 10,
+        }));
       }
     } catch (err) {
-      console.error('Error loading exercise:', err)
+      console.error('Error loading exercise:', err);
       if (err.status === 401) {
-        clearStoredToken()
-        navigate('/portal/login')
-        return
+        clearStoredToken();
+        navigate('/portal/login');
+        return;
       }
-      setError(err.message || 'Kunne ikke laste øvelsen')
+      setError(err.message || 'Kunne ikke laste øvelsen');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Submit progress
   const handleSubmitProgress = async () => {
     try {
-      setSubmitting(true)
+      setSubmitting(true);
 
       const response = await patientApi.recordProgress(
         token,
         prescriptionId,
         exerciseId,
         feedbackData
-      )
+      );
 
       if (response.success) {
-        setShowFeedbackModal(false)
+        setShowFeedbackModal(false);
         // Refresh to show updated completion status
-        loadExercise()
+        loadExercise();
       }
     } catch (err) {
-      console.error('Error recording progress:', err)
-      setError(err.message || 'Kunne ikke registrere fremgang')
+      console.error('Error recording progress:', err);
+      setError(err.message || 'Kunne ikke registrere fremgang');
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
   // Go back
   const handleBack = () => {
-    navigate(`/portal/mine-øvelser?token=${token}`)
-  }
+    navigate(`/portal/mine-øvelser?token=${token}`);
+  };
 
   // Get difficulty color
   const getDifficultyColor = (level) => {
     switch (level) {
-      case 'beginner': return 'bg-green-100 text-green-800'
-      case 'intermediate': return 'bg-yellow-100 text-yellow-800'
-      case 'advanced': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'beginner':
+        return 'bg-green-100 text-green-800';
+      case 'intermediate':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'advanced':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
-  }
+  };
 
   // Get difficulty label
   const getDifficultyLabel = (level) => {
     switch (level) {
-      case 'beginner': return 'Nybegynner'
-      case 'intermediate': return 'Middels'
-      case 'advanced': return 'Avansert'
-      default: return level
+      case 'beginner':
+        return 'Nybegynner';
+      case 'intermediate':
+        return 'Middels';
+      case 'advanced':
+        return 'Avansert';
+      default:
+        return level;
     }
-  }
+  };
 
   // Loading state
   if (loading) {
@@ -149,7 +157,7 @@ const ExerciseDetail = () => {
           <p className="text-gray-600">Laster ovelse...</p>
         </div>
       </div>
-    )
+    );
   }
 
   // Error state
@@ -160,9 +168,7 @@ const ExerciseDetail = () => {
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertTriangle className="w-8 h-8 text-red-600" />
           </div>
-          <h1 className="text-xl font-semibold text-gray-900 mb-2">
-            Kunne ikke laste øvelsen
-          </h1>
+          <h1 className="text-xl font-semibold text-gray-900 mb-2">Kunne ikke laste øvelsen</h1>
           <p className="text-gray-600 mb-6">{error}</p>
           <button
             onClick={handleBack}
@@ -172,10 +178,10 @@ const ExerciseDetail = () => {
           </button>
         </div>
       </div>
-    )
+    );
   }
 
-  const exercise = data?.exercise
+  const exercise = data?.exercise;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -190,9 +196,7 @@ const ExerciseDetail = () => {
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div className="flex-1 min-w-0">
-              <h1 className="font-semibold text-gray-900 truncate">
-                {exercise?.name || 'Ovelse'}
-              </h1>
+              <h1 className="font-semibold text-gray-900 truncate">{exercise?.name || 'Ovelse'}</h1>
               <p className="text-sm text-gray-500">{data?.clinic?.name}</p>
             </div>
           </div>
@@ -253,7 +257,9 @@ const ExerciseDetail = () => {
               </span>
             )}
             {exercise?.difficultyLevel && (
-              <span className={`px-3 py-1 rounded-full text-sm ${getDifficultyColor(exercise.difficultyLevel)}`}>
+              <span
+                className={`px-3 py-1 rounded-full text-sm ${getDifficultyColor(exercise.difficultyLevel)}`}
+              >
                 {getDifficultyLabel(exercise.difficultyLevel)}
               </span>
             )}
@@ -285,9 +291,7 @@ const ExerciseDetail = () => {
                 Hold {exercise.holdSeconds} sek
               </span>
             )}
-            {exercise?.frequencyPerDay && (
-              <span>{exercise.frequencyPerDay}x daglig</span>
-            )}
+            {exercise?.frequencyPerDay && <span>{exercise.frequencyPerDay}x daglig</span>}
           </div>
         </div>
 
@@ -296,9 +300,7 @@ const ExerciseDetail = () => {
           {/* Custom Instructions */}
           {exercise?.customInstructions && (
             <div className="p-4 bg-blue-50 rounded-xl">
-              <h3 className="text-sm font-medium text-blue-900 mb-2">
-                Spesielle instruksjoner
-              </h3>
+              <h3 className="text-sm font-medium text-blue-900 mb-2">Spesielle instruksjoner</h3>
               <p className="text-sm text-blue-800 whitespace-pre-line">
                 {exercise.customInstructions}
               </p>
@@ -309,9 +311,7 @@ const ExerciseDetail = () => {
           {exercise?.instructions && (
             <div className="bg-white rounded-xl p-4 shadow-sm">
               <h3 className="font-medium text-gray-900 mb-2">Instruksjoner</h3>
-              <p className="text-sm text-gray-600 whitespace-pre-line">
-                {exercise.instructions}
-              </p>
+              <p className="text-sm text-gray-600 whitespace-pre-line">{exercise.instructions}</p>
             </div>
           )}
 
@@ -319,9 +319,7 @@ const ExerciseDetail = () => {
           {exercise?.description && (
             <div className="bg-white rounded-xl p-4 shadow-sm">
               <h3 className="font-medium text-gray-900 mb-2">Beskrivelse</h3>
-              <p className="text-sm text-gray-600 whitespace-pre-line">
-                {exercise.description}
-              </p>
+              <p className="text-sm text-gray-600 whitespace-pre-line">{exercise.description}</p>
             </div>
           )}
 
@@ -369,9 +367,7 @@ const ExerciseDetail = () => {
                 <div className="flex items-center gap-2">
                   <History className="w-5 h-5 text-gray-400" />
                   <span className="font-medium text-gray-900">Fremgangshistorikk</span>
-                  <span className="text-sm text-gray-500">
-                    ({exercise.progressHistory.length})
-                  </span>
+                  <span className="text-sm text-gray-500">({exercise.progressHistory.length})</span>
                 </div>
                 {showHistory ? (
                   <ChevronUp className="w-5 h-5 text-gray-400" />
@@ -390,11 +386,11 @@ const ExerciseDetail = () => {
                             day: 'numeric',
                             month: 'short',
                             hour: '2-digit',
-                            minute: '2-digit'
+                            minute: '2-digit',
                           })}
                         </span>
                         <div className="flex items-center gap-1">
-                          {[1, 2, 3, 4, 5].map(star => (
+                          {[1, 2, 3, 4, 5].map((star) => (
                             <Star
                               key={star}
                               className={`w-3 h-3 ${
@@ -461,9 +457,7 @@ const ExerciseDetail = () => {
 
         {/* Contact Footer */}
         <div className="p-4 text-center text-sm text-gray-500 pb-24">
-          <p>
-            Stopp øvelsen hvis du opplever økt smerte.
-          </p>
+          <p>Stopp øvelsen hvis du opplever økt smerte.</p>
           {data?.clinic?.phone && (
             <a
               href={`tel:${data.clinic.phone}`}
@@ -513,10 +507,12 @@ const ExerciseDetail = () => {
                   <input
                     type="number"
                     value={feedbackData.setsCompleted}
-                    onChange={(e) => setFeedbackData(prev => ({
-                      ...prev,
-                      setsCompleted: parseInt(e.target.value) || 0
-                    }))}
+                    onChange={(e) =>
+                      setFeedbackData((prev) => ({
+                        ...prev,
+                        setsCompleted: parseInt(e.target.value) || 0,
+                      }))
+                    }
                     className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     min="0"
                     max="20"
@@ -529,10 +525,12 @@ const ExerciseDetail = () => {
                   <input
                     type="number"
                     value={feedbackData.repsCompleted}
-                    onChange={(e) => setFeedbackData(prev => ({
-                      ...prev,
-                      repsCompleted: parseInt(e.target.value) || 0
-                    }))}
+                    onChange={(e) =>
+                      setFeedbackData((prev) => ({
+                        ...prev,
+                        repsCompleted: parseInt(e.target.value) || 0,
+                      }))
+                    }
                     className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     min="0"
                     max="100"
@@ -546,11 +544,13 @@ const ExerciseDetail = () => {
                   Hvor vanskelig var øvelsen?
                 </label>
                 <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5].map(rating => (
+                  {[1, 2, 3, 4, 5].map((rating) => (
                     <button
                       key={rating}
                       type="button"
-                      onClick={() => setFeedbackData(prev => ({ ...prev, difficultyRating: rating }))}
+                      onClick={() =>
+                        setFeedbackData((prev) => ({ ...prev, difficultyRating: rating }))
+                      }
                       className={`flex-1 py-2.5 rounded-lg border transition-colors ${
                         feedbackData.difficultyRating === rating
                           ? 'bg-blue-600 text-white border-blue-600'
@@ -575,10 +575,12 @@ const ExerciseDetail = () => {
                 <input
                   type="range"
                   value={feedbackData.painRating}
-                  onChange={(e) => setFeedbackData(prev => ({
-                    ...prev,
-                    painRating: parseInt(e.target.value)
-                  }))}
+                  onChange={(e) =>
+                    setFeedbackData((prev) => ({
+                      ...prev,
+                      painRating: parseInt(e.target.value),
+                    }))
+                  }
                   className="w-full accent-blue-600"
                   min="0"
                   max="10"
@@ -597,7 +599,7 @@ const ExerciseDetail = () => {
                 </label>
                 <textarea
                   value={feedbackData.notes}
-                  onChange={(e) => setFeedbackData(prev => ({ ...prev, notes: e.target.value }))}
+                  onChange={(e) => setFeedbackData((prev) => ({ ...prev, notes: e.target.value }))}
                   className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                   rows={3}
                   placeholder="Hvordan føltes øvelsen?"
@@ -627,7 +629,7 @@ const ExerciseDetail = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default ExerciseDetail
+export default ExerciseDetail;

@@ -32,7 +32,7 @@ export const logAudit = async ({
   changes = null,
   reason = null,
   ipAddress = null,
-  userAgent = null
+  userAgent = null,
 }) => {
   try {
     await query(
@@ -60,7 +60,7 @@ export const logAudit = async ({
         changes ? JSON.stringify(changes) : null,
         reason,
         ipAddress,
-        userAgent
+        userAgent,
       ]
     );
 
@@ -69,7 +69,7 @@ export const logAudit = async ({
       userId,
       action,
       resourceType,
-      resourceId
+      resourceId,
     });
   } catch (error) {
     logger.error('Failed to create audit log', {
@@ -77,7 +77,7 @@ export const logAudit = async ({
       organizationId,
       userId,
       action,
-      resourceType
+      resourceType,
     });
     // Don't throw - audit logging should not break the application
   }
@@ -88,58 +88,59 @@ export const logAudit = async ({
  * Automatically logs actions based on HTTP method
  * @param {string} resourceType - Type of resource being accessed
  */
-export const auditMiddleware = (resourceType) => {
-  return async (req, res, next) => {
-    // Store original send function
-    const originalSend = res.send;
+export const auditMiddleware = (resourceType) => async (req, res, next) => {
+  // Store original send function
+  const originalSend = res.send;
 
-    // Override send to capture response
-    res.send = function (data) {
-      // Determine action based on method and status
-      let action;
-      if (res.statusCode >= 200 && res.statusCode < 300) {
-        switch (req.method) {
-          case 'POST':
-            action = 'CREATE';
-            break;
-          case 'GET':
-            action = 'READ';
-            break;
-          case 'PUT':
-          case 'PATCH':
-            action = 'UPDATE';
-            break;
-          case 'DELETE':
-            action = 'DELETE';
-            break;
-          default:
-            action = req.method;
-        }
-
-        // Log the audit event
-        logAudit({
-          organizationId: req.organizationId,
-          userId: req.user?.id,
-          userEmail: req.user?.email,
-          userRole: req.user?.role,
-          action,
-          resourceType,
-          resourceId: req.params.id || req.body?.id,
-          changes: req.method !== 'GET' ? {
-            old: req.originalData,
-            new: req.body
-          } : null,
-          ipAddress: req.ip || req.connection.remoteAddress,
-          userAgent: req.get('user-agent')
-        });
+  // Override send to capture response
+  res.send = function (data) {
+    // Determine action based on method and status
+    let action;
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      switch (req.method) {
+        case 'POST':
+          action = 'CREATE';
+          break;
+        case 'GET':
+          action = 'READ';
+          break;
+        case 'PUT':
+        case 'PATCH':
+          action = 'UPDATE';
+          break;
+        case 'DELETE':
+          action = 'DELETE';
+          break;
+        default:
+          action = req.method;
       }
 
-      // Call original send
-      originalSend.call(this, data);
-    };
+      // Log the audit event
+      logAudit({
+        organizationId: req.organizationId,
+        userId: req.user?.id,
+        userEmail: req.user?.email,
+        userRole: req.user?.role,
+        action,
+        resourceType,
+        resourceId: req.params.id || req.body?.id,
+        changes:
+          req.method !== 'GET'
+            ? {
+                old: req.originalData,
+                new: req.body,
+              }
+            : null,
+        ipAddress: req.ip || req.connection.remoteAddress,
+        userAgent: req.get('user-agent'),
+      });
+    }
 
-    next();
+    // Call original send
+    originalSend.call(this, data);
   };
+
+  next();
 };
 
 /**
@@ -168,7 +169,7 @@ export const getResourceAuditLogs = async (resourceType, resourceId, limit = 50)
     logger.error('Failed to retrieve audit logs', {
       error: error.message,
       resourceType,
-      resourceId
+      resourceId,
     });
     throw error;
   }
@@ -184,11 +185,7 @@ export const getResourceAuditLogs = async (resourceType, resourceId, limit = 50)
  * @returns {Promise<Array>} Array of audit logs
  */
 export const getUserAuditLogs = async (userId, options = {}) => {
-  const {
-    startDate = null,
-    endDate = null,
-    limit = 100
-  } = options;
+  const { startDate = null, endDate = null, limit = 100 } = options;
 
   try {
     let queryText = `
@@ -216,7 +213,7 @@ export const getUserAuditLogs = async (userId, options = {}) => {
   } catch (error) {
     logger.error('Failed to retrieve user audit logs', {
       error: error.message,
-      userId
+      userId,
     });
     throw error;
   }
@@ -247,14 +244,14 @@ export const exportAuditLogs = async (organizationId, startDate, endDate) => {
       organizationId,
       count: result.rows.length,
       startDate,
-      endDate
+      endDate,
     });
 
     return result.rows;
   } catch (error) {
     logger.error('Failed to export audit logs', {
       error: error.message,
-      organizationId
+      organizationId,
     });
     throw error;
   }
@@ -265,5 +262,5 @@ export default {
   auditMiddleware,
   getResourceAuditLogs,
   getUserAuditLogs,
-  exportAuditLogs
+  exportAuditLogs,
 };

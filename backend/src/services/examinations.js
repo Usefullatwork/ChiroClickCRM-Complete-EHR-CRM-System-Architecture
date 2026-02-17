@@ -600,20 +600,38 @@ export const createTemplateSet = async (setData) => {
 export const mapFindingsToObjective = (existingObjective, examData, storedFindings = []) => {
   const objective = { ...existingObjective };
 
-  if (examData.observation) objective.observation = examData.observation;
-  if (examData.palpation) objective.palpation = examData.palpation;
-  if (examData.rom) objective.rom = examData.rom;
-  if (examData.ortho_tests) objective.ortho_tests = examData.ortho_tests;
-  if (examData.neuro_tests) objective.neuro_tests = examData.neuro_tests;
-  if (examData.vital_signs) objective.vital_signs = examData.vital_signs;
+  if (examData.observation) {
+    objective.observation = examData.observation;
+  }
+  if (examData.palpation) {
+    objective.palpation = examData.palpation;
+  }
+  if (examData.rom) {
+    objective.rom = examData.rom;
+  }
+  if (examData.ortho_tests) {
+    objective.ortho_tests = examData.ortho_tests;
+  }
+  if (examData.neuro_tests) {
+    objective.neuro_tests = examData.neuro_tests;
+  }
+  if (examData.vital_signs) {
+    objective.vital_signs = examData.vital_signs;
+  }
 
   if (storedFindings.length > 0) {
     const findingsSummary = storedFindings
       .map((f) => {
         let text = f.test_name || '';
-        if (f.result) text += `: ${f.result}`;
-        if (f.laterality) text += ` (${f.laterality})`;
-        if (f.findings_text) text += ` - ${f.findings_text}`;
+        if (f.result) {
+          text += `: ${f.result}`;
+        }
+        if (f.laterality) {
+          text += ` (${f.laterality})`;
+        }
+        if (f.findings_text) {
+          text += ` - ${f.findings_text}`;
+        }
         return text;
       })
       .filter(Boolean);

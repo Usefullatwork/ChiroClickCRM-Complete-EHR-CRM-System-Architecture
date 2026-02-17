@@ -8,7 +8,7 @@
  * - Generates narrative for SOAP
  */
 
-import React, { useState } from 'react';
+import _React, { useState } from 'react';
 import { ArrowLeft, MessageSquare } from 'lucide-react';
 
 const TRANSLATIONS = {
@@ -25,32 +25,102 @@ const TRANSLATIONS = {
     customPlaceholder: 'Beskriv ditt problem...',
     continueButton: 'Fortsett',
     back: 'Tilbake',
-  }
+  },
 };
 
 const COMMON_COMPLAINTS = {
   en: [
-    { id: 'low_back', label: 'Lower back pain', icon: '🔻', description: 'Pain in the lower spine area' },
-    { id: 'neck', label: 'Neck pain/stiffness', icon: '🔺', description: 'Neck discomfort or limited movement' },
+    {
+      id: 'low_back',
+      label: 'Lower back pain',
+      icon: '🔻',
+      description: 'Pain in the lower spine area',
+    },
+    {
+      id: 'neck',
+      label: 'Neck pain/stiffness',
+      icon: '🔺',
+      description: 'Neck discomfort or limited movement',
+    },
     { id: 'headache', label: 'Headaches', icon: '🤕', description: 'Head pain or migraines' },
-    { id: 'shoulder', label: 'Shoulder pain', icon: '💪', description: 'Shoulder or upper arm pain' },
-    { id: 'sciatica', label: 'Leg pain/sciatica', icon: '🦵', description: 'Pain radiating down the leg' },
-    { id: 'upper_back', label: 'Upper back pain', icon: '🔙', description: 'Pain between the shoulders' },
-    { id: 'maintenance', label: 'Maintenance visit', icon: '✅', description: 'Regular wellness check' },
-    { id: 'followup', label: 'Follow-up (same issue)', icon: '🔄', description: 'Continuing previous treatment' },
+    {
+      id: 'shoulder',
+      label: 'Shoulder pain',
+      icon: '💪',
+      description: 'Shoulder or upper arm pain',
+    },
+    {
+      id: 'sciatica',
+      label: 'Leg pain/sciatica',
+      icon: '🦵',
+      description: 'Pain radiating down the leg',
+    },
+    {
+      id: 'upper_back',
+      label: 'Upper back pain',
+      icon: '🔙',
+      description: 'Pain between the shoulders',
+    },
+    {
+      id: 'maintenance',
+      label: 'Maintenance visit',
+      icon: '✅',
+      description: 'Regular wellness check',
+    },
+    {
+      id: 'followup',
+      label: 'Follow-up (same issue)',
+      icon: '🔄',
+      description: 'Continuing previous treatment',
+    },
     { id: 'other', label: 'Other...', icon: '✏️', description: 'Something else' },
   ],
   no: [
-    { id: 'low_back', label: 'Korsryggssmerter', icon: '🔻', description: 'Smerter i nedre del av ryggen' },
-    { id: 'neck', label: 'Nakkesmerter/stivhet', icon: '🔺', description: 'Ubehag eller stivhet i nakken' },
+    {
+      id: 'low_back',
+      label: 'Korsryggssmerter',
+      icon: '🔻',
+      description: 'Smerter i nedre del av ryggen',
+    },
+    {
+      id: 'neck',
+      label: 'Nakkesmerter/stivhet',
+      icon: '🔺',
+      description: 'Ubehag eller stivhet i nakken',
+    },
     { id: 'headache', label: 'Hodepine', icon: '🤕', description: 'Hodepine eller migrene' },
-    { id: 'shoulder', label: 'Skuldersmerter', icon: '💪', description: 'Smerter i skulder eller overarm' },
-    { id: 'sciatica', label: 'Bensmerter/isjias', icon: '🦵', description: 'Smerter som stråler ned i benet' },
-    { id: 'upper_back', label: 'Øvre ryggplager', icon: '🔙', description: 'Smerter mellom skulderbladene' },
-    { id: 'maintenance', label: 'Vedlikeholdstime', icon: '✅', description: 'Regelmessig velvære-sjekk' },
-    { id: 'followup', label: 'Oppfølging (samme problem)', icon: '🔄', description: 'Fortsetter tidligere behandling' },
+    {
+      id: 'shoulder',
+      label: 'Skuldersmerter',
+      icon: '💪',
+      description: 'Smerter i skulder eller overarm',
+    },
+    {
+      id: 'sciatica',
+      label: 'Bensmerter/isjias',
+      icon: '🦵',
+      description: 'Smerter som stråler ned i benet',
+    },
+    {
+      id: 'upper_back',
+      label: 'Øvre ryggplager',
+      icon: '🔙',
+      description: 'Smerter mellom skulderbladene',
+    },
+    {
+      id: 'maintenance',
+      label: 'Vedlikeholdstime',
+      icon: '✅',
+      description: 'Regelmessig velvære-sjekk',
+    },
+    {
+      id: 'followup',
+      label: 'Oppfølging (samme problem)',
+      icon: '🔄',
+      description: 'Fortsetter tidligere behandling',
+    },
     { id: 'other', label: 'Annet...', icon: '✏️', description: 'Noe annet' },
-  ]
+  ],
 };
 
 export default function ChiefComplaintCapture({ onNext, onBack, lang = 'no' }) {
@@ -65,43 +135,41 @@ export default function ChiefComplaintCapture({ onNext, onBack, lang = 'no' }) {
     if (id === 'other') {
       setShowCustom(true);
       if (!selected.includes('other')) {
-        setSelected(prev => [...prev, 'other']);
+        setSelected((prev) => [...prev, 'other']);
       }
       return;
     }
 
-    setSelected(prev =>
-      prev.includes(id)
-        ? prev.filter(x => x !== id)
-        : [...prev, id]
-    );
+    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
 
   const handleNext = () => {
     // Generate narrative from selections
     const selectedLabels = selected
-      .filter(id => id !== 'other')
-      .map(id => complaints.find(c => c.id === id)?.label)
+      .filter((id) => id !== 'other')
+      .map((id) => complaints.find((c) => c.id === id)?.label)
       .filter(Boolean);
 
     let narrative = '';
     if (selectedLabels.length > 0) {
-      narrative = lang === 'no'
-        ? `Pasient kommer inn for: ${selectedLabels.join(', ')}.`
-        : `Patient presents for: ${selectedLabels.join(', ')}.`;
+      narrative =
+        lang === 'no'
+          ? `Pasient kommer inn for: ${selectedLabels.join(', ')}.`
+          : `Patient presents for: ${selectedLabels.join(', ')}.`;
     }
 
     if (customText.trim()) {
       narrative += narrative ? '\n' : '';
-      narrative += lang === 'no'
-        ? `Pasientens beskrivelse: "${customText.trim()}"`
-        : `Patient description: "${customText.trim()}"`;
+      narrative +=
+        lang === 'no'
+          ? `Pasientens beskrivelse: "${customText.trim()}"`
+          : `Patient description: "${customText.trim()}"`;
     }
 
     onNext({
-      complaintCategories: selected.filter(id => id !== 'other'),
+      complaintCategories: selected.filter((id) => id !== 'other'),
       chiefComplaint: customText.trim(),
-      narrative
+      narrative,
     });
   };
 
@@ -121,25 +189,22 @@ export default function ChiefComplaintCapture({ onNext, onBack, lang = 'no' }) {
 
       {/* Header */}
       <div className="text-center mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">
-          {t.title}
-        </h1>
-        <p className="text-lg text-slate-500">
-          {t.subtitle}
-        </p>
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">{t.title}</h1>
+        <p className="text-lg text-slate-500">{t.subtitle}</p>
       </div>
 
       {/* Complaint buttons - 2 column grid */}
       <div className="grid grid-cols-2 gap-3 mb-4 flex-1 overflow-y-auto">
-        {complaints.map(c => (
+        {complaints.map((c) => (
           <button
             key={c.id}
             onClick={() => toggle(c.id)}
             className={`p-4 rounded-2xl border-2 text-left transition-all
               active:scale-[0.98] transform
-              ${selected.includes(c.id)
-                ? 'border-teal-500 bg-teal-50 ring-2 ring-teal-200'
-                : 'border-slate-200 hover:border-slate-300 bg-white'
+              ${
+                selected.includes(c.id)
+                  ? 'border-teal-500 bg-teal-50 ring-2 ring-teal-200'
+                  : 'border-slate-200 hover:border-slate-300 bg-white'
               }`}
           >
             <div className="flex items-center gap-3">
@@ -148,9 +213,7 @@ export default function ChiefComplaintCapture({ onNext, onBack, lang = 'no' }) {
                 <span className="text-base md:text-lg font-medium text-slate-800 block">
                   {c.label}
                 </span>
-                <span className="text-xs text-slate-500 hidden md:block">
-                  {c.description}
-                </span>
+                <span className="text-xs text-slate-500 hidden md:block">{c.description}</span>
               </div>
             </div>
           </button>
@@ -162,7 +225,9 @@ export default function ChiefComplaintCapture({ onNext, onBack, lang = 'no' }) {
         <div className="mb-4">
           <div className="flex items-center gap-2 text-slate-600 mb-2">
             <MessageSquare className="w-5 h-5" />
-            <span className="font-medium">{lang === 'no' ? 'Beskriv problemet' : 'Describe your concern'}</span>
+            <span className="font-medium">
+              {lang === 'no' ? 'Beskriv problemet' : 'Describe your concern'}
+            </span>
           </div>
           <textarea
             value={customText}

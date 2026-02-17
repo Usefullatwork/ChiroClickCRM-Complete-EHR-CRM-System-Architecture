@@ -16,7 +16,7 @@
  * Bilingual: English/Norwegian
  */
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import _React, { useState, _useEffect, useMemo, useCallback } from 'react';
 import {
   QUESTIONNAIRES,
   calculateScore,
@@ -91,7 +91,9 @@ function ProgressBar({ current, total, lang }) {
   return (
     <div className="mb-6">
       <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
-        <span>{t.question} {current} {t.of} {total}</span>
+        <span>
+          {t.question} {current} {t.of} {total}
+        </span>
         <span>{Math.round(percentage)}%</span>
       </div>
       <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -136,9 +138,7 @@ function SectionQuestion({ section, answer, onChange, lang }) {
               onChange={() => onChange(option.score)}
               className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500"
             />
-            <span className="ml-3 text-gray-900 dark:text-white">
-              {option.text[lang]}
-            </span>
+            <span className="ml-3 text-gray-900 dark:text-white">{option.text[lang]}</span>
           </label>
         ))}
       </div>
@@ -169,22 +169,26 @@ function VASSlider({ questionnaire, value, onChange, lang }) {
     onChange(localValue);
   };
 
-  const getColor = () => {
-    if (localValue <= 30) return 'from-green-500 to-yellow-500';
-    if (localValue <= 60) return 'from-yellow-500 to-orange-500';
+  const _getColor = () => {
+    if (localValue <= 30) {
+      return 'from-green-500 to-yellow-500';
+    }
+    if (localValue <= 60) {
+      return 'from-yellow-500 to-orange-500';
+    }
     return 'from-orange-500 to-red-500';
   };
 
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <div className="text-6xl font-bold text-gray-900 dark:text-white mb-2">
-          {localValue}
-        </div>
+        <div className="text-6xl font-bold text-gray-900 dark:text-white mb-2">{localValue}</div>
         <div className="text-sm text-gray-500 dark:text-gray-400">
-          {questionnaire.scoring.interpretation.find(
-            (i) => localValue >= i.min && localValue <= i.max
-          )?.label[lang]}
+          {
+            questionnaire.scoring.interpretation.find(
+              (i) => localValue >= i.min && localValue <= i.max
+            )?.label[lang]
+          }
         </div>
       </div>
 
@@ -218,14 +222,13 @@ function NRSScale({ questionnaire, value, onChange, lang }) {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <div className="text-6xl font-bold text-gray-900 dark:text-white mb-2">
-          {value ?? '-'}
-        </div>
+        <div className="text-6xl font-bold text-gray-900 dark:text-white mb-2">{value ?? '-'}</div>
         {value !== null && value !== undefined && (
           <div className="text-sm text-gray-500 dark:text-gray-400">
-            {questionnaire.scoring.interpretation.find(
-              (i) => value >= i.min && value <= i.max
-            )?.label[lang]}
+            {
+              questionnaire.scoring.interpretation.find((i) => value >= i.min && value <= i.max)
+                ?.label[lang]
+            }
           </div>
         )}
       </div>
@@ -239,12 +242,12 @@ function NRSScale({ questionnaire, value, onChange, lang }) {
               value === i
                 ? 'bg-blue-600 text-white scale-110'
                 : i === 0
-                ? 'bg-green-100 text-green-800 hover:bg-green-200'
-                : i <= 3
-                ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
-                : i <= 6
-                ? 'bg-orange-100 text-orange-800 hover:bg-orange-200'
-                : 'bg-red-100 text-red-800 hover:bg-red-200'
+                  ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                  : i <= 3
+                    ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
+                    : i <= 6
+                      ? 'bg-orange-100 text-orange-800 hover:bg-orange-200'
+                      : 'bg-red-100 text-red-800 hover:bg-red-200'
             }`}
           >
             {i}
@@ -268,9 +271,7 @@ function FABQQuestion({ item, answer, onChange, lang }) {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-        {item.text[lang]}
-      </h3>
+      <h3 className="text-lg font-medium text-gray-900 dark:text-white">{item.text[lang]}</h3>
       <div className="flex justify-between gap-1">
         {options.map((option) => (
           <button
@@ -308,21 +309,25 @@ function ResultsDisplay({ questionnaireId, score, previousScore, lang }) {
 
   const getColorClass = (interpretation) => {
     switch (interpretation?.color) {
-      case 'green': return 'text-green-600 bg-green-100';
-      case 'yellow': return 'text-yellow-600 bg-yellow-100';
-      case 'orange': return 'text-orange-600 bg-orange-100';
-      case 'red': return 'text-red-600 bg-red-100';
-      case 'darkred': return 'text-red-800 bg-red-200';
-      default: return 'text-gray-600 bg-gray-100';
+      case 'green':
+        return 'text-green-600 bg-green-100';
+      case 'yellow':
+        return 'text-yellow-600 bg-yellow-100';
+      case 'orange':
+        return 'text-orange-600 bg-orange-100';
+      case 'red':
+        return 'text-red-600 bg-red-100';
+      case 'darkred':
+        return 'text-red-800 bg-red-200';
+      default:
+        return 'text-gray-600 bg-gray-100';
     }
   };
 
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-          {t.thankYou}
-        </h3>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t.thankYou}</h3>
         <p className="text-gray-600 dark:text-gray-400">{t.resultsBelow}</p>
       </div>
 
@@ -346,7 +351,9 @@ function ResultsDisplay({ questionnaireId, score, previousScore, lang }) {
             )}
           </div>
           <div className="mt-2">
-            <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getColorClass(score.interpretation)}`}>
+            <span
+              className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getColorClass(score.interpretation)}`}
+            >
               {score.interpretation?.label[lang]}
             </span>
           </div>
@@ -357,10 +364,13 @@ function ResultsDisplay({ questionnaireId, score, previousScore, lang }) {
           <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
             <div
               className={`h-full transition-all duration-500 ${
-                score.percentage <= 20 ? 'bg-green-500' :
-                score.percentage <= 40 ? 'bg-yellow-500' :
-                score.percentage <= 60 ? 'bg-orange-500' :
-                'bg-red-500'
+                score.percentage <= 20
+                  ? 'bg-green-500'
+                  : score.percentage <= 40
+                    ? 'bg-yellow-500'
+                    : score.percentage <= 60
+                      ? 'bg-orange-500'
+                      : 'bg-red-500'
               }`}
               style={{ width: `${score.percentage}%` }}
             />
@@ -371,9 +381,7 @@ function ResultsDisplay({ questionnaireId, score, previousScore, lang }) {
       {/* Comparison with Previous */}
       {change && (
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-          <h4 className="font-medium text-gray-900 dark:text-white mb-4">
-            {t.change}
-          </h4>
+          <h4 className="font-medium text-gray-900 dark:text-white mb-4">{t.change}</h4>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <div className="text-sm text-gray-500 dark:text-gray-400">{t.previousScore}</div>
@@ -383,24 +391,31 @@ function ResultsDisplay({ questionnaireId, score, previousScore, lang }) {
             </div>
             <div>
               <div className="text-sm text-gray-500 dark:text-gray-400">{t.change}</div>
-              <div className={`text-2xl font-bold ${
-                change.absoluteChange > 0 ? 'text-green-600' :
-                change.absoluteChange < 0 ? 'text-red-600' :
-                'text-gray-600'
-              }`}>
+              <div
+                className={`text-2xl font-bold ${
+                  change.absoluteChange > 0
+                    ? 'text-green-600'
+                    : change.absoluteChange < 0
+                      ? 'text-red-600'
+                      : 'text-gray-600'
+                }`}
+              >
                 {change.absoluteChange > 0 ? '-' : '+'}
                 {Math.abs(change.absoluteChange)}%
               </div>
             </div>
           </div>
           {change.clinicallySignificant && (
-            <div className={`mt-4 p-3 rounded-lg ${
-              change.significance === 'improved'
-                ? 'bg-green-50 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                : 'bg-red-50 text-red-800 dark:bg-red-900/20 dark:text-red-400'
-            }`}>
+            <div
+              className={`mt-4 p-3 rounded-lg ${
+                change.significance === 'improved'
+                  ? 'bg-green-50 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                  : 'bg-red-50 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+              }`}
+            >
               {change.significance === 'improved' ? '✓ ' : '⚠ '}
-              {t.clinicallySignificant}: {change.significance === 'improved' ? t.improved : t.worsened}
+              {t.clinicallySignificant}:{' '}
+              {change.significance === 'improved' ? t.improved : t.worsened}
             </div>
           )}
         </div>
@@ -554,9 +569,7 @@ export default function OutcomeQuestionnaire({
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
           {questionnaire.name[lang]}
         </h2>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">
-          {questionnaire.description[lang]}
-        </p>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">{questionnaire.description[lang]}</p>
       </div>
 
       {isComplete ? (
@@ -569,11 +582,7 @@ export default function OutcomeQuestionnaire({
       ) : (
         <>
           {/* Progress */}
-          <ProgressBar
-            current={currentSection + 1}
-            total={totalSections}
-            lang={lang}
-          />
+          <ProgressBar current={currentSection + 1} total={totalSections} lang={lang} />
 
           {/* Instructions (first question only) */}
           {currentSection === 0 && (
@@ -610,11 +619,4 @@ export default function OutcomeQuestionnaire({
 }
 
 // Named exports for individual components
-export {
-  SectionQuestion,
-  VASSlider,
-  NRSScale,
-  FABQQuestion,
-  ResultsDisplay,
-  ProgressBar,
-};
+export { SectionQuestion, VASSlider, NRSScale, FABQQuestion, ResultsDisplay, ProgressBar };

@@ -27,19 +27,19 @@ import {
   ChevronLeft,
   MoreVertical,
   Paperclip,
-  Smile,
-  X,
+  _Smile,
+  _X,
   RefreshCw,
-  Bell,
-  BellOff,
-  Archive,
-  Trash2,
-  Star,
-  StarOff,
+  _Bell,
+  _BellOff,
+  _Archive,
+  _Trash2,
+  _Star,
+  _StarOff,
 } from 'lucide-react';
 import {
   getConversations,
-  getConversation,
+  _getConversation,
   sendSMS,
   markConversationRead,
   formatNorwegianPhone,
@@ -152,7 +152,9 @@ export default function SMSConversation({
   // Filter conversations by search
   const filteredConversations = Object.values(conversations)
     .filter((conv) => {
-      if (!searchTerm) return true;
+      if (!searchTerm) {
+        return true;
+      }
       const patient = getPatientByPhone(conv.phone);
       const name = patient ? `${patient.first_name} ${patient.last_name}`.toLowerCase() : '';
       return name.includes(searchTerm.toLowerCase()) || conv.phone.includes(searchTerm);
@@ -165,7 +167,9 @@ export default function SMSConversation({
 
   // Send message
   const handleSend = async () => {
-    if (!newMessage.trim() || !selectedPhone || isSending) return;
+    if (!newMessage.trim() || !selectedPhone || isSending) {
+      return;
+    }
 
     setIsSending(true);
     try {
@@ -504,7 +508,9 @@ export function UnreadBadge({ className = '' }) {
     return () => clearInterval(interval);
   }, []);
 
-  if (count === 0) return null;
+  if (count === 0) {
+    return null;
+  }
 
   return (
     <span

@@ -5,60 +5,60 @@
  * Simple two-click flow, no mouse movement needed.
  */
 
-import React, { useState, useCallback } from 'react';
+import _React, { useState, useCallback } from 'react';
 import { ChevronDown, ChevronUp, X } from 'lucide-react';
 
 // Spine segment configuration
 const SPINE_REGIONS = {
   cervical: {
     label: 'CERVICAL',
-    segments: ['C0-C1', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7']
+    segments: ['C0-C1', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7'],
   },
   thoracic: {
     label: 'THORACIC',
-    segments: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12']
+    segments: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
   },
   lumbar: {
     label: 'LUMBAR',
-    segments: ['L1', 'L2', 'L3', 'L4', 'L5']
+    segments: ['L1', 'L2', 'L3', 'L4', 'L5'],
   },
   sacral: {
     label: 'SACRAL',
-    segments: ['Sacrum', 'SI-V', 'SI-H']
+    segments: ['Sacrum', 'SI-V', 'SI-H'],
   },
   muscle: {
     label: 'MUSKEL',
-    segments: ['C-para', 'T-para', 'L-para', 'QL', 'Piriformis']
-  }
+    segments: ['C-para', 'T-para', 'L-para', 'QL', 'Piriformis'],
+  },
 };
 
 // Direction options
 const DIRECTIONS = [
   { id: 'left', label: 'V', title: 'Venstre' },
   { id: 'right', label: 'H', title: 'Høyre' },
-  { id: 'bilateral', label: 'B', title: 'Bilateral' }
+  { id: 'bilateral', label: 'B', title: 'Bilateral' },
 ];
 
 // Text templates for each segment + direction
 const getRestrictionText = (segment, direction) => {
   const segmentNames = {
     'C0-C1': 'Occiput-atlas (C0-C1)',
-    'C1': 'Atlas (C1)',
-    'C2': 'Axis (C2)',
-    'Sacrum': 'Sacrum',
+    C1: 'Atlas (C1)',
+    C2: 'Axis (C2)',
+    Sacrum: 'Sacrum',
     'SI-V': 'SI-ledd venstre',
     'SI-H': 'SI-ledd høyre',
     'C-para': 'Cervical paraspinal muskulatur',
     'T-para': 'Thoracal paraspinal muskulatur',
     'L-para': 'Lumbal paraspinal muskulatur',
-    'QL': 'Quadratus lumborum',
-    'Piriformis': 'Piriformis'
+    QL: 'Quadratus lumborum',
+    Piriformis: 'Piriformis',
   };
 
   const directionText = {
-    'left': 'venstre',
-    'right': 'høyre',
-    'bilateral': 'bilateral'
+    left: 'venstre',
+    right: 'høyre',
+    bilateral: 'bilateral',
   };
 
   const name = segmentNames[segment] || segment;
@@ -73,39 +73,55 @@ const getRestrictionText = (segment, direction) => {
 export const QuickPalpationSpine = ({ onInsertText, disabled = false }) => {
   const [activeSegment, setActiveSegment] = useState(null);
   const [recentSegments, setRecentSegments] = useState([]);
-  const [expandedRegions, setExpandedRegions] = useState({ cervical: true, thoracic: true, lumbar: true });
+  const [expandedRegions, setExpandedRegions] = useState({
+    cervical: true,
+    thoracic: true,
+    lumbar: true,
+  });
 
   // Click segment to show direction options
-  const handleSegmentClick = useCallback((segment) => {
-    if (disabled) return;
-    setActiveSegment(activeSegment === segment ? null : segment);
-  }, [disabled, activeSegment]);
+  const handleSegmentClick = useCallback(
+    (segment) => {
+      if (disabled) {
+        return;
+      }
+      setActiveSegment(activeSegment === segment ? null : segment);
+    },
+    [disabled, activeSegment]
+  );
 
   // Click direction to insert text
-  const handleDirectionClick = useCallback((direction) => {
-    if (!activeSegment || disabled) return;
+  const handleDirectionClick = useCallback(
+    (direction) => {
+      if (!activeSegment || disabled) {
+        return;
+      }
 
-    const text = getRestrictionText(activeSegment, direction);
-    if (onInsertText) {
-      onInsertText(text);
-    }
+      const text = getRestrictionText(activeSegment, direction);
+      if (onInsertText) {
+        onInsertText(text);
+      }
 
-    // Brief highlight feedback
-    const seg = activeSegment;
-    setRecentSegments(prev => [...new Set([seg, ...prev])].slice(0, 3));
-    setTimeout(() => {
-      setRecentSegments(prev => prev.filter(s => s !== seg));
-    }, 1500);
+      // Brief highlight feedback
+      const seg = activeSegment;
+      setRecentSegments((prev) => [...new Set([seg, ...prev])].slice(0, 3));
+      setTimeout(() => {
+        setRecentSegments((prev) => prev.filter((s) => s !== seg));
+      }, 1500);
 
-    // Close direction picker
-    setActiveSegment(null);
-  }, [activeSegment, disabled, onInsertText]);
+      // Close direction picker
+      setActiveSegment(null);
+    },
+    [activeSegment, disabled, onInsertText]
+  );
 
   const toggleRegion = (region) => {
-    setExpandedRegions(prev => ({ ...prev, [region]: !prev[region] }));
+    setExpandedRegions((prev) => ({ ...prev, [region]: !prev[region] }));
   };
 
-  if (disabled) return null;
+  if (disabled) {
+    return null;
+  }
 
   return (
     <div className="bg-white border-l border-slate-200 h-full flex flex-col">
@@ -149,7 +165,11 @@ export const QuickPalpationSpine = ({ onInsertText, disabled = false }) => {
               className="w-full flex items-center justify-between px-2 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50"
             >
               <span>{region.label}</span>
-              {expandedRegions[key] ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+              {expandedRegions[key] ? (
+                <ChevronUp className="h-3 w-3" />
+              ) : (
+                <ChevronDown className="h-3 w-3" />
+              )}
             </button>
 
             {/* Segments */}
@@ -172,11 +192,12 @@ export const QuickPalpationSpine = ({ onInsertText, disabled = false }) => {
                       onClick={() => handleSegmentClick(segment)}
                       className={`
                         px-2 py-1 text-xs font-medium rounded transition-all cursor-pointer
-                        ${isActive
-                          ? 'bg-emerald-600 text-white ring-2 ring-emerald-300'
-                          : isRecent
-                            ? 'bg-emerald-500 text-white'
-                            : 'bg-slate-100 text-slate-700 hover:bg-emerald-100 hover:text-emerald-700'
+                        ${
+                          isActive
+                            ? 'bg-emerald-600 text-white ring-2 ring-emerald-300'
+                            : isRecent
+                              ? 'bg-emerald-500 text-white'
+                              : 'bg-slate-100 text-slate-700 hover:bg-emerald-100 hover:text-emerald-700'
                         }
                       `}
                       title={`Klikk for å velge retning`}
@@ -193,9 +214,7 @@ export const QuickPalpationSpine = ({ onInsertText, disabled = false }) => {
 
       {/* Hint */}
       <div className="px-2 py-1 bg-slate-50 border-t border-slate-100">
-        <p className="text-[9px] text-slate-400 text-center">
-          1. Klikk segment → 2. Klikk V/H/B
-        </p>
+        <p className="text-[9px] text-slate-400 text-center">1. Klikk segment → 2. Klikk V/H/B</p>
       </div>
     </div>
   );

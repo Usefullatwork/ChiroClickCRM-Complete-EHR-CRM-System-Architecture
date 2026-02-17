@@ -82,14 +82,17 @@ export class Encounter {
    * Check if encounter can be signed
    */
   canSign() {
-    if (this.isSigned) return false;
-    if (this.status !== 'COMPLETED') return false;
+    if (this.isSigned) {
+      return false;
+    }
+    if (this.status !== 'COMPLETED') {
+      return false;
+    }
 
     // Must have at least assessment and plan
-    const hasAssessment = this.assessment.clinical_impression ||
-                          this.assessment.diagnoses?.length > 0;
-    const hasPlan = this.plan.treatment_provided ||
-                    this.plan.recommendations;
+    const hasAssessment =
+      this.assessment.clinical_impression || this.assessment.diagnoses?.length > 0;
+    const hasPlan = this.plan.treatment_provided || this.plan.recommendations;
 
     return hasAssessment && hasPlan;
   }
@@ -119,8 +122,12 @@ export class Encounter {
     const combined = `${chiefComplaint} ${observations}`;
 
     // Check for cauda equina symptoms
-    if (combined.includes('bladder') || combined.includes('bowel') ||
-        combined.includes('saddle') || combined.includes('bilateral leg')) {
+    if (
+      combined.includes('bladder') ||
+      combined.includes('bowel') ||
+      combined.includes('saddle') ||
+      combined.includes('bilateral leg')
+    ) {
       identifiedFlags.push('CAUDA_EQUINA');
     }
 
@@ -159,7 +166,9 @@ export class Encounter {
    * Calculate VAS improvement from previous encounter
    */
   calculateVASImprovement(previousVAS) {
-    if (this.vasPain === null || previousVAS === null) return null;
+    if (this.vasPain === null || previousVAS === null) {
+      return null;
+    }
     return previousVAS - this.vasPain;
   }
 

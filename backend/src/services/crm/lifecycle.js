@@ -95,7 +95,9 @@ export const updatePatientLifecycle = async (clinicId, patientId, data) => {
     params.push(JSON.stringify(tags));
   }
 
-  if (updates.length === 0) return null;
+  if (updates.length === 0) {
+    return null;
+  }
 
   const result = await query(
     `UPDATE patients SET ${updates.join(', ')}
@@ -234,7 +236,9 @@ export const updateReferral = async (clinicId, referralId, data) => {
     }
   }
 
-  if (fields.length === 0) return null;
+  if (fields.length === 0) {
+    return null;
+  }
 
   const result = await query(
     `UPDATE referrals SET ${fields.join(', ')}

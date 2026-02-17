@@ -27,7 +27,7 @@ export const parsePDF = async (filePath) => {
         subject: data.info?.Subject || null,
         keywords: data.info?.Keywords || null,
         creationDate: data.info?.CreationDate || null,
-      }
+      },
     };
   } catch (error) {
     logger.error('Error parsing PDF:', error);
@@ -48,7 +48,7 @@ export const parseWord = async (filePath) => {
       metadata: {
         fileName: path.basename(filePath),
         size: fs.statSync(filePath).size,
-      }
+      },
     };
   } catch (error) {
     logger.error('Error parsing Word document:', error);
@@ -83,7 +83,7 @@ export const extractSOAPNotes = (text) => {
     objective: null,
     assessment: null,
     plan: null,
-    raw: text
+    raw: text,
   };
 
   // Try to extract SOAP sections
@@ -92,10 +92,18 @@ export const extractSOAPNotes = (text) => {
   const assessmentMatch = text.match(/Assessment[:\s]+(.*?)(?=Plan|$)/is);
   const planMatch = text.match(/Plan[:\s]+(.*?)$/is);
 
-  if (subjectiveMatch) soap.subjective = subjectiveMatch[1].trim();
-  if (objectiveMatch) soap.objective = objectiveMatch[1].trim();
-  if (assessmentMatch) soap.assessment = assessmentMatch[1].trim();
-  if (planMatch) soap.plan = planMatch[1].trim();
+  if (subjectiveMatch) {
+    soap.subjective = subjectiveMatch[1].trim();
+  }
+  if (objectiveMatch) {
+    soap.objective = objectiveMatch[1].trim();
+  }
+  if (assessmentMatch) {
+    soap.assessment = assessmentMatch[1].trim();
+  }
+  if (planMatch) {
+    soap.plan = planMatch[1].trim();
+  }
 
   return soap;
 };
@@ -104,10 +112,7 @@ export const extractSOAPNotes = (text) => {
  * Parse multiple documents from a directory
  */
 export const parseDirectory = async (directoryPath, options = {}) => {
-  const {
-    recursive = false,
-    includeTypes = ['.pdf', '.docx', '.doc']
-  } = options;
+  const { recursive = false, includeTypes = ['.pdf', '.docx', '.doc'] } = options;
 
   const results = [];
   const errors = [];
@@ -115,18 +120,20 @@ export const parseDirectory = async (directoryPath, options = {}) => {
   const processFile = async (filePath) => {
     try {
       const ext = path.extname(filePath).toLowerCase();
-      if (!includeTypes.includes(ext)) return;
+      if (!includeTypes.includes(ext)) {
+        return;
+      }
 
       const parsed = await parseDocument(filePath);
       results.push({
         filePath,
         fileName: path.basename(filePath),
-        ...parsed
+        ...parsed,
       });
     } catch (error) {
       errors.push({
         filePath,
-        error: error.message
+        error: error.message,
       });
     }
   };
@@ -151,7 +158,7 @@ export const parseDirectory = async (directoryPath, options = {}) => {
     documents: results,
     errors,
     total: results.length,
-    errorCount: errors.length
+    errorCount: errors.length,
   };
 };
 
@@ -163,7 +170,7 @@ export const extractChiropracticTerms = (text) => {
     diagnoses: [],
     treatments: [],
     anatomicalTerms: [],
-    symptoms: []
+    symptoms: [],
   };
 
   // Norwegian anatomical terms
@@ -181,7 +188,7 @@ export const extractChiropracticTerms = (text) => {
     /cervical/gi,
     /thoracic/gi,
     /lumbar/gi,
-    /sacral/gi
+    /sacral/gi,
   ];
 
   // Symptoms
@@ -193,7 +200,7 @@ export const extractChiropracticTerms = (text) => {
     /låsning/gi,
     /betennelse/gi,
     /parestesi/gi,
-    /nummenhet/gi
+    /nummenhet/gi,
   ];
 
   // Treatments
@@ -203,29 +210,35 @@ export const extractChiropracticTerms = (text) => {
     /bløtdelsbehandling/gi,
     /tøyning/gi,
     /øvelser/gi,
-    /hjemmeøvelser/gi
+    /hjemmeøvelser/gi,
   ];
 
   // Extract matches
-  anatomicalPatterns.forEach(pattern => {
+  anatomicalPatterns.forEach((pattern) => {
     const matches = text.match(pattern);
-    if (matches) terms.anatomicalTerms.push(...matches);
+    if (matches) {
+      terms.anatomicalTerms.push(...matches);
+    }
   });
 
-  symptomPatterns.forEach(pattern => {
+  symptomPatterns.forEach((pattern) => {
     const matches = text.match(pattern);
-    if (matches) terms.symptoms.push(...matches);
+    if (matches) {
+      terms.symptoms.push(...matches);
+    }
   });
 
-  treatmentPatterns.forEach(pattern => {
+  treatmentPatterns.forEach((pattern) => {
     const matches = text.match(pattern);
-    if (matches) terms.treatments.push(...matches);
+    if (matches) {
+      terms.treatments.push(...matches);
+    }
   });
 
   // Deduplicate and count
   const deduplicateAndCount = (arr) => {
     const counts = {};
-    arr.forEach(term => {
+    arr.forEach((term) => {
       const normalized = term.toLowerCase();
       counts[normalized] = (counts[normalized] || 0) + 1;
     });
@@ -237,7 +250,7 @@ export const extractChiropracticTerms = (text) => {
   return {
     anatomicalTerms: deduplicateAndCount(terms.anatomicalTerms),
     symptoms: deduplicateAndCount(terms.symptoms),
-    treatments: deduplicateAndCount(terms.treatments)
+    treatments: deduplicateAndCount(terms.treatments),
   };
 };
 
@@ -265,5 +278,5 @@ export default {
   parseDirectory,
   extractSOAPNotes,
   extractChiropracticTerms,
-  chunkTextForTraining
+  chunkTextForTraining,
 };

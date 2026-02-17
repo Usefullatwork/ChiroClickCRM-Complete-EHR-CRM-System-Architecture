@@ -1,4 +1,4 @@
-import React from 'react';
+import _React from 'react';
 import { Calendar, Clock, BookOpen, Check, Activity, Lock, Loader2 } from 'lucide-react';
 
 export default function EncounterHeader({
@@ -10,12 +10,14 @@ export default function EncounterHeader({
   onShowKeyboardHelp,
   autoSaveStatus,
   lastSaved,
-  encounterId
+  encounterId,
 }) {
   return (
     <header className="bg-white border-b border-slate-200 px-6 py-3 flex justify-between items-center flex-shrink-0">
       <div className="flex items-center space-x-4">
-        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full ${isSigned ? 'bg-slate-100 text-slate-500' : 'bg-teal-50 text-teal-700'} text-sm font-medium border ${isSigned ? 'border-slate-200' : 'border-teal-200'}`}>
+        <span
+          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full ${isSigned ? 'bg-slate-100 text-slate-500' : 'bg-teal-50 text-teal-700'} text-sm font-medium border ${isSigned ? 'border-slate-200' : 'border-teal-200'}`}
+        >
           <Calendar className="h-3.5 w-3.5" />
           <input
             type="date"
@@ -41,10 +43,13 @@ export default function EncounterHeader({
           <input
             type="number"
             value={encounterData.duration_minutes}
-            onChange={(e) => onUpdateField('duration_minutes', parseInt(e.target.value) || 30, true)}
+            onChange={(e) =>
+              onUpdateField('duration_minutes', parseInt(e.target.value) || 30, true)
+            }
             disabled={isSigned}
             className="w-12 text-center bg-transparent border border-slate-200 rounded px-1 disabled:opacity-50 disabled:cursor-not-allowed"
-          /> min
+          />{' '}
+          min
         </span>
       </div>
       <div className="flex items-center gap-2">
@@ -75,7 +80,10 @@ export default function EncounterHeader({
           </span>
         )}
         {autoSaveStatus === 'saved' && lastSaved && (
-          <span className="text-xs text-green-600 flex items-center gap-1" title={`Lagret ${lastSaved.toLocaleTimeString()}`}>
+          <span
+            className="text-xs text-green-600 flex items-center gap-1"
+            title={`Lagret ${lastSaved.toLocaleTimeString()}`}
+          >
             <Check className="h-3 w-3" />
             Auto-lagret
           </span>

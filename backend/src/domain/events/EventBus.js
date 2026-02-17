@@ -6,7 +6,7 @@
  */
 
 import logger from '../../utils/logger.js';
-import { DOMAIN_EVENTS, DomainEvent } from './DomainEvents.js';
+import { _DOMAIN_EVENTS, DomainEvent } from './DomainEvents.js';
 
 /**
  * EventBus singleton for publishing and subscribing to domain events
@@ -27,7 +27,7 @@ class EventBus {
       published: 0,
       delivered: 0,
       failed: 0,
-      byType: {}
+      byType: {},
     };
 
     /** @type {boolean} */
@@ -55,7 +55,7 @@ class EventBus {
       } catch (error) {
         logger.error(`Event handler error for ${eventType}:`, {
           error: error.message,
-          eventId: event.id
+          eventId: event.id,
         });
         if (!options.suppressErrors) {
           throw error;
@@ -81,8 +81,8 @@ class EventBus {
    * @returns {Function} Unsubscribe function
    */
   onMany(eventTypes, handler) {
-    const unsubscribers = eventTypes.map(type => this.on(type, handler));
-    return () => unsubscribers.forEach(unsub => unsub());
+    const unsubscribers = eventTypes.map((type) => this.on(type, handler));
+    return () => unsubscribers.forEach((unsub) => unsub());
   }
 
   /**
@@ -119,7 +119,7 @@ class EventBus {
     this.eventHistory.push({
       ...event.toJSON(),
       processedAt: null,
-      handlers: []
+      handlers: [],
     });
 
     // Trim history if needed
@@ -160,9 +160,7 @@ class EventBus {
     }
 
     const handlers = Array.from(subscribers);
-    const results = await Promise.allSettled(
-      handlers.map(handler => handler(event))
-    );
+    const results = await Promise.allSettled(handlers.map((handler) => handler(event)));
 
     // Track failures
     results.forEach((result, index) => {
@@ -182,7 +180,9 @@ class EventBus {
    * @private
    */
   async processEvents() {
-    if (this.isProcessing) return;
+    if (this.isProcessing) {
+      return;
+    }
     this.isProcessing = true;
 
     try {
@@ -195,23 +195,23 @@ class EventBus {
         }
 
         // Fire and forget - don't block on handlers
-        Promise.allSettled(
-          Array.from(subscribers).map(handler => handler(event))
-        ).then(results => {
-          results.forEach((result) => {
-            if (result.status === 'rejected') {
-              this.stats.failed++;
-            } else {
-              this.stats.delivered++;
-            }
-          });
+        Promise.allSettled(Array.from(subscribers).map((handler) => handler(event))).then(
+          (results) => {
+            results.forEach((result) => {
+              if (result.status === 'rejected') {
+                this.stats.failed++;
+              } else {
+                this.stats.delivered++;
+              }
+            });
 
-          // Update history
-          const historyEntry = this.eventHistory.find(e => e.id === event.id);
-          if (historyEntry) {
-            historyEntry.processedAt = new Date().toISOString();
+            // Update history
+            const historyEntry = this.eventHistory.find((e) => e.id === event.id);
+            if (historyEntry) {
+              historyEntry.processedAt = new Date().toISOString();
+            }
           }
-        });
+        );
       }
     } finally {
       this.isProcessing = false;
@@ -233,11 +233,13 @@ class EventBus {
   getStats() {
     return {
       ...this.stats,
-      totalSubscribers: Array.from(this.subscribers.values())
-        .reduce((sum, set) => sum + set.size, 0),
+      totalSubscribers: Array.from(this.subscribers.values()).reduce(
+        (sum, set) => sum + set.size,
+        0
+      ),
       eventTypes: this.subscribers.size,
       historySize: this.eventHistory.length,
-      pendingEvents: this.pendingEvents.length
+      pendingEvents: this.pendingEvents.length,
     };
   }
 
@@ -247,9 +249,7 @@ class EventBus {
    * @param {number} limit
    */
   getRecentEvents(eventType, limit = 10) {
-    return this.eventHistory
-      .filter(e => !eventType || e.type === eventType)
-      .slice(-limit);
+    return this.eventHistory.filter((e) => !eventType || e.type === eventType).slice(-limit);
   }
 
   /**
@@ -268,7 +268,7 @@ class EventBus {
       published: 0,
       delivered: 0,
       failed: 0,
-      byType: {}
+      byType: {},
     };
     this.eventHistory = [];
   }
@@ -294,7 +294,7 @@ export function registerEventHandlers(handlers) {
     unsubscribers.push(eventBus.on(eventType, handler));
   }
 
-  return () => unsubscribers.forEach(unsub => unsub());
+  return () => unsubscribers.forEach((unsub) => unsub());
 }
 
 /**

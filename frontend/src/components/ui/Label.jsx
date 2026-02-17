@@ -1,11 +1,6 @@
-import React from 'react';
+import _React from 'react';
 
-export const Label = ({
-  children,
-  htmlFor,
-  className = '',
-  required = false
-}) => {
+export const Label = ({ children, htmlFor, className = '', required = false }) => {
   return (
     <label
       htmlFor={htmlFor}

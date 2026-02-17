@@ -1,4 +1,4 @@
-import { User, Save, Loader2 } from 'lucide-react';
+import { _User, Save, Loader2 } from 'lucide-react';
 
 export default function ProfileSettings({
   t,

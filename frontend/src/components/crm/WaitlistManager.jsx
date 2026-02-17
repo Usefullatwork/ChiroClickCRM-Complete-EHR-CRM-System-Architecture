@@ -12,26 +12,26 @@
  * - Bilingual support (EN/NO)
  */
 
-import { useState, useEffect } from 'react';
+import { useState, _useEffect } from 'react';
 import {
   Clock,
-  User,
+  _User,
   Phone,
-  MessageSquare,
+  _MessageSquare,
   Plus,
-  X,
-  Check,
-  AlertCircle,
-  Calendar,
-  Bell,
+  _X,
+  _Check,
+  _AlertCircle,
+  _Calendar,
+  _Bell,
   Send,
   Trash2,
   ChevronDown,
   ChevronUp,
-  Filter,
+  _Filter,
   Search,
-  Star,
-  RefreshCw,
+  _Star,
+  _RefreshCw,
 } from 'lucide-react';
 
 // Priority levels
@@ -65,7 +65,7 @@ export default function WaitlistManager({
   onAdd,
   onRemove,
   onNotify,
-  onUpdate,
+  _onUpdate,
   patients = [],
   language = 'en',
   className = '',
@@ -161,7 +161,9 @@ export default function WaitlistManager({
   // Filter and sort waitlist
   const filteredWaitlist = waitlist
     .filter((entry) => {
-      if (filterPriority !== 'all' && entry.priority !== filterPriority) return false;
+      if (filterPriority !== 'all' && entry.priority !== filterPriority) {
+        return false;
+      }
       if (searchTerm) {
         const patient = patients.find((p) => p.id === entry.patientId);
         const name = patient ? `${patient.first_name} ${patient.last_name}`.toLowerCase() : '';
@@ -185,7 +187,9 @@ export default function WaitlistManager({
     });
 
   const handleAdd = () => {
-    if (!newEntry.patientId) return;
+    if (!newEntry.patientId) {
+      return;
+    }
 
     onAdd?.({
       ...newEntry,
@@ -209,13 +213,16 @@ export default function WaitlistManager({
 
   const handleNotify = async (entry) => {
     const patient = patients.find((p) => p.id === entry.patientId);
-    if (!patient) return;
+    if (!patient) {
+      return;
+    }
 
     await onNotify?.(entry, {
       patient,
-      message: language === 'en'
-        ? `Hi ${patient.first_name}! A spot has opened up at our clinic. Reply YES to book.`
-        : `Hei ${patient.first_name}! En time har blitt ledig på klinikken vår. Svar JA for å bestille.`,
+      message:
+        language === 'en'
+          ? `Hi ${patient.first_name}! A spot has opened up at our clinic. Reply YES to book.`
+          : `Hei ${patient.first_name}! En time har blitt ledig på klinikken vår. Svar JA for å bestille.`,
     });
   };
 
@@ -328,7 +335,9 @@ export default function WaitlistManager({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t.timePreference}</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t.timePreference}
+                </label>
                 <select
                   value={newEntry.timePreferences[0]}
                   onChange={(e) => setNewEntry({ ...newEntry, timePreferences: [e.target.value] })}
@@ -343,7 +352,9 @@ export default function WaitlistManager({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t.dayPreference}</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t.dayPreference}
+                </label>
                 <select
                   value={newEntry.dayPreferences[0]}
                   onChange={(e) => setNewEntry({ ...newEntry, dayPreferences: [e.target.value] })}
@@ -369,7 +380,9 @@ export default function WaitlistManager({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t.notifyOptions}</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t.notifyOptions}
+              </label>
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2">
                   <input
@@ -421,7 +434,8 @@ export default function WaitlistManager({
         ) : (
           filteredWaitlist.map((entry) => {
             const patient = patients.find((p) => p.id === entry.patientId);
-            const priority = PRIORITY_LEVELS[entry.priority.toUpperCase()] || PRIORITY_LEVELS.NORMAL;
+            const priority =
+              PRIORITY_LEVELS[entry.priority.toUpperCase()] || PRIORITY_LEVELS.NORMAL;
             const isExpanded = expandedId === entry.id;
             const daysWaiting = getDaysWaiting(entry.dateAdded);
 
@@ -435,16 +449,23 @@ export default function WaitlistManager({
                         {patient ? `${patient.first_name} ${patient.last_name}` : 'Unknown'}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {t.waitingSince} {formatDate(entry.dateAdded)} ({daysWaiting} {language === 'no' ? 'dager' : 'days'})
+                        {t.waitingSince} {formatDate(entry.dateAdded)} ({daysWaiting}{' '}
+                        {language === 'no' ? 'dager' : 'days'})
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <span className={`px-2 py-0.5 text-xs font-medium rounded-full
-                      ${priority.color === 'red' ? 'bg-red-100 text-red-700' :
-                        priority.color === 'blue' ? 'bg-blue-100 text-blue-700' :
-                          'bg-gray-100 text-gray-700'}`}>
+                    <span
+                      className={`px-2 py-0.5 text-xs font-medium rounded-full
+                      ${
+                        priority.color === 'red'
+                          ? 'bg-red-100 text-red-700'
+                          : priority.color === 'blue'
+                            ? 'bg-blue-100 text-blue-700'
+                            : 'bg-gray-100 text-gray-700'
+                      }`}
+                    >
                       {priority.label[language] || priority.label.en}
                     </span>
 
@@ -460,7 +481,11 @@ export default function WaitlistManager({
                       onClick={() => setExpandedId(isExpanded ? null : entry.id)}
                       className="p-1.5 text-gray-400 hover:text-gray-600 rounded"
                     >
-                      {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                      {isExpanded ? (
+                        <ChevronUp className="w-4 h-4" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4" />
+                      )}
                     </button>
 
                     <button
@@ -478,15 +503,19 @@ export default function WaitlistManager({
                   <div className="mt-3 pl-5 space-y-2 text-sm">
                     <div className="flex gap-4">
                       <span className="text-gray-500">{t.timePreference}:</span>
-                      <span>{entry.timePreferences?.map((p) =>
-                        TIME_PREFERENCES[p.toUpperCase()]?.label[language] || p
-                      ).join(', ')}</span>
+                      <span>
+                        {entry.timePreferences
+                          ?.map((p) => TIME_PREFERENCES[p.toUpperCase()]?.label[language] || p)
+                          .join(', ')}
+                      </span>
                     </div>
                     <div className="flex gap-4">
                       <span className="text-gray-500">{t.dayPreference}:</span>
-                      <span>{entry.dayPreferences?.map((p) =>
-                        DAY_PREFERENCES[p.toUpperCase()]?.label[language] || p
-                      ).join(', ')}</span>
+                      <span>
+                        {entry.dayPreferences
+                          ?.map((p) => DAY_PREFERENCES[p.toUpperCase()]?.label[language] || p)
+                          .join(', ')}
+                      </span>
                     </div>
                     {entry.notes && (
                       <div className="flex gap-4">
@@ -541,9 +570,7 @@ export function WaitlistCompact({
         </h4>
         <span className="text-sm text-gray-500">
           {waitlist.length} {t.count}
-          {urgentCount > 0 && (
-            <span className="ml-1 text-red-500">({urgentCount} urgent)</span>
-          )}
+          {urgentCount > 0 && <span className="ml-1 text-red-500">({urgentCount} urgent)</span>}
         </span>
       </div>
 

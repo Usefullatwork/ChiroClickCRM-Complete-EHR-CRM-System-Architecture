@@ -3,7 +3,7 @@
  * Allows providers to give feedback on AI-generated suggestions
  */
 
-import React, { useState, useCallback } from 'react';
+import _React, { useState, useCallback } from 'react';
 
 // Feedback categories (should match database seed)
 const FEEDBACK_CATEGORIES = {
@@ -11,19 +11,19 @@ const FEEDBACK_CATEGORIES = {
     { id: 'accurate', label: 'Nøyaktig', icon: '✓' },
     { id: 'time_saving', label: 'Tidsbesparende', icon: '⏱' },
     { id: 'comprehensive', label: 'Omfattende', icon: '📋' },
-    { id: 'well_written', label: 'God formulering', icon: '✍' }
+    { id: 'well_written', label: 'God formulering', icon: '✍' },
   ],
   negative: [
     { id: 'inaccurate', label: 'Unøyaktig', icon: '✗' },
     { id: 'irrelevant', label: 'Irrelevant', icon: '❌' },
     { id: 'too_verbose', label: 'For omfattende', icon: '📝' },
     { id: 'missing_info', label: 'Manglet informasjon', icon: '❓' },
-    { id: 'missed_red_flag', label: 'Manglet rødt flagg', icon: '🚨' }
+    { id: 'missed_red_flag', label: 'Manglet rødt flagg', icon: '🚨' },
   ],
   neutral: [
     { id: 'partially_helpful', label: 'Delvis nyttig', icon: '◐' },
-    { id: 'needs_customization', label: 'Trenger tilpasning', icon: '⚙' }
-  ]
+    { id: 'needs_customization', label: 'Trenger tilpasning', icon: '⚙' },
+  ],
 };
 
 /**
@@ -33,17 +33,20 @@ export const QuickFeedback = ({ suggestionId, onFeedback }) => {
   const [submitted, setSubmitted] = useState(false);
   const [feedback, setFeedback] = useState(null);
 
-  const handleFeedback = useCallback(async (isHelpful) => {
-    setFeedback(isHelpful);
-    setSubmitted(true);
+  const handleFeedback = useCallback(
+    async (isHelpful) => {
+      setFeedback(isHelpful);
+      setSubmitted(true);
 
-    try {
-      await onFeedback(suggestionId, { wasHelpful: isHelpful });
-    } catch (error) {
-      console.error('Failed to submit feedback:', error);
-      setSubmitted(false);
-    }
-  }, [suggestionId, onFeedback]);
+      try {
+        await onFeedback(suggestionId, { wasHelpful: isHelpful });
+      } catch (error) {
+        console.error('Failed to submit feedback:', error);
+        setSubmitted(false);
+      }
+    },
+    [suggestionId, onFeedback]
+  );
 
   if (submitted) {
     return (
@@ -82,12 +85,7 @@ export const QuickFeedback = ({ suggestionId, onFeedback }) => {
 /**
  * Detailed feedback form
  */
-export const DetailedFeedback = ({
-  suggestionId,
-  suggestionText,
-  onSubmit,
-  onCancel
-}) => {
+export const DetailedFeedback = ({ suggestionId, suggestionText, onSubmit, onCancel }) => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -96,10 +94,8 @@ export const DetailedFeedback = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const toggleCategory = useCallback((categoryId) => {
-    setSelectedCategories(prev =>
-      prev.includes(categoryId)
-        ? prev.filter(id => id !== categoryId)
-        : [...prev, categoryId]
+    setSelectedCategories((prev) =>
+      prev.includes(categoryId) ? prev.filter((id) => id !== categoryId) : [...prev, categoryId]
     );
   }, []);
 
@@ -114,7 +110,7 @@ export const DetailedFeedback = ({
         rating,
         comment,
         modifiedText: showTextEditor ? modifiedText : null,
-        decision: modifiedText !== suggestionText ? 'MODIFIED' : 'APPROVED'
+        decision: modifiedText !== suggestionText ? 'MODIFIED' : 'APPROVED',
       });
     } catch (error) {
       console.error('Failed to submit feedback:', error);
@@ -130,12 +126,8 @@ export const DetailedFeedback = ({
       <form onSubmit={handleSubmit}>
         {/* Original suggestion */}
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            AI-forslag
-          </label>
-          <div className="p-3 bg-gray-50 rounded border text-sm">
-            {suggestionText}
-          </div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">AI-forslag</label>
+          <div className="p-3 bg-gray-50 rounded border text-sm">{suggestionText}</div>
         </div>
 
         {/* Rating */}
@@ -289,20 +281,16 @@ export const DetailedFeedback = ({
 /**
  * AI Suggestion Review Card
  */
-export const AISuggestionReview = ({
-  suggestion,
-  onApprove,
-  onModify,
-  onReject
-}) => {
+export const AISuggestionReview = ({ suggestion, onApprove, onModify, onReject }) => {
   const [isModifying, setIsModifying] = useState(false);
   const [modifiedText, setModifiedText] = useState(suggestion.suggestedText);
 
-  const confidenceColor = suggestion.confidenceLevel === 'HIGH'
-    ? 'text-green-600 bg-green-50'
-    : suggestion.confidenceLevel === 'MEDIUM'
-    ? 'text-yellow-600 bg-yellow-50'
-    : 'text-red-600 bg-red-50';
+  const confidenceColor =
+    suggestion.confidenceLevel === 'HIGH'
+      ? 'text-green-600 bg-green-50'
+      : suggestion.confidenceLevel === 'MEDIUM'
+        ? 'text-yellow-600 bg-yellow-50'
+        : 'text-red-600 bg-red-50';
 
   return (
     <div className="border rounded-lg p-4 bg-white shadow-sm">
@@ -312,9 +300,12 @@ export const AISuggestionReview = ({
           <span className="text-lg">🤖</span>
           <span className="font-medium">AI-forslag</span>
           <span className={`px-2 py-0.5 rounded text-xs ${confidenceColor}`}>
-            {suggestion.confidenceLevel === 'HIGH' ? 'Høy' :
-             suggestion.confidenceLevel === 'MEDIUM' ? 'Moderat' : 'Lav'} konfidens
-            ({Math.round(suggestion.confidenceScore * 100)}%)
+            {suggestion.confidenceLevel === 'HIGH'
+              ? 'Høy'
+              : suggestion.confidenceLevel === 'MEDIUM'
+                ? 'Moderat'
+                : 'Lav'}{' '}
+            konfidens ({Math.round(suggestion.confidenceScore * 100)}%)
           </span>
         </div>
         {suggestion.hasRedFlags && (
@@ -332,17 +323,13 @@ export const AISuggestionReview = ({
           className="w-full p-3 border rounded-lg text-sm mb-3 min-h-[100px]"
         />
       ) : (
-        <div className="p-3 bg-gray-50 rounded-lg text-sm mb-3">
-          {suggestion.suggestedText}
-        </div>
+        <div className="p-3 bg-gray-50 rounded-lg text-sm mb-3">{suggestion.suggestedText}</div>
       )}
 
       {/* Red flag warnings */}
       {suggestion.hasRedFlags && suggestion.redFlags?.length > 0 && (
         <div className="mb-3 p-2 bg-red-50 rounded border border-red-200">
-          <div className="text-xs font-medium text-red-700 mb-1">
-            Påkrevd vurdering:
-          </div>
+          <div className="text-xs font-medium text-red-700 mb-1">Påkrevd vurdering:</div>
           <ul className="text-xs text-red-600 list-disc list-inside">
             {suggestion.redFlags.map((flag, idx) => (
               <li key={idx}>{flag.description}</li>
@@ -404,5 +391,5 @@ export const AISuggestionReview = ({
 export default {
   QuickFeedback,
   DetailedFeedback,
-  AISuggestionReview
+  AISuggestionReview,
 };

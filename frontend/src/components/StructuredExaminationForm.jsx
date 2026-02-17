@@ -8,7 +8,7 @@ export default function StructuredExaminationForm({
   encounterId,
   isOpen,
   onClose,
-  existingFinding = null
+  existingFinding = null,
 }) {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
@@ -53,13 +53,15 @@ export default function StructuredExaminationForm({
   };
 
   const handleChange = (field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
-  if (!isOpen || !protocol) return null;
+  if (!isOpen || !protocol) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
@@ -119,9 +121,7 @@ export default function StructuredExaminationForm({
 
             {/* Result */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Resultat *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Resultat *</label>
               <select
                 value={formData.result}
                 onChange={(e) => handleChange('result', e.target.value)}
@@ -138,9 +138,7 @@ export default function StructuredExaminationForm({
 
             {/* Laterality */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Lateralitet
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Lateralitet</label>
               <select
                 value={formData.laterality}
                 onChange={(e) => handleChange('laterality', e.target.value)}
@@ -188,9 +186,7 @@ export default function StructuredExaminationForm({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Enhet
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Enhet</label>
                 <input
                   type="text"
                   value={formData.measurement_unit}

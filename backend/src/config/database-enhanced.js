@@ -88,7 +88,9 @@ export const initializeDatabase = async () => {
  * Get main pool
  */
 export const getPool = () => {
-  if (!pool) throw new Error('Database not initialized. Call initializeDatabase()');
+  if (!pool) {
+    throw new Error('Database not initialized. Call initializeDatabase()');
+  }
   return pool;
 };
 
@@ -123,9 +125,7 @@ export const queryRead = async (text, params) => {
 /**
  * Get client for transactions
  */
-export const getClient = async () => {
-  return await getPool().connect();
-};
+export const getClient = async () => await getPool().connect();
 
 /**
  * Transaction helper
@@ -150,7 +150,7 @@ export const transaction = async (callback) => {
  */
 export const healthCheck = async () => {
   try {
-    const result = await query('SELECT 1 as healthy');
+    const _result = await query('SELECT 1 as healthy');
     return { healthy: true, timestamp: new Date().toISOString() };
   } catch (error) {
     return { healthy: false, error: error.message, timestamp: new Date().toISOString() };
@@ -173,8 +173,12 @@ export const getPoolStats = () =>
  * Close pools
  */
 export const closeDatabase = async () => {
-  if (pool) await pool.end();
-  if (readReplicaPool) await readReplicaPool.end();
+  if (pool) {
+    await pool.end();
+  }
+  if (readReplicaPool) {
+    await readReplicaPool.end();
+  }
   logger.info('✅ Database pools closed');
 };
 

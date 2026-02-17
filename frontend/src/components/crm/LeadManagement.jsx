@@ -11,15 +11,15 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import {
-  UserPlus,
+  _UserPlus,
   Phone,
   Mail,
   Calendar,
-  MapPin,
-  Star,
-  Clock,
-  ChevronRight,
-  Filter,
+  _MapPin,
+  _Star,
+  _Clock,
+  _ChevronRight,
+  _Filter,
   Search,
   Plus,
   MoreVertical,
@@ -27,8 +27,8 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  TrendingUp,
-  Target,
+  _TrendingUp,
+  _Target,
   Loader2,
 } from 'lucide-react';
 import { crmAPI } from '../../services/api';
@@ -96,7 +96,7 @@ export default function LeadManagement({ language = 'no' }) {
       setShowNewLeadForm(false);
     } catch (err) {
       logger.error('Error creating lead:', err);
-      toast.error('Failed to create lead: ' + err.message);
+      toast.error(`Failed to create lead: ${err.message}`);
     }
   };
 
@@ -110,7 +110,7 @@ export default function LeadManagement({ language = 'no' }) {
       }
     } catch (err) {
       logger.error('Error updating lead:', err);
-      toast.error('Failed to update lead: ' + err.message);
+      toast.error(`Failed to update lead: ${err.message}`);
     }
   };
 
@@ -122,7 +122,7 @@ export default function LeadManagement({ language = 'no' }) {
       setSelectedLead(null);
     } catch (err) {
       logger.error('Error converting lead:', err);
-      toast.error('Failed to convert lead: ' + err.message);
+      toast.error(`Failed to convert lead: ${err.message}`);
     }
   };
 

@@ -14,7 +14,7 @@ class Cache {
       hits: 0,
       misses: 0,
       sets: 0,
-      deletes: 0
+      deletes: 0,
     };
   }
 
@@ -48,7 +48,7 @@ class Cache {
   set(key, value, ttl = 300) {
     this.store.set(key, value);
     if (ttl > 0) {
-      this.ttls.set(key, Date.now() + (ttl * 1000));
+      this.ttls.set(key, Date.now() + ttl * 1000);
     }
     this.stats.sets++;
 
@@ -73,7 +73,7 @@ class Cache {
    * @param {string} pattern - Key pattern (supports wildcards *)
    */
   deletePattern(pattern) {
-    const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
+    const regex = new RegExp(`^${pattern.replace(/\*/g, '.*')}$`);
     let count = 0;
 
     for (const key of this.store.keys()) {
@@ -101,14 +101,15 @@ class Cache {
    * Get cache statistics
    */
   getStats() {
-    const hitRate = this.stats.hits + this.stats.misses > 0
-      ? (this.stats.hits / (this.stats.hits + this.stats.misses) * 100).toFixed(2)
-      : 0;
+    const hitRate =
+      this.stats.hits + this.stats.misses > 0
+        ? ((this.stats.hits / (this.stats.hits + this.stats.misses)) * 100).toFixed(2)
+        : 0;
 
     return {
       ...this.stats,
       size: this.store.size,
-      hitRate: `${hitRate}%`
+      hitRate: `${hitRate}%`,
     };
   }
 
@@ -155,15 +156,21 @@ class Cache {
 const cache = new Cache();
 
 // Clean expired entries every 5 minutes
-setInterval(() => {
-  cache.cleanExpired();
-}, 5 * 60 * 1000);
+setInterval(
+  () => {
+    cache.cleanExpired();
+  },
+  5 * 60 * 1000
+);
 
 // Log cache stats every hour in development
 if (process.env.NODE_ENV === 'development') {
-  setInterval(() => {
-    logger.debug('Cache stats', cache.getStats());
-  }, 60 * 60 * 1000);
+  setInterval(
+    () => {
+      logger.debug('Cache stats', cache.getStats());
+    },
+    60 * 60 * 1000
+  );
 }
 
 /**
@@ -177,7 +184,7 @@ export const CacheKeys = {
   patientStats: (patientId) => `patient:${patientId}:stats`,
   organizationSettings: (orgId) => `org:${orgId}:settings`,
   messageTemplate: (templateId) => `template:${templateId}`,
-  kpiStats: (orgId, startDate, endDate) => `kpi:${orgId}:${startDate}:${endDate}`
+  kpiStats: (orgId, startDate, endDate) => `kpi:${orgId}:${startDate}:${endDate}`,
 };
 
 export default cache;

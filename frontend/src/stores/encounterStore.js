@@ -193,7 +193,9 @@ const useEncounterStore = create(
       set((state) => {
         const key = codeType === 'icpc' ? 'icpc_codes' : 'icd10_codes';
         const existing = state.encounterData[key] || [];
-        if (existing.some((c) => c.code === code.code)) return state;
+        if (existing.some((c) => c.code === code.code)) {
+          return state;
+        }
         return {
           encounterData: {
             ...state.encounterData,

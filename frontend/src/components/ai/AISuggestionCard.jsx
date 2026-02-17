@@ -8,7 +8,7 @@
  * - Compact and expanded views
  */
 
-import React, { useState, useCallback } from 'react';
+import _React, { useState, useCallback } from 'react';
 import { ChevronDown, ChevronUp, Brain, AlertTriangle, Sparkles } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 
@@ -51,7 +51,7 @@ const TEXTS = {
       summary: 'Summary',
       default: 'Suggestion',
     },
-  }
+  },
 };
 
 /**
@@ -128,9 +128,7 @@ const ConfidenceIndicator = ({ score, language = 'NO', size = 'md' }) => {
         <span className={`${s.text} font-medium text-slate-600`}>
           {t.confidence}: <span className={confidence.textColor}>{confidence.label}</span>
         </span>
-        <span className={`${s.text} font-semibold ${confidence.textColor}`}>
-          {percentage}%
-        </span>
+        <span className={`${s.text} font-semibold ${confidence.textColor}`}>{percentage}%</span>
       </div>
       <div className={`w-full ${s.bar} bg-slate-200 rounded-full overflow-hidden`}>
         <div
@@ -182,18 +180,15 @@ const HighlightedText = ({ text, highlights = [] }) => {
 
   return (
     <span>
-      {parts.map((part) => (
+      {parts.map((part) =>
         part.highlighted ? (
-          <mark
-            key={part.key}
-            className="bg-yellow-200 text-slate-900 rounded px-0.5"
-          >
+          <mark key={part.key} className="bg-yellow-200 text-slate-900 rounded px-0.5">
             {part.text}
           </mark>
         ) : (
           <span key={part.key}>{part.text}</span>
         )
-      ))}
+      )}
     </span>
   );
 };
@@ -216,7 +211,7 @@ export const AISuggestionCard = ({
   const [expanded, setExpanded] = useState(defaultExpanded);
 
   const {
-    id,
+    _id,
     type = 'default',
     suggestionText = '',
     confidenceScore = 0,
@@ -230,9 +225,10 @@ export const AISuggestionCard = ({
   // Determine if content should be truncated
   const maxCompactLength = 150;
   const shouldTruncate = collapsible && suggestionText.length > maxCompactLength;
-  const displayText = !expanded && shouldTruncate
-    ? suggestionText.slice(0, maxCompactLength) + '...'
-    : suggestionText;
+  const displayText =
+    !expanded && shouldTruncate
+      ? `${suggestionText.slice(0, maxCompactLength)}...`
+      : suggestionText;
 
   const handleToggle = useCallback(() => {
     if (collapsible) {
@@ -240,11 +236,14 @@ export const AISuggestionCard = ({
     }
   }, [collapsible]);
 
-  const handleClick = useCallback((e) => {
-    if (onClick) {
-      onClick(suggestion, e);
-    }
-  }, [onClick, suggestion]);
+  const handleClick = useCallback(
+    (e) => {
+      if (onClick) {
+        onClick(suggestion, e);
+      }
+    },
+    [onClick, suggestion]
+  );
 
   return (
     <div
@@ -291,11 +290,7 @@ export const AISuggestionCard = ({
         {/* Confidence Bar */}
         {showConfidence && expanded && (
           <div className="mb-3">
-            <ConfidenceIndicator
-              score={confidenceScore}
-              language={language}
-              size="sm"
-            />
+            <ConfidenceIndicator score={confidenceScore} language={language} size="sm" />
           </div>
         )}
 
@@ -362,9 +357,8 @@ export const AISuggestionCardCompact = ({
   const typeLabel = t.types[type?.toLowerCase()] || t.types.default;
 
   // Truncate text for compact view
-  const truncatedText = suggestionText.length > 80
-    ? suggestionText.slice(0, 80) + '...'
-    : suggestionText;
+  const truncatedText =
+    suggestionText.length > 80 ? `${suggestionText.slice(0, 80)}...` : suggestionText;
 
   return (
     <button
@@ -372,9 +366,10 @@ export const AISuggestionCardCompact = ({
       onClick={() => onClick?.(suggestion)}
       className={`
         w-full text-left px-3 py-2 rounded-lg border transition-all duration-150
-        ${selected
-          ? 'border-teal-500 bg-teal-50 ring-2 ring-teal-500 ring-opacity-20'
-          : `border-slate-200 hover:border-slate-300 hover:bg-slate-50`
+        ${
+          selected
+            ? 'border-teal-500 bg-teal-50 ring-2 ring-teal-500 ring-opacity-20'
+            : `border-slate-200 hover:border-slate-300 hover:bg-slate-50`
         }
       `}
     >

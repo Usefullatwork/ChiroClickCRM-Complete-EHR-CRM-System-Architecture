@@ -8,12 +8,12 @@ import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { appointmentsAPI, patientsAPI, usersAPI } from '../services/api';
 import { ArrowLeft, Save, Calendar, Clock, User, Repeat } from 'lucide-react';
-import { useTranslation, formatDate, formatTime } from '../i18n';
+import { useTranslation, _formatDate, _formatTime } from '../i18n';
 import Breadcrumbs from '../components/common/Breadcrumbs';
 
 export default function NewAppointment() {
   const navigate = useNavigate();
-  const { t, lang } = useTranslation('appointments');
+  const { t, _lang } = useTranslation('appointments');
 
   const [formData, setFormData] = useState({
     patient_id: '',
@@ -81,11 +81,21 @@ export default function NewAppointment() {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.patient_id) newErrors.patient_id = 'Patient is required';
-    if (!formData.practitioner_id) newErrors.practitioner_id = 'Practitioner is required';
-    if (!formData.start_time) newErrors.start_time = 'Start time is required';
-    if (!formData.end_time) newErrors.end_time = 'End time is required';
-    if (!formData.appointment_type) newErrors.appointment_type = 'Appointment type is required';
+    if (!formData.patient_id) {
+      newErrors.patient_id = 'Patient is required';
+    }
+    if (!formData.practitioner_id) {
+      newErrors.practitioner_id = 'Practitioner is required';
+    }
+    if (!formData.start_time) {
+      newErrors.start_time = 'Start time is required';
+    }
+    if (!formData.end_time) {
+      newErrors.end_time = 'End time is required';
+    }
+    if (!formData.appointment_type) {
+      newErrors.appointment_type = 'Appointment type is required';
+    }
 
     // Validate end time is after start time
     if (formData.start_time && formData.end_time) {

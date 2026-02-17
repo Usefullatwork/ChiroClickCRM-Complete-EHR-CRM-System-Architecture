@@ -3,7 +3,7 @@
  * Comprehensive click-to-text template system for SOAP documentation
  */
 
-import { useState, useEffect } from 'react';
+import { useState, _useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { templatesAPI } from '../services/api';
 import {
@@ -13,21 +13,21 @@ import {
   ChevronRight,
   ChevronDown,
   X,
-  Filter,
-  Check,
+  _Filter,
+  _Check,
   Copy,
   BookOpen,
   Activity,
   Heart,
   Brain,
-  Bone
+  Bone,
 } from 'lucide-react';
 
 const SOAP_SECTIONS = [
   { value: 'SUBJECTIVE', label: 'Subjektiv (S)', icon: <BookOpen size={16} /> },
   { value: 'OBJECTIVE', label: 'Objektiv (O)', icon: <Activity size={16} /> },
   { value: 'ASSESSMENT', label: 'Vurdering (A)', icon: <Brain size={16} /> },
-  { value: 'PLAN', label: 'Plan (P)', icon: <Heart size={16} /> }
+  { value: 'PLAN', label: 'Plan (P)', icon: <Heart size={16} /> },
 ];
 
 const BODY_REGIONS = [
@@ -39,66 +39,77 @@ const BODY_REGIONS = [
   { value: 'wrist', label: 'Håndledd', icon: '✋' },
   { value: 'hip', label: 'Hofte', icon: '🦵' },
   { value: 'knee', label: 'Kne', icon: '🦵' },
-  { value: 'ankle', label: 'Ankel', icon: '👣' }
+  { value: 'ankle', label: 'Ankel', icon: '👣' },
 ];
 
 export default function OrthopedicTemplatePicker({
   soapSection,
   onSelectTemplate,
   onClose,
-  currentField = null
+  _currentField = null,
 }) {
   const [activeTab, setActiveTab] = useState('templates'); // 'templates', 'tests', 'phrases', 'favorites'
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [expandedCategories, setExpandedCategories] = useState(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBodyRegion, setSelectedBodyRegion] = useState(null);
-  const [selectedTemplateType, setSelectedTemplateType] = useState(null);
+  const [selectedTemplateType, _setSelectedTemplateType] = useState(null);
 
   // Fetch template categories
   const { data: categories } = useQuery({
     queryKey: ['template-categories', soapSection],
-    queryFn: () => templatesAPI.getCategories({ soap_section: soapSection })
+    queryFn: () => templatesAPI.getCategories({ soap_section: soapSection }),
   });
 
   // Fetch templates with filters
   const { data: templates, isLoading: templatesLoading } = useQuery({
-    queryKey: ['templates', selectedCategory, soapSection, selectedBodyRegion, searchQuery, selectedTemplateType, activeTab === 'favorites'],
-    queryFn: () => templatesAPI.getAll({
-      category_id: selectedCategory,
-      soap_section: soapSection,
-      body_region: selectedBodyRegion,
-      template_type: selectedTemplateType,
-      search: searchQuery,
-      favorites_only: activeTab === 'favorites'
-    }),
-    enabled: activeTab === 'templates' || activeTab === 'favorites'
+    queryKey: [
+      'templates',
+      selectedCategory,
+      soapSection,
+      selectedBodyRegion,
+      searchQuery,
+      selectedTemplateType,
+      activeTab === 'favorites',
+    ],
+    queryFn: () =>
+      templatesAPI.getAll({
+        category_id: selectedCategory,
+        soap_section: soapSection,
+        body_region: selectedBodyRegion,
+        template_type: selectedTemplateType,
+        search: searchQuery,
+        favorites_only: activeTab === 'favorites',
+      }),
+    enabled: activeTab === 'templates' || activeTab === 'favorites',
   });
 
   // Fetch orthopedic tests
   const { data: tests, isLoading: testsLoading } = useQuery({
     queryKey: ['orthopedic-tests', selectedBodyRegion, searchQuery],
-    queryFn: () => templatesAPI.getTestsLibrary({
-      bodyRegion: selectedBodyRegion,
-      search: searchQuery
-    }),
-    enabled: activeTab === 'tests'
+    queryFn: () =>
+      templatesAPI.getTestsLibrary({
+        bodyRegion: selectedBodyRegion,
+        search: searchQuery,
+      }),
+    enabled: activeTab === 'tests',
   });
 
   // Fetch phrases
   const { data: phrases, isLoading: phrasesLoading } = useQuery({
     queryKey: ['template-phrases', selectedBodyRegion, searchQuery],
-    queryFn: () => templatesAPI.getPhrases({
-      body_region: selectedBodyRegion,
-      search: searchQuery
-    }),
-    enabled: activeTab === 'phrases'
+    queryFn: () =>
+      templatesAPI.getPhrases({
+        body_region: selectedBodyRegion,
+        search: searchQuery,
+      }),
+    enabled: activeTab === 'phrases',
   });
 
   // Fetch user preferences
-  const { data: userPrefs } = useQuery({
+  const { data: _userPrefs } = useQuery({
     queryKey: ['user-template-preferences'],
-    queryFn: () => templatesAPI.getUserPreferences()
+    queryFn: () => templatesAPI.getUserPreferences(),
   });
 
   const toggleCategory = (categoryId) => {
@@ -116,7 +127,7 @@ export default function OrthopedicTemplatePicker({
     await templatesAPI.trackUsage(template.id);
 
     // Parse template content and handle variables
-    let content = template.content_no; // Using Norwegian by default
+    const content = template.content_no; // Using Norwegian by default
 
     // If template has variables, show a modal to fill them
     if (template.template_data?.variables && template.template_data.variables.length > 0) {
@@ -143,9 +154,11 @@ export default function OrthopedicTemplatePicker({
   };
 
   const renderCategoryTree = (cats, level = 0) => {
-    if (!cats) return null;
+    if (!cats) {
+      return null;
+    }
 
-    return cats.map(cat => (
+    return cats.map((cat) => (
       <div key={cat.id} className={`ml-${level * 4}`}>
         <div
           className={`flex items-center justify-between p-2 hover:bg-gray-50 rounded cursor-pointer ${
@@ -159,13 +172,13 @@ export default function OrthopedicTemplatePicker({
           }}
         >
           <div className="flex items-center gap-2">
-            {cat.children && cat.children.length > 0 && (
-              expandedCategories.has(cat.id) ? (
+            {cat.children &&
+              cat.children.length > 0 &&
+              (expandedCategories.has(cat.id) ? (
                 <ChevronDown size={16} />
               ) : (
                 <ChevronRight size={16} />
-              )
-            )}
+              ))}
             <span className="text-sm font-medium">{cat.name_no}</span>
             {cat.template_count > 0 && (
               <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
@@ -176,9 +189,7 @@ export default function OrthopedicTemplatePicker({
         </div>
 
         {expandedCategories.has(cat.id) && cat.children && cat.children.length > 0 && (
-          <div className="ml-4">
-            {renderCategoryTree(cat.children, level + 1)}
-          </div>
+          <div className="ml-4">{renderCategoryTree(cat.children, level + 1)}</div>
         )}
       </div>
     ));
@@ -205,7 +216,9 @@ export default function OrthopedicTemplatePicker({
           )}
         </div>
         <div className="flex items-center gap-1">
-          {template.is_user_favorite && <Star size={14} className="text-yellow-500 fill-yellow-500" />}
+          {template.is_user_favorite && (
+            <Star size={14} className="text-yellow-500 fill-yellow-500" />
+          )}
           {template.usage_count > 10 && <Clock size={14} className="text-gray-400" />}
         </div>
       </div>
@@ -216,7 +229,7 @@ export default function OrthopedicTemplatePicker({
 
       {template.keywords && template.keywords.length > 0 && (
         <div className="flex gap-1 mt-2 flex-wrap">
-          {template.keywords.slice(0, 3).map(keyword => (
+          {template.keywords.slice(0, 3).map((keyword) => (
             <span key={keyword} className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded">
               {keyword}
             </span>
@@ -247,14 +260,15 @@ export default function OrthopedicTemplatePicker({
         <Bone size={16} className="text-gray-400" />
       </div>
 
-      {test.description_no && (
-        <p className="text-sm text-gray-600 mb-2">{test.description_no}</p>
-      )}
+      {test.description_no && <p className="text-sm text-gray-600 mb-2">{test.description_no}</p>}
 
       {test.indicates_conditions && test.indicates_conditions.length > 0 && (
         <div className="flex gap-1 mt-2 flex-wrap">
-          {test.indicates_conditions.slice(0, 2).map(condition => (
-            <span key={condition} className="text-xs bg-orange-50 text-orange-700 px-2 py-0.5 rounded">
+          {test.indicates_conditions.slice(0, 2).map((condition) => (
+            <span
+              key={condition}
+              className="text-xs bg-orange-50 text-orange-700 px-2 py-0.5 rounded"
+            >
               {condition}
             </span>
           ))}
@@ -285,14 +299,11 @@ export default function OrthopedicTemplatePicker({
           <div>
             <h2 className="text-xl font-bold">Kliniske Maler</h2>
             <p className="text-sm text-gray-500">
-              {soapSection ? `${SOAP_SECTIONS.find(s => s.value === soapSection)?.label} - ` : ''}
+              {soapSection ? `${SOAP_SECTIONS.find((s) => s.value === soapSection)?.label} - ` : ''}
               Velg mal for å sette inn tekst
             </p>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -349,7 +360,10 @@ export default function OrthopedicTemplatePicker({
         <div className="p-4 border-b bg-gray-50">
           <div className="flex gap-3">
             <div className="flex-1 relative">
-              <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <Search
+                size={18}
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              />
               <input
                 type="text"
                 placeholder="Søk maler, tester, fraser..."
@@ -366,7 +380,7 @@ export default function OrthopedicTemplatePicker({
               className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Alle områder</option>
-              {BODY_REGIONS.map(region => (
+              {BODY_REGIONS.map((region) => (
                 <option key={region.value} value={region.value}>
                   {region.icon} {region.label}
                 </option>
@@ -433,7 +447,8 @@ export default function OrthopedicTemplatePicker({
                   templates.data.map(renderTemplate)
                 ) : (
                   <p className="text-gray-500 col-span-2 text-center py-8">
-                    Ingen favoritter ennå. Klikk på stjerne-ikonet på en mal for å legge til favoritter.
+                    Ingen favoritter ennå. Klikk på stjerne-ikonet på en mal for å legge til
+                    favoritter.
                   </p>
                 )}
               </div>
@@ -444,15 +459,13 @@ export default function OrthopedicTemplatePicker({
         {/* Footer */}
         <div className="border-t p-4 bg-gray-50 flex items-center justify-between">
           <div className="text-sm text-gray-500">
-            {activeTab === 'templates' && templates?.pagination && (
-              `Viser ${templates.data.length} av ${templates.pagination.total} maler`
-            )}
-            {activeTab === 'tests' && tests?.data && (
-              `${tests.data.length} tester tilgjengelig`
-            )}
-            {activeTab === 'phrases' && phrases?.data && (
-              `${phrases.data.length} fraser tilgjengelig`
-            )}
+            {activeTab === 'templates' &&
+              templates?.pagination &&
+              `Viser ${templates.data.length} av ${templates.pagination.total} maler`}
+            {activeTab === 'tests' && tests?.data && `${tests.data.length} tester tilgjengelig`}
+            {activeTab === 'phrases' &&
+              phrases?.data &&
+              `${phrases.data.length} fraser tilgjengelig`}
           </div>
           <button
             onClick={onClose}

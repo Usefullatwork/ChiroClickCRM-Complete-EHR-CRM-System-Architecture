@@ -10,7 +10,7 @@ import {
   FileText,
   ExternalLink,
   Copy,
-  CheckCircle2
+  CheckCircle2,
 } from 'lucide-react';
 import api from '../../api/client';
 
@@ -25,18 +25,15 @@ import api from '../../api/client';
  * @param {Object} props.patient - Patient object
  * @param {Function} props.onSent - Callback after successful send
  */
-export default function SendProgramModal({
-  isOpen,
-  onClose,
-  prescription,
-  patient,
-  onSent
-}) {
+export default function SendProgramModal({ isOpen, onClose, prescription, patient, onSent }) {
   const [sendMethod, setSendMethod] = useState('both'); // 'email', 'sms', 'both'
   const [includeAttachment, setIncludeAttachment] = useState(true);
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState(null);
   const [copied, setCopied] = useState(false);
+
+  const hasEmail = !!patient?.email;
+  const hasPhone = !!(patient?.phone || patient?.mobile);
 
   // Reset state when modal opens
   useEffect(() => {
@@ -46,17 +43,6 @@ export default function SendProgramModal({
       setIncludeAttachment(true);
     }
   }, [isOpen]);
-
-  if (!isOpen) return null;
-
-  const hasEmail = !!patient?.email;
-  const hasPhone = !!(patient?.phone || patient?.mobile);
-
-  // Determine available methods
-  const availableMethods = [];
-  if (hasEmail) availableMethods.push('email');
-  if (hasPhone) availableMethods.push('sms');
-  if (hasEmail && hasPhone) availableMethods.push('both');
 
   // Set default method based on availability
   useEffect(() => {
@@ -68,6 +54,22 @@ export default function SendProgramModal({
       setSendMethod('both');
     }
   }, [hasEmail, hasPhone]);
+
+  if (!isOpen) {
+    return null;
+  }
+
+  // Determine available methods
+  const availableMethods = [];
+  if (hasEmail) {
+    availableMethods.push('email');
+  }
+  if (hasPhone) {
+    availableMethods.push('sms');
+  }
+  if (hasEmail && hasPhone) {
+    availableMethods.push('both');
+  }
 
   const handleSend = async () => {
     setSending(true);
@@ -85,13 +87,13 @@ export default function SendProgramModal({
 
       const response = await api.post(endpoint, {
         prescriptionId: prescription.id,
-        includeAttachment
+        includeAttachment,
       });
 
       setResult({
         success: true,
         message: response.data.message || 'Sendt!',
-        details: response.data.results
+        details: response.data.results,
       });
 
       if (onSent) {
@@ -101,7 +103,7 @@ export default function SendProgramModal({
       setResult({
         success: false,
         message: error.response?.data?.error || 'Kunne ikke sende',
-        details: error.response?.data?.details
+        details: error.response?.data?.details,
       });
     } finally {
       setSending(false);
@@ -124,10 +126,7 @@ export default function SendProgramModal({
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/50 transition-opacity"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 bg-black/50 transition-opacity" onClick={onClose} />
 
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
@@ -140,11 +139,10 @@ export default function SendProgramModal({
                   <Send className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-white">
-                    Send ovelsesprogram
-                  </h2>
+                  <h2 className="text-lg font-semibold text-white">Send ovelsesprogram</h2>
                   <p className="text-sm text-blue-100">
-                    {patient?.first_name || patient?.firstName} {patient?.last_name || patient?.lastName}
+                    {patient?.first_name || patient?.firstName}{' '}
+                    {patient?.last_name || patient?.lastName}
                   </p>
                 </div>
               </div>
@@ -161,9 +159,7 @@ export default function SendProgramModal({
           <div className="px-6 py-5">
             {/* Patient contact info */}
             <div className="mb-5 rounded-lg bg-gray-50 p-4">
-              <h3 className="mb-3 text-sm font-medium text-gray-700">
-                Kontaktinformasjon
-              </h3>
+              <h3 className="mb-3 text-sm font-medium text-gray-700">Kontaktinformasjon</h3>
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
                   <Mail className={`h-4 w-4 ${hasEmail ? 'text-green-600' : 'text-gray-400'}`} />
@@ -173,7 +169,9 @@ export default function SendProgramModal({
                   {hasEmail && <CheckCircle2 className="h-4 w-4 text-green-500" />}
                 </div>
                 <div className="flex items-center gap-3">
-                  <Smartphone className={`h-4 w-4 ${hasPhone ? 'text-green-600' : 'text-gray-400'}`} />
+                  <Smartphone
+                    className={`h-4 w-4 ${hasPhone ? 'text-green-600' : 'text-gray-400'}`}
+                  />
                   <span className={`text-sm ${hasPhone ? 'text-gray-900' : 'text-gray-400'}`}>
                     {patient?.phone || patient?.mobile || 'Ingen telefon registrert'}
                   </span>
@@ -185,9 +183,7 @@ export default function SendProgramModal({
             {/* Send method selection */}
             {(hasEmail || hasPhone) && (
               <div className="mb-5">
-                <h3 className="mb-3 text-sm font-medium text-gray-700">
-                  Hvordan vil du sende?
-                </h3>
+                <h3 className="mb-3 text-sm font-medium text-gray-700">Hvordan vil du sende?</h3>
                 <div className="grid grid-cols-3 gap-2">
                   {/* Email option */}
                   <button
@@ -197,16 +193,20 @@ export default function SendProgramModal({
                       sendMethod === 'email'
                         ? 'border-blue-500 bg-blue-50'
                         : hasEmail
-                        ? 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                        : 'cursor-not-allowed border-gray-100 bg-gray-50 opacity-50'
+                          ? 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                          : 'cursor-not-allowed border-gray-100 bg-gray-50 opacity-50'
                     }`}
                   >
-                    <Mail className={`h-5 w-5 ${
-                      sendMethod === 'email' ? 'text-blue-600' : 'text-gray-500'
-                    }`} />
-                    <span className={`text-xs font-medium ${
-                      sendMethod === 'email' ? 'text-blue-700' : 'text-gray-600'
-                    }`}>
+                    <Mail
+                      className={`h-5 w-5 ${
+                        sendMethod === 'email' ? 'text-blue-600' : 'text-gray-500'
+                      }`}
+                    />
+                    <span
+                      className={`text-xs font-medium ${
+                        sendMethod === 'email' ? 'text-blue-700' : 'text-gray-600'
+                      }`}
+                    >
                       E-post
                     </span>
                   </button>
@@ -219,16 +219,20 @@ export default function SendProgramModal({
                       sendMethod === 'sms'
                         ? 'border-blue-500 bg-blue-50'
                         : hasPhone
-                        ? 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                        : 'cursor-not-allowed border-gray-100 bg-gray-50 opacity-50'
+                          ? 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                          : 'cursor-not-allowed border-gray-100 bg-gray-50 opacity-50'
                     }`}
                   >
-                    <Smartphone className={`h-5 w-5 ${
-                      sendMethod === 'sms' ? 'text-blue-600' : 'text-gray-500'
-                    }`} />
-                    <span className={`text-xs font-medium ${
-                      sendMethod === 'sms' ? 'text-blue-700' : 'text-gray-600'
-                    }`}>
+                    <Smartphone
+                      className={`h-5 w-5 ${
+                        sendMethod === 'sms' ? 'text-blue-600' : 'text-gray-500'
+                      }`}
+                    />
+                    <span
+                      className={`text-xs font-medium ${
+                        sendMethod === 'sms' ? 'text-blue-700' : 'text-gray-600'
+                      }`}
+                    >
                       SMS
                     </span>
                   </button>
@@ -241,21 +245,27 @@ export default function SendProgramModal({
                       sendMethod === 'both'
                         ? 'border-blue-500 bg-blue-50'
                         : hasEmail && hasPhone
-                        ? 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                        : 'cursor-not-allowed border-gray-100 bg-gray-50 opacity-50'
+                          ? 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                          : 'cursor-not-allowed border-gray-100 bg-gray-50 opacity-50'
                     }`}
                   >
                     <div className="flex -space-x-1">
-                      <Mail className={`h-4 w-4 ${
-                        sendMethod === 'both' ? 'text-blue-600' : 'text-gray-500'
-                      }`} />
-                      <Smartphone className={`h-4 w-4 ${
-                        sendMethod === 'both' ? 'text-blue-600' : 'text-gray-500'
-                      }`} />
+                      <Mail
+                        className={`h-4 w-4 ${
+                          sendMethod === 'both' ? 'text-blue-600' : 'text-gray-500'
+                        }`}
+                      />
+                      <Smartphone
+                        className={`h-4 w-4 ${
+                          sendMethod === 'both' ? 'text-blue-600' : 'text-gray-500'
+                        }`}
+                      />
                     </div>
-                    <span className={`text-xs font-medium ${
-                      sendMethod === 'both' ? 'text-blue-700' : 'text-gray-600'
-                    }`}>
+                    <span
+                      className={`text-xs font-medium ${
+                        sendMethod === 'both' ? 'text-blue-700' : 'text-gray-600'
+                      }`}
+                    >
                       Begge
                     </span>
                   </button>
@@ -275,9 +285,7 @@ export default function SendProgramModal({
                   />
                   <FileText className="h-5 w-5 text-gray-500" />
                   <div>
-                    <p className="text-sm font-medium text-gray-700">
-                      Legg ved PDF
-                    </p>
+                    <p className="text-sm font-medium text-gray-700">Legg ved PDF</p>
                     <p className="text-xs text-gray-500">
                       Inkluder ovelsesprogrammet som PDF-vedlegg
                     </p>
@@ -288,9 +296,7 @@ export default function SendProgramModal({
 
             {/* Program summary */}
             <div className="mb-5 rounded-lg border border-gray-200 p-4">
-              <h3 className="mb-2 text-sm font-medium text-gray-700">
-                Program
-              </h3>
+              <h3 className="mb-2 text-sm font-medium text-gray-700">Program</h3>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-600">
                   {prescription?.exercises?.length || 0} ovelser
@@ -317,12 +323,8 @@ export default function SendProgramModal({
                 <div className="flex items-center gap-3">
                   <ExternalLink className="h-5 w-5 text-gray-500" />
                   <div>
-                    <p className="text-sm font-medium text-gray-700">
-                      Kopier lenke
-                    </p>
-                    <p className="truncate text-xs text-gray-500 max-w-[200px]">
-                      {portalLink}
-                    </p>
+                    <p className="text-sm font-medium text-gray-700">Kopier lenke</p>
+                    <p className="truncate text-xs text-gray-500 max-w-[200px]">{portalLink}</p>
                   </div>
                 </div>
                 {copied ? (
@@ -338,12 +340,10 @@ export default function SendProgramModal({
               <div className="mb-5 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
                 <AlertCircle className="h-5 w-5 flex-shrink-0 text-amber-600" />
                 <div>
-                  <p className="text-sm font-medium text-amber-800">
-                    Ingen kontaktinformasjon
-                  </p>
+                  <p className="text-sm font-medium text-amber-800">Ingen kontaktinformasjon</p>
                   <p className="mt-1 text-xs text-amber-700">
-                    Pasienten har verken e-post eller telefonnummer registrert.
-                    Du kan kopiere lenken og dele den manuelt.
+                    Pasienten har verken e-post eller telefonnummer registrert. Du kan kopiere
+                    lenken og dele den manuelt.
                   </p>
                 </div>
               </div>
@@ -353,9 +353,7 @@ export default function SendProgramModal({
             {result && (
               <div
                 className={`mb-5 flex items-start gap-3 rounded-lg border p-4 ${
-                  result.success
-                    ? 'border-green-200 bg-green-50'
-                    : 'border-red-200 bg-red-50'
+                  result.success ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'
                 }`}
               >
                 {result.success ? (
@@ -374,17 +372,27 @@ export default function SendProgramModal({
                   {result.details && (
                     <div className="mt-2 space-y-1">
                       {result.details.email && (
-                        <p className={`text-xs ${
-                          result.details.email.success ? 'text-green-700' : 'text-red-700'
-                        }`}>
-                          E-post: {result.details.email.success ? 'Sendt' : result.details.email.error || 'Feilet'}
+                        <p
+                          className={`text-xs ${
+                            result.details.email.success ? 'text-green-700' : 'text-red-700'
+                          }`}
+                        >
+                          E-post:{' '}
+                          {result.details.email.success
+                            ? 'Sendt'
+                            : result.details.email.error || 'Feilet'}
                         </p>
                       )}
                       {result.details.sms && (
-                        <p className={`text-xs ${
-                          result.details.sms.success ? 'text-green-700' : 'text-red-700'
-                        }`}>
-                          SMS: {result.details.sms.success ? 'Sendt' : result.details.sms.error || 'Feilet'}
+                        <p
+                          className={`text-xs ${
+                            result.details.sms.success ? 'text-green-700' : 'text-red-700'
+                          }`}
+                        >
+                          SMS:{' '}
+                          {result.details.sms.success
+                            ? 'Sendt'
+                            : result.details.sms.error || 'Feilet'}
                         </p>
                       )}
                     </div>
@@ -416,7 +424,8 @@ export default function SendProgramModal({
                 ) : (
                   <>
                     <Send className="h-4 w-4" />
-                    Send {sendMethod === 'email' ? 'e-post' : sendMethod === 'sms' ? 'SMS' : 'begge'}
+                    Send{' '}
+                    {sendMethod === 'email' ? 'e-post' : sendMethod === 'sms' ? 'SMS' : 'begge'}
                   </>
                 )}
               </button>

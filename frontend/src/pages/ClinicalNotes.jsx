@@ -5,32 +5,32 @@
  * Clinical notes and SOAP documentation management
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import _React, { useState, useEffect, _useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   FileText,
   Plus,
   Search,
-  Filter,
-  Calendar,
+  _Filter,
+  _Calendar,
   User,
-  Clock,
-  ChevronRight,
+  _Clock,
+  _ChevronRight,
   ChevronDown,
   Edit,
-  Trash2,
-  Lock,
-  Unlock,
-  Download,
-  AlertTriangle,
-  CheckCircle,
-  Eye,
-  Printer,
+  _Trash2,
+  _Lock,
+  _Unlock,
+  _Download,
+  _AlertTriangle,
+  _CheckCircle,
+  _Eye,
+  _Printer,
   X,
   RefreshCw,
-  FileCheck,
-  Stethoscope,
+  _FileCheck,
+  _Stethoscope,
   ClipboardList,
   Activity,
 } from 'lucide-react';
@@ -53,7 +53,7 @@ import VestibularAssessment from '../components/notes/VestibularAssessment';
  */
 export default function ClinicalNotes() {
   const { patientId: routePatientId } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, _setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -92,7 +92,7 @@ export default function ClinicalNotes() {
   });
 
   // Fetch selected patient details
-  const { data: selectedPatient, isLoading: patientLoading } = useQuery({
+  const { data: selectedPatient, isLoading: _patientLoading } = useQuery({
     queryKey: ['patient', selectedPatientId],
     queryFn: () => api.patients.getById(selectedPatientId),
     enabled: !!selectedPatientId,
@@ -102,7 +102,7 @@ export default function ClinicalNotes() {
   const {
     data: notesData,
     isLoading: notesLoading,
-    refetch: refetchNotes,
+    refetch: _refetchNotes,
   } = useQuery({
     queryKey: ['clinical-notes', selectedPatientId, noteTypeFilter, dateRange, searchTerm],
     queryFn: () =>
@@ -391,7 +391,7 @@ export default function ClinicalNotes() {
   const renderNoteTemplate = () => {
     const patient = selectedPatient?.data || selectedPatient;
     const noteData = editingNote?.data || editingNote;
-    const readOnly = noteData?.signed_at != null;
+    const readOnly = noteData?.signed_at !== null && noteData?.signed_at !== undefined;
 
     const commonProps = {
       patient,

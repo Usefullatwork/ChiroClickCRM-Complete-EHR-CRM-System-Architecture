@@ -90,23 +90,21 @@ export const enforce2FA = async (req, res, next) => {
 /**
  * Role-based access control
  */
-export const requireRole = (allowedRoles) => {
-  return (req, res, next) => {
-    const user = req.user;
+export const requireRole = (allowedRoles) => (req, res, next) => {
+  const user = req.user;
 
-    if (!user) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
+  if (!user) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
 
-    if (!allowedRoles.includes(user.role)) {
-      return res.status(403).json({
-        error: 'Forbidden',
-        message: `This action requires one of the following roles: ${allowedRoles.join(', ')}`,
-      });
-    }
+  if (!allowedRoles.includes(user.role)) {
+    return res.status(403).json({
+      error: 'Forbidden',
+      message: `This action requires one of the following roles: ${allowedRoles.join(', ')}`,
+    });
+  }
 
-    next();
-  };
+  next();
 };
 
 /**
@@ -249,14 +247,13 @@ export const sanitizeInput = (req, res, next) => {
 /**
  * Sanitize string input (remove potentially dangerous characters)
  */
-const sanitizeString = (str) => {
-  return str
+const sanitizeString = (str) =>
+  str
     .replace(/<script[^>]*>.*?<\/script>/gi, '') // Remove script tags
     .replace(/<iframe[^>]*>.*?<\/iframe>/gi, '') // Remove iframes
     .replace(/javascript:/gi, '') // Remove javascript: protocol
     .replace(/on\w+\s*=/gi, '') // Remove inline event handlers
     .trim();
-};
 
 /**
  * Validate organization ownership
@@ -322,7 +319,7 @@ export const secureSession = {
  * Log security events
  */
 export const logSecurityEvent = async (req, eventType, details = {}) => {
-  const { logAction, ACTION_TYPES } = await import('../services/auditLog.js');
+  const { logAction, _ACTION_TYPES } = await import('../services/auditLog.js');
 
   await logAction(eventType, req.user?.id, {
     resourceType: 'security_event',

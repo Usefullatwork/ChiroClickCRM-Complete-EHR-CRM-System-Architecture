@@ -3,7 +3,7 @@
  * Allows practitioners to submit scored questionnaires for patients
  */
 
-import React, { useState, useCallback } from 'react';
+import _React, { useState, useCallback } from 'react';
 import { ClipboardList, Check, AlertCircle } from 'lucide-react';
 import { outcomesAPI } from '../../services/api';
 
@@ -323,7 +323,9 @@ export default function OutcomeMeasures({ patientId, encounterId, onSubmitted })
           rawAnswers,
         });
         setResult(response.data);
-        if (onSubmitted) onSubmitted(response.data);
+        if (onSubmitted) {
+          onSubmitted(response.data);
+        }
       } catch (err) {
         setError(err.response?.data?.error || err.message);
       } finally {
@@ -365,11 +367,19 @@ export default function OutcomeMeasures({ patientId, encounterId, onSubmitted })
   };
 
   const severityColor = (severity) => {
-    if (!severity) return 'text-gray-600';
+    if (!severity) {
+      return 'text-gray-600';
+    }
     const s = severity.toLowerCase();
-    if (s.includes('no ') || s.includes('minimal') || s.includes('none')) return 'text-green-600';
-    if (s.includes('mild')) return 'text-yellow-600';
-    if (s.includes('moderate')) return 'text-orange-600';
+    if (s.includes('no ') || s.includes('minimal') || s.includes('none')) {
+      return 'text-green-600';
+    }
+    if (s.includes('mild')) {
+      return 'text-yellow-600';
+    }
+    if (s.includes('moderate')) {
+      return 'text-orange-600';
+    }
     return 'text-red-600';
   };
 

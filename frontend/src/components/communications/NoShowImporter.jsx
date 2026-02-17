@@ -8,18 +8,18 @@
  * - Auto-generate SMS messages from templates
  * - Queue messages for approval
  */
-import React, { useState, useCallback, useRef } from 'react';
+import _React, { useState, useCallback, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Upload,
-  FileText,
+  _FileText,
   X,
   Check,
   AlertCircle,
-  User,
+  _User,
   Phone,
   Mail,
-  Calendar,
+  _Calendar,
   ChevronRight,
   Loader2,
 } from 'lucide-react';
@@ -56,10 +56,12 @@ function parseNoShowData(text) {
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
-    if (!line || (i === 0 && line.toLowerCase().includes('telefon'))) continue; // Skip header
+    if (!line || (i === 0 && line.toLowerCase().includes('telefon'))) {
+      continue;
+    } // Skip header
 
     // Try to parse as CSV or detect format
-    const parts = line.split(/[,;\t]/);
+    const _parts = line.split(/[,;\t]/);
 
     const entry = {
       lineNumber: i + 1,
@@ -134,7 +136,9 @@ export default function NoShowImporter({
   // Handle file upload
   const handleFileUpload = useCallback((e) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = (event) => {
@@ -157,7 +161,9 @@ export default function NoShowImporter({
 
   // Parse pasted text
   const handleParseText = useCallback(() => {
-    if (!rawData.trim()) return;
+    if (!rawData.trim()) {
+      return;
+    }
     const parsed = parseNoShowData(rawData);
     setParsedEntries(parsed);
     setStep(2);
@@ -227,7 +233,7 @@ export default function NoShowImporter({
 
       return { count: messages.length };
     },
-    onSuccess: (data) => {
+    onSuccess: (_data) => {
       setStep(4);
       queryClient.invalidateQueries(['pending-messages']);
     },
@@ -246,7 +252,9 @@ export default function NoShowImporter({
     onClose();
   }, [onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   const matchedCount = parsedEntries.filter((e) => e.matched).length;
   const unmatchedCount = parsedEntries.filter((e) => !e.matched && !e.error).length;

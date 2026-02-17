@@ -5,8 +5,8 @@
  * Demonstrates interactive body diagrams for marking pain and symptoms.
  */
 
-import React, { useState, useCallback } from 'react';
-import { Globe, Copy, Trash2, FileText, User, Eye, Maximize2, Info } from 'lucide-react';
+import _React, { useState, useCallback } from 'react';
+import { Globe, Copy, Trash2, FileText, User, _Eye, Maximize2, Info } from 'lucide-react';
 import { BodyChartPanel, QuickRegionButtons } from '../components/examination';
 
 // Symptom type reference
@@ -20,7 +20,7 @@ const SYMPTOM_TYPES = [
   { id: 'weakness', en: 'Weakness', no: 'Svakhet', color: '#6B7280' },
   { id: 'stiffness', en: 'Stiffness', no: 'Stivhet', color: '#10B981' },
   { id: 'swelling', en: 'Swelling', no: 'Hevelse', color: '#EC4899' },
-  { id: 'tenderness', en: 'Tenderness', no: 'Ømhet', color: '#F472B6' }
+  { id: 'tenderness', en: 'Tenderness', no: 'Ømhet', color: '#F472B6' },
 ];
 
 // Sample patient scenarios with correct marker format
@@ -31,65 +31,233 @@ const SAMPLE_SCENARIOS = {
       name: 'Low Back Pain with Radiculopathy',
       description: 'Classic L5 dermatomal pattern',
       markers: [
-        { id: 1, regionId: 'lumbar', view: 'back', symptom: 'pain', intensity: 7, description: 'Central lower back pain' },
-        { id: 2, regionId: 'l_thigh', view: 'front', symptom: 'aching', intensity: 5, description: 'Referred pain' },
-        { id: 3, regionId: 'l_lower_leg', view: 'front', symptom: 'numbness', intensity: 4, description: 'L5 dermatomal numbness' },
-        { id: 4, regionId: 'l_foot', view: 'front', symptom: 'tingling', intensity: 3, description: 'Foot paresthesia' }
-      ]
+        {
+          id: 1,
+          regionId: 'lumbar',
+          view: 'back',
+          symptom: 'pain',
+          intensity: 7,
+          description: 'Central lower back pain',
+        },
+        {
+          id: 2,
+          regionId: 'l_thigh',
+          view: 'front',
+          symptom: 'aching',
+          intensity: 5,
+          description: 'Referred pain',
+        },
+        {
+          id: 3,
+          regionId: 'l_lower_leg',
+          view: 'front',
+          symptom: 'numbness',
+          intensity: 4,
+          description: 'L5 dermatomal numbness',
+        },
+        {
+          id: 4,
+          regionId: 'l_foot',
+          view: 'front',
+          symptom: 'tingling',
+          intensity: 3,
+          description: 'Foot paresthesia',
+        },
+      ],
     },
     {
       name: 'Cervicogenic Headache',
       description: 'Upper cervical dysfunction with referral',
       markers: [
-        { id: 5, regionId: 'cervical', view: 'back', symptom: 'stiffness', intensity: 6, description: 'Upper cervical restriction' },
-        { id: 6, regionId: 'head', view: 'front', symptom: 'pain', intensity: 5, description: 'Unilateral temporal headache' },
-        { id: 7, regionId: 'r_shoulder', view: 'back', symptom: 'tenderness', intensity: 4, description: 'Upper trapezius trigger point' }
-      ]
+        {
+          id: 5,
+          regionId: 'cervical',
+          view: 'back',
+          symptom: 'stiffness',
+          intensity: 6,
+          description: 'Upper cervical restriction',
+        },
+        {
+          id: 6,
+          regionId: 'head',
+          view: 'front',
+          symptom: 'pain',
+          intensity: 5,
+          description: 'Unilateral temporal headache',
+        },
+        {
+          id: 7,
+          regionId: 'r_shoulder',
+          view: 'back',
+          symptom: 'tenderness',
+          intensity: 4,
+          description: 'Upper trapezius trigger point',
+        },
+      ],
     },
     {
       name: 'Thoracic Outlet Syndrome',
       description: 'Brachial plexus compression pattern',
       markers: [
-        { id: 8, regionId: 'neck', view: 'front', symptom: 'pain', intensity: 4, description: 'Scalene pain' },
-        { id: 9, regionId: 'r_shoulder', view: 'front', symptom: 'aching', intensity: 5, description: 'Shoulder pain' },
-        { id: 10, regionId: 'r_arm_upper', view: 'front', symptom: 'numbness', intensity: 6, description: 'Arm numbness' },
-        { id: 11, regionId: 'r_hand', view: 'front', symptom: 'tingling', intensity: 7, description: 'Hand paresthesia' },
-        { id: 12, regionId: 'r_forearm', view: 'front', symptom: 'weakness', intensity: 4, description: 'Grip weakness' }
-      ]
-    }
+        {
+          id: 8,
+          regionId: 'neck',
+          view: 'front',
+          symptom: 'pain',
+          intensity: 4,
+          description: 'Scalene pain',
+        },
+        {
+          id: 9,
+          regionId: 'r_shoulder',
+          view: 'front',
+          symptom: 'aching',
+          intensity: 5,
+          description: 'Shoulder pain',
+        },
+        {
+          id: 10,
+          regionId: 'r_arm_upper',
+          view: 'front',
+          symptom: 'numbness',
+          intensity: 6,
+          description: 'Arm numbness',
+        },
+        {
+          id: 11,
+          regionId: 'r_hand',
+          view: 'front',
+          symptom: 'tingling',
+          intensity: 7,
+          description: 'Hand paresthesia',
+        },
+        {
+          id: 12,
+          regionId: 'r_forearm',
+          view: 'front',
+          symptom: 'weakness',
+          intensity: 4,
+          description: 'Grip weakness',
+        },
+      ],
+    },
   ],
   no: [
     {
       name: 'Korsryggsmerte med Radikulopati',
       description: 'Klassisk L5 dermatomalt mønster',
       markers: [
-        { id: 1, regionId: 'lumbar', view: 'back', symptom: 'pain', intensity: 7, description: 'Sentral korsryggsmerte' },
-        { id: 2, regionId: 'l_thigh', view: 'front', symptom: 'aching', intensity: 5, description: 'Referert smerte' },
-        { id: 3, regionId: 'l_lower_leg', view: 'front', symptom: 'numbness', intensity: 4, description: 'L5 dermatom nummenhet' },
-        { id: 4, regionId: 'l_foot', view: 'front', symptom: 'tingling', intensity: 3, description: 'Fot parestesi' }
-      ]
+        {
+          id: 1,
+          regionId: 'lumbar',
+          view: 'back',
+          symptom: 'pain',
+          intensity: 7,
+          description: 'Sentral korsryggsmerte',
+        },
+        {
+          id: 2,
+          regionId: 'l_thigh',
+          view: 'front',
+          symptom: 'aching',
+          intensity: 5,
+          description: 'Referert smerte',
+        },
+        {
+          id: 3,
+          regionId: 'l_lower_leg',
+          view: 'front',
+          symptom: 'numbness',
+          intensity: 4,
+          description: 'L5 dermatom nummenhet',
+        },
+        {
+          id: 4,
+          regionId: 'l_foot',
+          view: 'front',
+          symptom: 'tingling',
+          intensity: 3,
+          description: 'Fot parestesi',
+        },
+      ],
     },
     {
       name: 'Cervikogen Hodepine',
       description: 'Øvre cervikal dysfunksjon med referering',
       markers: [
-        { id: 5, regionId: 'cervical', view: 'back', symptom: 'stiffness', intensity: 6, description: 'Øvre cervikal restriksjon' },
-        { id: 6, regionId: 'head', view: 'front', symptom: 'pain', intensity: 5, description: 'Unilateral temporal hodepine' },
-        { id: 7, regionId: 'r_shoulder', view: 'back', symptom: 'tenderness', intensity: 4, description: 'Øvre trapezius triggerpunkt' }
-      ]
+        {
+          id: 5,
+          regionId: 'cervical',
+          view: 'back',
+          symptom: 'stiffness',
+          intensity: 6,
+          description: 'Øvre cervikal restriksjon',
+        },
+        {
+          id: 6,
+          regionId: 'head',
+          view: 'front',
+          symptom: 'pain',
+          intensity: 5,
+          description: 'Unilateral temporal hodepine',
+        },
+        {
+          id: 7,
+          regionId: 'r_shoulder',
+          view: 'back',
+          symptom: 'tenderness',
+          intensity: 4,
+          description: 'Øvre trapezius triggerpunkt',
+        },
+      ],
     },
     {
       name: 'Thoracic Outlet Syndrom',
       description: 'Brachial plexus kompresjon mønster',
       markers: [
-        { id: 8, regionId: 'neck', view: 'front', symptom: 'pain', intensity: 4, description: 'Scalene smerte' },
-        { id: 9, regionId: 'r_shoulder', view: 'front', symptom: 'aching', intensity: 5, description: 'Skuldersmerte' },
-        { id: 10, regionId: 'r_arm_upper', view: 'front', symptom: 'numbness', intensity: 6, description: 'Arm nummenhet' },
-        { id: 11, regionId: 'r_hand', view: 'front', symptom: 'tingling', intensity: 7, description: 'Hånd parestesi' },
-        { id: 12, regionId: 'r_forearm', view: 'front', symptom: 'weakness', intensity: 4, description: 'Grep svakhet' }
-      ]
-    }
-  ]
+        {
+          id: 8,
+          regionId: 'neck',
+          view: 'front',
+          symptom: 'pain',
+          intensity: 4,
+          description: 'Scalene smerte',
+        },
+        {
+          id: 9,
+          regionId: 'r_shoulder',
+          view: 'front',
+          symptom: 'aching',
+          intensity: 5,
+          description: 'Skuldersmerte',
+        },
+        {
+          id: 10,
+          regionId: 'r_arm_upper',
+          view: 'front',
+          symptom: 'numbness',
+          intensity: 6,
+          description: 'Arm nummenhet',
+        },
+        {
+          id: 11,
+          regionId: 'r_hand',
+          view: 'front',
+          symptom: 'tingling',
+          intensity: 7,
+          description: 'Hånd parestesi',
+        },
+        {
+          id: 12,
+          regionId: 'r_forearm',
+          view: 'front',
+          symptom: 'weakness',
+          intensity: 4,
+          description: 'Grep svakhet',
+        },
+      ],
+    },
+  ],
 };
 
 export default function BodyChartDemo() {
@@ -115,11 +283,11 @@ export default function BodyChartDemo() {
         'Click on body regions to add markers',
         'Adjust intensity using the slider',
         'Add descriptions for each marker',
-        'Generate narrative for clinical notes'
+        'Generate narrative for clinical notes',
       ],
       markersCount: 'markers',
       noMarkers: 'No markers added yet',
-      generatedNarrative: 'Generated Narrative'
+      generatedNarrative: 'Generated Narrative',
     },
     no: {
       title: 'Kroppskart Demo',
@@ -137,12 +305,12 @@ export default function BodyChartDemo() {
         'Klikk på kroppsregioner for å legge til markører',
         'Juster intensitet med glidebryteren',
         'Legg til beskrivelser for hver markør',
-        'Generer narrativ for kliniske notater'
+        'Generer narrativ for kliniske notater',
       ],
       markersCount: 'markører',
       noMarkers: 'Ingen markører lagt til ennå',
-      generatedNarrative: 'Generert Narrativ'
-    }
+      generatedNarrative: 'Generert Narrativ',
+    },
   };
 
   const t = labels[lang];
@@ -225,8 +393,10 @@ export default function BodyChartDemo() {
               <ol className="space-y-2 text-sm text-gray-600">
                 {t.instructionsList.map((instruction, i) => (
                   <li key={i} className="flex gap-2">
-                    <span className="w-5 h-5 bg-sky-100 text-sky-600 rounded-full flex items-center
-                                    justify-center text-xs font-medium flex-shrink-0">
+                    <span
+                      className="w-5 h-5 bg-sky-100 text-sky-600 rounded-full flex items-center
+                                    justify-center text-xs font-medium flex-shrink-0"
+                    >
                       {i + 1}
                     </span>
                     {instruction}
@@ -275,8 +445,11 @@ export default function BodyChartDemo() {
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
                 <h3 className="font-semibold text-gray-800 mb-3">{t.reference}</h3>
                 <div className="space-y-2">
-                  {SYMPTOM_TYPES.map(type => (
-                    <div key={type.id} className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
+                  {SYMPTOM_TYPES.map((type) => (
+                    <div
+                      key={type.id}
+                      className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg"
+                    >
                       <div
                         className="w-4 h-4 rounded-full"
                         style={{ backgroundColor: type.color }}

@@ -4,7 +4,7 @@
  * Supports personalization, rate limiting, and retry logic
  */
 
-import { query, transaction } from '../config/database.js';
+import { query, _transaction } from '../config/database.js';
 import logger from '../utils/logger.js';
 import * as communicationService from './communications.js';
 import { v4 as uuidv4 } from 'uuid';
@@ -14,20 +14,20 @@ const RATE_LIMITS = {
   SMS: {
     perMinute: 5,
     perHour: 50,
-    perDay: 200
+    perDay: 200,
   },
   EMAIL: {
     perMinute: 10,
     perHour: 100,
-    perDay: 500
-  }
+    perDay: 500,
+  },
 };
 
 // Retry configuration
 const RETRY_CONFIG = {
   maxRetries: 3,
   retryDelayMs: [5000, 30000, 120000], // 5s, 30s, 2min
-  retryableErrors: ['NETWORK_ERROR', 'TIMEOUT', 'RATE_LIMITED', 'TEMPORARY_FAILURE']
+  retryableErrors: ['NETWORK_ERROR', 'TIMEOUT', 'RATE_LIMITED', 'TEMPORARY_FAILURE'],
 };
 
 // Available template variables
@@ -37,15 +37,18 @@ const TEMPLATE_VARIABLES = {
   '{fullName}': (patient) => `${patient.first_name || ''} ${patient.last_name || ''}`.trim(),
   '{phone}': (patient) => patient.phone || '',
   '{email}': (patient) => patient.email || '',
-  '{dateOfBirth}': (patient) => patient.date_of_birth ? new Date(patient.date_of_birth).toLocaleDateString('nb-NO') : '',
-  '{lastVisit}': (patient) => patient.last_visit_date ? new Date(patient.last_visit_date).toLocaleDateString('nb-NO') : '',
-  '{nextAppointment}': (patient) => patient.next_appointment ? new Date(patient.next_appointment).toLocaleDateString('nb-NO') : '',
+  '{dateOfBirth}': (patient) =>
+    patient.date_of_birth ? new Date(patient.date_of_birth).toLocaleDateString('nb-NO') : '',
+  '{lastVisit}': (patient) =>
+    patient.last_visit_date ? new Date(patient.last_visit_date).toLocaleDateString('nb-NO') : '',
+  '{nextAppointment}': (patient) =>
+    patient.next_appointment ? new Date(patient.next_appointment).toLocaleDateString('nb-NO') : '',
   '{clinicName}': (patient, clinic) => clinic?.name || '',
   '{clinicPhone}': (patient, clinic) => clinic?.phone || '',
   '{clinicEmail}': (patient, clinic) => clinic?.email || '',
   '{clinicAddress}': (patient, clinic) => clinic?.address || '',
   '{today}': () => new Date().toLocaleDateString('nb-NO'),
-  '{currentYear}': () => new Date().getFullYear().toString()
+  '{currentYear}': () => new Date().getFullYear().toString(),
 };
 
 /**
@@ -57,14 +60,20 @@ const TEMPLATE_VARIABLES = {
  * @param {object} options - Additional options
  * @returns {Promise<object>} Batch information
  */
-export const queueBulkCommunications = async (organizationId, patientIds, templateId, type, options = {}) => {
+export const queueBulkCommunications = async (
+  organizationId,
+  patientIds,
+  templateId,
+  type,
+  options = {}
+) => {
   const {
     scheduledAt = null,
     priority = 'NORMAL',
     userId,
     customSubject = null,
     customMessage = null,
-    clinicInfo = {}
+    clinicInfo = {},
   } = options;
 
   const batchId = uuidv4();
@@ -75,7 +84,7 @@ export const queueBulkCommunications = async (organizationId, patientIds, templa
       batchId,
       patientCount: patientIds.length,
       type,
-      templateId
+      templateId,
     });
 
     // Get template if templateId provided
@@ -104,7 +113,7 @@ export const queueBulkCommunications = async (organizationId, patientIds, templa
     const patients = patientsResult.rows;
 
     // Validate patients have required contact info and consent
-    const validPatients = patients.filter(patient => {
+    const validPatients = patients.filter((patient) => {
       if (type === 'SMS') {
         return patient.phone && patient.consent_sms !== false;
       } else if (type === 'EMAIL') {
@@ -113,7 +122,7 @@ export const queueBulkCommunications = async (organizationId, patientIds, templa
       return false;
     });
 
-    const skippedPatients = patients.filter(patient => !validPatients.includes(patient));
+    const skippedPatients = patients.filter((patient) => !validPatients.includes(patient));
 
     // Create batch record
     await query(
@@ -135,12 +144,12 @@ export const queueBulkCommunications = async (organizationId, patientIds, templa
         userId,
         customSubject,
         customMessage,
-        JSON.stringify(clinicInfo)
+        JSON.stringify(clinicInfo),
       ]
     );
 
     // Queue individual communications
-    const queueItems = validPatients.map(patient => {
+    const queueItems = validPatients.map((patient) => {
       const messageContent = customMessage || template?.body || '';
       const subject = customSubject || template?.subject || '';
       const personalizedContent = personalizeTemplate(messageContent, patient, clinicInfo);
@@ -154,7 +163,7 @@ export const queueBulkCommunications = async (organizationId, patientIds, templa
         recipientEmail: type === 'EMAIL' ? patient.email : null,
         subject: personalizedSubject,
         content: personalizedContent,
-        scheduledAt
+        scheduledAt,
       };
     });
 
@@ -167,7 +176,7 @@ export const queueBulkCommunications = async (organizationId, patientIds, templa
         return `($${offset * 8 + 1}, $${offset * 8 + 2}, $${offset * 8 + 3}, $${offset * 8 + 4}, $${offset * 8 + 5}, $${offset * 8 + 6}, $${offset * 8 + 7}, $${offset * 8 + 8})`;
       });
 
-      const params = chunk.flatMap(item => [
+      const params = chunk.flatMap((item) => [
         batchId,
         item.patientId,
         item.type,
@@ -175,7 +184,7 @@ export const queueBulkCommunications = async (organizationId, patientIds, templa
         item.recipientEmail,
         item.subject,
         item.content,
-        item.scheduledAt
+        item.scheduledAt,
       ]);
 
       await query(
@@ -195,8 +204,8 @@ export const queueBulkCommunications = async (organizationId, patientIds, templa
         ) SELECT $1, unnest($2::uuid[]), $3`,
         [
           batchId,
-          skippedPatients.map(p => p.id),
-          type === 'SMS' ? 'Missing phone or SMS consent' : 'Missing email or email consent'
+          skippedPatients.map((p) => p.id),
+          type === 'SMS' ? 'Missing phone or SMS consent' : 'Missing email or email consent',
         ]
       );
     }
@@ -204,7 +213,7 @@ export const queueBulkCommunications = async (organizationId, patientIds, templa
     logger.info('Bulk communications queued', {
       batchId,
       queued: validPatients.length,
-      skipped: skippedPatients.length
+      skipped: skippedPatients.length,
     });
 
     return {
@@ -212,12 +221,15 @@ export const queueBulkCommunications = async (organizationId, patientIds, templa
       status: scheduledAt ? 'SCHEDULED' : 'PENDING',
       totalCount: validPatients.length,
       skippedCount: skippedPatients.length,
-      skippedPatients: skippedPatients.map(p => ({
+      skippedPatients: skippedPatients.map((p) => ({
         id: p.id,
         name: `${p.first_name} ${p.last_name}`,
-        reason: type === 'SMS' ? 'Mangler telefon eller SMS-samtykke' : 'Mangler e-post eller e-postsamtykke'
+        reason:
+          type === 'SMS'
+            ? 'Mangler telefon eller SMS-samtykke'
+            : 'Mangler e-post eller e-postsamtykke',
       })),
-      scheduledAt
+      scheduledAt,
     };
   } catch (error) {
     logger.error('Error queuing bulk communications:', error);
@@ -233,7 +245,9 @@ export const queueBulkCommunications = async (organizationId, patientIds, templa
  * @returns {string} Personalized message
  */
 export const personalizeTemplate = (template, patient, clinicInfo = {}) => {
-  if (!template) return '';
+  if (!template) {
+    return '';
+  }
 
   let result = template;
 
@@ -296,7 +310,7 @@ export const processCommunicationQueue = async (batchSize = 10) => {
     }
 
     // Update batch status to PROCESSING
-    const batchIds = [...new Set(pendingResult.rows.map(r => r.batch_id))];
+    const batchIds = [...new Set(pendingResult.rows.map((r) => r.batch_id))];
     await query(
       `UPDATE bulk_communication_batches
       SET status = 'PROCESSING', started_at = COALESCE(started_at, NOW())
@@ -315,9 +329,10 @@ export const processCommunicationQueue = async (batchSize = 10) => {
 
         // Send the communication
         let result;
-        const clinicInfo = typeof item.clinic_info === 'string'
-          ? JSON.parse(item.clinic_info)
-          : item.clinic_info || {};
+        const _clinicInfo =
+          typeof item.clinic_info === 'string'
+            ? JSON.parse(item.clinic_info)
+            : item.clinic_info || {};
 
         if (item.type === 'SMS') {
           result = await communicationService.sendSMS(
@@ -326,7 +341,7 @@ export const processCommunicationQueue = async (batchSize = 10) => {
               patient_id: item.patient_id,
               recipient_phone: item.recipient_phone,
               content: item.content,
-              template_id: null
+              template_id: null,
             },
             null
           );
@@ -338,7 +353,7 @@ export const processCommunicationQueue = async (batchSize = 10) => {
               recipient_email: item.recipient_email,
               subject: item.subject,
               content: item.content,
-              template_id: null
+              template_id: null,
             },
             null
           );
@@ -360,11 +375,11 @@ export const processCommunicationQueue = async (batchSize = 10) => {
       } catch (error) {
         logger.error('Error processing queue item:', {
           itemId: item.id,
-          error: error.message
+          error: error.message,
         });
 
-        const isRetryable = RETRY_CONFIG.retryableErrors.some(e =>
-          error.message?.includes(e) || error.code?.includes(e)
+        const isRetryable = RETRY_CONFIG.retryableErrors.some(
+          (e) => error.message?.includes(e) || error.code?.includes(e)
         );
 
         if (isRetryable && item.retry_count < RETRY_CONFIG.maxRetries - 1) {
@@ -397,14 +412,14 @@ export const processCommunicationQueue = async (batchSize = 10) => {
 
     logger.info('Queue processing completed', {
       processed: processedCount,
-      failed: failedItems.length
+      failed: failedItems.length,
     });
 
     return {
       processed: processedCount,
       failed: failedItems.length,
       processedItems,
-      failedItems
+      failedItems,
     };
   } catch (error) {
     logger.error('Error in processCommunicationQueue:', error);
@@ -448,10 +463,10 @@ export const getQueueStatus = async (organizationId, batchId) => {
       processing: 0,
       sent: 0,
       failed: 0,
-      total: 0
+      total: 0,
     };
 
-    statsResult.rows.forEach(row => {
+    statsResult.rows.forEach((row) => {
       stats[row.status.toLowerCase()] = parseInt(row.count);
       stats.total += parseInt(row.count);
     });
@@ -477,9 +492,8 @@ export const getQueueStatus = async (organizationId, batchId) => {
     );
 
     // Calculate progress percentage
-    const progressPercentage = stats.total > 0
-      ? Math.round(((stats.sent + stats.failed) / stats.total) * 100)
-      : 0;
+    const progressPercentage =
+      stats.total > 0 ? Math.round(((stats.sent + stats.failed) / stats.total) * 100) : 0;
 
     return {
       batchId: batch.id,
@@ -493,18 +507,18 @@ export const getQueueStatus = async (organizationId, batchId) => {
       totalCount: batch.total_count,
       stats,
       progressPercentage,
-      skippedPatients: skippedResult.rows.map(r => ({
+      skippedPatients: skippedResult.rows.map((r) => ({
         id: r.patient_id,
         name: `${r.first_name} ${r.last_name}`,
-        reason: r.reason
+        reason: r.reason,
       })),
-      recentFailures: failedResult.rows.map(r => ({
+      recentFailures: failedResult.rows.map((r) => ({
         patientId: r.patient_id,
         name: `${r.first_name} ${r.last_name}`,
         error: r.last_error,
-        failedAt: r.failed_at
+        failedAt: r.failed_at,
       })),
-      estimatedCompletionTime: estimateCompletionTime(stats.pending, batch.type)
+      estimatedCompletionTime: estimateCompletionTime(stats.pending, batch.type),
     };
   } catch (error) {
     logger.error('Error getting queue status:', error);
@@ -562,14 +576,14 @@ export const cancelBatch = async (organizationId, batchId) => {
 
     logger.info('Batch cancelled', {
       batchId,
-      cancelledItems: pendingCount
+      cancelledItems: pendingCount,
     });
 
     return {
       batchId,
       status: 'CANCELLED',
       cancelledItems: pendingCount,
-      message: `Batch cancelled. ${pendingCount} pending items were cancelled.`
+      message: `Batch cancelled. ${pendingCount} pending items were cancelled.`,
     };
   } catch (error) {
     logger.error('Error cancelling batch:', error);
@@ -634,7 +648,7 @@ export const getPendingQueue = async (organizationId, options = {}) => {
     );
 
     return {
-      items: result.rows.map(row => ({
+      items: result.rows.map((row) => ({
         id: row.id,
         batchId: row.batch_id,
         patientId: row.patient_id,
@@ -649,14 +663,14 @@ export const getPendingQueue = async (organizationId, options = {}) => {
         failedAt: row.failed_at,
         retryCount: row.retry_count,
         lastError: row.last_error,
-        priority: row.priority
+        priority: row.priority,
       })),
       pagination: {
         page,
         limit,
         total,
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     };
   } catch (error) {
     logger.error('Error getting pending queue:', error);
@@ -710,7 +724,7 @@ export const getBatches = async (organizationId, options = {}) => {
     );
 
     return {
-      batches: result.rows.map(row => ({
+      batches: result.rows.map((row) => ({
         id: row.id,
         type: row.type,
         status: row.status,
@@ -723,14 +737,14 @@ export const getBatches = async (organizationId, options = {}) => {
         scheduledAt: row.scheduled_at,
         startedAt: row.started_at,
         completedAt: row.completed_at,
-        createdByName: row.created_by_name
+        createdByName: row.created_by_name,
       })),
       pagination: {
         page,
         limit,
         total,
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     };
   } catch (error) {
     logger.error('Error getting batches:', error);
@@ -746,7 +760,12 @@ export const getBatches = async (organizationId, options = {}) => {
  * @param {object} clinicInfo - Clinic information
  * @returns {Promise<object>} Preview result
  */
-export const previewMessage = async (organizationId, patientId, templateContent, clinicInfo = {}) => {
+export const previewMessage = async (
+  organizationId,
+  patientId,
+  templateContent,
+  clinicInfo = {}
+) => {
   try {
     const patientResult = await query(
       `SELECT * FROM patients WHERE id = $1 AND organization_id = $2`,
@@ -766,7 +785,7 @@ export const previewMessage = async (organizationId, patientId, templateContent,
       originalContent: templateContent,
       personalizedContent,
       characterCount: personalizedContent.length,
-      smsSegments: Math.ceil(personalizedContent.length / 160)
+      smsSegments: Math.ceil(personalizedContent.length / 160),
     };
   } catch (error) {
     logger.error('Error previewing message:', error);
@@ -842,7 +861,9 @@ async function updateBatchStatistics(batchId) {
  * Estimate completion time based on pending count and rate limits
  */
 function estimateCompletionTime(pendingCount, type) {
-  if (pendingCount === 0) return null;
+  if (pendingCount === 0) {
+    return null;
+  }
 
   const ratePerMinute = type === 'SMS' ? RATE_LIMITS.SMS.perMinute : RATE_LIMITS.EMAIL.perMinute;
   const minutes = Math.ceil(pendingCount / ratePerMinute);
@@ -854,18 +875,17 @@ function estimateCompletionTime(pendingCount, type) {
  * Sleep helper for rate limiting
  */
 function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
  * Get available template variables
  */
-export const getAvailableVariables = () => {
-  return Object.keys(TEMPLATE_VARIABLES).map(variable => ({
+export const getAvailableVariables = () =>
+  Object.keys(TEMPLATE_VARIABLES).map((variable) => ({
     variable,
-    description: getVariableDescription(variable)
+    description: getVariableDescription(variable),
   }));
-};
 
 function getVariableDescription(variable) {
   const descriptions = {
@@ -882,7 +902,7 @@ function getVariableDescription(variable) {
     '{clinicEmail}': 'Klinikkens e-postadresse',
     '{clinicAddress}': 'Klinikkens adresse',
     '{today}': 'Dagens dato',
-    '{currentYear}': 'Innevarende ar'
+    '{currentYear}': 'Innevarende ar',
   };
   return descriptions[variable] || variable;
 }
@@ -896,5 +916,5 @@ export default {
   getBatches,
   previewMessage,
   personalizeTemplate,
-  getAvailableVariables
+  getAvailableVariables,
 };

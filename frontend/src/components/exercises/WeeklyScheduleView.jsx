@@ -5,7 +5,7 @@
  * Visual weekly overview for exercise frequency
  */
 
-import React, { useState, useMemo } from 'react'
+import _React, { useState, useMemo } from 'react';
 import {
   Calendar,
   Check,
@@ -15,8 +15,8 @@ import {
   ChevronRight,
   Sun,
   Moon,
-  Info
-} from 'lucide-react'
+  _Info,
+} from 'lucide-react';
 
 /**
  * WeeklyScheduleView Component
@@ -27,91 +27,107 @@ import {
  * @param {Function} props.onExerciseClick - Click handler for exercise
  * @param {Date} props.startDate - Start date of the program
  */
-const WeeklyScheduleView = ({
-  exercises = [],
-  onExerciseClick,
-  startDate = new Date()
-}) => {
-  const [weekOffset, setWeekOffset] = useState(0)
+const WeeklyScheduleView = ({ exercises = [], onExerciseClick, _startDate = new Date() }) => {
+  const [weekOffset, setWeekOffset] = useState(0);
 
   // Norwegian day names
-  const dayNames = ['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lor', 'Son']
-  const dayNamesFull = ['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lordag', 'Sondag']
+  const dayNames = ['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lor', 'Son'];
+  const _dayNamesFull = ['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lordag', 'Sondag'];
 
   // Calculate current week dates
   const weekDates = useMemo(() => {
-    const today = new Date()
-    const currentDay = today.getDay()
-    const diff = currentDay === 0 ? 6 : currentDay - 1 // Adjust for Monday start
+    const today = new Date();
+    const currentDay = today.getDay();
+    const diff = currentDay === 0 ? 6 : currentDay - 1; // Adjust for Monday start
 
-    const monday = new Date(today)
-    monday.setDate(today.getDate() - diff + (weekOffset * 7))
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - diff + weekOffset * 7);
 
     return Array.from({ length: 7 }, (_, i) => {
-      const date = new Date(monday)
-      date.setDate(monday.getDate() + i)
-      return date
-    })
-  }, [weekOffset])
+      const date = new Date(monday);
+      date.setDate(monday.getDate() + i);
+      return date;
+    });
+  }, [weekOffset]);
 
   // Get exercises scheduled for a specific day
   const getExercisesForDay = (dayIndex) => {
     // dayIndex 0 = Monday, 6 = Sunday
-    return exercises.filter(exercise => {
-      const frequencyPerWeek = exercise.frequencyPerWeek || 7
+    return exercises.filter((exercise) => {
+      const frequencyPerWeek = exercise.frequencyPerWeek || 7;
 
       // Simple distribution logic based on frequency
-      if (frequencyPerWeek === 7) return true // Every day
-      if (frequencyPerWeek === 6) return dayIndex !== 6 // Not Sunday
-      if (frequencyPerWeek === 5) return dayIndex < 5 // Mon-Fri
-      if (frequencyPerWeek === 4) return [0, 1, 3, 4].includes(dayIndex) // Mon, Tue, Thu, Fri
-      if (frequencyPerWeek === 3) return [0, 2, 4].includes(dayIndex) // Mon, Wed, Fri
-      if (frequencyPerWeek === 2) return [0, 3].includes(dayIndex) // Mon, Thu
-      if (frequencyPerWeek === 1) return dayIndex === 0 // Monday only
+      if (frequencyPerWeek === 7) {
+        return true;
+      } // Every day
+      if (frequencyPerWeek === 6) {
+        return dayIndex !== 6;
+      } // Not Sunday
+      if (frequencyPerWeek === 5) {
+        return dayIndex < 5;
+      } // Mon-Fri
+      if (frequencyPerWeek === 4) {
+        return [0, 1, 3, 4].includes(dayIndex);
+      } // Mon, Tue, Thu, Fri
+      if (frequencyPerWeek === 3) {
+        return [0, 2, 4].includes(dayIndex);
+      } // Mon, Wed, Fri
+      if (frequencyPerWeek === 2) {
+        return [0, 3].includes(dayIndex);
+      } // Mon, Thu
+      if (frequencyPerWeek === 1) {
+        return dayIndex === 0;
+      } // Monday only
 
-      return false
-    })
-  }
+      return false;
+    });
+  };
 
   // Calculate total time for day
   const getTotalTimeForDay = (dayExercises) => {
     return dayExercises.reduce((total, ex) => {
-      const setsTime = (ex.sets || 3) * (ex.reps || 10) * 3
-      const holdTime = (ex.holdSeconds || 0) * (ex.sets || 3)
-      return total + setsTime + holdTime + 30
-    }, 0)
-  }
+      const setsTime = (ex.sets || 3) * (ex.reps || 10) * 3;
+      const holdTime = (ex.holdSeconds || 0) * (ex.sets || 3);
+      return total + setsTime + holdTime + 30;
+    }, 0);
+  };
 
   // Get time of day sessions
-  const getSessionsForDay = (exercise) => {
-    const frequencyPerDay = exercise.frequencyPerDay || 1
-    const sessions = []
+  const _getSessionsForDay = (exercise) => {
+    const frequencyPerDay = exercise.frequencyPerDay || 1;
+    const sessions = [];
 
-    if (frequencyPerDay >= 1) sessions.push({ time: 'morgen', icon: Sun })
-    if (frequencyPerDay >= 2) sessions.push({ time: 'kveld', icon: Moon })
-    if (frequencyPerDay >= 3) sessions.push({ time: 'ettermiddag', icon: Clock })
+    if (frequencyPerDay >= 1) {
+      sessions.push({ time: 'morgen', icon: Sun });
+    }
+    if (frequencyPerDay >= 2) {
+      sessions.push({ time: 'kveld', icon: Moon });
+    }
+    if (frequencyPerDay >= 3) {
+      sessions.push({ time: 'ettermiddag', icon: Clock });
+    }
 
-    return sessions
-  }
+    return sessions;
+  };
 
   // Format date for display
   const formatDate = (date) => {
-    return date.getDate()
-  }
+    return date.getDate();
+  };
 
   // Check if date is today
   const isToday = (date) => {
-    const today = new Date()
-    return date.toDateString() === today.toDateString()
-  }
+    const today = new Date();
+    return date.toDateString() === today.toDateString();
+  };
 
   // Get week range string
   const getWeekRangeString = () => {
-    const start = weekDates[0]
-    const end = weekDates[6]
-    const options = { day: 'numeric', month: 'short' }
-    return `${start.toLocaleDateString('nb-NO', options)} - ${end.toLocaleDateString('nb-NO', options)}`
-  }
+    const start = weekDates[0];
+    const end = weekDates[6];
+    const options = { day: 'numeric', month: 'short' };
+    return `${start.toLocaleDateString('nb-NO', options)} - ${end.toLocaleDateString('nb-NO', options)}`;
+  };
 
   return (
     <div className="bg-white rounded-lg border border-gray-200">
@@ -126,7 +142,7 @@ const WeeklyScheduleView = ({
           {/* Week Navigation */}
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setWeekOffset(prev => prev - 1)}
+              onClick={() => setWeekOffset((prev) => prev - 1)}
               className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <ChevronLeft className="w-5 h-5" />
@@ -135,7 +151,7 @@ const WeeklyScheduleView = ({
               {getWeekRangeString()}
             </span>
             <button
-              onClick={() => setWeekOffset(prev => prev + 1)}
+              onClick={() => setWeekOffset((prev) => prev + 1)}
               className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <ChevronRight className="w-5 h-5" />
@@ -169,16 +185,18 @@ const WeeklyScheduleView = ({
             {/* Day Headers */}
             {dayNames.map((day, index) => (
               <div key={day} className="text-center">
-                <div className={`text-xs font-medium mb-1 ${
-                  index >= 5 ? 'text-gray-400' : 'text-gray-600'
-                }`}>
+                <div
+                  className={`text-xs font-medium mb-1 ${
+                    index >= 5 ? 'text-gray-400' : 'text-gray-600'
+                  }`}
+                >
                   {day}
                 </div>
-                <div className={`text-lg font-semibold mb-2 w-8 h-8 mx-auto flex items-center justify-center rounded-full ${
-                  isToday(weekDates[index])
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-900'
-                }`}>
+                <div
+                  className={`text-lg font-semibold mb-2 w-8 h-8 mx-auto flex items-center justify-center rounded-full ${
+                    isToday(weekDates[index]) ? 'bg-blue-600 text-white' : 'text-gray-900'
+                  }`}
+                >
                   {formatDate(weekDates[index])}
                 </div>
               </div>
@@ -186,8 +204,8 @@ const WeeklyScheduleView = ({
 
             {/* Day Content */}
             {dayNames.map((_, dayIndex) => {
-              const dayExercises = getExercisesForDay(dayIndex)
-              const totalTime = getTotalTimeForDay(dayExercises)
+              const dayExercises = getExercisesForDay(dayIndex);
+              const totalTime = getTotalTimeForDay(dayExercises);
 
               return (
                 <div
@@ -196,8 +214,8 @@ const WeeklyScheduleView = ({
                     isToday(weekDates[dayIndex])
                       ? 'border-blue-300 bg-blue-50'
                       : dayIndex >= 5
-                      ? 'border-gray-100 bg-gray-50'
-                      : 'border-gray-200 bg-white'
+                        ? 'border-gray-100 bg-gray-50'
+                        : 'border-gray-200 bg-white'
                   }`}
                 >
                   {dayExercises.length === 0 ? (
@@ -208,8 +226,7 @@ const WeeklyScheduleView = ({
                     <div className="space-y-1">
                       {/* Time estimate */}
                       <div className="text-xs text-gray-500 flex items-center gap-1 mb-2">
-                        <Clock className="w-3 h-3" />
-                        ~{Math.ceil(totalTime / 60)} min
+                        <Clock className="w-3 h-3" />~{Math.ceil(totalTime / 60)} min
                       </div>
 
                       {/* Exercise pills */}
@@ -232,7 +249,7 @@ const WeeklyScheduleView = ({
                     </div>
                   )}
                 </div>
-              )
+              );
             })}
           </div>
         )}
@@ -249,12 +266,15 @@ const WeeklyScheduleView = ({
               </span>
               <span className="flex items-center gap-1 text-gray-600">
                 <Calendar className="w-4 h-4" />
-                {exercises.reduce((sum, ex) => sum + (ex.frequencyPerWeek || 7), 0) / exercises.length >= 5
+                {exercises.reduce((sum, ex) => sum + (ex.frequencyPerWeek || 7), 0) /
+                  exercises.length >=
+                5
                   ? 'Daglig trening'
-                  : exercises.reduce((sum, ex) => sum + (ex.frequencyPerWeek || 7), 0) / exercises.length >= 3
-                  ? 'Regelmessig trening'
-                  : 'Moderat trening'
-                }
+                  : exercises.reduce((sum, ex) => sum + (ex.frequencyPerWeek || 7), 0) /
+                        exercises.length >=
+                      3
+                    ? 'Regelmessig trening'
+                    : 'Moderat trening'}
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -285,7 +305,7 @@ const WeeklyScheduleView = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default WeeklyScheduleView
+export default WeeklyScheduleView;

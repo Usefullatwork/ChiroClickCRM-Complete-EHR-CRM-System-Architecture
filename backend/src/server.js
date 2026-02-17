@@ -24,7 +24,7 @@ import { initializeWebSocket, getIO } from './services/websocket.js';
 import { correlationId } from './middleware/correlationId.js';
 
 // Load environment variables
-const result = dotenv.config();
+const _result = dotenv.config();
 
 // Initialize Express app
 const app = express();
@@ -334,7 +334,7 @@ app.use((req, res) => {
 });
 
 // Global error handler
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
   // Log with correlation ID if available
   const logMeta = {
     error: err.message,

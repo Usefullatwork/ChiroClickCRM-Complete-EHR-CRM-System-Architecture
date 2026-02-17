@@ -16,7 +16,7 @@ export const createGDPRRequest = async (organizationId, requestData) => {
     request_type,
     request_details = '',
     requester_email,
-    requester_phone
+    requester_phone,
   } = requestData;
 
   const result = await query(
@@ -33,7 +33,9 @@ export const createGDPRRequest = async (organizationId, requestData) => {
     [organizationId, patient_id, request_type, request_details, requester_email, requester_phone]
   );
 
-  logger.info(`GDPR request created: ${result.rows[0].id} - Type: ${request_type} for patient: ${patient_id}`);
+  logger.info(
+    `GDPR request created: ${result.rows[0].id} - Type: ${request_type} for patient: ${patient_id}`
+  );
   return result.rows[0];
 };
 
@@ -41,16 +43,11 @@ export const createGDPRRequest = async (organizationId, requestData) => {
  * Get all GDPR requests
  */
 export const getAllGDPRRequests = async (organizationId, options = {}) => {
-  const {
-    page = 1,
-    limit = 50,
-    status = null,
-    requestType = null
-  } = options;
+  const { page = 1, limit = 50, status = null, requestType = null } = options;
 
   const offset = (page - 1) * limit;
-  let whereConditions = ['gr.organization_id = $1'];
-  let params = [organizationId];
+  const whereConditions = ['gr.organization_id = $1'];
+  const params = [organizationId];
   let paramIndex = 2;
 
   if (status) {
@@ -92,8 +89,8 @@ export const getAllGDPRRequests = async (organizationId, options = {}) => {
       page,
       limit,
       total,
-      pages: Math.ceil(total / limit)
-    }
+      pages: Math.ceil(total / limit),
+    },
   };
 };
 
@@ -180,7 +177,7 @@ export const processDataAccessRequest = async (organizationId, patientId) => {
       follow_ups: followUpsResult.rows,
       audit_trail: auditResult.rows,
       export_date: new Date().toISOString(),
-      organization_id: organizationId
+      organization_id: organizationId,
     };
 
     logger.info(`Data access request processed for patient: ${patientId}`);
@@ -204,7 +201,7 @@ export const processDataPortabilityRequest = async (organizationId, patientId) =
     version: '1.0',
     standard: 'FHIR-inspired', // Could be mapped to FHIR in production
     exported_at: new Date().toISOString(),
-    data: data
+    data: data,
   };
 
   logger.info(`Data portability request processed for patient: ${patientId}`);
@@ -248,7 +245,11 @@ export const processErasureRequest = async (organizationId, patientId, requestId
           status: 'REJECTED',
           reason: 'LEGAL_RETENTION_PERIOD',
           message: 'Medical records must be retained for 10 years under Norwegian law',
-          retention_expires: new Date(createdDate.getFullYear() + 10, createdDate.getMonth(), createdDate.getDate())
+          retention_expires: new Date(
+            createdDate.getFullYear() + 10,
+            createdDate.getMonth(),
+            createdDate.getDate()
+          ),
         };
       }
 
@@ -295,7 +296,7 @@ export const processErasureRequest = async (organizationId, patientId, requestId
       return {
         status: 'COMPLETED',
         action: 'ANONYMIZED',
-        message: 'Patient data has been anonymized while maintaining clinical record integrity'
+        message: 'Patient data has been anonymized while maintaining clinical record integrity',
       };
     });
   } catch (error) {
@@ -308,12 +309,7 @@ export const processErasureRequest = async (organizationId, patientId, requestId
  * Update consent preferences
  */
 export const updateConsent = async (organizationId, patientId, consentData) => {
-  const {
-    consent_sms,
-    consent_email,
-    consent_marketing,
-    consent_data_storage
-  } = consentData;
+  const { consent_sms, consent_email, consent_marketing, consent_data_storage } = consentData;
 
   const updates = [];
   const params = [patientId, organizationId];
@@ -417,5 +413,5 @@ export default {
   processErasureRequest,
   updateConsent,
   getConsentAuditTrail,
-  updateGDPRRequestStatus
+  updateGDPRRequestStatus,
 };

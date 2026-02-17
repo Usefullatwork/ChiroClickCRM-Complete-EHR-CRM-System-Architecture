@@ -11,11 +11,11 @@
  * - Norwegian and English text support
  */
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import _React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Check, X, Edit3, Star, Clock, Loader2, CheckCircle2, Send } from 'lucide-react';
 import { Card, CardBody } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { Badge } from '../ui/Badge';
+import { _Badge } from '../ui/Badge';
 import { Textarea } from '../ui/Textarea';
 import { AISuggestionCard } from './AISuggestionCard';
 
@@ -54,7 +54,7 @@ const TEXTS = {
     feedback: 'Feedback',
     additionalNotes: 'Additional notes',
     notesPlaceholder: 'Add comments for future improvement...',
-  }
+  },
 };
 
 /**
@@ -120,7 +120,9 @@ const TimeTracker = ({ startTime, text }) => {
   return (
     <div className="flex items-center gap-2 text-sm text-slate-500">
       <Clock size={14} />
-      <span>{text}: {formatTime(elapsed)}</span>
+      <span>
+        {text}: {formatTime(elapsed)}
+      </span>
     </div>
   );
 };
@@ -170,17 +172,20 @@ export const AIFeedbackPanel = ({
   }, [showCorrectionField, autoFocusCorrection]);
 
   // Handle action selection
-  const handleAction = useCallback((selectedAction) => {
-    setAction(selectedAction);
+  const handleAction = useCallback(
+    (selectedAction) => {
+      setAction(selectedAction);
 
-    if (selectedAction === 'edit') {
-      setShowCorrectionField(true);
-      setCorrection(suggestion?.suggestionText || '');
-    } else {
-      setShowCorrectionField(false);
-      setCorrection('');
-    }
-  }, [suggestion?.suggestionText]);
+      if (selectedAction === 'edit') {
+        setShowCorrectionField(true);
+        setCorrection(suggestion?.suggestionText || '');
+      } else {
+        setShowCorrectionField(false);
+        setCorrection('');
+      }
+    },
+    [suggestion?.suggestionText]
+  );
 
   // Calculate time to decision
   const getTimeToDecision = useCallback(() => {
@@ -189,7 +194,9 @@ export const AIFeedbackPanel = ({
 
   // Handle form submission
   const handleSubmit = useCallback(async () => {
-    if (!action || rating === 0) return;
+    if (!action || rating === 0) {
+      return;
+    }
 
     setIsSubmitting(true);
 
@@ -200,8 +207,8 @@ export const AIFeedbackPanel = ({
       originalSuggestion: suggestion?.suggestionText,
       userCorrection: action === 'edit' ? correction : null,
       accepted: action !== 'reject',
-      correctionType: action === 'accept' ? 'accepted_as_is' :
-                      action === 'edit' ? 'modified' : 'rejected',
+      correctionType:
+        action === 'accept' ? 'accepted_as_is' : action === 'edit' ? 'modified' : 'rejected',
       confidenceScore: suggestion?.confidenceScore,
       feedbackNotes: notes || null,
       userRating: rating,
@@ -241,19 +248,11 @@ export const AIFeedbackPanel = ({
         {/* Header with time tracker */}
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-slate-900">{t.title}</h3>
-          {showTimeTracker && (
-            <TimeTracker startTime={startTimeRef.current} text={t.timeSpent} />
-          )}
+          {showTimeTracker && <TimeTracker startTime={startTimeRef.current} text={t.timeSpent} />}
         </div>
 
         {/* AI Suggestion Display */}
-        {suggestion && (
-          <AISuggestionCard
-            suggestion={suggestion}
-            language={language}
-            expanded
-          />
-        )}
+        {suggestion && <AISuggestionCard suggestion={suggestion} language={language} expanded />}
 
         {/* Quick Action Buttons */}
         <div className="flex flex-wrap gap-3">
@@ -297,9 +296,7 @@ export const AIFeedbackPanel = ({
         {/* Correction Field (shown when editing) */}
         {showCorrectionField && (
           <div className="space-y-2 animate-slide-down">
-            <label className="block text-sm font-medium text-slate-700">
-              {t.correction}
-            </label>
+            <label className="block text-sm font-medium text-slate-700">{t.correction}</label>
             <Textarea
               ref={correctionRef}
               value={correction}
@@ -314,9 +311,7 @@ export const AIFeedbackPanel = ({
         {/* Star Rating */}
         {action && (
           <div className="space-y-2 animate-fade-in">
-            <label className="block text-sm font-medium text-slate-700">
-              {t.rating}
-            </label>
+            <label className="block text-sm font-medium text-slate-700">{t.rating}</label>
             <StarRating
               value={rating}
               onChange={setRating}
@@ -329,9 +324,7 @@ export const AIFeedbackPanel = ({
         {/* Additional Notes */}
         {action && rating > 0 && (
           <div className="space-y-2 animate-fade-in">
-            <label className="block text-sm font-medium text-slate-700">
-              {t.additionalNotes}
-            </label>
+            <label className="block text-sm font-medium text-slate-700">{t.additionalNotes}</label>
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}

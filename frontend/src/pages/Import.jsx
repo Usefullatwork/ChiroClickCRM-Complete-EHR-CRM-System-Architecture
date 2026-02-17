@@ -102,7 +102,9 @@ export default function Import() {
   };
 
   const handleUploadExcel = () => {
-    if (!file) return;
+    if (!file) {
+      return;
+    }
 
     const formData = new FormData();
     formData.append('file', file);
@@ -114,12 +116,16 @@ export default function Import() {
   };
 
   const handleParseText = () => {
-    if (!pastedText.trim()) return;
+    if (!pastedText.trim()) {
+      return;
+    }
     parseTextMutation.mutate(pastedText);
   };
 
   const handleImportParsed = () => {
-    if (!parsedData) return;
+    if (!parsedData) {
+      return;
+    }
 
     const patients = parsedData.type === 'table' ? parsedData.patients : [parsedData.patient];
 

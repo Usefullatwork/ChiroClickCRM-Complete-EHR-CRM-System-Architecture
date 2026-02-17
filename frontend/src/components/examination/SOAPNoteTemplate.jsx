@@ -5,7 +5,7 @@
  * Subjective, Objective, Assessment, Plan format.
  */
 
-import React, { useMemo, useState } from 'react';
+import _React, { useMemo, useState } from 'react';
 import {
   MessageSquare,
   Stethoscope,
@@ -15,8 +15,8 @@ import {
   ChevronUp,
   Copy,
   FileText,
-  AlertCircle,
-  CheckCircle
+  _AlertCircle,
+  CheckCircle,
 } from 'lucide-react';
 
 // Pre-defined templates for common sections
@@ -26,25 +26,25 @@ const SUBJECTIVE_TEMPLATES = {
     nameNo: 'Førstegangsbesøk',
     template: {
       en: 'Patient presents with {chief_complaint} for {duration}. Pain is {intensity}/10. {aggravating_factors} aggravate symptoms. {relieving_factors} provide relief.',
-      no: 'Pasienten kommer med {chief_complaint} i {duration}. Smerte er {intensity}/10. {aggravating_factors} forverrer symptomene. {relieving_factors} gir lindring.'
-    }
+      no: 'Pasienten kommer med {chief_complaint} i {duration}. Smerte er {intensity}/10. {aggravating_factors} forverrer symptomene. {relieving_factors} gir lindring.',
+    },
   },
   followUp: {
     name: 'Follow-up Visit',
     nameNo: 'Oppfølgingsbesøk',
     template: {
       en: 'Patient returns for follow-up. Reports {progress}% improvement since last visit. Current pain level is {intensity}/10.',
-      no: 'Pasienten kommer til oppfølging. Rapporterer {progress}% bedring siden forrige besøk. Nåværende smertenivå er {intensity}/10.'
-    }
+      no: 'Pasienten kommer til oppfølging. Rapporterer {progress}% bedring siden forrige besøk. Nåværende smertenivå er {intensity}/10.',
+    },
   },
   maintenance: {
     name: 'Maintenance Visit',
     nameNo: 'Vedlikeholdsbesøk',
     template: {
       en: 'Routine maintenance visit. Patient reports stable condition with {intensity}/10 pain level.',
-      no: 'Rutinemessig vedlikeholdsbesøk. Pasienten rapporterer stabil tilstand med {intensity}/10 smertenivå.'
-    }
-  }
+      no: 'Rutinemessig vedlikeholdsbesøk. Pasienten rapporterer stabil tilstand med {intensity}/10 smertenivå.',
+    },
+  },
 };
 
 const ASSESSMENT_TEMPLATES = {
@@ -53,33 +53,43 @@ const ASSESSMENT_TEMPLATES = {
     nameNo: 'Bedring',
     template: {
       en: 'Patient is responding well to treatment. Objective findings show improvement in {findings}. Continue current treatment plan.',
-      no: 'Pasienten responderer godt på behandling. Objektive funn viser bedring i {findings}. Fortsett nåværende behandlingsplan.'
-    }
+      no: 'Pasienten responderer godt på behandling. Objektive funn viser bedring i {findings}. Fortsett nåværende behandlingsplan.',
+    },
   },
   stable: {
     name: 'Stable',
     nameNo: 'Stabil',
     template: {
       en: 'Condition remains stable. No significant changes noted since last visit. Monitoring recommended.',
-      no: 'Tilstanden er stabil. Ingen betydelige endringer siden forrige besøk. Overvåkning anbefales.'
-    }
+      no: 'Tilstanden er stabil. Ingen betydelige endringer siden forrige besøk. Overvåkning anbefales.',
+    },
   },
   worsening: {
     name: 'Worsening',
     nameNo: 'Forverring',
     template: {
       en: 'Patient shows signs of worsening. Consider modifying treatment approach or additional diagnostics.',
-      no: 'Pasienten viser tegn på forverring. Vurder å endre behandlingstilnærming eller tilleggsdiagnostikk.'
-    }
-  }
+      no: 'Pasienten viser tegn på forverring. Vurder å endre behandlingstilnærming eller tilleggsdiagnostikk.',
+    },
+  },
 };
 
 // Phase of care options
 const CARE_PHASES = [
   { id: 'acute', name: 'Acute/Initial', nameNo: 'Akutt/Initial', color: 'bg-red-100 text-red-700' },
-  { id: 'corrective', name: 'Corrective', nameNo: 'Korrigerende', color: 'bg-amber-100 text-amber-700' },
-  { id: 'maintenance', name: 'Maintenance', nameNo: 'Vedlikehold', color: 'bg-green-100 text-green-700' },
-  { id: 'wellness', name: 'Wellness', nameNo: 'Velvære', color: 'bg-blue-100 text-blue-700' }
+  {
+    id: 'corrective',
+    name: 'Corrective',
+    nameNo: 'Korrigerende',
+    color: 'bg-amber-100 text-amber-700',
+  },
+  {
+    id: 'maintenance',
+    name: 'Maintenance',
+    nameNo: 'Vedlikehold',
+    color: 'bg-green-100 text-green-700',
+  },
+  { id: 'wellness', name: 'Wellness', nameNo: 'Velvære', color: 'bg-blue-100 text-blue-700' },
 ];
 
 // Treatment options
@@ -97,7 +107,7 @@ const TREATMENT_OPTIONS = [
   { id: 'dry_needling', name: 'Dry Needling', nameNo: 'Tørrnåling' },
   { id: 'taping', name: 'Kinesio Taping', nameNo: 'Kinesiotaping' },
   { id: 'ergonomic', name: 'Ergonomic Advice', nameNo: 'Ergonomisk rådgivning' },
-  { id: 'education', name: 'Patient Education', nameNo: 'Pasientopplæring' }
+  { id: 'education', name: 'Patient Education', nameNo: 'Pasientopplæring' },
 ];
 
 /**
@@ -112,13 +122,13 @@ function SectionHeader({ icon: Icon, title, titleNo, lang, expanded, onToggle, h
                  ${hasContent ? 'bg-teal-50' : 'bg-gray-50'} hover:bg-opacity-80 transition-colors`}
     >
       <div className="flex items-center gap-3">
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center
-                        ${hasContent ? 'bg-teal-100' : 'bg-gray-200'}`}>
+        <div
+          className={`w-8 h-8 rounded-full flex items-center justify-center
+                        ${hasContent ? 'bg-teal-100' : 'bg-gray-200'}`}
+        >
           <Icon className={`w-4 h-4 ${hasContent ? 'text-teal-600' : 'text-gray-500'}`} />
         </div>
-        <span className="font-semibold text-gray-700">
-          {lang === 'no' ? titleNo : title}
-        </span>
+        <span className="font-semibold text-gray-700">{lang === 'no' ? titleNo : title}</span>
         {hasContent && <CheckCircle className="w-4 h-4 text-green-500" />}
       </div>
       {expanded ? (
@@ -192,7 +202,9 @@ function SubjectiveSection({ values, onChange, lang, expanded, onToggle }) {
               type="text"
               value={values.chiefComplaint || ''}
               onChange={(e) => onChange({ ...values, chiefComplaint: e.target.value })}
-              placeholder={lang === 'no' ? 'Pasientens hovedproblem...' : "Patient's main problem..."}
+              placeholder={
+                lang === 'no' ? 'Pasientens hovedproblem...' : "Patient's main problem..."
+              }
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
             />
           </div>
@@ -204,7 +216,11 @@ function SubjectiveSection({ values, onChange, lang, expanded, onToggle }) {
             <textarea
               value={values.history || ''}
               onChange={(e) => onChange({ ...values, history: e.target.value })}
-              placeholder={lang === 'no' ? 'Beskriv symptomenes utvikling...' : 'Describe symptom progression...'}
+              placeholder={
+                lang === 'no'
+                  ? 'Beskriv symptomenes utvikling...'
+                  : 'Describe symptom progression...'
+              }
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none"
               rows={4}
             />
@@ -247,7 +263,11 @@ function SubjectiveSection({ values, onChange, lang, expanded, onToggle }) {
               type="text"
               value={values.patientGoals || ''}
               onChange={(e) => onChange({ ...values, patientGoals: e.target.value })}
-              placeholder={lang === 'no' ? 'Hva ønsker pasienten å oppnå?' : 'What does the patient want to achieve?'}
+              placeholder={
+                lang === 'no'
+                  ? 'Hva ønsker pasienten å oppnå?'
+                  : 'What does the patient want to achieve?'
+              }
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
             />
           </div>
@@ -261,7 +281,14 @@ function SubjectiveSection({ values, onChange, lang, expanded, onToggle }) {
  * Objective section
  */
 function ObjectiveSection({ values, onChange, lang, expanded, onToggle }) {
-  const hasContent = !!(values.vitalSigns || values.observation || values.palpation || values.rom || values.orthopedic || values.neurological);
+  const hasContent = !!(
+    values.vitalSigns ||
+    values.observation ||
+    values.palpation ||
+    values.rom ||
+    values.orthopedic ||
+    values.neurological
+  );
 
   return (
     <div className="border border-gray-200 rounded-lg overflow-hidden">
@@ -284,7 +311,11 @@ function ObjectiveSection({ values, onChange, lang, expanded, onToggle }) {
             <textarea
               value={values.observation || ''}
               onChange={(e) => onChange({ ...values, observation: e.target.value })}
-              placeholder={lang === 'no' ? 'Holdning, gange, bevegelsesmønster...' : 'Posture, gait, movement patterns...'}
+              placeholder={
+                lang === 'no'
+                  ? 'Holdning, gange, bevegelsesmønster...'
+                  : 'Posture, gait, movement patterns...'
+              }
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none"
               rows={2}
             />
@@ -297,7 +328,11 @@ function ObjectiveSection({ values, onChange, lang, expanded, onToggle }) {
             <textarea
               value={values.palpation || ''}
               onChange={(e) => onChange({ ...values, palpation: e.target.value })}
-              placeholder={lang === 'no' ? 'Muskelspenning, triggerpunkter, leddblokkeringer...' : 'Muscle tension, trigger points, joint restrictions...'}
+              placeholder={
+                lang === 'no'
+                  ? 'Muskelspenning, triggerpunkter, leddblokkeringer...'
+                  : 'Muscle tension, trigger points, joint restrictions...'
+              }
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none"
               rows={2}
             />
@@ -310,7 +345,9 @@ function ObjectiveSection({ values, onChange, lang, expanded, onToggle }) {
             <textarea
               value={values.rom || ''}
               onChange={(e) => onChange({ ...values, rom: e.target.value })}
-              placeholder={lang === 'no' ? 'Beskrivelse av ROM-funn...' : 'Description of ROM findings...'}
+              placeholder={
+                lang === 'no' ? 'Beskrivelse av ROM-funn...' : 'Description of ROM findings...'
+              }
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none"
               rows={2}
             />
@@ -323,7 +360,9 @@ function ObjectiveSection({ values, onChange, lang, expanded, onToggle }) {
             <textarea
               value={values.orthopedic || ''}
               onChange={(e) => onChange({ ...values, orthopedic: e.target.value })}
-              placeholder={lang === 'no' ? 'Utførte tester og resultater...' : 'Tests performed and results...'}
+              placeholder={
+                lang === 'no' ? 'Utførte tester og resultater...' : 'Tests performed and results...'
+              }
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none"
               rows={2}
             />
@@ -336,7 +375,11 @@ function ObjectiveSection({ values, onChange, lang, expanded, onToggle }) {
             <textarea
               value={values.neurological || ''}
               onChange={(e) => onChange({ ...values, neurological: e.target.value })}
-              placeholder={lang === 'no' ? 'Reflekser, sensibilitet, muskelkraft...' : 'Reflexes, sensation, muscle strength...'}
+              placeholder={
+                lang === 'no'
+                  ? 'Reflekser, sensibilitet, muskelkraft...'
+                  : 'Reflexes, sensation, muscle strength...'
+              }
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none"
               rows={2}
             />
@@ -385,7 +428,9 @@ function AssessmentSection({ values, onChange, lang, expanded, onToggle }) {
               type="text"
               value={values.diagnosis || ''}
               onChange={(e) => onChange({ ...values, diagnosis: e.target.value })}
-              placeholder={lang === 'no' ? 'ICD-10 eller ICPC kode(r)...' : 'ICD-10 or ICPC code(s)...'}
+              placeholder={
+                lang === 'no' ? 'ICD-10 eller ICPC kode(r)...' : 'ICD-10 or ICPC code(s)...'
+              }
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
             />
           </div>
@@ -397,7 +442,11 @@ function AssessmentSection({ values, onChange, lang, expanded, onToggle }) {
             <textarea
               value={values.clinicalImpression || ''}
               onChange={(e) => onChange({ ...values, clinicalImpression: e.target.value })}
-              placeholder={lang === 'no' ? 'Sammendrag av funn og vurdering...' : 'Summary of findings and assessment...'}
+              placeholder={
+                lang === 'no'
+                  ? 'Sammendrag av funn og vurdering...'
+                  : 'Summary of findings and assessment...'
+              }
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none"
               rows={3}
             />
@@ -409,13 +458,13 @@ function AssessmentSection({ values, onChange, lang, expanded, onToggle }) {
                 {lang === 'no' ? 'Behandlingsfase' : 'Phase of Care'}
               </label>
               <div className="flex flex-wrap gap-2">
-                {CARE_PHASES.map(phase => (
+                {CARE_PHASES.map((phase) => (
                   <button
                     key={phase.id}
                     type="button"
                     onClick={() => onChange({ ...values, carePhase: phase.id })}
                     className={`px-3 py-1.5 text-xs rounded-full border transition-colors
-                               ${values.carePhase === phase.id ? phase.color + ' border-current' : 'bg-white border-gray-200 text-gray-600'}`}
+                               ${values.carePhase === phase.id ? `${phase.color} border-current` : 'bg-white border-gray-200 text-gray-600'}`}
                   >
                     {lang === 'no' ? phase.nameNo : phase.name}
                   </button>
@@ -450,12 +499,16 @@ function AssessmentSection({ values, onChange, lang, expanded, onToggle }) {
  * Plan section
  */
 function PlanSection({ values, onChange, lang, expanded, onToggle }) {
-  const hasContent = !!(values.treatmentGiven?.length || values.homeInstructions || values.followUp);
+  const hasContent = !!(
+    values.treatmentGiven?.length ||
+    values.homeInstructions ||
+    values.followUp
+  );
 
   const toggleTreatment = (id) => {
     const current = values.treatmentGiven || [];
     if (current.includes(id)) {
-      onChange({ ...values, treatmentGiven: current.filter(t => t !== id) });
+      onChange({ ...values, treatmentGiven: current.filter((t) => t !== id) });
     } else {
       onChange({ ...values, treatmentGiven: [...current, id] });
     }
@@ -480,15 +533,17 @@ function PlanSection({ values, onChange, lang, expanded, onToggle }) {
               {lang === 'no' ? 'Behandling utført' : 'Treatment Given'}
             </label>
             <div className="flex flex-wrap gap-2">
-              {TREATMENT_OPTIONS.map(treatment => (
+              {TREATMENT_OPTIONS.map((treatment) => (
                 <button
                   key={treatment.id}
                   type="button"
                   onClick={() => toggleTreatment(treatment.id)}
                   className={`px-3 py-1.5 text-xs rounded-full border transition-colors
-                             ${(values.treatmentGiven || []).includes(treatment.id)
-                               ? 'bg-teal-100 border-teal-300 text-teal-700'
-                               : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                             ${
+                               (values.treatmentGiven || []).includes(treatment.id)
+                                 ? 'bg-teal-100 border-teal-300 text-teal-700'
+                                 : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                             }`}
                 >
                   {lang === 'no' ? treatment.nameNo : treatment.name}
                 </button>
@@ -503,7 +558,9 @@ function PlanSection({ values, onChange, lang, expanded, onToggle }) {
             <textarea
               value={values.treatmentNotes || ''}
               onChange={(e) => onChange({ ...values, treatmentNotes: e.target.value })}
-              placeholder={lang === 'no' ? 'Detaljer om behandlingen...' : 'Details about treatment...'}
+              placeholder={
+                lang === 'no' ? 'Detaljer om behandlingen...' : 'Details about treatment...'
+              }
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none"
               rows={2}
             />
@@ -516,7 +573,11 @@ function PlanSection({ values, onChange, lang, expanded, onToggle }) {
             <textarea
               value={values.homeInstructions || ''}
               onChange={(e) => onChange({ ...values, homeInstructions: e.target.value })}
-              placeholder={lang === 'no' ? 'Øvelser, is/varme, aktivitetsmodifisering...' : 'Exercises, ice/heat, activity modification...'}
+              placeholder={
+                lang === 'no'
+                  ? 'Øvelser, is/varme, aktivitetsmodifisering...'
+                  : 'Exercises, ice/heat, activity modification...'
+              }
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none"
               rows={3}
             />
@@ -556,7 +617,11 @@ function PlanSection({ values, onChange, lang, expanded, onToggle }) {
             <textarea
               value={values.referral || ''}
               onChange={(e) => onChange({ ...values, referral: e.target.value })}
-              placeholder={lang === 'no' ? 'Eventuell henvisning til annen behandler, bildediagnostikk, etc.' : 'Any referral to other provider, imaging, etc.'}
+              placeholder={
+                lang === 'no'
+                  ? 'Eventuell henvisning til annen behandler, bildediagnostikk, etc.'
+                  : 'Any referral to other provider, imaging, etc.'
+              }
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none"
               rows={2}
             />
@@ -574,10 +639,12 @@ export default function SOAPNoteTemplate({
   values = {},
   onChange,
   lang = 'no',
-  readOnly = false,
-  onGenerateNarrative
+  _readOnly = false,
+  onGenerateNarrative,
 }) {
-  const [expandedSections, setExpandedSections] = useState(new Set(['subjective', 'objective', 'assessment', 'plan']));
+  const [expandedSections, setExpandedSections] = useState(
+    new Set(['subjective', 'objective', 'assessment', 'plan'])
+  );
 
   const toggleSection = (section) => {
     const newExpanded = new Set(expandedSections);
@@ -600,28 +667,48 @@ export default function SOAPNoteTemplate({
     // Subjective
     if (values.subjective?.chiefComplaint || values.subjective?.history) {
       let s = `S: `;
-      if (values.subjective.chiefComplaint) s += values.subjective.chiefComplaint + '. ';
-      if (values.subjective.history) s += values.subjective.history;
-      if (values.subjective.painLevel) s += ` VAS: ${values.subjective.painLevel}/10.`;
+      if (values.subjective.chiefComplaint) {
+        s += `${values.subjective.chiefComplaint}. `;
+      }
+      if (values.subjective.history) {
+        s += values.subjective.history;
+      }
+      if (values.subjective.painLevel) {
+        s += ` VAS: ${values.subjective.painLevel}/10.`;
+      }
       parts.push(s.trim());
     }
 
     // Objective
     if (values.objective?.observation || values.objective?.palpation || values.objective?.rom) {
       let o = `O: `;
-      if (values.objective.observation) o += values.objective.observation + ' ';
-      if (values.objective.palpation) o += values.objective.palpation + ' ';
-      if (values.objective.rom) o += 'ROM: ' + values.objective.rom + ' ';
-      if (values.objective.orthopedic) o += values.objective.orthopedic + ' ';
-      if (values.objective.neurological) o += values.objective.neurological;
+      if (values.objective.observation) {
+        o += `${values.objective.observation} `;
+      }
+      if (values.objective.palpation) {
+        o += `${values.objective.palpation} `;
+      }
+      if (values.objective.rom) {
+        o += `ROM: ${values.objective.rom} `;
+      }
+      if (values.objective.orthopedic) {
+        o += `${values.objective.orthopedic} `;
+      }
+      if (values.objective.neurological) {
+        o += values.objective.neurological;
+      }
       parts.push(o.trim());
     }
 
     // Assessment
     if (values.assessment?.diagnosis || values.assessment?.clinicalImpression) {
       let a = `A: `;
-      if (values.assessment.diagnosis) a += values.assessment.diagnosis + '. ';
-      if (values.assessment.clinicalImpression) a += values.assessment.clinicalImpression;
+      if (values.assessment.diagnosis) {
+        a += `${values.assessment.diagnosis}. `;
+      }
+      if (values.assessment.clinicalImpression) {
+        a += values.assessment.clinicalImpression;
+      }
       parts.push(a.trim());
     }
 
@@ -630,14 +717,18 @@ export default function SOAPNoteTemplate({
       let p = `P: `;
       if (values.plan.treatmentGiven?.length) {
         const treatments = values.plan.treatmentGiven
-          .map(id => TREATMENT_OPTIONS.find(t => t.id === id))
+          .map((id) => TREATMENT_OPTIONS.find((t) => t.id === id))
           .filter(Boolean)
-          .map(t => lang === 'no' ? t.nameNo : t.name)
+          .map((t) => (lang === 'no' ? t.nameNo : t.name))
           .join(', ');
         p += `${lang === 'no' ? 'Behandling' : 'Treatment'}: ${treatments}. `;
       }
-      if (values.plan.homeInstructions) p += `${lang === 'no' ? 'Hjemmeøvelser' : 'Home exercises'}: ${values.plan.homeInstructions} `;
-      if (values.plan.followUp) p += `${lang === 'no' ? 'Oppfølging' : 'Follow-up'}: ${values.plan.followUp}`;
+      if (values.plan.homeInstructions) {
+        p += `${lang === 'no' ? 'Hjemmeøvelser' : 'Home exercises'}: ${values.plan.homeInstructions} `;
+      }
+      if (values.plan.followUp) {
+        p += `${lang === 'no' ? 'Oppfølging' : 'Follow-up'}: ${values.plan.followUp}`;
+      }
       parts.push(p.trim());
     }
 
@@ -657,7 +748,9 @@ export default function SOAPNoteTemplate({
             {lang === 'no' ? 'SOAP-notat' : 'SOAP Note'}
           </h3>
           <p className="text-sm text-gray-500">
-            {lang === 'no' ? 'Strukturert klinisk dokumentasjon' : 'Structured clinical documentation'}
+            {lang === 'no'
+              ? 'Strukturert klinisk dokumentasjon'
+              : 'Structured clinical documentation'}
           </p>
         </div>
 

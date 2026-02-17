@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import _React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Calendar,
@@ -7,8 +7,8 @@ import {
   AlertTriangle,
   Plus,
   CheckCircle,
-  XCircle,
-  TrendingUp
+  _XCircle,
+  TrendingUp,
 } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -42,9 +42,7 @@ export const Dashboard = () => {
   }
 
   const todayAppointments = summary?.todayAppointments || [];
-  const upcomingAppointments = todayAppointments.filter(
-    a => new Date(a.startTime) > new Date()
-  );
+  const _upcomingAppointments = todayAppointments.filter((a) => new Date(a.startTime) > new Date());
   const recentAlerts = summary?.recentAlerts || [];
   const quickStats = summary?.quickStats || {};
 
@@ -63,7 +61,7 @@ export const Dashboard = () => {
                   weekday: 'long',
                   year: 'numeric',
                   month: 'long',
-                  day: 'numeric'
+                  day: 'numeric',
                 })}
               </p>
             </div>
@@ -76,11 +74,7 @@ export const Dashboard = () => {
               >
                 {showKPIs ? 'Overview' : 'Analytics'}
               </Button>
-              <Button
-                variant="primary"
-                onClick={() => navigate('/patients/new')}
-                icon={Plus}
-              >
+              <Button variant="primary" onClick={() => navigate('/patients/new')} icon={Plus}>
                 New Patient
               </Button>
             </div>
@@ -183,11 +177,7 @@ export const Dashboard = () => {
                 <Card.Header>
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-slate-900">Today's Appointments</h3>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => navigate('/appointments')}
-                    >
+                    <Button variant="ghost" size="sm" onClick={() => navigate('/appointments')}>
                       View All
                     </Button>
                   </div>
@@ -200,7 +190,7 @@ export const Dashboard = () => {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      {todayAppointments.map(appointment => {
+                      {todayAppointments.map((appointment) => {
                         const startTime = new Date(appointment.startTime);
                         const isPast = startTime < new Date();
 
@@ -213,8 +203,13 @@ export const Dashboard = () => {
                             onClick={() => navigate(`/patients/${appointment.patientId}`)}
                           >
                             <div className="flex items-center gap-3">
-                              <div className={`p-2 rounded ${isPast ? 'bg-slate-200' : 'bg-teal-200'}`}>
-                                <Clock size={18} className={isPast ? 'text-slate-600' : 'text-teal-700'} />
+                              <div
+                                className={`p-2 rounded ${isPast ? 'bg-slate-200' : 'bg-teal-200'}`}
+                              >
+                                <Clock
+                                  size={18}
+                                  className={isPast ? 'text-slate-600' : 'text-teal-700'}
+                                />
                               </div>
                               <div>
                                 <p className="font-medium text-slate-900">
@@ -223,17 +218,24 @@ export const Dashboard = () => {
                                 <p className="text-sm text-slate-600">
                                   {startTime.toLocaleTimeString('nb-NO', {
                                     hour: '2-digit',
-                                    minute: '2-digit'
+                                    minute: '2-digit',
                                   })}
-                                  {' - '}{appointment.type}
+                                  {' - '}
+                                  {appointment.type}
                                 </p>
                               </div>
                             </div>
-                            <Badge variant={
-                              appointment.status === 'CONFIRMED' ? 'success' :
-                              appointment.status === 'PENDING' ? 'warning' :
-                              appointment.status === 'CANCELLED' ? 'danger' : 'info'
-                            }>
+                            <Badge
+                              variant={
+                                appointment.status === 'CONFIRMED'
+                                  ? 'success'
+                                  : appointment.status === 'PENDING'
+                                    ? 'warning'
+                                    : appointment.status === 'CANCELLED'
+                                      ? 'danger'
+                                      : 'info'
+                              }
+                            >
                               {appointment.status}
                             </Badge>
                           </div>
@@ -313,11 +315,20 @@ export const Dashboard = () => {
                 <Card.Body>
                   <div className="space-y-4">
                     {summary.recentActivity.map((activity, index) => (
-                      <div key={index} className="flex items-start gap-3 pb-4 border-b border-slate-200 last:border-0 last:pb-0">
+                      <div
+                        key={index}
+                        className="flex items-start gap-3 pb-4 border-b border-slate-200 last:border-0 last:pb-0"
+                      >
                         <div className="p-2 bg-slate-100 rounded">
-                          {activity.type === 'APPOINTMENT' && <Calendar size={16} className="text-slate-600" />}
-                          {activity.type === 'PATIENT' && <Users size={16} className="text-slate-600" />}
-                          {activity.type === 'NOTE' && <CheckCircle size={16} className="text-slate-600" />}
+                          {activity.type === 'APPOINTMENT' && (
+                            <Calendar size={16} className="text-slate-600" />
+                          )}
+                          {activity.type === 'PATIENT' && (
+                            <Users size={16} className="text-slate-600" />
+                          )}
+                          {activity.type === 'NOTE' && (
+                            <CheckCircle size={16} className="text-slate-600" />
+                          )}
                         </div>
                         <div className="flex-1">
                           <p className="text-sm font-medium text-slate-900">{activity.title}</p>

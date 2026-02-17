@@ -5,17 +5,53 @@
  * bilateral comparison, and pathological reflex assessment.
  */
 
-import React, { useMemo, useState } from 'react';
-import { AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import _React, { useMemo, useState } from 'react';
+import { AlertTriangle, _CheckCircle, Info } from 'lucide-react';
 
 // DTR Grading Scale
 const DTR_GRADES = [
-  { value: '0', label: '0', description: 'Absent', descriptionNo: 'Fraværende', color: 'bg-red-100 text-red-700 border-red-300' },
-  { value: '1', label: '1+', description: 'Diminished/Hyporeflexic', descriptionNo: 'Nedsatt/Hyporefleksi', color: 'bg-amber-100 text-amber-700 border-amber-300' },
-  { value: '2', label: '2+', description: 'Normal', descriptionNo: 'Normal', color: 'bg-green-100 text-green-700 border-green-300' },
-  { value: '3', label: '3+', description: 'Brisk/Hyperreflexic', descriptionNo: 'Livlig/Hyperrefleksi', color: 'bg-purple-100 text-purple-700 border-purple-300' },
-  { value: '4', label: '4+', description: 'Clonus', descriptionNo: 'Klonus', color: 'bg-red-100 text-red-700 border-red-300' },
-  { value: 'NT', label: 'NT', description: 'Not Tested', descriptionNo: 'Ikke testet', color: 'bg-gray-100 text-gray-500 border-gray-300' }
+  {
+    value: '0',
+    label: '0',
+    description: 'Absent',
+    descriptionNo: 'Fraværende',
+    color: 'bg-red-100 text-red-700 border-red-300',
+  },
+  {
+    value: '1',
+    label: '1+',
+    description: 'Diminished/Hyporeflexic',
+    descriptionNo: 'Nedsatt/Hyporefleksi',
+    color: 'bg-amber-100 text-amber-700 border-amber-300',
+  },
+  {
+    value: '2',
+    label: '2+',
+    description: 'Normal',
+    descriptionNo: 'Normal',
+    color: 'bg-green-100 text-green-700 border-green-300',
+  },
+  {
+    value: '3',
+    label: '3+',
+    description: 'Brisk/Hyperreflexic',
+    descriptionNo: 'Livlig/Hyperrefleksi',
+    color: 'bg-purple-100 text-purple-700 border-purple-300',
+  },
+  {
+    value: '4',
+    label: '4+',
+    description: 'Clonus',
+    descriptionNo: 'Klonus',
+    color: 'bg-red-100 text-red-700 border-red-300',
+  },
+  {
+    value: 'NT',
+    label: 'NT',
+    description: 'Not Tested',
+    descriptionNo: 'Ikke testet',
+    color: 'bg-gray-100 text-gray-500 border-gray-300',
+  },
 ];
 
 // Deep Tendon Reflexes
@@ -28,7 +64,7 @@ const DEEP_TENDON_REFLEXES = [
     nerve: 'Musculocutaneous',
     nerveNo: 'N. musculocutaneus',
     technique: 'Strike biceps tendon with arm flexed',
-    techniqueNo: 'Slå på bicepssenen med armen flektert'
+    techniqueNo: 'Slå på bicepssenen med armen flektert',
   },
   {
     id: 'brachioradialis',
@@ -38,7 +74,7 @@ const DEEP_TENDON_REFLEXES = [
     nerve: 'Radial',
     nerveNo: 'N. radialis',
     technique: 'Strike distal radius with forearm neutral',
-    techniqueNo: 'Slå på distale radius med underarmen i nøytral'
+    techniqueNo: 'Slå på distale radius med underarmen i nøytral',
   },
   {
     id: 'triceps',
@@ -48,7 +84,7 @@ const DEEP_TENDON_REFLEXES = [
     nerve: 'Radial',
     nerveNo: 'N. radialis',
     technique: 'Strike triceps tendon above olecranon',
-    techniqueNo: 'Slå på tricepssenen over olecranon'
+    techniqueNo: 'Slå på tricepssenen over olecranon',
   },
   {
     id: 'finger_flexor',
@@ -58,7 +94,7 @@ const DEEP_TENDON_REFLEXES = [
     nerve: 'Median/Ulnar',
     nerveNo: 'N. medianus/N. ulnaris',
     technique: 'Strike examiner finger across patient palm',
-    techniqueNo: 'Slå på undersøkers finger over pasientens håndflate'
+    techniqueNo: 'Slå på undersøkers finger over pasientens håndflate',
   },
   {
     id: 'patellar',
@@ -68,7 +104,7 @@ const DEEP_TENDON_REFLEXES = [
     nerve: 'Femoral',
     nerveNo: 'N. femoralis',
     technique: 'Strike patellar tendon with knee flexed',
-    techniqueNo: 'Slå på patellarsenen med kneet flektert'
+    techniqueNo: 'Slå på patellarsenen med kneet flektert',
   },
   {
     id: 'hamstring',
@@ -78,7 +114,7 @@ const DEEP_TENDON_REFLEXES = [
     nerve: 'Sciatic',
     nerveNo: 'N. ischiadicus',
     technique: 'Strike medial hamstring tendon',
-    techniqueNo: 'Slå på medial hamstringsene'
+    techniqueNo: 'Slå på medial hamstringsene',
   },
   {
     id: 'achilles',
@@ -88,8 +124,8 @@ const DEEP_TENDON_REFLEXES = [
     nerve: 'Tibial',
     nerveNo: 'N. tibialis',
     technique: 'Strike Achilles tendon with foot dorsiflexed',
-    techniqueNo: 'Slå på akillessenen med foten dorsalflektert'
-  }
+    techniqueNo: 'Slå på akillessenen med foten dorsalflektert',
+  },
 ];
 
 // Pathological Reflexes
@@ -103,7 +139,7 @@ const PATHOLOGICAL_REFLEXES = [
     positive: 'Great toe extension, fanning of other toes',
     positiveNo: 'Stortåekstensjon, vifte av andre tær',
     significance: 'Upper motor neuron lesion',
-    significanceNo: 'Øvre motornevron-lesjon'
+    significanceNo: 'Øvre motornevron-lesjon',
   },
   {
     id: 'hoffmann',
@@ -114,7 +150,7 @@ const PATHOLOGICAL_REFLEXES = [
     positive: 'Flexion of thumb and index finger',
     positiveNo: 'Fleksjon av tommel og pekefinger',
     significance: 'Cervical myelopathy / UMN lesion',
-    significanceNo: 'Cervikal myelopati / ØMN-lesjon'
+    significanceNo: 'Cervikal myelopati / ØMN-lesjon',
   },
   {
     id: 'clonus_ankle',
@@ -125,7 +161,7 @@ const PATHOLOGICAL_REFLEXES = [
     positive: 'Sustained rhythmic contractions (>3 beats)',
     positiveNo: 'Vedvarende rytmiske kontraksjoner (>3 slag)',
     significance: 'Upper motor neuron lesion',
-    significanceNo: 'Øvre motornevron-lesjon'
+    significanceNo: 'Øvre motornevron-lesjon',
   },
   {
     id: 'clonus_patellar',
@@ -136,7 +172,7 @@ const PATHOLOGICAL_REFLEXES = [
     positive: 'Sustained rhythmic bouncing',
     positiveNo: 'Vedvarende rytmisk hopping',
     significance: 'Upper motor neuron lesion',
-    significanceNo: 'Øvre motornevron-lesjon'
+    significanceNo: 'Øvre motornevron-lesjon',
   },
   {
     id: 'jaw_jerk',
@@ -147,7 +183,7 @@ const PATHOLOGICAL_REFLEXES = [
     positive: 'Brisk jaw closure',
     positiveNo: 'Livlig kjevesammenbitn',
     significance: 'Bilateral UMN lesion above pons',
-    significanceNo: 'Bilateral ØMN-lesjon over pons'
+    significanceNo: 'Bilateral ØMN-lesjon over pons',
   },
   {
     id: 'abdominal',
@@ -158,15 +194,15 @@ const PATHOLOGICAL_REFLEXES = [
     positive: 'Absent = UMN lesion',
     positiveNo: 'Fraværende = ØMN-lesjon',
     significance: 'T7-T12 segments',
-    significanceNo: 'T7-T12 segmenter'
-  }
+    significanceNo: 'T7-T12 segmenter',
+  },
 ];
 
 /**
  * Grade selector button
  */
 function GradeButton({ value, currentValue, onChange, lang }) {
-  const grade = DTR_GRADES.find(g => g.value === value);
+  const grade = DTR_GRADES.find((g) => g.value === value);
   const isSelected = currentValue === value;
 
   return (
@@ -174,7 +210,7 @@ function GradeButton({ value, currentValue, onChange, lang }) {
       type="button"
       onClick={() => onChange(value)}
       className={`w-10 h-10 rounded-lg border-2 font-bold text-sm transition-all
-                 ${isSelected ? grade.color + ' border-current shadow-md scale-105' : 'bg-white border-gray-200 text-gray-400 hover:border-gray-300'}`}
+                 ${isSelected ? `${grade.color} border-current shadow-md scale-105` : 'bg-white border-gray-200 text-gray-400 hover:border-gray-300'}`}
       title={lang === 'no' ? grade.descriptionNo : grade.description}
     >
       {grade.label}
@@ -197,7 +233,9 @@ function DTRRow({ reflex, values, onChange, lang, showTechnique = false }) {
 
   // Check for asymmetry
   const hasAsymmetry = () => {
-    if (leftValue === 'NT' || rightValue === 'NT') return false;
+    if (leftValue === 'NT' || rightValue === 'NT') {
+      return false;
+    }
     return Math.abs(parseInt(leftValue) - parseInt(rightValue)) >= 2;
   };
 
@@ -227,7 +265,7 @@ function DTRRow({ reflex, values, onChange, lang, showTechnique = false }) {
       </td>
       <td className="px-2 py-3">
         <div className="flex justify-center gap-1">
-          {DTR_GRADES.map(grade => (
+          {DTR_GRADES.map((grade) => (
             <GradeButton
               key={grade.value}
               value={grade.value}
@@ -245,7 +283,7 @@ function DTRRow({ reflex, values, onChange, lang, showTechnique = false }) {
       </td>
       <td className="px-2 py-3">
         <div className="flex justify-center gap-1">
-          {DTR_GRADES.map(grade => (
+          {DTR_GRADES.map((grade) => (
             <GradeButton
               key={grade.value}
               value={grade.value}
@@ -274,13 +312,19 @@ function PathologicalReflexItem({ reflex, values, onChange, lang }) {
 
   const options = [
     { value: 'NT', label: lang === 'no' ? 'IT' : 'NT', color: 'bg-gray-100 text-gray-500' },
-    { value: 'negative', label: lang === 'no' ? 'Neg' : 'Neg', color: 'bg-green-100 text-green-700' },
+    {
+      value: 'negative',
+      label: lang === 'no' ? 'Neg' : 'Neg',
+      color: 'bg-green-100 text-green-700',
+    },
     { value: 'positive', label: lang === 'no' ? 'Pos' : 'Pos', color: 'bg-red-100 text-red-700' },
-    { value: 'equivocal', label: lang === 'no' ? '?' : '?', color: 'bg-amber-100 text-amber-700' }
+    { value: 'equivocal', label: lang === 'no' ? '?' : '?', color: 'bg-amber-100 text-amber-700' },
   ];
 
   return (
-    <div className={`p-3 rounded-lg border ${values[leftKey] === 'positive' || values[rightKey] === 'positive' ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-white'}`}>
+    <div
+      className={`p-3 rounded-lg border ${values[leftKey] === 'positive' || values[rightKey] === 'positive' ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-white'}`}
+    >
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <h5 className="font-medium text-gray-700">
@@ -300,13 +344,13 @@ function PathologicalReflexItem({ reflex, values, onChange, lang }) {
           <div className="text-center">
             <span className="text-xs text-gray-400 block mb-1">{lang === 'no' ? 'V' : 'L'}</span>
             <div className="flex gap-1">
-              {options.map(opt => (
+              {options.map((opt) => (
                 <button
                   key={opt.value}
                   type="button"
                   onClick={() => onChange({ ...values, [leftKey]: opt.value })}
                   className={`px-2 py-1 text-xs rounded border transition-colors
-                             ${values[leftKey] === opt.value ? opt.color + ' border-current font-medium' : 'bg-white border-gray-200 text-gray-400'}`}
+                             ${values[leftKey] === opt.value ? `${opt.color} border-current font-medium` : 'bg-white border-gray-200 text-gray-400'}`}
                 >
                   {opt.label}
                 </button>
@@ -316,13 +360,13 @@ function PathologicalReflexItem({ reflex, values, onChange, lang }) {
           <div className="text-center">
             <span className="text-xs text-gray-400 block mb-1">{lang === 'no' ? 'H' : 'R'}</span>
             <div className="flex gap-1">
-              {options.map(opt => (
+              {options.map((opt) => (
                 <button
                   key={opt.value}
                   type="button"
                   onClick={() => onChange({ ...values, [rightKey]: opt.value })}
                   className={`px-2 py-1 text-xs rounded border transition-colors
-                             ${values[rightKey] === opt.value ? opt.color + ' border-current font-medium' : 'bg-white border-gray-200 text-gray-400'}`}
+                             ${values[rightKey] === opt.value ? `${opt.color} border-current font-medium` : 'bg-white border-gray-200 text-gray-400'}`}
                 >
                   {opt.label}
                 </button>
@@ -341,7 +385,7 @@ function PathologicalReflexItem({ reflex, values, onChange, lang }) {
 function QuickSetPanel({ values, onChange, lang }) {
   const setAllDTR = (grade) => {
     const updates = { ...values };
-    DEEP_TENDON_REFLEXES.forEach(r => {
+    DEEP_TENDON_REFLEXES.forEach((r) => {
       updates[`${r.id}_left`] = grade;
       updates[`${r.id}_right`] = grade;
     });
@@ -354,7 +398,7 @@ function QuickSetPanel({ values, onChange, lang }) {
         {lang === 'no' ? 'Hurtigvalg - Sett alle DTR:' : 'Quick Set - All DTRs:'}
       </span>
       <div className="flex flex-wrap gap-2">
-        {DTR_GRADES.filter(g => g.value !== 'NT').map(grade => (
+        {DTR_GRADES.filter((g) => g.value !== 'NT').map((grade) => (
           <button
             key={grade.value}
             type="button"
@@ -376,9 +420,9 @@ export default function DeepTendonReflexPanel({
   values = {},
   onChange,
   lang = 'no',
-  readOnly = false,
+  _readOnly = false,
   showTechnique = false,
-  onGenerateNarrative
+  onGenerateNarrative,
 }) {
   const [showPathological, setShowPathological] = useState(true);
 
@@ -388,26 +432,40 @@ export default function DeepTendonReflexPanel({
     let abnormal = 0;
     let asymmetric = 0;
 
-    DEEP_TENDON_REFLEXES.forEach(r => {
+    DEEP_TENDON_REFLEXES.forEach((r) => {
       const left = values[`${r.id}_left`];
       const right = values[`${r.id}_right`];
 
-      if (left && left !== 'NT') tested++;
-      if (right && right !== 'NT') tested++;
+      if (left && left !== 'NT') {
+        tested++;
+      }
+      if (right && right !== 'NT') {
+        tested++;
+      }
 
-      if (left === '0' || left === '4') abnormal++;
-      if (right === '0' || right === '4') abnormal++;
+      if (left === '0' || left === '4') {
+        abnormal++;
+      }
+      if (right === '0' || right === '4') {
+        abnormal++;
+      }
 
       if (left && right && left !== 'NT' && right !== 'NT') {
-        if (Math.abs(parseInt(left) - parseInt(right)) >= 2) asymmetric++;
+        if (Math.abs(parseInt(left) - parseInt(right)) >= 2) {
+          asymmetric++;
+        }
       }
     });
 
     // Check pathological reflexes
     let pathologicalPositive = 0;
-    PATHOLOGICAL_REFLEXES.forEach(r => {
-      if (values[`${r.id}_left`] === 'positive') pathologicalPositive++;
-      if (values[`${r.id}_right`] === 'positive') pathologicalPositive++;
+    PATHOLOGICAL_REFLEXES.forEach((r) => {
+      if (values[`${r.id}_left`] === 'positive') {
+        pathologicalPositive++;
+      }
+      if (values[`${r.id}_right`] === 'positive') {
+        pathologicalPositive++;
+      }
     });
 
     return { tested, abnormal, asymmetric, pathologicalPositive };
@@ -419,29 +477,37 @@ export default function DeepTendonReflexPanel({
 
     // DTR findings
     const dtrFindings = [];
-    DEEP_TENDON_REFLEXES.forEach(r => {
+    DEEP_TENDON_REFLEXES.forEach((r) => {
       const left = values[`${r.id}_left`];
       const right = values[`${r.id}_right`];
 
       if (left && left !== 'NT' && left !== '2') {
-        const grade = DTR_GRADES.find(g => g.value === left);
-        dtrFindings.push(`${lang === 'no' ? r.nameNo : r.name} ${lang === 'no' ? 'venstre' : 'left'}: ${grade?.label} (${lang === 'no' ? grade?.descriptionNo : grade?.description})`);
+        const grade = DTR_GRADES.find((g) => g.value === left);
+        dtrFindings.push(
+          `${lang === 'no' ? r.nameNo : r.name} ${lang === 'no' ? 'venstre' : 'left'}: ${grade?.label} (${lang === 'no' ? grade?.descriptionNo : grade?.description})`
+        );
       }
       if (right && right !== 'NT' && right !== '2') {
-        const grade = DTR_GRADES.find(g => g.value === right);
-        dtrFindings.push(`${lang === 'no' ? r.nameNo : r.name} ${lang === 'no' ? 'høyre' : 'right'}: ${grade?.label} (${lang === 'no' ? grade?.descriptionNo : grade?.description})`);
+        const grade = DTR_GRADES.find((g) => g.value === right);
+        dtrFindings.push(
+          `${lang === 'no' ? r.nameNo : r.name} ${lang === 'no' ? 'høyre' : 'right'}: ${grade?.label} (${lang === 'no' ? grade?.descriptionNo : grade?.description})`
+        );
       }
     });
 
     if (dtrFindings.length > 0) {
       findings.push(`DTR: ${dtrFindings.join(', ')}`);
     } else if (summary.tested > 0) {
-      findings.push(lang === 'no' ? 'DTR: Alle testede reflekser normale (2+) bilateralt.' : 'DTRs: All tested reflexes normal (2+) bilaterally.');
+      findings.push(
+        lang === 'no'
+          ? 'DTR: Alle testede reflekser normale (2+) bilateralt.'
+          : 'DTRs: All tested reflexes normal (2+) bilaterally.'
+      );
     }
 
     // Pathological reflexes
     const pathFindings = [];
-    PATHOLOGICAL_REFLEXES.forEach(r => {
+    PATHOLOGICAL_REFLEXES.forEach((r) => {
       const left = values[`${r.id}_left`];
       const right = values[`${r.id}_right`];
 
@@ -454,15 +520,23 @@ export default function DeepTendonReflexPanel({
         } else {
           side = lang === 'no' ? 'høyre' : 'right';
         }
-        pathFindings.push(`${lang === 'no' ? r.nameNo : r.name} ${lang === 'no' ? 'positiv' : 'positive'} ${side}`);
+        pathFindings.push(
+          `${lang === 'no' ? r.nameNo : r.name} ${lang === 'no' ? 'positiv' : 'positive'} ${side}`
+        );
       }
     });
 
     if (pathFindings.length > 0) {
-      findings.push(`${lang === 'no' ? 'Patologiske reflekser' : 'Pathological reflexes'}: ${pathFindings.join(', ')}`);
+      findings.push(
+        `${lang === 'no' ? 'Patologiske reflekser' : 'Pathological reflexes'}: ${pathFindings.join(', ')}`
+      );
     }
 
-    return findings.length > 0 ? findings.join('. ') + '.' : (lang === 'no' ? 'Refleksundersøkelse ikke utført.' : 'Reflex examination not performed.');
+    return findings.length > 0
+      ? `${findings.join('. ')}.`
+      : lang === 'no'
+        ? 'Refleksundersøkelse ikke utført.'
+        : 'Reflex examination not performed.';
   }, [values, summary, lang]);
 
   return (
@@ -477,13 +551,20 @@ export default function DeepTendonReflexPanel({
             <p className="text-sm text-gray-500">
               {summary.tested} {lang === 'no' ? 'tester' : 'tests'}
               {summary.abnormal > 0 && (
-                <span className="text-red-600 ml-2">• {summary.abnormal} {lang === 'no' ? 'abnormale' : 'abnormal'}</span>
+                <span className="text-red-600 ml-2">
+                  • {summary.abnormal} {lang === 'no' ? 'abnormale' : 'abnormal'}
+                </span>
               )}
               {summary.asymmetric > 0 && (
-                <span className="text-amber-600 ml-2">• {summary.asymmetric} {lang === 'no' ? 'asymmetri' : 'asymmetry'}</span>
+                <span className="text-amber-600 ml-2">
+                  • {summary.asymmetric} {lang === 'no' ? 'asymmetri' : 'asymmetry'}
+                </span>
               )}
               {summary.pathologicalPositive > 0 && (
-                <span className="text-red-600 ml-2">• {summary.pathologicalPositive} {lang === 'no' ? 'patologiske +' : 'pathological +'}</span>
+                <span className="text-red-600 ml-2">
+                  • {summary.pathologicalPositive}{' '}
+                  {lang === 'no' ? 'patologiske +' : 'pathological +'}
+                </span>
               )}
             </p>
           )}
@@ -504,9 +585,10 @@ export default function DeepTendonReflexPanel({
 
       {/* Grading Legend */}
       <div className="flex flex-wrap gap-2 text-xs">
-        {DTR_GRADES.filter(g => g.value !== 'NT').map(grade => (
+        {DTR_GRADES.filter((g) => g.value !== 'NT').map((grade) => (
           <div key={grade.value} className={`px-2 py-1 rounded ${grade.color}`}>
-            <span className="font-bold">{grade.label}</span> = {lang === 'no' ? grade.descriptionNo : grade.description}
+            <span className="font-bold">{grade.label}</span> ={' '}
+            {lang === 'no' ? grade.descriptionNo : grade.description}
           </div>
         ))}
       </div>
@@ -531,7 +613,7 @@ export default function DeepTendonReflexPanel({
             </tr>
           </thead>
           <tbody>
-            {DEEP_TENDON_REFLEXES.map(reflex => (
+            {DEEP_TENDON_REFLEXES.map((reflex) => (
               <DTRRow
                 key={reflex.id}
                 reflex={reflex}
@@ -552,12 +634,13 @@ export default function DeepTendonReflexPanel({
           onClick={() => setShowPathological(!showPathological)}
           className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2"
         >
-          {showPathological ? '▼' : '▶'} {lang === 'no' ? 'Patologiske reflekser' : 'Pathological Reflexes'}
+          {showPathological ? '▼' : '▶'}{' '}
+          {lang === 'no' ? 'Patologiske reflekser' : 'Pathological Reflexes'}
         </button>
 
         {showPathological && (
           <div className="space-y-2">
-            {PATHOLOGICAL_REFLEXES.map(reflex => (
+            {PATHOLOGICAL_REFLEXES.map((reflex) => (
               <PathologicalReflexItem
                 key={reflex.id}
                 reflex={reflex}
@@ -575,11 +658,28 @@ export default function DeepTendonReflexPanel({
         <div className="flex items-start gap-2">
           <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
           <div className="text-blue-700">
-            <p className="font-medium mb-1">{lang === 'no' ? 'Klinisk tolkning:' : 'Clinical Interpretation:'}</p>
+            <p className="font-medium mb-1">
+              {lang === 'no' ? 'Klinisk tolkning:' : 'Clinical Interpretation:'}
+            </p>
             <ul className="space-y-0.5 text-blue-600">
-              <li>• {lang === 'no' ? 'Hyporefleksi (0-1+): LMN lesjon, polynevropati, myopati' : 'Hyporeflexia (0-1+): LMN lesion, polyneuropathy, myopathy'}</li>
-              <li>• {lang === 'no' ? 'Hyperrefleksi (3-4+): UMN lesjon, myelopati' : 'Hyperreflexia (3-4+): UMN lesion, myelopathy'}</li>
-              <li>• {lang === 'no' ? 'Asymmetri: Fokal nerverotsaffeksjon' : 'Asymmetry: Focal nerve root involvement'}</li>
+              <li>
+                •{' '}
+                {lang === 'no'
+                  ? 'Hyporefleksi (0-1+): LMN lesjon, polynevropati, myopati'
+                  : 'Hyporeflexia (0-1+): LMN lesion, polyneuropathy, myopathy'}
+              </li>
+              <li>
+                •{' '}
+                {lang === 'no'
+                  ? 'Hyperrefleksi (3-4+): UMN lesjon, myelopati'
+                  : 'Hyperreflexia (3-4+): UMN lesion, myelopathy'}
+              </li>
+              <li>
+                •{' '}
+                {lang === 'no'
+                  ? 'Asymmetri: Fokal nerverotsaffeksjon'
+                  : 'Asymmetry: Focal nerve root involvement'}
+              </li>
             </ul>
           </div>
         </div>

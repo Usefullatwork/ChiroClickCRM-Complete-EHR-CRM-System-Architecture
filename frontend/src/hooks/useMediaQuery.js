@@ -10,17 +10,17 @@
  * const isLargeScreen = useMediaQueryValue('(min-width: 1024px)')
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react';
 
 // Tailwind CSS default breakpoints
 export const BREAKPOINTS = {
-  xs: 320,    // Extra small phones
-  sm: 640,    // Small phones (landscape)
-  md: 768,    // Tablets
-  lg: 1024,   // Small laptops/tablets landscape
-  xl: 1280,   // Desktops
-  '2xl': 1536 // Large desktops
-}
+  xs: 320, // Extra small phones
+  sm: 640, // Small phones (landscape)
+  md: 768, // Tablets
+  lg: 1024, // Small laptops/tablets landscape
+  xl: 1280, // Desktops
+  '2xl': 1536, // Large desktops
+};
 
 // Common device queries
 export const MEDIA_QUERIES = {
@@ -31,8 +31,8 @@ export const MEDIA_QUERIES = {
   reducedMotion: '(prefers-reduced-motion: reduce)',
   darkMode: '(prefers-color-scheme: dark)',
   portrait: '(orientation: portrait)',
-  landscape: '(orientation: landscape)'
-}
+  landscape: '(orientation: landscape)',
+};
 
 /**
  * Check if a media query matches
@@ -42,10 +42,10 @@ export const MEDIA_QUERIES = {
 const getMatches = (query) => {
   // Prevent SSR issues
   if (typeof window !== 'undefined') {
-    return window.matchMedia(query).matches
+    return window.matchMedia(query).matches;
   }
-  return false
-}
+  return false;
+};
 
 /**
  * Hook to check a single media query
@@ -53,30 +53,30 @@ const getMatches = (query) => {
  * @returns {boolean} Whether the query matches
  */
 export function useMediaQueryValue(query) {
-  const [matches, setMatches] = useState(() => getMatches(query))
+  const [matches, setMatches] = useState(() => getMatches(query));
 
   useEffect(() => {
-    const mediaQueryList = window.matchMedia(query)
+    const mediaQueryList = window.matchMedia(query);
 
     const handleChange = (event) => {
-      setMatches(event.matches)
-    }
+      setMatches(event.matches);
+    };
 
     // Set initial value
-    setMatches(mediaQueryList.matches)
+    setMatches(mediaQueryList.matches);
 
     // Modern browsers
     if (mediaQueryList.addEventListener) {
-      mediaQueryList.addEventListener('change', handleChange)
-      return () => mediaQueryList.removeEventListener('change', handleChange)
+      mediaQueryList.addEventListener('change', handleChange);
+      return () => mediaQueryList.removeEventListener('change', handleChange);
     } else {
       // Legacy browsers (Safari < 14)
-      mediaQueryList.addListener(handleChange)
-      return () => mediaQueryList.removeListener(handleChange)
+      mediaQueryList.addListener(handleChange);
+      return () => mediaQueryList.removeListener(handleChange);
     }
-  }, [query])
+  }, [query]);
 
-  return matches
+  return matches;
 }
 
 /**
@@ -85,35 +85,45 @@ export function useMediaQueryValue(query) {
  */
 export default function useMediaQuery() {
   // Core breakpoint states
-  const isMobile = useMediaQueryValue(MEDIA_QUERIES.mobile)
-  const isTablet = useMediaQueryValue(MEDIA_QUERIES.tablet)
-  const isDesktop = useMediaQueryValue(MEDIA_QUERIES.desktop)
+  const isMobile = useMediaQueryValue(MEDIA_QUERIES.mobile);
+  const isTablet = useMediaQueryValue(MEDIA_QUERIES.tablet);
+  const isDesktop = useMediaQueryValue(MEDIA_QUERIES.desktop);
 
   // Device capabilities
-  const isTouchDevice = useMediaQueryValue(MEDIA_QUERIES.touch)
-  const prefersReducedMotion = useMediaQueryValue(MEDIA_QUERIES.reducedMotion)
-  const prefersDarkMode = useMediaQueryValue(MEDIA_QUERIES.darkMode)
+  const isTouchDevice = useMediaQueryValue(MEDIA_QUERIES.touch);
+  const prefersReducedMotion = useMediaQueryValue(MEDIA_QUERIES.reducedMotion);
+  const prefersDarkMode = useMediaQueryValue(MEDIA_QUERIES.darkMode);
 
   // Orientation
-  const isPortrait = useMediaQueryValue(MEDIA_QUERIES.portrait)
-  const isLandscape = useMediaQueryValue(MEDIA_QUERIES.landscape)
+  const isPortrait = useMediaQueryValue(MEDIA_QUERIES.portrait);
+  const isLandscape = useMediaQueryValue(MEDIA_QUERIES.landscape);
 
   // Granular breakpoints (min-width based, like Tailwind)
-  const isSmUp = useMediaQueryValue(`(min-width: ${BREAKPOINTS.sm}px)`)
-  const isMdUp = useMediaQueryValue(`(min-width: ${BREAKPOINTS.md}px)`)
-  const isLgUp = useMediaQueryValue(`(min-width: ${BREAKPOINTS.lg}px)`)
-  const isXlUp = useMediaQueryValue(`(min-width: ${BREAKPOINTS.xl}px)`)
-  const is2xlUp = useMediaQueryValue(`(min-width: ${BREAKPOINTS['2xl']}px)`)
+  const isSmUp = useMediaQueryValue(`(min-width: ${BREAKPOINTS.sm}px)`);
+  const isMdUp = useMediaQueryValue(`(min-width: ${BREAKPOINTS.md}px)`);
+  const isLgUp = useMediaQueryValue(`(min-width: ${BREAKPOINTS.lg}px)`);
+  const isXlUp = useMediaQueryValue(`(min-width: ${BREAKPOINTS.xl}px)`);
+  const is2xlUp = useMediaQueryValue(`(min-width: ${BREAKPOINTS['2xl']}px)`);
 
   // Utility function to get current breakpoint name
   const getCurrentBreakpoint = useCallback(() => {
-    if (is2xlUp) return '2xl'
-    if (isXlUp) return 'xl'
-    if (isLgUp) return 'lg'
-    if (isMdUp) return 'md'
-    if (isSmUp) return 'sm'
-    return 'xs'
-  }, [isSmUp, isMdUp, isLgUp, isXlUp, is2xlUp])
+    if (is2xlUp) {
+      return '2xl';
+    }
+    if (isXlUp) {
+      return 'xl';
+    }
+    if (isLgUp) {
+      return 'lg';
+    }
+    if (isMdUp) {
+      return 'md';
+    }
+    if (isSmUp) {
+      return 'sm';
+    }
+    return 'xs';
+  }, [isSmUp, isMdUp, isLgUp, isXlUp, is2xlUp]);
 
   return {
     // Primary device types
@@ -142,8 +152,8 @@ export default function useMediaQuery() {
     breakpoint: getCurrentBreakpoint(),
 
     // Raw breakpoint values for custom logic
-    breakpoints: BREAKPOINTS
-  }
+    breakpoints: BREAKPOINTS,
+  };
 }
 
 /**
@@ -154,34 +164,34 @@ export default function useMediaQuery() {
 export function useWindowSize(delay = 100) {
   const [windowSize, setWindowSize] = useState({
     width: typeof window !== 'undefined' ? window.innerWidth : 0,
-    height: typeof window !== 'undefined' ? window.innerHeight : 0
-  })
+    height: typeof window !== 'undefined' ? window.innerHeight : 0,
+  });
 
   useEffect(() => {
-    let timeoutId = null
+    let timeoutId = null;
 
     const handleResize = () => {
-      clearTimeout(timeoutId)
+      clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
         setWindowSize({
           width: window.innerWidth,
-          height: window.innerHeight
-        })
-      }, delay)
-    }
+          height: window.innerHeight,
+        });
+      }, delay);
+    };
 
-    window.addEventListener('resize', handleResize)
+    window.addEventListener('resize', handleResize);
 
     // Set initial size
-    handleResize()
+    handleResize();
 
     return () => {
-      clearTimeout(timeoutId)
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [delay])
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [delay]);
 
-  return windowSize
+  return windowSize;
 }
 
 /**
@@ -192,29 +202,31 @@ export function useWindowSize(delay = 100) {
  * @returns {boolean} Whether element is in viewport
  */
 export function useInViewport(ref, options = {}) {
-  const [isInViewport, setIsInViewport] = useState(false)
+  const [isInViewport, setIsInViewport] = useState(false);
 
   useEffect(() => {
-    if (!ref.current) return
+    if (!ref.current) {
+      return;
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsInViewport(entry.isIntersecting)
+        setIsInViewport(entry.isIntersecting);
       },
       {
         threshold: 0.1,
-        ...options
+        ...options,
       }
-    )
+    );
 
-    observer.observe(ref.current)
+    observer.observe(ref.current);
 
     return () => {
-      observer.disconnect()
-    }
-  }, [ref, options])
+      observer.disconnect();
+    };
+  }, [ref, options]);
 
-  return isInViewport
+  return isInViewport;
 }
 
 /**
@@ -223,40 +235,40 @@ export function useInViewport(ref, options = {}) {
  * @returns {Object} Scroll direction and position
  */
 export function useScrollDirection() {
-  const [scrollDirection, setScrollDirection] = useState('up')
-  const [scrollY, setScrollY] = useState(0)
-  const [isScrolled, setIsScrolled] = useState(false)
+  const [scrollDirection, setScrollDirection] = useState('up');
+  const [scrollY, setScrollY] = useState(0);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    let lastScrollY = window.scrollY
-    let ticking = false
+    let lastScrollY = window.scrollY;
+    let ticking = false;
 
     const updateScrollDirection = () => {
-      const currentScrollY = window.scrollY
+      const currentScrollY = window.scrollY;
 
       if (currentScrollY > lastScrollY && currentScrollY > 50) {
-        setScrollDirection('down')
+        setScrollDirection('down');
       } else if (currentScrollY < lastScrollY) {
-        setScrollDirection('up')
+        setScrollDirection('up');
       }
 
-      setScrollY(currentScrollY)
-      setIsScrolled(currentScrollY > 10)
-      lastScrollY = currentScrollY
-      ticking = false
-    }
+      setScrollY(currentScrollY);
+      setIsScrolled(currentScrollY > 10);
+      lastScrollY = currentScrollY;
+      ticking = false;
+    };
 
     const onScroll = () => {
       if (!ticking) {
-        window.requestAnimationFrame(updateScrollDirection)
-        ticking = true
+        window.requestAnimationFrame(updateScrollDirection);
+        ticking = true;
       }
-    }
+    };
 
-    window.addEventListener('scroll', onScroll)
+    window.addEventListener('scroll', onScroll);
 
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
-  return { scrollDirection, scrollY, isScrolled }
+  return { scrollDirection, scrollY, isScrolled };
 }

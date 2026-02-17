@@ -13,12 +13,12 @@ import {
   Star,
   AlertTriangle,
   CheckCircle,
-  XCircle,
+  _XCircle,
   Edit,
-  Trash2,
+  _Trash2,
   Copy,
   ChevronRight,
-  Settings,
+  _Settings,
   Activity,
   Loader2,
 } from 'lucide-react';
@@ -104,19 +104,19 @@ const WorkflowBuilder = () => {
   }, []);
 
   // Create new workflow
-  const handleCreateWorkflow = async (workflowData) => {
+  const _handleCreateWorkflow = async (workflowData) => {
     try {
       const response = await crmAPI.createWorkflow(workflowData);
       setWorkflows((prev) => [...prev, response.data]);
       setShowNewWorkflow(false);
     } catch (err) {
       logger.error('Error creating workflow:', err);
-      toast.error('Failed to create workflow: ' + err.message);
+      toast.error(`Failed to create workflow: ${err.message}`);
     }
   };
 
   // Toggle workflow (activate/pause)
-  const handleToggleWorkflow = async (workflowId, active) => {
+  const _handleToggleWorkflow = async (workflowId, active) => {
     try {
       await crmAPI.toggleWorkflow(workflowId, active);
       setWorkflows((prev) =>
@@ -124,7 +124,7 @@ const WorkflowBuilder = () => {
       );
     } catch (err) {
       logger.error('Error toggling workflow:', err);
-      toast.error('Failed to toggle workflow: ' + err.message);
+      toast.error(`Failed to toggle workflow: ${err.message}`);
     }
   };
 
@@ -137,9 +137,15 @@ const WorkflowBuilder = () => {
 
   // Filter workflows
   const filteredWorkflows = workflows.filter((w) => {
-    if (activeTab === 'active') return w.status === 'ACTIVE';
-    if (activeTab === 'paused') return w.status === 'PAUSED';
-    if (activeTab === 'draft') return w.status === 'DRAFT';
+    if (activeTab === 'active') {
+      return w.status === 'ACTIVE';
+    }
+    if (activeTab === 'paused') {
+      return w.status === 'PAUSED';
+    }
+    if (activeTab === 'draft') {
+      return w.status === 'DRAFT';
+    }
     return true;
   });
 

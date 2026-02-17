@@ -15,7 +15,9 @@ export default function usePatientPresence(patientId, currentUserName) {
   // On mount: emit viewing and request current viewers
   useEffect(() => {
     const socket = getSocket();
-    if (!socket || !patientId) return;
+    if (!socket || !patientId) {
+      return;
+    }
 
     // Tell server we're viewing this patient
     socket.emit('patient:viewing', { patientId, userName: currentUserName });
@@ -36,10 +38,14 @@ export default function usePatientPresence(patientId, currentUserName) {
   useSocketEvent(
     'patient:user-joined',
     useCallback((data) => {
-      if (data.patientId !== patientIdRef.current) return;
+      if (data.patientId !== patientIdRef.current) {
+        return;
+      }
       setViewers((prev) => {
         // Avoid duplicates
-        if (prev.some((v) => v.userId === data.userId)) return prev;
+        if (prev.some((v) => v.userId === data.userId)) {
+          return prev;
+        }
         return [...prev, { userId: data.userId, name: data.userName }];
       });
     }, [])
@@ -49,7 +55,9 @@ export default function usePatientPresence(patientId, currentUserName) {
   useSocketEvent(
     'patient:user-left',
     useCallback((data) => {
-      if (data.patientId !== patientIdRef.current) return;
+      if (data.patientId !== patientIdRef.current) {
+        return;
+      }
       setViewers((prev) => prev.filter((v) => v.userId !== data.userId));
     }, [])
   );

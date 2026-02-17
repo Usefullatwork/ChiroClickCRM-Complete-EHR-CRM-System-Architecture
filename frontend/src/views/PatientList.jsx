@@ -1,15 +1,6 @@
-import React, { useState } from 'react';
+import _React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Search,
-  Plus,
-  Filter,
-  User,
-  Phone,
-  Mail,
-  Calendar,
-  ChevronRight
-} from 'lucide-react';
+import { Search, Plus, Filter, User, Phone, Mail, Calendar, ChevronRight } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
@@ -40,7 +31,7 @@ export const PatientList = () => {
     page,
     limit,
     search: searchQuery,
-    status: statusFilter === 'all' ? undefined : statusFilter
+    status: statusFilter === 'all' ? undefined : statusFilter,
   });
 
   const patients = data?.patients || [];
@@ -77,11 +68,7 @@ export const PatientList = () => {
               </p>
             </div>
 
-            <Button
-              variant="primary"
-              onClick={() => navigate('/patients/new')}
-              icon={Plus}
-            >
+            <Button variant="primary" onClick={() => navigate('/patients/new')} icon={Plus}>
               New Patient
             </Button>
           </div>
@@ -174,10 +161,8 @@ export const PatientList = () => {
           </Card>
         ) : (
           <div className="space-y-3">
-            {patients.map(patient => {
-              const age = patient.fodselsnummer
-                ? calculateAge(patient.fodselsnummer)
-                : null;
+            {patients.map((patient) => {
+              const age = patient.fodselsnummer ? calculateAge(patient.fodselsnummer) : null;
 
               return (
                 <Card
@@ -192,7 +177,8 @@ export const PatientList = () => {
                         {/* Avatar */}
                         <div className="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center">
                           <span className="text-lg font-semibold text-teal-700">
-                            {patient.firstName?.[0]}{patient.lastName?.[0]}
+                            {patient.firstName?.[0]}
+                            {patient.lastName?.[0]}
                           </span>
                         </div>
 
@@ -202,9 +188,7 @@ export const PatientList = () => {
                             <h3 className="text-lg font-semibold text-slate-900 truncate">
                               {patient.firstName} {patient.lastName}
                             </h3>
-                            <Badge variant={getStatusColor(patient.status)}>
-                              {patient.status}
-                            </Badge>
+                            <Badge variant={getStatusColor(patient.status)}>{patient.status}</Badge>
                           </div>
 
                           <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-slate-600">
@@ -261,15 +245,15 @@ export const PatientList = () => {
         {totalPages > 1 && (
           <div className="flex items-center justify-between mt-6">
             <div className="text-sm text-slate-600">
-              Showing {(page - 1) * limit + 1} to{' '}
-              {Math.min(page * limit, totalCount)} of {totalCount} patients
+              Showing {(page - 1) * limit + 1} to {Math.min(page * limit, totalCount)} of{' '}
+              {totalCount} patients
             </div>
 
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setPage(p => Math.max(1, p - 1))}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
               >
                 Previous
@@ -307,7 +291,7 @@ export const PatientList = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
               >
                 Next

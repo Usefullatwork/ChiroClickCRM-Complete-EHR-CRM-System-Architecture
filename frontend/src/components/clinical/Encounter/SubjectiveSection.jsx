@@ -1,14 +1,21 @@
-import React from 'react';
+import _React from 'react';
 import { useEncounter } from '../../../context/EncounterContext';
 
-export default function SubjectiveSection({ onTextInputWithMacros, onQuickPhrase, onSetActiveField, quickPhrases }) {
+export default function SubjectiveSection({
+  onTextInputWithMacros,
+  onQuickPhrase,
+  onSetActiveField,
+  quickPhrases,
+}) {
   const { encounterData, isSigned, updateField, setEncounterData } = useEncounter();
 
   return (
     <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
       <div className="px-4 py-3 bg-gradient-to-r from-blue-50 to-white border-b border-slate-100 flex items-center justify-between">
         <h3 className="font-semibold text-slate-800 flex items-center gap-2">
-          <span className="bg-blue-600 text-white h-6 w-6 rounded-md flex items-center justify-center text-sm font-bold">S</span>
+          <span className="bg-blue-600 text-white h-6 w-6 rounded-md flex items-center justify-center text-sm font-bold">
+            S
+          </span>
           Subjektivt
         </h3>
         <div className="flex items-center gap-3">
@@ -18,11 +25,15 @@ export default function SubjectiveSection({ onTextInputWithMacros, onQuickPhrase
             min="0"
             max="10"
             value={encounterData.vas_pain_start || 0}
-            onChange={(e) => setEncounterData(prev => ({ ...prev, vas_pain_start: parseInt(e.target.value) }))}
+            onChange={(e) =>
+              setEncounterData((prev) => ({ ...prev, vas_pain_start: parseInt(e.target.value) }))
+            }
             disabled={isSigned}
             className="w-20 h-1.5 accent-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
           />
-          <span className="text-sm font-semibold text-blue-600 w-6">{encounterData.vas_pain_start || 0}</span>
+          <span className="text-sm font-semibold text-blue-600 w-6">
+            {encounterData.vas_pain_start || 0}
+          </span>
         </div>
       </div>
       <div className="p-4 space-y-3">
@@ -48,7 +59,7 @@ export default function SubjectiveSection({ onTextInputWithMacros, onQuickPhrase
         />
         {!isSigned && (
           <div className="flex flex-wrap gap-1.5">
-            {quickPhrases.subjective.map(phrase => (
+            {quickPhrases.subjective.map((phrase) => (
               <button
                 key={phrase}
                 onClick={() => onQuickPhrase(phrase, 'subjective', 'history')}

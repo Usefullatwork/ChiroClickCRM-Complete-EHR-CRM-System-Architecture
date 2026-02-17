@@ -12,7 +12,7 @@
  * Integrates with existing SOAP documentation workflow
  */
 
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import _React, { useState, useCallback, useMemo, _useEffect } from 'react';
 import {
   AlertTriangle,
   CheckCircle,
@@ -26,8 +26,8 @@ import {
   RotateCcw,
   Save,
   AlertCircle,
-  ArrowRight,
-  Info
+  _ArrowRight,
+  Info,
 } from 'lucide-react';
 
 import {
@@ -36,7 +36,7 @@ import {
   checkRedFlags,
   generateNarrative,
   formatNarrativeForSOAP,
-  diagnoseBPPV
+  diagnoseBPPV,
 } from './neurologicalExamDefinitions';
 
 // =============================================================================
@@ -73,7 +73,7 @@ const TRANSLATIONS = {
     centralSigns: 'Sentrale tegn (ekskluder hjerneslag)',
     completed: 'Fullført',
     inProgress: 'Pågår',
-    notStarted: 'Ikke startet'
+    notStarted: 'Ikke startet',
   },
   en: {
     title: 'Neurological Examination',
@@ -104,8 +104,8 @@ const TRANSLATIONS = {
     centralSigns: 'Central signs (exclude stroke)',
     completed: 'Completed',
     inProgress: 'In progress',
-    notStarted: 'Not started'
-  }
+    notStarted: 'Not started',
+  },
 };
 
 // Cluster icons mapping
@@ -118,7 +118,7 @@ const CLUSTER_ICONS = {
   UPPER_CERVICAL_INSTABILITY: AlertTriangle,
   MYELOPATHY: AlertCircle,
   VNG_OCULOMOTOR: Eye,
-  ACTIVATOR: Activity
+  ACTIVATOR: Activity,
 };
 
 // =============================================================================
@@ -152,8 +152,8 @@ function ClusterSelector({ clusters, selectedCluster, onSelect, testResults, lan
                 isSelected
                   ? 'bg-blue-50 border-l-4 border-blue-600'
                   : isCritical
-                  ? 'bg-red-50 border-l-4 border-red-600 hover:bg-red-100'
-                  : 'hover:bg-gray-50 border-l-4 border-transparent'
+                    ? 'bg-red-50 border-l-4 border-red-600 hover:bg-red-100'
+                    : 'hover:bg-gray-50 border-l-4 border-transparent'
               }`}
             >
               <Icon
@@ -162,29 +162,31 @@ function ClusterSelector({ clusters, selectedCluster, onSelect, testResults, lan
                 }`}
               />
               <div className="flex-1 min-w-0">
-                <div className={`text-sm font-medium truncate ${
-                  isCritical ? 'text-red-900' : isSelected ? 'text-blue-900' : 'text-gray-900'
-                }`}>
+                <div
+                  className={`text-sm font-medium truncate ${
+                    isCritical ? 'text-red-900' : isSelected ? 'text-blue-900' : 'text-gray-900'
+                  }`}
+                >
                   {cluster.name[lang]}
                 </div>
                 {hasResults && (
-                  <div className={`text-xs ${
-                    score.meetsThreshold
-                      ? isCritical ? 'text-red-600' : 'text-orange-600'
-                      : 'text-gray-500'
-                  }`}>
+                  <div
+                    className={`text-xs ${
+                      score.meetsThreshold
+                        ? isCritical
+                          ? 'text-red-600'
+                          : 'text-orange-600'
+                        : 'text-gray-500'
+                    }`}
+                  >
                     {t.score}: {score.score}/{score.total}
                     {score.meetsThreshold && (
-                      <span className="ml-1">
-                        {isCritical ? '⚠️' : '●'}
-                      </span>
+                      <span className="ml-1">{isCritical ? '⚠️' : '●'}</span>
                     )}
                   </div>
                 )}
               </div>
-              {isCritical && (
-                <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0" />
-              )}
+              {isCritical && <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0" />}
             </button>
           );
         })}
@@ -201,13 +203,13 @@ function TestCard({ test, results, onChange, lang }) {
   const testResults = results || { criteria: {} };
 
   const handleCriterionChange = (criterionId, checked) => {
-    const criterion = test.criteria.find(c => c.id === criterionId);
+    const criterion = test.criteria.find((c) => c.id === criterionId);
 
     // If this is an exclusive criterion and it's being checked, clear others
     if (criterion?.exclusive && checked) {
       onChange({
         ...testResults,
-        criteria: { [criterionId]: true }
+        criteria: { [criterionId]: true },
       });
     } else {
       // If checking a non-exclusive criterion, remove any exclusive ones
@@ -215,7 +217,7 @@ function TestCard({ test, results, onChange, lang }) {
 
       if (checked) {
         // Remove exclusive criteria when adding non-exclusive
-        test.criteria.forEach(c => {
+        test.criteria.forEach((c) => {
           if (c.exclusive && newCriteria[c.id]) {
             delete newCriteria[c.id];
           }
@@ -223,28 +225,32 @@ function TestCard({ test, results, onChange, lang }) {
       }
 
       newCriteria[criterionId] = checked;
-      if (!checked) delete newCriteria[criterionId];
+      if (!checked) {
+        delete newCriteria[criterionId];
+      }
 
       onChange({
         ...testResults,
-        criteria: newCriteria
+        criteria: newCriteria,
       });
     }
   };
 
   const checkedCount = Object.values(testResults.criteria || {}).filter(Boolean).length;
-  const hasPositiveFindings = test.criteria.some(c =>
-    !c.exclusive && testResults.criteria?.[c.id]
+  const hasPositiveFindings = test.criteria.some(
+    (c) => !c.exclusive && testResults.criteria?.[c.id]
   );
 
   return (
-    <div className={`border rounded-lg overflow-hidden ${
-      test.redFlag && hasPositiveFindings
-        ? 'border-red-300 bg-red-50'
-        : hasPositiveFindings
-        ? 'border-orange-200 bg-orange-50'
-        : 'border-gray-200 bg-white'
-    }`}>
+    <div
+      className={`border rounded-lg overflow-hidden ${
+        test.redFlag && hasPositiveFindings
+          ? 'border-red-300 bg-red-50'
+          : hasPositiveFindings
+            ? 'border-orange-200 bg-orange-50'
+            : 'border-gray-200 bg-white'
+      }`}
+    >
       {/* Test Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
@@ -259,23 +265,23 @@ function TestCard({ test, results, onChange, lang }) {
             <div className="w-5 h-5 rounded-full border-2 border-gray-300" />
           )}
           <div>
-            <h4 className={`font-medium ${
-              test.redFlag && hasPositiveFindings ? 'text-red-900' : 'text-gray-900'
-            }`}>
+            <h4
+              className={`font-medium ${
+                test.redFlag && hasPositiveFindings ? 'text-red-900' : 'text-gray-900'
+              }`}
+            >
               {test.name[lang]}
             </h4>
-            {test.subtitle && (
-              <p className="text-xs text-gray-500">{test.subtitle[lang]}</p>
-            )}
+            {test.subtitle && <p className="text-xs text-gray-500">{test.subtitle[lang]}</p>}
           </div>
         </div>
         <div className="flex items-center gap-2">
           {checkedCount > 0 && (
-            <span className={`text-xs px-2 py-0.5 rounded-full ${
-              hasPositiveFindings
-                ? 'bg-orange-200 text-orange-800'
-                : 'bg-gray-200 text-gray-600'
-            }`}>
+            <span
+              className={`text-xs px-2 py-0.5 rounded-full ${
+                hasPositiveFindings ? 'bg-orange-200 text-orange-800' : 'bg-gray-200 text-gray-600'
+              }`}
+            >
               {checkedCount}
             </span>
           )}
@@ -290,7 +296,7 @@ function TestCard({ test, results, onChange, lang }) {
       {/* Criteria Checkboxes */}
       {isExpanded && (
         <div className="px-4 pb-4 space-y-2">
-          {test.criteria.map(criterion => (
+          {test.criteria.map((criterion) => (
             <label
               key={criterion.id}
               className={`flex items-start gap-3 p-2 rounded cursor-pointer transition-colors ${
@@ -307,11 +313,15 @@ function TestCard({ test, results, onChange, lang }) {
                 onChange={(e) => handleCriterionChange(criterion.id, e.target.checked)}
                 className="mt-0.5 h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
               />
-              <span className={`text-sm ${
-                testResults.criteria?.[criterion.id]
-                  ? criterion.exclusive ? 'text-green-800' : 'text-orange-800'
-                  : 'text-gray-700'
-              }`}>
+              <span
+                className={`text-sm ${
+                  testResults.criteria?.[criterion.id]
+                    ? criterion.exclusive
+                      ? 'text-green-800'
+                      : 'text-orange-800'
+                    : 'text-gray-700'
+                }`}
+              >
                 {criterion.label[lang]}
                 {criterion.exclusive && (
                   <span className="ml-2 text-xs text-gray-500">(negativ)</span>
@@ -337,9 +347,11 @@ function TestCard({ test, results, onChange, lang }) {
 
           {/* Interpretation */}
           {test.interpretation && hasPositiveFindings && (
-            <div className={`mt-3 p-3 rounded-lg text-sm ${
-              test.redFlag ? 'bg-red-100 text-red-800' : 'bg-blue-50 text-blue-800'
-            }`}>
+            <div
+              className={`mt-3 p-3 rounded-lg text-sm ${
+                test.redFlag ? 'bg-red-100 text-red-800' : 'bg-blue-50 text-blue-800'
+              }`}
+            >
               <strong>→</strong> {test.interpretation[lang]}
             </div>
           )}
@@ -357,22 +369,28 @@ function ClusterScoreCard({ cluster, score, lang }) {
   const isCritical = cluster.isRedFlagCluster && score.meetsThreshold;
 
   return (
-    <div className={`p-4 rounded-lg ${
-      isCritical
-        ? 'bg-red-100 border-2 border-red-500'
-        : score.meetsThreshold
-        ? 'bg-orange-100 border-2 border-orange-500'
-        : 'bg-gray-100 border border-gray-200'
-    }`}>
+    <div
+      className={`p-4 rounded-lg ${
+        isCritical
+          ? 'bg-red-100 border-2 border-red-500'
+          : score.meetsThreshold
+            ? 'bg-orange-100 border-2 border-orange-500'
+            : 'bg-gray-100 border border-gray-200'
+      }`}
+    >
       <div className="flex items-center justify-between mb-2">
-        <h4 className={`font-semibold ${
-          isCritical ? 'text-red-900' : score.meetsThreshold ? 'text-orange-900' : 'text-gray-900'
-        }`}>
+        <h4
+          className={`font-semibold ${
+            isCritical ? 'text-red-900' : score.meetsThreshold ? 'text-orange-900' : 'text-gray-900'
+          }`}
+        >
           {cluster.name[lang]}
         </h4>
-        <span className={`text-2xl font-bold ${
-          isCritical ? 'text-red-600' : score.meetsThreshold ? 'text-orange-600' : 'text-gray-600'
-        }`}>
+        <span
+          className={`text-2xl font-bold ${
+            isCritical ? 'text-red-600' : score.meetsThreshold ? 'text-orange-600' : 'text-gray-600'
+          }`}
+        >
           {score.score}/{score.total}
         </span>
       </div>
@@ -392,9 +410,11 @@ function ClusterScoreCard({ cluster, score, lang }) {
       </div>
 
       {score.interpretation && (
-        <div className={`mt-2 text-sm font-medium ${
-          isCritical ? 'text-red-800' : score.meetsThreshold ? 'text-orange-800' : 'text-gray-700'
-        }`}>
+        <div
+          className={`mt-2 text-sm font-medium ${
+            isCritical ? 'text-red-800' : score.meetsThreshold ? 'text-orange-800' : 'text-gray-700'
+          }`}
+        >
           {score.interpretation.label[lang]}
         </div>
       )}
@@ -422,16 +442,16 @@ function ClusterScoreCard({ cluster, score, lang }) {
 function RedFlagAlert({ redFlags, lang }) {
   const t = TRANSLATIONS[lang];
 
-  if (redFlags.length === 0) return null;
+  if (redFlags.length === 0) {
+    return null;
+  }
 
-  const hasCritical = redFlags.some(f =>
-    f.clusterId === 'MYELOPATHY' || f.clusterId === 'UPPER_CERVICAL_INSTABILITY'
+  const hasCritical = redFlags.some(
+    (f) => f.clusterId === 'MYELOPATHY' || f.clusterId === 'UPPER_CERVICAL_INSTABILITY'
   );
 
   return (
-    <div className={`rounded-lg p-4 mb-6 ${
-      hasCritical ? 'bg-red-600' : 'bg-red-500'
-    }`}>
+    <div className={`rounded-lg p-4 mb-6 ${hasCritical ? 'bg-red-600' : 'bg-red-500'}`}>
       <div className="flex items-start gap-3">
         <AlertTriangle className="w-6 h-6 text-white flex-shrink-0" />
         <div className="flex-1">
@@ -464,7 +484,9 @@ function BPPVDiagnosisPanel({ testResults, lang }) {
   const t = TRANSLATIONS[lang];
   const diagnosis = diagnoseBPPV(testResults);
 
-  if (!diagnosis.type) return null;
+  if (!diagnosis.type) {
+    return null;
+  }
 
   const subCluster = EXAM_CLUSTERS.BPPV.subClusters[diagnosis.type];
 
@@ -480,7 +502,8 @@ function BPPVDiagnosisPanel({ testResults, lang }) {
         </div>
         {diagnosis.affectedSide && (
           <div>
-            <strong>{t.affectedSide}:</strong> {diagnosis.affectedSide === 'right' ? 'Høyre/Right' : 'Venstre/Left'}
+            <strong>{t.affectedSide}:</strong>{' '}
+            {diagnosis.affectedSide === 'right' ? 'Høyre/Right' : 'Venstre/Left'}
           </div>
         )}
         <div>
@@ -502,7 +525,9 @@ function BPPVDiagnosisPanel({ testResults, lang }) {
 function HINTSPanel({ cluster, testResults, lang }) {
   const t = TRANSLATIONS[lang];
 
-  if (!cluster.hintsPlus) return null;
+  if (!cluster.hintsPlus) {
+    return null;
+  }
 
   return (
     <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
@@ -512,12 +537,12 @@ function HINTSPanel({ cluster, testResults, lang }) {
       </h4>
       <p className="text-sm text-yellow-800 mb-3">{t.centralSigns}</p>
       <div className="space-y-2">
-        {cluster.hintsPlus.centralSigns.map(sign => (
+        {cluster.hintsPlus.centralSigns.map((sign) => (
           <label key={sign.id} className="flex items-start gap-2 text-sm">
             <input
               type="checkbox"
               checked={testResults[`hints_${sign.id}`] || false}
-              onChange={(e) => {
+              onChange={(_e) => {
                 // This would need to be hooked up to state management
               }}
               className="mt-0.5"
@@ -540,11 +565,7 @@ function NarrativeDisplay({ narratives, lang }) {
   const t = TRANSLATIONS[lang];
 
   if (narratives.length === 0) {
-    return (
-      <div className="text-center py-8 text-gray-500">
-        {t.noTestsPerformed}
-      </div>
-    );
+    return <div className="text-center py-8 text-gray-500">{t.noTestsPerformed}</div>;
   }
 
   return (
@@ -553,7 +574,9 @@ function NarrativeDisplay({ narratives, lang }) {
         <div key={i} className="border border-gray-200 rounded-lg overflow-hidden">
           <div className="px-4 py-2 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
             <h4 className="font-medium text-gray-900">{cluster.clusterName}</h4>
-            <span className="text-sm text-gray-600">{t.score}: {cluster.score}</span>
+            <span className="text-sm text-gray-600">
+              {t.score}: {cluster.score}
+            </span>
           </div>
           <div className="p-4 space-y-2">
             {cluster.interpretation && (
@@ -591,7 +614,7 @@ export default function NeurologicalExam({
   onNarrativeGenerated,
   patientId,
   encounterId,
-  lang = 'no'
+  lang = 'no',
 }) {
   const t = TRANSLATIONS[lang];
 
@@ -611,9 +634,9 @@ export default function NeurologicalExam({
 
   // Handlers
   const handleTestChange = useCallback((testId, results) => {
-    setTestResults(prev => ({
+    setTestResults((prev) => ({
       ...prev,
-      [testId]: results
+      [testId]: results,
     }));
   }, []);
 
@@ -632,7 +655,7 @@ export default function NeurologicalExam({
       }, {}),
       redFlags,
       narrative: formatNarrativeForSOAP(narratives, lang),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     if (onSave) {
@@ -642,7 +665,16 @@ export default function NeurologicalExam({
     if (onNarrativeGenerated) {
       onNarrativeGenerated(formatNarrativeForSOAP(narratives, lang));
     }
-  }, [testResults, redFlags, narratives, patientId, encounterId, lang, onSave, onNarrativeGenerated]);
+  }, [
+    testResults,
+    redFlags,
+    narratives,
+    patientId,
+    encounterId,
+    lang,
+    onSave,
+    onNarrativeGenerated,
+  ]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -704,11 +736,7 @@ export default function NeurologicalExam({
 
             {/* Score Summary */}
             <div className="mt-4">
-              <ClusterScoreCard
-                cluster={currentCluster}
-                score={currentScore}
-                lang={lang}
-              />
+              <ClusterScoreCard cluster={currentCluster} score={currentScore} lang={lang} />
             </div>
           </div>
 
@@ -735,11 +763,16 @@ export default function NeurologicalExam({
                   {currentCluster.diagnosticCriteria && (
                     <div className="mt-3 flex items-center gap-4 text-sm">
                       <span className="text-gray-600">
-                        {t.threshold}: <strong>≥{currentCluster.diagnosticCriteria.threshold}/{currentCluster.diagnosticCriteria.total}</strong>
+                        {t.threshold}:{' '}
+                        <strong>
+                          ≥{currentCluster.diagnosticCriteria.threshold}/
+                          {currentCluster.diagnosticCriteria.total}
+                        </strong>
                       </span>
                       {currentCluster.diagnosticCriteria.sensitivity && (
                         <span className="text-gray-500">
-                          Sens: {currentCluster.diagnosticCriteria.sensitivity}% | Spec: {currentCluster.diagnosticCriteria.specificity}%
+                          Sens: {currentCluster.diagnosticCriteria.sensitivity}% | Spec:{' '}
+                          {currentCluster.diagnosticCriteria.specificity}%
                         </span>
                       )}
                     </div>
@@ -764,15 +797,15 @@ export default function NeurologicalExam({
                       {currentCluster.redFlags.name[lang]}
                     </h4>
                     <div className="space-y-2">
-                      {currentCluster.redFlags.items.map(flag => (
+                      {currentCluster.redFlags.items.map((flag) => (
                         <label key={flag.id} className="flex items-start gap-2 text-sm">
                           <input
                             type="checkbox"
                             checked={testResults[`${selectedCluster}_redFlag_${flag.id}`] || false}
                             onChange={(e) => {
-                              setTestResults(prev => ({
+                              setTestResults((prev) => ({
                                 ...prev,
-                                [`${selectedCluster}_redFlag_${flag.id}`]: e.target.checked
+                                [`${selectedCluster}_redFlag_${flag.id}`]: e.target.checked,
                               }));
                             }}
                             className="mt-0.5 text-red-600"
@@ -786,7 +819,7 @@ export default function NeurologicalExam({
 
                 {/* Tests Grid */}
                 <div className="grid gap-4">
-                  {currentCluster.tests?.map(test => (
+                  {currentCluster.tests?.map((test) => (
                     <TestCard
                       key={test.id}
                       test={test}
@@ -809,11 +842,7 @@ export default function NeurologicalExam({
 // COMPACT VERSION (for embedding in SOAP)
 // =============================================================================
 
-export function NeurologicalExamCompact({
-  testResults = {},
-  onChange,
-  lang = 'no'
-}) {
+export function NeurologicalExamCompact({ testResults = {}, onChange, lang = 'no' }) {
   const t = TRANSLATIONS[lang];
   const [expandedCluster, setExpandedCluster] = useState(null);
 
@@ -824,7 +853,7 @@ export function NeurologicalExamCompact({
     }, {});
   }, [testResults]);
 
-  const hasAnyResults = Object.values(scores).some(s => s.score > 0);
+  const hasAnyResults = Object.values(scores).some((s) => s.score > 0);
 
   return (
     <div className="border border-gray-200 rounded-lg overflow-hidden">
@@ -833,9 +862,7 @@ export function NeurologicalExamCompact({
           <Brain className="w-5 h-5 text-blue-600" />
           {t.title}
         </h3>
-        {hasAnyResults && (
-          <span className="text-xs text-gray-500">{t.inProgress}</span>
-        )}
+        {hasAnyResults && <span className="text-xs text-gray-500">{t.inProgress}</span>}
       </div>
 
       <div className="divide-y divide-gray-100">
@@ -852,20 +879,22 @@ export function NeurologicalExamCompact({
                   isCritical ? 'bg-red-50' : score.meetsThreshold ? 'bg-orange-50' : ''
                 }`}
               >
-                <span className={`text-sm ${
-                  isCritical ? 'text-red-900 font-medium' : 'text-gray-900'
-                }`}>
+                <span
+                  className={`text-sm ${isCritical ? 'text-red-900 font-medium' : 'text-gray-900'}`}
+                >
                   {cluster.name[lang]}
                 </span>
                 <div className="flex items-center gap-2">
                   {score.score > 0 && (
-                    <span className={`text-xs px-2 py-0.5 rounded ${
-                      isCritical
-                        ? 'bg-red-200 text-red-800'
-                        : score.meetsThreshold
-                        ? 'bg-orange-200 text-orange-800'
-                        : 'bg-gray-200 text-gray-600'
-                    }`}>
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded ${
+                        isCritical
+                          ? 'bg-red-200 text-red-800'
+                          : score.meetsThreshold
+                            ? 'bg-orange-200 text-orange-800'
+                            : 'bg-gray-200 text-gray-600'
+                      }`}
+                    >
                       {score.score}/{score.total}
                     </span>
                   )}
@@ -879,7 +908,7 @@ export function NeurologicalExamCompact({
 
               {isExpanded && (
                 <div className="px-4 py-3 bg-gray-50 space-y-2">
-                  {cluster.tests?.slice(0, 5).map(test => (
+                  {cluster.tests?.slice(0, 5).map((test) => (
                     <div key={test.id} className="text-xs">
                       <label className="flex items-center gap-2">
                         <input
@@ -890,8 +919,8 @@ export function NeurologicalExamCompact({
                               ...testResults,
                               [test.id]: {
                                 ...testResults[test.id],
-                                positive: e.target.checked
-                              }
+                                positive: e.target.checked,
+                              },
                             });
                           }}
                           className="h-3 w-3"

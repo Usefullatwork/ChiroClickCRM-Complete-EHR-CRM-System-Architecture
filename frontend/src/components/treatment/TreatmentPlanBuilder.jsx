@@ -8,7 +8,7 @@
  * 4. Review and save
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, _useEffect } from 'react';
 import { treatmentPlansAPI } from '../../services/api';
 import { PLAN_TEMPLATES } from './TreatmentPlan';
 
@@ -123,9 +123,9 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
       }));
 
       // Auto-create milestones from phases
-      let visitCount = 0;
+      let _visitCount = 0;
       const autoMilestones = template.phases.map((phase, i) => {
-        visitCount += phase.weeks * phase.frequency;
+        _visitCount += phase.weeks * phase.frequency;
         const targetDate = new Date();
         targetDate.setDate(targetDate.getDate() + phase.weeks * 7 * (i + 1));
         return {
@@ -221,7 +221,9 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
         });
       }
 
-      if (onCreated) onCreated(plan);
+      if (onCreated) {
+        onCreated(plan);
+      }
     } catch (err) {
       setError(err.response?.data?.error || t.errorCreating);
     } finally {

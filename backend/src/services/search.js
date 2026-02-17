@@ -17,7 +17,7 @@ const normalizeSearchQuery = (searchTerm) => {
   }
 
   // Clean and normalize the search term
-  let normalized = searchTerm
+  const normalized = searchTerm
     .trim()
     .toLowerCase()
     // Replace Norwegian characters with alternatives for broader matching
@@ -53,7 +53,10 @@ export const searchPatients = async (organizationId, searchTerm, options = {}) =
   }
 
   // Check cache first
-  const cacheKey = CacheKeys.patientSearch(organizationId, `${searchTerm}:${status}:${offset}:${limit}`);
+  const cacheKey = CacheKeys.patientSearch(
+    organizationId,
+    `${searchTerm}:${status}:${offset}:${limit}`
+  );
   const cached = await hybridCache.get(cacheKey);
   if (cached) {
     return cached;
@@ -66,7 +69,9 @@ export const searchPatients = async (organizationId, searchTerm, options = {}) =
 
     if (!includeInactive) {
       statusFilter = status ? 'AND status = $5' : "AND status != 'INACTIVE'";
-      if (status) params.push(status);
+      if (status) {
+        params.push(status);
+      }
     }
 
     // Full-text search with ranking

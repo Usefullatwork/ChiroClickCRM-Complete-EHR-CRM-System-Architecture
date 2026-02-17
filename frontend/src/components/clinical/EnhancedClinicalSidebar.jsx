@@ -11,22 +11,17 @@
  * The sidebar maintains the same click-to-insert-text workflow
  * while providing professional anatomical visualizations.
  */
-import React, { useState, useCallback } from 'react';
-import { Layers, Box, User, ChevronDown, ChevronUp, Settings, X } from 'lucide-react';
+import _React, { useState, useCallback } from 'react';
+import { Layers, Box, User, ChevronDown, ChevronUp, Settings, _X } from 'lucide-react';
 import QuickPalpationSpine from './QuickPalpationSpine';
-import {
-  EnhancedSpineDiagram,
-  Spine3DViewer,
-  EnhancedBodyDiagram,
-  VIEW_MODES
-} from '../anatomy';
+import { EnhancedSpineDiagram, Spine3DViewer, EnhancedBodyDiagram, _VIEW_MODES } from '../anatomy';
 
 // Sidebar view modes
 const SIDEBAR_MODES = {
-  QUICK: 'quick',      // Original quick palpation buttons
+  QUICK: 'quick', // Original quick palpation buttons
   SPINE_2D: 'spine2d', // Enhanced 2D spine diagram
   SPINE_3D: 'spine3d', // 3D spine viewer
-  BODY: 'body'         // Body pain mapping
+  BODY: 'body', // Body pain mapping
 };
 
 const MODE_CONFIG = {
@@ -34,26 +29,26 @@ const MODE_CONFIG = {
     label: 'Hurtig',
     shortLabel: 'Q',
     icon: Settings,
-    description: 'Hurtig knapp-basert'
+    description: 'Hurtig knapp-basert',
   },
   [SIDEBAR_MODES.SPINE_2D]: {
     label: '2D Spine',
     shortLabel: '2D',
     icon: Layers,
-    description: 'Anatomisk 2D diagram'
+    description: 'Anatomisk 2D diagram',
   },
   [SIDEBAR_MODES.SPINE_3D]: {
     label: '3D Spine',
     shortLabel: '3D',
     icon: Box,
-    description: '3D interaktiv visning'
+    description: '3D interaktiv visning',
   },
   [SIDEBAR_MODES.BODY]: {
     label: 'Kropp',
     shortLabel: 'B',
     icon: User,
-    description: 'Smertelokalisering'
-  }
+    description: 'Smertelokalisering',
+  },
 };
 
 export default function EnhancedClinicalSidebar({
@@ -65,27 +60,33 @@ export default function EnhancedClinicalSidebar({
   onBodyRegionsChange,
   templates = {},
   initialMode = SIDEBAR_MODES.QUICK,
-  className = ''
+  className = '',
 }) {
   const [mode, setMode] = useState(initialMode);
   const [isExpanded, setIsExpanded] = useState(true);
   const [showModeSelector, setShowModeSelector] = useState(false);
 
   // Handle text insertion (works for all modes)
-  const handleTextInsert = useCallback((text) => {
-    if (!disabled && onInsertText) {
-      onInsertText(text);
-    }
-  }, [disabled, onInsertText]);
+  const handleTextInsert = useCallback(
+    (text) => {
+      if (!disabled && onInsertText) {
+        onInsertText(text);
+      }
+    },
+    [disabled, onInsertText]
+  );
 
   // Handle body region click (for text insertion)
-  const handleBodyRegionClick = useCallback((regionData) => {
-    if (!disabled && onInsertText) {
-      // Generate text from region click
-      const text = `Smerte: ${regionData.label}. `;
-      onInsertText(text);
-    }
-  }, [disabled, onInsertText]);
+  const handleBodyRegionClick = useCallback(
+    (regionData) => {
+      if (!disabled && onInsertText) {
+        // Generate text from region click
+        const text = `Smerte: ${regionData.label}. `;
+        onInsertText(text);
+      }
+    },
+    [disabled, onInsertText]
+  );
 
   // Render the active view
   const renderView = () => {
@@ -95,12 +96,7 @@ export default function EnhancedClinicalSidebar({
 
     switch (mode) {
       case SIDEBAR_MODES.QUICK:
-        return (
-          <QuickPalpationSpine
-            onInsertText={handleTextInsert}
-            disabled={disabled}
-          />
-        );
+        return <QuickPalpationSpine onInsertText={handleTextInsert} disabled={disabled} />;
 
       case SIDEBAR_MODES.SPINE_2D:
         return (
@@ -192,11 +188,7 @@ export default function EnhancedClinicalSidebar({
               className="p-1 text-slate-400 hover:text-slate-600"
               title={isExpanded ? 'Minimer' : 'Utvid'}
             >
-              {isExpanded ? (
-                <ChevronUp className="w-4 h-4" />
-              ) : (
-                <ChevronDown className="w-4 h-4" />
-              )}
+              {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             </button>
           </div>
         </div>
@@ -241,9 +233,7 @@ export default function EnhancedClinicalSidebar({
       </div>
 
       {/* Main content area */}
-      <div className="flex-1 overflow-hidden">
-        {renderView()}
-      </div>
+      <div className="flex-1 overflow-hidden">{renderView()}</div>
 
       {/* Footer hint */}
       {isExpanded && (
@@ -262,7 +252,9 @@ export default function EnhancedClinicalSidebar({
 
 // Compact mode selector bar (can be placed above sidebar)
 export function SidebarModeBar({ mode, onModeChange, disabled }) {
-  if (disabled) return null;
+  if (disabled) {
+    return null;
+  }
 
   return (
     <div className="flex items-center gap-0.5 p-1 bg-slate-100 rounded-lg">

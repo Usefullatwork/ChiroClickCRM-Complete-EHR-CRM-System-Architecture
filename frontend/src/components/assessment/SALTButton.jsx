@@ -22,9 +22,18 @@ const IMPROVEMENT_MODIFIERS = [
   { label: '50% better', value: 'Patient reports approximately 50% improvement since last visit.' },
   { label: '75% better', value: 'Patient reports approximately 75% improvement since last visit.' },
   { label: 'Much better', value: 'Patient reports significant improvement since last visit.' },
-  { label: 'Slightly worse', value: 'Patient reports slight worsening of symptoms since last visit.' },
-  { label: 'Much worse', value: 'Patient reports significant worsening of symptoms since last visit.' },
-  { label: 'New complaint', value: 'Patient presents with a new complaint in addition to ongoing issues.' },
+  {
+    label: 'Slightly worse',
+    value: 'Patient reports slight worsening of symptoms since last visit.',
+  },
+  {
+    label: 'Much worse',
+    value: 'Patient reports significant worsening of symptoms since last visit.',
+  },
+  {
+    label: 'New complaint',
+    value: 'Patient presents with a new complaint in addition to ongoing issues.',
+  },
 ];
 
 // Sections that can be cloned
@@ -41,25 +50,23 @@ export default function SALTButton({
   previousEncounter,
   onApply,
   disabled = false,
-  className = ''
+  className = '',
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedSections, setSelectedSections] = useState(
-    CLONE_SECTIONS.map(s => s.id)
-  );
+  const [selectedSections, setSelectedSections] = useState(CLONE_SECTIONS.map((s) => s.id));
   const [selectedModifier, setSelectedModifier] = useState(null);
   const [applied, setApplied] = useState(false);
 
   const toggleSection = (sectionId) => {
-    setSelectedSections(prev =>
-      prev.includes(sectionId)
-        ? prev.filter(s => s !== sectionId)
-        : [...prev, sectionId]
+    setSelectedSections((prev) =>
+      prev.includes(sectionId) ? prev.filter((s) => s !== sectionId) : [...prev, sectionId]
     );
   };
 
   const handleApply = () => {
-    if (!previousEncounter) return;
+    if (!previousEncounter) {
+      return;
+    }
 
     // Build cloned data based on selected sections
     const clonedData = {};
@@ -70,11 +77,12 @@ export default function SALTButton({
         // Prepend improvement modifier if selected
         chief_complaint: selectedModifier
           ? `${selectedModifier}\n\n${previousEncounter.subjective?.chief_complaint || ''}`
-          : previousEncounter.subjective?.chief_complaint || ''
+          : previousEncounter.subjective?.chief_complaint || '',
       };
       clonedData.pain_locations = previousEncounter.pain_locations || [];
       clonedData.pain_qualities = previousEncounter.pain_qualities || [];
-      clonedData.aggravating_factors_selected = previousEncounter.aggravating_factors_selected || [];
+      clonedData.aggravating_factors_selected =
+        previousEncounter.aggravating_factors_selected || [];
       clonedData.relieving_factors_selected = previousEncounter.relieving_factors_selected || [];
     }
 
@@ -95,7 +103,7 @@ export default function SALTButton({
       clonedData.treatments_selected = previousEncounter.treatments_selected || [];
       clonedData.plan = {
         ...clonedData.plan,
-        treatment: previousEncounter.plan?.treatment || ''
+        treatment: previousEncounter.plan?.treatment || '',
       };
     }
 
@@ -103,7 +111,7 @@ export default function SALTButton({
       clonedData.exercises_selected = previousEncounter.exercises_selected || [];
       clonedData.plan = {
         ...clonedData.plan,
-        exercises: previousEncounter.plan?.exercises || ''
+        exercises: previousEncounter.plan?.exercises || '',
       };
     }
 
@@ -124,7 +132,7 @@ export default function SALTButton({
     ? new Date(previousEncounter.encounter_date).toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
-        year: 'numeric'
+        year: 'numeric',
       })
     : null;
 
@@ -135,11 +143,12 @@ export default function SALTButton({
         disabled={disabled || !previousEncounter}
         className={`
           flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all
-          ${applied
-            ? 'bg-green-600 text-white'
-            : disabled || !previousEncounter
-              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-              : 'bg-amber-500 text-white hover:bg-amber-600 shadow-sm hover:shadow'
+          ${
+            applied
+              ? 'bg-green-600 text-white'
+              : disabled || !previousEncounter
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                : 'bg-amber-500 text-white hover:bg-amber-600 shadow-sm hover:shadow'
           }
         `}
         title={previousEncounter ? `Clone from ${previousDate}` : 'No previous encounter'}
@@ -179,14 +188,15 @@ export default function SALTButton({
               {IMPROVEMENT_MODIFIERS.map((mod) => (
                 <button
                   key={mod.label}
-                  onClick={() => setSelectedModifier(
-                    selectedModifier === mod.value ? null : mod.value
-                  )}
+                  onClick={() =>
+                    setSelectedModifier(selectedModifier === mod.value ? null : mod.value)
+                  }
                   className={`
                     px-2 py-1.5 text-xs rounded-lg transition-colors text-left
-                    ${selectedModifier === mod.value
-                      ? 'bg-amber-100 text-amber-800 border border-amber-300'
-                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-transparent'
+                    ${
+                      selectedModifier === mod.value
+                        ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-transparent'
                     }
                   `}
                 >
@@ -209,10 +219,7 @@ export default function SALTButton({
                     key={section.id}
                     className={`
                       flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer
-                      ${selectedSections.includes(section.id)
-                        ? 'bg-amber-50'
-                        : 'hover:bg-gray-50'
-                      }
+                      ${selectedSections.includes(section.id) ? 'bg-amber-50' : 'hover:bg-gray-50'}
                       ${!hasData ? 'opacity-50' : ''}
                     `}
                   >
@@ -225,9 +232,7 @@ export default function SALTButton({
                     />
                     <span className="text-sm">{section.icon}</span>
                     <span className="text-sm text-gray-700">{section.label}</span>
-                    {!hasData && (
-                      <span className="ml-auto text-xs text-gray-400">(empty)</span>
-                    )}
+                    {!hasData && <span className="ml-auto text-xs text-gray-400">(empty)</span>}
                   </label>
                 );
               })}
@@ -238,7 +243,10 @@ export default function SALTButton({
           <div className="px-4 py-3 bg-gray-50 rounded-b-xl">
             <div className="flex items-start gap-2 text-xs text-gray-500 mb-3">
               <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-              <span>This will populate fields with data from the previous visit. You can edit after applying.</span>
+              <span>
+                This will populate fields with data from the previous visit. You can edit after
+                applying.
+              </span>
             </div>
             <div className="flex gap-2">
               <button
@@ -264,7 +272,9 @@ export default function SALTButton({
 
 // Helper to check if a section has data
 function checkSectionHasData(encounter, sectionId) {
-  if (!encounter) return false;
+  if (!encounter) {
+    return false;
+  }
 
   switch (sectionId) {
     case 'subjective':
@@ -280,25 +290,13 @@ function checkSectionHasData(encounter, sectionId) {
         encounter.palpation_findings?.length
       );
     case 'spinal_findings':
-      return !!(
-        encounter.spinal_findings &&
-        Object.keys(encounter.spinal_findings).length > 0
-      );
+      return !!(encounter.spinal_findings && Object.keys(encounter.spinal_findings).length > 0);
     case 'treatments':
-      return !!(
-        encounter.treatments_selected?.length ||
-        encounter.plan?.treatment
-      );
+      return !!(encounter.treatments_selected?.length || encounter.plan?.treatment);
     case 'exercises':
-      return !!(
-        encounter.exercises_selected?.length ||
-        encounter.plan?.exercises
-      );
+      return !!(encounter.exercises_selected?.length || encounter.plan?.exercises);
     case 'diagnoses':
-      return !!(
-        encounter.icpc_codes?.length ||
-        encounter.icd10_codes?.length
-      );
+      return !!(encounter.icpc_codes?.length || encounter.icd10_codes?.length);
     default:
       return false;
   }
@@ -309,7 +307,9 @@ export function SALTButtonCompact({ previousEncounter, onApply }) {
   const [applied, setApplied] = useState(false);
 
   const handleQuickApply = () => {
-    if (!previousEncounter) return;
+    if (!previousEncounter) {
+      return;
+    }
 
     // Quick apply - clone everything
     const clonedData = {
@@ -328,7 +328,7 @@ export function SALTButtonCompact({ previousEncounter, onApply }) {
       treatments_selected: previousEncounter.treatments_selected || [],
       exercises_selected: previousEncounter.exercises_selected || [],
       icpc_codes: previousEncounter.icpc_codes || [],
-      icd10_codes: previousEncounter.icd10_codes || []
+      icd10_codes: previousEncounter.icd10_codes || [],
     };
 
     onApply(clonedData);
@@ -342,11 +342,12 @@ export function SALTButtonCompact({ previousEncounter, onApply }) {
       disabled={!previousEncounter}
       className={`
         p-2 rounded-lg transition-colors
-        ${applied
-          ? 'bg-green-100 text-green-600'
-          : previousEncounter
-            ? 'bg-amber-100 text-amber-600 hover:bg-amber-200'
-            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+        ${
+          applied
+            ? 'bg-green-100 text-green-600'
+            : previousEncounter
+              ? 'bg-amber-100 text-amber-600 hover:bg-amber-200'
+              : 'bg-gray-100 text-gray-400 cursor-not-allowed'
         }
       `}
       title="Same As Last Treatment"

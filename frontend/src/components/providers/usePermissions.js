@@ -26,7 +26,9 @@ export function PermissionsProvider({ children, currentUser }) {
   // Check if user has a specific permission
   const hasPermission = useCallback(
     (permission) => {
-      if (rolePermissions.includes('all')) return true;
+      if (rolePermissions.includes('all')) {
+        return true;
+      }
       return rolePermissions.includes(permission);
     },
     [rolePermissions]
@@ -35,7 +37,9 @@ export function PermissionsProvider({ children, currentUser }) {
   // Check if user has any of the given permissions
   const hasAnyPermission = useCallback(
     (permissions) => {
-      if (rolePermissions.includes('all')) return true;
+      if (rolePermissions.includes('all')) {
+        return true;
+      }
       return permissions.some((p) => rolePermissions.includes(p));
     },
     [rolePermissions]
@@ -44,7 +48,9 @@ export function PermissionsProvider({ children, currentUser }) {
   // Check if user has all of the given permissions
   const hasAllPermissions = useCallback(
     (permissions) => {
-      if (rolePermissions.includes('all')) return true;
+      if (rolePermissions.includes('all')) {
+        return true;
+      }
       return permissions.every((p) => rolePermissions.includes(p));
     },
     [rolePermissions]
@@ -75,11 +81,7 @@ export function PermissionsProvider({ children, currentUser }) {
     isPractitioner,
   };
 
-  return (
-    <PermissionsContext.Provider value={value}>
-      {children}
-    </PermissionsContext.Provider>
-  );
+  return <PermissionsContext.Provider value={value}>{children}</PermissionsContext.Provider>;
 }
 
 // =============================================================================
@@ -127,9 +129,7 @@ export function PermissionGuard({
 
   // Multiple permissions check
   if (permissions) {
-    const hasAccess = requireAll
-      ? hasAllPermissions(permissions)
-      : hasAnyPermission(permissions);
+    const hasAccess = requireAll ? hasAllPermissions(permissions) : hasAnyPermission(permissions);
     return hasAccess ? children : fallback;
   }
 
@@ -175,8 +175,12 @@ export function PractitionerOnly({ children, fallback = null }) {
 export function filterByPermission(items, permissionKey, userPermissions) {
   return items.filter((item) => {
     const required = item[permissionKey];
-    if (!required) return true;
-    if (userPermissions.includes('all')) return true;
+    if (!required) {
+      return true;
+    }
+    if (userPermissions.includes('all')) {
+      return true;
+    }
     if (Array.isArray(required)) {
       return required.some((p) => userPermissions.includes(p));
     }

@@ -1,14 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import _React, { useState, useEffect } from 'react';
 import {
-  TrendingUp, TrendingDown, Users, UserPlus, UserMinus, UserCheck,
-  Calendar, DollarSign, Activity, Clock, AlertTriangle, Star,
-  ChevronRight, RefreshCw, Target, Loader2
+  TrendingUp,
+  TrendingDown,
+  _Users,
+  UserPlus,
+  UserMinus,
+  _UserCheck,
+  _Calendar,
+  _DollarSign,
+  Activity,
+  Clock,
+  AlertTriangle,
+  Star,
+  ChevronRight,
+  RefreshCw,
+  Target,
+  Loader2,
 } from 'lucide-react';
 import { crmAPI } from '../../services/api';
 
 const RetentionDashboard = () => {
   const [timeRange, setTimeRange] = useState('30d');
-  const [selectedMetric, setSelectedMetric] = useState('retention');
+  const [_selectedMetric, _setSelectedMetric] = useState('retention');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [retentionData, setRetentionData] = useState({
@@ -18,14 +31,14 @@ const RetentionDashboard = () => {
     monthlyChurn: 0,
     avgLifetime: 0,
     avgVisitsPerPatient: 0,
-    reactivationRate: 0
+    reactivationRate: 0,
   });
   const [patientFlow, setPatientFlow] = useState({
     newPatients: 0,
     reactivated: 0,
     churned: 0,
     atRisk: 0,
-    netChange: 0
+    netChange: 0,
   });
   const [cohortData, setCohortData] = useState([]);
   const [atRiskPatients, setAtRiskPatients] = useState([]);
@@ -39,7 +52,7 @@ const RetentionDashboard = () => {
         setError(null);
         const [dashboardRes, churnRes] = await Promise.all([
           crmAPI.getRetentionDashboard({ period: timeRange }),
-          crmAPI.getChurnAnalysis({ period: timeRange })
+          crmAPI.getChurnAnalysis({ period: timeRange }),
         ]);
 
         if (dashboardRes.data) {
@@ -50,28 +63,30 @@ const RetentionDashboard = () => {
             monthlyChurn: dashboardRes.data.monthly_churn || 0,
             avgLifetime: dashboardRes.data.avg_lifetime_months || 0,
             avgVisitsPerPatient: dashboardRes.data.avg_visits_per_patient || 0,
-            reactivationRate: dashboardRes.data.reactivation_rate || 0
+            reactivationRate: dashboardRes.data.reactivation_rate || 0,
           });
           setPatientFlow({
             newPatients: dashboardRes.data.new_patients || 0,
             reactivated: dashboardRes.data.reactivated || 0,
             churned: dashboardRes.data.churned || 0,
             atRisk: dashboardRes.data.at_risk || 0,
-            netChange: dashboardRes.data.net_change || 0
+            netChange: dashboardRes.data.net_change || 0,
           });
           setCohortData(dashboardRes.data.cohorts || []);
           setSegmentRetention(dashboardRes.data.segments || []);
         }
 
         if (churnRes.data?.atRiskPatients) {
-          setAtRiskPatients(churnRes.data.atRiskPatients.map(p => ({
-            id: p.id,
-            name: p.name || `${p.first_name || ''} ${p.last_name || ''}`.trim(),
-            daysSinceVisit: p.days_since_visit || 0,
-            lastVisit: p.last_visit_date,
-            totalVisits: p.total_visits || 0,
-            riskScore: p.risk_score || 0
-          })));
+          setAtRiskPatients(
+            churnRes.data.atRiskPatients.map((p) => ({
+              id: p.id,
+              name: p.name || `${p.first_name || ''} ${p.last_name || ''}`.trim(),
+              daysSinceVisit: p.days_since_visit || 0,
+              lastVisit: p.last_visit_date,
+              totalVisits: p.total_visits || 0,
+              riskScore: p.risk_score || 0,
+            }))
+          );
         }
       } catch (err) {
         console.error('Error fetching retention data:', err);
@@ -85,15 +100,23 @@ const RetentionDashboard = () => {
 
   // Get color based on retention rate
   const getRetentionColor = (rate) => {
-    if (rate >= 80) return 'text-green-600 bg-green-100';
-    if (rate >= 60) return 'text-yellow-600 bg-yellow-100';
+    if (rate >= 80) {
+      return 'text-green-600 bg-green-100';
+    }
+    if (rate >= 60) {
+      return 'text-yellow-600 bg-yellow-100';
+    }
     return 'text-red-600 bg-red-100';
   };
 
   // Get risk color
   const getRiskColor = (score) => {
-    if (score >= 80) return 'text-red-600 bg-red-100';
-    if (score >= 60) return 'text-orange-600 bg-orange-100';
+    if (score >= 80) {
+      return 'text-red-600 bg-red-100';
+    }
+    if (score >= 60) {
+      return 'text-orange-600 bg-orange-100';
+    }
     return 'text-yellow-600 bg-yellow-100';
   };
 
@@ -132,7 +155,7 @@ const RetentionDashboard = () => {
           <p className="text-gray-600">Forstå og forbedre pasientbevaring</p>
         </div>
         <div className="flex gap-2">
-          {['7d', '30d', '90d', '1y'].map(range => (
+          {['7d', '30d', '90d', '1y'].map((range) => (
             <button
               key={range}
               onClick={() => setTimeRange(range)}
@@ -142,7 +165,13 @@ const RetentionDashboard = () => {
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              {range === '7d' ? '7 dager' : range === '30d' ? '30 dager' : range === '90d' ? '90 dager' : '1 år'}
+              {range === '7d'
+                ? '7 dager'
+                : range === '30d'
+                  ? '30 dager'
+                  : range === '90d'
+                    ? '90 dager'
+                    : '1 år'}
             </button>
           ))}
         </div>
@@ -156,9 +185,16 @@ const RetentionDashboard = () => {
             <span className="text-sm text-gray-500">Retensjon</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">{retentionData.currentRate}%</p>
-          <div className={`flex items-center gap-1 text-sm ${retentionData.trend >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {retentionData.trend >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-            {retentionData.trend > 0 ? '+' : ''}{retentionData.trend}%
+          <div
+            className={`flex items-center gap-1 text-sm ${retentionData.trend >= 0 ? 'text-green-600' : 'text-red-600'}`}
+          >
+            {retentionData.trend >= 0 ? (
+              <TrendingUp className="w-4 h-4" />
+            ) : (
+              <TrendingDown className="w-4 h-4" />
+            )}
+            {retentionData.trend > 0 ? '+' : ''}
+            {retentionData.trend}%
           </div>
         </div>
 
@@ -237,21 +273,23 @@ const RetentionDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {cohortData.map(row => (
+                {cohortData.map((row) => (
                   <tr key={row.month} className="border-t border-gray-100">
                     <td className="py-2 px-2 font-medium text-gray-900">{row.month}</td>
                     <td className="py-2 px-2 text-center text-gray-600">{row.total}</td>
-                    {[row.month1, row.month2, row.month3, row.month4, row.month5, row.month6].map((val, idx) => (
-                      <td key={idx} className="py-2 px-2 text-center">
-                        {val !== null ? (
-                          <span className={`px-2 py-1 rounded ${getRetentionColor(val)}`}>
-                            {val}%
-                          </span>
-                        ) : (
-                          <span className="text-gray-300">-</span>
-                        )}
-                      </td>
-                    ))}
+                    {[row.month1, row.month2, row.month3, row.month4, row.month5, row.month6].map(
+                      (val, idx) => (
+                        <td key={idx} className="py-2 px-2 text-center">
+                          {val !== null ? (
+                            <span className={`px-2 py-1 rounded ${getRetentionColor(val)}`}>
+                              {val}%
+                            </span>
+                          ) : (
+                            <span className="text-gray-300">-</span>
+                          )}
+                        </td>
+                      )
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -263,14 +301,19 @@ const RetentionDashboard = () => {
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <h3 className="font-bold text-gray-900 mb-4">Retensjon per Segment</h3>
           <div className="space-y-4">
-            {segmentRetention.map(seg => (
+            {segmentRetention.map((seg) => (
               <div key={seg.segment}>
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-sm text-gray-700">{seg.segment}</span>
-                  <span className={`text-sm font-medium ${
-                    seg.retention >= 80 ? 'text-green-600' :
-                    seg.retention >= 60 ? 'text-yellow-600' : 'text-red-600'
-                  }`}>
+                  <span
+                    className={`text-sm font-medium ${
+                      seg.retention >= 80
+                        ? 'text-green-600'
+                        : seg.retention >= 60
+                          ? 'text-yellow-600'
+                          : 'text-red-600'
+                    }`}
+                  >
                     {seg.retention}%
                   </span>
                 </div>
@@ -278,8 +321,11 @@ const RetentionDashboard = () => {
                   <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full ${
-                        seg.retention >= 80 ? 'bg-green-500' :
-                        seg.retention >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                        seg.retention >= 80
+                          ? 'bg-green-500'
+                          : seg.retention >= 60
+                            ? 'bg-yellow-500'
+                            : 'bg-red-500'
                       }`}
                       style={{ width: `${seg.retention}%` }}
                     />
@@ -304,25 +350,42 @@ const RetentionDashboard = () => {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Pasient</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Dager Siden Besøk</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Siste Besøk</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Totalt Besøk</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Risikoscore</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Handling</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                  Pasient
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                  Dager Siden Besøk
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                  Siste Besøk
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                  Totalt Besøk
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                  Risikoscore
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                  Handling
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {atRiskPatients.map(patient => (
+              {atRiskPatients.map((patient) => (
                 <tr key={patient.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
                     <span className="font-medium text-gray-900">{patient.name}</span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`font-medium ${
-                      patient.daysSinceVisit >= 90 ? 'text-red-600' :
-                      patient.daysSinceVisit >= 45 ? 'text-orange-600' : 'text-yellow-600'
-                    }`}>
+                    <span
+                      className={`font-medium ${
+                        patient.daysSinceVisit >= 90
+                          ? 'text-red-600'
+                          : patient.daysSinceVisit >= 45
+                            ? 'text-orange-600'
+                            : 'text-yellow-600'
+                      }`}
+                    >
                       {patient.daysSinceVisit} dager
                     </span>
                   </td>
@@ -331,7 +394,9 @@ const RetentionDashboard = () => {
                   </td>
                   <td className="px-4 py-3 text-gray-600">{patient.totalVisits}</td>
                   <td className="px-4 py-3">
-                    <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getRiskColor(patient.riskScore)}`}>
+                    <span
+                      className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getRiskColor(patient.riskScore)}`}
+                    >
                       {patient.riskScore}%
                     </span>
                   </td>

@@ -5,24 +5,24 @@
  * Dra-og-slipp programbygger for treningsforskrivninger
  */
 
-import React, { useState, useCallback, useRef } from 'react'
+import _React, { useState, _useCallback, useRef } from 'react';
 import {
-  GripVertical,
-  Trash2,
-  ChevronUp,
-  ChevronDown,
-  Edit2,
+  _GripVertical,
+  _Trash2,
+  _ChevronUp,
+  _ChevronDown,
+  _Edit2,
   Plus,
   Dumbbell,
-  Clock,
-  Target,
-  Activity,
-  AlertTriangle,
-  Play,
+  _Clock,
+  _Target,
+  _Activity,
+  _AlertTriangle,
+  _Play,
   Info,
-  X
-} from 'lucide-react'
-import PrescriptionCard from './PrescriptionCard'
+  _X,
+} from 'lucide-react';
+import PrescriptionCard from './PrescriptionCard';
 
 /**
  * PrescriptionBuilder Component
@@ -35,115 +35,117 @@ import PrescriptionCard from './PrescriptionCard'
  * @param {Function} props.onReorder - Reorder exercises callback
  * @param {Function} props.onAddClick - Add exercise button callback
  */
-const PrescriptionBuilder = ({
-  exercises = [],
-  onRemove,
-  onUpdate,
-  onReorder,
-  onAddClick
-}) => {
-  const [draggedIndex, setDraggedIndex] = useState(null)
-  const [dragOverIndex, setDragOverIndex] = useState(null)
-  const [expandedIndex, setExpandedIndex] = useState(null)
-  const dragRef = useRef(null)
+const PrescriptionBuilder = ({ exercises = [], onRemove, onUpdate, onReorder, onAddClick }) => {
+  const [draggedIndex, setDraggedIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
+  const [expandedIndex, setExpandedIndex] = useState(null);
+  const dragRef = useRef(null);
 
   /**
    * Handle drag start
    */
   const handleDragStart = (e, index) => {
-    setDraggedIndex(index)
-    e.dataTransfer.effectAllowed = 'move'
-    e.dataTransfer.setData('text/plain', index)
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', index);
     // Add some styling to the dragged element
     setTimeout(() => {
       if (dragRef.current) {
-        dragRef.current.style.opacity = '0.5'
+        dragRef.current.style.opacity = '0.5';
       }
-    }, 0)
-  }
+    }, 0);
+  };
 
   /**
    * Handle drag end
    */
   const handleDragEnd = () => {
-    setDraggedIndex(null)
-    setDragOverIndex(null)
+    setDraggedIndex(null);
+    setDragOverIndex(null);
     if (dragRef.current) {
-      dragRef.current.style.opacity = '1'
+      dragRef.current.style.opacity = '1';
     }
-  }
+  };
 
   /**
    * Handle drag over
    */
   const handleDragOver = (e, index) => {
-    e.preventDefault()
+    e.preventDefault();
     if (draggedIndex !== null && draggedIndex !== index) {
-      setDragOverIndex(index)
+      setDragOverIndex(index);
     }
-  }
+  };
 
   /**
    * Handle drop
    */
   const handleDrop = (e, toIndex) => {
-    e.preventDefault()
-    const fromIndex = draggedIndex
+    e.preventDefault();
+    const fromIndex = draggedIndex;
     if (fromIndex !== null && fromIndex !== toIndex && onReorder) {
-      onReorder(fromIndex, toIndex)
+      onReorder(fromIndex, toIndex);
     }
-    setDraggedIndex(null)
-    setDragOverIndex(null)
-  }
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
 
   /**
    * Move exercise up in order
    */
   const handleMoveUp = (index) => {
     if (index > 0 && onReorder) {
-      onReorder(index, index - 1)
+      onReorder(index, index - 1);
     }
-  }
+  };
 
   /**
    * Move exercise down in order
    */
   const handleMoveDown = (index) => {
     if (index < exercises.length - 1 && onReorder) {
-      onReorder(index, index + 1)
+      onReorder(index, index + 1);
     }
-  }
+  };
 
   /**
    * Toggle expanded view
    */
   const handleToggleExpand = (index) => {
-    setExpandedIndex(expandedIndex === index ? null : index)
-  }
+    setExpandedIndex(expandedIndex === index ? null : index);
+  };
 
   /**
    * Get difficulty color classes
    */
   const getDifficultyColor = (level) => {
     switch (level) {
-      case 'beginner': return 'text-green-600 bg-green-50 border-green-200'
-      case 'intermediate': return 'text-yellow-600 bg-yellow-50 border-yellow-200'
-      case 'advanced': return 'text-red-600 bg-red-50 border-red-200'
-      default: return 'text-gray-600 bg-gray-50 border-gray-200'
+      case 'beginner':
+        return 'text-green-600 bg-green-50 border-green-200';
+      case 'intermediate':
+        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+      case 'advanced':
+        return 'text-red-600 bg-red-50 border-red-200';
+      default:
+        return 'text-gray-600 bg-gray-50 border-gray-200';
     }
-  }
+  };
 
   /**
    * Get difficulty label in Norwegian
    */
   const getDifficultyLabel = (level) => {
     switch (level) {
-      case 'beginner': return 'Nybegynner'
-      case 'intermediate': return 'Middels'
-      case 'advanced': return 'Avansert'
-      default: return level
+      case 'beginner':
+        return 'Nybegynner';
+      case 'intermediate':
+        return 'Middels';
+      case 'advanced':
+        return 'Avansert';
+      default:
+        return level;
     }
-  }
+  };
 
   return (
     <div className="bg-white rounded-lg border border-gray-200">
@@ -152,9 +154,7 @@ const PrescriptionBuilder = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Dumbbell className="w-5 h-5 text-blue-600" />
-            <h2 className="text-lg font-semibold text-gray-900">
-              Ovelser ({exercises.length})
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-900">Ovelser ({exercises.length})</h2>
           </div>
           <button
             onClick={onAddClick}
@@ -233,15 +233,15 @@ const PrescriptionBuilder = ({
             <div className="text-sm">
               <p className="font-medium text-amber-800">Tips</p>
               <p className="text-amber-700">
-                Et godt treningsprogram inneholder vanligvis 3-6 ovelser.
-                Start enkelt og ok gradvis.
+                Et godt treningsprogram inneholder vanligvis 3-6 ovelser. Start enkelt og ok
+                gradvis.
               </p>
             </div>
           </div>
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default PrescriptionBuilder
+export default PrescriptionBuilder;

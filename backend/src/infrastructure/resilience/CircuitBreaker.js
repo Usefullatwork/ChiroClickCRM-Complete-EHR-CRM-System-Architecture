@@ -20,7 +20,7 @@ import { DOMAIN_EVENTS } from '../../domain/events/DomainEvents.js';
 export const CircuitState = {
   CLOSED: 'CLOSED',
   OPEN: 'OPEN',
-  HALF_OPEN: 'HALF_OPEN'
+  HALF_OPEN: 'HALF_OPEN',
 };
 
 /**
@@ -59,12 +59,12 @@ export class CircuitBreaker {
       failedRequests: 0,
       rejectedRequests: 0,
       fallbackExecutions: 0,
-      stateChanges: []
+      stateChanges: [],
     };
 
     logger.info(`CircuitBreaker "${this.name}" initialized`, {
       failureThreshold: this.failureThreshold,
-      timeout: this.timeout
+      timeout: this.timeout,
     });
   }
 
@@ -102,15 +102,17 @@ export class CircuitBreaker {
   async executeWithTimeout(fn) {
     return new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
-        reject(new Error(`CircuitBreaker "${this.name}" request timeout after ${this.requestTimeout}ms`));
+        reject(
+          new Error(`CircuitBreaker "${this.name}" request timeout after ${this.requestTimeout}ms`)
+        );
       }, this.requestTimeout);
 
       Promise.resolve(fn())
-        .then(result => {
+        .then((result) => {
           clearTimeout(timeoutId);
           resolve(result);
         })
-        .catch(error => {
+        .catch((error) => {
           clearTimeout(timeoutId);
           reject(error);
         });
@@ -144,7 +146,7 @@ export class CircuitBreaker {
 
     logger.warn(`CircuitBreaker "${this.name}" failure #${this.failures}`, {
       error: error.message,
-      state: this.state
+      state: this.state,
     });
 
     if (this.state === CircuitState.HALF_OPEN) {
@@ -162,7 +164,7 @@ export class CircuitBreaker {
       } catch (fallbackError) {
         logger.error(`CircuitBreaker "${this.name}" fallback also failed`, {
           originalError: error.message,
-          fallbackError: fallbackError.message
+          fallbackError: fallbackError.message,
         });
         throw error;
       }
@@ -180,7 +182,7 @@ export class CircuitBreaker {
 
     logger.debug(`CircuitBreaker "${this.name}" rejected request`, {
       state: this.state,
-      nextAttempt: new Date(this.nextAttempt).toISOString()
+      nextAttempt: new Date(this.nextAttempt).toISOString(),
     });
 
     if (this.fallback) {
@@ -204,13 +206,13 @@ export class CircuitBreaker {
     this.stats.stateChanges.push({
       from: oldState,
       to: newState,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     logger.info(`CircuitBreaker "${this.name}" state change`, {
       from: oldState,
       to: newState,
-      failures: this.failures
+      failures: this.failures,
     });
 
     // Reset counters on state change
@@ -220,7 +222,7 @@ export class CircuitBreaker {
 
       // Emit circuit closed event
       eventBus.emit(DOMAIN_EVENTS.OLLAMA_CIRCUIT_CLOSED, {
-        name: this.name
+        name: this.name,
       });
     } else if (newState === CircuitState.OPEN) {
       this.nextAttempt = Date.now() + this.timeout;
@@ -229,7 +231,7 @@ export class CircuitBreaker {
       // Emit circuit opened event
       eventBus.emit(DOMAIN_EVENTS.OLLAMA_CIRCUIT_OPENED, {
         name: this.name,
-        failures: this.failures
+        failures: this.failures,
       });
     } else if (newState === CircuitState.HALF_OPEN) {
       this.successes = 0;
@@ -260,13 +262,9 @@ export class CircuitBreaker {
       state: this.state,
       failures: this.failures,
       successes: this.successes,
-      lastFailureTime: this.lastFailureTime
-        ? new Date(this.lastFailureTime).toISOString()
-        : null,
-      nextAttempt: this.nextAttempt
-        ? new Date(this.nextAttempt).toISOString()
-        : null,
-      stats: this.stats
+      lastFailureTime: this.lastFailureTime ? new Date(this.lastFailureTime).toISOString() : null,
+      nextAttempt: this.nextAttempt ? new Date(this.nextAttempt).toISOString() : null,
+      stats: this.stats,
     };
   }
 
@@ -274,9 +272,15 @@ export class CircuitBreaker {
    * Check if circuit is allowing requests
    */
   isAvailable() {
-    if (this.state === CircuitState.CLOSED) return true;
-    if (this.state === CircuitState.HALF_OPEN) return true;
-    if (this.state === CircuitState.OPEN && Date.now() >= this.nextAttempt) return true;
+    if (this.state === CircuitState.CLOSED) {
+      return true;
+    }
+    if (this.state === CircuitState.HALF_OPEN) {
+      return true;
+    }
+    if (this.state === CircuitState.OPEN && Date.now() >= this.nextAttempt) {
+      return true;
+    }
     return false;
   }
 
@@ -368,9 +372,9 @@ export const CircuitBreakers = {
       return {
         fallback: true,
         message: 'AI service temporarily unavailable. Please try again later.',
-        suggestion: null
+        suggestion: null,
       };
-    }
+    },
   }),
 
   /**
@@ -386,9 +390,9 @@ export const CircuitBreakers = {
       return {
         fallback: true,
         message: 'Helsenorge integration temporarily unavailable',
-        data: null
+        data: null,
       };
-    }
+    },
   }),
 
   /**
@@ -398,7 +402,7 @@ export const CircuitBreakers = {
     failureThreshold: 5,
     successThreshold: 2,
     timeout: 30000,
-    requestTimeout: 10000
+    requestTimeout: 10000,
   }),
 
   /**
@@ -408,8 +412,8 @@ export const CircuitBreakers = {
     failureThreshold: 5,
     successThreshold: 2,
     timeout: 30000,
-    requestTimeout: 10000
-  })
+    requestTimeout: 10000,
+  }),
 };
 
 export default { CircuitBreaker, CircuitBreakerOpenError, circuitBreakerRegistry, CircuitBreakers };

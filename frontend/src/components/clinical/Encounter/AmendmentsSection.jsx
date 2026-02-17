@@ -1,4 +1,4 @@
-import React from 'react';
+import _React from 'react';
 import { FileText, Save, Loader2, Lock } from 'lucide-react';
 
 export default function AmendmentsSection({
@@ -14,9 +14,11 @@ export default function AmendmentsSection({
   handleCreateAmendment,
   createAmendmentMutation,
   amendments,
-  signAmendmentMutation
+  signAmendmentMutation,
 }) {
-  if (!isSigned) return null;
+  if (!isSigned) {
+    return null;
+  }
 
   return (
     <section className="bg-amber-50 rounded-xl border border-amber-200 p-5 shadow-sm">
@@ -55,7 +57,9 @@ export default function AmendmentsSection({
             </div>
             {amendmentType === 'CORRECTION' && (
               <div className="flex-1">
-                <label className="block text-xs font-medium text-slate-600 mb-1">Begrunnelse for rettelse *</label>
+                <label className="block text-xs font-medium text-slate-600 mb-1">
+                  Begrunnelse for rettelse *
+                </label>
                 <input
                   type="text"
                   value={amendmentReason}
@@ -89,7 +93,11 @@ export default function AmendmentsSection({
             </button>
             <button
               onClick={handleCreateAmendment}
-              disabled={!amendmentContent.trim() || createAmendmentMutation.isPending || (amendmentType === 'CORRECTION' && !amendmentReason.trim())}
+              disabled={
+                !amendmentContent.trim() ||
+                createAmendmentMutation.isPending ||
+                (amendmentType === 'CORRECTION' && !amendmentReason.trim())
+              }
               className="px-4 py-2 text-sm font-semibold rounded-lg bg-amber-600 text-white hover:bg-amber-700 disabled:opacity-50 transition-colors flex items-center gap-2"
             >
               {createAmendmentMutation.isPending ? (
@@ -110,19 +118,28 @@ export default function AmendmentsSection({
             <div key={amendment.id} className="bg-white rounded-lg border border-slate-200 p-4">
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                    amendment.amendment_type === 'CORRECTION' ? 'bg-red-100 text-red-700' :
-                    amendment.amendment_type === 'CLARIFICATION' ? 'bg-blue-100 text-blue-700' :
-                    amendment.amendment_type === 'LATE_ENTRY' ? 'bg-purple-100 text-purple-700' :
-                    'bg-amber-100 text-amber-700'
-                  }`}>
+                  <span
+                    className={`px-2 py-0.5 rounded text-xs font-medium ${
+                      amendment.amendment_type === 'CORRECTION'
+                        ? 'bg-red-100 text-red-700'
+                        : amendment.amendment_type === 'CLARIFICATION'
+                          ? 'bg-blue-100 text-blue-700'
+                          : amendment.amendment_type === 'LATE_ENTRY'
+                            ? 'bg-purple-100 text-purple-700'
+                            : 'bg-amber-100 text-amber-700'
+                    }`}
+                  >
                     {amendment.amendment_type === 'ADDENDUM' && 'Tillegg'}
                     {amendment.amendment_type === 'CORRECTION' && 'Rettelse'}
                     {amendment.amendment_type === 'CLARIFICATION' && 'Avklaring'}
                     {amendment.amendment_type === 'LATE_ENTRY' && 'Sen registrering'}
                   </span>
                   <span className="text-xs text-slate-500">
-                    #{index + 1} - {new Date(amendment.created_at).toLocaleDateString('no-NO')} {new Date(amendment.created_at).toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}
+                    #{index + 1} - {new Date(amendment.created_at).toLocaleDateString('no-NO')}{' '}
+                    {new Date(amendment.created_at).toLocaleTimeString('no-NO', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -143,7 +160,9 @@ export default function AmendmentsSection({
                 </div>
               </div>
               {amendment.reason && (
-                <p className="text-xs text-slate-500 mb-2 italic">Begrunnelse: {amendment.reason}</p>
+                <p className="text-xs text-slate-500 mb-2 italic">
+                  Begrunnelse: {amendment.reason}
+                </p>
               )}
               <p className="text-sm text-slate-700 whitespace-pre-wrap">{amendment.content}</p>
               <p className="text-xs text-slate-400 mt-2">

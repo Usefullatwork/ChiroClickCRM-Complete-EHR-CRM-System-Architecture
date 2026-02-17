@@ -7,7 +7,12 @@
  * Designed for 16GB RAM: one model at a time via keep_alive
  */
 
-import { generateCompletion, extractCompletionText, analyzeRedFlags, getModelForTask } from './ai.js';
+import {
+  generateCompletion,
+  extractCompletionText,
+  analyzeRedFlags,
+  getModelForTask,
+} from './ai.js';
 import logger from '../utils/logger.js';
 
 /**
@@ -36,7 +41,12 @@ export const runClinicalPipeline = async (patientData, soapData, options = {}) =
     }
   } catch (error) {
     logger.error('Clinical pipeline safety step failed:', error.message);
-    results.steps.push({ step: 'safety', model: 'chiro-medical', success: false, error: error.message });
+    results.steps.push({
+      step: 'safety',
+      model: 'chiro-medical',
+      success: false,
+      error: error.message,
+    });
   }
 
   // Step 2: Generate clinical documentation suggestions
@@ -47,10 +57,19 @@ export const runClinicalPipeline = async (patientData, soapData, options = {}) =
       maxTokens: 800,
     });
     results.clinical = extractCompletionText(clinicalResult);
-    results.steps.push({ step: 'clinical', model: getModelForTask('clinical_summary'), success: true });
+    results.steps.push({
+      step: 'clinical',
+      model: getModelForTask('clinical_summary'),
+      success: true,
+    });
   } catch (error) {
     logger.error('Clinical pipeline documentation step failed:', error.message);
-    results.steps.push({ step: 'clinical', model: 'chiro-no', success: false, error: error.message });
+    results.steps.push({
+      step: 'clinical',
+      model: 'chiro-no',
+      success: false,
+      error: error.message,
+    });
   }
 
   // Step 3: Language polish (optional, for Norwegian output)
@@ -65,11 +84,20 @@ export const runClinicalPipeline = async (patientData, soapData, options = {}) =
         }
       );
       results.polished = extractCompletionText(polishResult);
-      results.steps.push({ step: 'language', model: getModelForTask('norwegian_text'), success: true });
+      results.steps.push({
+        step: 'language',
+        model: getModelForTask('norwegian_text'),
+        success: true,
+      });
     } catch (error) {
       logger.warn('Language polish step failed, using unpolished:', error.message);
       results.polished = results.clinical;
-      results.steps.push({ step: 'language', model: 'chiro-norwegian', success: false, error: error.message });
+      results.steps.push({
+        step: 'language',
+        model: 'chiro-norwegian',
+        success: false,
+        error: error.message,
+      });
     }
   }
 
@@ -104,14 +132,30 @@ export const quickSuggestion = async (partialText, fieldType = 'autocomplete') =
 const buildClinicalPrompt = (patientData, soapData) => {
   const parts = ['Generer klinisk sammendrag basert på:'];
 
-  if (patientData.age) parts.push(`Pasient: ${patientData.age} år`);
-  if (soapData.subjective?.chief_complaint) parts.push(`Hovedplage: ${soapData.subjective.chief_complaint}`);
-  if (soapData.subjective?.history) parts.push(`Anamnese: ${soapData.subjective.history}`);
-  if (soapData.objective?.observation) parts.push(`Observasjon: ${soapData.objective.observation}`);
-  if (soapData.objective?.palpation) parts.push(`Palpasjon: ${soapData.objective.palpation}`);
-  if (soapData.objective?.rom) parts.push(`ROM: ${soapData.objective.rom}`);
-  if (soapData.objective?.ortho_tests) parts.push(`Tester: ${soapData.objective.ortho_tests}`);
-  if (soapData.assessment?.clinical_reasoning) parts.push(`Vurdering: ${soapData.assessment.clinical_reasoning}`);
+  if (patientData.age) {
+    parts.push(`Pasient: ${patientData.age} år`);
+  }
+  if (soapData.subjective?.chief_complaint) {
+    parts.push(`Hovedplage: ${soapData.subjective.chief_complaint}`);
+  }
+  if (soapData.subjective?.history) {
+    parts.push(`Anamnese: ${soapData.subjective.history}`);
+  }
+  if (soapData.objective?.observation) {
+    parts.push(`Observasjon: ${soapData.objective.observation}`);
+  }
+  if (soapData.objective?.palpation) {
+    parts.push(`Palpasjon: ${soapData.objective.palpation}`);
+  }
+  if (soapData.objective?.rom) {
+    parts.push(`ROM: ${soapData.objective.rom}`);
+  }
+  if (soapData.objective?.ortho_tests) {
+    parts.push(`Tester: ${soapData.objective.ortho_tests}`);
+  }
+  if (soapData.assessment?.clinical_reasoning) {
+    parts.push(`Vurdering: ${soapData.assessment.clinical_reasoning}`);
+  }
 
   parts.push('\nGi kort klinisk sammendrag med vurdering og anbefalt plan.');
   return parts.join('\n');

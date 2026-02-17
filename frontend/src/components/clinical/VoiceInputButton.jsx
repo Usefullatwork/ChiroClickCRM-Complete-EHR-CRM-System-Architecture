@@ -12,13 +12,12 @@
  * - Accessible design
  */
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import _React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Mic, MicOff, Square, AlertCircle } from 'lucide-react';
 
 // Check if browser supports speech recognition
-const SpeechRecognition = typeof window !== 'undefined'
-  ? window.SpeechRecognition || window.webkitSpeechRecognition
-  : null;
+const SpeechRecognition =
+  typeof window !== 'undefined' ? window.SpeechRecognition || window.webkitSpeechRecognition : null;
 
 /**
  * @param {function} onTranscript - Callback with final transcript text
@@ -38,7 +37,7 @@ export default function VoiceInputButton({
   disabled = false,
   size = 'md',
   variant = 'default',
-  className = ''
+  className = '',
 }) {
   const recognitionRef = useRef(null);
 
@@ -54,7 +53,9 @@ export default function VoiceInputButton({
 
   // Initialize speech recognition
   const initRecognition = useCallback(() => {
-    if (!SpeechRecognition) return null;
+    if (!SpeechRecognition) {
+      return null;
+    }
 
     const recognition = new SpeechRecognition();
     recognition.continuous = continuous;
@@ -99,9 +100,9 @@ export default function VoiceInputButton({
         'not-allowed': 'Mikrofontilgang nektet. Sjekk nettleserinnstillinger.',
         'no-speech': 'Ingen tale oppdaget. Prøv igjen.',
         'audio-capture': 'Ingen mikrofon funnet.',
-        'network': 'Nettverksfeil. Sjekk internettforbindelse.',
-        'aborted': 'Talegjenkjenning avbrutt.',
-        'service-not-allowed': 'Talegjenkjenning ikke tillatt for denne siden.'
+        network: 'Nettverksfeil. Sjekk internettforbindelse.',
+        aborted: 'Talegjenkjenning avbrutt.',
+        'service-not-allowed': 'Talegjenkjenning ikke tillatt for denne siden.',
       };
 
       setError(errorMessages[event.error] || `Feil: ${event.error}`);
@@ -146,13 +147,13 @@ export default function VoiceInputButton({
   const sizeClasses = {
     sm: 'p-1 w-7 h-7',
     md: 'p-1.5 w-9 h-9',
-    lg: 'p-2 w-11 h-11'
+    lg: 'p-2 w-11 h-11',
   };
 
   const iconSizes = {
     sm: 'w-3.5 h-3.5',
     md: 'w-4 h-4',
-    lg: 'w-5 h-5'
+    lg: 'w-5 h-5',
   };
 
   // Variant classes
@@ -160,12 +161,10 @@ export default function VoiceInputButton({
     default: isListening
       ? 'bg-red-500 text-white shadow-lg hover:bg-red-600'
       : 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500',
-    minimal: isListening
-      ? 'text-red-500 bg-red-50'
-      : 'text-gray-400 hover:text-red-500',
+    minimal: isListening ? 'text-red-500 bg-red-50' : 'text-gray-400 hover:text-red-500',
     pill: isListening
       ? 'bg-red-500 text-white px-3 rounded-full'
-      : 'bg-gray-100 text-gray-600 px-3 rounded-full hover:bg-red-50 hover:text-red-500'
+      : 'bg-gray-100 text-gray-600 px-3 rounded-full hover:bg-red-50 hover:text-red-500',
   };
 
   // Not supported
@@ -197,17 +196,11 @@ export default function VoiceInputButton({
         aria-label={isListening ? 'Stopp diktering' : 'Start diktering'}
         aria-pressed={isListening}
       >
-        {isListening ? (
-          <Square className={iconSizes[size]} />
-        ) : (
-          <Mic className={iconSizes[size]} />
-        )}
+        {isListening ? <Square className={iconSizes[size]} /> : <Mic className={iconSizes[size]} />}
 
         {/* Pill variant shows text */}
         {variant === 'pill' && (
-          <span className="ml-1.5 text-xs font-medium">
-            {isListening ? 'Stopp' : 'Dikter'}
-          </span>
+          <span className="ml-1.5 text-xs font-medium">{isListening ? 'Stopp' : 'Dikter'}</span>
         )}
       </button>
 
@@ -246,13 +239,7 @@ export default function VoiceInputButton({
  * Hook version for more control
  */
 export function useVoiceInput(options = {}) {
-  const {
-    language = 'nb-NO',
-    continuous = true,
-    onTranscript,
-    onInterim,
-    onError
-  } = options;
+  const { language = 'nb-NO', continuous = true, onTranscript, onInterim, onError } = options;
 
   const recognitionRef = useRef(null);
   const [isListening, setIsListening] = useState(false);
@@ -266,7 +253,9 @@ export function useVoiceInput(options = {}) {
   }, []);
 
   const start = useCallback(() => {
-    if (!SpeechRecognition || isListening) return;
+    if (!SpeechRecognition || isListening) {
+      return;
+    }
 
     const recognition = new SpeechRecognition();
     recognition.continuous = continuous;
@@ -295,7 +284,7 @@ export function useVoiceInput(options = {}) {
       onInterim?.(interim);
 
       if (final) {
-        setTranscript(prev => prev + final);
+        setTranscript((prev) => prev + final);
         onTranscript?.(final);
       }
     };
@@ -351,6 +340,6 @@ export function useVoiceInput(options = {}) {
     start,
     stop,
     toggle,
-    reset
+    reset,
   };
 }

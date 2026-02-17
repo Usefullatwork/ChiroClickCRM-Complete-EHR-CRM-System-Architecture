@@ -3,11 +3,15 @@
  * Comprehensive financial management and billing tracking
  */
 
-import { useState, useEffect } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { financialAPI, patientsAPI } from '../services/api'
-import { formatDate, formatCurrency } from '../lib/utils'
-import { useTranslation, formatDate as i18nFormatDate, formatCurrency as i18nFormatCurrency } from '../i18n'
+import { useState, _useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { financialAPI, _patientsAPI } from '../services/api';
+import { formatDate, formatCurrency } from '../lib/utils';
+import {
+  useTranslation,
+  formatDate as _i18nFormatDate,
+  formatCurrency as _i18nFormatCurrency,
+} from '../i18n';
 import {
   DollarSign,
   TrendingUp,
@@ -15,21 +19,33 @@ import {
   AlertCircle,
   Download,
   Filter,
-  Search,
+  _Search,
   Plus,
   CheckCircle,
-  XCircle,
+  _XCircle,
   Clock,
   FileText,
-  Calendar,
-  ChevronDown
-} from 'lucide-react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
-import InvoiceModal from '../components/InvoiceModal'
+  _Calendar,
+  ChevronDown,
+} from 'lucide-react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+} from 'recharts';
+import InvoiceModal from '../components/InvoiceModal';
 
 export default function Financial() {
-  const { t, lang } = useTranslation('financial')
-  const queryClient = useQueryClient()
+  const { t, _lang } = useTranslation('financial');
+  const queryClient = useQueryClient();
 
   // Filters state
   const [filters, setFilters] = useState({
@@ -39,116 +55,129 @@ export default function Financial() {
     transactionType: '',
     patientSearch: '',
     page: 1,
-    limit: 20
-  })
+    limit: 20,
+  });
 
-  const [showCreateModal, setShowCreateModal] = useState(false)
-  const [selectedInvoiceTransaction, setSelectedInvoiceTransaction] = useState(null)
-  const [showExportMenu, setShowExportMenu] = useState(false)
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [selectedInvoiceTransaction, setSelectedInvoiceTransaction] = useState(null);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   // Fetch financial summary
   const { data: summaryData } = useQuery({
     queryKey: ['financial-summary', filters.startDate, filters.endDate],
-    queryFn: () => financialAPI.getSummary({
-      startDate: filters.startDate,
-      endDate: filters.endDate
-    })
-  })
+    queryFn: () =>
+      financialAPI.getSummary({
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+      }),
+  });
 
   // Fetch financial transactions
   const { data: transactionsData, isLoading } = useQuery({
     queryKey: ['financial-transactions', filters],
-    queryFn: () => financialAPI.getAll(filters)
-  })
+    queryFn: () => financialAPI.getAll(filters),
+  });
 
   // Fetch outstanding invoices
   const { data: outstandingData } = useQuery({
     queryKey: ['financial-outstanding'],
-    queryFn: () => financialAPI.getOutstanding()
-  })
+    queryFn: () => financialAPI.getOutstanding(),
+  });
 
   // Fetch payment method breakdown
   const { data: paymentMethodsData } = useQuery({
     queryKey: ['financial-payment-methods', filters.startDate, filters.endDate],
-    queryFn: () => financialAPI.getPaymentMethods({
-      startDate: filters.startDate,
-      endDate: filters.endDate
-    })
-  })
+    queryFn: () =>
+      financialAPI.getPaymentMethods({
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+      }),
+  });
 
   // Fetch daily revenue chart
   const { data: revenueChartData } = useQuery({
     queryKey: ['financial-revenue-chart', filters.startDate, filters.endDate],
-    queryFn: () => financialAPI.getDailyRevenueChart({
-      startDate: filters.startDate,
-      endDate: filters.endDate
-    })
-  })
+    queryFn: () =>
+      financialAPI.getDailyRevenueChart({
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+      }),
+  });
 
   const summary = summaryData?.data || {
     totalRevenue: 0,
     totalPaid: 0,
     totalPending: 0,
     totalOutstanding: 0,
-    transactionCount: 0
-  }
+    transactionCount: 0,
+  };
 
-  const transactions = transactionsData?.data?.transactions || []
-  const pagination = transactionsData?.data?.pagination || { page: 1, pages: 1, total: 0 }
-  const outstanding = outstandingData?.data?.invoices || []
-  const paymentMethods = paymentMethodsData?.data?.breakdown || []
-  const revenueChart = revenueChartData?.data?.dailyRevenue || []
+  const transactions = transactionsData?.data?.transactions || [];
+  const pagination = transactionsData?.data?.pagination || { page: 1, pages: 1, total: 0 };
+  const outstanding = outstandingData?.data?.invoices || [];
+  const paymentMethods = paymentMethodsData?.data?.breakdown || [];
+  const revenueChart = revenueChartData?.data?.dailyRevenue || [];
 
   // Update payment status mutation
   const updatePaymentMutation = useMutation({
-    mutationFn: ({ id, status }) => financialAPI.updatePaymentStatus(id, { payment_status: status }),
+    mutationFn: ({ id, status }) =>
+      financialAPI.updatePaymentStatus(id, { payment_status: status }),
     onSuccess: () => {
-      queryClient.invalidateQueries(['financial-transactions'])
-      queryClient.invalidateQueries(['financial-summary'])
-      queryClient.invalidateQueries(['financial-outstanding'])
-    }
-  })
+      queryClient.invalidateQueries(['financial-transactions']);
+      queryClient.invalidateQueries(['financial-summary']);
+      queryClient.invalidateQueries(['financial-outstanding']);
+    },
+  });
 
   const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value, page: 1 }))
-  }
+    setFilters((prev) => ({ ...prev, [key]: value, page: 1 }));
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
       case 'PAID':
-        return 'bg-green-100 text-green-800'
+        return 'bg-green-100 text-green-800';
       case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800'
+        return 'bg-yellow-100 text-yellow-800';
       case 'PARTIALLY_PAID':
-        return 'bg-blue-100 text-blue-800'
+        return 'bg-blue-100 text-blue-800';
       case 'REFUNDED':
-        return 'bg-red-100 text-red-800'
+        return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 text-gray-800';
     }
-  }
+  };
 
   const getPaymentMethodIcon = (method) => {
     switch (method) {
       case 'CARD':
       case 'VIPPS':
-        return <CreditCard className="w-4 h-4" />
+        return <CreditCard className="w-4 h-4" />;
       case 'CASH':
-        return <DollarSign className="w-4 h-4" />
+        return <DollarSign className="w-4 h-4" />;
       case 'INVOICE':
-        return <FileText className="w-4 h-4" />
+        return <FileText className="w-4 h-4" />;
       default:
-        return <DollarSign className="w-4 h-4" />
+        return <DollarSign className="w-4 h-4" />;
     }
-  }
+  };
 
   // Chart colors
-  const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899']
+  const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
 
   // Export functionality
   const exportToCSV = () => {
-    const headers = ['Date', 'Patient', 'Type', 'Amount', 'Insurance', 'Payment Method', 'Status', 'Invoice Number']
-    const rows = transactions.map(t => [
+    const headers = [
+      'Date',
+      'Patient',
+      'Type',
+      'Amount',
+      'Insurance',
+      'Payment Method',
+      'Status',
+      'Invoice Number',
+    ];
+    const rows = transactions.map((t) => [
       new Date(t.created_at).toISOString().split('T')[0],
       t.patient_name || 'Unknown',
       t.transaction_type || '',
@@ -156,31 +185,42 @@ export default function Financial() {
       t.insurance_amount || 0,
       t.payment_method || '',
       t.payment_status || '',
-      t.invoice_number || ''
-    ])
+      t.invoice_number || '',
+    ]);
 
     const csvContent = [
       headers.join(','),
-      ...rows.map(row => row.map(cell =>
-        typeof cell === 'string' && cell.includes(',') ? `"${cell}"` : cell
-      ).join(','))
-    ].join('\n')
+      ...rows.map((row) =>
+        row
+          .map((cell) => (typeof cell === 'string' && cell.includes(',') ? `"${cell}"` : cell))
+          .join(',')
+      ),
+    ].join('\n');
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const link = document.createElement('a')
-    const url = URL.createObjectURL(blob)
-    link.setAttribute('href', url)
-    link.setAttribute('download', `financial-export-${new Date().toISOString().split('T')[0]}.csv`)
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    setShowExportMenu(false)
-  }
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `financial-export-${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setShowExportMenu(false);
+  };
 
   const exportToExcel = () => {
     // Excel XML format (simple version)
-    const headers = ['Date', 'Patient', 'Type', 'Amount', 'Insurance', 'Payment Method', 'Status', 'Invoice Number']
-    const rows = transactions.map(t => [
+    const headers = [
+      'Date',
+      'Patient',
+      'Type',
+      'Amount',
+      'Insurance',
+      'Payment Method',
+      'Status',
+      'Invoice Number',
+    ];
+    const rows = transactions.map((t) => [
       new Date(t.created_at).toISOString().split('T')[0],
       t.patient_name || 'Unknown',
       t.transaction_type || '',
@@ -188,33 +228,41 @@ export default function Financial() {
       t.insurance_amount || 0,
       t.payment_method || '',
       t.payment_status || '',
-      t.invoice_number || ''
-    ])
+      t.invoice_number || '',
+    ]);
 
-    let xmlContent = `<?xml version="1.0"?>
+    const xmlContent = `<?xml version="1.0"?>
 <?mso-application progid="Excel.Sheet"?>
 <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
   xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
   <Worksheet ss:Name="Financial Report">
     <Table>
-      <Row>${headers.map(h => `<Cell><Data ss:Type="String">${h}</Data></Cell>`).join('')}</Row>
-      ${rows.map(row => `<Row>${row.map((cell, i) =>
-        `<Cell><Data ss:Type="${i === 3 || i === 4 ? 'Number' : 'String'}">${cell}</Data></Cell>`
-      ).join('')}</Row>`).join('\n      ')}
+      <Row>${headers.map((h) => `<Cell><Data ss:Type="String">${h}</Data></Cell>`).join('')}</Row>
+      ${rows
+        .map(
+          (row) =>
+            `<Row>${row
+              .map(
+                (cell, i) =>
+                  `<Cell><Data ss:Type="${i === 3 || i === 4 ? 'Number' : 'String'}">${cell}</Data></Cell>`
+              )
+              .join('')}</Row>`
+        )
+        .join('\n      ')}
     </Table>
   </Worksheet>
-</Workbook>`
+</Workbook>`;
 
-    const blob = new Blob([xmlContent], { type: 'application/vnd.ms-excel' })
-    const link = document.createElement('a')
-    const url = URL.createObjectURL(blob)
-    link.setAttribute('href', url)
-    link.setAttribute('download', `financial-export-${new Date().toISOString().split('T')[0]}.xls`)
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    setShowExportMenu(false)
-  }
+    const blob = new Blob([xmlContent], { type: 'application/vnd.ms-excel' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `financial-export-${new Date().toISOString().split('T')[0]}.xls`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setShowExportMenu(false);
+  };
 
   return (
     <div className="p-6">
@@ -329,7 +377,12 @@ export default function Financial() {
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={revenueChart}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" tickFormatter={(date) => new Date(date).toLocaleDateString('no-NO', { month: 'short', day: 'numeric' })} />
+              <XAxis
+                dataKey="date"
+                tickFormatter={(date) =>
+                  new Date(date).toLocaleDateString('no-NO', { month: 'short', day: 'numeric' })
+                }
+              />
               <YAxis tickFormatter={(value) => `${value.toLocaleString()} kr`} />
               <Tooltip
                 formatter={(value) => formatCurrency(value)}
@@ -382,7 +435,10 @@ export default function Financial() {
                 {outstanding.length} {outstanding.length !== 1 ? t('invoices') : t('invoice')}
               </p>
               <p className="text-sm text-yellow-800 mt-1">
-                {t('totalOutstanding')}: {formatCurrency(outstanding.reduce((sum, inv) => sum + parseFloat(inv.patient_amount || 0), 0))}
+                {t('totalOutstanding')}:{' '}
+                {formatCurrency(
+                  outstanding.reduce((sum, inv) => sum + parseFloat(inv.patient_amount || 0), 0)
+                )}
               </p>
             </div>
           </div>
@@ -418,7 +474,9 @@ export default function Financial() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('paymentStatus')}</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('paymentStatus')}
+            </label>
             <select
               value={filters.paymentStatus}
               onChange={(e) => handleFilterChange('paymentStatus', e.target.value)}
@@ -433,7 +491,9 @@ export default function Financial() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('transactionType')}</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('transactionType')}
+            </label>
             <select
               value={filters.transactionType}
               onChange={(e) => handleFilterChange('transactionType', e.target.value)}
@@ -449,7 +509,9 @@ export default function Financial() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('searchPatient')}</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('searchPatient')}
+            </label>
             <input
               type="text"
               value={filters.patientSearch}
@@ -465,7 +527,9 @@ export default function Financial() {
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold">{t('transactions')}</h2>
-          <p className="text-sm text-gray-600">{pagination.total} {t('transactions').toLowerCase()}</p>
+          <p className="text-sm text-gray-600">
+            {pagination.total} {t('transactions').toLowerCase()}
+          </p>
         </div>
 
         {isLoading ? (
@@ -482,14 +546,30 @@ export default function Financial() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('date')}</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('patient')}</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('type')}</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('amount')}</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('payment')}</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('status')}</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('invoice')}</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('actions')}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      {t('date')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      {t('patient')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      {t('type')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      {t('amount')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      {t('payment')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      {t('status')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      {t('invoice')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      {t('actions')}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -526,7 +606,9 @@ export default function Financial() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(transaction.payment_status)}`}>
+                        <span
+                          className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(transaction.payment_status)}`}
+                        >
                           {transaction.payment_status}
                         </span>
                       </td>
@@ -544,10 +626,12 @@ export default function Financial() {
                           </button>
                           {transaction.payment_status === 'PENDING' && (
                             <button
-                              onClick={() => updatePaymentMutation.mutate({
-                                id: transaction.id,
-                                status: 'PAID'
-                              })}
+                              onClick={() =>
+                                updatePaymentMutation.mutate({
+                                  id: transaction.id,
+                                  status: 'PAID',
+                                })
+                              }
                               disabled={updatePaymentMutation.isPending}
                               className="text-green-600 hover:text-green-900 font-medium disabled:opacity-50"
                             >
@@ -567,21 +651,21 @@ export default function Financial() {
               <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
                 <div className="text-sm text-gray-700">
                   {t('showing')
-                    .replace('{from}', ((filters.page - 1) * filters.limit) + 1)
+                    .replace('{from}', (filters.page - 1) * filters.limit + 1)
                     .replace('{to}', Math.min(filters.page * filters.limit, pagination.total))
                     .replace('{total}', pagination.total)}
                 </div>
 
                 <div className="flex gap-2">
                   <button
-                    onClick={() => setFilters(prev => ({ ...prev, page: prev.page - 1 }))}
+                    onClick={() => setFilters((prev) => ({ ...prev, page: prev.page - 1 }))}
                     disabled={filters.page === 1}
                     className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
                   >
                     {t('previous')}
                   </button>
                   <button
-                    onClick={() => setFilters(prev => ({ ...prev, page: prev.page + 1 }))}
+                    onClick={() => setFilters((prev) => ({ ...prev, page: prev.page + 1 }))}
                     disabled={filters.page === pagination.pages}
                     className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
                   >
@@ -618,5 +702,5 @@ export default function Financial() {
         />
       )}
     </div>
-  )
+  );
 }

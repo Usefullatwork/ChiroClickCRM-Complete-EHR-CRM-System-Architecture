@@ -8,11 +8,9 @@ export * from './actions.js';
 export * from './engine.js';
 
 // Preserve default export for backward compatibility
-import { TRIGGER_TYPES } from './triggers.js';
-import { OPERATORS } from './conditions.js';
+import { TRIGGER_TYPES, evaluateTrigger } from './triggers.js';
+import { OPERATORS, evaluateConditions } from './conditions.js';
 import { ACTION_TYPES, executeActions } from './actions.js';
-import { evaluateConditions } from './conditions.js';
-import { evaluateTrigger } from './triggers.js';
 import {
   getWorkflows,
   getWorkflowById,

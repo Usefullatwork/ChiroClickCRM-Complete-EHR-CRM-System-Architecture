@@ -5,7 +5,7 @@
  * Template for initial consultation / first visit
  */
 
-import React, { useState, useCallback, useEffect, useRef } from 'react'
+import _React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
   User,
   FileText,
@@ -21,11 +21,11 @@ import {
   Trash2,
   Heart,
   Activity,
-  Clock,
-  Calendar,
-  CheckCircle
-} from 'lucide-react'
-import ICD10CodePicker from './ICD10CodePicker'
+  _Clock,
+  _Calendar,
+  CheckCircle,
+} from 'lucide-react';
+import ICD10CodePicker from './ICD10CodePicker';
 
 /**
  * InitialConsultTemplate Component
@@ -44,124 +44,126 @@ export default function InitialConsultTemplate({
   patient,
   onSave,
   onLock,
-  readOnly = false
+  readOnly = false,
 }) {
   // Auto-save timer ref
-  const autoSaveTimerRef = useRef(null)
-  const [lastAutoSave, setLastAutoSave] = useState(null)
-  const [hasChanges, setHasChanges] = useState(false)
+  const autoSaveTimerRef = useRef(null);
+  const [lastAutoSave, setLastAutoSave] = useState(null);
+  const [hasChanges, setHasChanges] = useState(false);
 
   // State for consultation data
   // Tilstand for konsultasjonsdata
-  const [consultData, setConsultData] = useState(initialData || {
-    // Pasientinformasjon / Patient information
-    demographics: {
-      occupation: '',
-      lifestyle: '',
-      activityLevel: '',
-      sleepQuality: ''
-    },
-    // Hovedklage / Chief complaint
-    subjective: {
-      chiefComplaint: '',
-      historyOfPresentIllness: '',
-      onsetDate: '',
-      onsetCircumstances: '',
-      painLocation: '',
-      painIntensity: 0,
-      painQuality: '',
-      painRadiation: '',
-      painPattern: '', // constant, intermittent, progressive
-      aggravatingFactors: '',
-      relievingFactors: '',
-      functionalLimitations: '',
-      previousEpisodes: '',
-      previousTreatment: '',
-      currentMedications: '',
-      medicationAllergies: ''
-    },
-    // Sykehistorie / Medical history
-    medicalHistory: {
-      pastMedicalHistory: '',
-      surgicalHistory: '',
-      familyHistory: '',
-      socialHistory: '',
-      redFlagScreening: {
-        unexplainedWeightLoss: false,
-        nightPain: false,
-        fever: false,
-        bladderDysfunction: false,
-        bowelDysfunction: false,
-        progressiveWeakness: false,
-        saddleAnesthesia: false,
-        recentTrauma: false,
-        cancerHistory: false,
-        immunocompromised: false
-      }
-    },
-    // Objektive funn / Objective findings
-    objective: {
-      generalAppearance: '',
-      gait: '',
-      posture: '',
-      vitalSigns: {
-        bloodPressure: '',
-        pulse: '',
-        respiratoryRate: '',
-        temperature: '',
-        height: '',
-        weight: ''
+  const [consultData, setConsultData] = useState(
+    initialData || {
+      // Pasientinformasjon / Patient information
+      demographics: {
+        occupation: '',
+        lifestyle: '',
+        activityLevel: '',
+        sleepQuality: '',
       },
-      inspection: '',
-      palpation: '',
-      rangeOfMotion: '',
-      neurologicalExam: {
-        motorTesting: '',
-        sensoryTesting: '',
-        reflexes: '',
-        cranialNerves: ''
+      // Hovedklage / Chief complaint
+      subjective: {
+        chiefComplaint: '',
+        historyOfPresentIllness: '',
+        onsetDate: '',
+        onsetCircumstances: '',
+        painLocation: '',
+        painIntensity: 0,
+        painQuality: '',
+        painRadiation: '',
+        painPattern: '', // constant, intermittent, progressive
+        aggravatingFactors: '',
+        relievingFactors: '',
+        functionalLimitations: '',
+        previousEpisodes: '',
+        previousTreatment: '',
+        currentMedications: '',
+        medicationAllergies: '',
       },
-      orthopedicTests: '',
-      specialTests: '',
-      imaging: ''
-    },
-    // Vurdering / Assessment
-    assessment: {
-      primaryDiagnosis: '',
-      secondaryDiagnoses: [],
-      differentialDiagnosis: '',
-      clinicalImpression: '',
-      redFlags: [],
-      severity: '', // mild, moderate, severe
-      prognosis: '',
-      expectedRecoveryTime: ''
-    },
-    // Behandlingsplan / Treatment plan
-    plan: {
-      treatmentGoals: {
-        shortTerm: '',
-        longTerm: ''
+      // Sykehistorie / Medical history
+      medicalHistory: {
+        pastMedicalHistory: '',
+        surgicalHistory: '',
+        familyHistory: '',
+        socialHistory: '',
+        redFlagScreening: {
+          unexplainedWeightLoss: false,
+          nightPain: false,
+          fever: false,
+          bladderDysfunction: false,
+          bowelDysfunction: false,
+          progressiveWeakness: false,
+          saddleAnesthesia: false,
+          recentTrauma: false,
+          cancerHistory: false,
+          immunocompromised: false,
+        },
       },
-      proposedTreatment: '',
-      treatmentFrequency: '',
-      estimatedVisits: '',
-      initialTreatment: '',
-      exercises: '',
-      patientEducation: '',
-      lifestyleRecommendations: '',
-      followUp: '',
-      referrals: '',
-      contraindications: '',
-      informedConsent: false
-    },
-    // Diagnosekoder / Diagnosis codes
-    icd10_codes: [],
-    icpc_codes: [],
-    // Metadata
-    vas_pain_start: 0,
-    vas_pain_end: null,
-    duration_minutes: 60
-  })
+      // Objektive funn / Objective findings
+      objective: {
+        generalAppearance: '',
+        gait: '',
+        posture: '',
+        vitalSigns: {
+          bloodPressure: '',
+          pulse: '',
+          respiratoryRate: '',
+          temperature: '',
+          height: '',
+          weight: '',
+        },
+        inspection: '',
+        palpation: '',
+        rangeOfMotion: '',
+        neurologicalExam: {
+          motorTesting: '',
+          sensoryTesting: '',
+          reflexes: '',
+          cranialNerves: '',
+        },
+        orthopedicTests: '',
+        specialTests: '',
+        imaging: '',
+      },
+      // Vurdering / Assessment
+      assessment: {
+        primaryDiagnosis: '',
+        secondaryDiagnoses: [],
+        differentialDiagnosis: '',
+        clinicalImpression: '',
+        redFlags: [],
+        severity: '', // mild, moderate, severe
+        prognosis: '',
+        expectedRecoveryTime: '',
+      },
+      // Behandlingsplan / Treatment plan
+      plan: {
+        treatmentGoals: {
+          shortTerm: '',
+          longTerm: '',
+        },
+        proposedTreatment: '',
+        treatmentFrequency: '',
+        estimatedVisits: '',
+        initialTreatment: '',
+        exercises: '',
+        patientEducation: '',
+        lifestyleRecommendations: '',
+        followUp: '',
+        referrals: '',
+        contraindications: '',
+        informedConsent: false,
+      },
+      // Diagnosekoder / Diagnosis codes
+      icd10_codes: [],
+      icpc_codes: [],
+      // Metadata
+      vas_pain_start: 0,
+      vas_pain_end: null,
+      duration_minutes: 60,
+    }
+  );
 
   const [expandedSections, setExpandedSections] = useState({
     demographics: true,
@@ -170,22 +172,24 @@ export default function InitialConsultTemplate({
     objective: true,
     assessment: true,
     plan: true,
-    codes: true
-  })
+    codes: true,
+  });
 
-  const [saving, setSaving] = useState(false)
-  const [showCodePicker, setShowCodePicker] = useState(false)
+  const [saving, setSaving] = useState(false);
+  const [showCodePicker, setShowCodePicker] = useState(false);
 
   /**
    * Auto-save effect
    * Auto-lagring effekt
    */
   useEffect(() => {
-    if (!hasChanges || readOnly) return
+    if (!hasChanges || readOnly) {
+      return;
+    }
 
     // Clear existing timer
     if (autoSaveTimerRef.current) {
-      clearTimeout(autoSaveTimerRef.current)
+      clearTimeout(autoSaveTimerRef.current);
     }
 
     // Set new timer for auto-save (30 seconds)
@@ -194,139 +198,162 @@ export default function InitialConsultTemplate({
         if (onSave) {
           await onSave({
             ...consultData,
-            auto_save_data: consultData
-          })
-          setLastAutoSave(new Date())
-          setHasChanges(false)
+            auto_save_data: consultData,
+          });
+          setLastAutoSave(new Date());
+          setHasChanges(false);
         }
       } catch (error) {
-        console.error('Auto-save failed:', error)
+        console.error('Auto-save failed:', error);
       }
-    }, 30000)
+    }, 30000);
 
     return () => {
       if (autoSaveTimerRef.current) {
-        clearTimeout(autoSaveTimerRef.current)
+        clearTimeout(autoSaveTimerRef.current);
       }
-    }
-  }, [consultData, hasChanges, readOnly, onSave])
+    };
+  }, [consultData, hasChanges, readOnly, onSave]);
 
   /**
    * Toggle section expansion
    * Veksle seksjonsutviding
    */
   const toggleSection = (section) => {
-    setExpandedSections(prev => ({
+    setExpandedSections((prev) => ({
       ...prev,
-      [section]: !prev[section]
-    }))
-  }
+      [section]: !prev[section],
+    }));
+  };
 
   /**
    * Update field with change tracking
    * Oppdater felt med endringsregistrering
    */
-  const updateField = useCallback((section, field, value) => {
-    if (readOnly) return
-    setConsultData(prev => ({
-      ...prev,
-      [section]: {
-        ...prev[section],
-        [field]: value
+  const updateField = useCallback(
+    (section, field, value) => {
+      if (readOnly) {
+        return;
       }
-    }))
-    setHasChanges(true)
-  }, [readOnly])
+      setConsultData((prev) => ({
+        ...prev,
+        [section]: {
+          ...prev[section],
+          [field]: value,
+        },
+      }));
+      setHasChanges(true);
+    },
+    [readOnly]
+  );
 
   /**
    * Update nested field
    * Oppdater nestet felt
    */
-  const updateNestedField = useCallback((section, parent, field, value) => {
-    if (readOnly) return
-    setConsultData(prev => ({
-      ...prev,
-      [section]: {
-        ...prev[section],
-        [parent]: {
-          ...prev[section][parent],
-          [field]: value
-        }
+  const updateNestedField = useCallback(
+    (section, parent, field, value) => {
+      if (readOnly) {
+        return;
       }
-    }))
-    setHasChanges(true)
-  }, [readOnly])
+      setConsultData((prev) => ({
+        ...prev,
+        [section]: {
+          ...prev[section],
+          [parent]: {
+            ...prev[section][parent],
+            [field]: value,
+          },
+        },
+      }));
+      setHasChanges(true);
+    },
+    [readOnly]
+  );
 
   /**
    * Update root level field
    * Oppdater rotnivafeld
    */
-  const updateRootField = useCallback((field, value) => {
-    if (readOnly) return
-    setConsultData(prev => ({
-      ...prev,
-      [field]: value
-    }))
-    setHasChanges(true)
-  }, [readOnly])
+  const updateRootField = useCallback(
+    (field, value) => {
+      if (readOnly) {
+        return;
+      }
+      setConsultData((prev) => ({
+        ...prev,
+        [field]: value,
+      }));
+      setHasChanges(true);
+    },
+    [readOnly]
+  );
 
   /**
    * Add red flag
    * Legg til rodt flagg
    */
   const addRedFlag = (flag) => {
-    if (readOnly || !flag) return
-    setConsultData(prev => ({
+    if (readOnly || !flag) {
+      return;
+    }
+    setConsultData((prev) => ({
       ...prev,
       assessment: {
         ...prev.assessment,
-        redFlags: [...(prev.assessment.redFlags || []), flag]
-      }
-    }))
-    setHasChanges(true)
-  }
+        redFlags: [...(prev.assessment.redFlags || []), flag],
+      },
+    }));
+    setHasChanges(true);
+  };
 
   /**
    * Remove red flag
    * Fjern rodt flagg
    */
   const removeRedFlag = (index) => {
-    if (readOnly) return
-    setConsultData(prev => ({
+    if (readOnly) {
+      return;
+    }
+    setConsultData((prev) => ({
       ...prev,
       assessment: {
         ...prev.assessment,
-        redFlags: prev.assessment.redFlags.filter((_, i) => i !== index)
-      }
-    }))
-    setHasChanges(true)
-  }
+        redFlags: prev.assessment.redFlags.filter((_, i) => i !== index),
+      },
+    }));
+    setHasChanges(true);
+  };
 
   /**
    * Handle ICD-10 code selection
    * Handter ICD-10 kodevalg
    */
   const handleCodeSelect = (code) => {
-    if (readOnly) return
-    setConsultData(prev => ({
+    if (readOnly) {
+      return;
+    }
+    setConsultData((prev) => ({
       ...prev,
-      icd10_codes: [...(prev.icd10_codes || []), code.code]
-    }))
-    setHasChanges(true)
-  }
+      icd10_codes: [...(prev.icd10_codes || []), code.code],
+    }));
+    setHasChanges(true);
+  };
 
   /**
    * Remove ICD-10 code
    * Fjern ICD-10 kode
    */
   const removeCode = (codeToRemove) => {
-    if (readOnly) return
-    setConsultData(prev => ({
+    if (readOnly) {
+      return;
+    }
+    setConsultData((prev) => ({
       ...prev,
-      icd10_codes: prev.icd10_codes.filter(code => code !== codeToRemove)
-    }))
-    setHasChanges(true)
-  }
+      icd10_codes: prev.icd10_codes.filter((code) => code !== codeToRemove),
+    }));
+    setHasChanges(true);
+  };
 
   /**
    * Handle save
@@ -334,15 +361,15 @@ export default function InitialConsultTemplate({
    */
   const handleSave = async () => {
     try {
-      setSaving(true)
+      setSaving(true);
       if (onSave) {
-        await onSave(consultData)
-        setHasChanges(false)
+        await onSave(consultData);
+        setHasChanges(false);
       }
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   /**
    * Handle lock/sign
@@ -350,9 +377,9 @@ export default function InitialConsultTemplate({
    */
   const handleLock = async () => {
     if (onLock) {
-      await onLock(consultData)
+      await onLock(consultData);
     }
-  }
+  };
 
   /**
    * Section component
@@ -376,13 +403,9 @@ export default function InitialConsultTemplate({
           <ChevronDown className="w-5 h-5 text-gray-500" />
         )}
       </button>
-      {expandedSections[id] && (
-        <div className="p-4 space-y-4">
-          {children}
-        </div>
-      )}
+      {expandedSections[id] && <div className="p-4 space-y-4">{children}</div>}
     </div>
-  )
+  );
 
   /**
    * Text field component
@@ -403,7 +426,7 @@ export default function InitialConsultTemplate({
         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500 resize-none"
       />
     </div>
-  )
+  );
 
   /**
    * Input field component
@@ -421,16 +444,22 @@ export default function InitialConsultTemplate({
         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
       />
     </div>
-  )
+  );
 
   /**
    * Checkbox component
    * Avkryssingsbokskomponent
    */
   const Checkbox = ({ label, checked, onChange, warning = false }) => (
-    <label className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer ${
-      checked ? (warning ? 'bg-red-50 border border-red-200' : 'bg-blue-50 border border-blue-200') : 'hover:bg-gray-50'
-    }`}>
+    <label
+      className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer ${
+        checked
+          ? warning
+            ? 'bg-red-50 border border-red-200'
+            : 'bg-blue-50 border border-blue-200'
+          : 'hover:bg-gray-50'
+      }`}
+    >
       <input
         type="checkbox"
         checked={checked || false}
@@ -438,12 +467,14 @@ export default function InitialConsultTemplate({
         disabled={readOnly}
         className="rounded border-gray-300"
       />
-      <span className={`text-sm ${checked && warning ? 'text-red-700 font-medium' : 'text-gray-700'}`}>
+      <span
+        className={`text-sm ${checked && warning ? 'text-red-700 font-medium' : 'text-gray-700'}`}
+      >
         {label}
       </span>
       {checked && warning && <AlertTriangle className="w-4 h-4 text-red-500" />}
     </label>
-  )
+  );
 
   return (
     <div className="space-y-4">
@@ -462,7 +493,8 @@ export default function InitialConsultTemplate({
           {lastAutoSave && (
             <span className="text-xs text-gray-500 flex items-center gap-1">
               <CheckCircle className="w-3 h-3 text-green-500" />
-              Autolagret {lastAutoSave.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}
+              Autolagret{' '}
+              {lastAutoSave.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}
             </span>
           )}
           {hasChanges && !readOnly && (
@@ -523,7 +555,12 @@ export default function InitialConsultTemplate({
       </Section>
 
       {/* Subjective Section / Subjektiv seksjon */}
-      <Section id="subjective" title="Subjektiv - Hovedklage og anamnese" icon={FileText} color="blue">
+      <Section
+        id="subjective"
+        title="Subjektiv - Hovedklage og anamnese"
+        icon={FileText}
+        color="blue"
+      >
         <TextField
           label="Hovedklage"
           value={consultData.subjective.chiefComplaint}
@@ -569,15 +606,17 @@ export default function InitialConsultTemplate({
               max="10"
               value={consultData.subjective.painIntensity || 0}
               onChange={(e) => {
-                updateField('subjective', 'painIntensity', parseInt(e.target.value))
-                updateRootField('vas_pain_start', parseInt(e.target.value))
+                updateField('subjective', 'painIntensity', parseInt(e.target.value));
+                updateRootField('vas_pain_start', parseInt(e.target.value));
               }}
               disabled={readOnly}
               className="w-full"
             />
             <div className="flex justify-between text-xs text-gray-500 mt-1">
               <span>0</span>
-              <span className="font-medium text-blue-600">{consultData.subjective.painIntensity || 0}</span>
+              <span className="font-medium text-blue-600">
+                {consultData.subjective.painIntensity || 0}
+              </span>
               <span>10</span>
             </div>
           </div>
@@ -691,13 +730,17 @@ export default function InitialConsultTemplate({
             <Checkbox
               label="Uforklarlig vekttap"
               checked={consultData.medicalHistory.redFlagScreening?.unexplainedWeightLoss}
-              onChange={(v) => updateNestedField('medicalHistory', 'redFlagScreening', 'unexplainedWeightLoss', v)}
+              onChange={(v) =>
+                updateNestedField('medicalHistory', 'redFlagScreening', 'unexplainedWeightLoss', v)
+              }
               warning
             />
             <Checkbox
               label="Nattesmerte"
               checked={consultData.medicalHistory.redFlagScreening?.nightPain}
-              onChange={(v) => updateNestedField('medicalHistory', 'redFlagScreening', 'nightPain', v)}
+              onChange={(v) =>
+                updateNestedField('medicalHistory', 'redFlagScreening', 'nightPain', v)
+              }
               warning
             />
             <Checkbox
@@ -709,43 +752,57 @@ export default function InitialConsultTemplate({
             <Checkbox
               label="Blaeredysfunksjon"
               checked={consultData.medicalHistory.redFlagScreening?.bladderDysfunction}
-              onChange={(v) => updateNestedField('medicalHistory', 'redFlagScreening', 'bladderDysfunction', v)}
+              onChange={(v) =>
+                updateNestedField('medicalHistory', 'redFlagScreening', 'bladderDysfunction', v)
+              }
               warning
             />
             <Checkbox
               label="Tarmdysfunksjon"
               checked={consultData.medicalHistory.redFlagScreening?.bowelDysfunction}
-              onChange={(v) => updateNestedField('medicalHistory', 'redFlagScreening', 'bowelDysfunction', v)}
+              onChange={(v) =>
+                updateNestedField('medicalHistory', 'redFlagScreening', 'bowelDysfunction', v)
+              }
               warning
             />
             <Checkbox
               label="Progressiv svakhet"
               checked={consultData.medicalHistory.redFlagScreening?.progressiveWeakness}
-              onChange={(v) => updateNestedField('medicalHistory', 'redFlagScreening', 'progressiveWeakness', v)}
+              onChange={(v) =>
+                updateNestedField('medicalHistory', 'redFlagScreening', 'progressiveWeakness', v)
+              }
               warning
             />
             <Checkbox
               label="Sadelanestesi"
               checked={consultData.medicalHistory.redFlagScreening?.saddleAnesthesia}
-              onChange={(v) => updateNestedField('medicalHistory', 'redFlagScreening', 'saddleAnesthesia', v)}
+              onChange={(v) =>
+                updateNestedField('medicalHistory', 'redFlagScreening', 'saddleAnesthesia', v)
+              }
               warning
             />
             <Checkbox
               label="Nylig traume"
               checked={consultData.medicalHistory.redFlagScreening?.recentTrauma}
-              onChange={(v) => updateNestedField('medicalHistory', 'redFlagScreening', 'recentTrauma', v)}
+              onChange={(v) =>
+                updateNestedField('medicalHistory', 'redFlagScreening', 'recentTrauma', v)
+              }
               warning
             />
             <Checkbox
               label="Krefthistorie"
               checked={consultData.medicalHistory.redFlagScreening?.cancerHistory}
-              onChange={(v) => updateNestedField('medicalHistory', 'redFlagScreening', 'cancerHistory', v)}
+              onChange={(v) =>
+                updateNestedField('medicalHistory', 'redFlagScreening', 'cancerHistory', v)
+              }
               warning
             />
             <Checkbox
               label="Immunsupprimert"
               checked={consultData.medicalHistory.redFlagScreening?.immunocompromised}
-              onChange={(v) => updateNestedField('medicalHistory', 'redFlagScreening', 'immunocompromised', v)}
+              onChange={(v) =>
+                updateNestedField('medicalHistory', 'redFlagScreening', 'immunocompromised', v)
+              }
               warning
             />
           </div>
@@ -753,7 +810,12 @@ export default function InitialConsultTemplate({
       </Section>
 
       {/* Objective Section / Objektiv seksjon */}
-      <Section id="objective" title="Objektiv - Klinisk undersokelse" icon={Stethoscope} color="green">
+      <Section
+        id="objective"
+        title="Objektiv - Klinisk undersokelse"
+        icon={Stethoscope}
+        color="green"
+      >
         {/* Vital Signs / Vitale tegn */}
         <div className="bg-gray-50 rounded-lg p-4 mb-4">
           <h4 className="text-sm font-medium text-gray-700 mb-3">Vitale tegn</h4>
@@ -844,13 +906,17 @@ export default function InitialConsultTemplate({
             <TextField
               label="Motorisk testing"
               value={consultData.objective.neurologicalExam?.motorTesting}
-              onChange={(v) => updateNestedField('objective', 'neurologicalExam', 'motorTesting', v)}
+              onChange={(v) =>
+                updateNestedField('objective', 'neurologicalExam', 'motorTesting', v)
+              }
               placeholder="Muskelstyrke..."
             />
             <TextField
               label="Sensorisk testing"
               value={consultData.objective.neurologicalExam?.sensoryTesting}
-              onChange={(v) => updateNestedField('objective', 'neurologicalExam', 'sensoryTesting', v)}
+              onChange={(v) =>
+                updateNestedField('objective', 'neurologicalExam', 'sensoryTesting', v)
+              }
               placeholder="Sensibilitet..."
             />
             <TextField
@@ -862,7 +928,9 @@ export default function InitialConsultTemplate({
             <TextField
               label="Hjernenerver"
               value={consultData.objective.neurologicalExam?.cranialNerves}
-              onChange={(v) => updateNestedField('objective', 'neurologicalExam', 'cranialNerves', v)}
+              onChange={(v) =>
+                updateNestedField('objective', 'neurologicalExam', 'cranialNerves', v)
+              }
               placeholder="Relevante hjernenerver..."
             />
           </div>
@@ -914,12 +982,13 @@ export default function InitialConsultTemplate({
 
         {/* Red Flags / Rode flagg */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Rode flagg
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Rode flagg</label>
           <div className="space-y-2">
             {(consultData.assessment.redFlags || []).map((flag, index) => (
-              <div key={index} className="flex items-center gap-2 p-2 bg-red-50 border border-red-200 rounded-lg">
+              <div
+                key={index}
+                className="flex items-center gap-2 p-2 bg-red-50 border border-red-200 rounded-lg"
+              >
                 <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
                 <span className="flex-1 text-sm text-red-700">{flag}</span>
                 {!readOnly && (
@@ -935,8 +1004,10 @@ export default function InitialConsultTemplate({
             {!readOnly && (
               <button
                 onClick={() => {
-                  const flag = prompt('Legg til rodt flagg:')
-                  if (flag) addRedFlag(flag)
+                  const flag = prompt('Legg til rodt flagg:');
+                  if (flag) {
+                    addRedFlag(flag);
+                  }
                 }}
                 className="flex items-center gap-2 text-sm text-red-600 hover:text-red-700"
               >
@@ -1002,10 +1073,7 @@ export default function InitialConsultTemplate({
                 >
                   {code}
                   {!readOnly && (
-                    <button
-                      onClick={() => removeCode(code)}
-                      className="ml-1 hover:text-blue-600"
-                    >
+                    <button onClick={() => removeCode(code)} className="ml-1 hover:text-blue-600">
                       <X className="w-3 h-3" />
                     </button>
                   )}
@@ -1133,7 +1201,7 @@ export default function InitialConsultTemplate({
         />
       )}
     </div>
-  )
+  );
 }
 
 // X icon component for removing codes
@@ -1141,4 +1209,4 @@ const X = ({ className }) => (
   <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
   </svg>
-)
+);

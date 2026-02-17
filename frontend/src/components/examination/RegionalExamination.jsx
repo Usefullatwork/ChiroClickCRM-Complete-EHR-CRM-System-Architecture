@@ -5,15 +5,15 @@
  * Each region has normal (standard) tests and extra (special) tests.
  */
 
-import React, { useState, useMemo, useCallback } from 'react';
+import _React, { useState, useMemo, useCallback } from 'react';
 import {
   ChevronDown,
   ChevronRight,
-  CheckCircle,
-  XCircle,
+  _CheckCircle,
+  _XCircle,
   FileText,
   RefreshCw,
-  Activity
+  Activity,
 } from 'lucide-react';
 
 // Regional test definitions - Norwegian
@@ -23,30 +23,54 @@ const REGIONAL_TESTS = {
     name: 'Nakke / Cervikalcolumna',
     icon: '🦴',
     normalTests: [
-      { id: 'cerv_arom', name: 'Aktiv ROM', description: 'Fleksjon, ekstensjon, rotasjon, lateralfleksjon' },
+      {
+        id: 'cerv_arom',
+        name: 'Aktiv ROM',
+        description: 'Fleksjon, ekstensjon, rotasjon, lateralfleksjon',
+      },
       { id: 'cerv_prom', name: 'Passiv ROM', description: 'Slutt-følelse, smerte ved bevegelse' },
-      { id: 'cerv_palp', name: 'Palpasjon', description: 'Muskulatur, processus spinosus, fasettledd' },
+      {
+        id: 'cerv_palp',
+        name: 'Palpasjon',
+        description: 'Muskulatur, processus spinosus, fasettledd',
+      },
       { id: 'cerv_spurling', name: 'Spurlings test', description: 'Cervikal radikulopati' },
       { id: 'cerv_distraction', name: 'Distraksjonstest', description: 'Nerverotsavlastning' },
       { id: 'cerv_alar', name: 'Alar ligament test', description: 'Stabilitet C0-C2' },
     ],
     extraTests: [
-      { id: 'cerv_sharp_purser', name: 'Sharp-Purser test', description: 'Atlantoaksial instabilitet' },
+      {
+        id: 'cerv_sharp_purser',
+        name: 'Sharp-Purser test',
+        description: 'Atlantoaksial instabilitet',
+      },
       { id: 'cerv_vbi', name: 'VBI screening', description: 'Vertebrobasilær insuffisiens' },
       { id: 'cerv_slump', name: 'Slump test (cervical)', description: 'Nevral mobilitet' },
-      { id: 'cerv_ultt', name: 'ULTT (Upper limb tension)', description: 'Brachialplexus/nerverotstensjon' },
-      { id: 'cerv_cranial_nerve', name: 'Hjernenervetest', description: 'CN V, VII, IX, X, XI, XII' },
+      {
+        id: 'cerv_ultt',
+        name: 'ULTT (Upper limb tension)',
+        description: 'Brachialplexus/nerverotstensjon',
+      },
+      {
+        id: 'cerv_cranial_nerve',
+        name: 'Hjernenervetest',
+        description: 'CN V, VII, IX, X, XI, XII',
+      },
       { id: 'cerv_myotomes', name: 'Myotomer C5-T1', description: 'Motorisk funksjon' },
       { id: 'cerv_dermatomes', name: 'Dermatomer C5-T1', description: 'Sensorisk funksjon' },
       { id: 'cerv_reflexes', name: 'Reflekser', description: 'Biceps, brachioradialis, triceps' },
-    ]
+    ],
   },
   thoracic: {
     id: 'thoracic',
     name: 'Thorax / Thorakalcolumna',
     icon: '🦴',
     normalTests: [
-      { id: 'thor_arom', name: 'Aktiv ROM', description: 'Fleksjon, ekstensjon, rotasjon, lateralfleksjon' },
+      {
+        id: 'thor_arom',
+        name: 'Aktiv ROM',
+        description: 'Fleksjon, ekstensjon, rotasjon, lateralfleksjon',
+      },
       { id: 'thor_prom', name: 'Passiv ROM', description: 'Segmentell bevegelse' },
       { id: 'thor_palp', name: 'Palpasjon', description: 'Costotransversal, paravertebral' },
       { id: 'thor_rib_spring', name: 'Ribbefjærtest', description: 'Rib cage mobilitet' },
@@ -59,20 +83,32 @@ const REGIONAL_TESTS = {
       { id: 'thor_compression', name: 'Thorax kompresjon', description: 'Costafraktur/lesjon' },
       { id: 'thor_first_rib', name: 'Første ribbetest', description: 'Dysfunksjon første ribbe' },
       { id: 'thor_breathing', name: 'Pustemønster', description: 'Diafragma vs apikal' },
-      { id: 'thor_schober', name: 'Modifisert Schober', description: 'Thoracolumbal fleksibilitet' },
-    ]
+      {
+        id: 'thor_schober',
+        name: 'Modifisert Schober',
+        description: 'Thoracolumbal fleksibilitet',
+      },
+    ],
   },
   lumbar: {
     id: 'lumbar',
     name: 'Korsrygg / Lumbalcolumna',
     icon: '🦴',
     normalTests: [
-      { id: 'lumb_arom', name: 'Aktiv ROM', description: 'Fleksjon, ekstensjon, rotasjon, lateralfleksjon' },
+      {
+        id: 'lumb_arom',
+        name: 'Aktiv ROM',
+        description: 'Fleksjon, ekstensjon, rotasjon, lateralfleksjon',
+      },
       { id: 'lumb_prom', name: 'Passiv ROM', description: 'Slutt-følelse, smerte' },
       { id: 'lumb_palp', name: 'Palpasjon', description: 'Paravertebral, SI-ledd, prosesser' },
       { id: 'lumb_slr', name: 'Straight Leg Raise (SLR)', description: 'Isjas/nerverotkompresjon' },
       { id: 'lumb_slump', name: 'Slump test', description: 'Nevral mobilitet' },
-      { id: 'lumb_prone_instab', name: 'Prone instabilitetstest', description: 'Lumbal instabilitet' },
+      {
+        id: 'lumb_prone_instab',
+        name: 'Prone instabilitetstest',
+        description: 'Lumbal instabilitet',
+      },
     ],
     extraTests: [
       { id: 'lumb_crossed_slr', name: 'Krysset SLR', description: 'Diskusprolaps' },
@@ -84,7 +120,7 @@ const REGIONAL_TESTS = {
       { id: 'lumb_reflexes', name: 'Reflekser', description: 'Patella, achilles' },
       { id: 'lumb_babinski', name: 'Babinski', description: 'Øvre motornevron' },
       { id: 'lumb_clonus', name: 'Klonus', description: 'Øvre motornevron' },
-    ]
+    ],
   },
   sacroiliac: {
     id: 'sacroiliac',
@@ -104,7 +140,7 @@ const REGIONAL_TESTS = {
       { id: 'si_sitting_flex', name: 'Sitting flexion test', description: 'SI-ledd bevegelse' },
       { id: 'si_stork', name: 'Stork test', description: 'SI-ledd stabilitet' },
       { id: 'si_trendelenburg', name: 'Trendelenburg', description: 'Gluteus medius funksjon' },
-    ]
+    ],
   },
   tmj: {
     id: 'tmj',
@@ -121,7 +157,7 @@ const REGIONAL_TESTS = {
       { id: 'tmj_cervical', name: 'Cervikal påvirkning', description: 'Nakke-kjeve relasjon' },
       { id: 'tmj_occlusion', name: 'Okklusjon', description: 'Bittforhold' },
       { id: 'tmj_headache', name: 'Assosiert hodepine', description: 'Temporal, frontal' },
-    ]
+    ],
   },
   shoulder: {
     id: 'shoulder',
@@ -143,39 +179,47 @@ const REGIONAL_TESTS = {
       { id: 'shld_external_lag', name: 'External rotation lag', description: 'Infraspinatus' },
       { id: 'shld_speed', name: 'Speed test', description: 'Biceps tendinopati' },
       { id: 'shld_yergason', name: 'Yergasons test', description: 'Biceps tendinopati' },
-      { id: 'shld_obrien', name: 'O\'Brien test', description: 'SLAP lesjon' },
+      { id: 'shld_obrien', name: "O'Brien test", description: 'SLAP lesjon' },
       { id: 'shld_apprehension', name: 'Apprehension test', description: 'Anterior instabilitet' },
       { id: 'shld_relocation', name: 'Relocation test', description: 'Anterior instabilitet' },
       { id: 'shld_sulcus', name: 'Sulcus sign', description: 'Inferior instabilitet' },
       { id: 'shld_cross_body', name: 'Cross-body adduksjon', description: 'AC-ledd patologi' },
-    ]
+    ],
   },
   elbow: {
     id: 'elbow',
     name: 'Albue',
     icon: '💪',
     normalTests: [
-      { id: 'elb_arom', name: 'Aktiv ROM', description: 'Fleksjon, ekstensjon, pronasjon, supinasjon' },
+      {
+        id: 'elb_arom',
+        name: 'Aktiv ROM',
+        description: 'Fleksjon, ekstensjon, pronasjon, supinasjon',
+      },
       { id: 'elb_prom', name: 'Passiv ROM', description: 'Slutt-følelse' },
       { id: 'elb_palp', name: 'Palpasjon', description: 'Epikondyler, olecranon' },
       { id: 'elb_cozen', name: 'Cozens test', description: 'Lateral epikondylitt' },
       { id: 'elb_mill', name: 'Mills test', description: 'Lateral epikondylitt' },
     ],
     extraTests: [
-      { id: 'elb_medial_epi', name: 'Medial epikondylitt test', description: 'Golfer\'s elbow' },
+      { id: 'elb_medial_epi', name: 'Medial epikondylitt test', description: "Golfer's elbow" },
       { id: 'elb_maudsley', name: 'Maudsleys test', description: 'Lateral epikondylitt' },
       { id: 'elb_tinel', name: 'Tinels test (albue)', description: 'Ulnar nevropati' },
       { id: 'elb_flexion_test', name: 'Albuebøyningstest', description: 'Ulnar nervekompresjon' },
       { id: 'elb_valgus', name: 'Valgus stresstest', description: 'MCL stabilitet' },
       { id: 'elb_varus', name: 'Varus stresstest', description: 'LCL stabilitet' },
-    ]
+    ],
   },
   wrist_hand: {
     id: 'wrist_hand',
     name: 'Håndledd / Hånd',
     icon: '✋',
     normalTests: [
-      { id: 'wrist_arom', name: 'Aktiv ROM', description: 'Fleksjon, ekstensjon, radial/ulnar deviasjon' },
+      {
+        id: 'wrist_arom',
+        name: 'Aktiv ROM',
+        description: 'Fleksjon, ekstensjon, radial/ulnar deviasjon',
+      },
       { id: 'wrist_prom', name: 'Passiv ROM', description: 'Slutt-følelse' },
       { id: 'wrist_palp', name: 'Palpasjon', description: 'Karpalbein, sener' },
       { id: 'wrist_phalen', name: 'Phalens test', description: 'Karpaltunnelsyndrom' },
@@ -190,14 +234,18 @@ const REGIONAL_TESTS = {
       { id: 'wrist_piano', name: 'Piano key test', description: 'DRUJ instabilitet' },
       { id: 'wrist_fovea', name: 'Fovea sign', description: 'TFCC lesjon' },
       { id: 'wrist_pinch', name: 'Pinsetgrep', description: 'Finmotorikk' },
-    ]
+    ],
   },
   hip: {
     id: 'hip',
     name: 'Hofte',
     icon: '🦵',
     normalTests: [
-      { id: 'hip_arom', name: 'Aktiv ROM', description: 'Fleksjon, ekstensjon, rotasjon, abduksjon/adduksjon' },
+      {
+        id: 'hip_arom',
+        name: 'Aktiv ROM',
+        description: 'Fleksjon, ekstensjon, rotasjon, abduksjon/adduksjon',
+      },
       { id: 'hip_prom', name: 'Passiv ROM', description: 'Kapselmønster' },
       { id: 'hip_palp', name: 'Palpasjon', description: 'Trochanter, adduktorer, iliopsoas' },
       { id: 'hip_faber', name: 'FABER/Patricks test', description: 'Hofte/SI-ledd' },
@@ -212,7 +260,7 @@ const REGIONAL_TESTS = {
       { id: 'hip_resisted', name: 'Isometrisk motstand', description: 'Muskelstyrke' },
       { id: 'hip_trendelenburg', name: 'Trendelenburg', description: 'Gluteus medius' },
       { id: 'hip_craig', name: 'Craigs test', description: 'Femoral anteversjon' },
-    ]
+    ],
   },
   knee: {
     id: 'knee',
@@ -235,16 +283,24 @@ const REGIONAL_TESTS = {
       { id: 'knee_apley', name: 'Apleys test', description: 'Menisk' },
       { id: 'knee_thessaly', name: 'Thessaly test', description: 'Menisk' },
       { id: 'knee_patella_grind', name: 'Patella grind', description: 'Patellofemoral' },
-      { id: 'knee_apprehension', name: 'Patella apprehension', description: 'Patella instabilitet' },
+      {
+        id: 'knee_apprehension',
+        name: 'Patella apprehension',
+        description: 'Patella instabilitet',
+      },
       { id: 'knee_clarke', name: 'Clarkes test', description: 'Chondromalaci' },
-    ]
+    ],
   },
   ankle_foot: {
     id: 'ankle_foot',
     name: 'Ankel / Fot',
     icon: '🦶',
     normalTests: [
-      { id: 'ankle_arom', name: 'Aktiv ROM', description: 'Dorsalfleksjon, plantarfleksjon, inversjon, eversjon' },
+      {
+        id: 'ankle_arom',
+        name: 'Aktiv ROM',
+        description: 'Dorsalfleksjon, plantarfleksjon, inversjon, eversjon',
+      },
       { id: 'ankle_prom', name: 'Passiv ROM', description: 'Slutt-følelse' },
       { id: 'ankle_palp', name: 'Palpasjon', description: 'Malleol, achilles, plantar fascia' },
       { id: 'ankle_anterior_drawer', name: 'Anterior skufftest', description: 'ATFL' },
@@ -260,7 +316,7 @@ const REGIONAL_TESTS = {
       { id: 'ankle_navicular_drop', name: 'Navicular drop', description: 'Fotbuepronasjon' },
       { id: 'ankle_heel_raise', name: 'Singel heel raise', description: 'Posterior tibialis' },
       { id: 'ankle_gait', name: 'Ganganalyse', description: 'Funksjonell vurdering' },
-    ]
+    ],
   },
   balance_neuro: {
     id: 'balance_neuro',
@@ -272,7 +328,11 @@ const REGIONAL_TESTS = {
       { id: 'bal_single_leg', name: 'Ettbens stående', description: 'Propriosepsjon' },
       { id: 'bal_gait', name: 'Gangobservasjon', description: 'Gangmønster' },
       { id: 'neuro_coordination', name: 'Koordinasjon', description: 'Finger-nese, hel-kne' },
-      { id: 'neuro_diadochokinesis', name: 'Dysdiadokokinesi', description: 'Rask alternerende bevegelse' },
+      {
+        id: 'neuro_diadochokinesis',
+        name: 'Dysdiadokokinesi',
+        description: 'Rask alternerende bevegelse',
+      },
     ],
     extraTests: [
       { id: 'bal_fukuda', name: 'Fukuda stepping', description: 'Vestibulær asymmetri' },
@@ -281,10 +341,18 @@ const REGIONAL_TESTS = {
       { id: 'neuro_hoffmann', name: 'Hoffmann', description: 'Øvre motornevron' },
       { id: 'neuro_clonus', name: 'Klonus', description: 'Øvre motornevron' },
       { id: 'neuro_cranial', name: 'Hjernenerver', description: 'CN II-XII screening' },
-      { id: 'bal_vestibular', name: 'Vestibulær screening', description: 'Dix-Hallpike, head impulse' },
-      { id: 'neuro_sensation', name: 'Sensorisk screening', description: 'Lett berøring, pin-prick' },
-    ]
-  }
+      {
+        id: 'bal_vestibular',
+        name: 'Vestibulær screening',
+        description: 'Dix-Hallpike, head impulse',
+      },
+      {
+        id: 'neuro_sensation',
+        name: 'Sensorisk screening',
+        description: 'Lett berøring, pin-prick',
+      },
+    ],
+  },
 };
 
 /**
@@ -292,15 +360,17 @@ const REGIONAL_TESTS = {
  */
 function TestItem({ test, value, onChange, isExtra = false }) {
   return (
-    <div className={`p-2.5 border rounded-lg transition-colors ${
-      value === true
-        ? 'border-amber-300 bg-amber-50'
-        : value === false
-          ? 'border-green-200 bg-green-50'
-          : isExtra
-            ? 'border-gray-200 bg-gray-50'
-            : 'border-gray-200 bg-white'
-    }`}>
+    <div
+      className={`p-2.5 border rounded-lg transition-colors ${
+        value === true
+          ? 'border-amber-300 bg-amber-50'
+          : value === false
+            ? 'border-green-200 bg-green-50'
+            : isExtra
+              ? 'border-gray-200 bg-gray-50'
+              : 'border-gray-200 bg-white'
+      }`}
+    >
       <div className="flex items-center gap-3">
         <div className="flex gap-1.5">
           <button
@@ -327,14 +397,18 @@ function TestItem({ test, value, onChange, isExtra = false }) {
           </button>
         </div>
         <div className="flex-1 min-w-0">
-          <span className={`text-sm font-medium ${
-            value === true ? 'text-amber-700' : value === false ? 'text-green-700' : 'text-gray-700'
-          }`}>
+          <span
+            className={`text-sm font-medium ${
+              value === true
+                ? 'text-amber-700'
+                : value === false
+                  ? 'text-green-700'
+                  : 'text-gray-700'
+            }`}
+          >
             {test.name}
           </span>
-          <span className="text-xs text-gray-500 ml-2">
-            {test.description}
-          </span>
+          <span className="text-xs text-gray-500 ml-2">{test.description}</span>
         </div>
       </div>
     </div>
@@ -348,9 +422,11 @@ function RegionPanel({ region, values = {}, onChange, expanded, onToggle }) {
   const [showExtra, setShowExtra] = useState(false);
 
   // Count results
-  const normalCount = region.normalTests.filter(t => values[t.id] !== undefined).length;
-  const extraCount = region.extraTests.filter(t => values[t.id] !== undefined).length;
-  const positiveCount = [...region.normalTests, ...region.extraTests].filter(t => values[t.id] === true).length;
+  const normalCount = region.normalTests.filter((t) => values[t.id] !== undefined).length;
+  const extraCount = region.extraTests.filter((t) => values[t.id] !== undefined).length;
+  const positiveCount = [...region.normalTests, ...region.extraTests].filter(
+    (t) => values[t.id] === true
+  ).length;
   const totalTested = normalCount + extraCount;
 
   const handleTestChange = (testId, value) => {
@@ -364,9 +440,11 @@ function RegionPanel({ region, values = {}, onChange, expanded, onToggle }) {
   };
 
   return (
-    <div className={`border rounded-lg overflow-hidden ${
-      positiveCount > 0 ? 'border-amber-300' : 'border-gray-200'
-    }`}>
+    <div
+      className={`border rounded-lg overflow-hidden ${
+        positiveCount > 0 ? 'border-amber-300' : 'border-gray-200'
+      }`}
+    >
       {/* Header */}
       <button
         onClick={onToggle}
@@ -384,9 +462,7 @@ function RegionPanel({ region, values = {}, onChange, expanded, onToggle }) {
             <span className="text-sm text-gray-500">
               {totalTested} tester
               {positiveCount > 0 && (
-                <span className="text-amber-600 font-medium ml-1">
-                  ({positiveCount} positiv)
-                </span>
+                <span className="text-amber-600 font-medium ml-1">({positiveCount} positiv)</span>
               )}
             </span>
           )}
@@ -403,7 +479,7 @@ function RegionPanel({ region, values = {}, onChange, expanded, onToggle }) {
               Normale tester ({normalCount}/{region.normalTests.length})
             </h4>
             <div className="space-y-2">
-              {region.normalTests.map(test => (
+              {region.normalTests.map((test) => (
                 <TestItem
                   key={test.id}
                   test={test}
@@ -420,13 +496,17 @@ function RegionPanel({ region, values = {}, onChange, expanded, onToggle }) {
               onClick={() => setShowExtra(!showExtra)}
               className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
             >
-              {showExtra ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+              {showExtra ? (
+                <ChevronDown className="w-4 h-4" />
+              ) : (
+                <ChevronRight className="w-4 h-4" />
+              )}
               Ekstra tester ({extraCount}/{region.extraTests.length})
             </button>
 
             {showExtra && (
               <div className="mt-2 space-y-2">
-                {region.extraTests.map(test => (
+                {region.extraTests.map((test) => (
                   <TestItem
                     key={test.id}
                     test={test}
@@ -451,21 +531,21 @@ export default function RegionalExamination({
   values = {},
   onChange,
   onGenerateReport,
-  readOnly = false
+  _readOnly = false,
 }) {
   const [expandedRegions, setExpandedRegions] = useState({});
 
   const handleRegionToggle = (regionId) => {
-    setExpandedRegions(prev => ({
+    setExpandedRegions((prev) => ({
       ...prev,
-      [regionId]: !prev[regionId]
+      [regionId]: !prev[regionId],
     }));
   };
 
   const handleRegionChange = (regionId, regionValues) => {
     onChange({
       ...values,
-      [regionId]: regionValues
+      [regionId]: regionValues,
     });
   };
 
@@ -479,14 +559,14 @@ export default function RegionalExamination({
     const stats = {
       totalTested: 0,
       totalPositive: 0,
-      regions: []
+      regions: [],
     };
 
     Object.entries(REGIONAL_TESTS).forEach(([key, region]) => {
       const regionValues = values[key] || {};
       const allTests = [...region.normalTests, ...region.extraTests];
-      const tested = allTests.filter(t => regionValues[t.id] !== undefined).length;
-      const positive = allTests.filter(t => regionValues[t.id] === true).length;
+      const tested = allTests.filter((t) => regionValues[t.id] !== undefined).length;
+      const positive = allTests.filter((t) => regionValues[t.id] === true).length;
 
       stats.totalTested += tested;
       stats.totalPositive += positive;
@@ -497,7 +577,7 @@ export default function RegionalExamination({
           name: region.name,
           icon: region.icon,
           positive,
-          tested
+          tested,
         });
       }
     });
@@ -514,18 +594,20 @@ export default function RegionalExamination({
     Object.entries(REGIONAL_TESTS).forEach(([key, region]) => {
       const regionValues = values[key] || {};
       const allTests = [...region.normalTests, ...region.extraTests];
-      const testedTests = allTests.filter(t => regionValues[t.id] !== undefined);
+      const testedTests = allTests.filter((t) => regionValues[t.id] !== undefined);
 
-      if (testedTests.length === 0) return;
+      if (testedTests.length === 0) {
+        return;
+      }
 
-      const positive = testedTests.filter(t => regionValues[t.id] === true);
-      const negative = testedTests.filter(t => regionValues[t.id] === false);
+      const positive = testedTests.filter((t) => regionValues[t.id] === true);
+      const negative = testedTests.filter((t) => regionValues[t.id] === false);
 
       lines.push(`\n${region.icon} ${region.name}:`);
 
       if (positive.length > 0) {
         lines.push('  Positive funn:');
-        positive.forEach(t => {
+        positive.forEach((t) => {
           lines.push(`    • ${t.name}`);
         });
       }
@@ -537,8 +619,10 @@ export default function RegionalExamination({
 
     if (summary.totalPositive > 0) {
       lines.push('\n\nOPPSUMMERING:');
-      lines.push(`Totalt ${summary.totalTested} tester utført, ${summary.totalPositive} positive funn.`);
-      summary.regions.forEach(r => {
+      lines.push(
+        `Totalt ${summary.totalTested} tester utført, ${summary.totalPositive} positive funn.`
+      );
+      summary.regions.forEach((r) => {
         lines.push(`  ${r.icon} ${r.name}: ${r.positive} positive`);
       });
     } else if (summary.totalTested > 0) {
@@ -561,12 +645,8 @@ export default function RegionalExamination({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-gray-800">
-            Regional undersøkelse
-          </h2>
-          <p className="text-sm text-gray-500">
-            Full kroppsundersøkelse organisert etter region
-          </p>
+          <h2 className="text-lg font-semibold text-gray-800">Regional undersøkelse</h2>
+          <p className="text-sm text-gray-500">Full kroppsundersøkelse organisert etter region</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -590,17 +670,19 @@ export default function RegionalExamination({
 
       {/* Summary */}
       {summary.totalTested > 0 && (
-        <div className={`p-3 rounded-lg border ${
-          summary.totalPositive > 0
-            ? 'bg-amber-50 border-amber-200'
-            : 'bg-green-50 border-green-200'
-        }`}>
+        <div
+          className={`p-3 rounded-lg border ${
+            summary.totalPositive > 0
+              ? 'bg-amber-50 border-amber-200'
+              : 'bg-green-50 border-green-200'
+          }`}
+        >
           <p className="text-sm font-medium">
             {summary.totalTested} tester utført • {summary.totalPositive} positive funn
           </p>
           {summary.regions.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
-              {summary.regions.map(r => (
+              {summary.regions.map((r) => (
                 <span
                   key={r.id}
                   className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs font-medium"

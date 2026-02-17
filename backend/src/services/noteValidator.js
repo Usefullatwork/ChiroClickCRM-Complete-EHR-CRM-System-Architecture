@@ -7,7 +7,7 @@
 import { normalizeSoapData, getRequiredFields } from '../utils/soapSchema.js';
 import { scanForRedFlags, calculateRiskScore } from './redFlagEngine.js';
 import { checkRedFlagsInContent, checkMedicationWarnings } from './clinicalValidation.js';
-import logger from '../utils/logger.js';
+import _logger from '../utils/logger.js';
 
 /**
  * ICPC-2 code format: letter + 2 digits (e.g. L03, A97)
@@ -29,8 +29,12 @@ const MIN_CONTENT_LENGTH = 10;
  * Sections can be strings or objects with subfields.
  */
 function extractSectionText(section) {
-  if (!section) return '';
-  if (typeof section === 'string') return section;
+  if (!section) {
+    return '';
+  }
+  if (typeof section === 'string') {
+    return section;
+  }
   if (typeof section === 'object') {
     return Object.values(section)
       .filter((v) => typeof v === 'string')
@@ -51,8 +55,12 @@ function sectionHasContent(section) {
  * Get the chief complaint from subjective data (handles various field names)
  */
 function getChiefComplaint(subjective) {
-  if (!subjective) return null;
-  if (typeof subjective === 'string') return subjective;
+  if (!subjective) {
+    return null;
+  }
+  if (typeof subjective === 'string') {
+    return subjective;
+  }
   return (
     subjective.chief_complaint ||
     subjective.chiefComplaint ||
@@ -66,14 +74,16 @@ function getChiefComplaint(subjective) {
  * Calculate completeness score (0-100)
  * 25 points per SOAP section, bonus for diagnosis codes
  */
-function calculateCompletenessScore(data, encounterType) {
+function calculateCompletenessScore(data, _encounterType) {
   let score = 0;
-  const maxSectionScore = 25;
+  const _maxSectionScore = 25;
 
   // Subjective (25 pts)
   if (sectionHasContent(data.subjective)) {
     score += 15;
-    if (getChiefComplaint(data.subjective)) score += 10;
+    if (getChiefComplaint(data.subjective)) {
+      score += 10;
+    }
   }
 
   // Objective (25 pts)
@@ -87,7 +97,9 @@ function calculateCompletenessScore(data, encounterType) {
     // Bonus for diagnosis codes
     const hasIcpc = data.icpc_codes?.length > 0 || data.icpcCodes?.length > 0;
     const hasIcd10 = data.icd10_codes?.length > 0 || data.icd10Codes?.length > 0;
-    if (hasIcpc || hasIcd10) score += 5;
+    if (hasIcpc || hasIcd10) {
+      score += 5;
+    }
   }
 
   // Plan (25 pts)
@@ -103,7 +115,9 @@ function calculateCompletenessScore(data, encounterType) {
  */
 function validateIcpcCodes(codes) {
   const errors = [];
-  if (!codes || !Array.isArray(codes)) return errors;
+  if (!codes || !Array.isArray(codes)) {
+    return errors;
+  }
 
   for (const code of codes) {
     if (typeof code !== 'string') {
@@ -124,7 +138,9 @@ function validateIcpcCodes(codes) {
  */
 function validateIcd10Codes(codes) {
   const errors = [];
-  if (!codes || !Array.isArray(codes)) return errors;
+  if (!codes || !Array.isArray(codes)) {
+    return errors;
+  }
 
   for (const code of codes) {
     if (typeof code !== 'string') {
@@ -200,10 +216,14 @@ export function validate(data, encounterType = 'SOAP', context = {}) {
   const requiredFields = getRequiredFields(type);
   for (const [section, reqs] of Object.entries(requiredFields)) {
     const sectionData = normalized[section];
-    if (!sectionData || typeof sectionData !== 'object') continue;
+    if (!sectionData || typeof sectionData !== 'object') {
+      continue;
+    }
 
     for (const field of reqs.required) {
-      if (field === 'chief_complaint') continue; // Already checked above
+      if (field === 'chief_complaint') {
+        continue;
+      } // Already checked above
       const value = sectionData[field];
       if (!value || (typeof value === 'string' && value.trim().length < 3)) {
         result.suggestions.push(`Anbefalt felt mangler: ${section}.${field}`);
@@ -246,7 +266,7 @@ export function validate(data, encounterType = 'SOAP', context = {}) {
     });
 
     if (engineFlags.length > 0) {
-      const riskScore = calculateRiskScore(engineFlags, {
+      const _riskScore = calculateRiskScore(engineFlags, {
         age: context.patient?.age || context.age,
       });
 

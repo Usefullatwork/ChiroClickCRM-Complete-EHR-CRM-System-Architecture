@@ -10,8 +10,8 @@
  * - Pull-to-refresh gesture support
  */
 
-import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import _React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Dumbbell,
   Loader2,
@@ -25,155 +25,165 @@ import {
   LogOut,
   TrendingUp,
   CheckCircle2,
-  ArrowUp
-} from 'lucide-react'
-import { patientApi, getStoredToken, clearStoredToken } from '../../api/patientApi'
-import ExerciseCard from '../../components/patient/ExerciseCard'
-import useMediaQuery from '../../hooks/useMediaQuery'
+  ArrowUp,
+} from 'lucide-react';
+import { patientApi, getStoredToken, clearStoredToken } from '../../api/patientApi';
+import ExerciseCard from '../../components/patient/ExerciseCard';
+import useMediaQuery from '../../hooks/useMediaQuery';
 
 const MyExercises = () => {
-  const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
-  const { isMobile, isTouchDevice, prefersReducedMotion } = useMediaQuery()
-  const mainRef = useRef(null)
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { _isMobile, isTouchDevice, prefersReducedMotion } = useMediaQuery();
+  const mainRef = useRef(null);
 
   // State
-  const [loading, setLoading] = useState(true)
-  const [refreshing, setRefreshing] = useState(false)
-  const [error, setError] = useState(null)
-  const [data, setData] = useState(null)
-  const [selectedPrescription, setSelectedPrescription] = useState(null)
-  const [dailySummary, setDailySummary] = useState(null)
-  const [showScrollTop, setShowScrollTop] = useState(false)
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState(null);
+  const [data, setData] = useState(null);
+  const [selectedPrescription, setSelectedPrescription] = useState(null);
+  const [dailySummary, setDailySummary] = useState(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   // Pull-to-refresh state
-  const [pullDistance, setPullDistance] = useState(0)
-  const [isPulling, setIsPulling] = useState(false)
-  const touchStartY = useRef(0)
+  const [pullDistance, setPullDistance] = useState(0);
+  const [isPulling, setIsPulling] = useState(false);
+  const touchStartY = useRef(0);
 
   // Get token
-  const token = searchParams.get('token') || getStoredToken()
+  const token = searchParams.get('token') || getStoredToken();
 
   // Load data on mount
   useEffect(() => {
     if (!token) {
-      navigate('/portal/login')
-      return
+      navigate('/portal/login');
+      return;
     }
-    loadPrescriptions()
-  }, [token])
+    loadPrescriptions();
+  }, [token]);
 
   // Track scroll position for "scroll to top" button
   useEffect(() => {
     const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 300)
-    }
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+      setShowScrollTop(window.scrollY > 300);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Pull-to-refresh handlers
-  const handleTouchStart = useCallback((e) => {
-    if (window.scrollY === 0 && !refreshing) {
-      touchStartY.current = e.touches[0].clientY
-      setIsPulling(true)
-    }
-  }, [refreshing])
+  const handleTouchStart = useCallback(
+    (e) => {
+      if (window.scrollY === 0 && !refreshing) {
+        touchStartY.current = e.touches[0].clientY;
+        setIsPulling(true);
+      }
+    },
+    [refreshing]
+  );
 
-  const handleTouchMove = useCallback((e) => {
-    if (!isPulling || refreshing) return
-    const currentY = e.touches[0].clientY
-    const distance = Math.max(0, currentY - touchStartY.current)
-    setPullDistance(Math.min(distance * 0.5, 80)) // Max 80px with resistance
-  }, [isPulling, refreshing])
+  const handleTouchMove = useCallback(
+    (e) => {
+      if (!isPulling || refreshing) {
+        return;
+      }
+      const currentY = e.touches[0].clientY;
+      const distance = Math.max(0, currentY - touchStartY.current);
+      setPullDistance(Math.min(distance * 0.5, 80)); // Max 80px with resistance
+    },
+    [isPulling, refreshing]
+  );
 
   const handleTouchEnd = useCallback(() => {
     if (pullDistance > 60 && !refreshing) {
-      handleRefresh()
+      handleRefresh();
     }
-    setPullDistance(0)
-    setIsPulling(false)
-  }, [pullDistance, refreshing])
+    setPullDistance(0);
+    setIsPulling(false);
+  }, [pullDistance, refreshing]);
 
   // Load prescriptions
   const loadPrescriptions = async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
-      const response = await patientApi.getPrescriptions(token)
+      const response = await patientApi.getPrescriptions(token);
 
       if (response.success) {
-        setData(response.data)
+        setData(response.data);
 
         // Auto-select first prescription if only one
         if (response.data.prescriptions?.length === 1) {
-          loadPrescriptionDetail(response.data.prescriptions[0].id)
+          loadPrescriptionDetail(response.data.prescriptions[0].id);
         }
       }
     } catch (err) {
-      console.error('Error loading prescriptions:', err)
+      console.error('Error loading prescriptions:', err);
       if (err.status === 401) {
         // Token expired - redirect to login
-        clearStoredToken()
-        navigate('/portal/login')
-        return
+        clearStoredToken();
+        navigate('/portal/login');
+        return;
       }
-      setError(err.message || 'Kunne ikke laste øvelsene')
+      setError(err.message || 'Kunne ikke laste øvelsene');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Load specific prescription detail
   const loadPrescriptionDetail = async (prescriptionId) => {
     try {
-      setRefreshing(true)
+      setRefreshing(true);
 
       const [prescriptionResponse, summaryResponse] = await Promise.all([
         patientApi.getPrescription(token, prescriptionId),
-        patientApi.getDailySummary(token, prescriptionId)
-      ])
+        patientApi.getDailySummary(token, prescriptionId),
+      ]);
 
       if (prescriptionResponse.success) {
-        setSelectedPrescription(prescriptionResponse.data)
+        setSelectedPrescription(prescriptionResponse.data);
       }
 
       if (summaryResponse.success) {
-        setDailySummary(summaryResponse.data)
+        setDailySummary(summaryResponse.data);
       }
     } catch (err) {
-      console.error('Error loading prescription detail:', err)
-      setError(err.message || 'Kunne ikke laste øvelsene')
+      console.error('Error loading prescription detail:', err);
+      setError(err.message || 'Kunne ikke laste øvelsene');
     } finally {
-      setRefreshing(false)
+      setRefreshing(false);
     }
-  }
+  };
 
   // Refresh data
   const handleRefresh = () => {
     if (selectedPrescription) {
-      loadPrescriptionDetail(selectedPrescription.prescription.id)
+      loadPrescriptionDetail(selectedPrescription.prescription.id);
     } else {
-      loadPrescriptions()
+      loadPrescriptions();
     }
-  }
+  };
 
   // Navigate to exercise detail
   const handleExerciseClick = (exercise) => {
-    navigate(`/portal/ovelse/${selectedPrescription.prescription.id}/${exercise.exerciseId}?token=${token}`)
-  }
+    navigate(
+      `/portal/ovelse/${selectedPrescription.prescription.id}/${exercise.exerciseId}?token=${token}`
+    );
+  };
 
   // Handle logout
   const handleLogout = () => {
-    clearStoredToken()
-    navigate('/portal/login')
-  }
+    clearStoredToken();
+    navigate('/portal/login');
+  };
 
   // Scroll to top
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' })
-  }
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+  };
 
   // Loading state
   if (loading) {
@@ -184,7 +194,7 @@ const MyExercises = () => {
           <p className="text-gray-600 text-base sm:text-lg">Laster øvelser...</p>
         </div>
       </div>
-    )
+    );
   }
 
   // Error state
@@ -207,7 +217,7 @@ const MyExercises = () => {
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -223,14 +233,14 @@ const MyExercises = () => {
           className="fixed top-0 left-0 right-0 flex justify-center z-50 pointer-events-none"
           style={{
             transform: `translateY(${pullDistance - 40}px)`,
-            opacity: Math.min(pullDistance / 60, 1)
+            opacity: Math.min(pullDistance / 60, 1),
           }}
         >
           <div className="bg-white rounded-full p-2 shadow-lg">
             <RefreshCw
               className={`w-6 h-6 text-blue-600 ${pullDistance > 60 ? 'animate-spin' : ''}`}
               style={{
-                transform: `rotate(${pullDistance * 3}deg)`
+                transform: `rotate(${pullDistance * 3}deg)`,
               }}
             />
           </div>
@@ -307,7 +317,7 @@ const MyExercises = () => {
                         {new Date(prescription.prescribedAt).toLocaleDateString('nb-NO', {
                           day: 'numeric',
                           month: 'long',
-                          year: 'numeric'
+                          year: 'numeric',
                         })}
                       </span>
                     </div>
@@ -353,7 +363,9 @@ const MyExercises = () => {
             {dailySummary && (
               <div className="bg-white rounded-xl shadow-sm p-3 sm:p-4 mb-4 sm:mb-6">
                 <div className="flex items-center justify-between mb-3">
-                  <h2 className="font-medium text-gray-900 text-sm sm:text-base">Din fremgang i dag</h2>
+                  <h2 className="font-medium text-gray-900 text-sm sm:text-base">
+                    Din fremgang i dag
+                  </h2>
                   <div className="flex items-center gap-1 text-sm">
                     <TrendingUp className="w-4 h-4 text-green-500" />
                     <span className="text-green-600 font-semibold">
@@ -408,17 +420,22 @@ const MyExercises = () => {
                 {selectedPrescription.prescription.prescribedBy && (
                   <div className="flex items-center gap-2">
                     <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                    <span className="truncate">Foreskrevet av: {selectedPrescription.prescription.prescribedBy}</span>
+                    <span className="truncate">
+                      Foreskrevet av: {selectedPrescription.prescription.prescribedBy}
+                    </span>
                   </div>
                 )}
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
                   <span>
-                    {new Date(selectedPrescription.prescription.prescribedAt).toLocaleDateString('nb-NO', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric'
-                    })}
+                    {new Date(selectedPrescription.prescription.prescribedAt).toLocaleDateString(
+                      'nb-NO',
+                      {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      }
+                    )}
                   </span>
                 </div>
                 {data?.clinic?.phone && (
@@ -455,7 +472,7 @@ const MyExercises = () => {
                 </div>
               ) : (
                 <div className="space-y-2 sm:space-y-3">
-                  {selectedPrescription.exercises?.map((exercise, index) => (
+                  {selectedPrescription.exercises?.map((exercise, _index) => (
                     <ExerciseCard
                       key={exercise.id}
                       exercise={exercise}
@@ -495,12 +512,8 @@ const MyExercises = () => {
 
         {/* Footer */}
         <div className="mt-8 p-4 text-center text-xs sm:text-sm text-gray-500">
-          <p>
-            Stopp øvelsene hvis du opplever økt smerte og kontakt klinikken.
-          </p>
-          <p className="mt-2">
-            Dette programmet er personlig tilpasset deg.
-          </p>
+          <p>Stopp øvelsene hvis du opplever økt smerte og kontakt klinikken.</p>
+          <p className="mt-2">Dette programmet er personlig tilpasset deg.</p>
         </div>
       </main>
 
@@ -518,7 +531,7 @@ const MyExercises = () => {
         </button>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default MyExercises
+export default MyExercises;

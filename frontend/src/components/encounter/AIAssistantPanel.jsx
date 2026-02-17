@@ -2,7 +2,7 @@
  * AIAssistantPanel - Extracted from ClinicalEncounter.jsx
  * Floating AI clinical assistant panel
  */
-import React from 'react';
+import _React from 'react';
 import { Brain, X, Sparkles, Loader2 } from 'lucide-react';
 
 export function AIAssistantPanel({
@@ -12,7 +12,9 @@ export function AIAssistantPanel({
   aiLoading,
   getAISuggestions,
 }) {
-  if (!showAIAssistant) return null;
+  if (!showAIAssistant) {
+    return null;
+  }
 
   return (
     <div className="fixed bottom-6 right-6 w-96 bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden z-50">

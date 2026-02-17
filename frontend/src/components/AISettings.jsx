@@ -3,7 +3,7 @@
  * Model selection, feature toggles, and connection testing for the AI system.
  */
 
-import React, { useState } from 'react';
+import _React, { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { aiAPI } from '../services/api';
 
@@ -53,7 +53,7 @@ const AISettings = () => {
   const {
     data: aiStatus,
     isLoading: statusLoading,
-    refetch: refetchStatus,
+    refetch: _refetchStatus,
   } = useQuery({
     queryKey: ['ai-status'],
     queryFn: () => aiAPI.getStatus(),

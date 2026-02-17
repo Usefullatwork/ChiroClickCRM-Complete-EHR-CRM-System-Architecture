@@ -4,7 +4,7 @@
  */
 
 import { query } from '../config/database.js';
-import { generateToken, hashToken } from './password.js';
+import { generateToken, _hashToken } from './password.js';
 import logger from '../utils/logger.js';
 
 // Session duration: 7 days
@@ -32,7 +32,7 @@ export const createSession = async (userId, metadata = {}) => {
 
   return {
     sessionId,
-    expiresAt
+    expiresAt,
   };
 };
 
@@ -73,8 +73,8 @@ export const validateSession = async (sessionId) => {
   const row = result.rows[0];
 
   // Check if session is still "fresh" (within 30 minutes of creation)
-  const isFresh = row.fresh &&
-    (Date.now() - new Date(row.session_created).getTime()) < FRESH_DURATION_MS;
+  const isFresh =
+    row.fresh && Date.now() - new Date(row.session_created).getTime() < FRESH_DURATION_MS;
 
   // If session was fresh but no longer is, update it
   if (row.fresh && !isFresh) {
@@ -86,7 +86,7 @@ export const validateSession = async (sessionId) => {
       id: row.session_id,
       userId: row.user_id,
       expiresAt: row.expires_at,
-      fresh: isFresh
+      fresh: isFresh,
     },
     user: {
       id: row.id,
@@ -99,8 +99,8 @@ export const validateSession = async (sessionId) => {
       specializations: row.specializations,
       isActive: row.is_active,
       preferredLanguage: row.preferred_language,
-      notificationPreferences: row.notification_preferences
-    }
+      notificationPreferences: row.notification_preferences,
+    },
   };
 };
 
@@ -130,10 +130,7 @@ export const invalidateAllUserSessions = async (userId) => {
 export const extendSession = async (sessionId) => {
   const expiresAt = new Date(Date.now() + SESSION_DURATION_MS);
 
-  await query(
-    'UPDATE sessions SET expires_at = $1 WHERE id = $2',
-    [expiresAt, sessionId]
-  );
+  await query('UPDATE sessions SET expires_at = $1 WHERE id = $2', [expiresAt, sessionId]);
 
   return expiresAt;
 };
@@ -152,14 +149,14 @@ export const getUserSessions = async (userId) => {
     [userId]
   );
 
-  return result.rows.map(row => ({
-    id: row.id.substring(0, 8) + '...', // Mask full ID for security
+  return result.rows.map((row) => ({
+    id: `${row.id.substring(0, 8)}...`, // Mask full ID for security
     createdAt: row.created_at,
     expiresAt: row.expires_at,
     ipAddress: row.ip_address,
     userAgent: row.user_agent,
     fresh: row.fresh,
-    current: false // Will be set by caller
+    current: false, // Will be set by caller
   }));
 };
 
@@ -168,10 +165,7 @@ export const getUserSessions = async (userId) => {
  * @param {string} sessionId - Session ID
  */
 export const refreshSessionFreshness = async (sessionId) => {
-  await query(
-    `UPDATE sessions SET fresh = true, created_at = NOW() WHERE id = $1`,
-    [sessionId]
-  );
+  await query(`UPDATE sessions SET fresh = true, created_at = NOW() WHERE id = $1`, [sessionId]);
 };
 
 /**
@@ -192,5 +186,5 @@ export default {
   extendSession,
   getUserSessions,
   refreshSessionFreshness,
-  cleanupExpiredSessions
+  cleanupExpiredSessions,
 };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import _React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -9,10 +9,10 @@ import {
   Mail,
   MapPin,
   User,
-  Activity,
+  _Activity,
   Plus,
   Download,
-  Trash2
+  Trash2,
 } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -25,9 +25,10 @@ import {
   maskFodselsnummer,
   extractBirthDate,
   extractGender,
-  calculateAge
+  calculateAge,
 } from '../utils/norwegianIdValidation';
 import { useAuth } from '../hooks/useAuth';
+import { gdprAPI } from '../services/api';
 
 /**
  * Patient Detail View
@@ -105,25 +106,24 @@ export const PatientDetail = () => {
                 <h1 className="text-2xl font-bold text-slate-900">
                   {patient.firstName} {patient.lastName}
                 </h1>
-                <p className="text-sm text-slate-600 mt-1">
-                  Patient ID: {patient.id}
-                </p>
+                <p className="text-sm text-slate-600 mt-1">Patient ID: {patient.id}</p>
               </div>
 
-              <Badge variant={
-                patient.status === 'ACTIVE' ? 'success' :
-                patient.status === 'INACTIVE' ? 'warning' : 'danger'
-              }>
+              <Badge
+                variant={
+                  patient.status === 'ACTIVE'
+                    ? 'success'
+                    : patient.status === 'INACTIVE'
+                      ? 'warning'
+                      : 'danger'
+                }
+              >
                 {patient.status}
               </Badge>
             </div>
 
             <div className="flex items-center gap-3">
-              <Button
-                variant="primary"
-                onClick={() => setShowSoapBuilder(true)}
-                icon={Plus}
-              >
+              <Button variant="primary" onClick={() => setShowSoapBuilder(true)} icon={Plus}>
                 New Note
               </Button>
 
@@ -156,7 +156,8 @@ export const PatientDetail = () => {
                   <div className="flex justify-center">
                     <div className="w-24 h-24 rounded-full bg-teal-100 flex items-center justify-center">
                       <span className="text-3xl font-semibold text-teal-700">
-                        {patient.firstName?.[0]}{patient.lastName?.[0]}
+                        {patient.firstName?.[0]}
+                        {patient.lastName?.[0]}
                       </span>
                     </div>
                   </div>
@@ -176,7 +177,9 @@ export const PatientDetail = () => {
                         <label className="text-xs text-slate-500 uppercase">Date of Birth</label>
                         <p className="text-sm text-slate-900 mt-1">
                           {birthDate.toLocaleDateString('nb-NO')}
-                          {age !== null && <span className="text-slate-500 ml-2">({age} years)</span>}
+                          {age !== null && (
+                            <span className="text-slate-500 ml-2">({age} years)</span>
+                          )}
                         </p>
                       </div>
                     )}
@@ -225,8 +228,10 @@ export const PatientDetail = () => {
                       <div>
                         <label className="text-xs text-slate-500">Address</label>
                         <p className="text-sm text-slate-900">
-                          {patient.address.street}<br />
-                          {patient.address.postalCode} {patient.address.city}<br />
+                          {patient.address.street}
+                          <br />
+                          {patient.address.postalCode} {patient.address.city}
+                          <br />
                           {patient.address.country || 'Norway'}
                         </p>
                       </div>
@@ -245,9 +250,7 @@ export const PatientDetail = () => {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-slate-600">Total Visits</span>
-                    <span className="font-semibold text-slate-900">
-                      {patient.totalVisits || 0}
-                    </span>
+                    <span className="font-semibold text-slate-900">{patient.totalVisits || 0}</span>
                   </div>
 
                   {patient.lastVisit && (
@@ -286,7 +289,7 @@ export const PatientDetail = () => {
                       icon={Download}
                       onClick={async () => {
                         // Export patient data (GDPR right to data portability)
-                        const blob = await api.gdpr.exportPatientData(patientId);
+                        const blob = await gdprAPI.exportPatientData(patientId);
                         const url = window.URL.createObjectURL(blob);
                         const a = document.createElement('a');
                         a.href = url;
@@ -303,7 +306,11 @@ export const PatientDetail = () => {
                       className="w-full justify-start"
                       icon={Trash2}
                       onClick={() => {
-                        if (confirm('Are you sure you want to delete this patient? This action cannot be undone.')) {
+                        if (
+                          confirm(
+                            'Are you sure you want to delete this patient? This action cannot be undone.'
+                          )
+                        ) {
                           // Delete patient data (GDPR right to be forgotten)
                           // Implementation needed
                         }
@@ -356,7 +363,7 @@ export const PatientDetail = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {encounterList.map(encounter => (
+                    {encounterList.map((encounter) => (
                       <div
                         key={encounter.id}
                         className="border border-slate-200 rounded-lg p-4 hover:border-teal-300 hover:shadow-md transition-all cursor-pointer"
@@ -414,7 +421,7 @@ export const PatientDetail = () => {
                         {encounter.diagnosisCodes && encounter.diagnosisCodes.length > 0 && (
                           <div className="mt-3 pt-3 border-t border-slate-200">
                             <div className="flex flex-wrap gap-2">
-                              {encounter.diagnosisCodes.map(code => (
+                              {encounter.diagnosisCodes.map((code) => (
                                 <Badge key={code} variant="secondary" size="sm">
                                   {code}
                                 </Badge>

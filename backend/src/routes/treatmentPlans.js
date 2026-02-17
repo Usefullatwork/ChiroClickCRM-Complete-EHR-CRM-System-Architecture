@@ -79,7 +79,9 @@ router.get(
   async (req, res) => {
     const { organizationId } = req;
     const plan = await treatmentPlanService.getPlan(req.params.id, organizationId);
-    if (!plan) return res.status(404).json({ error: 'Treatment plan not found' });
+    if (!plan) {
+      return res.status(404).json({ error: 'Treatment plan not found' });
+    }
     res.json(plan);
   }
 );
@@ -96,7 +98,9 @@ router.patch(
   async (req, res) => {
     const { organizationId } = req;
     const plan = await treatmentPlanService.updatePlan(req.params.id, organizationId, req.body);
-    if (!plan) return res.status(404).json({ error: 'Treatment plan not found' });
+    if (!plan) {
+      return res.status(404).json({ error: 'Treatment plan not found' });
+    }
     res.json(plan);
   }
 );
@@ -112,7 +116,9 @@ router.get(
   validate(getPlanProgressSchema),
   async (req, res) => {
     const progress = await treatmentPlanService.getPlanProgress(req.params.id);
-    if (!progress) return res.status(404).json({ error: 'Treatment plan not found' });
+    if (!progress) {
+      return res.status(404).json({ error: 'Treatment plan not found' });
+    }
     res.json(progress);
   }
 );
@@ -147,7 +153,9 @@ router.patch(
   validate(updateMilestoneSchema),
   async (req, res) => {
     const milestone = await treatmentPlanService.updateMilestone(req.params.milestoneId, req.body);
-    if (!milestone) return res.status(404).json({ error: 'Milestone not found' });
+    if (!milestone) {
+      return res.status(404).json({ error: 'Milestone not found' });
+    }
     res.json(milestone);
   }
 );
@@ -182,7 +190,9 @@ router.post(
   validate(completeSessionSchema),
   async (req, res) => {
     const session = await treatmentPlanService.completeSession(req.params.sessionId, req.body);
-    if (!session) return res.status(404).json({ error: 'Session not found' });
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
     res.json(session);
   }
 );

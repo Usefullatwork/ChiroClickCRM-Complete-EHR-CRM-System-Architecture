@@ -16,8 +16,10 @@ const AI_FEEDBACK_API = {
   getMyFeedback: (params) => apiClient.get('/ai/feedback/mine', { params }),
   getMyStats: () => apiClient.get('/ai/feedback/stats'),
   getPerformanceMetrics: (params) => apiClient.get('/ai/feedback/metrics', { params }),
-  getSuggestionsNeedingReview: (limit) => apiClient.get('/ai/feedback/review-needed', { params: { limit } }),
-  exportFeedback: (params) => apiClient.get('/ai/feedback/export', { params, responseType: 'blob' }),
+  getSuggestionsNeedingReview: (limit) =>
+    apiClient.get('/ai/feedback/review-needed', { params: { limit } }),
+  exportFeedback: (params) =>
+    apiClient.get('/ai/feedback/export', { params, responseType: 'blob' }),
   getRetrainingStatus: () => apiClient.get('/ai/feedback/retraining-status'),
 };
 
@@ -79,9 +81,15 @@ export const useMyAIFeedback = (options = {}) => {
     ['ai-feedback', 'mine', { limit, offset, suggestionType, startDate, endDate }],
     async () => {
       const params = { limit, offset };
-      if (suggestionType) params.suggestionType = suggestionType;
-      if (startDate) params.startDate = startDate;
-      if (endDate) params.endDate = endDate;
+      if (suggestionType) {
+        params.suggestionType = suggestionType;
+      }
+      if (startDate) {
+        params.startDate = startDate;
+      }
+      if (endDate) {
+        params.endDate = endDate;
+      }
 
       const response = await AI_FEEDBACK_API.getMyFeedback(params);
       return response.data;
@@ -143,9 +151,15 @@ export const useAIPerformanceMetrics = (options = {}) => {
     ['ai-performance-metrics', { groupBy, startDate, endDate, suggestionType }],
     async () => {
       const params = { groupBy };
-      if (startDate) params.startDate = startDate;
-      if (endDate) params.endDate = endDate;
-      if (suggestionType) params.suggestionType = suggestionType;
+      if (startDate) {
+        params.startDate = startDate;
+      }
+      if (endDate) {
+        params.endDate = endDate;
+      }
+      if (suggestionType) {
+        params.suggestionType = suggestionType;
+      }
 
       const response = await AI_FEEDBACK_API.getPerformanceMetrics(params);
       return response.data;
@@ -214,9 +228,15 @@ export const useExportAIFeedback = () => {
   return useMutation(
     async ({ format = 'csv', startDate, endDate, suggestionType }) => {
       const params = { format };
-      if (startDate) params.startDate = startDate;
-      if (endDate) params.endDate = endDate;
-      if (suggestionType) params.suggestionType = suggestionType;
+      if (startDate) {
+        params.startDate = startDate;
+      }
+      if (endDate) {
+        params.endDate = endDate;
+      }
+      if (suggestionType) {
+        params.suggestionType = suggestionType;
+      }
 
       const response = await AI_FEEDBACK_API.exportFeedback(params);
 
@@ -254,7 +274,7 @@ export const useExportAIFeedback = () => {
  * @returns {object} Combined feedback operations and data
  */
 export const useAIFeedback = (options = {}) => {
-  const { fetchHistory = true, fetchStats = true, feedbackOptions = {} } = options;
+  const { fetchHistory = true, _fetchStats = true, feedbackOptions = {} } = options;
 
   // Mutations
   const submitFeedbackMutation = useSubmitAIFeedback();

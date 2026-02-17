@@ -38,8 +38,15 @@ export const getAppointmentById = async (organizationId, appointmentId) => {
 export const updateAppointment = async (organizationId, appointmentId, updateData) => {
   try {
     const allowedFields = [
-      'patient_id', 'practitioner_id', 'start_time', 'end_time',
-      'appointment_type', 'status', 'patient_notes', 'recurring_pattern', 'recurring_end_date'
+      'patient_id',
+      'practitioner_id',
+      'start_time',
+      'end_time',
+      'appointment_type',
+      'status',
+      'patient_notes',
+      'recurring_pattern',
+      'recurring_end_date',
     ];
 
     const updateFields = [];
@@ -66,7 +73,9 @@ export const updateAppointment = async (organizationId, appointmentId, updateDat
       params
     );
 
-    if (result.rows.length === 0) return null;
+    if (result.rows.length === 0) {
+      return null;
+    }
 
     logger.info('Appointment updated:', { organizationId, appointmentId });
     return result.rows[0];
@@ -89,7 +98,9 @@ export const confirmAppointment = async (organizationId, appointmentId, userId) 
       [organizationId, appointmentId, userId]
     );
 
-    if (result.rows.length === 0) return null;
+    if (result.rows.length === 0) {
+      return null;
+    }
 
     logger.info('Appointment confirmed:', { organizationId, appointmentId, confirmedBy: userId });
     return result.rows[0];
@@ -112,7 +123,9 @@ export const checkInAppointment = async (organizationId, appointmentId) => {
       [organizationId, appointmentId]
     );
 
-    if (result.rows.length === 0) return null;
+    if (result.rows.length === 0) {
+      return null;
+    }
 
     logger.info('Appointment checked in:', { organizationId, appointmentId });
     return result.rows[0];
@@ -133,7 +146,7 @@ export const getAllAppointments = async (organizationId, options = {}) => {
     endDate = null,
     practitionerId = null,
     patientId = null,
-    status = null
+    status = null,
   } = options;
 
   const offset = (page - 1) * limit;
@@ -173,10 +186,7 @@ export const getAllAppointments = async (organizationId, options = {}) => {
       paramIndex++;
     }
 
-    const countResult = await query(
-      `SELECT COUNT(*) FROM appointments a ${whereClause}`,
-      params
-    );
+    const countResult = await query(`SELECT COUNT(*) FROM appointments a ${whereClause}`, params);
     const total = parseInt(countResult.rows[0].count);
 
     params.push(limit, offset);
@@ -201,8 +211,8 @@ export const getAllAppointments = async (organizationId, options = {}) => {
         page: parseInt(page),
         limit: parseInt(limit),
         total,
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     };
   } catch (error) {
     logger.error('Error getting appointments:', error);
@@ -239,13 +249,13 @@ export const createAppointment = async (organizationId, appointmentData) => {
         'SCHEDULED',
         appointmentData.recurring_pattern || null,
         appointmentData.recurring_end_date || null,
-        appointmentData.patient_notes || null
+        appointmentData.patient_notes || null,
       ]
     );
 
     logger.info('Appointment created:', {
       organizationId,
-      appointmentId: result.rows[0].id
+      appointmentId: result.rows[0].id,
     });
 
     return result.rows[0];
@@ -258,7 +268,7 @@ export const createAppointment = async (organizationId, appointmentData) => {
 /**
  * Update appointment status
  */
-export const updateAppointmentStatus = async (organizationId, appointmentId, status, userId) => {
+export const updateAppointmentStatus = async (organizationId, appointmentId, status, _userId) => {
   try {
     const result = await query(
       `UPDATE appointments
@@ -275,7 +285,7 @@ export const updateAppointmentStatus = async (organizationId, appointmentId, sta
     logger.info('Appointment status updated:', {
       organizationId,
       appointmentId,
-      status
+      status,
     });
 
     return result.rows[0];
@@ -310,7 +320,7 @@ export const cancelAppointment = async (organizationId, appointmentId, reason, u
       organizationId,
       appointmentId,
       reason,
-      cancelledBy: userId
+      cancelledBy: userId,
     });
 
     return result.rows[0];
@@ -354,5 +364,5 @@ export default {
   confirmAppointment,
   checkInAppointment,
   cancelAppointment,
-  getAppointmentStats
+  getAppointmentStats,
 };

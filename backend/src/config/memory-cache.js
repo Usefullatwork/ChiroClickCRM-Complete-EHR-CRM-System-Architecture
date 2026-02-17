@@ -40,7 +40,9 @@ const set = (key, value, ttlSeconds = 0) => {
 const get = (key) => {
   const prefixed = prefixKey(key);
   const value = store.get(prefixed);
-  if (value === undefined) return null;
+  if (value === undefined) {
+    return null;
+  }
   try {
     return JSON.parse(value);
   } catch {
@@ -65,7 +67,7 @@ const del = (key) => {
  */
 const delPattern = (pattern) => {
   const prefixed = prefixKey(pattern);
-  const regex = new RegExp('^' + prefixed.replace(/\*/g, '.*') + '$');
+  const regex = new RegExp(`^${prefixed.replace(/\*/g, '.*')}$`);
   let count = 0;
   for (const key of store.keys()) {
     if (regex.test(key)) {
@@ -101,7 +103,9 @@ const incr = (key) => {
  */
 const expire = (key, ttlSeconds) => {
   const prefixed = prefixKey(key);
-  if (!store.has(prefixed)) return false;
+  if (!store.has(prefixed)) {
+    return false;
+  }
   if (timers.has(prefixed)) {
     clearTimeout(timers.get(prefixed));
   }
@@ -145,24 +149,41 @@ export const closeRedis = async () => {
 export const redisHealthCheck = async () => true;
 
 export const redisCache = {
-  async get(key) { return get(key); },
+  async get(key) {
+    return get(key);
+  },
   async set(key, value, ttlSeconds = 300) {
     set(key, value, ttlSeconds);
     return true;
   },
-  async del(key) { del(key); return true; },
-  async delPattern(pattern) { return delPattern(pattern); },
+  async del(key) {
+    del(key);
+    return true;
+  },
+  async delPattern(pattern) {
+    return delPattern(pattern);
+  },
   async getOrSet(key, fetchFn, ttlSeconds = 300) {
     const cached = get(key);
-    if (cached !== null) return cached;
+    if (cached !== null) {
+      return cached;
+    }
     const value = await fetchFn();
     set(key, value, ttlSeconds);
     return value;
   },
-  async exists(key) { return exists(key); },
-  async expire(key, ttlSeconds) { return expire(key, ttlSeconds); },
-  async incr(key) { return incr(key); },
-  async ttl(key) { return -1; }, // TTL not tracked precisely in memory
+  async exists(key) {
+    return exists(key);
+  },
+  async expire(key, ttlSeconds) {
+    return expire(key, ttlSeconds);
+  },
+  async incr(key) {
+    return incr(key);
+  },
+  async ttl(_key) {
+    return -1;
+  }, // TTL not tracked precisely in memory
 };
 
 export const redisRateLimiter = {
@@ -175,12 +196,16 @@ export const redisRateLimiter = {
     let entries = [];
     try {
       const stored = store.get(prefixed);
-      if (stored) entries = JSON.parse(stored);
-    } catch { /* ignore */ }
+      if (stored) {
+        entries = JSON.parse(stored);
+      }
+    } catch {
+      /* ignore */
+    }
 
     // Remove old entries outside window
     const windowStart = now - windowSeconds * 1000;
-    entries = entries.filter(ts => ts > windowStart);
+    entries = entries.filter((ts) => ts > windowStart);
 
     if (entries.length >= limit) {
       return { allowed: false, remaining: 0, resetAt: windowStart + windowSeconds * 1000 };
@@ -190,7 +215,9 @@ export const redisRateLimiter = {
     store.set(prefixed, JSON.stringify(entries));
 
     // Auto-expire
-    if (timers.has(prefixed)) clearTimeout(timers.get(prefixed));
+    if (timers.has(prefixed)) {
+      clearTimeout(timers.get(prefixed));
+    }
     const timer = setTimeout(() => {
       store.delete(prefixed);
       timers.delete(prefixed);
@@ -198,7 +225,11 @@ export const redisRateLimiter = {
     timer.unref?.();
     timers.set(prefixed, timer);
 
-    return { allowed: true, remaining: limit - entries.length, resetAt: now + windowSeconds * 1000 };
+    return {
+      allowed: true,
+      remaining: limit - entries.length,
+      resetAt: now + windowSeconds * 1000,
+    };
   },
 };
 

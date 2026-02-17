@@ -14,10 +14,10 @@
  * - Bilingual support (EN/NO)
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, _useEffect, useCallback } from 'react';
 import {
   Play,
-  Pause,
+  _Pause,
   Plus,
   Trash2,
   ChevronDown,
@@ -31,17 +31,17 @@ import {
   Calendar,
   Gift,
   Users,
-  AlertCircle,
+  _AlertCircle,
   CheckCircle,
   XCircle,
   Settings,
   Eye,
-  History,
+  _History,
   Save,
   RefreshCw,
   Zap,
-  ArrowRight,
-  GripVertical,
+  _ArrowRight,
+  _GripVertical,
 } from 'lucide-react';
 
 // =============================================================================
@@ -54,57 +54,75 @@ const TRIGGER_TYPES = {
     label: { en: 'Patient Created', no: 'Ny pasient opprettet' },
     icon: UserPlus,
     color: 'blue',
-    description: { en: 'Triggered when a new patient is created', no: 'Utloses nar en ny pasient opprettes' }
+    description: {
+      en: 'Triggered when a new patient is created',
+      no: 'Utloses nar en ny pasient opprettes',
+    },
   },
   APPOINTMENT_SCHEDULED: {
     id: 'APPOINTMENT_SCHEDULED',
     label: { en: 'Appointment Scheduled', no: 'Time bestilt' },
     icon: Calendar,
     color: 'green',
-    description: { en: 'Triggered when an appointment is booked', no: 'Utloses nar en time bestilles' }
+    description: {
+      en: 'Triggered when an appointment is booked',
+      no: 'Utloses nar en time bestilles',
+    },
   },
   APPOINTMENT_COMPLETED: {
     id: 'APPOINTMENT_COMPLETED',
     label: { en: 'Appointment Completed', no: 'Time fullfort' },
     icon: CheckCircle,
     color: 'emerald',
-    description: { en: 'Triggered when an appointment is completed', no: 'Utloses nar en time er fullfort' }
+    description: {
+      en: 'Triggered when an appointment is completed',
+      no: 'Utloses nar en time er fullfort',
+    },
   },
   APPOINTMENT_MISSED: {
     id: 'APPOINTMENT_MISSED',
     label: { en: 'Appointment Missed', no: 'Uteblitt fra time' },
     icon: XCircle,
     color: 'red',
-    description: { en: 'Triggered when patient misses appointment', no: 'Utloses nar pasient uteblir' }
+    description: {
+      en: 'Triggered when patient misses appointment',
+      no: 'Utloses nar pasient uteblir',
+    },
   },
   DAYS_SINCE_VISIT: {
     id: 'DAYS_SINCE_VISIT',
     label: { en: 'Days Since Last Visit', no: 'Dager siden siste besok' },
     icon: Clock,
     color: 'orange',
-    description: { en: 'Triggered after X days without visit', no: 'Utloses etter X dager uten besok' }
+    description: {
+      en: 'Triggered after X days without visit',
+      no: 'Utloses etter X dager uten besok',
+    },
   },
   BIRTHDAY: {
     id: 'BIRTHDAY',
     label: { en: 'Patient Birthday', no: 'Pasientens bursdag' },
     icon: Gift,
     color: 'purple',
-    description: { en: 'Triggered on patient birthday', no: 'Utloses pa pasientens bursdag' }
+    description: { en: 'Triggered on patient birthday', no: 'Utloses pa pasientens bursdag' },
   },
   LIFECYCLE_CHANGE: {
     id: 'LIFECYCLE_CHANGE',
     label: { en: 'Lifecycle Stage Changed', no: 'Livssyklusstatus endret' },
     icon: RefreshCw,
     color: 'indigo',
-    description: { en: 'Triggered when lifecycle stage changes', no: 'Utloses nar livssyklusstatus endres' }
+    description: {
+      en: 'Triggered when lifecycle stage changes',
+      no: 'Utloses nar livssyklusstatus endres',
+    },
   },
   CUSTOM: {
     id: 'CUSTOM',
     label: { en: 'Custom Trigger', no: 'Egendefinert trigger' },
     icon: Zap,
     color: 'gray',
-    description: { en: 'Custom event trigger', no: 'Egendefinert hendelsestrigger' }
-  }
+    description: { en: 'Custom event trigger', no: 'Egendefinert hendelsestrigger' },
+  },
 };
 
 const ACTION_TYPES = {
@@ -112,54 +130,69 @@ const ACTION_TYPES = {
     id: 'SEND_SMS',
     label: { en: 'Send SMS', no: 'Send SMS' },
     icon: MessageSquare,
-    color: 'green'
+    color: 'green',
   },
   SEND_EMAIL: {
     id: 'SEND_EMAIL',
     label: { en: 'Send Email', no: 'Send e-post' },
     icon: Mail,
-    color: 'blue'
+    color: 'blue',
   },
   CREATE_FOLLOW_UP: {
     id: 'CREATE_FOLLOW_UP',
     label: { en: 'Create Follow-up', no: 'Opprett oppfolging' },
     icon: Calendar,
-    color: 'orange'
+    color: 'orange',
   },
   UPDATE_STATUS: {
     id: 'UPDATE_STATUS',
     label: { en: 'Update Status', no: 'Oppdater status' },
     icon: RefreshCw,
-    color: 'purple'
+    color: 'purple',
   },
   UPDATE_LIFECYCLE: {
     id: 'UPDATE_LIFECYCLE',
     label: { en: 'Update Lifecycle', no: 'Oppdater livssyklus' },
     icon: Users,
-    color: 'indigo'
+    color: 'indigo',
   },
   NOTIFY_STAFF: {
     id: 'NOTIFY_STAFF',
     label: { en: 'Notify Staff', no: 'Varsle ansatte' },
     icon: Bell,
-    color: 'yellow'
+    color: 'yellow',
   },
   ADD_TAG: {
     id: 'ADD_TAG',
     label: { en: 'Add Tag', no: 'Legg til etikett' },
     icon: Tag,
-    color: 'pink'
-  }
+    color: 'pink',
+  },
 };
 
 const CONDITION_FIELDS = [
-  { id: 'status', label: { en: 'Patient Status', no: 'Pasientstatus' }, type: 'select', options: ['ACTIVE', 'INACTIVE', 'FINISHED'] },
-  { id: 'lifecycle_stage', label: { en: 'Lifecycle Stage', no: 'Livssyklusstatus' }, type: 'select', options: ['NEW', 'ONBOARDING', 'ACTIVE', 'AT_RISK', 'INACTIVE', 'LOST', 'REACTIVATED'] },
+  {
+    id: 'status',
+    label: { en: 'Patient Status', no: 'Pasientstatus' },
+    type: 'select',
+    options: ['ACTIVE', 'INACTIVE', 'FINISHED'],
+  },
+  {
+    id: 'lifecycle_stage',
+    label: { en: 'Lifecycle Stage', no: 'Livssyklusstatus' },
+    type: 'select',
+    options: ['NEW', 'ONBOARDING', 'ACTIVE', 'AT_RISK', 'INACTIVE', 'LOST', 'REACTIVATED'],
+  },
   { id: 'total_visits', label: { en: 'Total Visits', no: 'Totalt besok' }, type: 'number' },
   { id: 'consent_sms', label: { en: 'SMS Consent', no: 'SMS-samtykke' }, type: 'boolean' },
   { id: 'consent_email', label: { en: 'Email Consent', no: 'E-post-samtykke' }, type: 'boolean' },
   { id: 'is_vip', label: { en: 'VIP Patient', no: 'VIP-pasient' }, type: 'boolean' },
-  { id: 'preferred_contact_method', label: { en: 'Preferred Contact', no: 'Foretrukket kontakt' }, type: 'select', options: ['SMS', 'EMAIL', 'PHONE'] }
+  {
+    id: 'preferred_contact_method',
+    label: { en: 'Preferred Contact', no: 'Foretrukket kontakt' },
+    type: 'select',
+    options: ['SMS', 'EMAIL', 'PHONE'],
+  },
 ];
 
 const OPERATORS = {
@@ -169,7 +202,7 @@ const OPERATORS = {
   less_than: { label: { en: 'Less Than', no: 'Mindre enn' } },
   contains: { label: { en: 'Contains', no: 'Inneholder' } },
   is_empty: { label: { en: 'Is Empty', no: 'Er tom' } },
-  is_not_empty: { label: { en: 'Is Not Empty', no: 'Er ikke tom' } }
+  is_not_empty: { label: { en: 'Is Not Empty', no: 'Er ikke tom' } },
 };
 
 // =============================================================================
@@ -182,10 +215,10 @@ export default function WorkflowBuilder({
   onTest,
   onCancel,
   testPatients = [],
-  templates = [],
+  _templates = [],
   staff = [],
   language = 'en',
-  className = ''
+  className = '',
 }) {
   // Workflow state
   const [name, setName] = useState(workflow?.name || '');
@@ -262,7 +295,7 @@ export default function WorkflowBuilder({
       required: 'Required',
       errorName: 'Workflow name is required',
       errorTrigger: 'Please select a trigger type',
-      errorActions: 'Add at least one action'
+      errorActions: 'Add at least one action',
     },
     no: {
       title: workflow ? 'Rediger arbeidsflyt' : 'Opprett arbeidsflyt',
@@ -318,8 +351,8 @@ export default function WorkflowBuilder({
       required: 'Pakrevd',
       errorName: 'Arbeidsflytens navn er pakrevd',
       errorTrigger: 'Velg en triggertype',
-      errorActions: 'Legg til minst en handling'
-    }
+      errorActions: 'Legg til minst en handling',
+    },
   };
 
   const t = labels[language] || labels.en;
@@ -346,7 +379,9 @@ export default function WorkflowBuilder({
 
   // Handle save
   const handleSave = async () => {
-    if (!validate()) return;
+    if (!validate()) {
+      return;
+    }
 
     setIsSaving(true);
     try {
@@ -358,7 +393,7 @@ export default function WorkflowBuilder({
         conditions,
         actions,
         is_active: isActive,
-        max_runs_per_patient: maxRunsPerPatient
+        max_runs_per_patient: maxRunsPerPatient,
       };
 
       if (workflow?.id) {
@@ -375,7 +410,9 @@ export default function WorkflowBuilder({
 
   // Handle test
   const handleTest = async () => {
-    if (!testPatientId) return;
+    if (!testPatientId) {
+      return;
+    }
 
     setIsTesting(true);
     try {
@@ -385,9 +422,9 @@ export default function WorkflowBuilder({
           trigger_type: triggerType,
           trigger_config: triggerConfig,
           conditions,
-          actions
+          actions,
         },
-        patient_id: testPatientId
+        patient_id: testPatientId,
       });
       setTestResult(result);
     } catch (error) {
@@ -400,10 +437,7 @@ export default function WorkflowBuilder({
 
   // Add condition
   const addCondition = () => {
-    setConditions([
-      ...conditions,
-      { field: '', operator: 'equals', value: '' }
-    ]);
+    setConditions([...conditions, { field: '', operator: 'equals', value: '' }]);
   };
 
   // Remove condition
@@ -469,7 +503,9 @@ export default function WorkflowBuilder({
   // Move action
   const moveAction = (index, direction) => {
     const newIndex = index + direction;
-    if (newIndex < 0 || newIndex >= actions.length) return;
+    if (newIndex < 0 || newIndex >= actions.length) {
+      return;
+    }
 
     const newActions = [...actions];
     [newActions[index], newActions[newIndex]] = [newActions[newIndex], newActions[index]];
@@ -478,20 +514,22 @@ export default function WorkflowBuilder({
 
   // Render trigger config
   const renderTriggerConfig = () => {
-    if (!triggerType) return null;
+    if (!triggerType) {
+      return null;
+    }
 
     switch (triggerType) {
       case 'DAYS_SINCE_VISIT':
         return (
           <div className="mt-4 space-y-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t.days}
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t.days}</label>
               <input
                 type="number"
                 value={triggerConfig.days || 42}
-                onChange={(e) => setTriggerConfig({ ...triggerConfig, days: parseInt(e.target.value) })}
+                onChange={(e) =>
+                  setTriggerConfig({ ...triggerConfig, days: parseInt(e.target.value) })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 min="1"
               />
@@ -503,13 +541,13 @@ export default function WorkflowBuilder({
         return (
           <div className="mt-4 space-y-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t.daysBefore}
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t.daysBefore}</label>
               <input
                 type="number"
                 value={triggerConfig.days_before || 0}
-                onChange={(e) => setTriggerConfig({ ...triggerConfig, days_before: parseInt(e.target.value) })}
+                onChange={(e) =>
+                  setTriggerConfig({ ...triggerConfig, days_before: parseInt(e.target.value) })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 min="0"
               />
@@ -527,13 +565,19 @@ export default function WorkflowBuilder({
               </label>
               <select
                 value={triggerConfig.appointment_type || ''}
-                onChange={(e) => setTriggerConfig({ ...triggerConfig, appointment_type: e.target.value })}
+                onChange={(e) =>
+                  setTriggerConfig({ ...triggerConfig, appointment_type: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">{language === 'no' ? 'Alle typer' : 'All types'}</option>
                 <option value="INITIAL">{language === 'no' ? 'Forstegangstime' : 'Initial'}</option>
-                <option value="FOLLOWUP">{language === 'no' ? 'Oppfolgingstime' : 'Follow-up'}</option>
-                <option value="MAINTENANCE">{language === 'no' ? 'Vedlikeholdstime' : 'Maintenance'}</option>
+                <option value="FOLLOWUP">
+                  {language === 'no' ? 'Oppfolgingstime' : 'Follow-up'}
+                </option>
+                <option value="MAINTENANCE">
+                  {language === 'no' ? 'Vedlikeholdstime' : 'Maintenance'}
+                </option>
               </select>
             </div>
           </div>
@@ -552,9 +596,13 @@ export default function WorkflowBuilder({
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">{language === 'no' ? 'Alle' : 'Any'}</option>
-                {['NEW', 'ONBOARDING', 'ACTIVE', 'AT_RISK', 'INACTIVE', 'LOST', 'REACTIVATED'].map(stage => (
-                  <option key={stage} value={stage}>{stage}</option>
-                ))}
+                {['NEW', 'ONBOARDING', 'ACTIVE', 'AT_RISK', 'INACTIVE', 'LOST', 'REACTIVATED'].map(
+                  (stage) => (
+                    <option key={stage} value={stage}>
+                      {stage}
+                    </option>
+                  )
+                )}
               </select>
             </div>
             <div>
@@ -567,9 +615,13 @@ export default function WorkflowBuilder({
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">{language === 'no' ? 'Alle' : 'Any'}</option>
-                {['NEW', 'ONBOARDING', 'ACTIVE', 'AT_RISK', 'INACTIVE', 'LOST', 'REACTIVATED'].map(stage => (
-                  <option key={stage} value={stage}>{stage}</option>
-                ))}
+                {['NEW', 'ONBOARDING', 'ACTIVE', 'AT_RISK', 'INACTIVE', 'LOST', 'REACTIVATED'].map(
+                  (stage) => (
+                    <option key={stage} value={stage}>
+                      {stage}
+                    </option>
+                  )
+                )}
               </select>
             </div>
           </div>
@@ -583,15 +635,15 @@ export default function WorkflowBuilder({
   // Render action config
   const renderActionConfig = (action, index) => {
     const actionType = ACTION_TYPES[action.type];
-    if (!actionType) return null;
+    if (!actionType) {
+      return null;
+    }
 
     return (
       <div className="space-y-3">
         {/* Delay */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t.delayHours}
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t.delayHours}</label>
           <input
             type="number"
             value={action.delay_hours || 0}
@@ -604,9 +656,7 @@ export default function WorkflowBuilder({
         {/* Type-specific config */}
         {action.type === 'SEND_SMS' && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t.message} *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t.message} *</label>
             <textarea
               value={action.message || ''}
               onChange={(e) => updateAction(index, { message: e.target.value })}
@@ -621,9 +671,7 @@ export default function WorkflowBuilder({
         {action.type === 'SEND_EMAIL' && (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t.subject} *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t.subject} *</label>
               <input
                 type="text"
                 value={action.subject || ''}
@@ -632,9 +680,7 @@ export default function WorkflowBuilder({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t.body} *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t.body} *</label>
               <textarea
                 value={action.body || ''}
                 onChange={(e) => updateAction(index, { body: e.target.value })}
@@ -650,9 +696,7 @@ export default function WorkflowBuilder({
           <>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t.priority}
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t.priority}</label>
                 <select
                   value={action.priority || 'MEDIUM'}
                   onChange={(e) => updateAction(index, { priority: e.target.value })}
@@ -689,17 +733,17 @@ export default function WorkflowBuilder({
             </div>
             {staff.length > 0 && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t.assignTo}
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t.assignTo}</label>
                 <select
                   value={action.assigned_to || ''}
                   onChange={(e) => updateAction(index, { assigned_to: e.target.value || null })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">{language === 'no' ? 'Ikke tildelt' : 'Unassigned'}</option>
-                  {staff.map(s => (
-                    <option key={s.id} value={s.id}>{s.first_name} {s.last_name}</option>
+                  {staff.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.first_name} {s.last_name}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -709,9 +753,7 @@ export default function WorkflowBuilder({
 
         {(action.type === 'UPDATE_STATUS' || action.type === 'UPDATE_LIFECYCLE') && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t.newValue} *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t.newValue} *</label>
             <select
               value={action.value || ''}
               onChange={(e) => updateAction(index, { value: e.target.value })}
@@ -726,8 +768,18 @@ export default function WorkflowBuilder({
                 </>
               ) : (
                 <>
-                  {['NEW', 'ONBOARDING', 'ACTIVE', 'AT_RISK', 'INACTIVE', 'LOST', 'REACTIVATED'].map(stage => (
-                    <option key={stage} value={stage}>{stage}</option>
+                  {[
+                    'NEW',
+                    'ONBOARDING',
+                    'ACTIVE',
+                    'AT_RISK',
+                    'INACTIVE',
+                    'LOST',
+                    'REACTIVATED',
+                  ].map((stage) => (
+                    <option key={stage} value={stage}>
+                      {stage}
+                    </option>
                   ))}
                 </>
               )}
@@ -738,9 +790,7 @@ export default function WorkflowBuilder({
         {action.type === 'NOTIFY_STAFF' && (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t.message} *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t.message} *</label>
               <textarea
                 value={action.message || ''}
                 onChange={(e) => updateAction(index, { message: e.target.value })}
@@ -753,7 +803,7 @@ export default function WorkflowBuilder({
                 {t.notifyRoles}
               </label>
               <div className="flex gap-3">
-                {['ADMIN', 'PRACTITIONER', 'ASSISTANT'].map(role => (
+                {['ADMIN', 'PRACTITIONER', 'ASSISTANT'].map((role) => (
                   <label key={role} className="flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -763,7 +813,7 @@ export default function WorkflowBuilder({
                         if (e.target.checked) {
                           updateAction(index, { roles: [...roles, role] });
                         } else {
-                          updateAction(index, { roles: roles.filter(r => r !== role) });
+                          updateAction(index, { roles: roles.filter((r) => r !== role) });
                         }
                       }}
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
@@ -778,9 +828,7 @@ export default function WorkflowBuilder({
 
         {action.type === 'ADD_TAG' && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t.tag} *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t.tag} *</label>
             <input
               type="text"
               value={action.tag || ''}
@@ -804,9 +852,7 @@ export default function WorkflowBuilder({
         </h2>
         <div className="flex items-center gap-3">
           <label className="flex items-center gap-2 text-sm">
-            <span className={isActive ? 'text-green-600' : 'text-gray-500'}>
-              {t.enabled}
-            </span>
+            <span className={isActive ? 'text-green-600' : 'text-gray-500'}>{t.enabled}</span>
             <button
               onClick={() => setIsActive(!isActive)}
               className={`relative w-12 h-6 rounded-full transition-colors ${
@@ -828,9 +874,7 @@ export default function WorkflowBuilder({
         {/* Name & Description */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t.name} *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t.name} *</label>
             <input
               type="text"
               value={name}
@@ -840,14 +884,10 @@ export default function WorkflowBuilder({
               }`}
               placeholder={t.namePlaceholder}
             />
-            {errors.name && (
-              <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-            )}
+            {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t.description}
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t.description}</label>
             <input
               type="text"
               value={description}
@@ -900,12 +940,16 @@ export default function WorkflowBuilder({
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
-                      <Icon className={`w-5 h-5 mb-2 ${
-                        isSelected ? `text-${trigger.color}-600` : 'text-gray-400'
-                      }`} />
-                      <p className={`text-sm font-medium ${
-                        isSelected ? `text-${trigger.color}-900` : 'text-gray-700'
-                      }`}>
+                      <Icon
+                        className={`w-5 h-5 mb-2 ${
+                          isSelected ? `text-${trigger.color}-600` : 'text-gray-400'
+                        }`}
+                      />
+                      <p
+                        className={`text-sm font-medium ${
+                          isSelected ? `text-${trigger.color}-900` : 'text-gray-700'
+                        }`}
+                      >
                         {trigger.label[language] || trigger.label.en}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
@@ -916,9 +960,7 @@ export default function WorkflowBuilder({
                 })}
               </div>
 
-              {errors.trigger && (
-                <p className="mt-2 text-sm text-red-600">{errors.trigger}</p>
-              )}
+              {errors.trigger && <p className="mt-2 text-sm text-red-600">{errors.trigger}</p>}
 
               {renderTriggerConfig()}
             </div>
@@ -968,7 +1010,7 @@ export default function WorkflowBuilder({
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="">{t.field}...</option>
-                      {CONDITION_FIELDS.map(field => (
+                      {CONDITION_FIELDS.map((field) => (
                         <option key={field.id} value={field.id}>
                           {field.label[language] || field.label.en}
                         </option>
@@ -1050,7 +1092,9 @@ export default function WorkflowBuilder({
               <div className="mt-4 space-y-4">
                 {actions.map((action, index) => {
                   const actionType = ACTION_TYPES[action.type];
-                  if (!actionType) return null;
+                  if (!actionType) {
+                    return null;
+                  }
                   const Icon = actionType.icon;
 
                   return (
@@ -1073,7 +1117,9 @@ export default function WorkflowBuilder({
                               <ChevronDown className="w-4 h-4" />
                             </button>
                           </div>
-                          <div className={`w-8 h-8 rounded-lg bg-${actionType.color}-100 flex items-center justify-center`}>
+                          <div
+                            className={`w-8 h-8 rounded-lg bg-${actionType.color}-100 flex items-center justify-center`}
+                          >
                             <Icon className={`w-4 h-4 text-${actionType.color}-600`} />
                           </div>
                           <div>
@@ -1105,9 +1151,7 @@ export default function WorkflowBuilder({
                 )}
               </div>
 
-              {errors.actions && (
-                <p className="mt-2 text-sm text-red-600">{errors.actions}</p>
-              )}
+              {errors.actions && <p className="mt-2 text-sm text-red-600">{errors.actions}</p>}
 
               {/* Add Action Buttons */}
               <div className="mt-4">
@@ -1156,9 +1200,7 @@ export default function WorkflowBuilder({
           {activeSection === 'settings' && (
             <div className="px-4 pb-4 border-t border-gray-100">
               <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t.maxRuns}
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t.maxRuns}</label>
                 <input
                   type="number"
                   value={maxRunsPerPatient}
@@ -1184,10 +1226,7 @@ export default function WorkflowBuilder({
         </button>
 
         <div className="flex items-center gap-3">
-          <button
-            onClick={onCancel}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800"
-          >
+          <button onClick={onCancel} className="px-4 py-2 text-gray-600 hover:text-gray-800">
             {t.cancel}
           </button>
           <button
@@ -1229,7 +1268,7 @@ export default function WorkflowBuilder({
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">{language === 'no' ? 'Velg...' : 'Select...'}</option>
-                  {testPatients.map(p => (
+                  {testPatients.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.first_name} {p.last_name}
                     </option>
@@ -1238,20 +1277,26 @@ export default function WorkflowBuilder({
               </div>
 
               {testResult && (
-                <div className={`p-4 rounded-lg ${
-                  testResult.success && testResult.conditions_pass
-                    ? 'bg-green-50 border border-green-200'
-                    : 'bg-red-50 border border-red-200'
-                }`}>
+                <div
+                  className={`p-4 rounded-lg ${
+                    testResult.success && testResult.conditions_pass
+                      ? 'bg-green-50 border border-green-200'
+                      : 'bg-red-50 border border-red-200'
+                  }`}
+                >
                   <div className="flex items-center gap-2 mb-2">
                     {testResult.success && testResult.conditions_pass ? (
                       <CheckCircle className="w-5 h-5 text-green-600" />
                     ) : (
                       <XCircle className="w-5 h-5 text-red-600" />
                     )}
-                    <span className={`font-medium ${
-                      testResult.success && testResult.conditions_pass ? 'text-green-700' : 'text-red-700'
-                    }`}>
+                    <span
+                      className={`font-medium ${
+                        testResult.success && testResult.conditions_pass
+                          ? 'text-green-700'
+                          : 'text-red-700'
+                      }`}
+                    >
                       {testResult.conditions_pass ? t.conditionsPassed : t.conditionsFailed}
                     </span>
                   </div>
@@ -1261,7 +1306,10 @@ export default function WorkflowBuilder({
                       <p className="text-sm font-medium text-gray-700 mb-2">{t.actionsPreview}:</p>
                       <div className="space-y-2">
                         {testResult.actions.map((action, idx) => (
-                          <div key={idx} className="text-sm text-gray-600 pl-4 border-l-2 border-gray-200">
+                          <div
+                            key={idx}
+                            className="text-sm text-gray-600 pl-4 border-l-2 border-gray-200"
+                          >
                             <strong>{action.type}</strong>
                             {action.delay_hours > 0 && ` (+${action.delay_hours}h)`}
                             {action.preview && (

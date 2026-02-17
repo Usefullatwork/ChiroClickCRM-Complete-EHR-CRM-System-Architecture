@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Sync Queue Utility
  *
@@ -12,10 +13,7 @@
  * Bilingual: English/Norwegian
  */
 
-import {
-  openDatabase,
-  STORES
-} from './offlineStorage';
+import { openDatabase, STORES } from './offlineStorage';
 
 // =============================================================================
 // QUEUE ITEM TYPES
@@ -24,7 +22,7 @@ import {
 export const SYNC_TYPES = {
   EXERCISE_PROGRESS: 'exercise-progress',
   FEEDBACK: 'feedback',
-  PRESCRIPTION_VIEW: 'prescription-view'
+  PRESCRIPTION_VIEW: 'prescription-view',
 };
 
 // =============================================================================
@@ -51,7 +49,7 @@ export async function addToSyncQueue(item) {
     createdAt: new Date().toISOString(),
     attempts: 0,
     lastAttempt: null,
-    status: 'pending'
+    status: 'pending',
   };
 
   return new Promise((resolve, reject) => {
@@ -131,7 +129,7 @@ export async function updateQueueItem(id, status, additionalData = {}) {
           ...additionalData,
           status,
           lastAttempt: new Date().toISOString(),
-          attempts: item.attempts + 1
+          attempts: item.attempts + 1,
         };
 
         const putRequest = store.put(updatedItem);
@@ -171,7 +169,7 @@ export async function removeFromQueue(id) {
  * @returns {Promise<number>} Number of items cleared
  */
 export async function clearCompletedItems() {
-  const db = await openDatabase();
+  const _db = await openDatabase();
   const items = await getAllQueueItems();
   const completedItems = items.filter((item) => item.status === 'completed');
 
@@ -248,9 +246,9 @@ export async function processSyncQueue(options = {}) {
         method: item.method,
         headers: {
           'Content-Type': 'application/json',
-          ...item.headers
+          ...item.headers,
         },
-        body: item.body ? JSON.stringify(item.body) : undefined
+        body: item.body ? JSON.stringify(item.body) : undefined,
       });
 
       if (response.ok) {
@@ -269,7 +267,7 @@ export async function processSyncQueue(options = {}) {
 
         await updateQueueItem(item.id, 'failed', {
           error: errorData.message || `HTTP ${response.status}`,
-          statusCode: response.status
+          statusCode: response.status,
         });
         failed++;
 
@@ -283,12 +281,12 @@ export async function processSyncQueue(options = {}) {
       // Network error - keep in queue for retry
       if (item.attempts < 5) {
         await updateQueueItem(item.id, 'pending', {
-          error: error.message
+          error: error.message,
         });
       } else {
         // Too many attempts - mark as failed
         await updateQueueItem(item.id, 'failed', {
-          error: error.message
+          error: error.message,
         });
         failed++;
       }
@@ -303,7 +301,9 @@ export async function processSyncQueue(options = {}) {
 
   const remaining = pendingItems.length - synced - failed;
 
-  console.log(`[SyncQueue] Sync complete: ${synced} synced, ${failed} failed, ${remaining} remaining`);
+  console.log(
+    `[SyncQueue] Sync complete: ${synced} synced, ${failed} failed, ${remaining} remaining`
+  );
 
   return { synced, failed, remaining };
 }
@@ -347,8 +347,8 @@ export async function queueExerciseProgress(token, prescriptionId, exerciseId, p
     metadata: {
       prescriptionId,
       exerciseId,
-      ...progressData
-    }
+      ...progressData,
+    },
   });
 }
 
@@ -372,8 +372,8 @@ export async function queueExerciseFeedback(token, prescriptionId, exerciseId, f
     metadata: {
       prescriptionId,
       exerciseId,
-      ...feedbackData
-    }
+      ...feedbackData,
+    },
   });
 }
 
@@ -398,9 +398,10 @@ export async function getSyncQueueStats() {
       acc[item.type] = (acc[item.type] || 0) + 1;
       return acc;
     }, {}),
-    oldestPending: items
-      .filter((i) => i.status === 'pending')
-      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))[0]?.createdAt || null
+    oldestPending:
+      items
+        .filter((i) => i.status === 'pending')
+        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))[0]?.createdAt || null,
   };
 }
 
@@ -425,10 +426,14 @@ let syncInProgress = false;
  * @param {object} options - Sync options for processSyncQueue
  */
 export function enableAutoSync(options = {}) {
-  if (autoSyncEnabled) return;
+  if (autoSyncEnabled) {
+    return;
+  }
 
   const handleOnline = async () => {
-    if (syncInProgress) return;
+    if (syncInProgress) {
+      return;
+    }
 
     console.log('[SyncQueue] Online - starting auto-sync');
     syncInProgress = true;
@@ -497,5 +502,5 @@ export default {
   getSyncQueueStats,
   hasPendingSync,
   enableAutoSync,
-  triggerSync
+  triggerSync,
 };

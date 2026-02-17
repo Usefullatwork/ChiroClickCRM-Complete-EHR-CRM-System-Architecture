@@ -40,7 +40,7 @@ export const executeActions = async (organizationId, workflow, patient) => {
 /**
  * Execute a single action
  */
-export const executeAction = async (organizationId, action, patient, executionId) => {
+export const executeAction = async (organizationId, action, patient, _executionId) => {
   try {
     switch (action.type) {
       case ACTION_TYPES.SEND_SMS:
@@ -304,7 +304,9 @@ const executeCreateTask = async (organizationId, action, patient) => {
  * Replace template variables with patient data
  */
 export const replaceVariables = (template, patient) => {
-  if (!template) return '';
+  if (!template) {
+    return '';
+  }
 
   const variables = {
     '{firstName}': patient?.first_name || '',

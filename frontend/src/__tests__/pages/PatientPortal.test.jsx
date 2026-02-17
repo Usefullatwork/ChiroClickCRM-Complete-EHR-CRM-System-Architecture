@@ -4,9 +4,9 @@
  */
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import _userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { BrowserRouter, MemoryRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, _MemoryRouter, _Route, _Routes } from 'react-router-dom';
 import axios from 'axios';
 import PatientPortal from '../../pages/PatientPortal';
 import { createMockPrescription, createMockExercise } from '../setup';
@@ -126,9 +126,7 @@ describe('PatientPortal Page', () => {
       renderWithRouter(<PatientPortal />);
 
       await waitFor(() => {
-        expect(
-          screen.getByText('Ovelsene er ikke tilgjengelige')
-        ).toBeInTheDocument();
+        expect(screen.getByText('Ovelsene er ikke tilgjengelige')).toBeInTheDocument();
       });
     });
 
@@ -138,9 +136,7 @@ describe('PatientPortal Page', () => {
       renderWithRouter(<PatientPortal />);
 
       await waitFor(() => {
-        expect(
-          screen.getByText(/Kontakt klinikken for a fa en ny lenke/)
-        ).toBeInTheDocument();
+        expect(screen.getByText(/Kontakt klinikken for a fa en ny lenke/)).toBeInTheDocument();
       });
     });
 
@@ -206,9 +202,7 @@ describe('PatientPortal Page', () => {
 
       await waitFor(() => {
         expect(screen.getByText('Instruksjoner:')).toBeInTheDocument();
-        expect(
-          screen.getByText(mockPrescription.patientInstructions)
-        ).toBeInTheDocument();
+        expect(screen.getByText(mockPrescription.patientInstructions)).toBeInTheDocument();
       });
     });
   });
@@ -232,9 +226,7 @@ describe('PatientPortal Page', () => {
       await waitFor(() => {
         // Should show "X / Y" format for completion
         expect(
-          screen.getByText(
-            `${mockProgressHistory.length} / ${mockPrescription.exercises.length}`
-          )
+          screen.getByText(`${mockProgressHistory.length} / ${mockPrescription.exercises.length}`)
         ).toBeInTheDocument();
       });
     });
@@ -330,9 +322,7 @@ describe('PatientPortal Page', () => {
 
       await waitFor(() => {
         expect(screen.getByText('Instruksjoner')).toBeInTheDocument();
-        expect(
-          screen.getByText('Len hodet forsiktig til siden')
-        ).toBeInTheDocument();
+        expect(screen.getByText('Len hodet forsiktig til siden')).toBeInTheDocument();
       });
     });
 
@@ -574,9 +564,7 @@ describe('PatientPortal Page', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(
-            'Stopp ovelsene hvis du opplever okt smerte og kontakt klinikken.'
-          )
+          screen.getByText('Stopp ovelsene hvis du opplever okt smerte og kontakt klinikken.')
         ).toBeInTheDocument();
       });
     });
@@ -601,9 +589,7 @@ describe('PatientPortal Page', () => {
       renderWithRouter(<PatientPortal />);
 
       await waitFor(() => {
-        expect(axios.get).toHaveBeenCalledWith(
-          expect.stringContaining('/portal/exercises/')
-        );
+        expect(axios.get).toHaveBeenCalledWith(expect.stringContaining('/portal/exercises/'));
       });
     });
 
@@ -611,9 +597,7 @@ describe('PatientPortal Page', () => {
       renderWithRouter(<PatientPortal />);
 
       await waitFor(() => {
-        expect(axios.get).toHaveBeenCalledWith(
-          expect.stringContaining('/progress')
-        );
+        expect(axios.get).toHaveBeenCalledWith(expect.stringContaining('/progress'));
       });
     });
 
@@ -709,9 +693,7 @@ describe('PatientPortal Page', () => {
 
       await waitFor(() => {
         expect(screen.getByText('Spesielle instruksjoner')).toBeInTheDocument();
-        expect(
-          screen.getByText('Spesiell instruksjon for denne pasienten')
-        ).toBeInTheDocument();
+        expect(screen.getByText('Spesiell instruksjon for denne pasienten')).toBeInTheDocument();
       });
     });
   });

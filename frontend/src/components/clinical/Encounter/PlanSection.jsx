@@ -1,11 +1,11 @@
-import React, { useRef } from 'react';
-import { ChevronDown, Check, Target, Settings } from 'lucide-react';
+import _React, { useRef } from 'react';
+import { ChevronDown, Check, Target, Settings, FileText } from 'lucide-react';
 import { useEncounter } from '../../../context/EncounterContext';
 import {
   BodyChartPanel,
   AnatomicalBodyChart,
   ActivatorMethodPanel,
-  FacialLinesChart
+  FacialLinesChart,
 } from '../../examination';
 
 export default function PlanSection({
@@ -19,20 +19,30 @@ export default function PlanSection({
   notationData,
   setNotationData,
   setNotationNarrative,
-  onNavigateSettings
+  onNavigateSettings,
 }) {
   const {
-    encounterData, setEncounterData, isSigned, updateField,
-    selectedTakster, toggleTakst, totalPrice, showTakster, setShowTakster, taksterNorwegian
+    encounterData,
+    setEncounterData,
+    isSigned,
+    updateField,
+    selectedTakster,
+    toggleTakst,
+    totalPrice,
+    showTakster,
+    setShowTakster,
+    taksterNorwegian,
   } = useEncounter();
-  
+
   const textAreaRef = useRef(null);
 
   return (
     <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
       <div className="px-4 py-3 bg-gradient-to-r from-purple-50 to-white border-b border-slate-100 flex items-center justify-between">
         <h3 className="font-semibold text-slate-800 flex items-center gap-2">
-          <span className="bg-purple-600 text-white h-6 w-6 rounded-md flex items-center justify-center text-sm font-bold">P</span>
+          <span className="bg-purple-600 text-white h-6 w-6 rounded-md flex items-center justify-center text-sm font-bold">
+            P
+          </span>
           Plan & Behandling
         </h3>
         <div className="flex items-center gap-3">
@@ -42,15 +52,18 @@ export default function PlanSection({
             min="0"
             max="10"
             value={encounterData.vas_pain_end || 0}
-            onChange={(e) => setEncounterData(prev => ({ ...prev, vas_pain_end: parseInt(e.target.value) }))}
+            onChange={(e) =>
+              setEncounterData((prev) => ({ ...prev, vas_pain_end: parseInt(e.target.value) }))
+            }
             disabled={isSigned}
             className="w-20 h-1.5 accent-purple-600 disabled:opacity-50 disabled:cursor-not-allowed"
           />
-          <span className="text-sm font-semibold text-purple-600 w-6">{encounterData.vas_pain_end || 0}</span>
+          <span className="text-sm font-semibold text-purple-600 w-6">
+            {encounterData.vas_pain_end || 0}
+          </span>
         </div>
       </div>
       <div className="p-4 space-y-4">
-        
         {/* Treatment Notation Method Indicator */}
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
@@ -127,11 +140,15 @@ export default function PlanSection({
           <textarea
             ref={textAreaRef}
             placeholder={
-              currentNotationMethod.id === 'segment_listing' ? 'Segmentlisting: f.eks. C5 PRS, T4-T6 anterior, L5 PLI...' :
-              currentNotationMethod.id === 'gonstead_listing' ? 'Gonstead: f.eks. Atlas ASLA, C2 PRSA, L5 PLI-M...' :
-              currentNotationMethod.id === 'diversified_notation' ? 'Diversifisert: beskriv manipulasjoner og mobiliseringer...' :
-              currentNotationMethod.id === 'soap_narrative' ? 'SOAP narrativ: beskriv behandlingen i detalj...' :
-              'Utført behandling... (bruk .hvla for makro)'
+              currentNotationMethod.id === 'segment_listing'
+                ? 'Segmentlisting: f.eks. C5 PRS, T4-T6 anterior, L5 PLI...'
+                : currentNotationMethod.id === 'gonstead_listing'
+                  ? 'Gonstead: f.eks. Atlas ASLA, C2 PRSA, L5 PLI-M...'
+                  : currentNotationMethod.id === 'diversified_notation'
+                    ? 'Diversifisert: beskriv manipulasjoner og mobiliseringer...'
+                    : currentNotationMethod.id === 'soap_narrative'
+                      ? 'SOAP narrativ: beskriv behandlingen i detalj...'
+                      : 'Utført behandling... (bruk .hvla for makro)'
             }
             className="w-full min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
             value={encounterData.plan.treatment}
@@ -156,7 +173,9 @@ export default function PlanSection({
               <span className="font-medium text-purple-900">Takster (behandlingskoder)</span>
               <span className="text-xs text-purple-600">(Kun for behandlere)</span>
             </div>
-            <ChevronDown className={`h-4 w-4 text-purple-600 transition-transform ${showTakster ? 'rotate-180' : ''}`} />
+            <ChevronDown
+              className={`h-4 w-4 text-purple-600 transition-transform ${showTakster ? 'rotate-180' : ''}`}
+            />
           </button>
 
           {showTakster && (
@@ -169,19 +188,25 @@ export default function PlanSection({
                     disabled={isSigned}
                     className={`
                       flex items-center justify-between p-3 rounded-lg border-2 text-left transition-all
-                      ${selectedTakster.includes(takst.id)
-                        ? 'border-purple-500 bg-purple-50'
-                        : 'border-slate-200 bg-white hover:border-slate-300'}
+                      ${
+                        selectedTakster.includes(takst.id)
+                          ? 'border-purple-500 bg-purple-50'
+                          : 'border-slate-200 bg-white hover:border-slate-300'
+                      }
                       ${isSigned ? 'opacity-70 cursor-not-allowed' : ''}
                     `}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`
+                      <div
+                        className={`
                         h-5 w-5 rounded flex items-center justify-center
-                        ${selectedTakster.includes(takst.id)
-                          ? 'bg-purple-600 text-white'
-                          : 'border-2 border-slate-300'}
-                      `}>
+                        ${
+                          selectedTakster.includes(takst.id)
+                            ? 'bg-purple-600 text-white'
+                            : 'border-2 border-slate-300'
+                        }
+                      `}
+                      >
                         {selectedTakster.includes(takst.id) && <Check className="h-3 w-3" />}
                       </div>
                       <div>

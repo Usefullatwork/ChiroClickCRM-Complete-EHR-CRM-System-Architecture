@@ -12,7 +12,9 @@
  * @returns {boolean} - True if valid
  */
 export const validateFodselsnummer = (fnr) => {
-  if (!fnr) return false;
+  if (!fnr) {
+    return false;
+  }
 
   // Remove spaces and dashes
   const cleaned = fnr.replace(/[\s-]/g, '');
@@ -25,7 +27,7 @@ export const validateFodselsnummer = (fnr) => {
   // Extract date parts
   let day = parseInt(cleaned.substring(0, 2));
   const month = parseInt(cleaned.substring(2, 4));
-  const year = parseInt(cleaned.substring(4, 6));
+  const _year = parseInt(cleaned.substring(4, 6));
 
   // Check for D-number (day + 40)
   const isDNumber = day > 40;
@@ -71,9 +73,13 @@ export const validateFodselsnummer = (fnr) => {
  * @returns {boolean}
  */
 export const isDNumber = (fnr) => {
-  if (!fnr) return false;
+  if (!fnr) {
+    return false;
+  }
   const cleaned = fnr.replace(/[\s-]/g, '');
-  if (cleaned.length !== 11) return false;
+  if (cleaned.length !== 11) {
+    return false;
+  }
 
   const day = parseInt(cleaned.substring(0, 2));
   return day > 40;
@@ -85,13 +91,15 @@ export const isDNumber = (fnr) => {
  * @returns {Date|null} - Birth date or null if invalid
  */
 export const extractBirthDate = (fnr) => {
-  if (!validateFodselsnummer(fnr)) return null;
+  if (!validateFodselsnummer(fnr)) {
+    return null;
+  }
 
   const cleaned = fnr.replace(/[\s-]/g, '');
 
   let day = parseInt(cleaned.substring(0, 2));
   const month = parseInt(cleaned.substring(2, 4));
-  let year = parseInt(cleaned.substring(4, 6));
+  const year = parseInt(cleaned.substring(4, 6));
   const individnummer = parseInt(cleaned.substring(6, 9));
 
   // Handle D-numbers
@@ -131,7 +139,9 @@ export const extractBirthDate = (fnr) => {
  * @returns {string|null} - 'M' for male, 'F' for female, null if invalid
  */
 export const extractGender = (fnr) => {
-  if (!validateFodselsnummer(fnr)) return null;
+  if (!validateFodselsnummer(fnr)) {
+    return null;
+  }
 
   const cleaned = fnr.replace(/[\s-]/g, '');
   const genderDigit = parseInt(cleaned[8]); // Digit 9 (0-indexed position 8)
@@ -146,7 +156,9 @@ export const extractGender = (fnr) => {
  */
 export const calculateAge = (fnr) => {
   const birthDate = extractBirthDate(fnr);
-  if (!birthDate) return null;
+  if (!birthDate) {
+    return null;
+  }
 
   const today = new Date();
   let age = today.getFullYear() - birthDate.getFullYear();
@@ -165,9 +177,13 @@ export const calculateAge = (fnr) => {
  * @returns {string} - Formatted as DDMMYY-XXXXX
  */
 export const formatFodselsnummer = (fnr) => {
-  if (!fnr) return '';
+  if (!fnr) {
+    return '';
+  }
   const cleaned = fnr.replace(/[\s-]/g, '');
-  if (cleaned.length !== 11) return fnr;
+  if (cleaned.length !== 11) {
+    return fnr;
+  }
 
   return `${cleaned.substring(0, 6)}-${cleaned.substring(6)}`;
 };
@@ -180,9 +196,13 @@ export const formatFodselsnummer = (fnr) => {
  * @returns {string} - Masked fødselsnummer
  */
 export const maskFodselsnummer = (fnr, visibleStart = 2, visibleEnd = 2) => {
-  if (!fnr) return '***';
+  if (!fnr) {
+    return '***';
+  }
   const cleaned = fnr.replace(/[\s-]/g, '');
-  if (cleaned.length !== 11) return '***';
+  if (cleaned.length !== 11) {
+    return '***';
+  }
 
   const start = cleaned.substring(0, visibleStart);
   const end = cleaned.substring(11 - visibleEnd);
@@ -204,7 +224,7 @@ export const validateAndSanitize = (fnr) => {
     birthDate: null,
     age: null,
     gender: null,
-    isDNumber: false
+    isDNumber: false,
   };
 
   if (!fnr) {
@@ -252,5 +272,5 @@ export default {
   calculateAge,
   formatFodselsnummer,
   maskFodselsnummer,
-  validateAndSanitize
+  validateAndSanitize,
 };

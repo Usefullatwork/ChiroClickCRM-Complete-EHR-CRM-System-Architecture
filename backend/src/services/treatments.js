@@ -231,8 +231,12 @@ export const mapTreatmentsToPlan = (existingPlan, treatmentData) => {
     const treatmentDescriptions = treatmentData.treatments
       .map((t) => {
         let desc = t.description || t.code || '';
-        if (t.region) desc += ` (${t.region})`;
-        if (t.notes) desc += ` - ${t.notes}`;
+        if (t.region) {
+          desc += ` (${t.region})`;
+        }
+        if (t.notes) {
+          desc += ` - ${t.notes}`;
+        }
         return desc;
       })
       .filter(Boolean);
@@ -243,10 +247,18 @@ export const mapTreatmentsToPlan = (existingPlan, treatmentData) => {
     ];
   }
 
-  if (treatmentData.exercises) plan.exercises = treatmentData.exercises;
-  if (treatmentData.advice) plan.advice = treatmentData.advice;
-  if (treatmentData.follow_up) plan.follow_up = treatmentData.follow_up;
-  if (treatmentData.referral) plan.referral = treatmentData.referral;
+  if (treatmentData.exercises) {
+    plan.exercises = treatmentData.exercises;
+  }
+  if (treatmentData.advice) {
+    plan.advice = treatmentData.advice;
+  }
+  if (treatmentData.follow_up) {
+    plan.follow_up = treatmentData.follow_up;
+  }
+  if (treatmentData.referral) {
+    plan.referral = treatmentData.referral;
+  }
 
   return plan;
 };

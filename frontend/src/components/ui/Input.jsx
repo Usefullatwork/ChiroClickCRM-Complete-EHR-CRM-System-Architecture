@@ -1,13 +1,6 @@
-import React from 'react';
+import _React from 'react';
 
-export const Input = ({
-  label,
-  error,
-  helperText,
-  required = false,
-  className = '',
-  ...props
-}) => (
+export const Input = ({ label, error, helperText, required = false, className = '', ...props }) => (
   <div className="space-y-1">
     {label && (
       <label className="block text-sm font-medium text-slate-700">

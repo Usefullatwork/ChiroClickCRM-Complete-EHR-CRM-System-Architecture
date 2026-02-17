@@ -3,13 +3,13 @@
  * Configure automatic acceptance of appointments and referrals
  */
 
-import React, { useState, useEffect } from 'react'
+import _React, { useState, useEffect } from 'react';
 import {
   Calendar,
   Users,
   Bell,
-  Clock,
-  Shield,
+  _Clock,
+  _Shield,
   AlertCircle,
   Check,
   Save,
@@ -17,9 +17,9 @@ import {
   ChevronDown,
   ChevronUp,
   X,
-  Info
-} from 'lucide-react'
-import api from '../../services/api'
+  _Info,
+} from 'lucide-react';
+import api from '../../services/api';
 
 const AutoAcceptSettings = () => {
   // State
@@ -37,16 +37,16 @@ const AutoAcceptSettings = () => {
     referralRequireCompleteInfo: true,
     notifyOnAutoAccept: true,
     notificationEmail: '',
-    notificationSms: ''
-  })
+    notificationSms: '',
+  });
 
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState(null)
-  const [success, setSuccess] = useState(null)
-  const [showLog, setShowLog] = useState(false)
-  const [log, setLog] = useState([])
-  const [expandedSection, setExpandedSection] = useState('appointments')
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const [showLog, setShowLog] = useState(false);
+  const [log, setLog] = useState([]);
+  const [expandedSection, setExpandedSection] = useState('appointments');
 
   // Appointment types (these would typically come from an API)
   const appointmentTypes = [
@@ -55,8 +55,8 @@ const AutoAcceptSettings = () => {
     'Behandling',
     'Akutt',
     'Telefonkonsultasjon',
-    'Videokonsultasjon'
-  ]
+    'Videokonsultasjon',
+  ];
 
   // Referral sources
   const referralSources = [
@@ -65,18 +65,18 @@ const AutoAcceptSettings = () => {
     'Sykehus',
     'Fysioterapeut',
     'Annen kiropraktor',
-    'Selvhenvisning'
-  ]
+    'Selvhenvisning',
+  ];
 
   // Load settings
   useEffect(() => {
-    loadSettings()
-  }, [])
+    loadSettings();
+  }, []);
 
   const loadSettings = async () => {
     try {
-      setLoading(true)
-      const response = await api.get('/auto-accept/settings')
+      setLoading(true);
+      const response = await api.get('/auto-accept/settings');
       if (response.data.data) {
         setSettings({
           ...settings,
@@ -94,63 +94,61 @@ const AutoAcceptSettings = () => {
           referralRequireCompleteInfo: response.data.data.referral_require_complete_info ?? true,
           notifyOnAutoAccept: response.data.data.notify_on_auto_accept ?? true,
           notificationEmail: response.data.data.notification_email || '',
-          notificationSms: response.data.data.notification_sms || ''
-        })
+          notificationSms: response.data.data.notification_sms || '',
+        });
       }
     } catch (err) {
-      console.error('Error loading settings:', err)
-      setError('Kunne ikke laste innstillinger')
+      console.error('Error loading settings:', err);
+      setError('Kunne ikke laste innstillinger');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const loadLog = async () => {
     try {
       const response = await api.get('/auto-accept/log', {
-        params: { limit: 50 }
-      })
-      setLog(response.data.data || [])
+        params: { limit: 50 },
+      });
+      setLog(response.data.data || []);
     } catch (err) {
-      console.error('Error loading log:', err)
+      console.error('Error loading log:', err);
     }
-  }
+  };
 
   // Save settings
   const handleSave = async () => {
     try {
-      setSaving(true)
-      setError(null)
+      setSaving(true);
+      setError(null);
 
-      await api.put('/auto-accept/settings', settings)
+      await api.put('/auto-accept/settings', settings);
 
-      setSuccess('Innstillinger lagret!')
-      setTimeout(() => setSuccess(null), 3000)
+      setSuccess('Innstillinger lagret!');
+      setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      console.error('Error saving settings:', err)
-      setError('Kunne ikke lagre innstillinger')
+      console.error('Error saving settings:', err);
+      setError('Kunne ikke lagre innstillinger');
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   // Toggle array item
   const toggleArrayItem = (field, item) => {
-    setSettings(prev => {
-      const array = prev[field] || []
-      const newArray = array.includes(item)
-        ? array.filter(i => i !== item)
-        : [...array, item]
-      return { ...prev, [field]: newArray }
-    })
-  }
+    setSettings((prev) => {
+      const array = prev[field] || [];
+      const newArray = array.includes(item) ? array.filter((i) => i !== item) : [...array, item];
+      return { ...prev, [field]: newArray };
+    });
+  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
-    )
+    );
   }
 
   return (
@@ -185,7 +183,9 @@ const AutoAcceptSettings = () => {
         {/* Appointments Section */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <button
-            onClick={() => setExpandedSection(expandedSection === 'appointments' ? null : 'appointments')}
+            onClick={() =>
+              setExpandedSection(expandedSection === 'appointments' ? null : 'appointments')
+            }
             className="w-full flex items-center justify-between p-4 hover:bg-gray-50"
           >
             <div className="flex items-center gap-3">
@@ -194,17 +194,17 @@ const AutoAcceptSettings = () => {
               </div>
               <div className="text-left">
                 <h2 className="font-medium text-gray-900">Avtaler</h2>
-                <p className="text-sm text-gray-500">
-                  Automatisk bekreft nye timebestillinger
-                </p>
+                <p className="text-sm text-gray-500">Automatisk bekreft nye timebestillinger</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className={`px-2 py-1 rounded text-xs font-medium ${
-                settings.autoAcceptAppointments
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-gray-100 text-gray-600'
-              }`}>
+              <span
+                className={`px-2 py-1 rounded text-xs font-medium ${
+                  settings.autoAcceptAppointments
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-gray-100 text-gray-600'
+                }`}
+              >
                 {settings.autoAcceptAppointments ? 'Aktiv' : 'Inaktiv'}
               </span>
               {expandedSection === 'appointments' ? (
@@ -223,17 +223,21 @@ const AutoAcceptSettings = () => {
                   Aktiver auto-godkjenning av avtaler
                 </label>
                 <button
-                  onClick={() => setSettings(prev => ({
-                    ...prev,
-                    autoAcceptAppointments: !prev.autoAcceptAppointments
-                  }))}
+                  onClick={() =>
+                    setSettings((prev) => ({
+                      ...prev,
+                      autoAcceptAppointments: !prev.autoAcceptAppointments,
+                    }))
+                  }
                   className={`relative w-12 h-6 rounded-full transition-colors ${
                     settings.autoAcceptAppointments ? 'bg-blue-600' : 'bg-gray-200'
                   }`}
                 >
-                  <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                    settings.autoAcceptAppointments ? 'left-7' : 'left-1'
-                  }`} />
+                  <div
+                    className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                      settings.autoAcceptAppointments ? 'left-7' : 'left-1'
+                    }`}
+                  />
                 </button>
               </div>
 
@@ -248,10 +252,12 @@ const AutoAcceptSettings = () => {
                       <input
                         type="number"
                         value={settings.appointmentAcceptDelayMinutes}
-                        onChange={(e) => setSettings(prev => ({
-                          ...prev,
-                          appointmentAcceptDelayMinutes: parseInt(e.target.value) || 0
-                        }))}
+                        onChange={(e) =>
+                          setSettings((prev) => ({
+                            ...prev,
+                            appointmentAcceptDelayMinutes: parseInt(e.target.value) || 0,
+                          }))
+                        }
                         className="w-24 px-3 py-2 border border-gray-200 rounded-lg"
                         min="0"
                         max="1440"
@@ -266,25 +272,27 @@ const AutoAcceptSettings = () => {
                   {/* Business Hours Only */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <label className="text-sm font-medium text-gray-700">
-                        Kun i kontortid
-                      </label>
+                      <label className="text-sm font-medium text-gray-700">Kun i kontortid</label>
                       <p className="text-xs text-gray-500">
                         Godkjenn kun avtaler innenfor 08:00-18:00 på hverdager
                       </p>
                     </div>
                     <button
-                      onClick={() => setSettings(prev => ({
-                        ...prev,
-                        appointmentBusinessHoursOnly: !prev.appointmentBusinessHoursOnly
-                      }))}
+                      onClick={() =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          appointmentBusinessHoursOnly: !prev.appointmentBusinessHoursOnly,
+                        }))
+                      }
                       className={`relative w-12 h-6 rounded-full transition-colors ${
                         settings.appointmentBusinessHoursOnly ? 'bg-blue-600' : 'bg-gray-200'
                       }`}
                     >
-                      <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                        settings.appointmentBusinessHoursOnly ? 'left-7' : 'left-1'
-                      }`} />
+                      <div
+                        className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                          settings.appointmentBusinessHoursOnly ? 'left-7' : 'left-1'
+                        }`}
+                      />
                     </button>
                   </div>
 
@@ -296,10 +304,14 @@ const AutoAcceptSettings = () => {
                     <input
                       type="number"
                       value={settings.appointmentMaxDailyLimit || ''}
-                      onChange={(e) => setSettings(prev => ({
-                        ...prev,
-                        appointmentMaxDailyLimit: e.target.value ? parseInt(e.target.value) : null
-                      }))}
+                      onChange={(e) =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          appointmentMaxDailyLimit: e.target.value
+                            ? parseInt(e.target.value)
+                            : null,
+                        }))
+                      }
                       className="w-24 px-3 py-2 border border-gray-200 rounded-lg"
                       min="1"
                       placeholder="Ingen grense"
@@ -312,7 +324,7 @@ const AutoAcceptSettings = () => {
                       Ekskluder disse avtaletypene
                     </label>
                     <div className="flex flex-wrap gap-2">
-                      {appointmentTypes.map(type => (
+                      {appointmentTypes.map((type) => (
                         <button
                           key={type}
                           onClick={() => toggleArrayItem('appointmentTypesExcluded', type)}
@@ -348,17 +360,17 @@ const AutoAcceptSettings = () => {
               </div>
               <div className="text-left">
                 <h2 className="font-medium text-gray-900">Henvisninger</h2>
-                <p className="text-sm text-gray-500">
-                  Automatisk godta innkommende henvisninger
-                </p>
+                <p className="text-sm text-gray-500">Automatisk godta innkommende henvisninger</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className={`px-2 py-1 rounded text-xs font-medium ${
-                settings.autoAcceptReferrals
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-gray-100 text-gray-600'
-              }`}>
+              <span
+                className={`px-2 py-1 rounded text-xs font-medium ${
+                  settings.autoAcceptReferrals
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-gray-100 text-gray-600'
+                }`}
+              >
                 {settings.autoAcceptReferrals ? 'Aktiv' : 'Inaktiv'}
               </span>
               {expandedSection === 'referrals' ? (
@@ -377,17 +389,21 @@ const AutoAcceptSettings = () => {
                   Aktiver auto-godkjenning av henvisninger
                 </label>
                 <button
-                  onClick={() => setSettings(prev => ({
-                    ...prev,
-                    autoAcceptReferrals: !prev.autoAcceptReferrals
-                  }))}
+                  onClick={() =>
+                    setSettings((prev) => ({
+                      ...prev,
+                      autoAcceptReferrals: !prev.autoAcceptReferrals,
+                    }))
+                  }
                   className={`relative w-12 h-6 rounded-full transition-colors ${
                     settings.autoAcceptReferrals ? 'bg-blue-600' : 'bg-gray-200'
                   }`}
                 >
-                  <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                    settings.autoAcceptReferrals ? 'left-7' : 'left-1'
-                  }`} />
+                  <div
+                    className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                      settings.autoAcceptReferrals ? 'left-7' : 'left-1'
+                    }`}
+                  />
                 </button>
               </div>
 
@@ -402,10 +418,12 @@ const AutoAcceptSettings = () => {
                       <input
                         type="number"
                         value={settings.referralAcceptDelayMinutes}
-                        onChange={(e) => setSettings(prev => ({
-                          ...prev,
-                          referralAcceptDelayMinutes: parseInt(e.target.value) || 0
-                        }))}
+                        onChange={(e) =>
+                          setSettings((prev) => ({
+                            ...prev,
+                            referralAcceptDelayMinutes: parseInt(e.target.value) || 0,
+                          }))
+                        }
                         className="w-24 px-3 py-2 border border-gray-200 rounded-lg"
                         min="0"
                         max="1440"
@@ -425,17 +443,21 @@ const AutoAcceptSettings = () => {
                       </p>
                     </div>
                     <button
-                      onClick={() => setSettings(prev => ({
-                        ...prev,
-                        referralRequireCompleteInfo: !prev.referralRequireCompleteInfo
-                      }))}
+                      onClick={() =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          referralRequireCompleteInfo: !prev.referralRequireCompleteInfo,
+                        }))
+                      }
                       className={`relative w-12 h-6 rounded-full transition-colors ${
                         settings.referralRequireCompleteInfo ? 'bg-blue-600' : 'bg-gray-200'
                       }`}
                     >
-                      <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                        settings.referralRequireCompleteInfo ? 'left-7' : 'left-1'
-                      }`} />
+                      <div
+                        className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                          settings.referralRequireCompleteInfo ? 'left-7' : 'left-1'
+                        }`}
+                      />
                     </button>
                   </div>
 
@@ -445,7 +467,7 @@ const AutoAcceptSettings = () => {
                       Godta kun fra disse kildene (la tom for alle)
                     </label>
                     <div className="flex flex-wrap gap-2">
-                      {referralSources.map(source => (
+                      {referralSources.map((source) => (
                         <button
                           key={source}
                           onClick={() => toggleArrayItem('referralSourcesIncluded', source)}
@@ -469,7 +491,9 @@ const AutoAcceptSettings = () => {
         {/* Notifications Section */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <button
-            onClick={() => setExpandedSection(expandedSection === 'notifications' ? null : 'notifications')}
+            onClick={() =>
+              setExpandedSection(expandedSection === 'notifications' ? null : 'notifications')
+            }
             className="w-full flex items-center justify-between p-4 hover:bg-gray-50"
           >
             <div className="flex items-center gap-3">
@@ -478,9 +502,7 @@ const AutoAcceptSettings = () => {
               </div>
               <div className="text-left">
                 <h2 className="font-medium text-gray-900">Varsler</h2>
-                <p className="text-sm text-gray-500">
-                  Få beskjed når noe blir automatisk godkjent
-                </p>
+                <p className="text-sm text-gray-500">Få beskjed når noe blir automatisk godkjent</p>
               </div>
             </div>
             {expandedSection === 'notifications' ? (
@@ -498,17 +520,21 @@ const AutoAcceptSettings = () => {
                   Send varsel ved auto-godkjenning
                 </label>
                 <button
-                  onClick={() => setSettings(prev => ({
-                    ...prev,
-                    notifyOnAutoAccept: !prev.notifyOnAutoAccept
-                  }))}
+                  onClick={() =>
+                    setSettings((prev) => ({
+                      ...prev,
+                      notifyOnAutoAccept: !prev.notifyOnAutoAccept,
+                    }))
+                  }
                   className={`relative w-12 h-6 rounded-full transition-colors ${
                     settings.notifyOnAutoAccept ? 'bg-blue-600' : 'bg-gray-200'
                   }`}
                 >
-                  <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                    settings.notifyOnAutoAccept ? 'left-7' : 'left-1'
-                  }`} />
+                  <div
+                    className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                      settings.notifyOnAutoAccept ? 'left-7' : 'left-1'
+                    }`}
+                  />
                 </button>
               </div>
 
@@ -521,10 +547,12 @@ const AutoAcceptSettings = () => {
                     <input
                       type="email"
                       value={settings.notificationEmail}
-                      onChange={(e) => setSettings(prev => ({
-                        ...prev,
-                        notificationEmail: e.target.value
-                      }))}
+                      onChange={(e) =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          notificationEmail: e.target.value,
+                        }))
+                      }
                       className="w-full px-3 py-2 border border-gray-200 rounded-lg"
                       placeholder="eksempel@klinikk.no"
                     />
@@ -537,10 +565,12 @@ const AutoAcceptSettings = () => {
                     <input
                       type="tel"
                       value={settings.notificationSms}
-                      onChange={(e) => setSettings(prev => ({
-                        ...prev,
-                        notificationSms: e.target.value
-                      }))}
+                      onChange={(e) =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          notificationSms: e.target.value,
+                        }))
+                      }
                       className="w-full px-3 py-2 border border-gray-200 rounded-lg"
                       placeholder="+47 XXX XX XXX"
                     />
@@ -555,8 +585,10 @@ const AutoAcceptSettings = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <button
             onClick={() => {
-              setShowLog(!showLog)
-              if (!showLog) loadLog()
+              setShowLog(!showLog);
+              if (!showLog) {
+                loadLog();
+              }
             }}
             className="w-full flex items-center justify-between p-4 hover:bg-gray-50"
           >
@@ -566,9 +598,7 @@ const AutoAcceptSettings = () => {
               </div>
               <div className="text-left">
                 <h2 className="font-medium text-gray-900">Aktivitetslogg</h2>
-                <p className="text-sm text-gray-500">
-                  Se historikk over automatiske godkjenninger
-                </p>
+                <p className="text-sm text-gray-500">Se historikk over automatiske godkjenninger</p>
               </div>
             </div>
             {showLog ? (
@@ -581,25 +611,26 @@ const AutoAcceptSettings = () => {
           {showLog && (
             <div className="border-t border-gray-100 max-h-64 overflow-y-auto">
               {log.length === 0 ? (
-                <div className="p-4 text-center text-gray-500 text-sm">
-                  Ingen aktivitet ennå
-                </div>
+                <div className="p-4 text-center text-gray-500 text-sm">Ingen aktivitet ennå</div>
               ) : (
                 <div className="divide-y divide-gray-100">
                   {log.map((entry, index) => (
                     <div key={index} className="p-3 flex items-center gap-3 text-sm">
-                      <div className={`w-2 h-2 rounded-full ${
-                        entry.action === 'accepted' ? 'bg-green-500' : 'bg-red-500'
-                      }`} />
+                      <div
+                        className={`w-2 h-2 rounded-full ${
+                          entry.action === 'accepted' ? 'bg-green-500' : 'bg-red-500'
+                        }`}
+                      />
                       <div className="flex-1">
-                        <span className="capitalize">{entry.resource_type}</span>
-                        {' '}
-                        <span className={entry.action === 'accepted' ? 'text-green-700' : 'text-red-700'}>
+                        <span className="capitalize">{entry.resource_type}</span>{' '}
+                        <span
+                          className={
+                            entry.action === 'accepted' ? 'text-green-700' : 'text-red-700'
+                          }
+                        >
                           {entry.action === 'accepted' ? 'godkjent' : 'avvist'}
                         </span>
-                        {entry.reason && (
-                          <span className="text-gray-500"> - {entry.reason}</span>
-                        )}
+                        {entry.reason && <span className="text-gray-500"> - {entry.reason}</span>}
                       </div>
                       <span className="text-gray-400 text-xs">
                         {new Date(entry.created_at).toLocaleString('nb-NO')}
@@ -634,7 +665,7 @@ const AutoAcceptSettings = () => {
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AutoAcceptSettings
+export default AutoAcceptSettings;

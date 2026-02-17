@@ -39,9 +39,13 @@ export const useAIStream = () => {
       const decoder = new TextDecoder();
       let buffer = '';
 
-      while (true) {
+      let streamDone = false;
+      while (!streamDone) {
         const { done, value } = await reader.read();
-        if (done) break;
+        streamDone = done;
+        if (done) {
+          break;
+        }
 
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split('\n');
@@ -52,7 +56,7 @@ export const useAIStream = () => {
             try {
               const data = JSON.parse(line.slice(6));
               if (data.text) {
-                setText(prev => prev + data.text);
+                setText((prev) => prev + data.text);
               }
               if (data.done) {
                 setStreaming(false);

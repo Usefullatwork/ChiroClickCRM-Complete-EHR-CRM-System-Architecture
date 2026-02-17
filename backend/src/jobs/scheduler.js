@@ -6,7 +6,7 @@
  */
 
 import cron from 'node-cron';
-import { query, transaction } from '../config/database.js';
+import { query, _transaction } from '../config/database.js';
 import logger from '../utils/logger.js';
 
 // Timezone for Norway (Europe/Oslo)

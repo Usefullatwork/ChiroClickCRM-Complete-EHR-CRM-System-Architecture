@@ -6,23 +6,23 @@
  * with Norwegian takst codes and automatic HELFO calculations
  */
 
-import React, { useState, useEffect } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
+import _React, { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import {
   FileText,
   User,
-  Calendar,
+  _Calendar,
   Save,
   Send,
   X,
   AlertCircle,
   Check,
   Loader2,
-  Search
-} from 'lucide-react'
-import { billingAPI, patientsAPI } from '../../services/api'
-import TakstCodes from './TakstCodes'
+  Search,
+} from 'lucide-react';
+import { billingAPI, patientsAPI } from '../../services/api';
+import TakstCodes from './TakstCodes';
 
 /**
  * InvoiceGenerator Component
@@ -36,116 +36,123 @@ export default function InvoiceGenerator({
   patientId: initialPatientId = null,
   encounterId = null,
   onClose,
-  onInvoiceCreated
+  onInvoiceCreated,
 }) {
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
+  const _navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   // Form state
-  const [selectedPatientId, setSelectedPatientId] = useState(initialPatientId)
-  const [selectedCodes, setSelectedCodes] = useState([])
-  const [notes, setNotes] = useState('')
-  const [dueDays, setDueDays] = useState(14)
-  const [isChild, setIsChild] = useState(false)
-  const [hasExemption, setHasExemption] = useState(false)
-  const [patientSearch, setPatientSearch] = useState('')
-  const [showPatientSearch, setShowPatientSearch] = useState(!initialPatientId)
-  const [errors, setErrors] = useState({})
+  const [selectedPatientId, setSelectedPatientId] = useState(initialPatientId);
+  const [selectedCodes, setSelectedCodes] = useState([]);
+  const [notes, setNotes] = useState('');
+  const [dueDays, setDueDays] = useState(14);
+  const [isChild, setIsChild] = useState(false);
+  const [hasExemption, setHasExemption] = useState(false);
+  const [patientSearch, setPatientSearch] = useState('');
+  const [showPatientSearch, setShowPatientSearch] = useState(!initialPatientId);
+  const [errors, setErrors] = useState({});
 
   // Fetch selected patient
   const { data: patient, isLoading: patientLoading } = useQuery({
     queryKey: ['patient', selectedPatientId],
     queryFn: async () => {
-      if (!selectedPatientId) return null
-      const response = await patientsAPI.getById(selectedPatientId)
-      return response.data
+      if (!selectedPatientId) {
+        return null;
+      }
+      const response = await patientsAPI.getById(selectedPatientId);
+      return response.data;
     },
-    enabled: !!selectedPatientId
-  })
+    enabled: !!selectedPatientId,
+  });
 
   // Search patients
   const { data: searchResults, isLoading: searchLoading } = useQuery({
     queryKey: ['patient-search', patientSearch],
     queryFn: async () => {
-      if (!patientSearch || patientSearch.length < 2) return []
-      const response = await patientsAPI.search(patientSearch)
-      return response.data?.patients || response.data || []
+      if (!patientSearch || patientSearch.length < 2) {
+        return [];
+      }
+      const response = await patientsAPI.search(patientSearch);
+      return response.data?.patients || response.data || [];
     },
-    enabled: patientSearch.length >= 2
-  })
+    enabled: patientSearch.length >= 2,
+  });
 
   // Calculate totals
   const { data: totals } = useQuery({
     queryKey: ['invoice-totals', selectedCodes, isChild, hasExemption],
     queryFn: async () => {
-      if (selectedCodes.length === 0) return null
+      if (selectedCodes.length === 0) {
+        return null;
+      }
       const response = await billingAPI.calculateTotals({
         items: selectedCodes,
         isChild,
-        hasExemption
-      })
-      return response.data
+        hasExemption,
+      });
+      return response.data;
     },
-    enabled: selectedCodes.length > 0
-  })
+    enabled: selectedCodes.length > 0,
+  });
 
   // Create invoice mutation
   const createMutation = useMutation({
     mutationFn: (data) => billingAPI.createInvoice(data),
     onSuccess: (response) => {
-      queryClient.invalidateQueries(['invoices'])
+      queryClient.invalidateQueries(['invoices']);
       if (onInvoiceCreated) {
-        onInvoiceCreated(response.data)
+        onInvoiceCreated(response.data);
       }
-    }
-  })
+    },
+  });
 
   // Check if patient is a child (under 16)
   useEffect(() => {
     if (patient?.date_of_birth) {
-      const birthDate = new Date(patient.date_of_birth)
-      const today = new Date()
-      const age = today.getFullYear() - birthDate.getFullYear()
-      const monthDiff = today.getMonth() - birthDate.getMonth()
-      const actualAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())
-        ? age - 1
-        : age
-      setIsChild(actualAge < 16)
+      const birthDate = new Date(patient.date_of_birth);
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      const actualAge =
+        monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) ? age - 1 : age;
+      setIsChild(actualAge < 16);
     }
-  }, [patient])
+  }, [patient]);
 
   /**
    * Handle patient selection from search
    */
   const handleSelectPatient = (selectedPatient) => {
-    setSelectedPatientId(selectedPatient.id)
-    setPatientSearch('')
-    setShowPatientSearch(false)
-  }
+    setSelectedPatientId(selectedPatient.id);
+    setPatientSearch('');
+    setShowPatientSearch(false);
+  };
 
   /**
    * Validate form before submission
    */
   const validateForm = () => {
-    const newErrors = {}
+    const newErrors = {};
 
     if (!selectedPatientId) {
-      newErrors.patient = 'Velg en pasient'
+      newErrors.patient = 'Velg en pasient';
     }
 
     if (selectedCodes.length === 0) {
-      newErrors.codes = 'Velg minst en takstkode'
+      newErrors.codes = 'Velg minst en takstkode';
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   /**
    * Handle form submission
    */
   const handleSubmit = async (sendImmediately = false) => {
-    if (!validateForm()) return
+    if (!validateForm()) {
+      return;
+    }
 
     try {
       const invoiceData = {
@@ -155,19 +162,19 @@ export default function InvoiceGenerator({
         notes,
         due_days: dueDays,
         is_child: isChild,
-        has_exemption: hasExemption
-      }
+        has_exemption: hasExemption,
+      };
 
-      const response = await createMutation.mutateAsync(invoiceData)
+      const response = await createMutation.mutateAsync(invoiceData);
 
       // If send immediately, finalize the invoice
       if (sendImmediately && response.data?.id) {
-        await billingAPI.finalizeInvoice(response.data.id)
+        await billingAPI.finalizeInvoice(response.data.id);
       }
     } catch (error) {
-      console.error('Failed to create invoice:', error)
+      console.error('Failed to create invoice:', error);
     }
-  }
+  };
 
   /**
    * Format currency in NOK
@@ -176,9 +183,9 @@ export default function InvoiceGenerator({
     return new Intl.NumberFormat('no-NO', {
       style: 'currency',
       currency: 'NOK',
-      minimumFractionDigits: 0
-    }).format(amount || 0)
-  }
+      minimumFractionDigits: 0,
+    }).format(amount || 0);
+  };
 
   /**
    * Format date in Norwegian format
@@ -187,9 +194,9 @@ export default function InvoiceGenerator({
     return new Date(date).toLocaleDateString('no-NO', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric'
-    })
-  }
+      year: 'numeric',
+    });
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -205,10 +212,7 @@ export default function InvoiceGenerator({
               <p className="text-sm text-gray-500">Opprett faktura med takstkoder</p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
             <X className="w-5 h-5 text-gray-500" />
           </button>
         </div>
@@ -217,9 +221,7 @@ export default function InvoiceGenerator({
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Patient Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Pasient *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Pasient *</label>
 
             {showPatientSearch ? (
               <div className="space-y-3">
@@ -242,7 +244,7 @@ export default function InvoiceGenerator({
                   </div>
                 ) : searchResults?.length > 0 ? (
                   <div className="border border-gray-200 rounded-lg divide-y max-h-60 overflow-y-auto">
-                    {searchResults.map(p => (
+                    {searchResults.map((p) => (
                       <button
                         key={p.id}
                         onClick={() => handleSelectPatient(p)}
@@ -283,8 +285,8 @@ export default function InvoiceGenerator({
                 </div>
                 <button
                   onClick={() => {
-                    setSelectedPatientId(null)
-                    setShowPatientSearch(true)
+                    setSelectedPatientId(null);
+                    setShowPatientSearch(true);
                   }}
                   className="text-sm text-blue-600 hover:text-blue-800"
                 >
@@ -330,9 +332,7 @@ export default function InvoiceGenerator({
 
           {/* Takst Codes Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Takstkoder *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Takstkoder *</label>
             <TakstCodes
               selectedCodes={selectedCodes}
               onCodesChange={setSelectedCodes}
@@ -350,9 +350,7 @@ export default function InvoiceGenerator({
           {/* Invoice Options */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Forfallsdager
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Forfallsdager</label>
               <select
                 value={dueDays}
                 onChange={(e) => setDueDays(parseInt(e.target.value))}
@@ -420,7 +418,9 @@ export default function InvoiceGenerator({
               <Check className="w-5 h-5 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-medium">Faktura opprettet</p>
-                <p className="text-sm">Fakturanummer: {createMutation.data?.data?.invoice_number}</p>
+                <p className="text-sm">
+                  Fakturanummer: {createMutation.data?.data?.invoice_number}
+                </p>
               </div>
             </div>
           )}
@@ -464,5 +464,5 @@ export default function InvoiceGenerator({
         </div>
       </div>
     </div>
-  )
+  );
 }

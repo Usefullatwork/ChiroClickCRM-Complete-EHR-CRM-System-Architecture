@@ -36,9 +36,7 @@ const MacroButton = React.memo(({ macro, onInsert, isLoading }) => {
       title={macro.text}
     >
       <div className="font-medium truncate">{macro.name}</div>
-      {macro.shortcutKey && (
-        <div className="text-xs text-gray-400 mt-0.5">{macro.shortcutKey}</div>
-      )}
+      {macro.shortcutKey && <div className="text-xs text-gray-400 mt-0.5">{macro.shortcutKey}</div>}
     </button>
   );
 });
@@ -97,7 +95,9 @@ const CategorySection = ({ category, macros, subcategories, onInsert, isCollapse
  * Favorites Bar
  */
 const FavoritesBar = ({ favorites, onInsert }) => {
-  if (!favorites || favorites.length === 0) return null;
+  if (!favorites || favorites.length === 0) {
+    return null;
+  }
 
   return (
     <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
@@ -172,7 +172,7 @@ const SectionFilter = ({ activeSection, onChange }) => {
     { id: 'subjective', label: 'S', icon: '💬' },
     { id: 'objective', label: 'O', icon: '🔍' },
     { id: 'assessment', label: 'A', icon: '💭' },
-    { id: 'plan', label: 'P', icon: '📝' }
+    { id: 'plan', label: 'P', icon: '📝' },
   ];
 
   return (
@@ -183,9 +183,11 @@ const SectionFilter = ({ activeSection, onChange }) => {
           onClick={() => onChange(section.id)}
           className={`
             px-3 py-1.5 text-sm rounded-lg transition-colors
-            ${activeSection === section.id
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}
+            ${
+              activeSection === section.id
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }
           `}
         >
           {section.icon} {section.label}
@@ -204,8 +206,8 @@ export const MacroMatrix = ({
   onInsert,
   onLoadMore,
   isLoading,
-  targetRef, // Reference to text input/textarea to insert into
-  context // Patient/encounter context for variable substitution
+  _targetRef, // Reference to text input/textarea to insert into
+  context, // Patient/encounter context for variable substitution
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeSection, setActiveSection] = useState(null);
@@ -213,7 +215,9 @@ export const MacroMatrix = ({
 
   // Filter macros based on search and section
   const filteredMacros = useMemo(() => {
-    if (!macros) return {};
+    if (!macros) {
+      return {};
+    }
 
     const filtered = {};
 
@@ -224,7 +228,8 @@ export const MacroMatrix = ({
       // Apply filters
       Object.keys(categorySubcategories).forEach((subName) => {
         categorySubcategories[subName] = categorySubcategories[subName].filter((macro) => {
-          const matchesSearch = !searchTerm ||
+          const matchesSearch =
+            !searchTerm ||
             macro.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             macro.text.toLowerCase().includes(searchTerm.toLowerCase());
 
@@ -240,7 +245,8 @@ export const MacroMatrix = ({
       });
 
       const filteredTopLevel = categoryMacros.filter((macro) => {
-        const matchesSearch = !searchTerm ||
+        const matchesSearch =
+          !searchTerm ||
           macro.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           macro.text.toLowerCase().includes(searchTerm.toLowerCase());
 
@@ -254,7 +260,7 @@ export const MacroMatrix = ({
         filtered[categoryName] = {
           ...category,
           macros: filteredTopLevel,
-          subcategories: categorySubcategories
+          subcategories: categorySubcategories,
         };
       }
     });
@@ -263,20 +269,23 @@ export const MacroMatrix = ({
   }, [macros, searchTerm, activeSection]);
 
   // Handle macro insertion
-  const handleInsert = useCallback((macro) => {
-    onInsert(macro, context);
+  const handleInsert = useCallback(
+    (macro) => {
+      onInsert(macro, context);
 
-    // Update usage count
-    if (onLoadMore) {
-      // This could trigger a background API call to record usage
-    }
-  }, [onInsert, context, onLoadMore]);
+      // Update usage count
+      if (onLoadMore) {
+        // This could trigger a background API call to record usage
+      }
+    },
+    [onInsert, context, onLoadMore]
+  );
 
   // Toggle category collapse
   const toggleCategory = useCallback((categoryName) => {
     setCollapsedCategories((prev) => ({
       ...prev,
-      [categoryName]: !prev[categoryName]
+      [categoryName]: !prev[categoryName],
     }));
   }, []);
 
@@ -292,17 +301,10 @@ export const MacroMatrix = ({
   return (
     <div className="macro-matrix">
       {/* Search */}
-      <SearchBar
-        value={searchTerm}
-        onChange={setSearchTerm}
-        onClear={() => setSearchTerm('')}
-      />
+      <SearchBar value={searchTerm} onChange={setSearchTerm} onClear={() => setSearchTerm('')} />
 
       {/* Section Filter */}
-      <SectionFilter
-        activeSection={activeSection}
-        onChange={setActiveSection}
-      />
+      <SectionFilter activeSection={activeSection} onChange={setActiveSection} />
 
       {/* Favorites */}
       <FavoritesBar favorites={favorites} onInsert={handleInsert} />

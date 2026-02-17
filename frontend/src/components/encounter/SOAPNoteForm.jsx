@@ -2,7 +2,7 @@
  * SOAPNoteForm - Extracted from ClinicalEncounter.jsx
  * Contains the four SOAP sections: Subjective, Objective, Assessment, Plan
  */
-import React from 'react';
+import _React from 'react';
 import { Activity, Target, Settings } from 'lucide-react';
 import { EnhancedClinicalTextarea, SALTBanner } from '../clinical';
 import {
@@ -56,7 +56,7 @@ export function SOAPNoteForm({
   clinicalLang,
   notationData,
   setNotationData,
-  notationNarrative,
+  _notationNarrative,
   setNotationNarrative,
   navigate,
   // Takster
@@ -69,7 +69,7 @@ export function SOAPNoteForm({
   showExercisePanel,
   setShowExercisePanel,
   // Auto-save
-  setAutoSaveStatus,
+  _setAutoSaveStatus,
 }) {
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">

@@ -8,7 +8,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { query, transaction } from '../config/database.js';
+import { _query, transaction } from '../config/database.js';
 import logger from '../utils/logger.js';
 
 const __filename = fileURLToPath(import.meta.url);

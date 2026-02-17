@@ -31,7 +31,7 @@ export const getActiveKeyVersion = async () => {
 
   return {
     version: result.rows[0].key_version,
-    createdAt: result.rows[0].created_at
+    createdAt: result.rows[0].created_at,
   };
 };
 
@@ -56,9 +56,7 @@ export const needsRotation = async () => {
 /**
  * Generate new encryption key
  */
-export const generateNewKey = () => {
-  return crypto.randomBytes(32).toString('hex');
-};
+export const generateNewKey = () => crypto.randomBytes(32).toString('hex');
 
 /**
  * Rotate encryption keys
@@ -104,10 +102,10 @@ export const rotateKeys = async () => {
           const reencrypted = encrypt(decrypted);
 
           // Update in database
-          await client.query(
-            'UPDATE patients SET encrypted_personal_number = $1 WHERE id = $2',
-            [reencrypted, patient.id]
-          );
+          await client.query('UPDATE patients SET encrypted_personal_number = $1 WHERE id = $2', [
+            reencrypted,
+            patient.id,
+          ]);
         } catch (error) {
           logger.error(`Failed to re-encrypt patient ${patient.id}`, error);
           throw error;
@@ -115,23 +113,21 @@ export const rotateKeys = async () => {
       }
 
       // Deactivate old key
-      await client.query(
-        'UPDATE encryption_keys SET is_active = false WHERE key_version = $1',
-        [currentVersion]
-      );
+      await client.query('UPDATE encryption_keys SET is_active = false WHERE key_version = $1', [
+        currentVersion,
+      ]);
 
       // Activate new key
-      await client.query(
-        'UPDATE encryption_keys SET is_active = true WHERE key_version = $1',
-        [newVersion]
-      );
+      await client.query('UPDATE encryption_keys SET is_active = true WHERE key_version = $1', [
+        newVersion,
+      ]);
 
       logger.info(`Key rotation completed. New key version: ${newVersion}`);
 
       return {
         oldVersion: currentVersion,
         newVersion,
-        recordsReencrypted: patientsResult.rows.length
+        recordsReencrypted: patientsResult.rows.length,
       };
     });
   } catch (error) {
@@ -196,5 +192,5 @@ export default {
   needsRotation,
   rotateKeys,
   scheduleKeyRotation,
-  createKeyRotationTable
+  createKeyRotationTable,
 };

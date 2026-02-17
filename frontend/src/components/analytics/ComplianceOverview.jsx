@@ -5,19 +5,19 @@
  * @module components/analytics/ComplianceOverview
  */
 
-import React, { useMemo } from 'react';
+import _React, { useMemo } from 'react';
 import {
   AreaChart,
   Area,
-  BarChart,
-  Bar,
+  _BarChart,
+  _Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
-  Cell
+  _Legend,
+  _Cell,
 } from 'recharts';
 import {
   Activity,
@@ -26,7 +26,7 @@ import {
   XCircle,
   TrendingUp,
   Target,
-  Award
+  Award,
 } from 'lucide-react';
 
 /**
@@ -34,9 +34,9 @@ import {
  */
 const STATUS_COLORS = {
   completed: '#10b981', // green
-  active: '#3b82f6',    // blue
-  paused: '#f59e0b',    // amber
-  cancelled: '#ef4444'  // red
+  active: '#3b82f6', // blue
+  paused: '#f59e0b', // amber
+  cancelled: '#ef4444', // red
 };
 
 /**
@@ -45,34 +45,33 @@ const STATUS_COLORS = {
  * @param {Object} data - Compliance data from API
  * @param {boolean} loading - Loading state
  */
-export const ComplianceOverview = ({
-  data = {},
-  loading = false
-}) => {
+export const ComplianceOverview = ({ data = {}, loading = false }) => {
   // Prepare status distribution data for chart
   const statusDistribution = useMemo(() => {
     return [
       { name: 'Fullfort', value: data.completed || 0, color: STATUS_COLORS.completed },
       { name: 'Aktiv', value: data.active || 0, color: STATUS_COLORS.active },
       { name: 'Pause', value: data.paused || 0, color: STATUS_COLORS.paused },
-      { name: 'Avbrutt', value: data.cancelled || 0, color: STATUS_COLORS.cancelled }
-    ].filter(item => item.value > 0);
+      { name: 'Avbrutt', value: data.cancelled || 0, color: STATUS_COLORS.cancelled },
+    ].filter((item) => item.value > 0);
   }, [data]);
 
   // Format weekly trend data
   const weeklyTrendData = useMemo(() => {
-    if (!data.weeklyTrend || data.weeklyTrend.length === 0) return [];
+    if (!data.weeklyTrend || data.weeklyTrend.length === 0) {
+      return [];
+    }
 
-    return data.weeklyTrend.map(item => ({
+    return data.weeklyTrend.map((item) => ({
       week: item.week
         ? new Date(item.week).toLocaleDateString('no-NO', {
             day: 'numeric',
-            month: 'short'
+            month: 'short',
           })
         : item.label,
-      'Etterlevelse': item.avgRate || 0,
-      'Totalt': item.total || 0,
-      'Fullfort': item.completed || 0
+      Etterlevelse: item.avgRate || 0,
+      Totalt: item.total || 0,
+      Fullfort: item.completed || 0,
     }));
   }, [data]);
 
@@ -84,10 +83,7 @@ export const ComplianceOverview = ({
           <p className="text-sm font-semibold text-gray-900 mb-2">{label}</p>
           {payload.map((entry, index) => (
             <div key={index} className="flex items-center gap-2 text-sm">
-              <div
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: entry.color }}
-              />
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
               <span className="text-gray-600">{entry.name}:</span>
               <span className="font-semibold text-gray-900">
                 {entry.name === 'Etterlevelse' ? `${entry.value}%` : entry.value}
@@ -102,9 +98,15 @@ export const ComplianceOverview = ({
 
   // Determine compliance level and color
   const getComplianceLevel = (rate) => {
-    if (rate >= 80) return { label: 'Utmerket', color: 'text-green-600', bgColor: 'bg-green-100' };
-    if (rate >= 60) return { label: 'God', color: 'text-blue-600', bgColor: 'bg-blue-100' };
-    if (rate >= 40) return { label: 'Moderat', color: 'text-yellow-600', bgColor: 'bg-yellow-100' };
+    if (rate >= 80) {
+      return { label: 'Utmerket', color: 'text-green-600', bgColor: 'bg-green-100' };
+    }
+    if (rate >= 60) {
+      return { label: 'God', color: 'text-blue-600', bgColor: 'bg-blue-100' };
+    }
+    if (rate >= 40) {
+      return { label: 'Moderat', color: 'text-yellow-600', bgColor: 'bg-yellow-100' };
+    }
     return { label: 'Lav', color: 'text-red-600', bgColor: 'bg-red-100' };
   };
 
@@ -139,7 +141,9 @@ export const ComplianceOverview = ({
           </div>
 
           {/* Compliance badge */}
-          <div className={`px-3 py-1.5 rounded-full text-sm font-medium ${complianceLevel.bgColor} ${complianceLevel.color}`}>
+          <div
+            className={`px-3 py-1.5 rounded-full text-sm font-medium ${complianceLevel.bgColor} ${complianceLevel.color}`}
+          >
             <div className="flex items-center gap-1">
               <Award size={14} />
               {complianceLevel.label}
@@ -174,9 +178,7 @@ export const ComplianceOverview = ({
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-bold text-blue-700">{avgProgressRate}%</span>
             </div>
-            <p className="text-xs text-blue-600 mt-1">
-              Gjennomsnittlig okt/fullforte
-            </p>
+            <p className="text-xs text-blue-600 mt-1">Gjennomsnittlig okt/fullforte</p>
           </div>
 
           {/* Active Prescriptions */}
@@ -188,15 +190,15 @@ export const ComplianceOverview = ({
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-bold text-purple-700">{data.active || 0}</span>
             </div>
-            <p className="text-xs text-purple-600 mt-1">
-              {data.paused || 0} pa pause
-            </p>
+            <p className="text-xs text-purple-600 mt-1">{data.paused || 0} pa pause</p>
           </div>
         </div>
 
         {/* Weekly Trend Chart */}
         <div className="mt-6">
-          <h4 className="text-sm font-semibold text-gray-900 mb-4">Ukentlig etterlevelse (12 uker)</h4>
+          <h4 className="text-sm font-semibold text-gray-900 mb-4">
+            Ukentlig etterlevelse (12 uker)
+          </h4>
           {weeklyTrendData.length > 0 ? (
             <ResponsiveContainer width="100%" height={240}>
               <AreaChart data={weeklyTrendData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
@@ -246,9 +248,7 @@ export const ComplianceOverview = ({
       <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-xl">
         <div className="flex items-center justify-between">
           <h4 className="text-sm font-semibold text-gray-700">Statusfordeling</h4>
-          <span className="text-sm text-gray-500">
-            Totalt: {data.totalPrescriptions || 0}
-          </span>
+          <span className="text-sm text-gray-500">Totalt: {data.totalPrescriptions || 0}</span>
         </div>
 
         <div className="mt-3 grid grid-cols-4 gap-3">
@@ -301,7 +301,7 @@ export const ComplianceOverview = ({
                   className="h-full transition-all duration-500"
                   style={{
                     width: `${percentage}%`,
-                    backgroundColor: item.color
+                    backgroundColor: item.color,
                   }}
                   title={`${item.name}: ${item.value} (${percentage.toFixed(1)}%)`}
                 />
@@ -321,35 +321,27 @@ export const ComplianceGauge = ({ rate = 0, size = 'md', loading = false }) => {
   const sizes = {
     sm: { container: 'w-16 h-16', text: 'text-lg' },
     md: { container: 'w-24 h-24', text: 'text-2xl' },
-    lg: { container: 'w-32 h-32', text: 'text-3xl' }
+    lg: { container: 'w-32 h-32', text: 'text-3xl' },
   };
 
   const sizeConfig = sizes[size] || sizes.md;
 
   if (loading) {
-    return (
-      <div className={`${sizeConfig.container} rounded-full bg-gray-100 animate-pulse`}></div>
-    );
+    return <div className={`${sizeConfig.container} rounded-full bg-gray-100 animate-pulse`}></div>;
   }
 
   // Calculate stroke dash for progress circle
   const circumference = 2 * Math.PI * 45;
   const strokeDashoffset = circumference - (rate / 100) * circumference;
 
-  const color = rate >= 80 ? '#10b981' : rate >= 60 ? '#3b82f6' : rate >= 40 ? '#f59e0b' : '#ef4444';
+  const color =
+    rate >= 80 ? '#10b981' : rate >= 60 ? '#3b82f6' : rate >= 40 ? '#f59e0b' : '#ef4444';
 
   return (
     <div className={`${sizeConfig.container} relative`}>
       <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
         {/* Background circle */}
-        <circle
-          cx="50"
-          cy="50"
-          r="45"
-          fill="none"
-          stroke="#e5e7eb"
-          strokeWidth="8"
-        />
+        <circle cx="50" cy="50" r="45" fill="none" stroke="#e5e7eb" strokeWidth="8" />
         {/* Progress circle */}
         <circle
           cx="50"
@@ -366,9 +358,7 @@ export const ComplianceGauge = ({ rate = 0, size = 'md', loading = false }) => {
       </svg>
       {/* Center text */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className={`${sizeConfig.text} font-bold text-gray-900`}>
-          {rate}%
-        </span>
+        <span className={`${sizeConfig.text} font-bold text-gray-900`}>{rate}%</span>
       </div>
     </div>
   );

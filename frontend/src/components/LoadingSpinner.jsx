@@ -3,7 +3,7 @@
  * Provides consistent loading states across the application
  */
 
-import React from 'react';
+import _React from 'react';
 
 export const LoadingSpinner = ({
   size = 'md',

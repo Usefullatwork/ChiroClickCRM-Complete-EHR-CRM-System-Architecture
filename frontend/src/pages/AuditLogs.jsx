@@ -4,33 +4,33 @@
  * View all system audit logs for compliance and security
  */
 
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import {
   Shield,
   Search,
-  Filter,
+  _Filter,
   Download,
   Eye,
   Edit,
   Trash2,
   FileText,
   User,
-  Calendar,
-  Clock,
+  _Calendar,
+  _Clock,
   AlertCircle,
-  CheckCircle,
+  _CheckCircle,
   XCircle,
-  Database
-} from 'lucide-react'
-import { format } from 'date-fns'
-import { useTranslation } from '../i18n'
+  Database,
+} from 'lucide-react';
+import { format } from 'date-fns';
+import { useTranslation } from '../i18n';
 
 // Mock API - In production, this would call a real audit logs endpoint
 const mockAuditAPI = {
-  getAll: async (params) => {
+  getAll: async (_params) => {
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     const mockLogs = [
       {
@@ -46,7 +46,7 @@ const mockAuditAPI = {
         ip_address: '192.168.1.100',
         user_agent: 'Mozilla/5.0...',
         reason: null,
-        changes: null
+        changes: null,
       },
       {
         id: '2',
@@ -61,7 +61,7 @@ const mockAuditAPI = {
         ip_address: '192.168.1.101',
         user_agent: 'Mozilla/5.0...',
         reason: null,
-        changes: { consent_marketing: { old: false, new: true } }
+        changes: { consent_marketing: { old: false, new: true } },
       },
       {
         id: '3',
@@ -76,7 +76,7 @@ const mockAuditAPI = {
         ip_address: '192.168.1.100',
         user_agent: 'Mozilla/5.0...',
         reason: null,
-        changes: null
+        changes: null,
       },
       {
         id: '4',
@@ -91,7 +91,7 @@ const mockAuditAPI = {
         ip_address: '192.168.1.101',
         user_agent: 'Mozilla/5.0...',
         reason: 'GDPR Article 20 - Data Portability Request',
-        changes: null
+        changes: null,
       },
       {
         id: '5',
@@ -106,81 +106,81 @@ const mockAuditAPI = {
         ip_address: '192.168.1.102',
         user_agent: 'Mozilla/5.0...',
         reason: 'Patient requested cancellation',
-        changes: null
-      }
-    ]
+        changes: null,
+      },
+    ];
 
-    return { data: { logs: mockLogs, total: mockLogs.length } }
-  }
-}
+    return { data: { logs: mockLogs, total: mockLogs.length } };
+  },
+};
 
 export default function AuditLogs() {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('common');
   const [filters, setFilters] = useState({
     startDate: '',
     endDate: '',
     action: '',
     resourceType: '',
     userRole: '',
-    search: ''
-  })
-  const [selectedLog, setSelectedLog] = useState(null)
+    search: '',
+  });
+  const [selectedLog, setSelectedLog] = useState(null);
 
   // Fetch audit logs
   const { data: logsData, isLoading } = useQuery({
     queryKey: ['audit-logs', filters],
-    queryFn: () => mockAuditAPI.getAll(filters)
-  })
+    queryFn: () => mockAuditAPI.getAll(filters),
+  });
 
-  const logs = logsData?.data?.logs || []
+  const logs = logsData?.data?.logs || [];
 
   const getActionIcon = (action) => {
     switch (action) {
       case 'CREATE':
-        return <FileText className="w-4 h-4 text-green-600" />
+        return <FileText className="w-4 h-4 text-green-600" />;
       case 'READ':
-        return <Eye className="w-4 h-4 text-blue-600" />
+        return <Eye className="w-4 h-4 text-blue-600" />;
       case 'UPDATE':
-        return <Edit className="w-4 h-4 text-yellow-600" />
+        return <Edit className="w-4 h-4 text-yellow-600" />;
       case 'DELETE':
-        return <Trash2 className="w-4 h-4 text-red-600" />
+        return <Trash2 className="w-4 h-4 text-red-600" />;
       case 'EXPORT':
-        return <Download className="w-4 h-4 text-purple-600" />
+        return <Download className="w-4 h-4 text-purple-600" />;
       default:
-        return <Database className="w-4 h-4 text-gray-600" />
+        return <Database className="w-4 h-4 text-gray-600" />;
     }
-  }
+  };
 
   const getActionColor = (action) => {
     switch (action) {
       case 'CREATE':
-        return 'bg-green-100 text-green-800 border-green-200'
+        return 'bg-green-100 text-green-800 border-green-200';
       case 'READ':
-        return 'bg-blue-100 text-blue-800 border-blue-200'
+        return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'UPDATE':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case 'DELETE':
-        return 'bg-red-100 text-red-800 border-red-200'
+        return 'bg-red-100 text-red-800 border-red-200';
       case 'EXPORT':
-        return 'bg-purple-100 text-purple-800 border-purple-200'
+        return 'bg-purple-100 text-purple-800 border-purple-200';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200'
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
-  }
+  };
 
   const exportAuditLogs = () => {
-    const dataStr = JSON.stringify(logs, null, 2)
-    const dataBlob = new Blob([dataStr], { type: 'application/json' })
-    const url = URL.createObjectURL(dataBlob)
+    const dataStr = JSON.stringify(logs, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
 
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `audit_logs_${new Date().toISOString().split('T')[0]}.json`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
-  }
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `audit_logs_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -191,9 +191,7 @@ export default function AuditLogs() {
             <Shield className="w-8 h-8 text-blue-600" />
             <div>
               <h1 className="text-3xl font-bold text-gray-900">{t('auditLogs')}</h1>
-              <p className="text-gray-600">
-                {t('auditLogsSubtitle')}
-              </p>
+              <p className="text-gray-600">{t('auditLogsSubtitle')}</p>
             </div>
           </div>
           <button
@@ -212,9 +210,7 @@ export default function AuditLogs() {
           <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
           <div>
             <h3 className="font-semibold text-gray-900 mb-1">{t('gdprCompliance')}</h3>
-            <p className="text-sm text-gray-700">
-              {t('gdprComplianceDesc')}
-            </p>
+            <p className="text-sm text-gray-700">{t('gdprComplianceDesc')}</p>
           </div>
         </div>
       </div>
@@ -224,37 +220,31 @@ export default function AuditLogs() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Date Range */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('startDate')}
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('startDate')}</label>
             <input
               type="date"
               value={filters.startDate}
-              onChange={(e) => setFilters(prev => ({ ...prev, startDate: e.target.value }))}
+              onChange={(e) => setFilters((prev) => ({ ...prev, startDate: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('endDate')}
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('endDate')}</label>
             <input
               type="date"
               value={filters.endDate}
-              onChange={(e) => setFilters(prev => ({ ...prev, endDate: e.target.value }))}
+              onChange={(e) => setFilters((prev) => ({ ...prev, endDate: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           {/* Action Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('action')}
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('action')}</label>
             <select
               value={filters.action}
-              onChange={(e) => setFilters(prev => ({ ...prev, action: e.target.value }))}
+              onChange={(e) => setFilters((prev) => ({ ...prev, action: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">{t('allActions')}</option>
@@ -273,7 +263,7 @@ export default function AuditLogs() {
             </label>
             <select
               value={filters.resourceType}
-              onChange={(e) => setFilters(prev => ({ ...prev, resourceType: e.target.value }))}
+              onChange={(e) => setFilters((prev) => ({ ...prev, resourceType: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">{t('allResources')}</option>
@@ -288,12 +278,10 @@ export default function AuditLogs() {
 
           {/* User Role Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('userRole')}
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('userRole')}</label>
             <select
               value={filters.userRole}
-              onChange={(e) => setFilters(prev => ({ ...prev, userRole: e.target.value }))}
+              onChange={(e) => setFilters((prev) => ({ ...prev, userRole: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">{t('allRoles')}</option>
@@ -305,16 +293,14 @@ export default function AuditLogs() {
 
           {/* Search */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('search')}
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('search')}</label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
                 type="text"
                 placeholder={t('searchLogs')}
                 value={filters.search}
-                onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
                 className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -378,17 +364,15 @@ export default function AuditLogs() {
                       <div className="flex items-center gap-2">
                         <User className="w-4 h-4 text-gray-400" />
                         <div>
-                          <div className="text-sm font-medium text-gray-900">
-                            {log.user_name}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {log.user_role}
-                          </div>
+                          <div className="text-sm font-medium text-gray-900">{log.user_name}</div>
+                          <div className="text-xs text-gray-500">{log.user_role}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border ${getActionColor(log.action)}`}>
+                      <span
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border ${getActionColor(log.action)}`}
+                      >
                         {getActionIcon(log.action)}
                         {log.action}
                       </span>
@@ -445,7 +429,9 @@ export default function AuditLogs() {
                 <div>
                   <label className="text-sm font-medium text-gray-500">{t('action')}</label>
                   <p className="mt-1">
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border ${getActionColor(selectedLog.action)}`}>
+                    <span
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border ${getActionColor(selectedLog.action)}`}
+                    >
                       {getActionIcon(selectedLog.action)}
                       {selectedLog.action}
                     </span>
@@ -491,7 +477,9 @@ export default function AuditLogs() {
 
               {selectedLog.changes && (
                 <div>
-                  <label className="text-sm font-medium text-gray-500 mb-2 block">{t('changes')}</label>
+                  <label className="text-sm font-medium text-gray-500 mb-2 block">
+                    {t('changes')}
+                  </label>
                   <pre className="text-xs bg-gray-50 p-3 rounded-lg border border-gray-200 overflow-x-auto">
                     {JSON.stringify(selectedLog.changes, null, 2)}
                   </pre>
@@ -511,5 +499,5 @@ export default function AuditLogs() {
         </div>
       )}
     </div>
-  )
+  );
 }

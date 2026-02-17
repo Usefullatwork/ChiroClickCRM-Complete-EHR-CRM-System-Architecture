@@ -3,7 +3,7 @@
  * Shows SMS/email messages for today with delivery status and filtering.
  */
 
-import React, { useState } from 'react';
+import _React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { notificationsAPI } from '../../services/api';
 

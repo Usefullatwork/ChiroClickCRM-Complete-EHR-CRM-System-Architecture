@@ -10,8 +10,8 @@
  * - Safe area insets for notched devices
  */
 
-import React, { useState, useEffect, useRef } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import _React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Menu,
   X,
@@ -23,14 +23,14 @@ import {
   User,
   LogOut,
   ChevronRight,
-  Bell,
+  _Bell,
   Search,
   FileText,
   BarChart3,
   HelpCircle,
-  Phone
-} from 'lucide-react'
-import useMediaQuery from '../../hooks/useMediaQuery'
+  Phone,
+} from 'lucide-react';
+import useMediaQuery from '../../hooks/useMediaQuery';
 
 /**
  * MobileNav Component
@@ -50,14 +50,14 @@ export default function MobileNav({
   clinicName = '',
   onLogout,
   showBottomNav = true,
-  variant = 'clinic'
+  variant = 'clinic',
 }) {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const { isMobile, prefersReducedMotion } = useMediaQuery()
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const menuRef = useRef(null)
-  const [touchStart, setTouchStart] = useState(null)
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { isMobile, prefersReducedMotion } = useMediaQuery();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+  const [touchStart, setTouchStart] = useState(null);
 
   // Default navigation items for clinic staff
   const defaultClinicNav = [
@@ -65,102 +65,109 @@ export default function MobileNav({
     { icon: Calendar, label: 'Kalender', path: '/calendar' },
     { icon: Users, label: 'Pasienter', path: '/patients' },
     { icon: FileText, label: 'Notater', path: '/notes' },
-    { icon: Menu, label: 'Meny', action: 'menu' }
-  ]
+    { icon: Menu, label: 'Meny', action: 'menu' },
+  ];
 
   // Default navigation items for patient portal
   const defaultPortalNav = [
     { icon: Dumbbell, label: 'Ovelser', path: '/portal/ovelser' },
     { icon: Calendar, label: 'Timer', path: '/portal/timer' },
     { icon: User, label: 'Profil', path: '/portal/profil' },
-    { icon: Phone, label: 'Kontakt', action: 'contact' }
-  ]
+    { icon: Phone, label: 'Kontakt', action: 'contact' },
+  ];
 
   // Use provided items or defaults
-  const bottomNavItems = navItems.length > 0
-    ? navItems
-    : (variant === 'portal' ? defaultPortalNav : defaultClinicNav)
+  const bottomNavItems =
+    navItems.length > 0 ? navItems : variant === 'portal' ? defaultPortalNav : defaultClinicNav;
 
   // Default menu items
   const defaultMenuItems = [
     { icon: BarChart3, label: 'Statistikk', path: '/statistics' },
     { icon: Dumbbell, label: 'Ovelsesbibliotek', path: '/exercises' },
     { icon: Settings, label: 'Innstillinger', path: '/settings' },
-    { icon: HelpCircle, label: 'Hjelp', path: '/help' }
-  ]
+    { icon: HelpCircle, label: 'Hjelp', path: '/help' },
+  ];
 
-  const drawerMenuItems = menuItems.length > 0 ? menuItems : defaultMenuItems
+  const drawerMenuItems = menuItems.length > 0 ? menuItems : defaultMenuItems;
 
   // Close menu when route changes
   useEffect(() => {
-    setIsMenuOpen(false)
-  }, [location.pathname])
+    setIsMenuOpen(false);
+  }, [location.pathname]);
 
   // Close menu on escape key
   useEffect(() => {
     const handleEscape = (e) => {
-      if (e.key === 'Escape') setIsMenuOpen(false)
-    }
-    document.addEventListener('keydown', handleEscape)
-    return () => document.removeEventListener('keydown', handleEscape)
-  }, [])
+      if (e.key === 'Escape') {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, []);
 
   // Lock body scroll when menu is open
   useEffect(() => {
     if (isMenuOpen) {
-      document.body.style.overflow = 'hidden'
+      document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = ''
+      document.body.style.overflow = '';
     }
     return () => {
-      document.body.style.overflow = ''
-    }
-  }, [isMenuOpen])
+      document.body.style.overflow = '';
+    };
+  }, [isMenuOpen]);
 
   // Handle swipe to close
   const handleTouchStart = (e) => {
-    setTouchStart(e.touches[0].clientX)
-  }
+    setTouchStart(e.touches[0].clientX);
+  };
 
   const handleTouchMove = (e) => {
-    if (!touchStart) return
+    if (!touchStart) {
+      return;
+    }
 
-    const currentTouch = e.touches[0].clientX
-    const diff = touchStart - currentTouch
+    const currentTouch = e.touches[0].clientX;
+    const diff = touchStart - currentTouch;
 
     // Swipe left to close (on the menu itself)
     if (diff > 50) {
-      setIsMenuOpen(false)
-      setTouchStart(null)
+      setIsMenuOpen(false);
+      setTouchStart(null);
     }
-  }
+  };
 
   const handleTouchEnd = () => {
-    setTouchStart(null)
-  }
+    setTouchStart(null);
+  };
 
   // Check if path is active
   const isActive = (path) => {
-    if (!path) return false
-    return location.pathname === path || location.pathname.startsWith(path + '/')
-  }
+    if (!path) {
+      return false;
+    }
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
 
   // Handle nav item click
   const handleNavClick = (item) => {
     if (item.action === 'menu') {
-      setIsMenuOpen(true)
+      setIsMenuOpen(true);
     } else if (item.action === 'contact') {
       // Could open a contact modal or call
-      window.location.href = 'tel:+4712345678'
+      window.location.href = 'tel:+4712345678';
     } else if (item.path) {
-      navigate(item.path)
+      navigate(item.path);
     } else if (item.onClick) {
-      item.onClick()
+      item.onClick();
     }
-  }
+  };
 
   // Don't render on desktop
-  if (!isMobile) return null
+  if (!isMobile) {
+    return null;
+  }
 
   return (
     <>
@@ -169,13 +176,13 @@ export default function MobileNav({
         <nav
           className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 safe-area-inset-bottom"
           style={{
-            paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+            paddingBottom: 'env(safe-area-inset-bottom, 0px)',
           }}
         >
           <div className="flex items-stretch justify-around">
             {bottomNavItems.map((item, index) => {
-              const Icon = item.icon
-              const active = isActive(item.path)
+              const Icon = item.icon;
+              const active = isActive(item.path);
 
               return (
                 <button
@@ -197,7 +204,7 @@ export default function MobileNav({
                     {item.label}
                   </span>
                 </button>
-              )
+              );
             })}
           </div>
         </nav>
@@ -230,12 +237,8 @@ export default function MobileNav({
         {/* Menu Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
           <div className="flex-1 min-w-0">
-            {userName && (
-              <p className="font-semibold text-gray-900 truncate">{userName}</p>
-            )}
-            {clinicName && (
-              <p className="text-sm text-gray-500 truncate">{clinicName}</p>
-            )}
+            {userName && <p className="font-semibold text-gray-900 truncate">{userName}</p>}
+            {clinicName && <p className="text-sm text-gray-500 truncate">{clinicName}</p>}
           </div>
           <button
             onClick={() => setIsMenuOpen(false)}
@@ -263,16 +266,19 @@ export default function MobileNav({
           {/* Menu Items */}
           <div className="px-2 py-2">
             {drawerMenuItems.map((item, index) => {
-              const Icon = item.icon
-              const active = isActive(item.path)
+              const Icon = item.icon;
+              const active = isActive(item.path);
 
               return (
                 <button
                   key={index}
                   onClick={() => {
-                    if (item.path) navigate(item.path)
-                    else if (item.onClick) item.onClick()
-                    setIsMenuOpen(false)
+                    if (item.path) {
+                      navigate(item.path);
+                    } else if (item.onClick) {
+                      item.onClick();
+                    }
+                    setIsMenuOpen(false);
                   }}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors min-h-[48px] ${
                     active
@@ -280,11 +286,13 @@ export default function MobileNav({
                       : 'text-gray-700 hover:bg-gray-100 active:bg-gray-200'
                   }`}
                 >
-                  <Icon className={`w-5 h-5 flex-shrink-0 ${active ? 'text-blue-600' : 'text-gray-500'}`} />
+                  <Icon
+                    className={`w-5 h-5 flex-shrink-0 ${active ? 'text-blue-600' : 'text-gray-500'}`}
+                  />
                   <span className="flex-1 font-medium">{item.label}</span>
                   <ChevronRight className="w-5 h-5 text-gray-400" />
                 </button>
-              )
+              );
             })}
           </div>
 
@@ -296,8 +304,8 @@ export default function MobileNav({
             <div className="px-2 py-2">
               <button
                 onClick={() => {
-                  onLogout()
-                  setIsMenuOpen(false)
+                  onLogout();
+                  setIsMenuOpen(false);
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-red-600 hover:bg-red-50 active:bg-red-100 transition-colors min-h-[48px]"
               >
@@ -312,7 +320,7 @@ export default function MobileNav({
         <div
           className="p-4 border-t border-gray-200 bg-gray-50 text-center text-xs text-gray-500"
           style={{
-            paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)'
+            paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)',
           }}
         >
           <p>ChiroClick CRM</p>
@@ -324,12 +332,12 @@ export default function MobileNav({
         <div
           className="h-[56px]"
           style={{
-            height: 'calc(56px + env(safe-area-inset-bottom, 0px))'
+            height: 'calc(56px + env(safe-area-inset-bottom, 0px))',
           }}
         />
       )}
     </>
-  )
+  );
 }
 
 /**
@@ -343,24 +351,24 @@ export function MobileHeader({
   rightAction,
   showBack = false,
   onBack,
-  className = ''
+  className = '',
 }) {
-  const navigate = useNavigate()
-  const { prefersReducedMotion } = useMediaQuery()
+  const navigate = useNavigate();
+  const { _prefersReducedMotion } = useMediaQuery();
 
   const handleBack = () => {
     if (onBack) {
-      onBack()
+      onBack();
     } else {
-      navigate(-1)
+      navigate(-1);
     }
-  }
+  };
 
   return (
     <header
       className={`sticky top-0 z-30 bg-white border-b border-gray-200 safe-area-inset-top ${className}`}
       style={{
-        paddingTop: 'env(safe-area-inset-top, 0px)'
+        paddingTop: 'env(safe-area-inset-top, 0px)',
       }}
     >
       <div className="flex items-center justify-between h-14 px-4">
@@ -381,21 +389,15 @@ export function MobileHeader({
 
         {/* Title */}
         <div className="flex-1 text-center min-w-0 px-2">
-          <h1 className="font-semibold text-gray-900 truncate text-lg">
-            {title}
-          </h1>
-          {subtitle && (
-            <p className="text-xs text-gray-500 truncate">{subtitle}</p>
-          )}
+          <h1 className="font-semibold text-gray-900 truncate text-lg">{title}</h1>
+          {subtitle && <p className="text-xs text-gray-500 truncate">{subtitle}</p>}
         </div>
 
         {/* Right Action */}
-        <div className="w-12 flex justify-end">
-          {rightAction}
-        </div>
+        <div className="w-12 flex justify-end">{rightAction}</div>
       </div>
     </header>
-  )
+  );
 }
 
 /**
@@ -405,8 +407,8 @@ export function MobileHeader({
 export function MobilePageContainer({
   children,
   hasBottomNav = true,
-  hasHeader = true,
-  className = ''
+  _hasHeader = true,
+  className = '',
 }) {
   return (
     <div
@@ -414,24 +416,19 @@ export function MobilePageContainer({
       style={{
         paddingBottom: hasBottomNav
           ? 'calc(56px + env(safe-area-inset-bottom, 0px))'
-          : 'env(safe-area-inset-bottom, 0px)'
+          : 'env(safe-area-inset-bottom, 0px)',
       }}
     >
       {children}
     </div>
-  )
+  );
 }
 
 /**
  * TouchTarget Component
  * Ensures minimum 44px touch target size
  */
-export function TouchTarget({
-  children,
-  as: Component = 'button',
-  className = '',
-  ...props
-}) {
+export function TouchTarget({ children, as: Component = 'button', className = '', ...props }) {
   return (
     <Component
       className={`min-w-[44px] min-h-[44px] flex items-center justify-center ${className}`}
@@ -439,5 +436,5 @@ export function TouchTarget({
     >
       {children}
     </Component>
-  )
+  );
 }

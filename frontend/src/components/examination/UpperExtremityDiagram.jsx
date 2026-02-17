@@ -8,16 +8,16 @@
  * - Click to mark symptom radiation
  */
 
-import React, { useState, useCallback, useRef } from 'react';
+import _React, { useState, useCallback, useRef } from 'react';
 import { Trash2 } from 'lucide-react';
 
 // Dermatome colors for upper extremity
 const DERMATOME_COLORS = {
-  C5: { fill: 'rgba(239, 68, 68, 0.2)', stroke: '#ef4444' },   // Red
-  C6: { fill: 'rgba(249, 115, 22, 0.2)', stroke: '#f97316' },  // Orange
-  C7: { fill: 'rgba(234, 179, 8, 0.2)', stroke: '#eab308' },   // Yellow
-  C8: { fill: 'rgba(34, 197, 94, 0.2)', stroke: '#22c55e' },   // Green
-  T1: { fill: 'rgba(59, 130, 246, 0.2)', stroke: '#3b82f6' },  // Blue
+  C5: { fill: 'rgba(239, 68, 68, 0.2)', stroke: '#ef4444' }, // Red
+  C6: { fill: 'rgba(249, 115, 22, 0.2)', stroke: '#f97316' }, // Orange
+  C7: { fill: 'rgba(234, 179, 8, 0.2)', stroke: '#eab308' }, // Yellow
+  C8: { fill: 'rgba(34, 197, 94, 0.2)', stroke: '#22c55e' }, // Green
+  T1: { fill: 'rgba(59, 130, 246, 0.2)', stroke: '#3b82f6' }, // Blue
 };
 
 // Nerve colors
@@ -42,7 +42,7 @@ const MARKER_TYPES = {
 function ArmsAnterior({ width = 350, height = 300, showDermatomes = true, showNerves = true }) {
   const centerX = width / 2;
   const shoulderY = 40;
-  const armLength = 180;
+  const _armLength = 180;
 
   return (
     <g>
@@ -86,8 +86,15 @@ function ArmsAnterior({ width = 350, height = 300, showDermatomes = true, showNe
         />
 
         {/* Elbow */}
-        <ellipse cx={centerX - 110} cy={shoulderY + 130} rx={12} ry={15}
-          fill="none" stroke="#d1d5db" strokeWidth="1" />
+        <ellipse
+          cx={centerX - 110}
+          cy={shoulderY + 130}
+          rx={12}
+          ry={15}
+          fill="none"
+          stroke="#d1d5db"
+          strokeWidth="1"
+        />
 
         {/* Forearm */}
         <path
@@ -101,8 +108,15 @@ function ArmsAnterior({ width = 350, height = 300, showDermatomes = true, showNe
         />
 
         {/* Hand */}
-        <ellipse cx={centerX - 112} cy={shoulderY + 245} rx={15} ry={20}
-          fill="none" stroke="#9ca3af" strokeWidth="1.5" />
+        <ellipse
+          cx={centerX - 112}
+          cy={shoulderY + 245}
+          rx={15}
+          ry={20}
+          fill="none"
+          stroke="#9ca3af"
+          strokeWidth="1.5"
+        />
 
         {/* Fingers outline */}
         <path
@@ -136,7 +150,15 @@ function ArmsAnterior({ width = 350, height = 300, showDermatomes = true, showNe
               strokeWidth="0.5"
               strokeDasharray="3,2"
             />
-            <text x={centerX - 90} y={shoulderY + 70} fontSize="7" fill={DERMATOME_COLORS.C5.stroke} fontWeight="bold">C5</text>
+            <text
+              x={centerX - 90}
+              y={shoulderY + 70}
+              fontSize="7"
+              fill={DERMATOME_COLORS.C5.stroke}
+              fontWeight="bold"
+            >
+              C5
+            </text>
 
             {/* C6 - Lateral forearm, thumb */}
             <path
@@ -151,7 +173,15 @@ function ArmsAnterior({ width = 350, height = 300, showDermatomes = true, showNe
               strokeWidth="0.5"
               strokeDasharray="3,2"
             />
-            <text x={centerX - 115} y={shoulderY + 180} fontSize="7" fill={DERMATOME_COLORS.C6.stroke} fontWeight="bold">C6</text>
+            <text
+              x={centerX - 115}
+              y={shoulderY + 180}
+              fontSize="7"
+              fill={DERMATOME_COLORS.C6.stroke}
+              fontWeight="bold"
+            >
+              C6
+            </text>
 
             {/* C7 - Middle finger */}
             <path
@@ -164,7 +194,15 @@ function ArmsAnterior({ width = 350, height = 300, showDermatomes = true, showNe
               strokeWidth="0.5"
               strokeDasharray="3,2"
             />
-            <text x={centerX - 112} y={shoulderY + 270} fontSize="6" fill={DERMATOME_COLORS.C7.stroke} fontWeight="bold">C7</text>
+            <text
+              x={centerX - 112}
+              y={shoulderY + 270}
+              fontSize="6"
+              fill={DERMATOME_COLORS.C7.stroke}
+              fontWeight="bold"
+            >
+              C7
+            </text>
 
             {/* C8 - Medial forearm, little finger */}
             <path
@@ -179,7 +217,15 @@ function ArmsAnterior({ width = 350, height = 300, showDermatomes = true, showNe
               strokeWidth="0.5"
               strokeDasharray="3,2"
             />
-            <text x={centerX - 108} y={shoulderY + 190} fontSize="7" fill={DERMATOME_COLORS.C8.stroke} fontWeight="bold">C8</text>
+            <text
+              x={centerX - 108}
+              y={shoulderY + 190}
+              fontSize="7"
+              fill={DERMATOME_COLORS.C8.stroke}
+              fontWeight="bold"
+            >
+              C8
+            </text>
           </>
         )}
 
@@ -228,7 +274,14 @@ function ArmsAnterior({ width = 350, height = 300, showDermatomes = true, showNe
         )}
 
         {/* Label */}
-        <text x={centerX - 112} y={height - 5} fontSize="10" fill="#6b7280" textAnchor="middle" fontWeight="bold">
+        <text
+          x={centerX - 112}
+          y={height - 5}
+          fontSize="10"
+          fill="#6b7280"
+          textAnchor="middle"
+          fontWeight="bold"
+        >
           V / L
         </text>
       </g>
@@ -247,8 +300,15 @@ function ArmsAnterior({ width = 350, height = 300, showDermatomes = true, showNe
         />
 
         {/* Elbow */}
-        <ellipse cx={centerX + 110} cy={shoulderY + 130} rx={12} ry={15}
-          fill="none" stroke="#d1d5db" strokeWidth="1" />
+        <ellipse
+          cx={centerX + 110}
+          cy={shoulderY + 130}
+          rx={12}
+          ry={15}
+          fill="none"
+          stroke="#d1d5db"
+          strokeWidth="1"
+        />
 
         {/* Forearm */}
         <path
@@ -262,8 +322,15 @@ function ArmsAnterior({ width = 350, height = 300, showDermatomes = true, showNe
         />
 
         {/* Hand */}
-        <ellipse cx={centerX + 112} cy={shoulderY + 245} rx={15} ry={20}
-          fill="none" stroke="#9ca3af" strokeWidth="1.5" />
+        <ellipse
+          cx={centerX + 112}
+          cy={shoulderY + 245}
+          rx={15}
+          ry={20}
+          fill="none"
+          stroke="#9ca3af"
+          strokeWidth="1.5"
+        />
 
         {/* Fingers outline */}
         <path
@@ -297,7 +364,15 @@ function ArmsAnterior({ width = 350, height = 300, showDermatomes = true, showNe
               strokeWidth="0.5"
               strokeDasharray="3,2"
             />
-            <text x={centerX + 90} y={shoulderY + 70} fontSize="7" fill={DERMATOME_COLORS.C5.stroke} fontWeight="bold">C5</text>
+            <text
+              x={centerX + 90}
+              y={shoulderY + 70}
+              fontSize="7"
+              fill={DERMATOME_COLORS.C5.stroke}
+              fontWeight="bold"
+            >
+              C5
+            </text>
 
             {/* C6 */}
             <path
@@ -312,7 +387,15 @@ function ArmsAnterior({ width = 350, height = 300, showDermatomes = true, showNe
               strokeWidth="0.5"
               strokeDasharray="3,2"
             />
-            <text x={centerX + 115} y={shoulderY + 180} fontSize="7" fill={DERMATOME_COLORS.C6.stroke} fontWeight="bold">C6</text>
+            <text
+              x={centerX + 115}
+              y={shoulderY + 180}
+              fontSize="7"
+              fill={DERMATOME_COLORS.C6.stroke}
+              fontWeight="bold"
+            >
+              C6
+            </text>
 
             {/* C7 */}
             <path
@@ -325,7 +408,15 @@ function ArmsAnterior({ width = 350, height = 300, showDermatomes = true, showNe
               strokeWidth="0.5"
               strokeDasharray="3,2"
             />
-            <text x={centerX + 112} y={shoulderY + 270} fontSize="6" fill={DERMATOME_COLORS.C7.stroke} fontWeight="bold">C7</text>
+            <text
+              x={centerX + 112}
+              y={shoulderY + 270}
+              fontSize="6"
+              fill={DERMATOME_COLORS.C7.stroke}
+              fontWeight="bold"
+            >
+              C7
+            </text>
 
             {/* C8 */}
             <path
@@ -340,7 +431,15 @@ function ArmsAnterior({ width = 350, height = 300, showDermatomes = true, showNe
               strokeWidth="0.5"
               strokeDasharray="3,2"
             />
-            <text x={centerX + 108} y={shoulderY + 190} fontSize="7" fill={DERMATOME_COLORS.C8.stroke} fontWeight="bold">C8</text>
+            <text
+              x={centerX + 108}
+              y={shoulderY + 190}
+              fontSize="7"
+              fill={DERMATOME_COLORS.C8.stroke}
+              fontWeight="bold"
+            >
+              C8
+            </text>
           </>
         )}
 
@@ -389,7 +488,14 @@ function ArmsAnterior({ width = 350, height = 300, showDermatomes = true, showNe
         )}
 
         {/* Label */}
-        <text x={centerX + 112} y={height - 5} fontSize="10" fill="#6b7280" textAnchor="middle" fontWeight="bold">
+        <text
+          x={centerX + 112}
+          y={height - 5}
+          fontSize="10"
+          fill="#6b7280"
+          textAnchor="middle"
+          fontWeight="bold"
+        >
           H / R
         </text>
       </g>
@@ -400,8 +506,18 @@ function ArmsAnterior({ width = 350, height = 300, showDermatomes = true, showNe
           <rect x="0" y="0" width="80" height="50" fill="white" fillOpacity="0.9" rx="3" />
           {Object.entries(NERVE_COLORS).map(([key, nerve], i) => (
             <g key={key} transform={`translate(5, ${10 + i * 14})`}>
-              <line x1="0" y1="0" x2="15" y2="0" stroke={nerve.stroke} strokeWidth="2.5" strokeOpacity="0.6" />
-              <text x="20" y="4" fontSize="8" fill="#6b7280">{nerve.label}</text>
+              <line
+                x1="0"
+                y1="0"
+                x2="15"
+                y2="0"
+                stroke={nerve.stroke}
+                strokeWidth="2.5"
+                strokeOpacity="0.6"
+              />
+              <text x="20" y="4" fontSize="8" fill="#6b7280">
+                {nerve.label}
+              </text>
             </g>
           ))}
         </g>
@@ -445,9 +561,16 @@ function DiagramMarker({ marker, onRemove, selected, onSelect }) {
         {type.symbol}
       </text>
       {selected && (
-        <g onClick={(e) => { e.stopPropagation(); onRemove(marker.id); }}>
+        <g
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove(marker.id);
+          }}
+        >
           <circle cx={marker.x + 10} cy={marker.y - 10} r={6} fill="#ef4444" />
-          <text x={marker.x + 10} y={marker.y - 7} fontSize="8" fill="white" textAnchor="middle">×</text>
+          <text x={marker.x + 10} y={marker.y - 7} fontSize="8" fill="white" textAnchor="middle">
+            ×
+          </text>
         </g>
       )}
     </g>
@@ -464,7 +587,7 @@ export default function UpperExtremityDiagram({
   showDermatomes = true,
   showNerves = true,
   readOnly = false,
-  compact = false
+  compact = false,
 }) {
   const [selectedType, setSelectedType] = useState('pain');
   const [selectedMarker, setSelectedMarker] = useState(null);
@@ -473,43 +596,53 @@ export default function UpperExtremityDiagram({
   const width = compact ? 280 : 350;
   const height = compact ? 250 : 300;
 
-  const handleSvgClick = useCallback((e) => {
-    if (readOnly) return;
+  const handleSvgClick = useCallback(
+    (e) => {
+      if (readOnly) {
+        return;
+      }
 
-    const svg = svgRef.current;
-    if (!svg) return;
+      const svg = svgRef.current;
+      if (!svg) {
+        return;
+      }
 
-    const rect = svg.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * width;
-    const y = ((e.clientY - rect.top) / rect.height) * height;
+      const rect = svg.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * width;
+      const y = ((e.clientY - rect.top) / rect.height) * height;
 
-    const side = x < width / 2 ? 'left' : 'right';
+      const side = x < width / 2 ? 'left' : 'right';
 
-    const newMarker = {
-      id: `marker_${Date.now()}`,
-      type: selectedType,
-      x: Math.round(x),
-      y: Math.round(y),
-      side,
-      note: ''
-    };
+      const newMarker = {
+        id: `marker_${Date.now()}`,
+        type: selectedType,
+        x: Math.round(x),
+        y: Math.round(y),
+        side,
+        note: '',
+      };
 
-    onChange([...markers, newMarker]);
-    setSelectedMarker(null);
-  }, [markers, onChange, selectedType, width, height, readOnly]);
+      onChange([...markers, newMarker]);
+      setSelectedMarker(null);
+    },
+    [markers, onChange, selectedType, width, height, readOnly]
+  );
 
-  const handleRemoveMarker = useCallback((markerId) => {
-    onChange(markers.filter(m => m.id !== markerId));
-    setSelectedMarker(null);
-  }, [markers, onChange]);
+  const handleRemoveMarker = useCallback(
+    (markerId) => {
+      onChange(markers.filter((m) => m.id !== markerId));
+      setSelectedMarker(null);
+    },
+    [markers, onChange]
+  );
 
   const handleClearAll = () => {
     onChange([]);
     setSelectedMarker(null);
   };
 
-  const leftMarkers = markers.filter(m => m.side === 'left' || m.x < width / 2).length;
-  const rightMarkers = markers.filter(m => m.side === 'right' || m.x >= width / 2).length;
+  const leftMarkers = markers.filter((m) => m.side === 'left' || m.x < width / 2).length;
+  const rightMarkers = markers.filter((m) => m.side === 'right' || m.x >= width / 2).length;
 
   return (
     <div className={`flex ${compact ? 'gap-2' : 'gap-4'}`}>
@@ -526,9 +659,11 @@ export default function UpperExtremityDiagram({
               onClick={() => setSelectedType(key)}
               disabled={readOnly}
               className={`w-full text-left px-2 py-1 text-xs rounded flex items-center gap-2
-                         ${selectedType === key
-                           ? 'bg-gray-100 ring-1 ring-gray-300'
-                           : 'hover:bg-gray-50'}`}
+                         ${
+                           selectedType === key
+                             ? 'bg-gray-100 ring-1 ring-gray-300'
+                             : 'hover:bg-gray-50'
+                         }`}
             >
               <span
                 className="w-4 h-4 rounded-full flex items-center justify-center text-white text-[9px]"
@@ -556,8 +691,12 @@ export default function UpperExtremityDiagram({
 
         {markers.length > 0 && (
           <div className="text-[10px] text-gray-500 space-y-0.5">
-            <div>V/L: {leftMarkers} {lang === 'no' ? 'markering' : 'marker'}(s)</div>
-            <div>H/R: {rightMarkers} {lang === 'no' ? 'markering' : 'marker'}(s)</div>
+            <div>
+              V/L: {leftMarkers} {lang === 'no' ? 'markering' : 'marker'}(s)
+            </div>
+            <div>
+              H/R: {rightMarkers} {lang === 'no' ? 'markering' : 'marker'}(s)
+            </div>
           </div>
         )}
       </div>

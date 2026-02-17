@@ -20,7 +20,7 @@ const __dirname = path.dirname(__filename);
 const CONFIG = {
   inputDir: 'D:\\ChiroClickCRM-Complete-EHR-CRM-System-Architecture\\training-data-extracted',
   outputDir: 'D:\\ChiroClickCRM-Complete-EHR-CRM-System-Architecture\\ai-training',
-  ollamaModelName: 'chiro-no'
+  ollamaModelName: 'chiro-no',
 };
 
 // Statistics
@@ -28,7 +28,7 @@ const stats = {
   filesProcessed: 0,
   trainingPairs: 0,
   totalChars: 0,
-  categories: {}
+  categories: {},
 };
 
 /**
@@ -48,13 +48,16 @@ async function readExtractedFiles() {
       } else if (entry.name.endsWith('.txt') && !entry.name.includes('README')) {
         const content = await fs.readFile(fullPath, 'utf8');
         // Remove the header added during extraction
-        const cleanContent = content.replace(/^={80}\nSOURCE:.*\nEXTRACTED:.*\nCHARACTERS:.*\n={80}\n\n/s, '');
+        const cleanContent = content.replace(
+          /^={80}\nSOURCE:.*\nEXTRACTED:.*\nCHARACTERS:.*\n={80}\n\n/s,
+          ''
+        );
 
         files.push({
           path: fullPath,
           name: entry.name,
           content: cleanContent,
-          category: categorizeFile(entry.name, fullPath)
+          category: categorizeFile(entry.name, fullPath),
         });
       }
     }
@@ -71,7 +74,12 @@ function categorizeFile(name, fullPath) {
   const nameLower = name.toLowerCase();
   const pathLower = fullPath.toLowerCase();
 
-  if (pathLower.includes('vng') || nameLower.includes('vestibul') || nameLower.includes('svimmel') || nameLower.includes('nystagmus')) {
+  if (
+    pathLower.includes('vng') ||
+    nameLower.includes('vestibul') ||
+    nameLower.includes('svimmel') ||
+    nameLower.includes('nystagmus')
+  ) {
     return 'vestibular';
   }
   if (nameLower.includes('sope') || nameLower.includes('soap') || nameLower.includes('analyse')) {
@@ -97,23 +105,30 @@ function extractSOAPSections(text) {
     subjective: [],
     objective: [],
     assessment: [],
-    plan: []
+    plan: [],
   };
 
   // Common Norwegian SOAP section markers
   const sectionMarkers = {
-    subjective: ['Anamnese', 'Subjective', 'Sykehistorie', 'Hovedklage', 'Pasienten presenterer', 'Pasienten rapporterer'],
+    subjective: [
+      'Anamnese',
+      'Subjective',
+      'Sykehistorie',
+      'Hovedklage',
+      'Pasienten presenterer',
+      'Pasienten rapporterer',
+    ],
     objective: ['Undersøkelse', 'Objective', 'Observasjon', 'Palpasjon', 'ROM', 'Tester'],
     assessment: ['Behandling', 'Assessment', 'Vurdering', 'Diagnose', 'Klinisk'],
-    plan: ['Konklusjon', 'Plan', 'Oppfølging', 'Videre', 'Øvelser', 'Råd']
+    plan: ['Konklusjon', 'Plan', 'Oppfølging', 'Videre', 'Øvelser', 'Råd'],
   };
 
   // Split text into paragraphs
-  const paragraphs = text.split(/\n\n+/).filter(p => p.trim().length > 20);
+  const paragraphs = text.split(/\n\n+/).filter((p) => p.trim().length > 20);
 
   for (const para of paragraphs) {
     for (const [section, markers] of Object.entries(sectionMarkers)) {
-      if (markers.some(m => para.toLowerCase().includes(m.toLowerCase()))) {
+      if (markers.some((m) => para.toLowerCase().includes(m.toLowerCase()))) {
         sections[section].push(para.trim());
         break;
       }
@@ -131,12 +146,17 @@ function generateTrainingPairs(files) {
 
   // System prompts for different tasks
   const systemPrompts = {
-    subjective: 'Du er en klinisk dokumentasjonsassistent for kiropraktorer. Generer profesjonell subjektiv dokumentasjon basert på pasientinformasjon.',
-    objective: 'Du er en klinisk dokumentasjonsassistent for kiropraktorer. Generer profesjonell objektiv dokumentasjon basert på undersøkelsesfunn.',
-    assessment: 'Du er en klinisk dokumentasjonsassistent for kiropraktorer. Generer profesjonell vurdering med diagnose og klinisk resonnement.',
+    subjective:
+      'Du er en klinisk dokumentasjonsassistent for kiropraktorer. Generer profesjonell subjektiv dokumentasjon basert på pasientinformasjon.',
+    objective:
+      'Du er en klinisk dokumentasjonsassistent for kiropraktorer. Generer profesjonell objektiv dokumentasjon basert på undersøkelsesfunn.',
+    assessment:
+      'Du er en klinisk dokumentasjonsassistent for kiropraktorer. Generer profesjonell vurdering med diagnose og klinisk resonnement.',
     plan: 'Du er en klinisk dokumentasjonsassistent for kiropraktorer. Generer profesjonell behandlingsplan med øvelser og oppfølging.',
-    vestibular: 'Du er en klinisk dokumentasjonsassistent spesialisert på vestibulær vurdering. Generer profesjonell VNG-dokumentasjon.',
-    general: 'Du er en klinisk dokumentasjonsassistent for kiropraktorer i Norge. Generer profesjonell klinisk dokumentasjon på norsk.'
+    vestibular:
+      'Du er en klinisk dokumentasjonsassistent spesialisert på vestibulær vurdering. Generer profesjonell VNG-dokumentasjon.',
+    general:
+      'Du er en klinisk dokumentasjonsassistent for kiropraktorer i Norge. Generer profesjonell klinisk dokumentasjon på norsk.',
   };
 
   for (const file of files) {
@@ -156,7 +176,7 @@ function generateTrainingPairs(files) {
             system: systemPrompts[sectionName] || systemPrompts.general,
             instruction: getInstructionForSection(sectionName),
             input: extractContext(content),
-            output: content
+            output: content,
           });
           stats.trainingPairs++;
         }
@@ -186,10 +206,11 @@ function generateTrainingPairs(files) {
  */
 function getInstructionForSection(section) {
   const instructions = {
-    subjective: 'Skriv den subjektive delen av et SOPE-notat for en pasient med følgende informasjon:',
+    subjective:
+      'Skriv den subjektive delen av et SOPE-notat for en pasient med følgende informasjon:',
     objective: 'Skriv den objektive delen av et SOPE-notat basert på følgende undersøkelsesfunn:',
     assessment: 'Skriv vurderingsdelen av et SOPE-notat med diagnose og klinisk resonnement:',
-    plan: 'Skriv plandelen av et SOPE-notat med behandling og oppfølging:'
+    plan: 'Skriv plandelen av et SOPE-notat med behandling og oppfølging:',
   };
   return instructions[section] || 'Generer klinisk dokumentasjon:';
 }
@@ -201,12 +222,24 @@ function extractContext(content) {
   // Extract key terms as context
   const keyTerms = [];
 
-  if (content.includes('nakke')) keyTerms.push('nakkesmerter');
-  if (content.includes('rygg') || content.includes('lumbal')) keyTerms.push('ryggsmerter');
-  if (content.includes('skulder')) keyTerms.push('skuldersmerter');
-  if (content.includes('hofte')) keyTerms.push('hoftesmerter');
-  if (content.includes('svimmel') || content.includes('vertigo')) keyTerms.push('svimmelhet');
-  if (content.includes('hodepine')) keyTerms.push('hodepine');
+  if (content.includes('nakke')) {
+    keyTerms.push('nakkesmerter');
+  }
+  if (content.includes('rygg') || content.includes('lumbal')) {
+    keyTerms.push('ryggsmerter');
+  }
+  if (content.includes('skulder')) {
+    keyTerms.push('skuldersmerter');
+  }
+  if (content.includes('hofte')) {
+    keyTerms.push('hoftesmerter');
+  }
+  if (content.includes('svimmel') || content.includes('vertigo')) {
+    keyTerms.push('svimmelhet');
+  }
+  if (content.includes('hodepine')) {
+    keyTerms.push('hodepine');
+  }
 
   if (keyTerms.length > 0) {
     return `Pasient med ${keyTerms.join(', ')}`;
@@ -214,7 +247,9 @@ function extractContext(content) {
 
   // Return first sentence as context
   const firstSentence = content.split(/[.!?]/)[0];
-  return firstSentence.length > 10 ? firstSentence.substring(0, 100) : 'Pasient presenterer seg med plager';
+  return firstSentence.length > 10
+    ? firstSentence.substring(0, 100)
+    : 'Pasient presenterer seg med plager';
 }
 
 /**
@@ -222,7 +257,7 @@ function extractContext(content) {
  */
 function extractPhrasePairs(content) {
   const pairs = [];
-  const lines = content.split('\n').filter(l => l.trim().length > 10);
+  const lines = content.split('\n').filter((l) => l.trim().length > 10);
 
   for (let i = 0; i < lines.length - 1; i++) {
     const line = lines[i].trim();
@@ -233,7 +268,7 @@ function extractPhrasePairs(content) {
         system: 'Du er en klinisk dokumentasjonsassistent. Fullfør den kliniske frasen.',
         instruction: 'Fullfør følgende kliniske frase:',
         input: line.replace(/\[.*?\]/g, '___'),
-        output: line
+        output: line,
       });
     }
 
@@ -247,7 +282,7 @@ function extractPhrasePairs(content) {
           system: 'Du er en klinisk dokumentasjonsassistent for kiropraktorer.',
           instruction: `Skriv et eksempel på ${category.toLowerCase()}:`,
           input: '',
-          output: example
+          output: example,
         });
       }
     }
@@ -268,14 +303,17 @@ function extractCasePairs(content) {
   for (const caseText of cases) {
     if (caseText.length > 200 && caseText.length < 10000) {
       // Extract chief complaint if present
-      const ccMatch = caseText.match(/(?:hovedklage|presenterer seg med|kommer inn med)[:\s]*([^.]+)/i);
+      const ccMatch = caseText.match(
+        /(?:hovedklage|presenterer seg med|kommer inn med)[:\s]*([^.]+)/i
+      );
       const chiefComplaint = ccMatch ? ccMatch[1].trim() : 'kliniske plager';
 
       pairs.push({
-        system: 'Du er en klinisk dokumentasjonsassistent for kiropraktorer i Norge. Generer fullstendig SOPE-notat.',
+        system:
+          'Du er en klinisk dokumentasjonsassistent for kiropraktorer i Norge. Generer fullstendig SOPE-notat.',
         instruction: 'Skriv et fullstendig SOPE-notat for følgende pasient:',
         input: `Pasient med ${chiefComplaint}`,
-        output: caseText.trim().substring(0, 4000) // Limit length
+        output: caseText.trim().substring(0, 4000), // Limit length
       });
     }
   }
@@ -287,14 +325,14 @@ function extractCasePairs(content) {
  * Generate JSONL file for fine-tuning
  */
 async function generateJSONL(pairs, outputPath) {
-  const lines = pairs.map(pair => {
+  const lines = pairs.map((pair) => {
     // OpenAI/Llama chat format
     return JSON.stringify({
       messages: [
         { role: 'system', content: pair.system },
         { role: 'user', content: pair.instruction + (pair.input ? `\n\n${pair.input}` : '') },
-        { role: 'assistant', content: pair.output }
-      ]
+        { role: 'assistant', content: pair.output },
+      ],
     });
   });
 
@@ -306,10 +344,10 @@ async function generateJSONL(pairs, outputPath) {
  * Generate Alpaca format for Llama fine-tuning
  */
 async function generateAlpacaFormat(pairs, outputPath) {
-  const data = pairs.map(pair => ({
+  const data = pairs.map((pair) => ({
     instruction: pair.instruction,
     input: pair.input,
-    output: pair.output
+    output: pair.output,
   }));
 
   await fs.writeFile(outputPath, JSON.stringify(data, null, 2), 'utf8');
@@ -464,10 +502,10 @@ Not a substitute for professional clinical judgment.
  */
 async function generateRAGChunks(files, outputPath) {
   const chunks = [];
-  const chunkSize = 500; // tokens approx
+  const _chunkSize = 500; // tokens approx
 
   for (const file of files) {
-    const paragraphs = file.content.split(/\n\n+/).filter(p => p.trim().length > 50);
+    const paragraphs = file.content.split(/\n\n+/).filter((p) => p.trim().length > 50);
 
     for (const para of paragraphs) {
       if (para.length > 100 && para.length < 2000) {
@@ -479,8 +517,8 @@ async function generateRAGChunks(files, outputPath) {
           metadata: {
             charCount: para.length,
             hasSOAP: /anamnese|undersøkelse|behandling|konklusjon/i.test(para),
-            hasVNG: /vng|vestibul|nystagmus|svimmel/i.test(para)
-          }
+            hasVNG: /vng|vestibul|nystagmus|svimmel/i.test(para),
+          },
         });
       }
     }
@@ -591,7 +629,7 @@ async function main() {
       filesProcessed: stats.filesProcessed,
       trainingPairs: stats.trainingPairs,
       totalCharacters: stats.totalChars,
-      categories: stats.categories
+      categories: stats.categories,
     },
     outputs: [
       'training-data.jsonl - OpenAI/Llama chat format',
@@ -599,12 +637,12 @@ async function main() {
       'Modelfile - Ollama model definition',
       'rag-chunks.json - RAG-ready document chunks',
       'build-model.bat - Windows build script',
-      'build-model.sh - Linux/Mac build script'
+      'build-model.sh - Linux/Mac build script',
     ],
     usage: {
       ollama: 'Run build-model.bat to create the chiro-no model',
-      test: 'ollama run chiro-no "Skriv et SOPE-notat for en pasient med nakkesmerter"'
-    }
+      test: 'ollama run chiro-no "Skriv et SOPE-notat for en pasient med nakkesmerter"',
+    },
   };
 
   await fs.writeFile(
@@ -635,7 +673,7 @@ async function main() {
 }
 
 // Run
-main().catch(error => {
+main().catch((error) => {
   console.error('Fatal error:', error);
   process.exit(1);
 });

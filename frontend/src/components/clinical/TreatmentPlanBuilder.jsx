@@ -87,7 +87,9 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel })
   };
 
   const addGoal = () => {
-    if (!newGoal.trim()) return;
+    if (!newGoal.trim()) {
+      return;
+    }
     updateForm('goals', [...form.goals, newGoal.trim()]);
     setNewGoal('');
   };
@@ -100,7 +102,9 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel })
   };
 
   const addMilestone = () => {
-    if (!newMilestone.title.trim()) return;
+    if (!newMilestone.title.trim()) {
+      return;
+    }
     updateForm('milestones', [...form.milestones, { ...newMilestone }]);
     setNewMilestone({ title: '', targetDate: '', outcomeMeasure: '', targetScore: '' });
   };
@@ -162,7 +166,9 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel })
         });
       }
 
-      if (onCreated) onCreated(planRes.data);
+      if (onCreated) {
+        onCreated(planRes.data);
+      }
     } catch (err) {
       setError(err.response?.data?.error || err.message);
     } finally {

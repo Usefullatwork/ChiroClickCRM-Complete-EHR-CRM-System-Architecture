@@ -3,7 +3,7 @@
  * Components for exercise prescription and documentation
  */
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import _React, { useState, useEffect, _useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { exercisesAPI } from '../../services/api';
 import {
@@ -12,16 +12,16 @@ import {
   X,
   Plus,
   Check,
-  ChevronDown,
-  ChevronUp,
+  _ChevronDown,
+  _ChevronUp,
   Play,
   Clock,
   Dumbbell,
   Star,
   Loader2,
-  AlertCircle,
+  _AlertCircle,
   Info,
-  Image as ImageIcon
+  Image as _ImageIcon,
 } from 'lucide-react';
 
 // Body region labels in Norwegian
@@ -36,7 +36,7 @@ const BODY_REGION_LABELS = {
   core: 'Kjerne',
   full_body: 'Helkropp',
   upper_extremity: 'Overekstremitet',
-  lower_extremity: 'Underekstremitet'
+  lower_extremity: 'Underekstremitet',
 };
 
 // Category labels in Norwegian
@@ -48,14 +48,14 @@ const CATEGORY_LABELS = {
   vestibular: 'Vestibulær',
   breathing: 'Pust',
   posture: 'Holdning',
-  nerve_glide: 'Nervegliding'
+  nerve_glide: 'Nervegliding',
 };
 
 // Difficulty labels in Norwegian
-const DIFFICULTY_LABELS = {
+const _DIFFICULTY_LABELS = {
   beginner: 'Lett',
   intermediate: 'Middels',
-  advanced: 'Vanskelig'
+  advanced: 'Vanskelig',
 };
 
 // Frequency labels in Norwegian
@@ -63,7 +63,7 @@ const FREQUENCY_LABELS = {
   daily: 'Daglig',
   '2x_daily': '2 ganger daglig',
   '3x_week': '3 ganger per uke',
-  weekly: 'Ukentlig'
+  weekly: 'Ukentlig',
 };
 
 /**
@@ -98,9 +98,7 @@ const ExerciseCard = ({ exercise, onSelect, isSelected, compact = false }) => {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div>
-              <h4 className="font-medium text-sm text-slate-800 truncate">
-                {exercise.name_no}
-              </h4>
+              <h4 className="font-medium text-sm text-slate-800 truncate">{exercise.name_no}</h4>
               <div className="flex items-center gap-2 mt-0.5">
                 <span className="text-xs px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">
                   {BODY_REGION_LABELS[exercise.body_region] || exercise.body_region}
@@ -137,11 +135,13 @@ const ExerciseCard = ({ exercise, onSelect, isSelected, compact = false }) => {
           {/* Default dosing */}
           {!compact && (
             <div className="mt-1.5 flex items-center gap-3 text-xs text-slate-500">
-              <span>{exercise.default_sets || 3}x{exercise.default_reps || 10}</span>
-              {exercise.default_hold_seconds && (
-                <span>Hold: {exercise.default_hold_seconds}s</span>
-              )}
-              <span>{FREQUENCY_LABELS[exercise.default_frequency] || exercise.default_frequency}</span>
+              <span>
+                {exercise.default_sets || 3}x{exercise.default_reps || 10}
+              </span>
+              {exercise.default_hold_seconds && <span>Hold: {exercise.default_hold_seconds}s</span>}
+              <span>
+                {FREQUENCY_LABELS[exercise.default_frequency] || exercise.default_frequency}
+              </span>
             </div>
           )}
         </div>
@@ -150,9 +150,7 @@ const ExerciseCard = ({ exercise, onSelect, isSelected, compact = false }) => {
       {/* Expanded details */}
       {showDetails && (
         <div className="mt-3 pt-3 border-t border-slate-100">
-          <p className="text-xs text-slate-600 leading-relaxed">
-            {exercise.instructions_no}
-          </p>
+          <p className="text-xs text-slate-600 leading-relaxed">{exercise.instructions_no}</p>
           {exercise.contraindications && (
             <div className="mt-2 p-2 bg-red-50 rounded text-xs text-red-700">
               <strong>Kontraindikasjoner:</strong> {exercise.contraindications}
@@ -181,8 +179,12 @@ const ExerciseCard = ({ exercise, onSelect, isSelected, compact = false }) => {
 const SelectedExerciseItem = ({ exercise, onRemove, onUpdate, readOnly = false }) => {
   const [sets, setSets] = useState(exercise.sets || exercise.default_sets || 3);
   const [reps, setReps] = useState(exercise.reps || exercise.default_reps || 10);
-  const [holdSeconds, setHoldSeconds] = useState(exercise.hold_seconds || exercise.default_hold_seconds || null);
-  const [frequency, setFrequency] = useState(exercise.frequency || exercise.default_frequency || 'daily');
+  const [holdSeconds, _setHoldSeconds] = useState(
+    exercise.hold_seconds || exercise.default_hold_seconds || null
+  );
+  const [frequency, setFrequency] = useState(
+    exercise.frequency || exercise.default_frequency || 'daily'
+  );
 
   useEffect(() => {
     onUpdate({
@@ -190,7 +192,7 @@ const SelectedExerciseItem = ({ exercise, onRemove, onUpdate, readOnly = false }
       sets,
       reps,
       hold_seconds: holdSeconds,
-      frequency
+      frequency,
     });
   }, [sets, reps, holdSeconds, frequency]);
 
@@ -276,13 +278,17 @@ export const ExercisePanel = ({
 
   // Fetch exercises
   const { data: exercisesData, isLoading: loadingExercises } = useQuery({
-    queryKey: ['exercises', { search: searchTerm, category: selectedCategory, bodyRegion: selectedBodyRegion }],
-    queryFn: () => exercisesAPI.getAll({
-      search: searchTerm || undefined,
-      category: selectedCategory || undefined,
-      bodyRegion: selectedBodyRegion || undefined,
-      limit: 50
-    }),
+    queryKey: [
+      'exercises',
+      { search: searchTerm, category: selectedCategory, bodyRegion: selectedBodyRegion },
+    ],
+    queryFn: () =>
+      exercisesAPI.getAll({
+        search: searchTerm || undefined,
+        category: selectedCategory || undefined,
+        bodyRegion: selectedBodyRegion || undefined,
+        limit: 50,
+      }),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
@@ -313,7 +319,7 @@ export const ExercisePanel = ({
     mutationFn: ({ patientId, data }) => exercisesAPI.prescribeToPatient(patientId, data),
     onSuccess: () => {
       queryClient.invalidateQueries(['patient', patientId, 'exercises']);
-    }
+    },
   });
 
   // Get exercises array from response
@@ -324,32 +330,35 @@ export const ExercisePanel = ({
 
   // Handle exercise selection
   const handleSelectExercise = useCallback((exercise) => {
-    setSelectedExercises(prev => {
-      const isSelected = prev.some(e => e.id === exercise.id || e.code === exercise.code);
+    setSelectedExercises((prev) => {
+      const isSelected = prev.some((e) => e.id === exercise.id || e.code === exercise.code);
       if (isSelected) {
-        return prev.filter(e => e.id !== exercise.id && e.code !== exercise.code);
+        return prev.filter((e) => e.id !== exercise.id && e.code !== exercise.code);
       }
-      return [...prev, {
-        ...exercise,
-        sets: exercise.default_sets || 3,
-        reps: exercise.default_reps || 10,
-        hold_seconds: exercise.default_hold_seconds,
-        frequency: exercise.default_frequency || 'daily'
-      }];
+      return [
+        ...prev,
+        {
+          ...exercise,
+          sets: exercise.default_sets || 3,
+          reps: exercise.default_reps || 10,
+          hold_seconds: exercise.default_hold_seconds,
+          frequency: exercise.default_frequency || 'daily',
+        },
+      ];
     });
   }, []);
 
   // Handle exercise update
   const handleUpdateExercise = useCallback((updatedExercise) => {
-    setSelectedExercises(prev =>
-      prev.map(e => e.id === updatedExercise.id ? updatedExercise : e)
+    setSelectedExercises((prev) =>
+      prev.map((e) => (e.id === updatedExercise.id ? updatedExercise : e))
     );
   }, []);
 
   // Handle exercise removal
   const handleRemoveExercise = useCallback((exercise) => {
-    setSelectedExercises(prev =>
-      prev.filter(e => e.id !== exercise.id && e.code !== exercise.code)
+    setSelectedExercises((prev) =>
+      prev.filter((e) => e.id !== exercise.id && e.code !== exercise.code)
     );
   }, []);
 
@@ -363,32 +372,37 @@ export const ExercisePanel = ({
   // Apply program
   const handleApplyProgram = useCallback((program) => {
     if (program.exercises && Array.isArray(program.exercises)) {
-      const newExercises = program.exercises.map(pe => ({
+      const newExercises = program.exercises.map((pe) => ({
         id: pe.exercise_id,
         code: pe.exercise_code,
         name_no: pe.exercise_name,
         sets: pe.sets || 3,
         reps: pe.reps || 10,
         hold_seconds: pe.hold_seconds,
-        frequency: pe.frequency || 'daily'
+        frequency: pe.frequency || 'daily',
       }));
-      setSelectedExercises(prev => {
+      setSelectedExercises((prev) => {
         // Avoid duplicates
-        const existingCodes = prev.map(e => e.code);
-        const uniqueNew = newExercises.filter(e => !existingCodes.includes(e.code));
+        const existingCodes = prev.map((e) => e.code);
+        const uniqueNew = newExercises.filter((e) => !existingCodes.includes(e.code));
         return [...prev, ...uniqueNew];
       });
     }
   }, []);
 
   // Check if exercise is selected
-  const isExerciseSelected = useCallback((exercise) => {
-    return selectedExercises.some(e => e.id === exercise.id || e.code === exercise.code);
-  }, [selectedExercises]);
+  const isExerciseSelected = useCallback(
+    (exercise) => {
+      return selectedExercises.some((e) => e.id === exercise.id || e.code === exercise.code);
+    },
+    [selectedExercises]
+  );
 
   // Prescribe selected exercises
   const handlePrescribeAll = async () => {
-    if (!patientId || selectedExercises.length === 0) return;
+    if (!patientId || selectedExercises.length === 0) {
+      return;
+    }
 
     for (const exercise of selectedExercises) {
       await prescribeMutation.mutateAsync({
@@ -402,8 +416,8 @@ export const ExercisePanel = ({
           reps: exercise.reps,
           hold_seconds: exercise.hold_seconds,
           frequency: exercise.frequency,
-          encounter_id: encounterId
-        }
+          encounter_id: encounterId,
+        },
       });
     }
   };
@@ -483,7 +497,9 @@ export const ExercisePanel = ({
               >
                 <option value="">Alle regioner</option>
                 {Object.entries(BODY_REGION_LABELS).map(([value, label]) => (
-                  <option key={value} value={value}>{label}</option>
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
                 ))}
               </select>
               <select
@@ -493,7 +509,9 @@ export const ExercisePanel = ({
               >
                 <option value="">Alle kategorier</option>
                 {Object.entries(CATEGORY_LABELS).map(([value, label]) => (
-                  <option key={value} value={value}>{label}</option>
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
                 ))}
               </select>
             </div>
@@ -510,9 +528,7 @@ export const ExercisePanel = ({
                 <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
               </div>
             ) : exercises.length === 0 ? (
-              <div className="text-center py-6 text-slate-500 text-sm">
-                Ingen øvelser funnet
-              </div>
+              <div className="text-center py-6 text-slate-500 text-sm">Ingen øvelser funnet</div>
             ) : (
               exercises.map((exercise) => (
                 <ExerciseCard
@@ -563,9 +579,7 @@ export const ExercisePanel = ({
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <h4 className="font-medium text-sm text-slate-800">
-                        {program.name_no}
-                      </h4>
+                      <h4 className="font-medium text-sm text-slate-800">{program.name_no}</h4>
                       {program.description_no && (
                         <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">
                           {program.description_no}
@@ -651,13 +665,13 @@ export const ExercisePanel = ({
             {patientExercises.slice(0, 3).map((prescription) => (
               <div key={prescription.id} className="flex items-center justify-between">
                 <span className="truncate">{prescription.exercise_name}</span>
-                <span>{prescription.sets}x{prescription.reps}</span>
+                <span>
+                  {prescription.sets}x{prescription.reps}
+                </span>
               </div>
             ))}
             {patientExercises.length > 3 && (
-              <span className="text-slate-400">
-                + {patientExercises.length - 3} flere...
-              </span>
+              <span className="text-slate-400">+ {patientExercises.length - 3} flere...</span>
             )}
           </div>
         </div>

@@ -9,7 +9,7 @@
  * Some exceptions exist, but this covers the vast majority
  */
 const OSLO_POSTAL_CODE_RANGES = [
-  { min: 1, max: 1299 }  // Oslo postal codes
+  { min: 1, max: 1299 }, // Oslo postal codes
 ];
 
 /**
@@ -17,14 +17,14 @@ const OSLO_POSTAL_CODE_RANGES = [
  * Includes Bærum, Asker, Lillestrøm, etc.
  */
 const GREATER_OSLO_POSTAL_CODES = [
-  { min: 1300, max: 1390 },  // Ski, Oppegård
-  { min: 1400, max: 1490 },  // Nesoddtangen
-  { min: 1500, max: 1599 },  // Moss
-  { min: 1600, max: 1799 },  // Fredrikstad
-  { min: 1800, max: 1890 },  // Askim
-  { min: 1900, max: 1999 },  // Fetsund
-  { min: 2000, max: 2099 },  // Lillestrøm
-  { min: 3000, max: 3099 },  // Drammen (close to Oslo)
+  { min: 1300, max: 1390 }, // Ski, Oppegård
+  { min: 1400, max: 1490 }, // Nesoddtangen
+  { min: 1500, max: 1599 }, // Moss
+  { min: 1600, max: 1799 }, // Fredrikstad
+  { min: 1800, max: 1890 }, // Askim
+  { min: 1900, max: 1999 }, // Fetsund
+  { min: 2000, max: 2099 }, // Lillestrøm
+  { min: 3000, max: 3099 }, // Drammen (close to Oslo)
 ];
 
 /**
@@ -33,16 +33,18 @@ const GREATER_OSLO_POSTAL_CODES = [
  * @returns {boolean} - True if Oslo postal code
  */
 export const isOsloPostalCode = (postalCode) => {
-  if (!postalCode) return false;
+  if (!postalCode) {
+    return false;
+  }
 
   // Remove spaces and convert to number
   const code = parseInt(postalCode.replace(/\s+/g, ''), 10);
 
-  if (isNaN(code)) return false;
+  if (isNaN(code)) {
+    return false;
+  }
 
-  return OSLO_POSTAL_CODE_RANGES.some(
-    range => code >= range.min && code <= range.max
-  );
+  return OSLO_POSTAL_CODE_RANGES.some((range) => code >= range.min && code <= range.max);
 };
 
 /**
@@ -51,15 +53,20 @@ export const isOsloPostalCode = (postalCode) => {
  * @returns {boolean} - True if in greater Oslo area
  */
 export const isGreaterOsloPostalCode = (postalCode) => {
-  if (!postalCode) return false;
+  if (!postalCode) {
+    return false;
+  }
 
   const code = parseInt(postalCode.replace(/\s+/g, ''), 10);
 
-  if (isNaN(code)) return false;
+  if (isNaN(code)) {
+    return false;
+  }
 
   // Check if Oslo or Greater Oslo
-  return isOsloPostalCode(postalCode) || GREATER_OSLO_POSTAL_CODES.some(
-    range => code >= range.min && code <= range.max
+  return (
+    isOsloPostalCode(postalCode) ||
+    GREATER_OSLO_POSTAL_CODES.some((range) => code >= range.min && code <= range.max)
   );
 };
 
@@ -98,7 +105,7 @@ export const getDistanceCategory = (patient) => {
     oslo: 'Oslo',
     greater_oslo: 'Greater Oslo Area',
     outside_oslo: 'Outside Oslo',
-    unknown: 'Unknown Location'
+    unknown: 'Unknown Location',
   };
 
   return labels[classification] || 'Unknown';
@@ -155,7 +162,7 @@ export const classifyVisit = (visit) => {
     location,
     locationLabel: getDistanceCategory(visit.patient),
     // Special flag for Saturday + non-Oslo combination
-    isSaturdayNonOslo: isSaturdayVisit && location === 'outside_oslo'
+    isSaturdayNonOslo: isSaturdayVisit && location === 'outside_oslo',
   };
 };
 
@@ -165,7 +172,9 @@ export const classifyVisit = (visit) => {
  * @returns {boolean} - True if Oslo
  */
 export const isOsloCity = (address) => {
-  if (!address?.city) return false;
+  if (!address?.city) {
+    return false;
+  }
 
   const city = address.city.toLowerCase().trim();
   return city === 'oslo';
@@ -177,7 +186,9 @@ export const isOsloCity = (address) => {
  * @returns {string} - Formatted postal code (NNNN)
  */
 export const formatPostalCode = (postalCode) => {
-  if (!postalCode) return '';
+  if (!postalCode) {
+    return '';
+  }
 
   // Remove all non-digits
   const digits = postalCode.replace(/\D/g, '');
@@ -194,16 +205,34 @@ export const formatPostalCode = (postalCode) => {
 export const getRegionLabel = (postalCode) => {
   const code = parseInt(formatPostalCode(postalCode), 10);
 
-  if (isNaN(code)) return 'Unknown';
+  if (isNaN(code)) {
+    return 'Unknown';
+  }
 
-  if (code >= 1 && code <= 1299) return 'Oslo';
-  if (code >= 1300 && code <= 3999) return 'Viken (Oslo Area)';
-  if (code >= 4000 && code <= 4999) return 'Rogaland';
-  if (code >= 5000 && code <= 5999) return 'Vestland';
-  if (code >= 6000 && code <= 6999) return 'Møre og Romsdal';
-  if (code >= 7000 && code <= 7999) return 'Trøndelag';
-  if (code >= 8000 && code <= 8999) return 'Nordland';
-  if (code >= 9000 && code <= 9999) return 'Troms og Finnmark';
+  if (code >= 1 && code <= 1299) {
+    return 'Oslo';
+  }
+  if (code >= 1300 && code <= 3999) {
+    return 'Viken (Oslo Area)';
+  }
+  if (code >= 4000 && code <= 4999) {
+    return 'Rogaland';
+  }
+  if (code >= 5000 && code <= 5999) {
+    return 'Vestland';
+  }
+  if (code >= 6000 && code <= 6999) {
+    return 'Møre og Romsdal';
+  }
+  if (code >= 7000 && code <= 7999) {
+    return 'Trøndelag';
+  }
+  if (code >= 8000 && code <= 8999) {
+    return 'Nordland';
+  }
+  if (code >= 9000 && code <= 9999) {
+    return 'Troms og Finnmark';
+  }
 
   return 'Unknown';
 };

@@ -9,11 +9,11 @@
  * - GLTF model support (when available)
  * - Fallback to procedural geometry
  */
-import React, { useState, useRef, useCallback, Suspense, useMemo } from 'react';
+import _React, { useState, useRef, useCallback, Suspense, useMemo } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Text, Html, PerspectiveCamera, Environment } from '@react-three/drei';
+import { OrbitControls, _Text, Html, _PerspectiveCamera, Environment } from '@react-three/drei';
 import * as THREE from 'three';
-import { RotateCcw, Rotate3D, ZoomIn, ZoomOut, Move } from 'lucide-react';
+import { RotateCcw, Rotate3D, _ZoomIn, _ZoomOut, Move } from 'lucide-react';
 
 // Vertebra configuration for 3D positioning
 const VERTEBRA_CONFIG = {
@@ -26,8 +26,8 @@ const VERTEBRA_CONFIG = {
       { id: 'C4', y: 6.4, scale: 0.42 },
       { id: 'C5', y: 5.7, scale: 0.44 },
       { id: 'C6', y: 5.0, scale: 0.46 },
-      { id: 'C7', y: 4.3, scale: 0.5 }
-    ]
+      { id: 'C7', y: 4.3, scale: 0.5 },
+    ],
   },
   thoracic: {
     color: '#10B981',
@@ -43,8 +43,8 @@ const VERTEBRA_CONFIG = {
       { id: 'T9', y: -2.1, scale: 0.61 },
       { id: 'T10', y: -2.8, scale: 0.63 },
       { id: 'T11', y: -3.5, scale: 0.65 },
-      { id: 'T12', y: -4.2, scale: 0.68 }
-    ]
+      { id: 'T12', y: -4.2, scale: 0.68 },
+    ],
   },
   lumbar: {
     color: '#F59E0B',
@@ -53,16 +53,16 @@ const VERTEBRA_CONFIG = {
       { id: 'L2', y: -5.9, scale: 0.76 },
       { id: 'L3', y: -6.8, scale: 0.8 },
       { id: 'L4', y: -7.7, scale: 0.84 },
-      { id: 'L5', y: -8.6, scale: 0.88 }
-    ]
+      { id: 'L5', y: -8.6, scale: 0.88 },
+    ],
   },
   sacral: {
     color: '#EF4444',
     segments: [
       { id: 'Sacrum', y: -9.8, scale: 1.0, special: 'sacrum' },
-      { id: 'Coccyx', y: -11.2, scale: 0.3, special: 'coccyx' }
-    ]
-  }
+      { id: 'Coccyx', y: -11.2, scale: 0.3, special: 'coccyx' },
+    ],
+  },
 };
 
 // Finding colors
@@ -72,12 +72,12 @@ const FINDING_COLORS = {
   restriction: '#EAB308',
   tenderness: '#A855F7',
   spasm: '#3B82F6',
-  default: '#9CA3AF'
+  default: '#9CA3AF',
 };
 
 // Procedural vertebra geometry
 function createVertebraGeometry(scale, special) {
-  const geometry = new THREE.BufferGeometry();
+  const _geometry = new THREE.BufferGeometry();
 
   if (special === 'sacrum') {
     // Triangular sacrum shape
@@ -102,12 +102,7 @@ function createVertebraGeometry(scale, special) {
   const bodyHeight = 0.15 * scale;
 
   // Create vertebral body (cylinder)
-  const bodyGeometry = new THREE.CylinderGeometry(
-    bodyRadius,
-    bodyRadius * 1.1,
-    bodyHeight,
-    16
-  );
+  const bodyGeometry = new THREE.CylinderGeometry(bodyRadius, bodyRadius * 1.1, bodyHeight, 16);
 
   return bodyGeometry;
 }
@@ -122,9 +117,9 @@ function Vertebra({
   hasFinding,
   findingColor,
   isSelected,
-  isHovered,
+  _isHovered,
   onClick,
-  onHover
+  onHover,
 }) {
   const meshRef = useRef();
   const [localHovered, setLocalHovered] = useState(false);
@@ -133,19 +128,22 @@ function Vertebra({
   useFrame(() => {
     if (meshRef.current) {
       const targetScale = localHovered || isSelected ? 1.15 : 1;
-      meshRef.current.scale.lerp(
-        new THREE.Vector3(targetScale, targetScale, targetScale),
-        0.1
-      );
+      meshRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
     }
   });
 
   const geometry = useMemo(() => createVertebraGeometry(scale, special), [scale, special]);
 
   const color = useMemo(() => {
-    if (hasFinding && findingColor) return findingColor;
-    if (isSelected) return '#1F2937';
-    if (localHovered) return regionColor;
+    if (hasFinding && findingColor) {
+      return findingColor;
+    }
+    if (isSelected) {
+      return '#1F2937';
+    }
+    if (localHovered) {
+      return regionColor;
+    }
     return new THREE.Color(regionColor).lerp(new THREE.Color('#FFFFFF'), 0.4).getHexString();
   }, [hasFinding, findingColor, isSelected, localHovered, regionColor]);
 
@@ -222,22 +220,30 @@ function SpineModel({ findings, onVertebraClick, selectedVertebra, hoveredVerteb
   });
 
   // Get finding color for vertebra
-  const getFindingColor = useCallback((vertebraId) => {
-    const vFindings = Object.values(findings).filter(f => f.vertebra === vertebraId);
-    if (vFindings.length === 0) return null;
-
-    const priority = ['subluxation', 'fixation', 'restriction', 'tenderness', 'spasm'];
-    for (const type of priority) {
-      if (vFindings.some(f => f.type === type)) {
-        return FINDING_COLORS[type];
+  const getFindingColor = useCallback(
+    (vertebraId) => {
+      const vFindings = Object.values(findings).filter((f) => f.vertebra === vertebraId);
+      if (vFindings.length === 0) {
+        return null;
       }
-    }
-    return FINDING_COLORS.default;
-  }, [findings]);
 
-  const hasFinding = useCallback((vertebraId) => {
-    return Object.values(findings).some(f => f.vertebra === vertebraId);
-  }, [findings]);
+      const priority = ['subluxation', 'fixation', 'restriction', 'tenderness', 'spasm'];
+      for (const type of priority) {
+        if (vFindings.some((f) => f.type === type)) {
+          return FINDING_COLORS[type];
+        }
+      }
+      return FINDING_COLORS.default;
+    },
+    [findings]
+  );
+
+  const hasFinding = useCallback(
+    (vertebraId) => {
+      return Object.values(findings).some((f) => f.vertebra === vertebraId);
+    },
+    [findings]
+  );
 
   return (
     <group ref={groupRef}>
@@ -248,7 +254,7 @@ function SpineModel({ findings, onVertebraClick, selectedVertebra, hoveredVerteb
       </mesh>
 
       {/* Render all vertebrae */}
-      {Object.entries(VERTEBRA_CONFIG).map(([regionKey, region]) =>
+      {Object.entries(VERTEBRA_CONFIG).map(([_regionKey, region]) =>
         region.segments.map((seg) => (
           <Vertebra
             key={seg.id}
@@ -321,10 +327,10 @@ function LoadingSpine() {
 // Main component
 export default function Spine3DViewer({
   findings = {},
-  onChange,
+  _onChange,
   onInsertText,
   templates = {},
-  className = ''
+  className = '',
 }) {
   const [selectedVertebra, setSelectedVertebra] = useState(null);
   const [hoveredVertebra, setHoveredVertebra] = useState(null);
@@ -337,24 +343,27 @@ export default function Spine3DViewer({
     back: [0, 0, -8],
     left: [-8, 0, 0],
     right: [8, 0, 0],
-    top: [0, 12, 0]
+    top: [0, 12, 0],
   };
 
   // Handle vertebra click
-  const handleVertebraClick = useCallback((vertebraId) => {
-    setSelectedVertebra(prev => prev === vertebraId ? null : vertebraId);
+  const handleVertebraClick = useCallback(
+    (vertebraId) => {
+      setSelectedVertebra((prev) => (prev === vertebraId ? null : vertebraId));
 
-    if (onInsertText && templates) {
-      // Get default template text
-      const segmentTemplates = templates[vertebraId] || [];
-      if (segmentTemplates.length > 0) {
-        // For now, insert first template - could show popup for direction selection
-        onInsertText(segmentTemplates[0].text_template);
-      } else {
-        onInsertText(`${vertebraId} `);
+      if (onInsertText && templates) {
+        // Get default template text
+        const segmentTemplates = templates[vertebraId] || [];
+        if (segmentTemplates.length > 0) {
+          // For now, insert first template - could show popup for direction selection
+          onInsertText(segmentTemplates[0].text_template);
+        } else {
+          onInsertText(`${vertebraId} `);
+        }
       }
-    }
-  }, [onInsertText, templates]);
+    },
+    [onInsertText, templates]
+  );
 
   // Reset camera
   const resetCamera = useCallback(() => {
@@ -383,7 +392,7 @@ export default function Spine3DViewer({
         {/* View Controls */}
         <div className="flex items-center gap-2">
           <div className="inline-flex rounded-lg border border-gray-300 bg-white p-0.5">
-            {['front', 'back', 'left', 'right'].map(preset => (
+            {['front', 'back', 'left', 'right'].map((preset) => (
               <button
                 key={preset}
                 onClick={() => setCameraPreset(preset)}
@@ -393,9 +402,13 @@ export default function Spine3DViewer({
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
-                {preset === 'front' ? 'Foran' :
-                 preset === 'back' ? 'Bak' :
-                 preset === 'left' ? 'V' : 'H'}
+                {preset === 'front'
+                  ? 'Foran'
+                  : preset === 'back'
+                    ? 'Bak'
+                    : preset === 'left'
+                      ? 'V'
+                      : 'H'}
               </button>
             ))}
           </div>
@@ -412,32 +425,18 @@ export default function Spine3DViewer({
 
       {/* 3D Canvas */}
       <div className="relative" style={{ height: '400px' }}>
-        <Canvas
-          shadows
-          dpr={[1, 2]}
-          camera={{ position: [0, 0, 8], fov: 50 }}
-        >
+        <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 0, 8], fov: 50 }}>
           <Suspense fallback={<LoadingSpine />}>
             {/* Lighting */}
             <ambientLight intensity={0.5} />
-            <directionalLight
-              position={[5, 10, 5]}
-              intensity={1}
-              castShadow
-            />
-            <directionalLight
-              position={[-5, 5, -5]}
-              intensity={0.3}
-            />
+            <directionalLight position={[5, 10, 5]} intensity={1} castShadow />
+            <directionalLight position={[-5, 5, -5]} intensity={0.3} />
 
             {/* Environment for reflections */}
             <Environment preset="studio" />
 
             {/* Camera position controller */}
-            <CameraController
-              position={cameraPositions[cameraPreset]}
-              target={[0, -1, 0]}
-            />
+            <CameraController position={cameraPositions[cameraPreset]} target={[0, -1, 0]} />
 
             {/* Spine model */}
             <SpineModel
@@ -483,14 +482,15 @@ export default function Spine3DViewer({
           <span className="text-gray-500 font-medium">Regioner:</span>
           {Object.entries(VERTEBRA_CONFIG).map(([key, region]) => (
             <div key={key} className="flex items-center gap-1">
-              <div
-                className="w-3 h-3 rounded"
-                style={{ backgroundColor: region.color }}
-              />
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: region.color }} />
               <span className="text-gray-600">
-                {key === 'cervical' ? 'Cervical' :
-                 key === 'thoracic' ? 'Thoracal' :
-                 key === 'lumbar' ? 'Lumbal' : 'Sacral'}
+                {key === 'cervical'
+                  ? 'Cervical'
+                  : key === 'thoracic'
+                    ? 'Thoracal'
+                    : key === 'lumbar'
+                      ? 'Lumbal'
+                      : 'Sacral'}
               </span>
             </div>
           ))}

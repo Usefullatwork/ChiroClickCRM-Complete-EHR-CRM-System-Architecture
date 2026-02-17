@@ -9,15 +9,15 @@
  * - Test-specific overlays (SLR angle, etc.)
  */
 
-import React, { useState, useCallback, useRef } from 'react';
-import { Trash2, RotateCcw } from 'lucide-react';
+import _React, { useState, useCallback, useRef } from 'react';
+import { Trash2, _RotateCcw } from 'lucide-react';
 
 // Dermatome colors
 const DERMATOME_COLORS = {
-  L4: { fill: 'rgba(59, 130, 246, 0.2)', stroke: '#3b82f6' },  // Blue
-  L5: { fill: 'rgba(16, 185, 129, 0.2)', stroke: '#10b981' },  // Green
-  S1: { fill: 'rgba(239, 68, 68, 0.2)', stroke: '#ef4444' },   // Red
-  S2: { fill: 'rgba(168, 85, 247, 0.2)', stroke: '#a855f7' },  // Purple
+  L4: { fill: 'rgba(59, 130, 246, 0.2)', stroke: '#3b82f6' }, // Blue
+  L5: { fill: 'rgba(16, 185, 129, 0.2)', stroke: '#10b981' }, // Green
+  S1: { fill: 'rgba(239, 68, 68, 0.2)', stroke: '#ef4444' }, // Red
+  S2: { fill: 'rgba(168, 85, 247, 0.2)', stroke: '#a855f7' }, // Purple
 };
 
 // Marker types for symptoms
@@ -32,7 +32,7 @@ const MARKER_TYPES = {
 /**
  * SVG Lower Body - Posterior view of legs
  */
-function LegsPosterior({ width = 300, height = 350, showDermatomes = true, showNerves = true }) {
+function LegsPosterior({ width = 300, _height = 350, showDermatomes = true, showNerves = true }) {
   const legWidth = 50;
   const legSpacing = 40;
   const leftLegX = width / 2 - legSpacing;
@@ -42,10 +42,10 @@ function LegsPosterior({ width = 300, height = 350, showDermatomes = true, showN
     <g>
       {/* Pelvis/Hip area */}
       <path
-        d={`M ${width/2 - 80} 20
-            C ${width/2 - 60} 10, ${width/2 + 60} 10, ${width/2 + 80} 20
-            L ${width/2 + 70} 50
-            C ${width/2 + 40} 60, ${width/2 - 40} 60, ${width/2 - 70} 50
+        d={`M ${width / 2 - 80} 20
+            C ${width / 2 - 60} 10, ${width / 2 + 60} 10, ${width / 2 + 80} 20
+            L ${width / 2 + 70} 50
+            C ${width / 2 + 40} 60, ${width / 2 - 40} 60, ${width / 2 - 70} 50
             Z`}
         fill="none"
         stroke="#9ca3af"
@@ -54,44 +54,60 @@ function LegsPosterior({ width = 300, height = 350, showDermatomes = true, showN
 
       {/* Sacrum */}
       <path
-        d={`M ${width/2 - 20} 25 L ${width/2} 55 L ${width/2 + 20} 25`}
+        d={`M ${width / 2 - 20} 25 L ${width / 2} 55 L ${width / 2 + 20} 25`}
         fill="none"
         stroke="#d1d5db"
         strokeWidth="1"
       />
-      <text x={width/2} y={40} fontSize="8" fill="#9ca3af" textAnchor="middle">SAC</text>
+      <text x={width / 2} y={40} fontSize="8" fill="#9ca3af" textAnchor="middle">
+        SAC
+      </text>
 
       {/* LEFT LEG */}
       <g id="left-leg">
         {/* Thigh */}
         <path
-          d={`M ${leftLegX - legWidth/2} 55
-              L ${leftLegX - legWidth/2 + 5} 160
-              C ${leftLegX - legWidth/2 + 5} 170, ${leftLegX + legWidth/2 - 5} 170, ${leftLegX + legWidth/2 - 5} 160
-              L ${leftLegX + legWidth/2} 55`}
+          d={`M ${leftLegX - legWidth / 2} 55
+              L ${leftLegX - legWidth / 2 + 5} 160
+              C ${leftLegX - legWidth / 2 + 5} 170, ${leftLegX + legWidth / 2 - 5} 170, ${leftLegX + legWidth / 2 - 5} 160
+              L ${leftLegX + legWidth / 2} 55`}
           fill="none"
           stroke="#9ca3af"
           strokeWidth="1.5"
         />
 
         {/* Knee */}
-        <ellipse cx={leftLegX} cy={175} rx={legWidth/2 - 5} ry={15}
-          fill="none" stroke="#d1d5db" strokeWidth="1" />
+        <ellipse
+          cx={leftLegX}
+          cy={175}
+          rx={legWidth / 2 - 5}
+          ry={15}
+          fill="none"
+          stroke="#d1d5db"
+          strokeWidth="1"
+        />
 
         {/* Lower leg */}
         <path
-          d={`M ${leftLegX - legWidth/2 + 8} 185
-              L ${leftLegX - legWidth/2 + 10} 290
-              C ${leftLegX - legWidth/2 + 10} 300, ${leftLegX + legWidth/2 - 10} 300, ${leftLegX + legWidth/2 - 10} 290
-              L ${leftLegX + legWidth/2 - 8} 185`}
+          d={`M ${leftLegX - legWidth / 2 + 8} 185
+              L ${leftLegX - legWidth / 2 + 10} 290
+              C ${leftLegX - legWidth / 2 + 10} 300, ${leftLegX + legWidth / 2 - 10} 300, ${leftLegX + legWidth / 2 - 10} 290
+              L ${leftLegX + legWidth / 2 - 8} 185`}
           fill="none"
           stroke="#9ca3af"
           strokeWidth="1.5"
         />
 
         {/* Foot */}
-        <ellipse cx={leftLegX} cy={315} rx={legWidth/2 - 5} ry={18}
-          fill="none" stroke="#9ca3af" strokeWidth="1.5" />
+        <ellipse
+          cx={leftLegX}
+          cy={315}
+          rx={legWidth / 2 - 5}
+          ry={18}
+          fill="none"
+          stroke="#9ca3af"
+          strokeWidth="1.5"
+        />
 
         {/* Dermatome zones - Left */}
         {showDermatomes && (
@@ -108,7 +124,15 @@ function LegsPosterior({ width = 300, height = 350, showDermatomes = true, showN
               strokeWidth="0.5"
               strokeDasharray="3,2"
             />
-            <text x={leftLegX + 5} y={250} fontSize="7" fill={DERMATOME_COLORS.L4.stroke} fontWeight="bold">L4</text>
+            <text
+              x={leftLegX + 5}
+              y={250}
+              fontSize="7"
+              fill={DERMATOME_COLORS.L4.stroke}
+              fontWeight="bold"
+            >
+              L4
+            </text>
 
             {/* L5 - Dorsum of foot, lateral leg */}
             <path
@@ -123,7 +147,15 @@ function LegsPosterior({ width = 300, height = 350, showDermatomes = true, showN
               strokeWidth="0.5"
               strokeDasharray="3,2"
             />
-            <text x={leftLegX - 10} y={260} fontSize="7" fill={DERMATOME_COLORS.L5.stroke} fontWeight="bold">L5</text>
+            <text
+              x={leftLegX - 10}
+              y={260}
+              fontSize="7"
+              fill={DERMATOME_COLORS.L5.stroke}
+              fontWeight="bold"
+            >
+              L5
+            </text>
 
             {/* S1 - Lateral foot, posterior leg */}
             <path
@@ -138,7 +170,15 @@ function LegsPosterior({ width = 300, height = 350, showDermatomes = true, showN
               strokeWidth="0.5"
               strokeDasharray="3,2"
             />
-            <text x={leftLegX - 20} y={270} fontSize="7" fill={DERMATOME_COLORS.S1.stroke} fontWeight="bold">S1</text>
+            <text
+              x={leftLegX - 20}
+              y={270}
+              fontSize="7"
+              fill={DERMATOME_COLORS.S1.stroke}
+              fontWeight="bold"
+            >
+              S1
+            </text>
           </>
         )}
 
@@ -158,7 +198,14 @@ function LegsPosterior({ width = 300, height = 350, showDermatomes = true, showN
         )}
 
         {/* Label */}
-        <text x={leftLegX} y={345} fontSize="10" fill="#6b7280" textAnchor="middle" fontWeight="bold">
+        <text
+          x={leftLegX}
+          y={345}
+          fontSize="10"
+          fill="#6b7280"
+          textAnchor="middle"
+          fontWeight="bold"
+        >
           V / L
         </text>
       </g>
@@ -167,33 +214,47 @@ function LegsPosterior({ width = 300, height = 350, showDermatomes = true, showN
       <g id="right-leg">
         {/* Thigh */}
         <path
-          d={`M ${rightLegX - legWidth/2} 55
-              L ${rightLegX - legWidth/2 + 5} 160
-              C ${rightLegX - legWidth/2 + 5} 170, ${rightLegX + legWidth/2 - 5} 170, ${rightLegX + legWidth/2 - 5} 160
-              L ${rightLegX + legWidth/2} 55`}
+          d={`M ${rightLegX - legWidth / 2} 55
+              L ${rightLegX - legWidth / 2 + 5} 160
+              C ${rightLegX - legWidth / 2 + 5} 170, ${rightLegX + legWidth / 2 - 5} 170, ${rightLegX + legWidth / 2 - 5} 160
+              L ${rightLegX + legWidth / 2} 55`}
           fill="none"
           stroke="#9ca3af"
           strokeWidth="1.5"
         />
 
         {/* Knee */}
-        <ellipse cx={rightLegX} cy={175} rx={legWidth/2 - 5} ry={15}
-          fill="none" stroke="#d1d5db" strokeWidth="1" />
+        <ellipse
+          cx={rightLegX}
+          cy={175}
+          rx={legWidth / 2 - 5}
+          ry={15}
+          fill="none"
+          stroke="#d1d5db"
+          strokeWidth="1"
+        />
 
         {/* Lower leg */}
         <path
-          d={`M ${rightLegX - legWidth/2 + 8} 185
-              L ${rightLegX - legWidth/2 + 10} 290
-              C ${rightLegX - legWidth/2 + 10} 300, ${rightLegX + legWidth/2 - 10} 300, ${rightLegX + legWidth/2 - 10} 290
-              L ${rightLegX + legWidth/2 - 8} 185`}
+          d={`M ${rightLegX - legWidth / 2 + 8} 185
+              L ${rightLegX - legWidth / 2 + 10} 290
+              C ${rightLegX - legWidth / 2 + 10} 300, ${rightLegX + legWidth / 2 - 10} 300, ${rightLegX + legWidth / 2 - 10} 290
+              L ${rightLegX + legWidth / 2 - 8} 185`}
           fill="none"
           stroke="#9ca3af"
           strokeWidth="1.5"
         />
 
         {/* Foot */}
-        <ellipse cx={rightLegX} cy={315} rx={legWidth/2 - 5} ry={18}
-          fill="none" stroke="#9ca3af" strokeWidth="1.5" />
+        <ellipse
+          cx={rightLegX}
+          cy={315}
+          rx={legWidth / 2 - 5}
+          ry={18}
+          fill="none"
+          stroke="#9ca3af"
+          strokeWidth="1.5"
+        />
 
         {/* Dermatome zones - Right */}
         {showDermatomes && (
@@ -210,7 +271,15 @@ function LegsPosterior({ width = 300, height = 350, showDermatomes = true, showN
               strokeWidth="0.5"
               strokeDasharray="3,2"
             />
-            <text x={rightLegX - 5} y={250} fontSize="7" fill={DERMATOME_COLORS.L4.stroke} fontWeight="bold">L4</text>
+            <text
+              x={rightLegX - 5}
+              y={250}
+              fontSize="7"
+              fill={DERMATOME_COLORS.L4.stroke}
+              fontWeight="bold"
+            >
+              L4
+            </text>
 
             {/* L5 */}
             <path
@@ -225,7 +294,15 @@ function LegsPosterior({ width = 300, height = 350, showDermatomes = true, showN
               strokeWidth="0.5"
               strokeDasharray="3,2"
             />
-            <text x={rightLegX + 10} y={260} fontSize="7" fill={DERMATOME_COLORS.L5.stroke} fontWeight="bold">L5</text>
+            <text
+              x={rightLegX + 10}
+              y={260}
+              fontSize="7"
+              fill={DERMATOME_COLORS.L5.stroke}
+              fontWeight="bold"
+            >
+              L5
+            </text>
 
             {/* S1 */}
             <path
@@ -240,7 +317,15 @@ function LegsPosterior({ width = 300, height = 350, showDermatomes = true, showN
               strokeWidth="0.5"
               strokeDasharray="3,2"
             />
-            <text x={rightLegX + 20} y={270} fontSize="7" fill={DERMATOME_COLORS.S1.stroke} fontWeight="bold">S1</text>
+            <text
+              x={rightLegX + 20}
+              y={270}
+              fontSize="7"
+              fill={DERMATOME_COLORS.S1.stroke}
+              fontWeight="bold"
+            >
+              S1
+            </text>
           </>
         )}
 
@@ -260,7 +345,14 @@ function LegsPosterior({ width = 300, height = 350, showDermatomes = true, showN
         )}
 
         {/* Label */}
-        <text x={rightLegX} y={345} fontSize="10" fill="#6b7280" textAnchor="middle" fontWeight="bold">
+        <text
+          x={rightLegX}
+          y={345}
+          fontSize="10"
+          fill="#6b7280"
+          textAnchor="middle"
+          fontWeight="bold"
+        >
           H / R
         </text>
       </g>
@@ -269,8 +361,18 @@ function LegsPosterior({ width = 300, height = 350, showDermatomes = true, showN
       {showNerves && (
         <g transform={`translate(${width - 70}, 10)`}>
           <rect x="0" y="0" width="65" height="20" fill="white" fillOpacity="0.9" rx="3" />
-          <line x1="5" y1="10" x2="20" y2="10" stroke="#fbbf24" strokeWidth="3" strokeOpacity="0.6" />
-          <text x="25" y="14" fontSize="8" fill="#6b7280">N. ischiadicus</text>
+          <line
+            x1="5"
+            y1="10"
+            x2="20"
+            y2="10"
+            stroke="#fbbf24"
+            strokeWidth="3"
+            strokeOpacity="0.6"
+          />
+          <text x="25" y="14" fontSize="8" fill="#6b7280">
+            N. ischiadicus
+          </text>
         </g>
       )}
     </g>
@@ -280,8 +382,10 @@ function LegsPosterior({ width = 300, height = 350, showDermatomes = true, showN
 /**
  * SLR Angle visualization - filled wedge/bar style
  */
-function SLRAngleOverlay({ side, angle, x, y }) {
-  if (!angle || angle <= 0) return null;
+function SLRAngleOverlay({ _side, angle, x, y }) {
+  if (!angle || angle <= 0) {
+    return null;
+  }
 
   const radius = 50;
   const innerRadius = 15;
@@ -308,9 +412,15 @@ function SLRAngleOverlay({ side, angle, x, y }) {
 
   // Color based on angle severity
   const getColor = (ang) => {
-    if (ang < 30) return { fill: '#ef4444', stroke: '#dc2626' }; // Red - severe
-    if (ang < 45) return { fill: '#f97316', stroke: '#ea580c' }; // Orange - moderate
-    if (ang < 60) return { fill: '#eab308', stroke: '#ca8a04' }; // Yellow - mild
+    if (ang < 30) {
+      return { fill: '#ef4444', stroke: '#dc2626' };
+    } // Red - severe
+    if (ang < 45) {
+      return { fill: '#f97316', stroke: '#ea580c' };
+    } // Orange - moderate
+    if (ang < 60) {
+      return { fill: '#eab308', stroke: '#ca8a04' };
+    } // Yellow - mild
     return { fill: '#22c55e', stroke: '#16a34a' }; // Green - normal
   };
 
@@ -320,8 +430,13 @@ function SLRAngleOverlay({ side, angle, x, y }) {
     <g>
       {/* Reference line (vertical/table) */}
       <line
-        x1={x} y1={y} x2={x} y2={y - radius - 5}
-        stroke="#9ca3af" strokeWidth="1" strokeDasharray="4,2"
+        x1={x}
+        y1={y}
+        x2={x}
+        y2={y - radius - 5}
+        stroke="#9ca3af"
+        strokeWidth="1"
+        strokeDasharray="4,2"
       />
 
       {/* Filled wedge/bar */}
@@ -335,27 +450,30 @@ function SLRAngleOverlay({ side, angle, x, y }) {
 
       {/* Leg line indicator */}
       <line
-        x1={x} y1={y} x2={outerEndX} y2={outerEndY}
-        stroke={colors.stroke} strokeWidth="3" strokeLinecap="round"
+        x1={x}
+        y1={y}
+        x2={outerEndX}
+        y2={outerEndY}
+        stroke={colors.stroke}
+        strokeWidth="3"
+        strokeLinecap="round"
       />
 
       {/* Angle label with background */}
-      <g transform={`translate(${x + Math.sin(angleRad / 2) * (radius + 18)}, ${y - Math.cos(angleRad / 2) * (radius + 18)})`}>
+      <g
+        transform={`translate(${x + Math.sin(angleRad / 2) * (radius + 18)}, ${y - Math.cos(angleRad / 2) * (radius + 18)})`}
+      >
         <rect
-          x="-14" y="-10"
-          width="28" height="18"
+          x="-14"
+          y="-10"
+          width="28"
+          height="18"
           fill="white"
           stroke={colors.stroke}
           strokeWidth="1"
           rx="3"
         />
-        <text
-          x="0" y="4"
-          fontSize="11"
-          fontWeight="bold"
-          fill={colors.stroke}
-          textAnchor="middle"
-        >
+        <text x="0" y="4" fontSize="11" fontWeight="bold" fill={colors.stroke} textAnchor="middle">
           {angle}°
         </text>
       </g>
@@ -398,9 +516,16 @@ function DiagramMarker({ marker, onRemove, selected, onSelect }) {
         {type.symbol}
       </text>
       {selected && (
-        <g onClick={(e) => { e.stopPropagation(); onRemove(marker.id); }}>
+        <g
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove(marker.id);
+          }}
+        >
           <circle cx={marker.x + 10} cy={marker.y - 10} r={6} fill="#ef4444" />
-          <text x={marker.x + 10} y={marker.y - 7} fontSize="8" fill="white" textAnchor="middle">×</text>
+          <text x={marker.x + 10} y={marker.y - 7} fontSize="8" fill="white" textAnchor="middle">
+            ×
+          </text>
         </g>
       )}
     </g>
@@ -419,7 +544,7 @@ export default function LowerExtremityDiagram({
   showDermatomes = true,
   showNerves = true,
   readOnly = false,
-  compact = false
+  compact = false,
 }) {
   const [selectedType, setSelectedType] = useState('pain');
   const [selectedMarker, setSelectedMarker] = useState(null);
@@ -428,36 +553,46 @@ export default function LowerExtremityDiagram({
   const width = compact ? 220 : 300;
   const height = compact ? 280 : 350;
 
-  const handleSvgClick = useCallback((e) => {
-    if (readOnly) return;
+  const handleSvgClick = useCallback(
+    (e) => {
+      if (readOnly) {
+        return;
+      }
 
-    const svg = svgRef.current;
-    if (!svg) return;
+      const svg = svgRef.current;
+      if (!svg) {
+        return;
+      }
 
-    const rect = svg.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * width;
-    const y = ((e.clientY - rect.top) / rect.height) * height;
+      const rect = svg.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * width;
+      const y = ((e.clientY - rect.top) / rect.height) * height;
 
-    // Determine which leg was clicked
-    const side = x < width / 2 ? 'left' : 'right';
+      // Determine which leg was clicked
+      const side = x < width / 2 ? 'left' : 'right';
 
-    const newMarker = {
-      id: `marker_${Date.now()}`,
-      type: selectedType,
-      x: Math.round(x),
-      y: Math.round(y),
-      side,
-      note: ''
-    };
+      const newMarker = {
+        id: `marker_${Date.now()}`,
+        type: selectedType,
+        x: Math.round(x),
+        y: Math.round(y),
+        side,
+        note: '',
+      };
 
-    onChange([...markers, newMarker]);
-    setSelectedMarker(null);
-  }, [markers, onChange, selectedType, width, height, readOnly]);
+      onChange([...markers, newMarker]);
+      setSelectedMarker(null);
+    },
+    [markers, onChange, selectedType, width, height, readOnly]
+  );
 
-  const handleRemoveMarker = useCallback((markerId) => {
-    onChange(markers.filter(m => m.id !== markerId));
-    setSelectedMarker(null);
-  }, [markers, onChange]);
+  const handleRemoveMarker = useCallback(
+    (markerId) => {
+      onChange(markers.filter((m) => m.id !== markerId));
+      setSelectedMarker(null);
+    },
+    [markers, onChange]
+  );
 
   const handleClearAll = () => {
     onChange([]);
@@ -465,8 +600,8 @@ export default function LowerExtremityDiagram({
   };
 
   // Count markers by side
-  const leftMarkers = markers.filter(m => m.side === 'left' || m.x < width / 2).length;
-  const rightMarkers = markers.filter(m => m.side === 'right' || m.x >= width / 2).length;
+  const leftMarkers = markers.filter((m) => m.side === 'left' || m.x < width / 2).length;
+  const rightMarkers = markers.filter((m) => m.side === 'right' || m.x >= width / 2).length;
 
   return (
     <div className={`flex ${compact ? 'gap-2' : 'gap-4'}`}>
@@ -484,9 +619,11 @@ export default function LowerExtremityDiagram({
               onClick={() => setSelectedType(key)}
               disabled={readOnly}
               className={`w-full text-left px-2 py-1 text-xs rounded flex items-center gap-2
-                         ${selectedType === key
-                           ? 'bg-gray-100 ring-1 ring-gray-300'
-                           : 'hover:bg-gray-50'}`}
+                         ${
+                           selectedType === key
+                             ? 'bg-gray-100 ring-1 ring-gray-300'
+                             : 'hover:bg-gray-50'
+                         }`}
             >
               <span
                 className="w-4 h-4 rounded-full flex items-center justify-center text-white text-[9px]"
@@ -516,8 +653,12 @@ export default function LowerExtremityDiagram({
         {/* Marker counts */}
         {markers.length > 0 && (
           <div className="text-[10px] text-gray-500 space-y-0.5">
-            <div>V/L: {leftMarkers} {lang === 'no' ? 'markering' : 'marker'}(s)</div>
-            <div>H/R: {rightMarkers} {lang === 'no' ? 'markering' : 'marker'}(s)</div>
+            <div>
+              V/L: {leftMarkers} {lang === 'no' ? 'markering' : 'marker'}(s)
+            </div>
+            <div>
+              H/R: {rightMarkers} {lang === 'no' ? 'markering' : 'marker'}(s)
+            </div>
           </div>
         )}
       </div>
@@ -543,28 +684,37 @@ export default function LowerExtremityDiagram({
 
           {/* SLR Angle overlays - positioned at hip level */}
           {slrAngleLeft && (
-            <SLRAngleOverlay
-              side="left"
-              angle={slrAngleLeft}
-              x={width / 2 - 40}
-              y={55}
-            />
+            <SLRAngleOverlay side="left" angle={slrAngleLeft} x={width / 2 - 40} y={55} />
           )}
           {slrAngleRight && (
-            <SLRAngleOverlay
-              side="right"
-              angle={slrAngleRight}
-              x={width / 2 + 40}
-              y={55}
-            />
+            <SLRAngleOverlay side="right" angle={slrAngleRight} x={width / 2 + 40} y={55} />
           )}
 
           {/* Angle labels at bottom */}
           {(slrAngleLeft || slrAngleRight) && (
             <g>
-              <rect x={width/2 - 70} y={height - 30} width={140} height={25} fill="white" fillOpacity="0.9" rx="4" stroke="#ef4444" strokeWidth="1" />
-              <text x={width/2} y={height - 12} fontSize="11" fill="#ef4444" textAnchor="middle" fontWeight="bold">
-                SLR: {slrAngleLeft ? `V ${slrAngleLeft}°` : ''} {slrAngleLeft && slrAngleRight ? ' | ' : ''} {slrAngleRight ? `H ${slrAngleRight}°` : ''}
+              <rect
+                x={width / 2 - 70}
+                y={height - 30}
+                width={140}
+                height={25}
+                fill="white"
+                fillOpacity="0.9"
+                rx="4"
+                stroke="#ef4444"
+                strokeWidth="1"
+              />
+              <text
+                x={width / 2}
+                y={height - 12}
+                fontSize="11"
+                fill="#ef4444"
+                textAnchor="middle"
+                fontWeight="bold"
+              >
+                SLR: {slrAngleLeft ? `V ${slrAngleLeft}°` : ''}{' '}
+                {slrAngleLeft && slrAngleRight ? ' | ' : ''}{' '}
+                {slrAngleRight ? `H ${slrAngleRight}°` : ''}
               </text>
             </g>
           )}

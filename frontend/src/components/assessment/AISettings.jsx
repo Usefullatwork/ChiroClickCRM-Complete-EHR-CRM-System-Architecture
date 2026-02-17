@@ -33,13 +33,13 @@ import {
   ChevronDown,
   ChevronUp,
   Zap,
-  HardDrive,
+  _HardDrive,
 } from 'lucide-react';
 import {
   getAIConfig,
   saveAIConfig,
   checkOllamaStatus,
-  listModels,
+  _listModels,
   generateText,
 } from '../../services/aiService';
 
@@ -47,11 +47,7 @@ import {
 // AI SETTINGS PANEL
 // =============================================================================
 
-export default function AISettings({
-  language = 'en',
-  onClose,
-  className = '',
-}) {
+export default function AISettings({ language = 'en', onClose, className = '' }) {
   const [config, setConfig] = useState(getAIConfig());
   const [status, setStatus] = useState({ connected: false, models: [] });
   const [isLoading, setIsLoading] = useState(false);
@@ -109,7 +105,7 @@ export default function AISettings({
       setTestResult({
         success: true,
         response: result.text,
-        duration: result.totalDuration ? (result.totalDuration / 1e9).toFixed(2) + 's' : 'N/A',
+        duration: result.totalDuration ? `${(result.totalDuration / 1e9).toFixed(2)}s` : 'N/A',
       });
     } catch (error) {
       setTestResult({
@@ -209,11 +205,27 @@ export default function AISettings({
   const t = labels[language] || labels.en;
 
   const recommendedModels = [
-    { name: 'llama3.2', size: '2GB', purpose: language === 'no' ? 'Generell bruk, rask' : 'General use, fast' },
-    { name: 'llama3.2:7b', size: '4GB', purpose: language === 'no' ? 'Bedre kvalitet' : 'Better quality' },
+    {
+      name: 'llama3.2',
+      size: '2GB',
+      purpose: language === 'no' ? 'Generell bruk, rask' : 'General use, fast',
+    },
+    {
+      name: 'llama3.2:7b',
+      size: '4GB',
+      purpose: language === 'no' ? 'Bedre kvalitet' : 'Better quality',
+    },
     { name: 'mistral', size: '4GB', purpose: language === 'no' ? 'God balanse' : 'Good balance' },
-    { name: 'medllama2', size: '4GB', purpose: language === 'no' ? 'Medisinsk terminologi' : 'Medical terminology' },
-    { name: 'codellama', size: '4GB', purpose: language === 'no' ? 'Teknisk innhold' : 'Technical content' },
+    {
+      name: 'medllama2',
+      size: '4GB',
+      purpose: language === 'no' ? 'Medisinsk terminologi' : 'Medical terminology',
+    },
+    {
+      name: 'codellama',
+      size: '4GB',
+      purpose: language === 'no' ? 'Teknisk innhold' : 'Technical content',
+    },
   ];
 
   return (
@@ -231,12 +243,8 @@ export default function AISettings({
             </div>
           </div>
           {onClose && (
-            <button
-              onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
-            >
-              <span className="sr-only">Close</span>
-              ×
+            <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-lg">
+              <span className="sr-only">Close</span>×
             </button>
           )}
         </div>
@@ -299,14 +307,18 @@ export default function AISettings({
                 <Terminal className="w-4 h-4 text-blue-500 mt-0.5" />
                 <div>
                   <p className="font-medium text-blue-800">{t.step2}</p>
-                  <code className="text-xs bg-blue-100 px-2 py-1 rounded">{t.step2desc.split(': ')[1]}</code>
+                  <code className="text-xs bg-blue-100 px-2 py-1 rounded">
+                    {t.step2desc.split(': ')[1]}
+                  </code>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <Cpu className="w-4 h-4 text-blue-500 mt-0.5" />
                 <div>
                   <p className="font-medium text-blue-800">{t.step3}</p>
-                  <code className="text-xs bg-blue-100 px-2 py-1 rounded">{t.step3desc.split(': ')[1]}</code>
+                  <code className="text-xs bg-blue-100 px-2 py-1 rounded">
+                    {t.step3desc.split(': ')[1]}
+                  </code>
                 </div>
               </div>
             </div>
@@ -356,9 +368,7 @@ export default function AISettings({
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="llama3.2"
               />
-              {status.connected && (
-                <p className="mt-1 text-xs text-amber-600">{t.noModels}</p>
-              )}
+              {status.connected && <p className="mt-1 text-xs text-amber-600">{t.noModels}</p>}
             </div>
           )}
           <p className="mt-1 text-xs text-gray-500">{t.modelHelp}</p>
@@ -372,9 +382,11 @@ export default function AISettings({
                   key={model.name}
                   onClick={() => handleConfigChange('model', model.name)}
                   className={`px-2 py-1 text-xs rounded border transition-colors
-                    ${config.model === model.name
-                      ? 'bg-blue-50 border-blue-300 text-blue-700'
-                      : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                    ${
+                      config.model === model.name
+                        ? 'bg-blue-50 border-blue-300 text-blue-700'
+                        : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                    }`}
                   title={`${model.size} - ${model.purpose}`}
                 >
                   {model.name}
@@ -433,9 +445,7 @@ export default function AISettings({
         {showAdvanced && (
           <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t.timeout}
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t.timeout}</label>
               <input
                 type="number"
                 min="10000"
@@ -492,7 +502,9 @@ export default function AISettings({
             </div>
 
             {testResult && (
-              <div className={`p-3 rounded-lg text-sm ${testResult.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+              <div
+                className={`p-3 rounded-lg text-sm ${testResult.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}
+              >
                 {testResult.success ? (
                   <>
                     <div className="flex items-center gap-2 text-green-700 font-medium mb-1">
@@ -545,11 +557,7 @@ export default function AISettings({
 // AI STATUS INDICATOR - Compact status badge
 // =============================================================================
 
-export function AIStatusIndicator({
-  onClick,
-  language = 'en',
-  className = '',
-}) {
+export function AIStatusIndicator({ onClick, language = 'en', className = '' }) {
   const [status, setStatus] = useState({ connected: false });
 
   useEffect(() => {
@@ -574,17 +582,15 @@ export function AIStatusIndicator({
     <button
       onClick={onClick}
       className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium transition-colors
-        ${status.connected
-          ? 'bg-green-100 text-green-700 hover:bg-green-200'
-          : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}
+        ${
+          status.connected
+            ? 'bg-green-100 text-green-700 hover:bg-green-200'
+            : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+        }
         ${className}`}
       title={status.connected ? t.aiOnline : t.aiOffline}
     >
-      {status.connected ? (
-        <Wifi className="w-3.5 h-3.5" />
-      ) : (
-        <WifiOff className="w-3.5 h-3.5" />
-      )}
+      {status.connected ? <Wifi className="w-3.5 h-3.5" /> : <WifiOff className="w-3.5 h-3.5" />}
       {status.connected ? 'AI' : 'AI'}
     </button>
   );

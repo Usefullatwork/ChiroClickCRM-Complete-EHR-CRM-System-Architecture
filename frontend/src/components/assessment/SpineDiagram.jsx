@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { RotateCcw, ChevronDown, ChevronUp } from 'lucide-react';
+import { RotateCcw, _ChevronDown, _ChevronUp } from 'lucide-react';
 
 /**
  * SpineDiagram - Detailed vertebra-by-vertebra spine assessment
@@ -17,23 +17,23 @@ const SPINE_REGIONS = {
   cervical: {
     label: 'Cervical',
     color: 'blue',
-    vertebrae: ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7']
+    vertebrae: ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7'],
   },
   thoracic: {
     label: 'Thoracic',
     color: 'green',
-    vertebrae: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12']
+    vertebrae: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
   },
   lumbar: {
     label: 'Lumbar',
     color: 'orange',
-    vertebrae: ['L1', 'L2', 'L3', 'L4', 'L5']
+    vertebrae: ['L1', 'L2', 'L3', 'L4', 'L5'],
   },
   sacral: {
     label: 'Sacral/Pelvis',
     color: 'red',
-    vertebrae: ['Sacrum', 'R Ilium', 'L Ilium', 'Coccyx']
-  }
+    vertebrae: ['Sacrum', 'R Ilium', 'L Ilium', 'Coccyx'],
+  },
 };
 
 const FINDING_TYPES = {
@@ -41,14 +41,14 @@ const FINDING_TYPES = {
   fixation: { label: 'Fixation', color: 'orange', abbrev: 'FIX' },
   restriction: { label: 'Restriction', color: 'yellow', abbrev: 'REST' },
   tenderness: { label: 'Tenderness', color: 'purple', abbrev: 'TTP' },
-  spasm: { label: 'Muscle Spasm', color: 'blue', abbrev: 'SP' }
+  spasm: { label: 'Muscle Spasm', color: 'blue', abbrev: 'SP' },
 };
 
 const SIDES = {
   L: 'Left',
   R: 'Right',
   B: 'Bilateral',
-  C: 'Central'
+  C: 'Central',
 };
 
 export default function SpineDiagram({
@@ -56,20 +56,20 @@ export default function SpineDiagram({
   onChange,
   showNarrative = true,
   compact = false,
-  className = ''
+  className = '',
 }) {
   const [selectedVertebra, setSelectedVertebra] = useState(null);
-  const [expandedRegions, setExpandedRegions] = useState({
+  const [_expandedRegions, setExpandedRegions] = useState({
     cervical: true,
     thoracic: true,
     lumbar: true,
-    sacral: true
+    sacral: true,
   });
 
-  const toggleRegion = (region) => {
-    setExpandedRegions(prev => ({
+  const _toggleRegion = (region) => {
+    setExpandedRegions((prev) => ({
       ...prev,
-      [region]: !prev[region]
+      [region]: !prev[region],
     }));
   };
 
@@ -84,7 +84,7 @@ export default function SpineDiagram({
         vertebra,
         type,
         side,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
 
@@ -97,34 +97,48 @@ export default function SpineDiagram({
   };
 
   const hasFinding = (vertebra) => {
-    return Object.values(findings).some(f => f.vertebra === vertebra);
+    return Object.values(findings).some((f) => f.vertebra === vertebra);
   };
 
   const getVertebraFindings = (vertebra) => {
-    return Object.values(findings).filter(f => f.vertebra === vertebra);
+    return Object.values(findings).filter((f) => f.vertebra === vertebra);
   };
 
   const getVertebraColor = (vertebra) => {
     const vFindings = getVertebraFindings(vertebra);
-    if (vFindings.length === 0) return 'bg-gray-200';
+    if (vFindings.length === 0) {
+      return 'bg-gray-200';
+    }
 
     // Priority: subluxation > fixation > restriction > tenderness > spasm
-    if (vFindings.some(f => f.type === 'subluxation')) return 'bg-red-500';
-    if (vFindings.some(f => f.type === 'fixation')) return 'bg-orange-500';
-    if (vFindings.some(f => f.type === 'restriction')) return 'bg-yellow-500';
-    if (vFindings.some(f => f.type === 'tenderness')) return 'bg-purple-500';
+    if (vFindings.some((f) => f.type === 'subluxation')) {
+      return 'bg-red-500';
+    }
+    if (vFindings.some((f) => f.type === 'fixation')) {
+      return 'bg-orange-500';
+    }
+    if (vFindings.some((f) => f.type === 'restriction')) {
+      return 'bg-yellow-500';
+    }
+    if (vFindings.some((f) => f.type === 'tenderness')) {
+      return 'bg-purple-500';
+    }
     return 'bg-blue-500';
   };
 
   // Generate ChiroTouch-style narrative
   const generateNarrative = () => {
     const findingsList = Object.values(findings);
-    if (findingsList.length === 0) return null;
+    if (findingsList.length === 0) {
+      return null;
+    }
 
     // Group by type
     const grouped = {};
-    findingsList.forEach(f => {
-      if (!grouped[f.type]) grouped[f.type] = [];
+    findingsList.forEach((f) => {
+      if (!grouped[f.type]) {
+        grouped[f.type] = [];
+      }
       grouped[f.type].push(f);
     });
 
@@ -132,37 +146,37 @@ export default function SpineDiagram({
 
     // Subluxations
     if (grouped.subluxation) {
-      const subs = grouped.subluxation.map(f =>
-        `${f.side !== 'C' ? SIDES[f.side].toLowerCase() + ' ' : ''}${f.vertebra}`
+      const subs = grouped.subluxation.map(
+        (f) => `${f.side !== 'C' ? `${SIDES[f.side].toLowerCase()} ` : ''}${f.vertebra}`
       );
       narratives.push(`Spinal Restrictions/Subluxations: ${subs.join(', ')}`);
     }
 
     // Fixations
     if (grouped.fixation) {
-      const fixes = grouped.fixation.map(f =>
-        `${f.side !== 'C' ? SIDES[f.side].toLowerCase() + ' ' : ''}${f.vertebra}`
+      const fixes = grouped.fixation.map(
+        (f) => `${f.side !== 'C' ? `${SIDES[f.side].toLowerCase()} ` : ''}${f.vertebra}`
       );
       narratives.push(`Segmental Fixations: ${fixes.join(', ')}`);
     }
 
     // Restrictions
     if (grouped.restriction) {
-      const rests = grouped.restriction.map(f => f.vertebra);
+      const rests = grouped.restriction.map((f) => f.vertebra);
       narratives.push(`Motion Restrictions noted at: ${rests.join(', ')}`);
     }
 
     // Tenderness
     if (grouped.tenderness) {
-      const tends = grouped.tenderness.map(f =>
-        `${f.side !== 'C' ? SIDES[f.side].toLowerCase() + ' ' : ''}${f.vertebra}`
+      const tends = grouped.tenderness.map(
+        (f) => `${f.side !== 'C' ? `${SIDES[f.side].toLowerCase()} ` : ''}${f.vertebra}`
       );
       narratives.push(`Pain/Tenderness: ${tends.join(', ')}`);
     }
 
     // Spasm
     if (grouped.spasm) {
-      const spasms = grouped.spasm.map(f => f.vertebra);
+      const spasms = grouped.spasm.map((f) => f.vertebra);
       narratives.push(`Muscle Spasm(s): Hypertonic tissue tone at ${spasms.join(', ')}`);
     }
 
@@ -309,7 +323,7 @@ export default function SpineDiagram({
 
           {/* Sacrum/Pelvis buttons */}
           <div className="ml-4 flex flex-col justify-end gap-2 pb-4">
-            {SPINE_REGIONS.sacral.vertebrae.map(v => {
+            {SPINE_REGIONS.sacral.vertebrae.map((v) => {
               const finding = hasFinding(v);
               return (
                 <button
@@ -384,7 +398,7 @@ export default function SpineDiagram({
                     Current Findings for {selectedVertebra}
                   </label>
                   <div className="flex flex-wrap gap-1">
-                    {getVertebraFindings(selectedVertebra).map(f => (
+                    {getVertebraFindings(selectedVertebra).map((f) => (
                       <span
                         key={`${f.vertebra}_${f.type}_${f.side}`}
                         className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded"
@@ -426,7 +440,7 @@ export default function SpineDiagram({
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   <h5 className="text-xs font-medium text-gray-500 mb-2">All Findings</h5>
                   <div className="flex flex-wrap gap-1 max-h-32 overflow-y-auto">
-                    {Object.values(findings).map(f => (
+                    {Object.values(findings).map((f) => (
                       <span
                         key={`${f.vertebra}_${f.type}_${f.side}`}
                         className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded text-white bg-${FINDING_TYPES[f.type].color}-500`}
@@ -450,7 +464,9 @@ export default function SpineDiagram({
           </label>
           <ul className="space-y-1">
             {narrative.map((line, i) => (
-              <li key={i} className="text-sm text-green-900">• {line}</li>
+              <li key={i} className="text-sm text-green-900">
+                • {line}
+              </li>
             ))}
           </ul>
         </div>
@@ -475,7 +491,7 @@ export function QuickVertebraSelect({ findings = {}, onChange }) {
   };
 
   const hasAnyFinding = (vertebra) => {
-    return Object.values(findings).some(f => f.vertebra === vertebra);
+    return Object.values(findings).some((f) => f.vertebra === vertebra);
   };
 
   return (
@@ -484,7 +500,7 @@ export function QuickVertebraSelect({ findings = {}, onChange }) {
         <div key={regionKey}>
           <label className="block text-xs font-medium text-gray-500 mb-1">{region.label}</label>
           <div className="flex flex-wrap gap-1">
-            {region.vertebrae.map(v => (
+            {region.vertebrae.map((v) => (
               <button
                 key={v}
                 onClick={() => toggleVertebra(v)}

@@ -9,7 +9,7 @@
  * - Quick phrase chips below
  */
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import _React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useSlashCommands, SlashCommandMenu } from '../assessment/SlashCommands';
 import { Sparkles, Loader2, Mic, MicOff, Square } from 'lucide-react';
 import { aiAPI } from '../../services/api';
@@ -71,13 +71,12 @@ const MACROS = {
   '.modr': 'Moderat respons. Justerer behandlingsplan. ',
   '.begr': 'Begrenset respons. Vurderer alternativ tilnærming. ',
   '.prog': 'Prognose: ',
-  '.diff': 'Differensialdiagnoser: '
+  '.diff': 'Differensialdiagnoser: ',
 };
 
 // Check if browser supports speech recognition
-const SpeechRecognition = typeof window !== 'undefined'
-  ? window.SpeechRecognition || window.webkitSpeechRecognition
-  : null;
+const SpeechRecognition =
+  typeof window !== 'undefined' ? window.SpeechRecognition || window.webkitSpeechRecognition : null;
 
 export default function EnhancedClinicalTextarea({
   value,
@@ -122,16 +121,18 @@ export default function EnhancedClinicalTextarea({
     menuPosition,
     filteredCommands,
     selectedIndex,
-    setSelectedIndex,
+    _setSelectedIndex,
     handleKeyDown: slashKeyDown,
     handleChange: slashChange,
     selectCommand,
-    closeMenu
+    closeMenu,
   } = useSlashCommands();
 
   // Initialize speech recognition
   const initRecognition = useCallback(() => {
-    if (!SpeechRecognition) return null;
+    if (!SpeechRecognition) {
+      return null;
+    }
 
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
@@ -169,11 +170,12 @@ export default function EnhancedClinicalTextarea({
 
     recognition.onerror = (event) => {
       log.error('Speech recognition error', { error: event.error });
-      setVoiceError(event.error === 'not-allowed'
-        ? 'Mikrofontilgang nektet'
-        : event.error === 'no-speech'
-        ? 'Ingen tale oppdaget'
-        : `Feil: ${event.error}`
+      setVoiceError(
+        event.error === 'not-allowed'
+          ? 'Mikrofontilgang nektet'
+          : event.error === 'no-speech'
+            ? 'Ingen tale oppdaget'
+            : `Feil: ${event.error}`
       );
       setIsListening(false);
     };
@@ -222,13 +224,14 @@ export default function EnhancedClinicalTextarea({
       const expansion = MACROS[macroKey];
 
       if (expansion) {
-        const newText = text.substring(0, cursorPosition - macroKey.length) +
+        const newText =
+          text.substring(0, cursorPosition - macroKey.length) +
           expansion +
           text.substring(cursorPosition);
         return {
           expanded: true,
           text: newText,
-          newCursorPosition: cursorPosition - macroKey.length + expansion.length
+          newCursorPosition: cursorPosition - macroKey.length + expansion.length,
         };
       }
     }
@@ -264,7 +267,7 @@ export default function EnhancedClinicalTextarea({
     const partialMatch = beforeCursor.match(/(\.[a-zøæå0-9]*)$/i);
     if (partialMatch && partialMatch[1].length > 1) {
       const partial = partialMatch[1].toLowerCase();
-      const matches = Object.keys(MACROS).filter(k => k.startsWith(partial));
+      const matches = Object.keys(MACROS).filter((k) => k.startsWith(partial));
       if (matches.length > 0 && matches[0] !== partial) {
         setMacroHint(`${matches[0]} → ${MACROS[matches[0]].substring(0, 40)}...`);
         setShowMacroHint(true);
@@ -311,7 +314,9 @@ export default function EnhancedClinicalTextarea({
 
   // Insert quick phrase at cursor
   const insertQuickPhrase = (phrase) => {
-    if (!textareaRef.current) return;
+    if (!textareaRef.current) {
+      return;
+    }
 
     const start = textareaRef.current.selectionStart;
     const end = textareaRef.current.selectionEnd;
@@ -319,7 +324,8 @@ export default function EnhancedClinicalTextarea({
     const textAfter = value.substring(end);
 
     // Add space before if needed
-    const needsSpaceBefore = textBefore.length > 0 && !textBefore.endsWith(' ') && !textBefore.endsWith('\n');
+    const needsSpaceBefore =
+      textBefore.length > 0 && !textBefore.endsWith(' ') && !textBefore.endsWith('\n');
     const insertText = (needsSpaceBefore ? ' ' : '') + phrase;
 
     const newValue = textBefore + insertText + textAfter;
@@ -352,11 +358,15 @@ export default function EnhancedClinicalTextarea({
     const timeout = setTimeout(async () => {
       try {
         setIsAILoading(true);
-        const response = await aiAPI.generateField(section, {
-          partialText: value,
-          maxTokens: 50, // Short continuation only
-          ...aiContext
-        }, 'no');
+        const response = await aiAPI.generateField(
+          section,
+          {
+            partialText: value,
+            maxTokens: 50, // Short continuation only
+            ...aiContext,
+          },
+          'no'
+        );
 
         // Extract continuation from response
         const continuation = response?.data?.text || response?.data?.continuation || '';
@@ -365,7 +375,7 @@ export default function EnhancedClinicalTextarea({
         if (continuation && continuation.length > 5 && !value.includes(continuation.trim())) {
           // Trim to first sentence or max 60 chars for ghost text
           const trimmed = continuation.split(/[.!?]/)[0].trim();
-          setAiSuggestion(trimmed.length > 60 ? trimmed.substring(0, 60) + '...' : trimmed + '.');
+          setAiSuggestion(trimmed.length > 60 ? `${trimmed.substring(0, 60)}...` : `${trimmed}.`);
         } else {
           setAiSuggestion('');
         }
@@ -463,9 +473,7 @@ export default function EnhancedClinicalTextarea({
           )}
 
           {/* AI loading indicator */}
-          {isAILoading && (
-            <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />
-          )}
+          {isAILoading && <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />}
         </div>
 
         {/* Tab hint for AI suggestion */}
@@ -512,7 +520,7 @@ export default function EnhancedClinicalTextarea({
       {/* Quick phrases */}
       {quickPhrases.length > 0 && !disabled && (
         <div className="flex flex-wrap gap-1.5 mt-2">
-          {quickPhrases.slice(0, 8).map(phrase => (
+          {quickPhrases.slice(0, 8).map((phrase) => (
             <button
               key={phrase}
               onClick={() => insertQuickPhrase(phrase)}
@@ -523,9 +531,7 @@ export default function EnhancedClinicalTextarea({
             </button>
           ))}
           {quickPhrases.length > 8 && (
-            <span className="px-2 py-1 text-xs text-gray-400">
-              +{quickPhrases.length - 8} mer
-            </span>
+            <span className="px-2 py-1 text-xs text-gray-400">+{quickPhrases.length - 8} mer</span>
           )}
         </div>
       )}

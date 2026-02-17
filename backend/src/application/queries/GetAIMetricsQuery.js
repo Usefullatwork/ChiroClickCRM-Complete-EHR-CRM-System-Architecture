@@ -7,7 +7,10 @@
 
 import { aiFeedbackService } from '../services/AIFeedbackService.js';
 import { aiRetrainingService } from '../services/AIRetrainingService.js';
-import { CircuitBreakers, circuitBreakerRegistry } from '../../infrastructure/resilience/CircuitBreaker.js';
+import {
+  CircuitBreakers,
+  circuitBreakerRegistry,
+} from '../../infrastructure/resilience/CircuitBreaker.js';
 import { cacheManager } from '../../infrastructure/cache/CacheManager.js';
 import logger from '../../utils/logger.js';
 
@@ -40,19 +43,14 @@ export class GetAIMetricsQueryHandler {
   async handle(query) {
     logger.debug('Handling GetAIMetricsQuery', { days: query.days });
 
-    const [
-      feedbackMetrics,
-      modelInfo,
-      trainingHistory,
-      circuitStatus,
-      cacheStats
-    ] = await Promise.all([
-      aiFeedbackService.getMetrics(query.days),
-      aiRetrainingService.getCurrentModelInfo(),
-      query.includeHistory ? aiRetrainingService.getTrainingHistory(5) : [],
-      query.includeCircuitStatus ? circuitBreakerRegistry.getAllStatus() : {},
-      cacheManager.getStats()
-    ]);
+    const [feedbackMetrics, modelInfo, trainingHistory, circuitStatus, cacheStats] =
+      await Promise.all([
+        aiFeedbackService.getMetrics(query.days),
+        aiRetrainingService.getCurrentModelInfo(),
+        query.includeHistory ? aiRetrainingService.getTrainingHistory(5) : [],
+        query.includeCircuitStatus ? circuitBreakerRegistry.getAllStatus() : {},
+        cacheManager.getStats(),
+      ]);
 
     return {
       feedback: feedbackMetrics,
@@ -60,7 +58,7 @@ export class GetAIMetricsQueryHandler {
       trainingHistory,
       circuitBreakers: circuitStatus,
       cache: cacheStats,
-      queriedAt: new Date().toISOString()
+      queriedAt: new Date().toISOString(),
     };
   }
 }
@@ -78,7 +76,7 @@ export class GetAIDashboardQuery {
  * Handler for GetAIDashboardQuery
  */
 export class GetAIDashboardQueryHandler {
-  async handle(query) {
+  async handle(_query) {
     const metrics = await aiFeedbackService.getMetrics(7);
     const modelInfo = await aiRetrainingService.getCurrentModelInfo();
 
@@ -89,7 +87,7 @@ export class GetAIDashboardQueryHandler {
       dailyTrend: metrics.dailyStats || [],
       activeModel: modelInfo.version,
       circuitStatus: CircuitBreakers.ollama.getStatus().state,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
   }
 }
@@ -104,5 +102,5 @@ export default {
   GetAIDashboardQuery,
   GetAIDashboardQueryHandler,
   getAIMetricsHandler,
-  getAIDashboardHandler
+  getAIDashboardHandler,
 };

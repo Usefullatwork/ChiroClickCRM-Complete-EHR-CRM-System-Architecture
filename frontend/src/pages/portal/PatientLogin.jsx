@@ -4,83 +4,83 @@
  * Validates access token and redirects to exercises
  */
 
-import React, { useState, useEffect } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import _React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Dumbbell,
   Loader2,
   AlertTriangle,
   CheckCircle,
   ArrowRight,
-  Phone,
-  Mail
-} from 'lucide-react'
-import { patientApi, storeToken, getTokenFromUrl } from '../../api/patientApi'
+  _Phone,
+  _Mail,
+} from 'lucide-react';
+import { patientApi, storeToken, _getTokenFromUrl } from '../../api/patientApi';
 
 const PatientLogin = () => {
-  const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   // State
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [tokenData, setTokenData] = useState(null)
-  const [manualToken, setManualToken] = useState('')
-  const [showManualEntry, setShowManualEntry] = useState(false)
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [tokenData, setTokenData] = useState(null);
+  const [manualToken, setManualToken] = useState('');
+  const [showManualEntry, setShowManualEntry] = useState(false);
 
   // Get token from URL on mount
   useEffect(() => {
-    const token = searchParams.get('token')
+    const token = searchParams.get('token');
     if (token) {
-      validateToken(token)
+      validateToken(token);
     } else {
-      setLoading(false)
-      setShowManualEntry(true)
+      setLoading(false);
+      setShowManualEntry(true);
     }
-  }, [searchParams])
+  }, [searchParams]);
 
   /**
    * Validate the access token
    */
   const validateToken = async (token) => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
-      const response = await patientApi.validateToken(token)
+      const response = await patientApi.validateToken(token);
 
       if (response.success && response.valid) {
-        setTokenData(response.data)
-        storeToken(token)
+        setTokenData(response.data);
+        storeToken(token);
 
         // Auto-redirect after showing welcome
         setTimeout(() => {
-          navigate(`/portal/mine-ovelser?token=${token}`)
-        }, 2000)
+          navigate(`/portal/mine-ovelser?token=${token}`);
+        }, 2000);
       } else {
-        setError(response.error || 'Tilgangskoden er ugyldig')
-        setShowManualEntry(true)
+        setError(response.error || 'Tilgangskoden er ugyldig');
+        setShowManualEntry(true);
       }
     } catch (err) {
-      console.error('Token validation error:', err)
-      setError(err.message || 'Kunne ikke validere tilgangskoden')
-      setShowManualEntry(true)
+      console.error('Token validation error:', err);
+      setError(err.message || 'Kunne ikke validere tilgangskoden');
+      setShowManualEntry(true);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   /**
    * Handle manual token submission
    */
   const handleManualSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (manualToken.trim().length >= 32) {
-      validateToken(manualToken.trim())
+      validateToken(manualToken.trim());
     } else {
-      setError('Tilgangskoden må være minst 32 tegn')
+      setError('Tilgangskoden må være minst 32 tegn');
     }
-  }
+  };
 
   // Loading state
   if (loading) {
@@ -90,13 +90,11 @@ const PatientLogin = () => {
           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
           </div>
-          <h1 className="text-xl font-semibold text-gray-900 mb-2">
-            Validerer tilgang...
-          </h1>
+          <h1 className="text-xl font-semibold text-gray-900 mb-2">Validerer tilgang...</h1>
           <p className="text-gray-500">Vennligst vent</p>
         </div>
       </div>
-    )
+    );
   }
 
   // Success state - show welcome before redirect
@@ -110,16 +108,14 @@ const PatientLogin = () => {
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
             Velkommen, {tokenData.patient?.firstName}!
           </h1>
-          <p className="text-gray-600 mb-4">
-            Du er logget inn hos {tokenData.clinic?.name}
-          </p>
+          <p className="text-gray-600 mb-4">Du er logget inn hos {tokenData.clinic?.name}</p>
           <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
             <Loader2 className="w-4 h-4 animate-spin" />
             <span>Laster øvelsene dine...</span>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   // Error/Manual entry state
@@ -131,12 +127,8 @@ const PatientLogin = () => {
           <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
             <Dumbbell className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Pasientportalen
-          </h1>
-          <p className="text-gray-500 mt-1">
-            Logg inn for å se øvelsene dine
-          </p>
+          <h1 className="text-2xl font-bold text-gray-900">Pasientportalen</h1>
+          <p className="text-gray-500 mt-1">Logg inn for å se øvelsene dine</p>
         </div>
 
         {/* Error Message */}
@@ -155,12 +147,10 @@ const PatientLogin = () => {
         {/* Manual Token Entry */}
         {showManualEntry && (
           <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Skriv inn tilgangskode
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Skriv inn tilgangskode</h2>
             <p className="text-sm text-gray-500 mb-4">
-              Du finner tilgangskoden i e-posten du fikk fra klinikken.
-              Koden er en lang rekke med bokstaver og tall.
+              Du finner tilgangskoden i e-posten du fikk fra klinikken. Koden er en lang rekke med
+              bokstaver og tall.
             </p>
 
             <form onSubmit={handleManualSubmit} className="space-y-4">
@@ -193,26 +183,22 @@ const PatientLogin = () => {
 
         {/* Help Section */}
         <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500 mb-4">
-            Finner du ikke tilgangskoden?
-          </p>
+          <p className="text-sm text-gray-500 mb-4">Finner du ikke tilgangskoden?</p>
           <div className="space-y-2">
-            <p className="text-sm text-gray-600">
-              Kontakt klinikken din for å få en ny lenke.
-            </p>
+            <p className="text-sm text-gray-600">Kontakt klinikken din for å få en ny lenke.</p>
           </div>
         </div>
 
         {/* Footer */}
         <div className="mt-12 pt-6 border-t border-gray-200 text-center">
           <p className="text-xs text-gray-400">
-            Dette er en sikker innloggingsside.
-            Din tilgangskode er personlig og bør ikke deles med andre.
+            Dette er en sikker innloggingsside. Din tilgangskode er personlig og bør ikke deles med
+            andre.
           </p>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default PatientLogin
+export default PatientLogin;

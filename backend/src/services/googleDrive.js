@@ -6,7 +6,8 @@
 
 import logger from '../utils/logger.js';
 
-const NOT_AVAILABLE = 'Google Drive not available in standalone desktop mode. Use local file import instead.';
+const NOT_AVAILABLE =
+  'Google Drive not available in standalone desktop mode. Use local file import instead.';
 
 export const initializeOAuth2Client = () => {
   logger.info('Google Drive: disabled in desktop mode');
@@ -21,25 +22,22 @@ export const exchangeCodeForTokens = async () => {
   throw new Error(NOT_AVAILABLE);
 };
 
-export const listFilesInFolder = async () => {
-  return [];
-};
+export const listFilesInFolder = async () => [];
 
 export const downloadFile = async () => {
   throw new Error(NOT_AVAILABLE);
 };
 
-export const syncTrainingDocuments = async () => {
-  return { total: 0, downloaded: 0, skipped: 0, errors: [{ error: NOT_AVAILABLE }] };
-};
+export const syncTrainingDocuments = async () => ({
+  total: 0,
+  downloaded: 0,
+  skipped: 0,
+  errors: [{ error: NOT_AVAILABLE }],
+});
 
-export const searchFiles = async () => {
-  return [];
-};
+export const searchFiles = async () => [];
 
-export const checkConnection = async () => {
-  return { connected: false, error: NOT_AVAILABLE };
-};
+export const checkConnection = async () => ({ connected: false, error: NOT_AVAILABLE });
 
 export default {
   initializeOAuth2Client,
@@ -49,5 +47,5 @@ export default {
   downloadFile,
   syncTrainingDocuments,
   searchFiles,
-  checkConnection
+  checkConnection,
 };

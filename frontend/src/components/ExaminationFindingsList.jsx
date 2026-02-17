@@ -93,7 +93,9 @@ export default function ExaminationFindingsList({ encounterId }) {
   };
 
   const getSeverityBadge = (severity) => {
-    if (!severity) return null;
+    if (!severity) {
+      return null;
+    }
 
     const colors = {
       mild: 'bg-yellow-100 text-yellow-800',
@@ -123,7 +125,9 @@ export default function ExaminationFindingsList({ encounterId }) {
   };
 
   const exportFindings = () => {
-    if (!findings?.data || findings.data.length === 0) return;
+    if (!findings?.data || findings.data.length === 0) {
+      return;
+    }
 
     const text = findings.data
       .map(
@@ -139,7 +143,9 @@ export default function ExaminationFindingsList({ encounterId }) {
   };
 
   const filterFindings = (findingsData) => {
-    if (!findingsData) return {};
+    if (!findingsData) {
+      return {};
+    }
 
     return Object.entries(findingsData).reduce((acc, [region, regionFindings]) => {
       // Filter by region
@@ -149,7 +155,9 @@ export default function ExaminationFindingsList({ encounterId }) {
 
       // Filter by result
       const filtered = regionFindings.filter((finding) => {
-        if (filterResult === 'all') return true;
+        if (filterResult === 'all') {
+          return true;
+        }
         return finding.result === filterResult;
       });
 

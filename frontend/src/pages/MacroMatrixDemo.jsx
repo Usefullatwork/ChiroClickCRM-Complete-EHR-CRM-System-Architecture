@@ -4,7 +4,7 @@
  * Demonstrates the 15-second SOAP note capability with bilingual support.
  */
 
-import React, { useState } from 'react';
+import _React, { useState } from 'react';
 import { Globe, FileText, Zap, Clock, Copy, Trash2 } from 'lucide-react';
 import MacroMatrix, { MacroMatrixInline } from '../components/assessment/MacroMatrix';
 
@@ -14,9 +14,9 @@ export default function MacroMatrixDemo() {
   const [favorites, setFavorites] = useState([]);
   const [insertCount, setInsertCount] = useState(0);
 
-  const handleInsert = (text, field) => {
-    setNoteContent(prev => prev ? `${prev}\n\n${text}` : text);
-    setInsertCount(prev => prev + 1);
+  const handleInsert = (text, _field) => {
+    setNoteContent((prev) => (prev ? `${prev}\n\n${text}` : text));
+    setInsertCount((prev) => prev + 1);
   };
 
   const handleClear = () => {
@@ -165,7 +165,9 @@ export default function MacroMatrixDemo() {
               {noteContent && (
                 <div className="px-4 py-2 bg-gray-50 border-t border-gray-200">
                   <p className="text-xs text-gray-500">
-                    {noteContent.length} {lang === 'no' ? 'tegn' : 'characters'} | {noteContent.split(/\s+/).filter(Boolean).length} {lang === 'no' ? 'ord' : 'words'}
+                    {noteContent.length} {lang === 'no' ? 'tegn' : 'characters'} |{' '}
+                    {noteContent.split(/\s+/).filter(Boolean).length}{' '}
+                    {lang === 'no' ? 'ord' : 'words'}
                   </p>
                 </div>
               )}

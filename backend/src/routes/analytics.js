@@ -243,7 +243,7 @@ router.get(
 
       res.setHeader('Content-Type', 'text/csv; charset=utf-8');
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-      res.send('\uFEFF' + csvContent); // BOM for Excel UTF-8 support
+      res.send(`\uFEFF${csvContent}`); // BOM for Excel UTF-8 support
     } catch (error) {
       logger.error('Error exporting analytics:', error);
       res.status(500).json({

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Offline Storage Utility
  *
@@ -24,7 +25,7 @@ const STORES = {
   PROGRESS: 'progress',
   SYNC_QUEUE: 'sync-queue',
   CACHED_VIDEOS: 'cached-videos',
-  SETTINGS: 'settings'
+  SETTINGS: 'settings',
 };
 
 // =============================================================================
@@ -76,7 +77,10 @@ export async function openDatabase() {
 
       // Progress store - locally completed exercises (before sync)
       if (!db.objectStoreNames.contains(STORES.PROGRESS)) {
-        const progressStore = db.createObjectStore(STORES.PROGRESS, { keyPath: 'id', autoIncrement: true });
+        const progressStore = db.createObjectStore(STORES.PROGRESS, {
+          keyPath: 'id',
+          autoIncrement: true,
+        });
         progressStore.createIndex('exerciseId', 'exerciseId', { unique: false });
         progressStore.createIndex('prescriptionId', 'prescriptionId', { unique: false });
         progressStore.createIndex('completedAt', 'completedAt', { unique: false });
@@ -247,7 +251,7 @@ export async function cachePrescription(token, prescriptionData) {
     id: prescription.id,
     token,
     data: prescriptionData,
-    cachedAt: new Date().toISOString()
+    cachedAt: new Date().toISOString(),
   });
 
   // Save individual exercises
@@ -256,12 +260,14 @@ export async function cachePrescription(token, prescriptionData) {
       await saveItem(STORES.EXERCISES, {
         ...exercise,
         prescriptionId: prescription.id,
-        cachedAt: new Date().toISOString()
+        cachedAt: new Date().toISOString(),
       });
     }
   }
 
-  console.log(`[OfflineStorage] Cached prescription ${prescription.id} with ${exercises?.length || 0} exercises`);
+  console.log(
+    `[OfflineStorage] Cached prescription ${prescription.id} with ${exercises?.length || 0} exercises`
+  );
 }
 
 /**
@@ -346,7 +352,7 @@ export async function saveProgress(progressData) {
   const record = {
     ...progressData,
     completedAt: new Date().toISOString(),
-    synced: false
+    synced: false,
   };
 
   const id = await saveItem(STORES.PROGRESS, record);
@@ -414,7 +420,7 @@ export async function trackCachedVideo(url, exerciseId, size) {
     url,
     exerciseId,
     size,
-    cachedAt: new Date().toISOString()
+    cachedAt: new Date().toISOString(),
   });
   console.log(`[OfflineStorage] Tracked cached video: ${url}`);
 }
@@ -526,9 +532,10 @@ export async function getStorageStats() {
     pendingSyncItems: syncQueue.length,
     cachedVideos: cachedVideos.length,
     totalVideoSizeMB: (totalVideoSize / (1024 * 1024)).toFixed(2),
-    lastUpdated: prescriptions.length > 0
-      ? prescriptions.sort((a, b) => new Date(b.cachedAt) - new Date(a.cachedAt))[0]?.cachedAt
-      : null
+    lastUpdated:
+      prescriptions.length > 0
+        ? prescriptions.sort((a, b) => new Date(b.cachedAt) - new Date(a.cachedAt))[0]?.cachedAt
+        : null,
   };
 }
 
@@ -572,5 +579,5 @@ export default {
   clearAllOfflineData,
   getStorageStats,
   isIndexedDBAvailable,
-  STORES
+  STORES,
 };

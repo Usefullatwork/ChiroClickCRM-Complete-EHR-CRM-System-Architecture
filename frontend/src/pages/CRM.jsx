@@ -21,23 +21,23 @@ import { useTranslation } from '../i18n';
 import {
   Users,
   UserPlus,
-  Heart,
+  _Heart,
   MessageSquare,
   BarChart3,
   Settings,
   Gift,
   Star,
   Clock,
-  Mail,
+  _Mail,
   Workflow,
   TrendingUp,
-  Calendar,
+  _Calendar,
   FileText,
   Send,
-  Filter,
-  Search,
+  _Filter,
+  _Search,
   Plus,
-  ChevronRight,
+  _ChevronRight,
   Bell,
   Target,
   Zap,
@@ -150,7 +150,7 @@ const CRM_MODULES = [
 export default function CRM() {
   const [activeModule, setActiveModule] = useState('overview');
   const { lang: language, setLang: setLanguage } = useTranslation();
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [overviewStats, setOverviewStats] = useState({
     newLeads: 0,
     activePatients: 0,
@@ -169,7 +169,9 @@ export default function CRM() {
 
   // Fetch waitlist data when module is active
   useEffect(() => {
-    if (activeModule !== 'waitlist') return;
+    if (activeModule !== 'waitlist') {
+      return;
+    }
     const fetchWaitlist = async () => {
       try {
         const [wRes, pRes] = await Promise.all([
@@ -290,7 +292,7 @@ export default function CRM() {
                 logger.error('Failed to remove from waitlist:', err);
               }
             }}
-            onNotify={async (entry, message) => {
+            onNotify={async (entry, _message) => {
               try {
                 await crmAPI.notifyWaitlist({ entryId: entry.id });
                 setWaitlistData((prev) =>

@@ -6,12 +6,12 @@
  * and quick actions for payment tracking
  */
 
-import React, { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import _React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   FileText,
   Search,
-  Filter,
+  _Filter,
   ChevronLeft,
   ChevronRight,
   Eye,
@@ -22,11 +22,11 @@ import {
   AlertTriangle,
   XCircle,
   MoreVertical,
-  Download,
+  _Download,
   Ban,
-  CreditCard
-} from 'lucide-react'
-import { billingAPI } from '../../services/api'
+  CreditCard,
+} from 'lucide-react';
+import { billingAPI } from '../../services/api';
 
 /**
  * Get status badge styling and label
@@ -36,46 +36,46 @@ const getStatusConfig = (status) => {
     draft: {
       label: 'Utkast',
       color: 'bg-gray-100 text-gray-700',
-      icon: FileText
+      icon: FileText,
     },
     pending: {
       label: 'Venter',
       color: 'bg-yellow-100 text-yellow-800',
-      icon: Clock
+      icon: Clock,
     },
     sent: {
       label: 'Sendt',
       color: 'bg-blue-100 text-blue-800',
-      icon: Send
+      icon: Send,
     },
     paid: {
       label: 'Betalt',
       color: 'bg-green-100 text-green-800',
-      icon: CheckCircle
+      icon: CheckCircle,
     },
     partial: {
       label: 'Delvis betalt',
       color: 'bg-orange-100 text-orange-800',
-      icon: CreditCard
+      icon: CreditCard,
     },
     overdue: {
       label: 'Forfalt',
       color: 'bg-red-100 text-red-800',
-      icon: AlertTriangle
+      icon: AlertTriangle,
     },
     cancelled: {
       label: 'Kansellert',
       color: 'bg-gray-100 text-gray-500',
-      icon: XCircle
+      icon: XCircle,
     },
     credited: {
       label: 'Kreditert',
       color: 'bg-purple-100 text-purple-800',
-      icon: Ban
-    }
-  }
-  return configs[status] || configs.pending
-}
+      icon: Ban,
+    },
+  };
+  return configs[status] || configs.pending;
+};
 
 /**
  * InvoiceList Component
@@ -83,21 +83,18 @@ const getStatusConfig = (status) => {
  * @param {Function} props.onViewInvoice - Callback when viewing invoice details
  * @param {Function} props.onRecordPayment - Callback to open payment recording
  */
-export default function InvoiceList({
-  onViewInvoice,
-  onRecordPayment
-}) {
-  const queryClient = useQueryClient()
+export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
+  const queryClient = useQueryClient();
 
   // State for filtering
-  const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState('')
-  const [dateRange, setDateRange] = useState({ start: '', end: '' })
-  const [sortBy, setSortBy] = useState('invoice_date')
-  const [sortOrder, setSortOrder] = useState('DESC')
-  const [page, setPage] = useState(1)
-  const [limit] = useState(20)
-  const [activeDropdown, setActiveDropdown] = useState(null)
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [dateRange, setDateRange] = useState({ start: '', end: '' });
+  const [sortBy, setSortBy] = useState('invoice_date');
+  const [sortOrder, setSortOrder] = useState('DESC');
+  const [page, setPage] = useState(1);
+  const [limit] = useState(20);
+  const [activeDropdown, setActiveDropdown] = useState(null);
 
   // Fetch invoices
   const { data, isLoading, error } = useQuery({
@@ -111,27 +108,27 @@ export default function InvoiceList({
         start_date: dateRange.start || undefined,
         end_date: dateRange.end || undefined,
         sort_by: sortBy,
-        sort_order: sortOrder
-      })
-      return response.data
-    }
-  })
+        sort_order: sortOrder,
+      });
+      return response.data;
+    },
+  });
 
   // Finalize invoice mutation
   const finalizeMutation = useMutation({
     mutationFn: (invoiceId) => billingAPI.finalizeInvoice(invoiceId),
     onSuccess: () => {
-      queryClient.invalidateQueries(['invoices'])
-    }
-  })
+      queryClient.invalidateQueries(['invoices']);
+    },
+  });
 
   // Cancel invoice mutation
   const cancelMutation = useMutation({
     mutationFn: ({ invoiceId, reason }) => billingAPI.cancelInvoice(invoiceId, { reason }),
     onSuccess: () => {
-      queryClient.invalidateQueries(['invoices'])
-    }
-  })
+      queryClient.invalidateQueries(['invoices']);
+    },
+  });
 
   /**
    * Format currency in NOK
@@ -140,85 +137,89 @@ export default function InvoiceList({
     return new Intl.NumberFormat('no-NO', {
       style: 'currency',
       currency: 'NOK',
-      minimumFractionDigits: 0
-    }).format(amount || 0)
-  }
+      minimumFractionDigits: 0,
+    }).format(amount || 0);
+  };
 
   /**
    * Format date in Norwegian format
    */
   const formatDate = (date) => {
-    if (!date) return '-'
+    if (!date) {
+      return '-';
+    }
     return new Date(date).toLocaleDateString('no-NO', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric'
-    })
-  }
+      year: 'numeric',
+    });
+  };
 
   /**
    * Handle send/finalize invoice
    */
   const handleSendInvoice = async (invoiceId) => {
     try {
-      await finalizeMutation.mutateAsync(invoiceId)
-      setActiveDropdown(null)
+      await finalizeMutation.mutateAsync(invoiceId);
+      setActiveDropdown(null);
     } catch (error) {
-      console.error('Failed to send invoice:', error)
+      console.error('Failed to send invoice:', error);
     }
-  }
+  };
 
   /**
    * Handle cancel invoice
    */
   const handleCancelInvoice = async (invoiceId) => {
-    const reason = window.prompt('Angi grunn for kansellering:')
-    if (!reason) return
+    const reason = window.prompt('Angi grunn for kansellering:');
+    if (!reason) {
+      return;
+    }
 
     try {
-      await cancelMutation.mutateAsync({ invoiceId, reason })
-      setActiveDropdown(null)
+      await cancelMutation.mutateAsync({ invoiceId, reason });
+      setActiveDropdown(null);
     } catch (error) {
-      console.error('Failed to cancel invoice:', error)
+      console.error('Failed to cancel invoice:', error);
     }
-  }
+  };
 
   /**
    * Handle print invoice
    */
   const handlePrintInvoice = async (invoiceId) => {
     try {
-      const response = await billingAPI.getInvoiceHTML(invoiceId)
-      const printWindow = window.open('', '_blank')
-      printWindow.document.write(response.data.html)
-      printWindow.document.close()
-      setTimeout(() => printWindow.print(), 250)
+      const response = await billingAPI.getInvoiceHTML(invoiceId);
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(response.data.html);
+      printWindow.document.close();
+      setTimeout(() => printWindow.print(), 250);
     } catch (error) {
-      console.error('Failed to print invoice:', error)
+      console.error('Failed to print invoice:', error);
     }
-  }
+  };
 
   /**
    * Toggle sort order
    */
   const handleSort = (column) => {
     if (sortBy === column) {
-      setSortOrder(sortOrder === 'ASC' ? 'DESC' : 'ASC')
+      setSortOrder(sortOrder === 'ASC' ? 'DESC' : 'ASC');
     } else {
-      setSortBy(column)
-      setSortOrder('DESC')
+      setSortBy(column);
+      setSortOrder('DESC');
     }
-  }
+  };
 
-  const invoices = data?.invoices || []
-  const pagination = data?.pagination || { page: 1, pages: 1, total: 0 }
+  const invoices = data?.invoices || [];
+  const pagination = data?.pagination || { page: 1, pages: 1, total: 0 };
 
   if (error) {
     return (
       <div className="bg-red-50 text-red-700 p-4 rounded-lg">
         Kunne ikke laste fakturaer: {error.message}
       </div>
-    )
+    );
   }
 
   return (
@@ -234,8 +235,8 @@ export default function InvoiceList({
                 placeholder="Sok etter pasient eller fakturanummer..."
                 value={searchTerm}
                 onChange={(e) => {
-                  setSearchTerm(e.target.value)
-                  setPage(1)
+                  setSearchTerm(e.target.value);
+                  setPage(1);
                 }}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -244,8 +245,8 @@ export default function InvoiceList({
           <select
             value={statusFilter}
             onChange={(e) => {
-              setStatusFilter(e.target.value)
-              setPage(1)
+              setStatusFilter(e.target.value);
+              setPage(1);
             }}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
           >
@@ -262,8 +263,8 @@ export default function InvoiceList({
             type="date"
             value={dateRange.start}
             onChange={(e) => {
-              setDateRange({ ...dateRange, start: e.target.value })
-              setPage(1)
+              setDateRange({ ...dateRange, start: e.target.value });
+              setPage(1);
             }}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Fra dato"
@@ -272,8 +273,8 @@ export default function InvoiceList({
             type="date"
             value={dateRange.end}
             onChange={(e) => {
-              setDateRange({ ...dateRange, end: e.target.value })
-              setPage(1)
+              setDateRange({ ...dateRange, end: e.target.value });
+              setPage(1);
             }}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Til dato"
@@ -340,10 +341,12 @@ export default function InvoiceList({
                 </tr>
               ) : invoices.length > 0 ? (
                 invoices.map((invoice) => {
-                  const statusConfig = getStatusConfig(invoice.status)
-                  const StatusIcon = statusConfig.icon
-                  const isOverdue = invoice.status !== 'paid' && invoice.status !== 'cancelled' &&
-                    new Date(invoice.due_date) < new Date()
+                  const statusConfig = getStatusConfig(invoice.status);
+                  const StatusIcon = statusConfig.icon;
+                  const isOverdue =
+                    invoice.status !== 'paid' &&
+                    invoice.status !== 'cancelled' &&
+                    new Date(invoice.due_date) < new Date();
 
                   return (
                     <tr
@@ -352,9 +355,7 @@ export default function InvoiceList({
                       onClick={() => onViewInvoice && onViewInvoice(invoice)}
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="font-medium text-blue-600">
-                          {invoice.invoice_number}
-                        </span>
+                        <span className="font-medium text-blue-600">{invoice.invoice_number}</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-gray-900">{invoice.patient_name}</span>
@@ -372,7 +373,9 @@ export default function InvoiceList({
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-full ${statusConfig.color}`}>
+                        <span
+                          className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-full ${statusConfig.color}`}
+                        >
                           <StatusIcon className="w-3.5 h-3.5" />
                           {statusConfig.label}
                         </span>
@@ -380,18 +383,22 @@ export default function InvoiceList({
                       <td className="px-6 py-4 whitespace-nowrap text-gray-500">
                         {formatDate(invoice.invoice_date)}
                       </td>
-                      <td className={`px-6 py-4 whitespace-nowrap ${isOverdue ? 'text-red-600 font-medium' : 'text-gray-500'}`}>
+                      <td
+                        className={`px-6 py-4 whitespace-nowrap ${isOverdue ? 'text-red-600 font-medium' : 'text-gray-500'}`}
+                      >
                         {formatDate(invoice.due_date)}
-                        {isOverdue && invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
-                          <AlertTriangle className="w-4 h-4 inline ml-1 text-red-500" />
-                        )}
+                        {isOverdue &&
+                          invoice.status !== 'paid' &&
+                          invoice.status !== 'cancelled' && (
+                            <AlertTriangle className="w-4 h-4 inline ml-1 text-red-500" />
+                          )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <div className="relative inline-block">
                           <button
                             onClick={(e) => {
-                              e.stopPropagation()
-                              setActiveDropdown(activeDropdown === invoice.id ? null : invoice.id)
+                              e.stopPropagation();
+                              setActiveDropdown(activeDropdown === invoice.id ? null : invoice.id);
                             }}
                             className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
                           >
@@ -402,9 +409,9 @@ export default function InvoiceList({
                             <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
                               <button
                                 onClick={(e) => {
-                                  e.stopPropagation()
-                                  onViewInvoice && onViewInvoice(invoice)
-                                  setActiveDropdown(null)
+                                  e.stopPropagation();
+                                  onViewInvoice && onViewInvoice(invoice);
+                                  setActiveDropdown(null);
                                 }}
                                 className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
                               >
@@ -414,8 +421,8 @@ export default function InvoiceList({
                               {invoice.status === 'draft' && (
                                 <button
                                   onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleSendInvoice(invoice.id)
+                                    e.stopPropagation();
+                                    handleSendInvoice(invoice.id);
                                   }}
                                   className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2 text-blue-600"
                                 >
@@ -423,12 +430,14 @@ export default function InvoiceList({
                                   Send faktura
                                 </button>
                               )}
-                              {['pending', 'sent', 'partial', 'overdue'].includes(invoice.status) && (
+                              {['pending', 'sent', 'partial', 'overdue'].includes(
+                                invoice.status
+                              ) && (
                                 <button
                                   onClick={(e) => {
-                                    e.stopPropagation()
-                                    onRecordPayment && onRecordPayment(invoice)
-                                    setActiveDropdown(null)
+                                    e.stopPropagation();
+                                    onRecordPayment && onRecordPayment(invoice);
+                                    setActiveDropdown(null);
                                   }}
                                   className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2 text-green-600"
                                 >
@@ -438,8 +447,8 @@ export default function InvoiceList({
                               )}
                               <button
                                 onClick={(e) => {
-                                  e.stopPropagation()
-                                  handlePrintInvoice(invoice.id)
+                                  e.stopPropagation();
+                                  handlePrintInvoice(invoice.id);
                                 }}
                                 className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
                               >
@@ -449,8 +458,8 @@ export default function InvoiceList({
                               {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
                                 <button
                                   onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleCancelInvoice(invoice.id)
+                                    e.stopPropagation();
+                                    handleCancelInvoice(invoice.id);
                                   }}
                                   className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2 text-red-600"
                                 >
@@ -463,7 +472,7 @@ export default function InvoiceList({
                         </div>
                       </td>
                     </tr>
-                  )
+                  );
                 })
               ) : (
                 <tr>
@@ -486,7 +495,8 @@ export default function InvoiceList({
         {pagination.pages > 1 && (
           <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
             <p className="text-sm text-gray-500">
-              Viser {(page - 1) * limit + 1}-{Math.min(page * limit, pagination.total)} av {pagination.total} fakturaer
+              Viser {(page - 1) * limit + 1}-{Math.min(page * limit, pagination.total)} av{' '}
+              {pagination.total} fakturaer
             </p>
             <div className="flex items-center gap-2">
               <button
@@ -513,11 +523,8 @@ export default function InvoiceList({
 
       {/* Click outside to close dropdown */}
       {activeDropdown && (
-        <div
-          className="fixed inset-0 z-0"
-          onClick={() => setActiveDropdown(null)}
-        />
+        <div className="fixed inset-0 z-0" onClick={() => setActiveDropdown(null)} />
       )}
     </div>
-  )
+  );
 }

@@ -7,25 +7,53 @@
  * Based on standardized MMT protocols for chiropractic and physical therapy.
  */
 
-import React, { useMemo, useState } from 'react';
-import { AlertTriangle, CheckCircle, ChevronDown, ChevronUp, Info } from 'lucide-react';
+import _React, { useMemo, useState } from 'react';
+import { AlertTriangle, _CheckCircle, ChevronDown, ChevronUp, Info } from 'lucide-react';
 
 // MMT Grading Scale with descriptions
 const MMT_GRADES = [
-  { value: '5', label: '5', description: 'Normal - Full ROM against gravity with maximal resistance' },
-  { value: '5-', label: '5-', description: 'Normal minus - Full ROM against gravity, breaks with strong resistance' },
-  { value: '4+', label: '4+', description: 'Good plus - Full ROM against gravity with strong resistance' },
-  { value: '4', label: '4', description: 'Good - Full ROM against gravity with moderate resistance' },
-  { value: '4-', label: '4-', description: 'Good minus - Full ROM against gravity with slight resistance' },
-  { value: '3+', label: '3+', description: 'Fair plus - Full ROM against gravity with minimal resistance' },
+  {
+    value: '5',
+    label: '5',
+    description: 'Normal - Full ROM against gravity with maximal resistance',
+  },
+  {
+    value: '5-',
+    label: '5-',
+    description: 'Normal minus - Full ROM against gravity, breaks with strong resistance',
+  },
+  {
+    value: '4+',
+    label: '4+',
+    description: 'Good plus - Full ROM against gravity with strong resistance',
+  },
+  {
+    value: '4',
+    label: '4',
+    description: 'Good - Full ROM against gravity with moderate resistance',
+  },
+  {
+    value: '4-',
+    label: '4-',
+    description: 'Good minus - Full ROM against gravity with slight resistance',
+  },
+  {
+    value: '3+',
+    label: '3+',
+    description: 'Fair plus - Full ROM against gravity with minimal resistance',
+  },
   { value: '3', label: '3', description: 'Fair - Full ROM against gravity only' },
   { value: '3-', label: '3-', description: 'Fair minus - Partial ROM against gravity' },
   { value: '2+', label: '2+', description: 'Poor plus - Initiates movement against gravity' },
   { value: '2', label: '2', description: 'Poor - Full ROM with gravity eliminated' },
   { value: '2-', label: '2-', description: 'Poor minus - Partial ROM with gravity eliminated' },
-  { value: '1', label: '1', description: 'Trace - Visible/palpable muscle contraction, no movement' },
+  {
+    value: '1',
+    label: '1',
+    description: 'Trace - Visible/palpable muscle contraction, no movement',
+  },
   { value: '0', label: '0', description: 'Zero - No visible or palpable contraction' },
-  { value: 'NT', label: 'NT', description: 'Not Tested' }
+  { value: 'NT', label: 'NT', description: 'Not Tested' },
 ];
 
 // Muscle groups organized by region with nerve roots
@@ -41,7 +69,7 @@ const MUSCLE_GROUPS = {
         nerveRoot: 'C1-C2',
         primaryMuscle: 'SCM, Longus Colli',
         position: 'Supine',
-        positionNo: 'Ryggliggende'
+        positionNo: 'Ryggliggende',
       },
       {
         id: 'neck_extension',
@@ -50,9 +78,9 @@ const MUSCLE_GROUPS = {
         nerveRoot: 'C1-C4',
         primaryMuscle: 'Upper Trapezius, Splenius',
         position: 'Prone',
-        positionNo: 'Mageliggende'
-      }
-    ]
+        positionNo: 'Mageliggende',
+      },
+    ],
   },
   upperExtremity: {
     name: 'Upper Extremity',
@@ -65,7 +93,7 @@ const MUSCLE_GROUPS = {
         nerveRoot: 'C5',
         primaryMuscle: 'Deltoid, Supraspinatus',
         position: 'Sitting',
-        positionNo: 'Sittende'
+        positionNo: 'Sittende',
       },
       {
         id: 'shoulder_external_rotation',
@@ -74,7 +102,7 @@ const MUSCLE_GROUPS = {
         nerveRoot: 'C5-C6',
         primaryMuscle: 'Infraspinatus, Teres Minor',
         position: 'Sitting/Prone',
-        positionNo: 'Sittende/Mageliggende'
+        positionNo: 'Sittende/Mageliggende',
       },
       {
         id: 'elbow_flexion',
@@ -83,7 +111,7 @@ const MUSCLE_GROUPS = {
         nerveRoot: 'C5-C6',
         primaryMuscle: 'Biceps Brachii',
         position: 'Sitting',
-        positionNo: 'Sittende'
+        positionNo: 'Sittende',
       },
       {
         id: 'elbow_extension',
@@ -92,7 +120,7 @@ const MUSCLE_GROUPS = {
         nerveRoot: 'C7',
         primaryMuscle: 'Triceps Brachii',
         position: 'Sitting/Prone',
-        positionNo: 'Sittende/Mageliggende'
+        positionNo: 'Sittende/Mageliggende',
       },
       {
         id: 'wrist_extension',
@@ -101,7 +129,7 @@ const MUSCLE_GROUPS = {
         nerveRoot: 'C6-C7',
         primaryMuscle: 'ECRL, ECRB, ECU',
         position: 'Sitting',
-        positionNo: 'Sittende'
+        positionNo: 'Sittende',
       },
       {
         id: 'wrist_flexion',
@@ -110,7 +138,7 @@ const MUSCLE_GROUPS = {
         nerveRoot: 'C7-C8',
         primaryMuscle: 'FCR, FCU, PL',
         position: 'Sitting',
-        positionNo: 'Sittende'
+        positionNo: 'Sittende',
       },
       {
         id: 'finger_abduction',
@@ -119,7 +147,7 @@ const MUSCLE_GROUPS = {
         nerveRoot: 'T1',
         primaryMuscle: 'Dorsal Interossei',
         position: 'Sitting',
-        positionNo: 'Sittende'
+        positionNo: 'Sittende',
       },
       {
         id: 'thumb_opposition',
@@ -128,9 +156,9 @@ const MUSCLE_GROUPS = {
         nerveRoot: 'C8-T1',
         primaryMuscle: 'Opponens Pollicis',
         position: 'Sitting',
-        positionNo: 'Sittende'
-      }
-    ]
+        positionNo: 'Sittende',
+      },
+    ],
   },
   trunk: {
     name: 'Trunk',
@@ -143,7 +171,7 @@ const MUSCLE_GROUPS = {
         nerveRoot: 'T6-T12',
         primaryMuscle: 'Rectus Abdominis',
         position: 'Supine',
-        positionNo: 'Ryggliggende'
+        positionNo: 'Ryggliggende',
       },
       {
         id: 'trunk_rotation',
@@ -152,9 +180,9 @@ const MUSCLE_GROUPS = {
         nerveRoot: 'T6-T12',
         primaryMuscle: 'Obliques',
         position: 'Supine',
-        positionNo: 'Ryggliggende'
-      }
-    ]
+        positionNo: 'Ryggliggende',
+      },
+    ],
   },
   lowerExtremity: {
     name: 'Lower Extremity',
@@ -167,7 +195,7 @@ const MUSCLE_GROUPS = {
         nerveRoot: 'L1-L2',
         primaryMuscle: 'Iliopsoas',
         position: 'Sitting/Supine',
-        positionNo: 'Sittende/Ryggliggende'
+        positionNo: 'Sittende/Ryggliggende',
       },
       {
         id: 'hip_extension',
@@ -176,7 +204,7 @@ const MUSCLE_GROUPS = {
         nerveRoot: 'L5-S1',
         primaryMuscle: 'Gluteus Maximus',
         position: 'Prone',
-        positionNo: 'Mageliggende'
+        positionNo: 'Mageliggende',
       },
       {
         id: 'hip_abduction',
@@ -185,7 +213,7 @@ const MUSCLE_GROUPS = {
         nerveRoot: 'L4-S1',
         primaryMuscle: 'Gluteus Medius',
         position: 'Side-lying',
-        positionNo: 'Sideliggende'
+        positionNo: 'Sideliggende',
       },
       {
         id: 'hip_adduction',
@@ -194,7 +222,7 @@ const MUSCLE_GROUPS = {
         nerveRoot: 'L2-L4',
         primaryMuscle: 'Adductors',
         position: 'Side-lying',
-        positionNo: 'Sideliggende'
+        positionNo: 'Sideliggende',
       },
       {
         id: 'knee_extension',
@@ -203,7 +231,7 @@ const MUSCLE_GROUPS = {
         nerveRoot: 'L3-L4',
         primaryMuscle: 'Quadriceps',
         position: 'Sitting',
-        positionNo: 'Sittende'
+        positionNo: 'Sittende',
       },
       {
         id: 'knee_flexion',
@@ -212,7 +240,7 @@ const MUSCLE_GROUPS = {
         nerveRoot: 'L5-S2',
         primaryMuscle: 'Hamstrings',
         position: 'Prone',
-        positionNo: 'Mageliggende'
+        positionNo: 'Mageliggende',
       },
       {
         id: 'ankle_dorsiflexion',
@@ -221,7 +249,7 @@ const MUSCLE_GROUPS = {
         nerveRoot: 'L4-L5',
         primaryMuscle: 'Tibialis Anterior',
         position: 'Sitting/Supine',
-        positionNo: 'Sittende/Ryggliggende'
+        positionNo: 'Sittende/Ryggliggende',
       },
       {
         id: 'ankle_plantarflexion',
@@ -230,7 +258,7 @@ const MUSCLE_GROUPS = {
         nerveRoot: 'S1-S2',
         primaryMuscle: 'Gastrocnemius, Soleus',
         position: 'Standing/Prone',
-        positionNo: 'Stående/Mageliggende'
+        positionNo: 'Stående/Mageliggende',
       },
       {
         id: 'great_toe_extension',
@@ -239,10 +267,10 @@ const MUSCLE_GROUPS = {
         nerveRoot: 'L5',
         primaryMuscle: 'EHL',
         position: 'Sitting/Supine',
-        positionNo: 'Sittende/Ryggliggende'
-      }
-    ]
-  }
+        positionNo: 'Sittende/Ryggliggende',
+      },
+    ],
+  },
 };
 
 /**
@@ -251,14 +279,22 @@ const MUSCLE_GROUPS = {
 function GradeSelector({ value, onChange, disabled = false }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const selectedGrade = MMT_GRADES.find(g => g.value === value) || { value: '', label: '-' };
+  const selectedGrade = MMT_GRADES.find((g) => g.value === value) || { value: '', label: '-' };
 
   const getGradeColor = (grade) => {
-    if (!grade || grade === 'NT') return 'bg-gray-100 text-gray-600';
+    if (!grade || grade === 'NT') {
+      return 'bg-gray-100 text-gray-600';
+    }
     const numericValue = parseFloat(grade.replace('+', '.5').replace('-', '.25'));
-    if (numericValue >= 4) return 'bg-green-100 text-green-700 border-green-300';
-    if (numericValue >= 3) return 'bg-yellow-100 text-yellow-700 border-yellow-300';
-    if (numericValue >= 2) return 'bg-orange-100 text-orange-700 border-orange-300';
+    if (numericValue >= 4) {
+      return 'bg-green-100 text-green-700 border-green-300';
+    }
+    if (numericValue >= 3) {
+      return 'bg-yellow-100 text-yellow-700 border-yellow-300';
+    }
+    if (numericValue >= 2) {
+      return 'bg-orange-100 text-orange-700 border-orange-300';
+    }
     return 'bg-red-100 text-red-700 border-red-300';
   };
 
@@ -279,12 +315,11 @@ function GradeSelector({ value, onChange, disabled = false }) {
 
       {isOpen && (
         <>
+          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
           <div
-            className="fixed inset-0 z-10"
-            onClick={() => setIsOpen(false)}
-          />
-          <div className="absolute z-20 mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-lg
-                         max-h-64 overflow-y-auto">
+            className="absolute z-20 mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-lg
+                         max-h-64 overflow-y-auto"
+          >
             {MMT_GRADES.map((grade) => (
               <button
                 key={grade.value}
@@ -297,8 +332,10 @@ function GradeSelector({ value, onChange, disabled = false }) {
                            flex items-center gap-2 border-b border-gray-100 last:border-0
                            ${value === grade.value ? 'bg-teal-50' : ''}`}
               >
-                <span className={`w-8 h-6 flex items-center justify-center rounded text-xs font-medium
-                                ${getGradeColor(grade.value)}`}>
+                <span
+                  className={`w-8 h-6 flex items-center justify-center rounded text-xs font-medium
+                                ${getGradeColor(grade.value)}`}
+                >
                   {grade.label}
                 </span>
                 <span className="text-gray-600 text-xs">{grade.description}</span>
@@ -323,18 +360,22 @@ function MuscleRow({ muscle, values, onChange, lang = 'no', showDetails = false 
   const handleChange = (field, value) => {
     onChange({
       ...values,
-      [field]: value
+      [field]: value,
     });
   };
 
   const hasWeakness = (grade) => {
-    if (!grade || grade === 'NT') return false;
+    if (!grade || grade === 'NT') {
+      return false;
+    }
     const numericValue = parseFloat(grade.replace('+', '.5').replace('-', '.25'));
     return numericValue < 4;
   };
 
   const hasAsymmetry = () => {
-    if (!leftValue || !rightValue || leftValue === 'NT' || rightValue === 'NT') return false;
+    if (!leftValue || !rightValue || leftValue === 'NT' || rightValue === 'NT') {
+      return false;
+    }
     const leftNum = parseFloat(leftValue.replace('+', '.5').replace('-', '.25'));
     const rightNum = parseFloat(rightValue.replace('+', '.5').replace('-', '.25'));
     return Math.abs(leftNum - rightNum) >= 1;
@@ -347,11 +388,7 @@ function MuscleRow({ muscle, values, onChange, lang = 'no', showDetails = false 
           <span className="text-sm font-medium text-gray-700">
             {lang === 'no' ? muscle.nameNo : muscle.name}
           </span>
-          {showDetails && (
-            <span className="text-xs text-gray-500">
-              {muscle.primaryMuscle}
-            </span>
-          )}
+          {showDetails && <span className="text-xs text-gray-500">{muscle.primaryMuscle}</span>}
         </div>
       </td>
       <td className="px-2 py-2 text-center">
@@ -370,9 +407,7 @@ function MuscleRow({ muscle, values, onChange, lang = 'no', showDetails = false 
             value={leftValue}
             onChange={(val) => handleChange(`${muscle.id}_left`, val)}
           />
-          {hasWeakness(leftValue) && (
-            <AlertTriangle className="w-4 h-4 text-amber-500" />
-          )}
+          {hasWeakness(leftValue) && <AlertTriangle className="w-4 h-4 text-amber-500" />}
         </div>
       </td>
       <td className="px-2 py-2">
@@ -391,9 +426,7 @@ function MuscleRow({ muscle, values, onChange, lang = 'no', showDetails = false 
             value={rightValue}
             onChange={(val) => handleChange(`${muscle.id}_right`, val)}
           />
-          {hasWeakness(rightValue) && (
-            <AlertTriangle className="w-4 h-4 text-amber-500" />
-          )}
+          {hasWeakness(rightValue) && <AlertTriangle className="w-4 h-4 text-amber-500" />}
         </div>
       </td>
       <td className="px-2 py-2">
@@ -413,7 +446,16 @@ function MuscleRow({ muscle, values, onChange, lang = 'no', showDetails = false 
 /**
  * Region section with collapsible muscle groups
  */
-function RegionSection({ regionKey, region, values, onChange, lang, showDetails, expanded, onToggle }) {
+function RegionSection({
+  _regionKey,
+  region,
+  values,
+  onChange,
+  lang,
+  showDetails,
+  expanded,
+  onToggle,
+}) {
   return (
     <div className="border border-gray-200 rounded-lg overflow-hidden">
       <button
@@ -487,15 +529,35 @@ function RegionSection({ regionKey, region, values, onChange, lang, showDetails,
  */
 function QuickTestPanel({ onSelectPattern, lang }) {
   const patterns = [
-    { id: 'c5', label: 'C5', nameNo: 'C5 Myotom', muscles: ['shoulder_abduction', 'elbow_flexion'] },
+    {
+      id: 'c5',
+      label: 'C5',
+      nameNo: 'C5 Myotom',
+      muscles: ['shoulder_abduction', 'elbow_flexion'],
+    },
     { id: 'c6', label: 'C6', nameNo: 'C6 Myotom', muscles: ['elbow_flexion', 'wrist_extension'] },
     { id: 'c7', label: 'C7', nameNo: 'C7 Myotom', muscles: ['elbow_extension', 'wrist_flexion'] },
-    { id: 'c8', label: 'C8', nameNo: 'C8 Myotom', muscles: ['finger_abduction', 'thumb_opposition'] },
+    {
+      id: 'c8',
+      label: 'C8',
+      nameNo: 'C8 Myotom',
+      muscles: ['finger_abduction', 'thumb_opposition'],
+    },
     { id: 'l2', label: 'L2', nameNo: 'L2 Myotom', muscles: ['hip_flexion'] },
     { id: 'l3', label: 'L3', nameNo: 'L3 Myotom', muscles: ['knee_extension'] },
     { id: 'l4', label: 'L4', nameNo: 'L4 Myotom', muscles: ['ankle_dorsiflexion'] },
-    { id: 'l5', label: 'L5', nameNo: 'L5 Myotom', muscles: ['great_toe_extension', 'hip_abduction'] },
-    { id: 's1', label: 'S1', nameNo: 'S1 Myotom', muscles: ['ankle_plantarflexion', 'knee_flexion'] }
+    {
+      id: 'l5',
+      label: 'L5',
+      nameNo: 'L5 Myotom',
+      muscles: ['great_toe_extension', 'hip_abduction'],
+    },
+    {
+      id: 's1',
+      label: 'S1',
+      nameNo: 'S1 Myotom',
+      muscles: ['ankle_plantarflexion', 'knee_flexion'],
+    },
   ];
 
   return (
@@ -532,18 +594,18 @@ function GradingLegend({ lang }) {
         className="flex items-center gap-2 text-gray-600 hover:text-gray-800"
       >
         <Info className="w-4 h-4" />
-        <span className="font-medium">
-          {lang === 'no' ? 'Graderingsskala' : 'Grading Scale'}
-        </span>
+        <span className="font-medium">{lang === 'no' ? 'Graderingsskala' : 'Grading Scale'}</span>
         {showFull ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
       </button>
 
       {showFull ? (
         <div className="mt-2 grid grid-cols-2 md:grid-cols-3 gap-2">
-          {MMT_GRADES.filter(g => g.value !== 'NT').map((grade) => (
+          {MMT_GRADES.filter((g) => g.value !== 'NT').map((grade) => (
             <div key={grade.value} className="flex items-center gap-2">
-              <span className="w-6 h-5 flex items-center justify-center bg-white border
-                             border-gray-200 rounded text-xs font-medium">
+              <span
+                className="w-6 h-5 flex items-center justify-center bg-white border
+                             border-gray-200 rounded text-xs font-medium"
+              >
                 {grade.label}
               </span>
               <span className="text-gray-600 truncate">{grade.description.split(' - ')[0]}</span>
@@ -552,12 +614,24 @@ function GradingLegend({ lang }) {
         </div>
       ) : (
         <div className="mt-1 flex flex-wrap gap-3 text-gray-500">
-          <span><strong>5</strong>=Normal</span>
-          <span><strong>4</strong>={lang === 'no' ? 'God' : 'Good'}</span>
-          <span><strong>3</strong>={lang === 'no' ? 'Moderat' : 'Fair'}</span>
-          <span><strong>2</strong>={lang === 'no' ? 'Svak' : 'Poor'}</span>
-          <span><strong>1</strong>={lang === 'no' ? 'Spor' : 'Trace'}</span>
-          <span><strong>0</strong>={lang === 'no' ? 'Ingen' : 'Zero'}</span>
+          <span>
+            <strong>5</strong>=Normal
+          </span>
+          <span>
+            <strong>4</strong>={lang === 'no' ? 'God' : 'Good'}
+          </span>
+          <span>
+            <strong>3</strong>={lang === 'no' ? 'Moderat' : 'Fair'}
+          </span>
+          <span>
+            <strong>2</strong>={lang === 'no' ? 'Svak' : 'Poor'}
+          </span>
+          <span>
+            <strong>1</strong>={lang === 'no' ? 'Spor' : 'Trace'}
+          </span>
+          <span>
+            <strong>0</strong>={lang === 'no' ? 'Ingen' : 'Zero'}
+          </span>
         </div>
       )}
     </div>
@@ -571,13 +645,13 @@ export default function ManualMuscleTesting({
   values = {},
   onChange,
   lang = 'no',
-  readOnly = false,
+  _readOnly = false,
   showDetails = false,
   onGenerateNarrative,
-  defaultExpanded = ['upperExtremity', 'lowerExtremity']
+  defaultExpanded = ['upperExtremity', 'lowerExtremity'],
 }) {
   const [expandedRegions, setExpandedRegions] = useState(new Set(defaultExpanded));
-  const [highlightedMuscles, setHighlightedMuscles] = useState(new Set());
+  const [_highlightedMuscles, setHighlightedMuscles] = useState(new Set());
 
   const toggleRegion = (regionKey) => {
     const newExpanded = new Set(expandedRegions);
@@ -593,7 +667,7 @@ export default function ManualMuscleTesting({
     // Expand all regions containing these muscles
     const regionsToExpand = new Set(expandedRegions);
     Object.entries(MUSCLE_GROUPS).forEach(([key, region]) => {
-      if (region.muscles.some(m => muscleIds.includes(m.id))) {
+      if (region.muscles.some((m) => muscleIds.includes(m.id))) {
         regionsToExpand.add(key);
       }
     });
@@ -611,30 +685,40 @@ export default function ManualMuscleTesting({
     let painful = 0;
     let asymmetric = 0;
 
-    Object.values(MUSCLE_GROUPS).forEach(region => {
-      region.muscles.forEach(muscle => {
+    Object.values(MUSCLE_GROUPS).forEach((region) => {
+      region.muscles.forEach((muscle) => {
         const leftGrade = values[`${muscle.id}_left`];
         const rightGrade = values[`${muscle.id}_right`];
 
         if (leftGrade && leftGrade !== 'NT') {
           total++;
           const leftNum = parseFloat(leftGrade.replace('+', '.5').replace('-', '.25'));
-          if (leftNum < 4) weakness++;
+          if (leftNum < 4) {
+            weakness++;
+          }
         }
         if (rightGrade && rightGrade !== 'NT') {
           total++;
           const rightNum = parseFloat(rightGrade.replace('+', '.5').replace('-', '.25'));
-          if (rightNum < 4) weakness++;
+          if (rightNum < 4) {
+            weakness++;
+          }
         }
 
-        if (values[`${muscle.id}_pain_left`]) painful++;
-        if (values[`${muscle.id}_pain_right`]) painful++;
+        if (values[`${muscle.id}_pain_left`]) {
+          painful++;
+        }
+        if (values[`${muscle.id}_pain_right`]) {
+          painful++;
+        }
 
         // Check for asymmetry
         if (leftGrade && rightGrade && leftGrade !== 'NT' && rightGrade !== 'NT') {
           const leftNum = parseFloat(leftGrade.replace('+', '.5').replace('-', '.25'));
           const rightNum = parseFloat(rightGrade.replace('+', '.5').replace('-', '.25'));
-          if (Math.abs(leftNum - rightNum) >= 1) asymmetric++;
+          if (Math.abs(leftNum - rightNum) >= 1) {
+            asymmetric++;
+          }
         }
       });
     });
@@ -647,15 +731,17 @@ export default function ManualMuscleTesting({
     const findings = [];
     const weaknessByNerve = {};
 
-    Object.values(MUSCLE_GROUPS).forEach(region => {
-      region.muscles.forEach(muscle => {
+    Object.values(MUSCLE_GROUPS).forEach((region) => {
+      region.muscles.forEach((muscle) => {
         const leftGrade = values[`${muscle.id}_left`];
         const rightGrade = values[`${muscle.id}_right`];
         const painLeft = values[`${muscle.id}_pain_left`];
         const painRight = values[`${muscle.id}_pain_right`];
 
         const processGrade = (grade, side, hasPain) => {
-          if (!grade || grade === 'NT') return null;
+          if (!grade || grade === 'NT') {
+            return null;
+          }
           const numericValue = parseFloat(grade.replace('+', '.5').replace('-', '.25'));
 
           if (numericValue < 4) {
@@ -667,7 +753,9 @@ export default function ManualMuscleTesting({
             if (!weaknessByNerve[muscle.nerveRoot]) {
               weaknessByNerve[muscle.nerveRoot] = [];
             }
-            weaknessByNerve[muscle.nerveRoot].push(`${muscleName} ${sideLabel}: ${grade}${painText}`);
+            weaknessByNerve[muscle.nerveRoot].push(
+              `${muscleName} ${sideLabel}: ${grade}${painText}`
+            );
           }
         };
 

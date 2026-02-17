@@ -15,12 +15,14 @@ export const parseClinicalCase = (text) => {
     undersokelse: {},
     behandling: '',
     konklusjon: '',
-    oppfolging: []
+    oppfolging: [],
   };
 
   try {
     // Extract Anamnese section
-    const anamneseMatch = text.match(/Anamnese:([^]*?)(?=Undersøkelse:|Undersøkelse:|Beh:|Behandling:|$)/i);
+    const anamneseMatch = text.match(
+      /Anamnese:([^]*?)(?=Undersøkelse:|Undersøkelse:|Beh:|Behandling:|$)/i
+    );
     if (anamneseMatch) {
       sections.anamnese = anamneseMatch[1].trim();
     }
@@ -38,7 +40,7 @@ export const parseClinicalCase = (text) => {
         ortopediske_tester: extractSubsection(undersokelseText, 'O/N'),
         kraft: extractSubsection(undersokelseText, 'Kraft'),
         lengde: extractSubsection(undersokelseText, 'Lengde'),
-        funksjon: extractSubsection(undersokelseText, 'Funksjon')
+        funksjon: extractSubsection(undersokelseText, 'Funksjon'),
       };
     }
 
@@ -72,7 +74,10 @@ export const parseClinicalCase = (text) => {
  */
 const extractSubsection = (text, ...keywords) => {
   for (const keyword of keywords) {
-    const regex = new RegExp(`${keyword}[:\\.]?([^]*?)(?=\\n[A-Z]|Palp|ROM|O/N|Kraft|Funksjon|$)`, 'i');
+    const regex = new RegExp(
+      `${keyword}[:\\.]?([^]*?)(?=\\n[A-Z]|Palp|ROM|O/N|Kraft|Funksjon|$)`,
+      'i'
+    );
     const match = text.match(regex);
     if (match) {
       return match[1].trim();
@@ -87,7 +92,7 @@ const extractSubsection = (text, ...keywords) => {
 export const extractFindings = (undersokelseText) => {
   const findings = {
     positive: [],
-    negative: []
+    negative: [],
   };
 
   // Positive findings indicators
@@ -97,7 +102,7 @@ export const extractFindings = (undersokelseText) => {
     /økt tonus ([^,\n]+)/gi,
     /nedsatt ([^,\n]+)/gi,
     /palp\.?øm ([^,\n]+)/gi,
-    /smerte ved ([^,\n]+)/gi
+    /smerte ved ([^,\n]+)/gi,
   ];
 
   // Negative findings indicators
@@ -105,7 +110,7 @@ export const extractFindings = (undersokelseText) => {
     /\(-\)([^,\n]+)/g,
     /ingen ([^,\n]+)/gi,
     /u\.a\.?/gi,
-    /normal ([^,\n]+)/gi
+    /normal ([^,\n]+)/gi,
   ];
 
   for (const pattern of positivePatterns) {
@@ -133,7 +138,7 @@ export const extractTreatment = (behandlingText) => {
     manipulation: [],
     soft_tissue: [],
     exercises: [],
-    advice: []
+    advice: [],
   };
 
   // Leddjustering/manipulation
@@ -170,39 +175,55 @@ export const classifyCase = (text) => {
   const classification = {
     region: [],
     pathology: [],
-    category: ''
+    category: '',
   };
 
   // Body regions
   const regionKeywords = {
-    'Cervical': ['nakke', 'cervical', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7'],
-    'Thoracic': ['brystrygg', 'thoracal', 'torakal', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
-    'Lumbar': ['korsrygg', 'lumbal', 'L1', 'L2', 'L3', 'L4', 'L5'],
-    'Pelvis': ['bekken', 'IS ledd', 'IS-ledd', 'sacrum', 'ilium', 'PI ilium', 'P-R sacr'],
-    'Shoulder': ['skulder', 'rotator', 'supraspinatus', 'infraspinatus', 'subscapularis'],
-    'Elbow': ['albue', 'epikondyl', 'tennisalbue'],
-    'Wrist': ['håndledd', 'håndledds'],
-    'Hip': ['hofte', 'hofteledd', 'trochanteritt'],
-    'Knee': ['kne', 'kneet', 'patella', 'menisk'],
-    'Ankle': ['ankel', 'ankelen', 'talus', 'calcaneus'],
-    'Foot': ['fot', 'foten', 'plantar']
+    Cervical: ['nakke', 'cervical', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7'],
+    Thoracic: [
+      'brystrygg',
+      'thoracal',
+      'torakal',
+      'T1',
+      'T2',
+      'T3',
+      'T4',
+      'T5',
+      'T6',
+      'T7',
+      'T8',
+      'T9',
+      'T10',
+      'T11',
+      'T12',
+    ],
+    Lumbar: ['korsrygg', 'lumbal', 'L1', 'L2', 'L3', 'L4', 'L5'],
+    Pelvis: ['bekken', 'IS ledd', 'IS-ledd', 'sacrum', 'ilium', 'PI ilium', 'P-R sacr'],
+    Shoulder: ['skulder', 'rotator', 'supraspinatus', 'infraspinatus', 'subscapularis'],
+    Elbow: ['albue', 'epikondyl', 'tennisalbue'],
+    Wrist: ['håndledd', 'håndledds'],
+    Hip: ['hofte', 'hofteledd', 'trochanteritt'],
+    Knee: ['kne', 'kneet', 'patella', 'menisk'],
+    Ankle: ['ankel', 'ankelen', 'talus', 'calcaneus'],
+    Foot: ['fot', 'foten', 'plantar'],
   };
 
   // Pathologies
   const pathologyKeywords = {
-    'Fasettleddsdysfunksjon': ['fasettledd', 'fasettledds'],
-    'Myalgi': ['myalgi', 'myalgier', 'muskelsmerte', 'triggerpunkt'],
-    'Tendinopati': ['tendinopati', 'tendinose', 'sene'],
-    'Artrose': ['artrose'],
-    'Radikulopati': ['isjias', 'radikulopati', 'nerverot'],
-    'Skivelidelse': ['skive', 'prolaps', 'disc'],
-    'Bekkenleddsdysfunksjon': ['bekkenledd', 'IS ledd', 'sacroiliac'],
-    'BPPV': ['BPPV', 'svimmelhet', 'vertigo', 'Dix-Hallpike'],
-    'Hodepine': ['hodepine', 'tensjonshodepine', 'migrene'],
-    'Graviditet': ['gravid', 'svangerskap'],
-    'Kapsulitt': ['kapsulitt', 'frozen shoulder', 'adhesiv'],
-    'Impingement': ['impingement'],
-    'Plantar Fascitt': ['plantar fasc']
+    Fasettleddsdysfunksjon: ['fasettledd', 'fasettledds'],
+    Myalgi: ['myalgi', 'myalgier', 'muskelsmerte', 'triggerpunkt'],
+    Tendinopati: ['tendinopati', 'tendinose', 'sene'],
+    Artrose: ['artrose'],
+    Radikulopati: ['isjias', 'radikulopati', 'nerverot'],
+    Skivelidelse: ['skive', 'prolaps', 'disc'],
+    Bekkenleddsdysfunksjon: ['bekkenledd', 'IS ledd', 'sacroiliac'],
+    BPPV: ['BPPV', 'svimmelhet', 'vertigo', 'Dix-Hallpike'],
+    Hodepine: ['hodepine', 'tensjonshodepine', 'migrene'],
+    Graviditet: ['gravid', 'svangerskap'],
+    Kapsulitt: ['kapsulitt', 'frozen shoulder', 'adhesiv'],
+    Impingement: ['impingement'],
+    'Plantar Fascitt': ['plantar fasc'],
   };
 
   const lowerText = text.toLowerCase();
@@ -242,10 +263,14 @@ export const classifyCase = (text) => {
  */
 export const convertToTrainingExample = (caseText) => {
   const parsed = parseClinicalCase(caseText);
-  if (!parsed) return null;
+  if (!parsed) {
+    return null;
+  }
 
   const classification = classifyCase(caseText);
-  const findings = parsed.undersokelse ? extractFindings(JSON.stringify(parsed.undersokelse)) : { positive: [], negative: [] };
+  const findings = parsed.undersokelse
+    ? extractFindings(JSON.stringify(parsed.undersokelse))
+    : { positive: [], negative: [] };
   const treatment = parsed.behandling ? extractTreatment(parsed.behandling) : {};
 
   return {
@@ -254,7 +279,7 @@ export const convertToTrainingExample = (caseText) => {
       chief_complaint: extractChiefComplaint(parsed.anamnese),
       symptoms: extractSymptoms(parsed.anamnese),
       region: classification.region,
-      category: classification.category
+      category: classification.category,
     },
 
     // Output: What the AI should generate
@@ -266,23 +291,26 @@ export const convertToTrainingExample = (caseText) => {
         palpation: parsed.undersokelse.palpasjon || '',
         ortho_tests: parsed.undersokelse.ortopediske_tester || '',
         positive_findings: findings.positive,
-        negative_findings: findings.negative
+        negative_findings: findings.negative,
       },
       assessment: parsed.konklusjon,
       plan: {
         manipulation: treatment.manipulation || [],
         soft_tissue: treatment.soft_tissue || [],
         exercises: treatment.exercises || [],
-        advice: treatment.advice || []
-      }
+        advice: treatment.advice || [],
+      },
     },
 
     // Metadata for organization
     metadata: {
       classification: classification,
       has_followup: parsed.oppfolging.length > 0,
-      outcome: parsed.oppfolging.length > 0 ? extractOutcome(parsed.oppfolging[parsed.oppfolging.length - 1]) : null
-    }
+      outcome:
+        parsed.oppfolging.length > 0
+          ? extractOutcome(parsed.oppfolging[parsed.oppfolging.length - 1])
+          : null,
+    },
   };
 };
 
@@ -290,7 +318,9 @@ export const convertToTrainingExample = (caseText) => {
  * Extract chief complaint from anamnese
  */
 const extractChiefComplaint = (anamneseText) => {
-  if (!anamneseText) return '';
+  if (!anamneseText) {
+    return '';
+  }
 
   // Take first 1-2 sentences
   const sentences = anamneseText.split(/\.\s+/);
@@ -301,14 +331,16 @@ const extractChiefComplaint = (anamneseText) => {
  * Extract key symptoms
  */
 const extractSymptoms = (anamneseText) => {
-  if (!anamneseText) return [];
+  if (!anamneseText) {
+    return [];
+  }
 
   const symptoms = [];
   const symptomPatterns = [
     /smerte i ([^,\.]+)/gi,
     /vondt i ([^,\.]+)/gi,
     /stiv[t]? ([^,\.]+)/gi,
-    /utstråling ([^,\.]+)/gi
+    /utstråling ([^,\.]+)/gi,
   ];
 
   for (const pattern of symptomPatterns) {
@@ -325,12 +357,14 @@ const extractSymptoms = (anamneseText) => {
  * Extract outcome from follow-up note
  */
 const extractOutcome = (oppfolgingText) => {
-  if (!oppfolgingText) return null;
+  if (!oppfolgingText) {
+    return null;
+  }
 
   const outcome = {
     status: 'unknown',
     improvement: null,
-    pain_reduction: null
+    pain_reduction: null,
   };
 
   const lowerText = oppfolgingText.toLowerCase();
@@ -354,30 +388,30 @@ const extractOutcome = (oppfolgingText) => {
 /**
  * Convert to JSONL format for fine-tuning
  */
-export const convertToJSONL = (trainingExamples) => {
-  return trainingExamples
-    .filter(ex => ex !== null)
-    .map(example => {
+export const convertToJSONL = (trainingExamples) =>
+  trainingExamples
+    .filter((ex) => ex !== null)
+    .map((example) =>
       // Format for OpenAI/Anthropic fine-tuning
-      return JSON.stringify({
+      JSON.stringify({
         messages: [
           {
             role: 'system',
-            content: 'Du er en erfaren kiropraktor i Norge. Basert på pasientens hovedplage og symptomer, generer strukturerte kliniske notater i SOAP-format.'
+            content:
+              'Du er en erfaren kiropraktor i Norge. Basert på pasientens hovedplage og symptomer, generer strukturerte kliniske notater i SOAP-format.',
           },
           {
             role: 'user',
-            content: `Hovedplage: ${example.input.chief_complaint}\nSymptomer: ${example.input.symptoms.join(', ')}\nRegion: ${example.input.region.join(', ')}`
+            content: `Hovedplage: ${example.input.chief_complaint}\nSymptomer: ${example.input.symptoms.join(', ')}\nRegion: ${example.input.region.join(', ')}`,
           },
           {
             role: 'assistant',
-            content: JSON.stringify(example.output, null, 2)
-          }
-        ]
-      });
-    })
+            content: JSON.stringify(example.output, null, 2),
+          },
+        ],
+      })
+    )
     .join('\n');
-};
 
 export default {
   parseClinicalCase,
@@ -385,5 +419,5 @@ export default {
   extractTreatment,
   classifyCase,
   convertToTrainingExample,
-  convertToJSONL
+  convertToJSONL,
 };

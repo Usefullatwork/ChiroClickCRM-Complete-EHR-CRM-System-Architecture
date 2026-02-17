@@ -3,9 +3,14 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, _fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import AnatomicalSpine, { VERTEBRAE, FINDING_TYPES, LISTINGS, REGION_COLORS } from '../AnatomicalSpine';
+import AnatomicalSpine, {
+  VERTEBRAE,
+  FINDING_TYPES,
+  LISTINGS,
+  REGION_COLORS,
+} from '../AnatomicalSpine';
 
 describe('AnatomicalSpine Component', () => {
   const mockOnChange = vi.fn();
@@ -47,7 +52,7 @@ describe('AnatomicalSpine Component', () => {
 
       expect(screen.getByText('Funntype')).toBeInTheDocument();
 
-      Object.values(FINDING_TYPES).forEach(type => {
+      Object.values(FINDING_TYPES).forEach((type) => {
         expect(screen.getByText(new RegExp(type.label))).toBeInTheDocument();
       });
     });
@@ -110,13 +115,13 @@ describe('AnatomicalSpine Component', () => {
   describe('Findings Management', () => {
     it('should display findings count', () => {
       const findings = {
-        'L4_subluxation': {
+        L4_subluxation: {
           elementId: 'L4',
           elementLabel: 'L4',
           type: 'subluxation',
           typeLabel: 'Subluksasjon',
-          listing: 'PR'
-        }
+          listing: 'PR',
+        },
       };
 
       render(<AnatomicalSpine findings={findings} onChange={mockOnChange} />);
@@ -126,14 +131,14 @@ describe('AnatomicalSpine Component', () => {
 
     it('should display findings list', () => {
       const findings = {
-        'L4_subluxation': {
+        L4_subluxation: {
           elementId: 'L4',
           elementLabel: 'L4',
           type: 'subluxation',
           typeLabel: 'Subluksasjon',
           listing: 'PR',
-          color: '#ef4444'
-        }
+          color: '#ef4444',
+        },
       };
 
       render(<AnatomicalSpine findings={findings} onChange={mockOnChange} />);
@@ -145,11 +150,11 @@ describe('AnatomicalSpine Component', () => {
     it('should clear findings when clicking Nullstill', async () => {
       const user = userEvent.setup();
       const findings = {
-        'L4_subluxation': {
+        L4_subluxation: {
           elementId: 'L4',
           elementLabel: 'L4',
-          type: 'subluxation'
-        }
+          type: 'subluxation',
+        },
       };
 
       render(<AnatomicalSpine findings={findings} onChange={mockOnChange} />);
@@ -181,20 +186,20 @@ describe('AnatomicalSpine Component', () => {
   describe('Narrative Generation', () => {
     it('should generate narrative from findings', () => {
       const findings = {
-        'L4_subluxation': {
+        L4_subluxation: {
           elementId: 'L4',
           elementLabel: 'L4',
           type: 'subluxation',
           typeLabel: 'Subluksasjon',
-          listing: 'PR'
+          listing: 'PR',
         },
-        'L5_fixation': {
+        L5_fixation: {
           elementId: 'L5',
           elementLabel: 'L5',
           type: 'fixation',
           typeLabel: 'Fiksasjon',
-          listing: 'none'
-        }
+          listing: 'none',
+        },
       };
 
       render(<AnatomicalSpine findings={findings} onChange={mockOnChange} />);
@@ -215,10 +220,10 @@ describe('AnatomicalSpine Component', () => {
 
     it('should not show clear button in read only mode', () => {
       const findings = {
-        'L4_subluxation': {
+        L4_subluxation: {
           elementId: 'L4',
-          type: 'subluxation'
-        }
+          type: 'subluxation',
+        },
       };
 
       render(<AnatomicalSpine findings={findings} readOnly onChange={mockOnChange} />);
@@ -238,7 +243,7 @@ describe('AnatomicalSpine Component', () => {
 
 describe('VERTEBRAE Data', () => {
   it('should have all spine regions', () => {
-    const regions = new Set(VERTEBRAE.map(v => v.region));
+    const regions = new Set(VERTEBRAE.map((v) => v.region));
 
     expect(regions.has('cervical')).toBe(true);
     expect(regions.has('thoracic')).toBe(true);
@@ -247,9 +252,9 @@ describe('VERTEBRAE Data', () => {
   });
 
   it('should have correct vertebrae count', () => {
-    const cervical = VERTEBRAE.filter(v => v.region === 'cervical');
-    const thoracic = VERTEBRAE.filter(v => v.region === 'thoracic');
-    const lumbar = VERTEBRAE.filter(v => v.region === 'lumbar');
+    const cervical = VERTEBRAE.filter((v) => v.region === 'cervical');
+    const thoracic = VERTEBRAE.filter((v) => v.region === 'thoracic');
+    const lumbar = VERTEBRAE.filter((v) => v.region === 'lumbar');
 
     expect(cervical.length).toBe(7); // C1-C7
     expect(thoracic.length).toBe(12); // T1-T12
@@ -257,45 +262,52 @@ describe('VERTEBRAE Data', () => {
   });
 
   it('should have y positions for all vertebrae', () => {
-    VERTEBRAE.forEach(v => {
+    VERTEBRAE.forEach((v) => {
       expect(typeof v.y).toBe('number');
       expect(v.y).toBeGreaterThan(0);
     });
   });
 
   it('should have hasDisc property', () => {
-    VERTEBRAE.forEach(v => {
+    VERTEBRAE.forEach((v) => {
       expect(typeof v.hasDisc).toBe('boolean');
     });
 
     // C1 (Atlas) should not have disc
-    const c1 = VERTEBRAE.find(v => v.id === 'C1');
+    const c1 = VERTEBRAE.find((v) => v.id === 'C1');
     expect(c1.hasDisc).toBe(false);
 
     // L4 should have disc
-    const l4 = VERTEBRAE.find(v => v.id === 'L4');
+    const l4 = VERTEBRAE.find((v) => v.id === 'L4');
     expect(l4.hasDisc).toBe(true);
   });
 });
 
 describe('FINDING_TYPES Data', () => {
   it('should have all chiropractic finding types', () => {
-    const expectedTypes = ['subluxation', 'fixation', 'restriction', 'disc_bulge', 'disc_herniation', 'adjusted'];
+    const expectedTypes = [
+      'subluxation',
+      'fixation',
+      'restriction',
+      'disc_bulge',
+      'disc_herniation',
+      'adjusted',
+    ];
 
     const typeIds = Object.keys(FINDING_TYPES);
-    expectedTypes.forEach(type => {
+    expectedTypes.forEach((type) => {
       expect(typeIds).toContain(type);
     });
   });
 
   it('should have priorities for all types', () => {
-    Object.values(FINDING_TYPES).forEach(type => {
+    Object.values(FINDING_TYPES).forEach((type) => {
       expect(typeof type.priority).toBe('number');
     });
   });
 
   it('should have Norwegian labels', () => {
-    Object.values(FINDING_TYPES).forEach(type => {
+    Object.values(FINDING_TYPES).forEach((type) => {
       expect(type.label).toBeDefined();
       expect(type.label.length).toBeGreaterThan(0);
     });
@@ -304,7 +316,7 @@ describe('FINDING_TYPES Data', () => {
 
 describe('LISTINGS Data', () => {
   it('should have common chiropractic listings', () => {
-    const listingIds = LISTINGS.map(l => l.id);
+    const listingIds = LISTINGS.map((l) => l.id);
 
     expect(listingIds).toContain('PL');
     expect(listingIds).toContain('PR');
@@ -315,7 +327,7 @@ describe('LISTINGS Data', () => {
   });
 
   it('should have descriptions for all listings', () => {
-    LISTINGS.forEach(listing => {
+    LISTINGS.forEach((listing) => {
       expect(listing.description).toBeDefined();
       expect(listing.description.length).toBeGreaterThan(0);
     });
@@ -326,7 +338,7 @@ describe('REGION_COLORS Data', () => {
   it('should have colors for all regions', () => {
     const expectedRegions = ['cervical', 'thoracic', 'lumbar', 'sacral'];
 
-    expectedRegions.forEach(region => {
+    expectedRegions.forEach((region) => {
       expect(REGION_COLORS[region]).toBeDefined();
       expect(REGION_COLORS[region].fill).toBeDefined();
       expect(REGION_COLORS[region].stroke).toBeDefined();

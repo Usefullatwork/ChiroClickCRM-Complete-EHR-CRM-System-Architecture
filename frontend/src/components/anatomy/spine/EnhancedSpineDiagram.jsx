@@ -9,9 +9,13 @@
  * - Color-coded findings
  * - Smooth animations
  */
-import React, { useState, useCallback, useRef, useMemo } from 'react';
+import _React, { useState, useCallback, useRef, useMemo } from 'react';
 import { RotateCcw, ZoomIn, ZoomOut } from 'lucide-react';
-import useAnatomyClick, { FINDING_TYPES, STANDARD_DIRECTIONS, SI_DIRECTIONS } from '../hooks/useAnatomyClick';
+import _useAnatomyClick, {
+  FINDING_TYPES,
+  STANDARD_DIRECTIONS,
+  SI_DIRECTIONS,
+} from '../hooks/useAnatomyClick';
 
 // Vertebra configuration with anatomically-informed shapes
 const VERTEBRAE = {
@@ -26,8 +30,8 @@ const VERTEBRAE = {
       { id: 'C4', y: 63, width: 37, height: 12 },
       { id: 'C5', y: 77, width: 38, height: 12 },
       { id: 'C6', y: 91, width: 40, height: 13 },
-      { id: 'C7', y: 106, width: 42, height: 14 }
-    ]
+      { id: 'C7', y: 106, width: 42, height: 14 },
+    ],
   },
   thoracic: {
     label: 'Thoracic',
@@ -45,8 +49,8 @@ const VERTEBRAE = {
       { id: 'T9', y: 256, width: 51, height: 15 },
       { id: 'T10', y: 273, width: 52, height: 16 },
       { id: 'T11', y: 291, width: 54, height: 16 },
-      { id: 'T12', y: 309, width: 56, height: 17 }
-    ]
+      { id: 'T12', y: 309, width: 56, height: 17 },
+    ],
   },
   lumbar: {
     label: 'Lumbar',
@@ -57,8 +61,8 @@ const VERTEBRAE = {
       { id: 'L2', y: 350, width: 60, height: 19 },
       { id: 'L3', y: 371, width: 62, height: 20 },
       { id: 'L4', y: 393, width: 64, height: 21 },
-      { id: 'L5', y: 416, width: 66, height: 22 }
-    ]
+      { id: 'L5', y: 416, width: 66, height: 22 },
+    ],
   },
   sacral: {
     label: 'Sacral',
@@ -66,21 +70,21 @@ const VERTEBRAE = {
     lightColor: '#FEE2E2',
     segments: [
       { id: 'Sacrum', y: 442, width: 70, height: 35, special: 'sacrum' },
-      { id: 'Coccyx', y: 480, width: 24, height: 18, special: 'coccyx' }
-    ]
-  }
+      { id: 'Coccyx', y: 480, width: 24, height: 18, special: 'coccyx' },
+    ],
+  },
 };
 
 // SI Joint and Ilium configuration
 const PELVIS = {
   siJoints: [
     { id: 'SI-L', x: 35, y: 450, side: 'left' },
-    { id: 'SI-R', x: 165, y: 450, side: 'right' }
+    { id: 'SI-R', x: 165, y: 450, side: 'right' },
   ],
   iliums: [
     { id: 'L-Ilium', x: 20, y: 445, side: 'left' },
-    { id: 'R-Ilium', x: 150, y: 445, side: 'right' }
-  ]
+    { id: 'R-Ilium', x: 150, y: 445, side: 'right' },
+  ],
 };
 
 // Finding color mapping
@@ -90,7 +94,7 @@ const FINDING_COLORS = {
   restriction: '#EAB308',
   tenderness: '#A855F7',
   spasm: '#3B82F6',
-  hypermobility: '#10B981'
+  hypermobility: '#10B981',
 };
 
 // Generate vertebra SVG path (anatomically-styled)
@@ -100,11 +104,11 @@ function generateVertebraPath(x, y, width, height, special) {
   if (special === 'atlas') {
     // C1 Atlas - ring shape
     return `
-      M ${cx - width/2} ${y + height/2}
-      Q ${cx - width/2} ${y} ${cx} ${y}
-      Q ${cx + width/2} ${y} ${cx + width/2} ${y + height/2}
-      Q ${cx + width/2} ${y + height} ${cx} ${y + height}
-      Q ${cx - width/2} ${y + height} ${cx - width/2} ${y + height/2}
+      M ${cx - width / 2} ${y + height / 2}
+      Q ${cx - width / 2} ${y} ${cx} ${y}
+      Q ${cx + width / 2} ${y} ${cx + width / 2} ${y + height / 2}
+      Q ${cx + width / 2} ${y + height} ${cx} ${y + height}
+      Q ${cx - width / 2} ${y + height} ${cx - width / 2} ${y + height / 2}
       Z
     `;
   }
@@ -115,10 +119,10 @@ function generateVertebraPath(x, y, width, height, special) {
     return `
       M ${cx} ${y - densHeight}
       L ${cx + 4} ${y}
-      L ${cx + width/2 - 2} ${y + 2}
-      Q ${cx + width/2} ${y + height/2} ${cx + width/2 - 2} ${y + height - 2}
-      L ${cx - width/2 + 2} ${y + height - 2}
-      Q ${cx - width/2} ${y + height/2} ${cx - width/2 + 2} ${y + 2}
+      L ${cx + width / 2 - 2} ${y + 2}
+      Q ${cx + width / 2} ${y + height / 2} ${cx + width / 2 - 2} ${y + height - 2}
+      L ${cx - width / 2 + 2} ${y + height - 2}
+      Q ${cx - width / 2} ${y + height / 2} ${cx - width / 2 + 2} ${y + 2}
       L ${cx - 4} ${y}
       Z
     `;
@@ -127,13 +131,13 @@ function generateVertebraPath(x, y, width, height, special) {
   if (special === 'sacrum') {
     // Sacrum - triangular fused segment
     return `
-      M ${cx - width/2 + 5} ${y}
-      L ${cx + width/2 - 5} ${y}
-      Q ${cx + width/2} ${y + 5} ${cx + width/2 - 8} ${y + height * 0.4}
+      M ${cx - width / 2 + 5} ${y}
+      L ${cx + width / 2 - 5} ${y}
+      Q ${cx + width / 2} ${y + 5} ${cx + width / 2 - 8} ${y + height * 0.4}
       L ${cx + 8} ${y + height - 5}
       Q ${cx} ${y + height} ${cx - 8} ${y + height - 5}
-      L ${cx - width/2 + 8} ${y + height * 0.4}
-      Q ${cx - width/2} ${y + 5} ${cx - width/2 + 5} ${y}
+      L ${cx - width / 2 + 8} ${y + height * 0.4}
+      Q ${cx - width / 2} ${y + 5} ${cx - width / 2 + 5} ${y}
       Z
     `;
   }
@@ -141,11 +145,11 @@ function generateVertebraPath(x, y, width, height, special) {
   if (special === 'coccyx') {
     // Coccyx - small pointed shape
     return `
-      M ${cx - width/2} ${y}
-      L ${cx + width/2} ${y}
-      L ${cx + width/3} ${y + height * 0.6}
+      M ${cx - width / 2} ${y}
+      L ${cx + width / 2} ${y}
+      L ${cx + width / 3} ${y + height * 0.6}
       L ${cx} ${y + height}
-      L ${cx - width/3} ${y + height * 0.6}
+      L ${cx - width / 3} ${y + height * 0.6}
       Z
     `;
   }
@@ -155,18 +159,18 @@ function generateVertebraPath(x, y, width, height, special) {
   const bodyWidth = width * 0.6;
 
   return `
-    M ${cx - bodyWidth/2} ${y + 2}
-    Q ${cx - bodyWidth/2 - 2} ${y} ${cx - bodyWidth/2 - processWidth/2} ${y + height * 0.3}
-    L ${cx - bodyWidth/2 - processWidth} ${y + height * 0.4}
-    L ${cx - bodyWidth/2 - processWidth} ${y + height * 0.6}
-    L ${cx - bodyWidth/2 - processWidth/2} ${y + height * 0.7}
-    Q ${cx - bodyWidth/2 - 2} ${y + height} ${cx - bodyWidth/2} ${y + height - 2}
-    L ${cx + bodyWidth/2} ${y + height - 2}
-    Q ${cx + bodyWidth/2 + 2} ${y + height} ${cx + bodyWidth/2 + processWidth/2} ${y + height * 0.7}
-    L ${cx + bodyWidth/2 + processWidth} ${y + height * 0.6}
-    L ${cx + bodyWidth/2 + processWidth} ${y + height * 0.4}
-    L ${cx + bodyWidth/2 + processWidth/2} ${y + height * 0.3}
-    Q ${cx + bodyWidth/2 + 2} ${y} ${cx + bodyWidth/2} ${y + 2}
+    M ${cx - bodyWidth / 2} ${y + 2}
+    Q ${cx - bodyWidth / 2 - 2} ${y} ${cx - bodyWidth / 2 - processWidth / 2} ${y + height * 0.3}
+    L ${cx - bodyWidth / 2 - processWidth} ${y + height * 0.4}
+    L ${cx - bodyWidth / 2 - processWidth} ${y + height * 0.6}
+    L ${cx - bodyWidth / 2 - processWidth / 2} ${y + height * 0.7}
+    Q ${cx - bodyWidth / 2 - 2} ${y + height} ${cx - bodyWidth / 2} ${y + height - 2}
+    L ${cx + bodyWidth / 2} ${y + height - 2}
+    Q ${cx + bodyWidth / 2 + 2} ${y + height} ${cx + bodyWidth / 2 + processWidth / 2} ${y + height * 0.7}
+    L ${cx + bodyWidth / 2 + processWidth} ${y + height * 0.6}
+    L ${cx + bodyWidth / 2 + processWidth} ${y + height * 0.4}
+    L ${cx + bodyWidth / 2 + processWidth / 2} ${y + height * 0.3}
+    Q ${cx + bodyWidth / 2 + 2} ${y} ${cx + bodyWidth / 2} ${y + 2}
     Z
   `;
 }
@@ -175,14 +179,12 @@ function generateVertebraPath(x, y, width, height, special) {
 const DirectionPopup = ({ segment, position, onSelect, onClose, templates }) => {
   const popupRef = useRef(null);
   const isSI = segment?.startsWith('SI-') || segment?.includes('Ilium');
-  const directions = isSI
-    ? [...STANDARD_DIRECTIONS, ...SI_DIRECTIONS]
-    : STANDARD_DIRECTIONS;
+  const directions = isSI ? [...STANDARD_DIRECTIONS, ...SI_DIRECTIONS] : STANDARD_DIRECTIONS;
 
   // Get template text
   const getTemplateText = (directionId) => {
     const segmentTemplates = templates?.[segment] || [];
-    const template = segmentTemplates.find(t => t.direction === directionId);
+    const template = segmentTemplates.find((t) => t.direction === directionId);
     return template?.text_template || `${segment} ${directionId}. `;
   };
 
@@ -193,12 +195,10 @@ const DirectionPopup = ({ segment, position, onSelect, onClose, templates }) => 
       style={{
         top: position.top,
         left: position.left,
-        transform: 'translateY(-50%)'
+        transform: 'translateY(-50%)',
       }}
     >
-      <div className="text-xs font-semibold text-slate-700 mb-2 px-1 border-b pb-1">
-        {segment}
-      </div>
+      <div className="text-xs font-semibold text-slate-700 mb-2 px-1 border-b pb-1">{segment}</div>
       <div className="grid grid-cols-3 gap-1">
         {directions.map((dir) => (
           <button
@@ -226,7 +226,7 @@ export default function EnhancedSpineDiagram({
   showNarrative = true,
   showLegend = true,
   compact = false,
-  className = ''
+  className = '',
 }) {
   const [selectedVertebra, setSelectedVertebra] = useState(null);
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
@@ -236,76 +236,105 @@ export default function EnhancedSpineDiagram({
   const svgRef = useRef(null);
 
   // Check if vertebra has findings
-  const hasFinding = useCallback((vertebraId) => {
-    return Object.values(findings).some(f => f.vertebra === vertebraId);
-  }, [findings]);
+  const _hasFinding = useCallback(
+    (vertebraId) => {
+      return Object.values(findings).some((f) => f.vertebra === vertebraId);
+    },
+    [findings]
+  );
 
   // Get findings for vertebra
-  const getVertebraFindings = useCallback((vertebraId) => {
-    return Object.values(findings).filter(f => f.vertebra === vertebraId);
-  }, [findings]);
+  const getVertebraFindings = useCallback(
+    (vertebraId) => {
+      return Object.values(findings).filter((f) => f.vertebra === vertebraId);
+    },
+    [findings]
+  );
 
   // Get dominant finding color for vertebra
-  const getFindingColor = useCallback((vertebraId) => {
-    const vFindings = getVertebraFindings(vertebraId);
-    if (vFindings.length === 0) return null;
-
-    // Priority order
-    const priority = ['subluxation', 'fixation', 'restriction', 'tenderness', 'spasm', 'hypermobility'];
-    for (const type of priority) {
-      if (vFindings.some(f => f.type === type)) {
-        return FINDING_COLORS[type];
+  const getFindingColor = useCallback(
+    (vertebraId) => {
+      const vFindings = getVertebraFindings(vertebraId);
+      if (vFindings.length === 0) {
+        return null;
       }
-    }
-    return FINDING_COLORS.subluxation;
-  }, [getVertebraFindings]);
+
+      // Priority order
+      const priority = [
+        'subluxation',
+        'fixation',
+        'restriction',
+        'tenderness',
+        'spasm',
+        'hypermobility',
+      ];
+      for (const type of priority) {
+        if (vFindings.some((f) => f.type === type)) {
+          return FINDING_COLORS[type];
+        }
+      }
+      return FINDING_COLORS.subluxation;
+    },
+    [getVertebraFindings]
+  );
 
   // Handle vertebra click
-  const handleVertebraClick = useCallback((vertebraId, event) => {
-    if (onInsertText) {
-      // Text insertion mode - show direction popup
-      const rect = event.currentTarget.getBoundingClientRect();
-      const containerRect = containerRef.current?.getBoundingClientRect() || { top: 0, left: 0 };
+  const handleVertebraClick = useCallback(
+    (vertebraId, event) => {
+      if (onInsertText) {
+        // Text insertion mode - show direction popup
+        const rect = event.currentTarget.getBoundingClientRect();
+        const containerRect = containerRef.current?.getBoundingClientRect() || { top: 0, left: 0 };
 
-      setPopupPosition({
-        top: rect.top - containerRect.top + rect.height / 2,
-        left: rect.right - containerRect.left + 10
-      });
-      setSelectedVertebra(vertebraId);
-    } else if (onChange) {
-      // Finding toggle mode
-      setSelectedVertebra(prev => prev === vertebraId ? null : vertebraId);
-    }
-  }, [onInsertText, onChange]);
+        setPopupPosition({
+          top: rect.top - containerRect.top + rect.height / 2,
+          left: rect.right - containerRect.left + 10,
+        });
+        setSelectedVertebra(vertebraId);
+      } else if (onChange) {
+        // Finding toggle mode
+        setSelectedVertebra((prev) => (prev === vertebraId ? null : vertebraId));
+      }
+    },
+    [onInsertText, onChange]
+  );
 
   // Handle direction select
-  const handleDirectionSelect = useCallback((text) => {
-    if (onInsertText) {
-      onInsertText(text);
-    }
-    setSelectedVertebra(null);
-  }, [onInsertText]);
+  const handleDirectionSelect = useCallback(
+    (text) => {
+      if (onInsertText) {
+        onInsertText(text);
+      }
+      setSelectedVertebra(null);
+    },
+    [onInsertText]
+  );
 
   // Add finding
-  const addFinding = useCallback((vertebra, type, side) => {
-    if (!onChange) return;
+  const addFinding = useCallback(
+    (vertebra, type, side) => {
+      if (!onChange) {
+        return;
+      }
 
-    const key = `${vertebra}_${type}_${side}`;
-    const newFindings = { ...findings };
+      const key = `${vertebra}_${type}_${side}`;
+      const newFindings = { ...findings };
 
-    if (newFindings[key]) {
-      delete newFindings[key];
-    } else {
-      newFindings[key] = {
-        vertebra,
-        type,
-        side,
-        timestamp: new Date().toISOString()
-      };
-    }
+      if (newFindings[key]) {
+        delete newFindings[key];
+      } else {
+        newFindings[key] = {
+          vertebra,
+          type,
+          side,
+          timestamp: new Date().toISOString(),
+        };
+      }
 
-    onChange(newFindings);
-  }, [findings, onChange]);
+      onChange(newFindings);
+    },
+    [findings, onChange]
+  );
 
   // Clear all
   const clearAll = useCallback(() => {
@@ -318,40 +347,44 @@ export default function EnhancedSpineDiagram({
   // Generate narrative
   const narrative = useMemo(() => {
     const findingsList = Object.values(findings);
-    if (findingsList.length === 0) return [];
+    if (findingsList.length === 0) {
+      return [];
+    }
 
     const grouped = {};
-    findingsList.forEach(f => {
-      if (!grouped[f.type]) grouped[f.type] = [];
+    findingsList.forEach((f) => {
+      if (!grouped[f.type]) {
+        grouped[f.type] = [];
+      }
       grouped[f.type].push(f);
     });
 
     const narratives = [];
 
     if (grouped.subluxation) {
-      const items = grouped.subluxation.map(f =>
-        `${f.side !== 'central' ? f.side + ' ' : ''}${f.vertebra}`
+      const items = grouped.subluxation.map(
+        (f) => `${f.side !== 'central' ? `${f.side} ` : ''}${f.vertebra}`
       );
       narratives.push(`Subluksasjoner: ${items.join(', ')}`);
     }
 
     if (grouped.fixation) {
-      narratives.push(`Fiksasjoner: ${grouped.fixation.map(f => f.vertebra).join(', ')}`);
+      narratives.push(`Fiksasjoner: ${grouped.fixation.map((f) => f.vertebra).join(', ')}`);
     }
 
     if (grouped.restriction) {
-      narratives.push(`Restriksjoner: ${grouped.restriction.map(f => f.vertebra).join(', ')}`);
+      narratives.push(`Restriksjoner: ${grouped.restriction.map((f) => f.vertebra).join(', ')}`);
     }
 
     if (grouped.tenderness) {
-      const items = grouped.tenderness.map(f =>
-        `${f.side !== 'central' ? f.side + ' ' : ''}${f.vertebra}`
+      const items = grouped.tenderness.map(
+        (f) => `${f.side !== 'central' ? `${f.side} ` : ''}${f.vertebra}`
       );
       narratives.push(`Palpasjonsømhet: ${items.join(', ')}`);
     }
 
     if (grouped.spasm) {
-      narratives.push(`Muskelspasmer: ${grouped.spasm.map(f => f.vertebra).join(', ')}`);
+      narratives.push(`Muskelspasmer: ${grouped.spasm.map((f) => f.vertebra).join(', ')}`);
     }
 
     return narratives;
@@ -362,7 +395,10 @@ export default function EnhancedSpineDiagram({
   const viewBoxHeight = 520;
 
   return (
-    <div ref={containerRef} className={`bg-white border border-gray-200 rounded-lg relative ${className}`}>
+    <div
+      ref={containerRef}
+      className={`bg-white border border-gray-200 rounded-lg relative ${className}`}
+    >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-emerald-50 to-white border-b border-gray-200 rounded-t-lg">
         <div className="flex items-center gap-2">
@@ -376,7 +412,7 @@ export default function EnhancedSpineDiagram({
         <div className="flex items-center gap-2">
           {/* Zoom controls */}
           <button
-            onClick={() => setZoom(z => Math.max(0.5, z - 0.1))}
+            onClick={() => setZoom((z) => Math.max(0.5, z - 0.1))}
             className="p-1 text-gray-400 hover:text-gray-600"
             title="Zoom ut"
           >
@@ -384,7 +420,7 @@ export default function EnhancedSpineDiagram({
           </button>
           <span className="text-xs text-gray-500">{Math.round(zoom * 100)}%</span>
           <button
-            onClick={() => setZoom(z => Math.min(2, z + 0.1))}
+            onClick={() => setZoom((z) => Math.min(2, z + 0.1))}
             className="p-1 text-gray-400 hover:text-gray-600"
             title="Zoom inn"
           >
@@ -413,7 +449,7 @@ export default function EnhancedSpineDiagram({
             style={{
               width: `${180 * zoom}px`,
               height: `${450 * zoom}px`,
-              maxHeight: compact ? '350px' : '500px'
+              maxHeight: compact ? '350px' : '500px',
             }}
           >
             {/* Background spinal canal */}
@@ -425,8 +461,12 @@ export default function EnhancedSpineDiagram({
             />
 
             {/* Left/Right labels */}
-            <text x="25" y="12" className="text-[10px] font-medium fill-gray-400">V</text>
-            <text x="170" y="12" className="text-[10px] font-medium fill-gray-400">H</text>
+            <text x="25" y="12" className="text-[10px] font-medium fill-gray-400">
+              V
+            </text>
+            <text x="170" y="12" className="text-[10px] font-medium fill-gray-400">
+              H
+            </text>
 
             {/* Render vertebrae by region */}
             {Object.entries(VERTEBRAE).map(([regionKey, region]) => (
@@ -461,7 +501,7 @@ export default function EnhancedSpineDiagram({
                         onMouseEnter={() => setHoveredVertebra(seg.id)}
                         onMouseLeave={() => setHoveredVertebra(null)}
                         style={{
-                          filter: isHovered ? 'brightness(0.95)' : 'none'
+                          filter: isHovered ? 'brightness(0.95)' : 'none',
                         }}
                       />
 
@@ -570,14 +610,11 @@ export default function EnhancedSpineDiagram({
                   {Object.entries(FINDING_TYPES).map(([key, type]) => (
                     <div key={key}>
                       <div className="flex items-center gap-2 mb-1">
-                        <div
-                          className="w-3 h-3 rounded"
-                          style={{ backgroundColor: type.color }}
-                        />
+                        <div className="w-3 h-3 rounded" style={{ backgroundColor: type.color }} />
                         <span className="text-xs font-medium text-gray-700">{type.labelNo}</span>
                       </div>
                       <div className="flex gap-1">
-                        {['left', 'right', 'bilateral', 'central'].map(side => {
+                        {['left', 'right', 'bilateral', 'central'].map((side) => {
                           const isActive = findings[`${selectedVertebra}_${key}_${side}`];
                           return (
                             <button
@@ -590,7 +627,13 @@ export default function EnhancedSpineDiagram({
                               }`}
                               style={isActive ? { backgroundColor: type.color } : {}}
                             >
-                              {side === 'left' ? 'V' : side === 'right' ? 'H' : side === 'bilateral' ? 'B' : 'S'}
+                              {side === 'left'
+                                ? 'V'
+                                : side === 'right'
+                                  ? 'H'
+                                  : side === 'bilateral'
+                                    ? 'B'
+                                    : 'S'}
                             </button>
                           );
                         })}
@@ -628,7 +671,7 @@ export default function EnhancedSpineDiagram({
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <h5 className="text-xs font-medium text-gray-500 mb-2">Alle funn</h5>
                     <div className="flex flex-wrap gap-1 max-h-40 overflow-y-auto">
-                      {Object.values(findings).map(f => (
+                      {Object.values(findings).map((f) => (
                         <span
                           key={`${f.vertebra}_${f.type}_${f.side}`}
                           className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded text-white"
@@ -666,12 +709,12 @@ export default function EnhancedSpineDiagram({
       {/* Generated Narrative */}
       {showNarrative && narrative.length > 0 && (
         <div className="px-4 py-3 bg-green-50 border-t border-green-200 rounded-b-lg">
-          <label className="block text-xs font-medium text-green-800 mb-2">
-            Objektive funn:
-          </label>
+          <label className="block text-xs font-medium text-green-800 mb-2">Objektive funn:</label>
           <ul className="space-y-1">
             {narrative.map((line, i) => (
-              <li key={i} className="text-sm text-green-900">• {line}</li>
+              <li key={i} className="text-sm text-green-900">
+                • {line}
+              </li>
             ))}
           </ul>
         </div>

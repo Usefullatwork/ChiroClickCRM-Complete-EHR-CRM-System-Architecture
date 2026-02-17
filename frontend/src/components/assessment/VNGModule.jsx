@@ -15,19 +15,31 @@
  * - Balance Tests (Romberg, etc.)
  */
 
-import React, { useState, useCallback } from 'react';
+import _React, { useState, useCallback } from 'react';
 import { t } from './translations';
 import {
-  Eye, Activity, Target, Brain, ArrowUpDown, RotateCcw,
-  CheckCircle2, XCircle, AlertCircle, ChevronDown, ChevronUp,
-  FileText, Printer, Copy, Save
+  Eye,
+  Activity,
+  Target,
+  Brain,
+  ArrowUpDown,
+  RotateCcw,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  ChevronDown,
+  ChevronUp,
+  FileText,
+  Printer,
+  Copy,
+  Save,
 } from 'lucide-react';
 
 // Result options for tests
 const RESULT_OPTIONS = {
   normal: { value: 'normal', icon: CheckCircle2, color: 'text-green-600' },
   abnormal: { value: 'abnormal', icon: XCircle, color: 'text-red-600' },
-  notTested: { value: 'not_tested', icon: AlertCircle, color: 'text-gray-400' }
+  notTested: { value: 'not_tested', icon: AlertCircle, color: 'text-gray-400' },
 };
 
 // Default VNG data structure
@@ -36,7 +48,7 @@ const getDefaultVNGData = () => ({
   spontaneousNystagmus: {
     present: false,
     direction: '',
-    notes: ''
+    notes: '',
   },
 
   // Gaze Tests
@@ -46,7 +58,7 @@ const getDefaultVNGData = () => ({
     right: 'normal',
     up: 'normal',
     down: 'normal',
-    notes: ''
+    notes: '',
   },
   gazeDark: {
     center: 'normal',
@@ -54,7 +66,7 @@ const getDefaultVNGData = () => ({
     right: 'normal',
     up: 'normal',
     down: 'normal',
-    notes: ''
+    notes: '',
   },
 
   // Positional Testing
@@ -63,14 +75,14 @@ const getDefaultVNGData = () => ({
     headLeft: 'normal',
     bow: 'normal',
     lean: 'normal',
-    notes: ''
+    notes: '',
   },
 
   // Smooth Pursuit
   smoothPursuit: {
     horizontal: 'normal',
     vertical: 'normal',
-    notes: ''
+    notes: '',
   },
 
   // Saccades
@@ -79,15 +91,15 @@ const getDefaultVNGData = () => ({
       latency: '',
       velocity: '',
       accuracy: '',
-      result: 'normal'
+      result: 'normal',
     },
     antisaccade: {
       latency: '',
       velocity: '',
       accuracy: '',
-      result: 'normal'
+      result: 'normal',
     },
-    notes: ''
+    notes: '',
   },
 
   // OPK
@@ -100,7 +112,7 @@ const getDefaultVNGData = () => ({
     down10: 'normal',
     up20: 'normal',
     down20: 'normal',
-    notes: ''
+    notes: '',
   },
 
   // Cerebellar Assessment
@@ -112,7 +124,7 @@ const getDefaultVNGData = () => ({
     rapidSupination: 'normal',
     fingerTapping: 'normal',
     dualTasking: 'normal',
-    notes: ''
+    notes: '',
   },
 
   // VOR/HIT
@@ -120,7 +132,7 @@ const getDefaultVNGData = () => ({
     vorTest: 'normal',
     hipTest: 'normal',
     headShakeNystagmus: 'normal',
-    notes: ''
+    notes: '',
   },
 
   // Eye Tests
@@ -129,7 +141,7 @@ const getDefaultVNGData = () => ({
     pupilSize: 'normal',
     lightReflex: 'normal',
     gazeHold: 'normal',
-    notes: ''
+    notes: '',
   },
 
   // Vitals
@@ -138,7 +150,7 @@ const getDefaultVNGData = () => ({
     bloodPressureRight: '',
     pulseLeft: '',
     pulseRight: '',
-    capillaryRefill: 'normal'
+    capillaryRefill: 'normal',
   },
 
   // BPPV Assessment
@@ -147,12 +159,12 @@ const getDefaultVNGData = () => ({
     dixHallpikeLeft: 'normal',
     affectedCanal: '',
     type: '', // canalithiasis or cupulolithiasis
-    notes: ''
+    notes: '',
   },
 
   // Summary
   interpretation: '',
-  recommendations: ''
+  recommendations: '',
 });
 
 // Result Button Component
@@ -168,9 +180,10 @@ function ResultButton({ value, currentValue, onChange, language }) {
       className={`
         flex items-center gap-1 px-2 py-1 rounded text-xs font-medium
         transition-colors duration-150
-        ${isSelected
-          ? `${option.color} bg-gray-100 ring-1 ring-current`
-          : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+        ${
+          isSelected
+            ? `${option.color} bg-gray-100 ring-1 ring-current`
+            : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
         }
       `}
     >
@@ -204,7 +217,7 @@ function TestRow({ label, testKey, value, onChange, language }) {
 }
 
 // Collapsible Section Component
-function Section({ title, icon: Icon, children, defaultOpen = true, language }) {
+function Section({ title, icon: Icon, children, defaultOpen = true, _language }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
@@ -224,11 +237,7 @@ function Section({ title, icon: Icon, children, defaultOpen = true, language }) 
           <ChevronDown className="w-5 h-5 text-gray-500" />
         )}
       </button>
-      {isOpen && (
-        <div className="p-4 bg-white">
-          {children}
-        </div>
-      )}
+      {isOpen && <div className="p-4 bg-white">{children}</div>}
     </div>
   );
 }
@@ -238,35 +247,35 @@ export default function VNGModule({
   language = 'en',
   initialData = null,
   onSave,
-  onGenerateReport,
+  _onGenerateReport,
   patientName = '',
-  examDate = new Date().toISOString().split('T')[0]
+  examDate = new Date().toISOString().split('T')[0],
 }) {
   const [data, setData] = useState(initialData || getDefaultVNGData());
   const [activeTab, setActiveTab] = useState('assessment');
 
   // Update nested data
   const updateSection = useCallback((section, key, value) => {
-    setData(prev => ({
+    setData((prev) => ({
       ...prev,
       [section]: {
         ...prev[section],
-        [key]: value
-      }
+        [key]: value,
+      },
     }));
   }, []);
 
   // Update saccade data
   const updateSaccade = useCallback((type, key, value) => {
-    setData(prev => ({
+    setData((prev) => ({
       ...prev,
       saccades: {
         ...prev.saccades,
         [type]: {
           ...prev.saccades[type],
-          [key]: value
-        }
-      }
+          [key]: value,
+        },
+      },
     }));
   }, []);
 
@@ -280,14 +289,16 @@ export default function VNGModule({
       .map(([k]) => t('vng', k, language));
 
     if (gazeAbnormal.length > 0) {
-      sections.push(language === 'no'
-        ? `Blikktest viser avvik i: ${gazeAbnormal.join(', ')}.`
-        : `Gaze testing shows abnormality in: ${gazeAbnormal.join(', ')}.`
+      sections.push(
+        language === 'no'
+          ? `Blikktest viser avvik i: ${gazeAbnormal.join(', ')}.`
+          : `Gaze testing shows abnormality in: ${gazeAbnormal.join(', ')}.`
       );
     } else {
-      sections.push(language === 'no'
-        ? 'Blikktest er normal i alle retninger.'
-        : 'Gaze testing is normal in all directions.'
+      sections.push(
+        language === 'no'
+          ? 'Blikktest er normal i alle retninger.'
+          : 'Gaze testing is normal in all directions.'
       );
     }
 
@@ -297,33 +308,40 @@ export default function VNGModule({
       .map(([k]) => t('vng', k, language));
 
     if (cerebellarAbnormal.length > 0) {
-      sections.push(language === 'no'
-        ? `Cerebellum-vurdering viser avvik i: ${cerebellarAbnormal.join(', ')}.`
-        : `Cerebellar assessment shows abnormality in: ${cerebellarAbnormal.join(', ')}.`
+      sections.push(
+        language === 'no'
+          ? `Cerebellum-vurdering viser avvik i: ${cerebellarAbnormal.join(', ')}.`
+          : `Cerebellar assessment shows abnormality in: ${cerebellarAbnormal.join(', ')}.`
       );
     } else {
-      sections.push(language === 'no'
-        ? 'Cerebellum-vurdering er normal.'
-        : 'Cerebellar assessment is normal.'
+      sections.push(
+        language === 'no' ? 'Cerebellum-vurdering er normal.' : 'Cerebellar assessment is normal.'
       );
     }
 
     // VOR narrative
     if (data.vor.vorTest === 'abnormal' || data.vor.hipTest === 'abnormal') {
-      sections.push(language === 'no'
-        ? 'VOR/Hodeimpulstest viser avvik.'
-        : 'VOR/Head impulse testing shows abnormality.'
+      sections.push(
+        language === 'no'
+          ? 'VOR/Hodeimpulstest viser avvik.'
+          : 'VOR/Head impulse testing shows abnormality.'
       );
     }
 
     // BPPV narrative
     if (data.bppv.dixHallpikeRight === 'abnormal' || data.bppv.dixHallpikeLeft === 'abnormal') {
-      const side = data.bppv.dixHallpikeRight === 'abnormal'
-        ? (language === 'no' ? 'høyre' : 'right')
-        : (language === 'no' ? 'venstre' : 'left');
-      sections.push(language === 'no'
-        ? `Dix-Hallpike positiv på ${side} side. ${data.bppv.affectedCanal ? `Påvirket buegang: ${data.bppv.affectedCanal}.` : ''}`
-        : `Dix-Hallpike positive on ${side} side. ${data.bppv.affectedCanal ? `Affected canal: ${data.bppv.affectedCanal}.` : ''}`
+      const side =
+        data.bppv.dixHallpikeRight === 'abnormal'
+          ? language === 'no'
+            ? 'høyre'
+            : 'right'
+          : language === 'no'
+            ? 'venstre'
+            : 'left';
+      sections.push(
+        language === 'no'
+          ? `Dix-Hallpike positiv på ${side} side. ${data.bppv.affectedCanal ? `Påvirket buegang: ${data.bppv.affectedCanal}.` : ''}`
+          : `Dix-Hallpike positive on ${side} side. ${data.bppv.affectedCanal ? `Affected canal: ${data.bppv.affectedCanal}.` : ''}`
       );
     }
 
@@ -353,9 +371,7 @@ export default function VNGModule({
               <Eye className="w-7 h-7 text-blue-600" />
               {t('vng', 'title', language)}
             </h2>
-            <p className="text-sm text-gray-500 mt-1">
-              {t('vng', 'subtitle', language)}
-            </p>
+            <p className="text-sm text-gray-500 mt-1">{t('vng', 'subtitle', language)}</p>
           </div>
           <div className="text-right text-sm text-gray-600">
             {patientName && <div className="font-medium">{patientName}</div>}
@@ -403,7 +419,9 @@ export default function VNGModule({
                   <input
                     type="checkbox"
                     checked={data.spontaneousNystagmus.present}
-                    onChange={(e) => updateSection('spontaneousNystagmus', 'present', e.target.checked)}
+                    onChange={(e) =>
+                      updateSection('spontaneousNystagmus', 'present', e.target.checked)
+                    }
                     className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
                   <span className="text-sm">{t('vng', 'nystagmusPresent', language)}</span>
@@ -416,7 +434,9 @@ export default function VNGModule({
                   </label>
                   <select
                     value={data.spontaneousNystagmus.direction}
-                    onChange={(e) => updateSection('spontaneousNystagmus', 'direction', e.target.value)}
+                    onChange={(e) =>
+                      updateSection('spontaneousNystagmus', 'direction', e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                   >
                     <option value="">{language === 'no' ? 'Velg...' : 'Select...'}</option>
@@ -431,11 +451,7 @@ export default function VNGModule({
             </Section>
 
             {/* Gaze Testing - Light */}
-            <Section
-              title={t('vng', 'gazeLight', language)}
-              icon={Eye}
-              language={language}
-            >
+            <Section title={t('vng', 'gazeLight', language)} icon={Eye} language={language}>
               <TestRow
                 label={t('vng', 'center', language)}
                 testKey="center"
@@ -591,7 +607,9 @@ export default function VNGModule({
                   </h4>
                   <div className="space-y-2">
                     <div>
-                      <label className="text-xs text-gray-500">{t('vng', 'latency', language)} ({t('vng', 'ms', language)})</label>
+                      <label className="text-xs text-gray-500">
+                        {t('vng', 'latency', language)} ({t('vng', 'ms', language)})
+                      </label>
                       <input
                         type="number"
                         value={data.saccades.prosaccade.latency}
@@ -601,7 +619,9 @@ export default function VNGModule({
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-gray-500">{t('vng', 'velocity', language)} ({t('vng', 'degPerSec', language)})</label>
+                      <label className="text-xs text-gray-500">
+                        {t('vng', 'velocity', language)} ({t('vng', 'degPerSec', language)})
+                      </label>
                       <input
                         type="number"
                         value={data.saccades.prosaccade.velocity}
@@ -611,7 +631,9 @@ export default function VNGModule({
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-gray-500">{t('vng', 'accuracy', language)} ({t('vng', 'percent', language)})</label>
+                      <label className="text-xs text-gray-500">
+                        {t('vng', 'accuracy', language)} ({t('vng', 'percent', language)})
+                      </label>
                       <input
                         type="number"
                         value={data.saccades.prosaccade.accuracy}
@@ -630,7 +652,9 @@ export default function VNGModule({
                   </h4>
                   <div className="space-y-2">
                     <div>
-                      <label className="text-xs text-gray-500">{t('vng', 'latency', language)} ({t('vng', 'ms', language)})</label>
+                      <label className="text-xs text-gray-500">
+                        {t('vng', 'latency', language)} ({t('vng', 'ms', language)})
+                      </label>
                       <input
                         type="number"
                         value={data.saccades.antisaccade.latency}
@@ -640,7 +664,9 @@ export default function VNGModule({
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-gray-500">{t('vng', 'velocity', language)} ({t('vng', 'degPerSec', language)})</label>
+                      <label className="text-xs text-gray-500">
+                        {t('vng', 'velocity', language)} ({t('vng', 'degPerSec', language)})
+                      </label>
                       <input
                         type="number"
                         value={data.saccades.antisaccade.velocity}
@@ -650,7 +676,9 @@ export default function VNGModule({
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-gray-500">{t('vng', 'accuracy', language)} ({t('vng', 'percent', language)})</label>
+                      <label className="text-xs text-gray-500">
+                        {t('vng', 'accuracy', language)} ({t('vng', 'percent', language)})
+                      </label>
                       <input
                         type="number"
                         value={data.saccades.antisaccade.accuracy}
@@ -722,11 +750,7 @@ export default function VNGModule({
             </Section>
 
             {/* VOR / HIT */}
-            <Section
-              title={t('vng', 'vor', language)}
-              icon={Activity}
-              language={language}
-            >
+            <Section title={t('vng', 'vor', language)} icon={Activity} language={language}>
               <TestRow
                 label={t('vng', 'vorTest', language)}
                 testKey="vorTest"
@@ -751,11 +775,7 @@ export default function VNGModule({
             </Section>
 
             {/* Dix-Hallpike / BPPV */}
-            <Section
-              title={t('vng', 'dix', language)}
-              icon={RotateCcw}
-              language={language}
-            >
+            <Section title={t('vng', 'dix', language)} icon={RotateCcw} language={language}>
               <TestRow
                 label={`${t('vng', 'dix', language)} - ${t('vng', 'right', language)}`}
                 testKey="dixHallpikeRight"
@@ -771,7 +791,8 @@ export default function VNGModule({
                 language={language}
               />
 
-              {(data.bppv.dixHallpikeRight === 'abnormal' || data.bppv.dixHallpikeLeft === 'abnormal') && (
+              {(data.bppv.dixHallpikeRight === 'abnormal' ||
+                data.bppv.dixHallpikeLeft === 'abnormal') && (
                 <div className="mt-4 p-3 bg-yellow-50 rounded-lg">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -800,7 +821,9 @@ export default function VNGModule({
                       >
                         <option value="">{language === 'no' ? 'Velg...' : 'Select...'}</option>
                         <option value="canalithiasis">{t('vng', 'canalithiasis', language)}</option>
-                        <option value="cupulolithiasis">{t('vng', 'cupulolithiasis', language)}</option>
+                        <option value="cupulolithiasis">
+                          {t('vng', 'cupulolithiasis', language)}
+                        </option>
                       </select>
                     </div>
                   </div>
@@ -880,12 +903,15 @@ export default function VNGModule({
                   </label>
                   <textarea
                     value={data.interpretation}
-                    onChange={(e) => setData(prev => ({ ...prev, interpretation: e.target.value }))}
+                    onChange={(e) =>
+                      setData((prev) => ({ ...prev, interpretation: e.target.value }))
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     rows={3}
-                    placeholder={language === 'no'
-                      ? 'Klinisk tolkning av funnene...'
-                      : 'Clinical interpretation of findings...'
+                    placeholder={
+                      language === 'no'
+                        ? 'Klinisk tolkning av funnene...'
+                        : 'Clinical interpretation of findings...'
                     }
                   />
                 </div>
@@ -895,12 +921,15 @@ export default function VNGModule({
                   </label>
                   <textarea
                     value={data.recommendations}
-                    onChange={(e) => setData(prev => ({ ...prev, recommendations: e.target.value }))}
+                    onChange={(e) =>
+                      setData((prev) => ({ ...prev, recommendations: e.target.value }))
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     rows={3}
-                    placeholder={language === 'no'
-                      ? 'Anbefalinger og videre tiltak...'
-                      : 'Recommendations and further actions...'
+                    placeholder={
+                      language === 'no'
+                        ? 'Anbefalinger og videre tiltak...'
+                        : 'Recommendations and further actions...'
                     }
                   />
                 </div>

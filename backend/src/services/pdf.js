@@ -22,7 +22,9 @@ const __dirname = path.dirname(__filename);
  * @returns {Promise<Buffer|null>} Image buffer or null if failed
  */
 const fetchImageBuffer = async (url) => {
-  if (!url) return null;
+  if (!url) {
+    return null;
+  }
 
   return new Promise((resolve) => {
     const protocol = url.startsWith('https') ? https : http;
@@ -30,40 +32,46 @@ const fetchImageBuffer = async (url) => {
       resolve(null);
     }, 5000); // 5 second timeout
 
-    protocol.get(url, (response) => {
-      if (response.statusCode !== 200) {
-        clearTimeout(timeout);
-        resolve(null);
-        return;
-      }
+    protocol
+      .get(url, (response) => {
+        if (response.statusCode !== 200) {
+          clearTimeout(timeout);
+          resolve(null);
+          return;
+        }
 
-      const chunks = [];
-      response.on('data', (chunk) => chunks.push(chunk));
-      response.on('end', () => {
-        clearTimeout(timeout);
-        resolve(Buffer.concat(chunks));
-      });
-      response.on('error', () => {
+        const chunks = [];
+        response.on('data', (chunk) => chunks.push(chunk));
+        response.on('end', () => {
+          clearTimeout(timeout);
+          resolve(Buffer.concat(chunks));
+        });
+        response.on('error', () => {
+          clearTimeout(timeout);
+          resolve(null);
+        });
+      })
+      .on('error', () => {
         clearTimeout(timeout);
         resolve(null);
       });
-    }).on('error', () => {
-      clearTimeout(timeout);
-      resolve(null);
-    });
   });
 };
 
 // Norwegian date formatter
 const formatDateNO = (date) => {
-  if (!date) return 'N/A';
+  if (!date) {
+    return 'N/A';
+  }
   const d = new Date(date);
   return d.toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric' });
 };
 
 // Format currency in Norwegian style
 const formatCurrencyNO = (amount) => {
-  if (amount === null || amount === undefined) return '0 kr';
+  if (amount === null || amount === undefined) {
+    return '0 kr';
+  }
   return `${Number(amount).toLocaleString('no-NO')} kr`;
 };
 
@@ -78,14 +86,14 @@ const getUnicodeFontPath = () => {
     'C:/Windows/Fonts/Arial.ttf',
     'C:/Windows/Fonts/calibri.ttf',
     'C:/Windows/Fonts/Calibri.ttf',
-    'C:/Windows/Fonts/segoeui.ttf'
+    'C:/Windows/Fonts/segoeui.ttf',
   ];
 
   // Try common Linux/Mac paths
   const unixFontPaths = [
     '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
     '/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf',
-    '/System/Library/Fonts/Helvetica.ttc'
+    '/System/Library/Fonts/Helvetica.ttc',
   ];
 
   const allPaths = [...windowsFontPaths, ...unixFontPaths];
@@ -111,13 +119,15 @@ let cachedBoldFontPath = null;
  * @returns {string|null} Bold font path or null
  */
 const getBoldFontPath = (regularPath) => {
-  if (!regularPath) return null;
+  if (!regularPath) {
+    return null;
+  }
 
   // Try common bold font naming conventions
   const boldPaths = [
-    regularPath.replace(/\.ttf$/i, 'bd.ttf'),    // arial.ttf -> arialbd.ttf
+    regularPath.replace(/\.ttf$/i, 'bd.ttf'), // arial.ttf -> arialbd.ttf
     regularPath.replace(/\.ttf$/i, '-Bold.ttf'), // font.ttf -> font-Bold.ttf
-    regularPath.replace(/\.ttf$/i, 'b.ttf'),     // font.ttf -> fontb.ttf
+    regularPath.replace(/\.ttf$/i, 'b.ttf'), // font.ttf -> fontb.ttf
   ];
 
   for (const boldPath of boldPaths) {
@@ -139,8 +149,8 @@ const createPDFDocument = () => {
     info: {
       Title: 'ChiroClick Document',
       Author: 'ChiroClick EHR',
-      Creator: 'ChiroClick PDF Service'
-    }
+      Creator: 'ChiroClick PDF Service',
+    },
   });
 
   // Check for Unicode font path (only once)
@@ -154,7 +164,9 @@ const createPDFDocument = () => {
         logger.info(`PDF Service: Using bold font from ${cachedBoldFontPath}`);
       }
     } else {
-      logger.warn('PDF Service: No Unicode font found, Norwegian characters may not display correctly');
+      logger.warn(
+        'PDF Service: No Unicode font found, Norwegian characters may not display correctly'
+      );
     }
   }
 
@@ -193,15 +205,14 @@ const getFont = (bold = false) => {
  * @param {PDFDocument} doc - PDF document
  * @returns {Promise<Buffer>} PDF as buffer
  */
-const pdfToBuffer = (doc) => {
-  return new Promise((resolve, reject) => {
+const pdfToBuffer = (doc) =>
+  new Promise((resolve, reject) => {
     const chunks = [];
-    doc.on('data', chunk => chunks.push(chunk));
+    doc.on('data', (chunk) => chunks.push(chunk));
     doc.on('end', () => resolve(Buffer.concat(chunks)));
     doc.on('error', reject);
     doc.end();
   });
-};
 
 /**
  * Draw document header with clinic info
@@ -219,12 +230,16 @@ const drawHeader = (doc, data, title) => {
   doc.moveDown(0.5);
 
   // Clinic info (right aligned)
-  const startY = doc.y;
+  const _startY = doc.y;
   doc.fontSize(10).font('Helvetica');
   doc.text(data.clinic_name || 'Klinikk', { align: 'right' });
   doc.text(data.clinic_address || '', { align: 'right' });
-  if (data.clinic_phone) doc.text(`Tlf: ${data.clinic_phone}`, { align: 'right' });
-  if (data.org_number) doc.text(`Org.nr: ${data.org_number}`, { align: 'right' });
+  if (data.clinic_phone) {
+    doc.text(`Tlf: ${data.clinic_phone}`, { align: 'right' });
+  }
+  if (data.org_number) {
+    doc.text(`Org.nr: ${data.org_number}`, { align: 'right' });
+  }
   doc.moveDown(0.5);
 
   // Date
@@ -355,7 +370,7 @@ export const generatePatientLetter = async (organizationId, encounterId, letterT
 
     logger.info(`Generated ${letterType} PDF for encounter ${encounterId}`, {
       size: pdfBuffer.length,
-      type: letterType
+      type: letterType,
     });
 
     return {
@@ -363,7 +378,7 @@ export const generatePatientLetter = async (organizationId, encounterId, letterT
       contentType: 'application/pdf',
       filename: `${letterType}_${data.last_name}_${new Date().toISOString().split('T')[0]}.pdf`,
       encounter_id: encounterId,
-      letter_type: letterType
+      letter_type: letterType,
     };
   } catch (error) {
     logger.error('Error generating patient letter:', error);
@@ -608,11 +623,18 @@ export const generateInvoice = async (organizationId, financialMetricId) => {
     const doc = createPDFDocument();
 
     // Header with clinic info
-    doc.fontSize(18).font('Helvetica-Bold').text(data.clinic_name || 'Klinikk', { align: 'left' });
+    doc
+      .fontSize(18)
+      .font('Helvetica-Bold')
+      .text(data.clinic_name || 'Klinikk', { align: 'left' });
     doc.fontSize(10).font('Helvetica');
     doc.text(data.clinic_address || '');
-    if (data.clinic_phone) doc.text(`Tlf: ${data.clinic_phone}`);
-    if (data.org_number) doc.text(`Org.nr: ${data.org_number}`);
+    if (data.clinic_phone) {
+      doc.text(`Tlf: ${data.clinic_phone}`);
+    }
+    if (data.org_number) {
+      doc.text(`Org.nr: ${data.org_number}`);
+    }
 
     // Invoice title and number (right side)
     doc.fontSize(24).font('Helvetica-Bold');
@@ -630,14 +652,19 @@ export const generateInvoice = async (organizationId, financialMetricId) => {
     doc.fontSize(10).font('Helvetica-Bold').text('Faktureres til:');
     doc.font('Helvetica');
     doc.text(`${data.first_name || ''} ${data.last_name || ''}`);
-    if (data.address) doc.text(data.address);
-    if (data.postal_code || data.city) doc.text(`${data.postal_code || ''} ${data.city || ''}`);
+    if (data.address) {
+      doc.text(data.address);
+    }
+    if (data.postal_code || data.city) {
+      doc.text(`${data.postal_code || ''} ${data.city || ''}`);
+    }
     doc.moveDown(1.5);
 
     // Treatment codes table
-    const treatmentCodes = typeof data.treatment_codes === 'string'
-      ? JSON.parse(data.treatment_codes)
-      : data.treatment_codes || [];
+    const treatmentCodes =
+      typeof data.treatment_codes === 'string'
+        ? JSON.parse(data.treatment_codes)
+        : data.treatment_codes || [];
 
     // Table header
     const tableTop = doc.y;
@@ -692,9 +719,9 @@ export const generateInvoice = async (organizationId, financialMetricId) => {
     doc.moveDown(0.5);
 
     const statusMap = {
-      'PAID': 'BETALT',
-      'PENDING': 'UBETALT',
-      'CANCELLED': 'KANSELLERT'
+      PAID: 'BETALT',
+      PENDING: 'UBETALT',
+      CANCELLED: 'KANSELLERT',
     };
     const statusText = statusMap[data.payment_status] || data.payment_status;
     doc.font('Helvetica-Bold').text(`Status: ${statusText}`);
@@ -706,8 +733,10 @@ export const generateInvoice = async (organizationId, financialMetricId) => {
       data.clinic_name,
       data.clinic_address,
       data.clinic_phone ? `Tlf: ${data.clinic_phone}` : null,
-      data.clinic_email
-    ].filter(Boolean).join(' | ');
+      data.clinic_email,
+    ]
+      .filter(Boolean)
+      .join(' | ');
     doc.text(footerText, 50, footerY, { align: 'center', width: 495 });
 
     // Convert to buffer
@@ -715,14 +744,14 @@ export const generateInvoice = async (organizationId, financialMetricId) => {
 
     logger.info(`Generated invoice PDF for financial metric ${financialMetricId}`, {
       size: pdfBuffer.length,
-      invoiceNumber: data.invoice_number
+      invoiceNumber: data.invoice_number,
     });
 
     return {
       buffer: pdfBuffer,
       contentType: 'application/pdf',
       filename: `Faktura_${data.invoice_number || 'unknown'}_${data.last_name || 'patient'}.pdf`,
-      invoice_number: data.invoice_number
+      invoice_number: data.invoice_number,
     };
   } catch (error) {
     logger.error('Error generating invoice:', error);
@@ -746,7 +775,10 @@ export const generateCustomPDF = async (options) => {
     const doc = createPDFDocument();
 
     // Header
-    doc.fontSize(20).font('Helvetica-Bold').text(title || 'Dokument', { align: 'center' });
+    doc
+      .fontSize(20)
+      .font('Helvetica-Bold')
+      .text(title || 'Dokument', { align: 'center' });
     doc.moveDown(0.5);
     doc.moveTo(50, doc.y).lineTo(545, doc.y).stroke();
     doc.moveDown(1);
@@ -755,7 +787,9 @@ export const generateCustomPDF = async (options) => {
     if (clinic.name) {
       doc.fontSize(10).font('Helvetica');
       doc.text(clinic.name, { align: 'right' });
-      if (clinic.address) doc.text(clinic.address, { align: 'right' });
+      if (clinic.address) {
+        doc.text(clinic.address, { align: 'right' });
+      }
       doc.text(`Dato: ${formatDateNO(new Date())}`, { align: 'right' });
       doc.moveDown(1);
     }
@@ -779,7 +813,7 @@ export const generateCustomPDF = async (options) => {
     return {
       buffer: pdfBuffer,
       contentType: 'application/pdf',
-      filename: `${title || 'document'}_${formatDateNO(new Date()).replace(/\./g, '-')}.pdf`
+      filename: `${title || 'document'}_${formatDateNO(new Date()).replace(/\./g, '-')}.pdf`,
     };
   } catch (error) {
     logger.error('Error generating custom PDF:', error);
@@ -839,8 +873,12 @@ export const generateExerciseHandout = async (organizationId, patientId) => {
     // Clinic info (right aligned)
     doc.fontSize(10).font(font);
     doc.text(patient.clinic_name || 'Klinikk', { align: 'right' });
-    if (patient.clinic_address) doc.text(patient.clinic_address, { align: 'right' });
-    if (patient.clinic_phone) doc.text(`Tlf: ${patient.clinic_phone}`, { align: 'right' });
+    if (patient.clinic_address) {
+      doc.text(patient.clinic_address, { align: 'right' });
+    }
+    if (patient.clinic_phone) {
+      doc.text(`Tlf: ${patient.clinic_phone}`, { align: 'right' });
+    }
     doc.moveDown(1);
 
     // Patient info
@@ -851,16 +889,19 @@ export const generateExerciseHandout = async (organizationId, patientId) => {
 
     // Introduction
     doc.fontSize(10).font(font);
-    doc.text('Her er dine foreskrevne øvelser. Følg instruksjonene nøye og kontakt din behandler ved spørsmål.', { align: 'justify' });
+    doc.text(
+      'Her er dine foreskrevne øvelser. Følg instruksjonene nøye og kontakt din behandler ved spørsmål.',
+      { align: 'justify' }
+    );
     doc.moveDown(1);
 
     // Frequency labels in Norwegian
     const frequencyLabels = {
-      'daily': 'Daglig',
+      daily: 'Daglig',
       '2x_daily': '2 ganger daglig',
       '3x_week': '3 ganger per uke',
-      'weekly': 'Ukentlig',
-      'as_needed': 'Ved behov'
+      weekly: 'Ukentlig',
+      as_needed: 'Ved behov',
     };
 
     // Exercises
@@ -897,12 +938,14 @@ export const generateExerciseHandout = async (organizationId, patientId) => {
               doc.image(imageBuffer, imageX, imageY, {
                 fit: [imageWidth, imageHeight],
                 align: 'center',
-                valign: 'center'
+                valign: 'center',
               });
               imageEmbedded = true;
             }
           } catch (imgErr) {
-            logger.debug(`Could not embed image for exercise ${exercise.exercise_code}: ${imgErr.message}`);
+            logger.debug(
+              `Could not embed image for exercise ${exercise.exercise_code}: ${imgErr.message}`
+            );
           }
         }
 
@@ -913,16 +956,25 @@ export const generateExerciseHandout = async (organizationId, patientId) => {
         doc.fillColor('#000000').fontSize(10).font(fontBold);
         doc.text('Dosering:', 60, dosingTop + 8);
         doc.font(font);
-        doc.text(`${exercise.sets || 3} sett × ${exercise.reps || 10} repetisjoner`, 60, dosingTop + 22);
+        doc.text(
+          `${exercise.sets || 3} sett × ${exercise.reps || 10} repetisjoner`,
+          60,
+          dosingTop + 22
+        );
         if (exercise.hold_seconds) {
           doc.text(`Hold: ${exercise.hold_seconds} sekunder`, 60, dosingTop + 36);
         }
-        doc.text(`Frekvens: ${frequencyLabels[exercise.frequency] || exercise.frequency}`, 170, dosingTop + 22);
+        doc.text(
+          `Frekvens: ${frequencyLabels[exercise.frequency] || exercise.frequency}`,
+          170,
+          dosingTop + 22
+        );
 
         doc.y = dosingTop + (imageEmbedded ? 110 : 60);
 
         // Instructions (prefer Norwegian, fallback to English or stored instructions)
-        const instructions = exercise.instructions_no || exercise.exercise_instructions || exercise.instructions_en;
+        const instructions =
+          exercise.instructions_no || exercise.exercise_instructions || exercise.instructions_en;
         if (instructions) {
           doc.fontSize(10).font(fontBold);
           doc.text('Instruksjoner:');
@@ -1003,43 +1055,46 @@ export const generateExerciseHandout = async (organizationId, patientId) => {
       doc.text('Øvelse', 55, tableTop + 8);
 
       days.forEach((day, i) => {
-        doc.rect(220 + (i * cellWidth), tableTop, cellWidth, rowHeight).stroke();
-        doc.text(day, 223 + (i * cellWidth), tableTop + 8, { width: cellWidth - 6, align: 'center' });
+        doc.rect(220 + i * cellWidth, tableTop, cellWidth, rowHeight).stroke();
+        doc.text(day, 223 + i * cellWidth, tableTop + 8, { width: cellWidth - 6, align: 'center' });
       });
 
       // Exercise rows (max 8 to fit on page)
       const maxRows = Math.min(exercises.length, 8);
       for (let i = 0; i < maxRows; i++) {
-        const rowY = tableTop + rowHeight + (i * rowHeight);
+        const rowY = tableTop + rowHeight + i * rowHeight;
         doc.rect(50, rowY, 170, rowHeight).stroke();
         doc.font(font).fontSize(8);
 
         // Truncate exercise name if too long
         let name = exercises[i].exercise_name;
         if (name.length > 25) {
-          name = name.substring(0, 22) + '...';
+          name = `${name.substring(0, 22)}...`;
         }
         doc.text(name, 55, rowY + 8, { width: 160 });
 
         // Day cells
         days.forEach((_, j) => {
-          doc.rect(220 + (j * cellWidth), rowY, cellWidth, rowHeight).stroke();
+          doc.rect(220 + j * cellWidth, rowY, cellWidth, rowHeight).stroke();
         });
       }
 
-      doc.y = tableTop + rowHeight + (maxRows * rowHeight) + 10;
+      doc.y = tableTop + rowHeight + maxRows * rowHeight + 10;
     }
 
     // Footer instructions
     doc.moveDown(1);
     doc.fontSize(9).font(font).fillColor('#666666');
     doc.text('Tips:');
-    doc.list([
-      'Gjør øvelsene som vist av behandleren din',
-      'Stopp hvis du opplever økt smerte',
-      'Marker av når du har gjennomført øvelsene',
-      'Ta med dette skjemaet til neste konsultasjon'
-    ], { bulletRadius: 2, textIndent: 15 });
+    doc.list(
+      [
+        'Gjør øvelsene som vist av behandleren din',
+        'Stopp hvis du opplever økt smerte',
+        'Marker av når du har gjennomført øvelsene',
+        'Ta med dette skjemaet til neste konsultasjon',
+      ],
+      { bulletRadius: 2, textIndent: 15 }
+    );
 
     doc.fillColor('#000000');
 
@@ -1048,7 +1103,7 @@ export const generateExerciseHandout = async (organizationId, patientId) => {
 
     logger.info(`Generated exercise handout PDF for patient ${patientId}`, {
       size: pdfBuffer.length,
-      exerciseCount: exercises.length
+      exerciseCount: exercises.length,
     });
 
     return {
@@ -1056,7 +1111,7 @@ export const generateExerciseHandout = async (organizationId, patientId) => {
       contentType: 'application/pdf',
       filename: `Ovelsesprogram_${patient.last_name}_${formatDateNO(new Date()).replace(/\./g, '-')}.pdf`,
       patientId,
-      exerciseCount: exercises.length
+      exerciseCount: exercises.length,
     };
   } catch (error) {
     logger.error('Error generating exercise handout:', error);
@@ -1068,5 +1123,5 @@ export default {
   generatePatientLetter,
   generateInvoice,
   generateCustomPDF,
-  generateExerciseHandout
+  generateExerciseHandout,
 };

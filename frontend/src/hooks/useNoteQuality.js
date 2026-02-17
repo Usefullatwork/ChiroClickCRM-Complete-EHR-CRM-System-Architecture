@@ -42,9 +42,13 @@ export function useNoteQuality({ debounceMs = 500, enabled = true } = {}) {
   }, [encounterData.subjective]);
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) {
+      return;
+    }
 
-    if (timerRef.current) clearTimeout(timerRef.current);
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
 
     timerRef.current = setTimeout(() => {
       const completeness = checkCompleteness(encounterData, encounterData.encounter_type);
@@ -73,7 +77,9 @@ export function useNoteQuality({ debounceMs = 500, enabled = true } = {}) {
     }, debounceMs);
 
     return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
     };
   }, [encounterData, subjectiveText, enabled, debounceMs]);
 

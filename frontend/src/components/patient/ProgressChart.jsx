@@ -5,13 +5,13 @@
  * Displays patient's progress over time with charts
  */
 
-import React, { useState, useMemo } from 'react';
+import _React, { useState, useMemo } from 'react';
 import {
   TrendingUp,
   TrendingDown,
   Activity,
-  Calendar,
-  Target,
+  _Calendar,
+  _Target,
   Award,
   ChevronLeft,
   ChevronRight,
@@ -102,7 +102,9 @@ export default function ProgressChart({
    * Beregner navarende rekke
    */
   function calculateStreak(progressData) {
-    if (!progressData || progressData.length === 0) return 0;
+    if (!progressData || progressData.length === 0) {
+      return 0;
+    }
 
     let streak = 0;
     const sortedData = [...progressData].sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -121,7 +123,9 @@ export default function ProgressChart({
    * Get period navigation label
    */
   const getPeriodOffsetLabel = () => {
-    if (periodOffset === 0) return getPeriodLabel(currentPeriod);
+    if (periodOffset === 0) {
+      return getPeriodLabel(currentPeriod);
+    }
     const abs = Math.abs(periodOffset);
     const unit =
       currentPeriod === 'week'
@@ -159,14 +163,22 @@ export default function ProgressChart({
     if (selectedMetric === 'pain') {
       // Lower is better for pain
       // Lavere er bedre for smerte
-      if (percentage <= 30) return 'bg-green-500';
-      if (percentage <= 60) return 'bg-yellow-500';
+      if (percentage <= 30) {
+        return 'bg-green-500';
+      }
+      if (percentage <= 60) {
+        return 'bg-yellow-500';
+      }
       return 'bg-red-500';
     }
     // Higher is better for completion/frequency
     // Hoyere er bedre for fullforingsgrad/frekvens
-    if (percentage >= 70) return 'bg-green-500';
-    if (percentage >= 40) return 'bg-yellow-500';
+    if (percentage >= 70) {
+      return 'bg-green-500';
+    }
+    if (percentage >= 40) {
+      return 'bg-yellow-500';
+    }
     return 'bg-red-500';
   };
 

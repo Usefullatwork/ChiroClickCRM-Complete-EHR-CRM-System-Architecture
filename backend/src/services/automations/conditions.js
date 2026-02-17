@@ -42,14 +42,12 @@ export const evaluateConditions = (workflow, patient) => {
 /**
  * Group conditions by their logic operator
  */
-const groupConditionsByLogic = (conditions) => {
+const groupConditionsByLogic = (conditions) =>
   // Simple implementation: treat all as AND unless explicitly marked
-  return {
+  ({
     logic: 'AND',
     conditions: conditions,
-  };
-};
-
+  });
 /**
  * Evaluate a group of conditions
  */
@@ -73,9 +71,11 @@ const evaluateSingleCondition = (condition, patient) => {
 
   switch (operator) {
     case OPERATORS.EQUALS:
+      // eslint-disable-next-line eqeqeq
       return patientValue == value;
 
     case OPERATORS.NOT_EQUALS:
+      // eslint-disable-next-line eqeqeq
       return patientValue != value;
 
     case OPERATORS.GREATER_THAN:
@@ -112,13 +112,15 @@ const evaluateSingleCondition = (condition, patient) => {
         (!Array.isArray(patientValue) || patientValue.length > 0)
       );
 
-    case OPERATORS.IN:
+    case OPERATORS.IN: {
       const valueList = Array.isArray(value) ? value : [value];
       return valueList.includes(patientValue);
+    }
 
-    case OPERATORS.NOT_IN:
+    case OPERATORS.NOT_IN: {
       const excludeList = Array.isArray(value) ? value : [value];
       return !excludeList.includes(patientValue);
+    }
 
     default:
       logger.warn('Unknown condition operator:', operator);
@@ -130,13 +132,17 @@ const evaluateSingleCondition = (condition, patient) => {
  * Get nested value from object using dot notation
  */
 const getNestedValue = (obj, path) => {
-  if (!obj || !path) return undefined;
+  if (!obj || !path) {
+    return undefined;
+  }
 
   const keys = path.split('.');
   let value = obj;
 
   for (const key of keys) {
-    if (value === null || value === undefined) return undefined;
+    if (value === null || value === undefined) {
+      return undefined;
+    }
     value = value[key];
   }
 

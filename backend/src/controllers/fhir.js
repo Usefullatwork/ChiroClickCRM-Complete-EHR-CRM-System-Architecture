@@ -31,79 +31,73 @@ export const getCapabilityStatement = async (req, res) => {
     kind: 'instance',
     fhirVersion: '4.0.1',
     format: ['json', 'application/fhir+json'],
-    rest: [{
-      mode: 'server',
-      documentation: 'RESTful FHIR server for clinical data access',
-      security: {
-        cors: true,
-        service: [{
-          coding: [{
-            system: 'http://terminology.hl7.org/CodeSystem/restful-security-service',
-            code: 'OAuth',
-            display: 'OAuth'
-          }]
-        }],
-        description: 'OAuth2 authentication required'
+    rest: [
+      {
+        mode: 'server',
+        documentation: 'RESTful FHIR server for clinical data access',
+        security: {
+          cors: true,
+          service: [
+            {
+              coding: [
+                {
+                  system: 'http://terminology.hl7.org/CodeSystem/restful-security-service',
+                  code: 'OAuth',
+                  display: 'OAuth',
+                },
+              ],
+            },
+          ],
+          description: 'OAuth2 authentication required',
+        },
+        resource: [
+          {
+            type: 'Patient',
+            profile: 'http://hl7.no/fhir/StructureDefinition/no-basis-Patient',
+            interaction: [{ code: 'read' }, { code: 'search-type' }],
+            searchParam: [
+              { name: 'identifier', type: 'token' },
+              { name: 'name', type: 'string' },
+              { name: 'birthdate', type: 'date' },
+            ],
+          },
+          {
+            type: 'Encounter',
+            profile: 'http://hl7.no/fhir/StructureDefinition/no-basis-Encounter',
+            interaction: [{ code: 'read' }, { code: 'search-type' }],
+            searchParam: [
+              { name: 'patient', type: 'reference' },
+              { name: 'date', type: 'date' },
+              { name: 'status', type: 'token' },
+            ],
+          },
+          {
+            type: 'Condition',
+            profile: 'http://hl7.no/fhir/StructureDefinition/no-basis-Condition',
+            interaction: [{ code: 'read' }, { code: 'search-type' }],
+            searchParam: [
+              { name: 'patient', type: 'reference' },
+              { name: 'code', type: 'token' },
+            ],
+          },
+          {
+            type: 'Observation',
+            interaction: [{ code: 'read' }, { code: 'search-type' }],
+            searchParam: [
+              { name: 'patient', type: 'reference' },
+              { name: 'code', type: 'token' },
+              { name: 'date', type: 'date' },
+            ],
+          },
+        ],
+        operation: [
+          {
+            name: 'everything',
+            definition: 'http://hl7.org/fhir/OperationDefinition/Patient-everything',
+          },
+        ],
       },
-      resource: [
-        {
-          type: 'Patient',
-          profile: 'http://hl7.no/fhir/StructureDefinition/no-basis-Patient',
-          interaction: [
-            { code: 'read' },
-            { code: 'search-type' }
-          ],
-          searchParam: [
-            { name: 'identifier', type: 'token' },
-            { name: 'name', type: 'string' },
-            { name: 'birthdate', type: 'date' }
-          ]
-        },
-        {
-          type: 'Encounter',
-          profile: 'http://hl7.no/fhir/StructureDefinition/no-basis-Encounter',
-          interaction: [
-            { code: 'read' },
-            { code: 'search-type' }
-          ],
-          searchParam: [
-            { name: 'patient', type: 'reference' },
-            { name: 'date', type: 'date' },
-            { name: 'status', type: 'token' }
-          ]
-        },
-        {
-          type: 'Condition',
-          profile: 'http://hl7.no/fhir/StructureDefinition/no-basis-Condition',
-          interaction: [
-            { code: 'read' },
-            { code: 'search-type' }
-          ],
-          searchParam: [
-            { name: 'patient', type: 'reference' },
-            { name: 'code', type: 'token' }
-          ]
-        },
-        {
-          type: 'Observation',
-          interaction: [
-            { code: 'read' },
-            { code: 'search-type' }
-          ],
-          searchParam: [
-            { name: 'patient', type: 'reference' },
-            { name: 'code', type: 'token' },
-            { name: 'date', type: 'date' }
-          ]
-        }
-      ],
-      operation: [
-        {
-          name: 'everything',
-          definition: 'http://hl7.org/fhir/OperationDefinition/Patient-everything'
-        }
-      ]
-    }]
+    ],
   };
 
   res.set('Content-Type', 'application/fhir+json');
@@ -131,36 +125,39 @@ export const getPatient = async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({
         resourceType: 'OperationOutcome',
-        issue: [{
-          severity: 'error',
-          code: 'not-found',
-          diagnostics: `Patient/${id} not found`
-        }]
+        issue: [
+          {
+            severity: 'error',
+            code: 'not-found',
+            diagnostics: `Patient/${id} not found`,
+          },
+        ],
       });
     }
 
     const fhirPatient = fhirAdapter.patientToFHIR(result.rows[0], {
-      includeIdentifier: req.query._include === 'identifier'
+      includeIdentifier: req.query._include === 'identifier',
     });
 
     await logAudit('FHIR_READ', req.user.userId, {
       resourceType: 'Patient',
       resourceId: id,
-      organizationId
+      organizationId,
     });
 
     res.set('Content-Type', 'application/fhir+json');
     res.json(fhirPatient);
-
   } catch (error) {
     logger.error('FHIR getPatient error:', error);
     res.status(500).json({
       resourceType: 'OperationOutcome',
-      issue: [{
-        severity: 'error',
-        code: 'exception',
-        diagnostics: error.message
-      }]
+      issue: [
+        {
+          severity: 'error',
+          code: 'exception',
+          diagnostics: error.message,
+        },
+      ],
     });
   }
 };
@@ -171,7 +168,7 @@ export const getPatient = async (req, res) => {
 export const searchPatients = async (req, res) => {
   try {
     const { organizationId } = req.user;
-    const { name, birthdate, identifier, _count = 50 } = req.query;
+    const { name, birthdate, _identifier, _count = 50 } = req.query;
 
     let sql = `SELECT * FROM patients WHERE organization_id = $1`;
     const params = [organizationId];
@@ -198,24 +195,25 @@ export const searchPatients = async (req, res) => {
       resourceType: 'Bundle',
       type: 'searchset',
       total: result.rows.length,
-      entry: result.rows.map(patient => ({
+      entry: result.rows.map((patient) => ({
         fullUrl: `${fhirAdapter.FHIR_BASE_URL}/Patient/${patient.id}`,
-        resource: fhirAdapter.patientToFHIR(patient)
-      }))
+        resource: fhirAdapter.patientToFHIR(patient),
+      })),
     };
 
     res.set('Content-Type', 'application/fhir+json');
     res.json(bundle);
-
   } catch (error) {
     logger.error('FHIR searchPatients error:', error);
     res.status(500).json({
       resourceType: 'OperationOutcome',
-      issue: [{
-        severity: 'error',
-        code: 'exception',
-        diagnostics: error.message
-      }]
+      issue: [
+        {
+          severity: 'error',
+          code: 'exception',
+          diagnostics: error.message,
+        },
+      ],
     });
   }
 };
@@ -243,18 +241,20 @@ export const getEncounter = async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({
         resourceType: 'OperationOutcome',
-        issue: [{
-          severity: 'error',
-          code: 'not-found',
-          diagnostics: `Encounter/${id} not found`
-        }]
+        issue: [
+          {
+            severity: 'error',
+            code: 'not-found',
+            diagnostics: `Encounter/${id} not found`,
+          },
+        ],
       });
     }
 
     const encounter = result.rows[0];
     const patient = {
       first_name: encounter.patient_first_name,
-      last_name: encounter.patient_last_name
+      last_name: encounter.patient_last_name,
     };
 
     const fhirEncounter = fhirAdapter.encounterToFHIR(encounter, patient);
@@ -262,21 +262,22 @@ export const getEncounter = async (req, res) => {
     await logAudit('FHIR_READ', req.user.userId, {
       resourceType: 'Encounter',
       resourceId: id,
-      organizationId
+      organizationId,
     });
 
     res.set('Content-Type', 'application/fhir+json');
     res.json(fhirEncounter);
-
   } catch (error) {
     logger.error('FHIR getEncounter error:', error);
     res.status(500).json({
       resourceType: 'OperationOutcome',
-      issue: [{
-        severity: 'error',
-        code: 'exception',
-        diagnostics: error.message
-      }]
+      issue: [
+        {
+          severity: 'error',
+          code: 'exception',
+          diagnostics: error.message,
+        },
+      ],
     });
   }
 };
@@ -287,7 +288,7 @@ export const getEncounter = async (req, res) => {
 export const searchEncounters = async (req, res) => {
   try {
     const { organizationId } = req.user;
-    const { patient, date, status, _count = 50 } = req.query;
+    const { patient, date, _status, _count = 50 } = req.query;
 
     let sql = `
       SELECT ce.*, p.first_name as patient_first_name, p.last_name as patient_last_name
@@ -319,27 +320,28 @@ export const searchEncounters = async (req, res) => {
       resourceType: 'Bundle',
       type: 'searchset',
       total: result.rows.length,
-      entry: result.rows.map(encounter => ({
+      entry: result.rows.map((encounter) => ({
         fullUrl: `${fhirAdapter.FHIR_BASE_URL}/Encounter/${encounter.id}`,
         resource: fhirAdapter.encounterToFHIR(encounter, {
           first_name: encounter.patient_first_name,
-          last_name: encounter.patient_last_name
-        })
-      }))
+          last_name: encounter.patient_last_name,
+        }),
+      })),
     };
 
     res.set('Content-Type', 'application/fhir+json');
     res.json(bundle);
-
   } catch (error) {
     logger.error('FHIR searchEncounters error:', error);
     res.status(500).json({
       resourceType: 'OperationOutcome',
-      issue: [{
-        severity: 'error',
-        code: 'exception',
-        diagnostics: error.message
-      }]
+      issue: [
+        {
+          severity: 'error',
+          code: 'exception',
+          diagnostics: error.message,
+        },
+      ],
     });
   }
 };
@@ -352,18 +354,21 @@ export const getCondition = async (req, res) => {
   // Conditions are embedded in encounters - return OperationOutcome
   res.status(501).json({
     resourceType: 'OperationOutcome',
-    issue: [{
-      severity: 'information',
-      code: 'not-supported',
-      diagnostics: 'Conditions are embedded in Encounter resources. Use Encounter/$everything or Patient/$everything.'
-    }]
+    issue: [
+      {
+        severity: 'information',
+        code: 'not-supported',
+        diagnostics:
+          'Conditions are embedded in Encounter resources. Use Encounter/$everything or Patient/$everything.',
+      },
+    ],
   });
 };
 
 export const searchConditions = async (req, res) => {
   try {
     const { organizationId } = req.user;
-    const { patient, code, _count = 50 } = req.query;
+    const { patient, _code, _count = 50 } = req.query;
 
     let sql = `
       SELECT ce.id, ce.patient_id, ce.encounter_date, ce.icpc_codes, ce.icd10_codes
@@ -396,7 +401,7 @@ export const searchConditions = async (req, res) => {
         );
         entries.push({
           fullUrl: `${fhirAdapter.FHIR_BASE_URL}/Condition/${condition.id}`,
-          resource: condition
+          resource: condition,
         });
       }
     }
@@ -406,18 +411,19 @@ export const searchConditions = async (req, res) => {
       resourceType: 'Bundle',
       type: 'searchset',
       total: entries.length,
-      entry: entries
+      entry: entries,
     });
-
   } catch (error) {
     logger.error('FHIR searchConditions error:', error);
     res.status(500).json({
       resourceType: 'OperationOutcome',
-      issue: [{
-        severity: 'error',
-        code: 'exception',
-        diagnostics: error.message
-      }]
+      issue: [
+        {
+          severity: 'error',
+          code: 'exception',
+          diagnostics: error.message,
+        },
+      ],
     });
   }
 };
@@ -429,11 +435,13 @@ export const searchConditions = async (req, res) => {
 export const getObservation = async (req, res) => {
   res.status(501).json({
     resourceType: 'OperationOutcome',
-    issue: [{
-      severity: 'information',
-      code: 'not-supported',
-      diagnostics: 'Observations are generated from clinical_measurements. Use search instead.'
-    }]
+    issue: [
+      {
+        severity: 'information',
+        code: 'not-supported',
+        diagnostics: 'Observations are generated from clinical_measurements. Use search instead.',
+      },
+    ],
   });
 };
 
@@ -478,7 +486,7 @@ export const searchObservations = async (req, res) => {
       for (const obs of observations) {
         entries.push({
           fullUrl: `${fhirAdapter.FHIR_BASE_URL}/Observation/${obs.id}`,
-          resource: obs
+          resource: obs,
         });
       }
     }
@@ -488,18 +496,19 @@ export const searchObservations = async (req, res) => {
       resourceType: 'Bundle',
       type: 'searchset',
       total: entries.length,
-      entry: entries
+      entry: entries,
     });
-
   } catch (error) {
     logger.error('FHIR searchObservations error:', error);
     res.status(500).json({
       resourceType: 'OperationOutcome',
-      issue: [{
-        severity: 'error',
-        code: 'exception',
-        diagnostics: error.message
-      }]
+      issue: [
+        {
+          severity: 'error',
+          code: 'exception',
+          diagnostics: error.message,
+        },
+      ],
     });
   }
 };
@@ -525,16 +534,18 @@ export const getPatientEverything = async (req, res) => {
     if (patientCheck.rows.length === 0) {
       return res.status(404).json({
         resourceType: 'OperationOutcome',
-        issue: [{
-          severity: 'error',
-          code: 'not-found',
-          diagnostics: `Patient/${id} not found`
-        }]
+        issue: [
+          {
+            severity: 'error',
+            code: 'not-found',
+            diagnostics: `Patient/${id} not found`,
+          },
+        ],
       });
     }
 
     const bundle = await fhirAdapter.createPatientBundle(id, {
-      includeIdentifier: req.query._include === 'identifier'
+      includeIdentifier: req.query._include === 'identifier',
     });
 
     await logAudit('FHIR_EXPORT', req.user.userId, {
@@ -542,21 +553,22 @@ export const getPatientEverything = async (req, res) => {
       resourceId: id,
       operation: '$everything',
       resourceCount: bundle.total,
-      organizationId
+      organizationId,
     });
 
     res.set('Content-Type', 'application/fhir+json');
     res.json(bundle);
-
   } catch (error) {
     logger.error('FHIR getPatientEverything error:', error);
     res.status(500).json({
       resourceType: 'OperationOutcome',
-      issue: [{
-        severity: 'error',
-        code: 'exception',
-        diagnostics: error.message
-      }]
+      issue: [
+        {
+          severity: 'error',
+          code: 'exception',
+          diagnostics: error.message,
+        },
+      ],
     });
   }
 };
@@ -568,11 +580,13 @@ export const processBundle = async (req, res) => {
   // Read-only server for now
   res.status(501).json({
     resourceType: 'OperationOutcome',
-    issue: [{
-      severity: 'information',
-      code: 'not-supported',
-      diagnostics: 'Bundle transactions are not yet supported. This is a read-only FHIR server.'
-    }]
+    issue: [
+      {
+        severity: 'information',
+        code: 'not-supported',
+        diagnostics: 'Bundle transactions are not yet supported. This is a read-only FHIR server.',
+      },
+    ],
   });
 };
 
@@ -586,7 +600,7 @@ export const exportPatient = async (req, res) => {
     const { organizationId } = req.user;
 
     const bundle = await fhirAdapter.createPatientBundle(id, {
-      includeIdentifier: true
+      includeIdentifier: true,
     });
 
     await logAudit('FHIR_EXPORT', req.user.userId, {
@@ -594,34 +608,37 @@ export const exportPatient = async (req, res) => {
       resourceId: id,
       format,
       resourceCount: bundle.total,
-      organizationId
+      organizationId,
     });
 
     if (format === 'xml') {
       // XML conversion would require a library like fhir.js
       res.status(501).json({
         resourceType: 'OperationOutcome',
-        issue: [{
-          severity: 'information',
-          code: 'not-supported',
-          diagnostics: 'XML format not yet supported'
-        }]
+        issue: [
+          {
+            severity: 'information',
+            code: 'not-supported',
+            diagnostics: 'XML format not yet supported',
+          },
+        ],
       });
     } else {
       res.set('Content-Type', 'application/fhir+json');
       res.set('Content-Disposition', `attachment; filename="patient-${id}-fhir.json"`);
       res.json(bundle);
     }
-
   } catch (error) {
     logger.error('FHIR exportPatient error:', error);
     res.status(500).json({
       resourceType: 'OperationOutcome',
-      issue: [{
-        severity: 'error',
-        code: 'exception',
-        diagnostics: error.message
-      }]
+      issue: [
+        {
+          severity: 'error',
+          code: 'exception',
+          diagnostics: error.message,
+        },
+      ],
     });
   }
 };
@@ -638,5 +655,5 @@ export default {
   searchObservations,
   getPatientEverything,
   processBundle,
-  exportPatient
+  exportPatient,
 };

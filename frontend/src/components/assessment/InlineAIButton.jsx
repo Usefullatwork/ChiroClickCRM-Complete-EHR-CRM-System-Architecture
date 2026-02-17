@@ -18,7 +18,7 @@ export default function InlineAIButton({
   language = 'no',
   size = 'sm', // 'sm' | 'md'
   showLabel = false,
-  className = ''
+  className = '',
 }) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [streamText, setStreamText] = useState('');
@@ -51,7 +51,9 @@ export default function InlineAIButton({
         if (stored) {
           organizationId = JSON.parse(atob(stored)).id;
         }
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
       organizationId = organizationId || localStorage.getItem('organizationId');
 
       const response = await fetch(`${API_URL}/ai/generate-field-stream`, {
@@ -59,10 +61,10 @@ export default function InlineAIButton({
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'X-Organization-Id': organizationId || ''
+          'X-Organization-Id': organizationId || '',
         },
         body: JSON.stringify({ fieldType, context, language }),
-        signal: abortControllerRef.current.signal
+        signal: abortControllerRef.current.signal,
       });
 
       // Check if it's a cached JSON response (non-streaming)
@@ -87,9 +89,13 @@ export default function InlineAIButton({
       const decoder = new TextDecoder();
       let fullText = '';
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+      let done = false;
+      while (!done) {
+        const { done: streamDone, value } = await reader.read();
+        done = streamDone;
+        if (done) {
+          break;
+        }
 
         const chunk = decoder.decode(value, { stream: true });
         const lines = chunk.split('\n');
@@ -120,7 +126,7 @@ export default function InlineAIButton({
               }
             } catch (parseError) {
               // Skip malformed JSON
-              console.debug('Skipping malformed SSE data:', dataStr);
+              // Skipping malformed SSE data
             }
           }
         }
@@ -163,12 +169,12 @@ export default function InlineAIButton({
 
   const sizeClasses = {
     sm: 'p-1',
-    md: 'p-1.5'
+    md: 'p-1.5',
   };
 
   const iconSizes = {
     sm: 'w-4 h-4',
-    md: 'w-5 h-5'
+    md: 'w-5 h-5',
   };
 
   const labels = {
@@ -176,14 +182,14 @@ export default function InlineAIButton({
       generate: 'Generer med AI',
       generating: 'Genererer...',
       stop: 'Stopp',
-      cached: 'Fra hurtigbuffer'
+      cached: 'Fra hurtigbuffer',
     },
     en: {
       generate: 'Generate with AI',
       generating: 'Generating...',
       stop: 'Stop',
-      cached: 'From cache'
-    }
+      cached: 'From cache',
+    },
   };
 
   const l = labels[language] || labels.no;
@@ -233,7 +239,13 @@ export default function InlineAIButton({
 /**
  * Compact version for tight spaces
  */
-export function InlineAIButtonCompact({ fieldType, context, onTextGenerated, language = 'no', disabled }) {
+export function InlineAIButtonCompact({
+  fieldType,
+  context,
+  onTextGenerated,
+  language = 'no',
+  disabled,
+}) {
   return (
     <InlineAIButton
       fieldType={fieldType}

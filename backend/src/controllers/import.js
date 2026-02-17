@@ -196,7 +196,7 @@ const findExistingPatient = async (organizationId, patient) => {
 
   // Check by personal number (fødselsnummer)
   if (patient.personal_number) {
-    const result = await query(
+    const _result = await query(
       'SELECT id, first_name, last_name FROM patients WHERE organization_id = $1 AND encrypted_personal_number IS NOT NULL',
       [organizationId]
     );
@@ -317,7 +317,7 @@ export const importPatientsFromText = async (req, res) => {
 
           if (updateExisting && !dryRun) {
             // Update existing patient
-            const updatedPatient = await patientService.updatePatient(
+            const _updatedPatient = await patientService.updatePatient(
               organizationId,
               existingPatient.id,
               {
@@ -420,10 +420,18 @@ export const importPatientsFromText = async (req, res) => {
 
     // Build response message
     const messageParts = [];
-    if (results.imported > 0) messageParts.push(`${results.imported} imported`);
-    if (results.updated > 0) messageParts.push(`${results.updated} updated`);
-    if (results.skipped > 0) messageParts.push(`${results.skipped} skipped`);
-    if (results.errors.length > 0) messageParts.push(`${results.errors.length} errors`);
+    if (results.imported > 0) {
+      messageParts.push(`${results.imported} imported`);
+    }
+    if (results.updated > 0) {
+      messageParts.push(`${results.updated} updated`);
+    }
+    if (results.skipped > 0) {
+      messageParts.push(`${results.skipped} skipped`);
+    }
+    if (results.errors.length > 0) {
+      messageParts.push(`${results.errors.length} errors`);
+    }
 
     res.json({
       success: true,

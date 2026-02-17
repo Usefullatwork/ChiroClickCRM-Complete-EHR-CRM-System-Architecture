@@ -3,9 +3,9 @@
  * Compact orthopedic examination components
  */
 
-import React from 'react';
+import _React from 'react';
 
-export const OrthopedicExamCompact = ({ patientId, encounterId, onDataChange }) => {
+export const OrthopedicExamCompact = ({ _patientId, _encounterId, _onDataChange }) => {
   return (
     <div className="p-3 border rounded-lg bg-white">
       <h4 className="text-md font-medium mb-2">Ortopedisk (kompakt)</h4>

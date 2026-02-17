@@ -8,7 +8,7 @@
  * - Skipped for first-time patients
  */
 
-import React, { useState, useEffect } from 'react';
+import _React, { useState, useEffect } from 'react';
 import { ArrowLeft, TrendingUp, Minus, TrendingDown } from 'lucide-react';
 
 const TRANSLATIONS = {
@@ -26,7 +26,7 @@ const TRANSLATIONS = {
     continueButton: 'Complete Check-In',
     back: 'Back',
     firstVisitMessage: 'Welcome to your first visit!',
-    firstVisitSubtext: 'We\'re excited to help you.',
+    firstVisitSubtext: "We're excited to help you.",
   },
   no: {
     title: 'Siden sist besøk',
@@ -43,15 +43,10 @@ const TRANSLATIONS = {
     back: 'Tilbake',
     firstVisitMessage: 'Velkommen til ditt første besøk!',
     firstVisitSubtext: 'Vi gleder oss til å hjelpe deg.',
-  }
+  },
 };
 
-export default function QuickScreening({
-  appointment,
-  onNext,
-  onBack,
-  lang = 'no'
-}) {
+export default function QuickScreening({ appointment, onNext, onBack, lang = 'no' }) {
   const t = TRANSLATIONS[lang];
 
   const [comparedToLast, setComparedToLast] = useState(null);
@@ -72,12 +67,14 @@ export default function QuickScreening({
   }, [isFirstVisit, onNext]);
 
   const formatDate = (dateString) => {
-    if (!dateString) return '';
+    if (!dateString) {
+      return '';
+    }
     const date = new Date(dateString);
     return date.toLocaleDateString(lang === 'no' ? 'nb-NO' : 'en-US', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
@@ -86,11 +83,13 @@ export default function QuickScreening({
       isFirstVisit: false,
       comparedToLast,
       newSymptoms,
-      newSymptomsText: newSymptoms ? newSymptomsText : ''
+      newSymptomsText: newSymptoms ? newSymptomsText : '',
     });
   };
 
-  const canContinue = comparedToLast !== null && newSymptoms !== null &&
+  const canContinue =
+    comparedToLast !== null &&
+    newSymptoms !== null &&
     (newSymptoms === false || (newSymptoms === true && newSymptomsText.trim()));
 
   // First visit screen
@@ -98,12 +97,8 @@ export default function QuickScreening({
     return (
       <div className="flex flex-col items-center justify-center h-full text-center py-12">
         <div className="text-8xl mb-6 animate-bounce">👋</div>
-        <h2 className="text-3xl font-bold text-slate-800 mb-3">
-          {t.firstVisitMessage}
-        </h2>
-        <p className="text-xl text-slate-500">
-          {t.firstVisitSubtext}
-        </p>
+        <h2 className="text-3xl font-bold text-slate-800 mb-3">{t.firstVisitMessage}</h2>
+        <p className="text-xl text-slate-500">{t.firstVisitSubtext}</p>
         <div className="mt-8">
           <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin" />
         </div>
@@ -125,9 +120,7 @@ export default function QuickScreening({
 
       {/* Header */}
       <div className="text-center mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">
-          {t.title}
-        </h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">{t.title}</h1>
         {appointment?.lastVisitDate && (
           <p className="text-lg text-slate-500">
             {t.lastVisit}: {formatDate(appointment.lastVisitDate)}
@@ -145,13 +138,16 @@ export default function QuickScreening({
             onClick={() => setComparedToLast('better')}
             className={`p-4 md:p-5 rounded-2xl border-2 flex flex-col items-center gap-2
               transition-all active:scale-95
-              ${comparedToLast === 'better'
-                ? 'bg-green-100 border-green-500 ring-2 ring-green-200'
-                : 'bg-white border-slate-200 hover:border-green-300'
+              ${
+                comparedToLast === 'better'
+                  ? 'bg-green-100 border-green-500 ring-2 ring-green-200'
+                  : 'bg-white border-slate-200 hover:border-green-300'
               }`}
           >
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center
-              ${comparedToLast === 'better' ? 'bg-green-500 text-white' : 'bg-green-100 text-green-600'}`}>
+            <div
+              className={`w-12 h-12 rounded-full flex items-center justify-center
+              ${comparedToLast === 'better' ? 'bg-green-500 text-white' : 'bg-green-100 text-green-600'}`}
+            >
               <TrendingUp className="w-6 h-6" />
             </div>
             <span className="text-sm md:text-base font-medium text-slate-800">{t.better}</span>
@@ -161,13 +157,16 @@ export default function QuickScreening({
             onClick={() => setComparedToLast('same')}
             className={`p-4 md:p-5 rounded-2xl border-2 flex flex-col items-center gap-2
               transition-all active:scale-95
-              ${comparedToLast === 'same'
-                ? 'bg-yellow-100 border-yellow-500 ring-2 ring-yellow-200'
-                : 'bg-white border-slate-200 hover:border-yellow-300'
+              ${
+                comparedToLast === 'same'
+                  ? 'bg-yellow-100 border-yellow-500 ring-2 ring-yellow-200'
+                  : 'bg-white border-slate-200 hover:border-yellow-300'
               }`}
           >
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center
-              ${comparedToLast === 'same' ? 'bg-yellow-500 text-white' : 'bg-yellow-100 text-yellow-600'}`}>
+            <div
+              className={`w-12 h-12 rounded-full flex items-center justify-center
+              ${comparedToLast === 'same' ? 'bg-yellow-500 text-white' : 'bg-yellow-100 text-yellow-600'}`}
+            >
               <Minus className="w-6 h-6" />
             </div>
             <span className="text-sm md:text-base font-medium text-slate-800">{t.same}</span>
@@ -177,13 +176,16 @@ export default function QuickScreening({
             onClick={() => setComparedToLast('worse')}
             className={`p-4 md:p-5 rounded-2xl border-2 flex flex-col items-center gap-2
               transition-all active:scale-95
-              ${comparedToLast === 'worse'
-                ? 'bg-red-100 border-red-500 ring-2 ring-red-200'
-                : 'bg-white border-slate-200 hover:border-red-300'
+              ${
+                comparedToLast === 'worse'
+                  ? 'bg-red-100 border-red-500 ring-2 ring-red-200'
+                  : 'bg-white border-slate-200 hover:border-red-300'
               }`}
           >
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center
-              ${comparedToLast === 'worse' ? 'bg-red-500 text-white' : 'bg-red-100 text-red-600'}`}>
+            <div
+              className={`w-12 h-12 rounded-full flex items-center justify-center
+              ${comparedToLast === 'worse' ? 'bg-red-500 text-white' : 'bg-red-100 text-red-600'}`}
+            >
               <TrendingDown className="w-6 h-6" />
             </div>
             <span className="text-sm md:text-base font-medium text-slate-800">{t.worse}</span>
@@ -201,9 +203,10 @@ export default function QuickScreening({
             onClick={() => setNewSymptoms(false)}
             className={`p-5 rounded-2xl border-2 text-xl font-medium
               transition-all active:scale-95
-              ${newSymptoms === false
-                ? 'bg-green-100 border-green-500 ring-2 ring-green-200 text-green-800'
-                : 'bg-white border-slate-200 text-slate-700 hover:border-green-300'
+              ${
+                newSymptoms === false
+                  ? 'bg-green-100 border-green-500 ring-2 ring-green-200 text-green-800'
+                  : 'bg-white border-slate-200 text-slate-700 hover:border-green-300'
               }`}
           >
             {t.no}
@@ -213,9 +216,10 @@ export default function QuickScreening({
             onClick={() => setNewSymptoms(true)}
             className={`p-5 rounded-2xl border-2 text-xl font-medium
               transition-all active:scale-95
-              ${newSymptoms === true
-                ? 'bg-amber-100 border-amber-500 ring-2 ring-amber-200 text-amber-800'
-                : 'bg-white border-slate-200 text-slate-700 hover:border-amber-300'
+              ${
+                newSymptoms === true
+                  ? 'bg-amber-100 border-amber-500 ring-2 ring-amber-200 text-amber-800'
+                  : 'bg-white border-slate-200 text-slate-700 hover:border-amber-300'
               }`}
           >
             {t.yes}

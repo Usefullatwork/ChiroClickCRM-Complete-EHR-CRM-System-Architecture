@@ -5,7 +5,7 @@
  */
 
 import Joi from 'joi';
-import { validatePhoneNumber, validatePhoneWithOptions } from '../utils/phoneValidation.js';
+import { _validatePhoneNumber, validatePhoneWithOptions } from '../utils/phoneValidation.js';
 import { validateFodselsnummer, validateFodselsnummerWithDOB } from '../utils/encryption.js';
 
 // UUID validation pattern
@@ -26,7 +26,9 @@ const PHONE_VALIDATION_MODE = process.env.PHONE_VALIDATION_MODE || 'strict';
 const phoneSchema = Joi.string()
   .max(20)
   .custom((value, helpers) => {
-    if (!value) return value; // Allow empty/null
+    if (!value) {
+      return value;
+    } // Allow empty/null
 
     const result = validatePhoneWithOptions(value, { mode: PHONE_VALIDATION_MODE });
 
@@ -44,10 +46,12 @@ const phoneSchema = Joi.string()
 /**
  * Custom fødselsnummer validation (11 digits with Modulus 11 checksum)
  */
-const fodselsnummerSchema = Joi.string()
+const _fodselsnummerSchema = Joi.string()
   .length(11)
   .custom((value, helpers) => {
-    if (!value) return value;
+    if (!value) {
+      return value;
+    }
 
     // Remove spaces/dashes
     const cleaned = value.replace(/[\s-]/g, '');
@@ -305,7 +309,7 @@ export const crossValidatePatientIdentity = (patientData) => {
   const errors = [];
   const warnings = [];
 
-  const { fodselsnummer, personal_number, date_of_birth, gender } = patientData;
+  const { fodselsnummer, personal_number, date_of_birth, _gender } = patientData;
   const fnr = fodselsnummer || personal_number;
 
   // If no fødselsnummer, skip cross-validation

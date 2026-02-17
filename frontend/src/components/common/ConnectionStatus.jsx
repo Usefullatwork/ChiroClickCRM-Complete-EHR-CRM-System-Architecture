@@ -3,15 +3,15 @@
  * Shows in corner of screen to give clinicians confidence their work is saved
  */
 
-import React, { useState, useEffect } from 'react';
-import { Wifi, WifiOff, Cloud, CloudOff, RefreshCw, Check, AlertCircle } from 'lucide-react';
+import _React, { useState, useEffect } from 'react';
+import { Wifi, WifiOff, _Cloud, _CloudOff, RefreshCw, Check, AlertCircle } from 'lucide-react';
 
 export default function ConnectionStatus({
   pendingChanges = 0,
   lastSyncTime = null,
   syncError = null,
   onRetrySync = null,
-  position = 'bottom-right' // 'bottom-right', 'bottom-left', 'top-right', 'top-left'
+  position = 'bottom-right', // 'bottom-right', 'bottom-left', 'top-right', 'top-left'
 }) {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [showDetails, setShowDetails] = useState(false);
@@ -39,7 +39,7 @@ export default function ConnectionStatus({
         textColor: 'text-yellow-800',
         iconColor: 'text-yellow-600',
         label: 'Offline',
-        sublabel: pendingChanges > 0 ? `${pendingChanges} ventende` : 'Endringer lagres lokalt'
+        sublabel: pendingChanges > 0 ? `${pendingChanges} ventende` : 'Endringer lagres lokalt',
       };
     }
 
@@ -52,7 +52,7 @@ export default function ConnectionStatus({
         textColor: 'text-red-800',
         iconColor: 'text-red-600',
         label: 'Synkroniseringsfeil',
-        sublabel: 'Klikk for å prøve igjen'
+        sublabel: 'Klikk for å prøve igjen',
       };
     }
 
@@ -66,7 +66,7 @@ export default function ConnectionStatus({
         iconColor: 'text-blue-600',
         label: 'Synkroniserer...',
         sublabel: `${pendingChanges} endring${pendingChanges > 1 ? 'er' : ''}`,
-        animate: true
+        animate: true,
       };
     }
 
@@ -78,22 +78,32 @@ export default function ConnectionStatus({
       textColor: 'text-green-800',
       iconColor: 'text-green-600',
       label: 'Synkronisert',
-      sublabel: lastSyncTime ? formatRelativeTime(lastSyncTime) : null
+      sublabel: lastSyncTime ? formatRelativeTime(lastSyncTime) : null,
     };
   };
 
   const formatRelativeTime = (date) => {
-    if (!date) return null;
+    if (!date) {
+      return null;
+    }
     const now = new Date();
     const then = date instanceof Date ? date : new Date(date);
     const seconds = Math.floor((now - then) / 1000);
 
-    if (seconds < 10) return 'akkurat nå';
-    if (seconds < 60) return `${seconds}s siden`;
+    if (seconds < 10) {
+      return 'akkurat nå';
+    }
+    if (seconds < 60) {
+      return `${seconds}s siden`;
+    }
     const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m siden`;
+    if (minutes < 60) {
+      return `${minutes}m siden`;
+    }
     const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}t siden`;
+    if (hours < 24) {
+      return `${hours}t siden`;
+    }
     return then.toLocaleDateString('nb-NO');
   };
 
@@ -104,7 +114,7 @@ export default function ConnectionStatus({
     'bottom-right': 'bottom-4 right-4',
     'bottom-left': 'bottom-4 left-4',
     'top-right': 'top-4 right-4',
-    'top-left': 'top-4 left-4'
+    'top-left': 'top-4 left-4',
   };
 
   return (
@@ -129,13 +139,9 @@ export default function ConnectionStatus({
           hover:shadow-md
         `}
       >
-        <Icon
-          className={`w-4 h-4 ${status.iconColor} ${status.animate ? 'animate-spin' : ''}`}
-        />
+        <Icon className={`w-4 h-4 ${status.iconColor} ${status.animate ? 'animate-spin' : ''}`} />
         <span className="text-sm font-medium">{status.label}</span>
-        {status.sublabel && (
-          <span className="text-xs opacity-75">{status.sublabel}</span>
-        )}
+        {status.sublabel && <span className="text-xs opacity-75">{status.sublabel}</span>}
       </button>
 
       {/* Details popup */}
@@ -168,18 +174,14 @@ export default function ConnectionStatus({
             {lastSyncTime && (
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Sist synkronisert</span>
-                <span className="text-xs text-gray-500">
-                  {formatRelativeTime(lastSyncTime)}
-                </span>
+                <span className="text-xs text-gray-500">{formatRelativeTime(lastSyncTime)}</span>
               </div>
             )}
 
             {pendingChanges > 0 && (
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Ventende endringer</span>
-                <span className="text-xs font-medium text-blue-600">
-                  {pendingChanges}
-                </span>
+                <span className="text-xs font-medium text-blue-600">{pendingChanges}</span>
               </div>
             )}
 

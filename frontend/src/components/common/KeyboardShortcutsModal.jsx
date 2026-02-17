@@ -2,7 +2,9 @@ import { X } from 'lucide-react';
 import { SHORTCUTS } from '../../hooks/useGlobalKeyboardShortcuts';
 
 export default function KeyboardShortcutsModal({ open, onClose }) {
-  if (!open) return null;
+  if (!open) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center">

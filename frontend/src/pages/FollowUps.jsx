@@ -150,8 +150,12 @@ export default function FollowUps() {
   };
 
   const filteredFollowUps = followUps.filter((fu) => {
-    if (activeTab === 'pending') return fu.status === 'PENDING';
-    if (activeTab === 'completed') return fu.status === 'COMPLETED';
+    if (activeTab === 'pending') {
+      return fu.status === 'PENDING';
+    }
+    if (activeTab === 'completed') {
+      return fu.status === 'COMPLETED';
+    }
     return true;
   });
 

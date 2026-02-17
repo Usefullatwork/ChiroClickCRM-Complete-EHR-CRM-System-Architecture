@@ -3,7 +3,7 @@
  * File upload for ICS/CSV files with preview, conflict detection, and selective import.
  */
 
-import React, { useState, useRef } from 'react';
+import _React, { useState, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { appointmentsAPI, schedulerAPI } from '../../services/api';
 
@@ -42,7 +42,9 @@ function parseICS(content) {
 }
 
 function parseICSDate(dateStr) {
-  if (!dateStr) return null;
+  if (!dateStr) {
+    return null;
+  }
   // Remove timezone suffix
   const clean = dateStr.replace(/Z$/, '');
   // Format: 20260207T140000
@@ -63,7 +65,9 @@ function parseICSDate(dateStr) {
  */
 function parseCSV(content) {
   const lines = content.trim().split('\n');
-  if (lines.length < 2) return [];
+  if (lines.length < 2) {
+    return [];
+  }
 
   const headers = lines[0].split(',').map((h) => h.trim().toLowerCase());
   const events = [];
@@ -106,7 +110,9 @@ const AppointmentImporter = () => {
 
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      return;
+    }
 
     setError('');
     setFileName(file.name);
@@ -169,8 +175,11 @@ const AppointmentImporter = () => {
   const toggleEvent = (id) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
       return next;
     });
   };
@@ -213,7 +222,9 @@ const AppointmentImporter = () => {
   });
 
   const handleImport = () => {
-    if (selectedIds.size === 0) return;
+    if (selectedIds.size === 0) {
+      return;
+    }
     setImportStatus('importing');
     importMutation.mutate();
   };
@@ -225,7 +236,9 @@ const AppointmentImporter = () => {
     setImportStatus(null);
     setFileName('');
     setError('');
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   return (

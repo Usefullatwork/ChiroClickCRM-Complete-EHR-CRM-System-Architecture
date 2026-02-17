@@ -11,10 +11,20 @@
  * - Drawing tools for annotation
  */
 
-import React, { useState, useCallback, useMemo } from 'react';
+import _React, { useState, useCallback, useMemo } from 'react';
 import {
-  RotateCcw, ZoomIn, ZoomOut, Palette, Save, FileText,
-  Circle, X, ChevronLeft, ChevronRight, AlertCircle, CheckCircle
+  RotateCcw,
+  _ZoomIn,
+  _ZoomOut,
+  _Palette,
+  _Save,
+  FileText,
+  _Circle,
+  X,
+  _ChevronLeft,
+  _ChevronRight,
+  _AlertCircle,
+  _CheckCircle,
 } from 'lucide-react';
 
 // Bilingual labels
@@ -49,7 +59,7 @@ const LABELS = {
       weakness: 'Weakness',
       stiffness: 'Stiffness',
       swelling: 'Swelling',
-      tenderness: 'Tenderness'
+      tenderness: 'Tenderness',
     },
     regions: {
       head: 'Head',
@@ -88,8 +98,8 @@ const LABELS = {
       r_ankle: 'Right Ankle',
       l_ankle: 'Left Ankle',
       r_foot: 'Right Foot',
-      l_foot: 'Left Foot'
-    }
+      l_foot: 'Left Foot',
+    },
   },
   no: {
     title: 'Kroppskart',
@@ -121,7 +131,7 @@ const LABELS = {
       weakness: 'Svakhet',
       stiffness: 'Stivhet',
       swelling: 'Hevelse',
-      tenderness: 'Ømhet'
+      tenderness: 'Ømhet',
     },
     regions: {
       head: 'Hode',
@@ -160,23 +170,23 @@ const LABELS = {
       r_ankle: 'Høyre Ankel',
       l_ankle: 'Venstre Ankel',
       r_foot: 'Høyre Fot',
-      l_foot: 'Venstre Fot'
-    }
-  }
+      l_foot: 'Venstre Fot',
+    },
+  },
 };
 
 // Symptom type colors
 const SYMPTOM_COLORS = {
-  pain: '#EF4444',      // Red
-  aching: '#F97316',    // Orange
-  sharp: '#DC2626',     // Dark Red
-  burning: '#F59E0B',   // Amber
-  numbness: '#3B82F6',  // Blue
-  tingling: '#8B5CF6',  // Purple
-  weakness: '#6B7280',  // Gray
+  pain: '#EF4444', // Red
+  aching: '#F97316', // Orange
+  sharp: '#DC2626', // Dark Red
+  burning: '#F59E0B', // Amber
+  numbness: '#3B82F6', // Blue
+  tingling: '#8B5CF6', // Purple
+  weakness: '#6B7280', // Gray
   stiffness: '#10B981', // Green
-  swelling: '#EC4899',  // Pink
-  tenderness: '#F472B6' // Light Pink
+  swelling: '#EC4899', // Pink
+  tenderness: '#F472B6', // Light Pink
 };
 
 // Body region definitions with clickable areas
@@ -207,7 +217,7 @@ const BODY_REGIONS = {
     { id: 'r_ankle', cx: 75, cy: 440, rx: 10, ry: 10 },
     { id: 'l_ankle', cx: 125, cy: 440, rx: 10, ry: 10 },
     { id: 'r_foot', cx: 70, cy: 465, rx: 15, ry: 12 },
-    { id: 'l_foot', cx: 130, cy: 465, rx: 15, ry: 12 }
+    { id: 'l_foot', cx: 130, cy: 465, rx: 15, ry: 12 },
   ],
   back: [
     { id: 'head', cx: 100, cy: 40, rx: 25, ry: 30 },
@@ -236,8 +246,8 @@ const BODY_REGIONS = {
     { id: 'r_ankle', cx: 75, cy: 445, rx: 10, ry: 10 },
     { id: 'l_ankle', cx: 125, cy: 445, rx: 10, ry: 10 },
     { id: 'r_foot', cx: 70, cy: 470, rx: 15, ry: 12 },
-    { id: 'l_foot', cx: 130, cy: 470, rx: 15, ry: 12 }
-  ]
+    { id: 'l_foot', cx: 130, cy: 470, rx: 15, ry: 12 },
+  ],
 };
 
 // SVG body outline paths
@@ -259,7 +269,7 @@ const BODY_OUTLINES = {
     M135,105 Q155,110 160,125 L170,180 L175,230 L180,280
     M65,105 L65,130 Q65,200 70,220 L70,250 Q75,280 75,300 L70,380 L65,440 L60,490
     M135,105 L135,130 Q135,200 130,220 L130,250 Q125,280 125,300 L130,380 L135,440 L140,490
-  `
+  `,
 };
 
 export default function BodyChartPanel({
@@ -268,61 +278,70 @@ export default function BodyChartPanel({
   onGenerateNarrative,
   lang = 'en',
   showNarrative = true,
-  className = ''
+  className = '',
 }) {
   const [view, setView] = useState('front');
   const [selectedSymptom, setSelectedSymptom] = useState('pain');
   const [hoveredRegion, setHoveredRegion] = useState(null);
   const [intensity, setIntensity] = useState(5);
-  const [showDetails, setShowDetails] = useState(false);
+  const [_showDetails, _setShowDetails] = useState(false);
 
   const t = LABELS[lang] || LABELS.en;
 
   // Get markers for current view
-  const currentMarkers = useMemo(() =>
-    (value.markers || []).filter(m => m.view === view),
+  const currentMarkers = useMemo(
+    () => (value.markers || []).filter((m) => m.view === view),
     [value.markers, view]
   );
 
   // Handle region click
-  const handleRegionClick = useCallback((regionId) => {
-    const existingMarkerIndex = (value.markers || []).findIndex(
-      m => m.regionId === regionId && m.view === view
-    );
+  const handleRegionClick = useCallback(
+    (regionId) => {
+      const existingMarkerIndex = (value.markers || []).findIndex(
+        (m) => m.regionId === regionId && m.view === view
+      );
 
-    let newMarkers;
-    if (existingMarkerIndex >= 0) {
-      // Remove existing marker
-      newMarkers = value.markers.filter((_, i) => i !== existingMarkerIndex);
-    } else {
-      // Add new marker
-      const newMarker = {
-        id: Date.now(),
-        regionId,
-        view,
-        symptom: selectedSymptom,
-        intensity,
-        description: ''
-      };
-      newMarkers = [...(value.markers || []), newMarker];
-    }
+      let newMarkers;
+      if (existingMarkerIndex >= 0) {
+        // Remove existing marker
+        newMarkers = value.markers.filter((_, i) => i !== existingMarkerIndex);
+      } else {
+        // Add new marker
+        const newMarker = {
+          id: Date.now(),
+          regionId,
+          view,
+          symptom: selectedSymptom,
+          intensity,
+          description: '',
+        };
+        newMarkers = [...(value.markers || []), newMarker];
+      }
 
-    onChange({ ...value, markers: newMarkers });
-  }, [value, view, selectedSymptom, intensity, onChange]);
+      onChange({ ...value, markers: newMarkers });
+    },
+    [value, view, selectedSymptom, intensity, onChange]
+  );
 
   // Update marker description
-  const updateMarkerDescription = useCallback((markerId, description) => {
-    const newMarkers = (value.markers || []).map(m =>
-      m.id === markerId ? { ...m, description } : m
-    );
-    onChange({ ...value, markers: newMarkers });
-  }, [value, onChange]);
+  const updateMarkerDescription = useCallback(
+    (markerId, description) => {
+      const newMarkers = (value.markers || []).map((m) =>
+        m.id === markerId ? { ...m, description } : m
+      );
+      onChange({ ...value, markers: newMarkers });
+    },
+    [value, onChange]
+  );
 
   // Remove marker
-  const removeMarker = useCallback((markerId) => {
-    const newMarkers = (value.markers || []).filter(m => m.id !== markerId);
-    onChange({ ...value, markers: newMarkers });
-  }, [value, onChange]);
+  const removeMarker = useCallback(
+    (markerId) => {
+      const newMarkers = (value.markers || []).filter((m) => m.id !== markerId);
+      onChange({ ...value, markers: newMarkers });
+    },
+    [value, onChange]
+  );
 
   // Clear all markers
   const clearAll = useCallback(() => {
@@ -330,22 +349,32 @@ export default function BodyChartPanel({
   }, [onChange]);
 
   // Check if region has marker
-  const hasMarker = useCallback((regionId) => {
-    return (value.markers || []).some(m => m.regionId === regionId && m.view === view);
-  }, [value.markers, view]);
+  const _hasMarker = useCallback(
+    (regionId) => {
+      return (value.markers || []).some((m) => m.regionId === regionId && m.view === view);
+    },
+    [value.markers, view]
+  );
 
   // Get marker for region
-  const getMarker = useCallback((regionId) => {
-    return (value.markers || []).find(m => m.regionId === regionId && m.view === view);
-  }, [value.markers, view]);
+  const getMarker = useCallback(
+    (regionId) => {
+      return (value.markers || []).find((m) => m.regionId === regionId && m.view === view);
+    },
+    [value.markers, view]
+  );
 
   // Generate narrative text
   const generateNarrative = useCallback(() => {
-    if (!value.markers || value.markers.length === 0) return '';
+    if (!value.markers || value.markers.length === 0) {
+      return '';
+    }
 
     const groupedByView = {};
-    value.markers.forEach(m => {
-      if (!groupedByView[m.view]) groupedByView[m.view] = [];
+    value.markers.forEach((m) => {
+      if (!groupedByView[m.view]) {
+        groupedByView[m.view] = [];
+      }
       groupedByView[m.view].push(m);
     });
 
@@ -353,13 +382,17 @@ export default function BodyChartPanel({
 
     Object.entries(groupedByView).forEach(([viewKey, markers]) => {
       const viewLabel = t[viewKey] || viewKey;
-      const regionDescriptions = markers.map(m => {
+      const regionDescriptions = markers.map((m) => {
         const regionLabel = t.regions[m.regionId] || m.regionId;
         const symptomLabel = t.symptoms[m.symptom] || m.symptom;
         let desc = `${regionLabel} (${symptomLabel}`;
-        if (m.intensity) desc += `, ${m.intensity}/10`;
+        if (m.intensity) {
+          desc += `, ${m.intensity}/10`;
+        }
         desc += ')';
-        if (m.description) desc += `: ${m.description}`;
+        if (m.description) {
+          desc += `: ${m.description}`;
+        }
         return desc;
       });
 
@@ -391,7 +424,7 @@ export default function BodyChartPanel({
           <div className="flex items-center gap-2">
             {/* View toggle */}
             <div className="flex border border-gray-300 rounded-lg overflow-hidden">
-              {['front', 'back'].map(v => (
+              {['front', 'back'].map((v) => (
                 <button
                   key={v}
                   onClick={() => setView(v)}
@@ -424,9 +457,7 @@ export default function BodyChartPanel({
         {/* Symptom selector */}
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t.symptomType}
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t.symptomType}</label>
             <div className="grid grid-cols-2 gap-1">
               {Object.entries(SYMPTOM_COLORS).map(([symptom, color]) => (
                 <button
@@ -438,10 +469,7 @@ export default function BodyChartPanel({
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
-                  <span
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: color }}
-                  />
+                  <span className="w-3 h-3 rounded-full" style={{ backgroundColor: color }} />
                   {t.symptoms[symptom]}
                 </button>
               ))}
@@ -471,10 +499,7 @@ export default function BodyChartPanel({
 
         {/* Body diagram */}
         <div className="flex justify-center items-start">
-          <svg
-            viewBox="0 0 200 500"
-            className="w-full max-w-[200px] h-auto"
-          >
+          <svg viewBox="0 0 200 500" className="w-full max-w-[200px] h-auto">
             {/* Body outline */}
             <path
               d={outline}
@@ -486,7 +511,7 @@ export default function BodyChartPanel({
             />
 
             {/* Clickable regions */}
-            {regions.map(region => {
+            {regions.map((region) => {
               const marker = getMarker(region.id);
               const isHovered = hoveredRegion === region.id;
 
@@ -497,9 +522,21 @@ export default function BodyChartPanel({
                     cy={region.cy}
                     rx={region.rx}
                     ry={region.ry}
-                    fill={marker ? SYMPTOM_COLORS[marker.symptom] : isHovered ? '#BFDBFE' : 'transparent'}
+                    fill={
+                      marker
+                        ? SYMPTOM_COLORS[marker.symptom]
+                        : isHovered
+                          ? '#BFDBFE'
+                          : 'transparent'
+                    }
                     fillOpacity={marker ? 0.6 : isHovered ? 0.5 : 0}
-                    stroke={marker ? SYMPTOM_COLORS[marker.symptom] : isHovered ? '#3B82F6' : 'transparent'}
+                    stroke={
+                      marker
+                        ? SYMPTOM_COLORS[marker.symptom]
+                        : isHovered
+                          ? '#3B82F6'
+                          : 'transparent'
+                    }
                     strokeWidth="2"
                     className="cursor-pointer transition-all"
                     onClick={() => handleRegionClick(region.id)}
@@ -533,11 +570,8 @@ export default function BodyChartPanel({
             <p className="text-sm text-gray-500 italic">{t.noMarkers}</p>
           ) : (
             <div className="space-y-2 max-h-[300px] overflow-y-auto">
-              {currentMarkers.map(marker => (
-                <div
-                  key={marker.id}
-                  className="flex items-start gap-2 p-2 bg-gray-50 rounded-lg"
-                >
+              {currentMarkers.map((marker) => (
+                <div key={marker.id} className="flex items-start gap-2 p-2 bg-gray-50 rounded-lg">
                   <span
                     className="w-4 h-4 rounded-full flex-shrink-0 mt-0.5"
                     style={{ backgroundColor: SYMPTOM_COLORS[marker.symptom] }}
@@ -599,12 +633,12 @@ export function BodyChartCompact({
   view = 'front',
   onClick,
   lang = 'en',
-  className = ''
+  className = '',
 }) {
   const t = LABELS[lang] || LABELS.en;
   const regions = BODY_REGIONS[view] || BODY_REGIONS.front;
   const outline = BODY_OUTLINES[view] || BODY_OUTLINES.front;
-  const viewMarkers = (value.markers || []).filter(m => m.view === view);
+  const viewMarkers = (value.markers || []).filter((m) => m.view === view);
 
   return (
     <div
@@ -612,15 +646,12 @@ export function BodyChartCompact({
       onClick={onClick}
     >
       <svg viewBox="0 0 200 500" className="w-full h-32">
-        <path
-          d={outline}
-          fill="none"
-          stroke="#D1D5DB"
-          strokeWidth="1.5"
-        />
-        {regions.map(region => {
-          const marker = viewMarkers.find(m => m.regionId === region.id);
-          if (!marker) return null;
+        <path d={outline} fill="none" stroke="#D1D5DB" strokeWidth="1.5" />
+        {regions.map((region) => {
+          const marker = viewMarkers.find((m) => m.regionId === region.id);
+          if (!marker) {
+            return null;
+          }
 
           return (
             <ellipse
@@ -648,7 +679,7 @@ export function QuickRegionButtons({
   onChange,
   symptom = 'pain',
   lang = 'en',
-  className = ''
+  className = '',
 }) {
   const t = LABELS[lang] || LABELS.en;
 
@@ -661,40 +692,41 @@ export function QuickRegionButtons({
     { id: 'l_shoulder', view: 'front' },
     { id: 'r_hip', view: 'front' },
     { id: 'l_hip', view: 'front' },
-    { id: 'head', view: 'front' }
+    { id: 'head', view: 'front' },
   ];
 
   const toggleRegion = (region) => {
     const existingIndex = (value.markers || []).findIndex(
-      m => m.regionId === region.id && m.view === region.view
+      (m) => m.regionId === region.id && m.view === region.view
     );
 
     let newMarkers;
     if (existingIndex >= 0) {
       newMarkers = value.markers.filter((_, i) => i !== existingIndex);
     } else {
-      newMarkers = [...(value.markers || []), {
-        id: Date.now(),
-        regionId: region.id,
-        view: region.view,
-        symptom,
-        intensity: 5,
-        description: ''
-      }];
+      newMarkers = [
+        ...(value.markers || []),
+        {
+          id: Date.now(),
+          regionId: region.id,
+          view: region.view,
+          symptom,
+          intensity: 5,
+          description: '',
+        },
+      ];
     }
 
     onChange({ ...value, markers: newMarkers });
   };
 
   const isSelected = (region) => {
-    return (value.markers || []).some(
-      m => m.regionId === region.id && m.view === region.view
-    );
+    return (value.markers || []).some((m) => m.regionId === region.id && m.view === region.view);
   };
 
   return (
     <div className={`flex flex-wrap gap-2 ${className}`}>
-      {quickRegions.map(region => (
+      {quickRegions.map((region) => (
         <button
           key={`${region.view}-${region.id}`}
           onClick={() => toggleRegion(region)}

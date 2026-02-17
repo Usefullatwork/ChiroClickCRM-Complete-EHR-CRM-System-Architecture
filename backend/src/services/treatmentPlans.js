@@ -69,7 +69,9 @@ export async function getPlan(id, orgId) {
     [id, orgId]
   );
 
-  if (planResult.rows.length === 0) return null;
+  if (planResult.rows.length === 0) {
+    return null;
+  }
 
   const plan = planResult.rows[0];
 
@@ -151,7 +153,9 @@ export async function updatePlan(id, orgId, updates) {
     params
   );
 
-  if (result.rows.length === 0) return null;
+  if (result.rows.length === 0) {
+    return null;
+  }
 
   logger.info('Treatment plan updated', { planId: id });
   return result.rows[0];
@@ -163,7 +167,9 @@ export async function updatePlan(id, orgId, updates) {
 export async function addMilestone(planId, milestoneData) {
   const { title, description, targetDate, outcomeMeasure, targetScore } = milestoneData;
 
-  if (!title) throw new Error('Milestone title is required');
+  if (!title) {
+    throw new Error('Milestone title is required');
+  }
 
   const result = await query(
     `INSERT INTO treatment_plan_milestones
@@ -227,7 +233,9 @@ export async function updateMilestone(milestoneId, updates) {
     params
   );
 
-  if (result.rows.length === 0) return null;
+  if (result.rows.length === 0) {
+    return null;
+  }
   return result.rows[0];
 }
 
@@ -237,7 +245,9 @@ export async function updateMilestone(milestoneId, updates) {
 export async function addSession(planId, sessionData) {
   const { sessionNumber, scheduledDate, notes } = sessionData;
 
-  if (!sessionNumber) throw new Error('Session number is required');
+  if (!sessionNumber) {
+    throw new Error('Session number is required');
+  }
 
   const result = await query(
     `INSERT INTO treatment_plan_sessions
@@ -266,7 +276,9 @@ export async function completeSession(sessionId, encounterData) {
     [sessionId, encounterId || null, notes || null]
   );
 
-  if (sessionResult.rows.length === 0) return null;
+  if (sessionResult.rows.length === 0) {
+    return null;
+  }
 
   const session = sessionResult.rows[0];
 
@@ -292,7 +304,9 @@ export async function getPlanProgress(planId) {
     [planId]
   );
 
-  if (planResult.rows.length === 0) return null;
+  if (planResult.rows.length === 0) {
+    return null;
+  }
 
   const plan = planResult.rows[0];
 

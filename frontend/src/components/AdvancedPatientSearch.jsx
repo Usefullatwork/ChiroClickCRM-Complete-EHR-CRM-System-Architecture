@@ -3,25 +3,25 @@
  * Comprehensive patient search with multiple filter criteria
  */
 
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
-import { patientsAPI } from '../services/api'
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { patientsAPI } from '../services/api';
 import {
   X,
   Search,
-  Filter,
+  _Filter,
   Calendar,
   User,
   Phone,
   Mail,
   MapPin,
-  Shield,
-  AlertCircle
-} from 'lucide-react'
+  _Shield,
+  AlertCircle,
+} from 'lucide-react';
 
 export default function AdvancedPatientSearch({ onClose, onSelect }) {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [filters, setFilters] = useState({
     search: '',
     ageMin: '',
@@ -33,34 +33,39 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
     has_active_consent: '',
     last_visit_from: '',
     last_visit_to: '',
-    should_be_followed_up: ''
-  })
+    should_be_followed_up: '',
+  });
 
   // Fetch patients with advanced filters
-  const { data: resultsData, isLoading, refetch } = useQuery({
+  const {
+    data: resultsData,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ['advanced-patient-search', filters],
-    queryFn: () => patientsAPI.getAll({
-      search: filters.search || undefined,
-      ageMin: filters.ageMin || undefined,
-      ageMax: filters.ageMax || undefined,
-      gender: filters.gender || undefined,
-      city: filters.city || undefined,
-      consent_treatment: filters.consent_treatment || undefined,
-      consent_marketing: filters.consent_marketing || undefined,
-      has_active_consent: filters.has_active_consent || undefined,
-      last_visit_from: filters.last_visit_from || undefined,
-      last_visit_to: filters.last_visit_to || undefined,
-      should_be_followed_up: filters.should_be_followed_up || undefined,
-      limit: 50
-    }),
-    enabled: false // Only fetch when user clicks search
-  })
+    queryFn: () =>
+      patientsAPI.getAll({
+        search: filters.search || undefined,
+        ageMin: filters.ageMin || undefined,
+        ageMax: filters.ageMax || undefined,
+        gender: filters.gender || undefined,
+        city: filters.city || undefined,
+        consent_treatment: filters.consent_treatment || undefined,
+        consent_marketing: filters.consent_marketing || undefined,
+        has_active_consent: filters.has_active_consent || undefined,
+        last_visit_from: filters.last_visit_from || undefined,
+        last_visit_to: filters.last_visit_to || undefined,
+        should_be_followed_up: filters.should_be_followed_up || undefined,
+        limit: 50,
+      }),
+    enabled: false, // Only fetch when user clicks search
+  });
 
-  const patients = resultsData?.data?.patients || []
+  const patients = resultsData?.data?.patients || [];
 
   const handleSearch = () => {
-    refetch()
-  }
+    refetch();
+  };
 
   const handleClearFilters = () => {
     setFilters({
@@ -74,18 +79,18 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
       has_active_consent: '',
       last_visit_from: '',
       last_visit_to: '',
-      should_be_followed_up: ''
-    })
-  }
+      should_be_followed_up: '',
+    });
+  };
 
   const handlePatientClick = (patient) => {
     if (onSelect) {
-      onSelect(patient)
-      onClose()
+      onSelect(patient);
+      onClose();
     } else {
-      navigate(`/patients/${patient.id}`)
+      navigate(`/patients/${patient.id}`);
     }
-  }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -96,15 +101,10 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
             <Search className="w-6 h-6 text-blue-600" />
             <div>
               <h2 className="text-2xl font-bold text-gray-900">Advanced Patient Search</h2>
-              <p className="text-sm text-gray-600">
-                Search patients using multiple criteria
-              </p>
+              <p className="text-sm text-gray-600">Search patients using multiple criteria</p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg"
-          >
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -123,7 +123,7 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
                   type="text"
                   placeholder="Search by name, email, or phone..."
                   value={filters.search}
-                  onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                  onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
                   className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -131,39 +131,33 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
 
             {/* Age Range */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Min Age
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Min Age</label>
               <input
                 type="number"
                 placeholder="e.g., 18"
                 value={filters.ageMin}
-                onChange={(e) => setFilters(prev => ({ ...prev, ageMin: e.target.value }))}
+                onChange={(e) => setFilters((prev) => ({ ...prev, ageMin: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Max Age
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Max Age</label>
               <input
                 type="number"
                 placeholder="e.g., 65"
                 value={filters.ageMax}
-                onChange={(e) => setFilters(prev => ({ ...prev, ageMax: e.target.value }))}
+                onChange={(e) => setFilters((prev) => ({ ...prev, ageMax: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             {/* Gender */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Gender
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
               <select
                 value={filters.gender}
-                onChange={(e) => setFilters(prev => ({ ...prev, gender: e.target.value }))}
+                onChange={(e) => setFilters((prev) => ({ ...prev, gender: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All</option>
@@ -175,16 +169,14 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
 
             {/* City */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                City
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
                   type="text"
                   placeholder="e.g., Oslo"
                   value={filters.city}
-                  onChange={(e) => setFilters(prev => ({ ...prev, city: e.target.value }))}
+                  onChange={(e) => setFilters((prev) => ({ ...prev, city: e.target.value }))}
                   className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -198,19 +190,19 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
               <input
                 type="date"
                 value={filters.last_visit_from}
-                onChange={(e) => setFilters(prev => ({ ...prev, last_visit_from: e.target.value }))}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, last_visit_from: e.target.value }))
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Last Visit To
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Last Visit To</label>
               <input
                 type="date"
                 value={filters.last_visit_to}
-                onChange={(e) => setFilters(prev => ({ ...prev, last_visit_to: e.target.value }))}
+                onChange={(e) => setFilters((prev) => ({ ...prev, last_visit_to: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -222,7 +214,9 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
               </label>
               <select
                 value={filters.consent_treatment}
-                onChange={(e) => setFilters(prev => ({ ...prev, consent_treatment: e.target.value }))}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, consent_treatment: e.target.value }))
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All</option>
@@ -237,7 +231,9 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
               </label>
               <select
                 value={filters.consent_marketing}
-                onChange={(e) => setFilters(prev => ({ ...prev, consent_marketing: e.target.value }))}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, consent_marketing: e.target.value }))
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All</option>
@@ -252,7 +248,9 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
               </label>
               <select
                 value={filters.should_be_followed_up}
-                onChange={(e) => setFilters(prev => ({ ...prev, should_be_followed_up: e.target.value }))}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, should_be_followed_up: e.target.value }))
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All</option>
@@ -372,5 +370,5 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
         </div>
       </div>
     </div>
-  )
+  );
 }

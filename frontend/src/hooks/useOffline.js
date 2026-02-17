@@ -27,17 +27,17 @@ import {
   getStorageStats,
   saveSetting,
   getSetting,
-  clearAllOfflineData
+  clearAllOfflineData,
 } from '../utils/offlineStorage';
 import {
-  addToSyncQueue,
-  getPendingItems,
+  _addToSyncQueue,
+  _getPendingItems,
   processSyncQueue,
   getSyncQueueStats,
   queueExerciseProgress,
   enableAutoSync,
-  triggerSync as triggerSyncQueue,
-  SYNC_TYPES
+  triggerSync as _triggerSyncQueue,
+  _SYNC_TYPES,
 } from '../utils/syncQueue';
 import logger from '../utils/logger';
 
@@ -75,15 +75,17 @@ export function useOffline(options = {}) {
     onSyncComplete,
     onSyncError,
     onOffline,
-    onOnline
+    onOnline,
   } = options;
 
   // =============================================================================
   // STATE
   // =============================================================================
 
-  const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
-  const [swRegistration, setSwRegistration] = useState(null);
+  const [isOnline, setIsOnline] = useState(
+    typeof navigator !== 'undefined' ? navigator.onLine : true
+  );
+  const [_swRegistration, setSwRegistration] = useState(null);
   const [swReady, setSwReady] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncStatus, setSyncStatus] = useState(null); // 'success', 'error', null
@@ -230,7 +232,7 @@ export function useOffline(options = {}) {
         },
         onError: (item, error) => {
           log.error(' Sync error:', error);
-        }
+        },
       });
 
       return () => {
@@ -320,7 +322,7 @@ export function useOffline(options = {}) {
       const result = await processSyncQueue({
         onProgress: (current, total) => {
           log.debug('Sync progress', { current, total });
-        }
+        },
       });
 
       const now = new Date();
@@ -363,21 +365,24 @@ export function useOffline(options = {}) {
   /**
    * Cache a prescription for offline use
    */
-  const cachePrescriptionOffline = useCallback(async (prescriptionData) => {
-    if (!token) {
-      log.error(' No token provided');
-      return false;
-    }
+  const cachePrescriptionOffline = useCallback(
+    async (prescriptionData) => {
+      if (!token) {
+        log.error(' No token provided');
+        return false;
+      }
 
-    try {
-      await cachePrescription(token, prescriptionData);
-      await updateStorageStats();
-      return true;
-    } catch (error) {
-      log.error(' Error caching prescription:', error);
-      return false;
-    }
-  }, [token, updateStorageStats]);
+      try {
+        await cachePrescription(token, prescriptionData);
+        await updateStorageStats();
+        return true;
+      } catch (error) {
+        log.error(' Error caching prescription:', error);
+        return false;
+      }
+    },
+    [token, updateStorageStats]
+  );
 
   /**
    * Get cached prescription data
@@ -395,7 +400,9 @@ export function useOffline(options = {}) {
    * Get all cached prescriptions for current token
    */
   const getCachedPrescriptions = useCallback(async () => {
-    if (!token) return [];
+    if (!token) {
+      return [];
+    }
 
     try {
       return await getCachedPrescriptionsByToken(token);
@@ -412,56 +419,62 @@ export function useOffline(options = {}) {
   /**
    * Cache a video for offline use
    */
-  const cacheVideo = useCallback(async (url, exerciseId) => {
-    if (!swReady || !navigator.serviceWorker.controller) {
-      log.warn(' Service worker not ready');
-      return false;
-    }
+  const cacheVideo = useCallback(
+    async (url, exerciseId) => {
+      if (!swReady || !navigator.serviceWorker.controller) {
+        log.warn(' Service worker not ready');
+        return false;
+      }
 
-    try {
-      // Send message to service worker to cache video
-      navigator.serviceWorker.controller.postMessage({
-        type: 'CACHE_VIDEO',
-        payload: { url }
-      });
+      try {
+        // Send message to service worker to cache video
+        navigator.serviceWorker.controller.postMessage({
+          type: 'CACHE_VIDEO',
+          payload: { url },
+        });
 
-      // Track in IndexedDB
-      // Size will be updated when video is actually cached
-      await trackCachedVideo(url, exerciseId, 0);
-      await updateCachedVideoStats();
+        // Track in IndexedDB
+        // Size will be updated when video is actually cached
+        await trackCachedVideo(url, exerciseId, 0);
+        await updateCachedVideoStats();
 
-      return true;
-    } catch (error) {
-      log.error(' Error caching video:', error);
-      return false;
-    }
-  }, [swReady, updateCachedVideoStats]);
+        return true;
+      } catch (error) {
+        log.error(' Error caching video:', error);
+        return false;
+      }
+    },
+    [swReady, updateCachedVideoStats]
+  );
 
   /**
    * Remove a cached video
    */
-  const removeCachedVideo = useCallback(async (url) => {
-    if (!swReady || !navigator.serviceWorker.controller) {
-      return false;
-    }
+  const removeCachedVideo = useCallback(
+    async (url) => {
+      if (!swReady || !navigator.serviceWorker.controller) {
+        return false;
+      }
 
-    try {
-      // Send message to service worker to remove video
-      navigator.serviceWorker.controller.postMessage({
-        type: 'REMOVE_CACHED_VIDEO',
-        payload: { url }
-      });
+      try {
+        // Send message to service worker to remove video
+        navigator.serviceWorker.controller.postMessage({
+          type: 'REMOVE_CACHED_VIDEO',
+          payload: { url },
+        });
 
-      // Remove from tracking
-      await removeCachedVideoTracking(url);
-      await updateCachedVideoStats();
+        // Remove from tracking
+        await removeCachedVideoTracking(url);
+        await updateCachedVideoStats();
 
-      return true;
-    } catch (error) {
-      log.error(' Error removing cached video:', error);
-      return false;
-    }
-  }, [swReady, updateCachedVideoStats]);
+        return true;
+      } catch (error) {
+        log.error(' Error removing cached video:', error);
+        return false;
+      }
+    },
+    [swReady, updateCachedVideoStats]
+  );
 
   /**
    * Check if a video is cached
@@ -482,32 +495,35 @@ export function useOffline(options = {}) {
   /**
    * Record exercise progress (works offline)
    */
-  const recordExerciseProgress = useCallback(async (prescriptionId, exerciseId, progressData) => {
-    try {
-      // Save locally first
-      await saveProgress({
-        prescriptionId,
-        exerciseId,
-        ...progressData
-      });
+  const recordExerciseProgress = useCallback(
+    async (prescriptionId, exerciseId, progressData) => {
+      try {
+        // Save locally first
+        await saveProgress({
+          prescriptionId,
+          exerciseId,
+          ...progressData,
+        });
 
-      // If online, queue for sync
-      if (isOnline && token) {
-        await queueExerciseProgress(token, prescriptionId, exerciseId, progressData);
-        // Trigger sync after a delay
-        setTimeout(() => triggerSync(), 1000);
-      } else {
-        // Queue for later sync
-        await queueExerciseProgress(token, prescriptionId, exerciseId, progressData);
-        await updatePendingCount();
+        // If online, queue for sync
+        if (isOnline && token) {
+          await queueExerciseProgress(token, prescriptionId, exerciseId, progressData);
+          // Trigger sync after a delay
+          setTimeout(() => triggerSync(), 1000);
+        } else {
+          // Queue for later sync
+          await queueExerciseProgress(token, prescriptionId, exerciseId, progressData);
+          await updatePendingCount();
+        }
+
+        return true;
+      } catch (error) {
+        log.error(' Error recording progress:', error);
+        return false;
       }
-
-      return true;
-    } catch (error) {
-      log.error(' Error recording progress:', error);
-      return false;
-    }
-  }, [isOnline, token, triggerSync, updatePendingCount]);
+    },
+    [isOnline, token, triggerSync, updatePendingCount]
+  );
 
   /**
    * Get today's progress for a prescription
@@ -535,7 +551,7 @@ export function useOffline(options = {}) {
       // Clear service worker caches
       if (swReady && navigator.serviceWorker.controller) {
         navigator.serviceWorker.controller.postMessage({
-          type: 'CLEAR_CACHE'
+          type: 'CLEAR_CACHE',
         });
       }
 
@@ -556,7 +572,7 @@ export function useOffline(options = {}) {
     }
 
     navigator.serviceWorker.controller.postMessage({
-      type: 'GET_CACHE_STATUS'
+      type: 'GET_CACHE_STATUS',
     });
   }, [swReady]);
 
@@ -597,7 +613,7 @@ export function useOffline(options = {}) {
     // Utilities
     clearOfflineData,
     getCacheStatus,
-    updateStorageStats
+    updateStorageStats,
   };
 }
 

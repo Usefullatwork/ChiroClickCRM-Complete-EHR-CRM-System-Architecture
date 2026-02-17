@@ -1,5 +1,15 @@
 import { useState } from 'react';
-import { Plus, X, AlertCircle, Clock, Calendar, ChevronDown, ChevronUp, Edit2, Check } from 'lucide-react';
+import {
+  Plus,
+  X,
+  AlertCircle,
+  _Clock,
+  Calendar,
+  ChevronDown,
+  ChevronUp,
+  _Edit2,
+  _Check,
+} from 'lucide-react';
 
 /**
  * ProblemList - Patient problem/condition list panel
@@ -38,32 +48,42 @@ const COMMON_CHIRO_CONDITIONS = [
 
 const CONDITION_STATUS = {
   acute: { label: 'Acute', color: 'red', bgColor: 'bg-red-100', textColor: 'text-red-800' },
-  subacute: { label: 'Subacute', color: 'orange', bgColor: 'bg-orange-100', textColor: 'text-orange-800' },
+  subacute: {
+    label: 'Subacute',
+    color: 'orange',
+    bgColor: 'bg-orange-100',
+    textColor: 'text-orange-800',
+  },
   chronic: { label: 'Chronic', color: 'blue', bgColor: 'bg-blue-100', textColor: 'text-blue-800' },
-  resolved: { label: 'Resolved', color: 'green', bgColor: 'bg-green-100', textColor: 'text-green-800' },
+  resolved: {
+    label: 'Resolved',
+    color: 'green',
+    bgColor: 'bg-green-100',
+    textColor: 'text-green-800',
+  },
 };
 
 export default function ProblemList({
   problems = [],
   onChange,
-  patientName = '',
-  compact = false,
-  className = ''
+  _patientName = '',
+  _compact = false,
+  className = '',
 }) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [editingId, setEditingId] = useState(null);
+  const [_editingId, setEditingId] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
   const [newProblem, setNewProblem] = useState({
     code: '',
     name: '',
     status: 'acute',
     onsetDate: new Date().toISOString().split('T')[0],
-    notes: ''
+    notes: '',
   });
 
-  const activeProblems = problems.filter(p => p.status !== 'resolved');
-  const resolvedProblems = problems.filter(p => p.status === 'resolved');
+  const activeProblems = problems.filter((p) => p.status !== 'resolved');
+  const resolvedProblems = problems.filter((p) => p.status === 'resolved');
 
   const addProblem = (condition) => {
     const problem = {
@@ -73,7 +93,7 @@ export default function ProblemList({
       status: 'acute',
       onsetDate: new Date().toISOString().split('T')[0],
       notes: '',
-      addedAt: new Date().toISOString()
+      addedAt: new Date().toISOString(),
     };
     onChange([...problems, problem]);
     setShowAddForm(false);
@@ -81,11 +101,13 @@ export default function ProblemList({
   };
 
   const addCustomProblem = () => {
-    if (!newProblem.name) return;
+    if (!newProblem.name) {
+      return;
+    }
     const problem = {
       id: Date.now().toString(),
       ...newProblem,
-      addedAt: new Date().toISOString()
+      addedAt: new Date().toISOString(),
     };
     onChange([...problems, problem]);
     setNewProblem({
@@ -93,27 +115,30 @@ export default function ProblemList({
       name: '',
       status: 'acute',
       onsetDate: new Date().toISOString().split('T')[0],
-      notes: ''
+      notes: '',
     });
     setShowAddForm(false);
   };
 
   const updateProblem = (id, updates) => {
-    onChange(problems.map(p => p.id === id ? { ...p, ...updates } : p));
+    onChange(problems.map((p) => (p.id === id ? { ...p, ...updates } : p)));
     setEditingId(null);
   };
 
   const removeProblem = (id) => {
-    onChange(problems.filter(p => p.id !== id));
+    onChange(problems.filter((p) => p.id !== id));
   };
 
-  const filteredConditions = COMMON_CHIRO_CONDITIONS.filter(c =>
-    c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.code.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredConditions = COMMON_CHIRO_CONDITIONS.filter(
+    (c) =>
+      c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.code.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const groupedConditions = filteredConditions.reduce((acc, c) => {
-    if (!acc[c.category]) acc[c.category] = [];
+    if (!acc[c.category]) {
+      acc[c.category] = [];
+    }
     acc[c.category].push(c);
     return acc;
   }, {});
@@ -163,7 +188,7 @@ export default function ProblemList({
                   <div key={category}>
                     <div className="text-xs font-medium text-gray-500 mb-1">{category}</div>
                     <div className="space-y-1">
-                      {conditions.map(c => (
+                      {conditions.map((c) => (
                         <button
                           key={c.code}
                           onClick={() => addProblem(c)}
@@ -178,12 +203,14 @@ export default function ProblemList({
                   </div>
                 ))}
                 {filteredConditions.length === 0 && (
-                  <p className="text-sm text-gray-500 text-center py-2">No matching conditions found</p>
+                  <p className="text-sm text-gray-500 text-center py-2">
+                    No matching conditions found
+                  </p>
                 )}
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
-                {COMMON_CHIRO_CONDITIONS.slice(0, 10).map(c => (
+                {COMMON_CHIRO_CONDITIONS.slice(0, 10).map((c) => (
                   <button
                     key={c.code}
                     onClick={() => addProblem(c)}
@@ -222,7 +249,9 @@ export default function ProblemList({
                   className="flex-1 px-2 py-1.5 text-sm border border-gray-300 rounded"
                 >
                   {Object.entries(CONDITION_STATUS).map(([key, status]) => (
-                    <option key={key} value={key}>{status.label}</option>
+                    <option key={key} value={key}>
+                      {status.label}
+                    </option>
                   ))}
                 </select>
                 <input
@@ -258,15 +287,14 @@ export default function ProblemList({
             </button>
           </div>
         ) : (
-          activeProblems.map(problem => (
-            <div
-              key={problem.id}
-              className="px-4 py-3 hover:bg-gray-50 transition-colors"
-            >
+          activeProblems.map((problem) => (
+            <div key={problem.id} className="px-4 py-3 hover:bg-gray-50 transition-colors">
               <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className={`px-2 py-0.5 text-xs font-medium rounded ${CONDITION_STATUS[problem.status].bgColor} ${CONDITION_STATUS[problem.status].textColor}`}>
+                    <span
+                      className={`px-2 py-0.5 text-xs font-medium rounded ${CONDITION_STATUS[problem.status].bgColor} ${CONDITION_STATUS[problem.status].textColor}`}
+                    >
                       {CONDITION_STATUS[problem.status].label}
                     </span>
                     {problem.code && (
@@ -290,7 +318,9 @@ export default function ProblemList({
                     className="text-xs px-1 py-0.5 border border-gray-200 rounded"
                   >
                     {Object.entries(CONDITION_STATUS).map(([key, status]) => (
-                      <option key={key} value={key}>{status.label}</option>
+                      <option key={key} value={key}>
+                        {status.label}
+                      </option>
                     ))}
                   </select>
 
@@ -331,8 +361,11 @@ export default function ProblemList({
 
           {expandedId === 'resolved' && (
             <div className="px-4 pb-3 space-y-2">
-              {resolvedProblems.map(problem => (
-                <div key={problem.id} className="flex items-center justify-between text-sm text-gray-500">
+              {resolvedProblems.map((problem) => (
+                <div
+                  key={problem.id}
+                  className="flex items-center justify-between text-sm text-gray-500"
+                >
                   <span className="line-through">{problem.name}</span>
                   <button
                     onClick={() => updateProblem(problem.id, { status: 'chronic' })}
@@ -352,24 +385,25 @@ export default function ProblemList({
 
 // Compact version for sidebar display
 export function ProblemListCompact({ problems = [], className = '' }) {
-  const activeProblems = problems.filter(p => p.status !== 'resolved');
+  const activeProblems = problems.filter((p) => p.status !== 'resolved');
 
   if (activeProblems.length === 0) {
-    return (
-      <div className={`text-sm text-gray-500 ${className}`}>
-        No active problems
-      </div>
-    );
+    return <div className={`text-sm text-gray-500 ${className}`}>No active problems</div>;
   }
 
   return (
     <div className={`space-y-1 ${className}`}>
-      {activeProblems.map(problem => (
+      {activeProblems.map((problem) => (
         <div key={problem.id} className="flex items-center gap-2 text-sm">
-          <span className={`w-2 h-2 rounded-full ${
-            problem.status === 'acute' ? 'bg-red-500' :
-            problem.status === 'subacute' ? 'bg-orange-500' : 'bg-blue-500'
-          }`}></span>
+          <span
+            className={`w-2 h-2 rounded-full ${
+              problem.status === 'acute'
+                ? 'bg-red-500'
+                : problem.status === 'subacute'
+                  ? 'bg-orange-500'
+                  : 'bg-blue-500'
+            }`}
+          ></span>
           <span className="text-gray-700 truncate">{problem.name}</span>
           <span className="text-xs text-gray-400">- {CONDITION_STATUS[problem.status].label}</span>
         </div>

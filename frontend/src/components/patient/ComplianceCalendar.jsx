@@ -6,18 +6,18 @@
  * Viser ovelsesfullforing over tid i kalenderformat
  */
 
-import React, { useState, useMemo } from 'react'
+import _React, { useState, useMemo } from 'react';
 import {
   ChevronLeft,
   ChevronRight,
-  Calendar,
+  _Calendar,
   CheckCircle,
-  XCircle,
+  _XCircle,
   Activity,
   Frown,
   Meh,
-  Smile
-} from 'lucide-react'
+  Smile,
+} from 'lucide-react';
 
 /**
  * ComplianceCalendar Component
@@ -28,159 +28,186 @@ import {
  * @param {Function} props.onDateSelect - Callback when date is selected
  * @returns {JSX.Element} Compliance calendar component
  */
-export default function ComplianceCalendar({
-  data = [],
-  onDateSelect
-}) {
-  const [currentMonth, setCurrentMonth] = useState(new Date())
-  const [selectedDate, setSelectedDate] = useState(null)
+export default function ComplianceCalendar({ data = [], onDateSelect }) {
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
 
   // Norwegian day and month names
-  const dayNames = ['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lor', 'Son']
+  const dayNames = ['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lor', 'Son'];
   const monthNames = [
-    'Januar', 'Februar', 'Mars', 'April', 'Mai', 'Juni',
-    'Juli', 'August', 'September', 'Oktober', 'November', 'Desember'
-  ]
+    'Januar',
+    'Februar',
+    'Mars',
+    'April',
+    'Mai',
+    'Juni',
+    'Juli',
+    'August',
+    'September',
+    'Oktober',
+    'November',
+    'Desember',
+  ];
 
   /**
    * Create a map of progress data by date string
    */
   const progressMap = useMemo(() => {
-    const map = new Map()
-    data.forEach(item => {
-      const dateStr = new Date(item.date).toISOString().split('T')[0]
-      map.set(dateStr, item)
-    })
-    return map
-  }, [data])
+    const map = new Map();
+    data.forEach((item) => {
+      const dateStr = new Date(item.date).toISOString().split('T')[0];
+      map.set(dateStr, item);
+    });
+    return map;
+  }, [data]);
 
   /**
    * Get calendar days for the current month
    */
   const calendarDays = useMemo(() => {
-    const year = currentMonth.getFullYear()
-    const month = currentMonth.getMonth()
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
 
     // First day of month
-    const firstDay = new Date(year, month, 1)
+    const firstDay = new Date(year, month, 1);
     // Last day of month
-    const lastDay = new Date(year, month + 1, 0)
+    const lastDay = new Date(year, month + 1, 0);
 
     // Get the day of week (0-6, where 0 is Sunday)
     // Convert to Monday = 0
-    let startDayOfWeek = firstDay.getDay() - 1
-    if (startDayOfWeek < 0) startDayOfWeek = 6
+    let startDayOfWeek = firstDay.getDay() - 1;
+    if (startDayOfWeek < 0) {
+      startDayOfWeek = 6;
+    }
 
-    const days = []
+    const days = [];
 
     // Add previous month days
     for (let i = startDayOfWeek - 1; i >= 0; i--) {
-      const date = new Date(year, month, -i)
-      days.push({ date, isCurrentMonth: false })
+      const date = new Date(year, month, -i);
+      days.push({ date, isCurrentMonth: false });
     }
 
     // Add current month days
     for (let i = 1; i <= lastDay.getDate(); i++) {
-      const date = new Date(year, month, i)
-      days.push({ date, isCurrentMonth: true })
+      const date = new Date(year, month, i);
+      days.push({ date, isCurrentMonth: true });
     }
 
     // Add next month days to complete the grid
-    const remainingDays = 42 - days.length // 6 weeks x 7 days
+    const remainingDays = 42 - days.length; // 6 weeks x 7 days
     for (let i = 1; i <= remainingDays; i++) {
-      const date = new Date(year, month + 1, i)
-      days.push({ date, isCurrentMonth: false })
+      const date = new Date(year, month + 1, i);
+      days.push({ date, isCurrentMonth: false });
     }
 
-    return days
-  }, [currentMonth])
+    return days;
+  }, [currentMonth]);
 
   /**
    * Navigate to previous month
    */
   const goToPreviousMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))
-  }
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
+  };
 
   /**
    * Navigate to next month
    */
   const goToNextMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))
-  }
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
+  };
 
   /**
    * Handle date selection
    */
   const handleDateClick = (day) => {
-    if (!day.isCurrentMonth) return
-
-    setSelectedDate(day.date)
-    if (onDateSelect) {
-      const dateStr = day.date.toISOString().split('T')[0]
-      const dayData = progressMap.get(dateStr)
-      onDateSelect(day.date, dayData)
+    if (!day.isCurrentMonth) {
+      return;
     }
-  }
+
+    setSelectedDate(day.date);
+    if (onDateSelect) {
+      const dateStr = day.date.toISOString().split('T')[0];
+      const dayData = progressMap.get(dateStr);
+      onDateSelect(day.date, dayData);
+    }
+  };
 
   /**
    * Get completion status for a day
    */
   const getDayStatus = (day) => {
-    const dateStr = day.date.toISOString().split('T')[0]
-    const dayData = progressMap.get(dateStr)
+    const dateStr = day.date.toISOString().split('T')[0];
+    const dayData = progressMap.get(dateStr);
 
-    if (!dayData) return null
+    if (!dayData) {
+      return null;
+    }
 
     return {
       completionRate: dayData.completionRate || 0,
       exercisesDone: dayData.exercisesDone || 0,
       totalPrescribed: dayData.totalPrescribed || 0,
-      avgPain: dayData.avgPain
-    }
-  }
+      avgPain: dayData.avgPain,
+    };
+  };
 
   /**
    * Get cell color based on completion rate
    */
   const getCellColor = (status) => {
-    if (!status) return ''
-    const rate = status.completionRate
-    if (rate >= 80) return 'bg-green-100 hover:bg-green-200 border-green-300'
-    if (rate >= 50) return 'bg-yellow-100 hover:bg-yellow-200 border-yellow-300'
-    if (rate > 0) return 'bg-orange-100 hover:bg-orange-200 border-orange-300'
-    return 'bg-gray-100 hover:bg-gray-200 border-gray-300'
-  }
+    if (!status) {
+      return '';
+    }
+    const rate = status.completionRate;
+    if (rate >= 80) {
+      return 'bg-green-100 hover:bg-green-200 border-green-300';
+    }
+    if (rate >= 50) {
+      return 'bg-yellow-100 hover:bg-yellow-200 border-yellow-300';
+    }
+    if (rate > 0) {
+      return 'bg-orange-100 hover:bg-orange-200 border-orange-300';
+    }
+    return 'bg-gray-100 hover:bg-gray-200 border-gray-300';
+  };
 
   /**
    * Get pain emoji
    */
   const getPainEmoji = (level) => {
-    if (!level) return null
-    if (level <= 3) return <Smile className="w-3 h-3 text-green-500" />
-    if (level <= 6) return <Meh className="w-3 h-3 text-yellow-500" />
-    return <Frown className="w-3 h-3 text-red-500" />
-  }
+    if (!level) {
+      return null;
+    }
+    if (level <= 3) {
+      return <Smile className="w-3 h-3 text-green-500" />;
+    }
+    if (level <= 6) {
+      return <Meh className="w-3 h-3 text-yellow-500" />;
+    }
+    return <Frown className="w-3 h-3 text-red-500" />;
+  };
 
   /**
    * Check if date is today
    */
   const isToday = (date) => {
-    const today = new Date()
-    return date.toDateString() === today.toDateString()
-  }
+    const today = new Date();
+    return date.toDateString() === today.toDateString();
+  };
 
   /**
    * Check if date is selected
    */
   const isSelected = (date) => {
-    return selectedDate && date.toDateString() === selectedDate.toDateString()
-  }
+    return selectedDate && date.toDateString() === selectedDate.toDateString();
+  };
 
   // Get selected date details
   const selectedDateData = selectedDate
     ? progressMap.get(selectedDate.toISOString().split('T')[0])
-    : null
+    : null;
 
   return (
     <div className="space-y-4">
@@ -206,10 +233,7 @@ export default function ComplianceCalendar({
       {/* Day Headers */}
       <div className="grid grid-cols-7 gap-1">
         {dayNames.map((day) => (
-          <div
-            key={day}
-            className="text-center text-xs font-medium text-gray-500 py-2"
-          >
+          <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
             {day}
           </div>
         ))}
@@ -218,9 +242,9 @@ export default function ComplianceCalendar({
       {/* Calendar Grid */}
       <div className="grid grid-cols-7 gap-1">
         {calendarDays.map((day, index) => {
-          const status = getDayStatus(day)
-          const cellColor = getCellColor(status)
-          const isFutureDate = day.date > new Date()
+          const status = getDayStatus(day);
+          const cellColor = getCellColor(status);
+          const isFutureDate = day.date > new Date();
 
           return (
             <button
@@ -238,11 +262,13 @@ export default function ComplianceCalendar({
                 ${isFutureDate ? 'opacity-50 cursor-not-allowed' : ''}
               `}
             >
-              <span className={`
+              <span
+                className={`
                 text-sm font-medium
                 ${day.isCurrentMonth ? 'text-gray-900' : 'text-gray-400'}
                 ${isToday(day.date) ? 'text-blue-600' : ''}
-              `}>
+              `}
+              >
                 {day.date.getDate()}
               </span>
 
@@ -258,7 +284,7 @@ export default function ComplianceCalendar({
                 </div>
               )}
             </button>
-          )
+          );
         })}
       </div>
 
@@ -290,7 +316,7 @@ export default function ComplianceCalendar({
               weekday: 'long',
               year: 'numeric',
               month: 'long',
-              day: 'numeric'
+              day: 'numeric',
             })}
           </h4>
           {selectedDateData ? (
@@ -335,12 +361,10 @@ export default function ComplianceCalendar({
               )}
             </div>
           ) : (
-            <p className="text-sm text-gray-500">
-              Ingen treningsdata registrert for denne dagen
-            </p>
+            <p className="text-sm text-gray-500">Ingen treningsdata registrert for denne dagen</p>
           )}
         </div>
       )}
     </div>
-  )
+  );
 }

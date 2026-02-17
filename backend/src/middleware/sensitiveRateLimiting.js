@@ -9,8 +9,8 @@ import logger from '../utils/logger.js';
 /**
  * Create a custom rate limiter with logging
  */
-const createLimiter = (options) => {
-  return rateLimit({
+const createLimiter = (options) =>
+  rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
     handler: (req, res) => {
@@ -30,7 +30,6 @@ const createLimiter = (options) => {
     },
     ...options,
   });
-};
 
 /**
  * Rate limiter for GDPR data access requests

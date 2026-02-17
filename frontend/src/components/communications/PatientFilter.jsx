@@ -197,10 +197,11 @@ export default function PatientFilter({
     // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      result = result.filter((p) =>
-        `${p.firstName} ${p.lastName}`.toLowerCase().includes(query) ||
-        p.phone?.toLowerCase().includes(query) ||
-        p.email?.toLowerCase().includes(query)
+      result = result.filter(
+        (p) =>
+          `${p.firstName} ${p.lastName}`.toLowerCase().includes(query) ||
+          p.phone?.toLowerCase().includes(query) ||
+          p.email?.toLowerCase().includes(query)
       );
     }
 
@@ -218,18 +219,30 @@ export default function PatientFilter({
     if (lastVisitPreset) {
       const { from, to } = getDateRangeFromPreset(lastVisitPreset);
       result = result.filter((p) => {
-        if (!p.lastVisitDate) return false;
+        if (!p.lastVisitDate) {
+          return false;
+        }
         const visitDate = new Date(p.lastVisitDate);
-        if (from && visitDate < from) return false;
-        if (to && visitDate > to) return false;
+        if (from && visitDate < from) {
+          return false;
+        }
+        if (to && visitDate > to) {
+          return false;
+        }
         return true;
       });
     } else if (customDateFrom || customDateTo) {
       result = result.filter((p) => {
-        if (!p.lastVisitDate) return false;
+        if (!p.lastVisitDate) {
+          return false;
+        }
         const visitDate = new Date(p.lastVisitDate);
-        if (customDateFrom && visitDate < new Date(customDateFrom)) return false;
-        if (customDateTo && visitDate > new Date(customDateTo)) return false;
+        if (customDateFrom && visitDate < new Date(customDateFrom)) {
+          return false;
+        }
+        if (customDateTo && visitDate > new Date(customDateTo)) {
+          return false;
+        }
         return true;
       });
     }
@@ -326,17 +339,13 @@ export default function PatientFilter({
 
   const handleStatusToggle = (status) => {
     setSelectedStatus((prev) =>
-      prev.includes(status)
-        ? prev.filter((s) => s !== status)
-        : [...prev, status]
+      prev.includes(status) ? prev.filter((s) => s !== status) : [...prev, status]
     );
   };
 
   const handleCategoryToggle = (category) => {
     setSelectedCategories((prev) =>
-      prev.includes(category)
-        ? prev.filter((c) => c !== category)
-        : [...prev, category]
+      prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]
     );
   };
 
@@ -618,9 +627,7 @@ export default function PatientFilter({
                   key={patient.id}
                   onClick={() => canContact && handleTogglePatient(patient.id)}
                   className={`px-4 py-3 flex items-center gap-3 transition-colors ${
-                    canContact
-                      ? 'cursor-pointer hover:bg-gray-50'
-                      : 'opacity-50 cursor-not-allowed'
+                    canContact ? 'cursor-pointer hover:bg-gray-50' : 'opacity-50 cursor-not-allowed'
                   } ${isSelected ? 'bg-blue-50' : ''}`}
                 >
                   {/* Checkbox */}
@@ -629,8 +636,8 @@ export default function PatientFilter({
                       isSelected
                         ? 'bg-blue-600 border-blue-600'
                         : canContact
-                        ? 'border-gray-300'
-                        : 'border-gray-200'
+                          ? 'border-gray-300'
+                          : 'border-gray-200'
                     }`}
                   >
                     {isSelected && <Check className="w-3 h-3 text-white" />}
@@ -685,8 +692,8 @@ export default function PatientFilter({
                       {communicationType === 'SMS' && !patient.phone
                         ? t.noContact
                         : communicationType === 'EMAIL' && !patient.email
-                        ? t.noContact
-                        : t.noConsent}
+                          ? t.noContact
+                          : t.noConsent}
                     </span>
                   )}
                 </div>
@@ -704,7 +711,7 @@ export function PatientFilterCompact({
   patients = [],
   selectedPatients = [],
   onSelectionChange,
-  communicationType = 'SMS',
+  _communicationType = 'SMS',
   language = 'no',
   className = '',
 }) {
@@ -717,7 +724,9 @@ export function PatientFilterCompact({
   const t = labels[language] || labels.no;
 
   const filteredPatients = useMemo(() => {
-    if (!searchQuery) return patients;
+    if (!searchQuery) {
+      return patients;
+    }
     const query = searchQuery.toLowerCase();
     return patients.filter(
       (p) =>

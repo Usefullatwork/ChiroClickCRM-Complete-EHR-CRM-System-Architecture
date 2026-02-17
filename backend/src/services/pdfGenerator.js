@@ -75,7 +75,9 @@ let cachedBoldFontPath = null;
 let fontChecked = false;
 
 const findFont = () => {
-  if (fontChecked) return;
+  if (fontChecked) {
+    return;
+  }
   fontChecked = true;
 
   const candidates = [
@@ -109,7 +111,9 @@ const findFont = () => {
 };
 
 const fontName = (bold = false) => {
-  if (cachedFontPath) return bold ? 'Unicode-Bold' : 'Unicode';
+  if (cachedFontPath) {
+    return bold ? 'Unicode-Bold' : 'Unicode';
+  }
   return bold ? 'Helvetica-Bold' : 'Helvetica';
 };
 
@@ -119,9 +123,13 @@ const fontName = (bold = false) => {
  * Format date as dd.mm.yyyy (Norwegian convention)
  */
 export function formatNorwegianDate(date) {
-  if (!date) return '';
+  if (!date) {
+    return '';
+  }
   const d = new Date(date);
-  if (isNaN(d.getTime())) return '';
+  if (isNaN(d.getTime())) {
+    return '';
+  }
   const dd = String(d.getDate()).padStart(2, '0');
   const mm = String(d.getMonth() + 1).padStart(2, '0');
   const yyyy = d.getFullYear();
@@ -132,7 +140,9 @@ export function formatNorwegianDate(date) {
  * Format amount as Norwegian currency: "1 234,50 kr"
  */
 export function formatNorwegianCurrency(amount) {
-  if (amount == null) return '0,00 kr';
+  if (amount === null || amount === undefined) {
+    return '0,00 kr';
+  }
   const num = Number(amount);
   const parts = num.toFixed(2).split('.');
   const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
@@ -199,9 +209,15 @@ function addHeader(doc, clinic, title) {
         : clinic.address;
     doc.text(addr);
   }
-  if (clinic.phone) doc.text(`${TEXT.PHONE}: ${clinic.phone}`);
-  if (clinic.email) doc.text(clinic.email);
-  if (clinic.org_number) doc.text(`${TEXT.ORG_NR}: ${clinic.org_number}`);
+  if (clinic.phone) {
+    doc.text(`${TEXT.PHONE}: ${clinic.phone}`);
+  }
+  if (clinic.email) {
+    doc.text(clinic.email);
+  }
+  if (clinic.org_number) {
+    doc.text(`${TEXT.ORG_NR}: ${clinic.org_number}`);
+  }
 
   // Title (right side)
   doc.fontSize(20).font(f).text(title, 300, 30, { width: 245, align: 'right' });
@@ -318,7 +334,9 @@ function sectionHeading(doc, text) {
  * Draw a labeled value: "Label: Value"
  */
 function labeledValue(doc, label, value) {
-  if (!value) return;
+  if (!value) {
+    return;
+  }
   doc.font(fontName(true)).text(`${label}: `, { continued: true });
   doc.font(fontName(false)).text(String(value));
 }
@@ -361,7 +379,9 @@ export async function generateTreatmentSummary(patientId, orgId, options = {}) {
     [patientId, orgId]
   );
 
-  if (patientRes.rows.length === 0) throw new Error('Patient not found');
+  if (patientRes.rows.length === 0) {
+    throw new Error('Patient not found');
+  }
   const patient = patientRes.rows[0];
 
   const clinic = {
@@ -416,8 +436,12 @@ export async function generateTreatmentSummary(patientId, orgId, options = {}) {
   const allIcd = [...new Set(encounters.flatMap((e) => e.icd10_codes || []))];
   if (allIcpc.length > 0 || allIcd.length > 0) {
     sectionHeading(doc, TEXT.DIAGNOSIS);
-    if (allIcpc.length > 0) labeledValue(doc, 'ICPC-2', allIcpc.join(', '));
-    if (allIcd.length > 0) labeledValue(doc, 'ICD-10', allIcd.join(', '));
+    if (allIcpc.length > 0) {
+      labeledValue(doc, 'ICPC-2', allIcpc.join(', '));
+    }
+    if (allIcd.length > 0) {
+      labeledValue(doc, 'ICD-10', allIcd.join(', '));
+    }
     doc.moveDown(0.8);
   }
 
@@ -560,7 +584,7 @@ export async function generateTreatmentSummary(patientId, orgId, options = {}) {
  */
 export async function generateReferralLetter(referralData) {
   const {
-    patientId,
+    _patientId,
     orgId,
     encounterId,
     recipientName,
@@ -584,7 +608,9 @@ export async function generateReferralLetter(referralData) {
     [encounterId, orgId]
   );
 
-  if (res.rows.length === 0) throw new Error('Encounter not found');
+  if (res.rows.length === 0) {
+    throw new Error('Encounter not found');
+  }
   const data = res.rows[0];
 
   const clinic = {
@@ -616,15 +642,21 @@ export async function generateReferralLetter(referralData) {
         : clinic.address;
     doc.text(addr);
   }
-  if (data.hpr_number) doc.text(`${TEXT.HPR_NR}: ${data.hpr_number}`);
-  if (clinic.phone) doc.text(`${TEXT.PHONE}: ${clinic.phone}`);
+  if (data.hpr_number) {
+    doc.text(`${TEXT.HPR_NR}: ${data.hpr_number}`);
+  }
+  if (clinic.phone) {
+    doc.text(`${TEXT.PHONE}: ${clinic.phone}`);
+  }
 
   // ── Recipient block ──
   doc.moveDown(1.5);
   doc.fontSize(10).font(fb).text(`${TEXT.TO}:`);
   doc.font(f);
   doc.text(recipientName || '[Spesialist / Avdeling]');
-  if (recipientAddress) doc.text(recipientAddress);
+  if (recipientAddress) {
+    doc.text(recipientAddress);
+  }
 
   // ── Date (right side) ──
   doc
@@ -648,7 +680,9 @@ export async function generateReferralLetter(referralData) {
   const icpc = data.icpc_codes?.join(', ') || 'Ikke spesifisert';
   const icd = data.icd10_codes?.join(', ');
   labeledValue(doc, 'ICPC-2', icpc);
-  if (icd) labeledValue(doc, 'ICD-10', icd);
+  if (icd) {
+    labeledValue(doc, 'ICD-10', icd);
+  }
   doc.moveDown(0.5);
 
   // ── Clinical findings ──
@@ -680,13 +714,15 @@ export async function generateReferralLetter(referralData) {
 
   // ── Signature block ──
   doc.moveDown(2);
-  doc.font(f).text(TEXT.REGARDS + ',');
+  doc.font(f).text(`${TEXT.REGARDS},`);
   doc.moveDown(2);
   doc.moveTo(50, doc.y).lineTo(220, doc.y).stroke();
   doc.moveDown(0.3);
   doc.font(fb).text(data.practitioner_name || '');
   doc.font(f).text(TEXT.CHIROPRACTOR);
-  if (data.hpr_number) doc.text(`${TEXT.HPR_NR}: ${data.hpr_number}`);
+  if (data.hpr_number) {
+    doc.text(`${TEXT.HPR_NR}: ${data.hpr_number}`);
+  }
   doc.text(`${TEXT.DATE}: ${formatNorwegianDate(new Date())}`);
 
   addFooter(doc, clinic);
@@ -699,12 +735,24 @@ export async function generateReferralLetter(referralData) {
 /** Build clinical findings text from encounter objective data */
 function buildFindingsText(data) {
   const parts = [];
-  if (data.subjective?.history) parts.push(`${TEXT.HISTORY}: ${data.subjective.history}`);
-  if (data.objective?.observation) parts.push(`${TEXT.OBSERVATION}: ${data.objective.observation}`);
-  if (data.objective?.palpation) parts.push(`${TEXT.PALPATION}: ${data.objective.palpation}`);
-  if (data.objective?.ortho_tests) parts.push(`${TEXT.ORTHO_TESTS}: ${data.objective.ortho_tests}`);
-  if (data.objective?.neuro_tests) parts.push(`${TEXT.NEURO_TESTS}: ${data.objective.neuro_tests}`);
-  if (data.objective?.rom) parts.push(`${TEXT.ROM}: ${data.objective.rom}`);
+  if (data.subjective?.history) {
+    parts.push(`${TEXT.HISTORY}: ${data.subjective.history}`);
+  }
+  if (data.objective?.observation) {
+    parts.push(`${TEXT.OBSERVATION}: ${data.objective.observation}`);
+  }
+  if (data.objective?.palpation) {
+    parts.push(`${TEXT.PALPATION}: ${data.objective.palpation}`);
+  }
+  if (data.objective?.ortho_tests) {
+    parts.push(`${TEXT.ORTHO_TESTS}: ${data.objective.ortho_tests}`);
+  }
+  if (data.objective?.neuro_tests) {
+    parts.push(`${TEXT.NEURO_TESTS}: ${data.objective.neuro_tests}`);
+  }
+  if (data.objective?.rom) {
+    parts.push(`${TEXT.ROM}: ${data.objective.rom}`);
+  }
   return parts.join('\n') || 'Se pasientjournal.';
 }
 
@@ -757,7 +805,9 @@ export async function generateSickNote(sickNoteData) {
     [patientId, orgId, encounterId]
   );
 
-  if (res.rows.length === 0) throw new Error('Patient not found');
+  if (res.rows.length === 0) {
+    throw new Error('Patient not found');
+  }
   const data = res.rows[0];
 
   const clinic = {
@@ -784,7 +834,9 @@ export async function generateSickNote(sickNoteData) {
 
   labeledValue(doc, 'Navn', `${data.first_name} ${data.last_name}`);
   labeledValue(doc, TEXT.DOB, formatNorwegianDate(data.date_of_birth));
-  if (data.phone) labeledValue(doc, TEXT.PHONE, data.phone);
+  if (data.phone) {
+    labeledValue(doc, TEXT.PHONE, data.phone);
+  }
 
   const addr = data.address;
   if (addr) {
@@ -833,13 +885,15 @@ export async function generateSickNote(sickNoteData) {
   doc.moveTo(50, doc.y).lineTo(545, doc.y).lineWidth(0.5).stroke('#cccccc');
   doc.moveDown(1);
 
-  doc.font(f).text(TEXT.REGARDS + ',');
+  doc.font(f).text(`${TEXT.REGARDS},`);
   doc.moveDown(2);
   doc.moveTo(50, doc.y).lineTo(220, doc.y).stroke();
   doc.moveDown(0.3);
   doc.font(fb).text(data.practitioner_name || '');
   doc.font(f).text(TEXT.CHIROPRACTOR);
-  if (data.hpr_number) doc.text(`${TEXT.HPR_NR}: ${data.hpr_number}`);
+  if (data.hpr_number) {
+    doc.text(`${TEXT.HPR_NR}: ${data.hpr_number}`);
+  }
   doc.text(`${TEXT.DATE}: ${formatNorwegianDate(new Date())}`);
 
   addFooter(doc, clinic);
@@ -894,7 +948,9 @@ export async function generateInvoice(invoiceData) {
     [patientId, orgId]
   );
 
-  if (res.rows.length === 0) throw new Error('Patient not found');
+  if (res.rows.length === 0) {
+    throw new Error('Patient not found');
+  }
   const data = res.rows[0];
 
   const clinic = {
@@ -928,8 +984,12 @@ export async function generateInvoice(invoiceData) {
         : clinic.address;
     doc.text(addr);
   }
-  if (clinic.phone) doc.text(`${TEXT.PHONE}: ${clinic.phone}`);
-  if (clinic.org_number) doc.text(`${TEXT.ORG_NR}: ${clinic.org_number}`);
+  if (clinic.phone) {
+    doc.text(`${TEXT.PHONE}: ${clinic.phone}`);
+  }
+  if (clinic.org_number) {
+    doc.text(`${TEXT.ORG_NR}: ${clinic.org_number}`);
+  }
 
   // Invoice title (right)
   doc.fontSize(24).font(fb).text(TEXT.INVOICE, 350, 30, { width: 195, align: 'right' });
@@ -1037,15 +1097,18 @@ export async function generateInvoice(invoiceData) {
   doc.moveDown(1.5);
 
   // ── Payment info ──
-  doc
-    .fontSize(10)
-    .font(fb)
-    .text(TEXT.PAYMENT_INFO + ':');
+  doc.fontSize(10).font(fb).text(`${TEXT.PAYMENT_INFO}:`);
   doc.font(f).fontSize(9);
-  if (accountNumber) doc.text(`${TEXT.ACCOUNT_NR}: ${accountNumber}`);
-  if (kidNumber) doc.text(`${TEXT.KID_NR}: ${kidNumber}`);
+  if (accountNumber) {
+    doc.text(`${TEXT.ACCOUNT_NR}: ${accountNumber}`);
+  }
+  if (kidNumber) {
+    doc.text(`${TEXT.KID_NR}: ${kidNumber}`);
+  }
   doc.text(`${TEXT.DUE_DATE}: ${formatNorwegianDate(due)}`);
-  if (clinic.org_number) doc.text(`${TEXT.ORG_NR}: ${clinic.org_number}`);
+  if (clinic.org_number) {
+    doc.text(`${TEXT.ORG_NR}: ${clinic.org_number}`);
+  }
 
   addFooter(doc, clinic);
 

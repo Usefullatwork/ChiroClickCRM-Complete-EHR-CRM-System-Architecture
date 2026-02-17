@@ -5,12 +5,12 @@
 import express from 'express';
 import * as financialController from '../controllers/financial.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
-import { validate } from '../middleware/validation.js';
+import { _validate } from '../middleware/validation.js';
 import {
-  createFinancialMetricSchema,
-  updatePaymentStatusSchema,
-  getFinancialMetricsSchema,
-  getRevenueSummarySchema,
+  _createFinancialMetricSchema,
+  _updatePaymentStatusSchema,
+  _getFinancialMetricsSchema,
+  _getRevenueSummarySchema,
 } from '../validators/financial.validators.js';
 
 const router = express.Router();

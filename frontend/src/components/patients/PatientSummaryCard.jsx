@@ -5,9 +5,11 @@ import { useTranslation } from '../../i18n';
 
 export default function PatientSummaryCard({ patient, patientId }) {
   const navigate = useNavigate();
-  const { t } = useTranslation('patients');
+  const { _t } = useTranslation('patients');
 
-  if (!patient) return null;
+  if (!patient) {
+    return null;
+  }
 
   const age = calculateAge(patient.date_of_birth);
   const hasRedFlags = patient.red_flags && patient.red_flags.length > 0;

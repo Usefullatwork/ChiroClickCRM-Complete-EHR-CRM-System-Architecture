@@ -12,7 +12,9 @@ export const useTheme = () => {
   const [theme, setThemeState] = useState(() => {
     // Check localStorage first
     const stored = localStorage.getItem(THEME_KEY);
-    if (stored === 'dark' || stored === 'light') return stored;
+    if (stored === 'dark' || stored === 'light') {
+      return stored;
+    }
 
     // Fall back to system preference
     if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) {
@@ -37,7 +39,7 @@ export const useTheme = () => {
   }, []);
 
   const toggleTheme = useCallback(() => {
-    setThemeState(prev => prev === 'dark' ? 'light' : 'dark');
+    setThemeState((prev) => (prev === 'dark' ? 'light' : 'dark'));
   }, []);
 
   const isDark = theme === 'dark';

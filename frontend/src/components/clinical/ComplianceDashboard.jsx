@@ -17,7 +17,9 @@ export default function ComplianceDashboard({ patientId }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!patientId) return;
+    if (!patientId) {
+      return;
+    }
 
     const fetchData = async () => {
       setLoading(true);
@@ -37,11 +39,15 @@ export default function ComplianceDashboard({ patientId }) {
 
   // Calculate overall compliance
   const overallCompliance = useMemo(() => {
-    if (!prescriptions.length) return 0;
+    if (!prescriptions.length) {
+      return 0;
+    }
     const activePrescriptions = prescriptions.filter(
       (p) => p.status === 'active' || p.status === 'in_progress'
     );
-    if (!activePrescriptions.length) return 0;
+    if (!activePrescriptions.length) {
+      return 0;
+    }
     const total = activePrescriptions.reduce(
       (sum, p) => sum + (p.compliance_percentage || p.compliancePercentage || 0),
       0
@@ -83,7 +89,10 @@ export default function ComplianceDashboard({ patientId }) {
     for (const p of prescriptions) {
       const logs = p.compliance_logs || p.complianceLogs || [];
       for (const log of logs) {
-        if (log.pain_level != null || log.painLevel != null) {
+        if (
+          (log.pain_level !== null && log.pain_level !== undefined) ||
+          (log.painLevel !== null && log.painLevel !== undefined)
+        ) {
           entries.push({
             date: log.date || log.logged_at,
             level: log.pain_level ?? log.painLevel,

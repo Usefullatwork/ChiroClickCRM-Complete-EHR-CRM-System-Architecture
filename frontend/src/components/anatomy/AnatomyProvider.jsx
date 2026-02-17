@@ -7,7 +7,7 @@
  * - Template data from API
  * - Text insertion callback
  */
-import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import _React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { spineTemplatesAPI } from '../../services/api';
 
@@ -17,21 +17,21 @@ const AnatomyContext = createContext(null);
 export const VIEW_MODES = {
   SVG_2D: '2d',
   THREE_3D: '3d',
-  HYBRID: 'hybrid' // Side-by-side
+  HYBRID: 'hybrid', // Side-by-side
 };
 
 // Default findings structure
 const defaultFindings = {
-  spine: {},      // { "C5_subluxation_left": { vertebra, type, side, timestamp } }
-  body: [],       // ["lower_back", "r_shoulder"]
-  painMarkers: [] // [{ x, y, view, type, intensity }]
+  spine: {}, // { "C5_subluxation_left": { vertebra, type, side, timestamp } }
+  body: [], // ["lower_back", "r_shoulder"]
+  painMarkers: [], // [{ x, y, view, type, intensity }]
 };
 
 export function AnatomyProvider({
   children,
   onInsertText,
   initialFindings = defaultFindings,
-  language = 'NO'
+  language = 'NO',
 }) {
   // View state
   const [viewMode, setViewMode] = useState(VIEW_MODES.SVG_2D);
@@ -46,7 +46,7 @@ export function AnatomyProvider({
     queryFn: () => spineTemplatesAPI.getGrouped(language),
     staleTime: 5 * 60 * 1000,
     cacheTime: 30 * 60 * 1000,
-    retry: 1
+    retry: 1,
   });
 
   const templates = useMemo(() => {
@@ -56,7 +56,7 @@ export function AnatomyProvider({
   // Spine findings management
   const addSpineFinding = useCallback((vertebra, type, side) => {
     const key = `${vertebra}_${type}_${side}`;
-    setFindings(prev => ({
+    setFindings((prev) => ({
       ...prev,
       spine: {
         ...prev.spine,
@@ -64,15 +64,15 @@ export function AnatomyProvider({
           vertebra,
           type,
           side,
-          timestamp: new Date().toISOString()
-        }
-      }
+          timestamp: new Date().toISOString(),
+        },
+      },
     }));
   }, []);
 
   const removeSpineFinding = useCallback((vertebra, type, side) => {
     const key = `${vertebra}_${type}_${side}`;
-    setFindings(prev => {
+    setFindings((prev) => {
       const newSpine = { ...prev.spine };
       delete newSpine[key];
       return { ...prev, spine: newSpine };
@@ -81,7 +81,7 @@ export function AnatomyProvider({
 
   const toggleSpineFinding = useCallback((vertebra, type, side) => {
     const key = `${vertebra}_${type}_${side}`;
-    setFindings(prev => {
+    setFindings((prev) => {
       if (prev.spine[key]) {
         const newSpine = { ...prev.spine };
         delete newSpine[key];
@@ -95,9 +95,9 @@ export function AnatomyProvider({
               vertebra,
               type,
               side,
-              timestamp: new Date().toISOString()
-            }
-          }
+              timestamp: new Date().toISOString(),
+            },
+          },
         };
       }
     });
@@ -105,33 +105,34 @@ export function AnatomyProvider({
 
   // Body region management
   const toggleBodyRegion = useCallback((regionId) => {
-    setFindings(prev => {
+    setFindings((prev) => {
       const isSelected = prev.body.includes(regionId);
       return {
         ...prev,
-        body: isSelected
-          ? prev.body.filter(r => r !== regionId)
-          : [...prev.body, regionId]
+        body: isSelected ? prev.body.filter((r) => r !== regionId) : [...prev.body, regionId],
       };
     });
   }, []);
 
   // Pain marker management
   const addPainMarker = useCallback((marker) => {
-    setFindings(prev => ({
+    setFindings((prev) => ({
       ...prev,
-      painMarkers: [...prev.painMarkers, {
-        ...marker,
-        id: Date.now(),
-        timestamp: new Date().toISOString()
-      }]
+      painMarkers: [
+        ...prev.painMarkers,
+        {
+          ...marker,
+          id: Date.now(),
+          timestamp: new Date().toISOString(),
+        },
+      ],
     }));
   }, []);
 
   const removePainMarker = useCallback((markerId) => {
-    setFindings(prev => ({
+    setFindings((prev) => ({
       ...prev,
-      painMarkers: prev.painMarkers.filter(m => m.id !== markerId)
+      painMarkers: prev.painMarkers.filter((m) => m.id !== markerId),
     }));
   }, []);
 
@@ -142,15 +143,15 @@ export function AnatomyProvider({
 
   // Clear specific category
   const clearSpineFindings = useCallback(() => {
-    setFindings(prev => ({ ...prev, spine: {} }));
+    setFindings((prev) => ({ ...prev, spine: {} }));
   }, []);
 
   const clearBodyRegions = useCallback(() => {
-    setFindings(prev => ({ ...prev, body: [] }));
+    setFindings((prev) => ({ ...prev, body: [] }));
   }, []);
 
   const clearPainMarkers = useCallback(() => {
-    setFindings(prev => ({ ...prev, painMarkers: [] }));
+    setFindings((prev) => ({ ...prev, painMarkers: [] }));
   }, []);
 
   // Generate clinical narrative from findings
@@ -161,29 +162,31 @@ export function AnatomyProvider({
     if (spineFindings.length > 0) {
       // Group by type
       const grouped = {};
-      spineFindings.forEach(f => {
-        if (!grouped[f.type]) grouped[f.type] = [];
+      spineFindings.forEach((f) => {
+        if (!grouped[f.type]) {
+          grouped[f.type] = [];
+        }
         grouped[f.type].push(f);
       });
 
       // Subluxations
       if (grouped.subluxation) {
-        const items = grouped.subluxation.map(f =>
-          `${f.side !== 'central' ? f.side + ' ' : ''}${f.vertebra}`
+        const items = grouped.subluxation.map(
+          (f) => `${f.side !== 'central' ? `${f.side} ` : ''}${f.vertebra}`
         );
         narratives.push(`Subluksasjoner/Restriksjoner: ${items.join(', ')}`);
       }
 
       // Fixations
       if (grouped.fixation) {
-        const items = grouped.fixation.map(f => f.vertebra);
+        const items = grouped.fixation.map((f) => f.vertebra);
         narratives.push(`Fiksasjoner: ${items.join(', ')}`);
       }
 
       // Tenderness
       if (grouped.tenderness) {
-        const items = grouped.tenderness.map(f =>
-          `${f.side !== 'central' ? f.side + ' ' : ''}${f.vertebra}`
+        const items = grouped.tenderness.map(
+          (f) => `${f.side !== 'central' ? `${f.side} ` : ''}${f.vertebra}`
         );
         narratives.push(`Ømhet/Palpasjonssmerte: ${items.join(', ')}`);
       }
@@ -197,14 +200,20 @@ export function AnatomyProvider({
   }, [findings]);
 
   // Helper to check if vertebra has any finding
-  const hasSpineFinding = useCallback((vertebra) => {
-    return Object.values(findings.spine).some(f => f.vertebra === vertebra);
-  }, [findings.spine]);
+  const hasSpineFinding = useCallback(
+    (vertebra) => {
+      return Object.values(findings.spine).some((f) => f.vertebra === vertebra);
+    },
+    [findings.spine]
+  );
 
   // Get all findings for a vertebra
-  const getVertebraFindings = useCallback((vertebra) => {
-    return Object.values(findings.spine).filter(f => f.vertebra === vertebra);
-  }, [findings.spine]);
+  const getVertebraFindings = useCallback(
+    (vertebra) => {
+      return Object.values(findings.spine).filter((f) => f.vertebra === vertebra);
+    },
+    [findings.spine]
+  );
 
   const value = {
     // View state
@@ -246,14 +255,10 @@ export function AnatomyProvider({
 
     // Text insertion
     onInsertText,
-    language
+    language,
   };
 
-  return (
-    <AnatomyContext.Provider value={value}>
-      {children}
-    </AnatomyContext.Provider>
-  );
+  return <AnatomyContext.Provider value={value}>{children}</AnatomyContext.Provider>;
 }
 
 export function useAnatomy() {

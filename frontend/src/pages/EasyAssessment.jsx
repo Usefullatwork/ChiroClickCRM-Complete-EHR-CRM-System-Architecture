@@ -33,7 +33,7 @@ import {
   AIScribe,
   AISettings,
   AIStatusIndicator,
-  QUESTIONNAIRE_TYPES,
+  _QUESTIONNAIRE_TYPES,
 } from '../components/assessment';
 
 import useEasyAssessmentState from '../hooks/useEasyAssessmentState';
@@ -576,21 +576,21 @@ export default function EasyAssessment() {
         onClose={() => setShowTemplatePicker(false)}
         onSelectTemplate={(text) => {
           if (activeTab === 'subjective') {
-            updateField('subjective', 'history', encounterData.subjective.history + '\n' + text);
+            updateField('subjective', 'history', `${encounterData.subjective.history}\n${text}`);
           } else if (activeTab === 'objective') {
             updateField(
               'objective',
               'observation',
-              encounterData.objective.observation + '\n' + text
+              `${encounterData.objective.observation}\n${text}`
             );
           } else if (activeTab === 'assessment') {
             updateField(
               'assessment',
               'clinical_reasoning',
-              encounterData.assessment.clinical_reasoning + '\n' + text
+              `${encounterData.assessment.clinical_reasoning}\n${text}`
             );
           } else if (activeTab === 'plan') {
-            updateField('plan', 'treatment', encounterData.plan.treatment + '\n' + text);
+            updateField('plan', 'treatment', `${encounterData.plan.treatment}\n${text}`);
           }
         }}
         soapSection={activeTab}
@@ -653,7 +653,7 @@ export default function EasyAssessment() {
                         'subjective',
                         'chief_complaint',
                         (encounterData.subjective.chief_complaint
-                          ? encounterData.subjective.chief_complaint + '\n'
+                          ? `${encounterData.subjective.chief_complaint}\n`
                           : '') + template.content.subjective
                       );
                     }
@@ -662,7 +662,7 @@ export default function EasyAssessment() {
                         'subjective',
                         'history',
                         (encounterData.subjective.history
-                          ? encounterData.subjective.history + '\n'
+                          ? `${encounterData.subjective.history}\n`
                           : '') + template.content.history
                       );
                     }
@@ -672,7 +672,7 @@ export default function EasyAssessment() {
                         'objective',
                         'observation',
                         (encounterData.objective.observation
-                          ? encounterData.objective.observation + '\n'
+                          ? `${encounterData.objective.observation}\n`
                           : '') + template.content.objective
                       );
                     }
@@ -682,7 +682,7 @@ export default function EasyAssessment() {
                         'assessment',
                         'clinical_reasoning',
                         (encounterData.assessment.clinical_reasoning
-                          ? encounterData.assessment.clinical_reasoning + '\n'
+                          ? `${encounterData.assessment.clinical_reasoning}\n`
                           : '') + template.content.assessment
                       );
                     }
@@ -691,7 +691,7 @@ export default function EasyAssessment() {
                       updateField(
                         'plan',
                         'treatment',
-                        (encounterData.plan.treatment ? encounterData.plan.treatment + '\n' : '') +
+                        (encounterData.plan.treatment ? `${encounterData.plan.treatment}\n` : '') +
                           template.content.plan
                       );
                     }
@@ -822,7 +822,7 @@ export default function EasyAssessment() {
                       'subjective',
                       'chief_complaint',
                       (encounterData.subjective.chief_complaint
-                        ? encounterData.subjective.chief_complaint + '\n'
+                        ? `${encounterData.subjective.chief_complaint}\n`
                         : '') + sections.subjective
                     );
                   }
@@ -831,7 +831,7 @@ export default function EasyAssessment() {
                       'objective',
                       'observation',
                       (encounterData.objective.observation
-                        ? encounterData.objective.observation + '\n'
+                        ? `${encounterData.objective.observation}\n`
                         : '') + sections.objective
                     );
                   }
@@ -840,7 +840,7 @@ export default function EasyAssessment() {
                       'assessment',
                       'clinical_reasoning',
                       (encounterData.assessment.clinical_reasoning
-                        ? encounterData.assessment.clinical_reasoning + '\n'
+                        ? `${encounterData.assessment.clinical_reasoning}\n`
                         : '') + sections.assessment
                     );
                   }
@@ -848,7 +848,7 @@ export default function EasyAssessment() {
                     updateField(
                       'plan',
                       'treatment',
-                      (encounterData.plan.treatment ? encounterData.plan.treatment + '\n' : '') +
+                      (encounterData.plan.treatment ? `${encounterData.plan.treatment}\n` : '') +
                         sections.plan
                     );
                   }
@@ -860,7 +860,7 @@ export default function EasyAssessment() {
                       'subjective',
                       'chief_complaint',
                       (encounterData.subjective.chief_complaint
-                        ? encounterData.subjective.chief_complaint + '\n'
+                        ? `${encounterData.subjective.chief_complaint}\n`
                         : '') + transcript
                     );
                   } else if (activeTab === 'objective') {
@@ -868,7 +868,7 @@ export default function EasyAssessment() {
                       'objective',
                       'observation',
                       (encounterData.objective.observation
-                        ? encounterData.objective.observation + '\n'
+                        ? `${encounterData.objective.observation}\n`
                         : '') + transcript
                     );
                   } else if (activeTab === 'assessment') {
@@ -876,14 +876,14 @@ export default function EasyAssessment() {
                       'assessment',
                       'clinical_reasoning',
                       (encounterData.assessment.clinical_reasoning
-                        ? encounterData.assessment.clinical_reasoning + '\n'
+                        ? `${encounterData.assessment.clinical_reasoning}\n`
                         : '') + transcript
                     );
                   } else if (activeTab === 'plan') {
                     updateField(
                       'plan',
                       'treatment',
-                      (encounterData.plan.treatment ? encounterData.plan.treatment + '\n' : '') +
+                      (encounterData.plan.treatment ? `${encounterData.plan.treatment}\n` : '') +
                         transcript
                     );
                   }

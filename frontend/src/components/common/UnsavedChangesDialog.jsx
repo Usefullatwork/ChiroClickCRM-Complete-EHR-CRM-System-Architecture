@@ -3,7 +3,9 @@
  * Shows a confirmation dialog when the user tries to navigate away with unsaved changes.
  */
 export default function UnsavedChangesDialog({ isBlocked, onProceed, onCancel }) {
-  if (!isBlocked) return null;
+  if (!isBlocked) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center">

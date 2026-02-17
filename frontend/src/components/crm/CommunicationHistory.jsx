@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import _React, { useState, useEffect } from 'react';
 import {
   Mail,
   MessageSquare,
@@ -7,7 +7,7 @@ import {
   Calendar,
   FileText,
   Search,
-  Filter,
+  _Filter,
   ChevronRight,
   Clock,
   User,
@@ -94,14 +94,14 @@ const CommunicationHistory = () => {
   }, [selectedType]);
 
   // Log new communication
-  const handleLogCommunication = async (commData) => {
+  const _handleLogCommunication = async (commData) => {
     try {
       const response = await crmAPI.logCommunication(commData);
       setCommunications((prev) => [response.data, ...prev]);
       setShowNewMessage(false);
     } catch (err) {
       logger.error('Error logging communication:', err);
-      toast.error('Failed to log communication: ' + err.message);
+      toast.error(`Failed to log communication: ${err.message}`);
     }
   };
 

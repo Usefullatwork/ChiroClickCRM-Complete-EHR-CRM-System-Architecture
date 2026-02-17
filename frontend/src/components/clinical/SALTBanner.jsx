@@ -3,7 +3,7 @@
  * Shows when a similar previous encounter is found
  */
 
-import React from 'react';
+import _React from 'react';
 import { ClipboardCopy, X, ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function SALTBanner({
@@ -12,20 +12,20 @@ export default function SALTBanner({
   onApplySection,
   onDismiss,
   isExpanded,
-  onToggleExpand
+  onToggleExpand,
 }) {
-  if (!previousEncounter) return null;
+  if (!previousEncounter) {
+    return null;
+  }
 
   const encounterDate = new Date(previousEncounter.encounter_date);
-  const daysSince = Math.floor(
-    (new Date() - encounterDate) / (1000 * 60 * 60 * 24)
-  );
+  const daysSince = Math.floor((new Date() - encounterDate) / (1000 * 60 * 60 * 24));
 
   const formatDate = (date) => {
     return date.toLocaleDateString('nb-NO', {
       day: 'numeric',
       month: 'short',
-      year: 'numeric'
+      year: 'numeric',
     });
   };
 
@@ -38,9 +38,7 @@ export default function SALTBanner({
             <ClipboardCopy className="w-5 h-5 text-blue-600" />
           </div>
           <div>
-            <p className="font-medium text-blue-900">
-              Lignende konsultasjon funnet
-            </p>
+            <p className="font-medium text-blue-900">Lignende konsultasjon funnet</p>
             <p className="text-sm text-blue-700">
               {formatDate(encounterDate)} ({daysSince} {daysSince === 1 ? 'dag' : 'dager'} siden)
             </p>
@@ -83,18 +81,21 @@ export default function SALTBanner({
                 subjective: 'Subjektivt',
                 objective: 'Objektivt',
                 assessment: 'Vurdering',
-                plan: 'Plan'
+                plan: 'Plan',
               };
               const colors = {
                 subjective: 'blue',
                 objective: 'emerald',
                 assessment: 'amber',
-                plan: 'purple'
+                plan: 'purple',
               };
-              const hasContent = previousEncounter[section] &&
-                Object.values(previousEncounter[section]).some(v => v && v.length > 0);
+              const hasContent =
+                previousEncounter[section] &&
+                Object.values(previousEncounter[section]).some((v) => v && v.length > 0);
 
-              if (!hasContent) return null;
+              if (!hasContent) {
+                return null;
+              }
 
               return (
                 <button

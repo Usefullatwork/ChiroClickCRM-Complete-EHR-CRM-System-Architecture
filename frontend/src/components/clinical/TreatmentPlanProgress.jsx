@@ -2,7 +2,7 @@
  * TreatmentPlanProgress - Shows plan progress with session tracking and milestone checklist
  */
 
-import React, { useState, useEffect } from 'react';
+import _React, { useState, useEffect } from 'react';
 import {
   Target,
   Calendar,
@@ -80,14 +80,18 @@ function PlanCard({ plan, onUpdate }) {
       // Refresh detail
       const res = await treatmentPlansAPI.getPlan(plan.id);
       setDetail(res.data);
-      if (onUpdate) onUpdate();
+      if (onUpdate) {
+        onUpdate();
+      }
     } catch {
       // Silently fail
     }
   };
 
   const formatDate = (d) => {
-    if (!d) return '';
+    if (!d) {
+      return '';
+    }
     return new Date(d).toLocaleDateString('nb-NO', {
       day: '2-digit',
       month: 'short',
@@ -173,7 +177,9 @@ function PlanCard({ plan, onUpdate }) {
                         <span className="text-xs text-gray-400 ml-2">
                           {ms.outcome_measure}
                           {ms.target_score && ` <= ${ms.target_score}`}
-                          {ms.actual_score != null && ` (actual: ${ms.actual_score})`}
+                          {ms.actual_score !== null &&
+                            ms.actual_score !== undefined &&
+                            ` (actual: ${ms.actual_score})`}
                         </span>
                       )}
                     </div>
@@ -229,7 +235,9 @@ export default function TreatmentPlanProgress({ patientId }) {
   const [error, setError] = useState(null);
 
   const loadPlans = async () => {
-    if (!patientId) return;
+    if (!patientId) {
+      return;
+    }
     setLoading(true);
     setError(null);
     try {

@@ -23,7 +23,7 @@ import {
   Users,
   Smartphone,
   CheckCircle2,
-  AlertCircle,
+  _AlertCircle,
   X,
   Download,
   ArrowLeft,
@@ -31,7 +31,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { Card, CardHeader, CardBody, CardFooter } from '../ui/Card';
+import { Card, CardHeader, CardBody, _CardFooter } from '../ui/Card';
 import { Alert } from '../ui/Alert';
 import { Modal } from '../ui/Modal';
 import CSVColumnMapper from './CSVColumnMapper';
@@ -79,7 +79,8 @@ const TRANSLATIONS = {
       description: 'Copy and paste patient data from other sources',
       placeholder: 'Paste patient data here...',
       parseText: 'Parse Data',
-      instructions: 'Copy patient data from Solvit or Excel and paste below. Supports table format and single patient data.',
+      instructions:
+        'Copy patient data from Solvit or Excel and paste below. Supports table format and single patient data.',
     },
     importResults: {
       title: 'Import Complete',
@@ -142,7 +143,8 @@ const TRANSLATIONS = {
       description: 'Kopier og lim inn pasientdata fra andre kilder',
       placeholder: 'Lim inn pasientdata her...',
       parseText: 'Behandle Data',
-      instructions: 'Kopier pasientdata fra Solvit eller Excel og lim inn nedenfor. Stotter tabellformat og enkeltpasientdata.',
+      instructions:
+        'Kopier pasientdata fra Solvit eller Excel og lim inn nedenfor. Stotter tabellformat og enkeltpasientdata.',
     },
     importResults: {
       title: 'Import Fullfort',
@@ -200,8 +202,9 @@ export default function ImportWizard({
   // Import mutation for patients
   const importMutation = useMutation({
     mutationFn: async (patients) => {
-      const response = await api.patients.bulkCreate?.(patients) ||
-        Promise.all(patients.map(p => api.patients.create(p)));
+      const response =
+        (await api.patients.bulkCreate?.(patients)) ||
+        Promise.all(patients.map((p) => api.patients.create(p)));
       return response;
     },
     onSuccess: (data) => {
@@ -358,12 +361,7 @@ export default function ImportWizard({
         {/* Template download */}
         <Alert variant="info" title={t.excelTab.downloadTemplate}>
           <p className="mb-3">{t.excelTab.templateInfo}</p>
-          <Button
-            variant="secondary"
-            size="sm"
-            icon={Download}
-            onClick={handleDownloadTemplate}
-          >
+          <Button variant="secondary" size="sm" icon={Download} onClick={handleDownloadTemplate}>
             {t.excelTab.downloadTemplate}
           </Button>
         </Alert>
@@ -371,9 +369,10 @@ export default function ImportWizard({
         {/* File upload */}
         <div
           className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors cursor-pointer
-            ${dragActive
-              ? 'border-teal-500 bg-teal-50'
-              : 'border-slate-300 hover:border-slate-400 hover:bg-slate-50'
+            ${
+              dragActive
+                ? 'border-teal-500 bg-teal-50'
+                : 'border-slate-300 hover:border-slate-400 hover:bg-slate-50'
             }`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
@@ -385,9 +384,7 @@ export default function ImportWizard({
           <p className="text-lg font-medium text-slate-700 mb-2">
             {file ? file.name : t.excelTab.dropzone}
           </p>
-          <p className="text-sm text-slate-500">
-            {t.excelTab.supportedFormats}
-          </p>
+          <p className="text-sm text-slate-500">{t.excelTab.supportedFormats}</p>
           <input
             id="excel-file-input"
             type="file"
@@ -406,23 +403,12 @@ export default function ImportWizard({
                   <FileSpreadsheet className="w-8 h-8 text-teal-600" />
                   <div>
                     <p className="font-medium text-slate-900">{file.name}</p>
-                    <p className="text-sm text-slate-500">
-                      {(file.size / 1024).toFixed(2)} KB
-                    </p>
+                    <p className="text-sm text-slate-500">{(file.size / 1024).toFixed(2)} KB</p>
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    icon={X}
-                    onClick={() => setFile(null)}
-                  />
-                  <Button
-                    variant="primary"
-                    icon={ArrowRight}
-                    onClick={() => setStep(2)}
-                  >
+                  <Button variant="ghost" size="sm" icon={X} onClick={() => setFile(null)} />
+                  <Button variant="primary" icon={ArrowRight} onClick={() => setStep(2)}>
                     {t.buttons.next}
                   </Button>
                 </div>
@@ -450,12 +436,8 @@ export default function ImportWizard({
     return (
       <div className="text-center py-12">
         <Users className="w-16 h-16 text-blue-400 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-slate-900 mb-2">
-          {t.googleTab.title}
-        </h3>
-        <p className="text-slate-500 mb-6">
-          {t.googleTab.description}
-        </p>
+        <h3 className="text-lg font-semibold text-slate-900 mb-2">{t.googleTab.title}</h3>
+        <p className="text-slate-500 mb-6">{t.googleTab.description}</p>
         <Button
           variant="primary"
           icon={Users}
@@ -474,14 +456,10 @@ export default function ImportWizard({
   const renderTextTab = () => {
     return (
       <div className="space-y-4">
-        <Alert variant="info">
-          {t.textTab.instructions}
-        </Alert>
+        <Alert variant="info">{t.textTab.instructions}</Alert>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
-            {t.textTab.title}
-          </label>
+          <label className="block text-sm font-medium text-slate-700 mb-2">{t.textTab.title}</label>
           <textarea
             value={pastedText}
             onChange={(e) => setPastedText(e.target.value)}
@@ -505,7 +483,9 @@ export default function ImportWizard({
 
   // Review step
   const renderReviewStep = () => {
-    if (!mappedData) return null;
+    if (!mappedData) {
+      return null;
+    }
 
     const { data, validation } = mappedData;
 
@@ -520,15 +500,11 @@ export default function ImportWizard({
             <p className="text-sm text-teal-700">Ready to Import</p>
           </div>
           <div className="p-4 bg-red-50 rounded-lg text-center">
-            <p className="text-2xl font-bold text-red-600">
-              {validation?.invalid?.length || 0}
-            </p>
+            <p className="text-2xl font-bold text-red-600">{validation?.invalid?.length || 0}</p>
             <p className="text-sm text-red-700">{t.importResults.errors}</p>
           </div>
           <div className="p-4 bg-amber-50 rounded-lg text-center">
-            <p className="text-2xl font-bold text-amber-600">
-              {validation?.warnings?.length || 0}
-            </p>
+            <p className="text-2xl font-bold text-amber-600">{validation?.warnings?.length || 0}</p>
             <p className="text-sm text-amber-700">Warnings</p>
           </div>
         </div>
@@ -568,11 +544,7 @@ export default function ImportWizard({
 
         {/* Action buttons */}
         <div className="flex justify-between">
-          <Button
-            variant="secondary"
-            icon={ArrowLeft}
-            onClick={() => setStep(1)}
-          >
+          <Button variant="secondary" icon={ArrowLeft} onClick={() => setStep(1)}>
             {t.buttons.back}
           </Button>
           <Button
@@ -591,42 +563,34 @@ export default function ImportWizard({
 
   // Results step
   const renderResultsStep = () => {
-    if (!importResults) return null;
+    if (!importResults) {
+      return null;
+    }
 
     return (
       <div className="space-y-6">
         {/* Success header */}
         <div className="text-center">
           <CheckCircle2 className="w-16 h-16 text-teal-500 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-slate-900">
-            {t.importResults.title}
-          </h3>
+          <h3 className="text-xl font-semibold text-slate-900">{t.importResults.title}</h3>
         </div>
 
         {/* Result cards */}
         <div className="grid grid-cols-4 gap-4">
           <div className="p-4 bg-teal-50 rounded-lg text-center">
-            <p className="text-2xl font-bold text-teal-600">
-              {importResults.imported}
-            </p>
+            <p className="text-2xl font-bold text-teal-600">{importResults.imported}</p>
             <p className="text-sm text-teal-700">{t.importResults.imported}</p>
           </div>
           <div className="p-4 bg-blue-50 rounded-lg text-center">
-            <p className="text-2xl font-bold text-blue-600">
-              {importResults.updated}
-            </p>
+            <p className="text-2xl font-bold text-blue-600">{importResults.updated}</p>
             <p className="text-sm text-blue-700">{t.importResults.updated}</p>
           </div>
           <div className="p-4 bg-amber-50 rounded-lg text-center">
-            <p className="text-2xl font-bold text-amber-600">
-              {importResults.skipped}
-            </p>
+            <p className="text-2xl font-bold text-amber-600">{importResults.skipped}</p>
             <p className="text-sm text-amber-700">{t.importResults.skipped}</p>
           </div>
           <div className="p-4 bg-red-50 rounded-lg text-center">
-            <p className="text-2xl font-bold text-red-600">
-              {importResults.errors.length}
-            </p>
+            <p className="text-2xl font-bold text-red-600">{importResults.errors.length}</p>
             <p className="text-sm text-red-700">{t.importResults.errors}</p>
           </div>
         </div>
@@ -636,11 +600,7 @@ export default function ImportWizard({
           <Alert variant="warning">
             <div className="flex items-center justify-between">
               <span>{importResults.errors.length} errors occurred during import</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowErrorsModal(true)}
-              >
+              <Button variant="ghost" size="sm" onClick={() => setShowErrorsModal(true)}>
                 {t.importResults.viewErrors}
               </Button>
             </div>
@@ -675,9 +635,7 @@ export default function ImportWizard({
             <h1 className="text-2xl font-bold text-slate-900">{t.title}</h1>
             <p className="text-slate-500">{t.subtitle}</p>
           </div>
-          {onClose && (
-            <Button variant="ghost" icon={X} onClick={onClose} />
-          )}
+          {onClose && <Button variant="ghost" icon={X} onClick={onClose} />}
         </div>
       </div>
 
@@ -686,14 +644,15 @@ export default function ImportWizard({
         <>
           {/* Tabs */}
           <div className="flex gap-2 mb-6 border-b border-slate-200">
-            {IMPORT_TABS.map(tab => (
+            {IMPORT_TABS.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-4 py-3 font-medium transition-colors flex items-center gap-2
-                  ${activeTab === tab.id
-                    ? `text-${tab.color}-600 border-b-2 border-${tab.color}-600`
-                    : 'text-slate-600 hover:text-slate-900'
+                  ${
+                    activeTab === tab.id
+                      ? `text-${tab.color}-600 border-b-2 border-${tab.color}-600`
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
               >
                 <tab.icon className="w-5 h-5" />
@@ -704,9 +663,7 @@ export default function ImportWizard({
 
           {/* Tab content */}
           <Card>
-            <CardBody className="p-6">
-              {renderTabContent()}
-            </CardBody>
+            <CardBody className="p-6">{renderTabContent()}</CardBody>
           </Card>
         </>
       )}
@@ -726,18 +683,14 @@ export default function ImportWizard({
       {/* Step 3: Review */}
       {step === 3 && (
         <Card>
-          <CardBody className="p-6">
-            {renderReviewStep()}
-          </CardBody>
+          <CardBody className="p-6">{renderReviewStep()}</CardBody>
         </Card>
       )}
 
       {/* Step 4: Results */}
       {step === 4 && (
         <Card>
-          <CardBody className="p-6">
-            {renderResultsStep()}
-          </CardBody>
+          <CardBody className="p-6">{renderResultsStep()}</CardBody>
         </Card>
       )}
 
@@ -750,7 +703,10 @@ export default function ImportWizard({
       >
         <div className="space-y-2 max-h-64 overflow-y-auto">
           {importResults?.errors.map((error, idx) => (
-            <div key={idx} className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+            <div
+              key={idx}
+              className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700"
+            >
               {error}
             </div>
           ))}

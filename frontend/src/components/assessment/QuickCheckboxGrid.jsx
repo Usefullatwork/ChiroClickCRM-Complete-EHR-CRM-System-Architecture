@@ -18,37 +18,37 @@ export default function QuickCheckboxGrid({
   onChange,
   columns = 3,
   showGeneratedText = true,
-  className = ''
+  className = '',
 }) {
   const [expandedCategories, setExpandedCategories] = useState(
     Object.keys(categories).reduce((acc, key) => ({ ...acc, [key]: true }), {})
   );
 
   const toggleCategory = (category) => {
-    setExpandedCategories(prev => ({
+    setExpandedCategories((prev) => ({
       ...prev,
-      [category]: !prev[category]
+      [category]: !prev[category],
     }));
   };
 
   const toggleValue = (value) => {
     const newValues = selectedValues.includes(value)
-      ? selectedValues.filter(v => v !== value)
+      ? selectedValues.filter((v) => v !== value)
       : [...selectedValues, value];
     onChange(newValues);
   };
 
   const selectAll = (category) => {
     const categoryItems = categories[category];
-    const allSelected = categoryItems.every(item => selectedValues.includes(item.value));
+    const allSelected = categoryItems.every((item) => selectedValues.includes(item.value));
 
     if (allSelected) {
       // Deselect all in category
-      onChange(selectedValues.filter(v => !categoryItems.some(item => item.value === v)));
+      onChange(selectedValues.filter((v) => !categoryItems.some((item) => item.value === v)));
     } else {
       // Select all in category
       const newValues = [...selectedValues];
-      categoryItems.forEach(item => {
+      categoryItems.forEach((item) => {
         if (!newValues.includes(item.value)) {
           newValues.push(item.value);
         }
@@ -63,13 +63,15 @@ export default function QuickCheckboxGrid({
 
   // Generate human-readable text from selections
   const generateText = () => {
-    if (selectedValues.length === 0) return '';
+    if (selectedValues.length === 0) {
+      return '';
+    }
 
     const groupedSelections = {};
     Object.entries(categories).forEach(([categoryName, items]) => {
-      const selected = items.filter(item => selectedValues.includes(item.value));
+      const selected = items.filter((item) => selectedValues.includes(item.value));
       if (selected.length > 0) {
-        groupedSelections[categoryName] = selected.map(item => item.label);
+        groupedSelections[categoryName] = selected.map((item) => item.label);
       }
     });
 
@@ -84,14 +86,9 @@ export default function QuickCheckboxGrid({
       <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200 rounded-t-lg">
         <h3 className="font-medium text-gray-900">{title}</h3>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500">
-            {selectedValues.length} selected
-          </span>
+          <span className="text-sm text-gray-500">{selectedValues.length} selected</span>
           {selectedValues.length > 0 && (
-            <button
-              onClick={clearAll}
-              className="text-sm text-red-600 hover:text-red-800"
-            >
+            <button onClick={clearAll} className="text-sm text-red-600 hover:text-red-800">
               Clear
             </button>
           )}
@@ -102,7 +99,7 @@ export default function QuickCheckboxGrid({
       <div className="divide-y divide-gray-100">
         {Object.entries(categories).map(([categoryName, items]) => {
           const isExpanded = expandedCategories[categoryName];
-          const selectedCount = items.filter(item => selectedValues.includes(item.value)).length;
+          const selectedCount = items.filter((item) => selectedValues.includes(item.value)).length;
           const allSelected = items.length > 0 && selectedCount === items.length;
 
           return (
@@ -144,8 +141,11 @@ export default function QuickCheckboxGrid({
 
               {/* Category Items */}
               {isExpanded && (
-                <div className={`px-4 pb-3 grid gap-2`} style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>
-                  {items.map(item => {
+                <div
+                  className={`px-4 pb-3 grid gap-2`}
+                  style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
+                >
+                  {items.map((item) => {
                     const isSelected = selectedValues.includes(item.value);
                     return (
                       <button
@@ -157,11 +157,11 @@ export default function QuickCheckboxGrid({
                             : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
                         }`}
                       >
-                        <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 ${
-                          isSelected
-                            ? 'bg-blue-600 border-blue-600'
-                            : 'border-gray-300'
-                        }`}>
+                        <div
+                          className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 ${
+                            isSelected ? 'bg-blue-600 border-blue-600' : 'border-gray-300'
+                          }`}
+                        >
                           {isSelected && <Check className="w-3 h-3 text-white" />}
                         </div>
                         <span className="truncate">{item.label}</span>
@@ -205,51 +205,51 @@ export const PAIN_QUALITY_OPTIONS = {
     { value: 'localized', label: 'Localized' },
     { value: 'referred', label: 'Referred' },
     { value: 'numbness', label: 'Numbness/Tingling' },
-  ]
+  ],
 };
 
 export const AGGRAVATING_FACTORS_OPTIONS = {
-  'Positions': [
+  Positions: [
     { value: 'sitting', label: 'Sitting' },
     { value: 'standing', label: 'Standing' },
     { value: 'lying', label: 'Lying down' },
     { value: 'walking', label: 'Walking' },
   ],
-  'Movements': [
+  Movements: [
     { value: 'bending_forward', label: 'Bending forward' },
     { value: 'bending_backward', label: 'Bending backward' },
     { value: 'twisting', label: 'Twisting' },
     { value: 'lifting', label: 'Lifting' },
     { value: 'reaching', label: 'Reaching overhead' },
   ],
-  'Activities': [
+  Activities: [
     { value: 'prolonged_sitting', label: 'Prolonged sitting' },
     { value: 'driving', label: 'Driving' },
     { value: 'computer_work', label: 'Computer work' },
     { value: 'physical_activity', label: 'Physical activity' },
     { value: 'coughing', label: 'Coughing/Sneezing' },
-  ]
+  ],
 };
 
 export const RELIEVING_FACTORS_OPTIONS = {
-  'Positions': [
+  Positions: [
     { value: 'rest', label: 'Rest' },
     { value: 'lying_down', label: 'Lying down' },
     { value: 'sitting', label: 'Sitting' },
     { value: 'standing', label: 'Standing' },
     { value: 'position_change', label: 'Changing position' },
   ],
-  'Treatments': [
+  Treatments: [
     { value: 'heat', label: 'Heat' },
     { value: 'ice', label: 'Ice' },
     { value: 'medication', label: 'Medication' },
     { value: 'stretching', label: 'Stretching' },
     { value: 'massage', label: 'Massage' },
-  ]
+  ],
 };
 
 export const OBSERVATION_FINDINGS_OPTIONS = {
-  'Posture': [
+  Posture: [
     { value: 'forward_head', label: 'Forward head posture' },
     { value: 'rounded_shoulders', label: 'Rounded shoulders' },
     { value: 'increased_kyphosis', label: 'Increased thoracic kyphosis' },
@@ -259,20 +259,20 @@ export const OBSERVATION_FINDINGS_OPTIONS = {
     { value: 'pelvic_tilt', label: 'Pelvic tilt' },
     { value: 'leg_length_diff', label: 'Leg length discrepancy' },
   ],
-  'Gait': [
+  Gait: [
     { value: 'gait_normal', label: 'Normal gait' },
     { value: 'antalgic_gait', label: 'Antalgic gait' },
     { value: 'limping', label: 'Limping' },
     { value: 'shuffling', label: 'Shuffling' },
     { value: 'guarded_movement', label: 'Guarded movement' },
   ],
-  'Appearance': [
+  Appearance: [
     { value: 'swelling', label: 'Swelling' },
     { value: 'bruising', label: 'Bruising' },
     { value: 'muscle_atrophy', label: 'Muscle atrophy' },
     { value: 'muscle_spasm', label: 'Visible muscle spasm' },
     { value: 'skin_changes', label: 'Skin changes' },
-  ]
+  ],
 };
 
 export const PALPATION_FINDINGS_OPTIONS = {
@@ -295,7 +295,7 @@ export const PALPATION_FINDINGS_OPTIONS = {
     { value: 'cool', label: 'Cool to touch' },
     { value: 'edema', label: 'Edema' },
     { value: 'fibrosis', label: 'Fibrotic changes' },
-  ]
+  ],
 };
 
 export const ROM_FINDINGS_OPTIONS = {
@@ -321,7 +321,7 @@ export const ROM_FINDINGS_OPTIONS = {
     { value: 'deviation', label: 'Deviation during movement' },
     { value: 'centralization', label: 'Centralization' },
     { value: 'peripheralization', label: 'Peripheralization' },
-  ]
+  ],
 };
 
 export const ORTHO_TESTS_OPTIONS = {
@@ -349,11 +349,11 @@ export const ORTHO_TESTS_OPTIONS = {
     { value: 'gaenslen_pos', label: "Gaenslen's positive" },
     { value: 'si_compression_pos', label: 'SI compression positive' },
     { value: 'si_distraction_pos', label: 'SI distraction positive' },
-  ]
+  ],
 };
 
 export const NEURO_TESTS_OPTIONS = {
-  'Reflexes': [
+  Reflexes: [
     { value: 'reflex_normal', label: 'Reflexes normal' },
     { value: 'reflex_diminished', label: 'Reflexes diminished' },
     { value: 'reflex_hyperactive', label: 'Reflexes hyperactive' },
@@ -362,7 +362,7 @@ export const NEURO_TESTS_OPTIONS = {
     { value: 'biceps_diminished', label: 'Biceps diminished' },
     { value: 'triceps_diminished', label: 'Triceps diminished' },
   ],
-  'Sensation': [
+  Sensation: [
     { value: 'sensation_normal', label: 'Sensation normal' },
     { value: 'sensation_diminished', label: 'Sensation diminished' },
     { value: 'dermatomal_deficit', label: 'Dermatomal deficit' },
@@ -374,11 +374,11 @@ export const NEURO_TESTS_OPTIONS = {
     { value: 'myotomal_weakness', label: 'Myotomal weakness' },
     { value: 'foot_drop', label: 'Foot drop' },
     { value: 'grip_weakness', label: 'Grip weakness' },
-  ]
+  ],
 };
 
 export const TREATMENT_OPTIONS = {
-  'Manipulation': [
+  Manipulation: [
     { value: 'hvla_cervical', label: 'HVLA - Cervical' },
     { value: 'hvla_thoracic', label: 'HVLA - Thoracic' },
     { value: 'hvla_lumbar', label: 'HVLA - Lumbar' },
@@ -397,7 +397,7 @@ export const TREATMENT_OPTIONS = {
     { value: 'dry_needling', label: 'Dry needling' },
     { value: 'stretching', label: 'Assisted stretching' },
   ],
-  'Modalities': [
+  Modalities: [
     { value: 'ultrasound', label: 'Ultrasound' },
     { value: 'electrical_stim', label: 'Electrical stimulation' },
     { value: 'tens', label: 'TENS' },
@@ -405,11 +405,11 @@ export const TREATMENT_OPTIONS = {
     { value: 'ice_therapy', label: 'Ice/cryotherapy' },
     { value: 'laser_therapy', label: 'Laser therapy' },
     { value: 'traction', label: 'Traction' },
-  ]
+  ],
 };
 
 export const EXERCISE_OPTIONS = {
-  'Stretches': [
+  Stretches: [
     { value: 'neck_stretches', label: 'Neck stretches' },
     { value: 'upper_trap_stretch', label: 'Upper trap stretch' },
     { value: 'levator_scap_stretch', label: 'Levator scapulae stretch' },
@@ -419,7 +419,7 @@ export const EXERCISE_OPTIONS = {
     { value: 'hip_flexor_stretch', label: 'Hip flexor stretch' },
     { value: 'hamstring_stretch', label: 'Hamstring stretch' },
   ],
-  'Strengthening': [
+  Strengthening: [
     { value: 'chin_tucks', label: 'Chin tucks' },
     { value: 'scapular_retraction', label: 'Scapular retraction' },
     { value: 'core_bracing', label: 'Core bracing/activation' },
@@ -436,7 +436,7 @@ export const EXERCISE_OPTIONS = {
     { value: 'walking_program', label: 'Walking program' },
     { value: 'ice_at_home', label: 'Ice application at home' },
     { value: 'heat_at_home', label: 'Heat application at home' },
-  ]
+  ],
 };
 
 // ============================================================================
@@ -470,103 +470,103 @@ export const SHOULDER_ROM_OPTIONS = {
     { value: 'sh_pain_end_range', label: 'Pain at end range' },
     { value: 'sh_pain_throughout', label: 'Pain throughout range' },
     { value: 'sh_crepitus', label: 'Crepitus with motion' },
-  ]
+  ],
 };
 
 export const SHOULDER_IMPINGEMENT_OPTIONS = {
   'Impingement Tests': [
-    { value: 'hawkins_neg', label: "Hawkins-Kennedy negative" },
-    { value: 'hawkins_pos', label: "Hawkins-Kennedy POSITIVE" },
+    { value: 'hawkins_neg', label: 'Hawkins-Kennedy negative' },
+    { value: 'hawkins_pos', label: 'Hawkins-Kennedy POSITIVE' },
     { value: 'neer_neg', label: "Neer's test negative" },
     { value: 'neer_pos', label: "Neer's test POSITIVE" },
-    { value: 'painful_arc_neg', label: "Painful arc negative" },
-    { value: 'painful_arc_pos', label: "Painful arc POSITIVE (60-120°)" },
-    { value: 'cross_body_neg', label: "Cross-body adduction negative" },
-    { value: 'cross_body_pos', label: "Cross-body adduction POSITIVE" },
+    { value: 'painful_arc_neg', label: 'Painful arc negative' },
+    { value: 'painful_arc_pos', label: 'Painful arc POSITIVE (60-120°)' },
+    { value: 'cross_body_neg', label: 'Cross-body adduction negative' },
+    { value: 'cross_body_pos', label: 'Cross-body adduction POSITIVE' },
   ],
   'Clinical Findings': [
     { value: 'imp_lateral_pain', label: 'Lateral shoulder pain' },
     { value: 'imp_overhead_pain', label: 'Pain with overhead activities' },
     { value: 'imp_night_pain', label: 'Night pain present' },
     { value: 'imp_weakness', label: 'Weakness with abduction' },
-  ]
+  ],
 };
 
 export const SHOULDER_ROTATOR_CUFF_OPTIONS = {
   'Supraspinatus Tests': [
     { value: 'empty_can_neg', label: "Empty Can/Jobe's negative" },
     { value: 'empty_can_pos', label: "Empty Can/Jobe's POSITIVE" },
-    { value: 'full_can_neg', label: "Full Can test negative" },
-    { value: 'full_can_pos', label: "Full Can test POSITIVE" },
+    { value: 'full_can_neg', label: 'Full Can test negative' },
+    { value: 'full_can_pos', label: 'Full Can test POSITIVE' },
     { value: 'drop_arm_neg', label: "Codman's Arm Drop negative" },
     { value: 'drop_arm_pos', label: "Codman's Arm Drop POSITIVE" },
   ],
   'Subscapularis Tests': [
-    { value: 'lift_off_neg', label: "Lift-Off test negative" },
-    { value: 'lift_off_pos', label: "Lift-Off test POSITIVE" },
-    { value: 'bear_hug_neg', label: "Bear-Hug test negative" },
-    { value: 'bear_hug_pos', label: "Bear-Hug test POSITIVE" },
-    { value: 'ir_lag_neg', label: "Internal rotation lag negative" },
-    { value: 'ir_lag_pos', label: "Internal rotation lag POSITIVE" },
-    { value: 'napoleon_neg', label: "Napoleon/Belly press negative" },
-    { value: 'napoleon_pos', label: "Napoleon/Belly press POSITIVE" },
+    { value: 'lift_off_neg', label: 'Lift-Off test negative' },
+    { value: 'lift_off_pos', label: 'Lift-Off test POSITIVE' },
+    { value: 'bear_hug_neg', label: 'Bear-Hug test negative' },
+    { value: 'bear_hug_pos', label: 'Bear-Hug test POSITIVE' },
+    { value: 'ir_lag_neg', label: 'Internal rotation lag negative' },
+    { value: 'ir_lag_pos', label: 'Internal rotation lag POSITIVE' },
+    { value: 'napoleon_neg', label: 'Napoleon/Belly press negative' },
+    { value: 'napoleon_pos', label: 'Napoleon/Belly press POSITIVE' },
   ],
   'Infraspinatus/Teres Minor': [
-    { value: 'er_lag_neg', label: "External rotation lag negative" },
-    { value: 'er_lag_pos', label: "External rotation lag POSITIVE" },
+    { value: 'er_lag_neg', label: 'External rotation lag negative' },
+    { value: 'er_lag_pos', label: 'External rotation lag POSITIVE' },
     { value: 'hornblower_neg', label: "Hornblower's sign negative" },
     { value: 'hornblower_pos', label: "Hornblower's sign POSITIVE" },
-    { value: 'resist_er_normal', label: "Resisted ER normal strength" },
-    { value: 'resist_er_weak', label: "Resisted ER weak/painful" },
-  ]
+    { value: 'resist_er_normal', label: 'Resisted ER normal strength' },
+    { value: 'resist_er_weak', label: 'Resisted ER weak/painful' },
+  ],
 };
 
 export const SHOULDER_INSTABILITY_OPTIONS = {
   'Anterior Instability': [
-    { value: 'ant_appr_neg', label: "Anterior apprehension negative" },
-    { value: 'ant_appr_pos', label: "Anterior apprehension POSITIVE" },
-    { value: 'relocation_neg', label: "Relocation test negative" },
-    { value: 'relocation_pos', label: "Relocation test POSITIVE" },
-    { value: 'release_neg', label: "Release maneuver negative" },
-    { value: 'release_pos', label: "Release maneuver POSITIVE" },
-    { value: 'load_shift_ant_neg', label: "Load & Shift anterior negative" },
-    { value: 'load_shift_ant_pos', label: "Load & Shift anterior POSITIVE" },
+    { value: 'ant_appr_neg', label: 'Anterior apprehension negative' },
+    { value: 'ant_appr_pos', label: 'Anterior apprehension POSITIVE' },
+    { value: 'relocation_neg', label: 'Relocation test negative' },
+    { value: 'relocation_pos', label: 'Relocation test POSITIVE' },
+    { value: 'release_neg', label: 'Release maneuver negative' },
+    { value: 'release_pos', label: 'Release maneuver POSITIVE' },
+    { value: 'load_shift_ant_neg', label: 'Load & Shift anterior negative' },
+    { value: 'load_shift_ant_pos', label: 'Load & Shift anterior POSITIVE' },
   ],
   'Posterior Instability': [
-    { value: 'post_appr_neg', label: "Posterior apprehension negative" },
-    { value: 'post_appr_pos', label: "Posterior apprehension POSITIVE" },
-    { value: 'load_shift_post_neg', label: "Load & Shift posterior negative" },
-    { value: 'load_shift_post_pos', label: "Load & Shift posterior POSITIVE" },
+    { value: 'post_appr_neg', label: 'Posterior apprehension negative' },
+    { value: 'post_appr_pos', label: 'Posterior apprehension POSITIVE' },
+    { value: 'load_shift_post_neg', label: 'Load & Shift posterior negative' },
+    { value: 'load_shift_post_pos', label: 'Load & Shift posterior POSITIVE' },
     { value: 'norwood_neg', label: "Norwood's drawer negative" },
     { value: 'norwood_pos', label: "Norwood's drawer POSITIVE" },
   ],
   'Inferior Instability': [
-    { value: 'sulcus_neg', label: "Sulcus sign negative" },
-    { value: 'sulcus_pos', label: "Sulcus sign POSITIVE" },
+    { value: 'sulcus_neg', label: 'Sulcus sign negative' },
+    { value: 'sulcus_pos', label: 'Sulcus sign POSITIVE' },
     { value: 'feagin_neg', label: "Feagin's test negative" },
     { value: 'feagin_pos', label: "Feagin's test POSITIVE" },
-  ]
+  ],
 };
 
 export const SHOULDER_LABRAL_OPTIONS = {
   'SLAP Lesion Tests': [
     { value: 'obrien_neg', label: "O'Brien's test negative" },
     { value: 'obrien_pos', label: "O'Brien's test POSITIVE" },
-    { value: 'clunk_neg', label: "Clunk test negative" },
-    { value: 'clunk_pos', label: "Clunk test POSITIVE" },
-    { value: 'crank_neg', label: "Crank test negative" },
-    { value: 'crank_pos', label: "Crank test POSITIVE" },
-    { value: 'biceps_load_neg', label: "Biceps Load Test II negative" },
-    { value: 'biceps_load_pos', label: "Biceps Load Test II POSITIVE" },
-    { value: 'passive_comp_neg', label: "Passive compression negative" },
-    { value: 'passive_comp_pos', label: "Passive compression POSITIVE" },
+    { value: 'clunk_neg', label: 'Clunk test negative' },
+    { value: 'clunk_pos', label: 'Clunk test POSITIVE' },
+    { value: 'crank_neg', label: 'Crank test negative' },
+    { value: 'crank_pos', label: 'Crank test POSITIVE' },
+    { value: 'biceps_load_neg', label: 'Biceps Load Test II negative' },
+    { value: 'biceps_load_pos', label: 'Biceps Load Test II POSITIVE' },
+    { value: 'passive_comp_neg', label: 'Passive compression negative' },
+    { value: 'passive_comp_pos', label: 'Passive compression POSITIVE' },
   ],
   'Clinical Findings': [
     { value: 'labral_clicking', label: 'Clicking with motion' },
     { value: 'labral_catching', label: 'Catching/locking sensation' },
     { value: 'labral_instability', label: 'Sense of instability' },
     { value: 'labral_overhead_pain', label: 'Pain with overhead activities' },
-  ]
+  ],
 };
 
 export const SHOULDER_BICEPS_OPTIONS = {
@@ -575,28 +575,28 @@ export const SHOULDER_BICEPS_OPTIONS = {
     { value: 'speed_pos', label: "Speed's test POSITIVE" },
     { value: 'yergason_neg', label: "Yergason's test negative" },
     { value: 'yergason_pos', label: "Yergason's test POSITIVE" },
-    { value: 'hyperext_neg', label: "Hyperextension test negative" },
-    { value: 'hyperext_pos', label: "Hyperextension test POSITIVE" },
+    { value: 'hyperext_neg', label: 'Hyperextension test negative' },
+    { value: 'hyperext_pos', label: 'Hyperextension test POSITIVE' },
   ],
   'Clinical Findings': [
     { value: 'biceps_groove_tender', label: 'Bicipital groove tenderness' },
     { value: 'biceps_snapping', label: 'Snapping/clicking present' },
     { value: 'biceps_anterior_pain', label: 'Anterior shoulder pain' },
-  ]
+  ],
 };
 
 export const SHOULDER_AC_JOINT_OPTIONS = {
   'AC Joint Tests': [
-    { value: 'ac_shear_neg', label: "AC shear test negative" },
-    { value: 'ac_shear_pos', label: "AC shear test POSITIVE" },
-    { value: 'piano_key_neg', label: "Piano key sign negative" },
-    { value: 'piano_key_pos', label: "Piano key sign POSITIVE" },
-    { value: 'horiz_add_neg', label: "Horizontal adduction negative" },
-    { value: 'horiz_add_pos', label: "Horizontal adduction POSITIVE" },
-    { value: 'ac_ext_neg', label: "AC resisted extension negative" },
-    { value: 'ac_ext_pos', label: "AC resisted extension POSITIVE" },
+    { value: 'ac_shear_neg', label: 'AC shear test negative' },
+    { value: 'ac_shear_pos', label: 'AC shear test POSITIVE' },
+    { value: 'piano_key_neg', label: 'Piano key sign negative' },
+    { value: 'piano_key_pos', label: 'Piano key sign POSITIVE' },
+    { value: 'horiz_add_neg', label: 'Horizontal adduction negative' },
+    { value: 'horiz_add_pos', label: 'Horizontal adduction POSITIVE' },
+    { value: 'ac_ext_neg', label: 'AC resisted extension negative' },
+    { value: 'ac_ext_pos', label: 'AC resisted extension POSITIVE' },
   ],
-  'Classification': [
+  Classification: [
     { value: 'ac_type_1', label: 'Type 1 - AC capsule only' },
     { value: 'ac_type_2', label: 'Type 2 - Partial CC ligament' },
     { value: 'ac_type_3', label: 'Type 3 - Complete separation' },
@@ -605,7 +605,7 @@ export const SHOULDER_AC_JOINT_OPTIONS = {
     { value: 'ac_step_defect', label: 'Step defect visible' },
     { value: 'ac_tenderness', label: 'AC joint tenderness' },
     { value: 'ac_swelling', label: 'AC joint swelling' },
-  ]
+  ],
 };
 
 export const SHOULDER_FROZEN_OPTIONS = {
@@ -626,7 +626,7 @@ export const SHOULDER_FROZEN_OPTIONS = {
     { value: 'frozen_back_limit', label: 'Unable to reach behind back' },
     { value: 'frozen_dressing', label: 'Difficulty dressing' },
     { value: 'frozen_sleep', label: 'Sleep disruption' },
-  ]
+  ],
 };
 
 // ============================================================================
@@ -654,7 +654,7 @@ export const ELBOW_ROM_OPTIONS = {
     { value: 'elb_endfeel_boggy', label: 'Boggy (joint effusion)' },
     { value: 'elb_endfeel_myospasm', label: 'Myospasm' },
     { value: 'elb_endfeel_springy', label: 'Springy block (loose body)' },
-  ]
+  ],
 };
 
 export const ELBOW_LATERAL_EPICONDYLITIS_OPTIONS = {
@@ -663,19 +663,19 @@ export const ELBOW_LATERAL_EPICONDYLITIS_OPTIONS = {
     { value: 'cozen_pos', label: "Cozen's test POSITIVE" },
     { value: 'mill_neg', label: "Mill's test negative" },
     { value: 'mill_pos', label: "Mill's test POSITIVE" },
-    { value: 'mid_finger_ext_neg', label: "Middle finger extension negative" },
-    { value: 'mid_finger_ext_pos', label: "Middle finger extension POSITIVE" },
-    { value: 'book_test_neg', label: "Book test negative" },
-    { value: 'book_test_pos', label: "Book test POSITIVE" },
-    { value: 'resist_sup_neg', label: "Resisted supination negative" },
-    { value: 'resist_sup_pos', label: "Resisted supination POSITIVE" },
+    { value: 'mid_finger_ext_neg', label: 'Middle finger extension negative' },
+    { value: 'mid_finger_ext_pos', label: 'Middle finger extension POSITIVE' },
+    { value: 'book_test_neg', label: 'Book test negative' },
+    { value: 'book_test_pos', label: 'Book test POSITIVE' },
+    { value: 'resist_sup_neg', label: 'Resisted supination negative' },
+    { value: 'resist_sup_pos', label: 'Resisted supination POSITIVE' },
   ],
   'Clinical Findings': [
     { value: 'lat_epic_tender', label: 'Lateral epicondyle tenderness' },
     { value: 'lat_epic_ecrb_tender', label: 'ECRB origin tenderness' },
     { value: 'lat_epic_grip_weak', label: 'Grip strength decreased' },
     { value: 'lat_epic_ext_pain', label: 'Pain with wrist extension' },
-  ]
+  ],
 };
 
 export const ELBOW_MEDIAL_EPICONDYLITIS_OPTIONS = {
@@ -684,8 +684,8 @@ export const ELBOW_MEDIAL_EPICONDYLITIS_OPTIONS = {
     { value: 'rev_cozen_pos', label: "Reverse Cozen's POSITIVE" },
     { value: 'rev_mill_neg', label: "Reverse Mill's negative" },
     { value: 'rev_mill_pos', label: "Reverse Mill's POSITIVE" },
-    { value: 'valgus_stress_neg', label: "Valgus stress test negative" },
-    { value: 'valgus_stress_pos', label: "Valgus stress test POSITIVE" },
+    { value: 'valgus_stress_neg', label: 'Valgus stress test negative' },
+    { value: 'valgus_stress_pos', label: 'Valgus stress test POSITIVE' },
   ],
   'Clinical Findings': [
     { value: 'med_epic_tender', label: 'Medial epicondyle tenderness' },
@@ -693,7 +693,7 @@ export const ELBOW_MEDIAL_EPICONDYLITIS_OPTIONS = {
     { value: 'med_epic_grip_weak', label: 'Grip strength decreased' },
     { value: 'med_epic_flex_pain', label: 'Pain with wrist flexion' },
     { value: 'med_epic_4th_5th_tingling', label: '4th/5th finger tingling' },
-  ]
+  ],
 };
 
 export const ELBOW_STABILITY_OPTIONS = {
@@ -717,7 +717,7 @@ export const ELBOW_STABILITY_OPTIONS = {
     { value: 'ucl_grade_1', label: 'Grade I - slight stretch' },
     { value: 'ucl_grade_2', label: 'Grade II - partial tear' },
     { value: 'ucl_grade_3', label: 'Grade III - full rupture' },
-  ]
+  ],
 };
 
 export const ELBOW_CUBITAL_TUNNEL_OPTIONS = {
@@ -740,7 +740,7 @@ export const ELBOW_CUBITAL_TUNNEL_OPTIONS = {
     { value: 'cubital_grip_weak', label: 'Grip weakness' },
     { value: 'cubital_claw_hand', label: 'Claw/bishop hand deformity' },
     { value: 'cubital_atrophy', label: 'Intrinsic muscle atrophy' },
-  ]
+  ],
 };
 
 export const ELBOW_BURSITIS_OPTIONS = {
@@ -758,7 +758,7 @@ export const ELBOW_BURSITIS_OPTIONS = {
     { value: 'bursa_gout_suspect', label: 'Suspect gouty arthritis' },
     { value: 'bursa_ra_suspect', label: 'Suspect rheumatoid arthritis' },
     { value: 'bursa_simple', label: 'Simple traumatic bursitis' },
-  ]
+  ],
 };
 
 export const SHOULDER_TREATMENT_OPTIONS = {
@@ -775,7 +775,7 @@ export const SHOULDER_TREATMENT_OPTIONS = {
     { value: 'sh_tx_cspine_manip', label: 'Cervical spine manipulation' },
     { value: 'sh_tx_tspine_manip', label: 'Thoracic spine manipulation' },
   ],
-  'Modalities': [
+  Modalities: [
     { value: 'sh_tx_ultrasound', label: 'Ultrasound therapy' },
     { value: 'sh_tx_tens', label: 'TENS' },
     { value: 'sh_tx_ifc', label: 'Interferential current' },
@@ -794,7 +794,7 @@ export const SHOULDER_TREATMENT_OPTIONS = {
     { value: 'sh_ex_doorway', label: 'Doorway stretches' },
     { value: 'sh_ex_ityw', label: 'Prone I-T-Y-W exercises' },
     { value: 'sh_ex_brugger', label: "Brügger's exercises" },
-  ]
+  ],
 };
 
 export const ELBOW_TREATMENT_OPTIONS = {
@@ -808,7 +808,7 @@ export const ELBOW_TREATMENT_OPTIONS = {
     { value: 'elb_tx_cspine_manip', label: 'Cervical spine manipulation' },
     { value: 'elb_tx_tspine_manip', label: 'Thoracic spine manipulation' },
   ],
-  'Modalities': [
+  Modalities: [
     { value: 'elb_tx_ultrasound', label: 'Therapeutic ultrasound' },
     { value: 'elb_tx_iontophoresis', label: 'Iontophoresis with NSAIDs' },
     { value: 'elb_tx_laser', label: 'Low-level laser (904nm)' },
@@ -830,5 +830,5 @@ export const ELBOW_TREATMENT_OPTIONS = {
     { value: 'elb_ex_eccentric', label: 'Eccentric exercises' },
     { value: 'elb_ex_ext_stretch', label: 'Wrist extensor stretch' },
     { value: 'elb_ex_flex_stretch', label: 'Wrist flexor stretch' },
-  ]
+  ],
 };

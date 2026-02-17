@@ -246,7 +246,7 @@ export const parseCorpus = (corpusText) => {
   logger.info('Parsing clinical notes corpus...');
 
   // Split corpus into individual notes
-  const notePattern = /Journalnotat:[^\n]+/g;
+  const _notePattern = /Journalnotat:[^\n]+/g;
   const notes = [];
   const matches = corpusText.split(/(?=Journalnotat:)/);
 
@@ -309,7 +309,7 @@ const generateCorpusStatistics = (notes) => {
 export const extractTemplates = (parsedCorpus) => {
   logger.info('Extracting templates from corpus...');
 
-  const templates = [];
+  const _templates = [];
   const templateMap = new Map(); // To avoid duplicates
 
   parsedCorpus.notes.forEach((note) => {

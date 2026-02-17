@@ -264,7 +264,9 @@ export const COUNTRY_CODES = {
  * @returns {string} Cleaned phone number
  */
 export const cleanPhoneNumber = (phone) => {
-  if (!phone) return '';
+  if (!phone) {
+    return '';
+  }
   return phone.replace(/[\s\-\(\)\.]/g, '');
 };
 
@@ -311,7 +313,7 @@ export const validateNorwegianPhone = (phone) => {
   const cleaned = cleanPhoneNumber(phone);
 
   // Remove +47 or 0047 prefix if present
-  let nationalNumber = cleaned.replace(/^\+47/, '').replace(/^0047/, '').replace(/^0/, ''); // Remove leading 0
+  const nationalNumber = cleaned.replace(/^\+47/, '').replace(/^0047/, '').replace(/^0/, ''); // Remove leading 0
 
   // Must be exactly 8 digits
   if (!/^\d{8}$/.test(nationalNumber)) {
@@ -452,11 +454,10 @@ export const formatPhoneNumber = (phone, format = 'international') => {
  * Get list of all supported country codes for dropdown/selection
  * @returns {Array<{ code: string, country: string, countryCode: string }>}
  */
-export const getSupportedCountryCodes = () => {
-  return Object.values(COUNTRY_CODES)
+export const getSupportedCountryCodes = () =>
+  Object.values(COUNTRY_CODES)
     .map(({ code, country, countryCode }) => ({ code, country, countryCode }))
     .sort((a, b) => (a.country < b.country ? -1 : a.country > b.country ? 1 : 0));
-};
 
 /**
  * Get country code config by ISO country code
@@ -476,10 +477,14 @@ export const getCountryByISO = (isoCode) => {
 export const isMobileNumber = (phone) => {
   const result = validatePhoneNumber(phone);
 
-  if (!result.valid) return null;
+  if (!result.valid) {
+    return null;
+  }
 
   const config = COUNTRY_CODES[result.countryCode];
-  if (!config || !config.mobilePrefix) return null;
+  if (!config || !config.mobilePrefix) {
+    return null;
+  }
 
   const firstDigits = result.nationalNumber.substring(0, 2);
   return config.mobilePrefix.some((prefix) => firstDigits.startsWith(prefix));
@@ -546,7 +551,7 @@ export const validatePhoneWithOptions = (phone, options = {}) => {
   const { mode = PHONE_VALIDATION_MODE, defaultCountryCode = DEFAULT_COUNTRY_CODE } = options;
 
   switch (mode) {
-    case 'format-only':
+    case 'format-only': {
       // Just clean and format, always valid if non-empty
       if (!phone) {
         return { valid: false, error: 'Phone number is required' };
@@ -558,6 +563,7 @@ export const validatePhoneWithOptions = (phone, options = {}) => {
         fullNumber: cleaned.startsWith('+') ? cleaned : `${defaultCountryCode}${cleaned}`,
         mode: 'format-only',
       };
+    }
 
     case 'lenient':
       return validatePhoneLenient(phone, defaultCountryCode);
@@ -575,7 +581,9 @@ export const validatePhoneWithOptions = (phone, options = {}) => {
  * @returns {string} Normalized phone number (digits only)
  */
 export const normalizePhoneForSearch = (phone) => {
-  if (!phone) return '';
+  if (!phone) {
+    return '';
+  }
   return phone.replace(/\D/g, '');
 };
 
@@ -617,11 +625,15 @@ export const createSearchablePhoneVariants = (phone) => {
  * @returns {string[]} Matching phone numbers
  */
 export const searchPhoneNumbers = (searchQuery, phoneNumbers) => {
-  if (!searchQuery || !phoneNumbers?.length) return [];
+  if (!searchQuery || !phoneNumbers?.length) {
+    return [];
+  }
 
   const queryDigits = normalizePhoneForSearch(searchQuery);
 
-  if (queryDigits.length < 3) return []; // Require at least 3 digits
+  if (queryDigits.length < 3) {
+    return [];
+  } // Require at least 3 digits
 
   return phoneNumbers.filter((phone) => {
     const phoneDigits = normalizePhoneForSearch(phone);

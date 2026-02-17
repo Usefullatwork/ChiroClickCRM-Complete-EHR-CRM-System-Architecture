@@ -1,5 +1,15 @@
 import { useState } from 'react';
-import { Calendar, TrendingUp, Target, Clock, Edit2, Check, X, Plus, AlertTriangle } from 'lucide-react';
+import {
+  Calendar,
+  _TrendingUp,
+  Target,
+  Clock,
+  Edit2,
+  Check,
+  X,
+  Plus,
+  AlertTriangle,
+} from 'lucide-react';
 
 /**
  * TreatmentPlanTracker - Track treatment plan progress
@@ -17,9 +27,9 @@ export default function TreatmentPlanTracker({
   plan = null,
   currentVisit = 1,
   onChange,
-  onNewPlan,
+  _onNewPlan,
   compact = false,
-  className = ''
+  className = '',
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedPlan, setEditedPlan] = useState(plan || getDefaultPlan());
@@ -33,7 +43,7 @@ export default function TreatmentPlanTracker({
           visitsPerWeek: 3,
           totalWeeks: 2,
           totalVisits: 6,
-          goals: ['Pain reduction', 'Inflammation control', 'Restore basic function']
+          goals: ['Pain reduction', 'Inflammation control', 'Restore basic function'],
         },
         {
           id: 'p2',
@@ -41,7 +51,7 @@ export default function TreatmentPlanTracker({
           visitsPerWeek: 2,
           totalWeeks: 4,
           totalVisits: 8,
-          goals: ['Spinal correction', 'Postural improvement', 'Muscle strengthening']
+          goals: ['Spinal correction', 'Postural improvement', 'Muscle strengthening'],
         },
         {
           id: 'p3',
@@ -49,21 +59,24 @@ export default function TreatmentPlanTracker({
           visitsPerWeek: 1,
           totalWeeks: 4,
           totalVisits: 4,
-          goals: ['Maintain improvements', 'Prevent recurrence', 'Wellness care']
-        }
+          goals: ['Maintain improvements', 'Prevent recurrence', 'Wellness care'],
+        },
       ],
       startDate: new Date().toISOString().split('T')[0],
       reEvalInterval: 12, // visits
-      notes: ''
+      notes: '',
     };
   }
 
   const totalPlannedVisits = plan?.phases?.reduce((sum, p) => sum + p.totalVisits, 0) || 0;
-  const progressPercent = totalPlannedVisits > 0 ? Math.min((currentVisit / totalPlannedVisits) * 100, 100) : 0;
+  const progressPercent =
+    totalPlannedVisits > 0 ? Math.min((currentVisit / totalPlannedVisits) * 100, 100) : 0;
 
   // Determine current phase
   const getCurrentPhase = () => {
-    if (!plan?.phases) return null;
+    if (!plan?.phases) {
+      return null;
+    }
     let visitCount = 0;
     for (const phase of plan.phases) {
       visitCount += phase.totalVisits;
@@ -74,17 +87,20 @@ export default function TreatmentPlanTracker({
     return plan.phases[plan.phases.length - 1];
   };
 
-  const currentPhase = getCurrentPhase();
+  const _currentPhase = getCurrentPhase();
 
   // Check if re-evaluation is due
-  const isReEvalDue = plan?.reEvalInterval && currentVisit > 0 && currentVisit % plan.reEvalInterval === 0;
+  const isReEvalDue =
+    plan?.reEvalInterval && currentVisit > 0 && currentVisit % plan.reEvalInterval === 0;
 
   // Calculate phase progress
   const getPhaseProgress = () => {
-    if (!plan?.phases) return [];
+    if (!plan?.phases) {
+      return [];
+    }
 
     let visitCount = 0;
-    return plan.phases.map(phase => {
+    return plan.phases.map((phase) => {
       const phaseStart = visitCount + 1;
       const phaseEnd = visitCount + phase.totalVisits;
       visitCount += phase.totalVisits;
@@ -105,7 +121,7 @@ export default function TreatmentPlanTracker({
         phaseStart,
         phaseEnd,
         status,
-        phaseCurrentVisit
+        phaseCurrentVisit,
       };
     });
   };
@@ -118,11 +134,9 @@ export default function TreatmentPlanTracker({
   };
 
   const updatePhase = (phaseId, updates) => {
-    setEditedPlan(prev => ({
+    setEditedPlan((prev) => ({
       ...prev,
-      phases: prev.phases.map(p =>
-        p.id === phaseId ? { ...p, ...updates } : p
-      )
+      phases: prev.phases.map((p) => (p.id === phaseId ? { ...p, ...updates } : p)),
     }));
   };
 
@@ -249,13 +263,15 @@ export default function TreatmentPlanTracker({
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <span className={`px-2 py-0.5 text-xs font-bold rounded ${
-                      phase.status === 'current'
-                        ? 'bg-blue-600 text-white'
-                        : phase.status === 'completed'
-                          ? 'bg-green-600 text-white'
-                          : 'bg-gray-400 text-white'
-                    }`}>
+                    <span
+                      className={`px-2 py-0.5 text-xs font-bold rounded ${
+                        phase.status === 'current'
+                          ? 'bg-blue-600 text-white'
+                          : phase.status === 'completed'
+                            ? 'bg-green-600 text-white'
+                            : 'bg-gray-400 text-white'
+                      }`}
+                    >
                       P{index + 1}
                     </span>
                     <span className="font-medium text-gray-900">{phase.name}</span>
@@ -265,8 +281,7 @@ export default function TreatmentPlanTracker({
                       ? `${phase.phaseCurrentVisit}/${phase.totalVisits} visits`
                       : phase.status === 'completed'
                         ? 'Completed'
-                        : `${phase.totalVisits} visits`
-                    }
+                        : `${phase.totalVisits} visits`}
                   </span>
                 </div>
 
@@ -321,7 +336,9 @@ export default function TreatmentPlanTracker({
                   </tr>
                 ))}
                 <tr className="font-bold">
-                  <td className="pt-2" colSpan="3">Total</td>
+                  <td className="pt-2" colSpan="3">
+                    Total
+                  </td>
                   <td className="pt-2 text-right">{totalPlannedVisits}</td>
                 </tr>
               </tbody>
@@ -342,11 +359,15 @@ export default function TreatmentPlanTracker({
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Re-eval Every (visits)</label>
+              <label className="block text-xs font-medium text-gray-500 mb-1">
+                Re-eval Every (visits)
+              </label>
               <input
                 type="number"
                 value={editedPlan.reEvalInterval}
-                onChange={(e) => setEditedPlan({ ...editedPlan, reEvalInterval: parseInt(e.target.value) })}
+                onChange={(e) =>
+                  setEditedPlan({ ...editedPlan, reEvalInterval: parseInt(e.target.value) })
+                }
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg"
               />
             </div>
@@ -380,7 +401,7 @@ export default function TreatmentPlanTracker({
                         const v = parseInt(e.target.value) || 1;
                         updatePhase(phase.id, {
                           visitsPerWeek: v,
-                          totalVisits: v * phase.totalWeeks
+                          totalVisits: v * phase.totalWeeks,
                         });
                       }}
                       className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
@@ -396,7 +417,7 @@ export default function TreatmentPlanTracker({
                         const w = parseInt(e.target.value) || 1;
                         updatePhase(phase.id, {
                           totalWeeks: w,
-                          totalVisits: phase.visitsPerWeek * w
+                          totalVisits: phase.visitsPerWeek * w,
                         });
                       }}
                       className="w-full px-2 py-1 text-sm border border-gray-300 rounded"

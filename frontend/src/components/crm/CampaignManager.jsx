@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import _React, { useState, useEffect } from 'react';
 import {
   Send,
   Mail,
@@ -9,8 +9,8 @@ import {
   Plus,
   Calendar,
   Clock,
-  CheckCircle,
-  XCircle,
+  _CheckCircle,
+  _XCircle,
   Edit,
   Trash2,
   Eye,
@@ -82,19 +82,19 @@ const CampaignManager = () => {
   }, []);
 
   // Create new campaign
-  const handleCreateCampaign = async (campaignData) => {
+  const _handleCreateCampaign = async (campaignData) => {
     try {
       const response = await crmAPI.createCampaign(campaignData);
       setCampaigns((prev) => [...prev, response.data]);
       setShowNewCampaign(false);
     } catch (err) {
       logger.error('Error creating campaign:', err);
-      toast.error('Failed to create campaign: ' + err.message);
+      toast.error(`Failed to create campaign: ${err.message}`);
     }
   };
 
   // Launch campaign
-  const handleLaunchCampaign = async (campaignId) => {
+  const _handleLaunchCampaign = async (campaignId) => {
     try {
       await crmAPI.launchCampaign(campaignId);
       setCampaigns((prev) =>
@@ -102,7 +102,7 @@ const CampaignManager = () => {
       );
     } catch (err) {
       logger.error('Error launching campaign:', err);
-      toast.error('Failed to launch campaign: ' + err.message);
+      toast.error(`Failed to launch campaign: ${err.message}`);
     }
   };
 
@@ -117,7 +117,9 @@ const CampaignManager = () => {
 
   // Calculate metrics
   const getMetrics = (campaign) => {
-    if (campaign.sent === 0) return null;
+    if (campaign.sent === 0) {
+      return null;
+    }
     return {
       deliveryRate: Math.round((campaign.delivered / campaign.sent) * 100),
       openRate:
@@ -137,7 +139,9 @@ const CampaignManager = () => {
   };
 
   const formatDate = (dateStr) => {
-    if (!dateStr) return '-';
+    if (!dateStr) {
+      return '-';
+    }
     return new Date(dateStr).toLocaleDateString('nb-NO', {
       day: 'numeric',
       month: 'short',
@@ -146,7 +150,9 @@ const CampaignManager = () => {
   };
 
   const formatDateTime = (dateStr) => {
-    if (!dateStr) return '-';
+    if (!dateStr) {
+      return '-';
+    }
     return new Date(dateStr).toLocaleString('nb-NO', {
       day: 'numeric',
       month: 'short',
@@ -157,10 +163,18 @@ const CampaignManager = () => {
 
   // Filter campaigns by tab
   const filteredCampaigns = campaigns.filter((c) => {
-    if (activeTab === 'active') return c.status === 'ACTIVE' || c.status === 'SCHEDULED';
-    if (activeTab === 'draft') return c.status === 'DRAFT';
-    if (activeTab === 'completed') return c.status === 'COMPLETED';
-    if (activeTab === 'automated') return c.isAutomated;
+    if (activeTab === 'active') {
+      return c.status === 'ACTIVE' || c.status === 'SCHEDULED';
+    }
+    if (activeTab === 'draft') {
+      return c.status === 'DRAFT';
+    }
+    if (activeTab === 'completed') {
+      return c.status === 'COMPLETED';
+    }
+    if (activeTab === 'automated') {
+      return c.isAutomated;
+    }
     return true;
   });
 
@@ -612,7 +626,7 @@ const CampaignManager = () => {
                       value: selectedCampaign.converted,
                       color: 'bg-orange-400',
                     },
-                  ].map((step, index) => (
+                  ].map((step, _index) => (
                     <div key={step.label} className="flex items-center gap-3">
                       <span className="w-24 text-sm text-gray-600">{step.label}</span>
                       <div className="flex-1 h-6 bg-gray-100 rounded overflow-hidden">

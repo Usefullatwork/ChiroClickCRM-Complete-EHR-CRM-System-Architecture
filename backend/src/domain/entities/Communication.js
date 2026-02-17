@@ -85,7 +85,9 @@ export class Communication {
    * Check if it's time to send scheduled communication
    */
   shouldSendNow() {
-    if (this.status !== 'SCHEDULED') return false;
+    if (this.status !== 'SCHEDULED') {
+      return false;
+    }
     return this.scheduledAt && this.scheduledAt <= new Date();
   }
 
@@ -121,7 +123,9 @@ export class Communication {
    * Calculate SMS segment count
    */
   getSmsSegmentCount() {
-    if (this.type !== 'SMS' || !this.content) return 0;
+    if (this.type !== 'SMS' || !this.content) {
+      return 0;
+    }
 
     const length = this.content.length;
     if (length <= Communication.SMS_LIMITS.SINGLE_SMS) {
@@ -135,7 +139,9 @@ export class Communication {
    * Check if SMS is within limits
    */
   isWithinSmsLimits() {
-    if (this.type !== 'SMS') return true;
+    if (this.type !== 'SMS') {
+      return true;
+    }
     return this.getSmsSegmentCount() <= Communication.SMS_LIMITS.MAX_SEGMENTS;
   }
 
@@ -164,10 +170,12 @@ export class Communication {
    * Format phone number for Norwegian carriers
    */
   static formatNorwegianPhone(phone) {
-    if (!phone) return null;
+    if (!phone) {
+      return null;
+    }
 
     // Remove all non-digits
-    let cleaned = phone.replace(/\D/g, '');
+    const cleaned = phone.replace(/\D/g, '');
 
     // Handle Norwegian numbers
     if (cleaned.startsWith('47')) {
@@ -194,7 +202,9 @@ export class Communication {
    * Check if recipient has consent for this communication type
    */
   hasConsent(patient) {
-    if (!patient) return false;
+    if (!patient) {
+      return false;
+    }
 
     switch (this.type) {
       case 'SMS':
@@ -245,7 +255,9 @@ export class Communication {
     }
 
     if (this.type === 'SMS' && !this.isWithinSmsLimits()) {
-      errors.push(`SMS content exceeds maximum length (${Communication.SMS_LIMITS.MAX_SEGMENTS} segments)`);
+      errors.push(
+        `SMS content exceeds maximum length (${Communication.SMS_LIMITS.MAX_SEGMENTS} segments)`
+      );
     }
 
     return {

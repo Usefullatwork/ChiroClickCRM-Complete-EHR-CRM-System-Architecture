@@ -3,7 +3,7 @@
  * Displays active plans with session completion, milestones, and quick actions
  */
 
-import React, { useState, useEffect } from 'react';
+import _React, { useState, useEffect } from 'react';
 import { treatmentPlansAPI } from '../../services/api';
 
 export default function TreatmentPlanProgress({
@@ -15,7 +15,7 @@ export default function TreatmentPlanProgress({
 }) {
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [_error, setError] = useState(null);
 
   const t =
     lang === 'no'
@@ -53,7 +53,9 @@ export default function TreatmentPlanProgress({
         };
 
   useEffect(() => {
-    if (!patientId) return;
+    if (!patientId) {
+      return;
+    }
 
     const fetchPlans = async () => {
       try {
@@ -81,7 +83,9 @@ export default function TreatmentPlanProgress({
     );
   }
 
-  if (compact && plans.length === 0) return null;
+  if (compact && plans.length === 0) {
+    return null;
+  }
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Messaging Service
  *
@@ -82,7 +83,9 @@ export function isMessagingEnabled() {
  * Format phone number for Norwegian format
  */
 export function formatNorwegianPhone(phone) {
-  if (!phone) return '';
+  if (!phone) {
+    return '';
+  }
 
   // Remove all non-digits
   let digits = phone.replace(/\D/g, '');
@@ -106,7 +109,9 @@ export function formatNorwegianPhone(phone) {
  * Normalize phone number for API calls (E.164 format)
  */
 export function normalizePhone(phone, countryCode = '47') {
-  if (!phone) return '';
+  if (!phone) {
+    return '';
+  }
 
   // Remove all non-digits
   let digits = phone.replace(/\D/g, '');
@@ -116,7 +121,7 @@ export function normalizePhone(phone, countryCode = '47') {
     digits = countryCode + digits;
   }
 
-  return '+' + digits;
+  return `+${digits}`;
 }
 
 // =============================================================================
@@ -306,9 +311,10 @@ export async function sendBulkSMS(recipients, template, variables = {}, language
       lastName: recipient.last_name,
     };
 
-    const content = typeof template === 'string'
-      ? template
-      : template.content?.[language] || template.content?.en;
+    const content =
+      typeof template === 'string'
+        ? template
+        : template.content?.[language] || template.content?.en;
 
     const message = formatMessage(content, personalizedVars);
 
@@ -417,7 +423,7 @@ export function getTotalUnreadCount() {
  * Call SMS API (Telnyx implementation)
  * In production, this would be a real API call
  */
-async function callSMSAPI(config, to, message) {
+async function callSMSAPI(config, _to, _message) {
   // This is a placeholder for the actual Telnyx API call
   // In production, this would be:
   // POST https://api.telnyx.com/v2/messages
@@ -451,7 +457,7 @@ async function callSMSAPI(config, to, message) {
   // Mock response for development
   return {
     success: true,
-    messageId: 'mock_' + Date.now(),
+    messageId: `mock_${Date.now()}`,
   };
 }
 
@@ -494,7 +500,7 @@ function checkAutoReply(messageBody) {
   };
 
   for (const [action, words] of Object.entries(keywords)) {
-    if (words.some((word) => body === word || body.startsWith(word + ' '))) {
+    if (words.some((word) => body === word || body.startsWith(`${word} `))) {
       return { action, originalMessage: messageBody };
     }
   }

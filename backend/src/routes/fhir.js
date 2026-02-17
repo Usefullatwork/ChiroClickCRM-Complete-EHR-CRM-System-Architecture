@@ -5,7 +5,7 @@
 
 import express from 'express';
 import * as fhirController from '../controllers/fhir.js';
-import { requireAuth, optionalAuth } from '../middleware/auth.js';
+import { requireAuth, _optionalAuth } from '../middleware/auth.js';
 import validate from '../middleware/validation.js';
 import {
   getPatientSchema,

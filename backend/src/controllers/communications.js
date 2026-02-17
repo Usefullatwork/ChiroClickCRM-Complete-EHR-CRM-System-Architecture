@@ -15,7 +15,7 @@ export const getCommunications = async (req, res) => {
       patientId: req.query.patientId,
       type: req.query.type,
       startDate: req.query.startDate,
-      endDate: req.query.endDate
+      endDate: req.query.endDate,
     };
 
     const result = await communicationService.getAllCommunications(organizationId, options);
@@ -40,7 +40,7 @@ export const sendSMS = async (req, res) => {
       resourceType: 'COMMUNICATION',
       resourceId: sms.id,
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.status(201).json(sms);
@@ -64,7 +64,7 @@ export const sendEmail = async (req, res) => {
       resourceType: 'COMMUNICATION',
       resourceId: email.id,
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.status(201).json(email);
@@ -87,7 +87,7 @@ export const getTemplates = async (req, res) => {
 
 export const createTemplate = async (req, res) => {
   try {
-    const { organizationId, user } = req;
+    const { organizationId, _user } = req;
     const template = await communicationService.createTemplate(organizationId, req.body);
     res.status(201).json(template);
   } catch (error) {
@@ -100,7 +100,11 @@ export const getStats = async (req, res) => {
   try {
     const { organizationId } = req;
     const { startDate, endDate } = req.query;
-    const stats = await communicationService.getCommunicationStats(organizationId, startDate, endDate);
+    const stats = await communicationService.getCommunicationStats(
+      organizationId,
+      startDate,
+      endDate
+    );
     res.json(stats);
   } catch (error) {
     logger.error('Error in getStats controller:', error);
@@ -114,5 +118,5 @@ export default {
   sendEmail,
   getTemplates,
   createTemplate,
-  getStats
+  getStats,
 };

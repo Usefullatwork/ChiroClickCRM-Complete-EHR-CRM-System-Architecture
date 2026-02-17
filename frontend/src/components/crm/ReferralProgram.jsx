@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import _React, { useState, useEffect } from 'react';
 import {
   Users,
   Gift,
@@ -7,10 +7,10 @@ import {
   ChevronRight,
   Plus,
   Mail,
-  MessageSquare,
+  _MessageSquare,
   Copy,
   Check,
-  Star,
+  _Star,
   Calendar,
   DollarSign,
   UserPlus,
@@ -32,7 +32,7 @@ const ReferralProgram = () => {
   const [topReferrers, setTopReferrers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [patients, setPatients] = useState([]);
+  const [_patients, _setPatients] = useState([]);
 
   // Referral program settings
   const programSettings = {
@@ -89,14 +89,14 @@ const ReferralProgram = () => {
   }, []);
 
   // Create new referral
-  const handleCreateReferral = async (formData) => {
+  const _handleCreateReferral = async (formData) => {
     try {
       const response = await crmAPI.createReferral(formData);
       setReferrals((prev) => [response.data, ...prev]);
       setShowNewReferralForm(false);
     } catch (err) {
       logger.error('Error creating referral:', err);
-      toast.error('Failed to create referral: ' + err.message);
+      toast.error(`Failed to create referral: ${err.message}`);
     }
   };
 
@@ -131,7 +131,9 @@ const ReferralProgram = () => {
   };
 
   const formatDate = (dateStr) => {
-    if (!dateStr) return '-';
+    if (!dateStr) {
+      return '-';
+    }
     return new Date(dateStr).toLocaleDateString('nb-NO');
   };
 

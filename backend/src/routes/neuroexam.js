@@ -627,7 +627,7 @@ router.post(
   async (req, res) => {
     try {
       const { examId } = req.params;
-      const { specialty, urgency, notes } = req.body;
+      const { specialty, urgency, _notes } = req.body;
 
       const result = await pool.query(
         `
@@ -945,8 +945,10 @@ function determineClusterId(testId) {
 /**
  * Determine referral urgency based on red flags and scores
  */
-function determineReferralUrgency(redFlags, clusterScores) {
-  if (!redFlags || redFlags.length === 0) return null;
+function determineReferralUrgency(redFlags, _clusterScores) {
+  if (!redFlags || redFlags.length === 0) {
+    return null;
+  }
 
   // Check for myelopathy red flags
   const hasMyelopathy = redFlags.some(
@@ -957,7 +959,9 @@ function determineReferralUrgency(redFlags, clusterScores) {
       f.testId?.includes('lhermitte')
   );
 
-  if (hasMyelopathy) return 'EMERGENT';
+  if (hasMyelopathy) {
+    return 'EMERGENT';
+  }
 
   // Check for upper cervical instability
   const hasInstability = redFlags.some(
@@ -968,14 +972,18 @@ function determineReferralUrgency(redFlags, clusterScores) {
       f.testId?.includes('transverse')
   );
 
-  if (hasInstability) return 'EMERGENT';
+  if (hasInstability) {
+    return 'EMERGENT';
+  }
 
   // Check for central vestibular signs (HINTS+)
   const hasCentralSigns = redFlags.some(
     (f) => f.testId?.includes('skew') || f.label?.toLowerCase().includes('central')
   );
 
-  if (hasCentralSigns) return 'URGENT';
+  if (hasCentralSigns) {
+    return 'URGENT';
+  }
 
   // Default for other red flags
   return 'ROUTINE';

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, _useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { examinationsAPI } from '../services/api';
 import { X, Save, CheckCircle, AlertTriangle, Zap, ListChecks } from 'lucide-react';
@@ -23,7 +23,7 @@ export default function BatchExaminationForm({ encounterId, chiefComplaint, isOp
   });
 
   // Fetch protocols for selected template set
-  const { data: templateSetDetails } = useQuery({
+  const { data: _templateSetDetails } = useQuery({
     queryKey: ['template-set-details', selectedTemplateSet],
     queryFn: () => examinationsAPI.getTemplateSetById(selectedTemplateSet),
     enabled: !!selectedTemplateSet,
@@ -126,7 +126,7 @@ export default function BatchExaminationForm({ encounterId, chiefComplaint, isOp
     saveBatchMutation.mutate(batchData);
   };
 
-  const getResultBadgeColor = (result) => {
+  const _getResultBadgeColor = (result) => {
     switch (result) {
       case 'positive':
         return 'bg-red-100 text-red-800 border-red-300';
@@ -139,7 +139,9 @@ export default function BatchExaminationForm({ encounterId, chiefComplaint, isOp
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">

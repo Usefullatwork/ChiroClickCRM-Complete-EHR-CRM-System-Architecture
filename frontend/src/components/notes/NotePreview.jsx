@@ -5,12 +5,12 @@
  * Read-only preview of clinical note
  */
 
-import React from 'react'
+import _React from 'react';
 import {
   FileText,
-  Calendar,
+  _Calendar,
   User,
-  Clock,
+  _Clock,
   Edit,
   Trash2,
   Lock,
@@ -22,8 +22,8 @@ import {
   Stethoscope,
   Target,
   ClipboardCheck,
-  Activity
-} from 'lucide-react'
+  Activity,
+} from 'lucide-react';
 
 /**
  * NotePreview Component
@@ -50,60 +50,70 @@ export default function NotePreview({
   onExport,
   onDelete,
   getNoteTypeBadge,
-  getNoteTypeLabel
+  getNoteTypeLabel,
 }) {
   /**
    * Parse JSON field safely
    * Parser JSON-felt trygt
    */
   const parseField = (field) => {
-    if (!field) return {}
-    if (typeof field === 'object') return field
-    try {
-      return JSON.parse(field)
-    } catch {
-      return {}
+    if (!field) {
+      return {};
     }
-  }
+    if (typeof field === 'object') {
+      return field;
+    }
+    try {
+      return JSON.parse(field);
+    } catch {
+      return {};
+    }
+  };
 
   /**
    * Format date for display
    * Formater dato for visning
    */
   const formatDate = (dateString) => {
-    if (!dateString) return ''
-    const date = new Date(dateString)
+    if (!dateString) {
+      return '';
+    }
+    const date = new Date(dateString);
     return date.toLocaleDateString('no-NO', {
       weekday: 'long',
       day: 'numeric',
       month: 'long',
-      year: 'numeric'
-    })
-  }
+      year: 'numeric',
+    });
+  };
 
   /**
    * Format datetime for display
    * Formater dato og tid for visning
    */
   const formatDateTime = (dateString) => {
-    if (!dateString) return ''
-    const date = new Date(dateString)
+    if (!dateString) {
+      return '';
+    }
+    const date = new Date(dateString);
     return date.toLocaleString('no-NO', {
       day: '2-digit',
       month: 'short',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
-    })
+      minute: '2-digit',
+    });
+  };
+
+  if (!note && !isLoading) {
+    return null;
   }
 
-  if (!note && !isLoading) return null
-
-  const isLocked = !!note?.signed_at
-  const subjective = parseField(note?.subjective)
-  const objective = parseField(note?.objective)
-  const assessment = parseField(note?.assessment)
-  const plan = parseField(note?.plan)
+  const isLocked = !!note?.signed_at;
+  const subjective = parseField(note?.subjective);
+  const objective = parseField(note?.objective);
+  const assessment = parseField(note?.assessment);
+  const plan = parseField(note?.plan);
 
   /**
    * Section component for displaying note sections
@@ -111,7 +121,7 @@ export default function NotePreview({
    */
   const Section = ({ title, icon: Icon, color, children }) => {
     if (!children || (Array.isArray(children) && children.filter(Boolean).length === 0)) {
-      return null
+      return null;
     }
 
     return (
@@ -122,19 +132,19 @@ export default function NotePreview({
           </div>
           <h3 className={`font-semibold text-${color}-900`}>{title}</h3>
         </div>
-        <div className="space-y-3 pl-8">
-          {children}
-        </div>
+        <div className="space-y-3 pl-8">{children}</div>
       </div>
-    )
-  }
+    );
+  };
 
   /**
    * Field component for displaying individual fields
    * Feltkomponent for visning av individuelle felt
    */
   const Field = ({ label, value }) => {
-    if (!value || (Array.isArray(value) && value.length === 0)) return null
+    if (!value || (Array.isArray(value) && value.length === 0)) {
+      return null;
+    }
 
     return (
       <div>
@@ -143,8 +153,8 @@ export default function NotePreview({
           {Array.isArray(value) ? value.join(', ') : value}
         </dd>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -152,9 +162,11 @@ export default function NotePreview({
         {/* Header / Overskrift */}
         <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-              isLocked ? 'bg-green-100' : 'bg-blue-100'
-            }`}>
+            <div
+              className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                isLocked ? 'bg-green-100' : 'bg-blue-100'
+              }`}
+            >
               {isLocked ? (
                 <Lock className="w-5 h-5 text-green-600" />
               ) : (
@@ -166,9 +178,11 @@ export default function NotePreview({
                 <h2 className="font-semibold text-gray-900">
                   {getNoteTypeLabel(note?.template_type)} Notat
                 </h2>
-                <span className={`px-2 py-0.5 text-xs font-medium rounded ${
-                  getNoteTypeBadge(note?.template_type)
-                }`}>
+                <span
+                  className={`px-2 py-0.5 text-xs font-medium rounded ${getNoteTypeBadge(
+                    note?.template_type
+                  )}`}
+                >
                   {getNoteTypeLabel(note?.template_type)}
                 </span>
                 {isLocked && (
@@ -178,9 +192,7 @@ export default function NotePreview({
                   </span>
                 )}
               </div>
-              <p className="text-sm text-gray-500">
-                {formatDate(note?.note_date)}
-              </p>
+              <p className="text-sm text-gray-500">{formatDate(note?.note_date)}</p>
             </div>
           </div>
 
@@ -218,10 +230,7 @@ export default function NotePreview({
                 <Trash2 className="w-4 h-4" />
               </button>
             )}
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg"
-            >
+            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
               <X className="w-5 h-5 text-gray-500" />
             </button>
           </div>
@@ -257,7 +266,7 @@ export default function NotePreview({
                       <dd className="text-sm text-gray-900">{note.duration_minutes} minutter</dd>
                     </div>
                   )}
-                  {note?.vas_pain_start != null && (
+                  {note?.vas_pain_start !== null && note?.vas_pain_start !== undefined && (
                     <div>
                       <dt className="text-xs font-medium text-gray-500">VAS smerte</dt>
                       <dd className="text-sm text-gray-900">
@@ -269,7 +278,7 @@ export default function NotePreview({
               </div>
 
               {/* Diagnosis Codes / Diagnosekoder */}
-              {((note?.icd10_codes?.length > 0) || (note?.icpc_codes?.length > 0)) && (
+              {(note?.icd10_codes?.length > 0 || note?.icpc_codes?.length > 0) && (
                 <div className="bg-blue-50 rounded-lg p-4 mb-6">
                   <h4 className="text-sm font-medium text-blue-900 mb-2">Diagnosekoder</h4>
                   <div className="flex flex-wrap gap-2">
@@ -295,18 +304,42 @@ export default function NotePreview({
 
               {/* Subjective Section / Subjektiv seksjon */}
               <Section title="Subjektiv (S)" icon={User} color="blue">
-                <Field label="Hovedklage" value={subjective.chiefComplaint || subjective.chief_complaint} />
-                <Field label="Sykehistorie" value={subjective.historyOfPresentIllness || subjective.history} />
-                <Field label="Smertelokalisering" value={subjective.painLocation || subjective.pain_location} />
-                {subjective.painIntensity != null && (
+                <Field
+                  label="Hovedklage"
+                  value={subjective.chiefComplaint || subjective.chief_complaint}
+                />
+                <Field
+                  label="Sykehistorie"
+                  value={subjective.historyOfPresentIllness || subjective.history}
+                />
+                <Field
+                  label="Smertelokalisering"
+                  value={subjective.painLocation || subjective.pain_location}
+                />
+                {subjective.painIntensity !== null && subjective.painIntensity !== undefined && (
                   <Field label="Smerteintensitet" value={`${subjective.painIntensity}/10`} />
                 )}
-                <Field label="Smertekvalitet" value={subjective.painQuality || subjective.pain_quality} />
-                <Field label="Forverrende faktorer" value={subjective.aggravatingFactors || subjective.aggravating_factors} />
-                <Field label="Lindrende faktorer" value={subjective.relievingFactors || subjective.relieving_factors} />
-                <Field label="Funksjonsbegrensninger" value={subjective.functionalLimitations || subjective.functional_limitations} />
+                <Field
+                  label="Smertekvalitet"
+                  value={subjective.painQuality || subjective.pain_quality}
+                />
+                <Field
+                  label="Forverrende faktorer"
+                  value={subjective.aggravatingFactors || subjective.aggravating_factors}
+                />
+                <Field
+                  label="Lindrende faktorer"
+                  value={subjective.relievingFactors || subjective.relieving_factors}
+                />
+                <Field
+                  label="Funksjonsbegrensninger"
+                  value={subjective.functionalLimitations || subjective.functional_limitations}
+                />
                 <Field label="Medikamenter" value={subjective.medications} />
-                <Field label="Tidligere behandling" value={subjective.previousTreatment || subjective.previous_treatment} />
+                <Field
+                  label="Tidligere behandling"
+                  value={subjective.previousTreatment || subjective.previous_treatment}
+                />
               </Section>
 
               {/* Objective Section / Objektiv seksjon */}
@@ -321,17 +354,35 @@ export default function NotePreview({
                 )}
                 <Field label="Observasjon" value={objective.observation} />
                 <Field label="Palpasjon" value={objective.palpation} />
-                <Field label="Bevegelsesutslag (ROM)" value={objective.rangeOfMotion || objective.rom} />
-                <Field label="Nevrologisk undersokelse" value={objective.neurologicalExam || objective.neuro_tests} />
-                <Field label="Ortopediske tester" value={objective.orthopedicTests || objective.ortho_tests} />
-                <Field label="Spesialtester" value={objective.specialTests || objective.special_tests} />
+                <Field
+                  label="Bevegelsesutslag (ROM)"
+                  value={objective.rangeOfMotion || objective.rom}
+                />
+                <Field
+                  label="Nevrologisk undersokelse"
+                  value={objective.neurologicalExam || objective.neuro_tests}
+                />
+                <Field
+                  label="Ortopediske tester"
+                  value={objective.orthopedicTests || objective.ortho_tests}
+                />
+                <Field
+                  label="Spesialtester"
+                  value={objective.specialTests || objective.special_tests}
+                />
               </Section>
 
               {/* Assessment Section / Vurderingsseksjon */}
               <Section title="Vurdering (A)" icon={ClipboardCheck} color="purple">
                 <Field label="Diagnose" value={assessment.diagnosis} />
-                <Field label="Differensialdiagnoser" value={assessment.differentialDiagnosis || assessment.differential_diagnosis} />
-                <Field label="Klinisk vurdering" value={assessment.clinicalImpression || assessment.clinical_impression} />
+                <Field
+                  label="Differensialdiagnoser"
+                  value={assessment.differentialDiagnosis || assessment.differential_diagnosis}
+                />
+                <Field
+                  label="Klinisk vurdering"
+                  value={assessment.clinicalImpression || assessment.clinical_impression}
+                />
                 <Field label="Prognose" value={assessment.prognosis} />
 
                 {/* Red Flags / Rode flagg */}
@@ -359,7 +410,10 @@ export default function NotePreview({
               <Section title="Plan (P)" icon={Target} color="orange">
                 <Field label="Behandling" value={plan.treatment} />
                 <Field label="Ovelser/Hjemmeoppgaver" value={plan.exercises} />
-                <Field label="Pasientundervisning" value={plan.patientEducation || plan.patient_education} />
+                <Field
+                  label="Pasientundervisning"
+                  value={plan.patientEducation || plan.patient_education}
+                />
                 <Field label="Oppfolging" value={plan.followUp || plan.follow_up} />
                 <Field label="Henvisninger" value={plan.referrals} />
                 <Field label="Mal" value={plan.goals} />
@@ -369,16 +423,19 @@ export default function NotePreview({
               {note?.vestibular_data && (
                 <Section title="Vestibular vurdering" icon={Activity} color="teal">
                   {(() => {
-                    const vestibular = parseField(note.vestibular_data)
+                    const vestibular = parseField(note.vestibular_data);
                     return (
                       <>
                         <Field label="Diagnose" value={vestibular.clinicalAssessment?.diagnosis} />
                         <Field label="Type svimmelhet" value={vestibular.symptoms?.dizzinessType} />
                         <Field label="Utlosere" value={vestibular.symptoms?.triggers} />
                         <Field label="Behandling" value={vestibular.plan?.treatment} />
-                        <Field label="Vestibular rehabilitering" value={vestibular.plan?.vestibularRehabilitation} />
+                        <Field
+                          label="Vestibular rehabilitering"
+                          value={vestibular.plan?.vestibularRehabilitation}
+                        />
                       </>
-                    )
+                    );
                   })()}
                 </Section>
               )}
@@ -406,19 +463,15 @@ export default function NotePreview({
         <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex-shrink-0">
           <div className="flex items-center justify-between text-xs text-gray-500">
             <div className="flex items-center gap-4">
-              {note?.created_at && (
-                <span>Opprettet: {formatDateTime(note.created_at)}</span>
-              )}
+              {note?.created_at && <span>Opprettet: {formatDateTime(note.created_at)}</span>}
               {note?.updated_at && note.updated_at !== note.created_at && (
                 <span>Sist endret: {formatDateTime(note.updated_at)}</span>
               )}
             </div>
-            {note?.id && (
-              <span>ID: {note.id.slice(0, 8)}...</span>
-            )}
+            {note?.id && <span>ID: {note.id.slice(0, 8)}...</span>}
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

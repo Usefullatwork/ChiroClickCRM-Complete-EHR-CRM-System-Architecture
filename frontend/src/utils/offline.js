@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Offline Utilities Index
  *
@@ -45,7 +46,7 @@ export {
   clearAllOfflineData,
   getStorageStats,
   isIndexedDBAvailable,
-  STORES
+  STORES,
 } from './offlineStorage';
 
 // Default export as namespace
@@ -71,7 +72,7 @@ export {
   getSyncQueueStats,
   hasPendingSync,
   enableAutoSync,
-  triggerSync
+  triggerSync,
 } from './syncQueue';
 
 // Default export as namespace
@@ -96,15 +97,18 @@ export async function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
     try {
       const registration = await navigator.serviceWorker.register('/service-worker.js', {
-        scope: '/'
+        scope: '/',
       });
 
       console.log('[Offline] Service worker registered:', registration.scope);
 
       // Check for updates periodically
-      setInterval(() => {
-        registration.update();
-      }, 60 * 60 * 1000); // Every hour
+      setInterval(
+        () => {
+          registration.update();
+        },
+        60 * 60 * 1000
+      ); // Every hour
 
       return registration;
     } catch (error) {
@@ -147,7 +151,7 @@ export function sendMessageToSW(message) {
 export function requestVideoCaching(url) {
   sendMessageToSW({
     type: 'CACHE_VIDEO',
-    payload: { url }
+    payload: { url },
   });
 }
 
@@ -158,7 +162,7 @@ export function requestVideoCaching(url) {
 export function requestVideoRemoval(url) {
   sendMessageToSW({
     type: 'REMOVE_CACHED_VIDEO',
-    payload: { url }
+    payload: { url },
   });
 }
 
@@ -191,7 +195,7 @@ export function checkOfflineSupport() {
     cacheAPI: 'caches' in window,
     backgroundSync: 'SyncManager' in window,
     pushNotifications: 'PushManager' in window,
-    onlineDetection: 'onLine' in navigator
+    onlineDetection: 'onLine' in navigator,
   };
 }
 
@@ -201,7 +205,9 @@ export function checkOfflineSupport() {
  * @returns {string} Formatted size
  */
 export function formatBytes(bytes) {
-  if (bytes === 0) return '0 B';
+  if (bytes === 0) {
+    return '0 B';
+  }
 
   const k = 1024;
   const sizes = ['B', 'KB', 'MB', 'GB'];

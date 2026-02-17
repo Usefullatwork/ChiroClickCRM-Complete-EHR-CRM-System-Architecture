@@ -14,7 +14,7 @@ const AUDITABLE_ACTIONS = {
   POST: 'CREATE',
   PUT: 'UPDATE',
   PATCH: 'UPDATE',
-  DELETE: 'DELETE'
+  DELETE: 'DELETE',
 };
 
 /**
@@ -30,7 +30,7 @@ const SENSITIVE_RESOURCES = [
   'claims',
   'episodes',
   'auth',
-  'care_episodes'
+  'care_episodes',
 ];
 
 /**
@@ -45,23 +45,23 @@ const getResourceType = (path) => {
 
   // Map plurals to singular forms
   const resourceMap = {
-    'patients': 'PATIENT',
-    'appointments': 'APPOINTMENT',
-    'communications': 'COMMUNICATION',
-    'followups': 'FOLLOW_UP',
+    patients: 'PATIENT',
+    appointments: 'APPOINTMENT',
+    communications: 'COMMUNICATION',
+    followups: 'FOLLOW_UP',
     'follow-ups': 'FOLLOW_UP',
-    'financial': 'FINANCIAL_METRIC',
-    'billing': 'BILLING',
-    'claims': 'CLAIM',
-    'episodes': 'CARE_EPISODE',
-    'encounters': 'CLINICAL_ENCOUNTER',
-    'templates': 'MESSAGE_TEMPLATE',
-    'users': 'USER',
-    'organizations': 'ORGANIZATION',
-    'gdpr': 'GDPR_REQUEST',
-    'auth': 'AUTH',
-    'outcomes': 'OUTCOME_MEASURE',
-    'treatments': 'TREATMENT_PLAN'
+    financial: 'FINANCIAL_METRIC',
+    billing: 'BILLING',
+    claims: 'CLAIM',
+    episodes: 'CARE_EPISODE',
+    encounters: 'CLINICAL_ENCOUNTER',
+    templates: 'MESSAGE_TEMPLATE',
+    users: 'USER',
+    organizations: 'ORGANIZATION',
+    gdpr: 'GDPR_REQUEST',
+    auth: 'AUTH',
+    outcomes: 'OUTCOME_MEASURE',
+    treatments: 'TREATMENT_PLAN',
   };
 
   return resourceMap[resource] || resource.toUpperCase();
@@ -74,17 +74,31 @@ const getResourceType = (path) => {
  */
 const getResourceId = (req) => {
   // Try params first (e.g., /patients/:id)
-  if (req.params.id) return req.params.id;
-  if (req.params.patientId) return req.params.patientId;
-  if (req.params.encounterId) return req.params.encounterId;
-  if (req.params.episodeId) return req.params.episodeId;
-  if (req.params.claimId) return req.params.claimId;
+  if (req.params.id) {
+    return req.params.id;
+  }
+  if (req.params.patientId) {
+    return req.params.patientId;
+  }
+  if (req.params.encounterId) {
+    return req.params.encounterId;
+  }
+  if (req.params.episodeId) {
+    return req.params.episodeId;
+  }
+  if (req.params.claimId) {
+    return req.params.claimId;
+  }
 
   // Try body for POST requests
-  if (req.method === 'POST' && req.body?.id) return req.body.id;
+  if (req.method === 'POST' && req.body?.id) {
+    return req.body.id;
+  }
 
   // Try response for CREATE operations (set by controller)
-  if (req.auditResourceId) return req.auditResourceId;
+  if (req.auditResourceId) {
+    return req.auditResourceId;
+  }
 
   return null;
 };
@@ -98,7 +112,7 @@ const captureChanges = (req) => {
   if (req.method === 'PATCH' || req.method === 'PUT') {
     return {
       old_values: req.auditOldValues || {},
-      new_values: req.body || {}
+      new_values: req.body || {},
     };
   }
   return null;
@@ -112,7 +126,7 @@ const captureChanges = (req) => {
 const shouldAudit = (req) => {
   // Always audit sensitive resources
   const resourceType = getResourceType(req.path);
-  if (SENSITIVE_RESOURCES.some(r => resourceType.includes(r.toUpperCase()))) {
+  if (SENSITIVE_RESOURCES.some((r) => resourceType.includes(r.toUpperCase()))) {
     return true;
   }
 
@@ -155,7 +169,7 @@ export const auditLogger = async (req, res, next) => {
       try {
         const action = AUDITABLE_ACTIONS[req.method] || req.method;
         const resourceType = getResourceType(req.path);
-        const resourceId = getResourceId(req) || (data?.id) || (data?.data?.id);
+        const resourceId = getResourceId(req) || data?.id || data?.data?.id;
         const changes = captureChanges(req);
         const duration = Date.now() - startTime;
 
@@ -174,15 +188,15 @@ export const auditLogger = async (req, res, next) => {
             method: req.method,
             path: req.path,
             statusCode: res.statusCode,
-            duration: `${duration}ms`
-          }
+            duration: `${duration}ms`,
+          },
         });
       } catch (error) {
         // Don't fail the request if audit logging fails
         logger.error('Audit logging failed', {
           error: error.message,
           path: req.path,
-          method: req.method
+          method: req.method,
         });
       }
     });
@@ -206,7 +220,7 @@ export const auditSensitiveAccess = (req, res, next) => {
       return res.status(400).json({
         error: 'BadRequestError',
         code: 'AUDIT_REASON_REQUIRED',
-        message: 'A reason must be provided for accessing sensitive patient data'
+        message: 'A reason must be provided for accessing sensitive patient data',
       });
     }
 
@@ -235,10 +249,10 @@ export const auditBulkOperation = async (req, action, resourceType, resourceIds,
         bulkOperation: true,
         affectedCount: resourceIds.length,
         resourceIds: resourceIds.slice(0, 100), // Limit logged IDs
-        ...metadata
+        ...metadata,
       },
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
   } catch (error) {
     logger.error('Bulk audit logging failed', error);
@@ -257,7 +271,7 @@ export const auditAuthEvent = async ({
   success = true,
   ipAddress,
   userAgent,
-  metadata = {}
+  metadata = {},
 }) => {
   try {
     await logAudit({
@@ -274,14 +288,14 @@ export const auditAuthEvent = async ({
       userAgent,
       metadata: {
         success,
-        ...metadata
-      }
+        ...metadata,
+      },
     });
   } catch (error) {
     logger.error('Auth audit logging failed', {
       error: error.message,
       action,
-      userEmail
+      userEmail,
     });
   }
 };
@@ -309,13 +323,13 @@ export const auditBillingEvent = async (req, action, details = {}) => {
         claimNumber: details.claimNumber,
         amount: details.amount,
         modifier: details.modifier,
-        ...details.metadata
-      }
+        ...details.metadata,
+      },
     });
   } catch (error) {
     logger.error('Billing audit logging failed', {
       error: error.message,
-      action
+      action,
     });
   }
 };
@@ -325,5 +339,5 @@ export default {
   auditSensitiveAccess,
   auditBulkOperation,
   auditAuthEvent,
-  auditBillingEvent
+  auditBillingEvent,
 };

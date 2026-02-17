@@ -5,14 +5,30 @@
  * Provides visual alerts, acknowledgement workflow, and referral actions.
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import _React, { useState, useEffect, useCallback } from 'react';
 import {
-  AlertTriangle, Shield, ShieldAlert, ShieldCheck, ShieldX,
-  Check, X, Eye, EyeOff, ChevronDown, ChevronUp, FileText,
-  Phone, ExternalLink, Copy, Bell, BellOff, Clock, Activity
+  AlertTriangle,
+  Shield,
+  ShieldAlert,
+  ShieldCheck,
+  ShieldX,
+  Check,
+  _X,
+  _Eye,
+  _EyeOff,
+  ChevronDown,
+  ChevronUp,
+  _FileText,
+  _Phone,
+  ExternalLink,
+  Copy,
+  Bell,
+  BellOff,
+  _Clock,
+  Activity,
 } from 'lucide-react';
 import { useRedFlagScreening } from '../../hooks/useRedFlagScreening';
-import { SEVERITY, CATEGORIES, getCategoryLabels } from '../../services/redFlagScreeningService';
+import { SEVERITY, _CATEGORIES, getCategoryLabels } from '../../services/redFlagScreeningService';
 
 // Bilingual labels
 const LABELS = {
@@ -39,13 +55,13 @@ const LABELS = {
       CRITICAL: 'Critical',
       HIGH: 'High',
       MEDIUM: 'Medium',
-      LOW: 'Low'
+      LOW: 'Low',
     },
     summary: {
       critical: 'critical',
       high: 'high priority',
-      total: 'total flags'
-    }
+      total: 'total flags',
+    },
   },
   no: {
     title: 'Rødt Flagg Screening',
@@ -70,14 +86,14 @@ const LABELS = {
       CRITICAL: 'Kritisk',
       HIGH: 'Høy',
       MEDIUM: 'Moderat',
-      LOW: 'Lav'
+      LOW: 'Lav',
     },
     summary: {
       critical: 'kritisk',
       high: 'høy prioritet',
-      total: 'totalt flagg'
-    }
-  }
+      total: 'totalt flagg',
+    },
+  },
 };
 
 // Severity styling
@@ -88,7 +104,7 @@ const SEVERITY_STYLES = {
     text: 'text-red-800',
     icon: 'text-red-600',
     badge: 'bg-red-600 text-white',
-    ring: 'ring-red-500'
+    ring: 'ring-red-500',
   },
   HIGH: {
     bg: 'bg-orange-50',
@@ -96,7 +112,7 @@ const SEVERITY_STYLES = {
     text: 'text-orange-800',
     icon: 'text-orange-600',
     badge: 'bg-orange-500 text-white',
-    ring: 'ring-orange-500'
+    ring: 'ring-orange-500',
   },
   MEDIUM: {
     bg: 'bg-yellow-50',
@@ -104,7 +120,7 @@ const SEVERITY_STYLES = {
     text: 'text-yellow-800',
     icon: 'text-yellow-600',
     badge: 'bg-yellow-500 text-white',
-    ring: 'ring-yellow-500'
+    ring: 'ring-yellow-500',
   },
   LOW: {
     bg: 'bg-blue-50',
@@ -112,8 +128,8 @@ const SEVERITY_STYLES = {
     text: 'text-blue-800',
     icon: 'text-blue-600',
     badge: 'bg-blue-500 text-white',
-    ring: 'ring-blue-500'
-  }
+    ring: 'ring-blue-500',
+  },
 };
 
 /**
@@ -125,9 +141,11 @@ function RedFlagCard({ flag, isAcknowledged, onAcknowledge, lang = 'en' }) {
   const styles = SEVERITY_STYLES[flag.severity] || SEVERITY_STYLES.LOW;
 
   return (
-    <div className={`rounded-lg border-l-4 ${styles.border} ${styles.bg} overflow-hidden transition-all ${
-      isAcknowledged ? 'opacity-60' : ''
-    }`}>
+    <div
+      className={`rounded-lg border-l-4 ${styles.border} ${styles.bg} overflow-hidden transition-all ${
+        isAcknowledged ? 'opacity-60' : ''
+      }`}
+    >
       <div className="p-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3 flex-1 min-w-0">
@@ -213,9 +231,15 @@ function SummaryBadge({ summary, lang = 'en' }) {
   const hasHigh = summary.high > 0;
 
   return (
-    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg ${
-      hasCritical ? 'bg-red-100 text-red-800' : hasHigh ? 'bg-orange-100 text-orange-800' : 'bg-yellow-100 text-yellow-800'
-    }`}>
+    <div
+      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg ${
+        hasCritical
+          ? 'bg-red-100 text-red-800'
+          : hasHigh
+            ? 'bg-orange-100 text-orange-800'
+            : 'bg-yellow-100 text-yellow-800'
+      }`}
+    >
       {hasCritical ? <ShieldX className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
       <span className="text-sm font-medium">
         {summary.critical > 0 && `${summary.critical} ${t.summary.critical}`}
@@ -236,10 +260,10 @@ export default function RedFlagScreeningPanel({
   onReferral,
   lang = 'en',
   compact = false,
-  className = ''
+  className = '',
 }) {
   const t = LABELS[lang] || LABELS.en;
-  const categoryLabels = getCategoryLabels(lang);
+  const _categoryLabels = getCategoryLabels(lang);
 
   const {
     flags,
@@ -252,14 +276,14 @@ export default function RedFlagScreeningPanel({
     screenText,
     screenFullPatient,
     acknowledgeFlag,
-    acknowledgeAllFlags
+    acknowledgeAllFlags,
   } = useRedFlagScreening({
     lang,
     autoScreen: true,
     onCriticalFlag: (criticalFlags) => {
       // Could trigger audio alert or notification here
       console.warn('Critical red flags detected:', criticalFlags);
-    }
+    },
   });
 
   const [showAll, setShowAll] = useState(false);
@@ -288,10 +312,10 @@ export default function RedFlagScreeningPanel({
       `${lang === 'no' ? 'Kritiske' : 'Critical'}: ${summary.critical}`,
       `${lang === 'no' ? 'Høy prioritet' : 'High priority'}: ${summary.high}`,
       '',
-      lang === 'no' ? '--- DETALJER ---' : '--- DETAILS ---'
+      lang === 'no' ? '--- DETALJER ---' : '--- DETAILS ---',
     ];
 
-    flags.forEach(flag => {
+    flags.forEach((flag) => {
       lines.push('');
       lines.push(`[${flag.severity}] ${flag.description}`);
       lines.push(`${lang === 'no' ? 'Kategori' : 'Category'}: ${flag.categoryLabel}`);
@@ -317,17 +341,21 @@ export default function RedFlagScreeningPanel({
 
   // Main panel
   return (
-    <div className={`bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden ${className}`}>
+    <div
+      className={`bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden ${className}`}
+    >
       {/* Header */}
-      <div className={`px-4 py-3 border-b flex items-center justify-between ${
-        hasUnacknowledgedCritical
-          ? 'bg-red-600 text-white'
-          : summary.high > 0
-            ? 'bg-orange-500 text-white'
-            : summary.total > 0
-              ? 'bg-yellow-500 text-white'
-              : 'bg-gray-50 text-gray-800'
-      }`}>
+      <div
+        className={`px-4 py-3 border-b flex items-center justify-between ${
+          hasUnacknowledgedCritical
+            ? 'bg-red-600 text-white'
+            : summary.high > 0
+              ? 'bg-orange-500 text-white'
+              : summary.total > 0
+                ? 'bg-yellow-500 text-white'
+                : 'bg-gray-50 text-gray-800'
+        }`}
+      >
         <div className="flex items-center gap-3">
           <Shield className="w-5 h-5" />
           <div>
@@ -370,8 +398,10 @@ export default function RedFlagScreeningPanel({
         <div className="p-4 space-y-3">
           {/* Show critical and high first */}
           {flags
-            .filter(f => f.severity === SEVERITY.CRITICAL || f.severity === SEVERITY.HIGH || showAll)
-            .map(flag => (
+            .filter(
+              (f) => f.severity === SEVERITY.CRITICAL || f.severity === SEVERITY.HIGH || showAll
+            )
+            .map((flag) => (
               <RedFlagCard
                 key={flag.id}
                 flag={flag}
@@ -382,14 +412,16 @@ export default function RedFlagScreeningPanel({
             ))}
 
           {/* Toggle for lower severity */}
-          {!showAll && flags.filter(f => f.severity !== SEVERITY.CRITICAL && f.severity !== SEVERITY.HIGH).length > 0 && (
-            <button
-              onClick={() => setShowAll(true)}
-              className="w-full py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
-            >
-              {t.viewDetails} ({summary.medium + summary.low} {lang === 'no' ? 'flere' : 'more'})
-            </button>
-          )}
+          {!showAll &&
+            flags.filter((f) => f.severity !== SEVERITY.CRITICAL && f.severity !== SEVERITY.HIGH)
+              .length > 0 && (
+              <button
+                onClick={() => setShowAll(true)}
+                className="w-full py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+              >
+                {t.viewDetails} ({summary.medium + summary.low} {lang === 'no' ? 'flere' : 'more'})
+              </button>
+            )}
 
           {/* Actions */}
           <div className="flex flex-wrap gap-2 pt-3 border-t border-gray-100">
@@ -429,7 +461,8 @@ export default function RedFlagScreeningPanel({
           <p className="text-green-700 font-medium">{t.noFlags}</p>
           {lastScreened && (
             <p className="text-xs text-gray-500 mt-1">
-              {t.lastScreened}: {new Date(lastScreened).toLocaleTimeString(lang === 'no' ? 'nb-NO' : 'en-US')}
+              {t.lastScreened}:{' '}
+              {new Date(lastScreened).toLocaleTimeString(lang === 'no' ? 'nb-NO' : 'en-US')}
             </p>
           )}
         </div>

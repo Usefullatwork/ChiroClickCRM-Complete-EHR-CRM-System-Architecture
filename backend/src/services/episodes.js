@@ -8,15 +8,15 @@
  * - Modifier determines: AT (active), GA (ABN on file), GZ (no ABN, expect denial)
  */
 
-import { query, transaction } from '../config/database.js';
+import { query, _transaction } from '../config/database.js';
 import logger from '../utils/logger.js';
 
 // Episode statuses and their meanings
 export const EPISODE_STATUS = {
-  ACTIVE: 'ACTIVE',           // Patient showing improvement, billable
+  ACTIVE: 'ACTIVE', // Patient showing improvement, billable
   MAINTENANCE: 'MAINTENANCE', // At MMI, needs ABN for coverage
-  DISCHARGED: 'DISCHARGED',   // Care complete, goals met
-  INACTIVE: 'INACTIVE'        // Episode paused/discontinued
+  DISCHARGED: 'DISCHARGED', // Care complete, goals met
+  INACTIVE: 'INACTIVE', // Episode paused/discontinued
 };
 
 // Body regions for chiropractic care
@@ -25,7 +25,7 @@ export const BODY_REGIONS = {
   THORACIC: 'THORACIC',
   LUMBAR: 'LUMBAR',
   SACRAL: 'SACRAL',
-  EXTREMITY: 'EXTREMITY'
+  EXTREMITY: 'EXTREMITY',
 };
 
 /**
@@ -44,7 +44,7 @@ export const createEpisode = async (organizationId, episodeData) => {
     total_visits_planned = null,
     baseline_pain_level = null,
     baseline_function_score = null,
-    clinical_notes = null
+    clinical_notes = null,
   } = episodeData;
 
   // Calculate next re-eval date (typically 30 days or 12 visits)
@@ -87,7 +87,7 @@ export const createEpisode = async (organizationId, episodeData) => {
       baseline_pain_level,
       baseline_function_score,
       nextReevalDue,
-      clinical_notes
+      clinical_notes,
     ]
   );
 
@@ -157,7 +157,7 @@ export const updateEpisodeProgress = async (organizationId, episodeId, progressD
   const {
     current_pain_level = null,
     current_function_score = null,
-    clinical_notes = null
+    clinical_notes = null,
   } = progressData;
 
   const updates = ['visits_since_last_reeval = visits_since_last_reeval + 1'];
@@ -205,11 +205,11 @@ export const performReEvaluation = async (organizationId, episodeId, reevalData)
     current_pain_level,
     current_function_score,
     clinical_notes,
-    next_reeval_weeks = 4 // Default 4 weeks
+    next_reeval_weeks = 4, // Default 4 weeks
   } = reevalData;
 
   const nextReevalDue = new Date();
-  nextReevalDue.setDate(nextReevalDue.getDate() + (next_reeval_weeks * 7));
+  nextReevalDue.setDate(nextReevalDue.getDate() + next_reeval_weeks * 7);
 
   const result = await query(
     `UPDATE care_episodes
@@ -228,7 +228,7 @@ export const performReEvaluation = async (organizationId, episodeId, reevalData)
       current_pain_level,
       current_function_score,
       nextReevalDue,
-      `[RE-EVAL ${new Date().toISOString().split('T')[0]}] ${clinical_notes}`
+      `[RE-EVAL ${new Date().toISOString().split('T')[0]}] ${clinical_notes}`,
     ]
   );
 
@@ -250,7 +250,7 @@ export const transitionToMaintenance = async (organizationId, episodeId, transit
     abn_on_file = false,
     abn_signed_date = null,
     abn_document_id = null,
-    clinical_notes = null
+    clinical_notes = null,
   } = transitionData;
 
   const result = await query(
@@ -272,7 +272,7 @@ export const transitionToMaintenance = async (organizationId, episodeId, transit
       abn_on_file,
       abn_signed_date,
       abn_document_id,
-      `[MAINTENANCE ${new Date().toISOString().split('T')[0]}] Patient at MMI. ${clinical_notes || ''}`
+      `[MAINTENANCE ${new Date().toISOString().split('T')[0]}] Patient at MMI. ${clinical_notes || ''}`,
     ]
   );
 
@@ -288,10 +288,7 @@ export const transitionToMaintenance = async (organizationId, episodeId, transit
  * Record ABN signature for maintenance care
  */
 export const recordABN = async (organizationId, episodeId, abnData) => {
-  const {
-    abn_signed_date,
-    abn_document_id = null
-  } = abnData;
+  const { abn_signed_date, abn_document_id = null } = abnData;
 
   const result = await query(
     `UPDATE care_episodes
@@ -316,9 +313,7 @@ export const recordABN = async (organizationId, episodeId, abnData) => {
  * Discharge episode (care complete)
  */
 export const dischargeEpisode = async (organizationId, episodeId, dischargeData) => {
-  const {
-    discharge_notes = null
-  } = dischargeData;
+  const { discharge_notes = null } = dischargeData;
 
   const result = await query(
     `UPDATE care_episodes
@@ -356,10 +351,10 @@ export const getEpisodesNeedingReeval = async (organizationId) => {
  * Get billing modifier for an episode (calls DB function)
  */
 export const getBillingModifier = async (episodeId, patientId) => {
-  const result = await query(
-    `SELECT determine_billing_modifier($1, $2) as modifier`,
-    [episodeId, patientId]
-  );
+  const result = await query(`SELECT determine_billing_modifier($1, $2) as modifier`, [
+    episodeId,
+    patientId,
+  ]);
 
   return result.rows[0].modifier;
 };
@@ -368,29 +363,38 @@ export const getBillingModifier = async (episodeId, patientId) => {
  * Calculate improvement percentage
  */
 export const calculateImprovement = (episode) => {
-  if (!episode) return null;
+  if (!episode) {
+    return null;
+  }
 
-  const { baseline_pain_level, current_pain_level, baseline_function_score, current_function_score } = episode;
+  const {
+    baseline_pain_level,
+    current_pain_level,
+    baseline_function_score,
+    current_function_score,
+  } = episode;
 
   // Calculate pain improvement
   if (baseline_pain_level && current_pain_level !== null) {
-    const painImprovement = ((baseline_pain_level - current_pain_level) / baseline_pain_level) * 100;
+    const painImprovement =
+      ((baseline_pain_level - current_pain_level) / baseline_pain_level) * 100;
     return {
       type: 'pain',
       baseline: baseline_pain_level,
       current: current_pain_level,
-      improvement: Math.round(painImprovement * 10) / 10
+      improvement: Math.round(painImprovement * 10) / 10,
     };
   }
 
   // Calculate function improvement (ODI/NDI)
   if (baseline_function_score && current_function_score !== null) {
-    const functionImprovement = ((baseline_function_score - current_function_score) / baseline_function_score) * 100;
+    const functionImprovement =
+      ((baseline_function_score - current_function_score) / baseline_function_score) * 100;
     return {
       type: 'function',
       baseline: baseline_function_score,
       current: current_function_score,
-      improvement: Math.round(functionImprovement * 10) / 10
+      improvement: Math.round(functionImprovement * 10) / 10,
     };
   }
 
@@ -402,7 +406,9 @@ export const calculateImprovement = (episode) => {
  */
 export const getEpisodeSummary = async (organizationId, episodeId) => {
   const episode = await getEpisodeById(organizationId, episodeId);
-  if (!episode) return null;
+  if (!episode) {
+    return null;
+  }
 
   const modifier = await getBillingModifier(episodeId, episode.patient_id);
   const improvement = calculateImprovement(episode);
@@ -421,7 +427,7 @@ export const getEpisodeSummary = async (organizationId, episodeId) => {
     ...episode,
     billing_modifier: modifier,
     improvement,
-    stats: statsResult.rows[0]
+    stats: statsResult.rows[0],
   };
 };
 
@@ -440,5 +446,5 @@ export default {
   getEpisodesNeedingReeval,
   getBillingModifier,
   calculateImprovement,
-  getEpisodeSummary
+  getEpisodeSummary,
 };

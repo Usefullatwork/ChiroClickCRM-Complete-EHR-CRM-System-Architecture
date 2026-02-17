@@ -6,23 +6,23 @@
  * EDI 835: Electronic Remittance Advice (payment/denial response)
  */
 
-import { query, transaction } from '../config/database.js';
+import { query, _transaction } from '../config/database.js';
 import { getBillingModifier } from './episodes.js';
 import logger from '../utils/logger.js';
 
 // Claim statuses
 export const CLAIM_STATUS = {
-  DRAFT: 'DRAFT',         // Being prepared
-  READY: 'READY',         // Ready for submission
+  DRAFT: 'DRAFT', // Being prepared
+  READY: 'READY', // Ready for submission
   SUBMITTED: 'SUBMITTED', // Sent to clearinghouse
-  ACCEPTED: 'ACCEPTED',   // Acknowledged by payer
-  REJECTED: 'REJECTED',   // Rejected by clearinghouse
-  DENIED: 'DENIED',       // Denied by payer
-  PENDING: 'PENDING',     // Awaiting payer decision
-  PAID: 'PAID',           // Fully paid
-  PARTIAL: 'PARTIAL',     // Partially paid
-  APPEALED: 'APPEALED',   // Under appeal
-  WRITTEN_OFF: 'WRITTEN_OFF' // Written off
+  ACCEPTED: 'ACCEPTED', // Acknowledged by payer
+  REJECTED: 'REJECTED', // Rejected by clearinghouse
+  DENIED: 'DENIED', // Denied by payer
+  PENDING: 'PENDING', // Awaiting payer decision
+  PAID: 'PAID', // Fully paid
+  PARTIAL: 'PARTIAL', // Partially paid
+  APPEALED: 'APPEALED', // Under appeal
+  WRITTEN_OFF: 'WRITTEN_OFF', // Written off
 };
 
 // Common CPT codes for chiropractic
@@ -39,7 +39,7 @@ export const CHIROPRACTIC_CPT_CODES = {
   HOT_COLD_PACKS: '97010',
   ELECTRICAL_STIM: '97032',
   ULTRASOUND: '97035',
-  TRACTION: '97012'
+  TRACTION: '97012',
 };
 
 // Billing modifiers
@@ -53,7 +53,7 @@ export const MODIFIERS = {
   XE: 'XE', // Separate encounter
   XS: 'XS', // Separate structure
   XP: 'XP', // Separate practitioner
-  XU: 'XU'  // Unusual non-overlapping service
+  XU: 'XU', // Unusual non-overlapping service
 };
 
 /**
@@ -72,7 +72,7 @@ export const createClaim = async (organizationId, claimData) => {
     group_number = null,
     diagnosis_codes = [],
     line_items = [],
-    place_of_service = '11' // 11 = Office
+    place_of_service = '11', // 11 = Office
   } = claimData;
 
   // Calculate totals from line items
@@ -124,7 +124,7 @@ export const createClaim = async (organizationId, claimData) => {
       JSON.stringify(diagnosis_codes),
       JSON.stringify(line_items),
       total_charge,
-      primary_modifier
+      primary_modifier,
     ]
   );
 
@@ -185,12 +185,12 @@ export const getClaims = async (organizationId, options = {}) => {
     patient_id = null,
     payer_id = null,
     start_date = null,
-    end_date = null
+    end_date = null,
   } = options;
 
   const offset = (page - 1) * limit;
-  let whereConditions = ['c.organization_id = $1'];
-  let params = [organizationId];
+  const whereConditions = ['c.organization_id = $1'];
+  const params = [organizationId];
   let paramIndex = 2;
 
   if (status) {
@@ -226,10 +226,7 @@ export const getClaims = async (organizationId, options = {}) => {
   const whereClause = whereConditions.join(' AND ');
 
   // Get count
-  const countResult = await query(
-    `SELECT COUNT(*) FROM claims c WHERE ${whereClause}`,
-    params
-  );
+  const countResult = await query(`SELECT COUNT(*) FROM claims c WHERE ${whereClause}`, params);
 
   // Get claims
   const result = await query(
@@ -249,8 +246,8 @@ export const getClaims = async (organizationId, options = {}) => {
       page,
       limit,
       total: parseInt(countResult.rows[0].count),
-      pages: Math.ceil(countResult.rows[0].count / limit)
-    }
+      pages: Math.ceil(countResult.rows[0].count / limit),
+    },
   };
 };
 
@@ -317,20 +314,36 @@ export const submitClaim = async (organizationId, claimId, userId) => {
 const validateClaimForSubmission = (claim) => {
   const errors = [];
 
-  if (!claim.patient_id) errors.push('Patient required');
-  if (!claim.payer_id) errors.push('Payer ID required');
-  if (!claim.subscriber_id) errors.push('Subscriber ID required');
-  if (!claim.service_date) errors.push('Service date required');
-  if (!claim.rendering_provider_id) errors.push('Rendering provider required');
+  if (!claim.patient_id) {
+    errors.push('Patient required');
+  }
+  if (!claim.payer_id) {
+    errors.push('Payer ID required');
+  }
+  if (!claim.subscriber_id) {
+    errors.push('Subscriber ID required');
+  }
+  if (!claim.service_date) {
+    errors.push('Service date required');
+  }
+  if (!claim.rendering_provider_id) {
+    errors.push('Rendering provider required');
+  }
 
   const diagnosisCodes = JSON.parse(claim.diagnosis_codes || '[]');
-  if (diagnosisCodes.length === 0) errors.push('At least one diagnosis code required');
+  if (diagnosisCodes.length === 0) {
+    errors.push('At least one diagnosis code required');
+  }
 
   const lineItems = JSON.parse(claim.line_items || '[]');
-  if (lineItems.length === 0) errors.push('At least one line item required');
+  if (lineItems.length === 0) {
+    errors.push('At least one line item required');
+  }
 
   lineItems.forEach((item, index) => {
-    if (!item.cpt_code) errors.push(`Line ${index + 1}: CPT code required`);
+    if (!item.cpt_code) {
+      errors.push(`Line ${index + 1}: CPT code required`);
+    }
     if (!item.charge_amount || item.charge_amount <= 0) {
       errors.push(`Line ${index + 1}: Valid charge amount required`);
     }
@@ -347,24 +360,35 @@ const generateEDI837P = (claim) => {
   // This is a simplified representation
   // Real EDI 837P has strict segment and element requirements
   const segments = [];
-  const timestamp = new Date().toISOString().replace(/[-:T.Z]/g, '').substring(0, 14);
+  const timestamp = new Date()
+    .toISOString()
+    .replace(/[-:T.Z]/g, '')
+    .substring(0, 14);
 
   // ISA - Interchange Control Header
-  segments.push(`ISA*00*          *00*          *ZZ*SENDER_ID      *ZZ*RECEIVER_ID    *${timestamp.substring(0, 6)}*${timestamp.substring(6, 10)}*^*00501*${claim.id.substring(0, 9)}*0*P*:~`);
+  segments.push(
+    `ISA*00*          *00*          *ZZ*SENDER_ID      *ZZ*RECEIVER_ID    *${timestamp.substring(0, 6)}*${timestamp.substring(6, 10)}*^*00501*${claim.id.substring(0, 9)}*0*P*:~`
+  );
 
   // GS - Functional Group Header
-  segments.push(`GS*HC*SENDER_ID*RECEIVER_ID*${timestamp.substring(0, 8)}*${timestamp.substring(8, 12)}*1*X*005010X222A1~`);
+  segments.push(
+    `GS*HC*SENDER_ID*RECEIVER_ID*${timestamp.substring(0, 8)}*${timestamp.substring(8, 12)}*1*X*005010X222A1~`
+  );
 
   // ST - Transaction Set Header
   segments.push(`ST*837*0001*005010X222A1~`);
 
   // BHT - Beginning of Hierarchical Transaction
-  segments.push(`BHT*0019*00*${claim.claim_number}*${timestamp.substring(0, 8)}*${timestamp.substring(8, 12)}*CH~`);
+  segments.push(
+    `BHT*0019*00*${claim.claim_number}*${timestamp.substring(0, 8)}*${timestamp.substring(8, 12)}*CH~`
+  );
 
   // ... Additional segments would follow (NM1, PER, HL, CLM, etc.)
   // This is simplified for demonstration
 
-  segments.push(`CLM*${claim.claim_number}*${claim.total_charge}***${claim.place_of_service}:B:1*Y*A*Y*Y~`);
+  segments.push(
+    `CLM*${claim.claim_number}*${claim.total_charge}***${claim.place_of_service}:B:1*Y*A*Y*Y~`
+  );
 
   // Diagnosis codes
   const diagnoses = JSON.parse(claim.diagnosis_codes || '[]');
@@ -377,7 +401,9 @@ const generateEDI837P = (claim) => {
   lineItems.forEach((item, i) => {
     const modifiers = (item.modifiers || []).join(':');
     segments.push(`LX*${i + 1}~`);
-    segments.push(`SV1*HC:${item.cpt_code}${modifiers ? ':' + modifiers : ''}*${item.charge_amount}*UN*${item.units || 1}***${(item.diagnosis_pointers || [1]).join(':')}~`);
+    segments.push(
+      `SV1*HC:${item.cpt_code}${modifiers ? `:${modifiers}` : ''}*${item.charge_amount}*UN*${item.units || 1}***${(item.diagnosis_pointers || [1]).join(':')}~`
+    );
   });
 
   // Transaction Set Trailer
@@ -401,8 +427,8 @@ export const processRemittance = async (organizationId, claimId, remittanceData)
     payment_date,
     check_eft_number = null,
     denial_reason_codes = [],
-    line_item_adjustments = [],
-    edi_835_data = null
+    _line_item_adjustments = [],
+    edi_835_data = null,
   } = remittanceData;
 
   // Determine new status based on payment
@@ -441,7 +467,7 @@ export const processRemittance = async (organizationId, claimId, remittanceData)
       payment_date,
       check_eft_number,
       denial_reason_codes,
-      edi_835_data
+      edi_835_data,
     ]
   );
 
@@ -457,10 +483,9 @@ export const processRemittance = async (organizationId, claimId, remittanceData)
  * Get claims summary by status
  */
 export const getClaimsSummary = async (organizationId) => {
-  const result = await query(
-    `SELECT * FROM claims_summary WHERE organization_id = $1`,
-    [organizationId]
-  );
+  const result = await query(`SELECT * FROM claims_summary WHERE organization_id = $1`, [
+    organizationId,
+  ]);
 
   return result.rows;
 };
@@ -469,10 +494,9 @@ export const getClaimsSummary = async (organizationId) => {
  * Get outstanding claims
  */
 export const getOutstandingClaims = async (organizationId) => {
-  const result = await query(
-    `SELECT * FROM outstanding_claims WHERE organization_id = $1`,
-    [organizationId]
-  );
+  const result = await query(`SELECT * FROM outstanding_claims WHERE organization_id = $1`, [
+    organizationId,
+  ]);
 
   return result.rows;
 };
@@ -481,10 +505,7 @@ export const getOutstandingClaims = async (organizationId) => {
  * Get suggested CMT code based on regions treated
  */
 export const getSuggestedCMTCode = async (regionsCount) => {
-  const result = await query(
-    `SELECT suggest_cmt_code($1) as cpt_code`,
-    [regionsCount]
-  );
+  const result = await query(`SELECT suggest_cmt_code($1) as cpt_code`, [regionsCount]);
 
   return result.rows[0].cpt_code;
 };
@@ -493,10 +514,7 @@ export const getSuggestedCMTCode = async (regionsCount) => {
  * Appeal a denied claim
  */
 export const appealClaim = async (organizationId, claimId, appealData) => {
-  const {
-    appeal_notes,
-    appeal_deadline = null
-  } = appealData;
+  const { appeal_notes, appeal_deadline = null } = appealData;
 
   const result = await query(
     `UPDATE claims
@@ -554,5 +572,5 @@ export default {
   getOutstandingClaims,
   getSuggestedCMTCode,
   appealClaim,
-  writeOffClaim
+  writeOffClaim,
 };

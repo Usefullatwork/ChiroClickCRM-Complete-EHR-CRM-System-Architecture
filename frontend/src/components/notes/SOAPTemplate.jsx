@@ -11,9 +11,9 @@
  * - Full-screen modal on mobile
  */
 
-import React, { useState, useCallback } from 'react'
+import _React, { useState, useCallback } from 'react';
 import {
-  FileText,
+  _FileText,
   User,
   Stethoscope,
   ClipboardCheck,
@@ -26,11 +26,11 @@ import {
   Plus,
   Trash2,
   Copy,
-  Clock,
-  Calendar,
-  X
-} from 'lucide-react'
-import useMediaQuery from '../../hooks/useMediaQuery'
+  _Clock,
+  _Calendar,
+  X,
+} from 'lucide-react';
+import useMediaQuery from '../../hooks/useMediaQuery';
 
 /**
  * SOAPTemplate Component
@@ -51,156 +51,174 @@ export default function SOAPTemplate({
   onSave,
   onLock,
   templates = [],
-  readOnly = false
+  readOnly = false,
 }) {
-  const { isMobile, isTablet } = useMediaQuery()
+  const { isMobile, _isTablet } = useMediaQuery();
 
   // State for SOAP sections
   // Tilstand for SOAP-seksjoner
-  const [soapData, setSoapData] = useState(initialData || {
-    subjective: {
-      chiefComplaint: '',
-      historyOfPresentIllness: '',
-      painLocation: '',
-      painIntensity: 0,
-      painQuality: '',
-      aggravatingFactors: '',
-      relievingFactors: '',
-      functionalLimitations: '',
-      medications: '',
-      previousTreatment: ''
-    },
-    objective: {
-      vitalSigns: {
-        bloodPressure: '',
-        pulse: '',
-        respiratoryRate: '',
-        temperature: ''
+  const [soapData, setSoapData] = useState(
+    initialData || {
+      subjective: {
+        chiefComplaint: '',
+        historyOfPresentIllness: '',
+        painLocation: '',
+        painIntensity: 0,
+        painQuality: '',
+        aggravatingFactors: '',
+        relievingFactors: '',
+        functionalLimitations: '',
+        medications: '',
+        previousTreatment: '',
       },
-      observation: '',
-      palpation: '',
-      rangeOfMotion: '',
-      neurologicalExam: '',
-      orthopedicTests: '',
-      specialTests: ''
-    },
-    assessment: {
-      diagnosis: '',
-      differentialDiagnosis: '',
-      clinicalImpression: '',
-      redFlags: [],
-      prognosis: ''
-    },
-    plan: {
-      treatment: '',
-      exercises: '',
-      patientEducation: '',
-      followUp: '',
-      referrals: '',
-      goals: ''
+      objective: {
+        vitalSigns: {
+          bloodPressure: '',
+          pulse: '',
+          respiratoryRate: '',
+          temperature: '',
+        },
+        observation: '',
+        palpation: '',
+        rangeOfMotion: '',
+        neurologicalExam: '',
+        orthopedicTests: '',
+        specialTests: '',
+      },
+      assessment: {
+        diagnosis: '',
+        differentialDiagnosis: '',
+        clinicalImpression: '',
+        redFlags: [],
+        prognosis: '',
+      },
+      plan: {
+        treatment: '',
+        exercises: '',
+        patientEducation: '',
+        followUp: '',
+        referrals: '',
+        goals: '',
+      },
     }
-  })
+  );
 
   const [expandedSections, setExpandedSections] = useState({
     subjective: true,
     objective: !isMobile, // Collapse by default on mobile
     assessment: !isMobile,
-    plan: !isMobile
-  })
+    plan: !isMobile,
+  });
 
-  const [showTemplateSelector, setShowTemplateSelector] = useState(false)
-  const [saving, setSaving] = useState(false)
-  const [redFlagInput, setRedFlagInput] = useState('')
-  const [showRedFlagInput, setShowRedFlagInput] = useState(false)
+  const [showTemplateSelector, setShowTemplateSelector] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [redFlagInput, setRedFlagInput] = useState('');
+  const [showRedFlagInput, setShowRedFlagInput] = useState(false);
 
   /**
    * Toggle section expansion
    * Veksle seksjonsutviding
    */
   const toggleSection = (section) => {
-    setExpandedSections(prev => ({
+    setExpandedSections((prev) => ({
       ...prev,
-      [section]: !prev[section]
-    }))
-  }
+      [section]: !prev[section],
+    }));
+  };
 
   /**
    * Update SOAP field
    * Oppdater SOAP-felt
    */
-  const updateField = useCallback((section, field, value) => {
-    if (readOnly) return
-    setSoapData(prev => ({
-      ...prev,
-      [section]: {
-        ...prev[section],
-        [field]: value
+  const updateField = useCallback(
+    (section, field, value) => {
+      if (readOnly) {
+        return;
       }
-    }))
-  }, [readOnly])
+      setSoapData((prev) => ({
+        ...prev,
+        [section]: {
+          ...prev[section],
+          [field]: value,
+        },
+      }));
+    },
+    [readOnly]
+  );
 
   /**
    * Update nested field (e.g., vitalSigns.bloodPressure)
    * Oppdater nestet felt
    */
-  const updateNestedField = useCallback((section, parent, field, value) => {
-    if (readOnly) return
-    setSoapData(prev => ({
-      ...prev,
-      [section]: {
-        ...prev[section],
-        [parent]: {
-          ...prev[section][parent],
-          [field]: value
-        }
+  const updateNestedField = useCallback(
+    (section, parent, field, value) => {
+      if (readOnly) {
+        return;
       }
-    }))
-  }, [readOnly])
+      setSoapData((prev) => ({
+        ...prev,
+        [section]: {
+          ...prev[section],
+          [parent]: {
+            ...prev[section][parent],
+            [field]: value,
+          },
+        },
+      }));
+    },
+    [readOnly]
+  );
 
   /**
    * Add red flag
    * Legg til rod flagg
    */
   const addRedFlag = (flag) => {
-    if (readOnly || !flag.trim()) return
-    setSoapData(prev => ({
+    if (readOnly || !flag.trim()) {
+      return;
+    }
+    setSoapData((prev) => ({
       ...prev,
       assessment: {
         ...prev.assessment,
-        redFlags: [...(prev.assessment.redFlags || []), flag.trim()]
-      }
-    }))
-    setRedFlagInput('')
-    setShowRedFlagInput(false)
-  }
+        redFlags: [...(prev.assessment.redFlags || []), flag.trim()],
+      },
+    }));
+    setRedFlagInput('');
+    setShowRedFlagInput(false);
+  };
 
   /**
    * Remove red flag
    * Fjern rod flagg
    */
   const removeRedFlag = (index) => {
-    if (readOnly) return
-    setSoapData(prev => ({
+    if (readOnly) {
+      return;
+    }
+    setSoapData((prev) => ({
       ...prev,
       assessment: {
         ...prev.assessment,
-        redFlags: prev.assessment.redFlags.filter((_, i) => i !== index)
-      }
-    }))
-  }
+        redFlags: prev.assessment.redFlags.filter((_, i) => i !== index),
+      },
+    }));
+  };
 
   /**
    * Apply template
    * Bruk mal
    */
   const applyTemplate = (template) => {
-    if (readOnly) return
-    setSoapData(prev => ({
+    if (readOnly) {
+      return;
+    }
+    setSoapData((prev) => ({
       ...prev,
-      ...template.data
-    }))
-    setShowTemplateSelector(false)
-  }
+      ...template.data,
+    }));
+    setShowTemplateSelector(false);
+  };
 
   /**
    * Handle save
@@ -208,14 +226,14 @@ export default function SOAPTemplate({
    */
   const handleSave = async () => {
     try {
-      setSaving(true)
+      setSaving(true);
       if (onSave) {
-        await onSave(soapData)
+        await onSave(soapData);
       }
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   /**
    * Handle lock/sign
@@ -223,9 +241,9 @@ export default function SOAPTemplate({
    */
   const handleLock = async () => {
     if (onLock) {
-      await onLock(soapData)
+      await onLock(soapData);
     }
-  }
+  };
 
   /**
    * Section component
@@ -238,7 +256,9 @@ export default function SOAPTemplate({
         className={`w-full flex items-center justify-between p-3 sm:p-4 bg-${color}-50 border-b border-${color}-100 min-h-[56px] touch-manipulation`}
       >
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-${color}-100 flex items-center justify-center flex-shrink-0`}>
+          <div
+            className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-${color}-100 flex items-center justify-center flex-shrink-0`}
+          >
             <Icon className={`w-4 h-4 sm:w-5 sm:h-5 text-${color}-600`} />
           </div>
           <h3 className={`font-semibold text-${color}-900 text-sm sm:text-base`}>{title}</h3>
@@ -249,13 +269,9 @@ export default function SOAPTemplate({
           <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
         )}
       </button>
-      {expandedSections[id] && (
-        <div className="p-3 sm:p-4 space-y-3 sm:space-y-4">
-          {children}
-        </div>
-      )}
+      {expandedSections[id] && <div className="p-3 sm:p-4 space-y-3 sm:space-y-4">{children}</div>}
     </div>
-  )
+  );
 
   /**
    * Text field component
@@ -273,7 +289,7 @@ export default function SOAPTemplate({
         className="w-full px-3 sm:px-4 py-2.5 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500 resize-none text-base sm:text-sm"
       />
     </div>
-  )
+  );
 
   /**
    * Input field component
@@ -284,7 +300,9 @@ export default function SOAPTemplate({
       <input
         type={type}
         value={value || ''}
-        onChange={(e) => onChange(type === 'number' ? parseInt(e.target.value) || 0 : e.target.value)}
+        onChange={(e) =>
+          onChange(type === 'number' ? parseInt(e.target.value) || 0 : e.target.value)
+        }
         placeholder={placeholder}
         disabled={readOnly}
         className="w-full px-3 sm:px-4 py-2.5 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500 text-base sm:text-sm min-h-[44px]"
@@ -292,7 +310,7 @@ export default function SOAPTemplate({
         max={type === 'number' ? '10' : undefined}
       />
     </div>
-  )
+  );
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -479,12 +497,13 @@ export default function SOAPTemplate({
 
         {/* Red Flags / Rode flagg */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Rode flagg
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Rode flagg</label>
           <div className="space-y-2">
             {(soapData.assessment.redFlags || []).map((flag, index) => (
-              <div key={index} className="flex items-center gap-2 p-2 sm:p-3 bg-red-50 border border-red-200 rounded-lg">
+              <div
+                key={index}
+                className="flex items-center gap-2 p-2 sm:p-3 bg-red-50 border border-red-200 rounded-lg"
+              >
                 <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
                 <span className="flex-1 text-sm text-red-700">{flag}</span>
                 {!readOnly && (
@@ -509,10 +528,10 @@ export default function SOAPTemplate({
                       onChange={(e) => setRedFlagInput(e.target.value)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
-                          addRedFlag(redFlagInput)
+                          addRedFlag(redFlagInput);
                         } else if (e.key === 'Escape') {
-                          setShowRedFlagInput(false)
-                          setRedFlagInput('')
+                          setShowRedFlagInput(false);
+                          setRedFlagInput('');
                         }
                       }}
                       placeholder="Skriv inn rod flagg..."
@@ -527,8 +546,8 @@ export default function SOAPTemplate({
                     </button>
                     <button
                       onClick={() => {
-                        setShowRedFlagInput(false)
-                        setRedFlagInput('')
+                        setShowRedFlagInput(false);
+                        setRedFlagInput('');
                       }}
                       className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 min-h-[44px] touch-manipulation"
                     >
@@ -601,11 +620,11 @@ export default function SOAPTemplate({
       {/* Template Selector Modal / Malvelger-modal */}
       {showTemplateSelector && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50">
-          <div className={`bg-white w-full overflow-hidden ${
-            isMobile
-              ? 'rounded-t-2xl max-h-[85vh]'
-              : 'rounded-xl max-w-md mx-4 max-h-[80vh]'
-          }`}>
+          <div
+            className={`bg-white w-full overflow-hidden ${
+              isMobile ? 'rounded-t-2xl max-h-[85vh]' : 'rounded-xl max-w-md mx-4 max-h-[80vh]'
+            }`}
+          >
             <div className="px-4 sm:px-6 py-4 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
               <h3 className="font-semibold text-gray-900">Velg mal</h3>
               <button
@@ -651,5 +670,5 @@ export default function SOAPTemplate({
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -17,8 +17,8 @@ import logger from '../utils/logger.js';
 // =============================================================================
 
 const DEFAULT_WORK_HOURS = {
-  start: 8,  // 08:00
-  end: 18,   // 18:00
+  start: 8, // 08:00
+  end: 18, // 18:00
   slotDuration: 30, // minutes
 };
 
@@ -78,7 +78,7 @@ export const checkConflicts = async (
         practitionerId,
         proposedStart: startTime,
         proposedEnd: endTime,
-        conflicts: result.rows.length
+        conflicts: result.rows.length,
       });
     }
 
@@ -117,7 +117,7 @@ export const isSlotAvailable = async (
 
   return {
     available: conflicts.length === 0,
-    conflicts
+    conflicts,
   };
 };
 
@@ -134,16 +134,11 @@ export const isSlotAvailable = async (
  * @param {Object} options - Options (slotDuration, workHours)
  * @returns {Array} - List of available time slots
  */
-export const getAvailableSlots = async (
-  organizationId,
-  practitionerId,
-  date,
-  options = {}
-) => {
+export const getAvailableSlots = async (organizationId, practitionerId, date, options = {}) => {
   const {
     slotDuration = DEFAULT_WORK_HOURS.slotDuration,
     workStart = DEFAULT_WORK_HOURS.start,
-    workEnd = DEFAULT_WORK_HOURS.end
+    workEnd = DEFAULT_WORK_HOURS.end,
   } = options;
 
   try {
@@ -167,9 +162,9 @@ export const getAvailableSlots = async (
       [organizationId, practitionerId, dayStart.toISOString(), dayEnd.toISOString()]
     );
 
-    const bookedSlots = result.rows.map(row => ({
+    const bookedSlots = result.rows.map((row) => ({
       start: new Date(row.start_time),
-      end: new Date(row.end_time)
+      end: new Date(row.end_time),
     }));
 
     // Generate all possible slots
@@ -181,8 +176,8 @@ export const getAvailableSlots = async (
       const slotEnd = new Date(time + slotMs);
 
       // Check if slot is available
-      const isBooked = bookedSlots.some(booked =>
-        (slotStart < booked.end && slotEnd > booked.start)
+      const isBooked = bookedSlots.some(
+        (booked) => slotStart < booked.end && slotEnd > booked.start
       );
 
       // Don't include slots in the past
@@ -192,7 +187,7 @@ export const getAvailableSlots = async (
         start_time: slotStart.toISOString(),
         end_time: slotEnd.toISOString(),
         available: !isBooked && !isPast,
-        is_past: isPast
+        is_past: isPast,
       });
     }
 
@@ -294,10 +289,7 @@ export const getPractitionerUtilization = async (
   endDate,
   options = {}
 ) => {
-  const {
-    workStart = DEFAULT_WORK_HOURS.start,
-    workEnd = DEFAULT_WORK_HOURS.end
-  } = options;
+  const { workStart = DEFAULT_WORK_HOURS.start, workEnd = DEFAULT_WORK_HOURS.end } = options;
 
   try {
     // Get total minutes of appointments
@@ -331,9 +323,8 @@ export const getPractitionerUtilization = async (
       no_shows: parseInt(result.rows[0]?.no_shows) || 0,
       booked_minutes: bookedMinutes,
       available_minutes: totalAvailableMinutes,
-      utilization_percent: totalAvailableMinutes > 0
-        ? Math.round((bookedMinutes / totalAvailableMinutes) * 100)
-        : 0
+      utilization_percent:
+        totalAvailableMinutes > 0 ? Math.round((bookedMinutes / totalAvailableMinutes) * 100) : 0,
     };
   } catch (error) {
     logger.error('Error getting practitioner utilization:', error);
@@ -354,20 +345,24 @@ export const getPractitionerUtilization = async (
  * @param {string} excludeAppointmentId - Appointment ID to exclude (for updates)
  * @returns {Object} - { valid: boolean, errors: Array }
  */
-export const validateBooking = async (
-  organizationId,
-  bookingData,
-  excludeAppointmentId = null
-) => {
+export const validateBooking = async (organizationId, bookingData, excludeAppointmentId = null) => {
   const errors = [];
 
   const { practitioner_id, start_time, end_time, patient_id } = bookingData;
 
   // Validate required fields
-  if (!practitioner_id) errors.push('Behandler er p&aring;krevd');
-  if (!start_time) errors.push('Starttid er p&aring;krevd');
-  if (!end_time) errors.push('Sluttid er p&aring;krevd');
-  if (!patient_id) errors.push('Pasient er p&aring;krevd');
+  if (!practitioner_id) {
+    errors.push('Behandler er p&aring;krevd');
+  }
+  if (!start_time) {
+    errors.push('Starttid er p&aring;krevd');
+  }
+  if (!end_time) {
+    errors.push('Sluttid er p&aring;krevd');
+  }
+  if (!patient_id) {
+    errors.push('Pasient er p&aring;krevd');
+  }
 
   if (errors.length > 0) {
     return { valid: false, errors };
@@ -399,9 +394,12 @@ export const validateBooking = async (
 
     if (!availability.available) {
       errors.push('Tidspunktet er ikke tilgjengelig - konflikt med eksisterende avtale');
-      errors.push(...availability.conflicts.map(c =>
-        `Konflikt: ${c.patient_name} ${new Date(c.start_time).toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' })} - ${new Date(c.end_time).toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' })}`
-      ));
+      errors.push(
+        ...availability.conflicts.map(
+          (c) =>
+            `Konflikt: ${c.patient_name} ${new Date(c.start_time).toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' })} - ${new Date(c.end_time).toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' })}`
+        )
+      );
     }
   }
 
@@ -432,7 +430,7 @@ export const validateBooking = async (
 
   return {
     valid: errors.length === 0,
-    errors
+    errors,
   };
 };
 
@@ -456,7 +454,7 @@ export const generateRecurringDates = (startDate, pattern, endDate) => {
     DAILY: 1,
     WEEKLY: 7,
     BIWEEKLY: 14,
-    MONTHLY: 30 // Approximate
+    MONTHLY: 30, // Approximate
   };
 
   const interval = intervalDays[pattern] || 7;
@@ -510,7 +508,7 @@ export const createRecurringAppointments = async (
       start_time: appointmentStart.toISOString(),
       end_time: appointmentEnd.toISOString(),
       recurring_pattern: pattern,
-      recurring_end_date: recurringEndDate
+      recurring_end_date: recurringEndDate,
     };
 
     // Validate each occurrence
@@ -520,7 +518,7 @@ export const createRecurringAppointments = async (
       date: appointmentStart.toISOString(),
       valid: validation.valid,
       errors: validation.errors,
-      data: appointmentData
+      data: appointmentData,
     });
   }
 
@@ -541,5 +539,5 @@ export default {
   validateBooking,
   generateRecurringDates,
   createRecurringAppointments,
-  DEFAULT_WORK_HOURS
+  DEFAULT_WORK_HOURS,
 };

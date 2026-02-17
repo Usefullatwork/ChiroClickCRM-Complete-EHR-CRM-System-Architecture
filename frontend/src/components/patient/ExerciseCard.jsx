@@ -5,10 +5,10 @@
  * Displays a single exercise in the patient's exercise program
  */
 
-import React, { useState } from 'react'
+import _React, { useState } from 'react';
 import {
   Play,
-  Pause,
+  _Pause,
   Check,
   ChevronDown,
   ChevronUp,
@@ -17,10 +17,10 @@ import {
   Target,
   Activity,
   AlertTriangle,
-  Star,
-  MoreVertical,
-  Dumbbell
-} from 'lucide-react'
+  _Star,
+  _MoreVertical,
+  Dumbbell,
+} from 'lucide-react';
 
 /**
  * ExerciseCard Component
@@ -47,12 +47,12 @@ export default function ExerciseCard({
   onClick,
   showActions = true,
   compact = false,
-  variant = 'default'
+  variant = 'default',
 }) {
   // Support both completed and completedToday props
-  const isCompleted = completed || completedToday || exercise?.completedToday
-  const [isExpanded, setIsExpanded] = useState(false)
-  const [isPlaying, setIsPlaying] = useState(false)
+  const isCompleted = completed || completedToday || exercise?.completedToday;
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   /**
    * Get difficulty badge color
@@ -62,10 +62,10 @@ export default function ExerciseCard({
     const colors = {
       beginner: 'bg-green-100 text-green-800',
       intermediate: 'bg-yellow-100 text-yellow-800',
-      advanced: 'bg-red-100 text-red-800'
-    }
-    return colors[level] || 'bg-gray-100 text-gray-800'
-  }
+      advanced: 'bg-red-100 text-red-800',
+    };
+    return colors[level] || 'bg-gray-100 text-gray-800';
+  };
 
   /**
    * Get difficulty label in Norwegian
@@ -75,18 +75,18 @@ export default function ExerciseCard({
     const labels = {
       beginner: 'Nybegynner',
       intermediate: 'Middels',
-      advanced: 'Avansert'
-    }
-    return labels[level] || level
-  }
+      advanced: 'Avansert',
+    };
+    return labels[level] || level;
+  };
 
   /**
    * Handle play/pause video
    * Handterer avspilling/pause av video
    */
-  const handlePlayPause = () => {
-    setIsPlaying(!isPlaying)
-  }
+  const _handlePlayPause = () => {
+    setIsPlaying(!isPlaying);
+  };
 
   /**
    * Handle marking exercise as complete
@@ -94,25 +94,25 @@ export default function ExerciseCard({
    */
   const handleComplete = () => {
     if (onComplete) {
-      onComplete(exercise.id || exercise.exerciseId)
+      onComplete(exercise.id || exercise.exerciseId);
     }
-  }
+  };
 
   /**
    * Handle card click for navigation
    */
   const handleClick = () => {
     if (onClick) {
-      onClick(exercise)
+      onClick(exercise);
     }
-  }
+  };
 
   /**
    * Get thumbnail image URL
    */
   const getThumbnail = () => {
-    return exercise?.thumbnailUrl || exercise?.imageUrl || null
-  }
+    return exercise?.thumbnailUrl || exercise?.imageUrl || null;
+  };
 
   // Compact variant for portal lists
   if (compact || variant === 'compact') {
@@ -120,15 +120,17 @@ export default function ExerciseCard({
       <button
         onClick={handleClick}
         className={`w-full flex items-center gap-3 p-3 bg-white rounded-xl border transition-all hover:shadow-md active:scale-[0.98] ${
-          isCompleted
-            ? 'border-green-300 bg-green-50'
-            : 'border-gray-200 hover:border-blue-300'
+          isCompleted ? 'border-green-300 bg-green-50' : 'border-gray-200 hover:border-blue-300'
         }`}
       >
         {/* Thumbnail/Icon */}
-        <div className={`w-12 h-12 rounded-lg flex-shrink-0 overflow-hidden ${
-          getThumbnail() ? '' : 'bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center'
-        }`}>
+        <div
+          className={`w-12 h-12 rounded-lg flex-shrink-0 overflow-hidden ${
+            getThumbnail()
+              ? ''
+              : 'bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center'
+          }`}
+        >
           {getThumbnail() ? (
             <img src={getThumbnail()} alt={exercise?.name} className="w-full h-full object-cover" />
           ) : (
@@ -138,7 +140,9 @@ export default function ExerciseCard({
 
         {/* Info */}
         <div className="flex-1 min-w-0 text-left">
-          <h3 className="font-medium text-gray-900 truncate">{exercise?.name || 'Ukjent øvelse'}</h3>
+          <h3 className="font-medium text-gray-900 truncate">
+            {exercise?.name || 'Ukjent øvelse'}
+          </h3>
           <div className="flex items-center gap-2 mt-0.5 text-xs text-gray-500">
             {exercise?.sets && <span>{exercise.sets} sett</span>}
             {exercise?.sets && exercise?.reps && <span>-</span>}
@@ -161,7 +165,7 @@ export default function ExerciseCard({
           <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
         )}
       </button>
-    )
+    );
   }
 
   // Thumbnail variant for grid displays in portal
@@ -178,11 +182,7 @@ export default function ExerciseCard({
         {/* Thumbnail */}
         <div className="relative aspect-video bg-gray-100">
           {getThumbnail() ? (
-            <img
-              src={getThumbnail()}
-              alt={exercise?.name}
-              className="w-full h-full object-cover"
-            />
+            <img src={getThumbnail()} alt={exercise?.name} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-blue-100 to-indigo-50 flex items-center justify-center">
               <Dumbbell className="w-12 h-12 text-blue-300" />
@@ -218,7 +218,9 @@ export default function ExerciseCard({
               </span>
             )}
             {exercise?.difficultyLevel && (
-              <span className={`px-2 py-0.5 rounded text-xs ${getDifficultyColor(exercise.difficultyLevel)}`}>
+              <span
+                className={`px-2 py-0.5 rounded text-xs ${getDifficultyColor(exercise.difficultyLevel)}`}
+              >
                 {getDifficultyLabel(exercise.difficultyLevel)}
               </span>
             )}
@@ -246,24 +248,25 @@ export default function ExerciseCard({
           </div>
         </div>
       </button>
-    )
+    );
   }
 
   // Default expandable variant
   return (
-    <div className={`bg-white rounded-lg border transition-all ${
-      isCompleted ? 'border-green-300 bg-green-50' : 'border-gray-200 hover:border-gray-300'
-    }`}>
+    <div
+      className={`bg-white rounded-lg border transition-all ${
+        isCompleted ? 'border-green-300 bg-green-50' : 'border-gray-200 hover:border-gray-300'
+      }`}
+    >
       {/* Card Header / Kortoverskrift */}
-      <div
-        className="p-4 cursor-pointer"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
+      <div className="p-4 cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
         <div className="flex items-start gap-3">
           {/* Status Indicator / Statusindikator */}
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-            isCompleted ? 'bg-green-500' : 'bg-blue-100'
-          }`}>
+          <div
+            className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+              isCompleted ? 'bg-green-500' : 'bg-blue-100'
+            }`}
+          >
             {isCompleted ? (
               <Check className="w-5 h-5 text-white" />
             ) : (
@@ -278,7 +281,9 @@ export default function ExerciseCard({
                 {exercise?.name || 'Ukjent øvelse'}
               </h3>
               {exercise?.difficultyLevel && (
-                <span className={`text-xs px-2 py-0.5 rounded ${getDifficultyColor(exercise.difficultyLevel)}`}>
+                <span
+                  className={`text-xs px-2 py-0.5 rounded ${getDifficultyColor(exercise.difficultyLevel)}`}
+                >
                   {getDifficultyLabel(exercise.difficultyLevel)}
                 </span>
               )}
@@ -309,19 +314,13 @@ export default function ExerciseCard({
                   Hold {exercise.holdSeconds} sek
                 </span>
               )}
-              {exercise?.frequencyPerDay && (
-                <span>{exercise.frequencyPerDay}x daglig</span>
-              )}
+              {exercise?.frequencyPerDay && <span>{exercise.frequencyPerDay}x daglig</span>}
             </div>
           </div>
 
           {/* Expand Button / Utvid-knapp */}
           <div className="text-gray-400">
-            {isExpanded ? (
-              <ChevronUp className="w-5 h-5" />
-            ) : (
-              <ChevronDown className="w-5 h-5" />
-            )}
+            {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
           </div>
         </div>
       </div>
@@ -342,11 +341,7 @@ export default function ExerciseCard({
           )}
 
           {exercise?.imageUrl && !exercise?.videoUrl && (
-            <img
-              src={exercise.imageUrl}
-              alt={exercise.name}
-              className="w-full h-48 object-cover"
-            />
+            <img src={exercise.imageUrl} alt={exercise.name} className="w-full h-48 object-cover" />
           )}
 
           {/* Instructions / Instruksjoner */}
@@ -354,18 +349,14 @@ export default function ExerciseCard({
             {exercise?.instructions && (
               <div>
                 <h4 className="text-sm font-medium text-gray-700 mb-2">Instruksjoner</h4>
-                <p className="text-sm text-gray-600 whitespace-pre-line">
-                  {exercise.instructions}
-                </p>
+                <p className="text-sm text-gray-600 whitespace-pre-line">{exercise.instructions}</p>
               </div>
             )}
 
             {/* Custom Instructions / Tilpassede instruksjoner */}
             {exercise?.customInstructions && (
               <div className="p-3 bg-blue-50 rounded-lg">
-                <h4 className="text-sm font-medium text-blue-900 mb-1">
-                  Spesielle instruksjoner
-                </h4>
+                <h4 className="text-sm font-medium text-blue-900 mb-1">Spesielle instruksjoner</h4>
                 <p className="text-sm text-blue-800">{exercise.customInstructions}</p>
               </div>
             )}
@@ -421,5 +412,5 @@ export default function ExerciseCard({
         </div>
       )}
     </div>
-  )
+  );
 }

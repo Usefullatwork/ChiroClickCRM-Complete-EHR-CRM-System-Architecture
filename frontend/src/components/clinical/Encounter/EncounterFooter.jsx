@@ -1,4 +1,4 @@
-import React from 'react';
+import _React from 'react';
 import { Activity, FileText, Save, Lock, Loader2 } from 'lucide-react';
 
 export default function EncounterFooter({
@@ -10,18 +10,25 @@ export default function EncounterFooter({
   isSaving,
   isSigning,
   autoSaveStatus,
-  lastSaved
+  lastSaved,
 }) {
   return (
     <footer className="bg-white border-t border-slate-200 px-6 py-3 flex justify-between items-center flex-shrink-0 shadow-[0_-2px_10px_rgba(0,0,0,0.03)]">
       <div className="flex items-center gap-4">
         <span className="text-sm text-slate-500 flex items-center gap-1">
-          <Activity className={`h-4 w-4 ${autoSaveStatus === 'unsaved' ? 'text-amber-500' : 'text-green-500'}`} />
-          {isSaving ? 'Lagrer...' : (autoSaveStatus === 'saved' ? 'Alle endringer er lagret' : 'Utkast lagres automatisk')}
+          <Activity
+            className={`h-4 w-4 ${autoSaveStatus === 'unsaved' ? 'text-amber-500' : 'text-green-500'}`}
+          />
+          {isSaving
+            ? 'Lagrer...'
+            : autoSaveStatus === 'saved'
+              ? 'Alle endringer er lagret'
+              : 'Utkast lagres automatisk'}
         </span>
         {lastSaved && (
           <span className="text-xs text-slate-400">
-            Sist oppdatert: {lastSaved.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}
+            Sist oppdatert:{' '}
+            {lastSaved.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}
           </span>
         )}
       </div>
@@ -39,7 +46,7 @@ export default function EncounterFooter({
           <FileText className="h-4 w-4" />
           Forhåndsvis
         </button>
-        
+
         {!isSigned && (
           <>
             <button
@@ -68,12 +75,12 @@ export default function EncounterFooter({
             </button>
           </>
         )}
-        
+
         {isSigned && (
-           <span className="inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-green-100 text-green-700 text-sm font-medium">
-             <Lock className="h-4 w-4" />
-             Signert
-           </span>
+          <span className="inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-green-100 text-green-700 text-sm font-medium">
+            <Lock className="h-4 w-4" />
+            Signert
+          </span>
         )}
       </div>
     </footer>

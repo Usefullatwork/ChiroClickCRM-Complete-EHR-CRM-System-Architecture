@@ -10,133 +10,133 @@ import logger from '../utils/logger.js';
  */
 export const STANDARD_MAPPINGS = {
   // First name variations
-  'first_name': 'first_name',
-  'firstname': 'first_name',
+  first_name: 'first_name',
+  firstname: 'first_name',
   'first name': 'first_name',
-  'fornavn': 'first_name',
+  fornavn: 'first_name',
   'given name': 'first_name',
-  'givenname': 'first_name',
+  givenname: 'first_name',
 
   // Last name variations
-  'last_name': 'last_name',
-  'lastname': 'last_name',
+  last_name: 'last_name',
+  lastname: 'last_name',
   'last name': 'last_name',
-  'etternavn': 'last_name',
+  etternavn: 'last_name',
   'family name': 'last_name',
-  'familyname': 'last_name',
-  'surname': 'last_name',
+  familyname: 'last_name',
+  surname: 'last_name',
 
   // Email variations
-  'email': 'email',
+  email: 'email',
   'e-mail': 'email',
-  'epost': 'email',
+  epost: 'email',
   'e-post': 'email',
   'email address': 'email',
 
   // Phone variations
-  'phone': 'phone',
-  'telefon': 'phone',
-  'mobile': 'phone',
-  'mobil': 'phone',
-  'cell': 'phone',
-  'mobiltelefon': 'phone',
+  phone: 'phone',
+  telefon: 'phone',
+  mobile: 'phone',
+  mobil: 'phone',
+  cell: 'phone',
+  mobiltelefon: 'phone',
   'phone number': 'phone',
-  'phonenumber': 'phone',
+  phonenumber: 'phone',
 
   // Home phone
-  'home_phone': 'home_phone',
+  home_phone: 'home_phone',
   'home phone': 'home_phone',
-  'hjemmetelefon': 'home_phone',
+  hjemmetelefon: 'home_phone',
 
   // Work phone
-  'work_phone': 'work_phone',
+  work_phone: 'work_phone',
   'work phone': 'work_phone',
-  'arbeidstelefon': 'work_phone',
+  arbeidstelefon: 'work_phone',
   'jobb telefon': 'work_phone',
 
   // Address
-  'address': 'address_street',
-  'street': 'address_street',
+  address: 'address_street',
+  street: 'address_street',
   'street address': 'address_street',
-  'adresse': 'address_street',
-  'gateadresse': 'address_street',
+  adresse: 'address_street',
+  gateadresse: 'address_street',
 
   // City
-  'city': 'address_city',
-  'by': 'address_city',
-  'sted': 'address_city',
-  'poststed': 'address_city',
+  city: 'address_city',
+  by: 'address_city',
+  sted: 'address_city',
+  poststed: 'address_city',
 
   // Postal code
-  'postal_code': 'address_postal_code',
-  'postalcode': 'address_postal_code',
-  'zip': 'address_postal_code',
-  'zipcode': 'address_postal_code',
-  'postnummer': 'address_postal_code',
+  postal_code: 'address_postal_code',
+  postalcode: 'address_postal_code',
+  zip: 'address_postal_code',
+  zipcode: 'address_postal_code',
+  postnummer: 'address_postal_code',
   'post code': 'address_postal_code',
 
   // Country
-  'country': 'country',
-  'land': 'country',
+  country: 'country',
+  land: 'country',
 
   // Date of birth
-  'date_of_birth': 'date_of_birth',
-  'dateofbirth': 'date_of_birth',
-  'dob': 'date_of_birth',
-  'birthday': 'date_of_birth',
-  'birthdate': 'date_of_birth',
+  date_of_birth: 'date_of_birth',
+  dateofbirth: 'date_of_birth',
+  dob: 'date_of_birth',
+  birthday: 'date_of_birth',
+  birthdate: 'date_of_birth',
   'birth date': 'date_of_birth',
-  'fødselsdato': 'date_of_birth',
-  'fodselsdato': 'date_of_birth',
+  fødselsdato: 'date_of_birth',
+  fodselsdato: 'date_of_birth',
 
   // Gender
-  'gender': 'gender',
-  'sex': 'gender',
-  'kjønn': 'gender',
-  'kjonn': 'gender',
+  gender: 'gender',
+  sex: 'gender',
+  kjønn: 'gender',
+  kjonn: 'gender',
 
   // National ID (Norwegian fødselsnummer)
-  'national_id': 'personal_number',
-  'nationalid': 'personal_number',
-  'personal_number': 'personal_number',
-  'personnummer': 'personal_number',
-  'fødselsnummer': 'personal_number',
-  'fodselsnummer': 'personal_number',
-  'fnr': 'personal_number',
-  'ssn': 'personal_number',
+  national_id: 'personal_number',
+  nationalid: 'personal_number',
+  personal_number: 'personal_number',
+  personnummer: 'personal_number',
+  fødselsnummer: 'personal_number',
+  fodselsnummer: 'personal_number',
+  fnr: 'personal_number',
+  ssn: 'personal_number',
 
   // Notes
-  'notes': 'notes',
-  'notat': 'notes',
-  'notater': 'notes',
-  'comments': 'notes',
-  'kommentar': 'notes',
+  notes: 'notes',
+  notat: 'notes',
+  notater: 'notes',
+  comments: 'notes',
+  kommentar: 'notes',
 
   // External IDs
-  'solvit_id': 'solvit_id',
-  'solvitid': 'solvit_id',
-  'external_id': 'solvit_id',
-  'externalid': 'solvit_id',
+  solvit_id: 'solvit_id',
+  solvitid: 'solvit_id',
+  external_id: 'solvit_id',
+  externalid: 'solvit_id',
 
   // Category
-  'category': 'category',
-  'kategori': 'category',
+  category: 'category',
+  kategori: 'category',
 
   // Status
-  'status': 'status',
+  status: 'status',
 
   // Referral
-  'referral_source': 'referral_source',
-  'referred_by': 'referral_source',
-  'henvist_av': 'referral_source',
+  referral_source: 'referral_source',
+  referred_by: 'referral_source',
+  henvist_av: 'referral_source',
 
   // Emergency contact
-  'emergency_contact': 'emergency_contact_name',
-  'emergency_name': 'emergency_contact_name',
-  'nøkontakt': 'emergency_contact_name',
-  'pårørende': 'emergency_contact_name',
-  'emergency_phone': 'emergency_contact_phone',
-  'nøkontakt_telefon': 'emergency_contact_phone'
+  emergency_contact: 'emergency_contact_name',
+  emergency_name: 'emergency_contact_name',
+  nøkontakt: 'emergency_contact_name',
+  pårørende: 'emergency_contact_name',
+  emergency_phone: 'emergency_contact_phone',
+  nøkontakt_telefon: 'emergency_contact_phone',
 };
 
 /**
@@ -161,8 +161,18 @@ export const PATIENT_FIELDS = [
   { field: 'category', label: 'Category', labelNo: 'Kategori', required: false },
   { field: 'status', label: 'Status', labelNo: 'Status', required: false },
   { field: 'referral_source', label: 'Referral Source', labelNo: 'Henvist av', required: false },
-  { field: 'emergency_contact_name', label: 'Emergency Contact', labelNo: 'Pårørende', required: false },
-  { field: 'emergency_contact_phone', label: 'Emergency Phone', labelNo: 'Pårørende telefon', required: false }
+  {
+    field: 'emergency_contact_name',
+    label: 'Emergency Contact',
+    labelNo: 'Pårørende',
+    required: false,
+  },
+  {
+    field: 'emergency_contact_phone',
+    label: 'Emergency Phone',
+    labelNo: 'Pårørende telefon',
+    required: false,
+  },
 ];
 
 /**
@@ -175,7 +185,7 @@ const detectDelimiter = (content) => {
   let detected = ',';
 
   for (const delimiter of delimiters) {
-    const count = (firstLine.match(new RegExp('\\' + delimiter, 'g')) || []).length;
+    const count = (firstLine.match(new RegExp(`\\${delimiter}`, 'g')) || []).length;
     if (count > maxCount) {
       maxCount = count;
       detected = delimiter;
@@ -228,7 +238,7 @@ export const parseCSV = (content, options = {}) => {
   const {
     delimiter = null, // Auto-detect if null
     hasHeader = true,
-    encoding = 'utf-8'
+    _encoding = 'utf-8',
   } = options;
 
   // Normalize line endings
@@ -238,7 +248,7 @@ export const parseCSV = (content, options = {}) => {
   const actualDelimiter = delimiter || detectDelimiter(normalizedContent);
 
   // Split into lines and filter empty ones
-  const lines = normalizedContent.split('\n').filter(line => line.trim());
+  const lines = normalizedContent.split('\n').filter((line) => line.trim());
 
   if (lines.length === 0) {
     return { headers: [], rows: [], delimiter: actualDelimiter };
@@ -257,7 +267,9 @@ export const parseCSV = (content, options = {}) => {
     const values = parseCSVLine(lines[i], actualDelimiter);
 
     // Skip completely empty rows
-    if (values.every(v => !v)) continue;
+    if (values.every((v) => !v)) {
+      continue;
+    }
 
     const row = {};
     headers.forEach((header, index) => {
@@ -270,7 +282,7 @@ export const parseCSV = (content, options = {}) => {
     headers,
     rows,
     delimiter: actualDelimiter,
-    rowCount: rows.length
+    rowCount: rows.length,
   };
 };
 
@@ -309,8 +321,8 @@ export const autoDetectMappings = (headers) => {
  * @param {Object} mappings - Column to field mappings
  * @returns {Array} Array of patient objects
  */
-export const applyMappings = (rows, mappings) => {
-  return rows.map((row, index) => {
+export const applyMappings = (rows, mappings) =>
+  rows.map((row, index) => {
     const patient = { _sourceRowIndex: index + 1 };
 
     for (const [csvColumn, patientField] of Object.entries(mappings)) {
@@ -326,13 +338,14 @@ export const applyMappings = (rows, mappings) => {
 
     return patient;
   });
-};
 
 /**
  * Transform field values based on field type
  */
 const transformFieldValue = (field, value) => {
-  if (!value) return value;
+  if (!value) {
+    return value;
+  }
 
   switch (field) {
     case 'date_of_birth':
@@ -368,10 +381,12 @@ const transformFieldValue = (field, value) => {
  * Parse various date formats to ISO format
  */
 const parseDateValue = (value) => {
-  if (!value) return null;
+  if (!value) {
+    return null;
+  }
 
   // Try common formats
-  const formats = [
+  const _formats = [
     // ISO format
     /^(\d{4})-(\d{2})-(\d{2})$/,
     // Norwegian format DD.MM.YYYY
@@ -379,7 +394,7 @@ const parseDateValue = (value) => {
     // US format MM/DD/YYYY
     /^(\d{2})\/(\d{2})\/(\d{4})$/,
     // European format DD/MM/YYYY
-    /^(\d{2})\/(\d{2})\/(\d{4})$/
+    /^(\d{2})\/(\d{2})\/(\d{4})$/,
   ];
 
   // ISO format YYYY-MM-DD
@@ -443,7 +458,9 @@ const parseGenderValue = (value) => {
  * Normalize phone number
  */
 const normalizePhone = (value) => {
-  if (!value) return '';
+  if (!value) {
+    return '';
+  }
 
   // Remove common formatting characters
   let cleaned = value.replace(/[\s\-\(\)\.]/g, '');
@@ -511,7 +528,7 @@ export const validateParsedPatients = (patients) => {
   const results = {
     valid: [],
     invalid: [],
-    warnings: []
+    warnings: [],
   };
 
   for (const patient of patients) {
@@ -548,7 +565,7 @@ export const validateParsedPatients = (patients) => {
       results.invalid.push({
         patient,
         row: patient._sourceRowIndex,
-        errors
+        errors,
       });
     } else {
       results.valid.push(patient);
@@ -556,7 +573,7 @@ export const validateParsedPatients = (patients) => {
         results.warnings.push({
           patient,
           row: patient._sourceRowIndex,
-          warnings
+          warnings,
         });
       }
     }
@@ -568,14 +585,12 @@ export const validateParsedPatients = (patients) => {
 /**
  * Save column mapping template for reuse
  */
-export const createMappingTemplate = (name, mappings, metadata = {}) => {
-  return {
-    name,
-    mappings,
-    createdAt: new Date().toISOString(),
-    ...metadata
-  };
-};
+export const createMappingTemplate = (name, mappings, metadata = {}) => ({
+  name,
+  mappings,
+  createdAt: new Date().toISOString(),
+  ...metadata,
+});
 
 export default {
   parseCSV,
@@ -584,5 +599,5 @@ export default {
   validateParsedPatients,
   createMappingTemplate,
   STANDARD_MAPPINGS,
-  PATIENT_FIELDS
+  PATIENT_FIELDS,
 };

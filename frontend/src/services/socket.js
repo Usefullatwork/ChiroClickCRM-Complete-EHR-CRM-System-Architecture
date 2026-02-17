@@ -14,7 +14,9 @@ let socket = null;
  * Initialize socket connection
  */
 export function connectSocket() {
-  if (socket?.connected) return socket;
+  if (socket?.connected) {
+    return socket;
+  }
 
   socket = io(SOCKET_URL, {
     withCredentials: true,
@@ -67,7 +69,9 @@ export function useSocketEvent(event, callback) {
   callbackRef.current = callback;
 
   useEffect(() => {
-    if (!socket) return;
+    if (!socket) {
+      return;
+    }
 
     const handler = (...args) => callbackRef.current(...args);
     socket.on(event, handler);
@@ -85,7 +89,9 @@ export function useSocketStatus() {
   const [connected, setConnected] = useState(socket?.connected || false);
 
   useEffect(() => {
-    if (!socket) return;
+    if (!socket) {
+      return;
+    }
 
     const onConnect = () => setConnected(true);
     const onDisconnect = () => setConnected(false);
@@ -109,7 +115,9 @@ export function useOnlineUsers() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    if (!socket) return;
+    if (!socket) {
+      return;
+    }
 
     socket.emit('who-online', (onlineUsers) => {
       setUsers(onlineUsers || []);

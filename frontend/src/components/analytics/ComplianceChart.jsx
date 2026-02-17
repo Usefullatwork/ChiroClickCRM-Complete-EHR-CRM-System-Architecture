@@ -5,12 +5,12 @@
  * @module components/analytics/ComplianceChart
  */
 
-import React, { useMemo } from 'react';
+import _React, { useMemo } from 'react';
 import {
   LineChart,
   Line,
-  AreaChart,
-  Area,
+  _AreaChart,
+  _Area,
   PieChart,
   Pie,
   Cell,
@@ -19,25 +19,18 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend
+  Legend,
 } from 'recharts';
-import {
-  CheckCircle2,
-  Activity,
-  Clock,
-  XCircle,
-  PauseCircle,
-  TrendingUp
-} from 'lucide-react';
+import { CheckCircle2, Activity, Clock, _XCircle, PauseCircle, TrendingUp } from 'lucide-react';
 
 /**
  * Status colors for pie chart
  */
 const STATUS_COLORS = {
-  completed: '#10b981',  // green
-  active: '#3b82f6',     // blue
-  paused: '#f59e0b',     // amber
-  cancelled: '#ef4444'   // red
+  completed: '#10b981', // green
+  active: '#3b82f6', // blue
+  paused: '#f59e0b', // amber
+  cancelled: '#ef4444', // red
 };
 
 /**
@@ -46,32 +39,33 @@ const STATUS_COLORS = {
  * @param {Object} data - Compliance statistics
  * @param {boolean} loading - Loading state
  */
-export const ComplianceChart = ({
-  data = {},
-  loading = false
-}) => {
+export const ComplianceChart = ({ data = {}, loading = false }) => {
   // Format pie chart data
   const pieData = useMemo(() => {
-    if (!data) return [];
+    if (!data) {
+      return [];
+    }
 
     return [
       { name: 'Fullfort', value: data.completed || 0, color: STATUS_COLORS.completed },
       { name: 'Aktiv', value: data.active || 0, color: STATUS_COLORS.active },
       { name: 'Pauset', value: data.paused || 0, color: STATUS_COLORS.paused },
-      { name: 'Kansellert', value: data.cancelled || 0, color: STATUS_COLORS.cancelled }
-    ].filter(item => item.value > 0);
+      { name: 'Kansellert', value: data.cancelled || 0, color: STATUS_COLORS.cancelled },
+    ].filter((item) => item.value > 0);
   }, [data]);
 
   // Format trend data
   const trendData = useMemo(() => {
-    if (!data.weeklyTrend || data.weeklyTrend.length === 0) return [];
+    if (!data.weeklyTrend || data.weeklyTrend.length === 0) {
+      return [];
+    }
 
-    return data.weeklyTrend.map(item => ({
+    return data.weeklyTrend.map((item) => ({
       week: item.week
         ? new Date(item.week).toLocaleDateString('no-NO', { day: 'numeric', month: 'short' })
         : item.label,
       'Etterlevelse (%)': item.avgRate || 0,
-      'Totalt': item.total || 0
+      Totalt: item.total || 0,
     }));
   }, [data.weeklyTrend]);
 
@@ -82,10 +76,7 @@ export const ComplianceChart = ({
       return (
         <div className="bg-white px-3 py-2 shadow-lg rounded-lg border border-gray-200">
           <div className="flex items-center gap-2">
-            <div
-              className="w-3 h-3 rounded-full"
-              style={{ backgroundColor: item.payload.color }}
-            />
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.payload.color }} />
             <span className="text-sm text-gray-700">{item.name}:</span>
             <span className="text-sm font-bold text-gray-900">{item.value}</span>
           </div>
@@ -103,10 +94,7 @@ export const ComplianceChart = ({
           <p className="text-sm font-semibold text-gray-900 mb-2">{label}</p>
           {payload.map((entry, index) => (
             <div key={index} className="flex items-center gap-2 text-sm">
-              <div
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: entry.color }}
-              />
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
               <span className="text-gray-600">{entry.name}:</span>
               <span className="font-semibold text-gray-900">
                 {entry.name.includes('%') ? `${entry.value}%` : entry.value}
@@ -151,11 +139,15 @@ export const ComplianceChart = ({
           {/* Main compliance rate */}
           <div className="text-right">
             <p className="text-xs text-gray-500">Etterlevelsesrate</p>
-            <p className={`text-2xl font-bold ${
-              completionRate >= 70 ? 'text-green-600' :
-              completionRate >= 50 ? 'text-amber-600' :
-              'text-red-600'
-            }`}>
+            <p
+              className={`text-2xl font-bold ${
+                completionRate >= 70
+                  ? 'text-green-600'
+                  : completionRate >= 50
+                    ? 'text-amber-600'
+                    : 'text-red-600'
+              }`}
+            >
               {completionRate}%
             </p>
           </div>
@@ -288,8 +280,12 @@ export const ComplianceChart = ({
  */
 export const ComplianceGauge = ({ rate = 0, label = 'Etterlevelse', loading = false }) => {
   const getColor = () => {
-    if (rate >= 70) return '#10b981';
-    if (rate >= 50) return '#f59e0b';
+    if (rate >= 70) {
+      return '#10b981';
+    }
+    if (rate >= 50) {
+      return '#f59e0b';
+    }
     return '#ef4444';
   };
 
@@ -311,14 +307,7 @@ export const ComplianceGauge = ({ rate = 0, label = 'Etterlevelse', loading = fa
       <div className="relative w-16 h-16">
         <svg className="w-full h-full transform -rotate-90">
           {/* Background circle */}
-          <circle
-            cx="32"
-            cy="32"
-            r="28"
-            fill="none"
-            stroke="#e5e7eb"
-            strokeWidth="6"
-          />
+          <circle cx="32" cy="32" r="28" fill="none" stroke="#e5e7eb" strokeWidth="6" />
           {/* Progress circle */}
           <circle
             cx="32"

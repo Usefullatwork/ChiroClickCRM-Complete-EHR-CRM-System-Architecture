@@ -20,7 +20,7 @@ import {
   Clipboard,
   Brain,
   Eye,
-  Activity,
+  _Activity,
 } from 'lucide-react';
 
 // Referral types with Norwegian labels
@@ -100,7 +100,7 @@ export default function ClinicalNoteGenerator({
   providerInfo,
   language = 'no',
   onGenerate,
-  onSave,
+  _onSave,
   className = '',
 }) {
   const [selectedType, setSelectedType] = useState('CLINICAL_NOTE');
@@ -201,7 +201,8 @@ export default function ClinicalNoteGenerator({
     if (encounterData) {
       setClinicalFields((prev) => ({
         ...prev,
-        history: encounterData.subjective?.history || encounterData.subjective?.chief_complaint || '',
+        history:
+          encounterData.subjective?.history || encounterData.subjective?.chief_complaint || '',
       }));
     }
   }, [encounterData]);
@@ -304,15 +305,21 @@ export default function ClinicalNoteGenerator({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">{t.dixHallpike}</label>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                {t.dixHallpike}
+              </label>
               <select
                 value={clinicalFields.dix_hallpike}
-                onChange={(e) => setClinicalFields({ ...clinicalFields, dix_hallpike: e.target.value })}
+                onChange={(e) =>
+                  setClinicalFields({ ...clinicalFields, dix_hallpike: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
               >
                 <option value="">Velg...</option>
                 {VESTIBULAR_TESTS.dix_hallpike.map((opt) => (
-                  <option key={opt} value={opt}>{opt}</option>
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
                 ))}
               </select>
             </div>
@@ -326,7 +333,9 @@ export default function ClinicalNoteGenerator({
               >
                 <option value="">Velg...</option>
                 {VESTIBULAR_TESTS.hit_test.map((opt) => (
-                  <option key={opt} value={opt}>{opt}</option>
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
                 ))}
               </select>
             </div>
@@ -340,7 +349,9 @@ export default function ClinicalNoteGenerator({
               >
                 <option value="">Velg...</option>
                 {VESTIBULAR_TESTS.romberg.map((opt) => (
-                  <option key={opt} value={opt}>{opt}</option>
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
                 ))}
               </select>
             </div>
@@ -367,15 +378,21 @@ export default function ClinicalNoteGenerator({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">{t.headacheType}</label>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                {t.headacheType}
+              </label>
               <select
                 value={clinicalFields.headache_type}
-                onChange={(e) => setClinicalFields({ ...clinicalFields, headache_type: e.target.value })}
+                onChange={(e) =>
+                  setClinicalFields({ ...clinicalFields, headache_type: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
               >
                 <option value="">Velg...</option>
                 {HEADACHE_TYPES.map((type) => (
-                  <option key={type} value={type}>{type}</option>
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
                 ))}
               </select>
             </div>
@@ -385,7 +402,9 @@ export default function ClinicalNoteGenerator({
               <input
                 type="text"
                 value={clinicalFields.frequency}
-                onChange={(e) => setClinicalFields({ ...clinicalFields, frequency: e.target.value })}
+                onChange={(e) =>
+                  setClinicalFields({ ...clinicalFields, frequency: e.target.value })
+                }
                 placeholder="F.eks. 3-4 ganger/uke"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
               />
@@ -396,7 +415,9 @@ export default function ClinicalNoteGenerator({
               <input
                 type="text"
                 value={clinicalFields.intensity}
-                onChange={(e) => setClinicalFields({ ...clinicalFields, intensity: e.target.value })}
+                onChange={(e) =>
+                  setClinicalFields({ ...clinicalFields, intensity: e.target.value })
+                }
                 placeholder="F.eks. 7-8/10"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
               />
@@ -460,7 +481,9 @@ export default function ClinicalNoteGenerator({
                   <p className="text-xs text-gray-500">{selectedTypeConfig?.description}</p>
                 </div>
               </div>
-              <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${showTypeDropdown ? 'rotate-180' : ''}`} />
+              <ChevronDown
+                className={`w-5 h-5 text-gray-400 transition-transform ${showTypeDropdown ? 'rotate-180' : ''}`}
+              />
             </button>
 
             {showTypeDropdown && (
@@ -505,7 +528,9 @@ export default function ClinicalNoteGenerator({
             <input
               type="text"
               value={clinicalFields.institution}
-              onChange={(e) => setClinicalFields({ ...clinicalFields, institution: e.target.value })}
+              onChange={(e) =>
+                setClinicalFields({ ...clinicalFields, institution: e.target.value })
+              }
               placeholder="F.eks. Oslo universitetssykehus"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
             />

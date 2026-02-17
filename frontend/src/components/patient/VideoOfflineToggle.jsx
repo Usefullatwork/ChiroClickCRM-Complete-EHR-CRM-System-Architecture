@@ -11,7 +11,7 @@
  * Bilingual: English/Norwegian
  */
 
-import React, { useState, useEffect } from 'react';
+import _React, { useState, useEffect } from 'react';
 import {
   Download,
   Trash2,
@@ -21,7 +21,7 @@ import {
   Wifi,
   WifiOff,
   Video,
-  AlertCircle
+  AlertCircle,
 } from 'lucide-react';
 import { useOffline } from '../../hooks/useOffline';
 
@@ -48,7 +48,7 @@ const TRANSLATIONS = {
     noVideos: 'Ingen videoer a laste ned',
     videosToDownload: 'videoer kan lastes ned',
     videoCached: 'video lagret',
-    videosCached: 'videoer lagret'
+    videosCached: 'videoer lagret',
   },
   en: {
     saveForOffline: 'Save for offline',
@@ -68,8 +68,8 @@ const TRANSLATIONS = {
     noVideos: 'No videos to download',
     videosToDownload: 'videos can be downloaded',
     videoCached: 'video saved',
-    videosCached: 'videos saved'
-  }
+    videosCached: 'videos saved',
+  },
 };
 
 // =============================================================================
@@ -91,11 +91,11 @@ const TRANSLATIONS = {
 export function VideoOfflineToggle({
   videoUrl,
   exerciseId,
-  exerciseName,
+  _exerciseName,
   lang = 'no',
   variant = 'button',
   onCached,
-  onRemoved
+  onRemoved,
 }) {
   const t = TRANSLATIONS[lang] || TRANSLATIONS.no;
 
@@ -114,7 +114,9 @@ export function VideoOfflineToggle({
 
   // Handle toggle
   const handleToggle = async () => {
-    if (!videoUrl) return;
+    if (!videoUrl) {
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
@@ -155,7 +157,9 @@ export function VideoOfflineToggle({
   };
 
   // No video URL
-  if (!videoUrl) return null;
+  if (!videoUrl) {
+    return null;
+  }
 
   // Render based on variant
   switch (variant) {
@@ -166,9 +170,10 @@ export function VideoOfflineToggle({
           disabled={isLoading || (!isOnline && !isCached)}
           className={`
             p-2 rounded-lg transition-colors
-            ${isCached
-              ? 'bg-green-100 text-green-600 hover:bg-green-200'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            ${
+              isCached
+                ? 'bg-green-100 text-green-600 hover:bg-green-200'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }
             ${isLoading ? 'opacity-50 cursor-wait' : ''}
             ${!isOnline && !isCached ? 'opacity-50 cursor-not-allowed' : ''}
@@ -207,9 +212,7 @@ export function VideoOfflineToggle({
                 ${isCached ? 'translate-x-5' : 'translate-x-0'}
               `}
             >
-              {isLoading && (
-                <Loader2 className="w-4 h-4 m-0.5 text-gray-400 animate-spin" />
-              )}
+              {isLoading && <Loader2 className="w-4 h-4 m-0.5 text-gray-400 animate-spin" />}
             </span>
           </button>
         </label>
@@ -224,9 +227,10 @@ export function VideoOfflineToggle({
             disabled={isLoading || (!isOnline && !isCached)}
             className={`
               flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors
-              ${isCached
-                ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ${
+                isCached
+                  ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }
               ${isLoading ? 'opacity-50 cursor-wait' : ''}
               ${!isOnline && !isCached ? 'opacity-50 cursor-not-allowed' : ''}
@@ -278,11 +282,11 @@ export function VideoOfflineManager({ exercises, lang = 'no' }) {
 
   const {
     isOnline,
-    cachedVideoCount,
+    _cachedVideoCount,
     cachedVideoSize,
     cacheVideo,
     removeCachedVideo,
-    checkVideoCached
+    checkVideoCached,
   } = useOffline();
 
   const [cachedUrls, setCachedUrls] = useState(new Set());
@@ -309,14 +313,20 @@ export function VideoOfflineManager({ exercises, lang = 'no' }) {
 
   // Format size
   const formatSize = (bytes) => {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    if (bytes < 1024) {
+      return `${bytes} B`;
+    }
+    if (bytes < 1024 * 1024) {
+      return `${(bytes / 1024).toFixed(1)} KB`;
+    }
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
   // Download all videos
   const handleDownloadAll = async () => {
-    if (!isOnline) return;
+    if (!isOnline) {
+      return;
+    }
 
     setIsProcessing(true);
     setProgress({ current: 0, total: videosWithUrls.length });
@@ -369,7 +379,9 @@ export function VideoOfflineManager({ exercises, lang = 'no' }) {
                 <>
                   {cachedUrls.size} {cachedUrls.size === 1 ? t.videoCached : t.videosCached}
                   {cachedVideoSize > 0 && (
-                    <span className="ml-1">({formatSize(cachedVideoSize)} {t.storageUsed})</span>
+                    <span className="ml-1">
+                      ({formatSize(cachedVideoSize)} {t.storageUsed})
+                    </span>
                   )}
                 </>
               ) : (
@@ -380,7 +392,9 @@ export function VideoOfflineManager({ exercises, lang = 'no' }) {
         </div>
 
         {/* Connection indicator */}
-        <div className={`flex items-center gap-1 text-xs ${isOnline ? 'text-green-600' : 'text-amber-600'}`}>
+        <div
+          className={`flex items-center gap-1 text-xs ${isOnline ? 'text-green-600' : 'text-amber-600'}`}
+        >
           {isOnline ? <Wifi className="w-4 h-4" /> : <WifiOff className="w-4 h-4" />}
         </div>
       </div>
@@ -389,7 +403,9 @@ export function VideoOfflineManager({ exercises, lang = 'no' }) {
       {isProcessing && (
         <div className="mb-4">
           <div className="flex justify-between text-sm text-gray-500 mb-1">
-            <span>{progress.current} / {progress.total}</span>
+            <span>
+              {progress.current} / {progress.total}
+            </span>
             <span>{Math.round((progress.current / progress.total) * 100)}%</span>
           </div>
           <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -409,9 +425,10 @@ export function VideoOfflineManager({ exercises, lang = 'no' }) {
             disabled={isProcessing || !isOnline}
             className={`
               flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors
-              ${isOnline
-                ? 'bg-blue-600 text-white hover:bg-blue-700'
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              ${
+                isOnline
+                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
               }
               ${isProcessing ? 'opacity-50 cursor-wait' : ''}
             `}
@@ -449,7 +466,9 @@ export function VideoOfflineManager({ exercises, lang = 'no' }) {
       {cachedVideoSize > 0 && (
         <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
           <HardDrive className="w-3 h-3" />
-          <span>{formatSize(cachedVideoSize)} {t.storageUsed}</span>
+          <span>
+            {formatSize(cachedVideoSize)} {t.storageUsed}
+          </span>
         </div>
       )}
     </div>

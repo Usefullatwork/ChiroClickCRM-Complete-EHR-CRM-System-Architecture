@@ -6,30 +6,30 @@
  * chiropractic clinics with takst codes and HELFO integration
  */
 
-import React, { useState } from 'react';
+import _React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import {
-  CreditCard,
+  _CreditCard,
   Plus,
-  Search,
-  Filter,
+  _Search,
+  _Filter,
   Download,
-  Send,
-  CheckCircle,
+  _Send,
+  _CheckCircle,
   Clock,
   AlertTriangle,
   FileText,
-  DollarSign,
+  _DollarSign,
   TrendingUp,
-  Calendar,
-  User,
-  MoreVertical,
-  Eye,
-  Printer,
+  _Calendar,
+  _User,
+  _MoreVertical,
+  _Eye,
+  _Printer,
   BarChart3,
   RefreshCw,
-  Settings,
+  _Settings,
 } from 'lucide-react';
 import { billingAPI } from '../services/api';
 import toast from '../utils/toast';
@@ -47,7 +47,7 @@ import PaymentTracker from '../components/billing/PaymentTracker';
  * @returns {JSX.Element} Billing management page
  */
 export default function Billing() {
-  const navigate = useNavigate();
+  const _navigate = useNavigate();
 
   // State for tabs and modals
   const [activeTab, setActiveTab] = useState('invoices');

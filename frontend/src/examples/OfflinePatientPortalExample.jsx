@@ -14,8 +14,8 @@
  * IMPORTANT: This is an example file. Integrate these patterns into your actual pages.
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import _React, { useState, useEffect, useCallback } from 'react';
+import { _useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Dumbbell,
   Loader2,
@@ -23,7 +23,7 @@ import {
   RefreshCw,
   CloudOff,
   Cloud,
-  Download
+  Download,
 } from 'lucide-react';
 
 // Import offline utilities
@@ -52,16 +52,16 @@ export default function OfflineMyExercisesExample() {
     isOnline,
     isOffline,
     isSyncing,
-    syncStatus,
+    _syncStatus,
     pendingSyncCount,
-    lastSyncTime,
-    cachedVideoCount,
+    _lastSyncTime,
+    _cachedVideoCount,
     triggerSync,
     cachePrescriptionOffline,
     getCachedPrescriptionData,
     getCachedPrescriptions,
     recordExerciseProgress,
-    getTodayProgress
+    getTodayProgress,
   } = useOffline({ token, autoSync: true });
 
   // State
@@ -117,7 +117,7 @@ export default function OfflineMyExercisesExample() {
           setData({
             prescriptions: cachedPrescriptions.map((p) => p.prescription),
             clinic: cachedPrescriptions[0]?.clinic || null,
-            patient: cachedPrescriptions[0]?.patient || null
+            patient: cachedPrescriptions[0]?.patient || null,
           });
           setUsingCachedData(true);
         } else {
@@ -134,7 +134,7 @@ export default function OfflineMyExercisesExample() {
           setData({
             prescriptions: cachedPrescriptions.map((p) => p.prescription),
             clinic: cachedPrescriptions[0]?.clinic || null,
-            patient: cachedPrescriptions[0]?.patient || null
+            patient: cachedPrescriptions[0]?.patient || null,
           });
           setUsingCachedData(true);
         } else {
@@ -164,69 +164,77 @@ export default function OfflineMyExercisesExample() {
   // PRESCRIPTION SELECTION - WITH OFFLINE SUPPORT
   // =============================================================================
 
-  const loadPrescriptionDetail = useCallback(async (prescriptionId) => {
-    try {
-      let prescriptionData = null;
+  const _loadPrescriptionDetail = useCallback(
+    async (prescriptionId) => {
+      try {
+        let prescriptionData = null;
 
-      if (isOnline) {
-        // Online: Fetch fresh data
-        const response = await patientApi.getPrescription(token, prescriptionId);
-        if (response.success) {
-          prescriptionData = response.data;
-          // Update cache
-          await cachePrescriptionOffline(prescriptionData);
+        if (isOnline) {
+          // Online: Fetch fresh data
+          const response = await patientApi.getPrescription(token, prescriptionId);
+          if (response.success) {
+            prescriptionData = response.data;
+            // Update cache
+            await cachePrescriptionOffline(prescriptionData);
+          }
+        } else {
+          // Offline: Use cached data
+          prescriptionData = await getCachedPrescriptionData(prescriptionId);
         }
-      } else {
-        // Offline: Use cached data
-        prescriptionData = await getCachedPrescriptionData(prescriptionId);
-      }
 
-      if (prescriptionData) {
-        setSelectedPrescription(prescriptionData);
+        if (prescriptionData) {
+          setSelectedPrescription(prescriptionData);
 
-        // Load today's progress (from local storage)
-        const progress = await getTodayProgress(prescriptionId);
-        setTodayProgress(progress);
-      }
-    } catch (err) {
-      console.error('Error loading prescription:', err);
+          // Load today's progress (from local storage)
+          const progress = await getTodayProgress(prescriptionId);
+          setTodayProgress(progress);
+        }
+      } catch (err) {
+        console.error('Error loading prescription:', err);
 
-      // Try cache on error
-      const cached = await getCachedPrescriptionData(prescriptionId);
-      if (cached) {
-        setSelectedPrescription(cached);
-        const progress = await getTodayProgress(prescriptionId);
-        setTodayProgress(progress);
+        // Try cache on error
+        const cached = await getCachedPrescriptionData(prescriptionId);
+        if (cached) {
+          setSelectedPrescription(cached);
+          const progress = await getTodayProgress(prescriptionId);
+          setTodayProgress(progress);
+        }
       }
-    }
-  }, [token, isOnline, cachePrescriptionOffline, getCachedPrescriptionData, getTodayProgress]);
+    },
+    [token, isOnline, cachePrescriptionOffline, getCachedPrescriptionData, getTodayProgress]
+  );
 
   // =============================================================================
   // EXERCISE COMPLETION - WORKS OFFLINE
   // =============================================================================
 
-  const handleExerciseComplete = useCallback(async (exerciseId, progressData) => {
-    if (!selectedPrescription) return;
+  const handleExerciseComplete = useCallback(
+    async (exerciseId, progressData) => {
+      if (!selectedPrescription) {
+        return;
+      }
 
-    const prescriptionId = selectedPrescription.prescription.id;
+      const prescriptionId = selectedPrescription.prescription.id;
 
-    // Record progress - this works offline!
-    const success = await recordExerciseProgress(prescriptionId, exerciseId, progressData);
+      // Record progress - this works offline!
+      const success = await recordExerciseProgress(prescriptionId, exerciseId, progressData);
 
-    if (success) {
-      // Update local state
-      setTodayProgress((prev) => [
-        ...prev,
-        {
-          exerciseId,
-          ...progressData,
-          completedAt: new Date().toISOString()
-        }
-      ]);
+      if (success) {
+        // Update local state
+        setTodayProgress((prev) => [
+          ...prev,
+          {
+            exerciseId,
+            ...progressData,
+            completedAt: new Date().toISOString(),
+          },
+        ]);
 
-      console.log('Progress recorded', { exerciseId, offline: isOffline });
-    }
-  }, [selectedPrescription, recordExerciseProgress, isOffline]);
+        // Progress recorded
+      }
+    },
+    [selectedPrescription, recordExerciseProgress, isOffline]
+  );
 
   // =============================================================================
   // RENDER
@@ -296,9 +304,7 @@ export default function OfflineMyExercisesExample() {
                 </h1>
                 <p className="text-sm text-gray-500">
                   {data?.patient?.firstName ? `Hei, ${data.patient.firstName}!` : 'Mine ovelser'}
-                  {usingCachedData && (
-                    <span className="ml-2 text-amber-600">(frakoblet)</span>
-                  )}
+                  {usingCachedData && <span className="ml-2 text-amber-600">(frakoblet)</span>}
                 </p>
               </div>
             </div>
@@ -340,10 +346,7 @@ export default function OfflineMyExercisesExample() {
         {/* Video Offline Manager - Let patients download videos */}
         {selectedPrescription?.exercises?.some((e) => e.videoUrl) && (
           <div className="mb-6">
-            <VideoOfflineManager
-              exercises={selectedPrescription.exercises}
-              lang="no"
-            />
+            <VideoOfflineManager exercises={selectedPrescription.exercises} lang="no" />
           </div>
         )}
 
@@ -367,7 +370,7 @@ export default function OfflineMyExercisesExample() {
                     selectedPrescription?.exercises?.length
                       ? (todayProgress.length / selectedPrescription.exercises.length) * 100
                       : 0
-                  }%`
+                  }%`,
                 }}
               />
             </div>
@@ -378,7 +381,8 @@ export default function OfflineMyExercisesExample() {
 
           {pendingSyncCount > 0 && (
             <p className="mt-2 text-xs text-amber-600">
-              {pendingSyncCount} {pendingSyncCount === 1 ? 'endring' : 'endringer'} venter pa synkronisering
+              {pendingSyncCount} {pendingSyncCount === 1 ? 'endring' : 'endringer'} venter pa
+              synkronisering
             </p>
           )}
         </div>
@@ -399,7 +403,7 @@ export default function OfflineMyExercisesExample() {
                     setsCompleted: exercise.sets || 3,
                     repsCompleted: exercise.reps || 10,
                     difficultyRating: 3,
-                    painRating: 0
+                    painRating: 0,
                   });
                 }}
                 showActions={true}

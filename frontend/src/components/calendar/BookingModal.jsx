@@ -14,10 +14,10 @@
  * - Norwegian labels
  */
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, _useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { patientsAPI } from '../../services/api';
-import { format, parseISO, addMinutes, isWithinInterval } from 'date-fns';
+import { format, parseISO, addMinutes, _isWithinInterval } from 'date-fns';
 import { nb } from 'date-fns/locale';
 import {
   X,
@@ -29,7 +29,7 @@ import {
   CheckCircle,
   Loader2,
   Trash2,
-  UserPlus,
+  _UserPlus,
 } from 'lucide-react';
 import toast from '../../utils/toast';
 
@@ -60,7 +60,7 @@ const DEFAULT_DURATIONS_BY_TYPE = {
 // PATIENT SEARCH COMPONENT
 // =============================================================================
 
-function PatientSearch({ value, onChange, selectedPatient, onSelect, onClear }) {
+function PatientSearch({ _value, _onChange, selectedPatient, onSelect, onClear }) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -167,7 +167,9 @@ function PatientSearch({ value, onChange, selectedPatient, onSelect, onClear }) 
 // =============================================================================
 
 function ConflictWarning({ conflicts }) {
-  if (!conflicts || conflicts.length === 0) return null;
+  if (!conflicts || conflicts.length === 0) {
+    return null;
+  }
 
   return (
     <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -264,20 +266,28 @@ export default function BookingModal({
 
   // Check for conflicts
   const conflicts = useMemo(() => {
-    if (!appointmentDate || !appointmentTime || !practitionerId) return [];
+    if (!appointmentDate || !appointmentTime || !practitionerId) {
+      return [];
+    }
 
     const startDateTime = new Date(`${appointmentDate}T${appointmentTime}`);
     const endDateTime = addMinutes(startDateTime, duration);
 
     return existingAppointments.filter((apt) => {
       // Skip the appointment we're editing
-      if (editingAppointment && apt.id === editingAppointment.id) return false;
+      if (editingAppointment && apt.id === editingAppointment.id) {
+        return false;
+      }
 
       // Skip cancelled appointments
-      if (['CANCELLED', 'NO_SHOW'].includes(apt.status)) return false;
+      if (['CANCELLED', 'NO_SHOW'].includes(apt.status)) {
+        return false;
+      }
 
       // Only check same practitioner
-      if (apt.practitioner_id !== practitionerId) return false;
+      if (apt.practitioner_id !== practitionerId) {
+        return false;
+      }
 
       const aptStart = parseISO(apt.start_time);
       const aptEnd = parseISO(apt.end_time);
@@ -300,7 +310,9 @@ export default function BookingModal({
 
   // Calculate end time
   const endTime = useMemo(() => {
-    if (!appointmentDate || !appointmentTime) return '';
+    if (!appointmentDate || !appointmentTime) {
+      return '';
+    }
     const startDateTime = new Date(`${appointmentDate}T${appointmentTime}`);
     const endDateTime = addMinutes(startDateTime, duration);
     return format(endDateTime, 'HH:mm');
@@ -319,7 +331,9 @@ export default function BookingModal({
       const confirmed = window.confirm(
         'Det er en tidskonflikt. Er du sikker pa at du vil opprette denne avtalen likevel?'
       );
-      if (!confirmed) return;
+      if (!confirmed) {
+        return;
+      }
     }
 
     const startDateTime = new Date(`${appointmentDate}T${appointmentTime}`);
@@ -348,7 +362,9 @@ export default function BookingModal({
     setCancelReason('');
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">

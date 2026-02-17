@@ -15,7 +15,7 @@ export default function BodyDiagram({
   selectedRegions = [],
   onChange,
   showLabels = true,
-  className = ''
+  className = '',
 }) {
   const [view, setView] = useState('front'); // 'front' | 'back'
   const [hoveredRegion, setHoveredRegion] = useState(null);
@@ -23,7 +23,7 @@ export default function BodyDiagram({
   const toggleRegion = (regionId) => {
     const isSelected = selectedRegions.includes(regionId);
     if (isSelected) {
-      onChange(selectedRegions.filter(r => r !== regionId));
+      onChange(selectedRegions.filter((r) => r !== regionId));
     } else {
       onChange([...selectedRegions, regionId]);
     }
@@ -45,7 +45,11 @@ export default function BodyDiagram({
 
   // Body region definitions with SVG paths
   const frontRegions = [
-    { id: 'head', label: 'Head', path: 'M100,10 Q130,10 130,40 Q130,70 100,70 Q70,70 70,40 Q70,10 100,10' },
+    {
+      id: 'head',
+      label: 'Head',
+      path: 'M100,10 Q130,10 130,40 Q130,70 100,70 Q70,70 70,40 Q70,10 100,10',
+    },
     { id: 'neck_front', label: 'Neck', path: 'M90,70 L110,70 L115,95 L85,95 Z' },
     { id: 'r_shoulder', label: 'R Shoulder', path: 'M55,95 Q35,100 35,115 L55,125 L70,105 Z' },
     { id: 'l_shoulder', label: 'L Shoulder', path: 'M145,95 Q165,100 165,115 L145,125 L130,105 Z' },
@@ -70,10 +74,18 @@ export default function BodyDiagram({
   ];
 
   const backRegions = [
-    { id: 'head_back', label: 'Head', path: 'M100,10 Q130,10 130,40 Q130,70 100,70 Q70,70 70,40 Q70,10 100,10' },
+    {
+      id: 'head_back',
+      label: 'Head',
+      path: 'M100,10 Q130,10 130,40 Q130,70 100,70 Q70,70 70,40 Q70,10 100,10',
+    },
     { id: 'neck_back', label: 'Cervical', path: 'M85,70 L115,70 L118,100 L82,100 Z' },
     { id: 'r_shoulder_back', label: 'R Shoulder', path: 'M55,95 Q35,100 35,115 L55,125 L68,105 Z' },
-    { id: 'l_shoulder_back', label: 'L Shoulder', path: 'M145,95 Q165,100 165,115 L145,125 L132,105 Z' },
+    {
+      id: 'l_shoulder_back',
+      label: 'L Shoulder',
+      path: 'M145,95 Q165,100 165,115 L145,125 L132,105 Z',
+    },
     { id: 'upper_back', label: 'Thoracic', path: 'M68,100 L132,100 L135,155 L65,155 Z' },
     { id: 'mid_back', label: 'Mid Back', path: 'M65,155 L135,155 L130,185 L70,185 Z' },
     { id: 'lower_back', label: 'Lumbar', path: 'M70,185 L130,185 L125,210 L75,210 Z' },
@@ -98,10 +110,12 @@ export default function BodyDiagram({
 
   // Generate text from selections
   const generateLocationText = () => {
-    if (selectedRegions.length === 0) return '';
+    if (selectedRegions.length === 0) {
+      return '';
+    }
     const allRegions = [...frontRegions, ...backRegions];
-    const labels = selectedRegions.map(id => {
-      const region = allRegions.find(r => r.id === id);
+    const labels = selectedRegions.map((id) => {
+      const region = allRegions.find((r) => r.id === id);
       return region?.label || id;
     });
     return labels.join(', ');
@@ -118,9 +132,7 @@ export default function BodyDiagram({
             <button
               onClick={() => setView('front')}
               className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
-                view === 'front'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 hover:bg-gray-100'
+                view === 'front' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
               Front
@@ -128,9 +140,7 @@ export default function BodyDiagram({
             <button
               onClick={() => setView('back')}
               className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
-                view === 'back'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 hover:bg-gray-100'
+                view === 'back' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
               Back
@@ -152,21 +162,52 @@ export default function BodyDiagram({
 
       {/* Body Diagram */}
       <div className="p-4 flex justify-center">
-        <svg
-          viewBox="0 0 200 460"
-          className="w-48 h-auto"
-          style={{ maxHeight: '350px' }}
-        >
+        <svg viewBox="0 0 200 460" className="w-48 h-auto" style={{ maxHeight: '350px' }}>
           {/* Background silhouette */}
           <ellipse cx="100" cy="40" rx="30" ry="35" className="fill-gray-200 stroke-gray-300" />
-          <rect x="70" y="70" width="60" height="130" rx="5" className="fill-gray-200 stroke-gray-300" />
-          <rect x="30" y="110" width="25" height="110" rx="3" className="fill-gray-200 stroke-gray-300" />
-          <rect x="145" y="110" width="25" height="110" rx="3" className="fill-gray-200 stroke-gray-300" />
-          <rect x="65" y="200" width="30" height="180" rx="3" className="fill-gray-200 stroke-gray-300" />
-          <rect x="105" y="200" width="30" height="180" rx="3" className="fill-gray-200 stroke-gray-300" />
+          <rect
+            x="70"
+            y="70"
+            width="60"
+            height="130"
+            rx="5"
+            className="fill-gray-200 stroke-gray-300"
+          />
+          <rect
+            x="30"
+            y="110"
+            width="25"
+            height="110"
+            rx="3"
+            className="fill-gray-200 stroke-gray-300"
+          />
+          <rect
+            x="145"
+            y="110"
+            width="25"
+            height="110"
+            rx="3"
+            className="fill-gray-200 stroke-gray-300"
+          />
+          <rect
+            x="65"
+            y="200"
+            width="30"
+            height="180"
+            rx="3"
+            className="fill-gray-200 stroke-gray-300"
+          />
+          <rect
+            x="105"
+            y="200"
+            width="30"
+            height="180"
+            rx="3"
+            className="fill-gray-200 stroke-gray-300"
+          />
 
           {/* Clickable regions */}
-          {regions.map(region => (
+          {regions.map((region) => (
             <g key={region.id}>
               <path
                 d={region.path}
@@ -182,21 +223,9 @@ export default function BodyDiagram({
           {/* Hover label */}
           {hoveredRegion && (
             <g>
-              <rect
-                x="50"
-                y="0"
-                width="100"
-                height="20"
-                rx="4"
-                className="fill-gray-800"
-              />
-              <text
-                x="100"
-                y="14"
-                textAnchor="middle"
-                className="fill-white text-xs font-medium"
-              >
-                {regions.find(r => r.id === hoveredRegion)?.label || hoveredRegion}
+              <rect x="50" y="0" width="100" height="20" rx="4" className="fill-gray-800" />
+              <text x="100" y="14" textAnchor="middle" className="fill-white text-xs font-medium">
+                {regions.find((r) => r.id === hoveredRegion)?.label || hoveredRegion}
               </text>
             </g>
           )}
@@ -207,18 +236,15 @@ export default function BodyDiagram({
       {selectedRegions.length > 0 && (
         <div className="px-4 pb-3">
           <div className="flex flex-wrap gap-1.5">
-            {selectedRegions.map(regionId => {
-              const region = [...frontRegions, ...backRegions].find(r => r.id === regionId);
+            {selectedRegions.map((regionId) => {
+              const region = [...frontRegions, ...backRegions].find((r) => r.id === regionId);
               return (
                 <span
                   key={regionId}
                   className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full"
                 >
                   {region?.label || regionId}
-                  <button
-                    onClick={() => toggleRegion(regionId)}
-                    className="hover:text-red-600"
-                  >
+                  <button onClick={() => toggleRegion(regionId)} className="hover:text-red-600">
                     ×
                   </button>
                 </span>
@@ -231,9 +257,7 @@ export default function BodyDiagram({
       {/* Generated Text Output */}
       {selectedRegions.length > 0 && showLabels && (
         <div className="px-4 py-3 bg-green-50 border-t border-green-200 rounded-b-lg">
-          <label className="block text-xs font-medium text-green-800 mb-1">
-            Pain Location:
-          </label>
+          <label className="block text-xs font-medium text-green-800 mb-1">Pain Location:</label>
           <p className="text-sm text-green-900">{generateLocationText()}</p>
         </div>
       )}
@@ -260,7 +284,7 @@ export function QuickRegionSelect({ onChange, selectedRegions = [] }) {
   const toggleRegion = (regionId) => {
     const isSelected = selectedRegions.includes(regionId);
     if (isSelected) {
-      onChange(selectedRegions.filter(r => r !== regionId));
+      onChange(selectedRegions.filter((r) => r !== regionId));
     } else {
       onChange([...selectedRegions, regionId]);
     }
@@ -268,7 +292,7 @@ export function QuickRegionSelect({ onChange, selectedRegions = [] }) {
 
   return (
     <div className="flex flex-wrap gap-2">
-      {commonRegions.map(region => (
+      {commonRegions.map((region) => (
         <button
           key={region.id}
           onClick={() => toggleRegion(region.id)}

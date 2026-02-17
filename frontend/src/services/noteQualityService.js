@@ -101,10 +101,18 @@ export function checkCompleteness(soapData, encounterType = 'FOLLOWUP') {
   } else {
     missing.push('Hovedklage / Chief complaint');
   }
-  if (subj.history && subj.history.trim()) subjScore += 15;
-  if (subj.onset && subj.onset.trim()) subjScore += 10;
-  if (subj.pain_description && subj.pain_description.trim()) subjScore += 10;
-  if (subj.aggravating_factors || subj.relieving_factors) subjScore += 5;
+  if (subj.history && subj.history.trim()) {
+    subjScore += 15;
+  }
+  if (subj.onset && subj.onset.trim()) {
+    subjScore += 10;
+  }
+  if (subj.pain_description && subj.pain_description.trim()) {
+    subjScore += 10;
+  }
+  if (subj.aggravating_factors || subj.relieving_factors) {
+    subjScore += 5;
+  }
   sectionScores.subjective = Math.min(subjScore, 100);
 
   // --- Objective ---
@@ -124,11 +132,20 @@ export function checkCompleteness(soapData, encounterType = 'FOLLOWUP') {
   // --- Assessment ---
   const assess = soapData.assessment || {};
   let assessScore = 0;
-  if (assess.clinical_reasoning && assess.clinical_reasoning.trim()) assessScore += 50;
-  else if (encounterType === 'INITIAL') missing.push('Klinisk vurdering / Clinical reasoning');
-  if (assess.differential_diagnosis && assess.differential_diagnosis.trim()) assessScore += 20;
-  if (assess.prognosis && assess.prognosis.trim()) assessScore += 20;
-  if (assess.red_flags_checked) assessScore += 10;
+  if (assess.clinical_reasoning && assess.clinical_reasoning.trim()) {
+    assessScore += 50;
+  } else if (encounterType === 'INITIAL') {
+    missing.push('Klinisk vurdering / Clinical reasoning');
+  }
+  if (assess.differential_diagnosis && assess.differential_diagnosis.trim()) {
+    assessScore += 20;
+  }
+  if (assess.prognosis && assess.prognosis.trim()) {
+    assessScore += 20;
+  }
+  if (assess.red_flags_checked) {
+    assessScore += 10;
+  }
   sectionScores.assessment = Math.min(assessScore, 100);
 
   // Diagnosis codes
@@ -143,12 +160,23 @@ export function checkCompleteness(soapData, encounterType = 'FOLLOWUP') {
   // --- Plan ---
   const plan = soapData.plan || {};
   let planScore = 0;
-  if (plan.treatment && plan.treatment.trim()) planScore += 40;
-  else if (encounterType === 'INITIAL') missing.push('Behandling / Treatment');
-  if (plan.exercises && plan.exercises.trim()) planScore += 20;
-  if (plan.advice && plan.advice.trim()) planScore += 15;
-  if (plan.follow_up && plan.follow_up.trim()) planScore += 15;
-  if (plan.referrals && plan.referrals.trim()) planScore += 10;
+  if (plan.treatment && plan.treatment.trim()) {
+    planScore += 40;
+  } else if (encounterType === 'INITIAL') {
+    missing.push('Behandling / Treatment');
+  }
+  if (plan.exercises && plan.exercises.trim()) {
+    planScore += 20;
+  }
+  if (plan.advice && plan.advice.trim()) {
+    planScore += 15;
+  }
+  if (plan.follow_up && plan.follow_up.trim()) {
+    planScore += 15;
+  }
+  if (plan.referrals && plan.referrals.trim()) {
+    planScore += 10;
+  }
   sectionScores.plan = Math.min(planScore, 100);
 
   // Overall weighted score
@@ -212,8 +240,12 @@ export function checkRedFlags(subjective) {
  * @returns {'green' | 'yellow' | 'red'}
  */
 export function getQualityLevel(score) {
-  if (score >= 70) return 'green';
-  if (score >= 40) return 'yellow';
+  if (score >= 70) {
+    return 'green';
+  }
+  if (score >= 40) {
+    return 'yellow';
+  }
   return 'red';
 }
 

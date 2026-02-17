@@ -34,13 +34,16 @@ export class CacheManager {
       sets: 0,
       deletes: 0,
       redisErrors: 0,
-      localFallbacks: 0
+      localFallbacks: 0,
     };
 
     // Clean expired local entries every 5 minutes
-    this.cleanupInterval = setInterval(() => {
-      this.cleanExpiredLocal();
-    }, 5 * 60 * 1000);
+    this.cleanupInterval = setInterval(
+      () => {
+        this.cleanExpiredLocal();
+      },
+      5 * 60 * 1000
+    );
 
     logger.info('CacheManager initialized', { prefix: this.prefix });
   }
@@ -129,7 +132,7 @@ export class CacheManager {
     if (this.useLocalFallback) {
       this.localCache.set(fullKey, value);
       if (ttl > 0) {
-        this.localTTLs.set(fullKey, Date.now() + (ttl * 1000));
+        this.localTTLs.set(fullKey, Date.now() + ttl * 1000);
       }
     }
   }
@@ -241,7 +244,7 @@ export class CacheManager {
     }
 
     // Delete from local
-    const regex = new RegExp('^' + fullPattern.replace(/\*/g, '.*') + '$');
+    const regex = new RegExp(`^${fullPattern.replace(/\*/g, '.*')}$`);
     for (const key of this.localCache.keys()) {
       if (regex.test(key)) {
         this.localCache.delete(key);
@@ -286,15 +289,16 @@ export class CacheManager {
    * Get cache statistics
    */
   getStats() {
-    const hitRate = this.stats.hits + this.stats.misses > 0
-      ? ((this.stats.hits / (this.stats.hits + this.stats.misses)) * 100).toFixed(2)
-      : 0;
+    const hitRate =
+      this.stats.hits + this.stats.misses > 0
+        ? ((this.stats.hits / (this.stats.hits + this.stats.misses)) * 100).toFixed(2)
+        : 0;
 
     return {
       ...this.stats,
       hitRate: `${hitRate}%`,
       localCacheSize: this.localCache.size,
-      redisConnected: isRedisConnected()
+      redisConnected: isRedisConnected(),
     };
   }
 
@@ -332,8 +336,7 @@ export const cacheManager = new CacheManager();
 export const CacheKeys = {
   // Patient
   patient: (id) => `patient:${id}`,
-  patientList: (orgId, page, filters) =>
-    `patients:${orgId}:${page}:${JSON.stringify(filters)}`,
+  patientList: (orgId, page, filters) => `patients:${orgId}:${page}:${JSON.stringify(filters)}`,
   patientStats: (id) => `patient:${id}:stats`,
 
   // Appointments
@@ -359,21 +362,20 @@ export const CacheKeys = {
   orgUsers: (orgId) => `org:${orgId}:users`,
 
   // KPI
-  kpiStats: (orgId, startDate, endDate) =>
-    `kpi:${orgId}:${startDate}:${endDate}`,
-  dashboardStats: (orgId) => `dashboard:${orgId}:stats`
+  kpiStats: (orgId, startDate, endDate) => `kpi:${orgId}:${startDate}:${endDate}`,
+  dashboardStats: (orgId) => `dashboard:${orgId}:stats`,
 };
 
 /**
  * TTL presets for different data types
  */
 export const CacheTTL = {
-  SHORT: 60,          // 1 minute - volatile data
-  MEDIUM: 300,        // 5 minutes - moderately stable
-  DEFAULT: 3600,      // 1 hour - stable data
-  LONG: 7200,         // 2 hours - infrequently changing
-  DAY: 86400,         // 24 hours - static reference data
-  WEEK: 604800        // 7 days - very static data
+  SHORT: 60, // 1 minute - volatile data
+  MEDIUM: 300, // 5 minutes - moderately stable
+  DEFAULT: 3600, // 1 hour - stable data
+  LONG: 7200, // 2 hours - infrequently changing
+  DAY: 86400, // 24 hours - static reference data
+  WEEK: 604800, // 7 days - very static data
 };
 
 export default { cacheManager, CacheKeys, CacheTTL };

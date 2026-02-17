@@ -6,35 +6,35 @@
  * Viser pasientens treningsoverholdelse og terapeutens overvakningsvisning
  */
 
-import React, { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
+import _React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Activity,
-  TrendingUp,
-  TrendingDown,
+  _TrendingUp,
+  _TrendingDown,
   Calendar,
   Award,
   Users,
   ChevronLeft,
   ChevronRight,
   Search,
-  Filter,
+  _Filter,
   Clock,
-  AlertCircle,
+  _AlertCircle,
   CheckCircle,
   Target,
   Frown,
   Meh,
   Smile,
   ArrowUpRight,
-  ArrowDownRight
-} from 'lucide-react'
-import { progressAPI } from '../services/api'
-import ProgressChart from '../components/patient/ProgressChart'
-import ComplianceCalendar from '../components/patient/ComplianceCalendar'
-import PainTracker from '../components/patient/PainTracker'
-import ExerciseLog from '../components/patient/ExerciseLog'
+  ArrowDownRight,
+} from 'lucide-react';
+import { progressAPI } from '../services/api';
+import ProgressChart from '../components/patient/ProgressChart';
+import ComplianceCalendar from '../components/patient/ComplianceCalendar';
+import PainTracker from '../components/patient/PainTracker';
+import _ExerciseLog from '../components/patient/ExerciseLog';
 
 /**
  * PatientProgress Component
@@ -43,109 +43,123 @@ import ExerciseLog from '../components/patient/ExerciseLog'
  * @returns {JSX.Element} Patient progress dashboard
  */
 export default function PatientProgress() {
-  const { patientId } = useParams()
-  const navigate = useNavigate()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const { patientId } = useParams();
+  const navigate = useNavigate();
+  const [_searchParams, _setSearchParams] = useSearchParams();
 
   // View mode: 'patient' (single patient) or 'therapist' (all patients)
-  const viewMode = patientId ? 'patient' : 'therapist'
+  const viewMode = patientId ? 'patient' : 'therapist';
 
   // State
-  const [selectedPatient, setSelectedPatient] = useState(null)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [complianceFilter, setComplianceFilter] = useState('all')
-  const [sortBy, setSortBy] = useState('compliance_rate')
-  const [sortOrder, setSortOrder] = useState('DESC')
+  const [_selectedPatient, _setSelectedPatient] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [complianceFilter, setComplianceFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('compliance_rate');
+  const [sortOrder, setSortOrder] = useState('DESC');
 
   // Fetch patient progress stats (single patient view)
-  const { data: patientStatsResponse, isLoading: statsLoading } = useQuery({
+  const { data: patientStatsResponse, isLoading: _statsLoading } = useQuery({
     queryKey: ['patient-progress-stats', patientId],
     queryFn: () => progressAPI.getPatientStats(patientId),
-    enabled: !!patientId && viewMode === 'patient'
-  })
+    enabled: !!patientId && viewMode === 'patient',
+  });
 
   // Fetch weekly compliance (single patient view)
   const { data: weeklyResponse, isLoading: weeklyLoading } = useQuery({
     queryKey: ['patient-weekly-compliance', patientId],
     queryFn: () => progressAPI.getWeeklyCompliance(patientId, 12),
-    enabled: !!patientId && viewMode === 'patient'
-  })
+    enabled: !!patientId && viewMode === 'patient',
+  });
 
   // Fetch daily progress for calendar (single patient view)
   const { data: dailyResponse, isLoading: dailyLoading } = useQuery({
     queryKey: ['patient-daily-progress', patientId],
     queryFn: () => progressAPI.getDailyProgress(patientId, 3),
-    enabled: !!patientId && viewMode === 'patient'
-  })
+    enabled: !!patientId && viewMode === 'patient',
+  });
 
   // Fetch pain history (single patient view)
   const { data: painResponse, isLoading: painLoading } = useQuery({
     queryKey: ['patient-pain-history', patientId],
     queryFn: () => progressAPI.getPainHistory(patientId, 90),
-    enabled: !!patientId && viewMode === 'patient'
-  })
+    enabled: !!patientId && viewMode === 'patient',
+  });
 
   // Fetch all patients compliance (therapist view)
   const { data: complianceResponse, isLoading: complianceLoading } = useQuery({
     queryKey: ['all-patients-compliance', sortBy, sortOrder, complianceFilter],
-    queryFn: () => progressAPI.getAllPatientsCompliance({
-      limit: 50,
-      offset: 0,
-      sortBy,
-      order: sortOrder
-    }),
-    enabled: viewMode === 'therapist'
-  })
+    queryFn: () =>
+      progressAPI.getAllPatientsCompliance({
+        limit: 50,
+        offset: 0,
+        sortBy,
+        order: sortOrder,
+      }),
+    enabled: viewMode === 'therapist',
+  });
 
   // Fetch clinic overview (therapist view)
-  const { data: overviewResponse, isLoading: overviewLoading } = useQuery({
+  const { data: overviewResponse, isLoading: _overviewLoading } = useQuery({
     queryKey: ['clinic-compliance-overview'],
     queryFn: () => progressAPI.getClinicOverview(),
-    enabled: viewMode === 'therapist'
-  })
+    enabled: viewMode === 'therapist',
+  });
 
-  const patientStats = patientStatsResponse?.data
-  const weeklyData = weeklyResponse?.data || []
-  const dailyData = dailyResponse?.data || []
-  const painData = painResponse?.data
-  const allPatients = complianceResponse?.data?.patients || []
-  const clinicOverview = overviewResponse?.data
+  const patientStats = patientStatsResponse?.data;
+  const weeklyData = weeklyResponse?.data || [];
+  const dailyData = dailyResponse?.data || [];
+  const painData = painResponse?.data;
+  const allPatients = complianceResponse?.data?.patients || [];
+  const clinicOverview = overviewResponse?.data;
 
   // Filter patients by search and compliance
-  const filteredPatients = allPatients.filter(patient => {
-    const matchesSearch = patient.patientName.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesFilter = complianceFilter === 'all' ||
+  const filteredPatients = allPatients.filter((patient) => {
+    const matchesSearch = patient.patientName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter =
+      complianceFilter === 'all' ||
       (complianceFilter === 'excellent' && patient.complianceRate >= 80) ||
-      (complianceFilter === 'good' && patient.complianceRate >= 60 && patient.complianceRate < 80) ||
-      (complianceFilter === 'needs_attention' && patient.complianceRate < 60)
-    return matchesSearch && matchesFilter
-  })
+      (complianceFilter === 'good' &&
+        patient.complianceRate >= 60 &&
+        patient.complianceRate < 80) ||
+      (complianceFilter === 'needs_attention' && patient.complianceRate < 60);
+    return matchesSearch && matchesFilter;
+  });
 
   /**
    * Get compliance status color
    */
   const getComplianceColor = (rate) => {
-    if (rate >= 80) return 'text-green-600 bg-green-100'
-    if (rate >= 60) return 'text-blue-600 bg-blue-100'
-    if (rate >= 40) return 'text-yellow-600 bg-yellow-100'
-    return 'text-red-600 bg-red-100'
-  }
+    if (rate >= 80) {
+      return 'text-green-600 bg-green-100';
+    }
+    if (rate >= 60) {
+      return 'text-blue-600 bg-blue-100';
+    }
+    if (rate >= 40) {
+      return 'text-yellow-600 bg-yellow-100';
+    }
+    return 'text-red-600 bg-red-100';
+  };
 
   /**
    * Get pain emoji
    */
   const getPainEmoji = (level) => {
-    if (level <= 2) return <Smile className="w-5 h-5 text-green-500" />
-    if (level <= 5) return <Meh className="w-5 h-5 text-yellow-500" />
-    return <Frown className="w-5 h-5 text-red-500" />
-  }
+    if (level <= 2) {
+      return <Smile className="w-5 h-5 text-green-500" />;
+    }
+    if (level <= 5) {
+      return <Meh className="w-5 h-5 text-yellow-500" />;
+    }
+    return <Frown className="w-5 h-5 text-red-500" />;
+  };
 
   /**
    * Handle patient selection in therapist view
    */
   const handlePatientSelect = (patient) => {
-    navigate(`/progress/${patient.patientId}`)
-  }
+    navigate(`/progress/${patient.patientId}`);
+  };
 
   // Render therapist view (all patients)
   if (viewMode === 'therapist') {
@@ -212,7 +226,8 @@ export default function PatientProgress() {
                     <p className="text-2xl font-semibold text-gray-900">
                       {clinicOverview.overview?.avgPain30d || '-'}
                     </p>
-                    {clinicOverview.overview?.avgPain30d && getPainEmoji(parseFloat(clinicOverview.overview.avgPain30d))}
+                    {clinicOverview.overview?.avgPain30d &&
+                      getPainEmoji(parseFloat(clinicOverview.overview.avgPain30d))}
                   </div>
                 </div>
                 <div className="w-12 h-12 rounded-lg bg-orange-50 flex items-center justify-center">
@@ -229,27 +244,37 @@ export default function PatientProgress() {
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Overholdelsesfordeling</h3>
             <div className="flex gap-4">
               <div className="flex-1 text-center p-4 bg-green-50 rounded-lg">
-                <p className="text-3xl font-bold text-green-600">{clinicOverview.distribution.excellent || 0}</p>
+                <p className="text-3xl font-bold text-green-600">
+                  {clinicOverview.distribution.excellent || 0}
+                </p>
                 <p className="text-sm text-green-700 mt-1">Utmerket</p>
                 <p className="text-xs text-green-600">80%+</p>
               </div>
               <div className="flex-1 text-center p-4 bg-blue-50 rounded-lg">
-                <p className="text-3xl font-bold text-blue-600">{clinicOverview.distribution.good || 0}</p>
+                <p className="text-3xl font-bold text-blue-600">
+                  {clinicOverview.distribution.good || 0}
+                </p>
                 <p className="text-sm text-blue-700 mt-1">Bra</p>
                 <p className="text-xs text-blue-600">60-79%</p>
               </div>
               <div className="flex-1 text-center p-4 bg-yellow-50 rounded-lg">
-                <p className="text-3xl font-bold text-yellow-600">{clinicOverview.distribution.fair || 0}</p>
+                <p className="text-3xl font-bold text-yellow-600">
+                  {clinicOverview.distribution.fair || 0}
+                </p>
                 <p className="text-sm text-yellow-700 mt-1">Middels</p>
                 <p className="text-xs text-yellow-600">40-59%</p>
               </div>
               <div className="flex-1 text-center p-4 bg-orange-50 rounded-lg">
-                <p className="text-3xl font-bold text-orange-600">{clinicOverview.distribution.low || 0}</p>
+                <p className="text-3xl font-bold text-orange-600">
+                  {clinicOverview.distribution.low || 0}
+                </p>
                 <p className="text-sm text-orange-700 mt-1">Lav</p>
                 <p className="text-xs text-orange-600">20-39%</p>
               </div>
               <div className="flex-1 text-center p-4 bg-red-50 rounded-lg">
-                <p className="text-3xl font-bold text-red-600">{clinicOverview.distribution.inactive || 0}</p>
+                <p className="text-3xl font-bold text-red-600">
+                  {clinicOverview.distribution.inactive || 0}
+                </p>
                 <p className="text-sm text-red-700 mt-1">Inaktiv</p>
                 <p className="text-xs text-red-600">Under 20%</p>
               </div>
@@ -295,7 +320,11 @@ export default function PatientProgress() {
               onClick={() => setSortOrder(sortOrder === 'DESC' ? 'ASC' : 'DESC')}
               className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
             >
-              {sortOrder === 'DESC' ? <ArrowDownRight className="w-5 h-5" /> : <ArrowUpRight className="w-5 h-5" />}
+              {sortOrder === 'DESC' ? (
+                <ArrowDownRight className="w-5 h-5" />
+              ) : (
+                <ArrowUpRight className="w-5 h-5" />
+              )}
             </button>
           </div>
         </div>
@@ -321,7 +350,9 @@ export default function PatientProgress() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center ${getComplianceColor(patient.complianceRate)}`}>
+                      <div
+                        className={`w-12 h-12 rounded-full flex items-center justify-center ${getComplianceColor(patient.complianceRate)}`}
+                      >
                         <span className="text-lg font-semibold">{patient.complianceRate}%</span>
                       </div>
                       <div>
@@ -339,7 +370,8 @@ export default function PatientProgress() {
                           )}
                           <span className="flex items-center gap-1">
                             <Clock className="w-3 h-3" />
-                            Sist aktiv: {patient.lastActivity
+                            Sist aktiv:{' '}
+                            {patient.lastActivity
                               ? new Date(patient.lastActivity).toLocaleDateString('no-NO')
                               : 'Aldri'}
                           </span>
@@ -347,7 +379,9 @@ export default function PatientProgress() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className={`px-3 py-1 text-sm font-medium rounded-full ${getComplianceColor(patient.complianceRate)}`}>
+                      <span
+                        className={`px-3 py-1 text-sm font-medium rounded-full ${getComplianceColor(patient.complianceRate)}`}
+                      >
                         {patient.status?.label || 'Ukjent'}
                       </span>
                       <ChevronRight className="w-5 h-5 text-gray-400" />
@@ -360,14 +394,12 @@ export default function PatientProgress() {
             <div className="p-12 text-center">
               <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
               <h3 className="text-lg font-medium text-gray-900 mb-1">Ingen pasienter funnet</h3>
-              <p className="text-sm text-gray-500">
-                Ingen pasienter matcher sokekriteriene
-              </p>
+              <p className="text-sm text-gray-500">Ingen pasienter matcher sokekriteriene</p>
             </div>
           )}
         </div>
       </div>
-    )
+    );
   }
 
   // Render patient view (single patient)
@@ -383,9 +415,7 @@ export default function PatientProgress() {
         </button>
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Pasientfremgang</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Detaljert oversikt over treningsoverholdelse
-          </p>
+          <p className="text-sm text-gray-500 mt-1">Detaljert oversikt over treningsoverholdelse</p>
         </div>
       </div>
 
@@ -445,7 +475,8 @@ export default function PatientProgress() {
                   <p className="text-2xl font-semibold text-gray-900">
                     {patientStats.summary?.avgPain || '-'}
                   </p>
-                  {patientStats.summary?.avgPain && getPainEmoji(parseFloat(patientStats.summary.avgPain))}
+                  {patientStats.summary?.avgPain &&
+                    getPainEmoji(parseFloat(patientStats.summary.avgPain))}
                 </div>
               </div>
               <div className="w-12 h-12 rounded-lg bg-purple-50 flex items-center justify-center">
@@ -467,11 +498,11 @@ export default function PatientProgress() {
             </div>
           ) : (
             <ProgressChart
-              data={weeklyData.map(w => ({
+              data={weeklyData.map((w) => ({
                 date: w.weekStart,
                 label: w.weekLabel,
                 value: w.complianceRate,
-                completed: w.activeDays >= 5
+                completed: w.activeDays >= 5,
               }))}
               metric="completion"
               period="week"
@@ -524,11 +555,13 @@ export default function PatientProgress() {
               >
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className={`px-2 py-0.5 text-xs font-medium rounded ${
-                      prescription.status === 'active'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
+                    <span
+                      className={`px-2 py-0.5 text-xs font-medium rounded ${
+                        prescription.status === 'active'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
                       {prescription.status === 'active' ? 'Aktiv' : prescription.status}
                     </span>
                     <span className="text-sm text-gray-600">
@@ -537,11 +570,14 @@ export default function PatientProgress() {
                   </div>
                   <p className="text-sm text-gray-500 mt-1">
                     Fra {new Date(prescription.startDate).toLocaleDateString('no-NO')}
-                    {prescription.endDate && ` til ${new Date(prescription.endDate).toLocaleDateString('no-NO')}`}
+                    {prescription.endDate &&
+                      ` til ${new Date(prescription.endDate).toLocaleDateString('no-NO')}`}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className={`text-lg font-semibold ${getComplianceColor(prescription.complianceRate).split(' ')[0]}`}>
+                  <p
+                    className={`text-lg font-semibold ${getComplianceColor(prescription.complianceRate).split(' ')[0]}`}
+                  >
                     {prescription.complianceRate}%
                   </p>
                   <p className="text-sm text-gray-500">overholdelse</p>
@@ -552,5 +588,5 @@ export default function PatientProgress() {
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -3,10 +3,10 @@
  * Create and manage exercise prescriptions for patients
  */
 
-import React, { useState, useCallback } from 'react'
+import _React, { useState, _useCallback } from 'react';
 import {
-  Plus,
-  Minus,
+  _Plus,
+  _Minus,
   GripVertical,
   Trash2,
   ChevronUp,
@@ -21,10 +21,10 @@ import {
   Target,
   Activity,
   AlertTriangle,
-  Check,
-  X,
-  Edit2
-} from 'lucide-react'
+  _Check,
+  _X,
+  Edit2,
+} from 'lucide-react';
 
 const ExercisePrescription = ({
   patient,
@@ -36,44 +36,48 @@ const ExercisePrescription = ({
   onSendSMS,
   onGeneratePDF,
   saving = false,
-  sending = false
+  sending = false,
 }) => {
-  const [patientInstructions, setPatientInstructions] = useState('')
-  const [clinicalNotes, setClinicalNotes] = useState('')
-  const [expandedExercise, setExpandedExercise] = useState(null)
-  const [showDeliveryOptions, setShowDeliveryOptions] = useState(false)
+  const [patientInstructions, setPatientInstructions] = useState('');
+  const [clinicalNotes, setClinicalNotes] = useState('');
+  const [expandedExercise, setExpandedExercise] = useState(null);
+  const [showDeliveryOptions, setShowDeliveryOptions] = useState(false);
 
   // Move exercise up in order
   const moveExerciseUp = (index) => {
-    if (index === 0) return
-    const newExercises = [...selectedExercises]
-    ;[newExercises[index - 1], newExercises[index]] = [newExercises[index], newExercises[index - 1]]
-    onExercisesChange(newExercises)
-  }
+    if (index === 0) {
+      return;
+    }
+    const newExercises = [...selectedExercises];
+    [newExercises[index - 1], newExercises[index]] = [newExercises[index], newExercises[index - 1]];
+    onExercisesChange(newExercises);
+  };
 
   // Move exercise down in order
   const moveExerciseDown = (index) => {
-    if (index === selectedExercises.length - 1) return
-    const newExercises = [...selectedExercises]
-    ;[newExercises[index], newExercises[index + 1]] = [newExercises[index + 1], newExercises[index]]
-    onExercisesChange(newExercises)
-  }
+    if (index === selectedExercises.length - 1) {
+      return;
+    }
+    const newExercises = [...selectedExercises];
+    [newExercises[index], newExercises[index + 1]] = [newExercises[index + 1], newExercises[index]];
+    onExercisesChange(newExercises);
+  };
 
   // Remove exercise from prescription
   const removeExercise = (index) => {
-    const newExercises = selectedExercises.filter((_, i) => i !== index)
-    onExercisesChange(newExercises)
-  }
+    const newExercises = selectedExercises.filter((_, i) => i !== index);
+    onExercisesChange(newExercises);
+  };
 
   // Update exercise parameters
   const updateExerciseParams = (index, field, value) => {
-    const newExercises = [...selectedExercises]
+    const newExercises = [...selectedExercises];
     newExercises[index] = {
       ...newExercises[index],
-      [field]: value
-    }
-    onExercisesChange(newExercises)
-  }
+      [field]: value,
+    };
+    onExercisesChange(newExercises);
+  };
 
   // Handle save
   const handleSave = async () => {
@@ -91,21 +95,25 @@ const ExercisePrescription = ({
           frequencyPerDay: ex.frequencyPerDay || ex.frequency_per_day,
           frequencyPerWeek: ex.frequencyPerWeek || ex.frequency_per_week,
           customInstructions: ex.customInstructions,
-          displayOrder: index
-        }))
-      })
+          displayOrder: index,
+        })),
+      });
     }
-  }
+  };
 
   // Get difficulty color
   const getDifficultyColor = (level) => {
     switch (level) {
-      case 'beginner': return 'text-green-600 bg-green-50'
-      case 'intermediate': return 'text-yellow-600 bg-yellow-50'
-      case 'advanced': return 'text-red-600 bg-red-50'
-      default: return 'text-gray-600 bg-gray-50'
+      case 'beginner':
+        return 'text-green-600 bg-green-50';
+      case 'intermediate':
+        return 'text-yellow-600 bg-yellow-50';
+      case 'advanced':
+        return 'text-red-600 bg-red-50';
+      default:
+        return 'text-gray-600 bg-gray-50';
     }
-  }
+  };
 
   return (
     <div className="h-full flex flex-col bg-white rounded-lg shadow-sm">
@@ -118,7 +126,10 @@ const ExercisePrescription = ({
           </div>
           {patient && (
             <div className="text-sm text-gray-600">
-              Pasient: <span className="font-medium">{patient.first_name} {patient.last_name}</span>
+              Pasient:{' '}
+              <span className="font-medium">
+                {patient.first_name} {patient.last_name}
+              </span>
             </div>
           )}
         </div>
@@ -158,9 +169,14 @@ const ExercisePrescription = ({
                     </h4>
                     <div className="flex items-center gap-2 text-xs text-gray-500">
                       <span>{exercise.category}</span>
-                      <span className={`px-1.5 py-0.5 rounded ${getDifficultyColor(exercise.difficulty_level)}`}>
-                        {exercise.difficulty_level === 'beginner' ? 'Nybegynner' :
-                         exercise.difficulty_level === 'intermediate' ? 'Middels' : 'Avansert'}
+                      <span
+                        className={`px-1.5 py-0.5 rounded ${getDifficultyColor(exercise.difficulty_level)}`}
+                      >
+                        {exercise.difficulty_level === 'beginner'
+                          ? 'Nybegynner'
+                          : exercise.difficulty_level === 'intermediate'
+                            ? 'Middels'
+                            : 'Avansert'}
                       </span>
                     </div>
                   </div>
@@ -203,7 +219,9 @@ const ExercisePrescription = ({
                     <input
                       type="number"
                       value={exercise.sets || exercise.sets_default || 3}
-                      onChange={(e) => updateExerciseParams(index, 'sets', parseInt(e.target.value))}
+                      onChange={(e) =>
+                        updateExerciseParams(index, 'sets', parseInt(e.target.value))
+                      }
                       className="w-12 px-1 py-0.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                       min="1"
                       max="10"
@@ -216,7 +234,9 @@ const ExercisePrescription = ({
                     <input
                       type="number"
                       value={exercise.reps || exercise.reps_default || 10}
-                      onChange={(e) => updateExerciseParams(index, 'reps', parseInt(e.target.value))}
+                      onChange={(e) =>
+                        updateExerciseParams(index, 'reps', parseInt(e.target.value))
+                      }
                       className="w-12 px-1 py-0.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                       min="1"
                       max="100"
@@ -230,7 +250,9 @@ const ExercisePrescription = ({
                       <input
                         type="number"
                         value={exercise.holdSeconds || exercise.hold_seconds || 0}
-                        onChange={(e) => updateExerciseParams(index, 'holdSeconds', parseInt(e.target.value))}
+                        onChange={(e) =>
+                          updateExerciseParams(index, 'holdSeconds', parseInt(e.target.value))
+                        }
                         className="w-12 px-1 py-0.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                         min="0"
                         max="300"
@@ -244,7 +266,9 @@ const ExercisePrescription = ({
                     <input
                       type="number"
                       value={exercise.frequencyPerDay || exercise.frequency_per_day || 1}
-                      onChange={(e) => updateExerciseParams(index, 'frequencyPerDay', parseInt(e.target.value))}
+                      onChange={(e) =>
+                        updateExerciseParams(index, 'frequencyPerDay', parseInt(e.target.value))
+                      }
                       className="w-10 px-1 py-0.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                       min="1"
                       max="10"
@@ -273,7 +297,9 @@ const ExercisePrescription = ({
                       </label>
                       <textarea
                         value={exercise.customInstructions || ''}
-                        onChange={(e) => updateExerciseParams(index, 'customInstructions', e.target.value)}
+                        onChange={(e) =>
+                          updateExerciseParams(index, 'customInstructions', e.target.value)
+                        }
                         placeholder="Legg til spesielle instruksjoner..."
                         className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         rows={2}
@@ -285,7 +311,9 @@ const ExercisePrescription = ({
                       <div className="flex items-start gap-2 p-2 bg-yellow-50 rounded-lg">
                         <AlertTriangle className="w-4 h-4 text-yellow-600 mt-0.5" />
                         <div>
-                          <span className="text-xs font-medium text-yellow-700">Forsiktighetsregler:</span>
+                          <span className="text-xs font-medium text-yellow-700">
+                            Forsiktighetsregler:
+                          </span>
                           <ul className="text-xs text-yellow-600 mt-1">
                             {exercise.precautions.map((p, i) => (
                               <li key={i}>• {p}</li>
@@ -336,9 +364,7 @@ const ExercisePrescription = ({
       {/* Actions */}
       <div className="p-4 border-t border-gray-200 bg-white">
         <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-600">
-            {selectedExercises.length} øvelser valgt
-          </div>
+          <div className="text-sm text-gray-600">{selectedExercises.length} øvelser valgt</div>
 
           <div className="flex items-center gap-2">
             {/* Delivery Options */}
@@ -356,21 +382,30 @@ const ExercisePrescription = ({
               {showDeliveryOptions && (
                 <div className="absolute right-0 bottom-full mb-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
                   <button
-                    onClick={() => { onSendEmail?.(); setShowDeliveryOptions(false); }}
+                    onClick={() => {
+                      onSendEmail?.();
+                      setShowDeliveryOptions(false);
+                    }}
                     className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                   >
                     <Mail className="w-4 h-4" />
                     Send på e-post
                   </button>
                   <button
-                    onClick={() => { onSendSMS?.(); setShowDeliveryOptions(false); }}
+                    onClick={() => {
+                      onSendSMS?.();
+                      setShowDeliveryOptions(false);
+                    }}
                     className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                   >
                     <MessageSquare className="w-4 h-4" />
                     Send SMS-lenke
                   </button>
                   <button
-                    onClick={() => { onGeneratePDF?.(); setShowDeliveryOptions(false); }}
+                    onClick={() => {
+                      onGeneratePDF?.();
+                      setShowDeliveryOptions(false);
+                    }}
                     className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                   >
                     <FileText className="w-4 h-4" />
@@ -402,7 +437,7 @@ const ExercisePrescription = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ExercisePrescription
+export default ExercisePrescription;

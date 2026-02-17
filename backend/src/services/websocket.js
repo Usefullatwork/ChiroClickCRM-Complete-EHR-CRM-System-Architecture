@@ -60,7 +60,9 @@ export function initializeWebSocket(httpServer) {
       }
 
       const result = await validateSession(sessionMatch[1]);
-      if (!result) return next(new Error('Invalid session'));
+      if (!result) {
+        return next(new Error('Invalid session'));
+      }
 
       socket.user = result.user;
       socket.organizationId = result.user.organizationId;
@@ -96,7 +98,9 @@ export function initializeWebSocket(httpServer) {
 
     // Patient presence: user starts viewing a patient
     socket.on('patient:viewing', ({ patientId, userName }) => {
-      if (!patientId || !userId) return;
+      if (!patientId || !userId) {
+        return;
+      }
 
       // Leave previous patient if any
       if (currentViewingPatient && currentViewingPatient !== patientId) {
@@ -123,16 +127,22 @@ export function initializeWebSocket(httpServer) {
 
     // Patient presence: user leaves a patient view
     socket.on('patient:leaving', ({ patientId }) => {
-      if (!patientId || !userId) return;
+      if (!patientId || !userId) {
+        return;
+      }
       currentViewingPatient = null;
       removePatientViewer(patientId, userId, orgId);
     });
 
     // Client requests who's viewing a specific patient
     socket.on('patient:who-viewing', ({ patientId }, callback) => {
-      if (typeof callback !== 'function') return;
+      if (typeof callback !== 'function') {
+        return;
+      }
       const viewers = patientViewers.get(patientId);
-      if (!viewers) return callback([]);
+      if (!viewers) {
+        return callback([]);
+      }
       const result = [];
       for (const [uid, data] of viewers) {
         if (uid !== userId) {
@@ -190,7 +200,9 @@ function removePatientViewer(patientId, userId, orgId) {
  * Broadcast event to entire organization
  */
 export function broadcastToOrg(orgId, event, data) {
-  if (!io) return;
+  if (!io) {
+    return;
+  }
   io.to(`org:${orgId}`).emit(event, data);
 }
 
@@ -198,7 +210,9 @@ export function broadcastToOrg(orgId, event, data) {
  * Send event to specific user
  */
 export function sendToUser(userId, event, data) {
-  if (!io) return;
+  if (!io) {
+    return;
+  }
   const sockets = connectedUsers.get(userId);
   if (sockets) {
     for (const socketId of sockets) {
@@ -211,7 +225,9 @@ export function sendToUser(userId, event, data) {
  * Get count of connected users for an org
  */
 export function getOnlineCount(orgId) {
-  if (!io) return 0;
+  if (!io) {
+    return 0;
+  }
   const room = io.sockets.adapter.rooms.get(`org:${orgId}`);
   return room ? room.size : 0;
 }

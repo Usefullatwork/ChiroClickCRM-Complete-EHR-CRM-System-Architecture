@@ -1,5 +1,14 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { AlertTriangle, CheckCircle, XCircle, Info, Shield, Clock, FileText, Zap } from 'lucide-react';
+import { useState, useEffect, _useMemo, _useCallback } from 'react';
+import {
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  Info,
+  Shield,
+  Clock,
+  FileText,
+  Zap,
+} from 'lucide-react';
 
 /**
  * ComplianceEngine - Automated compliance checking and conditional logic
@@ -19,122 +28,178 @@ import { AlertTriangle, CheckCircle, XCircle, Info, Shield, Clock, FileText, Zap
 
 // Treatment-to-qualifier rules (ChiroTouch style)
 const TREATMENT_QUALIFIERS = {
-  'adjustment': {
+  adjustment: {
     required: ['subluxation_finding', 'joint_dysfunction'],
     recommended: ['palpation_finding', 'rom_restriction'],
     text_requirements: {
-      objective: ['subluxation', 'joint dysfunction', 'vertebral', 'spinal segment', 'motion restriction']
+      objective: [
+        'subluxation',
+        'joint dysfunction',
+        'vertebral',
+        'spinal segment',
+        'motion restriction',
+      ],
     },
-    auto_insert: 'Palpation to the spinal segment revealed segmental joint dysfunction, point tenderness, and motion restriction.'
+    auto_insert:
+      'Palpation to the spinal segment revealed segmental joint dysfunction, point tenderness, and motion restriction.',
   },
-  'therapeutic_stretching': {
+  therapeutic_stretching: {
     required: ['time_documented'],
     minimum_time: 8,
     time_unit: 'minutes',
     auto_insert: '– 8 minutes',
-    warning: 'Therapeutic stretching requires time documentation (minimum 8 minutes) for CPT 97110'
+    warning: 'Therapeutic stretching requires time documentation (minimum 8 minutes) for CPT 97110',
   },
-  'therapeutic_exercise': {
+  therapeutic_exercise: {
     required: ['time_documented'],
     minimum_time: 8,
     time_unit: 'minutes',
     auto_insert: '– 8 minutes',
-    warning: 'Therapeutic exercise requires time documentation (minimum 8 minutes) for CPT 97110'
+    warning: 'Therapeutic exercise requires time documentation (minimum 8 minutes) for CPT 97110',
   },
-  'manual_therapy': {
+  manual_therapy: {
     required: ['time_documented', 'body_region'],
     minimum_time: 8,
     time_unit: 'minutes',
     auto_insert: '– 8 minutes',
-    warning: 'Manual therapy requires time documentation (minimum 8 minutes) for CPT 97140'
+    warning: 'Manual therapy requires time documentation (minimum 8 minutes) for CPT 97140',
   },
-  'iastm': {
+  iastm: {
     required: ['time_documented'],
     minimum_time: 8,
     time_unit: 'minutes',
     auto_insert: '– 8 minutes',
-    warning: 'IASTM requires time documentation (minimum 8 minutes)'
+    warning: 'IASTM requires time documentation (minimum 8 minutes)',
   },
-  'electrical_stimulation': {
+  electrical_stimulation: {
     required: ['time_documented', 'body_region'],
     minimum_time: 15,
     time_unit: 'minutes',
     auto_insert: 'for 15 minutes',
-    warning: 'E-stim requires time documentation'
+    warning: 'E-stim requires time documentation',
   },
-  'ultrasound': {
+  ultrasound: {
     required: ['time_documented', 'body_region', 'intensity'],
     minimum_time: 5,
     time_unit: 'minutes',
     auto_insert: 'at 1.0 W/cm² for 5 minutes',
-    warning: 'Ultrasound requires time and intensity documentation'
+    warning: 'Ultrasound requires time and intensity documentation',
   },
-  'traction': {
+  traction: {
     required: ['time_documented'],
     minimum_time: 15,
     time_unit: 'minutes',
     auto_insert: 'for 15 minutes',
-    warning: 'Traction requires time documentation'
-  }
+    warning: 'Traction requires time documentation',
+  },
 };
 
 // Diagnosis-to-treatment matching rules
 const DIAGNOSIS_TREATMENT_RULES = {
   // Subluxation codes require adjustment documentation
-  'M99.01': { // Segmental dysfunction cervical
+  'M99.01': {
+    // Segmental dysfunction cervical
     requires_treatments: ['adjustment', 'manipulation'],
-    requires_findings: ['subluxation', 'joint dysfunction', 'motion restriction']
+    requires_findings: ['subluxation', 'joint dysfunction', 'motion restriction'],
   },
-  'M99.03': { // Segmental dysfunction lumbar
+  'M99.03': {
+    // Segmental dysfunction lumbar
     requires_treatments: ['adjustment', 'manipulation'],
-    requires_findings: ['subluxation', 'joint dysfunction', 'motion restriction']
+    requires_findings: ['subluxation', 'joint dysfunction', 'motion restriction'],
   },
-  'M54.5': { // Low back pain
+  'M54.5': {
+    // Low back pain
     requires_findings: ['tenderness', 'spasm', 'pain', 'restricted'],
-    recommended_treatments: ['adjustment', 'therapeutic_exercise', 'manual_therapy']
+    recommended_treatments: ['adjustment', 'therapeutic_exercise', 'manual_therapy'],
   },
-  'M54.2': { // Cervicalgia
+  'M54.2': {
+    // Cervicalgia
     requires_findings: ['tenderness', 'spasm', 'pain', 'restricted'],
-    recommended_treatments: ['adjustment', 'therapeutic_exercise', 'manual_therapy']
+    recommended_treatments: ['adjustment', 'therapeutic_exercise', 'manual_therapy'],
   },
-  'G89.29': { // Chronic pain
+  'G89.29': {
+    // Chronic pain
     requires_findings: ['chronic', 'duration', 'ongoing'],
-    warning: 'Chronic pain diagnosis requires duration documentation'
-  }
+    warning: 'Chronic pain diagnosis requires duration documentation',
+  },
 };
 
 // Red flags that should trigger alerts
 const RED_FLAGS = {
   subjective: [
-    { pattern: /bowel|bladder|incontinence/i, alert: 'Cauda equina symptoms - urgent evaluation needed', severity: 'critical' },
-    { pattern: /night sweats|unexplained weight loss|fever/i, alert: 'Constitutional symptoms - rule out serious pathology', severity: 'high' },
-    { pattern: /worst headache|thunderclap/i, alert: 'Sudden severe headache - rule out SAH', severity: 'critical' },
-    { pattern: /chest pain|shortness of breath/i, alert: 'Cardiac symptoms - ensure appropriate workup', severity: 'high' },
-    { pattern: /bilateral|both legs|saddle/i, alert: 'Bilateral symptoms - consider central pathology', severity: 'high' },
-    { pattern: /trauma|accident|fall/i, alert: 'Trauma history - rule out fracture/instability', severity: 'medium' },
-    { pattern: /cancer|tumor|malignancy/i, alert: 'History of malignancy - rule out metastatic disease', severity: 'high' },
-    { pattern: /numbness.*progressing|weakness.*progressing/i, alert: 'Progressive neurological symptoms - urgent evaluation', severity: 'critical' }
+    {
+      pattern: /bowel|bladder|incontinence/i,
+      alert: 'Cauda equina symptoms - urgent evaluation needed',
+      severity: 'critical',
+    },
+    {
+      pattern: /night sweats|unexplained weight loss|fever/i,
+      alert: 'Constitutional symptoms - rule out serious pathology',
+      severity: 'high',
+    },
+    {
+      pattern: /worst headache|thunderclap/i,
+      alert: 'Sudden severe headache - rule out SAH',
+      severity: 'critical',
+    },
+    {
+      pattern: /chest pain|shortness of breath/i,
+      alert: 'Cardiac symptoms - ensure appropriate workup',
+      severity: 'high',
+    },
+    {
+      pattern: /bilateral|both legs|saddle/i,
+      alert: 'Bilateral symptoms - consider central pathology',
+      severity: 'high',
+    },
+    {
+      pattern: /trauma|accident|fall/i,
+      alert: 'Trauma history - rule out fracture/instability',
+      severity: 'medium',
+    },
+    {
+      pattern: /cancer|tumor|malignancy/i,
+      alert: 'History of malignancy - rule out metastatic disease',
+      severity: 'high',
+    },
+    {
+      pattern: /numbness.*progressing|weakness.*progressing/i,
+      alert: 'Progressive neurological symptoms - urgent evaluation',
+      severity: 'critical',
+    },
   ],
   objective: [
-    { pattern: /absent reflex|areflexia/i, alert: 'Absent reflexes - neurological deficit', severity: 'high' },
-    { pattern: /positive babinski|clonus/i, alert: 'Upper motor neuron signs present', severity: 'high' },
-    { pattern: /3\/5|2\/5|1\/5|0\/5/i, alert: 'Motor weakness documented - monitor closely', severity: 'medium' }
-  ]
+    {
+      pattern: /absent reflex|areflexia/i,
+      alert: 'Absent reflexes - neurological deficit',
+      severity: 'high',
+    },
+    {
+      pattern: /positive babinski|clonus/i,
+      alert: 'Upper motor neuron signs present',
+      severity: 'high',
+    },
+    {
+      pattern: /3\/5|2\/5|1\/5|0\/5/i,
+      alert: 'Motor weakness documented - monitor closely',
+      severity: 'medium',
+    },
+  ],
 };
 
 // Time-based rules
-const TIME_RULES = {
+const _TIME_RULES = {
   total_treatment_time: {
     minimum: 8,
     warning_at: 7,
-    message: 'Total treatment time should be documented'
+    message: 'Total treatment time should be documented',
   },
   e_m_code_time: {
-    '99212': { min: 10, max: 19 },
-    '99213': { min: 20, max: 29 },
-    '99214': { min: 30, max: 39 },
-    '99215': { min: 40, max: Infinity }
-  }
+    99212: { min: 10, max: 19 },
+    99213: { min: 20, max: 29 },
+    99214: { min: 30, max: 39 },
+    99215: { min: 40, max: Infinity },
+  },
 };
 
 // =============================================================================
@@ -143,20 +208,24 @@ const TIME_RULES = {
 
 // Check text for required keywords
 function checkTextForKeywords(text, keywords) {
-  if (!text || !keywords) return false;
+  if (!text || !keywords) {
+    return false;
+  }
   const lowerText = text.toLowerCase();
-  return keywords.some(keyword => lowerText.includes(keyword.toLowerCase()));
+  return keywords.some((keyword) => lowerText.includes(keyword.toLowerCase()));
 }
 
 // Check if time is documented in text
 function extractTimeFromText(text) {
-  if (!text) return null;
+  if (!text) {
+    return null;
+  }
   const patterns = [
     /(\d+)\s*minutes?/i,
     /(\d+)\s*mins?/i,
     /for\s*(\d+)/i,
     /–\s*(\d+)/,
-    /-\s*(\d+)\s*min/i
+    /-\s*(\d+)\s*min/i,
   ];
 
   for (const pattern of patterns) {
@@ -180,22 +249,28 @@ export function checkCompliance(encounterData) {
     encounterData.subjective?.chief_complaint,
     encounterData.subjective?.history,
     encounterData.subjective?.onset,
-    encounterData.subjective?.pain_description
-  ].filter(Boolean).join(' ');
+    encounterData.subjective?.pain_description,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   const objectiveText = [
     encounterData.objective?.observation,
     encounterData.objective?.palpation,
     encounterData.objective?.rom,
     encounterData.objective?.ortho_tests,
-    encounterData.objective?.neuro_tests
-  ].filter(Boolean).join(' ');
+    encounterData.objective?.neuro_tests,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   const planText = [
     encounterData.plan?.treatment,
     encounterData.plan?.exercises,
-    encounterData.plan?.advice
-  ].filter(Boolean).join(' ');
+    encounterData.plan?.advice,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   // =============================================================================
   // 1. RED FLAG DETECTION
@@ -207,7 +282,7 @@ export function checkCompliance(encounterData) {
         severity,
         section: 'subjective',
         message: alert,
-        icon: AlertTriangle
+        icon: AlertTriangle,
       });
     }
   });
@@ -219,7 +294,7 @@ export function checkCompliance(encounterData) {
         severity,
         section: 'objective',
         message: alert,
-        icon: AlertTriangle
+        icon: AlertTriangle,
       });
     }
   });
@@ -230,44 +305,61 @@ export function checkCompliance(encounterData) {
   const selectedTreatments = encounterData.treatments_selected || [];
 
   // Check adjustment documentation
-  if (selectedTreatments.some(t =>
-    t.toLowerCase().includes('adjust') ||
-    t.toLowerCase().includes('manipulation') ||
-    t.toLowerCase().includes('diversified') ||
-    t.toLowerCase().includes('gonstead')
-  )) {
-    const hasSubluixationFinding = checkTextForKeywords(objectiveText,
-      ['subluxation', 'joint dysfunction', 'segmental', 'motion restriction', 'vertebral']
-    );
+  if (
+    selectedTreatments.some(
+      (t) =>
+        t.toLowerCase().includes('adjust') ||
+        t.toLowerCase().includes('manipulation') ||
+        t.toLowerCase().includes('diversified') ||
+        t.toLowerCase().includes('gonstead')
+    )
+  ) {
+    const hasSubluixationFinding = checkTextForKeywords(objectiveText, [
+      'subluxation',
+      'joint dysfunction',
+      'segmental',
+      'motion restriction',
+      'vertebral',
+    ]);
 
     if (!hasSubluixationFinding && !Object.keys(encounterData.spinal_findings || {}).length) {
       issues.push({
         type: 'missing_qualifier',
         severity: 'high',
         section: 'objective',
-        message: 'Adjustment performed but no subluxation/joint dysfunction documented in Objective',
+        message:
+          'Adjustment performed but no subluxation/joint dysfunction documented in Objective',
         suggestion: TREATMENT_QUALIFIERS.adjustment.auto_insert,
-        icon: FileText
+        icon: FileText,
       });
       autoInserts.push({
         section: 'objective',
         field: 'palpation',
-        text: TREATMENT_QUALIFIERS.adjustment.auto_insert
+        text: TREATMENT_QUALIFIERS.adjustment.auto_insert,
       });
     }
   }
 
   // Check time-based treatments
   const timeBasedTreatments = [
-    'therapeutic_stretching', 'therapeutic_exercise', 'manual_therapy',
-    'iastm', 'electrical_stimulation', 'ultrasound', 'traction', 'massage', 'stretch'
+    'therapeutic_stretching',
+    'therapeutic_exercise',
+    'manual_therapy',
+    'iastm',
+    'electrical_stimulation',
+    'ultrasound',
+    'traction',
+    'massage',
+    'stretch',
   ];
 
-  selectedTreatments.forEach(treatment => {
+  selectedTreatments.forEach((treatment) => {
     const treatmentLower = treatment.toLowerCase();
-    timeBasedTreatments.forEach(timeTreatment => {
-      if (treatmentLower.includes(timeTreatment.replace('_', ' ')) ||
-          treatmentLower.includes(timeTreatment.replace('_', ''))) {
+    timeBasedTreatments.forEach((timeTreatment) => {
+      if (
+        treatmentLower.includes(timeTreatment.replace('_', ' ')) ||
+        treatmentLower.includes(timeTreatment.replace('_', ''))
+      ) {
         const rule = TREATMENT_QUALIFIERS[timeTreatment];
         if (rule && rule.minimum_time) {
           const documentedTime = extractTimeFromText(planText);
@@ -278,13 +370,13 @@ export function checkCompliance(encounterData) {
               section: 'plan',
               message: rule.warning || `${treatment} requires time documentation`,
               suggestion: rule.auto_insert,
-              icon: Clock
+              icon: Clock,
             });
             autoInserts.push({
               section: 'plan',
               field: 'treatment',
               text: rule.auto_insert,
-              appendTo: treatment
+              appendTo: treatment,
             });
           } else if (documentedTime < rule.minimum_time) {
             warnings.push({
@@ -292,7 +384,7 @@ export function checkCompliance(encounterData) {
               severity: 'medium',
               section: 'plan',
               message: `${treatment} documented time (${documentedTime} min) is less than required minimum (${rule.minimum_time} min)`,
-              icon: Clock
+              icon: Clock,
             });
           }
         }
@@ -305,7 +397,7 @@ export function checkCompliance(encounterData) {
   // =============================================================================
   const diagnoses = [...(encounterData.icpc_codes || []), ...(encounterData.icd10_codes || [])];
 
-  diagnoses.forEach(code => {
+  diagnoses.forEach((code) => {
     const rule = DIAGNOSIS_TREATMENT_RULES[code];
     if (rule) {
       // Check required findings
@@ -317,15 +409,15 @@ export function checkCompliance(encounterData) {
             severity: 'medium',
             section: 'objective',
             message: `Diagnosis ${code} typically requires documentation of: ${rule.requires_findings.join(', ')}`,
-            icon: FileText
+            icon: FileText,
           });
         }
       }
 
       // Check required treatments
       if (rule.requires_treatments) {
-        const hasTreatment = selectedTreatments.some(t =>
-          rule.requires_treatments.some(rt => t.toLowerCase().includes(rt))
+        const hasTreatment = selectedTreatments.some((t) =>
+          rule.requires_treatments.some((rt) => t.toLowerCase().includes(rt))
         );
         if (!hasTreatment) {
           suggestions.push({
@@ -333,7 +425,7 @@ export function checkCompliance(encounterData) {
             severity: 'low',
             section: 'plan',
             message: `Diagnosis ${code} typically includes: ${rule.requires_treatments.join(' or ')}`,
-            icon: Info
+            icon: Info,
           });
         }
       }
@@ -351,17 +443,17 @@ export function checkCompliance(encounterData) {
       severity: 'high',
       section: 'subjective',
       message: 'Chief complaint is required',
-      icon: XCircle
+      icon: XCircle,
     });
   }
 
   // Check for at least one objective finding
   const hasObjectiveFindings =
     objectiveText.trim().length > 20 ||
-    (encounterData.observation_findings?.length > 0) ||
-    (encounterData.palpation_findings?.length > 0) ||
-    (encounterData.rom_findings?.length > 0) ||
-    (Object.keys(encounterData.spinal_findings || {}).length > 0);
+    encounterData.observation_findings?.length > 0 ||
+    encounterData.palpation_findings?.length > 0 ||
+    encounterData.rom_findings?.length > 0 ||
+    Object.keys(encounterData.spinal_findings || {}).length > 0;
 
   if (!hasObjectiveFindings) {
     issues.push({
@@ -369,7 +461,7 @@ export function checkCompliance(encounterData) {
       severity: 'high',
       section: 'objective',
       message: 'Objective findings are required',
-      icon: XCircle
+      icon: XCircle,
     });
   }
 
@@ -380,7 +472,7 @@ export function checkCompliance(encounterData) {
       severity: 'medium',
       section: 'assessment',
       message: 'No diagnosis code selected',
-      icon: FileText
+      icon: FileText,
     });
   }
 
@@ -391,7 +483,7 @@ export function checkCompliance(encounterData) {
       severity: 'medium',
       section: 'plan',
       message: 'No treatment documented',
-      icon: FileText
+      icon: FileText,
     });
   }
 
@@ -399,7 +491,8 @@ export function checkCompliance(encounterData) {
   // RETURN RESULTS
   // =============================================================================
 
-  const isCompliant = issues.filter(i => i.severity === 'critical' || i.severity === 'high').length === 0;
+  const isCompliant =
+    issues.filter((i) => i.severity === 'critical' || i.severity === 'high').length === 0;
   const score = calculateComplianceScore(issues, warnings, suggestions);
 
   return {
@@ -409,25 +502,34 @@ export function checkCompliance(encounterData) {
     warnings,
     suggestions,
     autoInserts,
-    summary: generateComplianceSummary(issues, warnings, suggestions)
+    summary: generateComplianceSummary(issues, warnings, suggestions),
   };
 }
 
 // Calculate compliance score (0-100)
-function calculateComplianceScore(issues, warnings, suggestions) {
+function calculateComplianceScore(issues, warnings, _suggestions) {
   let score = 100;
 
-  issues.forEach(issue => {
-    if (issue.severity === 'critical') score -= 25;
-    else if (issue.severity === 'high') score -= 15;
-    else if (issue.severity === 'medium') score -= 10;
-    else score -= 5;
+  issues.forEach((issue) => {
+    if (issue.severity === 'critical') {
+      score -= 25;
+    } else if (issue.severity === 'high') {
+      score -= 15;
+    } else if (issue.severity === 'medium') {
+      score -= 10;
+    } else {
+      score -= 5;
+    }
   });
 
-  warnings.forEach(warning => {
-    if (warning.severity === 'high') score -= 8;
-    else if (warning.severity === 'medium') score -= 5;
-    else score -= 2;
+  warnings.forEach((warning) => {
+    if (warning.severity === 'high') {
+      score -= 8;
+    } else if (warning.severity === 'medium') {
+      score -= 5;
+    } else {
+      score -= 2;
+    }
   });
 
   return Math.max(0, Math.min(100, score));
@@ -435,8 +537,8 @@ function calculateComplianceScore(issues, warnings, suggestions) {
 
 // Generate summary
 function generateComplianceSummary(issues, warnings, suggestions) {
-  const criticalCount = issues.filter(i => i.severity === 'critical').length;
-  const highCount = issues.filter(i => i.severity === 'high').length;
+  const criticalCount = issues.filter((i) => i.severity === 'critical').length;
+  const highCount = issues.filter((i) => i.severity === 'high').length;
 
   if (criticalCount > 0) {
     return `${criticalCount} critical issue(s) require immediate attention`;
@@ -455,11 +557,7 @@ function generateComplianceSummary(issues, warnings, suggestions) {
 // =============================================================================
 
 // Main Compliance Panel Component
-export default function CompliancePanel({
-  encounterData,
-  onApplyAutoInsert,
-  className = ''
-}) {
+export default function CompliancePanel({ encounterData, onApplyAutoInsert, className = '' }) {
   const [compliance, setCompliance] = useState(null);
   const [expanded, setExpanded] = useState(true);
 
@@ -469,7 +567,9 @@ export default function CompliancePanel({
     setCompliance(result);
   }, [encounterData]);
 
-  if (!compliance) return null;
+  if (!compliance) {
+    return null;
+  }
 
   const { isCompliant, score, issues, warnings, suggestions, autoInserts, summary } = compliance;
 
@@ -483,9 +583,15 @@ export default function CompliancePanel({
         }`}
       >
         <div className="flex items-center gap-3">
-          <Shield className={`w-5 h-5 ${
-            isCompliant ? 'text-green-600' : issues.length > 0 ? 'text-red-600' : 'text-yellow-600'
-          }`} />
+          <Shield
+            className={`w-5 h-5 ${
+              isCompliant
+                ? 'text-green-600'
+                : issues.length > 0
+                  ? 'text-red-600'
+                  : 'text-yellow-600'
+            }`}
+          />
           <div className="text-left">
             <h3 className="font-semibold text-gray-900">Compliance Check</h3>
             <p className="text-xs text-gray-600">{summary}</p>
@@ -493,12 +599,18 @@ export default function CompliancePanel({
         </div>
         <div className="flex items-center gap-3">
           {/* Score Badge */}
-          <div className={`
+          <div
+            className={`
             px-3 py-1 rounded-full text-sm font-bold
-            ${score >= 90 ? 'bg-green-100 text-green-800' :
-              score >= 70 ? 'bg-yellow-100 text-yellow-800' :
-              'bg-red-100 text-red-800'}
-          `}>
+            ${
+              score >= 90
+                ? 'bg-green-100 text-green-800'
+                : score >= 70
+                  ? 'bg-yellow-100 text-yellow-800'
+                  : 'bg-red-100 text-red-800'
+            }
+          `}
+          >
             {score}%
           </div>
           <span className={`transform transition-transform ${expanded ? 'rotate-180' : ''}`}>
@@ -557,11 +669,7 @@ export default function CompliancePanel({
               </h4>
               <div className="space-y-2">
                 {suggestions.map((suggestion, index) => (
-                  <ComplianceItem
-                    key={index}
-                    item={suggestion}
-                    onApplyFix={null}
-                  />
+                  <ComplianceItem key={index} item={suggestion} onApplyFix={null} />
                 ))}
               </div>
             </div>
@@ -579,7 +687,7 @@ export default function CompliancePanel({
           {autoInserts.length > 0 && onApplyAutoInsert && (
             <div className="p-4 bg-gray-50">
               <button
-                onClick={() => autoInserts.forEach(ai => onApplyAutoInsert(ai))}
+                onClick={() => autoInserts.forEach((ai) => onApplyAutoInsert(ai))}
                 className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
               >
                 <Zap className="w-4 h-4" />
@@ -601,19 +709,19 @@ function ComplianceItem({ item, onApplyFix }) {
     critical: 'bg-red-100 border-red-200 text-red-800',
     high: 'bg-red-50 border-red-100 text-red-700',
     medium: 'bg-yellow-50 border-yellow-100 text-yellow-700',
-    low: 'bg-blue-50 border-blue-100 text-blue-700'
+    low: 'bg-blue-50 border-blue-100 text-blue-700',
   };
 
   return (
-    <div className={`p-3 rounded-lg border ${severityColors[item.severity] || severityColors.medium}`}>
+    <div
+      className={`p-3 rounded-lg border ${severityColors[item.severity] || severityColors.medium}`}
+    >
       <div className="flex items-start gap-2">
         <Icon className="w-4 h-4 flex-shrink-0 mt-0.5" />
         <div className="flex-1">
           <p className="text-sm">{item.message}</p>
           {item.suggestion && (
-            <p className="text-xs mt-1 opacity-75">
-              Suggested fix: "{item.suggestion}"
-            </p>
+            <p className="text-xs mt-1 opacity-75">Suggested fix: "{item.suggestion}"</p>
           )}
         </div>
         {onApplyFix && (
@@ -638,7 +746,9 @@ export function ComplianceIndicator({ encounterData, onClick }) {
     setCompliance(result);
   }, [encounterData]);
 
-  if (!compliance) return null;
+  if (!compliance) {
+    return null;
+  }
 
   const { isCompliant, score, issues, warnings } = compliance;
   const totalIssues = issues.length + warnings.length;
@@ -648,20 +758,19 @@ export function ComplianceIndicator({ encounterData, onClick }) {
       onClick={onClick}
       className={`
         flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors
-        ${isCompliant
-          ? 'bg-green-100 text-green-700 hover:bg-green-200'
-          : totalIssues > 0
-            ? 'bg-red-100 text-red-700 hover:bg-red-200'
-            : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+        ${
+          isCompliant
+            ? 'bg-green-100 text-green-700 hover:bg-green-200'
+            : totalIssues > 0
+              ? 'bg-red-100 text-red-700 hover:bg-red-200'
+              : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
         }
       `}
     >
       <Shield className="w-4 h-4" />
       <span className="text-sm font-medium">{score}%</span>
       {totalIssues > 0 && (
-        <span className="px-1.5 py-0.5 text-xs bg-white/50 rounded-full">
-          {totalIssues}
-        </span>
+        <span className="px-1.5 py-0.5 text-xs bg-white/50 rounded-full">{totalIssues}</span>
       )}
     </button>
   );

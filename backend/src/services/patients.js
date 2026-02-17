@@ -3,7 +3,7 @@
  * Business logic for patient management
  */
 
-import { query, transaction } from '../config/database.js';
+import { query, _transaction } from '../config/database.js';
 import { encrypt, decrypt, maskSensitive } from '../utils/encryption.js';
 import logger from '../utils/logger.js';
 

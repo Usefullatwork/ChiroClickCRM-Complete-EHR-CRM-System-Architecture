@@ -12,31 +12,31 @@
  * Norwegian and English support
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, _useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  Brain,
-  TrendingUp,
-  TrendingDown,
+  _Brain,
+  _TrendingUp,
+  _TrendingDown,
   ThumbsUp,
-  ThumbsDown,
+  _ThumbsDown,
   RefreshCw,
   AlertCircle,
   CheckCircle2,
   Clock,
-  Calendar,
+  _Calendar,
   ArrowUpRight,
   ArrowDownRight,
-  Percent,
+  _Percent,
   Star,
   Activity,
-  Database,
-  Settings,
+  _Database,
+  _Settings,
   Download,
   Loader2,
-  FileText,
+  _FileText,
   GitBranch,
-  RotateCcw,
+  _RotateCcw,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../ui/Card';
 import { Button } from '../ui/Button';
@@ -156,15 +156,23 @@ const TEXTS = {
 
 // Helper to format percentage
 const formatPercent = (value) => {
-  if (value === null || value === undefined) return '-';
+  if (value === null || value === undefined) {
+    return '-';
+  }
   return `${parseFloat(value).toFixed(1)}%`;
 };
 
 // Helper to get performance rating
 const getPerformanceRating = (acceptanceRate) => {
-  if (acceptanceRate >= 80) return { level: 'excellent', color: 'teal' };
-  if (acceptanceRate >= 60) return { level: 'good', color: 'blue' };
-  if (acceptanceRate >= 40) return { level: 'fair', color: 'amber' };
+  if (acceptanceRate >= 80) {
+    return { level: 'excellent', color: 'teal' };
+  }
+  if (acceptanceRate >= 60) {
+    return { level: 'good', color: 'blue' };
+  }
+  if (acceptanceRate >= 40) {
+    return { level: 'fair', color: 'amber' };
+  }
   return { level: 'poor', color: 'red' };
 };
 
@@ -201,7 +209,9 @@ const StatCard = ({ icon: Icon, label, value, subValue, trend, color = 'slate' }
             <Icon className={`w-5 h-5 text-${color}-600`} />
           </div>
           {trend !== undefined && (
-            <div className={`flex items-center text-sm ${isPositiveTrend ? 'text-teal-600' : 'text-red-600'}`}>
+            <div
+              className={`flex items-center text-sm ${isPositiveTrend ? 'text-teal-600' : 'text-red-600'}`}
+            >
               <TrendIcon className="w-4 h-4" />
               <span>{Math.abs(trend).toFixed(1)}%</span>
             </div>
@@ -210,9 +220,7 @@ const StatCard = ({ icon: Icon, label, value, subValue, trend, color = 'slate' }
         <div className="mt-3">
           <p className="text-2xl font-bold text-slate-900">{value}</p>
           <p className="text-sm text-slate-500">{label}</p>
-          {subValue && (
-            <p className="text-xs text-slate-400 mt-1">{subValue}</p>
-          )}
+          {subValue && <p className="text-xs text-slate-400 mt-1">{subValue}</p>}
         </div>
       </CardBody>
     </Card>
@@ -221,9 +229,7 @@ const StatCard = ({ icon: Icon, label, value, subValue, trend, color = 'slate' }
 
 // Suggestion Type Card
 const SuggestionTypeCard = ({ type, data, t, maxTotal }) => {
-  const acceptanceRate = data.total > 0
-    ? ((data.accepted / data.total) * 100)
-    : 0;
+  const acceptanceRate = data.total > 0 ? (data.accepted / data.total) * 100 : 0;
 
   const performance = getPerformanceRating(acceptanceRate);
 
@@ -231,12 +237,8 @@ const SuggestionTypeCard = ({ type, data, t, maxTotal }) => {
     <Card className="overflow-hidden">
       <CardBody className="p-4">
         <div className="flex items-center justify-between mb-3">
-          <h4 className="font-medium text-slate-900">
-            {t.suggestionTypes[type] || type}
-          </h4>
-          <Badge variant={performance.color}>
-            {formatPercent(acceptanceRate)}
-          </Badge>
+          <h4 className="font-medium text-slate-900">{t.suggestionTypes[type] || type}</h4>
+          <Badge variant={performance.color}>{formatPercent(acceptanceRate)}</Badge>
         </div>
 
         <div className="space-y-2">
@@ -311,10 +313,7 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
   });
 
   // Fetch retraining status
-  const {
-    data: retrainingStatus,
-    isLoading: retrainingLoading,
-  } = useQuery({
+  const { data: retrainingStatus, isLoading: retrainingLoading } = useQuery({
     queryKey: ['ai-retraining-status'],
     queryFn: async () => {
       const response = await aiFeedbackAPI.getRetrainingStatus();
@@ -324,10 +323,7 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
   });
 
   // Fetch common corrections
-  const {
-    data: correctionsData,
-    isLoading: correctionsLoading,
-  } = useQuery({
+  const { data: correctionsData, isLoading: correctionsLoading } = useQuery({
     queryKey: ['ai-corrections', timeRange],
     queryFn: async () => {
       const response = await aiFeedbackAPI.getCommonCorrections({
@@ -340,9 +336,7 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
   });
 
   // Fetch retraining history
-  const {
-    data: retrainingHistory,
-  } = useQuery({
+  const { data: retrainingHistory } = useQuery({
     queryKey: ['ai-retraining-history'],
     queryFn: async () => {
       const response = await aiFeedbackAPI.getRetrainingHistory({ limit: 5 });
@@ -413,7 +407,9 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
 
   // Find max total for scaling bars
   const maxTotal = useMemo(() => {
-    if (!performanceData?.byType) return 1;
+    if (!performanceData?.byType) {
+      return 1;
+    }
     return Math.max(...Object.values(performanceData.byType).map((d) => d.total || 0), 1);
   }, [performanceData]);
 
@@ -474,11 +470,7 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
           >
             {t.exportData}
           </Button>
-          <Button
-            variant="ghost"
-            icon={RefreshCw}
-            onClick={() => refetchPerformance()}
-          />
+          <Button variant="ghost" icon={RefreshCw} onClick={() => refetchPerformance()} />
         </div>
       </div>
 
@@ -518,18 +510,10 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {performanceData?.byType &&
             Object.entries(performanceData.byType).map(([type, data]) => (
-              <SuggestionTypeCard
-                key={type}
-                type={type}
-                data={data}
-                t={t}
-                maxTotal={maxTotal}
-              />
+              <SuggestionTypeCard key={type} type={type} data={data} t={t} maxTotal={maxTotal} />
             ))}
           {(!performanceData?.byType || Object.keys(performanceData.byType).length === 0) && (
-            <div className="col-span-3 text-center py-8 text-slate-500">
-              {t.noData}
-            </div>
+            <div className="col-span-3 text-center py-8 text-slate-500">{t.noData}</div>
           )}
         </div>
       </div>
@@ -584,9 +568,7 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
 
             {/* Retraining History */}
             <div>
-              <h4 className="text-sm font-medium text-slate-700 mb-2">
-                {t.retrainingHistory}
-              </h4>
+              <h4 className="text-sm font-medium text-slate-700 mb-2">{t.retrainingHistory}</h4>
               {retrainingHistory?.length > 0 ? (
                 <div className="space-y-2">
                   {retrainingHistory.map((event, idx) => (
@@ -606,17 +588,13 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
                         )}
                       </div>
                       <span className="text-xs text-slate-500">
-                        {event.created_at
-                          ? new Date(event.created_at).toLocaleDateString()
-                          : '-'}
+                        {event.created_at ? new Date(event.created_at).toLocaleDateString() : '-'}
                       </span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-slate-500 text-center py-4">
-                  {t.noData}
-                </p>
+                <p className="text-sm text-slate-500 text-center py-4">{t.noData}</p>
               )}
             </div>
           </CardBody>
@@ -631,10 +609,7 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
             {correctionsData?.length > 0 ? (
               <div className="space-y-3">
                 {correctionsData.slice(0, 10).map((correction, idx) => (
-                  <div
-                    key={idx}
-                    className="p-3 bg-slate-50 rounded-lg"
-                  >
+                  <div key={idx} className="p-3 bg-slate-50 rounded-lg">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-slate-900 truncate">
@@ -653,7 +628,8 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
                     {correction.suggestion_type && (
                       <div className="mt-2">
                         <Badge variant="info" className="text-xs">
-                          {t.suggestionTypes[correction.suggestion_type] || correction.suggestion_type}
+                          {t.suggestionTypes[correction.suggestion_type] ||
+                            correction.suggestion_type}
                         </Badge>
                       </div>
                     )}
@@ -661,9 +637,7 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-slate-500 text-center py-8">
-                {t.noData}
-              </p>
+              <p className="text-sm text-slate-500 text-center py-8">{t.noData}</p>
             )}
           </CardBody>
         </Card>

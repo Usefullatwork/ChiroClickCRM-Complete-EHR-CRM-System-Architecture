@@ -9,7 +9,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 const AUTOSAVE_PREFIX = 'chiroclickcrm_autosave_';
 const DEFAULT_DEBOUNCE = 2000; // 2 seconds
 
-export const useAutoSave = (key, initialData = {}, options = {}) => {
+export const useAutoSave = (key, _initialData = {}, options = {}) => {
   const { debounceMs = DEFAULT_DEBOUNCE, enabled = true } = options;
   const storageKey = `${AUTOSAVE_PREFIX}${key}`;
   const timerRef = useRef(null);
@@ -17,7 +17,9 @@ export const useAutoSave = (key, initialData = {}, options = {}) => {
 
   // Try to recover saved data on mount
   const getRecoveredData = useCallback(() => {
-    if (!enabled) return null;
+    if (!enabled) {
+      return null;
+    }
     try {
       const saved = localStorage.getItem(storageKey);
       if (saved) {
@@ -47,25 +49,37 @@ export const useAutoSave = (key, initialData = {}, options = {}) => {
   }, [getRecoveredData]);
 
   // Save function (debounced)
-  const save = useCallback((data) => {
-    if (!enabled) return;
-    if (timerRef.current) clearTimeout(timerRef.current);
-
-    timerRef.current = setTimeout(() => {
-      try {
-        localStorage.setItem(storageKey, JSON.stringify({
-          data,
-          timestamp: Date.now(),
-        }));
-      } catch (e) {
-        // localStorage full or unavailable
+  const save = useCallback(
+    (data) => {
+      if (!enabled) {
+        return;
       }
-    }, debounceMs);
-  }, [storageKey, debounceMs, enabled]);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+
+      timerRef.current = setTimeout(() => {
+        try {
+          localStorage.setItem(
+            storageKey,
+            JSON.stringify({
+              data,
+              timestamp: Date.now(),
+            })
+          );
+        } catch (e) {
+          // localStorage full or unavailable
+        }
+      }, debounceMs);
+    },
+    [storageKey, debounceMs, enabled]
+  );
 
   // Clear saved data (call after successful submit)
   const clear = useCallback(() => {
-    if (timerRef.current) clearTimeout(timerRef.current);
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
     localStorage.removeItem(storageKey);
     setHasRecoveredData(false);
   }, [storageKey]);
@@ -78,7 +92,9 @@ export const useAutoSave = (key, initialData = {}, options = {}) => {
   // Cleanup timer on unmount
   useEffect(() => {
     return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
     };
   }, []);
 

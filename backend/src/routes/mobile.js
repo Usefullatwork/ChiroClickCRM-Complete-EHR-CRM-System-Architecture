@@ -320,7 +320,7 @@ router.get('/exercises', authenticateMobile, async (req, res) => {
     const result = await req.db.query(query, params);
 
     // Get total count
-    let countQuery = `SELECT COUNT(*) FROM exercise_library WHERE is_active = TRUE`;
+    const _countQuery = `SELECT COUNT(*) FROM exercise_library WHERE is_active = TRUE`;
     // Add same filters for count...
 
     res.json({

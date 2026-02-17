@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { patientsAPI } from '../services/api';
-import { formatDate, formatPhone, calculateAge, getStatusColor, debounce } from '../lib/utils';
-import { Search, Plus, Filter, Download, Upload } from 'lucide-react';
+import { formatDate, formatPhone, calculateAge, getStatusColor, _debounce } from '../lib/utils';
+import { Search, Plus, _Filter, Download, Upload } from 'lucide-react';
 import { useTranslation } from '../i18n';
 import { PatientsTableSkeleton } from '../components/ui/Skeleton';
 import toast from '../utils/toast';
 
 export default function Patients() {
   const navigate = useNavigate();
-  const { t, lang } = useTranslation('patients');
+  const { t, _lang } = useTranslation('patients');
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [filters, setFilters] = useState({

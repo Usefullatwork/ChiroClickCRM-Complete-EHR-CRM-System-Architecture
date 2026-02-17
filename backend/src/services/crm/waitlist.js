@@ -132,7 +132,9 @@ export const updateWaitlistEntry = async (clinicId, entryId, data) => {
     }
   }
 
-  if (fields.length === 0) return null;
+  if (fields.length === 0) {
+    return null;
+  }
 
   const result = await query(
     `UPDATE waitlist SET ${fields.join(', ')}
@@ -148,7 +150,7 @@ export const updateWaitlistEntry = async (clinicId, entryId, data) => {
  * Notify waitlist patients
  */
 export const notifyWaitlistPatients = async (clinicId, slotInfo) => {
-  const { slotDate, slotTime, practitionerId } = slotInfo;
+  const { _slotDate, _slotTime, practitionerId } = slotInfo;
 
   // Find matching waitlist entries
   let whereClause = 'WHERE w.organization_id = $1 AND w.status = $2';
@@ -246,10 +248,10 @@ export const getCRMOverview = async (clinicId) => {
 /**
  * Get CRM settings
  */
-export const getCRMSettings = async (clinicId) => {
+export const getCRMSettings = async (_clinicId) =>
   // For now, return default settings
   // In production, this would be stored in a settings table
-  return {
+  ({
     checkInFrequencyDays: 30,
     atRiskThresholdDays: 42,
     inactiveThresholdDays: 90,
@@ -260,8 +262,7 @@ export const getCRMSettings = async (clinicId) => {
     defaultReferralReward: { type: 'DISCOUNT', amount: 20, description: '20% rabatt' },
     enableWaitlist: true,
     maxWaitlistNotifications: 3,
-  };
-};
+  });
 
 /**
  * Update CRM settings

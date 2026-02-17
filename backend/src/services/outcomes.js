@@ -4,7 +4,7 @@
  */
 
 import { query } from '../config/database.js';
-import logger from '../utils/logger.js';
+import _logger from '../utils/logger.js';
 
 /**
  * Get patient outcome summary
@@ -46,36 +46,37 @@ export const getPatientOutcomeSummary = async (organizationId, patientId) => {
       total_encounters: 0,
       pain_trend: null,
       treatment_effectiveness: null,
-      encounters: []
+      encounters: [],
     };
   }
 
   // Calculate pain trend
   const painScores = encounters
-    .filter(e => e.vas_pain_start !== null)
-    .map(e => ({
+    .filter((e) => e.vas_pain_start !== null)
+    .map((e) => ({
       date: e.encounter_date,
       start: e.vas_pain_start,
       end: e.vas_pain_end,
-      improvement: e.vas_pain_start - (e.vas_pain_end || e.vas_pain_start)
+      improvement: e.vas_pain_start - (e.vas_pain_end || e.vas_pain_start),
     }));
 
-  const avgInitialPain = painScores.length > 0
-    ? painScores.reduce((sum, p) => sum + p.start, 0) / painScores.length
-    : null;
+  const avgInitialPain =
+    painScores.length > 0
+      ? painScores.reduce((sum, p) => sum + p.start, 0) / painScores.length
+      : null;
 
-  const latestPain = painScores.length > 0
-    ? painScores[painScores.length - 1].end || painScores[painScores.length - 1].start
-    : null;
+  const latestPain =
+    painScores.length > 0
+      ? painScores[painScores.length - 1].end || painScores[painScores.length - 1].start
+      : null;
 
-  const totalPainReduction = avgInitialPain && latestPain
-    ? avgInitialPain - latestPain
-    : null;
+  const totalPainReduction = avgInitialPain && latestPain ? avgInitialPain - latestPain : null;
 
   // Calculate treatment effectiveness
-  const effectivenessScore = totalPainReduction !== null
-    ? Math.min(100, Math.max(0, (totalPainReduction / avgInitialPain) * 100))
-    : null;
+  const effectivenessScore =
+    totalPainReduction !== null
+      ? Math.min(100, Math.max(0, (totalPainReduction / avgInitialPain) * 100))
+      : null;
 
   return {
     patient_id: patientId,
@@ -84,22 +85,27 @@ export const getPatientOutcomeSummary = async (organizationId, patientId) => {
       initial_average: avgInitialPain,
       latest_score: latestPain,
       total_reduction: totalPainReduction,
-      pain_scores: painScores
+      pain_scores: painScores,
     },
     treatment_effectiveness: {
       score: effectivenessScore,
-      rating: effectivenessScore > 70 ? 'EXCELLENT' :
-              effectivenessScore > 50 ? 'GOOD' :
-              effectivenessScore > 30 ? 'MODERATE' : 'POOR'
+      rating:
+        effectivenessScore > 70
+          ? 'EXCELLENT'
+          : effectivenessScore > 50
+            ? 'GOOD'
+            : effectivenessScore > 30
+              ? 'MODERATE'
+              : 'POOR',
     },
-    encounters: encounters.map(e => ({
+    encounters: encounters.map((e) => ({
       id: e.id,
       date: e.encounter_date,
       type: e.encounter_type,
       vas_pain_start: e.vas_pain_start,
       vas_pain_end: e.vas_pain_end,
-      icpc_codes: e.icpc_codes
-    }))
+      icpc_codes: e.icpc_codes,
+    })),
   };
 };
 
@@ -125,28 +131,31 @@ export const getDiagnosisOutcomeStats = async (organizationId, icpcCode, limit =
     [organizationId, icpcCode, limit]
   );
 
-  const outcomes = result.rows.map(row => ({
+  const outcomes = result.rows.map((row) => ({
     patient_id: row.patient_id,
     patient_name: row.patient_name,
     date: row.encounter_date,
     pain_reduction: row.vas_pain_start - (row.vas_pain_end || row.vas_pain_start),
-    improvement_percent: ((row.vas_pain_start - (row.vas_pain_end || row.vas_pain_start)) / row.vas_pain_start) * 100
+    improvement_percent:
+      ((row.vas_pain_start - (row.vas_pain_end || row.vas_pain_start)) / row.vas_pain_start) * 100,
   }));
 
-  const avgImprovement = outcomes.length > 0
-    ? outcomes.reduce((sum, o) => sum + o.improvement_percent, 0) / outcomes.length
-    : 0;
+  const avgImprovement =
+    outcomes.length > 0
+      ? outcomes.reduce((sum, o) => sum + o.improvement_percent, 0) / outcomes.length
+      : 0;
 
-  const successRate = outcomes.length > 0
-    ? (outcomes.filter(o => o.improvement_percent > 30).length / outcomes.length) * 100
-    : 0;
+  const successRate =
+    outcomes.length > 0
+      ? (outcomes.filter((o) => o.improvement_percent > 30).length / outcomes.length) * 100
+      : 0;
 
   return {
     icpc_code: icpcCode,
     total_cases: outcomes.length,
     avg_improvement_percent: Math.round(avgImprovement * 10) / 10,
     success_rate: Math.round(successRate * 10) / 10,
-    outcomes
+    outcomes,
   };
 };
 
@@ -174,9 +183,10 @@ export const getTreatmentOutcomeStats = async (organizationId, startDate, endDat
   const treatmentStats = {};
 
   for (const row of result.rows) {
-    const codes = typeof row.treatment_codes === 'string'
-      ? JSON.parse(row.treatment_codes)
-      : row.treatment_codes;
+    const codes =
+      typeof row.treatment_codes === 'string'
+        ? JSON.parse(row.treatment_codes)
+        : row.treatment_codes;
 
     if (Array.isArray(codes)) {
       for (const treatment of codes) {
@@ -187,7 +197,7 @@ export const getTreatmentOutcomeStats = async (organizationId, startDate, endDat
             description: treatment.description || '',
             usage_count: 0,
             total_improvement: 0,
-            avg_improvement: 0
+            avg_improvement: 0,
           };
         }
 
@@ -199,11 +209,10 @@ export const getTreatmentOutcomeStats = async (organizationId, startDate, endDat
   }
 
   // Calculate averages
-  const stats = Object.values(treatmentStats).map(stat => ({
+  const stats = Object.values(treatmentStats).map((stat) => ({
     ...stat,
-    avg_improvement: stat.usage_count > 0
-      ? Math.round((stat.total_improvement / stat.usage_count) * 10) / 10
-      : 0
+    avg_improvement:
+      stat.usage_count > 0 ? Math.round((stat.total_improvement / stat.usage_count) * 10) / 10 : 0,
   }));
 
   // Sort by avg improvement
@@ -220,7 +229,7 @@ export const getCohortAnalysis = async (organizationId, options = {}) => {
   const {
     groupBy = 'age_group', // age_group, gender, diagnosis
     startDate = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
-    endDate = new Date()
+    endDate = new Date(),
   } = options;
 
   let groupColumn;
@@ -259,14 +268,16 @@ export const getCohortAnalysis = async (organizationId, options = {}) => {
     [organizationId, startDate, endDate]
   );
 
-  return result.rows.map(row => ({
+  return result.rows.map((row) => ({
     cohort: row.cohort,
     patient_count: parseInt(row.patient_count),
     encounter_count: parseInt(row.encounter_count),
     avg_initial_pain: Math.round(parseFloat(row.avg_initial_pain) * 10) / 10,
     avg_final_pain: Math.round(parseFloat(row.avg_final_pain) * 10) / 10,
     avg_pain_reduction: Math.round(parseFloat(row.avg_pain_reduction) * 10) / 10,
-    improvement_rate: Math.round((parseFloat(row.avg_pain_reduction) / parseFloat(row.avg_initial_pain)) * 1000) / 10
+    improvement_rate:
+      Math.round((parseFloat(row.avg_pain_reduction) / parseFloat(row.avg_initial_pain)) * 1000) /
+      10,
   }));
 };
 
@@ -296,7 +307,7 @@ export const getPatientLongitudinalData = async (organizationId, patientId) => {
  * Predict treatment outcome using simple heuristics
  * (In production, this could use ML models)
  */
-export const predictTreatmentOutcome = async (organizationId, patientId, proposedTreatment) => {
+export const predictTreatmentOutcome = async (organizationId, patientId, _proposedTreatment) => {
   // Get patient's historical response to similar treatments
   const historyResult = await query(
     `SELECT
@@ -317,15 +328,16 @@ export const predictTreatmentOutcome = async (organizationId, patientId, propose
     return {
       prediction: 'UNKNOWN',
       confidence: 0,
-      message: 'No historical data available for this patient'
+      message: 'No historical data available for this patient',
     };
   }
 
   // Calculate average improvement
-  const avgImprovement = historyResult.rows.reduce((sum, row) => {
-    const improvement = row.vas_pain_start - (row.vas_pain_end || row.vas_pain_start);
-    return sum + improvement;
-  }, 0) / historyResult.rows.length;
+  const avgImprovement =
+    historyResult.rows.reduce((sum, row) => {
+      const improvement = row.vas_pain_start - (row.vas_pain_end || row.vas_pain_start);
+      return sum + improvement;
+    }, 0) / historyResult.rows.length;
 
   // Simple prediction logic
   let prediction, confidence;
@@ -347,7 +359,7 @@ export const predictTreatmentOutcome = async (organizationId, patientId, propose
     prediction,
     confidence,
     avg_historical_improvement: Math.round(avgImprovement * 10) / 10,
-    message: `Based on ${historyResult.rows.length} previous encounters`
+    message: `Based on ${historyResult.rows.length} previous encounters`,
   };
 };
 
@@ -357,5 +369,5 @@ export default {
   getTreatmentOutcomeStats,
   getCohortAnalysis,
   getPatientLongitudinalData,
-  predictTreatmentOutcome
+  predictTreatmentOutcome,
 };

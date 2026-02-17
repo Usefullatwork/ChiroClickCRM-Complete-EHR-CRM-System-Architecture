@@ -5,16 +5,24 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import {
-  ORTHO_EXAM_CLUSTERS,
+  _ORTHO_EXAM_CLUSTERS,
   calculateOrthoClusterScore,
   checkOrthoRedFlags,
   generateOrthoNarrative,
   getClustersByRegion,
-  getAvailableRegions
+  getAvailableRegions,
 } from './orthopedicExamDefinitions';
 import {
-  Activity, AlertTriangle, CheckCircle, XCircle, ChevronDown, ChevronUp,
-  ArrowRight, Clipboard, FileText, RotateCcw
+  Activity,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  ChevronDown,
+  ChevronUp,
+  _ArrowRight,
+  Clipboard,
+  FileText,
+  RotateCcw,
 } from 'lucide-react';
 
 // Body region icons and colors
@@ -29,7 +37,7 @@ const REGION_CONFIG = {
   LUMBAR: { icon: '🔙', color: 'amber', label: { no: 'Lumbal', en: 'Lumbar' } },
   SACROILIAC: { icon: '🔘', color: 'orange', label: { no: 'SI-ledd', en: 'Sacroiliac' } },
   FUNCTIONAL: { icon: '🏃', color: 'green', label: { no: 'Funksjonell', en: 'Functional' } },
-  NEUROLOGICAL: { icon: '🧠', color: 'purple', label: { no: 'Nevrologisk', en: 'Neurological' } }
+  NEUROLOGICAL: { icon: '🧠', color: 'purple', label: { no: 'Nevrologisk', en: 'Neurological' } },
 };
 
 // ============================================================================
@@ -41,10 +49,14 @@ function RegionSelector({ selectedRegion, onSelectRegion, clusterResults, langua
 
   return (
     <div className="flex flex-wrap gap-2 mb-4">
-      {regions.map(region => {
-        const config = REGION_CONFIG[region] || { icon: '📍', color: 'gray', label: { no: region, en: region } };
+      {regions.map((region) => {
+        const config = REGION_CONFIG[region] || {
+          icon: '📍',
+          color: 'gray',
+          label: { no: region, en: region },
+        };
         const clusters = getClustersByRegion(region);
-        const testedCount = clusters.filter(c => clusterResults[c.id]).length;
+        const testedCount = clusters.filter((c) => clusterResults[c.id]).length;
 
         return (
           <button
@@ -72,12 +84,14 @@ function RegionSelector({ selectedRegion, onSelectRegion, clusterResults, langua
 
 function ClusterCard({ cluster, results, onTestResult, expanded, onToggle, language }) {
   const score = results ? calculateOrthoClusterScore(cluster.id, results) : null;
-  const hasResults = results && Object.keys(results).length > 0;
+  const _hasResults = results && Object.keys(results).length > 0;
 
   return (
-    <div className={`border rounded-lg overflow-hidden mb-3 ${
-      cluster.redFlagCluster ? 'border-red-300 bg-red-50' : 'border-gray-200'
-    }`}>
+    <div
+      className={`border rounded-lg overflow-hidden mb-3 ${
+        cluster.redFlagCluster ? 'border-red-300 bg-red-50' : 'border-gray-200'
+      }`}
+    >
       {/* Header */}
       <button
         onClick={onToggle}
@@ -88,16 +102,18 @@ function ClusterCard({ cluster, results, onTestResult, expanded, onToggle, langu
         <div className="flex items-center gap-3">
           <span className="font-medium text-gray-900">{cluster.name[language]}</span>
           {cluster.redFlagCluster && (
-            <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">
-              RED FLAG
-            </span>
+            <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">RED FLAG</span>
           )}
           {score && (
-            <span className={`text-xs px-2 py-0.5 rounded-full ${
-              score.meetsThreshold
-                ? cluster.redFlagCluster ? 'bg-red-600 text-white' : 'bg-green-500 text-white'
-                : 'bg-gray-200 text-gray-700'
-            }`}>
+            <span
+              className={`text-xs px-2 py-0.5 rounded-full ${
+                score.meetsThreshold
+                  ? cluster.redFlagCluster
+                    ? 'bg-red-600 text-white'
+                    : 'bg-green-500 text-white'
+                  : 'bg-gray-200 text-gray-700'
+              }`}
+            >
               {score.positive}/{score.total}
               {score.meetsThreshold && ' ✓'}
             </span>
@@ -111,7 +127,7 @@ function ClusterCard({ cluster, results, onTestResult, expanded, onToggle, langu
         <div className="p-4 space-y-3">
           <p className="text-sm text-gray-600 mb-3">{cluster.description[language]}</p>
 
-          {cluster.tests.map(test => (
+          {cluster.tests.map((test) => (
             <TestRow
               key={test.id}
               test={test}
@@ -122,17 +138,23 @@ function ClusterCard({ cluster, results, onTestResult, expanded, onToggle, langu
           ))}
 
           {/* Diagnostic Criteria */}
-          <div className={`mt-4 p-3 rounded-lg ${
-            score?.meetsThreshold
-              ? cluster.redFlagCluster ? 'bg-red-100' : 'bg-green-100'
-              : 'bg-gray-100'
-          }`}>
+          <div
+            className={`mt-4 p-3 rounded-lg ${
+              score?.meetsThreshold
+                ? cluster.redFlagCluster
+                  ? 'bg-red-100'
+                  : 'bg-green-100'
+                : 'bg-gray-100'
+            }`}
+          >
             <p className="text-sm font-medium">
               {language === 'no' ? 'Diagnostiske kriterier: ' : 'Diagnostic criteria: '}
               {cluster.diagnosticCriteria.threshold}/{cluster.diagnosticCriteria.total} positive
             </p>
             {score?.meetsThreshold && (
-              <p className={`text-sm mt-1 ${cluster.redFlagCluster ? 'text-red-700' : 'text-green-700'}`}>
+              <p
+                className={`text-sm mt-1 ${cluster.redFlagCluster ? 'text-red-700' : 'text-green-700'}`}
+              >
                 ✓ {cluster.diagnosticCriteria.interpretation[language]}
               </p>
             )}
@@ -152,32 +174,29 @@ function TestRow({ test, result, onResult, language }) {
     onResult({
       result: newResult,
       side: side || undefined,
-      notes: notes || undefined
+      notes: notes || undefined,
     });
   };
 
   return (
-    <div className={`border rounded-lg p-3 ${
-      test.redFlag ? 'border-red-200 bg-red-50' : 'border-gray-200'
-    }`}>
+    <div
+      className={`border rounded-lg p-3 ${
+        test.redFlag ? 'border-red-200 bg-red-50' : 'border-gray-200'
+      }`}
+    >
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <span className="font-medium text-gray-900">{test.name[language]}</span>
-            {test.redFlag && (
-              <AlertTriangle size={16} className="text-red-500" />
-            )}
+            {test.redFlag && <AlertTriangle size={16} className="text-red-500" />}
             {test.sensitivity && (
               <span className="text-xs text-gray-500">
-                Se: {Math.round(test.sensitivity * 100)}% / Sp: {Math.round(test.specificity * 100)}%
+                Se: {Math.round(test.sensitivity * 100)}% / Sp: {Math.round(test.specificity * 100)}
+                %
               </span>
             )}
           </div>
-          {test.target && (
-            <p className="text-xs text-gray-500 mt-0.5">
-              Target: {test.target}
-            </p>
-          )}
+          {test.target && <p className="text-xs text-gray-500 mt-0.5">Target: {test.target}</p>}
         </div>
 
         {/* Result buttons */}
@@ -235,7 +254,7 @@ function TestRow({ test, result, onResult, language }) {
               {language === 'no' ? 'Side' : 'Side'}
             </label>
             <div className="flex gap-2">
-              {['left', 'right', 'bilateral'].map(s => (
+              {['left', 'right', 'bilateral'].map((s) => (
                 <button
                   key={s}
                   onClick={() => {
@@ -248,9 +267,17 @@ function TestRow({ test, result, onResult, language }) {
                     side === s ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'
                   }`}
                 >
-                  {s === 'left' ? (language === 'no' ? 'Venstre' : 'Left') :
-                   s === 'right' ? (language === 'no' ? 'Høyre' : 'Right') :
-                   (language === 'no' ? 'Bilateral' : 'Bilateral')}
+                  {s === 'left'
+                    ? language === 'no'
+                      ? 'Venstre'
+                      : 'Left'
+                    : s === 'right'
+                      ? language === 'no'
+                        ? 'Høyre'
+                        : 'Right'
+                      : language === 'no'
+                        ? 'Bilateral'
+                        : 'Bilateral'}
                 </button>
               ))}
             </div>
@@ -294,9 +321,7 @@ function TestRow({ test, result, onResult, language }) {
           {/* Red flag warning */}
           {test.redFlag && test.redFlagCondition && (
             <div className="bg-red-100 border border-red-300 rounded p-2 mt-2">
-              <p className="text-xs text-red-700 font-medium">
-                ⚠️ {test.redFlagCondition}
-              </p>
+              <p className="text-xs text-red-700 font-medium">⚠️ {test.redFlagCondition}</p>
             </div>
           )}
         </div>
@@ -306,7 +331,9 @@ function TestRow({ test, result, onResult, language }) {
 }
 
 function RedFlagAlert({ redFlags, language }) {
-  if (!redFlags || redFlags.length === 0) return null;
+  if (!redFlags || redFlags.length === 0) {
+    return null;
+  }
 
   return (
     <div className="bg-red-100 border-2 border-red-400 rounded-lg p-4 mb-4">
@@ -344,7 +371,8 @@ function NarrativePanel({ narrative, onCopy, language }) {
         </button>
       </div>
       <div className="prose prose-sm max-w-none whitespace-pre-wrap text-gray-700">
-        {narrative || (language === 'no' ? 'Ingen tester utført ennå...' : 'No tests performed yet...')}
+        {narrative ||
+          (language === 'no' ? 'Ingen tester utført ennå...' : 'No tests performed yet...')}
       </div>
     </div>
   );
@@ -355,11 +383,11 @@ function NarrativePanel({ narrative, onCopy, language }) {
 // ============================================================================
 
 export default function OrthopedicExam({
-  patientId,
-  encounterId,
+  _patientId,
+  _encounterId,
   onExamChange,
   initialData,
-  language = 'no'
+  language = 'no',
 }) {
   const [selectedRegion, setSelectedRegion] = useState('SHOULDER');
   const [clusterResults, setClusterResults] = useState(initialData?.clusterResults || {});
@@ -370,7 +398,7 @@ export default function OrthopedicExam({
   // Update narrative and red flags when results change
   useEffect(() => {
     const allResults = {};
-    Object.entries(clusterResults).forEach(([clusterId, results]) => {
+    Object.entries(clusterResults).forEach(([_clusterId, results]) => {
       Object.entries(results).forEach(([testId, result]) => {
         allResults[testId] = result;
       });
@@ -379,7 +407,10 @@ export default function OrthopedicExam({
     const newRedFlags = checkOrthoRedFlags(allResults);
     setRedFlags(newRedFlags);
 
-    const newNarrative = generateOrthoNarrative({ clusterResults, redFlags: newRedFlags }, language);
+    const newNarrative = generateOrthoNarrative(
+      { clusterResults, redFlags: newRedFlags },
+      language
+    );
     setNarrative(newNarrative);
 
     // Notify parent
@@ -391,25 +422,25 @@ export default function OrthopedicExam({
         clusterScores: Object.keys(clusterResults).reduce((acc, clusterId) => {
           acc[clusterId] = calculateOrthoClusterScore(clusterId, clusterResults[clusterId]);
           return acc;
-        }, {})
+        }, {}),
       });
     }
   }, [clusterResults, language]);
 
   const handleTestResult = useCallback((clusterId, testId, result) => {
-    setClusterResults(prev => ({
+    setClusterResults((prev) => ({
       ...prev,
       [clusterId]: {
         ...prev[clusterId],
-        [testId]: result
-      }
+        [testId]: result,
+      },
     }));
   }, []);
 
   const toggleCluster = useCallback((clusterId) => {
-    setExpandedClusters(prev => ({
+    setExpandedClusters((prev) => ({
       ...prev,
-      [clusterId]: !prev[clusterId]
+      [clusterId]: !prev[clusterId],
     }));
   }, []);
 
@@ -456,7 +487,7 @@ export default function OrthopedicExam({
 
       {/* Clusters for Selected Region */}
       <div className="space-y-3">
-        {regionClusters.map(cluster => (
+        {regionClusters.map((cluster) => (
           <ClusterCard
             key={cluster.id}
             cluster={cluster}
@@ -470,11 +501,7 @@ export default function OrthopedicExam({
       </div>
 
       {/* Narrative Output */}
-      <NarrativePanel
-        narrative={narrative}
-        onCopy={copyNarrative}
-        language={language}
-      />
+      <NarrativePanel narrative={narrative} onCopy={copyNarrative} language={language} />
     </div>
   );
 }

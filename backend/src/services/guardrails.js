@@ -19,25 +19,25 @@ const logger = require('../utils/logger');
 const GUARDRAILS_CONFIG = {
   // Maximum lengths for various content types
   maxLengths: {
-    prompt: 8000,          // Max input tokens (approximate)
-    response: 4000,        // Max output tokens
-    patientContext: 2000,  // Max patient history context
+    prompt: 8000, // Max input tokens (approximate)
+    response: 4000, // Max output tokens
+    patientContext: 2000, // Max patient history context
   },
 
   // Confidence thresholds for clinical content
   confidenceThresholds: {
-    diagnosis: 0.85,       // High confidence required for diagnoses
-    treatment: 0.80,       // Treatment recommendations
-    medication: 0.90,      // Medication-related content
-    referral: 0.75,        // Referral suggestions
-    general: 0.60,         // General clinical text
+    diagnosis: 0.85, // High confidence required for diagnoses
+    treatment: 0.8, // Treatment recommendations
+    medication: 0.9, // Medication-related content
+    referral: 0.75, // Referral suggestions
+    general: 0.6, // General clinical text
   },
 
   // Response time limits (ms)
   timeouts: {
-    simple: 5000,          // Simple completions
-    complex: 15000,        // Complex reasoning
-    rag: 10000,            // RAG-augmented queries
+    simple: 5000, // Simple completions
+    complex: 15000, // Complex reasoning
+    rag: 10000, // RAG-augmented queries
   },
 };
 
@@ -93,7 +93,7 @@ const DANGEROUS_PATTERNS = {
 const OUT_OF_SCOPE_PATTERNS = [
   /\b(psykiatrisk|psychiatric|schizophrenia|bipolar)\b/i,
   /\b(selvmord|suicide|suicidal)\b/i,
-  /\b(gravid|pregnancy|fødsel)\b/i,  // Unless relevant to MSK
+  /\b(gravid|pregnancy|fødsel)\b/i, // Unless relevant to MSK
   /\b(diabetes|insulin|blodsukker)\b/i,
   /\b(blodtrykk|hypertensjon)\b/i,
 ];
@@ -114,7 +114,8 @@ class InputValidator {
 
     // Check length
     const maxLength = GUARDRAILS_CONFIG.maxLengths.prompt;
-    if (input.length > maxLength * 4) { // Approximate char to token ratio
+    if (input.length > maxLength * 4) {
+      // Approximate char to token ratio
       issues.push({
         type: 'length',
         message: `Input exceeds maximum length (${input.length} chars)`,
@@ -188,7 +189,9 @@ class InputValidator {
    * Validate clinical context (patient history, etc.)
    */
   static validateContext(context) {
-    if (!context) return { valid: true, context: null };
+    if (!context) {
+      return { valid: true, context: null };
+    }
 
     let sanitizedContext = context;
 
@@ -200,7 +203,7 @@ class InputValidator {
     // Truncate if too long
     const maxLength = GUARDRAILS_CONFIG.maxLengths.patientContext;
     if (sanitizedContext.length > maxLength * 4) {
-      sanitizedContext = sanitizedContext.substring(0, maxLength * 4) + '...[truncated]';
+      sanitizedContext = `${sanitizedContext.substring(0, maxLength * 4)}...[truncated]`;
     }
 
     return {
@@ -253,7 +256,8 @@ class OutputFilter {
 
     // Add appropriate disclaimers based on content type
     if (addDisclaimer && type === 'diagnosis') {
-      const disclaimer = '\n\n---\n*Denne vurderingen er generert av AI og må verifiseres av behandlende kiropraktor.*';
+      const disclaimer =
+        '\n\n---\n*Denne vurderingen er generert av AI og må verifiseres av behandlende kiropraktor.*';
       if (!filtered.includes(disclaimer)) {
         filtered += disclaimer;
       }
@@ -267,7 +271,7 @@ class OutputFilter {
       flags,
       warnings,
       hallucinationRisk: hallucinationIndicators,
-      requiresReview: flags.some(f => f.severity === 'high'),
+      requiresReview: flags.some((f) => f.severity === 'high'),
       metadata: {
         originalLength: output.length,
         filteredLength: filtered.length,
@@ -392,7 +396,7 @@ class ClinicalHeuristics {
     }
 
     return {
-      appropriate: issues.filter(i => i.severity === 'error').length === 0,
+      appropriate: issues.filter((i) => i.severity === 'error').length === 0,
       issues,
     };
   }
@@ -413,7 +417,8 @@ class ClinicalHeuristics {
         if (pattern.test(response)) {
           issues.push({
             type: 'age_inappropriate',
-            message: 'Response contains techniques that may not be appropriate for pediatric patients',
+            message:
+              'Response contains techniques that may not be appropriate for pediatric patients',
             severity: 'warning',
           });
         }
@@ -422,9 +427,7 @@ class ClinicalHeuristics {
 
     // Geriatric considerations (over 65)
     if (age > 65) {
-      const contraindicated = [
-        /\b(høyhastighetsjustering|high-velocity)\b/i,
-      ];
+      const contraindicated = [/\b(høyhastighetsjustering|high-velocity)\b/i];
       for (const pattern of contraindicated) {
         if (pattern.test(response)) {
           issues.push({
@@ -502,11 +505,7 @@ class ClinicalHeuristics {
         /saddle|ridebukse/i,
         /bilateral|begge ben/i,
       ],
-      neckPain: [
-        /trauma|ulykke|fall/i,
-        /weakness|svakhet/i,
-        /bilateral arm/i,
-      ],
+      neckPain: [/trauma|ulykke|fall/i, /weakness|svakhet/i, /bilateral arm/i],
     };
 
     // Check if response appropriately addresses red flags
@@ -523,7 +522,11 @@ class ClinicalHeuristics {
 
     // If complaint matches red flag patterns, check response mentions them
     for (const pattern of relevantFlags) {
-      if (pattern.test(chiefComplaint) && !response.includes('røde flagg') && !response.includes('red flag')) {
+      if (
+        pattern.test(chiefComplaint) &&
+        !response.includes('røde flagg') &&
+        !response.includes('red flag')
+      ) {
         issues.push({
           type: 'red_flag_missing',
           message: 'Red flag condition mentioned but not addressed in response',
@@ -600,7 +603,7 @@ class GuardrailsService {
 
     if (allFlags.length > 0) {
       logger.info('Guardrails raised flags', {
-        flags: allFlags.map(f => f.type),
+        flags: allFlags.map((f) => f.type),
         outputLength: output.length,
       });
     }
@@ -662,12 +665,14 @@ class GuardrailsService {
   getStats() {
     return {
       ...this.stats,
-      blockRate: this.stats.inputsValidated > 0
-        ? (this.stats.inputsBlocked / this.stats.inputsValidated * 100).toFixed(2) + '%'
-        : '0%',
-      flagRate: this.stats.outputsFiltered > 0
-        ? (this.stats.flagsRaised / this.stats.outputsFiltered).toFixed(2)
-        : '0',
+      blockRate:
+        this.stats.inputsValidated > 0
+          ? `${((this.stats.inputsBlocked / this.stats.inputsValidated) * 100).toFixed(2)}%`
+          : '0%',
+      flagRate:
+        this.stats.outputsFiltered > 0
+          ? (this.stats.flagsRaised / this.stats.outputsFiltered).toFixed(2)
+          : '0',
     };
   }
 

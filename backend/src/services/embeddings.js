@@ -95,9 +95,7 @@ class EmbeddingsService {
 
     for (let i = 0; i < texts.length; i += batchSize) {
       const batch = texts.slice(i, i + batchSize);
-      const batchResults = await Promise.all(
-        batch.map(text => this.embed(text, type))
-      );
+      const batchResults = await Promise.all(batch.map((text) => this.embed(text, type)));
       results.push(...batchResults);
     }
 
@@ -117,7 +115,7 @@ class EmbeddingsService {
       {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.hfApiKey}`,
+          Authorization: `Bearer ${this.hfApiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -180,7 +178,9 @@ class EmbeddingsService {
    * Mean pooling for token embeddings
    */
   meanPool(tokenEmbeddings) {
-    if (!tokenEmbeddings.length) return [];
+    if (!tokenEmbeddings.length) {
+      return [];
+    }
 
     const dimensions = tokenEmbeddings[0].length;
     const pooled = new Array(dimensions).fill(0);
@@ -219,7 +219,9 @@ class EmbeddingsService {
     normA = Math.sqrt(normA);
     normB = Math.sqrt(normB);
 
-    if (normA === 0 || normB === 0) return 0;
+    if (normA === 0 || normB === 0) {
+      return 0;
+    }
 
     return dotProduct / (normA * normB);
   }

@@ -7,7 +7,7 @@
  * - Security without revealing sensitive data
  */
 
-import React, { useState } from 'react';
+import _React, { useState } from 'react';
 import { Loader2, ShieldCheck, AlertCircle, ArrowLeft } from 'lucide-react';
 
 const TRANSLATIONS = {
@@ -36,12 +36,12 @@ const TRANSLATIONS = {
     failed: 'Fødselsdato stemmer ikke med våre registre',
     tryAgain: 'Vennligst sjekk og prøv igjen, eller spør resepsjonen',
     back: 'Tilbake',
-  }
+  },
 };
 
 const MONTHS = {
   en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-  no: ['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Des']
+  no: ['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Des'],
 };
 
 export default function IdentityVerify({
@@ -49,7 +49,7 @@ export default function IdentityVerify({
   onVerified,
   onBack,
   lang = 'no',
-  apiBase = '/api/v1'
+  apiBase = '/api/v1',
 }) {
   const t = TRANSLATIONS[lang];
   const months = MONTHS[lang];
@@ -68,7 +68,9 @@ export default function IdentityVerify({
   const isComplete = day && month && year;
 
   const verify = async () => {
-    if (!isComplete) return;
+    if (!isComplete) {
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -82,8 +84,8 @@ export default function IdentityVerify({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           appointmentId: appointment.id,
-          dateOfBirth
-        })
+          dateOfBirth,
+        }),
       });
 
       const data = await res.json();
@@ -94,7 +96,7 @@ export default function IdentityVerify({
         setTimeout(() => {
           onVerified({
             ...appointment,
-            verifiedName: data.patientName
+            verifiedName: data.patientName,
           });
         }, 1000);
       } else {
@@ -111,8 +113,10 @@ export default function IdentityVerify({
   if (success) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center py-12">
-        <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6
-                        animate-bounce">
+        <div
+          className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6
+                        animate-bounce"
+        >
           <ShieldCheck className="w-12 h-12 text-green-600" />
         </div>
         <h2 className="text-3xl font-bold text-green-700 mb-2">{t.success}</h2>
@@ -137,12 +141,8 @@ export default function IdentityVerify({
 
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-3">
-          {t.title}
-        </h1>
-        <p className="text-xl text-slate-500">
-          {t.subtitle}
-        </p>
+        <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-3">{t.title}</h1>
+        <p className="text-xl text-slate-500">{t.subtitle}</p>
         <p className="text-lg text-teal-600 font-medium mt-2">
           {appointment.firstName} {appointment.lastName}
         </p>
@@ -163,8 +163,10 @@ export default function IdentityVerify({
                        outline-none transition-all bg-white appearance-none"
           >
             <option value="">--</option>
-            {days.map(d => (
-              <option key={d} value={d}>{d}</option>
+            {days.map((d) => (
+              <option key={d} value={d}>
+                {d}
+              </option>
             ))}
           </select>
         </div>
@@ -183,7 +185,9 @@ export default function IdentityVerify({
           >
             <option value="">--</option>
             {months.map((m, i) => (
-              <option key={i + 1} value={i + 1}>{m}</option>
+              <option key={i + 1} value={i + 1}>
+                {m}
+              </option>
             ))}
           </select>
         </div>
@@ -201,8 +205,10 @@ export default function IdentityVerify({
                        outline-none transition-all bg-white appearance-none"
           >
             <option value="">--</option>
-            {years.map(y => (
-              <option key={y} value={y}>{y}</option>
+            {years.map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
             ))}
           </select>
         </div>

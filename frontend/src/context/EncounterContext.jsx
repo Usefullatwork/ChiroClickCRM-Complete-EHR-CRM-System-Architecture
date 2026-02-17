@@ -8,7 +8,7 @@ import toast from '../utils/toast';
  * New components should import from stores/encounterStore directly.
  */
 
-import React, { createContext, useContext, useEffect, useRef } from 'react';
+import _React, { createContext, useContext, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { encountersAPI, patientsAPI, diagnosisAPI } from '../services/api';
@@ -63,9 +63,9 @@ export const EncounterProvider = ({ children }) => {
     showTakster,
     setShowTakster,
     autoSaveStatus,
-    setAutoSaveStatus,
+    _setAutoSaveStatus,
     lastSaved,
-    setLastSaved,
+    _setLastSaved,
     updateField,
     showAmendmentForm,
     setShowAmendmentForm,
@@ -154,7 +154,9 @@ export const EncounterProvider = ({ children }) => {
     if (encounterId && !isSigned) {
       markUnsaved();
 
-      if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
 
       autoSaveTimerRef.current = setTimeout(() => {
         markSaving();
@@ -162,18 +164,24 @@ export const EncounterProvider = ({ children }) => {
       }, 3000);
     }
     return () => {
-      if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
     };
   }, [encounterData, selectedTakster]);
 
   // --- HELPERS ---
   const cleanEmptyStrings = (obj) => {
-    if (typeof obj !== 'object' || obj === null) return obj;
+    if (typeof obj !== 'object' || obj === null) {
+      return obj;
+    }
     const cleaned = {};
     for (const [key, value] of Object.entries(obj)) {
       if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
         const cleanedNested = cleanEmptyStrings(value);
-        if (Object.keys(cleanedNested).length > 0) cleaned[key] = cleanedNested;
+        if (Object.keys(cleanedNested).length > 0) {
+          cleaned[key] = cleanedNested;
+        }
       } else if (value !== '' && value !== null && value !== undefined) {
         cleaned[key] = value;
       }
@@ -184,7 +192,9 @@ export const EncounterProvider = ({ children }) => {
   // --- MUTATIONS ---
   const saveMutation = useMutation({
     mutationFn: (data) => {
-      if (encounterId) return encountersAPI.update(encounterId, data);
+      if (encounterId) {
+        return encountersAPI.update(encounterId, data);
+      }
       return encountersAPI.create(data);
     },
     onSuccess: (response) => {
@@ -224,7 +234,7 @@ export const EncounterProvider = ({ children }) => {
     .filter((t) => selectedTakster.includes(t.id))
     .reduce((sum, t) => sum + t.price, 0);
 
-  const handleSave = (showToast = true) => {
+  const handleSave = (_showToast = true) => {
     const subjective = cleanEmptyStrings(encounterData.subjective);
     const objective = cleanEmptyStrings(encounterData.objective);
     const assessment = cleanEmptyStrings(encounterData.assessment);
@@ -262,7 +272,9 @@ export const EncounterProvider = ({ children }) => {
 
   const handleSignAndLock = () => {
     const newErrors = {};
-    if (!encounterData.subjective.chief_complaint) newErrors.subjective = true;
+    if (!encounterData.subjective.chief_complaint) {
+      newErrors.subjective = true;
+    }
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       toast.warning('Vennligst fyll ut hovedklage før signering.');
@@ -271,12 +283,16 @@ export const EncounterProvider = ({ children }) => {
 
     handleSave();
     setTimeout(() => {
-      if (encounterId) signMutation.mutate(encounterId);
+      if (encounterId) {
+        signMutation.mutate(encounterId);
+      }
     }, 500);
   };
 
   const handleCreateAmendment = () => {
-    if (!amendmentContent.trim()) return;
+    if (!amendmentContent.trim()) {
+      return;
+    }
     createAmendmentMutation.mutate({
       amendment_type: amendmentType,
       reason: amendmentReason,

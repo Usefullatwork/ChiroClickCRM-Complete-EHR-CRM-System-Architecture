@@ -38,12 +38,14 @@ class MemoryCache {
   delete(key) {
     const existed = this.store.delete(key);
     this.ttls.delete(key);
-    if (existed) this.stats.deletes++;
+    if (existed) {
+      this.stats.deletes++;
+    }
     return existed;
   }
 
   deletePattern(pattern) {
-    const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
+    const regex = new RegExp(`^${pattern.replace(/\*/g, '.*')}$`);
     let count = 0;
     for (const key of this.store.keys()) {
       if (regex.test(key)) {
@@ -91,7 +93,9 @@ let redisInitialized = false;
  * Initialize cache (attempts Redis connection)
  */
 export const initCache = async () => {
-  if (redisInitialized) return;
+  if (redisInitialized) {
+    return;
+  }
 
   try {
     if (process.env.REDIS_URL || process.env.REDIS_ENABLED === 'true') {
@@ -231,9 +235,12 @@ const hybridCache = {
 };
 
 // Clean expired entries periodically for memory cache
-setInterval(() => {
-  memoryCache.cleanExpired();
-}, 5 * 60 * 1000);
+setInterval(
+  () => {
+    memoryCache.cleanExpired();
+  },
+  5 * 60 * 1000
+);
 
 /**
  * Cache key builders for consistent naming

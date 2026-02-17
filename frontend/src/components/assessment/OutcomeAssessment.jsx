@@ -16,7 +16,7 @@ export default function OutcomeAssessment({
   responses = {},
   onChange,
   showScore = true,
-  className = ''
+  className = '',
 }) {
   const [expandedSections, setExpandedSections] = useState({});
 
@@ -24,44 +24,48 @@ export default function OutcomeAssessment({
     ODI: {
       name: 'Oswestry Disability Index',
       description: 'Low back pain disability assessment',
-      sections: ODI_QUESTIONS
+      sections: ODI_QUESTIONS,
     },
     NDI: {
       name: 'Neck Disability Index',
       description: 'Neck pain disability assessment',
-      sections: NDI_QUESTIONS
+      sections: NDI_QUESTIONS,
     },
     PSFS: {
       name: 'Patient-Specific Functional Scale',
       description: 'Custom functional limitation assessment',
-      sections: PSFS_QUESTIONS
-    }
+      sections: PSFS_QUESTIONS,
+    },
   };
 
   const questionnaire = questionnaires[type];
 
   const toggleSection = (sectionId) => {
-    setExpandedSections(prev => ({
+    setExpandedSections((prev) => ({
       ...prev,
-      [sectionId]: !prev[sectionId]
+      [sectionId]: !prev[sectionId],
     }));
   };
 
   const handleResponseChange = (questionId, value) => {
     onChange({
       ...responses,
-      [questionId]: value
+      [questionId]: value,
     });
   };
 
   // Calculate score
   const calculateScore = () => {
-    if (!questionnaire) return null;
+    if (!questionnaire) {
+      return null;
+    }
 
-    const questions = questionnaire.sections.flatMap(s => s.questions);
-    const answeredQuestions = questions.filter(q => responses[q.id] !== undefined);
+    const questions = questionnaire.sections.flatMap((s) => s.questions);
+    const answeredQuestions = questions.filter((q) => responses[q.id] !== undefined);
 
-    if (answeredQuestions.length === 0) return null;
+    if (answeredQuestions.length === 0) {
+      return null;
+    }
 
     const totalScore = answeredQuestions.reduce((sum, q) => sum + (responses[q.id] || 0), 0);
     const maxPossible = answeredQuestions.length * 5; // Each question max is 5
@@ -70,17 +74,25 @@ export default function OutcomeAssessment({
       raw: totalScore,
       percentage: Math.round((totalScore / maxPossible) * 100),
       answered: answeredQuestions.length,
-      total: questions.length
+      total: questions.length,
     };
   };
 
   const score = calculateScore();
 
   const getScoreInterpretation = (percentage) => {
-    if (percentage <= 20) return { text: 'Minimal disability', color: 'text-green-600 bg-green-50' };
-    if (percentage <= 40) return { text: 'Moderate disability', color: 'text-yellow-600 bg-yellow-50' };
-    if (percentage <= 60) return { text: 'Severe disability', color: 'text-orange-600 bg-orange-50' };
-    if (percentage <= 80) return { text: 'Crippling disability', color: 'text-red-600 bg-red-50' };
+    if (percentage <= 20) {
+      return { text: 'Minimal disability', color: 'text-green-600 bg-green-50' };
+    }
+    if (percentage <= 40) {
+      return { text: 'Moderate disability', color: 'text-yellow-600 bg-yellow-50' };
+    }
+    if (percentage <= 60) {
+      return { text: 'Severe disability', color: 'text-orange-600 bg-orange-50' };
+    }
+    if (percentage <= 80) {
+      return { text: 'Crippling disability', color: 'text-red-600 bg-red-50' };
+    }
     return { text: 'Bed-bound', color: 'text-red-800 bg-red-100' };
   };
 
@@ -101,9 +113,11 @@ export default function OutcomeAssessment({
           {/* Score badge */}
           {showScore && score && (
             <div className="text-right">
-              <div className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
-                getScoreInterpretation(score.percentage).color
-              }`}>
+              <div
+                className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
+                  getScoreInterpretation(score.percentage).color
+                }`}
+              >
                 {score.percentage}%
               </div>
               <div className="text-xs text-gray-500 mt-1">
@@ -116,9 +130,11 @@ export default function OutcomeAssessment({
 
       {/* Questions */}
       <div className="divide-y divide-gray-100">
-        {questionnaire.sections.map((section, sectionIndex) => {
+        {questionnaire.sections.map((section, _sectionIndex) => {
           const isExpanded = expandedSections[section.id] !== false; // Default to expanded
-          const sectionAnswered = section.questions.filter(q => responses[q.id] !== undefined).length;
+          const sectionAnswered = section.questions.filter(
+            (q) => responses[q.id] !== undefined
+          ).length;
           const sectionComplete = sectionAnswered === section.questions.length;
 
           return (
@@ -151,11 +167,9 @@ export default function OutcomeAssessment({
               {/* Section Questions */}
               {isExpanded && (
                 <div className="px-4 pb-4 space-y-4">
-                  {section.questions.map(question => (
+                  {section.questions.map((question) => (
                     <div key={question.id} className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-sm font-medium text-gray-900 mb-3">
-                        {question.text}
-                      </p>
+                      <p className="text-sm font-medium text-gray-900 mb-3">{question.text}</p>
                       <div className="space-y-2">
                         {question.options.map((option, optionIndex) => (
                           <label
@@ -193,7 +207,9 @@ export default function OutcomeAssessment({
           <div className="flex items-center justify-between">
             <div>
               <span className="text-sm font-medium text-gray-700">Interpretation: </span>
-              <span className={`text-sm font-medium ${getScoreInterpretation(score.percentage).color.split(' ')[0]}`}>
+              <span
+                className={`text-sm font-medium ${getScoreInterpretation(score.percentage).color.split(' ')[0]}`}
+              >
                 {getScoreInterpretation(score.percentage).text}
               </span>
             </div>
@@ -222,10 +238,10 @@ const ODI_QUESTIONS = [
           { value: 2, label: 'The pain is moderate at the moment' },
           { value: 3, label: 'The pain is fairly severe at the moment' },
           { value: 4, label: 'The pain is very severe at the moment' },
-          { value: 5, label: 'The pain is the worst imaginable at the moment' }
-        ]
-      }
-    ]
+          { value: 5, label: 'The pain is the worst imaginable at the moment' },
+        ],
+      },
+    ],
   },
   {
     id: 'personal_care',
@@ -240,10 +256,10 @@ const ODI_QUESTIONS = [
           { value: 2, label: 'It is painful to look after myself and I am slow and careful' },
           { value: 3, label: 'I need some help but can manage most of my personal care' },
           { value: 4, label: 'I need help every day in most aspects of self-care' },
-          { value: 5, label: 'I do not get dressed, wash with difficulty and stay in bed' }
-        ]
-      }
-    ]
+          { value: 5, label: 'I do not get dressed, wash with difficulty and stay in bed' },
+        ],
+      },
+    ],
   },
   {
     id: 'lifting',
@@ -256,12 +272,16 @@ const ODI_QUESTIONS = [
           { value: 0, label: 'I can lift heavy weights without extra pain' },
           { value: 1, label: 'I can lift heavy weights but it gives me extra pain' },
           { value: 2, label: 'Pain prevents me lifting heavy weights off the floor' },
-          { value: 3, label: 'Pain prevents me lifting heavy weights but I can manage if conveniently positioned' },
+          {
+            value: 3,
+            label:
+              'Pain prevents me lifting heavy weights but I can manage if conveniently positioned',
+          },
           { value: 4, label: 'I can only lift very light weights' },
-          { value: 5, label: 'I cannot lift or carry anything' }
-        ]
-      }
-    ]
+          { value: 5, label: 'I cannot lift or carry anything' },
+        ],
+      },
+    ],
   },
   {
     id: 'walking',
@@ -276,10 +296,10 @@ const ODI_QUESTIONS = [
           { value: 2, label: 'Pain prevents me walking more than 1/2 mile' },
           { value: 3, label: 'Pain prevents me walking more than 100 yards' },
           { value: 4, label: 'I can only walk using a stick or crutches' },
-          { value: 5, label: 'I am in bed most of the time' }
-        ]
-      }
-    ]
+          { value: 5, label: 'I am in bed most of the time' },
+        ],
+      },
+    ],
   },
   {
     id: 'sitting',
@@ -294,10 +314,10 @@ const ODI_QUESTIONS = [
           { value: 2, label: 'Pain prevents me sitting more than 1 hour' },
           { value: 3, label: 'Pain prevents me sitting more than 30 minutes' },
           { value: 4, label: 'Pain prevents me sitting more than 10 minutes' },
-          { value: 5, label: 'Pain prevents me from sitting at all' }
-        ]
-      }
-    ]
+          { value: 5, label: 'Pain prevents me from sitting at all' },
+        ],
+      },
+    ],
   },
   {
     id: 'standing',
@@ -312,11 +332,11 @@ const ODI_QUESTIONS = [
           { value: 2, label: 'Pain prevents me from standing for more than 1 hour' },
           { value: 3, label: 'Pain prevents me from standing for more than 30 minutes' },
           { value: 4, label: 'Pain prevents me from standing for more than 10 minutes' },
-          { value: 5, label: 'Pain prevents me from standing at all' }
-        ]
-      }
-    ]
-  }
+          { value: 5, label: 'Pain prevents me from standing at all' },
+        ],
+      },
+    ],
+  },
 ];
 
 // Neck Disability Index Questions
@@ -334,10 +354,10 @@ const NDI_QUESTIONS = [
           { value: 2, label: 'The pain is moderate at the moment' },
           { value: 3, label: 'The pain is fairly severe at the moment' },
           { value: 4, label: 'The pain is very severe at the moment' },
-          { value: 5, label: 'The pain is the worst imaginable at the moment' }
-        ]
-      }
-    ]
+          { value: 5, label: 'The pain is the worst imaginable at the moment' },
+        ],
+      },
+    ],
   },
   {
     id: 'ndi_personal_care',
@@ -352,10 +372,10 @@ const NDI_QUESTIONS = [
           { value: 2, label: 'It is painful to look after myself and I am slow and careful' },
           { value: 3, label: 'I need some help but manage most of my personal care' },
           { value: 4, label: 'I need help every day in most aspects of self-care' },
-          { value: 5, label: 'I do not get dressed, wash with difficulty and stay in bed' }
-        ]
-      }
-    ]
+          { value: 5, label: 'I do not get dressed, wash with difficulty and stay in bed' },
+        ],
+      },
+    ],
   },
   {
     id: 'ndi_reading',
@@ -368,12 +388,15 @@ const NDI_QUESTIONS = [
           { value: 0, label: 'I can read as much as I want with no pain in my neck' },
           { value: 1, label: 'I can read as much as I want with slight pain in my neck' },
           { value: 2, label: 'I can read as much as I want with moderate pain in my neck' },
-          { value: 3, label: 'I cannot read as much as I want because of moderate pain in my neck' },
+          {
+            value: 3,
+            label: 'I cannot read as much as I want because of moderate pain in my neck',
+          },
           { value: 4, label: 'I can hardly read at all because of severe pain in my neck' },
-          { value: 5, label: 'I cannot read at all' }
-        ]
-      }
-    ]
+          { value: 5, label: 'I cannot read at all' },
+        ],
+      },
+    ],
   },
   {
     id: 'ndi_headaches',
@@ -388,10 +411,10 @@ const NDI_QUESTIONS = [
           { value: 2, label: 'I have moderate headaches which come infrequently' },
           { value: 3, label: 'I have moderate headaches which come frequently' },
           { value: 4, label: 'I have severe headaches which come frequently' },
-          { value: 5, label: 'I have headaches almost all the time' }
-        ]
-      }
-    ]
+          { value: 5, label: 'I have headaches almost all the time' },
+        ],
+      },
+    ],
   },
   {
     id: 'ndi_concentration',
@@ -406,10 +429,10 @@ const NDI_QUESTIONS = [
           { value: 2, label: 'I have a fair degree of difficulty in concentrating when I want' },
           { value: 3, label: 'I have a lot of difficulty in concentrating when I want' },
           { value: 4, label: 'I have a great deal of difficulty in concentrating when I want' },
-          { value: 5, label: 'I cannot concentrate at all' }
-        ]
-      }
-    ]
+          { value: 5, label: 'I cannot concentrate at all' },
+        ],
+      },
+    ],
   },
   {
     id: 'ndi_work',
@@ -424,11 +447,11 @@ const NDI_QUESTIONS = [
           { value: 2, label: 'I can do most of my usual work but no more' },
           { value: 3, label: 'I cannot do my usual work' },
           { value: 4, label: 'I can hardly do any work at all' },
-          { value: 5, label: 'I cannot do any work at all' }
-        ]
-      }
-    ]
-  }
+          { value: 5, label: 'I cannot do any work at all' },
+        ],
+      },
+    ],
+  },
 ];
 
 // Patient-Specific Functional Scale
@@ -446,8 +469,8 @@ const PSFS_QUESTIONS = [
           { value: 2, label: 'Moderate difficulty (3-4)' },
           { value: 3, label: 'Mild difficulty (5-6)' },
           { value: 4, label: 'Minimal difficulty (7-8)' },
-          { value: 5, label: 'Able to perform at prior level (9-10)' }
-        ]
+          { value: 5, label: 'Able to perform at prior level (9-10)' },
+        ],
       },
       {
         id: 'psfs_activity_2',
@@ -458,8 +481,8 @@ const PSFS_QUESTIONS = [
           { value: 2, label: 'Moderate difficulty (3-4)' },
           { value: 3, label: 'Mild difficulty (5-6)' },
           { value: 4, label: 'Minimal difficulty (7-8)' },
-          { value: 5, label: 'Able to perform at prior level (9-10)' }
-        ]
+          { value: 5, label: 'Able to perform at prior level (9-10)' },
+        ],
       },
       {
         id: 'psfs_activity_3',
@@ -470,16 +493,16 @@ const PSFS_QUESTIONS = [
           { value: 2, label: 'Moderate difficulty (3-4)' },
           { value: 3, label: 'Mild difficulty (5-6)' },
           { value: 4, label: 'Minimal difficulty (7-8)' },
-          { value: 5, label: 'Able to perform at prior level (9-10)' }
-        ]
-      }
-    ]
-  }
+          { value: 5, label: 'Able to perform at prior level (9-10)' },
+        ],
+      },
+    ],
+  },
 ];
 
 // Export questionnaire types for external use
 export const QUESTIONNAIRE_TYPES = {
   ODI: 'ODI',
   NDI: 'NDI',
-  PSFS: 'PSFS'
+  PSFS: 'PSFS',
 };

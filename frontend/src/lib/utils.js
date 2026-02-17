@@ -1,15 +1,17 @@
-import { clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 /**
  * Format date to Norwegian format
  */
 export function formatDate(date, format = 'short') {
-  if (!date) return '-';
+  if (!date) {
+    return '-';
+  }
 
   const d = new Date(date);
 
@@ -21,7 +23,7 @@ export function formatDate(date, format = 'short') {
     return d.toLocaleDateString('no-NO', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
   }
 
@@ -36,14 +38,16 @@ export function formatDate(date, format = 'short') {
  * Format time to Norwegian format
  */
 export function formatTime(time, format = 'short') {
-  if (!time) return '-';
+  if (!time) {
+    return '-';
+  }
 
   const t = new Date(time);
 
   if (format === 'short') {
     return t.toLocaleTimeString('no-NO', {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   }
 
@@ -53,7 +57,7 @@ export function formatTime(time, format = 'short') {
 
   return t.toLocaleTimeString('no-NO', {
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   });
 }
 
@@ -61,13 +65,15 @@ export function formatTime(time, format = 'short') {
  * Format currency (Norwegian Kroner)
  */
 export function formatCurrency(amount) {
-  if (amount === null || amount === undefined) return '-';
+  if (amount === null || amount === undefined) {
+    return '-';
+  }
 
   return new Intl.NumberFormat('no-NO', {
     style: 'currency',
     currency: 'NOK',
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0
+    maximumFractionDigits: 0,
   }).format(amount);
 }
 
@@ -75,7 +81,9 @@ export function formatCurrency(amount) {
  * Format phone number
  */
 export function formatPhone(phone) {
-  if (!phone) return '-';
+  if (!phone) {
+    return '-';
+  }
 
   // Remove +47
   const cleaned = phone.replace('+47', '').replace(/\s/g, '');
@@ -92,7 +100,9 @@ export function formatPhone(phone) {
  * Calculate age from date of birth
  */
 export function calculateAge(dateOfBirth) {
-  if (!dateOfBirth) return null;
+  if (!dateOfBirth) {
+    return null;
+  }
 
   const today = new Date();
   const birth = new Date(dateOfBirth);
@@ -114,7 +124,7 @@ export function getStatusColor(status) {
     ACTIVE: 'bg-green-100 text-green-800',
     INACTIVE: 'bg-gray-100 text-gray-800',
     FINISHED: 'bg-blue-100 text-blue-800',
-    DECEASED: 'bg-red-100 text-red-800'
+    DECEASED: 'bg-red-100 text-red-800',
   };
 
   return colors[status] || 'bg-gray-100 text-gray-800';

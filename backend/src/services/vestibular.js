@@ -3,7 +3,7 @@
  * Business logic for vestibular/dizziness assessments, BPPV testing, VNG, and treatment tracking
  */
 
-import { query, transaction } from '../config/database.js';
+import { query, _transaction } from '../config/database.js';
 import logger from '../utils/logger.js';
 
 /**
@@ -73,7 +73,7 @@ export const createAssessment = async (assessmentData) => {
     follow_up_plan,
     referral_needed,
     referral_to,
-    notes
+    notes,
   } = assessmentData;
 
   try {
@@ -104,18 +104,62 @@ export const createAssessment = async (assessmentData) => {
         $51, $52, $53, $54, $55, $56
       ) RETURNING *`,
       [
-        encounter_id, patient_id, organization_id, assessed_by,
-        dizziness_type, dizziness_description, onset_date, onset_description, onset_trigger, duration_description,
-        JSON.stringify(triggers || {}), trigger_details, JSON.stringify(associated_symptoms || {}), headache_type, neck_symptoms, JSON.stringify(ear_symptoms || {}),
-        autonomic_symptoms, neurological_symptoms,
-        JSON.stringify(ortho_tests || {}), JSON.stringify(dtr_reflexes || {}), dermatomes, myotomes, babinski, pupil_reflex, cranial_nerves,
-        JSON.stringify(fukuda_test || {}), JSON.stringify(rhomberg_test || {}), tandem_rhomberg, parietal_arm_test, JSON.stringify(coordination || {}),
-        JSON.stringify(saccades || {}), JSON.stringify(smooth_pursuits || {}), JSON.stringify(convergence || {}), gaze_nystagmus, JSON.stringify(hit_test || {}),
-        JSON.stringify(dix_hallpike_right || {}), JSON.stringify(dix_hallpike_left || {}), JSON.stringify(supine_roll_right || {}), JSON.stringify(supine_roll_left || {}), JSON.stringify(deep_head_hang || {}), JSON.stringify(lean_test || {}),
-        vng_performed || false, JSON.stringify(vng_results || {}),
-        primary_diagnosis, JSON.stringify(bppv_details || {}), other_diagnoses,
-        JSON.stringify(maneuvers_performed || []), JSON.stringify(manual_treatment || []), JSON.stringify(vrt_exercises || []), home_exercises,
-        dhi_score, JSON.stringify(dhi_data || {}), follow_up_plan, referral_needed || false, referral_to, notes
+        encounter_id,
+        patient_id,
+        organization_id,
+        assessed_by,
+        dizziness_type,
+        dizziness_description,
+        onset_date,
+        onset_description,
+        onset_trigger,
+        duration_description,
+        JSON.stringify(triggers || {}),
+        trigger_details,
+        JSON.stringify(associated_symptoms || {}),
+        headache_type,
+        neck_symptoms,
+        JSON.stringify(ear_symptoms || {}),
+        autonomic_symptoms,
+        neurological_symptoms,
+        JSON.stringify(ortho_tests || {}),
+        JSON.stringify(dtr_reflexes || {}),
+        dermatomes,
+        myotomes,
+        babinski,
+        pupil_reflex,
+        cranial_nerves,
+        JSON.stringify(fukuda_test || {}),
+        JSON.stringify(rhomberg_test || {}),
+        tandem_rhomberg,
+        parietal_arm_test,
+        JSON.stringify(coordination || {}),
+        JSON.stringify(saccades || {}),
+        JSON.stringify(smooth_pursuits || {}),
+        JSON.stringify(convergence || {}),
+        gaze_nystagmus,
+        JSON.stringify(hit_test || {}),
+        JSON.stringify(dix_hallpike_right || {}),
+        JSON.stringify(dix_hallpike_left || {}),
+        JSON.stringify(supine_roll_right || {}),
+        JSON.stringify(supine_roll_left || {}),
+        JSON.stringify(deep_head_hang || {}),
+        JSON.stringify(lean_test || {}),
+        vng_performed || false,
+        JSON.stringify(vng_results || {}),
+        primary_diagnosis,
+        JSON.stringify(bppv_details || {}),
+        other_diagnoses,
+        JSON.stringify(maneuvers_performed || []),
+        JSON.stringify(manual_treatment || []),
+        JSON.stringify(vrt_exercises || []),
+        home_exercises,
+        dhi_score,
+        JSON.stringify(dhi_data || {}),
+        follow_up_plan,
+        referral_needed || false,
+        referral_to,
+        notes,
       ]
     );
 
@@ -188,8 +232,8 @@ export const getAssessmentsByPatient = async (patientId, organizationId, options
         total,
         page,
         limit,
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     };
   } catch (error) {
     logger.error('Error fetching patient vestibular assessments:', error);
@@ -237,12 +281,30 @@ export const updateAssessment = async (assessmentId, organizationId, updates) =>
 
     // Handle JSONB fields
     const jsonbFields = [
-      'triggers', 'associated_symptoms', 'ear_symptoms', 'ortho_tests', 'dtr_reflexes',
-      'fukuda_test', 'rhomberg_test', 'coordination', 'saccades', 'smooth_pursuits',
-      'convergence', 'hit_test', 'dix_hallpike_right', 'dix_hallpike_left',
-      'supine_roll_right', 'supine_roll_left', 'deep_head_hang', 'lean_test',
-      'vng_results', 'bppv_details', 'maneuvers_performed', 'manual_treatment',
-      'vrt_exercises', 'dhi_data'
+      'triggers',
+      'associated_symptoms',
+      'ear_symptoms',
+      'ortho_tests',
+      'dtr_reflexes',
+      'fukuda_test',
+      'rhomberg_test',
+      'coordination',
+      'saccades',
+      'smooth_pursuits',
+      'convergence',
+      'hit_test',
+      'dix_hallpike_right',
+      'dix_hallpike_left',
+      'supine_roll_right',
+      'supine_roll_left',
+      'deep_head_hang',
+      'lean_test',
+      'vng_results',
+      'bppv_details',
+      'maneuvers_performed',
+      'manual_treatment',
+      'vrt_exercises',
+      'dhi_data',
     ];
 
     for (const [key, value] of Object.entries(updates)) {
@@ -424,5 +486,5 @@ export default {
   deleteAssessment,
   getBPPVTrends,
   getCommonDiagnoses,
-  getTreatmentEfficacy
+  getTreatmentEfficacy,
 };

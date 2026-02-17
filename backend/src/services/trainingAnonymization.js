@@ -8,27 +8,22 @@ import logger from '../utils/logger.js';
 /**
  * Anonymize Norwegian national ID (personnummer)
  */
-const anonymizeNationalId = (text) => {
+const anonymizeNationalId = (text) =>
   // Pattern: 11 digits (DDMMYYXXXXX) with optional spaces
-  return text.replace(/\b\d{6}[\s-]?\d{5}\b/g, '[PERSONNUMMER]');
-};
-
+  text.replace(/\b\d{6}[\s-]?\d{5}\b/g, '[PERSONNUMMER]');
 /**
  * Anonymize Norwegian phone numbers
  */
-const anonymizePhone = (text) => {
+const anonymizePhone = (text) =>
   // Norwegian mobile: +47 or 47 followed by 8 digits
-  return text
+  text
     .replace(/(\+47|47)[\s-]?[4-9]\d{2}[\s-]?\d{2}[\s-]?\d{3}/g, '[TELEFON]')
     .replace(/[4-9]\d{2}[\s-]?\d{2}[\s-]?\d{3}/g, '[TELEFON]');
-};
-
 /**
  * Anonymize email addresses
  */
-const anonymizeEmail = (text) => {
-  return text.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '[EPOST]');
-};
+const anonymizeEmail = (text) =>
+  text.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '[EPOST]');
 
 /**
  * Anonymize Norwegian addresses
@@ -41,7 +36,10 @@ const anonymizeAddress = (text) => {
   anonymized = anonymized.replace(/\b\d{4}\s+[A-ZÆØÅ][a-zæøåA-ZÆØÅ\s-]+/g, '[ADRESSE]');
 
   // Street addresses (capitalized word(s) followed by numbers)
-  anonymized = anonymized.replace(/[A-ZÆØÅ][a-zæøå]+(?:\s+[A-ZÆØÅ][a-zæøå]+)*\s+\d+[A-Za-z]?/g, '[GATEADRESSE]');
+  anonymized = anonymized.replace(
+    /[A-ZÆØÅ][a-zæøå]+(?:\s+[A-ZÆØÅ][a-zæøå]+)*\s+\d+[A-Za-z]?/g,
+    '[GATEADRESSE]'
+  );
 
   return anonymized;
 };
@@ -55,17 +53,53 @@ const anonymizeNames = (text, knownNames = []) => {
 
   // Common Norwegian first names
   const commonNorwegianNames = [
-    'Ole', 'Jan', 'Per', 'Lars', 'Bjørn', 'Knut', 'Arne', 'Svein', 'Kjell', 'Hans',
-    'Eva', 'Anne', 'Kari', 'Marit', 'Ingrid', 'Liv', 'Solveig', 'Astrid', 'Gerd', 'Hilde',
-    'Maria', 'Nora', 'Emma', 'Sofia', 'Maja', 'Ella', 'Olivia', 'Sofie', 'Emilie', 'Leah',
-    'Lucas', 'Emil', 'Oliver', 'Filip', 'Noah', 'William', 'Aksel', 'Oskar', 'Kasper', 'Mathias'
+    'Ole',
+    'Jan',
+    'Per',
+    'Lars',
+    'Bjørn',
+    'Knut',
+    'Arne',
+    'Svein',
+    'Kjell',
+    'Hans',
+    'Eva',
+    'Anne',
+    'Kari',
+    'Marit',
+    'Ingrid',
+    'Liv',
+    'Solveig',
+    'Astrid',
+    'Gerd',
+    'Hilde',
+    'Maria',
+    'Nora',
+    'Emma',
+    'Sofia',
+    'Maja',
+    'Ella',
+    'Olivia',
+    'Sofie',
+    'Emilie',
+    'Leah',
+    'Lucas',
+    'Emil',
+    'Oliver',
+    'Filip',
+    'Noah',
+    'William',
+    'Aksel',
+    'Oskar',
+    'Kasper',
+    'Mathias',
   ];
 
   // Merge with known patient names
   const allNames = [...new Set([...commonNorwegianNames, ...knownNames])];
 
   // Replace names (case-insensitive)
-  allNames.forEach(name => {
+  allNames.forEach((name) => {
     const regex = new RegExp(`\\b${name}\\b`, 'gi');
     anonymized = anonymized.replace(regex, '[NAVN]');
   });
@@ -85,8 +119,11 @@ const anonymizeDates = (text, mode = 'replace') => {
   } else if (mode === 'generalize') {
     // Keep year and month, remove day
     return text
-      .replace(/\b(\d{1,2})[./](\d{1,2})[./](\d{4})\b/g, (match, day, month, year) => `XX.${month}.${year}`)
-      .replace(/\b(\d{4})-(\d{2})-(\d{2})\b/g, (match, year, month, day) => `${year}-${month}-XX`);
+      .replace(
+        /\b(\d{1,2})[./](\d{1,2})[./](\d{4})\b/g,
+        (match, day, month, year) => `XX.${month}.${year}`
+      )
+      .replace(/\b(\d{4})-(\d{2})-(\d{2})\b/g, (match, year, month, _day) => `${year}-${month}-XX`);
   }
   return text;
 };
@@ -94,26 +131,29 @@ const anonymizeDates = (text, mode = 'replace') => {
 /**
  * Anonymize ages (replace exact ages with age ranges)
  */
-const anonymizeAges = (text) => {
-  return text.replace(/\b(\d{1,3})\s*år\b/gi, (match, age) => {
+const anonymizeAges = (text) =>
+  text.replace(/\b(\d{1,3})\s*år\b/gi, (match, age) => {
     const ageNum = parseInt(age);
-    if (ageNum < 18) return '[ALDER: BARN]';
-    if (ageNum < 30) return '[ALDER: 18-30]';
-    if (ageNum < 50) return '[ALDER: 30-50]';
-    if (ageNum < 70) return '[ALDER: 50-70]';
+    if (ageNum < 18) {
+      return '[ALDER: BARN]';
+    }
+    if (ageNum < 30) {
+      return '[ALDER: 18-30]';
+    }
+    if (ageNum < 50) {
+      return '[ALDER: 30-50]';
+    }
+    if (ageNum < 70) {
+      return '[ALDER: 50-70]';
+    }
     return '[ALDER: 70+]';
   });
-};
 
 /**
  * Remove patient identifiers from SOAP notes
  */
 export const anonymizeSOAPNote = (soapNote, options = {}) => {
-  const {
-    preserveDates = false,
-    knownPatientNames = [],
-    aggressive = false
-  } = options;
+  const { preserveDates = false, knownPatientNames = [], aggressive = false } = options;
 
   let anonymized = typeof soapNote === 'string' ? soapNote : JSON.stringify(soapNote);
 
@@ -149,20 +189,18 @@ export const anonymizeSOAPNote = (soapNote, options = {}) => {
 /**
  * Anonymize clinical encounter for training
  */
-export const anonymizeEncounter = (encounter) => {
-  return {
-    encounter_type: encounter.encounter_type,
-    subjective: anonymizeSOAPNote(encounter.subjective),
-    objective: anonymizeSOAPNote(encounter.objective),
-    assessment: anonymizeSOAPNote(encounter.assessment),
-    plan: anonymizeSOAPNote(encounter.plan),
-    treatment_notes: encounter.treatment_notes ? anonymizeSOAPNote(encounter.treatment_notes) : null,
-    // Keep clinical codes (they're not PII)
-    diagnosis_codes: encounter.diagnosis_codes,
-    treatment_codes: encounter.treatment_codes,
-    duration_minutes: encounter.duration_minutes
-  };
-};
+export const anonymizeEncounter = (encounter) => ({
+  encounter_type: encounter.encounter_type,
+  subjective: anonymizeSOAPNote(encounter.subjective),
+  objective: anonymizeSOAPNote(encounter.objective),
+  assessment: anonymizeSOAPNote(encounter.assessment),
+  plan: anonymizeSOAPNote(encounter.plan),
+  treatment_notes: encounter.treatment_notes ? anonymizeSOAPNote(encounter.treatment_notes) : null,
+  // Keep clinical codes (they're not PII)
+  diagnosis_codes: encounter.diagnosis_codes,
+  treatment_codes: encounter.treatment_codes,
+  duration_minutes: encounter.duration_minutes,
+});
 
 /**
  * Batch anonymize multiple documents
@@ -179,13 +217,13 @@ export const batchAnonymize = (documents, options = {}) => {
         originalText: undefined, // Remove original
         text: anonymized,
         anonymized: true,
-        anonymizedAt: new Date().toISOString()
+        anonymizedAt: new Date().toISOString(),
       });
     } catch (error) {
       logger.error(`Error anonymizing document ${index}:`, error);
       errors.push({
         index,
-        error: error.message
+        error: error.message,
       });
     }
   });
@@ -195,7 +233,7 @@ export const batchAnonymize = (documents, options = {}) => {
     errors,
     total: documents.length,
     success: results.length,
-    failed: errors.length
+    failed: errors.length,
   };
 };
 
@@ -206,12 +244,12 @@ export const batchAnonymize = (documents, options = {}) => {
 export const createTrainingExamples = (anonymizedEncounters) => {
   const examples = [];
 
-  anonymizedEncounters.forEach(encounter => {
+  anonymizedEncounters.forEach((encounter) => {
     // Example 1: Subjective -> Objective prediction
     if (encounter.subjective && encounter.objective) {
       examples.push({
         prompt: `Basert på følgende subjektive funn, hva ville du forvente å finne ved objektiv undersøkelse?\n\nSubjektivt: ${encounter.subjective}`,
-        response: `Objektivt: ${encounter.objective}`
+        response: `Objektivt: ${encounter.objective}`,
       });
     }
 
@@ -219,7 +257,7 @@ export const createTrainingExamples = (anonymizedEncounters) => {
     if (encounter.subjective && encounter.objective && encounter.assessment) {
       examples.push({
         prompt: `Gitt følgende funn, hva er din vurdering?\n\nSubjektivt: ${encounter.subjective}\n\nObjektivt: ${encounter.objective}`,
-        response: `Vurdering: ${encounter.assessment}`
+        response: `Vurdering: ${encounter.assessment}`,
       });
     }
 
@@ -227,7 +265,7 @@ export const createTrainingExamples = (anonymizedEncounters) => {
     if (encounter.plan) {
       examples.push({
         prompt: `Basert på følgende journalnotat, hva er behandlingsplanen?\n\nS: ${encounter.subjective}\nO: ${encounter.objective}\nA: ${encounter.assessment}`,
-        response: `Plan: ${encounter.plan}`
+        response: `Plan: ${encounter.plan}`,
       });
     }
 
@@ -235,7 +273,7 @@ export const createTrainingExamples = (anonymizedEncounters) => {
     if (encounter.diagnosis_codes && encounter.diagnosis_codes.length > 0) {
       examples.push({
         prompt: `Foreslå passende diagnosekoder (ICPC-2) for følgende:\n\nSubjektivt: ${encounter.subjective}\nObjektivt: ${encounter.objective}`,
-        response: `Diagnosekoder: ${encounter.diagnosis_codes.join(', ')}`
+        response: `Diagnosekoder: ${encounter.diagnosis_codes.join(', ')}`,
       });
     }
   });
@@ -250,14 +288,22 @@ export const validateAnonymization = (text) => {
   const warnings = [];
 
   // Check for potential PII patterns
-  if (/\d{11}/.test(text)) warnings.push('Possible personnummer found');
-  if (/\d{8}/.test(text)) warnings.push('Possible phone number found');
-  if (/@/.test(text)) warnings.push('Possible email found');
-  if (/\d{4}\s+[A-ZÆØÅ]/.test(text)) warnings.push('Possible address found');
+  if (/\d{11}/.test(text)) {
+    warnings.push('Possible personnummer found');
+  }
+  if (/\d{8}/.test(text)) {
+    warnings.push('Possible phone number found');
+  }
+  if (/@/.test(text)) {
+    warnings.push('Possible email found');
+  }
+  if (/\d{4}\s+[A-ZÆØÅ]/.test(text)) {
+    warnings.push('Possible address found');
+  }
 
   return {
     isClean: warnings.length === 0,
-    warnings
+    warnings,
   };
 };
 
@@ -266,5 +312,5 @@ export default {
   anonymizeEncounter,
   batchAnonymize,
   createTrainingExamples,
-  validateAnonymization
+  validateAnonymization,
 };

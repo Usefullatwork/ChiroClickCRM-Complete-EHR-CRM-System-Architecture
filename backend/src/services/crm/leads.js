@@ -110,7 +110,9 @@ export const getLeadById = async (clinicId, leadId) => {
     [clinicId, leadId]
   );
 
-  if (result.rows.length === 0) return null;
+  if (result.rows.length === 0) {
+    return null;
+  }
 
   // Get activities
   const activities = await query(
@@ -210,7 +212,9 @@ export const updateLead = async (clinicId, leadId, data) => {
     }
   }
 
-  if (fields.length === 0) return null;
+  if (fields.length === 0) {
+    return null;
+  }
 
   fields.push('updated_at = CURRENT_TIMESTAMP');
 
@@ -227,9 +231,11 @@ export const updateLead = async (clinicId, leadId, data) => {
 /**
  * Convert lead to patient
  */
-export const convertLeadToPatient = async (clinicId, leadId, patientData) => {
+export const convertLeadToPatient = async (clinicId, leadId, _patientData) => {
   const lead = await getLeadById(clinicId, leadId);
-  if (!lead) throw new Error('Lead not found');
+  if (!lead) {
+    throw new Error('Lead not found');
+  }
 
   // Create patient from lead data
   const patientResult = await query(

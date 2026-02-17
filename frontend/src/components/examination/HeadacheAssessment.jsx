@@ -5,16 +5,8 @@
  * location, triggers, associated symptoms, and red flag screening.
  */
 
-import React, { useMemo, useState } from 'react';
-import {
-  AlertTriangle,
-  Clock,
-  Zap,
-  Target,
-  Activity,
-  Info,
-  CheckCircle
-} from 'lucide-react';
+import _React, { useMemo, _useState } from 'react';
+import { AlertTriangle, Clock, Zap, Target, Activity, _Info, _CheckCircle } from 'lucide-react';
 
 // Headache types with diagnostic criteria
 const HEADACHE_TYPES = [
@@ -23,18 +15,35 @@ const HEADACHE_TYPES = [
     name: 'Tension-Type Headache',
     nameNo: 'Tensjonotypehodepine',
     features: ['Bilateral', 'Pressing/tightening', 'Mild-moderate', 'Not aggravated by activity'],
-    featuresNo: ['Bilateral', 'Pressende/strammende', 'Mild-moderat', 'Ikke forverret av aktivitet'],
+    featuresNo: [
+      'Bilateral',
+      'Pressende/strammende',
+      'Mild-moderat',
+      'Ikke forverret av aktivitet',
+    ],
     duration: '30 min - 7 days',
-    durationNo: '30 min - 7 dager'
+    durationNo: '30 min - 7 dager',
   },
   {
     id: 'migraine_without_aura',
     name: 'Migraine without Aura',
     nameNo: 'Migrene uten aura',
-    features: ['Unilateral', 'Pulsating', 'Moderate-severe', 'Aggravated by activity', 'Nausea/photophobia'],
-    featuresNo: ['Unilateral', 'Pulserende', 'Moderat-alvorlig', 'Forverret av aktivitet', 'Kvalme/lysømfintlighet'],
+    features: [
+      'Unilateral',
+      'Pulsating',
+      'Moderate-severe',
+      'Aggravated by activity',
+      'Nausea/photophobia',
+    ],
+    featuresNo: [
+      'Unilateral',
+      'Pulserende',
+      'Moderat-alvorlig',
+      'Forverret av aktivitet',
+      'Kvalme/lysømfintlighet',
+    ],
     duration: '4-72 hours',
-    durationNo: '4-72 timer'
+    durationNo: '4-72 timer',
   },
   {
     id: 'migraine_with_aura',
@@ -43,7 +52,7 @@ const HEADACHE_TYPES = [
     features: ['Visual/sensory aura', 'Aura 5-60 min before headache', 'Fully reversible'],
     featuresNo: ['Visuell/sensorisk aura', 'Aura 5-60 min før hodepine', 'Fullstendig reversibel'],
     duration: '4-72 hours',
-    durationNo: '4-72 timer'
+    durationNo: '4-72 timer',
   },
   {
     id: 'cluster',
@@ -52,16 +61,21 @@ const HEADACHE_TYPES = [
     features: ['Unilateral periorbital', 'Severe', 'Autonomic symptoms', 'Restlessness'],
     featuresNo: ['Unilateral periorbital', 'Alvorlig', 'Autonome symptomer', 'Rastløshet'],
     duration: '15-180 min, multiple/day',
-    durationNo: '15-180 min, flere/dag'
+    durationNo: '15-180 min, flere/dag',
   },
   {
     id: 'cervicogenic',
     name: 'Cervicogenic Headache',
     nameNo: 'Cervikogen hodepine',
     features: ['Unilateral', 'Starts in neck', 'Reduced neck ROM', 'Provoked by neck movement'],
-    featuresNo: ['Unilateral', 'Starter i nakken', 'Redusert nakke-ROM', 'Utløst av nakkebevegelse'],
+    featuresNo: [
+      'Unilateral',
+      'Starter i nakken',
+      'Redusert nakke-ROM',
+      'Utløst av nakkebevegelse',
+    ],
     duration: 'Variable, related to neck position',
-    durationNo: 'Variabel, relatert til nakkestilling'
+    durationNo: 'Variabel, relatert til nakkestilling',
   },
   {
     id: 'medication_overuse',
@@ -70,8 +84,8 @@ const HEADACHE_TYPES = [
     features: ['Daily/near-daily', 'Worsens with analgesics', '>15 days/month medication use'],
     featuresNo: ['Daglig/nesten daglig', 'Forverres med analgetika', '>15 dager/måned medisinbruk'],
     duration: 'Chronic',
-    durationNo: 'Kronisk'
-  }
+    durationNo: 'Kronisk',
+  },
 ];
 
 // Pain locations
@@ -85,7 +99,7 @@ const HEADACHE_LOCATIONS = [
   { id: 'periorbital_right', name: 'Right Periorbital', nameNo: 'Høyre periorbital' },
   { id: 'vertex', name: 'Vertex', nameNo: 'Vertex' },
   { id: 'diffuse', name: 'Diffuse/Global', nameNo: 'Diffus/Global' },
-  { id: 'neck', name: 'Neck/Suboccipital', nameNo: 'Nakke/Suboksipital' }
+  { id: 'neck', name: 'Neck/Suboccipital', nameNo: 'Nakke/Suboksipital' },
 ];
 
 // Pain qualities
@@ -95,7 +109,7 @@ const PAIN_QUALITIES = [
   { id: 'stabbing', name: 'Stabbing/Sharp', nameNo: 'Stikkende/Skarp' },
   { id: 'dull', name: 'Dull/Aching', nameNo: 'Dump/Verkende' },
   { id: 'burning', name: 'Burning', nameNo: 'Brennende' },
-  { id: 'electric', name: 'Electric/Shooting', nameNo: 'Elektrisk/Skytende' }
+  { id: 'electric', name: 'Electric/Shooting', nameNo: 'Elektrisk/Skytende' },
 ];
 
 // Associated symptoms
@@ -112,10 +126,20 @@ const ASSOCIATED_SYMPTOMS = [
   { id: 'rhinorrhea', name: 'Rhinorrhea', nameNo: 'Rennende nese', category: 'autonomic' },
   { id: 'ptosis', name: 'Ptosis', nameNo: 'Ptose', category: 'autonomic' },
   { id: 'miosis', name: 'Miosis', nameNo: 'Miose', category: 'autonomic' },
-  { id: 'conjunctival_injection', name: 'Conjunctival Injection', nameNo: 'Konjunktival injeksjon', category: 'autonomic' },
-  { id: 'neck_pain', name: 'Neck Pain/Stiffness', nameNo: 'Nakkesmerter/-stivhet', category: 'cervical' },
+  {
+    id: 'conjunctival_injection',
+    name: 'Conjunctival Injection',
+    nameNo: 'Konjunktival injeksjon',
+    category: 'autonomic',
+  },
+  {
+    id: 'neck_pain',
+    name: 'Neck Pain/Stiffness',
+    nameNo: 'Nakkesmerter/-stivhet',
+    category: 'cervical',
+  },
   { id: 'dizziness', name: 'Dizziness', nameNo: 'Svimmelhet', category: 'other' },
-  { id: 'fatigue', name: 'Fatigue', nameNo: 'Tretthet', category: 'other' }
+  { id: 'fatigue', name: 'Fatigue', nameNo: 'Tretthet', category: 'other' },
 ];
 
 // Triggers
@@ -134,19 +158,44 @@ const TRIGGERS = [
   { id: 'hormonal', name: 'Hormonal (Menstrual)', nameNo: 'Hormonelle (Menstruasjon)' },
   { id: 'food', name: 'Specific Foods', nameNo: 'Spesifikke matvarer' },
   { id: 'neck_position', name: 'Neck Position/Movement', nameNo: 'Nakkestilling/-bevegelse' },
-  { id: 'exercise', name: 'Exercise', nameNo: 'Trening' }
+  { id: 'exercise', name: 'Exercise', nameNo: 'Trening' },
 ];
 
 // RED FLAGS - SNOOPY mnemonic
 const RED_FLAGS = [
-  { id: 'systemic', name: 'Systemic symptoms (fever, weight loss, cancer)', nameNo: 'Systemiske symptomer (feber, vekttap, kreft)', letter: 'S' },
+  {
+    id: 'systemic',
+    name: 'Systemic symptoms (fever, weight loss, cancer)',
+    nameNo: 'Systemiske symptomer (feber, vekttap, kreft)',
+    letter: 'S',
+  },
   { id: 'neurological', name: 'Neurological deficits', nameNo: 'Nevrologiske utfall', letter: 'N' },
-  { id: 'onset', name: 'Sudden Onset (thunderclap)', nameNo: 'Plutselig debut (tordenskrallhodepine)', letter: 'O' },
-  { id: 'older', name: 'Older age onset (>50 years)', nameNo: 'Debut i høy alder (>50 år)', letter: 'O' },
-  { id: 'pattern', name: 'Pattern change (progressive, daily)', nameNo: 'Mønsterendring (progressiv, daglig)', letter: 'P' },
-  { id: 'positional', name: 'Positional (worse lying/standing)', nameNo: 'Stillingsavhengig (verre liggende/stående)', letter: 'P' },
+  {
+    id: 'onset',
+    name: 'Sudden Onset (thunderclap)',
+    nameNo: 'Plutselig debut (tordenskrallhodepine)',
+    letter: 'O',
+  },
+  {
+    id: 'older',
+    name: 'Older age onset (>50 years)',
+    nameNo: 'Debut i høy alder (>50 år)',
+    letter: 'O',
+  },
+  {
+    id: 'pattern',
+    name: 'Pattern change (progressive, daily)',
+    nameNo: 'Mønsterendring (progressiv, daglig)',
+    letter: 'P',
+  },
+  {
+    id: 'positional',
+    name: 'Positional (worse lying/standing)',
+    nameNo: 'Stillingsavhengig (verre liggende/stående)',
+    letter: 'P',
+  },
   { id: 'papilledema', name: 'Papilledema', nameNo: 'Papilleødem', letter: 'P' },
-  { id: 'pregnancy', name: 'Pregnancy/Postpartum', nameNo: 'Graviditet/Postpartum', letter: 'Y' }
+  { id: 'pregnancy', name: 'Pregnancy/Postpartum', nameNo: 'Graviditet/Postpartum', letter: 'Y' },
 ];
 
 /**
@@ -155,7 +204,7 @@ const RED_FLAGS = [
 function ChipSelector({ items, selectedIds = [], onChange, lang = 'no' }) {
   const toggleItem = (id) => {
     if (selectedIds.includes(id)) {
-      onChange(selectedIds.filter(i => i !== id));
+      onChange(selectedIds.filter((i) => i !== id));
     } else {
       onChange([...selectedIds, id]);
     }
@@ -163,15 +212,17 @@ function ChipSelector({ items, selectedIds = [], onChange, lang = 'no' }) {
 
   return (
     <div className="flex flex-wrap gap-2">
-      {items.map(item => (
+      {items.map((item) => (
         <button
           key={item.id}
           type="button"
           onClick={() => toggleItem(item.id)}
           className={`px-3 py-1.5 text-xs rounded-full border transition-colors
-                     ${selectedIds.includes(item.id)
-                       ? 'bg-teal-100 border-teal-300 text-teal-700 font-medium'
-                       : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                     ${
+                       selectedIds.includes(item.id)
+                         ? 'bg-teal-100 border-teal-300 text-teal-700 font-medium'
+                         : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                     }`}
         >
           {lang === 'no' ? item.nameNo : item.name}
         </button>
@@ -184,7 +235,7 @@ function ChipSelector({ items, selectedIds = [], onChange, lang = 'no' }) {
  * Headache type selector with feature matching
  */
 function HeadacheTypeSection({ values, onChange, lang }) {
-  const selectedType = HEADACHE_TYPES.find(t => t.id === values.headacheType);
+  const selectedType = HEADACHE_TYPES.find((t) => t.id === values.headacheType);
 
   return (
     <div className="space-y-3">
@@ -193,15 +244,17 @@ function HeadacheTypeSection({ values, onChange, lang }) {
       </h4>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2">
-        {HEADACHE_TYPES.map(type => (
+        {HEADACHE_TYPES.map((type) => (
           <button
             key={type.id}
             type="button"
             onClick={() => onChange({ ...values, headacheType: type.id })}
             className={`p-3 rounded-lg border text-left transition-colors
-                       ${values.headacheType === type.id
-                         ? 'bg-teal-50 border-teal-300'
-                         : 'bg-white border-gray-200 hover:bg-gray-50'}`}
+                       ${
+                         values.headacheType === type.id
+                           ? 'bg-teal-50 border-teal-300'
+                           : 'bg-white border-gray-200 hover:bg-gray-50'
+                       }`}
           >
             <span className="font-medium text-sm text-gray-700">
               {lang === 'no' ? type.nameNo : type.name}
@@ -236,7 +289,9 @@ function RedFlagsSection({ values, onChange, lang }) {
   const hasRedFlags = (values.redFlags || []).length > 0;
 
   return (
-    <div className={`p-4 rounded-lg border ${hasRedFlags ? 'bg-red-50 border-red-200' : 'bg-gray-50 border-gray-200'}`}>
+    <div
+      className={`p-4 rounded-lg border ${hasRedFlags ? 'bg-red-50 border-red-200' : 'bg-gray-50 border-gray-200'}`}
+    >
       <div className="flex items-center gap-2 mb-3">
         <AlertTriangle className={`w-5 h-5 ${hasRedFlags ? 'text-red-600' : 'text-gray-400'}`} />
         <h4 className="text-sm font-medium text-gray-700">
@@ -250,7 +305,7 @@ function RedFlagsSection({ values, onChange, lang }) {
       </div>
 
       <div className="space-y-2">
-        {RED_FLAGS.map(flag => (
+        {RED_FLAGS.map((flag) => (
           <label
             key={flag.id}
             className={`flex items-start gap-2 p-2 rounded cursor-pointer
@@ -264,7 +319,7 @@ function RedFlagsSection({ values, onChange, lang }) {
                 if (e.target.checked) {
                   onChange({ ...values, redFlags: [...current, flag.id] });
                 } else {
-                  onChange({ ...values, redFlags: current.filter(id => id !== flag.id) });
+                  onChange({ ...values, redFlags: current.filter((id) => id !== flag.id) });
                 }
               }}
               className="mt-0.5 w-4 h-4 text-red-600 rounded border-gray-300 focus:ring-red-500"
@@ -282,7 +337,8 @@ function RedFlagsSection({ values, onChange, lang }) {
       {hasRedFlags && (
         <div className="mt-3 p-2 bg-red-100 rounded-lg">
           <p className="text-xs text-red-700 font-medium">
-            ⚠️ {lang === 'no'
+            ⚠️{' '}
+            {lang === 'no'
               ? 'Røde flagg identifisert - vurder henvisning/utredning!'
               : 'Red flags identified - consider referral/investigation!'}
           </p>
@@ -299,8 +355,8 @@ export default function HeadacheAssessment({
   values = {},
   onChange,
   lang = 'no',
-  readOnly = false,
-  onGenerateNarrative
+  _readOnly = false,
+  onGenerateNarrative,
 }) {
   // Generate narrative
   const generateNarrative = useMemo(() => {
@@ -308,18 +364,20 @@ export default function HeadacheAssessment({
 
     // Type
     if (values.headacheType) {
-      const type = HEADACHE_TYPES.find(t => t.id === values.headacheType);
+      const type = HEADACHE_TYPES.find((t) => t.id === values.headacheType);
       if (type) {
-        parts.push(`${lang === 'no' ? 'Hodepinetype' : 'Headache type'}: ${lang === 'no' ? type.nameNo : type.name}`);
+        parts.push(
+          `${lang === 'no' ? 'Hodepinetype' : 'Headache type'}: ${lang === 'no' ? type.nameNo : type.name}`
+        );
       }
     }
 
     // Location
     if (values.locations?.length > 0) {
       const locs = values.locations
-        .map(id => HEADACHE_LOCATIONS.find(l => l.id === id))
+        .map((id) => HEADACHE_LOCATIONS.find((l) => l.id === id))
         .filter(Boolean)
-        .map(l => lang === 'no' ? l.nameNo : l.name)
+        .map((l) => (lang === 'no' ? l.nameNo : l.name))
         .join(', ');
       parts.push(`${lang === 'no' ? 'Lokalisasjon' : 'Location'}: ${locs}`);
     }
@@ -327,9 +385,9 @@ export default function HeadacheAssessment({
     // Quality
     if (values.qualities?.length > 0) {
       const quals = values.qualities
-        .map(id => PAIN_QUALITIES.find(q => q.id === id))
+        .map((id) => PAIN_QUALITIES.find((q) => q.id === id))
         .filter(Boolean)
-        .map(q => lang === 'no' ? q.nameNo : q.name)
+        .map((q) => (lang === 'no' ? q.nameNo : q.name))
         .join(', ');
       parts.push(`${lang === 'no' ? 'Kvalitet' : 'Quality'}: ${quals}`);
     }
@@ -352,9 +410,9 @@ export default function HeadacheAssessment({
     // Associated symptoms
     if (values.symptoms?.length > 0) {
       const syms = values.symptoms
-        .map(id => ASSOCIATED_SYMPTOMS.find(s => s.id === id))
+        .map((id) => ASSOCIATED_SYMPTOMS.find((s) => s.id === id))
         .filter(Boolean)
-        .map(s => lang === 'no' ? s.nameNo : s.name)
+        .map((s) => (lang === 'no' ? s.nameNo : s.name))
         .join(', ');
       parts.push(`${lang === 'no' ? 'Ledsagende symptomer' : 'Associated symptoms'}: ${syms}`);
     }
@@ -362,9 +420,9 @@ export default function HeadacheAssessment({
     // Triggers
     if (values.triggers?.length > 0) {
       const trigs = values.triggers
-        .map(id => TRIGGERS.find(t => t.id === id))
+        .map((id) => TRIGGERS.find((t) => t.id === id))
         .filter(Boolean)
-        .map(t => lang === 'no' ? t.nameNo : t.name)
+        .map((t) => (lang === 'no' ? t.nameNo : t.name))
         .join(', ');
       parts.push(`${lang === 'no' ? 'Utløsende faktorer' : 'Triggers'}: ${trigs}`);
     }
@@ -372,15 +430,17 @@ export default function HeadacheAssessment({
     // Red flags
     if (values.redFlags?.length > 0) {
       const flags = values.redFlags
-        .map(id => RED_FLAGS.find(f => f.id === id))
+        .map((id) => RED_FLAGS.find((f) => f.id === id))
         .filter(Boolean)
-        .map(f => lang === 'no' ? f.nameNo : f.name)
+        .map((f) => (lang === 'no' ? f.nameNo : f.name))
         .join(', ');
       parts.push(`⚠️ ${lang === 'no' ? 'RØDE FLAGG' : 'RED FLAGS'}: ${flags}`);
     }
 
     if (parts.length === 0) {
-      return lang === 'no' ? 'Hodepineanamnese ikke dokumentert.' : 'Headache history not documented.';
+      return lang === 'no'
+        ? 'Hodepineanamnese ikke dokumentert.'
+        : 'Headache history not documented.';
     }
 
     return `${lang === 'no' ? 'Hodepineanamnese:' : 'Headache History:'} ${parts.join('. ')}.`;
@@ -395,7 +455,9 @@ export default function HeadacheAssessment({
             {lang === 'no' ? 'Hodepineutredning' : 'Headache Assessment'}
           </h3>
           <p className="text-sm text-gray-500">
-            {lang === 'no' ? 'Klassifisering og røde flagg-screening' : 'Classification and red flag screening'}
+            {lang === 'no'
+              ? 'Klassifisering og røde flagg-screening'
+              : 'Classification and red flag screening'}
           </p>
         </div>
 
@@ -523,11 +585,22 @@ export default function HeadacheAssessment({
           onChange={(e) => onChange({ ...values, notes: e.target.value })}
           className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none"
           rows={3}
-          placeholder={lang === 'no' ? 'Ytterligere relevante opplysninger...' : 'Additional relevant information...'}
+          placeholder={
+            lang === 'no'
+              ? 'Ytterligere relevante opplysninger...'
+              : 'Additional relevant information...'
+          }
         />
       </div>
     </div>
   );
 }
 
-export { HEADACHE_TYPES, HEADACHE_LOCATIONS, PAIN_QUALITIES, ASSOCIATED_SYMPTOMS, TRIGGERS, RED_FLAGS };
+export {
+  HEADACHE_TYPES,
+  HEADACHE_LOCATIONS,
+  PAIN_QUALITIES,
+  ASSOCIATED_SYMPTOMS,
+  TRIGGERS,
+  RED_FLAGS,
+};

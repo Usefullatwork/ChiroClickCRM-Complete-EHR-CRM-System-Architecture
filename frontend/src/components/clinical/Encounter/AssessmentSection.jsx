@@ -1,4 +1,4 @@
-import React from 'react';
+import _React from 'react';
 import { Search, X, Check } from 'lucide-react';
 import { useEncounter } from '../../../context/EncounterContext';
 
@@ -10,7 +10,7 @@ export default function AssessmentSection({
   setShowDiagnosisDropdown,
   filteredDiagnoses,
   toggleDiagnosis,
-  removeDiagnosisCode
+  removeDiagnosisCode,
 }) {
   const { encounterData, isSigned, updateField } = useEncounter();
 
@@ -18,7 +18,9 @@ export default function AssessmentSection({
     <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
       <div className="px-4 py-3 bg-gradient-to-r from-amber-50 to-white border-b border-slate-100">
         <h3 className="font-semibold text-slate-800 flex items-center gap-2">
-          <span className="bg-amber-500 text-white h-6 w-6 rounded-md flex items-center justify-center text-sm font-bold">A</span>
+          <span className="bg-amber-500 text-white h-6 w-6 rounded-md flex items-center justify-center text-sm font-bold">
+            A
+          </span>
           Vurdering & Diagnose
         </h3>
       </div>
@@ -53,7 +55,9 @@ export default function AssessmentSection({
                   >
                     <span>
                       <span className="font-mono font-medium text-amber-600">{diagnosis.code}</span>
-                      <span className="text-slate-600 ml-2">- {diagnosis.description_no || diagnosis.label}</span>
+                      <span className="text-slate-600 ml-2">
+                        - {diagnosis.description_no || diagnosis.label}
+                      </span>
                     </span>
                     {encounterData.icpc_codes.includes(diagnosis.code) && (
                       <Check className="h-4 w-4 text-amber-600" />

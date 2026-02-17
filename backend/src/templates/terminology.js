@@ -38,7 +38,9 @@ const examinationsCore = loadTemplate('base/examinations-core.json');
 export const buildAnatomicalAbbreviations = () => {
   const abbreviations = {};
 
-  if (!anatomyCore?.anatomy) return abbreviations;
+  if (!anatomyCore?.anatomy) {
+    return abbreviations;
+  }
 
   // Flatten spinal segments
   if (anatomyCore.anatomy.spinalSegments) {
@@ -105,7 +107,9 @@ export const buildAnatomicalAbbreviations = () => {
 export const buildTreatmentAbbreviations = () => {
   const abbreviations = {};
 
-  if (!treatmentsCore?.treatments) return abbreviations;
+  if (!treatmentsCore?.treatments) {
+    return abbreviations;
+  }
 
   // Process all treatment categories
   Object.values(treatmentsCore.treatments).forEach((category) => {
@@ -127,7 +131,9 @@ export const buildTreatmentAbbreviations = () => {
 export const buildExaminationTests = () => {
   const tests = {};
 
-  if (!examinationsCore?.examinations) return tests;
+  if (!examinationsCore?.examinations) {
+    return tests;
+  }
 
   // Process all examination categories
   Object.values(examinationsCore.examinations).forEach((category) => {

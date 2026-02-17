@@ -6,7 +6,7 @@
  * membership freeze declarations, and work declarations.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, _useEffect } from 'react';
 import {
   FileText,
   Wand2,
@@ -19,7 +19,7 @@ import {
   RefreshCw,
   User,
   Building,
-  Calendar,
+  _Calendar,
   FileCheck,
 } from 'lucide-react';
 
@@ -217,7 +217,9 @@ export default function MedicalCertificateGenerator({
 
   // Save to patient record
   const handleSave = async () => {
-    if (!generatedContent || !patientData?.id) return;
+    if (!generatedContent || !patientData?.id) {
+      return;
+    }
 
     try {
       const response = await fetch('/api/v1/ai/letters/save', {
@@ -252,11 +254,15 @@ export default function MedicalCertificateGenerator({
         return (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t.institution}</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t.institution}
+              </label>
               <input
                 type="text"
                 value={additionalFields.institution}
-                onChange={(e) => setAdditionalFields({ ...additionalFields, institution: e.target.value })}
+                onChange={(e) =>
+                  setAdditionalFields({ ...additionalFields, institution: e.target.value })
+                }
                 placeholder="F.eks. Universitetet i Oslo"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
@@ -266,7 +272,9 @@ export default function MedicalCertificateGenerator({
               <input
                 type="text"
                 value={additionalFields.purpose}
-                onChange={(e) => setAdditionalFields({ ...additionalFields, purpose: e.target.value })}
+                onChange={(e) =>
+                  setAdditionalFields({ ...additionalFields, purpose: e.target.value })
+                }
                 placeholder="F.eks. Utsatt eksamen i PSYC1000"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
@@ -282,7 +290,9 @@ export default function MedicalCertificateGenerator({
               <input
                 type="text"
                 value={additionalFields.recipient}
-                onChange={(e) => setAdditionalFields({ ...additionalFields, recipient: e.target.value })}
+                onChange={(e) =>
+                  setAdditionalFields({ ...additionalFields, recipient: e.target.value })
+                }
                 placeholder="F.eks. SATS Majorstuen"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
@@ -292,7 +302,9 @@ export default function MedicalCertificateGenerator({
               <input
                 type="text"
                 value={additionalFields.duration}
-                onChange={(e) => setAdditionalFields({ ...additionalFields, duration: e.target.value })}
+                onChange={(e) =>
+                  setAdditionalFields({ ...additionalFields, duration: e.target.value })
+                }
                 placeholder="F.eks. 6 uker"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
@@ -304,10 +316,14 @@ export default function MedicalCertificateGenerator({
         return (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t.workCapacity}</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t.workCapacity}
+              </label>
               <select
                 value={additionalFields.workCapacity}
-                onChange={(e) => setAdditionalFields({ ...additionalFields, workCapacity: e.target.value })}
+                onChange={(e) =>
+                  setAdditionalFields({ ...additionalFields, workCapacity: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">Velg arbeidsevne</option>
@@ -317,10 +333,14 @@ export default function MedicalCertificateGenerator({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t.restrictions}</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t.restrictions}
+              </label>
               <textarea
                 value={additionalFields.restrictions}
-                onChange={(e) => setAdditionalFields({ ...additionalFields, restrictions: e.target.value })}
+                onChange={(e) =>
+                  setAdditionalFields({ ...additionalFields, restrictions: e.target.value })
+                }
                 placeholder="F.eks. Unngå tunge løft, behov for hyppige pauser"
                 rows={2}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -331,7 +351,9 @@ export default function MedicalCertificateGenerator({
               <input
                 type="text"
                 value={additionalFields.duration}
-                onChange={(e) => setAdditionalFields({ ...additionalFields, duration: e.target.value })}
+                onChange={(e) =>
+                  setAdditionalFields({ ...additionalFields, duration: e.target.value })
+                }
                 placeholder="F.eks. 2-4 uker"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
@@ -345,7 +367,9 @@ export default function MedicalCertificateGenerator({
             <label className="block text-sm font-medium text-gray-700 mb-1">{t.purpose}</label>
             <textarea
               value={additionalFields.purpose}
-              onChange={(e) => setAdditionalFields({ ...additionalFields, purpose: e.target.value })}
+              onChange={(e) =>
+                setAdditionalFields({ ...additionalFields, purpose: e.target.value })
+              }
               placeholder="Beskriv formålet med erklæringen..."
               rows={2}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -384,7 +408,9 @@ export default function MedicalCertificateGenerator({
                   <p className="text-xs text-gray-500">{selectedTypeConfig?.description}</p>
                 </div>
               </div>
-              <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${showTypeDropdown ? 'rotate-180' : ''}`} />
+              <ChevronDown
+                className={`w-5 h-5 text-gray-400 transition-transform ${showTypeDropdown ? 'rotate-180' : ''}`}
+              />
             </button>
 
             {showTypeDropdown && (

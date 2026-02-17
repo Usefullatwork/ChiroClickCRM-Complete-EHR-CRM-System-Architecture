@@ -1,8 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import _React, { useState, useEffect } from 'react';
 import {
-  FileText, Mail, Plus, Edit, Trash2, Copy, Send, Search,
-  Filter, Eye, Download, Paperclip, Check, X, Upload,
-  FolderOpen, Tag, Clock, Users, ChevronRight, Loader2, AlertCircle
+  FileText,
+  _Mail,
+  Plus,
+  Edit,
+  _Trash2,
+  Copy,
+  Send,
+  Search,
+  _Filter,
+  Eye,
+  Download,
+  Paperclip,
+  Check,
+  X,
+  Upload,
+  _FolderOpen,
+  Tag,
+  Clock,
+  _Users,
+  _ChevronRight,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
 import { crmAPI } from '../../services/api';
 
@@ -28,7 +47,7 @@ const ExerciseTemplates = () => {
     { id: 'KNEE', label: 'Kne' },
     { id: 'GENERAL', label: 'Generell' },
     { id: 'POSTURE', label: 'Holdning' },
-    { id: 'STRETCH', label: 'Tøying' }
+    { id: 'STRETCH', label: 'Tøying' },
   ];
 
   // Fetch exercise templates from API
@@ -40,40 +59,46 @@ const ExerciseTemplates = () => {
 
         // Try to fetch exercise templates - API may not exist yet
         try {
-          const templatesRes = await crmAPI.getExerciseTemplates?.() || { data: [] };
-          const templateData = (templatesRes.data?.templates || templatesRes.data || []).map(t => ({
-            id: t.id,
-            name: t.name || t.title,
-            category: t.category || 'GENERAL',
-            description: t.description || '',
-            subject: t.email_subject || t.subject || '',
-            body: t.email_body || t.body || '',
-            attachments: t.attachments || [],
-            tags: t.tags || [],
-            usageCount: t.usage_count || t.usageCount || 0,
-            lastUsed: t.last_used || t.lastUsed,
-            createdAt: t.created_at || t.createdAt
-          }));
+          const templatesRes = (await crmAPI.getExerciseTemplates?.()) || { data: [] };
+          const templateData = (templatesRes.data?.templates || templatesRes.data || []).map(
+            (t) => ({
+              id: t.id,
+              name: t.name || t.title,
+              category: t.category || 'GENERAL',
+              description: t.description || '',
+              subject: t.email_subject || t.subject || '',
+              body: t.email_body || t.body || '',
+              attachments: t.attachments || [],
+              tags: t.tags || [],
+              usageCount: t.usage_count || t.usageCount || 0,
+              lastUsed: t.last_used || t.lastUsed,
+              createdAt: t.created_at || t.createdAt,
+            })
+          );
           setTemplates(templateData);
         } catch (apiErr) {
           // If API doesn't exist, use empty array - that's fine
-          console.log('Exercise templates API not available yet');
+          // Exercise templates API not available yet
           setTemplates([]);
         }
 
         // Try to fetch send history
         try {
-          const historyRes = await crmAPI.getCommunications?.({ type: 'exercise' }) || { data: [] };
-          const historyData = (historyRes.data?.communications || historyRes.data || []).map(h => ({
-            id: h.id,
-            templateName: h.template_name || h.subject || 'Unknown',
-            patientName: h.patient_name || `${h.first_name || ''} ${h.last_name || ''}`.trim(),
-            sentAt: h.sent_at || h.created_at,
-            status: h.status || 'SENT'
-          }));
+          const historyRes = (await crmAPI.getCommunications?.({ type: 'exercise' })) || {
+            data: [],
+          };
+          const historyData = (historyRes.data?.communications || historyRes.data || []).map(
+            (h) => ({
+              id: h.id,
+              templateName: h.template_name || h.subject || 'Unknown',
+              patientName: h.patient_name || `${h.first_name || ''} ${h.last_name || ''}`.trim(),
+              sentAt: h.sent_at || h.created_at,
+              status: h.status || 'SENT',
+            })
+          );
           setSendHistory(historyData);
         } catch (apiErr) {
-          console.log('Communication history API not available yet');
+          // Communication history API not available yet
           setSendHistory([]);
         }
       } catch (err) {
@@ -94,15 +119,16 @@ const ExerciseTemplates = () => {
     subject: '',
     body: '',
     attachments: [],
-    tags: []
+    tags: [],
   });
 
   // Filter templates
-  const filteredTemplates = templates.filter(t => {
+  const filteredTemplates = templates.filter((t) => {
     const matchesCategory = selectedCategory === 'ALL' || t.category === selectedCategory;
-    const matchesSearch = t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          t.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          t.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesSearch =
+      t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      t.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      t.tags.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase()));
     return matchesCategory && matchesSearch;
   });
 
@@ -110,7 +136,7 @@ const ExerciseTemplates = () => {
   const stats = {
     totalTemplates: templates.length,
     totalSent: templates.reduce((sum, t) => sum + t.usageCount, 0),
-    mostUsed: templates.reduce((max, t) => t.usageCount > max.usageCount ? t : max, templates[0])
+    mostUsed: templates.reduce((max, t) => (t.usageCount > max.usageCount ? t : max), templates[0]),
   };
 
   const formatDate = (dateStr) => {
@@ -122,7 +148,7 @@ const ExerciseTemplates = () => {
       day: 'numeric',
       month: 'short',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
@@ -207,8 +233,8 @@ const ExerciseTemplates = () => {
       <div className="flex gap-4 border-b border-gray-200">
         {[
           { id: 'templates', label: 'Maler' },
-          { id: 'history', label: 'Sendt' }
-        ].map(tab => (
+          { id: 'history', label: 'Sendt' },
+        ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
@@ -241,7 +267,7 @@ const ExerciseTemplates = () => {
                 </div>
               </div>
               <div className="flex gap-2 flex-wrap">
-                {categories.map(cat => (
+                {categories.map((cat) => (
                   <button
                     key={cat.id}
                     onClick={() => setSelectedCategory(cat.id)}
@@ -260,7 +286,7 @@ const ExerciseTemplates = () => {
 
           {/* Templates Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredTemplates.map(template => (
+            {filteredTemplates.map((template) => (
               <div
                 key={template.id}
                 className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-shadow"
@@ -273,7 +299,7 @@ const ExerciseTemplates = () => {
                     <div>
                       <h4 className="font-bold text-gray-900">{template.name}</h4>
                       <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
-                        {categories.find(c => c.id === template.category)?.label}
+                        {categories.find((c) => c.id === template.category)?.label}
                       </span>
                     </div>
                   </div>
@@ -283,7 +309,7 @@ const ExerciseTemplates = () => {
 
                 {/* Attachments */}
                 <div className="mb-3">
-                  {template.attachments.map(file => (
+                  {template.attachments.map((file) => (
                     <div key={file.name} className="flex items-center gap-2 text-sm text-gray-500">
                       <Paperclip className="w-3 h-3" />
                       <span className="truncate">{file.name}</span>
@@ -294,8 +320,11 @@ const ExerciseTemplates = () => {
 
                 {/* Tags */}
                 <div className="flex flex-wrap gap-1 mb-3">
-                  {template.tags.map(tag => (
-                    <span key={tag} className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">
+                  {template.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs"
+                    >
                       {tag}
                     </span>
                   ))}
@@ -349,14 +378,22 @@ const ExerciseTemplates = () => {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mal</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pasient</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sendt</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Mal
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Pasient
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Sendt
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Status
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {sendHistory.map(item => (
+              {sendHistory.map((item) => (
                 <tr key={item.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
                     <span className="font-medium text-gray-900">{item.templateName}</span>
@@ -364,13 +401,21 @@ const ExerciseTemplates = () => {
                   <td className="px-4 py-3 text-gray-600">{item.patientName}</td>
                   <td className="px-4 py-3 text-gray-600">{formatDateTime(item.sentAt)}</td>
                   <td className="px-4 py-3">
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
-                      item.status === 'OPENED' ? 'bg-green-100 text-green-700' :
-                      item.status === 'DELIVERED' ? 'bg-blue-100 text-blue-700' :
-                      'bg-gray-100 text-gray-700'
-                    }`}>
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                        item.status === 'OPENED'
+                          ? 'bg-green-100 text-green-700'
+                          : item.status === 'DELIVERED'
+                            ? 'bg-blue-100 text-blue-700'
+                            : 'bg-gray-100 text-gray-700'
+                      }`}
+                    >
                       {item.status === 'OPENED' && <Check className="w-3 h-3" />}
-                      {item.status === 'OPENED' ? 'Åpnet' : item.status === 'DELIVERED' ? 'Levert' : 'Sendt'}
+                      {item.status === 'OPENED'
+                        ? 'Åpnet'
+                        : item.status === 'DELIVERED'
+                          ? 'Levert'
+                          : 'Sendt'}
                     </span>
                   </td>
                 </tr>
@@ -393,7 +438,7 @@ const ExerciseTemplates = () => {
                   <input
                     type="text"
                     value={newTemplate.name}
-                    onChange={(e) => setNewTemplate(prev => ({ ...prev, name: e.target.value }))}
+                    onChange={(e) => setNewTemplate((prev) => ({ ...prev, name: e.target.value }))}
                     placeholder="F.eks. 'Nakkeøvelser - Avansert'"
                     className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
@@ -402,12 +447,18 @@ const ExerciseTemplates = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
                   <select
                     value={newTemplate.category}
-                    onChange={(e) => setNewTemplate(prev => ({ ...prev, category: e.target.value }))}
+                    onChange={(e) =>
+                      setNewTemplate((prev) => ({ ...prev, category: e.target.value }))
+                    }
                     className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                   >
-                    {categories.filter(c => c.id !== 'ALL').map(cat => (
-                      <option key={cat.id} value={cat.id}>{cat.label}</option>
-                    ))}
+                    {categories
+                      .filter((c) => c.id !== 'ALL')
+                      .map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                          {cat.label}
+                        </option>
+                      ))}
                   </select>
                 </div>
               </div>
@@ -417,7 +468,9 @@ const ExerciseTemplates = () => {
                 <input
                   type="text"
                   value={newTemplate.description}
-                  onChange={(e) => setNewTemplate(prev => ({ ...prev, description: e.target.value }))}
+                  onChange={(e) =>
+                    setNewTemplate((prev) => ({ ...prev, description: e.target.value }))
+                  }
                   placeholder="Kort beskrivelse av øvelsene..."
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
@@ -428,17 +481,19 @@ const ExerciseTemplates = () => {
                 <input
                   type="text"
                   value={newTemplate.subject}
-                  onChange={(e) => setNewTemplate(prev => ({ ...prev, subject: e.target.value }))}
+                  onChange={(e) => setNewTemplate((prev) => ({ ...prev, subject: e.target.value }))}
                   placeholder="Emne for e-posten..."
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">E-post Innhold</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  E-post Innhold
+                </label>
                 <textarea
                   value={newTemplate.body}
-                  onChange={(e) => setNewTemplate(prev => ({ ...prev, body: e.target.value }))}
+                  onChange={(e) => setNewTemplate((prev) => ({ ...prev, body: e.target.value }))}
                   rows={6}
                   placeholder="Skriv e-postinnholdet her... Bruk {name} for pasientnavn."
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
@@ -452,13 +507,17 @@ const ExerciseTemplates = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">PDF Vedlegg</label>
                 <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center">
                   <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                  <p className="text-sm text-gray-500">Dra og slipp PDF-filer her, eller klikk for å velge</p>
+                  <p className="text-sm text-gray-500">
+                    Dra og slipp PDF-filer her, eller klikk for å velge
+                  </p>
                   <input type="file" accept=".pdf" multiple className="hidden" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tagger (kommaseparert)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Tagger (kommaseparert)
+                </label>
                 <input
                   type="text"
                   placeholder="nakke, grunnleggende, tøying..."
@@ -489,9 +548,7 @@ const ExerciseTemplates = () => {
       {showSendModal && selectedTemplate && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-md">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">
-              Send "{selectedTemplate.name}"
-            </h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Send "{selectedTemplate.name}"</h3>
 
             <div className="space-y-4">
               <div>
@@ -507,7 +564,7 @@ const ExerciseTemplates = () => {
 
               <div className="p-3 bg-gray-50 rounded-lg">
                 <p className="text-sm font-medium text-gray-700 mb-2">Vedlegg:</p>
-                {selectedTemplate.attachments.map(file => (
+                {selectedTemplate.attachments.map((file) => (
                   <div key={file.name} className="flex items-center gap-2 text-sm">
                     <Paperclip className="w-4 h-4 text-gray-400" />
                     <span>{file.name}</span>
@@ -555,8 +612,14 @@ const ExerciseTemplates = () => {
 
       {/* Template Preview Modal */}
       {selectedTemplate && !showSendModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setSelectedTemplate(null)}>
-          <div className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          onClick={() => setSelectedTemplate(null)}
+        >
+          <div
+            className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-gray-900">{selectedTemplate.name}</h3>
               <button
@@ -580,8 +643,11 @@ const ExerciseTemplates = () => {
 
               <div className="p-4 bg-gray-50 rounded-lg">
                 <p className="text-sm font-medium text-gray-700 mb-2">Vedlegg:</p>
-                {selectedTemplate.attachments.map(file => (
-                  <div key={file.name} className="flex items-center justify-between p-2 bg-white rounded border border-gray-200">
+                {selectedTemplate.attachments.map((file) => (
+                  <div
+                    key={file.name}
+                    className="flex items-center justify-between p-2 bg-white rounded border border-gray-200"
+                  >
                     <div className="flex items-center gap-2">
                       <FileText className="w-5 h-5 text-red-500" />
                       <span>{file.name}</span>

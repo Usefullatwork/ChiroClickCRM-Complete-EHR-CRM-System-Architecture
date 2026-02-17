@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import _React, { useState, useEffect } from 'react';
 import {
   Star,
   ThumbsUp,
@@ -9,14 +9,14 @@ import {
   Send,
   Plus,
   Edit,
-  Trash2,
+  _Trash2,
   BarChart2,
   Users,
-  Calendar,
+  _Calendar,
   Mail,
   MessageSquare,
-  ChevronRight,
-  Filter,
+  _ChevronRight,
+  _Filter,
   Eye,
   Loader2,
   AlertCircle,
@@ -122,14 +122,14 @@ const SurveyManager = () => {
   }, []);
 
   // Create new survey
-  const handleCreateSurvey = async (surveyData) => {
+  const _handleCreateSurvey = async (surveyData) => {
     try {
       const response = await crmAPI.createSurvey(surveyData);
       setSurveys((prev) => [...prev, response.data]);
       setShowNewSurvey(false);
     } catch (err) {
       logger.error('Error creating survey:', err);
-      toast.error('Failed to create survey: ' + err.message);
+      toast.error(`Failed to create survey: ${err.message}`);
     }
   };
 
@@ -149,8 +149,12 @@ const SurveyManager = () => {
 
   // Get NPS score color
   const getNpsColor = (score) => {
-    if (score >= 50) return 'text-green-600';
-    if (score >= 0) return 'text-yellow-600';
+    if (score >= 50) {
+      return 'text-green-600';
+    }
+    if (score >= 0) {
+      return 'text-yellow-600';
+    }
     return 'text-red-600';
   };
 

@@ -8,7 +8,7 @@
  * - Filter by type (no-show, follow-up, reminder)
  * - Preview how message will appear to patient
  */
-import React, { useState, useCallback, useMemo } from 'react';
+import _React, { useState, useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   MessageSquare,
@@ -17,17 +17,17 @@ import {
   Check,
   X,
   Edit2,
-  AlertCircle,
+  _AlertCircle,
   Clock,
   User,
-  Calendar,
+  _Calendar,
   ChevronDown,
   ChevronUp,
-  Send,
+  _Send,
   Filter,
   RefreshCw,
   CheckCircle2,
-  XCircle,
+  _XCircle,
 } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
@@ -258,7 +258,9 @@ export default function MessageApprovalDashboard({ className = '' }) {
 
   // Filter messages by category
   const filteredMessages = useMemo(() => {
-    if (selectedCategory === 'all') return messages;
+    if (selectedCategory === 'all') {
+      return messages;
+    }
     return messages.filter((m) => m.category === selectedCategory);
   }, [messages, selectedCategory]);
 

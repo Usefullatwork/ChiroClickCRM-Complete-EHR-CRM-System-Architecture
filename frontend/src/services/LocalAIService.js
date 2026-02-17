@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * LocalAIService - Integration with Local LLM
  *
@@ -6,6 +7,8 @@
  *
  * Supports Norwegian chiropractic clinical documentation.
  */
+
+import React from 'react';
 
 // Default configuration - can be overridden via settings
 const DEFAULT_CONFIG = {
@@ -16,14 +19,14 @@ const DEFAULT_CONFIG = {
   endpoints: {
     ollama: 'http://localhost:11434/api/generate',
     textGenWebUI: 'http://localhost:5000/api/v1/generate',
-    openAICompatible: 'http://localhost:8080/v1/chat/completions'
+    openAICompatible: 'http://localhost:8080/v1/chat/completions',
   },
 
   // Models for different languages
   model: 'chiro-no', // Default Norwegian
   models: {
-    no: 'chiro-no',  // Norwegian clinical model
-    en: 'chiro-en'   // English clinical model
+    no: 'chiro-no', // Norwegian clinical model
+    en: 'chiro-en', // English clinical model
   },
 
   // Request timeout in milliseconds
@@ -33,7 +36,7 @@ const DEFAULT_CONFIG = {
   temperature: 0.3,
 
   // Max tokens for responses
-  maxTokens: 500
+  maxTokens: 500,
 };
 
 // Communication tone system prompts
@@ -53,7 +56,7 @@ Rules:
 - Only necessary information
 - No unnecessary pleasantries
 - Clear action/instruction
-Example: "Appointment tomorrow at 2:00 PM. Cancel? Call 12345678."`
+Example: "Appointment tomorrow at 2:00 PM. Cancel? Call 12345678."`,
   },
 
   kind: {
@@ -71,7 +74,7 @@ Rules:
 - Show you care
 - Positive phrasing
 - Personal touch without being intrusive
-Example: "Hi! Looking forward to seeing you tomorrow at 2:00 PM. Have a great day!"`
+Example: "Hi! Looking forward to seeing you tomorrow at 2:00 PM. Have a great day!"`,
   },
 
   professional: {
@@ -89,7 +92,7 @@ Rules:
 - Clinically accurate
 - Precise and informative
 - Objective and respectful
-Example: "Reminder: Your consultation is scheduled for tomorrow at 2:00 PM. Please arrive 15 minutes early."`
+Example: "Reminder: Your consultation is scheduled for tomorrow at 2:00 PM. Please arrive 15 minutes early."`,
   },
 
   empathetic: {
@@ -107,52 +110,52 @@ Rules:
 - Acknowledge challenges
 - Supportive tone
 - Give space for recipient to feel heard
-Example: "We understand this can be difficult. We are here for you when you are ready."`
-  }
+Example: "We understand this can be difficult. We are here for you when you are ready."`,
+  },
 };
 
 // Communication message types with context templates
 const COMMUNICATION_TYPES = {
   appointment_reminder: {
     no: 'Skriv en påminnelse om time',
-    en: 'Write an appointment reminder'
+    en: 'Write an appointment reminder',
   },
   follow_up: {
     no: 'Skriv en oppfølgingsmelding etter behandling',
-    en: 'Write a post-treatment follow-up message'
+    en: 'Write a post-treatment follow-up message',
   },
   no_show: {
     no: 'Skriv en melding om uteblitt time',
-    en: 'Write a no-show follow-up message'
+    en: 'Write a no-show follow-up message',
   },
   recall: {
     no: 'Skriv en innkallingsmelding til inaktiv pasient',
-    en: 'Write a recall message for inactive patient'
+    en: 'Write a recall message for inactive patient',
   },
   payment: {
     no: 'Skriv en betalingspåminnelse',
-    en: 'Write a payment reminder'
+    en: 'Write a payment reminder',
   },
   welcome: {
     no: 'Skriv en velkomstmelding til ny pasient',
-    en: 'Write a welcome message for new patient'
+    en: 'Write a welcome message for new patient',
   },
   schedule_change: {
     no: 'Skriv en melding om endring av time',
-    en: 'Write a schedule change notification'
+    en: 'Write a schedule change notification',
   },
   birthday: {
     no: 'Skriv en bursdagshilsen',
-    en: 'Write a birthday greeting'
+    en: 'Write a birthday greeting',
   },
   feedback: {
     no: 'Skriv en forespørsel om tilbakemelding',
-    en: 'Write a feedback request'
+    en: 'Write a feedback request',
   },
   exercise_reminder: {
     no: 'Skriv en påminnelse om hjemmeøvelser',
-    en: 'Write an exercise reminder'
-  }
+    en: 'Write an exercise reminder',
+  },
 };
 
 // Norwegian chiropractic system prompts
@@ -172,7 +175,7 @@ Eksempel på god dokumentasjon:
 "Pasienten presenterer seg med smerter i korsryggen som startet for 2 uker siden etter løfting.
 Smertene er lokalisert i nedre del av ryggen med utstråling til høyre sete.
 Symptomene forverres ved sitting og bøying, lindres ved gange.
-Pasienten rapporterer smerte på 6/10 på VAS-skala."`
+Pasienten rapporterer smerte på 6/10 på VAS-skala."`,
   },
 
   objective: {
@@ -191,7 +194,7 @@ Eksempel på god dokumentasjon:
 Palpasjon: Ømhet og hypertoni over høyre erector spinae L4-S1. Triggerpunkter i gluteus medius.
 AROM lumbal: Fleksjon 40° (redusert), ekstensjon 10° (smerte), lateralfleksjon 20° bilateralt.
 Ortopediske tester: Kemp's test positiv høyre, SLR negativ bilateralt.
-Nevrologisk: Reflekser normale, sensibilitet intakt, kraft 5/5 bilateral."`
+Nevrologisk: Reflekser normale, sensibilitet intakt, kraft 5/5 bilateral."`,
   },
 
   assessment: {
@@ -209,7 +212,7 @@ Eksempel på god dokumentasjon:
 "Klinisk vurdering: Funnene er konsistente med akutt mekanisk korsryggsyndrom (L84).
 Palpasjonsfunn og bevegelsesrestriksjon tyder på segmentell dysfunksjon L4-L5.
 Ingen tegn til nerverotaffeksjon. Røde flagg er vurdert og ikke til stede.
-Prognose: God prognose med konservativ behandling over 2-4 uker."`
+Prognose: God prognose med konservativ behandling over 2-4 uker."`,
   },
 
   plan: {
@@ -228,7 +231,7 @@ Eksempel på god dokumentasjon:
 triggerpunktbehandling gluteus medius. God respons på behandling.
 Hjemmeøvelser: Instruert i McKenzie-øvelser (ekstensjon i liggende) x10 hver time.
 Råd: Unngå langvarig sitting, bruk lendestøtte, gå korte turer flere ganger daglig.
-Oppfølging: Neste time om 3 dager. Forventet 3-4 behandlinger totalt."`
+Oppfølging: Neste time om 3 dager. Forventet 3-4 behandlinger totalt."`,
   },
 
   vestibular: {
@@ -245,8 +248,8 @@ Eksempel på god dokumentasjon:
 Dix-Hallpike positiv høyre side med oppslående, torsjonell nystagmus med latens 3 sek.
 Cerebellum-tester normale. VOR-HIT test normal bilateralt.
 Konklusjon: Funnene er konsistente med BPPV i høyre bakre buegang (kanalolithiasis).
-Behandling: Epley-manøver utført med god effekt. Kontroll om 1 uke."`
-  }
+Behandling: Epley-manøver utført med god effekt. Kontroll om 1 uke."`,
+  },
 };
 
 class LocalAIService {
@@ -264,7 +267,7 @@ class LocalAIService {
       // Try Ollama first
       const response = await fetch('http://localhost:11434/api/tags', {
         method: 'GET',
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(5000),
       });
 
       if (response.ok) {
@@ -279,7 +282,7 @@ class LocalAIService {
       try {
         const response = await fetch('http://localhost:5000/api/v1/model', {
           method: 'GET',
-          signal: AbortSignal.timeout(5000)
+          signal: AbortSignal.timeout(5000),
         });
 
         if (response.ok) {
@@ -313,7 +316,7 @@ class LocalAIService {
       model = this.config.model,
       temperature = this.config.temperature,
       maxTokens = this.config.maxTokens,
-      systemPrompt = ''
+      systemPrompt = '',
     } = options;
 
     try {
@@ -326,10 +329,10 @@ class LocalAIService {
           stream: false,
           options: {
             temperature,
-            num_predict: maxTokens
-          }
+            num_predict: maxTokens,
+          },
         }),
-        signal: AbortSignal.timeout(this.config.timeout)
+        signal: AbortSignal.timeout(this.config.timeout),
       });
 
       if (!response.ok) {
@@ -341,13 +344,13 @@ class LocalAIService {
         success: true,
         text: data.response || data.generated_text || '',
         model: data.model || model,
-        tokensUsed: data.eval_count || 0
+        tokensUsed: data.eval_count || 0,
       };
     } catch (error) {
       this.lastError = error.message;
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -361,9 +364,10 @@ class LocalAIService {
     // Select the appropriate model for the language
     const model = this.config.models?.[language] || this.config.model;
 
-    const prompt = language === 'no'
-      ? `Basert på følgende informasjon, generer dokumentasjon for ${section}-seksjonen:\n\n${context}`
-      : `Based on the following information, generate documentation for the ${section} section:\n\n${context}`;
+    const prompt =
+      language === 'no'
+        ? `Basert på følgende informasjon, generer dokumentasjon for ${section}-seksjonen:\n\n${context}`
+        : `Based on the following information, generate documentation for the ${section} section:\n\n${context}`;
 
     return this.generate(prompt, { systemPrompt, model });
   }
@@ -373,9 +377,10 @@ class LocalAIService {
    */
   async improveText(text, language = 'no') {
     const model = this.config.models?.[language] || this.config.model;
-    const systemPrompt = language === 'no'
-      ? `Du er en klinisk dokumentasjonsassistent. Forbedre og utvid følgende tekst til profesjonell klinisk dokumentasjon. Behold all faktisk informasjon, men gjør språket mer profesjonelt og fullstendig.`
-      : `You are a clinical documentation assistant. Improve and expand the following text into professional clinical documentation. Keep all factual information but make the language more professional and complete.`;
+    const systemPrompt =
+      language === 'no'
+        ? `Du er en klinisk dokumentasjonsassistent. Forbedre og utvid følgende tekst til profesjonell klinisk dokumentasjon. Behold all faktisk informasjon, men gjør språket mer profesjonelt og fullstendig.`
+        : `You are a clinical documentation assistant. Improve and expand the following text into professional clinical documentation. Keep all factual information but make the language more professional and complete.`;
 
     return this.generate(text, { systemPrompt, temperature: 0.2, model });
   }
@@ -385,13 +390,15 @@ class LocalAIService {
    */
   async generateDifferentials(findings, language = 'no') {
     const model = this.config.models?.[language] || this.config.model;
-    const systemPrompt = language === 'no'
-      ? `Du er en klinisk dokumentasjonsassistent for kiropraktorer. Basert på kliniske funn, foreslå differensialdiagnoser med ICPC-2 koder. List de mest sannsynlige diagnosene først.`
-      : `You are a clinical documentation assistant for chiropractors. Based on clinical findings, suggest differential diagnoses with ICPC-2 codes. List the most likely diagnoses first.`;
+    const systemPrompt =
+      language === 'no'
+        ? `Du er en klinisk dokumentasjonsassistent for kiropraktorer. Basert på kliniske funn, foreslå differensialdiagnoser med ICPC-2 koder. List de mest sannsynlige diagnosene først.`
+        : `You are a clinical documentation assistant for chiropractors. Based on clinical findings, suggest differential diagnoses with ICPC-2 codes. List the most likely diagnoses first.`;
 
-    const prompt = language === 'no'
-      ? `Kliniske funn:\n${findings}\n\nForeslå relevante differensialdiagnoser:`
-      : `Clinical findings:\n${findings}\n\nSuggest relevant differential diagnoses:`;
+    const prompt =
+      language === 'no'
+        ? `Kliniske funn:\n${findings}\n\nForeslå relevante differensialdiagnoser:`
+        : `Clinical findings:\n${findings}\n\nSuggest relevant differential diagnoses:`;
 
     return this.generate(prompt, { systemPrompt, model });
   }
@@ -404,18 +411,19 @@ class LocalAIService {
     const systemPrompt = SYSTEM_PROMPTS.vestibular[language] || SYSTEM_PROMPTS.vestibular.en;
 
     const dataDescription = Object.entries(vngData)
-      .filter(([key, value]) => value && typeof value === 'object')
+      .filter(([_key, value]) => value && typeof value === 'object')
       .map(([key, value]) => {
         const abnormal = Object.entries(value)
-          .filter(([k, v]) => v === 'abnormal')
+          .filter(([_k, v]) => v === 'abnormal')
           .map(([k]) => k);
         return abnormal.length > 0 ? `${key}: avvik i ${abnormal.join(', ')}` : `${key}: normal`;
       })
       .join('\n');
 
-    const prompt = language === 'no'
-      ? `VNG-funn:\n${dataDescription}\n\nGenerer klinisk tolkning:`
-      : `VNG findings:\n${dataDescription}\n\nGenerate clinical interpretation:`;
+    const prompt =
+      language === 'no'
+        ? `VNG-funn:\n${dataDescription}\n\nGenerer klinisk tolkning:`
+        : `VNG findings:\n${dataDescription}\n\nGenerate clinical interpretation:`;
 
     return this.generate(prompt, { systemPrompt, model });
   }
@@ -425,15 +433,16 @@ class LocalAIService {
    */
   async autocomplete(partialText, section, language = 'no') {
     const model = this.config.models?.[language] || this.config.model;
-    const systemPrompt = language === 'no'
-      ? `Fullfør følgende kliniske dokumentasjon. Skriv kun fortsettelsen, ikke gjenta det som allerede er skrevet.`
-      : `Complete the following clinical documentation. Only write the continuation, do not repeat what has already been written.`;
+    const systemPrompt =
+      language === 'no'
+        ? `Fullfør følgende kliniske dokumentasjon. Skriv kun fortsettelsen, ikke gjenta det som allerede er skrevet.`
+        : `Complete the following clinical documentation. Only write the continuation, do not repeat what has already been written.`;
 
     return this.generate(partialText, {
       systemPrompt,
       temperature: 0.4,
       maxTokens: 200,
-      model
+      model,
     });
   }
 
@@ -445,7 +454,13 @@ class LocalAIService {
    * @param {string} language - Language code ('no' or 'en')
    * @param {string} format - Format type ('sms' or 'email')
    */
-  async generateCommunication(messageType, context = {}, tone = 'direct', language = 'no', format = 'sms') {
+  async generateCommunication(
+    messageType,
+    context = {},
+    tone = 'direct',
+    language = 'no',
+    format = 'sms'
+  ) {
     const model = this.config.models?.[language] || this.config.model;
 
     // Get tone-specific system prompt
@@ -456,25 +471,42 @@ class LocalAIService {
 
     // Build context string from provided data
     const contextParts = [];
-    if (context.patientName) contextParts.push(`Pasient: ${context.patientName}`);
-    if (context.appointmentDate) contextParts.push(`Dato: ${context.appointmentDate}`);
-    if (context.appointmentTime) contextParts.push(`Tid: ${context.appointmentTime}`);
-    if (context.providerName) contextParts.push(`Behandler: ${context.providerName}`);
-    if (context.clinicName) contextParts.push(`Klinikk: ${context.clinicName}`);
-    if (context.clinicPhone) contextParts.push(`Telefon: ${context.clinicPhone}`);
-    if (context.amount) contextParts.push(`Beløp: ${context.amount}`);
-    if (context.customContext) contextParts.push(context.customContext);
+    if (context.patientName) {
+      contextParts.push(`Pasient: ${context.patientName}`);
+    }
+    if (context.appointmentDate) {
+      contextParts.push(`Dato: ${context.appointmentDate}`);
+    }
+    if (context.appointmentTime) {
+      contextParts.push(`Tid: ${context.appointmentTime}`);
+    }
+    if (context.providerName) {
+      contextParts.push(`Behandler: ${context.providerName}`);
+    }
+    if (context.clinicName) {
+      contextParts.push(`Klinikk: ${context.clinicName}`);
+    }
+    if (context.clinicPhone) {
+      contextParts.push(`Telefon: ${context.clinicPhone}`);
+    }
+    if (context.amount) {
+      contextParts.push(`Beløp: ${context.amount}`);
+    }
+    if (context.customContext) {
+      contextParts.push(context.customContext);
+    }
 
     const contextStr = contextParts.length > 0 ? contextParts.join('\n') : '';
 
     // Format-specific instructions
-    const formatInstruction = format === 'sms'
-      ? language === 'no'
-        ? 'Skriv en kort SMS (maks 160 tegn hvis mulig).'
-        : 'Write a short SMS (max 160 characters if possible).'
-      : language === 'no'
-        ? 'Skriv en e-post med emne og innhold.'
-        : 'Write an email with subject and body.';
+    const formatInstruction =
+      format === 'sms'
+        ? language === 'no'
+          ? 'Skriv en kort SMS (maks 160 tegn hvis mulig).'
+          : 'Write a short SMS (max 160 characters if possible).'
+        : language === 'no'
+          ? 'Skriv en e-post med emne og innhold.'
+          : 'Write an email with subject and body.';
 
     const prompt = `${typeDesc}.
 ${formatInstruction}
@@ -487,7 +519,7 @@ Generer melding:`;
       systemPrompt: tonePrompt,
       temperature: 0.4,
       maxTokens: format === 'sms' ? 100 : 300,
-      model
+      model,
     });
   }
 
@@ -501,15 +533,16 @@ Generer melding:`;
     const model = this.config.models?.[language] || this.config.model;
     const tonePrompt = TONE_PROMPTS[targetTone]?.[language] || TONE_PROMPTS.direct[language];
 
-    const prompt = language === 'no'
-      ? `Konverter denne meldingen til ${targetTone} tone:\n\n"${message}"\n\nKonvertert melding:`
-      : `Convert this message to ${targetTone} tone:\n\n"${message}"\n\nConverted message:`;
+    const prompt =
+      language === 'no'
+        ? `Konverter denne meldingen til ${targetTone} tone:\n\n"${message}"\n\nKonvertert melding:`
+        : `Convert this message to ${targetTone} tone:\n\n"${message}"\n\nConverted message:`;
 
     return this.generate(prompt, {
       systemPrompt: tonePrompt,
       temperature: 0.3,
       maxTokens: 200,
-      model
+      model,
     });
   }
 }
@@ -543,75 +576,96 @@ export function useLocalAI() {
     return result;
   }, [service]);
 
-  const generate = React.useCallback(async (prompt, options = {}) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const result = await service.generate(prompt, options);
-      if (!result.success) {
-        setError(result.error);
+  const generate = React.useCallback(
+    async (prompt, options = {}) => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const result = await service.generate(prompt, options);
+        if (!result.success) {
+          setError(result.error);
+        }
+        return result;
+      } finally {
+        setIsLoading(false);
       }
-      return result;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [service]);
+    },
+    [service]
+  );
 
-  const generateSOAP = React.useCallback(async (section, context, language = 'no') => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const result = await service.generateSOAPSuggestion(section, context, language);
-      if (!result.success) {
-        setError(result.error);
+  const generateSOAP = React.useCallback(
+    async (section, context, language = 'no') => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const result = await service.generateSOAPSuggestion(section, context, language);
+        if (!result.success) {
+          setError(result.error);
+        }
+        return result;
+      } finally {
+        setIsLoading(false);
       }
-      return result;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [service]);
+    },
+    [service]
+  );
 
-  const improveText = React.useCallback(async (text, language = 'no') => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const result = await service.improveText(text, language);
-      if (!result.success) {
-        setError(result.error);
+  const improveText = React.useCallback(
+    async (text, language = 'no') => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const result = await service.improveText(text, language);
+        if (!result.success) {
+          setError(result.error);
+        }
+        return result;
+      } finally {
+        setIsLoading(false);
       }
-      return result;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [service]);
+    },
+    [service]
+  );
 
-  const generateCommunication = React.useCallback(async (messageType, context = {}, tone = 'direct', language = 'no', format = 'sms') => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const result = await service.generateCommunication(messageType, context, tone, language, format);
-      if (!result.success) {
-        setError(result.error);
+  const generateCommunication = React.useCallback(
+    async (messageType, context = {}, tone = 'direct', language = 'no', format = 'sms') => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const result = await service.generateCommunication(
+          messageType,
+          context,
+          tone,
+          language,
+          format
+        );
+        if (!result.success) {
+          setError(result.error);
+        }
+        return result;
+      } finally {
+        setIsLoading(false);
       }
-      return result;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [service]);
+    },
+    [service]
+  );
 
-  const convertTone = React.useCallback(async (message, targetTone, language = 'no') => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const result = await service.convertTone(message, targetTone, language);
-      if (!result.success) {
-        setError(result.error);
+  const convertTone = React.useCallback(
+    async (message, targetTone, language = 'no') => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const result = await service.convertTone(message, targetTone, language);
+        if (!result.success) {
+          setError(result.error);
+        }
+        return result;
+      } finally {
+        setIsLoading(false);
       }
-      return result;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [service]);
+    },
+    [service]
+  );
 
   return {
     isLoading,
@@ -623,7 +677,7 @@ export function useLocalAI() {
     improveText,
     generateCommunication,
     convertTone,
-    service
+    service,
   };
 }
 

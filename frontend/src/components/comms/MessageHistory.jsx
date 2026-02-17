@@ -11,8 +11,8 @@ import { useQuery } from '@tanstack/react-query';
 import {
   History,
   Search,
-  Filter,
-  Calendar,
+  _Filter,
+  _Calendar,
   MessageSquare,
   Mail,
   CheckCircle,
@@ -20,47 +20,47 @@ import {
   Clock,
   AlertCircle,
   ChevronDown,
-  ChevronRight,
+  _ChevronRight,
   User,
   ExternalLink,
   RefreshCw,
-  Download
+  Download,
 } from 'lucide-react';
 import { communicationsAPI } from '../../services/api';
-import { formatDate, formatRelativeTime } from '../../lib/utils';
+import { _formatDate, _formatRelativeTime } from '../../lib/utils';
 
 // Status configurations
 const STATUS_CONFIG = {
   SENT: {
     label: { no: 'Sendt', en: 'Sent' },
     icon: CheckCircle,
-    color: 'green'
+    color: 'green',
   },
   DELIVERED: {
     label: { no: 'Levert', en: 'Delivered' },
     icon: CheckCircle,
-    color: 'green'
+    color: 'green',
   },
   PENDING: {
     label: { no: 'Venter', en: 'Pending' },
     icon: Clock,
-    color: 'yellow'
+    color: 'yellow',
   },
   FAILED: {
     label: { no: 'Feilet', en: 'Failed' },
     icon: XCircle,
-    color: 'red'
+    color: 'red',
   },
   OPENED: {
     label: { no: 'Apnet', en: 'Opened' },
     icon: CheckCircle,
-    color: 'blue'
+    color: 'blue',
   },
   CLICKED: {
     label: { no: 'Klikket', en: 'Clicked' },
     icon: ExternalLink,
-    color: 'purple'
-  }
+    color: 'purple',
+  },
 };
 
 export default function MessageHistory({ language = 'no' }) {
@@ -71,7 +71,7 @@ export default function MessageHistory({ language = 'no' }) {
     status: 'all',
     patientId: '',
     startDate: '',
-    endDate: ''
+    endDate: '',
   });
   const [expandedMessage, setExpandedMessage] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -111,7 +111,7 @@ export default function MessageHistory({ language = 'no' }) {
       openedAt: 'Apnet',
       clickedAt: 'Klikket',
       failureReason: 'Feilarsak',
-      subject: 'Emne'
+      subject: 'Emne',
     },
     en: {
       title: 'Message History',
@@ -146,8 +146,8 @@ export default function MessageHistory({ language = 'no' }) {
       openedAt: 'Opened',
       clickedAt: 'Clicked',
       failureReason: 'Failure Reason',
-      subject: 'Subject'
-    }
+      subject: 'Subject',
+    },
   };
 
   const t = labels[language] || labels.no;
@@ -161,7 +161,7 @@ export default function MessageHistory({ language = 'no' }) {
     patientId: filters.patientId || undefined,
     startDate: filters.startDate || undefined,
     endDate: filters.endDate || undefined,
-    search: searchTerm || undefined
+    search: searchTerm || undefined,
   };
 
   // Fetch messages
@@ -171,9 +171,9 @@ export default function MessageHistory({ language = 'no' }) {
       const response = await communicationsAPI.getAll(queryParams);
       return {
         communications: response.data?.communications || [],
-        pagination: response.data?.pagination || { page: 1, limit: 20, total: 0, pages: 1 }
+        pagination: response.data?.pagination || { page: 1, limit: 20, total: 0, pages: 1 },
       };
-    }
+    },
   });
 
   const messages = data?.communications || [];
@@ -181,16 +181,20 @@ export default function MessageHistory({ language = 'no' }) {
 
   // Get status info
   const getStatusInfo = (status) => {
-    return STATUS_CONFIG[status] || {
-      label: { no: status, en: status },
-      icon: AlertCircle,
-      color: 'gray'
-    };
+    return (
+      STATUS_CONFIG[status] || {
+        label: { no: status, en: status },
+        icon: AlertCircle,
+        color: 'gray',
+      }
+    );
   };
 
   // Format relative time with fallback
   const formatTime = (dateString) => {
-    if (!dateString) return '-';
+    if (!dateString) {
+      return '-';
+    }
     try {
       const date = new Date(dateString);
       const now = new Date();
@@ -199,15 +203,23 @@ export default function MessageHistory({ language = 'no' }) {
       const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
       const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-      if (diffMins < 1) return language === 'no' ? 'Akkurat na' : 'Just now';
-      if (diffMins < 60) return `${diffMins}m ${language === 'no' ? 'siden' : 'ago'}`;
-      if (diffHours < 24) return `${diffHours}t ${language === 'no' ? 'siden' : 'ago'}`;
-      if (diffDays < 7) return `${diffDays}d ${language === 'no' ? 'siden' : 'ago'}`;
+      if (diffMins < 1) {
+        return language === 'no' ? 'Akkurat na' : 'Just now';
+      }
+      if (diffMins < 60) {
+        return `${diffMins}m ${language === 'no' ? 'siden' : 'ago'}`;
+      }
+      if (diffHours < 24) {
+        return `${diffHours}t ${language === 'no' ? 'siden' : 'ago'}`;
+      }
+      if (diffDays < 7) {
+        return `${diffDays}d ${language === 'no' ? 'siden' : 'ago'}`;
+      }
 
       return date.toLocaleDateString(language === 'no' ? 'nb-NO' : 'en-US', {
         day: 'numeric',
         month: 'short',
-        year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+        year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
       });
     } catch {
       return dateString;
@@ -216,14 +228,16 @@ export default function MessageHistory({ language = 'no' }) {
 
   // Format full date time
   const formatFullDateTime = (dateString) => {
-    if (!dateString) return '-';
+    if (!dateString) {
+      return '-';
+    }
     try {
       return new Date(dateString).toLocaleString(language === 'no' ? 'nb-NO' : 'en-US', {
         day: 'numeric',
         month: 'long',
         year: 'numeric',
         hour: '2-digit',
-        minute: '2-digit'
+        minute: '2-digit',
       });
     } catch {
       return dateString;
@@ -234,18 +248,18 @@ export default function MessageHistory({ language = 'no' }) {
   const handleExport = async () => {
     // Create CSV content
     const headers = ['Dato', 'Type', 'Pasient', 'Mottaker', 'Status', 'Melding'];
-    const rows = messages.map(msg => [
+    const rows = messages.map((msg) => [
       formatFullDateTime(msg.sent_at),
       msg.type,
       msg.patient_name || '-',
       msg.recipient_phone || msg.recipient_email || '-',
       getStatusInfo(msg.status || 'SENT').label[language],
-      msg.content?.substring(0, 100) || '-'
+      msg.content?.substring(0, 100) || '-',
     ]);
 
     const csvContent = [
       headers.join(','),
-      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(',')),
     ].join('\n');
 
     // Download
@@ -325,7 +339,9 @@ export default function MessageHistory({ language = 'no' }) {
           >
             <option value="all">{t.allStatuses}</option>
             {Object.entries(STATUS_CONFIG).map(([key, config]) => (
-              <option key={key} value={key}>{config.label[language]}</option>
+              <option key={key} value={key}>
+                {config.label[language]}
+              </option>
             ))}
           </select>
 
@@ -382,10 +398,7 @@ export default function MessageHistory({ language = 'no' }) {
                 const isExpanded = expandedMessage === message.id;
 
                 return (
-                  <div
-                    key={message.id}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
+                  <div key={message.id} className="hover:bg-gray-50 transition-colors">
                     {/* Main Row */}
                     <div
                       className="px-6 py-4 cursor-pointer"
@@ -426,11 +439,13 @@ export default function MessageHistory({ language = 'no' }) {
 
                         {/* Type */}
                         <div className="col-span-4 md:col-span-1">
-                          <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded ${
-                            message.type === 'SMS'
-                              ? 'bg-purple-100 text-purple-700'
-                              : 'bg-blue-100 text-blue-700'
-                          }`}>
+                          <span
+                            className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded ${
+                              message.type === 'SMS'
+                                ? 'bg-purple-100 text-purple-700'
+                                : 'bg-blue-100 text-blue-700'
+                            }`}
+                          >
                             {message.type === 'SMS' ? (
                               <MessageSquare className="w-3 h-3" />
                             ) : (
@@ -442,14 +457,14 @@ export default function MessageHistory({ language = 'no' }) {
 
                         {/* Status */}
                         <div className="col-span-4 md:col-span-2">
-                          <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded bg-${statusInfo.color}-100 text-${statusInfo.color}-700`}>
+                          <span
+                            className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded bg-${statusInfo.color}-100 text-${statusInfo.color}-700`}
+                          >
                             <StatusIcon className="w-3 h-3" />
                             {statusInfo.label[language]}
                           </span>
                           {message.is_automated && (
-                            <span className="ml-1 text-xs text-gray-400">
-                              ({t.automated})
-                            </span>
+                            <span className="ml-1 text-xs text-gray-400">({t.automated})</span>
                           )}
                         </div>
 
@@ -458,7 +473,9 @@ export default function MessageHistory({ language = 'no' }) {
                           <span className="text-sm text-gray-500">
                             {formatTime(message.sent_at)}
                           </span>
-                          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                          <ChevronDown
+                            className={`w-4 h-4 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                          />
                         </div>
                       </div>
                     </div>
@@ -470,34 +487,50 @@ export default function MessageHistory({ language = 'no' }) {
                           {/* Left Column */}
                           <div className="space-y-3">
                             <div>
-                              <span className="text-xs font-medium text-gray-500 uppercase">{t.sentAt}</span>
-                              <p className="text-sm text-gray-900">{formatFullDateTime(message.sent_at)}</p>
+                              <span className="text-xs font-medium text-gray-500 uppercase">
+                                {t.sentAt}
+                              </span>
+                              <p className="text-sm text-gray-900">
+                                {formatFullDateTime(message.sent_at)}
+                              </p>
                             </div>
 
                             {message.sent_by_name && (
                               <div>
-                                <span className="text-xs font-medium text-gray-500 uppercase">{t.sentBy}</span>
+                                <span className="text-xs font-medium text-gray-500 uppercase">
+                                  {t.sentBy}
+                                </span>
                                 <p className="text-sm text-gray-900">{message.sent_by_name}</p>
                               </div>
                             )}
 
                             {message.delivered_at && (
                               <div>
-                                <span className="text-xs font-medium text-gray-500 uppercase">{t.deliveredAt}</span>
-                                <p className="text-sm text-gray-900">{formatFullDateTime(message.delivered_at)}</p>
+                                <span className="text-xs font-medium text-gray-500 uppercase">
+                                  {t.deliveredAt}
+                                </span>
+                                <p className="text-sm text-gray-900">
+                                  {formatFullDateTime(message.delivered_at)}
+                                </p>
                               </div>
                             )}
 
                             {message.opened_at && (
                               <div>
-                                <span className="text-xs font-medium text-gray-500 uppercase">{t.openedAt}</span>
-                                <p className="text-sm text-gray-900">{formatFullDateTime(message.opened_at)}</p>
+                                <span className="text-xs font-medium text-gray-500 uppercase">
+                                  {t.openedAt}
+                                </span>
+                                <p className="text-sm text-gray-900">
+                                  {formatFullDateTime(message.opened_at)}
+                                </p>
                               </div>
                             )}
 
                             {message.failure_reason && (
                               <div>
-                                <span className="text-xs font-medium text-red-500 uppercase">{t.failureReason}</span>
+                                <span className="text-xs font-medium text-red-500 uppercase">
+                                  {t.failureReason}
+                                </span>
                                 <p className="text-sm text-red-600">{message.failure_reason}</p>
                               </div>
                             )}
@@ -507,12 +540,18 @@ export default function MessageHistory({ language = 'no' }) {
                           <div>
                             {message.subject && (
                               <div className="mb-2">
-                                <span className="text-xs font-medium text-gray-500 uppercase">{t.subject}</span>
-                                <p className="text-sm font-medium text-gray-900">{message.subject}</p>
+                                <span className="text-xs font-medium text-gray-500 uppercase">
+                                  {t.subject}
+                                </span>
+                                <p className="text-sm font-medium text-gray-900">
+                                  {message.subject}
+                                </p>
                               </div>
                             )}
                             <div>
-                              <span className="text-xs font-medium text-gray-500 uppercase">{t.message}</span>
+                              <span className="text-xs font-medium text-gray-500 uppercase">
+                                {t.message}
+                              </span>
                               <div className="mt-1 p-3 bg-white rounded-lg border border-gray-200">
                                 <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans">
                                   {message.content}
@@ -531,7 +570,9 @@ export default function MessageHistory({ language = 'no' }) {
             {/* Pagination */}
             <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
               <div className="text-sm text-gray-500">
-                {t.showing} {((page - 1) * pagination.limit) + 1}-{Math.min(page * pagination.limit, pagination.total)} {t.of} {pagination.total} {t.messages}
+                {t.showing} {(page - 1) * pagination.limit + 1}-
+                {Math.min(page * pagination.limit, pagination.total)} {t.of} {pagination.total}{' '}
+                {t.messages}
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -570,25 +611,28 @@ export default function MessageHistory({ language = 'no' }) {
             {
               label: language === 'no' ? 'Totalt sendt' : 'Total Sent',
               value: pagination.total,
-              color: 'blue'
+              color: 'blue',
             },
             {
               label: language === 'no' ? 'Levert' : 'Delivered',
-              value: messages.filter(m => m.status === 'DELIVERED' || m.status === 'SENT').length,
-              color: 'green'
+              value: messages.filter((m) => m.status === 'DELIVERED' || m.status === 'SENT').length,
+              color: 'green',
             },
             {
               label: language === 'no' ? 'Apnet' : 'Opened',
-              value: messages.filter(m => m.opened_at).length,
-              color: 'purple'
+              value: messages.filter((m) => m.opened_at).length,
+              color: 'purple',
             },
             {
               label: language === 'no' ? 'Feilet' : 'Failed',
-              value: messages.filter(m => m.status === 'FAILED').length,
-              color: 'red'
-            }
+              value: messages.filter((m) => m.status === 'FAILED').length,
+              color: 'red',
+            },
           ].map((stat, index) => (
-            <div key={index} className={`bg-${stat.color}-50 rounded-lg p-4 border border-${stat.color}-100`}>
+            <div
+              key={index}
+              className={`bg-${stat.color}-50 rounded-lg p-4 border border-${stat.color}-100`}
+            >
               <div className={`text-2xl font-bold text-${stat.color}-700`}>{stat.value}</div>
               <div className={`text-sm text-${stat.color}-600`}>{stat.label}</div>
             </div>

@@ -3,7 +3,7 @@
  * Visual form creation tool for clinical forms and templates
  */
 
-import React, { useState, useCallback } from 'react'
+import _React, { useState, useCallback } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -11,24 +11,24 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  DragOverlay
-} from '@dnd-kit/core'
+  _DragOverlay,
+} from '@dnd-kit/core';
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
-  useSortable
-} from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import {
   GripVertical,
   Plus,
   Trash2,
   Copy,
-  Settings,
+  _Settings,
   ChevronDown,
-  ChevronUp,
+  _ChevronUp,
   Type,
   AlignLeft,
   CheckSquare,
@@ -43,8 +43,8 @@ import {
   Save,
   Eye,
   X,
-  Edit2
-} from 'lucide-react'
+  _Edit2,
+} from 'lucide-react';
 
 // Available field types
 const FIELD_TYPES = [
@@ -58,8 +58,8 @@ const FIELD_TYPES = [
   { type: 'rating', label: 'Vurdering', icon: Star, description: 'Stjerne-skala' },
   { type: 'vas', label: 'VAS-skala', icon: Minus, description: 'Smerteskala 0-10' },
   { type: 'section', label: 'Seksjonsdeler', icon: FileText, description: 'Gruppér felt' },
-  { type: 'image', label: 'Bilde', icon: Image, description: 'Last opp bilde' }
-]
+  { type: 'image', label: 'Bilde', icon: Image, description: 'Last opp bilde' },
+];
 
 // Default field properties
 const getDefaultFieldProps = (type) => ({
@@ -69,19 +69,20 @@ const getDefaultFieldProps = (type) => ({
   placeholder: '',
   required: false,
   helpText: '',
-  options: type === 'radio' || type === 'select' || type === 'checkbox'
-    ? [{ id: '1', value: 'Alternativ 1' }]
-    : [],
+  options:
+    type === 'radio' || type === 'select' || type === 'checkbox'
+      ? [{ id: '1', value: 'Alternativ 1' }]
+      : [],
   validation: {},
   width: 'full', // full, half, third
   min: type === 'number' || type === 'vas' ? 0 : undefined,
   max: type === 'number' ? undefined : type === 'vas' ? 10 : undefined,
-  defaultValue: ''
-})
+  defaultValue: '',
+});
 
 // Field Type Selector
 const FieldTypeSelector = ({ onSelect }) => {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div className="relative">
@@ -98,14 +99,14 @@ const FieldTypeSelector = ({ onSelect }) => {
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
           <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-20 py-2 max-h-80 overflow-y-auto">
-            {FIELD_TYPES.map(fieldType => {
-              const Icon = fieldType.icon
+            {FIELD_TYPES.map((fieldType) => {
+              const Icon = fieldType.icon;
               return (
                 <button
                   key={fieldType.type}
                   onClick={() => {
-                    onSelect(fieldType.type)
-                    setIsOpen(false)
+                    onSelect(fieldType.type);
+                    setIsOpen(false);
                   }}
                   className="flex items-center gap-3 w-full px-4 py-2 hover:bg-gray-50 text-left"
                 >
@@ -115,41 +116,29 @@ const FieldTypeSelector = ({ onSelect }) => {
                     <div className="text-xs text-gray-500">{fieldType.description}</div>
                   </div>
                 </button>
-              )
+              );
             })}
           </div>
         </>
       )}
     </div>
-  )
-}
+  );
+};
 
 // Sortable Field Item
-const SortableFieldItem = ({
-  field,
-  onUpdate,
-  onDelete,
-  onDuplicate,
-  isSelected,
-  onSelect
-}) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging
-  } = useSortable({ id: field.id })
+const SortableFieldItem = ({ field, _onUpdate, onDelete, onDuplicate, isSelected, onSelect }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: field.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1
-  }
+    opacity: isDragging ? 0.5 : 1,
+  };
 
-  const fieldTypeInfo = FIELD_TYPES.find(t => t.type === field.type)
-  const Icon = fieldTypeInfo?.icon || Type
+  const fieldTypeInfo = FIELD_TYPES.find((t) => t.type === field.type);
+  const Icon = fieldTypeInfo?.icon || Type;
 
   return (
     <div
@@ -181,9 +170,7 @@ const SortableFieldItem = ({
           <span className="text-sm font-medium text-gray-700">
             {field.label || fieldTypeInfo?.label || 'Uten tittel'}
           </span>
-          {field.required && (
-            <span className="text-red-500 text-xs">*</span>
-          )}
+          {field.required && <span className="text-red-500 text-xs">*</span>}
         </div>
 
         {/* Field Preview */}
@@ -203,22 +190,24 @@ const SortableFieldItem = ({
               disabled
             />
           )}
-          {field.type === 'checkbox' && field.options?.map(opt => (
-            <label key={opt.id} className="flex items-center gap-2 text-sm text-gray-600">
-              <input type="checkbox" disabled />
-              {opt.value}
-            </label>
-          ))}
-          {field.type === 'radio' && field.options?.map(opt => (
-            <label key={opt.id} className="flex items-center gap-2 text-sm text-gray-600">
-              <input type="radio" name={field.id} disabled />
-              {opt.value}
-            </label>
-          ))}
+          {field.type === 'checkbox' &&
+            field.options?.map((opt) => (
+              <label key={opt.id} className="flex items-center gap-2 text-sm text-gray-600">
+                <input type="checkbox" disabled />
+                {opt.value}
+              </label>
+            ))}
+          {field.type === 'radio' &&
+            field.options?.map((opt) => (
+              <label key={opt.id} className="flex items-center gap-2 text-sm text-gray-600">
+                <input type="radio" name={field.id} disabled />
+                {opt.value}
+              </label>
+            ))}
           {field.type === 'select' && (
             <select className="w-full px-3 py-2 border border-gray-200 rounded bg-gray-50" disabled>
               <option>Velg...</option>
-              {field.options?.map(opt => (
+              {field.options?.map((opt) => (
                 <option key={opt.id}>{opt.value}</option>
               ))}
             </select>
@@ -240,7 +229,7 @@ const SortableFieldItem = ({
           )}
           {field.type === 'rating' && (
             <div className="flex gap-1">
-              {[1, 2, 3, 4, 5].map(n => (
+              {[1, 2, 3, 4, 5].map((n) => (
                 <Star key={n} className="w-6 h-6 text-gray-300" />
               ))}
             </div>
@@ -248,13 +237,7 @@ const SortableFieldItem = ({
           {field.type === 'vas' && (
             <div className="flex items-center gap-2">
               <span className="text-xs text-gray-500">0</span>
-              <input
-                type="range"
-                min="0"
-                max="10"
-                className="flex-1"
-                disabled
-              />
+              <input type="range" min="0" max="10" className="flex-1" disabled />
               <span className="text-xs text-gray-500">10</span>
             </div>
           )}
@@ -266,23 +249,27 @@ const SortableFieldItem = ({
         </div>
 
         {/* Help Text */}
-        {field.helpText && (
-          <p className="text-xs text-gray-500">{field.helpText}</p>
-        )}
+        {field.helpText && <p className="text-xs text-gray-500">{field.helpText}</p>}
       </div>
 
       {/* Actions */}
       {isSelected && (
         <div className="absolute right-2 top-2 flex gap-1">
           <button
-            onClick={(e) => { e.stopPropagation(); onDuplicate(field.id); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDuplicate(field.id);
+            }}
             className="p-1.5 hover:bg-gray-100 rounded"
             title="Dupliser"
           >
             <Copy className="w-4 h-4 text-gray-500" />
           </button>
           <button
-            onClick={(e) => { e.stopPropagation(); onDelete(field.id); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(field.id);
+            }}
             className="p-1.5 hover:bg-red-100 rounded"
             title="Slett"
           >
@@ -291,43 +278,46 @@ const SortableFieldItem = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
 // Field Properties Editor
 const FieldPropertiesEditor = ({ field, onUpdate, onClose }) => {
-  const [localField, setLocalField] = useState(field)
+  const [localField, setLocalField] = useState(field);
 
   const handleChange = (key, value) => {
-    setLocalField(prev => ({ ...prev, [key]: value }))
-  }
+    setLocalField((prev) => ({ ...prev, [key]: value }));
+  };
 
   const handleSave = () => {
-    onUpdate(field.id, localField)
-    onClose()
-  }
+    onUpdate(field.id, localField);
+    onClose();
+  };
 
   const addOption = () => {
-    const newOption = { id: Date.now().toString(), value: `Alternativ ${(localField.options?.length || 0) + 1}` }
-    setLocalField(prev => ({
+    const newOption = {
+      id: Date.now().toString(),
+      value: `Alternativ ${(localField.options?.length || 0) + 1}`,
+    };
+    setLocalField((prev) => ({
       ...prev,
-      options: [...(prev.options || []), newOption]
-    }))
-  }
+      options: [...(prev.options || []), newOption],
+    }));
+  };
 
   const updateOption = (id, value) => {
-    setLocalField(prev => ({
+    setLocalField((prev) => ({
       ...prev,
-      options: prev.options.map(opt => opt.id === id ? { ...opt, value } : opt)
-    }))
-  }
+      options: prev.options.map((opt) => (opt.id === id ? { ...opt, value } : opt)),
+    }));
+  };
 
   const removeOption = (id) => {
-    setLocalField(prev => ({
+    setLocalField((prev) => ({
       ...prev,
-      options: prev.options.filter(opt => opt.id !== id)
-    }))
-  }
+      options: prev.options.filter((opt) => opt.id !== id),
+    }));
+  };
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4">
@@ -341,9 +331,7 @@ const FieldPropertiesEditor = ({ field, onUpdate, onClose }) => {
       <div className="space-y-4">
         {/* Label */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Etikett
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Etikett</label>
           <input
             type="text"
             value={localField.label}
@@ -356,9 +344,7 @@ const FieldPropertiesEditor = ({ field, onUpdate, onClose }) => {
         {/* Placeholder */}
         {['text', 'textarea', 'number'].includes(localField.type) && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Plassholder
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Plassholder</label>
             <input
               type="text"
               value={localField.placeholder}
@@ -371,9 +357,7 @@ const FieldPropertiesEditor = ({ field, onUpdate, onClose }) => {
 
         {/* Help Text */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Hjelpetekst
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Hjelpetekst</label>
           <input
             type="text"
             value={localField.helpText}
@@ -386,11 +370,9 @@ const FieldPropertiesEditor = ({ field, onUpdate, onClose }) => {
         {/* Options (for select, radio, checkbox) */}
         {['select', 'radio', 'checkbox'].includes(localField.type) && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Alternativer
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Alternativer</label>
             <div className="space-y-2">
-              {localField.options?.map(opt => (
+              {localField.options?.map((opt) => (
                 <div key={opt.id} className="flex gap-2">
                   <input
                     type="text"
@@ -422,24 +404,24 @@ const FieldPropertiesEditor = ({ field, onUpdate, onClose }) => {
         {localField.type === 'number' && (
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Minimum
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Minimum</label>
               <input
                 type="number"
                 value={localField.min ?? ''}
-                onChange={(e) => handleChange('min', e.target.value ? Number(e.target.value) : undefined)}
+                onChange={(e) =>
+                  handleChange('min', e.target.value ? Number(e.target.value) : undefined)
+                }
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Maksimum
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Maksimum</label>
               <input
                 type="number"
                 value={localField.max ?? ''}
-                onChange={(e) => handleChange('max', e.target.value ? Number(e.target.value) : undefined)}
+                onChange={(e) =>
+                  handleChange('max', e.target.value ? Number(e.target.value) : undefined)
+                }
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -462,11 +444,9 @@ const FieldPropertiesEditor = ({ field, onUpdate, onClose }) => {
 
         {/* Width */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Bredde
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Bredde</label>
           <div className="flex gap-2">
-            {['full', 'half', 'third'].map(width => (
+            {['full', 'half', 'third'].map((width) => (
               <button
                 key={width}
                 onClick={() => handleChange('width', width)}
@@ -491,111 +471,134 @@ const FieldPropertiesEditor = ({ field, onUpdate, onClose }) => {
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
 // Main Component
 const DragDropFormBuilder = ({
   initialFields = [],
   onChange,
   onSave,
-  formName = 'Nytt skjema'
+  formName = 'Nytt skjema',
 }) => {
-  const [fields, setFields] = useState(initialFields)
-  const [selectedFieldId, setSelectedFieldId] = useState(null)
-  const [showPreview, setShowPreview] = useState(false)
-  const [localFormName, setLocalFormName] = useState(formName)
+  const [fields, setFields] = useState(initialFields);
+  const [selectedFieldId, setSelectedFieldId] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
+  const [localFormName, setLocalFormName] = useState(formName);
 
   // DnD sensors
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: { distance: 8 }
+      activationConstraint: { distance: 8 },
     }),
     useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates
+      coordinateGetter: sortableKeyboardCoordinates,
     })
-  )
+  );
 
   // Handle drag end
-  const handleDragEnd = useCallback((event) => {
-    const { active, over } = event
+  const handleDragEnd = useCallback(
+    (event) => {
+      const { active, over } = event;
 
-    if (active.id !== over?.id) {
-      setFields(items => {
-        const oldIndex = items.findIndex(i => i.id === active.id)
-        const newIndex = items.findIndex(i => i.id === over.id)
-        const newFields = arrayMove(items, oldIndex, newIndex)
+      if (active.id !== over?.id) {
+        setFields((items) => {
+          const oldIndex = items.findIndex((i) => i.id === active.id);
+          const newIndex = items.findIndex((i) => i.id === over.id);
+          const newFields = arrayMove(items, oldIndex, newIndex);
 
-        if (onChange) {
-          onChange(newFields)
-        }
+          if (onChange) {
+            onChange(newFields);
+          }
 
-        return newFields
-      })
-    }
-  }, [onChange])
+          return newFields;
+        });
+      }
+    },
+    [onChange]
+  );
 
   // Add new field
-  const addField = useCallback((type) => {
-    const newField = getDefaultFieldProps(type)
-    setFields(prev => {
-      const newFields = [...prev, newField]
-      if (onChange) onChange(newFields)
-      return newFields
-    })
-    setSelectedFieldId(newField.id)
-  }, [onChange])
+  const addField = useCallback(
+    (type) => {
+      const newField = getDefaultFieldProps(type);
+      setFields((prev) => {
+        const newFields = [...prev, newField];
+        if (onChange) {
+          onChange(newFields);
+        }
+        return newFields;
+      });
+      setSelectedFieldId(newField.id);
+    },
+    [onChange]
+  );
 
   // Update field
-  const updateField = useCallback((fieldId, updates) => {
-    setFields(prev => {
-      const newFields = prev.map(f => f.id === fieldId ? { ...f, ...updates } : f)
-      if (onChange) onChange(newFields)
-      return newFields
-    })
-  }, [onChange])
+  const updateField = useCallback(
+    (fieldId, updates) => {
+      setFields((prev) => {
+        const newFields = prev.map((f) => (f.id === fieldId ? { ...f, ...updates } : f));
+        if (onChange) {
+          onChange(newFields);
+        }
+        return newFields;
+      });
+    },
+    [onChange]
+  );
 
   // Delete field
-  const deleteField = useCallback((fieldId) => {
-    setFields(prev => {
-      const newFields = prev.filter(f => f.id !== fieldId)
-      if (onChange) onChange(newFields)
-      return newFields
-    })
-    if (selectedFieldId === fieldId) {
-      setSelectedFieldId(null)
-    }
-  }, [onChange, selectedFieldId])
+  const deleteField = useCallback(
+    (fieldId) => {
+      setFields((prev) => {
+        const newFields = prev.filter((f) => f.id !== fieldId);
+        if (onChange) {
+          onChange(newFields);
+        }
+        return newFields;
+      });
+      if (selectedFieldId === fieldId) {
+        setSelectedFieldId(null);
+      }
+    },
+    [onChange, selectedFieldId]
+  );
 
   // Duplicate field
-  const duplicateField = useCallback((fieldId) => {
-    const fieldToDuplicate = fields.find(f => f.id === fieldId)
-    if (fieldToDuplicate) {
-      const newField = {
-        ...fieldToDuplicate,
-        id: `field_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        label: `${fieldToDuplicate.label} (kopi)`
+  const duplicateField = useCallback(
+    (fieldId) => {
+      const fieldToDuplicate = fields.find((f) => f.id === fieldId);
+      if (fieldToDuplicate) {
+        const newField = {
+          ...fieldToDuplicate,
+          id: `field_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          label: `${fieldToDuplicate.label} (kopi)`,
+        };
+        setFields((prev) => {
+          const index = prev.findIndex((f) => f.id === fieldId);
+          const newFields = [...prev.slice(0, index + 1), newField, ...prev.slice(index + 1)];
+          if (onChange) {
+            onChange(newFields);
+          }
+          return newFields;
+        });
       }
-      setFields(prev => {
-        const index = prev.findIndex(f => f.id === fieldId)
-        const newFields = [...prev.slice(0, index + 1), newField, ...prev.slice(index + 1)]
-        if (onChange) onChange(newFields)
-        return newFields
-      })
-    }
-  }, [fields, onChange])
+    },
+    [fields, onChange]
+  );
 
   // Handle save
   const handleSave = () => {
     if (onSave) {
       onSave({
         name: localFormName,
-        fields
-      })
+        fields,
+      });
     }
-  }
+  };
 
-  const selectedField = fields.find(f => f.id === selectedFieldId)
+  const selectedField = fields.find((f) => f.id === selectedFieldId);
 
   return (
     <div className="h-full flex flex-col bg-gray-50">
@@ -616,9 +619,7 @@ const DragDropFormBuilder = ({
             <button
               onClick={() => setShowPreview(!showPreview)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                showPreview
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'hover:bg-gray-100 text-gray-600'
+                showPreview ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100 text-gray-600'
               }`}
             >
               <Eye className="w-4 h-4" />
@@ -644,36 +645,60 @@ const DragDropFormBuilder = ({
             <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-6">{localFormName}</h2>
               <div className="space-y-4">
-                {fields.map(field => (
-                  <div key={field.id} className={`${
-                    field.width === 'half' ? 'w-1/2' : field.width === 'third' ? 'w-1/3' : 'w-full'
-                  }`}>
+                {fields.map((field) => (
+                  <div
+                    key={field.id}
+                    className={`${
+                      field.width === 'half'
+                        ? 'w-1/2'
+                        : field.width === 'third'
+                          ? 'w-1/3'
+                          : 'w-full'
+                    }`}
+                  >
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       {field.label}
                       {field.required && <span className="text-red-500 ml-1">*</span>}
                     </label>
                     {/* Render field based on type */}
                     {field.type === 'text' && (
-                      <input type="text" className="w-full px-3 py-2 border border-gray-200 rounded-lg" placeholder={field.placeholder} />
+                      <input
+                        type="text"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                        placeholder={field.placeholder}
+                      />
                     )}
                     {field.type === 'textarea' && (
-                      <textarea className="w-full px-3 py-2 border border-gray-200 rounded-lg h-24" placeholder={field.placeholder} />
+                      <textarea
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg h-24"
+                        placeholder={field.placeholder}
+                      />
                     )}
                     {field.type === 'number' && (
-                      <input type="number" className="w-full px-3 py-2 border border-gray-200 rounded-lg" min={field.min} max={field.max} />
+                      <input
+                        type="number"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                        min={field.min}
+                        max={field.max}
+                      />
                     )}
                     {field.type === 'date' && (
-                      <input type="date" className="w-full px-3 py-2 border border-gray-200 rounded-lg" />
+                      <input
+                        type="date"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                      />
                     )}
                     {field.type === 'select' && (
                       <select className="w-full px-3 py-2 border border-gray-200 rounded-lg">
                         <option value="">Velg...</option>
-                        {field.options?.map(opt => <option key={opt.id}>{opt.value}</option>)}
+                        {field.options?.map((opt) => (
+                          <option key={opt.id}>{opt.value}</option>
+                        ))}
                       </select>
                     )}
                     {field.type === 'radio' && (
                       <div className="space-y-1">
-                        {field.options?.map(opt => (
+                        {field.options?.map((opt) => (
                           <label key={opt.id} className="flex items-center gap-2">
                             <input type="radio" name={field.id} />
                             <span className="text-sm">{opt.value}</span>
@@ -683,7 +708,7 @@ const DragDropFormBuilder = ({
                     )}
                     {field.type === 'checkbox' && (
                       <div className="space-y-1">
-                        {field.options?.map(opt => (
+                        {field.options?.map((opt) => (
                           <label key={opt.id} className="flex items-center gap-2">
                             <input type="checkbox" />
                             <span className="text-sm">{opt.value}</span>
@@ -700,7 +725,7 @@ const DragDropFormBuilder = ({
                     )}
                     {field.type === 'rating' && (
                       <div className="flex gap-1">
-                        {[1,2,3,4,5].map(n => (
+                        {[1, 2, 3, 4, 5].map((n) => (
                           <button key={n} className="p-1 hover:text-yellow-500">
                             <Star className="w-6 h-6" />
                           </button>
@@ -729,7 +754,9 @@ const DragDropFormBuilder = ({
                 <div className="text-center py-16 bg-white rounded-lg border-2 border-dashed border-gray-300">
                   <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                   <p className="text-gray-500">Ingen felt ennå</p>
-                  <p className="text-sm text-gray-400 mb-4">Klikk "Legg til felt" for å komme i gang</p>
+                  <p className="text-sm text-gray-400 mb-4">
+                    Klikk "Legg til felt" for å komme i gang
+                  </p>
                   <FieldTypeSelector onSelect={addField} />
                 </div>
               ) : (
@@ -739,10 +766,10 @@ const DragDropFormBuilder = ({
                   onDragEnd={handleDragEnd}
                 >
                   <SortableContext
-                    items={fields.map(f => f.id)}
+                    items={fields.map((f) => f.id)}
                     strategy={verticalListSortingStrategy}
                   >
-                    {fields.map(field => (
+                    {fields.map((field) => (
                       <SortableFieldItem
                         key={field.id}
                         field={field}
@@ -772,7 +799,7 @@ const DragDropFormBuilder = ({
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default DragDropFormBuilder
+export default DragDropFormBuilder;

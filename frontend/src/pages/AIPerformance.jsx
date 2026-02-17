@@ -9,7 +9,7 @@
  * - Export feedback button
  */
 
-import React, { useState, useMemo } from 'react';
+import _React, { useState, useMemo } from 'react';
 import {
   TrendingUp,
   TrendingDown,
@@ -21,7 +21,7 @@ import {
   CheckCircle,
   XCircle,
   Edit3,
-  AlertTriangle,
+  _AlertTriangle,
   BarChart3,
   LineChart,
   Clock,
@@ -140,7 +140,7 @@ const TEXTS = {
       modified: 'Modified',
       rejected: 'Rejected',
     },
-  }
+  },
 };
 
 /**
@@ -155,22 +155,24 @@ const AcceptanceLineChart = ({ data = [], color = '#14b8a6' }) => {
     );
   }
 
-  const maxValue = Math.max(...data.map(d => d.acceptanceRate || 0), 100);
-  const minValue = Math.min(...data.map(d => d.acceptanceRate || 0), 0);
+  const maxValue = Math.max(...data.map((d) => d.acceptanceRate || 0), 100);
+  const minValue = Math.min(...data.map((d) => d.acceptanceRate || 0), 0);
 
-  const chartData = data.map(item => ({
+  const chartData = data.map((item) => ({
     ...item,
-    percentage: ((item.acceptanceRate - minValue) / (maxValue - minValue)) * 100 || 0
+    percentage: ((item.acceptanceRate - minValue) / (maxValue - minValue)) * 100 || 0,
   }));
 
   // SVG line chart
   const svgWidth = 100;
   const svgHeight = 100;
-  const points = chartData.map((item, index) => {
-    const x = chartData.length === 1 ? svgWidth / 2 : (index / (chartData.length - 1)) * svgWidth;
-    const y = svgHeight - item.percentage;
-    return `${x},${y}`;
-  }).join(' ');
+  const points = chartData
+    .map((item, index) => {
+      const x = chartData.length === 1 ? svgWidth / 2 : (index / (chartData.length - 1)) * svgWidth;
+      const y = svgHeight - item.percentage;
+      return `${x},${y}`;
+    })
+    .join(' ');
 
   return (
     <div className="space-y-4">
@@ -181,16 +183,8 @@ const AcceptanceLineChart = ({ data = [], color = '#14b8a6' }) => {
           preserveAspectRatio="none"
         >
           {/* Grid lines */}
-          {[0, 25, 50, 75, 100].map(y => (
-            <line
-              key={y}
-              x1="0"
-              y1={y}
-              x2={svgWidth}
-              y2={y}
-              stroke="#e2e8f0"
-              strokeWidth="0.5"
-            />
+          {[0, 25, 50, 75, 100].map((y) => (
+            <line key={y} x1="0" y1={y} x2={svgWidth} y2={y} stroke="#e2e8f0" strokeWidth="0.5" />
           ))}
 
           {/* Area under line */}
@@ -212,7 +206,8 @@ const AcceptanceLineChart = ({ data = [], color = '#14b8a6' }) => {
 
           {/* Data points */}
           {chartData.map((item, index) => {
-            const x = chartData.length === 1 ? svgWidth / 2 : (index / (chartData.length - 1)) * svgWidth;
+            const x =
+              chartData.length === 1 ? svgWidth / 2 : (index / (chartData.length - 1)) * svgWidth;
             const y = svgHeight - item.percentage;
             return (
               <g key={index}>
@@ -272,7 +267,7 @@ const TypeBarChart = ({ data = [], language = 'NO' }) => {
     );
   }
 
-  const maxValue = Math.max(...data.map(d => d.total || 0));
+  const maxValue = Math.max(...data.map((d) => d.total || 0));
 
   const colors = {
     subjective: '#3b82f6',
@@ -287,7 +282,7 @@ const TypeBarChart = ({ data = [], language = 'NO' }) => {
   return (
     <div className="space-y-3">
       {data.map((item, index) => {
-        const percentage = maxValue > 0 ? (item.total / maxValue) * 100 : 0;
+        const _percentage = maxValue > 0 ? (item.total / maxValue) * 100 : 0;
         const acceptedPercentage = item.total > 0 ? (item.accepted / item.total) * 100 : 0;
         const color = colors[item.type?.toLowerCase()] || '#6b7280';
         const typeLabel = t.types[item.type?.toLowerCase()] || item.type;
@@ -430,9 +425,7 @@ const RetrainingStatusCard = ({ status, language = 'NO' }) => {
             </div>
             <div>
               <p className="text-xs text-slate-500">{t.retraining.threshold}</p>
-              <p className="text-lg font-bold text-slate-900">
-                {status?.threshold || 50}
-              </p>
+              <p className="text-lg font-bold text-slate-900">{status?.threshold || 50}</p>
             </div>
             {status?.lastTrainedAt && (
               <div className="col-span-2">
@@ -451,13 +444,19 @@ const RetrainingStatusCard = ({ status, language = 'NO' }) => {
             <div className="pt-2">
               <div className="flex justify-between text-xs text-slate-500 mb-1">
                 <span>Progress to retraining</span>
-                <span>{Math.min(100, Math.round((status.pendingFeedbackCount / status.threshold) * 100))}%</span>
+                <span>
+                  {Math.min(
+                    100,
+                    Math.round((status.pendingFeedbackCount / status.threshold) * 100)
+                  )}
+                  %
+                </span>
               </div>
               <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-teal-500 transition-all duration-500"
                   style={{
-                    width: `${Math.min(100, (status.pendingFeedbackCount / status.threshold) * 100)}%`
+                    width: `${Math.min(100, (status.pendingFeedbackCount / status.threshold) * 100)}%`,
                   }}
                 />
               </div>
@@ -489,10 +488,12 @@ const RecentCorrectionsTable = ({ corrections = [], language = 'NO' }) => {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString(
-      language === 'NO' ? 'nb-NO' : 'en-US',
-      { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }
-    );
+    return new Date(dateString).toLocaleDateString(language === 'NO' ? 'nb-NO' : 'en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   };
 
   if (corrections.length === 0) {
@@ -527,15 +528,20 @@ const RecentCorrectionsTable = ({ corrections = [], language = 'NO' }) => {
                 <div className="flex items-center gap-2">
                   {getActionIcon(correction.correctionType)}
                   <span className="text-sm text-slate-700">
-                    {t.actions[correction.correctionType === 'accepted_as_is' ? 'accepted' :
-                      correction.correctionType] || correction.correctionType}
+                    {t.actions[
+                      correction.correctionType === 'accepted_as_is'
+                        ? 'accepted'
+                        : correction.correctionType
+                    ] || correction.correctionType}
                   </span>
                 </div>
               </td>
               <td className="px-4 py-3">
                 <div className="flex items-center gap-1">
                   <Star size={14} className="fill-yellow-400 text-yellow-400" />
-                  <span className="text-sm font-medium text-slate-700">{correction.userRating}</span>
+                  <span className="text-sm font-medium text-slate-700">
+                    {correction.userRating}
+                  </span>
                 </div>
               </td>
               <td className="px-4 py-3 text-sm text-slate-600">
@@ -579,10 +585,11 @@ export default function AIPerformance() {
     refetch: refetchMetrics,
   } = useAIPerformanceMetrics({ groupBy, startDate, endDate });
 
-  const {
-    data: feedbackData,
-    isLoading: feedbackLoading,
-  } = useMyAIFeedback({ limit: 10, startDate, endDate });
+  const { data: feedbackData, isLoading: feedbackLoading } = useMyAIFeedback({
+    limit: 10,
+    startDate,
+    endDate,
+  });
 
   const {
     data: statsData,
@@ -590,19 +597,18 @@ export default function AIPerformance() {
     refetch: refetchStats,
   } = useMyAIFeedbackStats();
 
-  const {
-    data: retrainingStatus,
-    isLoading: retrainingLoading,
-  } = useAIRetrainingStatus();
+  const { data: retrainingStatus, isLoading: _retrainingLoading } = useAIRetrainingStatus();
 
   const exportMutation = useExportAIFeedback();
 
   // Process metrics for charts
   const acceptanceOverTime = useMemo(() => {
-    if (!metricsData?.metrics) return [];
+    if (!metricsData?.metrics) {
+      return [];
+    }
     // Group by period and calculate acceptance rate
     const grouped = {};
-    metricsData.metrics.forEach(item => {
+    metricsData.metrics.forEach((item) => {
       if (!grouped[item.period]) {
         grouped[item.period] = { total: 0, accepted: 0 };
       }
@@ -610,17 +616,21 @@ export default function AIPerformance() {
       grouped[item.period].accepted += (item.accepted_as_is || 0) + (item.modified || 0);
     });
 
-    return Object.entries(grouped).map(([period, data]) => ({
-      period,
-      acceptanceRate: data.total > 0 ? (data.accepted / data.total) * 100 : 0,
-    })).sort((a, b) => new Date(a.period) - new Date(b.period));
+    return Object.entries(grouped)
+      .map(([period, data]) => ({
+        period,
+        acceptanceRate: data.total > 0 ? (data.accepted / data.total) * 100 : 0,
+      }))
+      .sort((a, b) => new Date(a.period) - new Date(b.period));
   }, [metricsData]);
 
   const byTypeData = useMemo(() => {
-    if (!metricsData?.metrics) return [];
+    if (!metricsData?.metrics) {
+      return [];
+    }
     // Group by suggestion type
     const grouped = {};
-    metricsData.metrics.forEach(item => {
+    metricsData.metrics.forEach((item) => {
       const type = item.suggestion_type || 'unknown';
       if (!grouped[type]) {
         grouped[type] = { type, total: 0, accepted: 0, modified: 0, rejected: 0 };
@@ -747,7 +757,9 @@ export default function AIPerformance() {
                   ) : (
                     <TrendingDown size={14} className="text-red-600" />
                   )}
-                  <span className={`text-xs ${overallStats.acceptanceRate >= 70 ? 'text-green-600' : 'text-red-600'}`}>
+                  <span
+                    className={`text-xs ${overallStats.acceptanceRate >= 70 ? 'text-green-600' : 'text-red-600'}`}
+                  >
                     {overallStats.acceptanceRate >= 70 ? 'Good' : 'Needs improvement'}
                   </span>
                 </div>
@@ -774,9 +786,11 @@ export default function AIPerformance() {
                     <Star
                       key={star}
                       size={12}
-                      className={star <= Math.round(overallStats.avgRating || 0)
-                        ? 'fill-yellow-400 text-yellow-400'
-                        : 'text-slate-300'}
+                      className={
+                        star <= Math.round(overallStats.avgRating || 0)
+                          ? 'fill-yellow-400 text-yellow-400'
+                          : 'text-slate-300'
+                      }
                     />
                   ))}
                 </div>
@@ -797,9 +811,7 @@ export default function AIPerformance() {
                 <p className="text-3xl font-bold text-slate-900 mt-2">
                   {overallStats.totalFeedback || 0}
                 </p>
-                <p className="text-xs text-slate-500 mt-1">
-                  In selected period
-                </p>
+                <p className="text-xs text-slate-500 mt-1">In selected period</p>
               </div>
               <div className="p-3 bg-blue-100 rounded-lg">
                 <Brain size={24} className="text-blue-600" />
@@ -819,9 +831,7 @@ export default function AIPerformance() {
                     ? `${Math.round(overallStats.avgDecisionTime / 1000)}s`
                     : '0s'}
                 </p>
-                <p className="text-xs text-slate-500 mt-1">
-                  Per suggestion
-                </p>
+                <p className="text-xs text-slate-500 mt-1">Per suggestion</p>
               </div>
               <div className="p-3 bg-purple-100 rounded-lg">
                 <Clock size={24} className="text-purple-600" />
@@ -899,10 +909,7 @@ export default function AIPerformance() {
         </div>
 
         {/* Retraining Status */}
-        <RetrainingStatusCard
-          status={retrainingStatus}
-          language={language}
-        />
+        <RetrainingStatusCard status={retrainingStatus} language={language} />
       </div>
     </div>
   );

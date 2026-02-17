@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Check, AlertCircle, FileText } from 'lucide-react';
+import { ChevronDown, ChevronUp, _Check, AlertCircle, FileText } from 'lucide-react';
 import QuickCheckboxGrid, {
   SHOULDER_ROM_OPTIONS,
   SHOULDER_IMPINGEMENT_OPTIONS,
@@ -9,7 +9,7 @@ import QuickCheckboxGrid, {
   SHOULDER_BICEPS_OPTIONS,
   SHOULDER_AC_JOINT_OPTIONS,
   SHOULDER_FROZEN_OPTIONS,
-  SHOULDER_TREATMENT_OPTIONS
+  SHOULDER_TREATMENT_OPTIONS,
 } from './QuickCheckboxGrid';
 
 /**
@@ -32,7 +32,7 @@ const EXAM_SECTIONS = [
   { id: 'biceps', title: 'Biceps Tests', icon: '💪' },
   { id: 'ac_joint', title: 'AC Joint Tests', icon: '🦴' },
   { id: 'frozen', title: 'Frozen Shoulder', icon: '❄️' },
-  { id: 'treatment', title: 'Treatment Plan', icon: '📋' }
+  { id: 'treatment', title: 'Treatment Plan', icon: '📋' },
 ];
 
 const SECTION_OPTIONS = {
@@ -44,7 +44,7 @@ const SECTION_OPTIONS = {
   biceps: SHOULDER_BICEPS_OPTIONS,
   ac_joint: SHOULDER_AC_JOINT_OPTIONS,
   frozen: SHOULDER_FROZEN_OPTIONS,
-  treatment: SHOULDER_TREATMENT_OPTIONS
+  treatment: SHOULDER_TREATMENT_OPTIONS,
 };
 
 // Clinical impression suggestions based on positive findings
@@ -52,68 +52,66 @@ const CLINICAL_IMPRESSIONS = {
   impingement: {
     pattern: ['hawkins_pos', 'neer_pos', 'painful_arc_pos'],
     diagnosis: 'Subacromial Impingement Syndrome',
-    icd10: 'M75.4'
+    icd10: 'M75.4',
   },
   rotator_cuff_strain: {
     pattern: ['empty_can_pos', 'drop_arm_pos'],
     diagnosis: 'Rotator Cuff Strain/Tendinopathy',
-    icd10: 'M75.1'
+    icd10: 'M75.1',
   },
   subscapularis: {
     pattern: ['lift_off_pos', 'bear_hug_pos', 'ir_lag_pos'],
     diagnosis: 'Subscapularis Tendinopathy',
-    icd10: 'M75.1'
+    icd10: 'M75.1',
   },
   bicipital: {
     pattern: ['speed_pos', 'yergason_pos'],
     diagnosis: 'Bicipital Tendinopathy',
-    icd10: 'M75.2'
+    icd10: 'M75.2',
   },
   labral: {
     pattern: ['obrien_pos', 'clunk_pos', 'crank_pos', 'biceps_load_pos'],
     diagnosis: 'Glenoid Labral Tear (SLAP Lesion)',
-    icd10: 'S43.43'
+    icd10: 'S43.43',
   },
   anterior_instability: {
     pattern: ['ant_appr_pos', 'relocation_pos'],
     diagnosis: 'Anterior GH Instability',
-    icd10: 'M24.41'
+    icd10: 'M24.41',
   },
   ac_sprain: {
     pattern: ['ac_shear_pos', 'piano_key_pos', 'horiz_add_pos'],
     diagnosis: 'AC Joint Sprain/Separation',
-    icd10: 'S43.1'
+    icd10: 'S43.1',
   },
   frozen_shoulder: {
     pattern: ['frozen_capsular_pattern', 'frozen_er_limited'],
     diagnosis: 'Adhesive Capsulitis (Frozen Shoulder)',
-    icd10: 'M75.0'
-  }
+    icd10: 'M75.0',
+  },
 };
 
 export default function ShoulderArmExamGrid({
   side = 'right', // 'left', 'right', or 'bilateral'
   selectedValues = {},
   onChange,
-  showNarrative = true,
-  language = 'EN',
-  className = ''
+  _showNarrative = true,
+  _language = 'EN',
+  className = '',
 }) {
   const [expandedSections, setExpandedSections] = useState(['rom']);
   const [activeTab, setActiveTab] = useState('exam');
 
   const toggleSection = (sectionId) => {
-    setExpandedSections(prev =>
-      prev.includes(sectionId)
-        ? prev.filter(s => s !== sectionId)
-        : [...prev, sectionId]
+    setExpandedSections((prev) =>
+      prev.includes(sectionId) ? prev.filter((s) => s !== sectionId) : [...prev, sectionId]
     );
   };
 
   const handleSectionChange = (sectionId, values) => {
     onChange({
       ...selectedValues,
-      [sectionId]: values
+      [sectionId]: values,
     });
   };
 
@@ -127,12 +125,12 @@ export default function ShoulderArmExamGrid({
     const allSelected = getAllSelectedValues();
     const suggestions = [];
 
-    Object.entries(CLINICAL_IMPRESSIONS).forEach(([key, impression]) => {
-      const matchCount = impression.pattern.filter(p => allSelected.includes(p)).length;
+    Object.entries(CLINICAL_IMPRESSIONS).forEach(([_key, impression]) => {
+      const matchCount = impression.pattern.filter((p) => allSelected.includes(p)).length;
       if (matchCount >= 2) {
         suggestions.push({
           ...impression,
-          confidence: Math.round((matchCount / impression.pattern.length) * 100)
+          confidence: Math.round((matchCount / impression.pattern.length) * 100),
         });
       }
     });
@@ -143,7 +141,9 @@ export default function ShoulderArmExamGrid({
   // Generate narrative documentation
   const generateNarrative = () => {
     const allSelected = getAllSelectedValues();
-    if (allSelected.length === 0) return '';
+    if (allSelected.length === 0) {
+      return '';
+    }
 
     const sideText = side === 'bilateral' ? 'bilateral' : `${side}`;
     let narrative = `SHOULDER EXAMINATION - ${sideText.toUpperCase()}\n\n`;
@@ -152,27 +152,36 @@ export default function ShoulderArmExamGrid({
     const romFindings = selectedValues.rom || [];
     if (romFindings.length > 0) {
       narrative += 'Range of Motion:\n';
-      romFindings.forEach(finding => {
+      romFindings.forEach((finding) => {
         const option = Object.values(SHOULDER_ROM_OPTIONS)
           .flat()
-          .find(opt => opt.value === finding);
-        if (option) narrative += `- ${option.label}\n`;
+          .find((opt) => opt.value === finding);
+        if (option) {
+          narrative += `- ${option.label}\n`;
+        }
       });
       narrative += '\n';
     }
 
     // Special tests
-    const testSections = ['impingement', 'rotator_cuff', 'instability', 'labral', 'biceps', 'ac_joint'];
+    const testSections = [
+      'impingement',
+      'rotator_cuff',
+      'instability',
+      'labral',
+      'biceps',
+      'ac_joint',
+    ];
     const positiveTests = [];
     const negativeTests = [];
 
-    testSections.forEach(section => {
+    testSections.forEach((section) => {
       const findings = selectedValues[section] || [];
-      findings.forEach(finding => {
+      findings.forEach((finding) => {
         const options = SECTION_OPTIONS[section];
         const option = Object.values(options)
           .flat()
-          .find(opt => opt.value === finding);
+          .find((opt) => opt.value === finding);
         if (option) {
           if (finding.includes('_pos')) {
             positiveTests.push(option.label);
@@ -185,7 +194,7 @@ export default function ShoulderArmExamGrid({
 
     if (positiveTests.length > 0) {
       narrative += 'Positive Special Tests:\n';
-      positiveTests.forEach(test => {
+      positiveTests.forEach((test) => {
         narrative += `- ${test}\n`;
       });
       narrative += '\n';
@@ -193,7 +202,7 @@ export default function ShoulderArmExamGrid({
 
     if (negativeTests.length > 0) {
       narrative += 'Negative Special Tests:\n';
-      negativeTests.forEach(test => {
+      negativeTests.forEach((test) => {
         narrative += `- ${test}\n`;
       });
       narrative += '\n';
@@ -203,7 +212,7 @@ export default function ShoulderArmExamGrid({
     const diagnoses = getSuggestedDiagnoses();
     if (diagnoses.length > 0) {
       narrative += 'Clinical Impression:\n';
-      diagnoses.forEach(dx => {
+      diagnoses.forEach((dx) => {
         narrative += `- ${dx.diagnosis} (${dx.icd10}) - ${dx.confidence}% match\n`;
       });
       narrative += '\n';
@@ -213,11 +222,13 @@ export default function ShoulderArmExamGrid({
     const treatmentFindings = selectedValues.treatment || [];
     if (treatmentFindings.length > 0) {
       narrative += 'Treatment Plan:\n';
-      treatmentFindings.forEach(finding => {
+      treatmentFindings.forEach((finding) => {
         const option = Object.values(SHOULDER_TREATMENT_OPTIONS)
           .flat()
-          .find(opt => opt.value === finding);
-        if (option) narrative += `- ${option.label}\n`;
+          .find((opt) => opt.value === finding);
+        if (option) {
+          narrative += `- ${option.label}\n`;
+        }
       });
     }
 
@@ -237,7 +248,9 @@ export default function ShoulderArmExamGrid({
             <div>
               <h2 className="font-semibold text-gray-900">Shoulder & Arm Examination</h2>
               <p className="text-sm text-gray-500">
-                {side === 'bilateral' ? 'Bilateral' : `${side.charAt(0).toUpperCase() + side.slice(1)} side`}
+                {side === 'bilateral'
+                  ? 'Bilateral'
+                  : `${side.charAt(0).toUpperCase() + side.slice(1)} side`}
                 {totalSelected > 0 && ` • ${totalSelected} findings selected`}
               </p>
             </div>
@@ -247,7 +260,7 @@ export default function ShoulderArmExamGrid({
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-500">Side:</span>
             <div className="flex rounded-lg overflow-hidden border border-gray-300">
-              {['left', 'right', 'bilateral'].map(s => (
+              {['left', 'right', 'bilateral'].map((s) => (
                 <button
                   key={s}
                   onClick={() => onChange({ ...selectedValues, _side: s })}
@@ -313,10 +326,10 @@ export default function ShoulderArmExamGrid({
           )}
 
           {/* Exam Sections */}
-          {EXAM_SECTIONS.map(section => {
+          {EXAM_SECTIONS.map((section) => {
             const isExpanded = expandedSections.includes(section.id);
             const sectionValues = selectedValues[section.id] || [];
-            const positiveCount = sectionValues.filter(v => v.includes('_pos')).length;
+            const positiveCount = sectionValues.filter((v) => v.includes('_pos')).length;
 
             return (
               <div key={section.id}>
@@ -375,7 +388,8 @@ export default function ShoulderArmExamGrid({
               </button>
             </div>
             <pre className="whitespace-pre-wrap text-sm text-gray-700 font-mono bg-white p-4 rounded border border-gray-200 max-h-96 overflow-y-auto">
-              {generateNarrative() || 'No findings selected. Select examination findings to generate documentation.'}
+              {generateNarrative() ||
+                'No findings selected. Select examination findings to generate documentation.'}
             </pre>
           </div>
         </div>
@@ -385,13 +399,12 @@ export default function ShoulderArmExamGrid({
       {totalSelected > 0 && (
         <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 rounded-b-lg">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">
-              {totalSelected} findings documented
-            </span>
+            <span className="text-gray-600">{totalSelected} findings documented</span>
             <div className="flex items-center gap-4">
               {suggestedDiagnoses.length > 0 && (
                 <span className="text-amber-600 font-medium">
-                  {suggestedDiagnoses.length} suggested {suggestedDiagnoses.length === 1 ? 'diagnosis' : 'diagnoses'}
+                  {suggestedDiagnoses.length} suggested{' '}
+                  {suggestedDiagnoses.length === 1 ? 'diagnosis' : 'diagnoses'}
                 </span>
               )}
             </div>
@@ -407,26 +420,26 @@ export const SHOULDER_EXAM_PRESETS = {
   impingementScreen: {
     name: 'Impingement Screen',
     sections: ['rom', 'impingement'],
-    description: 'Quick screen for subacromial impingement'
+    description: 'Quick screen for subacromial impingement',
   },
   rotatorCuffScreen: {
     name: 'Rotator Cuff Screen',
     sections: ['rom', 'rotator_cuff', 'impingement'],
-    description: 'Comprehensive rotator cuff evaluation'
+    description: 'Comprehensive rotator cuff evaluation',
   },
   instabilityScreen: {
     name: 'Instability Screen',
     sections: ['rom', 'instability', 'labral'],
-    description: 'GH instability and labral assessment'
+    description: 'GH instability and labral assessment',
   },
   frozenShoulderScreen: {
     name: 'Frozen Shoulder Screen',
     sections: ['rom', 'frozen'],
-    description: 'Adhesive capsulitis evaluation'
+    description: 'Adhesive capsulitis evaluation',
   },
   comprehensiveExam: {
     name: 'Comprehensive Exam',
     sections: ['rom', 'impingement', 'rotator_cuff', 'instability', 'labral', 'biceps', 'ac_joint'],
-    description: 'Full shoulder examination'
-  }
+    description: 'Full shoulder examination',
+  },
 };

@@ -7,23 +7,23 @@
  * @module pages/Analytics
  */
 
-import React, { useState, useMemo } from 'react';
+import _React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
-  BarChart3,
+  _BarChart3,
   Users,
   UserPlus,
   Calendar,
   DollarSign,
-  Activity,
+  _Activity,
   Download,
   Filter,
   RefreshCw,
-  TrendingUp,
-  TrendingDown,
+  _TrendingUp,
+  _TrendingDown,
   Dumbbell,
   Target,
-  FileText,
+  _FileText,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
@@ -73,17 +73,19 @@ export default function Analytics() {
     let startDate, endDate;
 
     switch (dateRange) {
-      case 'week':
+      case 'week': {
         const weekStart = new Date(now);
         weekStart.setDate(now.getDate() - now.getDay() + 1);
         startDate = weekStart.toISOString();
         endDate = now.toISOString();
         break;
-      case 'quarter':
+      }
+      case 'quarter': {
         const quarter = Math.floor(now.getMonth() / 3);
         startDate = new Date(now.getFullYear(), quarter * 3, 1).toISOString();
         endDate = now.toISOString();
         break;
+      }
       case 'year':
         startDate = new Date(now.getFullYear(), 0, 1).toISOString();
         endDate = now.toISOString();

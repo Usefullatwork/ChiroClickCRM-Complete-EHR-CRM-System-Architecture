@@ -5,12 +5,12 @@
  * Preview of exercise prescription as it will appear to the patient
  */
 
-import React, { useState } from 'react'
+import _React, { useState } from 'react';
 import {
   Dumbbell,
   User,
   Calendar,
-  Phone,
+  _Phone,
   Play,
   Clock,
   Target,
@@ -26,8 +26,8 @@ import {
   Check,
   Mail,
   Download,
-  Info
-} from 'lucide-react'
+  Info,
+} from 'lucide-react';
 
 /**
  * PrescriptionPreview Component
@@ -50,17 +50,17 @@ export default function PrescriptionPreview({
   onClose,
   onConfirm,
   onSendEmail,
-  onDownloadPDF
+  onDownloadPDF,
 }) {
-  const [viewMode, setViewMode] = useState('mobile')
-  const [expandedExercise, setExpandedExercise] = useState(null)
-  const [copied, setCopied] = useState(false)
+  const [viewMode, setViewMode] = useState('mobile');
+  const [expandedExercise, setExpandedExercise] = useState(null);
+  const [copied, setCopied] = useState(false);
 
   // Use patient name from patient object if available
-  const displayPatientName = patient?.name || patientName
+  const displayPatientName = patient?.name || patientName;
 
   // Get exercises from prescription
-  const exercises = prescription?.exercises || []
+  const exercises = prescription?.exercises || [];
 
   /**
    * Get difficulty color
@@ -70,10 +70,10 @@ export default function PrescriptionPreview({
     const colors = {
       beginner: 'bg-green-100 text-green-800',
       intermediate: 'bg-yellow-100 text-yellow-800',
-      advanced: 'bg-red-100 text-red-800'
-    }
-    return colors[level] || 'bg-gray-100 text-gray-800'
-  }
+      advanced: 'bg-red-100 text-red-800',
+    };
+    return colors[level] || 'bg-gray-100 text-gray-800';
+  };
 
   /**
    * Get difficulty label in Norwegian
@@ -83,44 +83,46 @@ export default function PrescriptionPreview({
     const labels = {
       beginner: 'Nybegynner',
       intermediate: 'Middels',
-      advanced: 'Avansert'
-    }
-    return labels[level] || level
-  }
+      advanced: 'Avansert',
+    };
+    return labels[level] || level;
+  };
 
   /**
    * Format date for display
    */
   const formatDate = (dateStr) => {
-    if (!dateStr) return ''
+    if (!dateStr) {
+      return '';
+    }
     return new Date(dateStr).toLocaleDateString('nb-NO', {
       day: 'numeric',
       month: 'long',
-      year: 'numeric'
-    })
-  }
+      year: 'numeric',
+    });
+  };
 
   /**
    * Calculate estimated time
    */
   const calculateEstimatedTime = () => {
     return exercises.reduce((total, ex) => {
-      const setsTime = (ex.sets || 3) * (ex.reps || 10) * 3
-      const holdTime = (ex.holdSeconds || 0) * (ex.sets || 3)
-      return total + setsTime + holdTime + 30
-    }, 0)
-  }
+      const setsTime = (ex.sets || 3) * (ex.reps || 10) * 3;
+      const holdTime = (ex.holdSeconds || 0) * (ex.sets || 3);
+      return total + setsTime + holdTime + 30;
+    }, 0);
+  };
 
   /**
    * Handle copy link
    * Handterer kopiering av lenke
    */
   const handleCopyLink = () => {
-    const link = `${window.location.origin}/portal/exercises/${prescription?.token || 'preview'}`
-    navigator.clipboard.writeText(link)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
+    const link = `${window.location.origin}/portal/exercises/${prescription?.token || 'preview'}`;
+    navigator.clipboard.writeText(link);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   /**
    * Get preview container class based on view mode
@@ -129,17 +131,17 @@ export default function PrescriptionPreview({
   const getPreviewContainerClass = () => {
     switch (viewMode) {
       case 'mobile':
-        return 'w-[375px] h-[667px]'
+        return 'w-[375px] h-[667px]';
       case 'tablet':
-        return 'w-[768px] h-[600px]'
+        return 'w-[768px] h-[600px]';
       case 'desktop':
-        return 'w-full h-full max-w-4xl'
+        return 'w-full h-full max-w-4xl';
       default:
-        return 'w-[375px] h-[667px]'
+        return 'w-[375px] h-[667px]';
     }
-  }
+  };
 
-  const totalTimeEstimate = calculateEstimatedTime()
+  const totalTimeEstimate = calculateEstimatedTime();
 
   return (
     <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
@@ -196,10 +198,7 @@ export default function PrescriptionPreview({
             </button>
 
             {/* Close Button / Lukk-knapp */}
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg"
-            >
+            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -207,10 +206,14 @@ export default function PrescriptionPreview({
 
         {/* Preview Area / Forhandsvisningsomrade */}
         <div className="flex-1 overflow-auto bg-gray-100 p-8 flex justify-center">
-          <div className={`bg-gray-800 rounded-[2rem] p-3 shadow-xl overflow-hidden ${
-            viewMode === 'desktop' ? 'w-full max-w-4xl' : ''
-          }`}>
-            <div className={`bg-white rounded-[1.5rem] overflow-auto ${getPreviewContainerClass()}`}>
+          <div
+            className={`bg-gray-800 rounded-[2rem] p-3 shadow-xl overflow-hidden ${
+              viewMode === 'desktop' ? 'w-full max-w-4xl' : ''
+            }`}
+          >
+            <div
+              className={`bg-white rounded-[1.5rem] overflow-auto ${getPreviewContainerClass()}`}
+            >
               {/* Patient Portal Preview / Pasientportal-forhandsvisning */}
               <div className="min-h-full bg-gray-50">
                 {/* Portal Header / Portaloverskrift */}
@@ -221,9 +224,7 @@ export default function PrescriptionPreview({
                         <Dumbbell className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <h1 className="font-semibold text-gray-900">
-                          {clinic?.name || 'Klinikk'}
-                        </h1>
+                        <h1 className="font-semibold text-gray-900">{clinic?.name || 'Klinikk'}</h1>
                         <p className="text-sm text-gray-500">Ditt treningsprogram</p>
                       </div>
                     </div>
@@ -234,9 +235,7 @@ export default function PrescriptionPreview({
                 <main className="p-4 space-y-4">
                   {/* Prescription Info / Forskrivningsinformasjon */}
                   <div className="bg-white rounded-xl shadow-sm p-4">
-                    <h2 className="font-semibold text-gray-900 mb-3">
-                      Treningsprogram
-                    </h2>
+                    <h2 className="font-semibold text-gray-900 mb-3">Treningsprogram</h2>
                     <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                       <div className="flex items-center gap-2">
                         <User className="w-4 h-4" />
@@ -257,7 +256,9 @@ export default function PrescriptionPreview({
                           <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                           <div>
                             <p className="text-sm font-medium text-blue-900 mb-1">Instruksjoner:</p>
-                            <p className="text-sm text-blue-800">{prescription.patientInstructions}</p>
+                            <p className="text-sm text-blue-800">
+                              {prescription.patientInstructions}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -269,10 +270,7 @@ export default function PrescriptionPreview({
                     <h3 className="font-medium text-gray-900 mb-3">Din fremgang i dag</h3>
                     <div className="flex items-center gap-4">
                       <div className="flex-1 bg-gray-100 rounded-full h-3">
-                        <div
-                          className="bg-green-500 h-full rounded-full"
-                          style={{ width: '0%' }}
-                        />
+                        <div className="bg-green-500 h-full rounded-full" style={{ width: '0%' }} />
                       </div>
                       <span className="text-sm font-medium text-gray-600">
                         0 / {exercises.length}
@@ -286,114 +284,120 @@ export default function PrescriptionPreview({
                       Ovelser ({exercises.length})
                     </h3>
                     <div className="space-y-3">
-                      {exercises.length > 0 ? exercises.map((exercise, index) => (
-                        <div
-                          key={exercise.id || exercise.exerciseId || index}
-                          className="bg-white rounded-xl shadow-sm overflow-hidden"
-                        >
-                          {/* Exercise Header / Ovelsesoverskrift */}
+                      {exercises.length > 0 ? (
+                        exercises.map((exercise, index) => (
                           <div
-                            className="p-4 cursor-pointer"
-                            onClick={() => setExpandedExercise(
-                              expandedExercise === index ? null : index
-                            )}
+                            key={exercise.id || exercise.exerciseId || index}
+                            className="bg-white rounded-xl shadow-sm overflow-hidden"
                           >
-                            <div className="flex items-start gap-3">
-                              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                <span className="text-blue-700 font-medium">{index + 1}</span>
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <h4 className="font-medium text-gray-900">
-                                  {exercise.name_norwegian || exercise.name}
-                                </h4>
-                                <div className="flex flex-wrap items-center gap-2 mt-1">
-                                  {exercise.category && (
-                                    <span className="text-xs text-gray-500">{exercise.category}</span>
-                                  )}
-                                  {exercise.difficulty_level && (
-                                    <span className={`text-xs px-2 py-0.5 rounded ${getDifficultyColor(exercise.difficulty_level)}`}>
-                                      {getDifficultyLabel(exercise.difficulty_level)}
-                                    </span>
-                                  )}
-                                  {exercise.video_url && (
-                                    <span className="flex items-center gap-1 text-xs text-blue-600">
-                                      <Play className="w-3 h-3" />
-                                      Video
-                                    </span>
-                                  )}
+                            {/* Exercise Header / Ovelsesoverskrift */}
+                            <div
+                              className="p-4 cursor-pointer"
+                              onClick={() =>
+                                setExpandedExercise(expandedExercise === index ? null : index)
+                              }
+                            >
+                              <div className="flex items-start gap-3">
+                                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                  <span className="text-blue-700 font-medium">{index + 1}</span>
                                 </div>
-                                {/* Parameters / Parametere */}
-                                <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-gray-600">
-                                  <span className="flex items-center gap-1">
-                                    <Target className="w-4 h-4 text-gray-400" />
-                                    {exercise.sets || 3} sett
-                                  </span>
-                                  <span className="flex items-center gap-1">
-                                    <Activity className="w-4 h-4 text-gray-400" />
-                                    {exercise.reps || 10} rep
-                                  </span>
-                                  {exercise.holdSeconds > 0 && (
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="font-medium text-gray-900">
+                                    {exercise.name_norwegian || exercise.name}
+                                  </h4>
+                                  <div className="flex flex-wrap items-center gap-2 mt-1">
+                                    {exercise.category && (
+                                      <span className="text-xs text-gray-500">
+                                        {exercise.category}
+                                      </span>
+                                    )}
+                                    {exercise.difficulty_level && (
+                                      <span
+                                        className={`text-xs px-2 py-0.5 rounded ${getDifficultyColor(exercise.difficulty_level)}`}
+                                      >
+                                        {getDifficultyLabel(exercise.difficulty_level)}
+                                      </span>
+                                    )}
+                                    {exercise.video_url && (
+                                      <span className="flex items-center gap-1 text-xs text-blue-600">
+                                        <Play className="w-3 h-3" />
+                                        Video
+                                      </span>
+                                    )}
+                                  </div>
+                                  {/* Parameters / Parametere */}
+                                  <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-gray-600">
                                     <span className="flex items-center gap-1">
-                                      <Clock className="w-4 h-4 text-gray-400" />
-                                      {exercise.holdSeconds} sek
+                                      <Target className="w-4 h-4 text-gray-400" />
+                                      {exercise.sets || 3} sett
                                     </span>
-                                  )}
-                                </div>
-                              </div>
-                              <div className="text-gray-400">
-                                {expandedExercise === index ? (
-                                  <ChevronUp className="w-5 h-5" />
-                                ) : (
-                                  <ChevronDown className="w-5 h-5" />
-                                )}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Expanded Content / Utvidet innhold */}
-                          {expandedExercise === index && (
-                            <div className="border-t border-gray-100 p-4">
-                              {(exercise.instructions_norwegian || exercise.instructions) && (
-                                <div className="mb-3">
-                                  <h5 className="text-sm font-medium text-gray-700 mb-1">
-                                    Instruksjoner
-                                  </h5>
-                                  <p className="text-sm text-gray-600">
-                                    {exercise.instructions_norwegian || exercise.instructions}
-                                  </p>
-                                </div>
-                              )}
-                              {exercise.customInstructions && (
-                                <div className="p-3 bg-blue-50 rounded-lg mb-3">
-                                  <p className="text-sm text-blue-800">
-                                    {exercise.customInstructions}
-                                  </p>
-                                </div>
-                              )}
-                              {exercise.precautions && exercise.precautions.length > 0 && (
-                                <div className="p-3 bg-yellow-50 rounded-lg">
-                                  <div className="flex items-start gap-2">
-                                    <AlertTriangle className="w-4 h-4 text-yellow-600 mt-0.5" />
-                                    <div>
-                                      <p className="text-sm font-medium text-yellow-800">
-                                        Forsiktighetsregler
-                                      </p>
-                                      <ul className="text-sm text-yellow-700 mt-1">
-                                        {exercise.precautions.map((p, i) => (
-                                          <li key={i}>- {p}</li>
-                                        ))}
-                                      </ul>
-                                    </div>
+                                    <span className="flex items-center gap-1">
+                                      <Activity className="w-4 h-4 text-gray-400" />
+                                      {exercise.reps || 10} rep
+                                    </span>
+                                    {exercise.holdSeconds > 0 && (
+                                      <span className="flex items-center gap-1">
+                                        <Clock className="w-4 h-4 text-gray-400" />
+                                        {exercise.holdSeconds} sek
+                                      </span>
+                                    )}
                                   </div>
                                 </div>
-                              )}
-                              <button className="w-full mt-3 py-2.5 bg-blue-600 text-white rounded-lg font-medium">
-                                Marker som fullfort
-                              </button>
+                                <div className="text-gray-400">
+                                  {expandedExercise === index ? (
+                                    <ChevronUp className="w-5 h-5" />
+                                  ) : (
+                                    <ChevronDown className="w-5 h-5" />
+                                  )}
+                                </div>
+                              </div>
                             </div>
-                          )}
-                        </div>
-                      )) : (
+
+                            {/* Expanded Content / Utvidet innhold */}
+                            {expandedExercise === index && (
+                              <div className="border-t border-gray-100 p-4">
+                                {(exercise.instructions_norwegian || exercise.instructions) && (
+                                  <div className="mb-3">
+                                    <h5 className="text-sm font-medium text-gray-700 mb-1">
+                                      Instruksjoner
+                                    </h5>
+                                    <p className="text-sm text-gray-600">
+                                      {exercise.instructions_norwegian || exercise.instructions}
+                                    </p>
+                                  </div>
+                                )}
+                                {exercise.customInstructions && (
+                                  <div className="p-3 bg-blue-50 rounded-lg mb-3">
+                                    <p className="text-sm text-blue-800">
+                                      {exercise.customInstructions}
+                                    </p>
+                                  </div>
+                                )}
+                                {exercise.precautions && exercise.precautions.length > 0 && (
+                                  <div className="p-3 bg-yellow-50 rounded-lg">
+                                    <div className="flex items-start gap-2">
+                                      <AlertTriangle className="w-4 h-4 text-yellow-600 mt-0.5" />
+                                      <div>
+                                        <p className="text-sm font-medium text-yellow-800">
+                                          Forsiktighetsregler
+                                        </p>
+                                        <ul className="text-sm text-yellow-700 mt-1">
+                                          {exercise.precautions.map((p, i) => (
+                                            <li key={i}>- {p}</li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                                <button className="w-full mt-3 py-2.5 bg-blue-600 text-white rounded-lg font-medium">
+                                  Marker som fullfort
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        ))
+                      ) : (
                         <div className="text-center py-8 text-gray-500">
                           Ingen ovelser i programmet
                         </div>
@@ -410,24 +414,24 @@ export default function PrescriptionPreview({
                       </div>
                       <p className="text-sm text-gray-600">
                         {prescription.startDate && (
-                          <>Start: <strong>{formatDate(prescription.startDate)}</strong></>
+                          <>
+                            Start: <strong>{formatDate(prescription.startDate)}</strong>
+                          </>
                         )}
                         {prescription.startDate && prescription.endDate && ' - '}
                         {prescription.endDate && (
-                          <>Slutt: <strong>{formatDate(prescription.endDate)}</strong></>
+                          <>
+                            Slutt: <strong>{formatDate(prescription.endDate)}</strong>
+                          </>
                         )}
-                        {!prescription.endDate && prescription.startDate && (
-                          <> (lopende program)</>
-                        )}
+                        {!prescription.endDate && prescription.startDate && <> (lopende program)</>}
                       </p>
                     </div>
                   )}
 
                   {/* Footer Warning / Bunntekst-advarsel */}
                   <div className="text-center text-sm text-gray-500 pt-4 pb-8">
-                    <p>
-                      Stopp ovelsene hvis du opplever okt smerte og kontakt klinikken.
-                    </p>
+                    <p>Stopp ovelsene hvis du opplever okt smerte og kontakt klinikken.</p>
                   </div>
                 </main>
               </div>
@@ -477,5 +481,5 @@ export default function PrescriptionPreview({
         </div>
       </div>
     </div>
-  )
+  );
 }

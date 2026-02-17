@@ -12,7 +12,7 @@
  * - Privacy-first: all processing local via Ollama
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, _useCallback } from 'react';
 import {
   Mic,
   MicOff,
@@ -21,7 +21,7 @@ import {
   Pause,
   RefreshCw,
   Check,
-  X,
+  _X,
   AlertCircle,
   Wifi,
   WifiOff,
@@ -37,7 +37,7 @@ import {
   checkOllamaStatus,
   parseTranscriptionToSOAP,
   createSpeechRecognition,
-  getAIConfig,
+  _getAIConfig,
 } from '../../services/aiService';
 import logger from '../../utils/logger';
 
@@ -68,7 +68,7 @@ export function AIScribeButton({
           }
         }
         if (finalTranscript) {
-          setTranscript((prev) => prev + ' ' + finalTranscript);
+          setTranscript((prev) => `${prev} ${finalTranscript}`);
         }
       },
       onError: (event) => {
@@ -84,13 +84,19 @@ export function AIScribeButton({
 
     return () => {
       if (sr) {
-        try { sr.stop(); } catch (e) { log.debug('Speech recognition cleanup', { message: e.message }); }
+        try {
+          sr.stop();
+        } catch (e) {
+          log.debug('Speech recognition cleanup', { message: e.message });
+        }
       }
     };
   }, [language]);
 
   const toggleRecording = () => {
-    if (!recognition) return;
+    if (!recognition) {
+      return;
+    }
 
     if (isRecording) {
       recognition.stop();
@@ -131,9 +137,10 @@ export function AIScribeButton({
       onClick={toggleRecording}
       disabled={disabled}
       className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors
-        ${isRecording
-          ? 'bg-red-500 text-white hover:bg-red-600 animate-pulse'
-          : 'bg-blue-500 text-white hover:bg-blue-600'
+        ${
+          isRecording
+            ? 'bg-red-500 text-white hover:bg-red-600 animate-pulse'
+            : 'bg-blue-500 text-white hover:bg-blue-600'
         }
         disabled:opacity-50 disabled:cursor-not-allowed
         ${className}`}
@@ -195,7 +202,7 @@ export default function AIScribe({
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const result = event.results[i];
           if (result.isFinal) {
-            final += result[0].transcript + ' ';
+            final += `${result[0].transcript} `;
           } else {
             interim += result[0].transcript;
           }
@@ -209,9 +216,11 @@ export default function AIScribe({
       onError: (event) => {
         log.error('Speech recognition error', { error: event.error });
         if (event.error === 'not-allowed') {
-          setError(language === 'no'
-            ? 'Mikrofontilgang nektet. Vennligst aktiver i nettleserinnstillinger.'
-            : 'Microphone access denied. Please enable in browser settings.');
+          setError(
+            language === 'no'
+              ? 'Mikrofontilgang nektet. Vennligst aktiver i nettleserinnstillinger.'
+              : 'Microphone access denied. Please enable in browser settings.'
+          );
         }
         stopRecording();
       },
@@ -231,7 +240,11 @@ export default function AIScribe({
 
     return () => {
       if (sr) {
-        try { sr.stop(); } catch (e) { log.debug('Speech recognition cleanup', { message: e.message }); }
+        try {
+          sr.stop();
+        } catch (e) {
+          log.debug('Speech recognition cleanup', { message: e.message });
+        }
       }
       if (timerRef.current) {
         clearInterval(timerRef.current);
@@ -241,9 +254,11 @@ export default function AIScribe({
 
   const startRecording = () => {
     if (!recognitionRef.current) {
-      setError(language === 'no'
-        ? 'Talegjenkjenning ikke støttet i denne nettleseren'
-        : 'Speech recognition not supported in this browser');
+      setError(
+        language === 'no'
+          ? 'Talegjenkjenning ikke støttet i denne nettleseren'
+          : 'Speech recognition not supported in this browser'
+      );
       return;
     }
 
@@ -269,7 +284,11 @@ export default function AIScribe({
 
   const stopRecording = () => {
     if (recognitionRef.current) {
-      try { recognitionRef.current.stop(); } catch (e) { log.debug('Speech recognition stop', { message: e.message }); }
+      try {
+        recognitionRef.current.stop();
+      } catch (e) {
+        log.debug('Speech recognition stop', { message: e.message });
+      }
     }
     if (timerRef.current) {
       clearInterval(timerRef.current);
@@ -287,9 +306,15 @@ export default function AIScribe({
         timerRef.current = setInterval(() => {
           setDuration((d) => d + 1);
         }, 1000);
-      } catch (e) { log.debug('Speech recognition resume', { message: e.message }); }
+      } catch (e) {
+        log.debug('Speech recognition resume', { message: e.message });
+      }
     } else {
-      try { recognitionRef.current?.stop(); } catch (e) { log.debug('Speech recognition pause', { message: e.message }); }
+      try {
+        recognitionRef.current?.stop();
+      } catch (e) {
+        log.debug('Speech recognition pause', { message: e.message });
+      }
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
@@ -299,7 +324,9 @@ export default function AIScribe({
   };
 
   const parseToSOAP = async () => {
-    if (!transcript.trim()) return;
+    if (!transcript.trim()) {
+      return;
+    }
 
     setIsProcessing(true);
     setError(null);
@@ -426,15 +453,19 @@ export default function AIScribe({
               <div className="flex items-center gap-2 text-sm">
                 <Clock className="w-4 h-4 text-gray-400" />
                 <span className="font-mono text-gray-600">{formatDuration(duration)}</span>
-                <span className={`px-2 py-0.5 rounded-full text-xs font-medium
-                  ${isPaused ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}>
+                <span
+                  className={`px-2 py-0.5 rounded-full text-xs font-medium
+                  ${isPaused ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}
+                >
                   {isPaused ? t.paused : t.listening}
                 </span>
               </div>
             )}
 
-            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
-              ${aiStatus.connected ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+            <div
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
+              ${aiStatus.connected ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}
+            >
               {aiStatus.connected ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
               {aiStatus.connected ? 'AI' : 'Offline'}
             </div>
@@ -459,9 +490,11 @@ export default function AIScribe({
               <button
                 onClick={togglePause}
                 className={`p-3 rounded-full transition-colors
-                  ${isPaused
-                    ? 'bg-blue-500 text-white hover:bg-blue-600'
-                    : 'bg-amber-100 text-amber-600 hover:bg-amber-200'}`}
+                  ${
+                    isPaused
+                      ? 'bg-blue-500 text-white hover:bg-blue-600'
+                      : 'bg-amber-100 text-amber-600 hover:bg-amber-200'
+                  }`}
                 title={isPaused ? t.resume : t.pause}
               >
                 {isPaused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
@@ -528,10 +561,10 @@ export default function AIScribe({
             placeholder={t.noTranscript}
           />
         ) : (
-          <div className={`min-h-[120px] p-4 rounded-lg border transition-colors
-            ${isRecording
-              ? 'bg-blue-50 border-blue-200'
-              : 'bg-gray-50 border-gray-200'}`}>
+          <div
+            className={`min-h-[120px] p-4 rounded-lg border transition-colors
+            ${isRecording ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'}`}
+          >
             {transcript || interimTranscript ? (
               <p className="text-sm text-gray-700 whitespace-pre-wrap">
                 {transcript}
@@ -562,9 +595,7 @@ export default function AIScribe({
               {isProcessing ? t.parsing : t.parseToSOAP}
             </button>
 
-            {!aiStatus.connected && (
-              <span className="text-xs text-amber-600">{t.aiOffline}</span>
-            )}
+            {!aiStatus.connected && <span className="text-xs text-amber-600">{t.aiOffline}</span>}
 
             <button
               onClick={handleApplyTranscript}
@@ -617,11 +648,7 @@ export default function AIScribe({
 // COMPACT AI SCRIBE - Inline recording widget
 // =============================================================================
 
-export function AIScribeCompact({
-  onTranscript,
-  language = 'en',
-  className = '',
-}) {
+export function AIScribeCompact({ onTranscript, language = 'en', className = '' }) {
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [duration, setDuration] = useState(0);
@@ -636,7 +663,7 @@ export function AIScribeCompact({
         let final = '';
         for (let i = event.resultIndex; i < event.results.length; i++) {
           if (event.results[i].isFinal) {
-            final += event.results[i][0].transcript + ' ';
+            final += `${event.results[i][0].transcript} `;
           }
         }
         if (final) {
@@ -645,7 +672,11 @@ export function AIScribeCompact({
       },
       onEnd: () => {
         if (isRecording && recognitionRef.current) {
-          try { recognitionRef.current.start(); } catch (e) { log.debug('Speech recognition auto-restart', { message: e.message }); }
+          try {
+            recognitionRef.current.start();
+          } catch (e) {
+            log.debug('Speech recognition auto-restart', { message: e.message });
+          }
         }
       },
     });
@@ -653,8 +684,16 @@ export function AIScribeCompact({
     recognitionRef.current = sr;
 
     return () => {
-      if (sr) try { sr.stop(); } catch (e) { log.debug('Speech recognition cleanup', { message: e.message }); }
-      if (timerRef.current) clearInterval(timerRef.current);
+      if (sr) {
+        try {
+          sr.stop();
+        } catch (e) {
+          log.debug('Speech recognition cleanup', { message: e.message });
+        }
+      }
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
     };
   }, [language, isRecording]);
 
@@ -681,16 +720,20 @@ export function AIScribeCompact({
 
   const formatDuration = (s) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
 
-  if (!recognitionRef.current) return null;
+  if (!recognitionRef.current) {
+    return null;
+  }
 
   return (
     <div className={`inline-flex items-center gap-2 ${className}`}>
       <button
         onClick={toggleRecording}
         className={`p-2 rounded-full transition-colors
-          ${isRecording
-            ? 'bg-red-500 text-white animate-pulse'
-            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+          ${
+            isRecording
+              ? 'bg-red-500 text-white animate-pulse'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          }`}
         title={isRecording ? 'Stop' : 'Record'}
       >
         {isRecording ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}

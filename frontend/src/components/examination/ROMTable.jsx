@@ -20,8 +20,8 @@ const ROM_NORMS = {
       { id: 'lat_flex_left', name: 'Left Lat Flex', nameNo: 'Lateral fleksjon V', normal: 45 },
       { id: 'lat_flex_right', name: 'Right Lat Flex', nameNo: 'Lateral fleksjon H', normal: 45 },
       { id: 'rotation_left', name: 'Left Rotation', nameNo: 'Rotasjon V', normal: 80 },
-      { id: 'rotation_right', name: 'Right Rotation', nameNo: 'Rotasjon H', normal: 80 }
-    ]
+      { id: 'rotation_right', name: 'Right Rotation', nameNo: 'Rotasjon H', normal: 80 },
+    ],
   },
   lumbar: {
     name: 'Lumbar',
@@ -32,8 +32,8 @@ const ROM_NORMS = {
       { id: 'lat_flex_left', name: 'Left Lat Flex', nameNo: 'Lateral fleksjon V', normal: 25 },
       { id: 'lat_flex_right', name: 'Right Lat Flex', nameNo: 'Lateral fleksjon H', normal: 25 },
       { id: 'rotation_left', name: 'Left Rotation', nameNo: 'Rotasjon V', normal: 30 },
-      { id: 'rotation_right', name: 'Right Rotation', nameNo: 'Rotasjon H', normal: 30 }
-    ]
+      { id: 'rotation_right', name: 'Right Rotation', nameNo: 'Rotasjon H', normal: 30 },
+    ],
   },
   shoulder: {
     name: 'Shoulder',
@@ -44,8 +44,13 @@ const ROM_NORMS = {
       { id: 'abduction', name: 'Abduction', nameNo: 'Abduksjon', normal: 180 },
       { id: 'adduction', name: 'Adduction', nameNo: 'Adduksjon', normal: 50 },
       { id: 'internal_rotation', name: 'Internal Rotation', nameNo: 'Intern rotasjon', normal: 70 },
-      { id: 'external_rotation', name: 'External Rotation', nameNo: 'Ekstern rotasjon', normal: 90 }
-    ]
+      {
+        id: 'external_rotation',
+        name: 'External Rotation',
+        nameNo: 'Ekstern rotasjon',
+        normal: 90,
+      },
+    ],
   },
   hip: {
     name: 'Hip',
@@ -56,16 +61,21 @@ const ROM_NORMS = {
       { id: 'abduction', name: 'Abduction', nameNo: 'Abduksjon', normal: 45 },
       { id: 'adduction', name: 'Adduction', nameNo: 'Adduksjon', normal: 30 },
       { id: 'internal_rotation', name: 'Internal Rotation', nameNo: 'Intern rotasjon', normal: 35 },
-      { id: 'external_rotation', name: 'External Rotation', nameNo: 'Ekstern rotasjon', normal: 45 }
-    ]
+      {
+        id: 'external_rotation',
+        name: 'External Rotation',
+        nameNo: 'Ekstern rotasjon',
+        normal: 45,
+      },
+    ],
   },
   knee: {
     name: 'Knee',
     nameNo: 'Kne',
     movements: [
       { id: 'flexion', name: 'Flexion', nameNo: 'Fleksjon', normal: 135 },
-      { id: 'extension', name: 'Extension', nameNo: 'Ekstensjon', normal: 0 }
-    ]
+      { id: 'extension', name: 'Extension', nameNo: 'Ekstensjon', normal: 0 },
+    ],
   },
   ankle: {
     name: 'Ankle',
@@ -74,9 +84,9 @@ const ROM_NORMS = {
       { id: 'dorsiflexion', name: 'Dorsiflexion', nameNo: 'Dorsalfleksjon', normal: 20 },
       { id: 'plantarflexion', name: 'Plantarflexion', nameNo: 'Plantarfleksjon', normal: 50 },
       { id: 'inversion', name: 'Inversion', nameNo: 'Inversjon', normal: 35 },
-      { id: 'eversion', name: 'Eversion', nameNo: 'Eversjon', normal: 15 }
-    ]
-  }
+      { id: 'eversion', name: 'Eversion', nameNo: 'Eversjon', normal: 15 },
+    ],
+  },
 };
 
 /**
@@ -91,9 +101,15 @@ function ROMArcSlider({ value, onChange, normal, readOnly }) {
 
   // Color based on percentage
   const getColor = () => {
-    if (percentage === 0) return { fill: '#e5e7eb', stroke: '#9ca3af', text: '#6b7280' };
-    if (percentage < 70) return { fill: '#fecaca', stroke: '#ef4444', text: '#dc2626' };
-    if (percentage < 90) return { fill: '#fef3c7', stroke: '#f59e0b', text: '#d97706' };
+    if (percentage === 0) {
+      return { fill: '#e5e7eb', stroke: '#9ca3af', text: '#6b7280' };
+    }
+    if (percentage < 70) {
+      return { fill: '#fecaca', stroke: '#ef4444', text: '#dc2626' };
+    }
+    if (percentage < 90) {
+      return { fill: '#fef3c7', stroke: '#f59e0b', text: '#d97706' };
+    }
     return { fill: '#bbf7d0', stroke: '#22c55e', text: '#16a34a' };
   };
 
@@ -117,7 +133,7 @@ function ROMArcSlider({ value, onChange, normal, readOnly }) {
     const rad = ((180 - angle) * Math.PI) / 180;
     return {
       x: cx + Math.cos(rad) * r,
-      y: cy - Math.sin(rad) * r
+      y: cy - Math.sin(rad) * r,
     };
   };
 
@@ -141,10 +157,14 @@ function ROMArcSlider({ value, onChange, normal, readOnly }) {
 
   // Handle drag
   const handleMouseMove = (e) => {
-    if (!isDragging || readOnly) return;
+    if (!isDragging || readOnly) {
+      return;
+    }
 
     const svg = svgRef.current;
-    if (!svg) return;
+    if (!svg) {
+      return;
+    }
 
     const rect = svg.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -158,8 +178,12 @@ function ROMArcSlider({ value, onChange, normal, readOnly }) {
     let angle = Math.atan2(dy, dx) * (180 / Math.PI);
 
     angle = 180 - angle;
-    if (angle < 0) angle = 0;
-    if (angle > 180) angle = 180;
+    if (angle < 0) {
+      angle = 0;
+    }
+    if (angle > 180) {
+      angle = 180;
+    }
 
     const romValue = Math.round((angle / maxDisplayAngle) * Math.max(normal, 180));
     const clampedValue = Math.min(Math.max(romValue, 0), Math.max(normal * 1.2, 180));
@@ -168,7 +192,9 @@ function ROMArcSlider({ value, onChange, normal, readOnly }) {
   };
 
   const handleMouseDown = (e) => {
-    if (readOnly) return;
+    if (readOnly) {
+      return;
+    }
     setIsDragging(true);
     handleMouseMove(e);
   };
@@ -266,7 +292,7 @@ function ROMArcSlider({ value, onChange, normal, readOnly }) {
 /**
  * Single ROM input cell (legacy fallback)
  */
-function ROMInput({ value, onChange, normal, readOnly }) {
+function _ROMInput({ value, onChange, normal, readOnly }) {
   const percentage = value ? (parseInt(value) / normal) * 100 : null;
   const isRestricted = percentage !== null && percentage < 70;
   const isMildlyRestricted = percentage !== null && percentage >= 70 && percentage < 90;
@@ -280,11 +306,13 @@ function ROMInput({ value, onChange, normal, readOnly }) {
         disabled={readOnly}
         className={`w-16 px-2 py-1 text-center text-sm border rounded
                    focus:ring-1 focus:ring-teal-500 focus:border-teal-500
-                   ${isRestricted
-                     ? 'border-red-300 bg-red-50 text-red-700'
-                     : isMildlyRestricted
-                       ? 'border-amber-300 bg-amber-50 text-amber-700'
-                       : 'border-gray-300'}`}
+                   ${
+                     isRestricted
+                       ? 'border-red-300 bg-red-50 text-red-700'
+                       : isMildlyRestricted
+                         ? 'border-amber-300 bg-amber-50 text-amber-700'
+                         : 'border-gray-300'
+                   }`}
         placeholder="°"
       />
       {isRestricted && (
@@ -297,15 +325,24 @@ function ROMInput({ value, onChange, normal, readOnly }) {
 /**
  * Single region ROM table
  */
-function RegionROMTable({ region, values = {}, onChange, lang = 'no', readOnly = false, side = null }) {
+function RegionROMTable({
+  region,
+  values = {},
+  onChange,
+  lang = 'no',
+  readOnly = false,
+  side = null,
+}) {
   const regionData = ROM_NORMS[region];
-  if (!regionData) return null;
+  if (!regionData) {
+    return null;
+  }
 
   const handleChange = (movementId, value) => {
     const key = side ? `${movementId}_${side}` : movementId;
     onChange({
       ...values,
-      [key]: value
+      [key]: value,
     });
   };
 
@@ -333,11 +370,17 @@ function RegionROMTable({ region, values = {}, onChange, lang = 'no', readOnly =
               <div
                 key={movement.id}
                 className={`p-2 rounded-lg border transition-colors
-                           ${hasPain ? 'border-red-300 bg-red-50' :
-                             percentage > 0 && percentage < 70 ? 'border-red-200 bg-red-50' :
-                             percentage >= 70 && percentage < 90 ? 'border-amber-200 bg-amber-50' :
-                             percentage >= 90 ? 'border-green-200 bg-green-50' :
-                             'border-gray-200 bg-white'}`}
+                           ${
+                             hasPain
+                               ? 'border-red-300 bg-red-50'
+                               : percentage > 0 && percentage < 70
+                                 ? 'border-red-200 bg-red-50'
+                                 : percentage >= 70 && percentage < 90
+                                   ? 'border-amber-200 bg-amber-50'
+                                   : percentage >= 90
+                                     ? 'border-green-200 bg-green-50'
+                                     : 'border-gray-200 bg-white'
+                           }`}
               >
                 {/* Movement name */}
                 <div className="text-xs font-medium text-gray-600 text-center mb-1 truncate">
@@ -364,9 +407,11 @@ function RegionROMTable({ region, values = {}, onChange, lang = 'no', readOnly =
                     onClick={() => !readOnly && handleChange(`${movement.id}_pain`, !hasPain)}
                     disabled={readOnly}
                     className={`px-2 py-0.5 text-[10px] rounded-full transition-colors
-                               ${hasPain
-                                 ? 'bg-red-500 text-white'
-                                 : 'bg-gray-100 text-gray-400 hover:bg-red-100 hover:text-red-500'}`}
+                               ${
+                                 hasPain
+                                   ? 'bg-red-500 text-white'
+                                   : 'bg-gray-100 text-gray-400 hover:bg-red-100 hover:text-red-500'
+                               }`}
                   >
                     {hasPain ? '⚡ Smerte' : '+ Smerte'}
                   </button>
@@ -390,32 +435,42 @@ export default function ROMTable({
   lang = 'no',
   readOnly = false,
   showBilateral = false,
-  onGenerateNarrative
+  onGenerateNarrative,
 }) {
   // Generate narrative from ROM values
   const generateNarrative = useMemo(() => {
     const findings = [];
 
-    regions.forEach(region => {
+    regions.forEach((region) => {
       const regionData = ROM_NORMS[region];
-      if (!regionData) return;
+      if (!regionData) {
+        return;
+      }
 
       const regionFindings = [];
       const regionValues = values[region] || {};
 
-      regionData.movements.forEach(movement => {
+      regionData.movements.forEach((movement) => {
         const measured = regionValues[movement.id];
-        if (!measured) return;
+        if (!measured) {
+          return;
+        }
 
         const percentage = (parseInt(measured) / movement.normal) * 100;
         const hasPain = regionValues[`${movement.id}_pain`];
 
         if (percentage < 70) {
-          regionFindings.push(`${lang === 'no' ? movement.nameNo : movement.name}: ${measured}° (betydelig redusert)${hasPain ? ' med smerte' : ''}`);
+          regionFindings.push(
+            `${lang === 'no' ? movement.nameNo : movement.name}: ${measured}° (betydelig redusert)${hasPain ? ' med smerte' : ''}`
+          );
         } else if (percentage < 90) {
-          regionFindings.push(`${lang === 'no' ? movement.nameNo : movement.name}: ${measured}° (lett redusert)${hasPain ? ' med smerte' : ''}`);
+          regionFindings.push(
+            `${lang === 'no' ? movement.nameNo : movement.name}: ${measured}° (lett redusert)${hasPain ? ' med smerte' : ''}`
+          );
         } else if (hasPain) {
-          regionFindings.push(`${lang === 'no' ? movement.nameNo : movement.name}: ${measured}° med smerte`);
+          regionFindings.push(
+            `${lang === 'no' ? movement.nameNo : movement.name}: ${measured}° med smerte`
+          );
         }
       });
 
@@ -426,16 +481,18 @@ export default function ROMTable({
     });
 
     if (findings.length === 0) {
-      return lang === 'no' ? 'ROM: Alle bevegelser innen normalområdet.' : 'ROM: All movements within normal limits.';
+      return lang === 'no'
+        ? 'ROM: Alle bevegelser innen normalområdet.'
+        : 'ROM: All movements within normal limits.';
     }
 
-    return findings.join('. ') + '.';
+    return `${findings.join('. ')}.`;
   }, [values, regions, lang]);
 
   const handleRegionChange = (region, regionValues) => {
     onChange({
       ...values,
-      [region]: regionValues
+      [region]: regionValues,
     });
   };
 
@@ -445,19 +502,25 @@ export default function ROMTable({
     let restricted = 0;
     let painful = 0;
 
-    regions.forEach(region => {
+    regions.forEach((region) => {
       const regionData = ROM_NORMS[region];
-      if (!regionData) return;
+      if (!regionData) {
+        return;
+      }
 
       const regionValues = values[region] || {};
 
-      regionData.movements.forEach(movement => {
+      regionData.movements.forEach((movement) => {
         const measured = regionValues[movement.id];
         if (measured) {
           total++;
           const percentage = (parseInt(measured) / movement.normal) * 100;
-          if (percentage < 70) restricted++;
-          if (regionValues[`${movement.id}_pain`]) painful++;
+          if (percentage < 70) {
+            restricted++;
+          }
+          if (regionValues[`${movement.id}_pain`]) {
+            painful++;
+          }
         }
       });
     });
@@ -519,7 +582,7 @@ export default function ROMTable({
 
       {/* ROM Tables */}
       <div className={`grid gap-4 ${regions.length > 1 ? 'md:grid-cols-2' : 'grid-cols-1'}`}>
-        {regions.map(region => (
+        {regions.map((region) => (
           <RegionROMTable
             key={region}
             region={region}
@@ -532,28 +595,30 @@ export default function ROMTable({
       </div>
 
       {/* Bilateral option for extremities */}
-      {showBilateral && regions.some(r => ['shoulder', 'hip', 'knee', 'ankle'].includes(r)) && (
+      {showBilateral && regions.some((r) => ['shoulder', 'hip', 'knee', 'ankle'].includes(r)) && (
         <div className="grid md:grid-cols-2 gap-4">
-          {regions.filter(r => ['shoulder', 'hip', 'knee', 'ankle'].includes(r)).map(region => (
-            <React.Fragment key={region}>
-              <RegionROMTable
-                region={region}
-                values={values[`${region}_left`] || {}}
-                onChange={(v) => handleRegionChange(`${region}_left`, v)}
-                lang={lang}
-                readOnly={readOnly}
-                side="left"
-              />
-              <RegionROMTable
-                region={region}
-                values={values[`${region}_right`] || {}}
-                onChange={(v) => handleRegionChange(`${region}_right`, v)}
-                lang={lang}
-                readOnly={readOnly}
-                side="right"
-              />
-            </React.Fragment>
-          ))}
+          {regions
+            .filter((r) => ['shoulder', 'hip', 'knee', 'ankle'].includes(r))
+            .map((region) => (
+              <React.Fragment key={region}>
+                <RegionROMTable
+                  region={region}
+                  values={values[`${region}_left`] || {}}
+                  onChange={(v) => handleRegionChange(`${region}_left`, v)}
+                  lang={lang}
+                  readOnly={readOnly}
+                  side="left"
+                />
+                <RegionROMTable
+                  region={region}
+                  values={values[`${region}_right`] || {}}
+                  onChange={(v) => handleRegionChange(`${region}_right`, v)}
+                  lang={lang}
+                  readOnly={readOnly}
+                  side="right"
+                />
+              </React.Fragment>
+            ))}
         </div>
       )}
     </div>

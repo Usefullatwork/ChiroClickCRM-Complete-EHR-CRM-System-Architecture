@@ -12,9 +12,11 @@ import logger from '../utils/logger.js';
  */
 export const getDashboardStats = async (req, res) => {
   try {
-    const { organizationId, userId } = req;
+    const { organizationId, _userId } = req;
     const today = new Date().toISOString().split('T')[0];
-    const firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+    const firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+      .toISOString()
+      .split('T')[0];
 
     // Get today's appointments count
     const todayAppointmentsResult = await query(
@@ -69,18 +71,18 @@ export const getDashboardStats = async (req, res) => {
       todayAppointments: parseInt(todayAppointmentsResult.rows[0].count),
       activePatients: parseInt(activePatientsResult.rows[0].count),
       pendingFollowUps: parseInt(pendingFollowUpsResult.rows[0].count),
-      monthRevenue: parseFloat(monthRevenueResult.rows[0].revenue)
+      monthRevenue: parseFloat(monthRevenueResult.rows[0].revenue),
     };
 
     res.json({
       success: true,
-      data: stats
+      data: stats,
     });
   } catch (error) {
     logger.error('Error fetching dashboard stats:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to fetch dashboard statistics'
+      error: 'Failed to fetch dashboard statistics',
     });
   }
 };
@@ -121,14 +123,14 @@ export const getTodayAppointments = async (req, res) => {
       data: {
         date: today,
         count: result.rows.length,
-        appointments: result.rows
-      }
+        appointments: result.rows,
+      },
     });
   } catch (error) {
     logger.error('Error fetching today appointments:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to fetch today\'s appointments'
+      error: "Failed to fetch today's appointments",
     });
   }
 };
@@ -165,14 +167,14 @@ export const getPendingTasks = async (req, res) => {
       success: true,
       data: {
         count: result.rows.length,
-        tasks: result.rows
-      }
+        tasks: result.rows,
+      },
     });
   } catch (error) {
     logger.error('Error fetching pending tasks:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to fetch pending tasks'
+      error: 'Failed to fetch pending tasks',
     });
   }
 };

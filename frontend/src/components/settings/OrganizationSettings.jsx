@@ -1,5 +1,5 @@
 import {
-  Building2,
+  _Building2,
   Save,
   Loader2,
   Check,

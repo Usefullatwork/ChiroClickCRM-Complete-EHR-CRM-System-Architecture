@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * GoogleContactsService - Integration with Google People API
  *
@@ -19,9 +20,9 @@ const GOOGLE_CONFIG = {
   apiKey: import.meta.env.VITE_GOOGLE_API_KEY || '',
   scopes: [
     'https://www.googleapis.com/auth/contacts',
-    'https://www.googleapis.com/auth/contacts.other.readonly'
+    'https://www.googleapis.com/auth/contacts.other.readonly',
   ].join(' '),
-  discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/people/v1/rest']
+  discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/people/v1/rest'],
 };
 
 // Contact group name for ChiroClickCRM contacts
@@ -40,7 +41,9 @@ class GoogleContactsService {
    * Initialize the Google API client
    */
   async initialize() {
-    if (this.isInitialized) return true;
+    if (this.isInitialized) {
+      return true;
+    }
 
     return new Promise((resolve, reject) => {
       // Load the gapi script if not already loaded
@@ -62,7 +65,7 @@ class GoogleContactsService {
         try {
           await window.gapi.client.init({
             apiKey: GOOGLE_CONFIG.apiKey,
-            discoveryDocs: GOOGLE_CONFIG.discoveryDocs
+            discoveryDocs: GOOGLE_CONFIG.discoveryDocs,
           });
           this.gapi = window.gapi;
           this.isInitialized = true;
@@ -108,7 +111,7 @@ class GoogleContactsService {
         this.isSignedIn = true;
         // Store token in session
         sessionStorage.setItem('google_access_token', response.access_token);
-      }
+      },
     });
   }
 
@@ -164,16 +167,18 @@ class GoogleContactsService {
    * Get or create the ChiroClickCRM contact group
    */
   async getOrCreateContactGroup() {
-    if (this.contactGroupId) return this.contactGroupId;
+    if (this.contactGroupId) {
+      return this.contactGroupId;
+    }
 
     try {
       // List existing contact groups
       const response = await this.gapi.client.people.contactGroups.list({
-        pageSize: 100
+        pageSize: 100,
       });
 
       const groups = response.result.contactGroups || [];
-      const existingGroup = groups.find(g => g.name === CRM_CONTACT_GROUP);
+      const existingGroup = groups.find((g) => g.name === CRM_CONTACT_GROUP);
 
       if (existingGroup) {
         this.contactGroupId = existingGroup.resourceName;
@@ -184,9 +189,9 @@ class GoogleContactsService {
       const createResponse = await this.gapi.client.people.contactGroups.create({
         resource: {
           contactGroup: {
-            name: CRM_CONTACT_GROUP
-          }
-        }
+            name: CRM_CONTACT_GROUP,
+          },
+        },
       });
 
       this.contactGroupId = createResponse.result.resourceName;
@@ -202,38 +207,42 @@ class GoogleContactsService {
    */
   _patientToGoogleContact(patient) {
     const contact = {
-      names: [{
-        givenName: patient.first_name,
-        familyName: patient.last_name
-      }],
+      names: [
+        {
+          givenName: patient.first_name,
+          familyName: patient.last_name,
+        },
+      ],
       phoneNumbers: [],
       emailAddresses: [],
       addresses: [],
       organizations: [],
       biographies: [],
-      userDefined: [{
-        key: 'ChiroClickCRM_PatientID',
-        value: String(patient.id)
-      }]
+      userDefined: [
+        {
+          key: 'ChiroClickCRM_PatientID',
+          value: String(patient.id),
+        },
+      ],
     };
 
     // Add phone numbers
     if (patient.phone) {
       contact.phoneNumbers.push({
         value: patient.phone,
-        type: 'mobile'
+        type: 'mobile',
       });
     }
     if (patient.home_phone) {
       contact.phoneNumbers.push({
         value: patient.home_phone,
-        type: 'home'
+        type: 'home',
       });
     }
     if (patient.work_phone) {
       contact.phoneNumbers.push({
         value: patient.work_phone,
-        type: 'work'
+        type: 'work',
       });
     }
 
@@ -241,7 +250,7 @@ class GoogleContactsService {
     if (patient.email) {
       contact.emailAddresses.push({
         value: patient.email,
-        type: 'home'
+        type: 'home',
       });
     }
 
@@ -252,27 +261,29 @@ class GoogleContactsService {
         city: patient.city || '',
         postalCode: patient.postal_code || '',
         country: patient.country || 'Norway',
-        type: 'home'
+        type: 'home',
       });
     }
 
     // Add birthday
     if (patient.date_of_birth) {
       const dob = new Date(patient.date_of_birth);
-      contact.birthdays = [{
-        date: {
-          year: dob.getFullYear(),
-          month: dob.getMonth() + 1,
-          day: dob.getDate()
-        }
-      }];
+      contact.birthdays = [
+        {
+          date: {
+            year: dob.getFullYear(),
+            month: dob.getMonth() + 1,
+            day: dob.getDate(),
+          },
+        },
+      ];
     }
 
     // Add notes
     if (patient.notes) {
       contact.biographies.push({
         value: patient.notes,
-        contentType: 'TEXT_PLAIN'
+        contentType: 'TEXT_PLAIN',
       });
     }
 
@@ -296,11 +307,11 @@ class GoogleContactsService {
       postal_code: '',
       country: '',
       date_of_birth: null,
-      notes: ''
+      notes: '',
     };
 
     // Extract phone numbers by type
-    contact.phoneNumbers?.forEach(phone => {
+    contact.phoneNumbers?.forEach((phone) => {
       if (phone.type === 'mobile' && !patient.phone) {
         patient.phone = phone.value;
       } else if (phone.type === 'home' && !patient.home_phone) {
@@ -331,7 +342,7 @@ class GoogleContactsService {
     patient.notes = contact.biographies?.[0]?.value || '';
 
     // Extract ChiroClickCRM patient ID if exists
-    const crmId = contact.userDefined?.find(u => u.key === 'ChiroClickCRM_PatientID');
+    const crmId = contact.userDefined?.find((u) => u.key === 'ChiroClickCRM_PatientID');
     if (crmId) {
       patient.crm_patient_id = parseInt(crmId.value, 10);
     }
@@ -358,22 +369,23 @@ class GoogleContactsService {
         // Update existing contact
         const response = await this.gapi.client.people.people.updateContact({
           resourceName: existingContact.resourceName,
-          updatePersonFields: 'names,phoneNumbers,emailAddresses,addresses,birthdays,biographies,userDefined',
-          resource: contactData
+          updatePersonFields:
+            'names,phoneNumbers,emailAddresses,addresses,birthdays,biographies,userDefined',
+          resource: contactData,
         });
         return { action: 'updated', contact: response.result };
       } else {
         // Create new contact
         const response = await this.gapi.client.people.people.createContact({
-          resource: contactData
+          resource: contactData,
         });
 
         // Add to ChiroClickCRM contact group
         await this.gapi.client.people.contactGroups.members.modify({
           resourceName: contactGroupId,
           resource: {
-            resourceNamesToAdd: [response.result.resourceName]
-          }
+            resourceNamesToAdd: [response.result.resourceName],
+          },
         });
 
         return { action: 'created', contact: response.result };
@@ -393,7 +405,7 @@ class GoogleContactsService {
       if (patient.email) {
         const response = await this.gapi.client.people.people.searchContacts({
           query: patient.email,
-          readMask: 'names,emailAddresses,userDefined'
+          readMask: 'names,emailAddresses,userDefined',
         });
 
         if (response.result.results?.length > 0) {
@@ -403,8 +415,8 @@ class GoogleContactsService {
 
       // Search by patient ID in user defined fields
       const allContacts = await this.getAllGoogleContacts();
-      return allContacts.find(c => {
-        const crmId = c.userDefined?.find(u => u.key === 'ChiroClickCRM_PatientID');
+      return allContacts.find((c) => {
+        const crmId = c.userDefined?.find((u) => u.key === 'ChiroClickCRM_PatientID');
         return crmId && parseInt(crmId.value, 10) === patient.id;
       });
     } catch (error) {
@@ -427,14 +439,17 @@ class GoogleContactsService {
       const response = await this.gapi.client.people.people.connections.list({
         resourceName: 'people/me',
         pageSize: 1000,
-        personFields: 'names,phoneNumbers,emailAddresses,addresses,birthdays,biographies,userDefined,memberships'
+        personFields:
+          'names,phoneNumbers,emailAddresses,addresses,birthdays,biographies,userDefined,memberships',
       });
 
       const contacts = response.result.connections || [];
 
       // Filter to only contacts in the ChiroClickCRM group
-      return contacts.filter(contact =>
-        contact.memberships?.some(m => m.contactGroupMembership?.contactGroupResourceName === contactGroupId)
+      return contacts.filter((contact) =>
+        contact.memberships?.some(
+          (m) => m.contactGroupMembership?.contactGroupResourceName === contactGroupId
+        )
       );
     } catch (error) {
       console.error('Error fetching Google contacts:', error);
@@ -447,7 +462,7 @@ class GoogleContactsService {
    */
   async importFromGoogle() {
     const googleContacts = await this.getAllGoogleContacts();
-    return googleContacts.map(contact => this._googleContactToPatient(contact));
+    return googleContacts.map((contact) => this._googleContactToPatient(contact));
   }
 
   /**
@@ -457,18 +472,22 @@ class GoogleContactsService {
     const results = {
       created: 0,
       updated: 0,
-      errors: []
+      errors: [],
     };
 
     for (const patient of patients) {
       try {
         const result = await this.syncPatientToGoogle(patient);
-        if (result.action === 'created') results.created++;
-        if (result.action === 'updated') results.updated++;
+        if (result.action === 'created') {
+          results.created++;
+        }
+        if (result.action === 'updated') {
+          results.updated++;
+        }
       } catch (error) {
         results.errors.push({
           patient: `${patient.first_name} ${patient.last_name}`,
-          error: error.message
+          error: error.message,
         });
       }
     }
@@ -486,7 +505,7 @@ class GoogleContactsService {
 
     try {
       await this.gapi.client.people.people.deleteContact({
-        resourceName
+        resourceName,
       });
       return true;
     } catch (error) {
@@ -555,18 +574,21 @@ export function useGoogleContacts() {
     setIsAuthenticated(false);
   }, [service]);
 
-  const syncPatient = React.useCallback(async (patient) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      return await service.syncPatientToGoogle(patient);
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [service]);
+  const syncPatient = React.useCallback(
+    async (patient) => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        return await service.syncPatientToGoogle(patient);
+      } catch (err) {
+        setError(err.message);
+        throw err;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [service]
+  );
 
   const importContacts = React.useCallback(async () => {
     setIsLoading(true);
@@ -581,18 +603,21 @@ export function useGoogleContacts() {
     }
   }, [service]);
 
-  const exportContacts = React.useCallback(async (patients) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      return await service.exportToGoogle(patients);
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [service]);
+  const exportContacts = React.useCallback(
+    async (patients) => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        return await service.exportToGoogle(patients);
+      } catch (err) {
+        setError(err.message);
+        throw err;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [service]
+  );
 
   return {
     isLoading,
@@ -604,7 +629,7 @@ export function useGoogleContacts() {
     syncPatient,
     importContacts,
     exportContacts,
-    service
+    service,
   };
 }
 

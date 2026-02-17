@@ -10,7 +10,7 @@
  */
 export const LANGUAGE_LEVELS = {
   BASIC: 'basic',
-  DETAILED: 'detailed'
+  DETAILED: 'detailed',
 };
 
 /**
@@ -26,7 +26,7 @@ export const DOCUMENT_TYPE_CONFIG = {
     templates: ['base/*', 'levels/basic/*'],
     format: 'abbreviated',
     sections: ['anamnese', 'undersokelse', 'behandling', 'notat'],
-    description: 'Quick daily clinical documentation with abbreviations'
+    description: 'Quick daily clinical documentation with abbreviations',
   },
 
   epikrise: {
@@ -43,9 +43,9 @@ export const DOCUMENT_TYPE_CONFIG = {
       'diagnose',
       'behandling',
       'vurdering',
-      'plan'
+      'plan',
     ],
-    description: 'Comprehensive clinical summary with professional terminology'
+    description: 'Comprehensive clinical summary with professional terminology',
   },
 
   henvisning: {
@@ -55,16 +55,9 @@ export const DOCUMENT_TYPE_CONFIG = {
     languageLevel: LANGUAGE_LEVELS.DETAILED,
     templates: ['base/*', 'levels/detailed/*', 'specialty/chiropractic'],
     format: 'professional',
-    sections: [
-      'pasientinfo',
-      'henvisningsarsak',
-      'sykehistorie',
-      'funn',
-      'vurdering',
-      'sporsmal'
-    ],
-    description: 'Professional referral letter for other healthcare providers'
-  }
+    sections: ['pasientinfo', 'henvisningsarsak', 'sykehistorie', 'funn', 'vurdering', 'sporsmal'],
+    description: 'Professional referral letter for other healthcare providers',
+  },
 };
 
 /**
@@ -75,20 +68,20 @@ export const SPECIALTY_CONFIG = {
     id: 'chiropractic',
     name: 'Kiropraktikk',
     nameEn: 'Chiropractic',
-    templates: ['specialty/chiropractic']
+    templates: ['specialty/chiropractic'],
   },
   physiotherapy: {
     id: 'physiotherapy',
     name: 'Fysioterapi',
     nameEn: 'Physiotherapy',
-    templates: ['specialty/physiotherapy']
+    templates: ['specialty/physiotherapy'],
   },
   vestibular: {
     id: 'vestibular',
     name: 'Vestibular',
     nameEn: 'Vestibular/Dizziness',
-    templates: ['specialty/vestibular']
-  }
+    templates: ['specialty/vestibular'],
+  },
 };
 
 /**
@@ -99,26 +92,26 @@ export const BODY_REGION_CONFIG = {
     id: 'cervical',
     name: 'Nakke/Cervical',
     nameEn: 'Neck/Cervical',
-    templates: ['body-regions/cervical']
+    templates: ['body-regions/cervical'],
   },
   thoracolumbar: {
     id: 'thoracolumbar',
     name: 'Rygg/Thorakolumbal',
     nameEn: 'Back/Thoracolumbar',
-    templates: ['body-regions/thoracic-lumbar']
+    templates: ['body-regions/thoracic-lumbar'],
   },
   upperExtremity: {
     id: 'upper-extremity',
     name: 'Overekstremitet',
     nameEn: 'Upper Extremity',
-    templates: ['body-regions/upper-extremity']
+    templates: ['body-regions/upper-extremity'],
   },
   lowerExtremity: {
     id: 'lower-extremity',
     name: 'Underekstremitet',
     nameEn: 'Lower Extremity',
-    templates: ['body-regions/lower-extremity']
-  }
+    templates: ['body-regions/lower-extremity'],
+  },
 };
 
 /**
@@ -131,7 +124,7 @@ export const PRACTITIONER_PRESETS = {
     style: 'formal',
     defaultLanguageLevel: LANGUAGE_LEVELS.DETAILED,
     preferredAbbreviations: ['SMT', 'EMT', 'IMS'],
-    templates: ['practitioners/sindre']
+    templates: ['practitioners/sindre'],
   },
   sigrun: {
     id: 'sigrun',
@@ -139,8 +132,8 @@ export const PRACTITIONER_PRESETS = {
     style: 'abbreviated',
     defaultLanguageLevel: LANGUAGE_LEVELS.BASIC,
     preferredAbbreviations: ['cx mob', 'tx mob', 'tp', 'mass'],
-    templates: ['practitioners/sigrun']
-  }
+    templates: ['practitioners/sigrun'],
+  },
 };
 
 /**
@@ -148,17 +141,13 @@ export const PRACTITIONER_PRESETS = {
  * @param {string} documentType - The document type (journal, epikrise, henvisning)
  * @returns {Object} Document type configuration
  */
-export const getDocumentTypeConfig = (documentType) => {
-  return DOCUMENT_TYPE_CONFIG[documentType] || null;
-};
+export const getDocumentTypeConfig = (documentType) => DOCUMENT_TYPE_CONFIG[documentType] || null;
 
 /**
  * Get all available document types
  * @returns {Array} List of document type configurations
  */
-export const getAllDocumentTypes = () => {
-  return Object.values(DOCUMENT_TYPE_CONFIG);
-};
+export const getAllDocumentTypes = () => Object.values(DOCUMENT_TYPE_CONFIG);
 
 /**
  * Get language level for a document type
@@ -178,5 +167,5 @@ export default {
   PRACTITIONER_PRESETS,
   getDocumentTypeConfig,
   getAllDocumentTypes,
-  getLanguageLevelForDocument
+  getLanguageLevelForDocument,
 };

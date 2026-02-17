@@ -1,5 +1,14 @@
 import { useState } from 'react';
-import { Activity, Eye, Brain, Target, RotateCw, TrendingDown, ChevronDown, ChevronUp } from 'lucide-react';
+import {
+  Activity,
+  Eye,
+  Brain,
+  Target,
+  RotateCw,
+  _TrendingDown,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react';
 
 /**
  * Comprehensive Vestibular Assessment Component
@@ -11,7 +20,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
     bppv: true,
     balance: false,
     oculomotor: false,
-    vng: false
+    vng: false,
   });
 
   // Initialize default data structure
@@ -68,7 +77,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
     referral_needed: false,
     referral_to: '',
 
-    ...data
+    ...data,
   };
 
   const assessmentData = { ...defaultData, ...data };
@@ -85,29 +94,29 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
         ...assessmentData,
         [parent]: {
           ...assessmentData[parent],
-          [field]: value
-        }
+          [field]: value,
+        },
       };
       onChange(updated);
     }
   };
 
   const toggleSection = (section) => {
-    setExpandedTests(prev => ({ ...prev, [section]: !prev[section] }));
+    setExpandedTests((prev) => ({ ...prev, [section]: !prev[section] }));
   };
 
   const tabs = [
     { id: 'anamnese', label: 'Anamnese', icon: Brain },
     { id: 'testing', label: 'Testing', icon: Activity },
     { id: 'diagnosis', label: 'Diagnose', icon: Target },
-    { id: 'treatment', label: 'Behandling', icon: RotateCw }
+    { id: 'treatment', label: 'Behandling', icon: RotateCw },
   ];
 
   return (
     <div className="vestibular-assessment bg-white rounded-lg shadow-sm border">
       {/* Tabs */}
       <div className="flex border-b">
-        {tabs.map(tab => {
+        {tabs.map((tab) => {
           const Icon = tab.icon;
           return (
             <button
@@ -147,8 +156,8 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                   { value: 'uvelhet', label: 'Uvelhet / Uggen / Småfull' },
                   { value: 'lysomfintlig', label: 'Lysømfintlig / Lydømfintlig' },
                   { value: 'hjernetåke', label: 'Hjernetåke / Tung i hodet' },
-                  { value: 'visuell', label: 'Synsforstyrrelser / Flirring' }
-                ].map(type => (
+                  { value: 'visuell', label: 'Synsforstyrrelser / Flirring' },
+                ].map((type) => (
                   <label key={type.value} className="flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -157,7 +166,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                         const current = assessmentData.dizziness_type || [];
                         const updated = e.target.checked
                           ? [...current, type.value]
-                          : current.filter(t => t !== type.value);
+                          : current.filter((t) => t !== type.value);
                         handleChange('dizziness_type', updated);
                       }}
                       disabled={readOnly}
@@ -187,9 +196,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
             {/* Debut */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Debut Dato
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Debut Dato</label>
                 <input
                   type="date"
                   value={assessmentData.onset_date || ''}
@@ -239,9 +246,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
 
             {/* Tilleggsplager */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Tilleggsplager
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Tilleggsplager</label>
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { key: 'hodepine', label: 'Hodepine' },
@@ -251,13 +256,15 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                   { key: 'kvalme', label: 'Kvalme/Oppkast' },
                   { key: 'nummenhet', label: 'Nummenhet' },
                   { key: 'lysomfintlig', label: 'Lysømfintlig' },
-                  { key: 'lydømfintlig', label: 'Lydømfintlig' }
-                ].map(symptom => (
+                  { key: 'lydømfintlig', label: 'Lydømfintlig' },
+                ].map((symptom) => (
                   <label key={symptom.key} className="flex items-center gap-2">
                     <input
                       type="checkbox"
                       checked={assessmentData.associated_symptoms?.[symptom.key] || false}
-                      onChange={(e) => handleNestedChange('associated_symptoms', symptom.key, e.target.checked)}
+                      onChange={(e) =>
+                        handleNestedChange('associated_symptoms', symptom.key, e.target.checked)
+                      }
                       disabled={readOnly}
                       className="rounded border-gray-300"
                     />
@@ -287,7 +294,11 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                   <RotateCw className="w-4 h-4" />
                   BPPV Testing (Posisjonstester)
                 </span>
-                {expandedTests.bppv ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                {expandedTests.bppv ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
               </button>
 
               {expandedTests.bppv && (
@@ -303,7 +314,13 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                           <input
                             type="checkbox"
                             checked={assessmentData.dix_hallpike_right?.nystagmus || false}
-                            onChange={(e) => handleNestedChange('dix_hallpike_right', 'nystagmus', e.target.checked)}
+                            onChange={(e) =>
+                              handleNestedChange(
+                                'dix_hallpike_right',
+                                'nystagmus',
+                                e.target.checked
+                              )
+                            }
                             disabled={readOnly}
                             className="rounded border-gray-300"
                           />
@@ -316,7 +333,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                               <label className="text-xs text-gray-600">Type</label>
                               <select
                                 value={assessmentData.dix_hallpike_right?.type || ''}
-                                onChange={(e) => handleNestedChange('dix_hallpike_right', 'type', e.target.value)}
+                                onChange={(e) =>
+                                  handleNestedChange('dix_hallpike_right', 'type', e.target.value)
+                                }
                                 disabled={readOnly}
                                 className="w-full text-sm p-1 border rounded"
                               >
@@ -330,7 +349,13 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                               <label className="text-xs text-gray-600">Intensitet</label>
                               <select
                                 value={assessmentData.dix_hallpike_right?.intensity || ''}
-                                onChange={(e) => handleNestedChange('dix_hallpike_right', 'intensity', e.target.value)}
+                                onChange={(e) =>
+                                  handleNestedChange(
+                                    'dix_hallpike_right',
+                                    'intensity',
+                                    e.target.value
+                                  )
+                                }
                                 disabled={readOnly}
                                 className="w-full text-sm p-1 border rounded"
                               >
@@ -344,7 +369,13 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                               <label className="text-xs text-gray-600">Karakter</label>
                               <select
                                 value={assessmentData.dix_hallpike_right?.character || ''}
-                                onChange={(e) => handleNestedChange('dix_hallpike_right', 'character', e.target.value)}
+                                onChange={(e) =>
+                                  handleNestedChange(
+                                    'dix_hallpike_right',
+                                    'character',
+                                    e.target.value
+                                  )
+                                }
                                 disabled={readOnly}
                                 className="w-full text-sm p-1 border rounded"
                               >
@@ -364,7 +395,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                           <input
                             type="checkbox"
                             checked={assessmentData.dix_hallpike_left?.nystagmus || false}
-                            onChange={(e) => handleNestedChange('dix_hallpike_left', 'nystagmus', e.target.checked)}
+                            onChange={(e) =>
+                              handleNestedChange('dix_hallpike_left', 'nystagmus', e.target.checked)
+                            }
                             disabled={readOnly}
                             className="rounded border-gray-300"
                           />
@@ -377,7 +410,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                               <label className="text-xs text-gray-600">Type</label>
                               <select
                                 value={assessmentData.dix_hallpike_left?.type || ''}
-                                onChange={(e) => handleNestedChange('dix_hallpike_left', 'type', e.target.value)}
+                                onChange={(e) =>
+                                  handleNestedChange('dix_hallpike_left', 'type', e.target.value)
+                                }
                                 disabled={readOnly}
                                 className="w-full text-sm p-1 border rounded"
                               >
@@ -391,7 +426,13 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                               <label className="text-xs text-gray-600">Intensitet</label>
                               <select
                                 value={assessmentData.dix_hallpike_left?.intensity || ''}
-                                onChange={(e) => handleNestedChange('dix_hallpike_left', 'intensity', e.target.value)}
+                                onChange={(e) =>
+                                  handleNestedChange(
+                                    'dix_hallpike_left',
+                                    'intensity',
+                                    e.target.value
+                                  )
+                                }
                                 disabled={readOnly}
                                 className="w-full text-sm p-1 border rounded"
                               >
@@ -405,7 +446,13 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                               <label className="text-xs text-gray-600">Karakter</label>
                               <select
                                 value={assessmentData.dix_hallpike_left?.character || ''}
-                                onChange={(e) => handleNestedChange('dix_hallpike_left', 'character', e.target.value)}
+                                onChange={(e) =>
+                                  handleNestedChange(
+                                    'dix_hallpike_left',
+                                    'character',
+                                    e.target.value
+                                  )
+                                }
                                 disabled={readOnly}
                                 className="w-full text-sm p-1 border rounded"
                               >
@@ -431,7 +478,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                           <input
                             type="checkbox"
                             checked={assessmentData.supine_roll_right?.nystagmus || false}
-                            onChange={(e) => handleNestedChange('supine_roll_right', 'nystagmus', e.target.checked)}
+                            onChange={(e) =>
+                              handleNestedChange('supine_roll_right', 'nystagmus', e.target.checked)
+                            }
                             disabled={readOnly}
                             className="rounded border-gray-300"
                           />
@@ -444,7 +493,13 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                               <label className="text-xs text-gray-600">Retning</label>
                               <select
                                 value={assessmentData.supine_roll_right?.direction || ''}
-                                onChange={(e) => handleNestedChange('supine_roll_right', 'direction', e.target.value)}
+                                onChange={(e) =>
+                                  handleNestedChange(
+                                    'supine_roll_right',
+                                    'direction',
+                                    e.target.value
+                                  )
+                                }
                                 disabled={readOnly}
                                 className="w-full text-sm p-1 border rounded"
                               >
@@ -457,7 +512,13 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                               <label className="text-xs text-gray-600">Intensitet</label>
                               <select
                                 value={assessmentData.supine_roll_right?.intensity || ''}
-                                onChange={(e) => handleNestedChange('supine_roll_right', 'intensity', e.target.value)}
+                                onChange={(e) =>
+                                  handleNestedChange(
+                                    'supine_roll_right',
+                                    'intensity',
+                                    e.target.value
+                                  )
+                                }
                                 disabled={readOnly}
                                 className="w-full text-sm p-1 border rounded"
                               >
@@ -478,7 +539,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                           <input
                             type="checkbox"
                             checked={assessmentData.supine_roll_left?.nystagmus || false}
-                            onChange={(e) => handleNestedChange('supine_roll_left', 'nystagmus', e.target.checked)}
+                            onChange={(e) =>
+                              handleNestedChange('supine_roll_left', 'nystagmus', e.target.checked)
+                            }
                             disabled={readOnly}
                             className="rounded border-gray-300"
                           />
@@ -491,7 +554,13 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                               <label className="text-xs text-gray-600">Retning</label>
                               <select
                                 value={assessmentData.supine_roll_left?.direction || ''}
-                                onChange={(e) => handleNestedChange('supine_roll_left', 'direction', e.target.value)}
+                                onChange={(e) =>
+                                  handleNestedChange(
+                                    'supine_roll_left',
+                                    'direction',
+                                    e.target.value
+                                  )
+                                }
                                 disabled={readOnly}
                                 className="w-full text-sm p-1 border rounded"
                               >
@@ -504,7 +573,13 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                               <label className="text-xs text-gray-600">Intensitet</label>
                               <select
                                 value={assessmentData.supine_roll_left?.intensity || ''}
-                                onChange={(e) => handleNestedChange('supine_roll_left', 'intensity', e.target.value)}
+                                onChange={(e) =>
+                                  handleNestedChange(
+                                    'supine_roll_left',
+                                    'intensity',
+                                    e.target.value
+                                  )
+                                }
                                 disabled={readOnly}
                                 className="w-full text-sm p-1 border rounded"
                               >
@@ -527,7 +602,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                       <input
                         type="checkbox"
                         checked={assessmentData.deep_head_hang?.nystagmus || false}
-                        onChange={(e) => handleNestedChange('deep_head_hang', 'nystagmus', e.target.checked)}
+                        onChange={(e) =>
+                          handleNestedChange('deep_head_hang', 'nystagmus', e.target.checked)
+                        }
                         disabled={readOnly}
                         className="rounded border-gray-300"
                       />
@@ -536,7 +613,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                     {assessmentData.deep_head_hang?.nystagmus && (
                       <textarea
                         value={assessmentData.deep_head_hang?.notes || ''}
-                        onChange={(e) => handleNestedChange('deep_head_hang', 'notes', e.target.value)}
+                        onChange={(e) =>
+                          handleNestedChange('deep_head_hang', 'notes', e.target.value)
+                        }
                         disabled={readOnly}
                         rows={2}
                         className="w-full p-2 border rounded text-sm mt-2"
@@ -558,7 +637,11 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                   <Activity className="w-4 h-4" />
                   Balanse & Cerebellare Tester
                 </span>
-                {expandedTests.balance ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                {expandedTests.balance ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
               </button>
 
               {expandedTests.balance && (
@@ -566,10 +649,14 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                   <div className="grid grid-cols-2 gap-4">
                     {/* Fukuda's Test */}
                     <div>
-                      <label className="block text-sm font-medium mb-2">Fukuda's Test (Step test)</label>
+                      <label className="block text-sm font-medium mb-2">
+                        Fukuda's Test (Step test)
+                      </label>
                       <select
                         value={assessmentData.fukuda_test?.result || 'ua'}
-                        onChange={(e) => handleNestedChange('fukuda_test', 'result', e.target.value)}
+                        onChange={(e) =>
+                          handleNestedChange('fukuda_test', 'result', e.target.value)
+                        }
                         disabled={readOnly}
                         className="w-full p-2 border rounded"
                       >
@@ -580,7 +667,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                         <input
                           type="text"
                           value={assessmentData.fukuda_test?.details || ''}
-                          onChange={(e) => handleNestedChange('fukuda_test', 'details', e.target.value)}
+                          onChange={(e) =>
+                            handleNestedChange('fukuda_test', 'details', e.target.value)
+                          }
                           disabled={readOnly}
                           className="w-full p-2 border rounded mt-2 text-sm"
                           placeholder="f.eks. '45 gr rot hø'"
@@ -593,7 +682,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                       <label className="block text-sm font-medium mb-2">Rhomberg's Test</label>
                       <select
                         value={assessmentData.rhomberg_test?.result || 'ua'}
-                        onChange={(e) => handleNestedChange('rhomberg_test', 'result', e.target.value)}
+                        onChange={(e) =>
+                          handleNestedChange('rhomberg_test', 'result', e.target.value)
+                        }
                         disabled={readOnly}
                         className="w-full p-2 border rounded"
                       >
@@ -604,7 +695,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                         <input
                           type="text"
                           value={assessmentData.rhomberg_test?.direction || ''}
-                          onChange={(e) => handleNestedChange('rhomberg_test', 'direction', e.target.value)}
+                          onChange={(e) =>
+                            handleNestedChange('rhomberg_test', 'direction', e.target.value)
+                          }
                           disabled={readOnly}
                           className="w-full p-2 border rounded mt-2 text-sm"
                           placeholder="Retning: hø/ve"
@@ -626,7 +719,11 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                   <Eye className="w-4 h-4" />
                   Oculomotoriske Tester
                 </span>
-                {expandedTests.oculomotor ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                {expandedTests.oculomotor ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
               </button>
 
               {expandedTests.oculomotor && (
@@ -636,7 +733,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                       <label className="block text-sm font-medium mb-2">Sakkader</label>
                       <select
                         value={assessmentData.saccades?.horizontal || 'ua'}
-                        onChange={(e) => handleNestedChange('saccades', 'horizontal', e.target.value)}
+                        onChange={(e) =>
+                          handleNestedChange('saccades', 'horizontal', e.target.value)
+                        }
                         disabled={readOnly}
                         className="w-full p-2 border rounded text-sm"
                       >
@@ -651,7 +750,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                       <label className="block text-sm font-medium mb-2">Smooth Pursuits</label>
                       <select
                         value={assessmentData.smooth_pursuits?.horizontal || 'ua'}
-                        onChange={(e) => handleNestedChange('smooth_pursuits', 'horizontal', e.target.value)}
+                        onChange={(e) =>
+                          handleNestedChange('smooth_pursuits', 'horizontal', e.target.value)
+                        }
                         disabled={readOnly}
                         className="w-full p-2 border rounded text-sm"
                       >
@@ -690,9 +791,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
             </h3>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Primærdiagnose
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Primærdiagnose</label>
               <select
                 value={assessmentData.primary_diagnosis || ''}
                 onChange={(e) => handleChange('primary_diagnosis', e.target.value)}
@@ -786,7 +885,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
               {assessmentData.dhi_score !== null && (
                 <p className="text-sm text-gray-600 mt-1">
                   {assessmentData.dhi_score <= 30 && 'Mild funksjonsnedsettelse'}
-                  {assessmentData.dhi_score > 30 && assessmentData.dhi_score <= 60 && 'Moderat funksjonsnedsettelse'}
+                  {assessmentData.dhi_score > 30 &&
+                    assessmentData.dhi_score <= 60 &&
+                    'Moderat funksjonsnedsettelse'}
                   {assessmentData.dhi_score > 60 && 'Alvorlig funksjonsnedsettelse'}
                 </p>
               )}
@@ -843,17 +944,21 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                   { value: 'deep_head_hang', label: 'Deep Head Hang (fremre buegang)' },
                   { value: 'semont_hø', label: 'Semont manøver høyre' },
                   { value: 'semont_ve', label: 'Semont manøver venstre' },
-                  { value: 'gufoni', label: 'Gufoni manøver' }
-                ].map(maneuver => (
+                  { value: 'gufoni', label: 'Gufoni manøver' },
+                ].map((maneuver) => (
                   <label key={maneuver.value} className="flex items-center gap-2">
                     <input
                       type="checkbox"
-                      checked={assessmentData.maneuvers_performed?.some(m => m.type === maneuver.value) || false}
+                      checked={
+                        assessmentData.maneuvers_performed?.some(
+                          (m) => m.type === maneuver.value
+                        ) || false
+                      }
                       onChange={(e) => {
                         const current = assessmentData.maneuvers_performed || [];
                         const updated = e.target.checked
                           ? [...current, { type: maneuver.value, success: true }]
-                          : current.filter(m => m.type !== maneuver.value);
+                          : current.filter((m) => m.type !== maneuver.value);
                         handleChange('maneuvers_performed', updated);
                       }}
                       disabled={readOnly}
@@ -875,17 +980,20 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                   { value: 'gaze_stability', label: 'Gaze Stability (feste blikket)' },
                   { value: 'balance', label: 'Balansetrening' },
                   { value: 'opk', label: 'OPK-stimulering (YouTube/app)' },
-                  { value: 'brandt_daroff', label: 'Brandt-Daroff habituering' }
-                ].map(exercise => (
+                  { value: 'brandt_daroff', label: 'Brandt-Daroff habituering' },
+                ].map((exercise) => (
                   <label key={exercise.value} className="flex items-center gap-2">
                     <input
                       type="checkbox"
-                      checked={assessmentData.vrt_exercises?.some(e => e.type === exercise.value) || false}
+                      checked={
+                        assessmentData.vrt_exercises?.some((e) => e.type === exercise.value) ||
+                        false
+                      }
                       onChange={(e) => {
                         const current = assessmentData.vrt_exercises || [];
                         const updated = e.target.checked
                           ? [...current, { type: exercise.value }]
-                          : current.filter(ex => ex.type !== exercise.value);
+                          : current.filter((ex) => ex.type !== exercise.value);
                         handleChange('vrt_exercises', updated);
                       }}
                       disabled={readOnly}

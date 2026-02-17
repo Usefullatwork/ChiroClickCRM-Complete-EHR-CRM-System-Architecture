@@ -3,7 +3,7 @@
  * Allows users to reorder SOAP note sections via drag-and-drop
  */
 
-import React, { useState, useCallback, useEffect } from 'react'
+import _React, { useState, useCallback, useEffect } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -11,28 +11,28 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  DragOverlay
-} from '@dnd-kit/core'
+  _DragOverlay,
+} from '@dnd-kit/core';
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
-  useSortable
-} from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import {
   GripVertical,
-  ChevronDown,
-  ChevronUp,
+  _ChevronDown,
+  _ChevronUp,
   Maximize2,
   Minimize2,
   Eye,
   EyeOff,
   Settings,
-  Save,
-  RotateCcw
-} from 'lucide-react'
+  _Save,
+  RotateCcw,
+} from 'lucide-react';
 
 // Default SOAP sections with Norwegian labels
 const DEFAULT_SECTIONS = [
@@ -43,7 +43,7 @@ const DEFAULT_SECTIONS = [
     labelEn: 'Subjective',
     icon: 'S',
     color: 'blue',
-    description: 'Pasientens symptomer og historie'
+    description: 'Pasientens symptomer og historie',
   },
   {
     id: 'objective',
@@ -52,7 +52,7 @@ const DEFAULT_SECTIONS = [
     labelEn: 'Objective',
     icon: 'O',
     color: 'green',
-    description: 'Kliniske funn og undersøkelse'
+    description: 'Kliniske funn og undersøkelse',
   },
   {
     id: 'assessment',
@@ -61,7 +61,7 @@ const DEFAULT_SECTIONS = [
     labelEn: 'Assessment',
     icon: 'A',
     color: 'orange',
-    description: 'Diagnose og vurdering'
+    description: 'Diagnose og vurdering',
   },
   {
     id: 'plan',
@@ -70,20 +70,28 @@ const DEFAULT_SECTIONS = [
     labelEn: 'Plan',
     icon: 'P',
     color: 'purple',
-    description: 'Behandling og oppfølging'
-  }
-]
+    description: 'Behandling og oppfølging',
+  },
+];
 
 // Get color classes
 const getColorClasses = (color, isActive = false) => {
   const colors = {
-    blue: isActive ? 'bg-blue-100 border-blue-500 text-blue-700' : 'bg-blue-50 border-blue-200 text-blue-600',
-    green: isActive ? 'bg-green-100 border-green-500 text-green-700' : 'bg-green-50 border-green-200 text-green-600',
-    orange: isActive ? 'bg-orange-100 border-orange-500 text-orange-700' : 'bg-orange-50 border-orange-200 text-orange-600',
-    purple: isActive ? 'bg-purple-100 border-purple-500 text-purple-700' : 'bg-purple-50 border-purple-200 text-purple-600'
-  }
-  return colors[color] || colors.blue
-}
+    blue: isActive
+      ? 'bg-blue-100 border-blue-500 text-blue-700'
+      : 'bg-blue-50 border-blue-200 text-blue-600',
+    green: isActive
+      ? 'bg-green-100 border-green-500 text-green-700'
+      : 'bg-green-50 border-green-200 text-green-600',
+    orange: isActive
+      ? 'bg-orange-100 border-orange-500 text-orange-700'
+      : 'bg-orange-50 border-orange-200 text-orange-600',
+    purple: isActive
+      ? 'bg-purple-100 border-purple-500 text-purple-700'
+      : 'bg-purple-50 border-purple-200 text-purple-600',
+  };
+  return colors[color] || colors.blue;
+};
 
 // Sortable Section Item
 const SortableSectionItem = ({
@@ -96,33 +104,34 @@ const SortableSectionItem = ({
   onToggleHidden,
   isActive,
   onFocus,
-  readOnly
+  readOnly,
 }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging
-  } = useSortable({ id: section.id })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: section.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 1000 : 'auto'
-  }
+    zIndex: isDragging ? 1000 : 'auto',
+  };
 
-  const colorClasses = getColorClasses(section.color, isActive)
+  const colorClasses = getColorClasses(section.color, isActive);
 
   if (isHidden) {
     return (
-      <div ref={setNodeRef} style={style} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg mb-2 opacity-50">
+      <div
+        ref={setNodeRef}
+        style={style}
+        className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg mb-2 opacity-50"
+      >
         <div {...attributes} {...listeners} className="cursor-grab text-gray-400">
           <GripVertical className="w-4 h-4" />
         </div>
-        <div className={`w-7 h-7 rounded flex items-center justify-center font-bold text-sm ${colorClasses}`}>
+        <div
+          className={`w-7 h-7 rounded flex items-center justify-center font-bold text-sm ${colorClasses}`}
+        >
           {section.icon}
         </div>
         <span className="flex-1 text-gray-500 line-through">{section.label}</span>
@@ -134,7 +143,7 @@ const SortableSectionItem = ({
           <Eye className="w-4 h-4" />
         </button>
       </div>
-    )
+    );
   }
 
   return (
@@ -151,15 +160,15 @@ const SortableSectionItem = ({
           <GripVertical className="w-4 h-4" />
         </div>
 
-        <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-lg bg-white shadow-sm`}>
+        <div
+          className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-lg bg-white shadow-sm`}
+        >
           {section.icon}
         </div>
 
         <div className="flex-1">
           <h3 className="font-semibold">{section.label}</h3>
-          {section.description && (
-            <p className="text-xs opacity-75">{section.description}</p>
-          )}
+          {section.description && <p className="text-xs opacity-75">{section.description}</p>}
         </div>
 
         <div className="flex items-center gap-1">
@@ -175,11 +184,7 @@ const SortableSectionItem = ({
             className="p-1.5 hover:bg-white/50 rounded"
             title={isCollapsed ? 'Utvid' : 'Minimer'}
           >
-            {isCollapsed ? (
-              <Maximize2 className="w-4 h-4" />
-            ) : (
-              <Minimize2 className="w-4 h-4" />
-            )}
+            {isCollapsed ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
           </button>
         </div>
       </div>
@@ -198,8 +203,8 @@ const SortableSectionItem = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
 // Main Component
 const DraggableSoapSections = ({
@@ -210,132 +215,143 @@ const DraggableSoapSections = ({
   sectionOrder: initialOrder,
   onOrderChange,
   collapsedSections: initialCollapsed,
-  hiddenSections: initialHidden
+  hiddenSections: initialHidden,
 }) => {
   // State
-  const [sections, setSections] = useState(DEFAULT_SECTIONS)
-  const [collapsedSections, setCollapsedSections] = useState(new Set(initialCollapsed || []))
-  const [hiddenSections, setHiddenSections] = useState(new Set(initialHidden || []))
-  const [activeSection, setActiveSection] = useState(null)
-  const [showSettings, setShowSettings] = useState(false)
+  const [sections, setSections] = useState(DEFAULT_SECTIONS);
+  const [collapsedSections, setCollapsedSections] = useState(new Set(initialCollapsed || []));
+  const [hiddenSections, setHiddenSections] = useState(new Set(initialHidden || []));
+  const [activeSection, setActiveSection] = useState(null);
+  const [showSettings, setShowSettings] = useState(false);
 
   // DnD sensors
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8
-      }
+        distance: 8,
+      },
     }),
     useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates
+      coordinateGetter: sortableKeyboardCoordinates,
     })
-  )
+  );
 
   // Apply initial order
   useEffect(() => {
     if (initialOrder && initialOrder.length > 0) {
-      setSections(prev => {
-        const orderedSections = []
-        initialOrder.forEach(id => {
-          const section = prev.find(s => s.id === id)
-          if (section) orderedSections.push(section)
-        })
-        // Add any sections not in the order
-        prev.forEach(section => {
-          if (!orderedSections.find(s => s.id === section.id)) {
-            orderedSections.push(section)
+      setSections((prev) => {
+        const orderedSections = [];
+        initialOrder.forEach((id) => {
+          const section = prev.find((s) => s.id === id);
+          if (section) {
+            orderedSections.push(section);
           }
-        })
-        return orderedSections
-      })
+        });
+        // Add any sections not in the order
+        prev.forEach((section) => {
+          if (!orderedSections.find((s) => s.id === section.id)) {
+            orderedSections.push(section);
+          }
+        });
+        return orderedSections;
+      });
     }
-  }, [initialOrder])
+  }, [initialOrder]);
 
   // Handle drag end
-  const handleDragEnd = useCallback((event) => {
-    const { active, over } = event
+  const handleDragEnd = useCallback(
+    (event) => {
+      const { active, over } = event;
 
-    if (active.id !== over?.id) {
-      setSections(items => {
-        const oldIndex = items.findIndex(i => i.id === active.id)
-        const newIndex = items.findIndex(i => i.id === over.id)
-        const newOrder = arrayMove(items, oldIndex, newIndex)
+      if (active.id !== over?.id) {
+        setSections((items) => {
+          const oldIndex = items.findIndex((i) => i.id === active.id);
+          const newIndex = items.findIndex((i) => i.id === over.id);
+          const newOrder = arrayMove(items, oldIndex, newIndex);
 
-        // Notify parent of order change
-        if (onOrderChange) {
-          onOrderChange(newOrder.map(s => s.id))
-        }
+          // Notify parent of order change
+          if (onOrderChange) {
+            onOrderChange(newOrder.map((s) => s.id));
+          }
 
-        return newOrder
-      })
-    }
-  }, [onOrderChange])
+          return newOrder;
+        });
+      }
+    },
+    [onOrderChange]
+  );
 
   // Toggle section collapse
   const toggleCollapse = useCallback((sectionId) => {
-    setCollapsedSections(prev => {
-      const newSet = new Set(prev)
+    setCollapsedSections((prev) => {
+      const newSet = new Set(prev);
       if (newSet.has(sectionId)) {
-        newSet.delete(sectionId)
+        newSet.delete(sectionId);
       } else {
-        newSet.add(sectionId)
+        newSet.add(sectionId);
       }
-      return newSet
-    })
-  }, [])
+      return newSet;
+    });
+  }, []);
 
   // Toggle section hidden
   const toggleHidden = useCallback((sectionId) => {
-    setHiddenSections(prev => {
-      const newSet = new Set(prev)
+    setHiddenSections((prev) => {
+      const newSet = new Set(prev);
       if (newSet.has(sectionId)) {
-        newSet.delete(sectionId)
+        newSet.delete(sectionId);
       } else {
-        newSet.add(sectionId)
+        newSet.add(sectionId);
       }
-      return newSet
-    })
-  }, [])
+      return newSet;
+    });
+  }, []);
 
   // Handle content change
-  const handleContentChange = useCallback((sectionKey, value) => {
-    if (onChange) {
-      onChange(sectionKey, value)
-    }
-  }, [onChange])
+  const handleContentChange = useCallback(
+    (sectionKey, value) => {
+      if (onChange) {
+        onChange(sectionKey, value);
+      }
+    },
+    [onChange]
+  );
 
   // Handle section focus
-  const handleFocus = useCallback((sectionKey) => {
-    setActiveSection(sectionKey)
-    if (onSectionFocus) {
-      onSectionFocus(sectionKey)
-    }
-  }, [onSectionFocus])
+  const handleFocus = useCallback(
+    (sectionKey) => {
+      setActiveSection(sectionKey);
+      if (onSectionFocus) {
+        onSectionFocus(sectionKey);
+      }
+    },
+    [onSectionFocus]
+  );
 
   // Reset to defaults
   const handleReset = useCallback(() => {
-    setSections(DEFAULT_SECTIONS)
-    setCollapsedSections(new Set())
-    setHiddenSections(new Set())
+    setSections(DEFAULT_SECTIONS);
+    setCollapsedSections(new Set());
+    setHiddenSections(new Set());
     if (onOrderChange) {
-      onOrderChange(DEFAULT_SECTIONS.map(s => s.id))
+      onOrderChange(DEFAULT_SECTIONS.map((s) => s.id));
     }
-  }, [onOrderChange])
+  }, [onOrderChange]);
 
   // Expand all
   const expandAll = useCallback(() => {
-    setCollapsedSections(new Set())
-  }, [])
+    setCollapsedSections(new Set());
+  }, []);
 
   // Collapse all
   const collapseAll = useCallback(() => {
-    setCollapsedSections(new Set(sections.map(s => s.id)))
-  }, [sections])
+    setCollapsedSections(new Set(sections.map((s) => s.id)));
+  }, [sections]);
 
   // Show all hidden
   const showAllHidden = useCallback(() => {
-    setHiddenSections(new Set())
-  }, [])
+    setHiddenSections(new Set());
+  }, []);
 
   return (
     <div className="relative">
@@ -345,10 +361,7 @@ const DraggableSoapSections = ({
 
         <div className="flex items-center gap-2">
           {hiddenSections.size > 0 && (
-            <button
-              onClick={showAllHidden}
-              className="text-xs text-blue-600 hover:underline"
-            >
+            <button onClick={showAllHidden} className="text-xs text-blue-600 hover:underline">
               Vis skjulte ({hiddenSections.size})
             </button>
           )}
@@ -399,7 +412,7 @@ const DraggableSoapSections = ({
             Dra seksjonene for å endre rekkefølge. Klikk på øye-ikonet for å skjule.
           </p>
           <div className="flex flex-wrap gap-2">
-            {sections.map(section => (
+            {sections.map((section) => (
               <div
                 key={section.id}
                 className={`flex items-center gap-1 px-2 py-1 rounded text-sm ${
@@ -417,16 +430,9 @@ const DraggableSoapSections = ({
       )}
 
       {/* Sortable Sections */}
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext
-          items={sections.map(s => s.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          {sections.map(section => (
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={sections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+          {sections.map((section) => (
             <SortableSectionItem
               key={section.id}
               section={section}
@@ -447,16 +453,14 @@ const DraggableSoapSections = ({
       {/* Hidden sections indicator */}
       {hiddenSections.size > 0 && (
         <div className="mt-2 p-2 bg-gray-100 rounded-lg text-center">
-          <button
-            onClick={showAllHidden}
-            className="text-sm text-gray-600 hover:text-gray-900"
-          >
-            {hiddenSections.size} seksjon{hiddenSections.size !== 1 ? 'er' : ''} skjult - klikk for å vise
+          <button onClick={showAllHidden} className="text-sm text-gray-600 hover:text-gray-900">
+            {hiddenSections.size} seksjon{hiddenSections.size !== 1 ? 'er' : ''} skjult - klikk for
+            å vise
           </button>
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default DraggableSoapSections
+export default DraggableSoapSections;

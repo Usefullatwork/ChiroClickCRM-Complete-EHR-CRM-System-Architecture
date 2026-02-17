@@ -10,48 +10,48 @@
  * - Sidebar with appointment list
  */
 
-import { useMemo, useRef, useEffect } from 'react'
-import { format, parseISO, isToday, differenceInMinutes } from 'date-fns'
-import { nb } from 'date-fns/locale'
-import { Calendar as CalendarIcon, Plus, Clock, User } from 'lucide-react'
-import AppointmentCard from './AppointmentCard'
+import { useMemo, useRef, useEffect } from 'react';
+import { format, parseISO, isToday, differenceInMinutes } from 'date-fns';
+import { nb } from 'date-fns/locale';
+import { Calendar as CalendarIcon, Plus, Clock, User } from 'lucide-react';
+import AppointmentCard from './AppointmentCard';
 
 // =============================================================================
 // CONSTANTS
 // =============================================================================
 
-const HOUR_HEIGHT = 64 // pixels per hour
-const SLOT_HEIGHT = HOUR_HEIGHT / 4 // 15 minute slots
+const HOUR_HEIGHT = 64; // pixels per hour
+const SLOT_HEIGHT = HOUR_HEIGHT / 4; // 15 minute slots
 
 // =============================================================================
 // HELPER FUNCTIONS
 // =============================================================================
 
 function getAppointmentStyle(appointment, workHours) {
-  const startTime = parseISO(appointment.start_time)
-  const endTime = parseISO(appointment.end_time)
+  const startTime = parseISO(appointment.start_time);
+  const endTime = parseISO(appointment.end_time);
 
-  const startHour = startTime.getHours()
-  const startMinute = startTime.getMinutes()
+  const startHour = startTime.getHours();
+  const startMinute = startTime.getMinutes();
 
-  const minutesFromStart = (startHour - workHours.start) * 60 + startMinute
-  const top = (minutesFromStart / 60) * HOUR_HEIGHT
+  const minutesFromStart = (startHour - workHours.start) * 60 + startMinute;
+  const top = (minutesFromStart / 60) * HOUR_HEIGHT;
 
-  const durationMinutes = differenceInMinutes(endTime, startTime)
-  const height = Math.max((durationMinutes / 60) * HOUR_HEIGHT, 32)
+  const durationMinutes = differenceInMinutes(endTime, startTime);
+  const height = Math.max((durationMinutes / 60) * HOUR_HEIGHT, 32);
 
-  return { top, height }
+  return { top, height };
 }
 
 function generateTimeSlots(workHours) {
-  const slots = []
+  const slots = [];
   for (let hour = workHours.start; hour < workHours.end; hour++) {
-    slots.push({ hour, minute: 0 })
-    slots.push({ hour, minute: 15 })
-    slots.push({ hour, minute: 30 })
-    slots.push({ hour, minute: 45 })
+    slots.push({ hour, minute: 0 });
+    slots.push({ hour, minute: 15 });
+    slots.push({ hour, minute: 30 });
+    slots.push({ hour, minute: 45 });
   }
-  return slots
+  return slots;
 }
 
 // =============================================================================
@@ -59,10 +59,10 @@ function generateTimeSlots(workHours) {
 // =============================================================================
 
 function AppointmentListItem({ appointment, typeColors, statusColors, onClick }) {
-  const startTime = parseISO(appointment.start_time)
-  const endTime = parseISO(appointment.end_time)
-  const typeColor = typeColors[appointment.appointment_type] || typeColors.FOLLOWUP
-  const statusColor = statusColors[appointment.status] || statusColors.SCHEDULED
+  const startTime = parseISO(appointment.start_time);
+  const endTime = parseISO(appointment.end_time);
+  const typeColor = typeColors[appointment.appointment_type] || typeColors.FOLLOWUP;
+  const statusColor = statusColors[appointment.status] || statusColors.SCHEDULED;
 
   return (
     <div
@@ -76,7 +76,9 @@ function AppointmentListItem({ appointment, typeColors, statusColors, onClick })
             {format(startTime, 'HH:mm')} - {format(endTime, 'HH:mm')}
           </span>
         </div>
-        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColor.bg} ${statusColor.text}`}>
+        <span
+          className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColor.bg} ${statusColor.text}`}
+        >
           {statusColor.label}
         </span>
       </div>
@@ -84,16 +86,12 @@ function AppointmentListItem({ appointment, typeColors, statusColors, onClick })
         <User className="w-4 h-4 text-gray-400" />
         <span className="font-semibold text-gray-900">{appointment.patient_name}</span>
       </div>
-      <div className={`text-xs mt-1 ${typeColor.text}`}>
-        {typeColor.label}
-      </div>
+      <div className={`text-xs mt-1 ${typeColor.text}`}>{typeColor.label}</div>
       {appointment.patient_notes && (
-        <p className="text-xs text-gray-500 mt-2 line-clamp-2">
-          {appointment.patient_notes}
-        </p>
+        <p className="text-xs text-gray-500 mt-2 line-clamp-2">{appointment.patient_notes}</p>
       )}
     </div>
-  )
+  );
 }
 
 // =============================================================================
@@ -101,27 +99,24 @@ function AppointmentListItem({ appointment, typeColors, statusColors, onClick })
 // =============================================================================
 
 function CurrentTimeIndicator({ workHours }) {
-  const now = new Date()
-  const currentHour = now.getHours()
-  const currentMinute = now.getMinutes()
+  const now = new Date();
+  const currentHour = now.getHours();
+  const currentMinute = now.getMinutes();
 
   if (currentHour < workHours.start || currentHour >= workHours.end) {
-    return null
+    return null;
   }
 
-  const top = ((currentHour - workHours.start) * 60 + currentMinute) / 60 * HOUR_HEIGHT
+  const top = (((currentHour - workHours.start) * 60 + currentMinute) / 60) * HOUR_HEIGHT;
 
   return (
-    <div
-      className="absolute left-0 right-0 z-20 pointer-events-none"
-      style={{ top: `${top}px` }}
-    >
+    <div className="absolute left-0 right-0 z-20 pointer-events-none" style={{ top: `${top}px` }}>
       <div className="flex items-center">
         <div className="w-3 h-3 rounded-full bg-red-500 -ml-1.5" />
         <div className="flex-1 h-0.5 bg-red-500" />
       </div>
     </div>
-  )
+  );
 }
 
 // =============================================================================
@@ -132,77 +127,79 @@ export default function DayView({
   date,
   appointments,
   workHours,
-  slotDuration,
+  _slotDuration,
   onSlotClick,
   onAppointmentClick,
   typeColors,
   statusColors,
-  isLoading
+  isLoading,
 }) {
-  const scrollContainerRef = useRef(null)
-  const isTodayDate = isToday(date)
-  const slots = generateTimeSlots(workHours)
+  const scrollContainerRef = useRef(null);
+  const isTodayDate = isToday(date);
+  const slots = generateTimeSlots(workHours);
 
   // Filter out cancelled/no-show for grid
   const visibleAppointments = useMemo(() => {
-    return appointments.filter(apt => !['CANCELLED', 'NO_SHOW'].includes(apt.status))
-  }, [appointments])
+    return appointments.filter((apt) => !['CANCELLED', 'NO_SHOW'].includes(apt.status));
+  }, [appointments]);
 
   // Position appointments with overlap handling
   const positionedAppointments = useMemo(() => {
-    if (!visibleAppointments || visibleAppointments.length === 0) return []
+    if (!visibleAppointments || visibleAppointments.length === 0) {
+      return [];
+    }
 
-    const sorted = [...visibleAppointments].sort((a, b) =>
-      new Date(a.start_time) - new Date(b.start_time)
-    )
+    const sorted = [...visibleAppointments].sort(
+      (a, b) => new Date(a.start_time) - new Date(b.start_time)
+    );
 
-    const positioned = []
-    const columns = []
+    const positioned = [];
+    const columns = [];
 
     sorted.forEach((apt) => {
-      const aptStart = parseISO(apt.start_time)
-      const aptEnd = parseISO(apt.end_time)
+      const aptStart = parseISO(apt.start_time);
+      const _aptEnd = parseISO(apt.end_time);
 
-      let columnIndex = 0
+      let columnIndex = 0;
       while (columns[columnIndex]) {
-        const lastInColumn = columns[columnIndex][columns[columnIndex].length - 1]
-        const lastEnd = parseISO(lastInColumn.end_time)
+        const lastInColumn = columns[columnIndex][columns[columnIndex].length - 1];
+        const lastEnd = parseISO(lastInColumn.end_time);
         if (aptStart >= lastEnd) {
-          break
+          break;
         }
-        columnIndex++
+        columnIndex++;
       }
 
       if (!columns[columnIndex]) {
-        columns[columnIndex] = []
+        columns[columnIndex] = [];
       }
-      columns[columnIndex].push(apt)
+      columns[columnIndex].push(apt);
 
       positioned.push({
         ...apt,
         columnIndex,
-        totalColumns: 0
-      })
-    })
+        totalColumns: 0,
+      });
+    });
 
     return positioned.map((apt) => ({
       ...apt,
-      totalColumns: columns.length
-    }))
-  }, [visibleAppointments])
+      totalColumns: columns.length,
+    }));
+  }, [visibleAppointments]);
 
   // Scroll to current time on mount
   useEffect(() => {
     if (scrollContainerRef.current && isTodayDate) {
-      const now = new Date()
-      const currentHour = now.getHours()
+      const now = new Date();
+      const currentHour = now.getHours();
 
       if (currentHour >= workHours.start && currentHour < workHours.end) {
-        const scrollPosition = Math.max(0, ((currentHour - workHours.start - 1) * HOUR_HEIGHT))
-        scrollContainerRef.current.scrollTop = scrollPosition
+        const scrollPosition = Math.max(0, (currentHour - workHours.start - 1) * HOUR_HEIGHT);
+        scrollContainerRef.current.scrollTop = scrollPosition;
       }
     }
-  }, [workHours, isTodayDate])
+  }, [workHours, isTodayDate]);
 
   if (isLoading) {
     return (
@@ -212,7 +209,7 @@ export default function DayView({
           <p className="mt-4 text-gray-500">Laster dag...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -220,8 +217,12 @@ export default function DayView({
       {/* Main time grid */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Day header */}
-        <div className={`px-6 py-4 border-b border-gray-200 ${isTodayDate ? 'bg-blue-50' : 'bg-gray-50'}`}>
-          <h2 className={`text-xl font-bold capitalize ${isTodayDate ? 'text-blue-600' : 'text-gray-900'}`}>
+        <div
+          className={`px-6 py-4 border-b border-gray-200 ${isTodayDate ? 'bg-blue-50' : 'bg-gray-50'}`}
+        >
+          <h2
+            className={`text-xl font-bold capitalize ${isTodayDate ? 'text-blue-600' : 'text-gray-900'}`}
+          >
             {format(date, 'EEEE d. MMMM yyyy', { locale: nb })}
           </h2>
           <p className="text-sm text-gray-500 mt-1">
@@ -235,18 +236,14 @@ export default function DayView({
             {/* Time column */}
             <div className="w-20 flex-shrink-0 border-r border-gray-200 bg-gray-50">
               {Array.from({ length: workHours.end - workHours.start }).map((_, i) => {
-                const hour = workHours.start + i
+                const hour = workHours.start + i;
                 return (
-                  <div
-                    key={hour}
-                    className="relative"
-                    style={{ height: `${HOUR_HEIGHT}px` }}
-                  >
+                  <div key={hour} className="relative" style={{ height: `${HOUR_HEIGHT}px` }}>
                     <span className="absolute top-0 right-3 -translate-y-1/2 text-sm text-gray-500 font-medium">
                       {String(hour).padStart(2, '0')}:00
                     </span>
                   </div>
-                )
+                );
               })}
             </div>
 
@@ -271,18 +268,18 @@ export default function DayView({
 
               {/* Clickable time slots */}
               {slots.map(({ hour, minute }) => {
-                const slotTop = ((hour - workHours.start) * 60 + minute) / 60 * HOUR_HEIGHT
+                const slotTop = (((hour - workHours.start) * 60 + minute) / 60) * HOUR_HEIGHT;
                 return (
                   <div
                     key={`${hour}-${minute}`}
                     className="absolute w-full cursor-pointer hover:bg-blue-50/50 transition-colors"
                     style={{
                       top: `${slotTop}px`,
-                      height: `${SLOT_HEIGHT}px`
+                      height: `${SLOT_HEIGHT}px`,
                     }}
                     onClick={() => onSlotClick(date, hour, minute)}
                   />
-                )
+                );
               })}
 
               {/* Current time indicator */}
@@ -290,13 +287,15 @@ export default function DayView({
 
               {/* Appointments */}
               {positionedAppointments.map((apt) => {
-                const style = getAppointmentStyle(apt, workHours)
-                const width = apt.totalColumns > 1
-                  ? `calc(${100 / apt.totalColumns}% - 8px)`
-                  : 'calc(100% - 16px)'
-                const left = apt.totalColumns > 1
-                  ? `calc(${(apt.columnIndex / apt.totalColumns) * 100}% + 8px)`
-                  : '8px'
+                const style = getAppointmentStyle(apt, workHours);
+                const width =
+                  apt.totalColumns > 1
+                    ? `calc(${100 / apt.totalColumns}% - 8px)`
+                    : 'calc(100% - 16px)';
+                const left =
+                  apt.totalColumns > 1
+                    ? `calc(${(apt.columnIndex / apt.totalColumns) * 100}% + 8px)`
+                    : '8px';
 
                 return (
                   <div
@@ -307,7 +306,7 @@ export default function DayView({
                       height: `${style.height}px`,
                       width,
                       left,
-                      zIndex: 10
+                      zIndex: 10,
                     }}
                   >
                     <AppointmentCard
@@ -319,7 +318,7 @@ export default function DayView({
                       compact={style.height < 50}
                     />
                   </div>
-                )
+                );
               })}
             </div>
           </div>
@@ -370,5 +369,5 @@ export default function DayView({
         </div>
       </div>
     </div>
-  )
+  );
 }

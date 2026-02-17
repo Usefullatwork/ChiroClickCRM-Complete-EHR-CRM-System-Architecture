@@ -4,7 +4,7 @@
  * Demo page to test all examination components.
  */
 
-import React, { useState } from 'react';
+import _React, { useState } from 'react';
 import {
   Activity,
   Brain,
@@ -25,7 +25,7 @@ import {
   User,
   Circle,
   Hand,
-  Footprints
+  Footprints,
 } from 'lucide-react';
 
 // Import all examination components
@@ -48,12 +48,22 @@ import {
   LowerExtremityDiagram,
   UpperExtremityDiagram,
   ROMTable,
-  VisualROMSelector
+  VisualROMSelector,
 } from '../components/examination';
 
 // Wrapper component to show all regional diagrams - LARGER SIZE
 function RegionalDiagramsDemo({ values = {}, onChange, lang = 'no' }) {
-  const regions = ['shoulder', 'knee', 'ankle', 'wrist', 'elbow', 'cervical', 'lumbar', 'hip', 'head'];
+  const regions = [
+    'shoulder',
+    'knee',
+    'ankle',
+    'wrist',
+    'elbow',
+    'cervical',
+    'lumbar',
+    'hip',
+    'head',
+  ];
 
   return (
     <div className="space-y-6">
@@ -63,7 +73,7 @@ function RegionalDiagramsDemo({ values = {}, onChange, lang = 'no' }) {
           : 'Click on diagrams to mark findings. Select left or right side.'}
       </p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {regions.map(region => (
+        {regions.map((region) => (
           <div key={region} className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm">
             <RegionalBodyDiagram
               region={region}
@@ -97,7 +107,9 @@ function LowerExtremityDemo({ values = {}, onChange, lang = 'no' }) {
       {/* SLR Angle inputs - prominent at top */}
       <div className="flex gap-4 p-3 bg-red-50 border border-red-200 rounded-lg">
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-red-700">SLR {lang === 'no' ? 'Venstre' : 'Left'}:</label>
+          <label className="text-sm font-medium text-red-700">
+            SLR {lang === 'no' ? 'Venstre' : 'Left'}:
+          </label>
           <input
             type="number"
             min="0"
@@ -110,7 +122,9 @@ function LowerExtremityDemo({ values = {}, onChange, lang = 'no' }) {
           <span className="text-red-600">°</span>
         </div>
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-red-700">SLR {lang === 'no' ? 'Høyre' : 'Right'}:</label>
+          <label className="text-sm font-medium text-red-700">
+            SLR {lang === 'no' ? 'Høyre' : 'Right'}:
+          </label>
           <input
             type="number"
             min="0"
@@ -124,7 +138,8 @@ function LowerExtremityDemo({ values = {}, onChange, lang = 'no' }) {
         </div>
         {(slrLeft || slrRight) && (
           <div className="ml-4 text-sm text-red-700 font-semibold">
-            SLR: {slrLeft ? `V ${slrLeft}°` : ''} {slrLeft && slrRight ? '|' : ''} {slrRight ? `H ${slrRight}°` : ''}
+            SLR: {slrLeft ? `V ${slrLeft}°` : ''} {slrLeft && slrRight ? '|' : ''}{' '}
+            {slrRight ? `H ${slrRight}°` : ''}
           </div>
         )}
       </div>
@@ -170,7 +185,7 @@ const DEMO_COMPONENTS = [
     nameNo: 'Manuell Muskeltesting',
     icon: Activity,
     color: 'bg-blue-500',
-    component: ManualMuscleTesting
+    component: ManualMuscleTesting,
   },
   {
     id: 'cranial',
@@ -178,7 +193,7 @@ const DEMO_COMPONENTS = [
     nameNo: 'Hjernenerver',
     icon: Brain,
     color: 'bg-purple-500',
-    component: CranialNervePanel
+    component: CranialNervePanel,
   },
   {
     id: 'sensory',
@@ -186,7 +201,7 @@ const DEMO_COMPONENTS = [
     nameNo: 'Sensibilitetsundersøkelse',
     icon: Zap,
     color: 'bg-amber-500',
-    component: SensoryExamination
+    component: SensoryExamination,
   },
   {
     id: 'pain',
@@ -194,7 +209,7 @@ const DEMO_COMPONENTS = [
     nameNo: 'Smertevurdering',
     icon: Target,
     color: 'bg-red-500',
-    component: PainAssessmentPanel
+    component: PainAssessmentPanel,
   },
   {
     id: 'soap',
@@ -202,7 +217,7 @@ const DEMO_COMPONENTS = [
     nameNo: 'SOAP-notat',
     icon: FileText,
     color: 'bg-teal-500',
-    component: SOAPNoteTemplate
+    component: SOAPNoteTemplate,
   },
   {
     id: 'dtr',
@@ -210,7 +225,7 @@ const DEMO_COMPONENTS = [
     nameNo: 'Dype Senereflekser',
     icon: Gauge,
     color: 'bg-green-500',
-    component: DeepTendonReflexPanel
+    component: DeepTendonReflexPanel,
   },
   {
     id: 'coordination',
@@ -218,7 +233,7 @@ const DEMO_COMPONENTS = [
     nameNo: 'Koordinasjonstester',
     icon: Move,
     color: 'bg-indigo-500',
-    component: CoordinationTestPanel
+    component: CoordinationTestPanel,
   },
   {
     id: 'nerve_tension',
@@ -226,7 +241,7 @@ const DEMO_COMPONENTS = [
     nameNo: 'Nervestrekkstester',
     icon: Cable,
     color: 'bg-orange-500',
-    component: NerveTensionTests
+    component: NerveTensionTests,
   },
   {
     id: 'headache',
@@ -234,7 +249,7 @@ const DEMO_COMPONENTS = [
     nameNo: 'Hodepineutredning',
     icon: HeadphonesIcon,
     color: 'bg-pink-500',
-    component: HeadacheAssessment
+    component: HeadacheAssessment,
   },
   {
     id: 'tissue',
@@ -242,7 +257,7 @@ const DEMO_COMPONENTS = [
     nameNo: 'Vevsabnormaliteter',
     icon: Crosshair,
     color: 'bg-cyan-500',
-    component: TissueAbnormalityMarkers
+    component: TissueAbnormalityMarkers,
   },
   {
     id: 'bppv',
@@ -250,7 +265,7 @@ const DEMO_COMPONENTS = [
     nameNo: 'BPPV-testing',
     icon: RotateCcw,
     color: 'bg-violet-500',
-    component: BPPVTestPanel
+    component: BPPVTestPanel,
   },
   {
     id: 'dynamic_positional',
@@ -258,7 +273,7 @@ const DEMO_COMPONENTS = [
     nameNo: 'Dynamisk Posisjonstesting',
     icon: ArrowUpDown,
     color: 'bg-rose-500',
-    component: DynamicPositionalTestPanel
+    component: DynamicPositionalTestPanel,
   },
   {
     id: 'activator',
@@ -266,7 +281,7 @@ const DEMO_COMPONENTS = [
     nameNo: 'Activator-metoden',
     icon: Ruler,
     color: 'bg-emerald-500',
-    component: ActivatorMethodPanel
+    component: ActivatorMethodPanel,
   },
   {
     id: 'bodychart',
@@ -274,7 +289,7 @@ const DEMO_COMPONENTS = [
     nameNo: 'Kroppskart',
     icon: User,
     color: 'bg-sky-500',
-    component: BodyChartPanel
+    component: BodyChartPanel,
   },
   {
     id: 'lower_extremity',
@@ -282,7 +297,7 @@ const DEMO_COMPONENTS = [
     nameNo: 'Underekstremitet (Ben)',
     icon: Footprints,
     color: 'bg-blue-600',
-    component: LowerExtremityDemo
+    component: LowerExtremityDemo,
   },
   {
     id: 'upper_extremity',
@@ -290,7 +305,7 @@ const DEMO_COMPONENTS = [
     nameNo: 'Overekstremitet (Armer)',
     icon: Hand,
     color: 'bg-purple-600',
-    component: UpperExtremityDemo
+    component: UpperExtremityDemo,
   },
   {
     id: 'regional_diagrams',
@@ -298,7 +313,7 @@ const DEMO_COMPONENTS = [
     nameNo: 'Regionale Diagrammer (Alle Ledd)',
     icon: Circle,
     color: 'bg-amber-600',
-    component: RegionalDiagramsDemo
+    component: RegionalDiagramsDemo,
   },
   {
     id: 'rom_table',
@@ -306,7 +321,7 @@ const DEMO_COMPONENTS = [
     nameNo: 'ROM Tabell (Bue-Skyveknapper)',
     icon: Gauge,
     color: 'bg-lime-600',
-    component: ROMTable
+    component: ROMTable,
   },
   {
     id: 'visual_rom',
@@ -314,8 +329,8 @@ const DEMO_COMPONENTS = [
     nameNo: 'Visuell ROM Velger',
     icon: Target,
     color: 'bg-fuchsia-600',
-    component: VisualROMSelector
-  }
+    component: VisualROMSelector,
+  },
 ];
 
 export default function ExaminationDemo() {
@@ -324,24 +339,24 @@ export default function ExaminationDemo() {
   const [componentValues, setComponentValues] = useState({});
   const [generatedNarratives, setGeneratedNarratives] = useState({});
 
-  const activeConfig = DEMO_COMPONENTS.find(c => c.id === activeComponent);
+  const activeConfig = DEMO_COMPONENTS.find((c) => c.id === activeComponent);
   const ActiveComponent = activeConfig?.component;
 
   const handleValueChange = (componentId, values) => {
-    setComponentValues(prev => ({
+    setComponentValues((prev) => ({
       ...prev,
-      [componentId]: values
+      [componentId]: values,
     }));
   };
 
   const handleGenerateNarrative = (componentId, narrative) => {
-    setGeneratedNarratives(prev => ({
+    setGeneratedNarratives((prev) => ({
       ...prev,
-      [componentId]: narrative
+      [componentId]: narrative,
     }));
   };
 
-  const currentIndex = DEMO_COMPONENTS.findIndex(c => c.id === activeComponent);
+  const currentIndex = DEMO_COMPONENTS.findIndex((c) => c.id === activeComponent);
 
   const goToPrevious = () => {
     const prevIndex = currentIndex > 0 ? currentIndex - 1 : DEMO_COMPONENTS.length - 1;
@@ -401,7 +416,8 @@ export default function ExaminationDemo() {
                 {DEMO_COMPONENTS.map((config, index) => {
                   const Icon = config.icon;
                   const isActive = activeComponent === config.id;
-                  const hasData = componentValues[config.id] &&
+                  const hasData =
+                    componentValues[config.id] &&
                     Object.keys(componentValues[config.id]).length > 0;
 
                   return (
@@ -410,17 +426,23 @@ export default function ExaminationDemo() {
                       onClick={() => setActiveComponent(config.id)}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
                                  text-left transition-colors mb-1
-                                 ${isActive
-                                   ? 'bg-teal-50 text-teal-700'
-                                   : 'hover:bg-gray-50 text-gray-600'}`}
+                                 ${
+                                   isActive
+                                     ? 'bg-teal-50 text-teal-700'
+                                     : 'hover:bg-gray-50 text-gray-600'
+                                 }`}
                     >
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center
-                                      ${isActive ? config.color : 'bg-gray-100'}`}>
+                      <div
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center
+                                      ${isActive ? config.color : 'bg-gray-100'}`}
+                      >
                         <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-gray-500'}`} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <span className={`text-sm font-medium block truncate
-                                        ${isActive ? 'text-teal-700' : 'text-gray-700'}`}>
+                        <span
+                          className={`text-sm font-medium block truncate
+                                        ${isActive ? 'text-teal-700' : 'text-gray-700'}`}
+                        >
                           {lang === 'no' ? config.nameNo : config.name}
                         </span>
                         {hasData && (
@@ -462,9 +484,13 @@ export default function ExaminationDemo() {
             {/* Component Card */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
               {/* Component Header */}
-              <div className={`px-6 py-4 ${activeConfig?.color} bg-opacity-10 border-b border-gray-200`}>
+              <div
+                className={`px-6 py-4 ${activeConfig?.color} bg-opacity-10 border-b border-gray-200`}
+              >
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${activeConfig?.color}`}>
+                  <div
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center ${activeConfig?.color}`}
+                  >
                     {activeConfig && <activeConfig.icon className="w-5 h-5 text-white" />}
                   </div>
                   <div>
@@ -485,7 +511,9 @@ export default function ExaminationDemo() {
                     values={componentValues[activeComponent] || {}}
                     onChange={(values) => handleValueChange(activeComponent, values)}
                     lang={lang}
-                    onGenerateNarrative={(narrative) => handleGenerateNarrative(activeComponent, narrative)}
+                    onGenerateNarrative={(narrative) =>
+                      handleGenerateNarrative(activeComponent, narrative)
+                    }
                     showDetails={true}
                     showTechnique={true}
                     showFindings={true}
@@ -507,7 +535,9 @@ export default function ExaminationDemo() {
                     {generatedNarratives[activeComponent]}
                   </pre>
                   <button
-                    onClick={() => navigator.clipboard.writeText(generatedNarratives[activeComponent])}
+                    onClick={() =>
+                      navigator.clipboard.writeText(generatedNarratives[activeComponent])
+                    }
                     className="mt-3 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg
                               text-sm text-gray-600 transition-colors"
                   >
@@ -519,8 +549,10 @@ export default function ExaminationDemo() {
 
             {/* Current State Debug (collapsible) */}
             <details className="mt-4 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <summary className="px-6 py-3 bg-gray-50 cursor-pointer hover:bg-gray-100
-                                 text-sm font-medium text-gray-600">
+              <summary
+                className="px-6 py-3 bg-gray-50 cursor-pointer hover:bg-gray-100
+                                 text-sm font-medium text-gray-600"
+              >
                 {lang === 'no' ? 'Vis komponentdata (Debug)' : 'Show component data (Debug)'}
               </summary>
               <div className="p-6">
@@ -538,10 +570,10 @@ export default function ExaminationDemo() {
             {lang === 'no' ? 'Oversikt over alle komponenter' : 'All Components Overview'}
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            {DEMO_COMPONENTS.map(config => {
+            {DEMO_COMPONENTS.map((config) => {
               const Icon = config.icon;
-              const hasData = componentValues[config.id] &&
-                Object.keys(componentValues[config.id]).length > 0;
+              const hasData =
+                componentValues[config.id] && Object.keys(componentValues[config.id]).length > 0;
               const hasNarrative = !!generatedNarratives[config.id];
 
               return (
@@ -549,14 +581,18 @@ export default function ExaminationDemo() {
                   key={config.id}
                   onClick={() => setActiveComponent(config.id)}
                   className={`p-4 rounded-lg border-2 transition-colors text-center
-                             ${activeComponent === config.id
-                               ? 'border-teal-500 bg-teal-50'
-                               : hasData
-                                 ? 'border-green-300 bg-green-50'
-                                 : 'border-gray-200 hover:bg-gray-50'}`}
+                             ${
+                               activeComponent === config.id
+                                 ? 'border-teal-500 bg-teal-50'
+                                 : hasData
+                                   ? 'border-green-300 bg-green-50'
+                                   : 'border-gray-200 hover:bg-gray-50'
+                             }`}
                 >
-                  <div className={`w-10 h-10 rounded-lg mx-auto mb-2 flex items-center
-                                  justify-center ${config.color}`}>
+                  <div
+                    className={`w-10 h-10 rounded-lg mx-auto mb-2 flex items-center
+                                  justify-center ${config.color}`}
+                  >
                     <Icon className="w-5 h-5 text-white" />
                   </div>
                   <span className="text-xs font-medium text-gray-700 block truncate">

@@ -6,7 +6,7 @@
  * Norwegian and English language support.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, _useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   FileText,
@@ -14,21 +14,21 @@ import {
   Edit,
   Trash2,
   Search,
-  Filter,
-  Copy,
-  Check,
+  _Filter,
+  _Copy,
+  _Check,
   X,
   Save,
   ChevronDown,
   MessageSquare,
-  Mail,
+  _Mail,
   Calendar,
   Gift,
   Activity,
   Clock,
-  AlertTriangle,
+  _AlertTriangle,
   Eye,
-  Tag
+  Tag,
 } from 'lucide-react';
 import { communicationsAPI } from '../../services/api';
 import toast from '../../utils/toast';
@@ -39,46 +39,82 @@ const CATEGORIES = {
     id: 'appointment_reminder',
     name: { no: 'Timepaminnelse', en: 'Appointment Reminder' },
     icon: Calendar,
-    color: 'blue'
+    color: 'blue',
   },
   exercise_reminder: {
     id: 'exercise_reminder',
     name: { no: 'Ovelsespaminnelse', en: 'Exercise Reminder' },
     icon: Activity,
-    color: 'green'
+    color: 'green',
   },
   followup_reminder: {
     id: 'followup_reminder',
     name: { no: 'Oppfolgingspaminnelse', en: 'Follow-up Reminder' },
     icon: Clock,
-    color: 'orange'
+    color: 'orange',
   },
   birthday: {
     id: 'birthday',
     name: { no: 'Bursdag', en: 'Birthday' },
     icon: Gift,
-    color: 'purple'
+    color: 'purple',
   },
   general: {
     id: 'general',
     name: { no: 'Generell', en: 'General' },
     icon: MessageSquare,
-    color: 'gray'
-  }
+    color: 'gray',
+  },
 };
 
 // Available template variables
 const TEMPLATE_VARIABLES = [
-  { key: 'patient_name', label: { no: 'Pasientnavn', en: 'Patient Name' }, example: 'Ola Nordmann' },
+  {
+    key: 'patient_name',
+    label: { no: 'Pasientnavn', en: 'Patient Name' },
+    example: 'Ola Nordmann',
+  },
   { key: 'patient_first_name', label: { no: 'Fornavn', en: 'First Name' }, example: 'Ola' },
-  { key: 'appointment_date', label: { no: 'Timedato', en: 'Appointment Date' }, example: '15. januar 2026' },
-  { key: 'appointment_time', label: { no: 'Klokkeslett', en: 'Appointment Time' }, example: '10:30' },
-  { key: 'provider_name', label: { no: 'Behandlernavn', en: 'Provider Name' }, example: 'Dr. Hansen' },
-  { key: 'clinic_name', label: { no: 'Klinikknavn', en: 'Clinic Name' }, example: 'ChiroClick Klinikk' },
-  { key: 'clinic_phone', label: { no: 'Klinikktelefon', en: 'Clinic Phone' }, example: '+47 123 45 678' },
-  { key: 'days_since_visit', label: { no: 'Dager siden besok', en: 'Days Since Visit' }, example: '30' },
-  { key: 'next_exercise', label: { no: 'Neste ovelse', en: 'Next Exercise' }, example: 'Ryggstrekkoveise' },
-  { key: 'portal_link', label: { no: 'Portallenke', en: 'Portal Link' }, example: 'https://portal.chiroclick.no' }
+  {
+    key: 'appointment_date',
+    label: { no: 'Timedato', en: 'Appointment Date' },
+    example: '15. januar 2026',
+  },
+  {
+    key: 'appointment_time',
+    label: { no: 'Klokkeslett', en: 'Appointment Time' },
+    example: '10:30',
+  },
+  {
+    key: 'provider_name',
+    label: { no: 'Behandlernavn', en: 'Provider Name' },
+    example: 'Dr. Hansen',
+  },
+  {
+    key: 'clinic_name',
+    label: { no: 'Klinikknavn', en: 'Clinic Name' },
+    example: 'ChiroClick Klinikk',
+  },
+  {
+    key: 'clinic_phone',
+    label: { no: 'Klinikktelefon', en: 'Clinic Phone' },
+    example: '+47 123 45 678',
+  },
+  {
+    key: 'days_since_visit',
+    label: { no: 'Dager siden besok', en: 'Days Since Visit' },
+    example: '30',
+  },
+  {
+    key: 'next_exercise',
+    label: { no: 'Neste ovelse', en: 'Next Exercise' },
+    example: 'Ryggstrekkoveise',
+  },
+  {
+    key: 'portal_link',
+    label: { no: 'Portallenke', en: 'Portal Link' },
+    example: 'https://portal.chiroclick.no',
+  },
 ];
 
 // Default templates (Norwegian)
@@ -90,7 +126,7 @@ const DEFAULT_TEMPLATES = [
     language: 'NO',
     subject: null,
     body: 'Hei {{patient_first_name}}! Paminnelse om time i morgen {{appointment_date}} kl {{appointment_time}} hos {{provider_name}}. Avbud? Ring {{clinic_phone}}.',
-    is_system: true
+    is_system: true,
   },
   {
     name: '1-times paminnelse',
@@ -99,7 +135,7 @@ const DEFAULT_TEMPLATES = [
     language: 'NO',
     subject: null,
     body: 'Hei {{patient_first_name}}! Husk timen din i dag kl {{appointment_time}} hos {{clinic_name}}. Vi gleder oss til a se deg!',
-    is_system: true
+    is_system: true,
   },
   {
     name: 'Ovelsesprogram paminnelse',
@@ -108,7 +144,7 @@ const DEFAULT_TEMPLATES = [
     language: 'NO',
     subject: null,
     body: 'Hei {{patient_first_name}}! Vi savner deg! Det er {{days_since_visit}} dager siden sist du logget inn pa ovelsesprogrammet. Logg inn her: {{portal_link}}',
-    is_system: true
+    is_system: true,
   },
   {
     name: 'Oppfolging - bestill ny time',
@@ -117,7 +153,7 @@ const DEFAULT_TEMPLATES = [
     language: 'NO',
     subject: null,
     body: 'Hei {{patient_first_name}}! Det er pa tide med en oppfolgingstime. Ring oss pa {{clinic_phone}} eller bestill online. Hilsen {{clinic_name}}',
-    is_system: true
+    is_system: true,
   },
   {
     name: 'Gratulerer med dagen!',
@@ -126,7 +162,7 @@ const DEFAULT_TEMPLATES = [
     language: 'NO',
     subject: null,
     body: 'Gratulerer med dagen, {{patient_first_name}}! Vi onsker deg en fantastisk dag! Hilsen alle oss pa {{clinic_name}}',
-    is_system: true
+    is_system: true,
   },
   {
     name: 'Timebekreftelse e-post',
@@ -149,8 +185,8 @@ Telefon: {{clinic_phone}}
 
 Med vennlig hilsen,
 {{clinic_name}}`,
-    is_system: true
-  }
+    is_system: true,
+  },
 ];
 
 export default function MessageTemplates({ language = 'no' }) {
@@ -172,7 +208,7 @@ export default function MessageTemplates({ language = 'no' }) {
     type: 'SMS',
     language: 'NO',
     subject: '',
-    body: ''
+    body: '',
   });
 
   // Labels
@@ -205,7 +241,7 @@ export default function MessageTemplates({ language = 'no' }) {
       customTemplate: 'Egendefinert',
       characters: 'tegn',
       smsSegments: 'SMS-segmenter',
-      emailSubjectRequired: 'Emne er pakrevd for e-post'
+      emailSubjectRequired: 'Emne er pakrevd for e-post',
     },
     en: {
       title: 'Message Templates',
@@ -235,8 +271,8 @@ export default function MessageTemplates({ language = 'no' }) {
       customTemplate: 'Custom',
       characters: 'characters',
       smsSegments: 'SMS segments',
-      emailSubjectRequired: 'Subject is required for email'
-    }
+      emailSubjectRequired: 'Subject is required for email',
+    },
   };
 
   const t = labels[language] || labels.no;
@@ -247,14 +283,15 @@ export default function MessageTemplates({ language = 'no' }) {
     queryFn: async () => {
       const response = await communicationsAPI.getTemplates();
       return response.data?.templates || [];
-    }
+    },
   });
 
   const templates = templatesData || DEFAULT_TEMPLATES;
 
   // Filter templates
-  const filteredTemplates = templates.filter(template => {
-    const matchesSearch = !searchTerm ||
+  const filteredTemplates = templates.filter((template) => {
+    const matchesSearch =
+      !searchTerm ||
       template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       template.body.toLowerCase().includes(searchTerm.toLowerCase());
 
@@ -266,7 +303,8 @@ export default function MessageTemplates({ language = 'no' }) {
 
   // Create template mutation
   const createMutation = useMutation({
-    mutationFn: (data) => communicationsAPI.createTemplate?.(data) || Promise.resolve({ data: data }),
+    mutationFn: (data) =>
+      communicationsAPI.createTemplate?.(data) || Promise.resolve({ data: data }),
     onSuccess: () => {
       queryClient.invalidateQueries(['message-templates']);
       setShowEditor(false);
@@ -275,12 +313,13 @@ export default function MessageTemplates({ language = 'no' }) {
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to create template');
-    }
+    },
   });
 
   // Update template mutation
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => communicationsAPI.updateTemplate?.(id, data) || Promise.resolve({ data: data }),
+    mutationFn: ({ id, data }) =>
+      communicationsAPI.updateTemplate?.(id, data) || Promise.resolve({ data: data }),
     onSuccess: () => {
       queryClient.invalidateQueries(['message-templates']);
       setShowEditor(false);
@@ -290,7 +329,7 @@ export default function MessageTemplates({ language = 'no' }) {
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to update template');
-    }
+    },
   });
 
   // Delete template mutation
@@ -302,7 +341,7 @@ export default function MessageTemplates({ language = 'no' }) {
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to delete template');
-    }
+    },
   });
 
   // Reset form
@@ -313,7 +352,7 @@ export default function MessageTemplates({ language = 'no' }) {
       type: 'SMS',
       language: 'NO',
       subject: '',
-      body: ''
+      body: '',
     });
   };
 
@@ -326,7 +365,7 @@ export default function MessageTemplates({ language = 'no' }) {
       type: template.type,
       language: template.language || 'NO',
       subject: template.subject || '',
-      body: template.body
+      body: template.body,
     });
     setShowEditor(true);
   };
@@ -385,16 +424,20 @@ export default function MessageTemplates({ language = 'no' }) {
 
   // Calculate SMS segments
   const getSmsSegments = (text) => {
-    if (!text) return 1;
+    if (!text) {
+      return 1;
+    }
     const length = text.length;
-    if (length <= 160) return 1;
+    if (length <= 160) {
+      return 1;
+    }
     return Math.ceil(length / 153);
   };
 
   // Preview with sample data
   const getPreviewText = (text) => {
     let preview = text;
-    TEMPLATE_VARIABLES.forEach(v => {
+    TEMPLATE_VARIABLES.forEach((v) => {
       preview = preview.replace(new RegExp(`{{${v.key}}}`, 'g'), v.example);
     });
     return preview;
@@ -445,8 +488,10 @@ export default function MessageTemplates({ language = 'no' }) {
           className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
         >
           <option value="all">{t.allCategories}</option>
-          {Object.values(CATEGORIES).map(cat => (
-            <option key={cat.id} value={cat.id}>{cat.name[language]}</option>
+          {Object.values(CATEGORIES).map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name[language]}
+            </option>
           ))}
         </select>
 
@@ -481,7 +526,9 @@ export default function MessageTemplates({ language = 'no' }) {
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-4 flex-1">
                       {/* Category Icon */}
-                      <div className={`w-10 h-10 rounded-lg bg-${categoryInfo.color}-100 flex items-center justify-center`}>
+                      <div
+                        className={`w-10 h-10 rounded-lg bg-${categoryInfo.color}-100 flex items-center justify-center`}
+                      >
                         <CategoryIcon className={`w-5 h-5 text-${categoryInfo.color}-600`} />
                       </div>
 
@@ -489,11 +536,13 @@ export default function MessageTemplates({ language = 'no' }) {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <h3 className="font-medium text-gray-900">{template.name}</h3>
-                          <span className={`px-2 py-0.5 text-xs font-medium rounded ${
-                            template.type === 'SMS'
-                              ? 'bg-purple-100 text-purple-700'
-                              : 'bg-blue-100 text-blue-700'
-                          }`}>
+                          <span
+                            className={`px-2 py-0.5 text-xs font-medium rounded ${
+                              template.type === 'SMS'
+                                ? 'bg-purple-100 text-purple-700'
+                                : 'bg-blue-100 text-blue-700'
+                            }`}
+                          >
                             {template.type}
                           </span>
                           {template.is_system && (
@@ -503,9 +552,7 @@ export default function MessageTemplates({ language = 'no' }) {
                           )}
                         </div>
 
-                        <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-                          {template.body}
-                        </p>
+                        <p className="text-sm text-gray-500 mt-1 line-clamp-2">{template.body}</p>
 
                         <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
                           <span className="flex items-center gap-1">
@@ -514,7 +561,8 @@ export default function MessageTemplates({ language = 'no' }) {
                           </span>
                           {template.type === 'SMS' && (
                             <span>
-                              {template.body.length} {t.characters} ({getSmsSegments(template.body)} {t.smsSegments})
+                              {template.body.length} {t.characters} ({getSmsSegments(template.body)}{' '}
+                              {t.smsSegments})
                             </span>
                           )}
                         </div>
@@ -578,9 +626,7 @@ export default function MessageTemplates({ language = 'no' }) {
             <div className="p-6 space-y-4">
               {/* Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t.name} *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t.name} *</label>
                 <input
                   type="text"
                   value={formData.name}
@@ -601,15 +647,15 @@ export default function MessageTemplates({ language = 'no' }) {
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   >
-                    {Object.values(CATEGORIES).map(cat => (
-                      <option key={cat.id} value={cat.id}>{cat.name[language]}</option>
+                    {Object.values(CATEGORIES).map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name[language]}
+                      </option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t.type}
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t.type}</label>
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
@@ -640,9 +686,7 @@ export default function MessageTemplates({ language = 'no' }) {
               {/* Body */}
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="block text-sm font-medium text-gray-700">
-                    {t.body} *
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700">{t.body} *</label>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setShowVariables(!showVariables)}
@@ -652,7 +696,9 @@ export default function MessageTemplates({ language = 'no' }) {
                     >
                       <Tag className="w-3 h-3" />
                       {t.variables}
-                      <ChevronDown className={`w-3 h-3 transition-transform ${showVariables ? 'rotate-180' : ''}`} />
+                      <ChevronDown
+                        className={`w-3 h-3 transition-transform ${showVariables ? 'rotate-180' : ''}`}
+                      />
                     </button>
                     <button
                       onClick={() => setPreviewMode(!previewMode)}
@@ -671,7 +717,7 @@ export default function MessageTemplates({ language = 'no' }) {
                   <div className="mb-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
                     <p className="text-xs text-gray-500 mb-2">{t.insertVariable}:</p>
                     <div className="flex flex-wrap gap-2">
-                      {TEMPLATE_VARIABLES.map(v => (
+                      {TEMPLATE_VARIABLES.map((v) => (
                         <button
                           key={v.key}
                           onClick={() => insertVariable(v.key)}
@@ -685,9 +731,11 @@ export default function MessageTemplates({ language = 'no' }) {
                 )}
 
                 {previewMode ? (
-                  <div className={`w-full px-3 py-2 border border-green-300 rounded-lg bg-green-50 ${
-                    formData.type === 'EMAIL' ? 'min-h-[200px]' : 'min-h-[100px]'
-                  }`}>
+                  <div
+                    className={`w-full px-3 py-2 border border-green-300 rounded-lg bg-green-50 ${
+                      formData.type === 'EMAIL' ? 'min-h-[200px]' : 'min-h-[100px]'
+                    }`}
+                  >
                     <pre className="whitespace-pre-wrap text-sm text-gray-800 font-sans">
                       {getPreviewText(formData.body)}
                     </pre>
@@ -700,9 +748,11 @@ export default function MessageTemplates({ language = 'no' }) {
                     className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none ${
                       formData.type === 'EMAIL' ? 'min-h-[200px]' : 'min-h-[100px]'
                     }`}
-                    placeholder={formData.type === 'SMS'
-                      ? 'Skriv din SMS-melding her...'
-                      : 'Skriv din e-postmelding her...'}
+                    placeholder={
+                      formData.type === 'SMS'
+                        ? 'Skriv din SMS-melding her...'
+                        : 'Skriv din e-postmelding her...'
+                    }
                   />
                 )}
 

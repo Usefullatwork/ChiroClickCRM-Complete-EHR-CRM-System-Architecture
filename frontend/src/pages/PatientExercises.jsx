@@ -5,24 +5,24 @@
  * Displays and manages patient's customized exercise programs
  */
 
-import React, { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useParams, useNavigate } from 'react-router-dom'
+import _React, { useState } from 'react';
+import { _useQuery, _useMutation, useQueryClient } from '@tanstack/react-query';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Dumbbell,
   Plus,
   Search,
-  Filter,
-  Play,
-  Pause,
-  CheckCircle,
-  Clock,
-  TrendingUp,
-  Calendar,
-  User,
+  _Filter,
+  _Play,
+  _Pause,
+  _CheckCircle,
+  _Clock,
+  _TrendingUp,
+  _Calendar,
+  _User,
   ChevronRight,
-  MoreVertical
-} from 'lucide-react'
+  _MoreVertical,
+} from 'lucide-react';
 
 /**
  * PatientExercises Component
@@ -31,36 +31,36 @@ import {
  * @returns {JSX.Element} Patient exercises management page
  */
 export default function PatientExercises() {
-  const { patientId } = useParams()
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
+  const { patientId } = useParams();
+  const navigate = useNavigate();
+  const _queryClient = useQueryClient();
 
   // State for filters and search
   // Tilstand for filtrering og sok
-  const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
-  const [categoryFilter, setCategoryFilter] = useState('all')
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
 
   // Placeholder for exercise programs data
   // Plassholder for treningsprogram-data
-  const exercisePrograms = []
-  const isLoading = false
+  const exercisePrograms = [];
+  const isLoading = false;
 
   /**
    * Handle creating new exercise prescription
    * Handterer opprettelse av ny treningsforskrivning
    */
   const handleCreatePrescription = () => {
-    navigate(`/patients/${patientId}/exercises/new`)
-  }
+    navigate(`/patients/${patientId}/exercises/new`);
+  };
 
   /**
    * Handle viewing exercise details
    * Handterer visning av treningsdetaljer
    */
   const handleViewExercise = (exerciseId) => {
-    navigate(`/exercises/${exerciseId}`)
-  }
+    navigate(`/exercises/${exerciseId}`);
+  };
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -168,5 +168,5 @@ export default function PatientExercises() {
         )}
       </div>
     </div>
-  )
+  );
 }

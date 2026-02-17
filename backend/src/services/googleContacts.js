@@ -11,7 +11,8 @@ import { query } from '../config/database.js';
 // Google OAuth2 configuration
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || null;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || null;
-const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/api/v1/auth/google/callback';
+const GOOGLE_REDIRECT_URI =
+  process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/api/v1/auth/google/callback';
 const PEOPLE_API_BASE = 'https://people.googleapis.com/v1';
 
 // Token storage (in production, use Redis or database)
@@ -23,8 +24,10 @@ let tokenExpiry = null;
  * Get OAuth2 authorization URL
  */
 export const getAuthorizationUrl = () => {
-  const scopes = 'https://www.googleapis.com/auth/contacts https://www.googleapis.com/auth/contacts.other.readonly';
-  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+  const scopes =
+    'https://www.googleapis.com/auth/contacts https://www.googleapis.com/auth/contacts.other.readonly';
+  const authUrl =
+    `https://accounts.google.com/o/oauth2/v2/auth?` +
     `client_id=${GOOGLE_CLIENT_ID}` +
     `&response_type=code` +
     `&redirect_uri=${encodeURIComponent(GOOGLE_REDIRECT_URI)}` +
@@ -40,25 +43,22 @@ export const getAuthorizationUrl = () => {
  */
 export const exchangeCodeForToken = async (code) => {
   try {
-    const response = await axios.post(
-      'https://oauth2.googleapis.com/token',
-      {
-        client_id: GOOGLE_CLIENT_ID,
-        client_secret: GOOGLE_CLIENT_SECRET,
-        code: code,
-        redirect_uri: GOOGLE_REDIRECT_URI,
-        grant_type: 'authorization_code'
-      }
-    );
+    const response = await axios.post('https://oauth2.googleapis.com/token', {
+      client_id: GOOGLE_CLIENT_ID,
+      client_secret: GOOGLE_CLIENT_SECRET,
+      code: code,
+      redirect_uri: GOOGLE_REDIRECT_URI,
+      grant_type: 'authorization_code',
+    });
 
     accessToken = response.data.access_token;
     refreshToken = response.data.refresh_token;
-    tokenExpiry = Date.now() + (response.data.expires_in * 1000);
+    tokenExpiry = Date.now() + response.data.expires_in * 1000;
 
     logger.info('Google Contacts access token obtained');
     return {
       success: true,
-      expiresIn: response.data.expires_in
+      expiresIn: response.data.expires_in,
     };
   } catch (error) {
     logger.error('Error exchanging code for token:', error.response?.data || error.message);
@@ -75,18 +75,15 @@ export const refreshAccessToken = async () => {
       throw new Error('No refresh token available');
     }
 
-    const response = await axios.post(
-      'https://oauth2.googleapis.com/token',
-      {
-        client_id: GOOGLE_CLIENT_ID,
-        client_secret: GOOGLE_CLIENT_SECRET,
-        refresh_token: refreshToken,
-        grant_type: 'refresh_token'
-      }
-    );
+    const response = await axios.post('https://oauth2.googleapis.com/token', {
+      client_id: GOOGLE_CLIENT_ID,
+      client_secret: GOOGLE_CLIENT_SECRET,
+      refresh_token: refreshToken,
+      grant_type: 'refresh_token',
+    });
 
     accessToken = response.data.access_token;
-    tokenExpiry = Date.now() + (response.data.expires_in * 1000);
+    tokenExpiry = Date.now() + response.data.expires_in * 1000;
 
     logger.info('Google Contacts access token refreshed');
     return true;
@@ -107,7 +104,7 @@ const ensureValidToken = async () => {
     throw new Error('Google Contacts not authenticated. Please authenticate first.');
   }
 
-  if (tokenExpiry && Date.now() > (tokenExpiry - 300000)) {
+  if (tokenExpiry && Date.now() > tokenExpiry - 300000) {
     const refreshed = await refreshAccessToken();
     if (!refreshed) {
       throw new Error('Failed to refresh Google token. Re-authentication required.');
@@ -126,26 +123,39 @@ export const syncPatientToContact = async (patientData) => {
 
     // Create contact resource
     const person = {
-      names: [{
-        givenName: first_name,
-        familyName: last_name,
-        displayName: `${first_name} ${last_name}`
-      }],
-      phoneNumbers: phone ? [{
-        value: phone,
-        type: 'mobile'
-      }] : [],
-      emailAddresses: email ? [{
-        value: email,
-        type: 'home'
-      }] : [],
-      userDefined: [{
-        key: 'SolvitID',
-        value: solvit_id
-      }, {
-        key: 'Source',
-        value: 'ChiroClickCRM'
-      }]
+      names: [
+        {
+          givenName: first_name,
+          familyName: last_name,
+          displayName: `${first_name} ${last_name}`,
+        },
+      ],
+      phoneNumbers: phone
+        ? [
+            {
+              value: phone,
+              type: 'mobile',
+            },
+          ]
+        : [],
+      emailAddresses: email
+        ? [
+            {
+              value: email,
+              type: 'home',
+            },
+          ]
+        : [],
+      userDefined: [
+        {
+          key: 'SolvitID',
+          value: solvit_id,
+        },
+        {
+          key: 'Source',
+          value: 'ChiroClickCRM',
+        },
+      ],
     };
 
     // Try to find existing contact first
@@ -158,41 +168,40 @@ export const syncPatientToContact = async (patientData) => {
         person,
         {
           headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
           },
           params: {
-            updatePersonFields: 'names,phoneNumbers,emailAddresses,userDefined'
-          }
+            updatePersonFields: 'names,phoneNumbers,emailAddresses,userDefined',
+          },
         }
       );
 
       logger.info('Google contact updated:', { phone, resourceName: response.data.resourceName });
       return {
         action: 'updated',
-        resourceName: response.data.resourceName
+        resourceName: response.data.resourceName,
       };
     } else {
       // Create new contact
-      const response = await axios.post(
-        `${PEOPLE_API_BASE}/people:createContact`,
-        person,
-        {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
+      const response = await axios.post(`${PEOPLE_API_BASE}/people:createContact`, person, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
       logger.info('Google contact created:', { phone, resourceName: response.data.resourceName });
       return {
         action: 'created',
-        resourceName: response.data.resourceName
+        resourceName: response.data.resourceName,
       };
     }
   } catch (error) {
-    logger.error('Error syncing patient to Google Contacts:', error.response?.data || error.message);
+    logger.error(
+      'Error syncing patient to Google Contacts:',
+      error.response?.data || error.message
+    );
     throw error;
   }
 };
@@ -206,18 +215,15 @@ export const findContactByPhone = async (phoneNumber) => {
 
     const cleanPhone = phoneNumber.replace(/\s/g, '');
 
-    const response = await axios.get(
-      `${PEOPLE_API_BASE}/people:searchContacts`,
-      {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
-        },
-        params: {
-          query: cleanPhone,
-          readMask: 'names,phoneNumbers,emailAddresses'
-        }
-      }
-    );
+    const response = await axios.get(`${PEOPLE_API_BASE}/people:searchContacts`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      params: {
+        query: cleanPhone,
+        readMask: 'names,phoneNumbers,emailAddresses',
+      },
+    });
 
     if (response.data.results && response.data.results.length > 0) {
       return response.data.results[0].person;
@@ -251,7 +257,7 @@ export const syncAllPatients = async (organizationId) => {
       created: 0,
       updated: 0,
       failed: 0,
-      errors: []
+      errors: [],
     };
 
     for (const patient of patients) {
@@ -264,12 +270,12 @@ export const syncAllPatients = async (organizationId) => {
         }
 
         // Small delay to avoid rate limiting
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise((resolve) => setTimeout(resolve, 200));
       } catch (error) {
         results.failed++;
         results.errors.push({
           patient: `${patient.first_name} ${patient.last_name}`,
-          error: error.message
+          error: error.message,
         });
       }
     }
@@ -289,14 +295,11 @@ export const deleteContact = async (resourceName) => {
   try {
     await ensureValidToken();
 
-    await axios.delete(
-      `${PEOPLE_API_BASE}/${resourceName}:deleteContact`,
-      {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
-        }
-      }
-    );
+    await axios.delete(`${PEOPLE_API_BASE}/${resourceName}:deleteContact`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
 
     logger.info('Google contact deleted:', { resourceName });
     return { success: true };
@@ -313,18 +316,15 @@ export const getAllContacts = async () => {
   try {
     await ensureValidToken();
 
-    const response = await axios.get(
-      `${PEOPLE_API_BASE}/people/me/connections`,
-      {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
-        },
-        params: {
-          personFields: 'names,phoneNumbers,emailAddresses',
-          pageSize: 100
-        }
-      }
-    );
+    const response = await axios.get(`${PEOPLE_API_BASE}/people/me/connections`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      params: {
+        personFields: 'names,phoneNumbers,emailAddresses',
+        pageSize: 100,
+      },
+    });
 
     return response.data.connections || [];
   } catch (error) {
@@ -342,21 +342,18 @@ export const checkConnection = async () => {
       return {
         connected: false,
         authenticated: false,
-        message: 'Not authenticated'
+        message: 'Not authenticated',
       };
     }
 
-    const response = await axios.get(
-      `${PEOPLE_API_BASE}/people/me`,
-      {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
-        },
-        params: {
-          personFields: 'names,emailAddresses'
-        }
-      }
-    );
+    const response = await axios.get(`${PEOPLE_API_BASE}/people/me`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      params: {
+        personFields: 'names,emailAddresses',
+      },
+    });
 
     const name = response.data.names?.[0]?.displayName || 'Unknown';
     const email = response.data.emailAddresses?.[0]?.value || 'Unknown';
@@ -366,14 +363,14 @@ export const checkConnection = async () => {
       authenticated: true,
       account: {
         name,
-        email
-      }
+        email,
+      },
     };
   } catch (error) {
     return {
       connected: false,
       authenticated: false,
-      message: error.message
+      message: error.message,
     };
   }
 };
@@ -390,13 +387,11 @@ export const setTokens = (tokens) => {
 /**
  * Get tokens (for persistence)
  */
-export const getTokens = () => {
-  return {
-    accessToken,
-    refreshToken,
-    tokenExpiry
-  };
-};
+export const getTokens = () => ({
+  accessToken,
+  refreshToken,
+  tokenExpiry,
+});
 
 export default {
   getAuthorizationUrl,
@@ -409,5 +404,5 @@ export default {
   getAllContacts,
   checkConnection,
   setTokens,
-  getTokens
+  getTokens,
 };

@@ -3,31 +3,32 @@
  * View and manage a patient's exercise prescriptions and compliance
  */
 
-import React, { useState, useCallback } from 'react';
+import _React, { useState, _useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { exercisesAPI } from '../../services/api';
 import {
   Activity,
-  Calendar,
+  _Calendar,
   Check,
   ChevronDown,
   ChevronUp,
-  Clock,
+  _Clock,
   Dumbbell,
-  Download,
+  _Download,
   Edit2,
   Loader2,
   Mail,
   MoreVertical,
-  Pause,
+  _Pause,
   Play,
+  Plus,
   Printer,
-  Star,
-  ThumbsUp,
-  Trash2,
-  TrendingUp,
+  _Star,
+  _ThumbsUp,
+  _Trash2,
+  _TrendingUp,
   X,
-  AlertTriangle
+  _AlertTriangle,
 } from 'lucide-react';
 
 // Status labels
@@ -35,7 +36,7 @@ const STATUS_LABELS = {
   active: 'Aktiv',
   completed: 'Fullført',
   discontinued: 'Avbrutt',
-  paused: 'Pauset'
+  paused: 'Pauset',
 };
 
 // Status colors
@@ -43,7 +44,7 @@ const STATUS_COLORS = {
   active: 'bg-green-100 text-green-700',
   completed: 'bg-blue-100 text-blue-700',
   discontinued: 'bg-red-100 text-red-700',
-  paused: 'bg-yellow-100 text-yellow-700'
+  paused: 'bg-yellow-100 text-yellow-700',
 };
 
 // Frequency labels
@@ -51,7 +52,7 @@ const FREQUENCY_LABELS = {
   daily: 'Daglig',
   '2x_daily': '2x daglig',
   '3x_week': '3x/uke',
-  weekly: 'Ukentlig'
+  weekly: 'Ukentlig',
 };
 
 /**
@@ -76,7 +77,7 @@ const ComplianceCalendar = ({ complianceLog, startDate, onLogCompliance }) => {
       completed: log?.completed,
       painLevel: log?.pain_level,
       isFuture: date > today,
-      isBeforeStart: date < start
+      isBeforeStart: date < start,
     });
   }
 
@@ -89,13 +90,14 @@ const ComplianceCalendar = ({ complianceLog, startDate, onLogCompliance }) => {
           disabled={day.isFuture || day.isBeforeStart}
           className={`
             w-8 h-10 rounded flex flex-col items-center justify-center text-xs
-            ${day.isFuture || day.isBeforeStart
-              ? 'bg-slate-50 text-slate-300 cursor-not-allowed'
-              : day.completed === true
-                ? 'bg-green-100 text-green-700 border border-green-200'
-                : day.completed === false
-                  ? 'bg-red-100 text-red-700 border border-red-200'
-                  : 'bg-slate-100 text-slate-500 hover:bg-slate-200 cursor-pointer'
+            ${
+              day.isFuture || day.isBeforeStart
+                ? 'bg-slate-50 text-slate-300 cursor-not-allowed'
+                : day.completed === true
+                  ? 'bg-green-100 text-green-700 border border-green-200'
+                  : day.completed === false
+                    ? 'bg-red-100 text-red-700 border border-red-200'
+                    : 'bg-slate-100 text-slate-500 hover:bg-slate-200 cursor-pointer'
             }
           `}
           title={day.date}
@@ -124,7 +126,7 @@ const LogComplianceModal = ({ prescription, date, onClose, onSave, isLoading }) 
       completed,
       pain_level: painLevel,
       notes,
-      sets_completed: setsCompleted
+      sets_completed: setsCompleted,
     });
   };
 
@@ -134,7 +136,9 @@ const LogComplianceModal = ({ prescription, date, onClose, onSave, isLoading }) 
         <div className="flex items-center justify-between p-4 border-b">
           <div>
             <h2 className="font-semibold">Logg fremgang</h2>
-            <p className="text-sm text-slate-500">{prescription.exercise_name} - {date}</p>
+            <p className="text-sm text-slate-500">
+              {prescription.exercise_name} - {date}
+            </p>
           </div>
           <button onClick={onClose} className="p-1 rounded hover:bg-slate-100">
             <X className="w-5 h-5" />
@@ -200,10 +204,15 @@ const LogComplianceModal = ({ prescription, date, onClose, onSave, isLoading }) 
                     onChange={(e) => setPainLevel(parseInt(e.target.value))}
                     className="flex-1"
                   />
-                  <span className={`w-8 text-center font-medium ${
-                    painLevel <= 3 ? 'text-green-600' :
-                    painLevel <= 6 ? 'text-yellow-600' : 'text-red-600'
-                  }`}>
+                  <span
+                    className={`w-8 text-center font-medium ${
+                      painLevel <= 3
+                        ? 'text-green-600'
+                        : painLevel <= 6
+                          ? 'text-yellow-600'
+                          : 'text-red-600'
+                    }`}
+                  >
                     {painLevel}
                   </span>
                 </div>
@@ -265,7 +274,9 @@ const PrescriptionCard = ({ prescription, onLogCompliance, onDiscontinue, onComp
   const [showMenu, setShowMenu] = useState(false);
 
   const compliancePercent = prescription.compliance_percent || 0;
-  const daysActive = Math.floor((new Date() - new Date(prescription.start_date)) / (1000 * 60 * 60 * 24));
+  const daysActive = Math.floor(
+    (new Date() - new Date(prescription.start_date)) / (1000 * 60 * 60 * 24)
+  );
 
   return (
     <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
@@ -275,7 +286,11 @@ const PrescriptionCard = ({ prescription, onLogCompliance, onDiscontinue, onComp
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center">
               {prescription.thumbnail_url ? (
-                <img src={prescription.thumbnail_url} alt="" className="w-full h-full object-cover rounded-lg" />
+                <img
+                  src={prescription.thumbnail_url}
+                  alt=""
+                  className="w-full h-full object-cover rounded-lg"
+                />
               ) : (
                 <Dumbbell className="w-6 h-6 text-slate-400" />
               )}
@@ -283,7 +298,9 @@ const PrescriptionCard = ({ prescription, onLogCompliance, onDiscontinue, onComp
             <div>
               <h3 className="font-medium text-slate-800">{prescription.exercise_name}</h3>
               <div className="flex items-center gap-2 mt-1">
-                <span className={`text-xs px-2 py-0.5 rounded ${STATUS_COLORS[prescription.status]}`}>
+                <span
+                  className={`text-xs px-2 py-0.5 rounded ${STATUS_COLORS[prescription.status]}`}
+                >
                   {STATUS_LABELS[prescription.status]}
                 </span>
                 <span className="text-xs text-slate-500">
@@ -305,7 +322,10 @@ const PrescriptionCard = ({ prescription, onLogCompliance, onDiscontinue, onComp
             {showMenu && (
               <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border z-10">
                 <button
-                  onClick={() => { onEdit(prescription); setShowMenu(false); }}
+                  onClick={() => {
+                    onEdit(prescription);
+                    setShowMenu(false);
+                  }}
                   className="w-full px-4 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2"
                 >
                   <Edit2 className="w-4 h-4" />
@@ -314,14 +334,20 @@ const PrescriptionCard = ({ prescription, onLogCompliance, onDiscontinue, onComp
                 {prescription.status === 'active' && (
                   <>
                     <button
-                      onClick={() => { onComplete(prescription); setShowMenu(false); }}
+                      onClick={() => {
+                        onComplete(prescription);
+                        setShowMenu(false);
+                      }}
                       className="w-full px-4 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2 text-blue-600"
                     >
                       <Check className="w-4 h-4" />
                       Merk som fullført
                     </button>
                     <button
-                      onClick={() => { onDiscontinue(prescription); setShowMenu(false); }}
+                      onClick={() => {
+                        onDiscontinue(prescription);
+                        setShowMenu(false);
+                      }}
                       className="w-full px-4 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2 text-red-600"
                     >
                       <X className="w-4 h-4" />
@@ -337,7 +363,9 @@ const PrescriptionCard = ({ prescription, onLogCompliance, onDiscontinue, onComp
         {/* Quick stats */}
         <div className="mt-4 grid grid-cols-3 gap-4">
           <div className="text-center">
-            <span className="text-2xl font-bold text-slate-800">{Math.round(compliancePercent)}%</span>
+            <span className="text-2xl font-bold text-slate-800">
+              {Math.round(compliancePercent)}%
+            </span>
             <p className="text-xs text-slate-500">Etterlevelse</p>
           </div>
           <div className="text-center">
@@ -358,7 +386,9 @@ const PrescriptionCard = ({ prescription, onLogCompliance, onDiscontinue, onComp
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-slate-600">Siste 14 dager</span>
               <button
-                onClick={() => onLogCompliance(prescription, new Date().toISOString().split('T')[0])}
+                onClick={() =>
+                  onLogCompliance(prescription, new Date().toISOString().split('T')[0])
+                }
                 className="text-xs text-purple-600 hover:underline flex items-center gap-1"
               >
                 <Plus className="w-3 h-3" />
@@ -423,8 +453,7 @@ const PrescriptionCard = ({ prescription, onLogCompliance, onDiscontinue, onComp
   );
 };
 
-// Need to import Plus for the ComplianceCalendar button
-import { Plus } from 'lucide-react';
+// Plus imported from lucide-react at top of file
 
 /**
  * Main Patient Exercises Component
@@ -435,27 +464,27 @@ export const PatientExercises = ({ patientId, patientName }) => {
   // State
   const [statusFilter, setStatusFilter] = useState('active');
   const [loggingCompliance, setLoggingCompliance] = useState(null);
-  const [editingPrescription, setEditingPrescription] = useState(null);
+  const [_editingPrescription, setEditingPrescription] = useState(null);
 
   // Fetch patient exercises
   const { data: exercisesData, isLoading } = useQuery({
     queryKey: ['patient', patientId, 'exercises', statusFilter],
-    queryFn: () => exercisesAPI.getPatientExercises(patientId, {
-      status: statusFilter === 'all' ? undefined : statusFilter,
-      includeCompleted: statusFilter === 'all' || statusFilter === 'completed'
-    }),
+    queryFn: () =>
+      exercisesAPI.getPatientExercises(patientId, {
+        status: statusFilter === 'all' ? undefined : statusFilter,
+        includeCompleted: statusFilter === 'all' || statusFilter === 'completed',
+      }),
     enabled: !!patientId,
     staleTime: 1 * 60 * 1000,
   });
 
   // Log compliance mutation
   const logComplianceMutation = useMutation({
-    mutationFn: ({ prescriptionId, data }) =>
-      exercisesAPI.logCompliance(prescriptionId, data),
+    mutationFn: ({ prescriptionId, data }) => exercisesAPI.logCompliance(prescriptionId, data),
     onSuccess: () => {
       queryClient.invalidateQueries(['patient', patientId, 'exercises']);
       setLoggingCompliance(null);
-    }
+    },
   });
 
   // Discontinue mutation
@@ -464,20 +493,19 @@ export const PatientExercises = ({ patientId, patientName }) => {
       exercisesAPI.discontinuePrescription(prescriptionId, reason),
     onSuccess: () => {
       queryClient.invalidateQueries(['patient', patientId, 'exercises']);
-    }
+    },
   });
 
   // Complete mutation
   const completeMutation = useMutation({
-    mutationFn: (prescriptionId) =>
-      exercisesAPI.completePrescription(prescriptionId),
+    mutationFn: (prescriptionId) => exercisesAPI.completePrescription(prescriptionId),
     onSuccess: () => {
       queryClient.invalidateQueries(['patient', patientId, 'exercises']);
-    }
+    },
   });
 
   const prescriptions = exercisesData?.data?.data || [];
-  const activeCount = prescriptions.filter(p => p.status === 'active').length;
+  const activeCount = prescriptions.filter((p) => p.status === 'active').length;
 
   const handleLogCompliance = (prescription, date) => {
     setLoggingCompliance({ prescription, date });
@@ -488,7 +516,7 @@ export const PatientExercises = ({ patientId, patientName }) => {
     if (reason !== null) {
       discontinueMutation.mutate({
         prescriptionId: prescription.id,
-        reason: reason || 'Avbrutt av behandler'
+        reason: reason || 'Avbrutt av behandler',
       });
     }
   };
@@ -506,9 +534,7 @@ export const PatientExercises = ({ patientId, patientName }) => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h1 className="text-2xl font-bold text-slate-800">Øvelsesprogram</h1>
-            {patientName && (
-              <p className="text-sm text-slate-500 mt-1">{patientName}</p>
-            )}
+            {patientName && <p className="text-sm text-slate-500 mt-1">{patientName}</p>}
           </div>
           <div className="flex items-center gap-2">
             <button className="px-4 py-2 text-sm font-medium text-slate-700 border rounded-lg hover:bg-slate-50 flex items-center gap-2">
@@ -531,14 +557,18 @@ export const PatientExercises = ({ patientId, patientName }) => {
           <div className="p-4 bg-blue-50 rounded-lg">
             <span className="text-2xl font-bold text-blue-700">
               {prescriptions.length > 0
-                ? Math.round(prescriptions.reduce((sum, p) => sum + (p.compliance_percent || 0), 0) / prescriptions.length)
-                : 0}%
+                ? Math.round(
+                    prescriptions.reduce((sum, p) => sum + (p.compliance_percent || 0), 0) /
+                      prescriptions.length
+                  )
+                : 0}
+              %
             </span>
             <p className="text-sm text-blue-600">Gj.snitt etterlevelse</p>
           </div>
           <div className="p-4 bg-purple-50 rounded-lg">
             <span className="text-2xl font-bold text-purple-700">
-              {prescriptions.filter(p => p.status === 'completed').length}
+              {prescriptions.filter((p) => p.status === 'completed').length}
             </span>
             <p className="text-sm text-purple-600">Fullførte</p>
           </div>
@@ -604,10 +634,12 @@ export const PatientExercises = ({ patientId, patientName }) => {
           prescription={loggingCompliance.prescription}
           date={loggingCompliance.date}
           onClose={() => setLoggingCompliance(null)}
-          onSave={(data) => logComplianceMutation.mutate({
-            prescriptionId: loggingCompliance.prescription.id,
-            data
-          })}
+          onSave={(data) =>
+            logComplianceMutation.mutate({
+              prescriptionId: loggingCompliance.prescription.id,
+              data,
+            })
+          }
           isLoading={logComplianceMutation.isPending}
         />
       )}

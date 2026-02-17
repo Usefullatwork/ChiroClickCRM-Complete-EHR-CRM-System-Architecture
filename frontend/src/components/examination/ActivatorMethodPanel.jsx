@@ -5,7 +5,7 @@
  * for chiropractic assessment using the Activator protocol.
  */
 
-import React, { useMemo, useState } from 'react';
+import _React, { useMemo, useState } from 'react';
 import {
   Zap,
   AlertTriangle,
@@ -14,29 +14,77 @@ import {
   Info,
   ChevronDown,
   ChevronUp,
-  ArrowUpDown
+  ArrowUpDown,
 } from 'lucide-react';
 
 // Leg length findings
 const LEG_LENGTH_FINDINGS = [
   { value: 'equal', label: 'Equal', labelNo: 'Lik', color: 'bg-green-100 text-green-700' },
-  { value: 'right_short', label: 'Right Short', labelNo: 'Høyre kort', color: 'bg-amber-100 text-amber-700' },
-  { value: 'left_short', label: 'Left Short', labelNo: 'Venstre kort', color: 'bg-amber-100 text-amber-700' }
+  {
+    value: 'right_short',
+    label: 'Right Short',
+    labelNo: 'Høyre kort',
+    color: 'bg-amber-100 text-amber-700',
+  },
+  {
+    value: 'left_short',
+    label: 'Left Short',
+    labelNo: 'Venstre kort',
+    color: 'bg-amber-100 text-amber-700',
+  },
 ];
 
 // Dynamic response options
 const DYNAMIC_RESPONSES = [
-  { value: 'no_change', label: 'No Change', labelNo: 'Ingen endring', color: 'bg-green-100 text-green-700' },
-  { value: 'right_shortens', label: 'Right Shortens', labelNo: 'Høyre forkortes', color: 'bg-red-100 text-red-700' },
-  { value: 'left_shortens', label: 'Left Shortens', labelNo: 'Venstre forkortes', color: 'bg-red-100 text-red-700' },
-  { value: 'lengthens', label: 'Lengthens', labelNo: 'Forlenges', color: 'bg-blue-100 text-blue-700' }
+  {
+    value: 'no_change',
+    label: 'No Change',
+    labelNo: 'Ingen endring',
+    color: 'bg-green-100 text-green-700',
+  },
+  {
+    value: 'right_shortens',
+    label: 'Right Shortens',
+    labelNo: 'Høyre forkortes',
+    color: 'bg-red-100 text-red-700',
+  },
+  {
+    value: 'left_shortens',
+    label: 'Left Shortens',
+    labelNo: 'Venstre forkortes',
+    color: 'bg-red-100 text-red-700',
+  },
+  {
+    value: 'lengthens',
+    label: 'Lengthens',
+    labelNo: 'Forlenges',
+    color: 'bg-blue-100 text-blue-700',
+  },
 ];
 
 // Palpation findings
 const PALPATION_FINDINGS = [
-  { value: 'NT', label: 'Not Tested', labelNo: 'Ikke testet', color: 'bg-gray-100 text-gray-500', icon: MinusCircle },
-  { value: 'normal', label: 'Normal', labelNo: 'Normal', color: 'bg-green-100 text-green-700', icon: CheckCircle },
-  { value: 'restriction', label: 'Restriction', labelNo: 'Restriksjon', color: 'bg-red-100 text-red-700', icon: AlertTriangle }
+  {
+    value: 'NT',
+    label: 'Not Tested',
+    labelNo: 'Ikke testet',
+    color: 'bg-gray-100 text-gray-500',
+    icon: MinusCircle,
+  },
+  {
+    value: 'normal',
+    label: 'Normal',
+    labelNo: 'Normal',
+    color: 'bg-green-100 text-green-700',
+    icon: CheckCircle,
+  },
+  {
+    value: 'restriction',
+    label: 'Restriction',
+    labelNo: 'Restriksjon',
+    color: 'bg-red-100 text-red-700',
+    icon: AlertTriangle,
+  },
 ];
 
 // Activator Method tests
@@ -55,9 +103,9 @@ const ACTIVATOR_TESTS = {
         technique: 'Compare leg lengths with patient prone, feet dorsiflexed',
         techniqueNo: 'Sammenlign benlengder med pasient mageliggende, føtter dorsalflektert',
         interpretation: 'Anatomical vs functional leg length difference',
-        interpretationNo: 'Anatomisk vs funksjonell benlengdeforskjell'
-      }
-    ]
+        interpretationNo: 'Anatomisk vs funksjonell benlengdeforskjell',
+      },
+    ],
   },
   dynamicHead: {
     name: 'Dynamic Head Tests',
@@ -73,7 +121,7 @@ const ACTIVATOR_TESTS = {
         technique: 'Patient lifts head into extension, observe leg length change',
         techniqueNo: 'Pasient løfter hodet i ekstensjon, observer benlengdeendring',
         positive: 'Cervical dysfunction indicated',
-        positiveNo: 'Cervical dysfunksjon indikert'
+        positiveNo: 'Cervical dysfunksjon indikert',
       },
       {
         id: 'dynamic_head_rotation_right',
@@ -83,7 +131,7 @@ const ACTIVATOR_TESTS = {
         technique: 'Patient rotates head right, observe leg length change',
         techniqueNo: 'Pasient roterer hodet til høyre, observer benlengdeendring',
         positive: 'C1-C2 dysfunction',
-        positiveNo: 'C1-C2 dysfunksjon'
+        positiveNo: 'C1-C2 dysfunksjon',
       },
       {
         id: 'dynamic_head_rotation_left',
@@ -93,7 +141,7 @@ const ACTIVATOR_TESTS = {
         technique: 'Patient rotates head left, observe leg length change',
         techniqueNo: 'Pasient roterer hodet til venstre, observer benlengdeendring',
         positive: 'C1-C2 dysfunction',
-        positiveNo: 'C1-C2 dysfunksjon'
+        positiveNo: 'C1-C2 dysfunksjon',
       },
       {
         id: 'dynamic_head_flexion',
@@ -103,9 +151,9 @@ const ACTIVATOR_TESTS = {
         technique: 'Patient tucks chin to chest, observe leg length change',
         techniqueNo: 'Pasient fører haken mot brystet, observer benlengdeendring',
         positive: 'Upper cervical dysfunction',
-        positiveNo: 'Øvre cervical dysfunksjon'
-      }
-    ]
+        positiveNo: 'Øvre cervical dysfunksjon',
+      },
+    ],
   },
   palpationScreening: {
     name: 'Palpation Screening',
@@ -119,7 +167,7 @@ const ACTIVATOR_TESTS = {
         nameNo: 'C0-C1 (Occiput-Atlas)',
         type: 'palpation',
         interpretation: 'Occipitocervical dysfunction',
-        interpretationNo: 'Occipitocervical dysfunksjon'
+        interpretationNo: 'Occipitocervical dysfunksjon',
       },
       {
         id: 'c1_c2',
@@ -127,7 +175,7 @@ const ACTIVATOR_TESTS = {
         nameNo: 'C1-C2 (Atlas-Axis)',
         type: 'palpation',
         interpretation: 'Atlantoaxial dysfunction',
-        interpretationNo: 'Atlantoaksial dysfunksjon'
+        interpretationNo: 'Atlantoaksial dysfunksjon',
       },
       {
         id: 'c2_c3',
@@ -135,7 +183,7 @@ const ACTIVATOR_TESTS = {
         nameNo: 'C2-C3',
         type: 'palpation',
         interpretation: 'Upper cervical dysfunction',
-        interpretationNo: 'Øvre cervical dysfunksjon'
+        interpretationNo: 'Øvre cervical dysfunksjon',
       },
       {
         id: 'c3_c4',
@@ -143,7 +191,7 @@ const ACTIVATOR_TESTS = {
         nameNo: 'C3-C4',
         type: 'palpation',
         interpretation: 'Mid cervical dysfunction',
-        interpretationNo: 'Midt-cervical dysfunksjon'
+        interpretationNo: 'Midt-cervical dysfunksjon',
       },
       {
         id: 'c4_c5',
@@ -151,7 +199,7 @@ const ACTIVATOR_TESTS = {
         nameNo: 'C4-C5',
         type: 'palpation',
         interpretation: 'Mid cervical dysfunction',
-        interpretationNo: 'Midt-cervical dysfunksjon'
+        interpretationNo: 'Midt-cervical dysfunksjon',
       },
       {
         id: 'c5_c6',
@@ -159,7 +207,7 @@ const ACTIVATOR_TESTS = {
         nameNo: 'C5-C6',
         type: 'palpation',
         interpretation: 'Lower cervical dysfunction',
-        interpretationNo: 'Nedre cervical dysfunksjon'
+        interpretationNo: 'Nedre cervical dysfunksjon',
       },
       {
         id: 'c6_c7',
@@ -167,7 +215,7 @@ const ACTIVATOR_TESTS = {
         nameNo: 'C6-C7',
         type: 'palpation',
         interpretation: 'Cervicothoracic junction',
-        interpretationNo: 'Cervicotorakal overgang'
+        interpretationNo: 'Cervicotorakal overgang',
       },
       {
         id: 'c7_t1',
@@ -175,9 +223,9 @@ const ACTIVATOR_TESTS = {
         nameNo: 'C7-T1',
         type: 'palpation',
         interpretation: 'Cervicothoracic junction',
-        interpretationNo: 'Cervicotorakal overgang'
-      }
-    ]
+        interpretationNo: 'Cervicotorakal overgang',
+      },
+    ],
   },
   thoracicScreening: {
     name: 'Thoracic Screening',
@@ -196,8 +244,8 @@ const ACTIVATOR_TESTS = {
       { id: 't9_t10', name: 'T9-T10', nameNo: 'T9-T10', type: 'palpation' },
       { id: 't10_t11', name: 'T10-T11', nameNo: 'T10-T11', type: 'palpation' },
       { id: 't11_t12', name: 'T11-T12', nameNo: 'T11-T12', type: 'palpation' },
-      { id: 't12_l1', name: 'T12-L1', nameNo: 'T12-L1', type: 'palpation' }
-    ]
+      { id: 't12_l1', name: 'T12-L1', nameNo: 'T12-L1', type: 'palpation' },
+    ],
   },
   lumbarScreening: {
     name: 'Lumbar Screening',
@@ -212,9 +260,9 @@ const ACTIVATOR_TESTS = {
       { id: 'l5_s1', name: 'L5-S1', nameNo: 'L5-S1', type: 'palpation' },
       { id: 'sacrum', name: 'Sacrum', nameNo: 'Sacrum', type: 'palpation' },
       { id: 'si_right', name: 'SI Joint Right', nameNo: 'IS-ledd høyre', type: 'palpation' },
-      { id: 'si_left', name: 'SI Joint Left', nameNo: 'IS-ledd venstre', type: 'palpation' }
-    ]
-  }
+      { id: 'si_left', name: 'SI Joint Left', nameNo: 'IS-ledd venstre', type: 'palpation' },
+    ],
+  },
 };
 
 /**
@@ -223,14 +271,14 @@ const ACTIVATOR_TESTS = {
 function LegLengthSelector({ value, onChange, lang }) {
   return (
     <div className="flex gap-2">
-      {LEG_LENGTH_FINDINGS.map(opt => (
+      {LEG_LENGTH_FINDINGS.map((opt) => (
         <button
           key={opt.value}
           type="button"
           onClick={() => onChange(opt.value)}
           className={`px-3 py-1.5 text-xs rounded border transition-colors ${
             value === opt.value
-              ? opt.color + ' border-current'
+              ? `${opt.color} border-current`
               : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
           }`}
         >
@@ -247,14 +295,14 @@ function LegLengthSelector({ value, onChange, lang }) {
 function DynamicResponseSelector({ value, onChange, lang }) {
   return (
     <div className="flex flex-wrap gap-1">
-      {DYNAMIC_RESPONSES.map(opt => (
+      {DYNAMIC_RESPONSES.map((opt) => (
         <button
           key={opt.value}
           type="button"
           onClick={() => onChange(opt.value)}
           className={`px-2 py-1 text-xs rounded border transition-colors ${
             value === opt.value
-              ? opt.color + ' border-current'
+              ? `${opt.color} border-current`
               : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
           }`}
         >
@@ -269,7 +317,7 @@ function DynamicResponseSelector({ value, onChange, lang }) {
  * Palpation finding toggle
  */
 function PalpationToggle({ value, onChange, lang }) {
-  const currentIndex = PALPATION_FINDINGS.findIndex(s => s.value === value);
+  const currentIndex = PALPATION_FINDINGS.findIndex((s) => s.value === value);
   const current = PALPATION_FINDINGS[currentIndex] || PALPATION_FINDINGS[0];
   const Icon = current.icon;
 
@@ -303,9 +351,7 @@ function TestItem({ test, values, onChange, lang, showDetails }) {
       <div className="p-3 bg-white rounded-lg border border-gray-200">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
-            <h5 className="font-medium text-gray-700">
-              {lang === 'no' ? test.nameNo : test.name}
-            </h5>
+            <h5 className="font-medium text-gray-700">{lang === 'no' ? test.nameNo : test.name}</h5>
             {showDetails && (
               <p className="text-xs text-gray-500 mt-1">
                 {lang === 'no' ? test.techniqueNo : test.technique}
@@ -321,7 +367,9 @@ function TestItem({ test, values, onChange, lang, showDetails }) {
           />
           {(values[resultKey] === 'right_short' || values[resultKey] === 'left_short') && (
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-600">{lang === 'no' ? 'Differanse:' : 'Difference:'}</span>
+              <span className="text-xs text-gray-600">
+                {lang === 'no' ? 'Differanse:' : 'Difference:'}
+              </span>
               <input
                 type="number"
                 value={values[differenceKey] || ''}
@@ -341,12 +389,12 @@ function TestItem({ test, values, onChange, lang, showDetails }) {
     const isPositive = values[resultKey] && values[resultKey] !== 'no_change';
 
     return (
-      <div className={`p-3 bg-white rounded-lg border ${isPositive ? 'border-red-300 bg-red-50' : 'border-gray-200'}`}>
+      <div
+        className={`p-3 bg-white rounded-lg border ${isPositive ? 'border-red-300 bg-red-50' : 'border-gray-200'}`}
+      >
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
-            <h5 className="font-medium text-gray-700">
-              {lang === 'no' ? test.nameNo : test.name}
-            </h5>
+            <h5 className="font-medium text-gray-700">{lang === 'no' ? test.nameNo : test.name}</h5>
             {showDetails && (
               <p className="text-xs text-gray-500 mt-1">
                 {lang === 'no' ? test.techniqueNo : test.technique}
@@ -375,12 +423,12 @@ function TestItem({ test, values, onChange, lang, showDetails }) {
   const isRestriction = values[resultKey] === 'restriction';
 
   return (
-    <div className={`flex items-center justify-between p-2 bg-white rounded border ${
-      isRestriction ? 'border-red-200 bg-red-50' : 'border-gray-200'
-    }`}>
-      <span className="text-sm text-gray-700">
-        {lang === 'no' ? test.nameNo : test.name}
-      </span>
+    <div
+      className={`flex items-center justify-between p-2 bg-white rounded border ${
+        isRestriction ? 'border-red-200 bg-red-50' : 'border-gray-200'
+      }`}
+    >
+      <span className="text-sm text-gray-700">{lang === 'no' ? test.nameNo : test.name}</span>
       <PalpationToggle
         value={values[resultKey] || 'NT'}
         onChange={(v) => onChange({ ...values, [resultKey]: v })}
@@ -393,25 +441,42 @@ function TestItem({ test, values, onChange, lang, showDetails }) {
 /**
  * Category section
  */
-function CategorySection({ categoryKey, category, values, onChange, lang, expanded, onToggle, showDetails }) {
+function CategorySection({
+  _categoryKey,
+  category,
+  values,
+  onChange,
+  lang,
+  expanded,
+  onToggle,
+  showDetails,
+}) {
   const restrictionCount = useMemo(() => {
-    return category.tests.filter(test => {
+    return category.tests.filter((test) => {
       const result = values[`${test.id}_result`];
-      if (test.type === 'palpation') return result === 'restriction';
-      if (test.type === 'dynamic') return result && result !== 'no_change';
+      if (test.type === 'palpation') {
+        return result === 'restriction';
+      }
+      if (test.type === 'dynamic') {
+        return result && result !== 'no_change';
+      }
       return false;
     }).length;
   }, [category.tests, values]);
 
   return (
-    <div className={`border rounded-lg overflow-hidden ${restrictionCount > 0 ? 'border-red-200' : 'border-gray-200'}`}>
+    <div
+      className={`border rounded-lg overflow-hidden ${restrictionCount > 0 ? 'border-red-200' : 'border-gray-200'}`}
+    >
       <button
         type="button"
         onClick={onToggle}
         className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100"
       >
         <div className="flex items-center gap-3">
-          <ArrowUpDown className={`w-5 h-5 ${restrictionCount > 0 ? 'text-red-600' : 'text-teal-600'}`} />
+          <ArrowUpDown
+            className={`w-5 h-5 ${restrictionCount > 0 ? 'text-red-600' : 'text-teal-600'}`}
+          />
           <span className="font-medium text-gray-700">
             {lang === 'no' ? category.nameNo : category.name}
           </span>
@@ -422,7 +487,11 @@ function CategorySection({ categoryKey, category, values, onChange, lang, expand
               {restrictionCount}
             </span>
           )}
-          {expanded ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+          {expanded ? (
+            <ChevronUp className="w-5 h-5 text-gray-400" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-gray-400" />
+          )}
         </div>
       </button>
 
@@ -433,7 +502,7 @@ function CategorySection({ categoryKey, category, values, onChange, lang, expand
               {lang === 'no' ? category.descriptionNo : category.description}
             </p>
           )}
-          {category.tests.map(test => (
+          {category.tests.map((test) => (
             <TestItem
               key={test.id}
               test={test}
@@ -456,11 +525,13 @@ export default function ActivatorMethodPanel({
   values = {},
   onChange,
   lang = 'no',
-  readOnly = false,
+  _readOnly = false,
   showDetails = true,
-  onGenerateNarrative
+  onGenerateNarrative,
 }) {
-  const [expandedCategories, setExpandedCategories] = useState(new Set(['legLength', 'dynamicHead', 'palpationScreening']));
+  const [expandedCategories, setExpandedCategories] = useState(
+    new Set(['legLength', 'dynamicHead', 'palpationScreening'])
+  );
 
   const toggleCategory = (key) => {
     const newExpanded = new Set(expandedCategories);
@@ -477,8 +548,8 @@ export default function ActivatorMethodPanel({
     let tested = 0;
     let restrictions = 0;
 
-    Object.values(ACTIVATOR_TESTS).forEach(category => {
-      category.tests.forEach(test => {
+    Object.values(ACTIVATOR_TESTS).forEach((category) => {
+      category.tests.forEach((test) => {
         const result = values[`${test.id}_result`];
         if (result && result !== 'NT') {
           tested++;
@@ -496,8 +567,8 @@ export default function ActivatorMethodPanel({
   const restrictedSegments = useMemo(() => {
     const segments = [];
 
-    Object.values(ACTIVATOR_TESTS).forEach(category => {
-      category.tests.forEach(test => {
+    Object.values(ACTIVATOR_TESTS).forEach((category) => {
+      category.tests.forEach((test) => {
         const result = values[`${test.id}_result`];
         if (result === 'restriction') {
           segments.push(lang === 'no' ? test.nameNo : test.name);
@@ -524,25 +595,29 @@ export default function ActivatorMethodPanel({
       narrative += lang === 'no' ? 'Benlengde lik. ' : 'Leg length equal. ';
     } else if (staticLeg === 'right_short') {
       const mm = values['static_leg_length_mm'];
-      narrative += lang === 'no'
-        ? `Høyre ben kort${mm ? ` (${mm}mm)` : ''}. `
-        : `Right leg short${mm ? ` (${mm}mm)` : ''}. `;
+      narrative +=
+        lang === 'no'
+          ? `Høyre ben kort${mm ? ` (${mm}mm)` : ''}. `
+          : `Right leg short${mm ? ` (${mm}mm)` : ''}. `;
     } else if (staticLeg === 'left_short') {
       const mm = values['static_leg_length_mm'];
-      narrative += lang === 'no'
-        ? `Venstre ben kort${mm ? ` (${mm}mm)` : ''}. `
-        : `Left leg short${mm ? ` (${mm}mm)` : ''}. `;
+      narrative +=
+        lang === 'no'
+          ? `Venstre ben kort${mm ? ` (${mm}mm)` : ''}. `
+          : `Left leg short${mm ? ` (${mm}mm)` : ''}. `;
     }
 
     // Restrictions
     if (restrictedSegments.length > 0) {
-      narrative += lang === 'no'
-        ? `Restriksjoner funnet i: ${restrictedSegments.join(', ')}.`
-        : `Restrictions found at: ${restrictedSegments.join(', ')}.`;
+      narrative +=
+        lang === 'no'
+          ? `Restriksjoner funnet i: ${restrictedSegments.join(', ')}.`
+          : `Restrictions found at: ${restrictedSegments.join(', ')}.`;
     } else if (summary.tested > 0) {
-      narrative += lang === 'no'
-        ? 'Ingen segmentelle restriksjoner påvist.'
-        : 'No segmental restrictions detected.';
+      narrative +=
+        lang === 'no'
+          ? 'Ingen segmentelle restriksjoner påvist.'
+          : 'No segmental restrictions detected.';
     }
 
     return narrative;
@@ -621,11 +696,25 @@ export default function ActivatorMethodPanel({
         <div className="flex items-start gap-2">
           <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
           <div className="text-blue-700">
-            <p className="font-medium mb-1">{lang === 'no' ? 'Aktivator protokoll:' : 'Activator Protocol:'}</p>
+            <p className="font-medium mb-1">
+              {lang === 'no' ? 'Aktivator protokoll:' : 'Activator Protocol:'}
+            </p>
             <ul className="space-y-0.5 text-blue-600">
-              <li>{lang === 'no' ? 'Dynamisk benlengdeendring indikerer segmentell dysfunksjon' : 'Dynamic leg length change indicates segmental dysfunction'}</li>
-              <li>{lang === 'no' ? 'Restriksjon ved palpasjon bekrefter behov for justering' : 'Palpation restriction confirms need for adjustment'}</li>
-              <li>{lang === 'no' ? 'Re-test etter justering for å bekrefte korrigering' : 'Re-test after adjustment to confirm correction'}</li>
+              <li>
+                {lang === 'no'
+                  ? 'Dynamisk benlengdeendring indikerer segmentell dysfunksjon'
+                  : 'Dynamic leg length change indicates segmental dysfunction'}
+              </li>
+              <li>
+                {lang === 'no'
+                  ? 'Restriksjon ved palpasjon bekrefter behov for justering'
+                  : 'Palpation restriction confirms need for adjustment'}
+              </li>
+              <li>
+                {lang === 'no'
+                  ? 'Re-test etter justering for å bekrefte korrigering'
+                  : 'Re-test after adjustment to confirm correction'}
+              </li>
             </ul>
           </div>
         </div>

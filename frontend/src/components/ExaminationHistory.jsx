@@ -29,7 +29,9 @@ export default function ExaminationHistory({ patientId, currentEncounterId }) {
   });
 
   const getComparisonIcon = (current, past) => {
-    if (!past) return <Minus className="w-4 h-4 text-gray-400" />;
+    if (!past) {
+      return <Minus className="w-4 h-4 text-gray-400" />;
+    }
 
     const currentScore = getResultScore(current);
     const pastScore = getResultScore(past);
@@ -44,40 +46,50 @@ export default function ExaminationHistory({ patientId, currentEncounterId }) {
 
   const getResultScore = (result) => {
     switch (result) {
-      case 'negative': return 3; // Best
-      case 'equivocal': return 2;
-      case 'positive': return 1;
-      case 'not_tested': return 0; // Worst
-      default: return 0;
+      case 'negative':
+        return 3; // Best
+      case 'equivocal':
+        return 2;
+      case 'positive':
+        return 1;
+      case 'not_tested':
+        return 0; // Worst
+      default:
+        return 0;
     }
   };
 
   const getResultText = (result) => {
     switch (result) {
-      case 'positive': return 'Positiv';
-      case 'negative': return 'Negativ';
-      case 'equivocal': return 'Uklar';
-      case 'not_tested': return 'Ikke testet';
-      default: return result;
+      case 'positive':
+        return 'Positiv';
+      case 'negative':
+        return 'Negativ';
+      case 'equivocal':
+        return 'Uklar';
+      case 'not_tested':
+        return 'Ikke testet';
+      default:
+        return result;
     }
   };
 
   const toggleTestExpansion = (testId) => {
-    setExpandedTests(prev => ({
+    setExpandedTests((prev) => ({
       ...prev,
-      [testId]: !prev[testId]
+      [testId]: !prev[testId],
     }));
   };
 
   const compareFindings = () => {
-    if (!currentFindings?.data || !pastFindings?.data) return [];
+    if (!currentFindings?.data || !pastFindings?.data) {
+      return [];
+    }
 
     const comparisons = [];
-    const pastFindingsMap = new Map(
-      pastFindings.data.map(f => [f.test_name, f])
-    );
+    const pastFindingsMap = new Map(pastFindings.data.map((f) => [f.test_name, f]));
 
-    currentFindings.data.forEach(currentFinding => {
+    currentFindings.data.forEach((currentFinding) => {
       const pastFinding = pastFindingsMap.get(currentFinding.test_name);
       comparisons.push({
         current: currentFinding,
@@ -91,9 +103,10 @@ export default function ExaminationHistory({ patientId, currentEncounterId }) {
   const comparisons = compareFindings();
 
   // Filter encounters to exclude current one
-  const availableEncounters = encounters?.data?.filter(
-    e => e.id !== currentEncounterId
-  ).sort((a, b) => new Date(b.encounter_date) - new Date(a.encounter_date)) || [];
+  const availableEncounters =
+    encounters?.data
+      ?.filter((e) => e.id !== currentEncounterId)
+      .sort((a, b) => new Date(b.encounter_date) - new Date(a.encounter_date)) || [];
 
   if (!patientId) {
     return null;
@@ -109,29 +122,30 @@ export default function ExaminationHistory({ patientId, currentEncounterId }) {
       {availableEncounters.length === 0 ? (
         <div className="text-center py-6 bg-gray-50 rounded-lg">
           <p className="text-sm text-gray-600">Ingen tidligere konsultasjoner</p>
-          <p className="text-xs text-gray-500 mt-1">Sammenligningen vil vises når pasienten har flere konsultasjoner</p>
+          <p className="text-xs text-gray-500 mt-1">
+            Sammenligningen vil vises når pasienten har flere konsultasjoner
+          </p>
         </div>
       ) : (
         <>
           {/* Select Past Encounter */}
           <div className="mb-4">
-            <label className="block text-xs font-medium text-gray-700 mb-2">
-              Sammenlign med:
-            </label>
+            <label className="block text-xs font-medium text-gray-700 mb-2">Sammenlign med:</label>
             <select
               value={selectedPastEncounter || ''}
               onChange={(e) => setSelectedPastEncounter(e.target.value || null)}
               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="">Velg tidligere konsultasjon...</option>
-              {availableEncounters.map(encounter => (
+              {availableEncounters.map((encounter) => (
                 <option key={encounter.id} value={encounter.id}>
                   {new Date(encounter.encounter_date).toLocaleDateString('nb-NO', {
                     year: 'numeric',
                     month: 'long',
-                    day: 'numeric'
+                    day: 'numeric',
                   })}
-                  {encounter.subjective?.chief_complaint && ` - ${encounter.subjective.chief_complaint}`}
+                  {encounter.subjective?.chief_complaint &&
+                    ` - ${encounter.subjective.chief_complaint}`}
                 </option>
               ))}
             </select>
@@ -167,16 +181,22 @@ export default function ExaminationHistory({ patientId, currentEncounterId }) {
                     </div>
 
                     <div className="flex gap-8 items-center">
-                      <span className={`text-xs w-16 text-right ${
-                        comparison.past ? 'text-gray-700' : 'text-gray-400'
-                      }`}>
+                      <span
+                        className={`text-xs w-16 text-right ${
+                          comparison.past ? 'text-gray-700' : 'text-gray-400'
+                        }`}
+                      >
                         {comparison.past ? getResultText(comparison.past.result) : 'N/A'}
                       </span>
-                      <span className={`text-xs w-16 text-right font-medium ${
-                        comparison.current.result === 'positive' ? 'text-red-600' :
-                        comparison.current.result === 'negative' ? 'text-green-600' :
-                        'text-gray-700'
-                      }`}>
+                      <span
+                        className={`text-xs w-16 text-right font-medium ${
+                          comparison.current.result === 'positive'
+                            ? 'text-red-600'
+                            : comparison.current.result === 'negative'
+                              ? 'text-green-600'
+                              : 'text-gray-700'
+                        }`}
+                      >
                         {getResultText(comparison.current.result)}
                       </span>
                       <div className="w-8 flex justify-center">
@@ -197,7 +217,8 @@ export default function ExaminationHistory({ patientId, currentEncounterId }) {
                         )}
                         {comparison.current.pain_score !== null && (
                           <p className="text-gray-600 mt-1">
-                            <span className="font-medium">Smerte:</span> {comparison.current.pain_score}/10
+                            <span className="font-medium">Smerte:</span>{' '}
+                            {comparison.current.pain_score}/10
                           </p>
                         )}
                       </div>
@@ -213,7 +234,8 @@ export default function ExaminationHistory({ patientId, currentEncounterId }) {
                           )}
                           {comparison.past.pain_score !== null && (
                             <p className="text-gray-600 mt-1">
-                              <span className="font-medium">Smerte:</span> {comparison.past.pain_score}/10
+                              <span className="font-medium">Smerte:</span>{' '}
+                              {comparison.past.pain_score}/10
                             </p>
                           )}
                         </div>
@@ -230,9 +252,13 @@ export default function ExaminationHistory({ patientId, currentEncounterId }) {
                     <div className="flex items-center justify-center gap-1 mb-1">
                       <TrendingUp className="w-4 h-4 text-green-600" />
                       <span className="text-lg font-bold text-green-600">
-                        {comparisons.filter(c =>
-                          c.past && getResultScore(c.current.result) > getResultScore(c.past.result)
-                        ).length}
+                        {
+                          comparisons.filter(
+                            (c) =>
+                              c.past &&
+                              getResultScore(c.current.result) > getResultScore(c.past.result)
+                          ).length
+                        }
                       </span>
                     </div>
                     <p className="text-xs text-green-700">Forbedret</p>
@@ -241,9 +267,13 @@ export default function ExaminationHistory({ patientId, currentEncounterId }) {
                     <div className="flex items-center justify-center gap-1 mb-1">
                       <Minus className="w-4 h-4 text-gray-600" />
                       <span className="text-lg font-bold text-gray-600">
-                        {comparisons.filter(c =>
-                          c.past && getResultScore(c.current.result) === getResultScore(c.past.result)
-                        ).length}
+                        {
+                          comparisons.filter(
+                            (c) =>
+                              c.past &&
+                              getResultScore(c.current.result) === getResultScore(c.past.result)
+                          ).length
+                        }
                       </span>
                     </div>
                     <p className="text-xs text-gray-700">Uendret</p>
@@ -252,9 +282,13 @@ export default function ExaminationHistory({ patientId, currentEncounterId }) {
                     <div className="flex items-center justify-center gap-1 mb-1">
                       <TrendingDown className="w-4 h-4 text-red-600" />
                       <span className="text-lg font-bold text-red-600">
-                        {comparisons.filter(c =>
-                          c.past && getResultScore(c.current.result) < getResultScore(c.past.result)
-                        ).length}
+                        {
+                          comparisons.filter(
+                            (c) =>
+                              c.past &&
+                              getResultScore(c.current.result) < getResultScore(c.past.result)
+                          ).length
+                        }
                       </span>
                     </div>
                     <p className="text-xs text-red-700">Forverret</p>

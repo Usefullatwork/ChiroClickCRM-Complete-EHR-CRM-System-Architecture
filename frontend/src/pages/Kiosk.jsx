@@ -12,7 +12,7 @@
  * Data flows to SOAP note pre-population for provider
  */
 
-import React, { useState, useCallback } from 'react';
+import _React, { useState, useCallback } from 'react';
 import { useTranslation } from '../i18n';
 import KioskLayout from '../components/kiosk/KioskLayout';
 import PatientLookup from '../components/kiosk/PatientLookup';
@@ -28,7 +28,7 @@ const STEPS = {
   COMPLAINT: 'complaint',
   PAIN: 'pain',
   SCREENING: 'screening',
-  CONFIRMATION: 'confirmation'
+  CONFIRMATION: 'confirmation',
 };
 
 const STEP_ORDER = [
@@ -37,14 +37,14 @@ const STEP_ORDER = [
   STEPS.COMPLAINT,
   STEPS.PAIN,
   STEPS.SCREENING,
-  STEPS.CONFIRMATION
+  STEPS.CONFIRMATION,
 ];
 
 // API base URL
 const API_BASE = '/api/v1';
 
 export default function Kiosk() {
-  const { t, lang } = useTranslation('kiosk');
+  const { _t, lang } = useTranslation('kiosk');
   const [currentStep, setCurrentStep] = useState(STEPS.LOOKUP);
   const [startTime] = useState(Date.now());
 
@@ -53,21 +53,24 @@ export default function Kiosk() {
     appointment: null,
     complaint: null,
     pain: null,
-    screening: null
+    screening: null,
   });
 
   // Get current step number for progress indicator
   const stepNumber = STEP_ORDER.indexOf(currentStep);
 
   // Update data and go to next step
-  const nextStep = useCallback((stepData, stepKey) => {
-    setData(prev => ({ ...prev, [stepKey]: stepData }));
+  const nextStep = useCallback(
+    (stepData, stepKey) => {
+      setData((prev) => ({ ...prev, [stepKey]: stepData }));
 
-    const currentIndex = STEP_ORDER.indexOf(currentStep);
-    if (currentIndex < STEP_ORDER.length - 1) {
-      setCurrentStep(STEP_ORDER[currentIndex + 1]);
-    }
-  }, [currentStep]);
+      const currentIndex = STEP_ORDER.indexOf(currentStep);
+      if (currentIndex < STEP_ORDER.length - 1) {
+        setCurrentStep(STEP_ORDER[currentIndex + 1]);
+      }
+    },
+    [currentStep]
+  );
 
   // Go back one step
   const prevStep = useCallback(() => {
@@ -84,50 +87,52 @@ export default function Kiosk() {
       appointment: null,
       complaint: null,
       pain: null,
-      screening: null
+      screening: null,
     });
   }, []);
 
   // Complete check-in - submit to API
-  const completeCheckIn = useCallback(async (screeningData) => {
-    const duration = Math.round((Date.now() - startTime) / 1000);
+  const completeCheckIn = useCallback(
+    async (screeningData) => {
+      const duration = Math.round((Date.now() - startTime) / 1000);
 
-    try {
-      const response = await fetch(`${API_BASE}/kiosk/checkin`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          appointmentId: data.appointment?.id,
-          complaintCategories: data.complaint?.complaintCategories || [],
-          chiefComplaint: data.complaint?.chiefComplaint || data.complaint?.narrative || '',
-          painLocations: data.pain?.painLocations || [],
-          painLevel: data.pain?.painLevel,
-          painDuration: data.pain?.painDuration,
-          comparedToLast: screeningData?.comparedToLast,
-          newSymptoms: screeningData?.newSymptoms,
-          newSymptomsText: screeningData?.newSymptomsText,
-          aggravatingFactors: [],
-          relievingFactors: [],
-          intakeDuration: duration,
-          lang
-        })
-      });
+      try {
+        const response = await fetch(`${API_BASE}/kiosk/checkin`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            appointmentId: data.appointment?.id,
+            complaintCategories: data.complaint?.complaintCategories || [],
+            chiefComplaint: data.complaint?.chiefComplaint || data.complaint?.narrative || '',
+            painLocations: data.pain?.painLocations || [],
+            painLevel: data.pain?.painLevel,
+            painDuration: data.pain?.painDuration,
+            comparedToLast: screeningData?.comparedToLast,
+            newSymptoms: screeningData?.newSymptoms,
+            newSymptomsText: screeningData?.newSymptomsText,
+            aggravatingFactors: [],
+            relievingFactors: [],
+            intakeDuration: duration,
+            lang,
+          }),
+        });
 
-      if (!response.ok) {
-        throw new Error('Check-in failed');
+        if (!response.ok) {
+          throw new Error('Check-in failed');
+        }
+
+        // Move to confirmation
+        setData((prev) => ({ ...prev, screening: screeningData }));
+        setCurrentStep(STEPS.CONFIRMATION);
+      } catch (error) {
+        console.error('Check-in error:', error);
+        // Still show confirmation but log error
+        setData((prev) => ({ ...prev, screening: screeningData }));
+        setCurrentStep(STEPS.CONFIRMATION);
       }
-
-      // Move to confirmation
-      setData(prev => ({ ...prev, screening: screeningData }));
-      setCurrentStep(STEPS.CONFIRMATION);
-
-    } catch (error) {
-      console.error('Check-in error:', error);
-      // Still show confirmation but log error
-      setData(prev => ({ ...prev, screening: screeningData }));
-      setCurrentStep(STEPS.CONFIRMATION);
-    }
-  }, [data.appointment, data.complaint, data.pain, startTime, lang]);
+    },
+    [data.appointment, data.complaint, data.pain, startTime, lang]
+  );
 
   // Render current step
   const renderStep = () => {

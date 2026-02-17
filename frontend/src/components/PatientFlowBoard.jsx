@@ -9,20 +9,20 @@
  * - Bilingual support (EN/NO)
  */
 
-import React, { useState, useCallback } from 'react';
+import _React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   User,
   Clock,
-  Phone,
+  _Phone,
   FileText,
-  ChevronRight,
+  _ChevronRight,
   MoreVertical,
   AlertTriangle,
   CheckCircle2,
   Play,
   XCircle,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
 
 // =============================================================================
@@ -85,7 +85,7 @@ const TRANSLATIONS = {
     refresh: 'Oppdater',
     today: 'I dag',
     kioskCheckin: 'Kiosk-innsjekking',
-  }
+  },
 };
 
 const APPOINTMENT_TYPES = {
@@ -108,16 +108,16 @@ function PatientCard({
   onDragStart,
   onStatusChange,
   onViewChart,
-  onStartVisit
+  onStartVisit,
 }) {
   const t = TRANSLATIONS[lang];
   const [showMenu, setShowMenu] = useState(false);
 
   const typeInfo = APPOINTMENT_TYPES[appointment.appointmentType] ||
-                   APPOINTMENT_TYPES[appointment.appointment_type] ||
-                   { en: 'Visit', no: 'Besøk', color: 'gray' };
+    APPOINTMENT_TYPES[appointment.appointment_type] || { en: 'Visit', no: 'Besøk', color: 'gray' };
 
-  const patientName = appointment.patientName ||
+  const patientName =
+    appointment.patientName ||
     `${appointment.patient?.first_name || appointment.firstName || ''} ${appointment.patient?.last_name || appointment.lastName || ''}`.trim();
 
   const appointmentTime = appointment.startTime || appointment.start_time;
@@ -125,7 +125,7 @@ function PatientCard({
     ? new Date(appointmentTime).toLocaleTimeString(lang === 'no' ? 'nb-NO' : 'en-US', {
         hour: '2-digit',
         minute: '2-digit',
-        hour12: false
+        hour12: false,
       })
     : '';
 
@@ -150,8 +150,10 @@ function PatientCard({
     >
       {/* Red flag indicator */}
       {hasRedFlags && (
-        <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full
-                        flex items-center justify-center">
+        <div
+          className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full
+                        flex items-center justify-center"
+        >
           <AlertTriangle className="w-3 h-3 text-white" />
         </div>
       )}
@@ -162,11 +164,12 @@ function PatientCard({
           <Clock className="w-3.5 h-3.5 text-gray-400" />
           <span className="text-sm font-medium text-gray-900">{formattedTime}</span>
         </div>
-        <span className={`text-xs px-2 py-0.5 rounded-full font-medium
+        <span
+          className={`text-xs px-2 py-0.5 rounded-full font-medium
           bg-${typeInfo.color}-100 text-${typeInfo.color}-700`}
           style={{
             backgroundColor: `var(--color-${typeInfo.color}-100, #f0f9ff)`,
-            color: `var(--color-${typeInfo.color}-700, #0369a1)`
+            color: `var(--color-${typeInfo.color}-700, #0369a1)`,
           }}
         >
           {typeInfo[lang]}
@@ -224,17 +227,25 @@ function PatientCard({
 
       {/* Context menu dropdown */}
       {showMenu && (
-        <div className="absolute right-0 top-8 z-10 w-40 bg-white rounded-lg shadow-lg
-                        border border-gray-200 py-1">
+        <div
+          className="absolute right-0 top-8 z-10 w-40 bg-white rounded-lg shadow-lg
+                        border border-gray-200 py-1"
+        >
           <button
-            onClick={() => { onViewChart?.(appointment); setShowMenu(false); }}
+            onClick={() => {
+              onViewChart?.(appointment);
+              setShowMenu(false);
+            }}
             className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
           >
             <FileText className="w-4 h-4" /> {t.viewChart}
           </button>
           {appointment.status === 'CONFIRMED' && (
             <button
-              onClick={() => { onStatusChange?.(appointment, 'ARRIVED'); setShowMenu(false); }}
+              onClick={() => {
+                onStatusChange?.(appointment, 'ARRIVED');
+                setShowMenu(false);
+              }}
               className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
             >
               <User className="w-4 h-4" /> {t.checkIn}
@@ -242,7 +253,10 @@ function PatientCard({
           )}
           {appointment.status === 'ARRIVED' && (
             <button
-              onClick={() => { onStartVisit?.(appointment); setShowMenu(false); }}
+              onClick={() => {
+                onStartVisit?.(appointment);
+                setShowMenu(false);
+              }}
               className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
             >
               <Play className="w-4 h-4" /> {t.startVisit}
@@ -250,7 +264,10 @@ function PatientCard({
           )}
           {appointment.status === 'IN_PROGRESS' && (
             <button
-              onClick={() => { onStatusChange?.(appointment, 'COMPLETED'); setShowMenu(false); }}
+              onClick={() => {
+                onStatusChange?.(appointment, 'COMPLETED');
+                setShowMenu(false);
+              }}
               className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
             >
               <CheckCircle2 className="w-4 h-4" /> {t.complete}
@@ -258,7 +275,10 @@ function PatientCard({
           )}
           {['SCHEDULED', 'CONFIRMED'].includes(appointment.status) && (
             <button
-              onClick={() => { onStatusChange?.(appointment, 'NO_SHOW'); setShowMenu(false); }}
+              onClick={() => {
+                onStatusChange?.(appointment, 'NO_SHOW');
+                setShowMenu(false);
+              }}
               className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 text-red-600 flex items-center gap-2"
             >
               <XCircle className="w-4 h-4" /> {t.markNoShow}
@@ -281,7 +301,7 @@ function FlowColumn({
   onDrop,
   onStatusChange,
   onViewChart,
-  onStartVisit
+  onStartVisit,
 }) {
   const t = TRANSLATIONS[lang];
   const [isDragOver, setIsDragOver] = useState(false);
@@ -349,7 +369,7 @@ function FlowColumn({
       {/* Cards Container */}
       <div className="p-3 min-h-[200px] max-h-[calc(100vh-280px)] overflow-y-auto">
         {appointments.length > 0 ? (
-          appointments.map(apt => (
+          appointments.map((apt) => (
             <PatientCard
               key={apt.id}
               appointment={apt}
@@ -379,40 +399,49 @@ export default function PatientFlowBoard({
   lang = 'no',
   onStatusChange,
   onRefresh,
-  isLoading = false
+  isLoading = false,
 }) {
   const navigate = useNavigate();
   const t = TRANSLATIONS[lang];
 
   // Group appointments by status
   const groupedAppointments = COLUMNS.reduce((acc, column) => {
-    acc[column.id] = appointments.filter(apt => apt.status === column.id);
+    acc[column.id] = appointments.filter((apt) => apt.status === column.id);
     return acc;
   }, {});
 
   // Handle status change via drag and drop
-  const handleDrop = useCallback((appointmentId, newStatus) => {
-    onStatusChange?.(appointmentId, newStatus);
-  }, [onStatusChange]);
+  const handleDrop = useCallback(
+    (appointmentId, newStatus) => {
+      onStatusChange?.(appointmentId, newStatus);
+    },
+    [onStatusChange]
+  );
 
   // Handle view chart
-  const handleViewChart = useCallback((appointment) => {
-    const patientId = appointment.patientId || appointment.patient_id || appointment.patient?.id;
-    if (patientId) {
-      navigate(`/patients/${patientId}/encounter`);
-    }
-  }, [navigate]);
+  const handleViewChart = useCallback(
+    (appointment) => {
+      const patientId = appointment.patientId || appointment.patient_id || appointment.patient?.id;
+      if (patientId) {
+        navigate(`/patients/${patientId}/encounter`);
+      }
+    },
+    [navigate]
+  );
 
   // Handle start visit
-  const handleStartVisit = useCallback((appointment) => {
-    // First update status to IN_PROGRESS
-    onStatusChange?.(appointment.id, 'IN_PROGRESS');
-    // Then navigate to encounter
-    const patientId = appointment.patientId || appointment.patient_id || appointment.patient?.id;
-    if (patientId) {
-      navigate(`/patients/${patientId}/encounter`);
-    }
-  }, [navigate, onStatusChange]);
+  const handleStartVisit = useCallback(
+    (appointment) => {
+      // First update status to IN_PROGRESS
+      onStatusChange?.(appointment.id, 'IN_PROGRESS');
+      // Then navigate to encounter
+      const patientId = appointment.patientId || appointment.patient_id || appointment.patient?.id;
+      if (patientId) {
+        navigate(`/patients/${patientId}/encounter`);
+      }
+    },
+    [navigate, onStatusChange]
+  );
 
   // Count stats
   const totalToday = appointments.length;
@@ -462,7 +491,7 @@ export default function PatientFlowBoard({
       {/* Kanban Board */}
       <div className="flex-1 overflow-x-auto pb-4">
         <div className="flex gap-4 min-w-max">
-          {COLUMNS.map(column => (
+          {COLUMNS.map((column) => (
             <FlowColumn
               key={column.id}
               column={column}

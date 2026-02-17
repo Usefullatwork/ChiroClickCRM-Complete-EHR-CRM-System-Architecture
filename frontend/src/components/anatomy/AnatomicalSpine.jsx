@@ -4,8 +4,8 @@
  * Enhanced version of SpineDiagram for clinical documentation
  */
 
-import React, { useState, useCallback, useMemo } from 'react';
-import { RotateCcw, Layers, Zap, Circle } from 'lucide-react';
+import _React, { useState, useCallback, useMemo } from 'react';
+import { RotateCcw, _Layers, Zap, Circle } from 'lucide-react';
 
 // Vertebrae with anatomical positions
 const VERTEBRAE = [
@@ -37,15 +37,16 @@ const VERTEBRAE = [
   { id: 'L4', label: 'L4', region: 'lumbar', y: 496, width: 60, hasDisc: true },
   { id: 'L5', label: 'L5', region: 'lumbar', y: 522, width: 62, hasDisc: true },
   // Sacral
-  { id: 'S1', label: 'Sacrum', region: 'sacral', y: 555, width: 70, hasDisc: false }
+  { id: 'S1', label: 'Sacrum', region: 'sacral', y: 555, width: 70, hasDisc: false },
 ];
 
 // Disc labels (between vertebrae)
-const DISCS = VERTEBRAE.filter(v => v.hasDisc).map((v, i) => ({
+const _DISCS = VERTEBRAE.filter((v) => v.hasDisc).map((v, i) => ({
   id: `disc_${v.id}`,
-  label: i === 0 ? 'C2-C3' : `${VERTEBRAE[VERTEBRAE.findIndex(x => x.id === v.id) - 1]?.id}-${v.id}`,
+  label:
+    i === 0 ? 'C2-C3' : `${VERTEBRAE[VERTEBRAE.findIndex((x) => x.id === v.id) - 1]?.id}-${v.id}`,
   vertebra: v.id,
-  y: v.y - 8
+  y: v.y - 8,
 }));
 
 // Nerve roots
@@ -64,7 +65,7 @@ const NERVE_ROOTS = [
   { id: 'L3_nerve', label: 'L3 nerve', vertebra: 'L3', y: 477 },
   { id: 'L4_nerve', label: 'L4 nerve', vertebra: 'L4', y: 503 },
   { id: 'L5_nerve', label: 'L5 nerve', vertebra: 'L5', y: 529 },
-  { id: 'S1_nerve', label: 'S1 nerve', vertebra: 'S1', y: 560 }
+  { id: 'S1_nerve', label: 'S1 nerve', vertebra: 'S1', y: 560 },
 ];
 
 // Region colors
@@ -72,7 +73,7 @@ const REGION_COLORS = {
   cervical: { fill: '#dbeafe', stroke: '#3b82f6', text: '#1d4ed8' },
   thoracic: { fill: '#dcfce7', stroke: '#22c55e', text: '#15803d' },
   lumbar: { fill: '#fef3c7', stroke: '#f59e0b', text: '#b45309' },
-  sacral: { fill: '#fee2e2', stroke: '#ef4444', text: '#b91c1c' }
+  sacral: { fill: '#fee2e2', stroke: '#ef4444', text: '#b91c1c' },
 };
 
 // Finding types
@@ -86,7 +87,7 @@ const FINDING_TYPES = {
   stenosis: { label: 'Stenose', abbrev: 'STEN', color: '#be185d', priority: 7 },
   nerve_irritation: { label: 'Nerveirritasjon', abbrev: 'NI', color: '#0891b2', priority: 8 },
   facet_syndrome: { label: 'Fasettleddssyndrom', abbrev: 'FS', color: '#059669', priority: 9 },
-  adjusted: { label: 'Justert', abbrev: '✓', color: '#22c55e', priority: 10 }
+  adjusted: { label: 'Justert', abbrev: '✓', color: '#22c55e', priority: 10 },
 };
 
 // Listing directions
@@ -101,7 +102,7 @@ const LISTINGS = [
   { id: 'RL', label: 'RL', description: 'Right Lateral' },
   { id: 'LL', label: 'LL', description: 'Left Lateral' },
   { id: 'RR', label: 'RR', description: 'Right Rotation' },
-  { id: 'LR', label: 'LR', description: 'Left Rotation' }
+  { id: 'LR', label: 'LR', description: 'Left Rotation' },
 ];
 
 export default function AnatomicalSpine({
@@ -112,56 +113,72 @@ export default function AnatomicalSpine({
   showNerves = true,
   showLabels = true,
   compact = false,
-  className = ''
+  className = '',
 }) {
   const [selectedElement, setSelectedElement] = useState(null);
-  const [selectedType, setSelectedType] = useState('vertebra'); // 'vertebra', 'disc', 'nerve'
+  const [_selectedType, _setSelectedType] = useState('vertebra'); // 'vertebra', 'disc', 'nerve'
   const [selectedFinding, setSelectedFinding] = useState('subluxation');
   const [selectedListing, setSelectedListing] = useState('none');
   const [showLayers, setShowLayers] = useState({ discs: showDiscs, nerves: showNerves });
 
-  const getElementFindings = useCallback((elementId) => {
-    return Object.values(findings).filter(f => f.elementId === elementId);
-  }, [findings]);
+  const getElementFindings = useCallback(
+    (elementId) => {
+      return Object.values(findings).filter((f) => f.elementId === elementId);
+    },
+    [findings]
+  );
 
-  const hasFindings = useCallback((elementId) => {
-    return getElementFindings(elementId).length > 0;
-  }, [getElementFindings]);
+  const hasFindings = useCallback(
+    (elementId) => {
+      return getElementFindings(elementId).length > 0;
+    },
+    [getElementFindings]
+  );
 
-  const getElementColor = useCallback((elementId) => {
-    const elementFindings = getElementFindings(elementId);
-    if (elementFindings.length === 0) return null;
+  const getElementColor = useCallback(
+    (elementId) => {
+      const elementFindings = getElementFindings(elementId);
+      if (elementFindings.length === 0) {
+        return null;
+      }
 
-    // Return highest priority finding color
-    const sorted = elementFindings.sort((a, b) =>
-      (FINDING_TYPES[a.type]?.priority || 99) - (FINDING_TYPES[b.type]?.priority || 99)
-    );
-    return FINDING_TYPES[sorted[0].type]?.color;
-  }, [getElementFindings]);
+      // Return highest priority finding color
+      const sorted = elementFindings.sort(
+        (a, b) => (FINDING_TYPES[a.type]?.priority || 99) - (FINDING_TYPES[b.type]?.priority || 99)
+      );
+      return FINDING_TYPES[sorted[0].type]?.color;
+    },
+    [getElementFindings]
+  );
 
-  const addFinding = useCallback((elementId, elementLabel, elementType) => {
-    if (readOnly) return;
+  const addFinding = useCallback(
+    (elementId, elementLabel, elementType) => {
+      if (readOnly) {
+        return;
+      }
 
-    const key = `${elementId}_${selectedFinding}`;
-    const newFindings = { ...findings };
+      const key = `${elementId}_${selectedFinding}`;
+      const newFindings = { ...findings };
 
-    if (newFindings[key]) {
-      delete newFindings[key];
-    } else {
-      newFindings[key] = {
-        elementId,
-        elementLabel,
-        elementType,
-        type: selectedFinding,
-        typeLabel: FINDING_TYPES[selectedFinding].label,
-        listing: selectedListing,
-        color: FINDING_TYPES[selectedFinding].color,
-        timestamp: new Date().toISOString()
-      };
-    }
+      if (newFindings[key]) {
+        delete newFindings[key];
+      } else {
+        newFindings[key] = {
+          elementId,
+          elementLabel,
+          elementType,
+          type: selectedFinding,
+          typeLabel: FINDING_TYPES[selectedFinding].label,
+          listing: selectedListing,
+          color: FINDING_TYPES[selectedFinding].color,
+          timestamp: new Date().toISOString(),
+        };
+      }
 
-    onChange?.(newFindings);
-  }, [findings, selectedFinding, selectedListing, onChange, readOnly]);
+      onChange?.(newFindings);
+    },
+    [findings, selectedFinding, selectedListing, onChange, readOnly]
+  );
 
   const clearAll = () => {
     onChange?.({});
@@ -170,12 +187,16 @@ export default function AnatomicalSpine({
 
   const generateNarrative = useMemo(() => {
     const findingsList = Object.values(findings);
-    if (findingsList.length === 0) return null;
+    if (findingsList.length === 0) {
+      return null;
+    }
 
     // Group by type
     const grouped = {};
-    findingsList.forEach(f => {
-      if (!grouped[f.type]) grouped[f.type] = [];
+    findingsList.forEach((f) => {
+      if (!grouped[f.type]) {
+        grouped[f.type] = [];
+      }
       const listingText = f.listing !== 'none' ? ` (${f.listing})` : '';
       grouped[f.type].push(`${f.elementLabel}${listingText}`);
     });
@@ -209,14 +230,14 @@ export default function AnatomicalSpine({
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setShowLayers(l => ({ ...l, discs: !l.discs }))}
+            onClick={() => setShowLayers((l) => ({ ...l, discs: !l.discs }))}
             className={`p-1.5 rounded ${showLayers.discs ? 'bg-blue-100 text-blue-700' : 'text-gray-400 hover:bg-gray-100'}`}
             title="Vis/skjul discer"
           >
             <Circle className="w-4 h-4" />
           </button>
           <button
-            onClick={() => setShowLayers(l => ({ ...l, nerves: !l.nerves }))}
+            onClick={() => setShowLayers((l) => ({ ...l, nerves: !l.nerves }))}
             className={`p-1.5 rounded ${showLayers.nerves ? 'bg-yellow-100 text-yellow-700' : 'text-gray-400 hover:bg-gray-100'}`}
             title="Vis/skjul nerver"
           >
@@ -245,68 +266,78 @@ export default function AnatomicalSpine({
                 <stop offset="100%" stopColor="#f3f4f6" />
               </linearGradient>
               <filter id="glow">
-                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                <feGaussianBlur stdDeviation="2" result="coloredBlur" />
                 <feMerge>
-                  <feMergeNode in="coloredBlur"/>
-                  <feMergeNode in="SourceGraphic"/>
+                  <feMergeNode in="coloredBlur" />
+                  <feMergeNode in="SourceGraphic" />
                 </feMerge>
               </filter>
             </defs>
 
             {/* Spinal canal background */}
-            <rect x={centerX - 4} y="25" width="8" height="545" rx="4" fill="#fef3c7" opacity="0.5" />
+            <rect
+              x={centerX - 4}
+              y="25"
+              width="8"
+              height="545"
+              rx="4"
+              fill="#fef3c7"
+              opacity="0.5"
+            />
 
             {/* Nerve roots */}
-            {showLayers.nerves && NERVE_ROOTS.map(nerve => {
-              const nerveColor = getElementColor(nerve.id);
-              return (
-                <g key={nerve.id}>
-                  {/* Left nerve */}
-                  <path
-                    d={`M${centerX - 5},${nerve.y} Q${centerX - 30},${nerve.y + 5} ${centerX - 45},${nerve.y + 15}`}
-                    fill="none"
-                    stroke={nerveColor || '#fbbf24'}
-                    strokeWidth={nerveColor ? 2.5 : 1.5}
-                    className={`cursor-pointer ${!readOnly ? 'hover:stroke-yellow-500' : ''}`}
-                    onClick={() => !readOnly && addFinding(nerve.id, nerve.label, 'nerve')}
-                    filter={nerveColor ? 'url(#glow)' : undefined}
-                  />
-                  {/* Right nerve */}
-                  <path
-                    d={`M${centerX + 5},${nerve.y} Q${centerX + 30},${nerve.y + 5} ${centerX + 45},${nerve.y + 15}`}
-                    fill="none"
-                    stroke={nerveColor || '#fbbf24'}
-                    strokeWidth={nerveColor ? 2.5 : 1.5}
-                    className={`cursor-pointer ${!readOnly ? 'hover:stroke-yellow-500' : ''}`}
-                    onClick={() => !readOnly && addFinding(nerve.id, nerve.label, 'nerve')}
-                    filter={nerveColor ? 'url(#glow)' : undefined}
-                  />
-                </g>
-              );
-            })}
+            {showLayers.nerves &&
+              NERVE_ROOTS.map((nerve) => {
+                const nerveColor = getElementColor(nerve.id);
+                return (
+                  <g key={nerve.id}>
+                    {/* Left nerve */}
+                    <path
+                      d={`M${centerX - 5},${nerve.y} Q${centerX - 30},${nerve.y + 5} ${centerX - 45},${nerve.y + 15}`}
+                      fill="none"
+                      stroke={nerveColor || '#fbbf24'}
+                      strokeWidth={nerveColor ? 2.5 : 1.5}
+                      className={`cursor-pointer ${!readOnly ? 'hover:stroke-yellow-500' : ''}`}
+                      onClick={() => !readOnly && addFinding(nerve.id, nerve.label, 'nerve')}
+                      filter={nerveColor ? 'url(#glow)' : undefined}
+                    />
+                    {/* Right nerve */}
+                    <path
+                      d={`M${centerX + 5},${nerve.y} Q${centerX + 30},${nerve.y + 5} ${centerX + 45},${nerve.y + 15}`}
+                      fill="none"
+                      stroke={nerveColor || '#fbbf24'}
+                      strokeWidth={nerveColor ? 2.5 : 1.5}
+                      className={`cursor-pointer ${!readOnly ? 'hover:stroke-yellow-500' : ''}`}
+                      onClick={() => !readOnly && addFinding(nerve.id, nerve.label, 'nerve')}
+                      filter={nerveColor ? 'url(#glow)' : undefined}
+                    />
+                  </g>
+                );
+              })}
 
             {/* Intervertebral discs */}
-            {showLayers.discs && VERTEBRAE.filter(v => v.hasDisc).map((v, i) => {
-              const discId = `disc_${v.id}`;
-              const discColor = getElementColor(discId);
-              const prevV = VERTEBRAE[VERTEBRAE.findIndex(x => x.id === v.id) - 1];
-              const discLabel = prevV ? `${prevV.id}-${v.id}` : v.id;
+            {showLayers.discs &&
+              VERTEBRAE.filter((v) => v.hasDisc).map((v, _i) => {
+                const discId = `disc_${v.id}`;
+                const discColor = getElementColor(discId);
+                const prevV = VERTEBRAE[VERTEBRAE.findIndex((x) => x.id === v.id) - 1];
+                const discLabel = prevV ? `${prevV.id}-${v.id}` : v.id;
 
-              return (
-                <ellipse
-                  key={discId}
-                  cx={centerX}
-                  cy={v.y - 6}
-                  rx={v.width / 2 - 2}
-                  ry={3}
-                  fill={discColor ? discColor + 'aa' : '#93c5fd'}
-                  stroke={discColor || '#60a5fa'}
-                  strokeWidth={discColor ? 2 : 1}
-                  className={`cursor-pointer ${!readOnly ? 'hover:fill-blue-300' : ''}`}
-                  onClick={() => !readOnly && addFinding(discId, discLabel + ' disc', 'disc')}
-                />
-              );
-            })}
+                return (
+                  <ellipse
+                    key={discId}
+                    cx={centerX}
+                    cy={v.y - 6}
+                    rx={v.width / 2 - 2}
+                    ry={3}
+                    fill={discColor ? `${discColor}aa` : '#93c5fd'}
+                    stroke={discColor || '#60a5fa'}
+                    strokeWidth={discColor ? 2 : 1}
+                    className={`cursor-pointer ${!readOnly ? 'hover:fill-blue-300' : ''}`}
+                    onClick={() => !readOnly && addFinding(discId, `${discLabel} disc`, 'disc')}
+                  />
+                );
+              })}
 
             {/* Vertebrae */}
             {VERTEBRAE.map((v) => {
@@ -323,7 +354,7 @@ export default function AnatomicalSpine({
                     width={v.width}
                     height={v.region === 'lumbar' ? 18 : v.region === 'sacral' ? 40 : 14}
                     rx={3}
-                    fill={findingColor ? findingColor + '40' : colors.fill}
+                    fill={findingColor ? `${findingColor}40` : colors.fill}
                     stroke={findingColor || (isSelected ? '#2563eb' : colors.stroke)}
                     strokeWidth={isSelected ? 2 : 1}
                     className={`cursor-pointer transition-all ${!readOnly ? 'hover:opacity-80' : ''}`}
@@ -388,22 +419,62 @@ export default function AnatomicalSpine({
             })}
 
             {/* Region labels */}
-            <text x="5" y="90" fontSize="8" fill="#3b82f6" fontWeight="bold" transform="rotate(-90, 5, 90)">CERVICAL</text>
-            <text x="5" y="290" fontSize="8" fill="#22c55e" fontWeight="bold" transform="rotate(-90, 5, 290)">THORACIC</text>
-            <text x="5" y="470" fontSize="8" fill="#f59e0b" fontWeight="bold" transform="rotate(-90, 5, 470)">LUMBAR</text>
-            <text x="5" y="570" fontSize="8" fill="#ef4444" fontWeight="bold" transform="rotate(-90, 5, 570)">SACRAL</text>
+            <text
+              x="5"
+              y="90"
+              fontSize="8"
+              fill="#3b82f6"
+              fontWeight="bold"
+              transform="rotate(-90, 5, 90)"
+            >
+              CERVICAL
+            </text>
+            <text
+              x="5"
+              y="290"
+              fontSize="8"
+              fill="#22c55e"
+              fontWeight="bold"
+              transform="rotate(-90, 5, 290)"
+            >
+              THORACIC
+            </text>
+            <text
+              x="5"
+              y="470"
+              fontSize="8"
+              fill="#f59e0b"
+              fontWeight="bold"
+              transform="rotate(-90, 5, 470)"
+            >
+              LUMBAR
+            </text>
+            <text
+              x="5"
+              y="570"
+              fontSize="8"
+              fill="#ef4444"
+              fontWeight="bold"
+              transform="rotate(-90, 5, 570)"
+            >
+              SACRAL
+            </text>
 
             {/* Legend indicators */}
             {showLayers.discs && (
               <g>
                 <ellipse cx="175" cy="15" rx="8" ry="3" fill="#93c5fd" stroke="#60a5fa" />
-                <text x="175" y="28" fontSize="6" fill="#6b7280" textAnchor="middle">Disc</text>
+                <text x="175" y="28" fontSize="6" fill="#6b7280" textAnchor="middle">
+                  Disc
+                </text>
               </g>
             )}
             {showLayers.nerves && (
               <g>
                 <path d="M165,40 Q175,45 185,50" fill="none" stroke="#fbbf24" strokeWidth="1.5" />
-                <text x="175" y="60" fontSize="6" fill="#6b7280" textAnchor="middle">Nerve</text>
+                <text x="175" y="60" fontSize="6" fill="#6b7280" textAnchor="middle">
+                  Nerve
+                </text>
               </g>
             )}
           </svg>
@@ -414,24 +485,20 @@ export default function AnatomicalSpine({
           {/* Finding type selector */}
           {!readOnly && (
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-2">
-                Funntype
-              </label>
+              <label className="block text-xs font-medium text-gray-500 mb-2">Funntype</label>
               <div className="grid grid-cols-2 gap-1">
                 {Object.entries(FINDING_TYPES).map(([key, type]) => (
                   <button
                     key={key}
                     onClick={() => setSelectedFinding(key)}
                     className={`px-2 py-1 text-xs rounded transition-all text-left ${
-                      selectedFinding === key
-                        ? 'ring-2 ring-offset-1'
-                        : 'hover:bg-gray-100'
+                      selectedFinding === key ? 'ring-2 ring-offset-1' : 'hover:bg-gray-100'
                     }`}
                     style={{
-                      backgroundColor: selectedFinding === key ? type.color + '20' : undefined,
+                      backgroundColor: selectedFinding === key ? `${type.color}20` : undefined,
                       borderColor: type.color,
                       borderWidth: '1px',
-                      color: type.color
+                      color: type.color,
                     }}
                   >
                     {type.abbrev} {type.label}
@@ -479,10 +546,7 @@ export default function AnatomicalSpine({
                     className="flex items-center justify-between p-2 bg-gray-50 rounded text-xs"
                   >
                     <div className="flex items-center gap-2">
-                      <span
-                        className="w-2 h-2 rounded-full"
-                        style={{ backgroundColor: f.color }}
-                      />
+                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: f.color }} />
                       <span className="font-medium">{f.elementLabel}</span>
                       <span className="text-gray-500">
                         {f.typeLabel}
@@ -509,9 +573,7 @@ export default function AnatomicalSpine({
 
           {/* Quick region selectors */}
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-2">
-              Hurtigvalg
-            </label>
+            <label className="block text-xs font-medium text-gray-500 mb-2">Hurtigvalg</label>
             <div className="grid grid-cols-4 gap-1">
               {['cervical', 'thoracic', 'lumbar', 'sacral'].map((region) => (
                 <div key={region} className="space-y-0.5">
@@ -519,12 +581,12 @@ export default function AnatomicalSpine({
                     className="text-[10px] font-medium px-1 rounded-t"
                     style={{
                       backgroundColor: REGION_COLORS[region].fill,
-                      color: REGION_COLORS[region].text
+                      color: REGION_COLORS[region].text,
                     }}
                   >
                     {region.charAt(0).toUpperCase() + region.slice(1, 4)}
                   </div>
-                  {VERTEBRAE.filter(v => v.region === region).map((v) => (
+                  {VERTEBRAE.filter((v) => v.region === region).map((v) => (
                     <button
                       key={v.id}
                       onClick={() => !readOnly && addFinding(v.id, v.label, 'vertebra')}
@@ -553,7 +615,9 @@ export default function AnatomicalSpine({
           </label>
           <ul className="space-y-1">
             {generateNarrative.map((line, i) => (
-              <li key={i} className="text-sm text-green-900">• {line}</li>
+              <li key={i} className="text-sm text-green-900">
+                • {line}
+              </li>
             ))}
           </ul>
         </div>

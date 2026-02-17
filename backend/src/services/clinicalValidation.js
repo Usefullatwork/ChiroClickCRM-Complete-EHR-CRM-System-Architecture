@@ -224,7 +224,9 @@ const LOGIC_RULES = [
         context.objective
       );
       const hasNeuroExam = /nevrologisk|neuro.*?test|reflek.*?test/gi.test(context.plan);
-      if (hasNeuroFindings && !hasNeuroExam) return false;
+      if (hasNeuroFindings && !hasNeuroExam) {
+        return false;
+      }
       return true;
     },
     message: 'Logikkfeil: Nevrologiske funn uten nevrologisk oppfølging i plan',
@@ -240,9 +242,13 @@ export const calculateConfidence = (content, context = {}) => {
 
   // Length check (not too short, not too long)
   const length = content?.length || 0;
-  if (length >= 50 && length <= 2000) score += 0.15;
-  else if (length < 20) score -= 0.3;
-  else if (length > 3000) score -= 0.1;
+  if (length >= 50 && length <= 2000) {
+    score += 0.15;
+  } else if (length < 20) {
+    score -= 0.3;
+  } else if (length > 3000) {
+    score -= 0.1;
+  }
 
   // Contains medical terminology (Norwegian and English)
   const medicalTerms = [
@@ -257,18 +263,30 @@ export const calculateConfidence = (content, context = {}) => {
 
   let termsFound = 0;
   medicalTerms.forEach((term) => {
-    if (term.test(content)) termsFound++;
+    if (term.test(content)) {
+      termsFound++;
+    }
   });
   score += (termsFound / medicalTerms.length) * 0.2;
 
   // Structured format (contains sections/structure)
-  if (content.includes(':')) score += 0.05;
-  if (/\d+/g.test(content)) score += 0.05; // Contains numbers
-  if (content.split('\n').length > 2) score += 0.05; // Multi-line
+  if (content.includes(':')) {
+    score += 0.05;
+  }
+  if (/\d+/g.test(content)) {
+    score += 0.05;
+  } // Contains numbers
+  if (content.split('\n').length > 2) {
+    score += 0.05;
+  } // Multi-line
 
   // Context bonus
-  if (context.hasSimilarCases) score += 0.1;
-  if (context.templateMatch > 0.8) score += 0.1;
+  if (context.hasSimilarCases) {
+    score += 0.1;
+  }
+  if (context.templateMatch > 0.8) {
+    score += 0.1;
+  }
 
   return Math.max(0, Math.min(1, score));
 };
@@ -519,7 +537,9 @@ export const validateClinicalMiddleware = async (req, res, next) => {
  * @returns {Array} Array of detected red flags
  */
 export const checkRedFlagsInContent = (content) => {
-  if (!content) return [];
+  if (!content) {
+    return [];
+  }
 
   const detectedFlags = [];
 
@@ -549,14 +569,14 @@ export const checkRedFlagsInContent = (content) => {
  * @returns {Array} Array of medication warnings
  */
 export const checkMedicationWarnings = (contentOrMedications, medicationsArg) => {
-  let content = '';
+  let _content = '';
   let medications = [];
 
   // Support both signatures: (medications) and (content, medications)
   if (Array.isArray(contentOrMedications)) {
     medications = contentOrMedications;
   } else {
-    content = contentOrMedications || '';
+    _content = contentOrMedications || '';
     medications = medicationsArg || [];
   }
 
@@ -671,7 +691,7 @@ export const validateMedicalLogic = (diagnosisCode, treatment, context = {}) => 
 /**
  * Check age-related clinical risks
  */
-export const checkAgeRelatedRisks = (age, complaint, context = {}) => {
+export const checkAgeRelatedRisks = (age, complaint, _context = {}) => {
   const warnings = [];
 
   if (age < 18) {

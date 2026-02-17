@@ -3,12 +3,12 @@
  * Combined panel for exercise prescription within clinical encounters
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import _React, { useState, useEffect, _useCallback } from 'react';
 import {
   X,
   Dumbbell,
-  ChevronLeft,
-  ChevronRight,
+  _ChevronLeft,
+  _ChevronRight,
   AlertCircle,
   Check,
   Download,
@@ -234,7 +234,9 @@ const ExercisePanel = ({ patient, encounterId, isOpen, onClose, onPrescriptionSa
 
   // Download PDF handout for the patient's current exercises
   const handleDownloadPDFHandout = async () => {
-    if (!patient?.id) return;
+    if (!patient?.id) {
+      return;
+    }
     try {
       setDownloadingPDF(true);
       setError(null);
@@ -261,7 +263,9 @@ const ExercisePanel = ({ patient, encounterId, isOpen, onClose, onPrescriptionSa
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex">

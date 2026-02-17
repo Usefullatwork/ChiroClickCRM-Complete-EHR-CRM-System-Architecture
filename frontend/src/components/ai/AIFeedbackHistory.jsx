@@ -7,7 +7,7 @@
  * - Stats summary (acceptance rate, avg rating)
  */
 
-import React, { useState, useMemo } from 'react';
+import _React, { useState, useMemo } from 'react';
 import {
   History,
   Filter,
@@ -101,7 +101,7 @@ const TEXTS = {
       default: 'Suggestion',
     },
     refresh: 'Refresh',
-  }
+  },
 };
 
 /**
@@ -169,9 +169,13 @@ const StatsSummary = ({ stats, language = 'NO' }) => {
  * Format decision time in seconds to readable format
  */
 function formatDecisionTime(ms) {
-  if (!ms || ms === 0) return '0s';
+  if (!ms || ms === 0) {
+    return '0s';
+  }
   const seconds = Math.round(ms / 1000);
-  if (seconds < 60) return `${seconds}s`;
+  if (seconds < 60) {
+    return `${seconds}s`;
+  }
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
   return `${minutes}m ${remainingSeconds}s`;
@@ -200,7 +204,7 @@ const FeedbackItem = ({ feedback, language = 'NO' }) => {
   const [expanded, setExpanded] = useState(false);
 
   const {
-    id,
+    _id,
     suggestionType,
     originalSuggestion,
     userCorrection,
@@ -261,7 +265,9 @@ const FeedbackItem = ({ feedback, language = 'NO' }) => {
         className="w-full px-4 py-3 flex items-center justify-between gap-3 bg-slate-50 hover:bg-slate-100 transition-colors"
       >
         <div className="flex items-center gap-3 min-w-0">
-          <Badge variant="default" size="sm">{typeLabel}</Badge>
+          <Badge variant="default" size="sm">
+            {typeLabel}
+          </Badge>
           <Badge variant={getActionBadgeVariant()} size="sm">
             {getActionIcon()}
             <span className="ml-1">{getActionLabel()}</span>
@@ -298,7 +304,7 @@ const FeedbackItem = ({ feedback, language = 'NO' }) => {
             </p>
             <p className="text-sm text-slate-700 bg-slate-50 p-2 rounded">
               {originalSuggestion?.length > 300
-                ? originalSuggestion.slice(0, 300) + '...'
+                ? `${originalSuggestion.slice(0, 300)}...`
                 : originalSuggestion}
             </p>
           </div>
@@ -311,7 +317,7 @@ const FeedbackItem = ({ feedback, language = 'NO' }) => {
               </p>
               <p className="text-sm text-slate-700 bg-blue-50 p-2 rounded border border-blue-200">
                 {userCorrection?.length > 300
-                  ? userCorrection.slice(0, 300) + '...'
+                  ? `${userCorrection.slice(0, 300)}...`
                   : userCorrection}
               </p>
             </div>
@@ -333,9 +339,7 @@ const FeedbackItem = ({ feedback, language = 'NO' }) => {
               <Clock size={12} />
               {formatDecisionTime(timeToDecision)}
             </span>
-            <span className="sm:hidden">
-              {formatDate(createdAt, language)}
-            </span>
+            <span className="sm:hidden">{formatDate(createdAt, language)}</span>
           </div>
         </div>
       )}
@@ -493,11 +497,7 @@ export const AIFeedbackHistory = ({
           {!isLoading && displayedFeedback.length > 0 && (
             <div className="space-y-3">
               {displayedFeedback.map((feedback) => (
-                <FeedbackItem
-                  key={feedback.id}
-                  feedback={feedback}
-                  language={language}
-                />
+                <FeedbackItem key={feedback.id} feedback={feedback} language={language} />
               ))}
 
               {/* Show More Button */}

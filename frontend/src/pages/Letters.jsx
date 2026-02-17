@@ -8,9 +8,9 @@
  * - Clinical Notes (Kliniske notater)
  */
 
-import { useState, useEffect } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import { useTranslation } from '../i18n'
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from '../i18n';
 import {
   FileText,
   Send,
@@ -25,9 +25,9 @@ import {
   ChevronRight,
   Calendar,
   User,
-  Sparkles
-} from 'lucide-react'
-import { lettersApi } from '../api/letters'
+  Sparkles,
+} from 'lucide-react';
+import { lettersApi } from '../api/letters';
 
 // Letter type definitions
 const LETTER_TYPES = {
@@ -37,7 +37,7 @@ const LETTER_TYPES = {
     description: { no: 'NAV-kompatible sykemeldinger', en: 'NAV-compliant sick notes' },
     icon: FileText,
     color: 'blue',
-    route: '/sick-notes'
+    route: '/sick-notes',
   },
   REFERRAL: {
     id: 'REFERRAL',
@@ -45,15 +45,18 @@ const LETTER_TYPES = {
     description: { no: 'Henvisninger til spesialister', en: 'Referrals to specialists' },
     icon: Send,
     color: 'green',
-    route: '/referral-letters'
+    route: '/referral-letters',
   },
   MEDICAL_CERTIFICATE: {
     id: 'MEDICAL_CERTIFICATE',
     name: { no: 'Medisinsk erklæring', en: 'Medical Certificate' },
-    description: { no: 'Erklæringer for arbeidsgiver, universitet, etc.', en: 'Certificates for employer, university, etc.' },
+    description: {
+      no: 'Erklæringer for arbeidsgiver, universitet, etc.',
+      en: 'Certificates for employer, university, etc.',
+    },
     icon: Award,
     color: 'purple',
-    route: '/certificates'
+    route: '/certificates',
   },
   CLINICAL_NOTE: {
     id: 'CLINICAL_NOTE',
@@ -61,47 +64,47 @@ const LETTER_TYPES = {
     description: { no: 'Detaljerte kliniske notater', en: 'Detailed clinical notes' },
     icon: ClipboardList,
     color: 'orange',
-    route: '/clinical-notes'
-  }
-}
+    route: '/clinical-notes',
+  },
+};
 
 // Status badge colors
 const STATUS_COLORS = {
   DRAFT: 'bg-gray-100 text-gray-800',
   FINALIZED: 'bg-blue-100 text-blue-800',
   SENT: 'bg-green-100 text-green-800',
-  ARCHIVED: 'bg-gray-100 text-gray-600'
-}
+  ARCHIVED: 'bg-gray-100 text-gray-600',
+};
 
 export default function Letters() {
-  const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
-  const { lang: language, setLang: setLanguage } = useTranslation()
-  const [letters, setLetters] = useState([])
-  const [letterTypes, setLetterTypes] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedType, setSelectedType] = useState(searchParams.get('type') || 'all')
-  const [view, setView] = useState('dashboard') // 'dashboard' | 'list'
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { lang: language, setLang: setLanguage } = useTranslation();
+  const [letters, setLetters] = useState([]);
+  const [_letterTypes, setLetterTypes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedType, setSelectedType] = useState(searchParams.get('type') || 'all');
+  const [view, setView] = useState('dashboard'); // 'dashboard' | 'list'
 
   // Fetch letter types from API
   const fetchLetterTypes = async () => {
     try {
-      const response = await lettersApi.getLetterTypes()
-      setLetterTypes(response.types || response || [])
+      const response = await lettersApi.getLetterTypes();
+      setLetterTypes(response.types || response || []);
     } catch (err) {
-      console.error('Error fetching letter types:', err)
+      console.error('Error fetching letter types:', err);
       // Use default types on error
-      setLetterTypes(Object.values(LETTER_TYPES))
+      setLetterTypes(Object.values(LETTER_TYPES));
     }
-  }
+  };
 
   // Fetch recent letters
   const fetchLetters = async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
       // For demo, use mock data until API is fully connected
       // In production: const response = await lettersApi.getAllLetters({ type: selectedType !== 'all' ? selectedType : undefined })
@@ -113,7 +116,7 @@ export default function Letters() {
           patientName: 'Ola Nordmann',
           title: 'Sykemelding - L84 Rygglidelse',
           createdAt: '2026-01-16T10:30:00Z',
-          status: 'SENT'
+          status: 'SENT',
         },
         {
           id: '2',
@@ -121,7 +124,7 @@ export default function Letters() {
           patientName: 'Kari Hansen',
           title: 'Henvisning til MR - Nakke',
           createdAt: '2026-01-15T14:20:00Z',
-          status: 'DRAFT'
+          status: 'DRAFT',
         },
         {
           id: '3',
@@ -129,7 +132,7 @@ export default function Letters() {
           patientName: 'Per Olsen',
           title: 'Universitetserklæring',
           createdAt: '2026-01-14T09:15:00Z',
-          status: 'FINALIZED'
+          status: 'FINALIZED',
         },
         {
           id: '4',
@@ -137,43 +140,43 @@ export default function Letters() {
           patientName: 'Lisa Eriksen',
           title: 'Sykemelding - L01 Nakkeplager',
           createdAt: '2026-01-13T11:45:00Z',
-          status: 'SENT'
-        }
-      ])
+          status: 'SENT',
+        },
+      ]);
     } catch (err) {
-      console.error('Error fetching letters:', err)
-      setError(language === 'no' ? 'Kunne ikke laste brev' : 'Failed to load letters')
+      console.error('Error fetching letters:', err);
+      setError(language === 'no' ? 'Kunne ikke laste brev' : 'Failed to load letters');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchLetterTypes()
-    fetchLetters()
-  }, [selectedType])
+    fetchLetterTypes();
+    fetchLetters();
+  }, [selectedType]);
 
   // Filter letters
-  const filteredLetters = letters.filter(letter => {
+  const filteredLetters = letters.filter((letter) => {
     const matchesSearch =
       letter.patientName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      letter.title?.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesType = selectedType === 'all' || letter.letterType === selectedType
-    return matchesSearch && matchesType
-  })
+      letter.title?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = selectedType === 'all' || letter.letterType === selectedType;
+    return matchesSearch && matchesType;
+  });
 
   // Get type config
-  const getTypeConfig = (typeId) => LETTER_TYPES[typeId] || LETTER_TYPES.CLINICAL_NOTE
+  const getTypeConfig = (typeId) => LETTER_TYPES[typeId] || LETTER_TYPES.CLINICAL_NOTE;
 
   // Format date
   const formatDate = (dateString) => {
-    const date = new Date(dateString)
+    const date = new Date(dateString);
     return date.toLocaleDateString(language === 'no' ? 'nb-NO' : 'en-US', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
-    })
-  }
+      day: 'numeric',
+    });
+  };
 
   // Dashboard view with type cards
   const renderDashboard = () => (
@@ -185,24 +188,22 @@ export default function Letters() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {Object.values(LETTER_TYPES).map((type) => {
-            const Icon = type.icon
+            const Icon = type.icon;
             return (
               <button
                 key={type.id}
                 onClick={() => navigate(`${type.route}?new=true`)}
                 className={`p-6 bg-white rounded-xl border-2 border-transparent hover:border-${type.color}-500 shadow-sm hover:shadow-md transition-all text-left group`}
               >
-                <div className={`w-12 h-12 rounded-lg bg-${type.color}-100 flex items-center justify-center mb-4 group-hover:bg-${type.color}-200 transition-colors`}>
+                <div
+                  className={`w-12 h-12 rounded-lg bg-${type.color}-100 flex items-center justify-center mb-4 group-hover:bg-${type.color}-200 transition-colors`}
+                >
                   <Icon className={`w-6 h-6 text-${type.color}-600`} />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-1">
-                  {type.name[language]}
-                </h3>
-                <p className="text-sm text-gray-500">
-                  {type.description[language]}
-                </p>
+                <h3 className="font-semibold text-gray-900 mb-1">{type.name[language]}</h3>
+                <p className="text-sm text-gray-500">{type.description[language]}</p>
               </button>
-            )
+            );
           })}
         </div>
       </div>
@@ -254,8 +255,8 @@ export default function Letters() {
         ) : (
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             {filteredLetters.slice(0, 5).map((letter, index) => {
-              const typeConfig = getTypeConfig(letter.letterType)
-              const Icon = typeConfig.icon
+              const typeConfig = getTypeConfig(letter.letterType);
+              const Icon = typeConfig.icon;
 
               return (
                 <div
@@ -265,15 +266,17 @@ export default function Letters() {
                   }`}
                   onClick={() => navigate(`${typeConfig.route}/${letter.id}`)}
                 >
-                  <div className={`w-10 h-10 rounded-lg bg-${typeConfig.color}-100 flex items-center justify-center`}>
+                  <div
+                    className={`w-10 h-10 rounded-lg bg-${typeConfig.color}-100 flex items-center justify-center`}
+                  >
                     <Icon className={`w-5 h-5 text-${typeConfig.color}-600`} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-gray-900 truncate">
-                        {letter.title}
-                      </span>
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[letter.status]}`}>
+                      <span className="font-medium text-gray-900 truncate">{letter.title}</span>
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[letter.status]}`}
+                      >
                         {letter.status}
                       </span>
                     </div>
@@ -290,7 +293,7 @@ export default function Letters() {
                   </div>
                   <ChevronRight className="w-5 h-5 text-gray-400" />
                 </div>
-              )
+              );
             })}
 
             {filteredLetters.length === 0 && (
@@ -302,7 +305,7 @@ export default function Letters() {
         )}
       </div>
     </div>
-  )
+  );
 
   // List view
   const renderList = () => (
@@ -313,7 +316,11 @@ export default function Letters() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
-            placeholder={language === 'no' ? 'Søk etter pasient eller tittel...' : 'Search by patient or title...'}
+            placeholder={
+              language === 'no'
+                ? 'Søk etter pasient eller tittel...'
+                : 'Search by patient or title...'
+            }
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -325,8 +332,10 @@ export default function Letters() {
           className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         >
           <option value="all">{language === 'no' ? 'Alle typer' : 'All types'}</option>
-          {Object.values(LETTER_TYPES).map(type => (
-            <option key={type.id} value={type.id}>{type.name[language]}</option>
+          {Object.values(LETTER_TYPES).map((type) => (
+            <option key={type.id} value={type.id}>
+              {type.name[language]}
+            </option>
           ))}
         </select>
         <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
@@ -364,8 +373,8 @@ export default function Letters() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredLetters.map((letter) => {
-                const typeConfig = getTypeConfig(letter.letterType)
-                const Icon = typeConfig.icon
+                const typeConfig = getTypeConfig(letter.letterType);
+                const Icon = typeConfig.icon;
 
                 return (
                   <tr
@@ -375,7 +384,9 @@ export default function Letters() {
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-lg bg-${typeConfig.color}-100 flex items-center justify-center`}>
+                        <div
+                          className={`w-8 h-8 rounded-lg bg-${typeConfig.color}-100 flex items-center justify-center`}
+                        >
                           <Icon className={`w-4 h-4 text-${typeConfig.color}-600`} />
                         </div>
                         <span className="font-medium text-gray-900">{letter.title}</span>
@@ -391,12 +402,14 @@ export default function Letters() {
                       {formatDate(letter.createdAt)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[letter.status]}`}>
+                      <span
+                        className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[letter.status]}`}
+                      >
                         {letter.status}
                       </span>
                     </td>
                   </tr>
-                )
+                );
               })}
               {filteredLetters.length === 0 && (
                 <tr>
@@ -410,7 +423,7 @@ export default function Letters() {
         )}
       </div>
     </div>
-  )
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -502,9 +515,7 @@ export default function Letters() {
       )}
 
       {/* Content */}
-      <div className="p-6">
-        {view === 'dashboard' ? renderDashboard() : renderList()}
-      </div>
+      <div className="p-6">{view === 'dashboard' ? renderDashboard() : renderList()}</div>
     </div>
-  )
+  );
 }

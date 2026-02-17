@@ -6,10 +6,10 @@
  * Diagram som viser smerteniva over tid med emoji-ansikter
  */
 
-import React, { useState, useMemo } from 'react'
+import _React, { useState, useMemo } from 'react';
 import {
-  LineChart,
-  Line,
+  _LineChart,
+  _Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -17,16 +17,9 @@ import {
   ResponsiveContainer,
   ReferenceLine,
   Area,
-  AreaChart
-} from 'recharts'
-import {
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  AlertTriangle,
-  Activity,
-  Calendar
-} from 'lucide-react'
+  AreaChart,
+} from 'recharts';
+import { TrendingUp, TrendingDown, Minus, _AlertTriangle, Activity, _Calendar } from 'lucide-react';
 
 // Pain level emoji faces (1-10 scale)
 const painEmojis = {
@@ -40,16 +33,16 @@ const painEmojis = {
   7: { emoji: '\u{1F623}', label: 'Sterk', color: '#f97316' },
   8: { emoji: '\u{1F62B}', label: 'Intens', color: '#ef4444' },
   9: { emoji: '\u{1F62D}', label: 'Alvorlig', color: '#ef4444' },
-  10: { emoji: '\u{1F631}', label: 'Verst mulig', color: '#dc2626' }
-}
+  10: { emoji: '\u{1F631}', label: 'Verst mulig', color: '#dc2626' },
+};
 
 /**
  * Get pain info for a given level
  */
 const getPainInfo = (level) => {
-  const roundedLevel = Math.round(level)
-  return painEmojis[Math.min(10, Math.max(0, roundedLevel))]
-}
+  const roundedLevel = Math.round(level);
+  return painEmojis[Math.min(10, Math.max(0, roundedLevel))];
+};
 
 /**
  * PainTracker Component
@@ -62,29 +55,24 @@ const getPainInfo = (level) => {
  * @param {Function} props.onLogPain - Callback to log new pain entry
  * @returns {JSX.Element} Pain tracker component
  */
-export default function PainTracker({
-  data = [],
-  trend = 'stable',
-  currentAvg = null,
-  onLogPain
-}) {
-  const [selectedPainLevel, setSelectedPainLevel] = useState(null)
-  const [showLogModal, setShowLogModal] = useState(false)
-  const [notes, setNotes] = useState('')
+export default function PainTracker({ data = [], trend = 'stable', currentAvg = null, onLogPain }) {
+  const [selectedPainLevel, setSelectedPainLevel] = useState(null);
+  const [showLogModal, setShowLogModal] = useState(false);
+  const [notes, setNotes] = useState('');
 
   /**
    * Process data for chart
    */
   const chartData = useMemo(() => {
-    return data.map(item => ({
+    return data.map((item) => ({
       ...item,
       date: new Date(item.date).toLocaleDateString('no-NO', {
         day: 'numeric',
-        month: 'short'
+        month: 'short',
       }),
-      avgPain: parseFloat(item.avgPain)
-    }))
-  }, [data])
+      avgPain: parseFloat(item.avgPain),
+    }));
+  }, [data]);
 
   /**
    * Calculate statistics
@@ -95,18 +83,18 @@ export default function PainTracker({
         average: null,
         min: null,
         max: null,
-        entries: 0
-      }
+        entries: 0,
+      };
     }
 
-    const values = data.map(d => parseFloat(d.avgPain))
+    const values = data.map((d) => parseFloat(d.avgPain));
     return {
       average: (values.reduce((a, b) => a + b, 0) / values.length).toFixed(1),
       min: Math.min(...values).toFixed(1),
       max: Math.max(...values).toFixed(1),
-      entries: data.reduce((sum, d) => sum + (d.entryCount || 1), 0)
-    }
-  }, [data])
+      entries: data.reduce((sum, d) => sum + (d.entryCount || 1), 0),
+    };
+  }, [data]);
 
   /**
    * Get trend indicator
@@ -117,30 +105,30 @@ export default function PainTracker({
         return {
           icon: <TrendingDown className="w-5 h-5 text-green-500" />,
           label: 'Forbedring',
-          color: 'text-green-600 bg-green-50'
-        }
+          color: 'text-green-600 bg-green-50',
+        };
       case 'worsening':
         return {
           icon: <TrendingUp className="w-5 h-5 text-red-500" />,
           label: 'Okning',
-          color: 'text-red-600 bg-red-50'
-        }
+          color: 'text-red-600 bg-red-50',
+        };
       default:
         return {
           icon: <Minus className="w-5 h-5 text-gray-500" />,
           label: 'Stabilt',
-          color: 'text-gray-600 bg-gray-50'
-        }
+          color: 'text-gray-600 bg-gray-50',
+        };
     }
-  }
+  };
 
   /**
    * Custom tooltip for chart
    */
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
-      const painLevel = payload[0].value
-      const painInfo = getPainInfo(painLevel)
+      const painLevel = payload[0].value;
+      const painInfo = getPainInfo(painLevel);
 
       return (
         <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
@@ -155,33 +143,33 @@ export default function PainTracker({
             </div>
           </div>
         </div>
-      )
+      );
     }
-    return null
-  }
+    return null;
+  };
 
   /**
    * Handle pain level selection for logging
    */
   const handlePainSelect = (level) => {
-    setSelectedPainLevel(level)
-    setShowLogModal(true)
-  }
+    setSelectedPainLevel(level);
+    setShowLogModal(true);
+  };
 
   /**
    * Handle pain entry submission
    */
   const handleSubmitPain = () => {
     if (onLogPain && selectedPainLevel !== null) {
-      onLogPain(selectedPainLevel, notes)
-      setShowLogModal(false)
-      setSelectedPainLevel(null)
-      setNotes('')
+      onLogPain(selectedPainLevel, notes);
+      setShowLogModal(false);
+      setSelectedPainLevel(null);
+      setNotes('');
     }
-  }
+  };
 
-  const trendInfo = getTrendIndicator()
-  const currentPainInfo = currentAvg ? getPainInfo(parseFloat(currentAvg)) : null
+  const trendInfo = getTrendIndicator();
+  const currentPainInfo = currentAvg ? getPainInfo(parseFloat(currentAvg)) : null;
 
   return (
     <div className="space-y-4">
@@ -230,18 +218,8 @@ export default function PainTracker({
                 axisLine={{ stroke: '#e5e7eb' }}
               />
               <Tooltip content={<CustomTooltip />} />
-              <ReferenceLine
-                y={3}
-                stroke="#22c55e"
-                strokeDasharray="3 3"
-                strokeOpacity={0.5}
-              />
-              <ReferenceLine
-                y={7}
-                stroke="#ef4444"
-                strokeDasharray="3 3"
-                strokeOpacity={0.5}
-              />
+              <ReferenceLine y={3} stroke="#22c55e" strokeDasharray="3 3" strokeOpacity={0.5} />
+              <ReferenceLine y={7} stroke="#ef4444" strokeDasharray="3 3" strokeOpacity={0.5} />
               <Area
                 type="monotone"
                 dataKey="avgPain"
@@ -259,9 +237,7 @@ export default function PainTracker({
           <div className="text-center">
             <Activity className="w-10 h-10 text-gray-300 mx-auto mb-2" />
             <p className="text-sm text-gray-500">Ingen smertedata tilgjengelig</p>
-            <p className="text-xs text-gray-400 mt-1">
-              Registrer smerteniva for a se fremgang
-            </p>
+            <p className="text-xs text-gray-400 mt-1">Registrer smerteniva for a se fremgang</p>
           </div>
         </div>
       )}
@@ -269,27 +245,19 @@ export default function PainTracker({
       {/* Statistics */}
       <div className="grid grid-cols-4 gap-4">
         <div className="text-center p-3 bg-gray-50 rounded-lg">
-          <p className="text-lg font-semibold text-gray-900">
-            {statistics.average || '-'}
-          </p>
+          <p className="text-lg font-semibold text-gray-900">{statistics.average || '-'}</p>
           <p className="text-xs text-gray-500">Gjennomsnitt</p>
         </div>
         <div className="text-center p-3 bg-gray-50 rounded-lg">
-          <p className="text-lg font-semibold text-green-600">
-            {statistics.min || '-'}
-          </p>
+          <p className="text-lg font-semibold text-green-600">{statistics.min || '-'}</p>
           <p className="text-xs text-gray-500">Laveste</p>
         </div>
         <div className="text-center p-3 bg-gray-50 rounded-lg">
-          <p className="text-lg font-semibold text-red-600">
-            {statistics.max || '-'}
-          </p>
+          <p className="text-lg font-semibold text-red-600">{statistics.max || '-'}</p>
           <p className="text-xs text-gray-500">Hoyeste</p>
         </div>
         <div className="text-center p-3 bg-gray-50 rounded-lg">
-          <p className="text-lg font-semibold text-gray-900">
-            {statistics.entries}
-          </p>
+          <p className="text-lg font-semibold text-gray-900">{statistics.entries}</p>
           <p className="text-xs text-gray-500">Registreringer</p>
         </div>
       </div>
@@ -297,12 +265,10 @@ export default function PainTracker({
       {/* Pain Level Selector */}
       {onLogPain && (
         <div className="pt-4 border-t border-gray-200">
-          <p className="text-sm font-medium text-gray-700 mb-3">
-            Registrer smerteniva na
-          </p>
+          <p className="text-sm font-medium text-gray-700 mb-3">Registrer smerteniva na</p>
           <div className="flex flex-wrap gap-2">
             {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((level) => {
-              const info = getPainInfo(level)
+              const info = getPainInfo(level);
               return (
                 <button
                   key={level}
@@ -310,9 +276,10 @@ export default function PainTracker({
                   className={`
                     flex flex-col items-center p-2 rounded-lg border-2 transition-all
                     hover:scale-105 hover:shadow-md
-                    ${selectedPainLevel === level
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                    ${
+                      selectedPainLevel === level
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-200 hover:border-gray-300'
                     }
                   `}
                   title={info.label}
@@ -322,7 +289,7 @@ export default function PainTracker({
                     {level}
                   </span>
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -348,14 +315,15 @@ export default function PainTracker({
       {showLogModal && selectedPainLevel !== null && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-xl">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Registrer smerteniva
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Registrer smerteniva</h3>
 
             <div className="flex items-center justify-center gap-4 mb-6">
               <span className="text-6xl">{getPainInfo(selectedPainLevel).emoji}</span>
               <div className="text-center">
-                <p className="text-4xl font-bold" style={{ color: getPainInfo(selectedPainLevel).color }}>
+                <p
+                  className="text-4xl font-bold"
+                  style={{ color: getPainInfo(selectedPainLevel).color }}
+                >
                   {selectedPainLevel}
                 </p>
                 <p className="text-sm text-gray-500">{getPainInfo(selectedPainLevel).label}</p>
@@ -393,5 +361,5 @@ export default function PainTracker({
         </div>
       )}
     </div>
-  )
+  );
 }

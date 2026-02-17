@@ -51,7 +51,7 @@ const TABS = [
 const CHART_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
 export default function Training() {
-  const { t } = useTranslation('common');
+  const { _t } = useTranslation('common');
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('models');
   const [newExamples, setNewExamples] = useState('');

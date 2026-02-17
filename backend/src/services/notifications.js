@@ -60,7 +60,7 @@ export async function getNotifications(organizationId, userId, options = {}) {
   try {
     let whereClause = 'WHERE n.organization_id = $1 AND n.user_id = $2';
     const params = [organizationId, userId];
-    let paramIndex = 3;
+    const paramIndex = 3;
 
     if (unreadOnly) {
       whereClause += ' AND n.read_at IS NULL';
@@ -202,7 +202,9 @@ export async function notifyByRole(organizationId, roles, notification) {
         userId: user.id,
         ...notification,
       });
-      if (n) notifications.push(n);
+      if (n) {
+        notifications.push(n);
+      }
     }
     return notifications;
   } catch (error) {

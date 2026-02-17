@@ -3,7 +3,7 @@
  * Condition-based recall rules for patient follow-ups
  */
 
-import { query, transaction } from '../config/database.js';
+import { query, _transaction } from '../config/database.js';
 import logger from '../utils/logger.js';
 import { createNotification } from './notifications.js';
 
@@ -130,7 +130,9 @@ export const getRecallSchedule = async (orgId, patientId) => {
     for (const plan of plansResult.rows) {
       const category = plan.category || 'chronic_pain';
       const rule = rules[category];
-      if (!rule) continue;
+      if (!rule) {
+        continue;
+      }
 
       const startDate = plan.end_date ? new Date(plan.end_date) : new Date(plan.start_date);
 

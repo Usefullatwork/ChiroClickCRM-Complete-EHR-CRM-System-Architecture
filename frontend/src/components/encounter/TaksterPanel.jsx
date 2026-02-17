@@ -1,4 +1,4 @@
-import React from 'react';
+import _React from 'react';
 import { FileText, ChevronUp, ChevronDown, Check } from 'lucide-react';
 
 // Static billing code data

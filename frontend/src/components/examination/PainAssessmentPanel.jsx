@@ -5,17 +5,17 @@
  * location, timing, and aggravating/relieving factors.
  */
 
-import React, { useMemo, useState } from 'react';
+import _React, { useMemo, _useState } from 'react';
 import {
-  Activity,
-  Clock,
+  _Activity,
+  _Clock,
   MapPin,
   TrendingUp,
   TrendingDown,
   AlertCircle,
   Zap,
-  Flame,
-  Target
+  _Flame,
+  Target,
 } from 'lucide-react';
 
 // Pain quality descriptors
@@ -28,10 +28,22 @@ const PAIN_QUALITIES = [
   { id: 'burning', name: 'Burning', nameNo: 'Brennende', icon: '🔥', category: 'neuropathic' },
   { id: 'tingling', name: 'Tingling', nameNo: 'Prikkende', icon: '✨', category: 'neuropathic' },
   { id: 'numbness', name: 'Numbness', nameNo: 'Nummenhet', icon: '🧊', category: 'neuropathic' },
-  { id: 'electric', name: 'Electric/Shooting', nameNo: 'Elektrisk/Skytende', icon: '⚡', category: 'neuropathic' },
-  { id: 'pins_needles', name: 'Pins & Needles', nameNo: 'Prikking', icon: '📍', category: 'neuropathic' },
+  {
+    id: 'electric',
+    name: 'Electric/Shooting',
+    nameNo: 'Elektrisk/Skytende',
+    icon: '⚡',
+    category: 'neuropathic',
+  },
+  {
+    id: 'pins_needles',
+    name: 'Pins & Needles',
+    nameNo: 'Prikking',
+    icon: '📍',
+    category: 'neuropathic',
+  },
   { id: 'cramping', name: 'Cramping', nameNo: 'Krampaktig', icon: '💪', category: 'nociceptive' },
-  { id: 'pressure', name: 'Pressure', nameNo: 'Trykk', icon: '⬇️', category: 'nociceptive' }
+  { id: 'pressure', name: 'Pressure', nameNo: 'Trykk', icon: '⬇️', category: 'nociceptive' },
 ];
 
 // Pain timing patterns
@@ -45,7 +57,7 @@ const TIMING_PATTERNS = [
   { id: 'rest', name: 'At rest', nameNo: 'I hvile' },
   { id: 'progressive', name: 'Getting worse', nameNo: 'Forverres' },
   { id: 'improving', name: 'Getting better', nameNo: 'Bedres' },
-  { id: 'stable', name: 'Stable', nameNo: 'Stabil' }
+  { id: 'stable', name: 'Stable', nameNo: 'Stabil' },
 ];
 
 // Common aggravating factors
@@ -63,7 +75,7 @@ const AGGRAVATING_FACTORS = [
   { id: 'sleep_position', name: 'Certain sleep positions', nameNo: 'Visse sovstillinger' },
   { id: 'weather', name: 'Weather changes', nameNo: 'Værforandringer' },
   { id: 'stress', name: 'Stress', nameNo: 'Stress' },
-  { id: 'cold', name: 'Cold', nameNo: 'Kulde' }
+  { id: 'cold', name: 'Cold', nameNo: 'Kulde' },
 ];
 
 // Common relieving factors
@@ -77,7 +89,7 @@ const RELIEVING_FACTORS = [
   { id: 'lying_down', name: 'Lying down', nameNo: 'Ligge ned' },
   { id: 'massage', name: 'Massage', nameNo: 'Massasje' },
   { id: 'stretching', name: 'Stretching', nameNo: 'Tøying' },
-  { id: 'pressure', name: 'Pressure', nameNo: 'Trykk' }
+  { id: 'pressure', name: 'Pressure', nameNo: 'Trykk' },
 ];
 
 // Pain locations
@@ -100,7 +112,7 @@ const PAIN_LOCATIONS = [
   { id: 'foot_left', name: 'Left Foot', nameNo: 'Venstre fot' },
   { id: 'foot_right', name: 'Right Foot', nameNo: 'Høyre fot' },
   { id: 'chest', name: 'Chest', nameNo: 'Bryst' },
-  { id: 'abdomen', name: 'Abdomen', nameNo: 'Mage' }
+  { id: 'abdomen', name: 'Abdomen', nameNo: 'Mage' },
 ];
 
 /**
@@ -108,26 +120,38 @@ const PAIN_LOCATIONS = [
  */
 function VASSlider({ value, onChange, label, labelNo, lang = 'no' }) {
   const getColor = (val) => {
-    if (val <= 3) return 'bg-green-500';
-    if (val <= 6) return 'bg-yellow-500';
-    if (val <= 8) return 'bg-orange-500';
+    if (val <= 3) {
+      return 'bg-green-500';
+    }
+    if (val <= 6) {
+      return 'bg-yellow-500';
+    }
+    if (val <= 8) {
+      return 'bg-orange-500';
+    }
     return 'bg-red-500';
   };
 
   const getLabel = (val) => {
-    if (val === 0) return lang === 'no' ? 'Ingen smerte' : 'No pain';
-    if (val <= 3) return lang === 'no' ? 'Mild' : 'Mild';
-    if (val <= 6) return lang === 'no' ? 'Moderat' : 'Moderate';
-    if (val <= 8) return lang === 'no' ? 'Alvorlig' : 'Severe';
+    if (val === 0) {
+      return lang === 'no' ? 'Ingen smerte' : 'No pain';
+    }
+    if (val <= 3) {
+      return lang === 'no' ? 'Mild' : 'Mild';
+    }
+    if (val <= 6) {
+      return lang === 'no' ? 'Moderat' : 'Moderate';
+    }
+    if (val <= 8) {
+      return lang === 'no' ? 'Alvorlig' : 'Severe';
+    }
     return lang === 'no' ? 'Verst tenkelig' : 'Worst imaginable';
   };
 
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-gray-700">
-          {lang === 'no' ? labelNo : label}
-        </span>
+        <span className="text-sm font-medium text-gray-700">{lang === 'no' ? labelNo : label}</span>
         <div className="flex items-center gap-2">
           <span className={`text-2xl font-bold ${getColor(value).replace('bg-', 'text-')}`}>
             {value}
@@ -149,7 +173,7 @@ function VASSlider({ value, onChange, label, labelNo, lang = 'no' }) {
               #22c55e 0%, #22c55e 30%,
               #eab308 30%, #eab308 60%,
               #f97316 60%, #f97316 80%,
-              #ef4444 80%, #ef4444 100%)`
+              #ef4444 80%, #ef4444 100%)`,
           }}
         />
         <div className="flex justify-between text-xs text-gray-400 mt-1">
@@ -170,7 +194,7 @@ function VASSlider({ value, onChange, label, labelNo, lang = 'no' }) {
 function ChipGroup({ items, selectedIds, onChange, lang = 'no' }) {
   const toggleItem = (id) => {
     if (selectedIds.includes(id)) {
-      onChange(selectedIds.filter(i => i !== id));
+      onChange(selectedIds.filter((i) => i !== id));
     } else {
       onChange([...selectedIds, id]);
     }
@@ -178,7 +202,7 @@ function ChipGroup({ items, selectedIds, onChange, lang = 'no' }) {
 
   return (
     <div className="flex flex-wrap gap-2">
-      {items.map(item => {
+      {items.map((item) => {
         const isSelected = selectedIds.includes(item.id);
         return (
           <button
@@ -186,9 +210,11 @@ function ChipGroup({ items, selectedIds, onChange, lang = 'no' }) {
             type="button"
             onClick={() => toggleItem(item.id)}
             className={`px-3 py-1.5 text-sm rounded-full border transition-colors
-                       ${isSelected
-                         ? 'bg-teal-100 border-teal-300 text-teal-700'
-                         : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                       ${
+                         isSelected
+                           ? 'bg-teal-100 border-teal-300 text-teal-700'
+                           : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                       }`}
           >
             {item.icon && <span className="mr-1">{item.icon}</span>}
             {lang === 'no' ? item.nameNo : item.name}
@@ -202,7 +228,7 @@ function ChipGroup({ items, selectedIds, onChange, lang = 'no' }) {
 /**
  * Pain entry for a single location
  */
-function PainEntry({ entry, index, onChange, onRemove, lang }) {
+function PainEntry({ entry, _index, onChange, onRemove, lang }) {
   const handleChange = (field, value) => {
     onChange({ ...entry, [field]: value });
   };
@@ -217,8 +243,10 @@ function PainEntry({ entry, index, onChange, onRemove, lang }) {
             onChange={(e) => handleChange('location', e.target.value)}
             className="text-sm font-medium border-0 bg-transparent focus:ring-0 cursor-pointer"
           >
-            <option value="">{lang === 'no' ? '-- Velg lokasjon --' : '-- Select location --'}</option>
-            {PAIN_LOCATIONS.map(loc => (
+            <option value="">
+              {lang === 'no' ? '-- Velg lokasjon --' : '-- Select location --'}
+            </option>
+            {PAIN_LOCATIONS.map((loc) => (
               <option key={loc.id} value={loc.id}>
                 {lang === 'no' ? loc.nameNo : loc.name}
               </option>
@@ -270,7 +298,9 @@ function PainEntry({ entry, index, onChange, onRemove, lang }) {
           onChange={(v) => handleChange('qualities', v)}
           lang={lang}
         />
-        {entry.qualities?.some(q => PAIN_QUALITIES.find(p => p.id === q)?.category === 'neuropathic') && (
+        {entry.qualities?.some(
+          (q) => PAIN_QUALITIES.find((p) => p.id === q)?.category === 'neuropathic'
+        ) && (
           <div className="mt-2 flex items-center gap-2 text-xs text-purple-600 bg-purple-50 px-2 py-1 rounded">
             <Zap className="w-3 h-3" />
             {lang === 'no' ? 'Nevropatiske trekk identifisert' : 'Neuropathic features identified'}
@@ -365,14 +395,14 @@ export default function PainAssessmentPanel({
   onChange,
   lang = 'no',
   readOnly = false,
-  onGenerateNarrative
+  onGenerateNarrative,
 }) {
   const entries = values.entries || [];
 
   const addEntry = () => {
     onChange({
       ...values,
-      entries: [...entries, { id: Date.now(), current: 0, best: 0, worst: 0 }]
+      entries: [...entries, { id: Date.now(), current: 0, best: 0, worst: 0 }],
     });
   };
 
@@ -385,7 +415,7 @@ export default function PainAssessmentPanel({
   const removeEntry = (index) => {
     onChange({
       ...values,
-      entries: entries.filter((_, i) => i !== index)
+      entries: entries.filter((_, i) => i !== index),
     });
   };
 
@@ -395,14 +425,14 @@ export default function PainAssessmentPanel({
       return lang === 'no' ? 'Ingen smerte rapportert.' : 'No pain reported.';
     }
 
-    const narratives = entries.map(entry => {
-      const location = PAIN_LOCATIONS.find(l => l.id === entry.location);
+    const narratives = entries.map((entry) => {
+      const location = PAIN_LOCATIONS.find((l) => l.id === entry.location);
       const locationName = location ? (lang === 'no' ? location.nameNo : location.name) : '';
 
       const qualities = (entry.qualities || [])
-        .map(q => PAIN_QUALITIES.find(p => p.id === q))
+        .map((q) => PAIN_QUALITIES.find((p) => p.id === q))
         .filter(Boolean)
-        .map(q => lang === 'no' ? q.nameNo : q.name)
+        .map((q) => (lang === 'no' ? q.nameNo : q.name))
         .join(', ');
 
       let text = `${locationName}: VAS ${entry.current}/10 (${lang === 'no' ? 'beste' : 'best'} ${entry.best}/10, ${lang === 'no' ? 'verste' : 'worst'} ${entry.worst}/10)`;
@@ -488,7 +518,7 @@ export default function PainAssessmentPanel({
       )}
 
       {/* Red flags */}
-      {entries.some(e => e.worst >= 9 || e.qualities?.includes('numbness')) && (
+      {entries.some((e) => e.worst >= 9 || e.qualities?.includes('numbness')) && (
         <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
           <div className="flex items-center gap-2 text-red-700">
             <AlertCircle className="w-5 h-5" />
@@ -497,11 +527,21 @@ export default function PainAssessmentPanel({
             </span>
           </div>
           <ul className="mt-2 text-sm text-red-600 space-y-1 ml-7">
-            {entries.some(e => e.worst >= 9) && (
-              <li>• {lang === 'no' ? 'Alvorlig smerteintensitet (≥9/10)' : 'Severe pain intensity (≥9/10)'}</li>
+            {entries.some((e) => e.worst >= 9) && (
+              <li>
+                •{' '}
+                {lang === 'no'
+                  ? 'Alvorlig smerteintensitet (≥9/10)'
+                  : 'Severe pain intensity (≥9/10)'}
+              </li>
             )}
-            {entries.some(e => e.qualities?.includes('numbness')) && (
-              <li>• {lang === 'no' ? 'Nummenhet rapportert - vurder nevrologisk undersøkelse' : 'Numbness reported - consider neurological examination'}</li>
+            {entries.some((e) => e.qualities?.includes('numbness')) && (
+              <li>
+                •{' '}
+                {lang === 'no'
+                  ? 'Nummenhet rapportert - vurder nevrologisk undersøkelse'
+                  : 'Numbness reported - consider neurological examination'}
+              </li>
             )}
           </ul>
         </div>

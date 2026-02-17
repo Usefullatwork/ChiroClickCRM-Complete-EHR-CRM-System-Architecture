@@ -10,7 +10,7 @@
  * Bilingual: English/Norwegian
  */
 
-import React, { useState, useMemo } from 'react';
+import _React, { useState, _useMemo } from 'react';
 
 // =============================================================================
 // TRANSLATIONS
@@ -300,7 +300,8 @@ function ProviderCard({ provider, onEdit, onSelect, isSelected, lang }) {
           className="w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold flex-shrink-0"
           style={{ backgroundColor: color?.hex || '#6b7280' }}
         >
-          {provider.firstName[0]}{provider.lastName[0]}
+          {provider.firstName[0]}
+          {provider.lastName[0]}
         </div>
 
         {/* Info */}
@@ -309,11 +310,13 @@ function ProviderCard({ provider, onEdit, onSelect, isSelected, lang }) {
             <h3 className="font-semibold text-gray-900 dark:text-white truncate">
               {provider.firstName} {provider.lastName}
             </h3>
-            <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-              provider.status === 'active'
-                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
-            }`}>
+            <span
+              className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                provider.status === 'active'
+                  ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                  : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+              }`}
+            >
               {provider.status === 'active' ? t.active : t.inactive}
             </span>
           </div>
@@ -343,17 +346,13 @@ function ProviderCard({ provider, onEdit, onSelect, isSelected, lang }) {
           <div className="text-2xl font-bold text-gray-900 dark:text-white">
             {provider.stats?.appointmentsToday || 0}
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">
-            {t.appointmentsToday}
-          </div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">{t.appointmentsToday}</div>
         </div>
         <div>
           <div className="text-2xl font-bold text-gray-900 dark:text-white">
             {provider.stats?.totalPatients || 0}
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">
-            {t.patientsTotal}
-          </div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">{t.patientsTotal}</div>
         </div>
       </div>
     </div>
@@ -387,9 +386,7 @@ function WorkingHoursEditor({ hours, onChange, lang }) {
               onChange={(e) => handleDayChange(day, 'enabled', e.target.checked)}
               className="h-4 w-4 text-blue-600 rounded"
             />
-            <span className="text-sm text-gray-700 dark:text-gray-300">
-              {t[day]}
-            </span>
+            <span className="text-sm text-gray-700 dark:text-gray-300">{t[day]}</span>
           </label>
 
           {hours[day]?.enabled ? (
@@ -557,7 +554,9 @@ function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
               {SPECIALTIES.map((s) => (
-                <option key={s.id} value={s.id}>{s.name[lang]}</option>
+                <option key={s.id} value={s.id}>
+                  {s.name[lang]}
+                </option>
               ))}
             </select>
           </div>
@@ -580,7 +579,9 @@ function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
               {Object.values(ROLES).map((role) => (
-                <option key={role.id} value={role.id}>{role.name[lang]}</option>
+                <option key={role.id} value={role.id}>
+                  {role.name[lang]}
+                </option>
               ))}
             </select>
           </div>
@@ -603,7 +604,9 @@ function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
             </label>
             <select
               value={formData.defaultDuration}
-              onChange={(e) => setFormData({ ...formData, defaultDuration: parseInt(e.target.value) })}
+              onChange={(e) =>
+                setFormData({ ...formData, defaultDuration: parseInt(e.target.value) })
+              }
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
               <option value={15}>15 {t.minutes}</option>
@@ -627,9 +630,7 @@ function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
               type="button"
               onClick={() => setFormData({ ...formData, color: color.id })}
               className={`w-10 h-10 rounded-full transition-all ${
-                formData.color === color.id
-                  ? 'ring-2 ring-offset-2 ring-gray-400 scale-110'
-                  : ''
+                formData.color === color.id ? 'ring-2 ring-offset-2 ring-gray-400 scale-110' : ''
               }`}
               style={{ backgroundColor: color.hex }}
               title={color.name[lang]}
@@ -768,9 +769,7 @@ export default function ProviderManagement({
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {t.providers}
-        </h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t.providers}</h2>
         <button
           onClick={handleAdd}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"

@@ -4,7 +4,7 @@
  */
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import _userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ExerciseCard from '../../components/patient/ExerciseCard';
 import { createMockExercise } from '../setup';
@@ -146,11 +146,7 @@ describe('ExerciseCard Component', () => {
 
     it('should call onComplete when complete button is clicked', async () => {
       render(
-        <ExerciseCard
-          exercise={mockExercise}
-          onComplete={mockOnComplete}
-          showActions={true}
-        />
+        <ExerciseCard exercise={mockExercise} onComplete={mockOnComplete} showActions={true} />
       );
 
       // Expand the card
@@ -167,13 +163,7 @@ describe('ExerciseCard Component', () => {
     });
 
     it('should show "Fullfort" text when completed', async () => {
-      render(
-        <ExerciseCard
-          exercise={mockExercise}
-          completed={true}
-          showActions={true}
-        />
-      );
+      render(<ExerciseCard exercise={mockExercise} completed={true} showActions={true} />);
 
       // Expand the card
       fireEvent.click(screen.getByText(mockExercise.name));
@@ -200,26 +190,14 @@ describe('ExerciseCard Component', () => {
     });
 
     it('should call onClick when compact card is clicked', () => {
-      render(
-        <ExerciseCard
-          exercise={mockExercise}
-          compact={true}
-          onClick={mockOnClick}
-        />
-      );
+      render(<ExerciseCard exercise={mockExercise} compact={true} onClick={mockOnClick} />);
 
       fireEvent.click(screen.getByRole('button'));
       expect(mockOnClick).toHaveBeenCalledWith(mockExercise);
     });
 
     it('should show completion check in compact mode', () => {
-      render(
-        <ExerciseCard
-          exercise={mockExercise}
-          compact={true}
-          completed={true}
-        />
-      );
+      render(<ExerciseCard exercise={mockExercise} compact={true} completed={true} />);
 
       // Check for green background indicating completion
       const container = document.querySelector('.bg-green-500');
@@ -249,26 +227,14 @@ describe('ExerciseCard Component', () => {
     });
 
     it('should call onClick when thumbnail card is clicked', () => {
-      render(
-        <ExerciseCard
-          exercise={mockExercise}
-          variant="thumbnail"
-          onClick={mockOnClick}
-        />
-      );
+      render(<ExerciseCard exercise={mockExercise} variant="thumbnail" onClick={mockOnClick} />);
 
       fireEvent.click(screen.getByRole('button'));
       expect(mockOnClick).toHaveBeenCalledWith(mockExercise);
     });
 
     it('should show completion badge in thumbnail mode', () => {
-      render(
-        <ExerciseCard
-          exercise={mockExercise}
-          variant="thumbnail"
-          completed={true}
-        />
-      );
+      render(<ExerciseCard exercise={mockExercise} variant="thumbnail" completed={true} />);
 
       // Should show green completion badge
       const badge = document.querySelector('.bg-green-500');
@@ -294,11 +260,7 @@ describe('ExerciseCard Component', () => {
 
     it('should hide action buttons when showActions is false', async () => {
       render(
-        <ExerciseCard
-          exercise={mockExercise}
-          showActions={false}
-          onComplete={mockOnComplete}
-        />
+        <ExerciseCard exercise={mockExercise} showActions={false} onComplete={mockOnComplete} />
       );
 
       // Expand the card
@@ -398,9 +360,7 @@ describe('ExerciseCard Component', () => {
 
       await waitFor(() => {
         expect(screen.getByText('Spesielle instruksjoner')).toBeInTheDocument();
-        expect(
-          screen.getByText('Spesielle instruksjoner for denne pasienten')
-        ).toBeInTheDocument();
+        expect(screen.getByText('Spesielle instruksjoner for denne pasienten')).toBeInTheDocument();
       });
     });
   });
@@ -431,7 +391,7 @@ describe('ExerciseCard Component', () => {
       fireEvent.click(screen.getByText(exerciseWithImage.name));
 
       await waitFor(() => {
-        const img = document.querySelector('img[alt="' + exerciseWithImage.name + '"]');
+        const img = document.querySelector(`img[alt="${exerciseWithImage.name}"]`);
         expect(img).toBeInTheDocument();
         expect(img).toHaveAttribute('src', exerciseWithImage.imageUrl);
       });

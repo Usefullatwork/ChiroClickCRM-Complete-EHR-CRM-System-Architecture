@@ -10,8 +10,9 @@ import logger from '../utils/logger.js';
  * Cache GET requests
  * @param {number} ttl - Time to live in seconds (default: 5 minutes)
  */
-export const cacheMiddleware = (ttl = 300) => {
-  return async (req, res, next) => {
+export const cacheMiddleware =
+  (ttl = 300) =>
+  async (req, res, next) => {
     // Only cache GET requests
     if (req.method !== 'GET') {
       return next();
@@ -51,36 +52,33 @@ export const cacheMiddleware = (ttl = 300) => {
       next(); // Proceed without caching
     }
   };
-};
 
 /**
  * Cache invalidation middleware
  * Invalidates cache on data mutations (POST, PUT, PATCH, DELETE)
  */
-export const invalidateCacheMiddleware = () => {
-  return async (req, res, next) => {
-    // Only invalidate on mutations
-    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
-      const organizationId = req.headers['x-organization-id'];
+export const invalidateCacheMiddleware = () => async (req, res, next) => {
+  // Only invalidate on mutations
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+    const organizationId = req.headers['x-organization-id'];
 
-      // Store original res.json
-      const originalJson = res.json.bind(res);
+    // Store original res.json
+    const originalJson = res.json.bind(res);
 
-      res.json = (body) => {
-        // Invalidate related caches on successful mutation
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          const resource = req.originalUrl.split('/')[3]; // e.g., 'patients', 'encounters'
-          redisCache.delPattern(`api:${organizationId}:*/api/v1/${resource}*`).catch((err) => {
-            logger.error('Failed to invalidate cache', { error: err.message });
-          });
-        }
+    res.json = (body) => {
+      // Invalidate related caches on successful mutation
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        const resource = req.originalUrl.split('/')[3]; // e.g., 'patients', 'encounters'
+        redisCache.delPattern(`api:${organizationId}:*/api/v1/${resource}*`).catch((err) => {
+          logger.error('Failed to invalidate cache', { error: err.message });
+        });
+      }
 
-        return originalJson(body);
-      };
-    }
+      return originalJson(body);
+    };
+  }
 
-    next();
-  };
+  next();
 };
 
 export default {

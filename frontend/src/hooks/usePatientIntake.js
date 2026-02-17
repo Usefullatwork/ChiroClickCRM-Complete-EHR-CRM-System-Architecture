@@ -12,7 +12,9 @@ export const usePatientIntake = (appointmentId) => {
   const [error, setError] = useState(null);
 
   const fetchIntake = useCallback(async () => {
-    if (!appointmentId) return;
+    if (!appointmentId) {
+      return;
+    }
     setLoading(true);
     setError(null);
     try {

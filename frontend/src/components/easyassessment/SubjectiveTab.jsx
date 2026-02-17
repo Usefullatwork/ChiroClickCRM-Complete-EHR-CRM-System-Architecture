@@ -47,7 +47,7 @@ export default function SubjectiveTab({
               relievingFactors: encounterData.relieving_factors_selected,
             }}
             language={language}
-            onGenerate={(narrative, source) => {
+            onGenerate={(narrative, _source) => {
               updateField('subjective', 'chief_complaint', narrative);
             }}
           />

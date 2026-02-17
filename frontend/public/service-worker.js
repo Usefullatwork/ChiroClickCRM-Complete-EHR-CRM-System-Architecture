@@ -46,7 +46,8 @@ self.addEventListener('install', (event) => {
   console.log('[Service Worker] Installing...');
 
   event.waitUntil(
-    caches.open(STATIC_CACHE)
+    caches
+      .open(STATIC_CACHE)
       .then((cache) => {
         console.log('[Service Worker] Caching static assets');
         // Don't fail installation if some assets fail to cache
@@ -73,16 +74,19 @@ self.addEventListener('activate', (event) => {
   console.log('[Service Worker] Activating...');
 
   event.waitUntil(
-    caches.keys()
+    caches
+      .keys()
       .then((cacheNames) => {
         return Promise.all(
           cacheNames
             .filter((cacheName) => {
               // Delete old caches
-              return cacheName.startsWith('chiroclickcrm-') &&
-                     cacheName !== STATIC_CACHE &&
-                     cacheName !== DATA_CACHE &&
-                     cacheName !== VIDEO_CACHE;
+              return (
+                cacheName.startsWith('chiroclickcrm-') &&
+                cacheName !== STATIC_CACHE &&
+                cacheName !== DATA_CACHE &&
+                cacheName !== VIDEO_CACHE
+              );
             })
             .map((cacheName) => {
               console.log('[Service Worker] Deleting old cache:', cacheName);
@@ -162,11 +166,11 @@ async function handleApiRequest(request) {
         success: false,
         offline: true,
         message: 'Du er frakoblet. Data er ikke tilgjengelig offline.',
-        messageEn: 'You are offline. Data is not available offline.'
+        messageEn: 'You are offline. Data is not available offline.',
       }),
       {
         status: 503,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       }
     );
   }
@@ -191,13 +195,10 @@ async function handleVideoRequest(request) {
     console.log('[Service Worker] Video not available offline');
 
     // Return offline placeholder response
-    return new Response(
-      'Video ikke tilgjengelig offline',
-      {
-        status: 503,
-        headers: { 'Content-Type': 'text/plain' }
-      }
-    );
+    return new Response('Video ikke tilgjengelig offline', {
+      status: 503,
+      headers: { 'Content-Type': 'text/plain' },
+    });
   }
 }
 
@@ -205,7 +206,7 @@ async function handleVideoRequest(request) {
  * Handle static requests - Stale-while-revalidate
  */
 async function handleStaticRequest(request) {
-  const url = new URL(request.url);
+  const _url = new URL(request.url);
 
   // For navigation requests, serve index.html (SPA)
   if (request.mode === 'navigate') {
@@ -307,7 +308,7 @@ async function syncExerciseProgress() {
         const response = await fetch(item.url, {
           method: item.method,
           headers: item.headers,
-          body: item.body ? JSON.stringify(item.body) : undefined
+          body: item.body ? JSON.stringify(item.body) : undefined,
         });
 
         if (response.ok) {
@@ -322,7 +323,7 @@ async function syncExerciseProgress() {
             clients.forEach((client) => {
               client.postMessage({
                 type: 'SYNC_SUCCESS',
-                itemId: item.id
+                itemId: item.id,
               });
             });
           });
@@ -370,7 +371,7 @@ self.addEventListener('message', (event) => {
       getCacheStatus().then((status) => {
         event.source.postMessage({
           type: 'CACHE_STATUS',
-          payload: status
+          payload: status,
         });
       });
       break;
@@ -396,7 +397,7 @@ async function cacheVideo(url) {
         clients.forEach((client) => {
           client.postMessage({
             type: 'VIDEO_CACHED',
-            payload: { url }
+            payload: { url },
           });
         });
       });
@@ -409,7 +410,7 @@ async function cacheVideo(url) {
       clients.forEach((client) => {
         client.postMessage({
           type: 'VIDEO_CACHE_FAILED',
-          payload: { url, error: error.message }
+          payload: { url, error: error.message },
         });
       });
     });
@@ -442,7 +443,7 @@ async function cacheExerciseData(data) {
 
     // Create a Response object from the data
     const response = new Response(JSON.stringify(data.response), {
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
 
     await cache.put(data.url, response);
@@ -475,7 +476,7 @@ async function getCacheStatus() {
   const status = {
     staticCached: false,
     dataCached: false,
-    cachedVideos: []
+    cachedVideos: [],
   };
 
   try {
@@ -543,7 +544,9 @@ function deleteFromStore(store, key) {
 // =============================================================================
 
 self.addEventListener('push', (event) => {
-  if (!event.data) return;
+  if (!event.data) {
+    return;
+  }
 
   try {
     const data = event.data.json();
@@ -555,15 +558,12 @@ self.addEventListener('push', (event) => {
       vibrate: [200, 100, 200],
       tag: data.tag || 'exercise-reminder',
       data: {
-        url: data.url || '/portal/mine-ovelser'
-      }
+        url: data.url || '/portal/mine-ovelser',
+      },
     };
 
     event.waitUntil(
-      self.registration.showNotification(
-        data.title || 'ChiroClick - Treningspaminnelse',
-        options
-      )
+      self.registration.showNotification(data.title || 'ChiroClick - Treningspaminnelse', options)
     );
   } catch (error) {
     console.error('[Service Worker] Push notification error:', error);

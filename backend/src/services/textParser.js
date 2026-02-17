@@ -10,7 +10,9 @@ import logger from '../utils/logger.js';
  * Parse Norwegian phone number
  */
 const parseNorwegianPhone = (text) => {
-  if (!text) return null;
+  if (!text) {
+    return null;
+  }
 
   // Remove all non-digits
   const digits = text.replace(/\D/g, '');
@@ -32,7 +34,9 @@ const parseNorwegianPhone = (text) => {
  * Parse Norwegian personnummer (national ID)
  */
 const parseNationalId = (text) => {
-  if (!text) return null;
+  if (!text) {
+    return null;
+  }
 
   const digits = text.replace(/\s/g, '');
 
@@ -48,7 +52,9 @@ const parseNationalId = (text) => {
  * Parse date in various Norwegian formats
  */
 const parseNorwegianDate = (text) => {
-  if (!text) return null;
+  if (!text) {
+    return null;
+  }
 
   // DD.MM.YYYY or DD/MM/YYYY
   const match = text.match(/(\d{1,2})[./](\d{1,2})[./](\d{4})/);
@@ -70,7 +76,10 @@ const parseNorwegianDate = (text) => {
  * Supports various formats (table, form, free text)
  */
 export const extractPatientFromText = (text) => {
-  const lines = text.split('\n').map(line => line.trim()).filter(line => line);
+  const lines = text
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line);
 
   const patient = {
     solvit_id: null,
@@ -84,7 +93,7 @@ export const extractPatientFromText = (text) => {
     address_postal_code: null,
     address_city: null,
     gender: null,
-    notes: []
+    notes: [],
   };
 
   for (const line of lines) {
@@ -114,9 +123,9 @@ export const extractPatientFromText = (text) => {
         // Determine century
         const centuryDigit = parseInt(patient.national_id.substring(6, 7));
         if (centuryDigit >= 5 && centuryDigit <= 9) {
-          year = '19' + year;
+          year = `19${year}`;
         } else {
-          year = '20' + year;
+          year = `20${year}`;
         }
 
         patient.date_of_birth = `${year}-${month}-${day}`;
@@ -124,7 +133,9 @@ export const extractPatientFromText = (text) => {
     }
 
     // Try to extract address
-    const addressMatch = line.match(/^([A-ZÆØÅ][a-zæøå]+(?:\s+[A-ZÆØÅ][a-zæøå]+)*)\s+(\d+[A-Za-z]?)/);
+    const addressMatch = line.match(
+      /^([A-ZÆØÅ][a-zæøå]+(?:\s+[A-ZÆØÅ][a-zæøå]+)*)\s+(\d+[A-Za-z]?)/
+    );
     if (addressMatch && !patient.address_street) {
       patient.address_street = `${addressMatch[1]} ${addressMatch[2]}`;
     }
@@ -151,7 +162,10 @@ export const extractPatientFromText = (text) => {
   // Join notes
   patient.notes = patient.notes.join(' ');
 
-  logger.info('Patient data extracted from text:', { hasEmail: !!patient.email, hasPhone: !!patient.phone });
+  logger.info('Patient data extracted from text:', {
+    hasEmail: !!patient.email,
+    hasPhone: !!patient.phone,
+  });
   return patient;
 };
 
@@ -160,7 +174,10 @@ export const extractPatientFromText = (text) => {
  * Format: Patient ID | First Name | Last Name | Last Visit | Email | Phone | Therapist | Contact Method | Status | Language | Main Problem | Treatment Type | Notes | Follow Up Date
  */
 export const parsePatientTable = (text) => {
-  const lines = text.split('\n').map(line => line.trim()).filter(line => line);
+  const lines = text
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line);
 
   // Skip header row
   const dataLines = lines.slice(1);
@@ -186,26 +203,40 @@ export const parsePatientTable = (text) => {
         main_problem: columns[10]?.trim() || null,
         treatment_type: columns[11]?.trim() || null,
         general_notes: columns[12]?.trim() || null,
-        should_be_followed_up: columns[13] ? parseNorwegianDate(columns[13].trim()) : null
+        should_be_followed_up: columns[13] ? parseNorwegianDate(columns[13].trim()) : null,
       };
 
       // Normalize status values
-      if (patient.patient_status === 'Inaktiv') patient.status = 'INACTIVE';
-      else if (patient.patient_status === 'Ferdig') patient.status = 'FINISHED';
-      else patient.status = 'ACTIVE';
+      if (patient.patient_status === 'Inaktiv') {
+        patient.status = 'INACTIVE';
+      } else if (patient.patient_status === 'Ferdig') {
+        patient.status = 'FINISHED';
+      } else {
+        patient.status = 'ACTIVE';
+      }
 
       // Normalize language
-      if (patient.language === 'Norsk') patient.language = 'NO';
-      else if (patient.language === 'Engelsk') patient.language = 'EN';
+      if (patient.language === 'Norsk') {
+        patient.language = 'NO';
+      } else if (patient.language === 'Engelsk') {
+        patient.language = 'EN';
+      }
 
       // Normalize treatment type
-      if (patient.treatment_type === 'Kiropraktor') patient.treatment_type = 'KIROPRAKTOR';
-      else if (patient.treatment_type === 'Nevrobehandling') patient.treatment_type = 'NEVROBEHANDLING';
-      else if (patient.treatment_type === 'Muskelbehandling') patient.treatment_type = 'MUSKELBEHANDLING';
+      if (patient.treatment_type === 'Kiropraktor') {
+        patient.treatment_type = 'KIROPRAKTOR';
+      } else if (patient.treatment_type === 'Nevrobehandling') {
+        patient.treatment_type = 'NEVROBEHANDLING';
+      } else if (patient.treatment_type === 'Muskelbehandling') {
+        patient.treatment_type = 'MUSKELBEHANDLING';
+      }
 
       // Normalize contact method
-      if (patient.preferred_contact_method === 'Melding') patient.preferred_contact_method = 'SMS';
-      else if (patient.preferred_contact_method?.includes('BARN')) patient.preferred_contact_method = 'NO_CONTACT';
+      if (patient.preferred_contact_method === 'Melding') {
+        patient.preferred_contact_method = 'SMS';
+      } else if (patient.preferred_contact_method?.includes('BARN')) {
+        patient.preferred_contact_method = 'NO_CONTACT';
+      }
 
       patients.push(patient);
     }
@@ -234,5 +265,5 @@ export default {
   parsePatientData,
   parseNorwegianPhone,
   parseNationalId,
-  parseNorwegianDate
+  parseNorwegianDate,
 };

@@ -21,7 +21,7 @@ import {
   Mail,
   MessageSquare,
   Clock,
-  Calendar,
+  _Calendar,
   Eye,
   EyeOff,
   Users,
@@ -31,12 +31,12 @@ import {
   RefreshCw,
   ChevronDown,
   ChevronUp,
-  Copy,
+  _Copy,
   Pause,
-  Play,
+  _Play,
   X,
-  FileText,
-  Edit3,
+  _FileText,
+  _Edit3,
   Info,
   Zap,
 } from 'lucide-react';
@@ -47,18 +47,24 @@ const bulkCommunicationAPI = {
   getPatients: async (filters) => {
     const params = new URLSearchParams(filters);
     const response = await fetch(`/api/v1/bulk-communications/patients?${params}`);
-    if (!response.ok) throw new Error('Failed to fetch patients');
+    if (!response.ok) {
+      throw new Error('Failed to fetch patients');
+    }
     return response.json();
   },
   getTemplates: async (type) => {
     const params = type ? `?type=${type}` : '';
     const response = await fetch(`/api/v1/bulk-communications/templates${params}`);
-    if (!response.ok) throw new Error('Failed to fetch templates');
+    if (!response.ok) {
+      throw new Error('Failed to fetch templates');
+    }
     return response.json();
   },
   getVariables: async () => {
     const response = await fetch('/api/v1/bulk-communications/variables');
-    if (!response.ok) throw new Error('Failed to fetch variables');
+    if (!response.ok) {
+      throw new Error('Failed to fetch variables');
+    }
     return response.json();
   },
   previewMessage: async (data) => {
@@ -67,7 +73,9 @@ const bulkCommunicationAPI = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error('Failed to preview message');
+    if (!response.ok) {
+      throw new Error('Failed to preview message');
+    }
     return response.json();
   },
   queueBulkSend: async (data) => {
@@ -84,24 +92,23 @@ const bulkCommunicationAPI = {
   },
   getBatchStatus: async (batchId) => {
     const response = await fetch(`/api/v1/bulk-communications/queue/status/${batchId}`);
-    if (!response.ok) throw new Error('Failed to fetch batch status');
+    if (!response.ok) {
+      throw new Error('Failed to fetch batch status');
+    }
     return response.json();
   },
   cancelBatch: async (batchId) => {
     const response = await fetch(`/api/v1/bulk-communications/queue/cancel/${batchId}`, {
       method: 'POST',
     });
-    if (!response.ok) throw new Error('Failed to cancel batch');
+    if (!response.ok) {
+      throw new Error('Failed to cancel batch');
+    }
     return response.json();
   },
 };
 
-export default function BulkSender({
-  clinicInfo = {},
-  language = 'no',
-  className = '',
-  onClose,
-}) {
+export default function BulkSender({ clinicInfo = {}, language = 'no', className = '', onClose }) {
   const queryClient = useQueryClient();
 
   // State
@@ -252,10 +259,7 @@ export default function BulkSender({
   const t = labels[language] || labels.no;
 
   // Queries
-  const {
-    data: patientsData,
-    isLoading: patientsLoading,
-  } = useQuery({
+  const { data: patientsData, isLoading: patientsLoading } = useQuery({
     queryKey: ['bulk-patients', communicationType],
     queryFn: () =>
       bulkCommunicationAPI.getPatients({
@@ -265,7 +269,7 @@ export default function BulkSender({
       }),
   });
 
-  const { data: templatesData, isLoading: templatesLoading } = useQuery({
+  const { data: templatesData, isLoading: _templatesLoading } = useQuery({
     queryKey: ['bulk-templates', communicationType],
     queryFn: () => bulkCommunicationAPI.getTemplates(communicationType),
   });
@@ -349,12 +353,20 @@ export default function BulkSender({
   const validateStep = (currentStep) => {
     switch (currentStep) {
       case 1:
-        if (selectedPatients.length === 0) return t.warnings.noPatients;
-        if (selectedPatients.length > 1000) return t.warnings.maxPatients;
+        if (selectedPatients.length === 0) {
+          return t.warnings.noPatients;
+        }
+        if (selectedPatients.length > 1000) {
+          return t.warnings.maxPatients;
+        }
         return null;
       case 2:
-        if (!getMessageContent().trim()) return t.warnings.noMessage;
-        if (communicationType === 'EMAIL' && !customSubject.trim()) return t.warnings.noSubject;
+        if (!getMessageContent().trim()) {
+          return t.warnings.noMessage;
+        }
+        if (communicationType === 'EMAIL' && !customSubject.trim()) {
+          return t.warnings.noSubject;
+        }
         return null;
       default:
         return null;
@@ -391,7 +403,8 @@ export default function BulkSender({
 
   // Progress calculations
   const progressPercentage = batchStatus?.data?.progressPercentage || 0;
-  const isComplete = batchStatus?.data?.status === 'COMPLETED' ||
+  const isComplete =
+    batchStatus?.data?.status === 'COMPLETED' ||
     batchStatus?.data?.status === 'COMPLETED_WITH_ERRORS' ||
     batchStatus?.data?.status === 'CANCELLED';
 
@@ -403,7 +416,9 @@ export default function BulkSender({
   }, [isComplete, activeBatchId, queryClient]);
 
   return (
-    <div className={`bg-white rounded-xl shadow-xl border border-gray-200 max-w-4xl w-full ${className}`}>
+    <div
+      className={`bg-white rounded-xl shadow-xl border border-gray-200 max-w-4xl w-full ${className}`}
+    >
       {/* Header */}
       <div className="px-6 py-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
@@ -433,17 +448,15 @@ export default function BulkSender({
                   s === step
                     ? 'bg-blue-600 text-white'
                     : s < step
-                    ? 'bg-green-500 text-white'
-                    : 'bg-gray-200 text-gray-500'
+                      ? 'bg-green-500 text-white'
+                      : 'bg-gray-200 text-gray-500'
                 }`}
               >
                 {s < step ? <CheckCircle className="w-5 h-5" /> : s}
               </div>
               {s < 4 && (
                 <div
-                  className={`w-12 h-1 mx-1 rounded ${
-                    s < step ? 'bg-green-500' : 'bg-gray-200'
-                  }`}
+                  className={`w-12 h-1 mx-1 rounded ${s < step ? 'bg-green-500' : 'bg-gray-200'}`}
                 />
               )}
             </div>
@@ -538,9 +551,7 @@ export default function BulkSender({
             {/* Email Subject (for email only) */}
             {communicationType === 'EMAIL' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t.subject}
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t.subject}</label>
                 <input
                   type="text"
                   value={customSubject}
@@ -554,9 +565,7 @@ export default function BulkSender({
             {/* Message Content */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  {t.customMessage}
-                </label>
+                <label className="block text-sm font-medium text-gray-700">{t.customMessage}</label>
                 <button
                   onClick={() => setShowVariables(!showVariables)}
                   className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
@@ -609,9 +618,7 @@ export default function BulkSender({
 
             {/* Schedule Options */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t.schedule}
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t.schedule}</label>
               <div className="flex gap-2">
                 <button
                   onClick={() => setScheduleType('immediate')}
@@ -653,9 +660,7 @@ export default function BulkSender({
 
             {/* Priority */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t.priority}
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t.priority}</label>
               <div className="flex gap-2">
                 {[
                   { value: 'HIGH', label: t.priorityHigh, color: 'red' },
@@ -715,7 +720,9 @@ export default function BulkSender({
                   <p className="text-lg font-bold text-green-900">
                     {scheduleType === 'immediate'
                       ? t.sendImmediately
-                      : new Date(scheduledDateTime).toLocaleString(language === 'no' ? 'nb-NO' : 'en-US')}
+                      : new Date(scheduledDateTime).toLocaleString(
+                          language === 'no' ? 'nb-NO' : 'en-US'
+                        )}
                   </p>
                 </div>
               </div>
@@ -817,10 +824,10 @@ export default function BulkSender({
                 {batchStatus?.data?.status === 'COMPLETED'
                   ? t.completed
                   : batchStatus?.data?.status === 'COMPLETED_WITH_ERRORS'
-                  ? t.completedWithErrors
-                  : batchStatus?.data?.status === 'CANCELLED'
-                  ? t.cancel
-                  : t.sending}
+                    ? t.completedWithErrors
+                    : batchStatus?.data?.status === 'CANCELLED'
+                      ? t.cancel
+                      : t.sending}
               </h3>
             </div>
 
@@ -836,8 +843,8 @@ export default function BulkSender({
                     batchStatus?.data?.status === 'COMPLETED'
                       ? 'bg-green-500'
                       : batchStatus?.data?.status === 'COMPLETED_WITH_ERRORS'
-                      ? 'bg-yellow-500'
-                      : 'bg-blue-500'
+                        ? 'bg-yellow-500'
+                        : 'bg-blue-500'
                   }`}
                   style={{ width: `${progressPercentage}%` }}
                 />

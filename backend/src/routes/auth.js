@@ -5,7 +5,7 @@
 
 import express from 'express';
 import * as authService from '../auth/authService.js';
-import { validateSession, getUserSessions, refreshSessionFreshness } from '../auth/sessions.js';
+import { _validateSession, getUserSessions, refreshSessionFreshness } from '../auth/sessions.js';
 import { requireLocalAuth, requireFreshSession } from '../middleware/auth.js';
 import { loginLimiter } from '../middleware/rateLimiting.js';
 import { authBruteForceLimit } from '../middleware/security.js';
@@ -259,7 +259,7 @@ router.get('/sessions', requireLocalAuth, async (req, res) => {
     const sessions = await getUserSessions(req.user.id);
 
     // Mark current session
-    const currentSessionId = req.cookies?.session?.substring(0, 8) + '...';
+    const currentSessionId = `${req.cookies?.session?.substring(0, 8)}...`;
     sessions.forEach((s) => {
       s.current = s.id === currentSessionId;
     });

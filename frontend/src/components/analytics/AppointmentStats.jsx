@@ -5,28 +5,28 @@
  * @module components/analytics/AppointmentStats
  */
 
-import React, { useMemo } from 'react';
+import _React, { useMemo } from 'react';
 import {
   PieChart,
   Pie,
   Cell,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
+  _BarChart,
+  _Bar,
+  _XAxis,
+  _YAxis,
+  _CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend
+  _Legend,
 } from 'recharts';
 import {
   Calendar,
   Clock,
   CheckCircle,
   XCircle,
-  AlertTriangle,
+  _AlertTriangle,
   UserX,
-  TrendingUp
+  TrendingUp,
 } from 'lucide-react';
 
 /**
@@ -35,9 +35,9 @@ import {
 const STATUS_COLORS = {
   CONFIRMED: '#10b981', // green
   COMPLETED: '#3b82f6', // blue
-  PENDING: '#f59e0b',   // amber
+  PENDING: '#f59e0b', // amber
   CANCELLED: '#ef4444', // red
-  NO_SHOW: '#6b7280'    // gray
+  NO_SHOW: '#6b7280', // gray
 };
 
 /**
@@ -48,7 +48,7 @@ const STATUS_LABELS = {
   COMPLETED: 'Fullfort',
   PENDING: 'Venter',
   CANCELLED: 'Avlyst',
-  NO_SHOW: 'Ikke mott'
+  NO_SHOW: 'Ikke mott',
 };
 
 /**
@@ -57,10 +57,7 @@ const STATUS_LABELS = {
  * @param {Object} data - Appointment statistics data
  * @param {boolean} loading - Loading state
  */
-export const AppointmentStats = ({
-  data = {},
-  loading = false
-}) => {
+export const AppointmentStats = ({ data = {}, loading = false }) => {
   // Prepare data for status pie chart
   const statusPieData = useMemo(() => {
     const today = data.today || {};
@@ -71,8 +68,8 @@ export const AppointmentStats = ({
       { name: 'Bekreftet', value: today.confirmed || 0, color: STATUS_COLORS.CONFIRMED },
       { name: 'Venter', value: today.pending || 0, color: STATUS_COLORS.PENDING },
       { name: 'Avlyst', value: thisWeek.cancelled || 0, color: STATUS_COLORS.CANCELLED },
-      { name: 'Ikke mott', value: thisWeek.noShow || 0, color: STATUS_COLORS.NO_SHOW }
-    ].filter(item => item.value > 0);
+      { name: 'Ikke mott', value: thisWeek.noShow || 0, color: STATUS_COLORS.NO_SHOW },
+    ].filter((item) => item.value > 0);
   }, [data]);
 
   // Calculate completion rate
@@ -81,7 +78,9 @@ export const AppointmentStats = ({
     const total = thisWeek.total || 0;
     const completed = thisWeek.completed || 0;
 
-    if (total === 0) return 0;
+    if (total === 0) {
+      return 0;
+    }
     return Math.round((completed / total) * 100);
   }, [data]);
 
@@ -91,7 +90,9 @@ export const AppointmentStats = ({
     const total = thisWeek.total || 0;
     const noShow = thisWeek.noShow || 0;
 
-    if (total === 0) return 0;
+    if (total === 0) {
+      return 0;
+    }
     return Math.round((noShow / total) * 100);
   }, [data]);
 
@@ -102,10 +103,7 @@ export const AppointmentStats = ({
       return (
         <div className="bg-white px-3 py-2 shadow-lg rounded-lg border border-gray-200">
           <div className="flex items-center gap-2">
-            <div
-              className="w-3 h-3 rounded-full"
-              style={{ backgroundColor: data.color }}
-            />
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: data.color }} />
             <span className="text-sm font-medium text-gray-900">{data.name}</span>
           </div>
           <p className="text-sm text-gray-600 mt-1">{data.value} avtaler</p>
@@ -150,13 +148,15 @@ export const AppointmentStats = ({
 
           {/* Completion rate badge */}
           <div className="flex items-center gap-2">
-            <div className={`px-3 py-1.5 rounded-full text-sm font-medium ${
-              completionRate >= 80
-                ? 'bg-green-100 text-green-700'
-                : completionRate >= 60
-                ? 'bg-yellow-100 text-yellow-700'
-                : 'bg-red-100 text-red-700'
-            }`}>
+            <div
+              className={`px-3 py-1.5 rounded-full text-sm font-medium ${
+                completionRate >= 80
+                  ? 'bg-green-100 text-green-700'
+                  : completionRate >= 60
+                    ? 'bg-yellow-100 text-yellow-700'
+                    : 'bg-red-100 text-red-700'
+              }`}
+            >
               {completionRate}% fullforingsrate
             </div>
           </div>
@@ -200,10 +200,7 @@ export const AppointmentStats = ({
             <div className="flex flex-wrap justify-center gap-4 mt-4">
               {statusPieData.map((item, index) => (
                 <div key={index} className="flex items-center gap-2">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: item.color }}
-                  />
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
                   <span className="text-xs text-gray-600">{item.name}</span>
                 </div>
               ))}
@@ -220,9 +217,7 @@ export const AppointmentStats = ({
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-gray-600">I dag</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {data.today?.total || 0}
-                  </p>
+                  <p className="text-2xl font-bold text-gray-900">{data.today?.total || 0}</p>
                 </div>
                 <div className="text-right text-sm">
                   <span className="text-green-600">{data.today?.completed || 0} fullfort</span>
@@ -244,9 +239,7 @@ export const AppointmentStats = ({
                     {data.thisWeek?.completed || 0}
                   </p>
                 </div>
-                <div className="text-sm text-gray-500">
-                  av {data.thisWeek?.total || 0} totalt
-                </div>
+                <div className="text-sm text-gray-500">av {data.thisWeek?.total || 0} totalt</div>
               </div>
             </div>
 
@@ -258,9 +251,7 @@ export const AppointmentStats = ({
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-gray-600">Fullfort denne mnd</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {data.completedThisMonth || 0}
-                  </p>
+                  <p className="text-2xl font-bold text-gray-900">{data.completedThisMonth || 0}</p>
                 </div>
               </div>
             </div>
@@ -272,9 +263,7 @@ export const AppointmentStats = ({
                   <XCircle size={14} className="text-red-500" />
                   <span className="text-xs text-red-700">Avlyst</span>
                 </div>
-                <p className="text-lg font-bold text-red-700">
-                  {data.thisWeek?.cancelled || 0}
-                </p>
+                <p className="text-lg font-bold text-red-700">{data.thisWeek?.cancelled || 0}</p>
               </div>
               <div className="bg-orange-50 rounded-lg p-3">
                 <div className="flex items-center gap-2 mb-1">
@@ -309,23 +298,23 @@ export const AppointmentStats = ({
                   <div className="text-sm font-medium text-gray-900">
                     {new Date(apt.startTime).toLocaleTimeString('no-NO', {
                       hour: '2-digit',
-                      minute: '2-digit'
+                      minute: '2-digit',
                     })}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {apt.patientName}
-                    </p>
+                    <p className="text-sm font-medium text-gray-900">{apt.patientName}</p>
                     <p className="text-xs text-gray-500">
                       {apt.appointmentType || 'Konsultasjon'} ({apt.durationMinutes || 30} min)
                     </p>
                   </div>
                 </div>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  apt.status === 'CONFIRMED'
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-yellow-100 text-yellow-700'
-                }`}>
+                <span
+                  className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    apt.status === 'CONFIRMED'
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-yellow-100 text-yellow-700'
+                  }`}
+                >
                   {STATUS_LABELS[apt.status] || apt.status}
                 </span>
               </div>
@@ -354,21 +343,15 @@ export const AppointmentStatsCompact = ({ data = {}, loading = false }) => {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <span className="text-sm text-gray-600">I dag</span>
-        <span className="text-lg font-bold text-gray-900">
-          {data.today?.total || 0}
-        </span>
+        <span className="text-lg font-bold text-gray-900">{data.today?.total || 0}</span>
       </div>
       <div className="flex items-center justify-between">
         <span className="text-sm text-gray-600">Denne uken</span>
-        <span className="text-lg font-bold text-gray-900">
-          {data.thisWeek?.total || 0}
-        </span>
+        <span className="text-lg font-bold text-gray-900">{data.thisWeek?.total || 0}</span>
       </div>
       <div className="flex items-center justify-between">
         <span className="text-sm text-gray-600">Denne mnd</span>
-        <span className="text-lg font-bold text-gray-900">
-          {data.completedThisMonth || 0}
-        </span>
+        <span className="text-lg font-bold text-gray-900">{data.completedThisMonth || 0}</span>
       </div>
     </div>
   );

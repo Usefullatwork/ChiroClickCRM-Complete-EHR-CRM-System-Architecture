@@ -10,7 +10,7 @@
  * - Horizontal scroll for category pills
  */
 
-import React, { useState, useEffect, useMemo, useRef } from 'react'
+import _React, { useState, _useEffect, useMemo, useRef } from 'react';
 import {
   Search,
   Plus,
@@ -27,12 +27,12 @@ import {
   Target,
   Clock,
   Check,
-  Video,
+  _Video,
   Info,
-  X
-} from 'lucide-react'
-import VimeoPlayer from './VimeoPlayer'
-import useMediaQuery from '../../hooks/useMediaQuery'
+  X,
+} from 'lucide-react';
+import VimeoPlayer from './VimeoPlayer';
+import useMediaQuery from '../../hooks/useMediaQuery';
 
 const ExerciseLibrary = ({
   exercises = [],
@@ -43,26 +43,26 @@ const ExerciseLibrary = ({
   onDeleteExercise,
   selectedExercises = [],
   selectionMode = false,
-  loading = false
+  loading = false,
 }) => {
-  const { isMobile, isTablet, prefersReducedMotion } = useMediaQuery()
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('all')
-  const [selectedBodyRegion, setSelectedBodyRegion] = useState('all')
-  const [selectedDifficulty, setSelectedDifficulty] = useState('all')
-  const [viewMode, setViewMode] = useState(isMobile ? 'grid' : 'grid')
-  const [showFilters, setShowFilters] = useState(false)
-  const [videoExercise, setVideoExercise] = useState(null) // For video modal
-  const [detailExercise, setDetailExercise] = useState(null) // For detail modal
-  const categoryScrollRef = useRef(null)
+  const { isMobile, _isTablet, prefersReducedMotion } = useMediaQuery();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedBodyRegion, setSelectedBodyRegion] = useState('all');
+  const [selectedDifficulty, setSelectedDifficulty] = useState('all');
+  const [viewMode, setViewMode] = useState(isMobile ? 'grid' : 'grid');
+  const [showFilters, setShowFilters] = useState(false);
+  const [videoExercise, setVideoExercise] = useState(null); // For video modal
+  const [detailExercise, setDetailExercise] = useState(null); // For detail modal
+  const categoryScrollRef = useRef(null);
 
   // Difficulty levels with Norwegian translations
   const difficultyLevels = [
     { value: 'all', label: 'Alle nivåer', labelEn: 'All Levels' },
     { value: 'beginner', label: 'Nybegynner', labelEn: 'Beginner' },
     { value: 'intermediate', label: 'Middels', labelEn: 'Intermediate' },
-    { value: 'advanced', label: 'Avansert', labelEn: 'Advanced' }
-  ]
+    { value: 'advanced', label: 'Avansert', labelEn: 'Advanced' },
+  ];
 
   // Body regions for filtering
   const bodyRegions = [
@@ -74,83 +74,88 @@ const ExerciseLibrary = ({
     { value: 'Hip', label: 'Hofte' },
     { value: 'Knee', label: 'Kne' },
     { value: 'Core', label: 'Kjerne' },
-    { value: 'Balance', label: 'Balanse' }
-  ]
+    { value: 'Balance', label: 'Balanse' },
+  ];
 
   // Filter exercises
   const filteredExercises = useMemo(() => {
-    return exercises.filter(exercise => {
+    return exercises.filter((exercise) => {
       // Search filter
       if (searchTerm) {
-        const search = searchTerm.toLowerCase()
+        const search = searchTerm.toLowerCase();
         const matchesSearch =
           exercise.name?.toLowerCase().includes(search) ||
           exercise.name_norwegian?.toLowerCase().includes(search) ||
           exercise.description?.toLowerCase().includes(search) ||
-          exercise.category?.toLowerCase().includes(search)
-        if (!matchesSearch) return false
+          exercise.category?.toLowerCase().includes(search);
+        if (!matchesSearch) {
+          return false;
+        }
       }
 
       // Category filter
       if (selectedCategory !== 'all' && exercise.category !== selectedCategory) {
-        return false
+        return false;
       }
 
       // Body region filter
       if (selectedBodyRegion !== 'all' && exercise.body_region !== selectedBodyRegion) {
-        return false
+        return false;
       }
 
       // Difficulty filter
       if (selectedDifficulty !== 'all' && exercise.difficulty_level !== selectedDifficulty) {
-        return false
+        return false;
       }
 
-      return true
-    })
-  }, [exercises, searchTerm, selectedCategory, selectedBodyRegion, selectedDifficulty])
+      return true;
+    });
+  }, [exercises, searchTerm, selectedCategory, selectedBodyRegion, selectedDifficulty]);
 
   // Check if exercise is selected
   const isSelected = (exerciseId) => {
-    return selectedExercises.some(ex => ex.exerciseId === exerciseId || ex.id === exerciseId)
-  }
+    return selectedExercises.some((ex) => ex.exerciseId === exerciseId || ex.id === exerciseId);
+  };
 
   // Get difficulty color
   const getDifficultyColor = (level) => {
     switch (level) {
-      case 'beginner': return 'bg-green-100 text-green-800'
-      case 'intermediate': return 'bg-yellow-100 text-yellow-800'
-      case 'advanced': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'beginner':
+        return 'bg-green-100 text-green-800';
+      case 'intermediate':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'advanced':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
-  }
+  };
 
   // Get difficulty label
   const getDifficultyLabel = (level) => {
-    const found = difficultyLevels.find(d => d.value === level)
-    return found?.label || level
-  }
+    const found = difficultyLevels.find((d) => d.value === level);
+    return found?.label || level;
+  };
 
   // Handle exercise click
   const handleExerciseClick = (exercise) => {
     if (onSelectExercise) {
-      onSelectExercise(exercise)
+      onSelectExercise(exercise);
     }
-  }
+  };
 
   // Count active filters
-  const activeFilterCount = [
-    selectedBodyRegion !== 'all',
-    selectedDifficulty !== 'all'
-  ].filter(Boolean).length
+  const activeFilterCount = [selectedBodyRegion !== 'all', selectedDifficulty !== 'all'].filter(
+    Boolean
+  ).length;
 
   // Clear all filters
   const clearFilters = () => {
-    setSelectedCategory('all')
-    setSelectedBodyRegion('all')
-    setSelectedDifficulty('all')
-    setSearchTerm('')
-  }
+    setSelectedCategory('all');
+    setSelectedBodyRegion('all');
+    setSelectedDifficulty('all');
+    setSearchTerm('');
+  };
 
   return (
     <div className="h-full flex flex-col bg-white rounded-lg shadow-sm">
@@ -174,7 +179,9 @@ const ExerciseLibrary = ({
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-2 min-w-[40px] min-h-[40px] flex items-center justify-center ${
-                  viewMode === 'grid' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-50'
+                  viewMode === 'grid'
+                    ? 'bg-blue-50 text-blue-600'
+                    : 'text-gray-500 hover:bg-gray-50'
                 }`}
                 aria-label="Rutenettvisning"
               >
@@ -183,7 +190,9 @@ const ExerciseLibrary = ({
               <button
                 onClick={() => setViewMode('list')}
                 className={`p-2 min-w-[40px] min-h-[40px] flex items-center justify-center ${
-                  viewMode === 'list' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-50'
+                  viewMode === 'list'
+                    ? 'bg-blue-50 text-blue-600'
+                    : 'text-gray-500 hover:bg-gray-50'
                 }`}
                 aria-label="Listevisning"
               >
@@ -235,7 +244,7 @@ const ExerciseLibrary = ({
               >
                 Alle
               </button>
-              {categories.map(cat => (
+              {categories.map((cat) => (
                 <button
                   key={cat.category}
                   onClick={() => setSelectedCategory(cat.category)}
@@ -276,9 +285,11 @@ const ExerciseLibrary = ({
 
           {/* Extended Filters */}
           {showFilters && (
-            <div className={`flex flex-col sm:flex-row flex-wrap gap-3 pt-3 border-t border-gray-100 ${
-              prefersReducedMotion ? '' : 'animate-in slide-in-from-top-2'
-            }`}>
+            <div
+              className={`flex flex-col sm:flex-row flex-wrap gap-3 pt-3 border-t border-gray-100 ${
+                prefersReducedMotion ? '' : 'animate-in slide-in-from-top-2'
+              }`}
+            >
               {/* Body Region */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                 <label className="text-sm text-gray-600 font-medium">Område:</label>
@@ -287,7 +298,7 @@ const ExerciseLibrary = ({
                   onChange={(e) => setSelectedBodyRegion(e.target.value)}
                   className="px-3 py-2.5 sm:py-1.5 border border-gray-200 rounded-lg text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] sm:min-h-[36px]"
                 >
-                  {bodyRegions.map(region => (
+                  {bodyRegions.map((region) => (
                     <option key={region.value} value={region.value}>
                       {region.label}
                     </option>
@@ -303,7 +314,7 @@ const ExerciseLibrary = ({
                   onChange={(e) => setSelectedDifficulty(e.target.value)}
                   className="px-3 py-2.5 sm:py-1.5 border border-gray-200 rounded-lg text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] sm:min-h-[36px]"
                 >
-                  {difficultyLevels.map(level => (
+                  {difficultyLevels.map((level) => (
                     <option key={level.value} value={level.value}>
                       {level.label}
                     </option>
@@ -348,7 +359,7 @@ const ExerciseLibrary = ({
         ) : viewMode === 'grid' ? (
           /* Grid View - Responsive columns */
           <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-            {filteredExercises.map(exercise => (
+            {filteredExercises.map((exercise) => (
               <div
                 key={exercise.id}
                 onClick={() => handleExerciseClick(exercise)}
@@ -389,7 +400,9 @@ const ExerciseLibrary = ({
                     <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">
                       {exercise.category}
                     </span>
-                    <span className={`px-2 py-0.5 rounded text-xs ${getDifficultyColor(exercise.difficulty_level)}`}>
+                    <span
+                      className={`px-2 py-0.5 rounded text-xs ${getDifficultyColor(exercise.difficulty_level)}`}
+                    >
                       {getDifficultyLabel(exercise.difficulty_level)}
                     </span>
                   </div>
@@ -419,7 +432,10 @@ const ExerciseLibrary = ({
                   <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-100">
                     {exercise.video_url && (
                       <button
-                        onClick={(e) => { e.stopPropagation(); setVideoExercise(exercise); }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setVideoExercise(exercise);
+                        }}
                         className="flex items-center gap-1 px-3 py-2 text-xs text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors min-h-[36px] touch-manipulation"
                       >
                         <Play className="w-3.5 h-3.5" />
@@ -429,7 +445,10 @@ const ExerciseLibrary = ({
                     )}
                     {exercise.description && (
                       <button
-                        onClick={(e) => { e.stopPropagation(); setDetailExercise(exercise); }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDetailExercise(exercise);
+                        }}
                         className="flex items-center gap-1 px-3 py-2 text-xs text-gray-600 bg-gray-50 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors min-h-[36px] touch-manipulation"
                       >
                         <Info className="w-3.5 h-3.5" />
@@ -441,12 +460,17 @@ const ExerciseLibrary = ({
 
                 {/* Action Buttons - Show on hover (desktop) or always visible (mobile) */}
                 {!selectionMode && (onEditExercise || onDeleteExercise) && (
-                  <div className={`absolute top-2 right-2 flex gap-1 ${
-                    isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                  } transition-opacity`}>
+                  <div
+                    className={`absolute top-2 right-2 flex gap-1 ${
+                      isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                    } transition-opacity`}
+                  >
                     {onEditExercise && (
                       <button
-                        onClick={(e) => { e.stopPropagation(); onEditExercise(exercise); }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEditExercise(exercise);
+                        }}
                         className="p-2 bg-white rounded-full shadow hover:bg-gray-50 active:bg-gray-100 min-w-[36px] min-h-[36px] flex items-center justify-center touch-manipulation"
                         aria-label="Rediger"
                       >
@@ -455,7 +479,10 @@ const ExerciseLibrary = ({
                     )}
                     {onDeleteExercise && (
                       <button
-                        onClick={(e) => { e.stopPropagation(); onDeleteExercise(exercise); }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteExercise(exercise);
+                        }}
                         className="p-2 bg-white rounded-full shadow hover:bg-red-50 active:bg-red-100 min-w-[36px] min-h-[36px] flex items-center justify-center touch-manipulation"
                         aria-label="Slett"
                       >
@@ -470,7 +497,7 @@ const ExerciseLibrary = ({
         ) : (
           /* List View - Mobile optimized */
           <div className="space-y-2">
-            {filteredExercises.map(exercise => (
+            {filteredExercises.map((exercise) => (
               <div
                 key={exercise.id}
                 onClick={() => handleExerciseClick(exercise)}
@@ -482,11 +509,11 @@ const ExerciseLibrary = ({
               >
                 {/* Selection checkbox */}
                 {selectionMode && (
-                  <div className={`w-6 h-6 rounded border-2 flex items-center justify-center flex-shrink-0 ${
-                    isSelected(exercise.id)
-                      ? 'bg-blue-600 border-blue-600'
-                      : 'border-gray-300'
-                  }`}>
+                  <div
+                    className={`w-6 h-6 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+                      isSelected(exercise.id) ? 'bg-blue-600 border-blue-600' : 'border-gray-300'
+                    }`}
+                  >
                     {isSelected(exercise.id) && <Check className="w-4 h-4 text-white" />}
                   </div>
                 )}
@@ -516,21 +543,17 @@ const ExerciseLibrary = ({
                     <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">
                       {exercise.category}
                     </span>
-                    <span className={`px-2 py-0.5 rounded text-xs ${getDifficultyColor(exercise.difficulty_level)}`}>
+                    <span
+                      className={`px-2 py-0.5 rounded text-xs ${getDifficultyColor(exercise.difficulty_level)}`}
+                    >
                       {getDifficultyLabel(exercise.difficulty_level)}
                     </span>
                   </div>
                   {/* Parameters - Hidden on mobile to save space */}
                   <div className="hidden sm:flex items-center gap-3 mt-1 text-xs text-gray-500">
-                    {exercise.sets_default && (
-                      <span>{exercise.sets_default} sett</span>
-                    )}
-                    {exercise.reps_default && (
-                      <span>{exercise.reps_default} rep</span>
-                    )}
-                    {exercise.hold_seconds && (
-                      <span>{exercise.hold_seconds}s hold</span>
-                    )}
+                    {exercise.sets_default && <span>{exercise.sets_default} sett</span>}
+                    {exercise.reps_default && <span>{exercise.reps_default} rep</span>}
+                    {exercise.hold_seconds && <span>{exercise.hold_seconds}s hold</span>}
                   </div>
                 </div>
 
@@ -538,7 +561,10 @@ const ExerciseLibrary = ({
                 <div className="flex items-center gap-1 flex-shrink-0">
                   {exercise.video_url && (
                     <button
-                      onClick={(e) => { e.stopPropagation(); setVideoExercise(exercise); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setVideoExercise(exercise);
+                      }}
                       className="p-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center touch-manipulation"
                       aria-label="Se video"
                     >
@@ -547,7 +573,10 @@ const ExerciseLibrary = ({
                   )}
                   {exercise.description && (
                     <button
-                      onClick={(e) => { e.stopPropagation(); setDetailExercise(exercise); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDetailExercise(exercise);
+                      }}
                       className="p-2 text-gray-600 bg-gray-50 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center touch-manipulation"
                       aria-label="Vis detaljer"
                     >
@@ -561,7 +590,10 @@ const ExerciseLibrary = ({
                   <div className="hidden sm:flex gap-1 flex-shrink-0">
                     {onEditExercise && (
                       <button
-                        onClick={(e) => { e.stopPropagation(); onEditExercise(exercise); }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEditExercise(exercise);
+                        }}
                         className="p-2 hover:bg-gray-100 active:bg-gray-200 rounded-lg min-w-[40px] min-h-[40px] flex items-center justify-center touch-manipulation"
                         aria-label="Rediger"
                       >
@@ -570,7 +602,10 @@ const ExerciseLibrary = ({
                     )}
                     {onDeleteExercise && (
                       <button
-                        onClick={(e) => { e.stopPropagation(); onDeleteExercise(exercise); }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteExercise(exercise);
+                        }}
                         className="p-2 hover:bg-red-50 active:bg-red-100 rounded-lg min-w-[40px] min-h-[40px] flex items-center justify-center touch-manipulation"
                         aria-label="Slett"
                       >
@@ -643,7 +678,9 @@ const ExerciseLibrary = ({
                     {detailExercise.subcategory}
                   </span>
                 )}
-                <span className={`px-3 py-1.5 rounded-full text-sm ${getDifficultyColor(detailExercise.difficulty_level)}`}>
+                <span
+                  className={`px-3 py-1.5 rounded-full text-sm ${getDifficultyColor(detailExercise.difficulty_level)}`}
+                >
                   {getDifficultyLabel(detailExercise.difficulty_level)}
                 </span>
               </div>
@@ -657,28 +694,36 @@ const ExerciseLibrary = ({
               </div>
 
               {/* Parameters */}
-              {(detailExercise.sets_default || detailExercise.reps_default || detailExercise.hold_seconds) && (
+              {(detailExercise.sets_default ||
+                detailExercise.reps_default ||
+                detailExercise.hold_seconds) && (
                 <div className="mt-4 pt-4 border-t border-gray-100">
                   <h4 className="text-sm font-medium text-gray-700 mb-3">Standard parametere</h4>
                   <div className="grid grid-cols-3 gap-3 text-sm">
                     {detailExercise.sets_default && (
                       <div className="flex flex-col items-center p-3 bg-gray-50 rounded-lg">
                         <Target className="w-5 h-5 text-blue-500 mb-1" />
-                        <span className="font-semibold text-gray-900">{detailExercise.sets_default}</span>
+                        <span className="font-semibold text-gray-900">
+                          {detailExercise.sets_default}
+                        </span>
                         <span className="text-xs text-gray-500">sett</span>
                       </div>
                     )}
                     {detailExercise.reps_default && (
                       <div className="flex flex-col items-center p-3 bg-gray-50 rounded-lg">
                         <Activity className="w-5 h-5 text-green-500 mb-1" />
-                        <span className="font-semibold text-gray-900">{detailExercise.reps_default}</span>
+                        <span className="font-semibold text-gray-900">
+                          {detailExercise.reps_default}
+                        </span>
                         <span className="text-xs text-gray-500">repetisjoner</span>
                       </div>
                     )}
                     {detailExercise.hold_seconds && (
                       <div className="flex flex-col items-center p-3 bg-gray-50 rounded-lg">
                         <Clock className="w-5 h-5 text-orange-500 mb-1" />
-                        <span className="font-semibold text-gray-900">{detailExercise.hold_seconds}</span>
+                        <span className="font-semibold text-gray-900">
+                          {detailExercise.hold_seconds}
+                        </span>
                         <span className="text-xs text-gray-500">sek hold</span>
                       </div>
                     )}
@@ -692,11 +737,18 @@ const ExerciseLibrary = ({
               className={`p-4 border-t border-gray-200 bg-gray-50 ${
                 isMobile ? 'flex flex-col gap-2' : 'flex items-center justify-between'
               }`}
-              style={{ paddingBottom: isMobile ? 'calc(env(safe-area-inset-bottom, 0px) + 1rem)' : undefined }}
+              style={{
+                paddingBottom: isMobile
+                  ? 'calc(env(safe-area-inset-bottom, 0px) + 1rem)'
+                  : undefined,
+              }}
             >
               {onSelectExercise && (
                 <button
-                  onClick={() => { onSelectExercise(detailExercise); setDetailExercise(null); }}
+                  onClick={() => {
+                    onSelectExercise(detailExercise);
+                    setDetailExercise(null);
+                  }}
                   className={`flex items-center justify-center gap-2 px-4 py-3 sm:py-2 rounded-lg transition-colors min-h-[48px] sm:min-h-[44px] touch-manipulation font-medium ${
                     isMobile ? 'w-full order-1' : ''
                   } ${
@@ -720,7 +772,10 @@ const ExerciseLibrary = ({
               )}
               {detailExercise.video_url && (
                 <button
-                  onClick={() => { setDetailExercise(null); setVideoExercise(detailExercise); }}
+                  onClick={() => {
+                    setDetailExercise(null);
+                    setVideoExercise(detailExercise);
+                  }}
                   className={`flex items-center justify-center gap-2 px-4 py-3 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors min-h-[48px] sm:min-h-[44px] touch-manipulation font-medium ${
                     isMobile ? 'w-full order-2' : ''
                   }`}
@@ -735,7 +790,7 @@ const ExerciseLibrary = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default ExerciseLibrary
+export default ExerciseLibrary;

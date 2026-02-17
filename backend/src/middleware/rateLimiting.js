@@ -21,7 +21,7 @@ export const generalLimiter = rateLimit({
     code: 'RATE_LIMIT_EXCEEDED',
     message: 'Too many requests from this IP, please try again later',
   },
-  handler: (req, res) => {
+  handler: (req, _res) => {
     logger.warn('Rate limit exceeded', {
       ip: req.ip,
       path: req.path,
@@ -40,10 +40,9 @@ export const smsLimiter = rateLimit({
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => {
+  keyGenerator: (req) =>
     // Rate limit per user (not IP)
-    return req.user?.id || req.ip;
-  },
+    req.user?.id || req.ip,
   message: {
     error: 'SMSRateLimitError',
     code: 'SMS_RATE_LIMIT_EXCEEDED',
@@ -53,7 +52,7 @@ export const smsLimiter = rateLimit({
       window: '1 hour',
     },
   },
-  handler: (req, res) => {
+  handler: (req, _res) => {
     logger.warn('SMS rate limit exceeded', {
       userId: req.user?.id,
       patientId: req.body?.patient_id,
@@ -61,10 +60,9 @@ export const smsLimiter = rateLimit({
     });
     throw new RateLimitError(req.rateLimit.resetTime);
   },
-  skip: (req) => {
+  skip: (req) =>
     // Skip rate limiting for admins in development
-    return process.env.NODE_ENV === 'development' && req.user?.role === 'ADMIN';
-  },
+    process.env.NODE_ENV === 'development' && req.user?.role === 'ADMIN',
 });
 
 /**
@@ -76,9 +74,7 @@ export const emailLimiter = rateLimit({
   max: 20,
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => {
-    return req.user?.id || req.ip;
-  },
+  keyGenerator: (req) => req.user?.id || req.ip,
   message: {
     error: 'EmailRateLimitError',
     code: 'EMAIL_RATE_LIMIT_EXCEEDED',
@@ -88,7 +84,7 @@ export const emailLimiter = rateLimit({
       window: '1 hour',
     },
   },
-  handler: (req, res) => {
+  handler: (req, _res) => {
     logger.warn('Email rate limit exceeded', {
       userId: req.user?.id,
       patientId: req.body?.patient_id,
@@ -96,9 +92,7 @@ export const emailLimiter = rateLimit({
     });
     throw new RateLimitError(req.rateLimit.resetTime);
   },
-  skip: (req) => {
-    return process.env.NODE_ENV === 'development' && req.user?.role === 'ADMIN';
-  },
+  skip: (req) => process.env.NODE_ENV === 'development' && req.user?.role === 'ADMIN',
 });
 
 /**
@@ -126,7 +120,7 @@ export const perPatientLimiter = rateLimit({
       window: '24 hours',
     },
   },
-  handler: (req, res) => {
+  handler: (req, _res) => {
     logger.warn('Per-patient communication limit exceeded', {
       userId: req.user?.id,
       patientId: req.body?.patient_id || req.params?.patientId,
@@ -134,10 +128,9 @@ export const perPatientLimiter = rateLimit({
     });
     throw new RateLimitError(req.rateLimit.resetTime);
   },
-  skip: (req) => {
+  skip: (req) =>
     // Skip if no patient_id (shouldn't happen with proper validation)
-    return !req.body?.patient_id && !req.params?.patientId;
-  },
+    !req.body?.patient_id && !req.params?.patientId,
 });
 
 /**
@@ -171,9 +164,7 @@ export const strictLimiter = rateLimit({
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => {
-    return req.user?.id || req.ip;
-  },
+  keyGenerator: (req) => req.user?.id || req.ip,
   message: {
     error: 'StrictRateLimitError',
     code: 'STRICT_RATE_LIMIT_EXCEEDED',

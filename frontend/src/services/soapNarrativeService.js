@@ -92,8 +92,12 @@ const LABELS = {
  * Format a SOAP field value, handling both string and array inputs
  */
 function formatFieldValue(value) {
-  if (!value) return '';
-  if (Array.isArray(value)) return value.filter(Boolean).join(', ');
+  if (!value) {
+    return '';
+  }
+  if (Array.isArray(value)) {
+    return value.filter(Boolean).join(', ');
+  }
   return String(value).trim();
 }
 
@@ -102,7 +106,9 @@ function formatFieldValue(value) {
  */
 function labeledLine(label, value) {
   const formatted = formatFieldValue(value);
-  if (!formatted) return null;
+  if (!formatted) {
+    return null;
+  }
   return `${label}: ${formatted}`;
 }
 
@@ -157,7 +163,9 @@ export function generateNarrative(soapData, options = {}) {
     ]
       .filter(Boolean)
       .join(separator);
-    if (header) parts.push(header);
+    if (header) {
+      parts.push(header);
+    }
   }
 
   // --- SUBJECTIVE ---
@@ -172,9 +180,9 @@ export function generateNarrative(soapData, options = {}) {
   ].filter(Boolean);
 
   // VAS pain
-  if (soapData.vas_pain_start != null) {
+  if (soapData.vas_pain_start !== null && soapData.vas_pain_start !== undefined) {
     const vasLine =
-      soapData.vas_pain_end != null
+      soapData.vas_pain_end !== null && soapData.vas_pain_end !== undefined
         ? `${t.vasPain}: ${soapData.vas_pain_start}/10 -> ${soapData.vas_pain_end}/10`
         : `${t.vasPain}: ${soapData.vas_pain_start}/10`;
     subjLines.push(vasLine);
@@ -211,7 +219,7 @@ export function generateNarrative(soapData, options = {}) {
     labeledLine(t.clinicalReasoning, assess.clinical_reasoning),
     labeledLine(t.differentialDiagnosis, assess.differential_diagnosis),
     labeledLine(t.prognosis, assess.prognosis),
-    assess.red_flags_checked != null
+    assess.red_flags_checked !== null && assess.red_flags_checked !== undefined
       ? `${t.redFlagsChecked}: ${assess.red_flags_checked ? t.yes : t.no}`
       : null,
   ].filter(Boolean);
@@ -271,13 +279,16 @@ export function generateNarrative(soapData, options = {}) {
  * Generate a brief one-line summary of the encounter
  * Useful for encounter lists, SALT banners, etc.
  */
-export function generateBriefSummary(soapData, language = 'no') {
+export function generateBriefSummary(soapData, _language = 'no') {
   const complaint = soapData.subjective?.chief_complaint || '';
   const diagnosis = (soapData.icpc_codes || []).map((c) => c.code).join(', ');
   const vas =
-    soapData.vas_pain_start != null
-      ? `VAS ${soapData.vas_pain_start}` +
-        (soapData.vas_pain_end != null ? `->${soapData.vas_pain_end}` : '')
+    soapData.vas_pain_start !== null && soapData.vas_pain_start !== undefined
+      ? `VAS ${soapData.vas_pain_start}${
+          soapData.vas_pain_end !== null && soapData.vas_pain_end !== undefined
+            ? `->${soapData.vas_pain_end}`
+            : ''
+        }`
       : '';
 
   return [complaint, diagnosis, vas].filter(Boolean).join(' | ');

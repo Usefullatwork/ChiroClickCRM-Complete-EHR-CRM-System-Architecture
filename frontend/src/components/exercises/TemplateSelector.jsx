@@ -5,7 +5,7 @@
  * Select and load predefined exercise program templates
  */
 
-import React, { useState, useMemo } from 'react'
+import _React, { useState, useMemo } from 'react';
 import {
   FileText,
   Search,
@@ -14,14 +14,14 @@ import {
   Dumbbell,
   ChevronRight,
   Star,
-  StarOff,
-  Plus,
-  Check,
+  _StarOff,
+  _Plus,
+  _Check,
   X,
   Loader2,
   Save,
-  AlertCircle
-} from 'lucide-react'
+  _AlertCircle,
+} from 'lucide-react';
 
 /**
  * TemplateSelector Component
@@ -39,57 +39,61 @@ const TemplateSelector = ({
   onSelectTemplate,
   onSaveAsTemplate,
   currentExercises = [],
-  loading = false
+  loading = false,
 }) => {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('all')
-  const [showSaveModal, setShowSaveModal] = useState(false)
-  const [newTemplateName, setNewTemplateName] = useState('')
-  const [newTemplateCategory, setNewTemplateCategory] = useState('')
-  const [newTemplateDescription, setNewTemplateDescription] = useState('')
-  const [saving, setSaving] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [newTemplateName, setNewTemplateName] = useState('');
+  const [newTemplateCategory, setNewTemplateCategory] = useState('');
+  const [newTemplateDescription, setNewTemplateDescription] = useState('');
+  const [saving, setSaving] = useState(false);
 
   // Extract unique categories from templates
   const categories = useMemo(() => {
-    const cats = [...new Set(templates.map(t => t.category).filter(Boolean))]
-    return cats.sort()
-  }, [templates])
+    const cats = [...new Set(templates.map((t) => t.category).filter(Boolean))];
+    return cats.sort();
+  }, [templates]);
 
   // Filter templates based on search and category
   const filteredTemplates = useMemo(() => {
-    return templates.filter(template => {
+    return templates.filter((template) => {
       // Search filter
       if (searchTerm) {
-        const search = searchTerm.toLowerCase()
+        const search = searchTerm.toLowerCase();
         const matchesSearch =
           template.name?.toLowerCase().includes(search) ||
           template.description?.toLowerCase().includes(search) ||
-          template.category?.toLowerCase().includes(search)
-        if (!matchesSearch) return false
+          template.category?.toLowerCase().includes(search);
+        if (!matchesSearch) {
+          return false;
+        }
       }
 
       // Category filter
       if (selectedCategory !== 'all' && template.category !== selectedCategory) {
-        return false
+        return false;
       }
 
-      return true
-    })
-  }, [templates, searchTerm, selectedCategory])
+      return true;
+    });
+  }, [templates, searchTerm, selectedCategory]);
 
   // Handle template selection
   const handleSelectTemplate = (template) => {
     if (onSelectTemplate) {
-      onSelectTemplate(template)
+      onSelectTemplate(template);
     }
-  }
+  };
 
   // Handle save as template
   const handleSaveAsTemplate = async () => {
-    if (!newTemplateName.trim()) return
+    if (!newTemplateName.trim()) {
+      return;
+    }
 
     try {
-      setSaving(true)
+      setSaving(true);
       await onSaveAsTemplate({
         name: newTemplateName,
         category: newTemplateCategory || 'Egendefinert',
@@ -101,29 +105,31 @@ const TemplateSelector = ({
           holdSeconds: ex.holdSeconds,
           frequencyPerDay: ex.frequencyPerDay,
           frequencyPerWeek: ex.frequencyPerWeek,
-          displayOrder: index
-        }))
-      })
-      setShowSaveModal(false)
-      setNewTemplateName('')
-      setNewTemplateCategory('')
-      setNewTemplateDescription('')
+          displayOrder: index,
+        })),
+      });
+      setShowSaveModal(false);
+      setNewTemplateName('');
+      setNewTemplateCategory('');
+      setNewTemplateDescription('');
     } catch (error) {
-      console.error('Error saving template:', error)
+      console.error('Error saving template:', error);
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   // Get estimated time for a template
   const getEstimatedTime = (template) => {
-    if (!template.exercises) return 0
+    if (!template.exercises) {
+      return 0;
+    }
     return template.exercises.reduce((total, ex) => {
-      const setsTime = (ex.sets || 3) * (ex.reps || 10) * 3
-      const holdTime = (ex.holdSeconds || 0) * (ex.sets || 3)
-      return total + setsTime + holdTime + 30
-    }, 0)
-  }
+      const setsTime = (ex.sets || 3) * (ex.reps || 10) * 3;
+      const holdTime = (ex.holdSeconds || 0) * (ex.sets || 3);
+      return total + setsTime + holdTime + 30;
+    }, 0);
+  };
 
   return (
     <div className="bg-white rounded-lg border border-gray-200">
@@ -177,7 +183,7 @@ const TemplateSelector = ({
           >
             Alle maler
           </button>
-          {categories.map(cat => (
+          {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
@@ -207,13 +213,12 @@ const TemplateSelector = ({
             <p className="text-sm text-gray-400 text-center mt-1">
               {searchTerm
                 ? 'Prøv å endre søkekriteriene'
-                : 'Lag et program og lagre det som mal for å komme i gang'
-              }
+                : 'Lag et program og lagre det som mal for å komme i gang'}
             </p>
           </div>
         ) : (
           <div className="divide-y divide-gray-100">
-            {filteredTemplates.map(template => (
+            {filteredTemplates.map((template) => (
               <button
                 key={template.id}
                 onClick={() => handleSelectTemplate(template)}
@@ -223,9 +228,7 @@ const TemplateSelector = ({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <FileText className="w-4 h-4 text-purple-500 flex-shrink-0" />
-                      <h3 className="font-medium text-gray-900 truncate">
-                        {template.name}
-                      </h3>
+                      <h3 className="font-medium text-gray-900 truncate">{template.name}</h3>
                       {template.isFavorite && (
                         <Star className="w-4 h-4 text-yellow-500 fill-current" />
                       )}
@@ -244,8 +247,8 @@ const TemplateSelector = ({
                         {template.exercises?.length || 0} øvelser
                       </span>
                       <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        ~{Math.ceil(getEstimatedTime(template) / 60)} min
+                        <Clock className="w-3 h-3" />~{Math.ceil(getEstimatedTime(template) / 60)}{' '}
+                        min
                       </span>
                     </div>
                   </div>
@@ -261,7 +264,8 @@ const TemplateSelector = ({
       {templates.length > 0 && (
         <div className="p-3 bg-purple-50 border-t border-purple-200 text-sm text-purple-700">
           <p>
-            <strong>{templates.length}</strong> maler tilgjengelig. Klikk for å laste inn et program.
+            <strong>{templates.length}</strong> maler tilgjengelig. Klikk for å laste inn et
+            program.
           </p>
         </div>
       )}
@@ -272,15 +276,10 @@ const TemplateSelector = ({
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
           onClick={() => setShowSaveModal(false)}
         >
-          <div
-            className="bg-white rounded-xl max-w-md w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="bg-white rounded-xl max-w-md w-full" onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Lagre som mal
-              </h3>
+              <h3 className="text-lg font-semibold text-gray-900">Lagre som mal</h3>
               <button
                 onClick={() => setShowSaveModal(false)}
                 className="p-2 hover:bg-gray-100 rounded-lg"
@@ -305,9 +304,7 @@ const TemplateSelector = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Kategori
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
                 <input
                   type="text"
                   value={newTemplateCategory}
@@ -318,9 +315,7 @@ const TemplateSelector = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Beskrivelse
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Beskrivelse</label>
                 <textarea
                   value={newTemplateDescription}
                   onChange={(e) => setNewTemplateDescription(e.target.value)}
@@ -367,7 +362,7 @@ const TemplateSelector = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default TemplateSelector
+export default TemplateSelector;

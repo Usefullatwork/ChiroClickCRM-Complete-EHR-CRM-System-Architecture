@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { Command, ChevronRight, X, Search, Star, Plus } from 'lucide-react';
+import { Command, ChevronRight, _X, _Search, _Star, _Plus } from 'lucide-react';
 
 /**
  * SlashCommands - Jane App-style text expansion system
@@ -22,49 +22,49 @@ const DEFAULT_COMMANDS = {
     category: 'Subjective',
     label: 'Patient Better',
     text: 'Patient reports improvement in symptoms since the last visit.',
-    aliases: ['/improved', '/improving']
+    aliases: ['/improved', '/improving'],
   },
   '/same': {
     category: 'Subjective',
     label: 'No Change',
     text: 'Patient reports no significant change in symptoms since the last visit.',
-    aliases: ['/nochange', '/unchanged']
+    aliases: ['/nochange', '/unchanged'],
   },
   '/worse': {
     category: 'Subjective',
     label: 'Patient Worse',
     text: 'Patient reports worsening of symptoms since the last visit.',
-    aliases: ['/worsening']
+    aliases: ['/worsening'],
   },
   '/50better': {
     category: 'Subjective',
     label: '50% Improvement',
     text: 'Patient reports approximately 50% improvement in symptoms since the last visit.',
-    aliases: ['/50', '/halfbetter']
+    aliases: ['/50', '/halfbetter'],
   },
   '/75better': {
     category: 'Subjective',
     label: '75% Improvement',
     text: 'Patient reports approximately 75% improvement in symptoms since the last visit.',
-    aliases: ['/75']
+    aliases: ['/75'],
   },
   '/25better': {
     category: 'Subjective',
     label: '25% Improvement',
     text: 'Patient reports approximately 25% improvement in symptoms since the last visit.',
-    aliases: ['/25']
+    aliases: ['/25'],
   },
   '/newcomplaint': {
     category: 'Subjective',
     label: 'New Complaint',
     text: 'Patient presents with a new complaint in addition to the ongoing condition being treated.',
-    aliases: ['/new', '/nc']
+    aliases: ['/new', '/nc'],
   },
   '/compliant': {
     category: 'Subjective',
     label: 'Compliant with HEP',
     text: 'Patient reports compliance with home exercise program and treatment recommendations.',
-    aliases: ['/hep']
+    aliases: ['/hep'],
   },
 
   // Objective shortcuts
@@ -72,49 +72,49 @@ const DEFAULT_COMMANDS = {
     category: 'Objective',
     label: 'Normal Exam',
     text: 'All orthopedic and neurological tests were within normal limits.',
-    aliases: ['/wnl', '/neg']
+    aliases: ['/wnl', '/neg'],
   },
   '/neuro': {
     category: 'Objective',
     label: 'Neuro Intact',
     text: 'Neurological examination: Deep tendon reflexes 2+ and symmetric bilaterally. Dermatomal sensation intact. Myotomal strength 5/5 throughout. No pathological reflexes noted.',
-    aliases: ['/neurointact', '/dtrs']
+    aliases: ['/neurointact', '/dtrs'],
   },
   '/spasm': {
     category: 'Objective',
     label: 'Muscle Spasm',
     text: 'Palpation revealed significant muscle spasm and hypertonicity in the paraspinal musculature.',
-    aliases: ['/hypertonicity']
+    aliases: ['/hypertonicity'],
   },
   '/sublux': {
     category: 'Objective',
     label: 'Subluxation Found',
     text: 'Palpation revealed vertebral subluxation with associated segmental joint dysfunction, point tenderness, muscle hypertonicity, and capsular swelling.',
-    aliases: ['/subluxation', '/vsc']
+    aliases: ['/subluxation', '/vsc'],
   },
   '/restricted': {
     category: 'Objective',
     label: 'Restricted ROM',
     text: 'Range of motion testing revealed restriction with pain noted at end range.',
-    aliases: ['/rom']
+    aliases: ['/rom'],
   },
   '/trigger': {
     category: 'Objective',
     label: 'Trigger Points',
     text: 'Multiple trigger points identified in the affected musculature with characteristic referred pain pattern.',
-    aliases: ['/tp', '/triggers']
+    aliases: ['/tp', '/triggers'],
   },
   '/posture': {
     category: 'Objective',
     label: 'Postural Analysis',
     text: 'Postural analysis revealed deviation from normal alignment with compensatory changes noted throughout the kinetic chain.',
-    aliases: ['/postural']
+    aliases: ['/postural'],
   },
   '/gait': {
     category: 'Objective',
     label: 'Gait Normal',
     text: 'Gait analysis revealed normal ambulation pattern without antalgic deviation.',
-    aliases: ['/gaitnormal']
+    aliases: ['/gaitnormal'],
   },
 
   // Assessment shortcuts
@@ -122,25 +122,25 @@ const DEFAULT_COMMANDS = {
     category: 'Assessment',
     label: 'Mechanical MSK',
     text: 'Clinical presentation consistent with mechanical musculoskeletal dysfunction. Responding well to conservative chiropractic care.',
-    aliases: ['/mechanical']
+    aliases: ['/mechanical'],
   },
   '/radicular': {
     category: 'Assessment',
     label: 'Radiculopathy',
     text: 'Clinical presentation consistent with radiculopathy with positive nerve tension signs and dermatomal findings. Monitor for progression.',
-    aliases: ['/radiculopathy']
+    aliases: ['/radiculopathy'],
   },
   '/cervicogenic': {
     category: 'Assessment',
     label: 'Cervicogenic HA',
     text: 'Clinical presentation consistent with cervicogenic headache secondary to upper cervical joint dysfunction.',
-    aliases: ['/cha', '/headache']
+    aliases: ['/cha', '/headache'],
   },
   '/prognosis': {
     category: 'Assessment',
     label: 'Good Prognosis',
     text: 'Prognosis is good with continued conservative care and patient compliance with treatment recommendations.',
-    aliases: ['/prog', '/goodprog']
+    aliases: ['/prog', '/goodprog'],
   },
 
   // Plan shortcuts
@@ -148,61 +148,61 @@ const DEFAULT_COMMANDS = {
     category: 'Plan',
     label: 'Continue Plan',
     text: 'Continue current treatment plan. Patient to return for follow-up visit as scheduled.',
-    aliases: ['/continue', '/ctp']
+    aliases: ['/continue', '/ctp'],
   },
   '/2x': {
     category: 'Plan',
     label: '2x per week',
     text: 'Recommend treatment frequency of 2 times per week for the next 2-4 weeks.',
-    aliases: ['/2xweek', '/twice']
+    aliases: ['/2xweek', '/twice'],
   },
   '/3x': {
     category: 'Plan',
     label: '3x per week',
     text: 'Recommend treatment frequency of 3 times per week during the acute phase.',
-    aliases: ['/3xweek', '/thrice']
+    aliases: ['/3xweek', '/thrice'],
   },
   '/1x': {
     category: 'Plan',
     label: '1x per week',
     text: 'Recommend treatment frequency of 1 time per week for maintenance care.',
-    aliases: ['/1xweek', '/weekly', '/maintenance']
+    aliases: ['/1xweek', '/weekly', '/maintenance'],
   },
   '/prn': {
     category: 'Plan',
     label: 'PRN',
     text: 'Patient may return on an as-needed basis for symptom management and wellness care.',
-    aliases: ['/asneeded']
+    aliases: ['/asneeded'],
   },
   '/reeval': {
     category: 'Plan',
     label: 'Re-evaluation',
     text: 'Re-evaluation scheduled in 30 days to assess progress and adjust treatment plan as needed.',
-    aliases: ['/reexam', '/30day']
+    aliases: ['/reexam', '/30day'],
   },
   '/refer': {
     category: 'Plan',
     label: 'Referral',
     text: 'Referral made to [SPECIALIST] for further evaluation and co-management.',
-    aliases: ['/referral']
+    aliases: ['/referral'],
   },
   '/imaging': {
     category: 'Plan',
     label: 'Imaging Ordered',
     text: 'Diagnostic imaging ordered to further evaluate the condition. X-ray / MRI of [REGION].',
-    aliases: ['/xray', '/mri']
+    aliases: ['/xray', '/mri'],
   },
   '/discharge': {
     category: 'Plan',
     label: 'Discharge',
     text: 'Patient has reached maximum therapeutic benefit and is discharged from active care. May return as needed for future episodes.',
-    aliases: ['/dc', '/mmb']
+    aliases: ['/dc', '/mmb'],
   },
   '/goals': {
     category: 'Plan',
     label: 'Goals Met',
     text: 'Patient has met treatment goals including: decreased pain, improved ROM, improved function, and return to normal activities.',
-    aliases: ['/goalsmet']
+    aliases: ['/goalsmet'],
   },
 
   // Treatment shortcuts
@@ -210,55 +210,55 @@ const DEFAULT_COMMANDS = {
     category: 'Treatment',
     label: 'Adjustment',
     text: 'Spinal adjustment performed. Patient tolerated the adjustment well with no adverse reaction.',
-    aliases: ['/adjusted', '/manipulation']
+    aliases: ['/adjusted', '/manipulation'],
   },
   '/estim': {
     category: 'Treatment',
     label: 'E-Stim',
     text: 'Electrical muscle stimulation applied to the affected area for 15 minutes to reduce muscle spasm and promote healing.',
-    aliases: ['/ems', '/tens']
+    aliases: ['/ems', '/tens'],
   },
   '/ultrasound': {
     category: 'Treatment',
     label: 'Ultrasound',
     text: 'Therapeutic ultrasound applied to the affected area at 1.0 W/cm² for 5 minutes to promote tissue healing.',
-    aliases: ['/us']
+    aliases: ['/us'],
   },
   '/heat': {
     category: 'Treatment',
     label: 'Heat Therapy',
     text: 'Moist heat therapy applied for 15 minutes to increase circulation and relax muscle tissue.',
-    aliases: ['/hp', '/hotpack']
+    aliases: ['/hp', '/hotpack'],
   },
   '/ice': {
     category: 'Treatment',
     label: 'Ice Therapy',
     text: 'Cryotherapy applied for 15 minutes to reduce inflammation and provide analgesic effect.',
-    aliases: ['/cryo', '/coldpack']
+    aliases: ['/cryo', '/coldpack'],
   },
   '/stretch': {
     category: 'Treatment',
     label: 'Stretching',
     text: 'Therapeutic stretching performed to improve flexibility and reduce muscle tension. – 8 minutes',
-    aliases: ['/stretching']
+    aliases: ['/stretching'],
   },
   '/massage': {
     category: 'Treatment',
     label: 'Massage',
     text: 'Therapeutic massage performed to reduce muscle tension and improve circulation. – 15 minutes',
-    aliases: ['/softissue']
+    aliases: ['/softissue'],
   },
   '/traction': {
     category: 'Treatment',
     label: 'Traction',
     text: 'Mechanical traction applied at appropriate poundage for 15 minutes to decompress spinal segments.',
-    aliases: ['/decompression']
+    aliases: ['/decompression'],
   },
   '/tolerated': {
     category: 'Treatment',
     label: 'Tolerated Well',
     text: 'Patient tolerated all procedures well with no adverse reactions noted.',
-    aliases: ['/tol', '/noadverse']
+    aliases: ['/tol', '/noadverse'],
   },
 
   // Response shortcuts
@@ -266,32 +266,32 @@ const DEFAULT_COMMANDS = {
     category: 'Response',
     label: 'Good Response',
     text: 'Patient demonstrated good response to treatment with improved range of motion and decreased pain.',
-    aliases: ['/gr', '/improved']
+    aliases: ['/gr', '/improved'],
   },
   '/excellent': {
     category: 'Response',
     label: 'Excellent Response',
     text: 'Patient demonstrated excellent response to treatment with significant symptomatic improvement.',
-    aliases: ['/exc']
+    aliases: ['/exc'],
   },
   '/fair': {
     category: 'Response',
     label: 'Fair Response',
     text: 'Patient demonstrated fair response to treatment with mild improvement noted. May require treatment modification.',
-    aliases: ['/fr']
+    aliases: ['/fr'],
   },
   '/poor': {
     category: 'Response',
     label: 'Poor Response',
     text: 'Patient demonstrated poor response to current treatment approach. Treatment plan modification indicated.',
-    aliases: ['/pr', '/noresponse']
+    aliases: ['/pr', '/noresponse'],
   },
   '/soreness': {
     category: 'Response',
     label: 'Post-Tx Soreness',
     text: 'Patient advised that mild post-treatment soreness may occur for 24-48 hours. Ice application recommended as needed.',
-    aliases: ['/posttx']
-  }
+    aliases: ['/posttx'],
+  },
 };
 
 // Get all commands including aliases
@@ -300,7 +300,7 @@ function getAllCommandsWithAliases(commands) {
   Object.entries(commands).forEach(([cmd, data]) => {
     all[cmd] = data;
     if (data.aliases) {
-      data.aliases.forEach(alias => {
+      data.aliases.forEach((alias) => {
         all[alias] = { ...data, isAlias: true, mainCommand: cmd };
       });
     }
@@ -315,48 +315,49 @@ export function useSlashCommands(customCommands = {}) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  const allCommands = useMemo(() =>
-    getAllCommandsWithAliases({ ...DEFAULT_COMMANDS, ...customCommands }),
+  const allCommands = useMemo(
+    () => getAllCommandsWithAliases({ ...DEFAULT_COMMANDS, ...customCommands }),
     [customCommands]
   );
 
   const filteredCommands = useMemo(() => {
-    if (!searchTerm) return [];
+    if (!searchTerm) {
+      return [];
+    }
     const search = searchTerm.toLowerCase();
     return Object.entries(allCommands)
       .filter(([cmd]) => cmd.toLowerCase().includes(search))
       .slice(0, 10);
   }, [searchTerm, allCommands]);
 
-  const handleKeyDown = useCallback((e, textareaRef, value, onChange) => {
-    if (showMenu) {
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        setSelectedIndex(prev =>
-          prev < filteredCommands.length - 1 ? prev + 1 : 0
-        );
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        setSelectedIndex(prev =>
-          prev > 0 ? prev - 1 : filteredCommands.length - 1
-        );
-      } else if (e.key === 'Enter' || e.key === 'Tab') {
-        if (filteredCommands.length > 0) {
+  const handleKeyDown = useCallback(
+    (e, textareaRef, value, onChange) => {
+      if (showMenu) {
+        if (e.key === 'ArrowDown') {
           e.preventDefault();
-          const [cmd, data] = filteredCommands[selectedIndex];
-          // Replace the slash command with the text
-          const beforeSlash = value.substring(0, value.lastIndexOf('/'));
-          const afterCursor = value.substring(textareaRef.current?.selectionEnd || value.length);
-          onChange(beforeSlash + data.text + afterCursor);
+          setSelectedIndex((prev) => (prev < filteredCommands.length - 1 ? prev + 1 : 0));
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          setSelectedIndex((prev) => (prev > 0 ? prev - 1 : filteredCommands.length - 1));
+        } else if (e.key === 'Enter' || e.key === 'Tab') {
+          if (filteredCommands.length > 0) {
+            e.preventDefault();
+            const [_cmd, data] = filteredCommands[selectedIndex];
+            // Replace the slash command with the text
+            const beforeSlash = value.substring(0, value.lastIndexOf('/'));
+            const afterCursor = value.substring(textareaRef.current?.selectionEnd || value.length);
+            onChange(beforeSlash + data.text + afterCursor);
+            setShowMenu(false);
+            setSearchTerm('');
+          }
+        } else if (e.key === 'Escape') {
           setShowMenu(false);
           setSearchTerm('');
         }
-      } else if (e.key === 'Escape') {
-        setShowMenu(false);
-        setSearchTerm('');
       }
-    }
-  }, [showMenu, filteredCommands, selectedIndex]);
+    },
+    [showMenu, filteredCommands, selectedIndex]
+  );
 
   const handleChange = useCallback((e, onChange) => {
     const value = e.target.value;
@@ -379,7 +380,7 @@ export function useSlashCommands(customCommands = {}) {
         const rect = textarea.getBoundingClientRect();
         setMenuPosition({
           top: rect.bottom + window.scrollY,
-          left: rect.left + window.scrollX
+          left: rect.left + window.scrollX,
         });
       } else {
         setShowMenu(false);
@@ -415,19 +416,12 @@ export function useSlashCommands(customCommands = {}) {
     closeMenu: () => {
       setShowMenu(false);
       setSearchTerm('');
-    }
+    },
   };
 }
 
 // Slash Commands Menu Component
-export function SlashCommandMenu({
-  show,
-  position,
-  commands,
-  selectedIndex,
-  onSelect,
-  onClose
-}) {
+export function SlashCommandMenu({ show, position, commands, selectedIndex, onSelect, onClose }) {
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -444,7 +438,9 @@ export function SlashCommandMenu({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [show, onClose]);
 
-  if (!show || commands.length === 0) return null;
+  if (!show || commands.length === 0) {
+    return null;
+  }
 
   // Group commands by category
   const grouped = {};
@@ -469,24 +465,17 @@ export function SlashCommandMenu({
 
       {Object.entries(grouped).map(([category, items]) => (
         <div key={category}>
-          <div className="px-3 py-1 text-xs font-medium text-gray-500 bg-gray-50">
-            {category}
-          </div>
+          <div className="px-3 py-1 text-xs font-medium text-gray-500 bg-gray-50">{category}</div>
           {items.map(({ cmd, data, index }) => (
             <button
               key={cmd}
               onClick={() => onSelect(cmd, data)}
               className={`
                 w-full px-3 py-2 text-left flex items-center gap-2 transition-colors
-                ${index === selectedIndex
-                  ? 'bg-blue-50 text-blue-700'
-                  : 'hover:bg-gray-50'
-                }
+                ${index === selectedIndex ? 'bg-blue-50 text-blue-700' : 'hover:bg-gray-50'}
               `}
             >
-              <code className="text-xs font-mono bg-gray-100 px-1.5 py-0.5 rounded">
-                {cmd}
-              </code>
+              <code className="text-xs font-mono bg-gray-100 px-1.5 py-0.5 rounded">{cmd}</code>
               <span className="text-sm text-gray-700 truncate">{data.label}</span>
               <ChevronRight className="w-4 h-4 text-gray-400 ml-auto" />
             </button>
@@ -514,11 +503,11 @@ export default function SlashCommandTextArea({
     menuPosition,
     filteredCommands,
     selectedIndex,
-    setSelectedIndex,
+    _setSelectedIndex,
     handleKeyDown,
     handleChange,
     selectCommand,
-    closeMenu
+    closeMenu,
   } = useSlashCommands(customCommands);
 
   return (
@@ -526,9 +515,7 @@ export default function SlashCommandTextArea({
       {label && (
         <label className="block text-sm font-medium text-gray-700 mb-1">
           {label}
-          <span className="ml-2 text-xs text-gray-400 font-normal">
-            Type "/" for commands
-          </span>
+          <span className="ml-2 text-xs text-gray-400 font-normal">Type "/" for commands</span>
         </label>
       )}
 
@@ -599,26 +586,20 @@ export function SlashCommandReference({ category = null, compact = false }) {
           <Command className="w-4 h-4" />
           Slash Commands Reference
         </h3>
-        <p className="text-xs text-gray-500 mt-1">
-          Type these shortcuts to auto-expand text
-        </p>
+        <p className="text-xs text-gray-500 mt-1">Type these shortcuts to auto-expand text</p>
       </div>
 
       <div className="divide-y divide-gray-100 max-h-96 overflow-y-auto">
         {Object.entries(grouped).map(([cat, cmds]) => (
           <div key={cat} className="p-3">
-            <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">
-              {cat}
-            </h4>
+            <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">{cat}</h4>
             <div className="space-y-1">
-              {cmds.map(({ cmd, label, text }) => (
+              {cmds.map(({ cmd, label, _text }) => (
                 <div key={cmd} className="flex items-start gap-2 text-sm">
                   <code className="flex-shrink-0 font-mono text-xs bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded">
                     {cmd}
                   </code>
-                  <span className="text-gray-600 text-xs line-clamp-1">
-                    {label}
-                  </span>
+                  <span className="text-gray-600 text-xs line-clamp-1">{label}</span>
                 </div>
               ))}
             </div>

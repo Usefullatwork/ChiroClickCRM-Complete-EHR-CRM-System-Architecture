@@ -5,7 +5,7 @@
  * featuring split-pane layout, safety alerts, and efficient SOAP documentation
  */
 
-import React, { useState } from 'react';
+import _React, { useState } from 'react';
 import {
   AlertTriangle,
   Calendar,
@@ -18,69 +18,67 @@ import {
   Clock,
   Phone,
   Mail,
-  Star,
+  _Star,
   Search,
   X,
   Sparkles,
-  ArrowLeft
+  ArrowLeft,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import RegionalBodyDiagram from '../components/examination/RegionalBodyDiagrams';
 
 // --- MOCK DATA FOR DEMO ---
 const mockPatient = {
-  name: "Ola Nordmann",
-  initials: "ON",
+  name: 'Ola Nordmann',
+  initials: 'ON',
   age: 45,
-  fnr: "120578-12345",
-  phone: "+47 912 34 567",
-  email: "ola.nordmann@email.no",
-  redFlags: [
-    "Tidligere prolaps L4/L5 (2022)",
-    "Går på blodfortynnende (Marevan)"
-  ],
-  contraindications: ["Osteoporose"],
+  fnr: '120578-12345',
+  phone: '+47 912 34 567',
+  email: 'ola.nordmann@email.no',
+  redFlags: ['Tidligere prolaps L4/L5 (2022)', 'Går på blodfortynnende (Marevan)'],
+  contraindications: ['Osteoporose'],
   lastVisit: {
-    date: "14. Okt 2024",
-    summary: "Justering L5, Cervical mobilisering. Rapporterte bedring i korsrygg, men fortsatt stivhet i nakke. VAS 5/10 → 3/10."
-  }
+    date: '14. Okt 2024',
+    summary:
+      'Justering L5, Cervical mobilisering. Rapporterte bedring i korsrygg, men fortsatt stivhet i nakke. VAS 5/10 → 3/10.',
+  },
 };
 
 const icpcDiagnoses = [
-  { value: "l02", code: "L02", label: "Ryggsmerte" },
-  { value: "l03", code: "L03", label: "Korsryggsymptom/plage" },
-  { value: "l84", code: "L84", label: "Ryggsyndrom uten utstråling" },
-  { value: "l86", code: "L86", label: "Isjias/ryggsmerte med utstråling" },
-  { value: "l01", code: "L01", label: "Nakkesymptom/plage" },
-  { value: "l83", code: "L83", label: "Nakkesyndrom" },
-  { value: "n01", code: "N01", label: "Hodepine" },
-  { value: "l08", code: "L08", label: "Skuldersymptom/plage" },
+  { value: 'l02', code: 'L02', label: 'Ryggsmerte' },
+  { value: 'l03', code: 'L03', label: 'Korsryggsymptom/plage' },
+  { value: 'l84', code: 'L84', label: 'Ryggsyndrom uten utstråling' },
+  { value: 'l86', code: 'L86', label: 'Isjias/ryggsmerte med utstråling' },
+  { value: 'l01', code: 'L01', label: 'Nakkesymptom/plage' },
+  { value: 'l83', code: 'L83', label: 'Nakkesyndrom' },
+  { value: 'n01', code: 'N01', label: 'Hodepine' },
+  { value: 'l08', code: 'L08', label: 'Skuldersymptom/plage' },
 ];
 
 const taksterNorwegian = [
-  { id: "l214", code: "L214", name: "Manipulasjonsbehandling", price: 450 },
-  { id: "l215", code: "L215", name: "Bløtvevsbehandling", price: 350 },
-  { id: "l220", code: "L220", name: "Tillegg for øvelser/veiledning", price: 150 },
-  { id: "akutt", code: "AKUTT", name: "Akutt-tillegg (samme dag)", price: 200 },
+  { id: 'l214', code: 'L214', name: 'Manipulasjonsbehandling', price: 450 },
+  { id: 'l215', code: 'L215', name: 'Bløtvevsbehandling', price: 350 },
+  { id: 'l220', code: 'L220', name: 'Tillegg for øvelser/veiledning', price: 150 },
+  { id: 'akutt', code: 'AKUTT', name: 'Akutt-tillegg (samme dag)', price: 200 },
 ];
 
 const quickPhrases = {
   subjective: [
-    "Bedring siden sist",
-    "Ingen endring",
-    "Verre om morgenen",
-    "Smerter ved løft",
-    "Stivhet etter hvile",
-    "Utstråling til ben"
+    'Bedring siden sist',
+    'Ingen endring',
+    'Verre om morgenen',
+    'Smerter ved løft',
+    'Stivhet etter hvile',
+    'Utstråling til ben',
   ],
   objective: [
-    "Normal ROM",
-    "Redusert fleksjon",
-    "Muskelspasme palperes",
-    "Triggerpunkt identifisert",
-    "Positiv SLR venstre",
-    "Positiv SLR høyre"
-  ]
+    'Normal ROM',
+    'Redusert fleksjon',
+    'Muskelspasme palperes',
+    'Triggerpunkt identifisert',
+    'Positiv SLR venstre',
+    'Positiv SLR høyre',
+  ],
 };
 
 // ---------------------------
@@ -89,66 +87,65 @@ export default function ClinicalEncounterDemo() {
   const navigate = useNavigate();
   const [selectedDiagnoses, setSelectedDiagnoses] = useState([]);
   const [selectedTakster, setSelectedTakster] = useState(['l214']);
-  const [subjectiveNotes, setSubjectiveNotes] = useState("");
-  const [objectiveNotes, setObjectiveNotes] = useState("");
-  const [assessmentNotes, setAssessmentNotes] = useState("");
-  const [planNotes, setPlanNotes] = useState("");
+  const [subjectiveNotes, setSubjectiveNotes] = useState('');
+  const [objectiveNotes, setObjectiveNotes] = useState('');
+  const [assessmentNotes, setAssessmentNotes] = useState('');
+  const [planNotes, setPlanNotes] = useState('');
   const [vasStart, setVasStart] = useState(5);
   const [vasEnd, setVasEnd] = useState(3);
   const [followUpWeeks, setFollowUpWeeks] = useState(2);
-  const [diagnosisSearch, setDiagnosisSearch] = useState("");
+  const [diagnosisSearch, setDiagnosisSearch] = useState('');
   const [showDiagnosisDropdown, setShowDiagnosisDropdown] = useState(false);
   const [showTakster, setShowTakster] = useState(false); // Hidden by default for students
   const [selectedRegion, setSelectedRegion] = useState('shoulder');
   const [bilateralFindings, setBilateralFindings] = useState({ left: {}, right: {} });
 
   const handleQuickPhrase = (phrase, setter) => {
-    setter(prev => prev + (prev ? "\n" : "") + "• " + phrase);
+    setter((prev) => `${prev + (prev ? '\n' : '')}• ${phrase}`);
   };
 
   const toggleDiagnosis = (diagnosis) => {
-    setSelectedDiagnoses(prev => {
-      if (prev.find(d => d.value === diagnosis.value)) {
-        return prev.filter(d => d.value !== diagnosis.value);
+    setSelectedDiagnoses((prev) => {
+      if (prev.find((d) => d.value === diagnosis.value)) {
+        return prev.filter((d) => d.value !== diagnosis.value);
       }
       return [...prev, diagnosis];
     });
-    setDiagnosisSearch("");
+    setDiagnosisSearch('');
     setShowDiagnosisDropdown(false);
   };
 
   const toggleTakst = (takstId) => {
-    setSelectedTakster(prev => {
+    setSelectedTakster((prev) => {
       if (prev.includes(takstId)) {
-        return prev.filter(t => t !== takstId);
+        return prev.filter((t) => t !== takstId);
       }
       return [...prev, takstId];
     });
   };
 
-  const filteredDiagnoses = icpcDiagnoses.filter(d =>
-    d.code.toLowerCase().includes(diagnosisSearch.toLowerCase()) ||
-    d.label.toLowerCase().includes(diagnosisSearch.toLowerCase())
+  const filteredDiagnoses = icpcDiagnoses.filter(
+    (d) =>
+      d.code.toLowerCase().includes(diagnosisSearch.toLowerCase()) ||
+      d.label.toLowerCase().includes(diagnosisSearch.toLowerCase())
   );
 
   const totalPrice = taksterNorwegian
-    .filter(t => selectedTakster.includes(t.id))
+    .filter((t) => selectedTakster.includes(t.id))
     .reduce((sum, t) => sum + t.price, 0);
 
   const currentDate = new Date().toLocaleDateString('no-NO', {
     day: 'numeric',
     month: 'long',
-    year: 'numeric'
+    year: 'numeric',
   });
 
   return (
     <div className="flex h-screen bg-slate-50 text-slate-900 overflow-hidden font-sans">
-
       {/* ═══════════════════════════════════════════════════════════════════
           1. LEFT SIDEBAR - PATIENT CONTEXT & SAFETY (Fixed Width)
           ═══════════════════════════════════════════════════════════════════ */}
       <aside className="w-80 bg-white border-r border-slate-200 flex flex-col h-full shadow-sm z-10">
-
         {/* Back Button & Patient Header */}
         <div className="p-4 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
           <button
@@ -185,7 +182,6 @@ export default function ClinicalEncounterDemo() {
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-
           {/* ⚠️ SAFETY ALERTS - RED FLAGS */}
           {mockPatient.redFlags.length > 0 && (
             <div className="rounded-lg bg-rose-50 border border-rose-200 p-3">
@@ -245,20 +241,17 @@ export default function ClinicalEncounterDemo() {
               AI-forslag
             </div>
             <p className="text-sm text-purple-600">
-              Basert på sykehistorie: Vurder L84 (Ryggsyndrom uten utstråling).
-              Anbefalt: Manipulasjon + bløtvevsbehandling.
+              Basert på sykehistorie: Vurder L84 (Ryggsyndrom uten utstråling). Anbefalt:
+              Manipulasjon + bløtvevsbehandling.
             </p>
           </div>
-
         </div>
       </aside>
-
 
       {/* ═══════════════════════════════════════════════════════════════════
           2. MAIN CONTENT - SOAP DOCUMENTATION
           ═══════════════════════════════════════════════════════════════════ */}
       <main className="flex-1 flex flex-col h-full overflow-hidden">
-
         {/* Header Bar */}
         <header className="bg-white border-b border-slate-200 px-6 py-3 flex justify-between items-center flex-shrink-0">
           <div className="flex items-center space-x-4">
@@ -283,20 +276,20 @@ export default function ClinicalEncounterDemo() {
           </div>
         </header>
 
-
         {/* ═══════════════════════════════════════════════════════════════════
             SCROLLABLE SOAP FORM
             ═══════════════════════════════════════════════════════════════════ */}
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-4xl mx-auto p-6 space-y-6">
-
             {/* ─────────────────────────────────────────────────────────────────
                 S - SUBJECTIVE
                 ───────────────────────────────────────────────────────────────── */}
             <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="px-4 py-3 bg-gradient-to-r from-blue-50 to-white border-b border-slate-100 flex items-center justify-between">
                 <h3 className="font-semibold text-slate-800 flex items-center gap-2">
-                  <span className="bg-blue-600 text-white h-6 w-6 rounded-md flex items-center justify-center text-sm font-bold">S</span>
+                  <span className="bg-blue-600 text-white h-6 w-6 rounded-md flex items-center justify-center text-sm font-bold">
+                    S
+                  </span>
                   Subjektivt
                 </h3>
                 <div className="flex items-center gap-3">
@@ -320,7 +313,7 @@ export default function ClinicalEncounterDemo() {
                   onChange={(e) => setSubjectiveNotes(e.target.value)}
                 />
                 <div className="flex flex-wrap gap-1.5">
-                  {quickPhrases.subjective.map(phrase => (
+                  {quickPhrases.subjective.map((phrase) => (
                     <button
                       key={phrase}
                       onClick={() => handleQuickPhrase(phrase, setSubjectiveNotes)}
@@ -333,14 +326,15 @@ export default function ClinicalEncounterDemo() {
               </div>
             </section>
 
-
             {/* ─────────────────────────────────────────────────────────────────
                 O - OBJECTIVE
                 ───────────────────────────────────────────────────────────────── */}
             <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="px-4 py-3 bg-gradient-to-r from-emerald-50 to-white border-b border-slate-100">
                 <h3 className="font-semibold text-slate-800 flex items-center gap-2">
-                  <span className="bg-emerald-600 text-white h-6 w-6 rounded-md flex items-center justify-center text-sm font-bold">O</span>
+                  <span className="bg-emerald-600 text-white h-6 w-6 rounded-md flex items-center justify-center text-sm font-bold">
+                    O
+                  </span>
                   Objektivt
                 </h3>
               </div>
@@ -348,7 +342,9 @@ export default function ClinicalEncounterDemo() {
                 {/* Bilateral Body Examination */}
                 <div className="mb-4">
                   <div className="flex items-center justify-between mb-3">
-                    <h4 className="text-sm font-medium text-slate-700">Leddundersøkelse (Bilateral)</h4>
+                    <h4 className="text-sm font-medium text-slate-700">
+                      Leddundersøkelse (Bilateral)
+                    </h4>
                     <select
                       value={selectedRegion}
                       onChange={(e) => setSelectedRegion(e.target.value)}
@@ -369,15 +365,17 @@ export default function ClinicalEncounterDemo() {
                   <div className="grid grid-cols-2 gap-4">
                     {/* Left Side */}
                     <div className="border border-slate-200 rounded-lg p-3 bg-blue-50/30">
-                      <h5 className="text-xs font-semibold text-blue-700 mb-2 text-center">VENSTRE</h5>
+                      <h5 className="text-xs font-semibold text-blue-700 mb-2 text-center">
+                        VENSTRE
+                      </h5>
                       <RegionalBodyDiagram
                         region={selectedRegion}
                         side="left"
                         findings={bilateralFindings.left[selectedRegion] || {}}
                         onFindingsChange={(findings) => {
-                          setBilateralFindings(prev => ({
+                          setBilateralFindings((prev) => ({
                             ...prev,
-                            left: { ...prev.left, [selectedRegion]: findings }
+                            left: { ...prev.left, [selectedRegion]: findings },
                           }));
                         }}
                         compact={false}
@@ -392,9 +390,9 @@ export default function ClinicalEncounterDemo() {
                         side="right"
                         findings={bilateralFindings.right[selectedRegion] || {}}
                         onFindingsChange={(findings) => {
-                          setBilateralFindings(prev => ({
+                          setBilateralFindings((prev) => ({
                             ...prev,
-                            right: { ...prev.right, [selectedRegion]: findings }
+                            right: { ...prev.right, [selectedRegion]: findings },
                           }));
                         }}
                         compact={false}
@@ -409,14 +407,17 @@ export default function ClinicalEncounterDemo() {
                     <h4 className="text-sm font-medium text-slate-700">Ortopediske Tester</h4>
                     <div className="space-y-2">
                       {[
-                        { name: "Straight Leg Raise (SLR)", type: "degrees" },
-                        { name: "Slump Test", type: "checkbox" },
-                        { name: "Kemp's Test", type: "checkbox" },
-                        { name: "Patrick's Test", type: "checkbox" }
+                        { name: 'Straight Leg Raise (SLR)', type: 'degrees' },
+                        { name: 'Slump Test', type: 'checkbox' },
+                        { name: "Kemp's Test", type: 'checkbox' },
+                        { name: "Patrick's Test", type: 'checkbox' },
                       ].map((test) => (
-                        <div key={test.name} className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                        <div
+                          key={test.name}
+                          className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100"
+                        >
                           <span className="text-sm text-slate-700">{test.name}</span>
-                          {test.type === "degrees" ? (
+                          {test.type === 'degrees' ? (
                             <div className="flex gap-2">
                               <input
                                 type="text"
@@ -452,7 +453,7 @@ export default function ClinicalEncounterDemo() {
                   onChange={(e) => setObjectiveNotes(e.target.value)}
                 />
                 <div className="flex flex-wrap gap-1.5">
-                  {quickPhrases.objective.map(phrase => (
+                  {quickPhrases.objective.map((phrase) => (
                     <button
                       key={phrase}
                       onClick={() => handleQuickPhrase(phrase, setObjectiveNotes)}
@@ -465,14 +466,15 @@ export default function ClinicalEncounterDemo() {
               </div>
             </section>
 
-
             {/* ─────────────────────────────────────────────────────────────────
                 A - ASSESSMENT / DIAGNOSIS
                 ───────────────────────────────────────────────────────────────── */}
             <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="px-4 py-3 bg-gradient-to-r from-amber-50 to-white border-b border-slate-100">
                 <h3 className="font-semibold text-slate-800 flex items-center gap-2">
-                  <span className="bg-amber-500 text-white h-6 w-6 rounded-md flex items-center justify-center text-sm font-bold">A</span>
+                  <span className="bg-amber-500 text-white h-6 w-6 rounded-md flex items-center justify-center text-sm font-bold">
+                    A
+                  </span>
                   Vurdering & Diagnose
                 </h3>
               </div>
@@ -505,10 +507,12 @@ export default function ClinicalEncounterDemo() {
                             className="w-full px-4 py-2 text-left text-sm hover:bg-amber-50 flex items-center justify-between"
                           >
                             <span>
-                              <span className="font-mono font-medium text-amber-600">{diagnosis.code}</span>
+                              <span className="font-mono font-medium text-amber-600">
+                                {diagnosis.code}
+                              </span>
                               <span className="text-slate-600 ml-2">- {diagnosis.label}</span>
                             </span>
-                            {selectedDiagnoses.find(d => d.value === diagnosis.value) && (
+                            {selectedDiagnoses.find((d) => d.value === diagnosis.value) && (
                               <Check className="h-4 w-4 text-amber-600" />
                             )}
                           </button>
@@ -551,14 +555,15 @@ export default function ClinicalEncounterDemo() {
               </div>
             </section>
 
-
             {/* ─────────────────────────────────────────────────────────────────
                 P - PLAN & TREATMENT (TAKSTER)
                 ───────────────────────────────────────────────────────────────── */}
             <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="px-4 py-3 bg-gradient-to-r from-purple-50 to-white border-b border-slate-100 flex items-center justify-between">
                 <h3 className="font-semibold text-slate-800 flex items-center gap-2">
-                  <span className="bg-purple-600 text-white h-6 w-6 rounded-md flex items-center justify-center text-sm font-bold">P</span>
+                  <span className="bg-purple-600 text-white h-6 w-6 rounded-md flex items-center justify-center text-sm font-bold">
+                    P
+                  </span>
                   Plan & Behandling
                 </h3>
                 <div className="flex items-center gap-3">
@@ -581,7 +586,9 @@ export default function ClinicalEncounterDemo() {
                     onClick={() => setShowTakster(!showTakster)}
                     className="flex items-center gap-2 text-sm font-medium text-slate-700 hover:text-slate-900 mb-3"
                   >
-                    <ChevronDown className={`h-4 w-4 transition-transform ${showTakster ? 'rotate-180' : ''}`} />
+                    <ChevronDown
+                      className={`h-4 w-4 transition-transform ${showTakster ? 'rotate-180' : ''}`}
+                    />
                     Takster (behandlingskoder)
                     <span className="text-xs text-slate-400 font-normal">(Kun for behandlere)</span>
                   </button>
@@ -595,26 +602,36 @@ export default function ClinicalEncounterDemo() {
                             onClick={() => toggleTakst(takst.id)}
                             className={`
                               flex items-center justify-between p-3 rounded-lg border-2 text-left transition-all
-                              ${selectedTakster.includes(takst.id)
-                                ? 'border-purple-500 bg-purple-50'
-                                : 'border-slate-200 bg-white hover:border-slate-300'}
+                              ${
+                                selectedTakster.includes(takst.id)
+                                  ? 'border-purple-500 bg-purple-50'
+                                  : 'border-slate-200 bg-white hover:border-slate-300'
+                              }
                             `}
                           >
                             <div className="flex items-center gap-3">
-                              <div className={`
+                              <div
+                                className={`
                                 h-5 w-5 rounded flex items-center justify-center
-                                ${selectedTakster.includes(takst.id)
-                                  ? 'bg-purple-600 text-white'
-                                  : 'border-2 border-slate-300'}
-                              `}>
-                                {selectedTakster.includes(takst.id) && <Check className="h-3 w-3" />}
+                                ${
+                                  selectedTakster.includes(takst.id)
+                                    ? 'bg-purple-600 text-white'
+                                    : 'border-2 border-slate-300'
+                                }
+                              `}
+                              >
+                                {selectedTakster.includes(takst.id) && (
+                                  <Check className="h-3 w-3" />
+                                )}
                               </div>
                               <div>
                                 <p className="font-semibold text-slate-800">{takst.code}</p>
                                 <p className="text-xs text-slate-500">{takst.name}</p>
                               </div>
                             </div>
-                            <span className="text-sm font-medium text-slate-600">{takst.price} kr</span>
+                            <span className="text-sm font-medium text-slate-600">
+                              {takst.price} kr
+                            </span>
                           </button>
                         ))}
                       </div>
@@ -657,10 +674,8 @@ export default function ClinicalEncounterDemo() {
                 />
               </div>
             </section>
-
           </div>
         </div>
-
 
         {/* ═══════════════════════════════════════════════════════════════════
             STICKY FOOTER - ACTIONS
@@ -672,7 +687,8 @@ export default function ClinicalEncounterDemo() {
               Utkast lagret automatisk
             </span>
             <span className="text-xs text-slate-400">
-              Sist oppdatert: {new Date().toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}
+              Sist oppdatert:{' '}
+              {new Date().toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}
             </span>
           </div>
           <div className="flex items-center gap-3">
@@ -689,7 +705,6 @@ export default function ClinicalEncounterDemo() {
             </button>
           </div>
         </footer>
-
       </main>
     </div>
   );

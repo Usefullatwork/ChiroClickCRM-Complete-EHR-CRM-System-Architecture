@@ -314,7 +314,9 @@ const getModelForTask = async (taskType) => {
   const envOverride = TASK_ENV_OVERRIDES[taskType];
   if (envOverride) {
     const available = await isModelAvailable(envOverride);
-    if (available) return envOverride;
+    if (available) {
+      return envOverride;
+    }
     logger.warn(
       `Env override model "${envOverride}" unavailable for task "${taskType}", using routing`
     );
@@ -325,7 +327,9 @@ const getModelForTask = async (taskType) => {
 
   // 3. Check availability and fall back if needed
   const available = await isModelAvailable(routedModel);
-  if (available) return routedModel;
+  if (available) {
+    return routedModel;
+  }
 
   // 4. Check if model config has a fallback
   const config = MODEL_CONFIG[routedModel];
@@ -347,9 +351,7 @@ const getModelForTask = async (taskType) => {
 /**
  * Check if AI is available and enabled
  */
-const isAIAvailable = () => {
-  return AI_ENABLED;
-};
+const isAIAvailable = () => AI_ENABLED;
 
 /**
  * Generate AI completion using selected provider
@@ -392,7 +394,7 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
   // Step 1: Validate input through guardrails
   let sanitizedPrompt = prompt;
   let inputWarnings = [];
-  let guardrailsValidationFailed = false;
+  let _guardrailsValidationFailed = false;
 
   if (GUARDRAILS_ENABLED && guardrailsService && !skipGuardrails) {
     try {
@@ -404,14 +406,14 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
       if (!inputValidation.proceed) {
         logger.warn('Input blocked by guardrails', { issues: inputValidation.issues });
         throw new Error(
-          'Input validation failed: ' + inputValidation.issues.map((i) => i.message).join('; ')
+          `Input validation failed: ${inputValidation.issues.map((i) => i.message).join('; ')}`
         );
       }
 
       sanitizedPrompt = inputValidation.sanitized;
       inputWarnings = inputValidation.warnings || [];
     } catch (guardrailError) {
-      guardrailsValidationFailed = true;
+      _guardrailsValidationFailed = true;
       // For safety-critical tasks, fail if guardrails validation fails
       if (guardrailsCheck.required) {
         logger.error('BLOCKED: Guardrails validation failed for safety-critical task', {
@@ -793,12 +795,10 @@ export const analyzeRedFlags = async (patientData, soapData) => {
     });
 
     return {
-      analysis:
-        'KRITISKE RØDE FLAGG OPPDAGET. ' +
-        redFlagsDetected
-          .filter((f) => f.severity === 'CRITICAL')
-          .map((f) => f.message)
-          .join(' '),
+      analysis: `KRITISKE RØDE FLAGG OPPDAGET. ${redFlagsDetected
+        .filter((f) => f.severity === 'CRITICAL')
+        .map((f) => f.message)
+        .join(' ')}`,
       riskLevel: 'CRITICAL',
       canTreat: false,
       recommendReferral: true,
@@ -1435,7 +1435,7 @@ export const getModelForField = async (fieldType) => {
 /**
  * Build a prompt for field-specific AI generation
  */
-export const buildFieldPrompt = (fieldType, context = {}, language = 'no') => {
+export const buildFieldPrompt = (fieldType, context = {}, _language = 'no') => {
   const basePrompt = context.chiefComplaint
     ? `Basert på hovedklage: ${context.chiefComplaint}\n`
     : '';

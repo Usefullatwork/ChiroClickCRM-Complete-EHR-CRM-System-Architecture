@@ -37,7 +37,9 @@ export default function GDPRExportModal({ patient, onClose }) {
   };
 
   const handleDownload = () => {
-    if (!exportedData) return;
+    if (!exportedData) {
+      return;
+    }
 
     // Create downloadable JSON file
     const dataStr = JSON.stringify(exportedData, null, 2);

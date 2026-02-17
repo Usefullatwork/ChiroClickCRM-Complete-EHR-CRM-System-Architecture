@@ -5,10 +5,10 @@
  * List of clinical notes for a patient
  */
 
-import React from 'react'
+import _React from 'react';
 import {
   FileText,
-  Calendar,
+  _Calendar,
   User,
   Clock,
   ChevronRight,
@@ -18,9 +18,9 @@ import {
   Eye,
   Printer,
   Download,
-  Plus,
-  AlertTriangle
-} from 'lucide-react'
+  _Plus,
+  AlertTriangle,
+} from 'lucide-react';
 
 /**
  * NotesList Component
@@ -49,34 +49,38 @@ export default function NotesList({
   onExportNote,
   selectedPatientId,
   getNoteTypeBadge,
-  getNoteTypeLabel
+  getNoteTypeLabel,
 }) {
   /**
    * Format date for display
    * Formater dato for visning
    */
   const formatDate = (dateString) => {
-    if (!dateString) return ''
-    const date = new Date(dateString)
+    if (!dateString) {
+      return '';
+    }
+    const date = new Date(dateString);
     return date.toLocaleDateString('no-NO', {
       day: '2-digit',
       month: 'short',
-      year: 'numeric'
-    })
-  }
+      year: 'numeric',
+    });
+  };
 
   /**
    * Format time for display
    * Formater tid for visning
    */
   const formatTime = (dateString) => {
-    if (!dateString) return ''
-    const date = new Date(dateString)
+    if (!dateString) {
+      return '';
+    }
+    const date = new Date(dateString);
     return date.toLocaleTimeString('no-NO', {
       hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
+      minute: '2-digit',
+    });
+  };
 
   /**
    * Get status badge
@@ -89,32 +93,32 @@ export default function NotesList({
           <Lock className="w-3 h-3" />
           Signert
         </span>
-      )
+      );
     }
     if (note.is_draft) {
       return (
         <span className="px-2 py-0.5 text-xs font-medium rounded bg-yellow-100 text-yellow-800">
           Utkast
         </span>
-      )
+      );
     }
-    return null
-  }
+    return null;
+  };
 
   /**
    * Get diagnosis codes display
    * Henter diagnosekoder for visning
    */
   const getDiagnosisCodes = (note) => {
-    const codes = []
+    const codes = [];
     if (note.icd10_codes?.length > 0) {
-      codes.push(...note.icd10_codes)
+      codes.push(...note.icd10_codes);
     }
     if (note.icpc_codes?.length > 0) {
-      codes.push(...note.icpc_codes)
+      codes.push(...note.icpc_codes);
     }
-    return codes.slice(0, 3)
-  }
+    return codes.slice(0, 3);
+  };
 
   /**
    * Get chief complaint preview
@@ -122,18 +126,16 @@ export default function NotesList({
    */
   const getChiefComplaint = (note) => {
     try {
-      const subjective = typeof note.subjective === 'string'
-        ? JSON.parse(note.subjective)
-        : note.subjective
+      const subjective =
+        typeof note.subjective === 'string' ? JSON.parse(note.subjective) : note.subjective;
 
-      return subjective?.chiefComplaint ||
-             subjective?.chief_complaint ||
-             subjective?.hovedklage ||
-             null
+      return (
+        subjective?.chiefComplaint || subjective?.chief_complaint || subjective?.hovedklage || null
+      );
     } catch {
-      return null
+      return null;
     }
-  }
+  };
 
   // Show empty state if no patient selected
   if (!selectedPatientId) {
@@ -141,11 +143,9 @@ export default function NotesList({
       <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
         <User className="w-12 h-12 text-gray-300 mx-auto mb-3" />
         <h3 className="text-lg font-medium text-gray-900 mb-1">Ingen pasient valgt</h3>
-        <p className="text-sm text-gray-500">
-          Velg en pasient for a se deres kliniske notater
-        </p>
+        <p className="text-sm text-gray-500">Velg en pasient for a se deres kliniske notater</p>
       </div>
-    )
+    );
   }
 
   // Show loading state
@@ -155,7 +155,7 @@ export default function NotesList({
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
         <p className="text-sm text-gray-500 mt-3">Laster notater...</p>
       </div>
-    )
+    );
   }
 
   // Show empty state if no notes
@@ -168,30 +168,25 @@ export default function NotesList({
           Det er ingen kliniske notater for denne pasienten enna
         </p>
       </div>
-    )
+    );
   }
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       {/* Header / Overskrift */}
       <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">
-          Notater ({notes.length})
-        </h2>
+        <h2 className="text-lg font-semibold text-gray-900">Notater ({notes.length})</h2>
       </div>
 
       {/* Notes List / Notatliste */}
       <div className="divide-y divide-gray-100">
         {notes.map((note) => {
-          const chiefComplaint = getChiefComplaint(note)
-          const diagnosisCodes = getDiagnosisCodes(note)
-          const isLocked = !!note.signed_at
+          const chiefComplaint = getChiefComplaint(note);
+          const diagnosisCodes = getDiagnosisCodes(note);
+          const isLocked = !!note.signed_at;
 
           return (
-            <div
-              key={note.id}
-              className="group hover:bg-gray-50 transition-colors"
-            >
+            <div key={note.id} className="group hover:bg-gray-50 transition-colors">
               <div className="px-6 py-4">
                 <div className="flex items-start justify-between">
                   {/* Note Info / Notatinformasjon */}
@@ -200,9 +195,11 @@ export default function NotesList({
                     onClick={() => onViewNote(note.id)}
                   >
                     {/* Icon */}
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                      isLocked ? 'bg-gray-100' : 'bg-blue-100'
-                    }`}>
+                    <div
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                        isLocked ? 'bg-gray-100' : 'bg-blue-100'
+                      }`}
+                    >
                       {isLocked ? (
                         <Lock className="w-5 h-5 text-gray-600" />
                       ) : (
@@ -217,9 +214,11 @@ export default function NotesList({
                         <span className="font-medium text-gray-900">
                           {formatDate(note.note_date)}
                         </span>
-                        <span className={`px-2 py-0.5 text-xs font-medium rounded ${
-                          getNoteTypeBadge(note.template_type)
-                        }`}>
+                        <span
+                          className={`px-2 py-0.5 text-xs font-medium rounded ${getNoteTypeBadge(
+                            note.template_type
+                          )}`}
+                        >
                           {getNoteTypeLabel(note.template_type)}
                         </span>
                         {getStatusBadge(note)}
@@ -227,9 +226,7 @@ export default function NotesList({
 
                       {/* Chief Complaint / Hovedklage */}
                       {chiefComplaint && (
-                        <p className="text-sm text-gray-600 truncate mb-1">
-                          {chiefComplaint}
-                        </p>
+                        <p className="text-sm text-gray-600 truncate mb-1">{chiefComplaint}</p>
                       )}
 
                       {/* Diagnosis Codes / Diagnosekoder */}
@@ -243,9 +240,9 @@ export default function NotesList({
                               {code}
                             </span>
                           ))}
-                          {(note.icd10_codes?.length + note.icpc_codes?.length) > 3 && (
+                          {note.icd10_codes?.length + note.icpc_codes?.length > 3 && (
                             <span className="text-xs text-gray-400">
-                              +{(note.icd10_codes?.length + note.icpc_codes?.length) - 3}
+                              +{note.icd10_codes?.length + note.icpc_codes?.length - 3}
                             </span>
                           )}
                         </div>
@@ -263,16 +260,15 @@ export default function NotesList({
                             {note.practitioner_name}
                           </span>
                         )}
-                        {note.duration_minutes && (
-                          <span>
-                            {note.duration_minutes} min
-                          </span>
-                        )}
-                        {note.vas_pain_start != null && note.vas_pain_end != null && (
-                          <span className="flex items-center gap-1">
-                            VAS: {note.vas_pain_start} {'->'} {note.vas_pain_end}
-                          </span>
-                        )}
+                        {note.duration_minutes && <span>{note.duration_minutes} min</span>}
+                        {note.vas_pain_start !== null &&
+                          note.vas_pain_start !== undefined &&
+                          note.vas_pain_end !== null &&
+                          note.vas_pain_end !== undefined && (
+                            <span className="flex items-center gap-1">
+                              VAS: {note.vas_pain_start} {'->'} {note.vas_pain_end}
+                            </span>
+                          )}
                       </div>
 
                       {/* Red flags warning / Rode flagg-advarsel */}
@@ -289,8 +285,8 @@ export default function NotesList({
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={(e) => {
-                        e.stopPropagation()
-                        onViewNote(note.id)
+                        e.stopPropagation();
+                        onViewNote(note.id);
                       }}
                       className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
                       title="Se notat"
@@ -300,8 +296,8 @@ export default function NotesList({
                     {!isLocked && (
                       <button
                         onClick={(e) => {
-                          e.stopPropagation()
-                          onEditNote(note)
+                          e.stopPropagation();
+                          onEditNote(note);
                         }}
                         className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
                         title="Rediger notat"
@@ -311,8 +307,8 @@ export default function NotesList({
                     )}
                     <button
                       onClick={(e) => {
-                        e.stopPropagation()
-                        onPrintNote(note.id)
+                        e.stopPropagation();
+                        onPrintNote(note.id);
                       }}
                       className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
                       title="Skriv ut"
@@ -321,8 +317,8 @@ export default function NotesList({
                     </button>
                     <button
                       onClick={(e) => {
-                        e.stopPropagation()
-                        onExportNote(note.id)
+                        e.stopPropagation();
+                        onExportNote(note.id);
                       }}
                       className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
                       title="Last ned"
@@ -332,8 +328,8 @@ export default function NotesList({
                     {!isLocked && (
                       <button
                         onClick={(e) => {
-                          e.stopPropagation()
-                          onDeleteNote(note.id)
+                          e.stopPropagation();
+                          onDeleteNote(note.id);
                         }}
                         className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
                         title="Slett notat"
@@ -346,7 +342,7 @@ export default function NotesList({
                 </div>
               </div>
             </div>
-          )
+          );
         })}
       </div>
 
@@ -359,5 +355,5 @@ export default function NotesList({
         </div>
       )}
     </div>
-  )
+  );
 }

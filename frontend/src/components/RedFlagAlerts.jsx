@@ -14,9 +14,13 @@ export default function RedFlagAlerts({ encounterId }) {
     refetchInterval: 10000, // Refetch every 10 seconds while component is mounted
   });
 
-  if (isLoading || dismissed) return null;
+  if (isLoading || dismissed) {
+    return null;
+  }
 
-  if (!redFlags?.data || redFlags.data.length === 0) return null;
+  if (!redFlags?.data || redFlags.data.length === 0) {
+    return null;
+  }
 
   return (
     <div className="bg-red-50 border-l-4 border-red-500 rounded-lg shadow-md overflow-hidden animate-pulse-slow">
@@ -45,21 +49,19 @@ export default function RedFlagAlerts({ encounterId }) {
 
         <div className="space-y-3">
           {redFlags.data.map((redFlag, index) => (
-            <div
-              key={index}
-              className="bg-white border border-red-200 rounded-lg p-3 shadow-sm"
-            >
+            <div key={index} className="bg-white border border-red-200 rounded-lg p-3 shadow-sm">
               {/* Test Name */}
               <div className="flex items-start gap-2 mb-2">
                 <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  <h4 className="text-sm font-semibold text-red-900">
-                    {redFlag.test_name}
-                  </h4>
+                  <h4 className="text-sm font-semibold text-red-900">{redFlag.test_name}</h4>
                   {redFlag.severity && (
                     <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium bg-red-100 text-red-800 rounded">
-                      {redFlag.severity === 'severe' ? 'Alvorlig' :
-                       redFlag.severity === 'moderate' ? 'Moderat' : 'Mild'}
+                      {redFlag.severity === 'severe'
+                        ? 'Alvorlig'
+                        : redFlag.severity === 'moderate'
+                          ? 'Moderat'
+                          : 'Mild'}
                     </span>
                   )}
                 </div>
@@ -69,9 +71,7 @@ export default function RedFlagAlerts({ encounterId }) {
               {redFlag.finding && (
                 <div className="mb-2 pl-6">
                   <p className="text-xs font-medium text-gray-700 mb-1">Funn:</p>
-                  <p className="text-sm text-gray-900 bg-gray-50 rounded p-2">
-                    {redFlag.finding}
-                  </p>
+                  <p className="text-sm text-gray-900 bg-gray-50 rounded p-2">{redFlag.finding}</p>
                 </div>
               )}
 

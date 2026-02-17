@@ -15,7 +15,7 @@ export const submitFeedback = async (req, res) => {
     const feedbackData = {
       ...req.body,
       userId,
-      organizationId
+      organizationId,
     };
 
     const feedback = await aiLearningService.recordFeedback(feedbackData);
@@ -23,13 +23,13 @@ export const submitFeedback = async (req, res) => {
     res.json({
       success: true,
       data: feedback,
-      message: 'Feedback recorded successfully'
+      message: 'Feedback recorded successfully',
     });
   } catch (error) {
     logger.error('Error submitting AI feedback:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to submit feedback'
+      error: 'Failed to submit feedback',
     });
   }
 };
@@ -40,19 +40,19 @@ export const submitFeedback = async (req, res) => {
 export const getMyFeedback = async (req, res) => {
   try {
     const { userId } = req;
-    const { limit = 50, offset = 0, suggestionType } = req.query;
+    const { _limit = 50, _offset = 0, _suggestionType } = req.query;
 
     const feedback = await aiLearningService.getUserFeedbackPattern(userId);
 
     res.json({
       success: true,
-      data: feedback
+      data: feedback,
     });
   } catch (error) {
     logger.error('Error getting user feedback:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to get feedback history'
+      error: 'Failed to get feedback history',
     });
   }
 };
@@ -73,7 +73,7 @@ export const getMyStats = async (req, res) => {
     let totalRatingSum = 0;
     let ratingCount = 0;
 
-    stats.forEach(s => {
+    stats.forEach((s) => {
       totalInteractions += parseInt(s.total_interactions) || 0;
       totalAccepted += parseInt(s.accepted) || 0;
       totalRejected += parseInt(s.rejected) || 0;
@@ -89,16 +89,17 @@ export const getMyStats = async (req, res) => {
         totalInteractions,
         totalAccepted,
         totalRejected,
-        acceptanceRate: totalInteractions > 0 ? ((totalAccepted / totalInteractions) * 100).toFixed(1) : 0,
+        acceptanceRate:
+          totalInteractions > 0 ? ((totalAccepted / totalInteractions) * 100).toFixed(1) : 0,
         avgRating: ratingCount > 0 ? (totalRatingSum / ratingCount).toFixed(2) : null,
-        byType: stats
-      }
+        byType: stats,
+      },
     });
   } catch (error) {
     logger.error('Error getting user stats:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to get user statistics'
+      error: 'Failed to get user statistics',
     });
   }
 };
@@ -114,18 +115,18 @@ export const getPerformanceMetrics = async (req, res) => {
       suggestionType,
       startDate,
       endDate,
-      groupBy
+      groupBy,
     });
 
     res.json({
       success: true,
-      data: metrics
+      data: metrics,
     });
   } catch (error) {
     logger.error('Error getting performance metrics:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to get performance metrics'
+      error: 'Failed to get performance metrics',
     });
   }
 };
@@ -141,13 +142,13 @@ export const getSuggestionsNeedingReview = async (req, res) => {
 
     res.json({
       success: true,
-      data: suggestions
+      data: suggestions,
     });
   } catch (error) {
     logger.error('Error getting suggestions for review:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to get suggestions for review'
+      error: 'Failed to get suggestions for review',
     });
   }
 };
@@ -162,18 +163,18 @@ export const getCommonCorrections = async (req, res) => {
     const corrections = await aiLearningService.analyzeCommonCorrections({
       suggestionType,
       days: parseInt(days),
-      minOccurrences: parseInt(minOccurrences)
+      minOccurrences: parseInt(minOccurrences),
     });
 
     res.json({
       success: true,
-      data: corrections
+      data: corrections,
     });
   } catch (error) {
     logger.error('Error getting common corrections:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to get common corrections'
+      error: 'Failed to get common corrections',
     });
   }
 };
@@ -194,26 +195,26 @@ export const triggerRetraining = async (req, res) => {
       logger.warn('AI retraining service not available');
       return res.status(503).json({
         success: false,
-        error: 'AI retraining service is not configured'
+        error: 'AI retraining service is not configured',
       });
     }
 
     const result = await aiRetrainingService.runRetrainingPipeline({
       triggeredBy: userId,
       suggestionTypes,
-      triggerType: 'manual'
+      triggerType: 'manual',
     });
 
     res.json({
       success: true,
       data: result,
-      message: 'Retraining triggered successfully'
+      message: 'Retraining triggered successfully',
     });
   } catch (error) {
     logger.error('Error triggering retraining:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to trigger retraining'
+      error: 'Failed to trigger retraining',
     });
   }
 };
@@ -231,14 +232,14 @@ export const getRetrainingStatus = async (req, res) => {
       data: {
         needsRetraining: thresholdResults.length > 0,
         triggeredTypes: thresholdResults,
-        lastCheck: new Date().toISOString()
-      }
+        lastCheck: new Date().toISOString(),
+      },
     });
   } catch (error) {
     logger.error('Error getting retraining status:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to get retraining status'
+      error: 'Failed to get retraining status',
     });
   }
 };
@@ -248,20 +249,20 @@ export const getRetrainingStatus = async (req, res) => {
  */
 export const getRetrainingHistory = async (req, res) => {
   try {
-    const { organizationId } = req;
-    const { limit = 10 } = req.query;
+    const { _organizationId } = req;
+    const { _limit = 10 } = req.query;
 
     // This would query the ai_retraining_events table
     // For now, return empty array if table doesn't exist
     res.json({
       success: true,
-      data: []
+      data: [],
     });
   } catch (error) {
     logger.error('Error getting retraining history:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to get retraining history'
+      error: 'Failed to get retraining history',
     });
   }
 };
@@ -280,7 +281,7 @@ export const rollbackModel = async (req, res) => {
     } catch (e) {
       return res.status(503).json({
         success: false,
-        error: 'AI retraining service is not configured'
+        error: 'AI retraining service is not configured',
       });
     }
 
@@ -289,13 +290,13 @@ export const rollbackModel = async (req, res) => {
     res.json({
       success: true,
       data: result,
-      message: 'Model rolled back successfully'
+      message: 'Model rolled back successfully',
     });
   } catch (error) {
     logger.error('Error rolling back model:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to rollback model'
+      error: 'Failed to rollback model',
     });
   }
 };
@@ -311,7 +312,7 @@ export const exportFeedback = async (req, res) => {
       format,
       suggestionType,
       minRating: minRating ? parseInt(minRating) : undefined,
-      days: days ? parseInt(days) : undefined
+      days: days ? parseInt(days) : undefined,
     });
 
     if (format === 'jsonl') {
@@ -329,7 +330,7 @@ export const exportFeedback = async (req, res) => {
     logger.error('Error exporting feedback:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to export feedback'
+      error: 'Failed to export feedback',
     });
   }
 };
@@ -345,5 +346,5 @@ export default {
   getRetrainingStatus,
   getRetrainingHistory,
   rollbackModel,
-  exportFeedback
+  exportFeedback,
 };

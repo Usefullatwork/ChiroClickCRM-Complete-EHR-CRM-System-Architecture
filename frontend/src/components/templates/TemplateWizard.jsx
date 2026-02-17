@@ -3,7 +3,7 @@
  * Step-by-step interface for creating communication templates
  */
 
-import React, { useState, useCallback } from 'react';
+import _React, { useState, useCallback } from 'react';
 import { aiAPI } from '../../services/api';
 
 // Template types with Norwegian translations
@@ -15,15 +15,25 @@ const TEMPLATE_TYPES = [
   { value: 'birthday', label: 'Birthday', labelNo: 'Bursdag' },
   { value: 'check_in', label: 'Check-in', labelNo: 'Sjekk inn' },
   { value: 'survey', label: 'Survey Invitation', labelNo: 'Spørreundersøkelse' },
-  { value: 'custom', label: 'Custom', labelNo: 'Tilpasset' }
+  { value: 'custom', label: 'Custom', labelNo: 'Tilpasset' },
 ];
 
 // Tone options
 const TONES = [
   { value: 'direct', label: 'Direct', labelNo: 'Direkte', description: 'Short and action-focused' },
   { value: 'kind', label: 'Kind', labelNo: 'Vennlig', description: 'Warm and caring' },
-  { value: 'professional', label: 'Professional', labelNo: 'Profesjonell', description: 'Formal and clinical' },
-  { value: 'empathetic', label: 'Empathetic', labelNo: 'Empatisk', description: 'Understanding and supportive' }
+  {
+    value: 'professional',
+    label: 'Professional',
+    labelNo: 'Profesjonell',
+    description: 'Formal and clinical',
+  },
+  {
+    value: 'empathetic',
+    label: 'Empathetic',
+    labelNo: 'Empatisk',
+    description: 'Understanding and supportive',
+  },
 ];
 
 // Available variables
@@ -37,8 +47,12 @@ const VARIABLES = [
   { key: '{{clinic}}', description: 'Clinic name', descriptionNo: 'Klinikknavn' },
   { key: '{{phone}}', description: 'Clinic phone', descriptionNo: 'Klinikk telefon' },
   { key: '{{lastVisit}}', description: 'Last visit date', descriptionNo: 'Siste besøk' },
-  { key: '{{daysSinceVisit}}', description: 'Days since last visit', descriptionNo: 'Dager siden siste besøk' },
-  { key: '{{bookingLink}}', description: 'Online booking URL', descriptionNo: 'Booking-lenke' }
+  {
+    key: '{{daysSinceVisit}}',
+    description: 'Days since last visit',
+    descriptionNo: 'Dager siden siste besøk',
+  },
+  { key: '{{bookingLink}}', description: 'Online booking URL', descriptionNo: 'Booking-lenke' },
 ];
 
 const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
@@ -55,40 +69,45 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
     subject: initialData?.subject || '',
     content: initialData?.content || '',
     category: initialData?.category || 'RECALL',
-    isActive: initialData?.isActive ?? true
+    isActive: initialData?.isActive ?? true,
   });
 
   const handleChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const insertVariable = useCallback((variable) => {
-    const textarea = document.getElementById('template-content');
-    if (textarea) {
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      const newContent = formData.content.substring(0, start) + variable + formData.content.substring(end);
-      handleChange('content', newContent);
-      // Reset cursor position
-      setTimeout(() => {
-        textarea.focus();
-        textarea.setSelectionRange(start + variable.length, start + variable.length);
-      }, 0);
-    } else {
-      handleChange('content', formData.content + variable);
-    }
-  }, [formData.content]);
+  const insertVariable = useCallback(
+    (variable) => {
+      const textarea = document.getElementById('template-content');
+      if (textarea) {
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const newContent =
+          formData.content.substring(0, start) + variable + formData.content.substring(end);
+        handleChange('content', newContent);
+        // Reset cursor position
+        setTimeout(() => {
+          textarea.focus();
+          textarea.setSelectionRange(start + variable.length, start + variable.length);
+        }, 0);
+      } else {
+        handleChange('content', formData.content + variable);
+      }
+    },
+    [formData.content]
+  );
 
   const generateWithAI = async () => {
     setIsGenerating(true);
     try {
       // Generate template content using AI
-      const typeLabel = TEMPLATE_TYPES.find(t => t.value === formData.type)?.labelNo || formData.type;
-      const toneLabel = TONES.find(t => t.value === formData.tone)?.labelNo || formData.tone;
+      const typeLabel =
+        TEMPLATE_TYPES.find((t) => t.value === formData.type)?.labelNo || formData.type;
+      const toneLabel = TONES.find((t) => t.value === formData.tone)?.labelNo || formData.tone;
 
       const prompt = `Generer en ${formData.channel === 'SMS' ? 'SMS' : 'e-post'} mal for ${typeLabel} med ${toneLabel} tone på norsk. Bruk disse variablene der relevant: {{firstName}}, {{date}}, {{time}}, {{provider}}, {{clinic}}, {{phone}}, {{bookingLink}}. Hold det kort og profesjonelt.`;
 
-      const response = await aiAPI.spellCheck({ text: prompt });
+      const _response = await aiAPI.spellCheck({ text: prompt });
 
       // For now, generate sample content based on type and tone
       const sampleContent = generateSampleContent(formData.type, formData.tone, formData.channel);
@@ -98,7 +117,7 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
       setGeneratedVariations([
         generateSampleContent(formData.type, formData.tone, formData.channel, 1),
         generateSampleContent(formData.type, formData.tone, formData.channel, 2),
-        generateSampleContent(formData.type, formData.tone, formData.channel, 3)
+        generateSampleContent(formData.type, formData.tone, formData.channel, 3),
       ]);
     } catch (error) {
       console.error('Error generating template:', error);
@@ -113,68 +132,68 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
         direct: [
           'Hei {{firstName}}, det er 3 måneder siden sist. Book ny time: {{bookingLink}}',
           'Hei {{firstName}}, på tide med oppfølging. Ring {{phone}} eller book online.',
-          '{{firstName}}: 3 måneder siden siste behandling. Kontakt oss for ny time.'
+          '{{firstName}}: 3 måneder siden siste behandling. Kontakt oss for ny time.',
         ],
         kind: [
           'Hei {{firstName}}! Vi savner deg! Det er nå 3 måneder siden siste besøk. Hvordan har du det? Book gjerne en ny time: {{bookingLink}}',
           'Kjære {{firstName}}, vi håper du har det bra! Tre måneder har gått, og vi vil gjerne sjekke hvordan det går. Velkommen tilbake!',
-          'Hei {{firstName}}! Håper alt er vel med deg. Det begynner å bli en stund siden sist - vi er her for deg når du trenger oss.'
+          'Hei {{firstName}}! Håper alt er vel med deg. Det begynner å bli en stund siden sist - vi er her for deg når du trenger oss.',
         ],
         professional: [
           'Påminnelse: Det er 3 måneder siden din siste konsultasjon hos {{clinic}}. For å sikre kontinuitet i behandlingen, anbefaler vi en oppfølgingstime. Kontakt oss på {{phone}}.',
           'Kjære {{firstName}}, vi informerer om at det har gått 3 måneder siden siste behandling. Vennligst ta kontakt for å avtale oppfølging.',
-          '{{firstName}}, som ledd i vår oppfølgingsrutine informerer vi om at det er tid for en kontrolltime. Ring {{phone}} for avtale.'
+          '{{firstName}}, som ledd i vår oppfølgingsrutine informerer vi om at det er tid for en kontrolltime. Ring {{phone}} for avtale.',
         ],
         empathetic: [
           'Hei {{firstName}}, vi tenker på deg og håper du har det bra. Tre måneder har gått siden sist, og vi er her for deg når du føler det passer. Ta kontakt når du er klar.',
           'Kjære {{firstName}}, vi forstår at hverdagen kan være travel. Bare en vennlig påminnelse om at vi er her for deg når du trenger oss.',
-          'Hei {{firstName}}, hvordan går det med deg? Vi håper hverdagen går bra. Når du føler det passer, tar vi gjerne imot deg igjen.'
-        ]
+          'Hei {{firstName}}, hvordan går det med deg? Vi håper hverdagen går bra. Når du føler det passer, tar vi gjerne imot deg igjen.',
+        ],
       },
       appointment_reminder: {
         direct: [
           'Hei {{firstName}}, time i morgen kl {{time}} hos {{provider}}. Avbud? Ring {{phone}}.',
           'Påminnelse: Time {{date}} kl {{time}} hos {{clinic}}. Ring {{phone}} ved avbud.',
-          '{{firstName}}: Husker du timen din? {{date}} kl {{time}}. Vi ses!'
+          '{{firstName}}: Husker du timen din? {{date}} kl {{time}}. Vi ses!',
         ],
         kind: [
           'Hei {{firstName}}! Vi gleder oss til å se deg {{date}} kl {{time}}. Gi beskjed om noe endrer seg. Ha en fin dag!',
           'Kjære {{firstName}}, bare en vennlig påminnelse om timen din hos {{provider}} i morgen kl {{time}}. Vi ser frem til å se deg!',
-          'Hei {{firstName}}! Timen din nærmer seg - {{date}} kl {{time}}. Vi gleder oss!'
+          'Hei {{firstName}}! Timen din nærmer seg - {{date}} kl {{time}}. Vi gleder oss!',
         ],
         professional: [
           'Påminnelse: Du har time hos {{provider}} i morgen {{date}} kl {{time}}. Ved avbud, kontakt oss på {{phone}}.',
           'Dette er en påminnelse om din avtale hos {{clinic}} den {{date}} kl {{time}}. Vennligst gi beskjed ved endringer.',
-          'Timebekreftelse: {{date}} kl {{time}} hos {{provider}}. Kontakt {{phone}} ved avbud.'
+          'Timebekreftelse: {{date}} kl {{time}} hos {{provider}}. Kontakt {{phone}} ved avbud.',
         ],
         empathetic: [
           'Hei {{firstName}}, vi ser frem til å se deg i morgen kl {{time}}. Hvis du trenger å endre timen, forstår vi det. Bare ring oss.',
           'Kjære {{firstName}}, timen din er snart her. Vi er her for å hjelpe deg, og ser frem til å se deg {{date}}.',
-          'Hei {{firstName}}, bare en vennlig påminnelse. Vi er klare til å ta imot deg {{date}} kl {{time}}.'
-        ]
+          'Hei {{firstName}}, bare en vennlig påminnelse. Vi er klare til å ta imot deg {{date}} kl {{time}}.',
+        ],
       },
       birthday: {
         direct: [
           'Gratulerer med dagen, {{firstName}}! Hilsen {{clinic}}',
           'Gratulerer med bursdagen! Vennlig hilsen fra oss på {{clinic}}.',
-          '{{firstName}} - gratulerer med dagen!'
+          '{{firstName}} - gratulerer med dagen!',
         ],
         kind: [
           'Gratulerer med dagen, {{firstName}}! Vi håper du får en fantastisk dag full av glede. Varme hilsener fra alle oss på {{clinic}}!',
           'Kjære {{firstName}}, gratulerer så mye med dagen! Vi tenker på deg og ønsker deg alt godt. Kos deg masse!',
-          'Hurra for {{firstName}}! Gratulerer med bursdagen! Vi sender varme tanker og ønsker deg en strålende dag!'
+          'Hurra for {{firstName}}! Gratulerer med bursdagen! Vi sender varme tanker og ønsker deg en strålende dag!',
         ],
         professional: [
           'På vegne av {{clinic}} ønsker vi deg en riktig god bursdag, {{firstName}}. Med vennlig hilsen, ditt helseteam.',
           '{{firstName}}, vi ønsker deg en fin fødselsdag. Hilsen {{clinic}}.',
-          'Gratulerer med dagen, {{firstName}}. Med beste ønsker fra {{clinic}}.'
+          'Gratulerer med dagen, {{firstName}}. Med beste ønsker fra {{clinic}}.',
         ],
         empathetic: [
           'Kjære {{firstName}}, på denne spesielle dagen ønsker vi deg all verdens lykke. Du fortjener en fantastisk feiring. Varme hilsener fra oss alle.',
           'Hei {{firstName}}, vi håper bursdagen din blir fylt med glede og gode stunder. Du er viktig for oss!',
-          'Gratulerer med dagen, {{firstName}}! Vi setter pris på deg og ønsker deg en dag full av alt det gode.'
-        ]
-      }
+          'Gratulerer med dagen, {{firstName}}! Vi setter pris på deg og ønsker deg en dag full av alt det gode.',
+        ],
+      },
     };
 
     const typeTemplates = templates[type] || templates.recall_3m;
@@ -186,7 +205,7 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
     if (onSave) {
       onSave({
         ...formData,
-        variables: VARIABLES.filter(v => formData.content.includes(v.key)).map(v => v.key)
+        variables: VARIABLES.filter((v) => formData.content.includes(v.key)).map((v) => v.key),
       });
     }
   };
@@ -213,9 +232,7 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
       <h3 className="text-lg font-semibold">Steg 1: Velg type</h3>
 
       <div className="space-y-4">
-        <label className="block text-sm font-medium text-gray-700">
-          Malnavn
-        </label>
+        <label className="block text-sm font-medium text-gray-700">Malnavn</label>
         <input
           type="text"
           value={formData.name}
@@ -224,36 +241,34 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
 
-        <label className="block text-sm font-medium text-gray-700 mt-4">
-          Type
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mt-4">Type</label>
         <div className="grid grid-cols-2 gap-3">
           {TEMPLATE_TYPES.map((type) => (
             <button
               key={type.value}
               onClick={() => handleChange('type', type.value)}
-              className={`p-3 text-left rounded-lg border-2 transition-colors ${formData.type === type.value
+              className={`p-3 text-left rounded-lg border-2 transition-colors ${
+                formData.type === type.value
                   ? 'border-blue-500 bg-blue-50'
                   : 'border-gray-200 hover:border-gray-300'
-                }`}
+              }`}
             >
               <span className="font-medium">{type.labelNo}</span>
             </button>
           ))}
         </div>
 
-        <label className="block text-sm font-medium text-gray-700 mt-4">
-          Kanal
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mt-4">Kanal</label>
         <div className="flex gap-4">
           {['SMS', 'EMAIL'].map((channel) => (
             <button
               key={channel}
               onClick={() => handleChange('channel', channel)}
-              className={`px-6 py-3 rounded-lg border-2 transition-colors ${formData.channel === channel
+              className={`px-6 py-3 rounded-lg border-2 transition-colors ${
+                formData.channel === channel
                   ? 'border-blue-500 bg-blue-50'
                   : 'border-gray-200 hover:border-gray-300'
-                }`}
+              }`}
             >
               {channel === 'SMS' ? '📱 SMS' : '📧 E-post'}
             </button>
@@ -272,10 +287,11 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
           <button
             key={tone.value}
             onClick={() => handleChange('tone', tone.value)}
-            className={`p-4 text-left rounded-lg border-2 transition-colors ${formData.tone === tone.value
+            className={`p-4 text-left rounded-lg border-2 transition-colors ${
+              formData.tone === tone.value
                 ? 'border-blue-500 bg-blue-50'
                 : 'border-gray-200 hover:border-gray-300'
-              }`}
+            }`}
           >
             <span className="font-medium block">{tone.labelNo}</span>
             <span className="text-sm text-gray-500">{tone.description}</span>
@@ -291,9 +307,7 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
 
       {formData.channel === 'EMAIL' && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Emne
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Emne</label>
           <input
             type="text"
             value={formData.subject}
@@ -306,9 +320,7 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
 
       <div>
         <div className="flex justify-between items-center mb-1">
-          <label className="block text-sm font-medium text-gray-700">
-            Melding
-          </label>
+          <label className="block text-sm font-medium text-gray-700">Melding</label>
           <span className="text-xs text-gray-500">
             {formData.content.length} tegn
             {formData.channel === 'SMS' && formData.content.length > 160 && (
@@ -340,18 +352,14 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
                 Genererer...
               </>
             ) : (
-              <>
-                ✨ Generer med AI
-              </>
+              <>✨ Generer med AI</>
             )}
           </button>
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Sett inn variabler
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Sett inn variabler</label>
         <div className="flex flex-wrap gap-2">
           {VARIABLES.map((variable) => (
             <button
@@ -394,7 +402,9 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
       <div className="bg-gray-100 rounded-lg p-4">
         <div className="flex items-center gap-2 mb-3">
           <span className="text-2xl">{formData.channel === 'SMS' ? '📱' : '📧'}</span>
-          <span className="font-medium">{formData.channel === 'SMS' ? 'SMS Preview' : 'E-post Preview'}</span>
+          <span className="font-medium">
+            {formData.channel === 'SMS' ? 'SMS Preview' : 'E-post Preview'}
+          </span>
         </div>
 
         {formData.channel === 'EMAIL' && formData.subject && (
@@ -432,7 +442,7 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
     { number: 1, title: 'Type' },
     { number: 2, title: 'Tone' },
     { number: 3, title: 'Innhold' },
-    { number: 4, title: 'Forhåndsvis' }
+    { number: 4, title: 'Forhåndsvis' },
   ];
 
   return (
@@ -453,20 +463,23 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
               className={`flex items-center ${index < steps.length - 1 ? 'flex-1' : ''}`}
             >
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step >= s.number
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-600'
-                  }`}
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                  step >= s.number ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
+                }`}
               >
                 {step > s.number ? '✓' : s.number}
               </div>
-              <span className={`ml-2 text-sm ${step >= s.number ? 'text-blue-600 font-medium' : 'text-gray-500'
-                }`}>
+              <span
+                className={`ml-2 text-sm ${
+                  step >= s.number ? 'text-blue-600 font-medium' : 'text-gray-500'
+                }`}
+              >
                 {s.title}
               </span>
               {index < steps.length - 1 && (
-                <div className={`flex-1 h-0.5 mx-4 ${step > s.number ? 'bg-blue-600' : 'bg-gray-200'
-                  }`} />
+                <div
+                  className={`flex-1 h-0.5 mx-4 ${step > s.number ? 'bg-blue-600' : 'bg-gray-200'}`}
+                />
               )}
             </div>
           ))}

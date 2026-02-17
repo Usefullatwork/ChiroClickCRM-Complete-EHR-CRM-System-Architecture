@@ -28,7 +28,7 @@ export default function SmartTextInput({
   aiFieldType = null,
   aiContext = {},
   aiAvailable = true,
-  language = 'no'
+  language = 'no',
 }) {
   const [isFocused, setIsFocused] = useState(false);
   const [showPhraseDropdown, setShowPhraseDropdown] = useState(false);
@@ -53,10 +53,14 @@ export default function SmartTextInput({
       const currentValue = value || '';
 
       // Add space before phrase if needed
-      const needsSpace = cursorPos > 0 && currentValue[cursorPos - 1] !== ' ' && currentValue[cursorPos - 1] !== '\n';
+      const needsSpace =
+        cursorPos > 0 &&
+        currentValue[cursorPos - 1] !== ' ' &&
+        currentValue[cursorPos - 1] !== '\n';
       const insertText = (needsSpace ? ' ' : '') + phrase;
 
-      const newValue = currentValue.slice(0, cursorPos) + insertText + currentValue.slice(cursorPos);
+      const newValue =
+        currentValue.slice(0, cursorPos) + insertText + currentValue.slice(cursorPos);
       onChange(newValue);
 
       // Set cursor position after inserted text
@@ -194,7 +198,7 @@ export default function SmartTextInput({
               onClick={() => insertPhrase(phrase)}
               className="px-2 py-0.5 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
             >
-              {phrase.length > 30 ? phrase.slice(0, 30) + '...' : phrase}
+              {phrase.length > 30 ? `${phrase.slice(0, 30)}...` : phrase}
             </button>
           ))}
         </div>

@@ -3,7 +3,7 @@
  * Allows users to drag-and-drop macros and categories to customize their order
  */
 
-import React, { useState, useEffect, useCallback } from 'react'
+import _React, { useState, useEffect, _useCallback } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -11,16 +11,16 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  DragOverlay
-} from '@dnd-kit/core'
+  _DragOverlay,
+} from '@dnd-kit/core';
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
-  useSortable
-} from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import {
   GripVertical,
   Star,
@@ -33,11 +33,11 @@ import {
   RotateCcw,
   Settings,
   X,
-  Check,
+  _Check,
   Folder,
-  FileText
-} from 'lucide-react'
-import api from '../../services/api'
+  FileText,
+} from 'lucide-react';
+import api from '../../services/api';
 
 // Sortable Category Item
 const SortableCategoryItem = ({
@@ -47,34 +47,38 @@ const SortableCategoryItem = ({
   onToggleHidden,
   macros,
   onMacroReorder,
-  onToggleFavorite
+  onToggleFavorite,
 }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging
-  } = useSortable({ id: category.name })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: category.name,
+  });
+
+  const macroSensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1
-  }
+    opacity: isDragging ? 0.5 : 1,
+  };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`mb-2 ${category.isHidden ? 'opacity-50' : ''}`}
-    >
+    <div ref={setNodeRef} style={style} className={`mb-2 ${category.isHidden ? 'opacity-50' : ''}`}>
       {/* Category Header */}
-      <div className={`flex items-center gap-2 p-3 bg-gray-50 rounded-lg border ${
-        isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
-      }`}>
-        <div {...attributes} {...listeners} className="cursor-grab text-gray-400 hover:text-gray-600">
+      <div
+        className={`flex items-center gap-2 p-3 bg-gray-50 rounded-lg border ${
+          isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+        }`}
+      >
+        <div
+          {...attributes}
+          {...listeners}
+          className="cursor-grab text-gray-400 hover:text-gray-600"
+        >
           <GripVertical className="w-4 h-4" />
         </div>
 
@@ -82,11 +86,7 @@ const SortableCategoryItem = ({
           onClick={() => onToggleExpand(category.name)}
           className="p-1 hover:bg-gray-200 rounded"
         >
-          {isExpanded ? (
-            <ChevronDown className="w-4 h-4" />
-          ) : (
-            <ChevronRight className="w-4 h-4" />
-          )}
+          {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
         </button>
 
         <Folder className="w-4 h-4 text-blue-500" />
@@ -94,7 +94,7 @@ const SortableCategoryItem = ({
         <span className="flex-1 font-medium text-gray-900">{category.name}</span>
 
         <span className="text-xs text-gray-500">
-          {macros.filter(m => m.category === category.name).length} macros
+          {macros.filter((m) => m.category === category.name).length} macros
         </span>
 
         <button
@@ -112,22 +112,17 @@ const SortableCategoryItem = ({
       {isExpanded && !category.isHidden && (
         <div className="ml-6 mt-1 space-y-1">
           <DndContext
-            sensors={useSensors(
-              useSensor(PointerSensor),
-              useSensor(KeyboardSensor, {
-                coordinateGetter: sortableKeyboardCoordinates
-              })
-            )}
+            sensors={macroSensors}
             collisionDetection={closestCenter}
             onDragEnd={(event) => onMacroReorder(category.name, event)}
           >
             <SortableContext
-              items={macros.filter(m => m.category === category.name).map(m => m.id)}
+              items={macros.filter((m) => m.category === category.name).map((m) => m.id)}
               strategy={verticalListSortingStrategy}
             >
               {macros
-                .filter(m => m.category === category.name)
-                .map(macro => (
+                .filter((m) => m.category === category.name)
+                .map((macro) => (
                   <SortableMacroItem
                     key={macro.id}
                     macro={macro}
@@ -139,25 +134,20 @@ const SortableCategoryItem = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
 // Sortable Macro Item
 const SortableMacroItem = ({ macro, onToggleFavorite }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging
-  } = useSortable({ id: macro.id })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: macro.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1
-  }
+    opacity: isDragging ? 0.5 : 1,
+  };
 
   return (
     <div
@@ -184,244 +174,244 @@ const SortableMacroItem = ({ macro, onToggleFavorite }) => {
         }`}
         title={macro.is_favorite ? 'Fjern fra favoritter' : 'Legg til i favoritter'}
       >
-        {macro.is_favorite ? <Star className="w-3 h-3 fill-current" /> : <StarOff className="w-3 h-3" />}
+        {macro.is_favorite ? (
+          <Star className="w-3 h-3 fill-current" />
+        ) : (
+          <StarOff className="w-3 h-3" />
+        )}
       </button>
     </div>
-  )
-}
+  );
+};
 
 // Main Component
-const MacroOrderCustomizer = ({
-  isOpen,
-  onClose,
-  onSave
-}) => {
+const MacroOrderCustomizer = ({ isOpen, onClose, onSave }) => {
   // State
-  const [categories, setCategories] = useState([])
-  const [macros, setMacros] = useState([])
-  const [expandedCategories, setExpandedCategories] = useState(new Set())
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [hasChanges, setHasChanges] = useState(false)
-  const [activeTab, setActiveTab] = useState('categories')
+  const [categories, setCategories] = useState([]);
+  const [macros, setMacros] = useState([]);
+  const [expandedCategories, setExpandedCategories] = useState(new Set());
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [activeTab, setActiveTab] = useState('categories');
 
   // DnD sensors
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates
+      coordinateGetter: sortableKeyboardCoordinates,
     })
-  )
+  );
 
   // Load data
   useEffect(() => {
     if (isOpen) {
-      loadData()
+      loadData();
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   const loadData = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
 
       // Load macros
-      const macrosResponse = await api.get('/macros')
-      const loadedMacros = macrosResponse.data.data || []
-      setMacros(loadedMacros)
+      const macrosResponse = await api.get('/macros');
+      const loadedMacros = macrosResponse.data.data || [];
+      setMacros(loadedMacros);
 
       // Extract unique categories
-      const uniqueCategories = [...new Set(loadedMacros.map(m => m.category))]
+      const uniqueCategories = [...new Set(loadedMacros.map((m) => m.category))]
         .filter(Boolean)
-        .map(name => ({
+        .map((name) => ({
           name,
           isHidden: false,
-          displayOrder: 0
-        }))
-      setCategories(uniqueCategories)
+          displayOrder: 0,
+        }));
+      setCategories(uniqueCategories);
 
       // Load user preferences
       try {
-        const prefsResponse = await api.get('/macros/preferences')
+        const prefsResponse = await api.get('/macros/preferences');
         if (prefsResponse.data.data) {
-          const prefs = prefsResponse.data.data
+          const prefs = prefsResponse.data.data;
 
           // Apply category order
           if (prefs.category_order && prefs.category_order.length > 0) {
-            setCategories(prevCats => {
-              const orderedCats = []
-              prefs.category_order.forEach(catName => {
-                const cat = prevCats.find(c => c.name === catName)
-                if (cat) orderedCats.push(cat)
-              })
-              // Add any new categories not in saved order
-              prevCats.forEach(cat => {
-                if (!orderedCats.find(c => c.name === cat.name)) {
-                  orderedCats.push(cat)
+            setCategories((prevCats) => {
+              const orderedCats = [];
+              prefs.category_order.forEach((catName) => {
+                const cat = prevCats.find((c) => c.name === catName);
+                if (cat) {
+                  orderedCats.push(cat);
                 }
-              })
-              return orderedCats
-            })
+              });
+              // Add any new categories not in saved order
+              prevCats.forEach((cat) => {
+                if (!orderedCats.find((c) => c.name === cat.name)) {
+                  orderedCats.push(cat);
+                }
+              });
+              return orderedCats;
+            });
           }
 
           // Apply hidden categories
           if (prefs.hidden_categories) {
-            setCategories(prevCats =>
-              prevCats.map(cat => ({
+            setCategories((prevCats) =>
+              prevCats.map((cat) => ({
                 ...cat,
-                isHidden: prefs.hidden_categories.includes(cat.name)
+                isHidden: prefs.hidden_categories.includes(cat.name),
               }))
-            )
+            );
           }
 
           // Apply favorite macro order
           if (prefs.favorite_macro_order) {
             // Reorder favorite macros
-            setMacros(prevMacros => {
-              const favoriteMacros = prevMacros.filter(m => m.is_favorite)
-              const nonFavoriteMacros = prevMacros.filter(m => !m.is_favorite)
+            setMacros((prevMacros) => {
+              const favoriteMacros = prevMacros.filter((m) => m.is_favorite);
+              const nonFavoriteMacros = prevMacros.filter((m) => !m.is_favorite);
 
-              const orderedFavorites = []
-              prefs.favorite_macro_order.forEach(id => {
-                const macro = favoriteMacros.find(m => m.id === id)
-                if (macro) orderedFavorites.push(macro)
-              })
-              // Add any favorites not in saved order
-              favoriteMacros.forEach(macro => {
-                if (!orderedFavorites.find(m => m.id === macro.id)) {
-                  orderedFavorites.push(macro)
+              const orderedFavorites = [];
+              prefs.favorite_macro_order.forEach((id) => {
+                const macro = favoriteMacros.find((m) => m.id === id);
+                if (macro) {
+                  orderedFavorites.push(macro);
                 }
-              })
+              });
+              // Add any favorites not in saved order
+              favoriteMacros.forEach((macro) => {
+                if (!orderedFavorites.find((m) => m.id === macro.id)) {
+                  orderedFavorites.push(macro);
+                }
+              });
 
-              return [...orderedFavorites, ...nonFavoriteMacros]
-            })
+              return [...orderedFavorites, ...nonFavoriteMacros];
+            });
           }
         }
       } catch (err) {
         // Preferences might not exist yet, that's okay
-        console.log('No saved preferences found')
+        // No saved preferences found, using defaults
       }
     } catch (error) {
-      console.error('Error loading macro data:', error)
+      console.error('Error loading macro data:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Handle category drag end
   const handleCategoryDragEnd = (event) => {
-    const { active, over } = event
+    const { active, over } = event;
 
     if (active.id !== over.id) {
-      setCategories(items => {
-        const oldIndex = items.findIndex(i => i.name === active.id)
-        const newIndex = items.findIndex(i => i.name === over.id)
-        return arrayMove(items, oldIndex, newIndex)
-      })
-      setHasChanges(true)
+      setCategories((items) => {
+        const oldIndex = items.findIndex((i) => i.name === active.id);
+        const newIndex = items.findIndex((i) => i.name === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+      setHasChanges(true);
     }
-  }
+  };
 
   // Handle macro drag end within a category
   const handleMacroDragEnd = (categoryName, event) => {
-    const { active, over } = event
+    const { active, over } = event;
 
     if (active.id !== over.id) {
-      setMacros(items => {
-        const categoryMacros = items.filter(m => m.category === categoryName)
-        const otherMacros = items.filter(m => m.category !== categoryName)
+      setMacros((items) => {
+        const categoryMacros = items.filter((m) => m.category === categoryName);
+        const otherMacros = items.filter((m) => m.category !== categoryName);
 
-        const oldIndex = categoryMacros.findIndex(m => m.id === active.id)
-        const newIndex = categoryMacros.findIndex(m => m.id === over.id)
+        const oldIndex = categoryMacros.findIndex((m) => m.id === active.id);
+        const newIndex = categoryMacros.findIndex((m) => m.id === over.id);
 
-        const reorderedCategoryMacros = arrayMove(categoryMacros, oldIndex, newIndex)
+        const reorderedCategoryMacros = arrayMove(categoryMacros, oldIndex, newIndex);
 
         // Reconstruct full list
-        return [...reorderedCategoryMacros, ...otherMacros]
-      })
-      setHasChanges(true)
+        return [...reorderedCategoryMacros, ...otherMacros];
+      });
+      setHasChanges(true);
     }
-  }
+  };
 
   // Toggle category expansion
   const toggleExpand = (categoryName) => {
-    setExpandedCategories(prev => {
-      const newSet = new Set(prev)
+    setExpandedCategories((prev) => {
+      const newSet = new Set(prev);
       if (newSet.has(categoryName)) {
-        newSet.delete(categoryName)
+        newSet.delete(categoryName);
       } else {
-        newSet.add(categoryName)
+        newSet.add(categoryName);
       }
-      return newSet
-    })
-  }
+      return newSet;
+    });
+  };
 
   // Toggle category hidden
   const toggleHidden = (categoryName) => {
-    setCategories(prev =>
-      prev.map(cat =>
-        cat.name === categoryName
-          ? { ...cat, isHidden: !cat.isHidden }
-          : cat
-      )
-    )
-    setHasChanges(true)
-  }
+    setCategories((prev) =>
+      prev.map((cat) => (cat.name === categoryName ? { ...cat, isHidden: !cat.isHidden } : cat))
+    );
+    setHasChanges(true);
+  };
 
   // Toggle macro favorite
   const toggleFavorite = async (macroId) => {
-    setMacros(prev =>
-      prev.map(macro =>
-        macro.id === macroId
-          ? { ...macro, is_favorite: !macro.is_favorite }
-          : macro
+    setMacros((prev) =>
+      prev.map((macro) =>
+        macro.id === macroId ? { ...macro, is_favorite: !macro.is_favorite } : macro
       )
-    )
-    setHasChanges(true)
-  }
+    );
+    setHasChanges(true);
+  };
 
   // Save preferences
   const handleSave = async () => {
     try {
-      setSaving(true)
+      setSaving(true);
 
       const preferences = {
-        categoryOrder: categories.map(c => c.name),
-        hiddenCategories: categories.filter(c => c.isHidden).map(c => c.name),
-        favoriteMacroOrder: macros.filter(m => m.is_favorite).map(m => m.id)
-      }
+        categoryOrder: categories.map((c) => c.name),
+        hiddenCategories: categories.filter((c) => c.isHidden).map((c) => c.name),
+        favoriteMacroOrder: macros.filter((m) => m.is_favorite).map((m) => m.id),
+      };
 
-      await api.put('/macros/preferences', preferences)
+      await api.put('/macros/preferences', preferences);
 
       // Update favorite status for individual macros
-      const favoriteMacros = macros.filter(m => m.is_favorite)
-      const nonFavoriteMacros = macros.filter(m => !m.is_favorite)
+      const favoriteMacros = macros.filter((m) => m.is_favorite);
+      const _nonFavoriteMacros = macros.filter((m) => !m.is_favorite);
 
       // Batch update favorites (simplified - would need proper endpoint)
       for (const macro of favoriteMacros) {
         if (!macro._originalIsFavorite) {
-          await api.patch(`/macros/${macro.id}`, { isFavorite: true })
+          await api.patch(`/macros/${macro.id}`, { isFavorite: true });
         }
       }
 
-      setHasChanges(false)
+      setHasChanges(false);
 
       if (onSave) {
-        onSave(preferences)
+        onSave(preferences);
       }
     } catch (error) {
-      console.error('Error saving preferences:', error)
+      console.error('Error saving preferences:', error);
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   // Reset to defaults
   const handleReset = () => {
-    loadData()
-    setHasChanges(false)
-  }
+    loadData();
+    setHasChanges(false);
+  };
 
-  if (!isOpen) return null
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -480,10 +470,10 @@ const MacroOrderCustomizer = ({
               onDragEnd={handleCategoryDragEnd}
             >
               <SortableContext
-                items={categories.map(c => c.name)}
+                items={categories.map((c) => c.name)}
                 strategy={verticalListSortingStrategy}
               >
-                {categories.map(category => (
+                {categories.map((category) => (
                   <SortableCategoryItem
                     key={category.name}
                     category={category}
@@ -507,40 +497,42 @@ const MacroOrderCustomizer = ({
                 sensors={sensors}
                 collisionDetection={closestCenter}
                 onDragEnd={(event) => {
-                  const { active, over } = event
+                  const { active, over } = event;
                   if (active.id !== over.id) {
-                    setMacros(items => {
-                      const favorites = items.filter(m => m.is_favorite)
-                      const nonFavorites = items.filter(m => !m.is_favorite)
+                    setMacros((items) => {
+                      const favorites = items.filter((m) => m.is_favorite);
+                      const nonFavorites = items.filter((m) => !m.is_favorite);
 
-                      const oldIndex = favorites.findIndex(m => m.id === active.id)
-                      const newIndex = favorites.findIndex(m => m.id === over.id)
+                      const oldIndex = favorites.findIndex((m) => m.id === active.id);
+                      const newIndex = favorites.findIndex((m) => m.id === over.id);
 
-                      const reordered = arrayMove(favorites, oldIndex, newIndex)
-                      return [...reordered, ...nonFavorites]
-                    })
-                    setHasChanges(true)
+                      const reordered = arrayMove(favorites, oldIndex, newIndex);
+                      return [...reordered, ...nonFavorites];
+                    });
+                    setHasChanges(true);
                   }
                 }}
               >
                 <SortableContext
-                  items={macros.filter(m => m.is_favorite).map(m => m.id)}
+                  items={macros.filter((m) => m.is_favorite).map((m) => m.id)}
                   strategy={verticalListSortingStrategy}
                 >
-                  {macros.filter(m => m.is_favorite).length === 0 ? (
+                  {macros.filter((m) => m.is_favorite).length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
                       <Star className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                       <p>Ingen favorittmakroer</p>
                       <p className="text-sm">Klikk på stjernen ved en makro for å legge den til</p>
                     </div>
                   ) : (
-                    macros.filter(m => m.is_favorite).map(macro => (
-                      <SortableMacroItem
-                        key={macro.id}
-                        macro={macro}
-                        onToggleFavorite={toggleFavorite}
-                      />
-                    ))
+                    macros
+                      .filter((m) => m.is_favorite)
+                      .map((macro) => (
+                        <SortableMacroItem
+                          key={macro.id}
+                          macro={macro}
+                          onToggleFavorite={toggleFavorite}
+                        />
+                      ))
                   )}
                 </SortableContext>
               </DndContext>
@@ -559,9 +551,7 @@ const MacroOrderCustomizer = ({
           </button>
 
           <div className="flex items-center gap-3">
-            {hasChanges && (
-              <span className="text-sm text-orange-600">Ulagrede endringer</span>
-            )}
+            {hasChanges && <span className="text-sm text-orange-600">Ulagrede endringer</span>}
             <button
               onClick={onClose}
               className="px-4 py-2 text-gray-600 hover:bg-gray-200 rounded-lg transition-colors"
@@ -589,7 +579,7 @@ const MacroOrderCustomizer = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MacroOrderCustomizer
+export default MacroOrderCustomizer;

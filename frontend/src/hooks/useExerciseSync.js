@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Exercise Sync Hook
  * Provides offline-first exercise data with IndexedDB caching and sync
@@ -17,7 +18,7 @@ const STORES = {
   PRESCRIPTIONS: 'prescriptions',
   PENDING_COMPLIANCE: 'pendingCompliance',
   PENDING_PRESCRIPTIONS: 'pendingPrescriptions',
-  SYNC_META: 'syncMeta'
+  SYNC_META: 'syncMeta',
 };
 
 /**
@@ -50,13 +51,19 @@ const initDB = () => {
 
       // Pending compliance logs (to sync when online)
       if (!db.objectStoreNames.contains(STORES.PENDING_COMPLIANCE)) {
-        const complianceStore = db.createObjectStore(STORES.PENDING_COMPLIANCE, { keyPath: 'localId', autoIncrement: true });
+        const complianceStore = db.createObjectStore(STORES.PENDING_COMPLIANCE, {
+          keyPath: 'localId',
+          autoIncrement: true,
+        });
         complianceStore.createIndex('prescription_id', 'prescription_id', { unique: false });
       }
 
       // Pending prescriptions (to sync when online)
       if (!db.objectStoreNames.contains(STORES.PENDING_PRESCRIPTIONS)) {
-        const pendingStore = db.createObjectStore(STORES.PENDING_PRESCRIPTIONS, { keyPath: 'localId', autoIncrement: true });
+        const pendingStore = db.createObjectStore(STORES.PENDING_PRESCRIPTIONS, {
+          keyPath: 'localId',
+          autoIncrement: true,
+        });
         pendingStore.createIndex('patient_id', 'patient_id', { unique: false });
       }
 
@@ -116,7 +123,7 @@ const putMany = async (db, storeName, items) => {
     const transaction = db.transaction(storeName, 'readwrite');
     const store = transaction.objectStore(storeName);
 
-    items.forEach(item => store.put(item));
+    items.forEach((item) => store.put(item));
 
     transaction.oncomplete = () => resolve();
     transaction.onerror = () => reject(transaction.error);
@@ -164,7 +171,7 @@ export const useExerciseSync = (patientId = null) => {
   // Initialize IndexedDB
   useEffect(() => {
     initDB()
-      .then(database => {
+      .then((database) => {
         setDb(database);
         // Get last sync time
         const transaction = database.transaction(STORES.SYNC_META, 'readonly');
@@ -176,7 +183,7 @@ export const useExerciseSync = (patientId = null) => {
           }
         };
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Failed to initialize IndexedDB:', error);
       });
 
@@ -212,7 +219,9 @@ export const useExerciseSync = (patientId = null) => {
 
   // Update pending count
   useEffect(() => {
-    if (!db) return;
+    if (!db) {
+      return;
+    }
 
     const updatePendingCount = async () => {
       try {
@@ -232,12 +241,17 @@ export const useExerciseSync = (patientId = null) => {
 
   // Background sync interval
   useEffect(() => {
-    if (!db || !isOnline) return;
+    if (!db || !isOnline) {
+      return;
+    }
 
     // Sync every 5 minutes
-    syncIntervalRef.current = setInterval(() => {
-      syncExerciseLibrary();
-    }, 5 * 60 * 1000);
+    syncIntervalRef.current = setInterval(
+      () => {
+        syncExerciseLibrary();
+      },
+      5 * 60 * 1000
+    );
 
     return () => {
       if (syncIntervalRef.current) {
@@ -250,7 +264,9 @@ export const useExerciseSync = (patientId = null) => {
    * Sync exercise library from server
    */
   const syncExerciseLibrary = useCallback(async () => {
-    if (!db || !isOnline || isSyncing) return;
+    if (!db || !isOnline || isSyncing) {
+      return;
+    }
 
     setIsSyncing(true);
     try {
@@ -280,29 +296,36 @@ export const useExerciseSync = (patientId = null) => {
   /**
    * Sync patient prescriptions
    */
-  const syncPatientPrescriptions = useCallback(async (patientId) => {
-    if (!db || !isOnline || !patientId) return;
-
-    try {
-      const response = await exercisesAPI.getPatientExercises(patientId, { limit: 100 });
-      const prescriptions = response.data?.data || [];
-
-      // Store prescriptions in cache
-      for (const prescription of prescriptions) {
-        await putItem(db, STORES.PRESCRIPTIONS, prescription);
+  const syncPatientPrescriptions = useCallback(
+    async (patientId) => {
+      if (!db || !isOnline || !patientId) {
+        return;
       }
 
-      console.log(`Patient prescriptions synced: ${prescriptions.length} prescriptions`);
-    } catch (error) {
-      console.error('Error syncing patient prescriptions:', error);
-    }
-  }, [db, isOnline]);
+      try {
+        const response = await exercisesAPI.getPatientExercises(patientId, { limit: 100 });
+        const prescriptions = response.data?.data || [];
+
+        // Store prescriptions in cache
+        for (const prescription of prescriptions) {
+          await putItem(db, STORES.PRESCRIPTIONS, prescription);
+        }
+
+        console.log(`Patient prescriptions synced: ${prescriptions.length} prescriptions`);
+      } catch (error) {
+        console.error('Error syncing patient prescriptions:', error);
+      }
+    },
+    [db, isOnline]
+  );
 
   /**
    * Sync pending data to server
    */
   const syncPendingData = useCallback(async () => {
-    if (!db || !isOnline || isSyncing) return;
+    if (!db || !isOnline || isSyncing) {
+      return;
+    }
 
     setIsSyncing(true);
     try {
@@ -346,124 +369,145 @@ export const useExerciseSync = (patientId = null) => {
   /**
    * Get exercises from cache (for offline use)
    */
-  const getCachedExercises = useCallback(async (filters = {}) => {
-    if (!db) return [];
-
-    try {
-      let exercises = await getAllFromStore(db, STORES.EXERCISES);
-
-      // Apply filters
-      if (filters.category) {
-        exercises = exercises.filter(e => e.category === filters.category);
-      }
-      if (filters.body_region) {
-        exercises = exercises.filter(e => e.body_region === filters.body_region);
-      }
-      if (filters.search) {
-        const searchLower = filters.search.toLowerCase();
-        exercises = exercises.filter(e =>
-          e.name_no?.toLowerCase().includes(searchLower) ||
-          e.name_en?.toLowerCase().includes(searchLower) ||
-          e.code?.toLowerCase().includes(searchLower)
-        );
+  const getCachedExercises = useCallback(
+    async (filters = {}) => {
+      if (!db) {
+        return [];
       }
 
-      return exercises;
-    } catch (error) {
-      console.error('Error getting cached exercises:', error);
-      return [];
-    }
-  }, [db]);
+      try {
+        let exercises = await getAllFromStore(db, STORES.EXERCISES);
+
+        // Apply filters
+        if (filters.category) {
+          exercises = exercises.filter((e) => e.category === filters.category);
+        }
+        if (filters.body_region) {
+          exercises = exercises.filter((e) => e.body_region === filters.body_region);
+        }
+        if (filters.search) {
+          const searchLower = filters.search.toLowerCase();
+          exercises = exercises.filter(
+            (e) =>
+              e.name_no?.toLowerCase().includes(searchLower) ||
+              e.name_en?.toLowerCase().includes(searchLower) ||
+              e.code?.toLowerCase().includes(searchLower)
+          );
+        }
+
+        return exercises;
+      } catch (error) {
+        console.error('Error getting cached exercises:', error);
+        return [];
+      }
+    },
+    [db]
+  );
 
   /**
    * Get patient prescriptions from cache
    */
-  const getCachedPrescriptions = useCallback(async (patientId) => {
-    if (!db || !patientId) return [];
+  const getCachedPrescriptions = useCallback(
+    async (patientId) => {
+      if (!db || !patientId) {
+        return [];
+      }
 
-    try {
-      return await getByIndex(db, STORES.PRESCRIPTIONS, 'patient_id', patientId);
-    } catch (error) {
-      console.error('Error getting cached prescriptions:', error);
-      return [];
-    }
-  }, [db]);
+      try {
+        return await getByIndex(db, STORES.PRESCRIPTIONS, 'patient_id', patientId);
+      } catch (error) {
+        console.error('Error getting cached prescriptions:', error);
+        return [];
+      }
+    },
+    [db]
+  );
 
   /**
    * Queue compliance log for sync (when offline)
    */
-  const queueComplianceLog = useCallback(async (prescriptionId, data) => {
-    if (!db) return false;
-
-    try {
-      await putItem(db, STORES.PENDING_COMPLIANCE, {
-        prescription_id: prescriptionId,
-        data,
-        timestamp: new Date().toISOString()
-      });
-
-      // Update the cached prescription locally
-      const transaction = db.transaction(STORES.PRESCRIPTIONS, 'readwrite');
-      const store = transaction.objectStore(STORES.PRESCRIPTIONS);
-      const request = store.get(prescriptionId);
-
-      request.onsuccess = () => {
-        if (request.result) {
-          const prescription = request.result;
-          const dateKey = data.date || new Date().toISOString().split('T')[0];
-          prescription.compliance_log = {
-            ...prescription.compliance_log,
-            [dateKey]: {
-              completed: data.completed,
-              pain_level: data.pain_level,
-              notes: data.notes,
-              synced: false
-            }
-          };
-          store.put(prescription);
-        }
-      };
-
-      setPendingCount(prev => prev + 1);
-
-      // Try to sync immediately if online
-      if (isOnline) {
-        syncPendingData();
+  const queueComplianceLog = useCallback(
+    async (prescriptionId, data) => {
+      if (!db) {
+        return false;
       }
 
-      return true;
-    } catch (error) {
-      console.error('Error queuing compliance log:', error);
-      return false;
-    }
-  }, [db, isOnline, syncPendingData]);
+      try {
+        await putItem(db, STORES.PENDING_COMPLIANCE, {
+          prescription_id: prescriptionId,
+          data,
+          timestamp: new Date().toISOString(),
+        });
+
+        // Update the cached prescription locally
+        const transaction = db.transaction(STORES.PRESCRIPTIONS, 'readwrite');
+        const store = transaction.objectStore(STORES.PRESCRIPTIONS);
+        const request = store.get(prescriptionId);
+
+        request.onsuccess = () => {
+          if (request.result) {
+            const prescription = request.result;
+            const dateKey = data.date || new Date().toISOString().split('T')[0];
+            prescription.compliance_log = {
+              ...prescription.compliance_log,
+              [dateKey]: {
+                completed: data.completed,
+                pain_level: data.pain_level,
+                notes: data.notes,
+                synced: false,
+              },
+            };
+            store.put(prescription);
+          }
+        };
+
+        setPendingCount((prev) => prev + 1);
+
+        // Try to sync immediately if online
+        if (isOnline) {
+          syncPendingData();
+        }
+
+        return true;
+      } catch (error) {
+        console.error('Error queuing compliance log:', error);
+        return false;
+      }
+    },
+    [db, isOnline, syncPendingData]
+  );
 
   /**
    * Queue prescription for sync (when offline)
    */
-  const queuePrescription = useCallback(async (patientId, data) => {
-    if (!db) return false;
-
-    try {
-      await putItem(db, STORES.PENDING_PRESCRIPTIONS, {
-        patient_id: patientId,
-        data,
-        timestamp: new Date().toISOString()
-      });
-
-      setPendingCount(prev => prev + 1);
-
-      // Try to sync immediately if online
-      if (isOnline) {
-        syncPendingData();
+  const queuePrescription = useCallback(
+    async (patientId, data) => {
+      if (!db) {
+        return false;
       }
 
-      return true;
-    } catch (error) {
-      console.error('Error queuing prescription:', error);
-      return false;
-    }
-  }, [db, isOnline, syncPendingData]);
+      try {
+        await putItem(db, STORES.PENDING_PRESCRIPTIONS, {
+          patient_id: patientId,
+          data,
+          timestamp: new Date().toISOString(),
+        });
+
+        setPendingCount((prev) => prev + 1);
+
+        // Try to sync immediately if online
+        if (isOnline) {
+          syncPendingData();
+        }
+
+        return true;
+      } catch (error) {
+        console.error('Error queuing prescription:', error);
+        return false;
+      }
+    },
+    [db, isOnline, syncPendingData]
+  );
 
   /**
    * Force sync all data
@@ -480,7 +524,9 @@ export const useExerciseSync = (patientId = null) => {
    * Clear all cached data
    */
   const clearCache = useCallback(async () => {
-    if (!db) return;
+    if (!db) {
+      return;
+    }
 
     try {
       await clearStore(db, STORES.EXERCISES);
@@ -514,7 +560,7 @@ export const useExerciseSync = (patientId = null) => {
     syncPatientPrescriptions,
     syncPendingData,
     forceSync,
-    clearCache
+    clearCache,
   };
 };
 

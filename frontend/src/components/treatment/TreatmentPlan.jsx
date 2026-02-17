@@ -11,7 +11,7 @@
  * Bilingual: English/Norwegian
  */
 
-import React, { useState, useMemo, useCallback } from 'react';
+import _React, { useState, useMemo, _useCallback } from 'react';
 
 // =============================================================================
 // TRANSLATIONS
@@ -152,7 +152,10 @@ export const PLAN_TEMPLATES = {
   acute: {
     id: 'acute',
     name: { en: 'Acute Care', no: 'Akuttbehandling' },
-    description: { en: 'Short-term pain relief and symptom reduction', no: 'Kortsiktig smertelindring og symptomreduksjon' },
+    description: {
+      en: 'Short-term pain relief and symptom reduction',
+      no: 'Kortsiktig smertelindring og symptomreduksjon',
+    },
     duration: 2, // weeks
     phases: [
       {
@@ -179,7 +182,10 @@ export const PLAN_TEMPLATES = {
   corrective: {
     id: 'corrective',
     name: { en: 'Corrective Care', no: 'Korrigerende behandling' },
-    description: { en: 'Address underlying dysfunction and restore function', no: 'Behandle underliggende dysfunksjon og gjenopprette funksjon' },
+    description: {
+      en: 'Address underlying dysfunction and restore function',
+      no: 'Behandle underliggende dysfunksjon og gjenopprette funksjon',
+    },
     duration: 8,
     phases: [
       {
@@ -216,7 +222,10 @@ export const PLAN_TEMPLATES = {
   maintenance: {
     id: 'maintenance',
     name: { en: 'Maintenance Care', no: 'Vedlikeholdsbehandling' },
-    description: { en: 'Prevent recurrence and maintain optimal function', no: 'Forhindre tilbakefall og opprettholde optimal funksjon' },
+    description: {
+      en: 'Prevent recurrence and maintain optimal function',
+      no: 'Forhindre tilbakefall og opprettholde optimal funksjon',
+    },
     duration: 12,
     phases: [
       {
@@ -235,7 +244,10 @@ export const PLAN_TEMPLATES = {
   rehabilitative: {
     id: 'rehabilitative',
     name: { en: 'Rehabilitative', no: 'Rehabilitering' },
-    description: { en: 'Post-injury or post-surgical rehabilitation', no: 'Rehabilitering etter skade eller operasjon' },
+    description: {
+      en: 'Post-injury or post-surgical rehabilitation',
+      no: 'Rehabilitering etter skade eller operasjon',
+    },
     duration: 12,
     phases: [
       {
@@ -286,7 +298,7 @@ export const PLAN_TEMPLATES = {
 /**
  * Phase Progress Card
  */
-function PhaseCard({ phase, index, currentPhaseIndex, visits, lang }) {
+function PhaseCard({ phase, index, currentPhaseIndex, _visits, lang }) {
   const t = TRANSLATIONS[lang];
   const isActive = index === currentPhaseIndex;
   const isComplete = index < currentPhaseIndex;
@@ -297,8 +309,8 @@ function PhaseCard({ phase, index, currentPhaseIndex, visits, lang }) {
         isActive
           ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
           : isComplete
-          ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-          : 'border-gray-200 dark:border-gray-700'
+            ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
+            : 'border-gray-200 dark:border-gray-700'
       }`}
     >
       <div className="flex items-center justify-between mb-2">
@@ -308,15 +320,13 @@ function PhaseCard({ phase, index, currentPhaseIndex, visits, lang }) {
               isComplete
                 ? 'bg-green-500 text-white'
                 : isActive
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
             }`}
           >
             {isComplete ? '✓' : index + 1}
           </span>
-          <span className="font-semibold text-gray-900 dark:text-white">
-            {phase.name[lang]}
-          </span>
+          <span className="font-semibold text-gray-900 dark:text-white">{phase.name[lang]}</span>
         </div>
         <span className="text-sm text-gray-500 dark:text-gray-400">
           {phase.weeks} {t.weeks}
@@ -367,12 +377,15 @@ function GoalTracker({ goals, onToggle, lang }) {
             {goal.achieved && '✓'}
           </div>
           <div className="flex-1">
-            <div className={`font-medium ${goal.achieved ? 'line-through text-gray-500' : 'text-gray-900 dark:text-white'}`}>
+            <div
+              className={`font-medium ${goal.achieved ? 'line-through text-gray-500' : 'text-gray-900 dark:text-white'}`}
+            >
               {goal.description}
             </div>
             {goal.targetDate && (
               <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                {t.targetDate}: {new Date(goal.targetDate).toLocaleDateString(lang === 'no' ? 'nb-NO' : 'en-US')}
+                {t.targetDate}:{' '}
+                {new Date(goal.targetDate).toLocaleDateString(lang === 'no' ? 'nb-NO' : 'en-US')}
               </div>
             )}
           </div>
@@ -395,9 +408,7 @@ function VisitProgress({ completed, total, lang }) {
         <span className="text-gray-600 dark:text-gray-400">
           {completed} / {total} {t.visitsCompleted.toLowerCase()}
         </span>
-        <span className="font-medium text-gray-900 dark:text-white">
-          {Math.round(percentage)}%
-        </span>
+        <span className="font-medium text-gray-900 dark:text-white">{Math.round(percentage)}%</span>
       </div>
       <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
         <div
@@ -423,16 +434,20 @@ function TemplateSelector({ onSelect, lang }) {
           onClick={() => onSelect(template)}
           className="p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 text-left transition-all"
         >
-          <h4 className="font-semibold text-gray-900 dark:text-white">
-            {template.name[lang]}
-          </h4>
+          <h4 className="font-semibold text-gray-900 dark:text-white">{template.name[lang]}</h4>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
             {template.description[lang]}
           </p>
           <div className="flex items-center gap-4 mt-3 text-sm text-gray-500 dark:text-gray-400">
-            <span>{template.duration} {t.weeks}</span>
-            <span>{template.totalVisits} {t.totalVisits.toLowerCase()}</span>
-            <span>{template.phases.length} {t.phases.toLowerCase()}</span>
+            <span>
+              {template.duration} {t.weeks}
+            </span>
+            <span>
+              {template.totalVisits} {t.totalVisits.toLowerCase()}
+            </span>
+            <span>
+              {template.phases.length} {t.phases.toLowerCase()}
+            </span>
           </div>
         </button>
       ))}
@@ -441,11 +456,11 @@ function TemplateSelector({ onSelect, lang }) {
         onClick={() => onSelect(null)}
         className="p-4 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-500 text-left transition-all"
       >
-        <h4 className="font-semibold text-gray-900 dark:text-white">
-          {t.customPlan}
-        </h4>
+        <h4 className="font-semibold text-gray-900 dark:text-white">{t.customPlan}</h4>
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-          {lang === 'en' ? 'Create a fully customized treatment plan' : 'Opprett en helt tilpasset behandlingsplan'}
+          {lang === 'en'
+            ? 'Create a fully customized treatment plan'
+            : 'Opprett en helt tilpasset behandlingsplan'}
         </p>
       </button>
     </div>
@@ -456,13 +471,7 @@ function TemplateSelector({ onSelect, lang }) {
 // MAIN COMPONENT
 // =============================================================================
 
-export default function TreatmentPlan({
-  patientId,
-  plan,
-  onSave,
-  onDelete,
-  lang = 'en',
-}) {
+export default function TreatmentPlan({ _patientId, plan, onSave, _onDelete, lang = 'en' }) {
   const t = TRANSLATIONS[lang];
   const [isEditing, setIsEditing] = useState(!plan);
   const [showTemplates, setShowTemplates] = useState(!plan);
@@ -481,7 +490,9 @@ export default function TreatmentPlan({
 
   // Calculate current phase
   const currentPhaseIndex = useMemo(() => {
-    if (!formData.phases || formData.phases.length === 0) return 0;
+    if (!formData.phases || formData.phases.length === 0) {
+      return 0;
+    }
 
     let visitsInPhases = 0;
     for (let i = 0; i < formData.phases.length; i++) {
@@ -518,9 +529,7 @@ export default function TreatmentPlan({
   const handleGoalToggle = (goalId) => {
     setFormData((prev) => ({
       ...prev,
-      goals: prev.goals.map((g) =>
-        g.id === goalId ? { ...g, achieved: !g.achieved } : g
-      ),
+      goals: prev.goals.map((g) => (g.id === goalId ? { ...g, achieved: !g.achieved } : g)),
     }));
   };
 
@@ -536,12 +545,8 @@ export default function TreatmentPlan({
   if (showTemplates) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-          {t.newPlan}
-        </h2>
-        <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">
-          {t.templates}
-        </h3>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">{t.newPlan}</h2>
+        <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">{t.templates}</h3>
         <TemplateSelector onSelect={handleTemplateSelect} lang={lang} />
       </div>
     );
@@ -552,9 +557,7 @@ export default function TreatmentPlan({
       {/* Header */}
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-            {t.treatmentPlan}
-          </h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t.treatmentPlan}</h2>
           <div className="flex items-center gap-2">
             {!isEditing ? (
               <>
@@ -628,9 +631,7 @@ export default function TreatmentPlan({
 
         {/* Visit Progress */}
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-            {t.progress}
-          </h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t.progress}</h3>
           <VisitProgress
             completed={formData.visitsCompleted}
             total={formData.totalVisits}
@@ -641,9 +642,7 @@ export default function TreatmentPlan({
         {/* Phases */}
         {formData.phases && formData.phases.length > 0 && (
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-              {t.phases}
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t.phases}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {formData.phases.map((phase, index) => (
                 <PhaseCard
@@ -662,14 +661,8 @@ export default function TreatmentPlan({
         {/* Goals */}
         {formData.goals && formData.goals.length > 0 && (
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-              {t.goals}
-            </h3>
-            <GoalTracker
-              goals={formData.goals}
-              onToggle={handleGoalToggle}
-              lang={lang}
-            />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t.goals}</h3>
+            <GoalTracker goals={formData.goals} onToggle={handleGoalToggle} lang={lang} />
           </div>
         )}
 

@@ -3,11 +3,11 @@
  * Real-time appointment board with WebSocket updates
  * Day view showing time slots with colored appointment blocks
  */
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import _React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Calendar,
   Clock,
-  User,
+  _User,
   ChevronLeft,
   ChevronRight,
   RefreshCw,
@@ -101,12 +101,14 @@ function toDateString(date) {
 }
 
 function getTimeFromISO(isoString) {
-  if (!isoString) return '08:00';
+  if (!isoString) {
+    return '08:00';
+  }
   const d = new Date(isoString);
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
-function getSlotIndex(time) {
+function _getSlotIndex(time) {
   const [h, m] = time.split(':').map(Number);
   return (h - 8) * 4 + Math.floor(m / 15);
 }
@@ -149,7 +151,9 @@ export default function LiveAppointmentBoard() {
 
   // WebSocket: appointment created
   useSocketEvent('appointment:created', (data) => {
-    if (!data?.appointment) return;
+    if (!data?.appointment) {
+      return;
+    }
     const apptDate = toDateString(data.appointment.start_time || data.appointment.appointment_date);
     if (apptDate === dateStr) {
       setAppointments((prev) => [...prev, data.appointment]);
@@ -158,7 +162,9 @@ export default function LiveAppointmentBoard() {
 
   // WebSocket: appointment updated
   useSocketEvent('appointment:updated', (data) => {
-    if (!data?.appointment) return;
+    if (!data?.appointment) {
+      return;
+    }
     const appt = data.appointment;
     setAppointments((prev) => {
       const idx = prev.findIndex((a) => a.id === appt.id);
@@ -178,7 +184,9 @@ export default function LiveAppointmentBoard() {
 
   // WebSocket: appointment cancelled
   useSocketEvent('appointment:cancelled', (data) => {
-    if (!data?.appointmentId) return;
+    if (!data?.appointmentId) {
+      return;
+    }
     setAppointments((prev) =>
       prev.map((a) => (a.id === data.appointmentId ? { ...a, status: 'cancelled' } : a))
     );
@@ -280,7 +288,7 @@ export default function LiveAppointmentBoard() {
             </div>
           ) : (
             <div className="relative">
-              {TIME_SLOTS.map((time, i) => {
+              {TIME_SLOTS.map((time, _i) => {
                 const isHour = time.endsWith(':00');
                 const slotAppointments = sortedAppointments.filter((a) => {
                   const apptTime = getTimeFromISO(a.start_time || a.appointment_date);

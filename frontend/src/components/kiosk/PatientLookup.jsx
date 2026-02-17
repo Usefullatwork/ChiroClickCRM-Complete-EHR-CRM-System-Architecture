@@ -8,7 +8,7 @@
  * - Bilingual support
  */
 
-import React, { useState, useCallback } from 'react';
+import _React, { useState, useCallback } from 'react';
 import { Search, Loader2, AlertCircle } from 'lucide-react';
 
 const TRANSLATIONS = {
@@ -33,7 +33,7 @@ const TRANSLATIONS = {
     tryAgain: 'Vennligst sjekk med resepsjonen',
     selectAppointment: 'Velg din avtale',
     appointmentAt: 'Avtale kl.',
-  }
+  },
 };
 
 const APPOINTMENT_TYPE_LABELS = {
@@ -44,7 +44,7 @@ const APPOINTMENT_TYPE_LABELS = {
     MAINTENANCE: 'Maintenance',
     ACUTE: 'Acute',
     REEXAM: 'Re-examination',
-    EMERGENCY: 'Emergency'
+    EMERGENCY: 'Emergency',
   },
   no: {
     INITIAL: 'Ny pasient',
@@ -53,8 +53,8 @@ const APPOINTMENT_TYPE_LABELS = {
     MAINTENANCE: 'Vedlikehold',
     ACUTE: 'Akutt',
     REEXAM: 'Reundersøkelse',
-    EMERGENCY: 'Akutt'
-  }
+    EMERGENCY: 'Akutt',
+  },
 };
 
 export default function PatientLookup({ onSelect, lang = 'no', apiBase = '/api/v1' }) {
@@ -72,12 +72,14 @@ export default function PatientLookup({ onSelect, lang = 'no', apiBase = '/api/v
     return date.toLocaleTimeString(lang === 'no' ? 'nb-NO' : 'en-US', {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: false
+      hour12: false,
     });
   };
 
   const search = useCallback(async () => {
-    if (query.length < 2) return;
+    if (query.length < 2) {
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -111,12 +113,8 @@ export default function PatientLookup({ onSelect, lang = 'no', apiBase = '/api/v
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-3">
-          {t.title}
-        </h1>
-        <p className="text-xl text-slate-500">
-          {t.subtitle}
-        </p>
+        <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-3">{t.title}</h1>
+        <p className="text-xl text-slate-500">{t.subtitle}</p>
       </div>
 
       {/* Search input */}
@@ -170,7 +168,7 @@ export default function PatientLookup({ onSelect, lang = 'no', apiBase = '/api/v
         <div className="mt-8 flex-1 overflow-y-auto">
           <p className="text-lg text-slate-600 mb-4 text-center">{t.selectAppointment}</p>
           <div className="space-y-3">
-            {results.map(apt => (
+            {results.map((apt) => (
               <button
                 key={apt.id}
                 onClick={() => onSelect(apt)}
@@ -182,13 +180,16 @@ export default function PatientLookup({ onSelect, lang = 'no', apiBase = '/api/v
                   {apt.firstName} {apt.lastName}
                 </div>
                 <div className="text-lg text-slate-500 mt-1 flex items-center gap-2">
-                  <span className="font-medium">{t.appointmentAt} {formatTime(apt.startTime)}</span>
+                  <span className="font-medium">
+                    {t.appointmentAt} {formatTime(apt.startTime)}
+                  </span>
                   <span className="text-slate-300">•</span>
                   <span>{typeLabels[apt.appointmentType] || apt.appointmentType}</span>
                 </div>
                 {apt.phoneLastFour && (
                   <div className="text-sm text-slate-400 mt-1">
-                    {lang === 'no' ? 'Telefon slutter på' : 'Phone ends with'} ...{apt.phoneLastFour}
+                    {lang === 'no' ? 'Telefon slutter på' : 'Phone ends with'} ...
+                    {apt.phoneLastFour}
                   </div>
                 )}
               </button>

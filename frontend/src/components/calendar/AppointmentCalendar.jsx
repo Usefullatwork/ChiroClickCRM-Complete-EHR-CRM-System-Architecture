@@ -11,7 +11,7 @@
  * Bilingual: English/Norwegian
  */
 
-import React, { useState, useMemo, useCallback } from 'react';
+import _React, { useState, useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 // =============================================================================
@@ -48,7 +48,20 @@ const TRANSLATIONS = {
     inProgress: 'In Progress',
     weekDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
     weekDaysFull: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-    months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    months: [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ],
   },
   no: {
     calendar: 'Kalender',
@@ -79,7 +92,20 @@ const TRANSLATIONS = {
     inProgress: 'Pågår',
     weekDays: ['Søn', 'Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør'],
     weekDaysFull: ['Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'],
-    months: ['Januar', 'Februar', 'Mars', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Desember'],
+    months: [
+      'Januar',
+      'Februar',
+      'Mars',
+      'April',
+      'Mai',
+      'Juni',
+      'Juli',
+      'August',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ],
   },
 };
 
@@ -165,7 +191,7 @@ function getWeekStart(date) {
   return new Date(d.setDate(diff));
 }
 
-function formatDate(date, lang) {
+function _formatDate(date, lang) {
   const d = new Date(date);
   return d.toLocaleDateString(lang === 'no' ? 'nb-NO' : 'en-US', {
     month: 'short',
@@ -246,14 +272,10 @@ function DayColumn({ date, appointments, lang, isToday, onSlotClick, onAppointme
           isToday ? 'bg-blue-50 dark:bg-blue-900/20' : ''
         }`}
       >
-        <div className="text-xs text-gray-500 dark:text-gray-400">
-          {t.weekDays[dayOfWeek]}
-        </div>
+        <div className="text-xs text-gray-500 dark:text-gray-400">{t.weekDays[dayOfWeek]}</div>
         <div
           className={`text-sm font-semibold ${
-            isToday
-              ? 'text-blue-600 dark:text-blue-400'
-              : 'text-gray-900 dark:text-white'
+            isToday ? 'text-blue-600 dark:text-blue-400' : 'text-gray-900 dark:text-white'
           }`}
         >
           {new Date(date).getDate()}
@@ -261,7 +283,10 @@ function DayColumn({ date, appointments, lang, isToday, onSlotClick, onAppointme
       </div>
 
       {/* Time Slots */}
-      <div className="relative" style={{ height: `${(WORK_HOURS.end - WORK_HOURS.start + 1) * 64}px` }}>
+      <div
+        className="relative"
+        style={{ height: `${(WORK_HOURS.end - WORK_HOURS.start + 1) * 64}px` }}
+      >
         {/* Hour grid lines */}
         {Array.from({ length: WORK_HOURS.end - WORK_HOURS.start + 1 }).map((_, i) => (
           <div
@@ -290,7 +315,8 @@ function DayColumn({ date, appointments, lang, isToday, onSlotClick, onAppointme
             </div>
             {apt.duration >= 30 && (
               <div className="text-xs text-gray-600 dark:text-gray-300 truncate">
-                {apt.startTime} • {apt.duration}{t.minutes}
+                {apt.startTime} • {apt.duration}
+                {t.minutes}
               </div>
             )}
           </div>
@@ -305,7 +331,9 @@ function DayColumn({ date, appointments, lang, isToday, onSlotClick, onAppointme
  */
 function AppointmentModal({ appointment, lang, onClose, onAction }) {
   const t = TRANSLATIONS[lang];
-  if (!appointment) return null;
+  if (!appointment) {
+    return null;
+  }
 
   const typeInfo = APPOINTMENT_TYPES[appointment.type] || {};
 
@@ -346,12 +374,17 @@ function AppointmentModal({ appointment, lang, onClose, onAction }) {
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-500 dark:text-gray-400">Status:</span>
-            <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-              appointment.status === 'CONFIRMED' ? 'bg-green-100 text-green-800' :
-              appointment.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-              appointment.status === 'COMPLETED' ? 'bg-blue-100 text-blue-800' :
-              'bg-gray-100 text-gray-800'
-            }`}>
+            <span
+              className={`px-2 py-0.5 rounded text-xs font-medium ${
+                appointment.status === 'CONFIRMED'
+                  ? 'bg-green-100 text-green-800'
+                  : appointment.status === 'PENDING'
+                    ? 'bg-yellow-100 text-yellow-800'
+                    : appointment.status === 'COMPLETED'
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'bg-gray-100 text-gray-800'
+              }`}
+            >
               {t[appointment.status?.toLowerCase()] || appointment.status}
             </span>
           </div>
@@ -438,13 +471,17 @@ export default function AppointmentCalendar({
 
   // Use external appointments or generate mock data
   const appointments = useMemo(() => {
-    if (externalAppointments) return externalAppointments;
+    if (externalAppointments) {
+      return externalAppointments;
+    }
     return generateMockAppointments(weekStart);
   }, [externalAppointments, weekStart]);
 
   // Filter appointments by provider
   const filteredAppointments = useMemo(() => {
-    if (!selectedProvider) return appointments;
+    if (!selectedProvider) {
+      return appointments;
+    }
     return appointments.filter((apt) => apt.providerId === selectedProvider);
   }, [appointments, selectedProvider]);
 
@@ -474,24 +511,30 @@ export default function AppointmentCalendar({
   const today = new Date().toISOString().split('T')[0];
 
   // Handle slot click for new appointment
-  const handleSlotClick = useCallback((date, hour) => {
-    if (onNewAppointment) {
-      onNewAppointment({ date, time: `${String(hour).padStart(2, '0')}:00` });
-    } else {
-      navigate(`/appointments/new?date=${date}&time=${hour}:00`);
-    }
-  }, [onNewAppointment, navigate]);
+  const handleSlotClick = useCallback(
+    (date, hour) => {
+      if (onNewAppointment) {
+        onNewAppointment({ date, time: `${String(hour).padStart(2, '0')}:00` });
+      } else {
+        navigate(`/appointments/new?date=${date}&time=${hour}:00`);
+      }
+    },
+    [onNewAppointment, navigate]
+  );
 
   // Handle appointment action
-  const handleAppointmentAction = useCallback((action, apt) => {
-    setSelectedAppointment(null);
-    if (onAppointmentAction) {
-      onAppointmentAction(action, apt);
-    } else {
-      // Default behavior
-      console.log('Action:', action, apt);
-    }
-  }, [onAppointmentAction]);
+  const handleAppointmentAction = useCallback(
+    (action, apt) => {
+      setSelectedAppointment(null);
+      if (onAppointmentAction) {
+        onAppointmentAction(action, apt);
+      } else {
+        // Default behavior
+        // Default action handler - no callback provided
+      }
+    },
+    [onAppointmentAction]
+  );
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -528,7 +571,9 @@ export default function AppointmentCalendar({
             {/* Provider Filter */}
             <select
               value={selectedProvider || ''}
-              onChange={(e) => setSelectedProvider(e.target.value ? parseInt(e.target.value) : null)}
+              onChange={(e) =>
+                setSelectedProvider(e.target.value ? parseInt(e.target.value) : null)
+              }
               className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
               <option value="">{t.allProviders}</option>

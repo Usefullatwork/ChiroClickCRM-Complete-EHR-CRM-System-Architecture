@@ -1,8 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import _React, { useState, useEffect } from 'react';
 import {
-  Settings, Clock, Calendar, Mail, MessageSquare, Bell,
-  Save, Plus, Trash2, Edit, Check, X, AlertCircle,
-  Users, Zap, FileText, ChevronDown, ChevronRight, Loader2
+  _Settings,
+  Clock,
+  Calendar,
+  Mail,
+  MessageSquare,
+  Bell,
+  Save,
+  Plus,
+  Trash2,
+  Edit,
+  _Check,
+  X,
+  AlertCircle,
+  Users,
+  Zap,
+  _FileText,
+  _ChevronDown,
+  ChevronRight,
+  Loader2,
 } from 'lucide-react';
 import { crmAPI } from '../../services/api';
 
@@ -17,12 +33,13 @@ const CRMSettings = () => {
   const [checkinSettings, setCheckinSettings] = useState({
     enabled: true,
     inactiveDays: 30,
-    messageTemplate: 'Hei {name}! Det er en stund siden sist. Vi savner deg! Book din neste time på {booking_link}',
+    messageTemplate:
+      'Hei {name}! Det er en stund siden sist. Vi savner deg! Book din neste time på {booking_link}',
     channel: 'SMS',
     sendTime: '10:00',
     excludeWeekends: true,
     maxAttempts: 2,
-    daysBetweenAttempts: 7
+    daysBetweenAttempts: 7,
   });
 
   // Scheduled information dates
@@ -35,7 +52,7 @@ const CRMSettings = () => {
       targetAudience: 'ALL',
       channel: 'EMAIL',
       template: 'newsletter_january',
-      enabled: true
+      enabled: true,
     },
     {
       id: 2,
@@ -45,7 +62,7 @@ const CRMSettings = () => {
       targetAudience: 'ACTIVE',
       channel: 'EMAIL',
       template: 'winter_exercises',
-      enabled: true
+      enabled: true,
     },
     {
       id: 3,
@@ -55,12 +72,12 @@ const CRMSettings = () => {
       targetAudience: 'ALL',
       channel: 'SMS',
       template: 'easter_greeting',
-      enabled: true
-    }
+      enabled: true,
+    },
   ]);
 
   const [showAddSchedule, setShowAddSchedule] = useState(false);
-  const [editingSchedule, setEditingSchedule] = useState(null);
+  const [_editingSchedule, setEditingSchedule] = useState(null);
   const [newSchedule, setNewSchedule] = useState({
     name: '',
     date: '',
@@ -68,7 +85,7 @@ const CRMSettings = () => {
     targetAudience: 'ALL',
     channel: 'EMAIL',
     template: '',
-    enabled: true
+    enabled: true,
   });
 
   // Lifecycle thresholds
@@ -77,7 +94,7 @@ const CRMSettings = () => {
     onboardingVisits: 3,
     atRiskDays: 45,
     inactiveDays: 90,
-    lostDays: 180
+    lostDays: 180,
   });
 
   // Notification settings
@@ -89,7 +106,7 @@ const CRMSettings = () => {
     birthdayGreeting: true,
     birthdayChannel: 'EMAIL',
     npsAfterVisit: true,
-    npsAfterVisits: 3
+    npsAfterVisits: 3,
   });
 
   // Fetch settings from API
@@ -99,64 +116,111 @@ const CRMSettings = () => {
         setLoading(true);
         setError(null);
 
-        const response = await crmAPI.getSettings?.() || { data: {} };
+        const response = (await crmAPI.getSettings?.()) || { data: {} };
         const settings = response.data || {};
 
         // Update state with fetched settings
         if (settings.checkin) {
-          setCheckinSettings(prev => ({
+          setCheckinSettings((prev) => ({
             ...prev,
             enabled: settings.checkin.enabled ?? prev.enabled,
-            inactiveDays: settings.checkin.inactive_days ?? settings.checkin.inactiveDays ?? prev.inactiveDays,
-            messageTemplate: settings.checkin.message_template ?? settings.checkin.messageTemplate ?? prev.messageTemplate,
+            inactiveDays:
+              settings.checkin.inactive_days ?? settings.checkin.inactiveDays ?? prev.inactiveDays,
+            messageTemplate:
+              settings.checkin.message_template ??
+              settings.checkin.messageTemplate ??
+              prev.messageTemplate,
             channel: settings.checkin.channel ?? prev.channel,
             sendTime: settings.checkin.send_time ?? settings.checkin.sendTime ?? prev.sendTime,
-            excludeWeekends: settings.checkin.exclude_weekends ?? settings.checkin.excludeWeekends ?? prev.excludeWeekends,
-            maxAttempts: settings.checkin.max_attempts ?? settings.checkin.maxAttempts ?? prev.maxAttempts,
-            daysBetweenAttempts: settings.checkin.days_between_attempts ?? settings.checkin.daysBetweenAttempts ?? prev.daysBetweenAttempts
+            excludeWeekends:
+              settings.checkin.exclude_weekends ??
+              settings.checkin.excludeWeekends ??
+              prev.excludeWeekends,
+            maxAttempts:
+              settings.checkin.max_attempts ?? settings.checkin.maxAttempts ?? prev.maxAttempts,
+            daysBetweenAttempts:
+              settings.checkin.days_between_attempts ??
+              settings.checkin.daysBetweenAttempts ??
+              prev.daysBetweenAttempts,
           }));
         }
 
         if (settings.scheduled_dates || settings.scheduledDates) {
           const dates = settings.scheduled_dates || settings.scheduledDates || [];
-          setScheduledDates(dates.map(d => ({
-            id: d.id,
-            name: d.name,
-            date: d.date,
-            time: d.time,
-            targetAudience: d.target_audience || d.targetAudience || 'ALL',
-            channel: d.channel || 'EMAIL',
-            template: d.template || '',
-            enabled: d.enabled ?? true
-          })));
+          setScheduledDates(
+            dates.map((d) => ({
+              id: d.id,
+              name: d.name,
+              date: d.date,
+              time: d.time,
+              targetAudience: d.target_audience || d.targetAudience || 'ALL',
+              channel: d.channel || 'EMAIL',
+              template: d.template || '',
+              enabled: d.enabled ?? true,
+            }))
+          );
         }
 
         if (settings.lifecycle) {
-          setLifecycleSettings(prev => ({
+          setLifecycleSettings((prev) => ({
             ...prev,
-            newPatientDays: settings.lifecycle.new_patient_days ?? settings.lifecycle.newPatientDays ?? prev.newPatientDays,
-            onboardingVisits: settings.lifecycle.onboarding_visits ?? settings.lifecycle.onboardingVisits ?? prev.onboardingVisits,
-            atRiskDays: settings.lifecycle.at_risk_days ?? settings.lifecycle.atRiskDays ?? prev.atRiskDays,
-            inactiveDays: settings.lifecycle.inactive_days ?? settings.lifecycle.inactiveDays ?? prev.inactiveDays,
-            lostDays: settings.lifecycle.lost_days ?? settings.lifecycle.lostDays ?? prev.lostDays
+            newPatientDays:
+              settings.lifecycle.new_patient_days ??
+              settings.lifecycle.newPatientDays ??
+              prev.newPatientDays,
+            onboardingVisits:
+              settings.lifecycle.onboarding_visits ??
+              settings.lifecycle.onboardingVisits ??
+              prev.onboardingVisits,
+            atRiskDays:
+              settings.lifecycle.at_risk_days ?? settings.lifecycle.atRiskDays ?? prev.atRiskDays,
+            inactiveDays:
+              settings.lifecycle.inactive_days ??
+              settings.lifecycle.inactiveDays ??
+              prev.inactiveDays,
+            lostDays: settings.lifecycle.lost_days ?? settings.lifecycle.lostDays ?? prev.lostDays,
           }));
         }
 
         if (settings.notifications) {
-          setNotificationSettings(prev => ({
+          setNotificationSettings((prev) => ({
             ...prev,
-            appointmentReminder: settings.notifications.appointment_reminder ?? settings.notifications.appointmentReminder ?? prev.appointmentReminder,
-            appointmentReminderHours: settings.notifications.appointment_reminder_hours ?? settings.notifications.appointmentReminderHours ?? prev.appointmentReminderHours,
-            followUpAfterVisit: settings.notifications.follow_up_after_visit ?? settings.notifications.followUpAfterVisit ?? prev.followUpAfterVisit,
-            followUpHours: settings.notifications.follow_up_hours ?? settings.notifications.followUpHours ?? prev.followUpHours,
-            birthdayGreeting: settings.notifications.birthday_greeting ?? settings.notifications.birthdayGreeting ?? prev.birthdayGreeting,
-            birthdayChannel: settings.notifications.birthday_channel ?? settings.notifications.birthdayChannel ?? prev.birthdayChannel,
-            npsAfterVisit: settings.notifications.nps_after_visit ?? settings.notifications.npsAfterVisit ?? prev.npsAfterVisit,
-            npsAfterVisits: settings.notifications.nps_after_visits ?? settings.notifications.npsAfterVisits ?? prev.npsAfterVisits
+            appointmentReminder:
+              settings.notifications.appointment_reminder ??
+              settings.notifications.appointmentReminder ??
+              prev.appointmentReminder,
+            appointmentReminderHours:
+              settings.notifications.appointment_reminder_hours ??
+              settings.notifications.appointmentReminderHours ??
+              prev.appointmentReminderHours,
+            followUpAfterVisit:
+              settings.notifications.follow_up_after_visit ??
+              settings.notifications.followUpAfterVisit ??
+              prev.followUpAfterVisit,
+            followUpHours:
+              settings.notifications.follow_up_hours ??
+              settings.notifications.followUpHours ??
+              prev.followUpHours,
+            birthdayGreeting:
+              settings.notifications.birthday_greeting ??
+              settings.notifications.birthdayGreeting ??
+              prev.birthdayGreeting,
+            birthdayChannel:
+              settings.notifications.birthday_channel ??
+              settings.notifications.birthdayChannel ??
+              prev.birthdayChannel,
+            npsAfterVisit:
+              settings.notifications.nps_after_visit ??
+              settings.notifications.npsAfterVisit ??
+              prev.npsAfterVisit,
+            npsAfterVisits:
+              settings.notifications.nps_after_visits ??
+              settings.notifications.npsAfterVisits ??
+              prev.npsAfterVisits,
           }));
         }
       } catch (err) {
-        console.log('Settings API not available yet, using defaults');
+        // Settings API not available yet, using defaults
         // Don't set error - just use defaults
       } finally {
         setLoading(false);
@@ -167,11 +231,36 @@ const CRMSettings = () => {
   }, []);
 
   const sections = [
-    { id: 'checkin', label: 'Innsjekking', icon: Clock, description: 'Automatisk oppfølging av inaktive pasienter' },
-    { id: 'scheduled', label: 'Planlagte Utsendelser', icon: Calendar, description: 'Planlegg informasjon til spesifikke datoer' },
-    { id: 'lifecycle', label: 'Livssyklus', icon: Users, description: 'Definer når pasienter skifter status' },
-    { id: 'notifications', label: 'Varsler', icon: Bell, description: 'Automatiske varsler og påminnelser' },
-    { id: 'automation', label: 'Automatisering', icon: Zap, description: 'Generelle automatiseringsinnstillinger' }
+    {
+      id: 'checkin',
+      label: 'Innsjekking',
+      icon: Clock,
+      description: 'Automatisk oppfølging av inaktive pasienter',
+    },
+    {
+      id: 'scheduled',
+      label: 'Planlagte Utsendelser',
+      icon: Calendar,
+      description: 'Planlegg informasjon til spesifikke datoer',
+    },
+    {
+      id: 'lifecycle',
+      label: 'Livssyklus',
+      icon: Users,
+      description: 'Definer når pasienter skifter status',
+    },
+    {
+      id: 'notifications',
+      label: 'Varsler',
+      icon: Bell,
+      description: 'Automatiske varsler og påminnelser',
+    },
+    {
+      id: 'automation',
+      label: 'Automatisering',
+      icon: Zap,
+      description: 'Generelle automatiseringsinnstillinger',
+    },
   ];
 
   const audienceOptions = [
@@ -180,7 +269,7 @@ const CRMSettings = () => {
     { value: 'NEW', label: 'Nye pasienter (siste 30 dager)' },
     { value: 'AT_RISK', label: 'Pasienter i fare' },
     { value: 'INACTIVE', label: 'Inaktive pasienter' },
-    { value: 'VIP', label: 'VIP pasienter' }
+    { value: 'VIP', label: 'VIP pasienter' },
   ];
 
   const handleSave = async () => {
@@ -197,9 +286,9 @@ const CRMSettings = () => {
           send_time: checkinSettings.sendTime,
           exclude_weekends: checkinSettings.excludeWeekends,
           max_attempts: checkinSettings.maxAttempts,
-          days_between_attempts: checkinSettings.daysBetweenAttempts
+          days_between_attempts: checkinSettings.daysBetweenAttempts,
         },
-        scheduled_dates: scheduledDates.map(d => ({
+        scheduled_dates: scheduledDates.map((d) => ({
           id: d.id,
           name: d.name,
           date: d.date,
@@ -207,14 +296,14 @@ const CRMSettings = () => {
           target_audience: d.targetAudience,
           channel: d.channel,
           template: d.template,
-          enabled: d.enabled
+          enabled: d.enabled,
         })),
         lifecycle: {
           new_patient_days: lifecycleSettings.newPatientDays,
           onboarding_visits: lifecycleSettings.onboardingVisits,
           at_risk_days: lifecycleSettings.atRiskDays,
           inactive_days: lifecycleSettings.inactiveDays,
-          lost_days: lifecycleSettings.lostDays
+          lost_days: lifecycleSettings.lostDays,
         },
         notifications: {
           appointment_reminder: notificationSettings.appointmentReminder,
@@ -224,8 +313,8 @@ const CRMSettings = () => {
           birthday_greeting: notificationSettings.birthdayGreeting,
           birthday_channel: notificationSettings.birthdayChannel,
           nps_after_visit: notificationSettings.npsAfterVisit,
-          nps_after_visits: notificationSettings.npsAfterVisits
-        }
+          nps_after_visits: notificationSettings.npsAfterVisits,
+        },
       };
 
       await crmAPI.updateSettings?.(settingsPayload);
@@ -239,12 +328,11 @@ const CRMSettings = () => {
   };
 
   const handleAddSchedule = () => {
-    if (!newSchedule.name || !newSchedule.date) return;
+    if (!newSchedule.name || !newSchedule.date) {
+      return;
+    }
 
-    setScheduledDates(prev => [
-      ...prev,
-      { ...newSchedule, id: Date.now() }
-    ]);
+    setScheduledDates((prev) => [...prev, { ...newSchedule, id: Date.now() }]);
     setNewSchedule({
       name: '',
       date: '',
@@ -252,21 +340,19 @@ const CRMSettings = () => {
       targetAudience: 'ALL',
       channel: 'EMAIL',
       template: '',
-      enabled: true
+      enabled: true,
     });
     setShowAddSchedule(false);
     setHasChanges(true);
   };
 
   const handleDeleteSchedule = (id) => {
-    setScheduledDates(prev => prev.filter(s => s.id !== id));
+    setScheduledDates((prev) => prev.filter((s) => s.id !== id));
     setHasChanges(true);
   };
 
   const handleToggleSchedule = (id) => {
-    setScheduledDates(prev => prev.map(s =>
-      s.id === id ? { ...s, enabled: !s.enabled } : s
-    ));
+    setScheduledDates((prev) => prev.map((s) => (s.id === id ? { ...s, enabled: !s.enabled } : s)));
     setHasChanges(true);
   };
 
@@ -327,7 +413,7 @@ const CRMSettings = () => {
         {/* Sidebar Navigation */}
         <div className="w-64 flex-shrink-0">
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            {sections.map(section => {
+            {sections.map((section) => {
               const Icon = section.icon;
               const isActive = activeSection === section.id;
               return (
@@ -338,7 +424,9 @@ const CRMSettings = () => {
                     isActive ? 'bg-blue-50 border-l-4 border-l-blue-500' : 'hover:bg-gray-50'
                   }`}
                 >
-                  <Icon className={`w-5 h-5 mt-0.5 ${isActive ? 'text-blue-600' : 'text-gray-400'}`} />
+                  <Icon
+                    className={`w-5 h-5 mt-0.5 ${isActive ? 'text-blue-600' : 'text-gray-400'}`}
+                  />
                   <div>
                     <p className={`font-medium ${isActive ? 'text-blue-600' : 'text-gray-900'}`}>
                       {section.label}
@@ -366,24 +454,30 @@ const CRMSettings = () => {
                 <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                   <div>
                     <p className="font-medium text-gray-900">Aktiver automatisk innsjekking</p>
-                    <p className="text-sm text-gray-500">Send automatisk melding til pasienter som ikke har vært her på en stund</p>
+                    <p className="text-sm text-gray-500">
+                      Send automatisk melding til pasienter som ikke har vært her på en stund
+                    </p>
                   </div>
                   <button
                     onClick={() => {
-                      setCheckinSettings(prev => ({ ...prev, enabled: !prev.enabled }));
+                      setCheckinSettings((prev) => ({ ...prev, enabled: !prev.enabled }));
                       setHasChanges(true);
                     }}
                     className={`relative w-12 h-6 rounded-full transition-colors ${
                       checkinSettings.enabled ? 'bg-blue-500' : 'bg-gray-300'
                     }`}
                   >
-                    <div className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
-                      checkinSettings.enabled ? 'translate-x-6' : 'translate-x-0.5'
-                    }`} />
+                    <div
+                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
+                        checkinSettings.enabled ? 'translate-x-6' : 'translate-x-0.5'
+                      }`}
+                    />
                   </button>
                 </div>
 
-                <div className={`space-y-4 ${!checkinSettings.enabled && 'opacity-50 pointer-events-none'}`}>
+                <div
+                  className={`space-y-4 ${!checkinSettings.enabled && 'opacity-50 pointer-events-none'}`}
+                >
                   {/* Inactive days */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -394,7 +488,10 @@ const CRMSettings = () => {
                         type="number"
                         value={checkinSettings.inactiveDays}
                         onChange={(e) => {
-                          setCheckinSettings(prev => ({ ...prev, inactiveDays: parseInt(e.target.value) }));
+                          setCheckinSettings((prev) => ({
+                            ...prev,
+                            inactiveDays: parseInt(e.target.value),
+                          }));
                           setHasChanges(true);
                         }}
                         min={7}
@@ -404,7 +501,8 @@ const CRMSettings = () => {
                       <span className="text-gray-500">dager</span>
                     </div>
                     <p className="text-xs text-gray-500 mt-1">
-                      Pasienter som ikke har besøkt klinikken på {checkinSettings.inactiveDays} dager vil motta en melding
+                      Pasienter som ikke har besøkt klinikken på {checkinSettings.inactiveDays}{' '}
+                      dager vil motta en melding
                     </p>
                   </div>
 
@@ -414,11 +512,11 @@ const CRMSettings = () => {
                       Kommunikasjonskanal
                     </label>
                     <div className="flex gap-2">
-                      {['SMS', 'EMAIL'].map(channel => (
+                      {['SMS', 'EMAIL'].map((channel) => (
                         <button
                           key={channel}
                           onClick={() => {
-                            setCheckinSettings(prev => ({ ...prev, channel }));
+                            setCheckinSettings((prev) => ({ ...prev, channel }));
                             setHasChanges(true);
                           }}
                           className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
@@ -427,7 +525,11 @@ const CRMSettings = () => {
                               : 'bg-gray-100 text-gray-700 border-2 border-transparent'
                           }`}
                         >
-                          {channel === 'SMS' ? <MessageSquare className="w-4 h-4" /> : <Mail className="w-4 h-4" />}
+                          {channel === 'SMS' ? (
+                            <MessageSquare className="w-4 h-4" />
+                          ) : (
+                            <Mail className="w-4 h-4" />
+                          )}
                           {channel === 'SMS' ? 'SMS' : 'E-post'}
                         </button>
                       ))}
@@ -443,7 +545,7 @@ const CRMSettings = () => {
                       type="time"
                       value={checkinSettings.sendTime}
                       onChange={(e) => {
-                        setCheckinSettings(prev => ({ ...prev, sendTime: e.target.value }));
+                        setCheckinSettings((prev) => ({ ...prev, sendTime: e.target.value }));
                         setHasChanges(true);
                       }}
                       className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
@@ -458,14 +560,18 @@ const CRMSettings = () => {
                     <textarea
                       value={checkinSettings.messageTemplate}
                       onChange={(e) => {
-                        setCheckinSettings(prev => ({ ...prev, messageTemplate: e.target.value }));
+                        setCheckinSettings((prev) => ({
+                          ...prev,
+                          messageTemplate: e.target.value,
+                        }));
                         setHasChanges(true);
                       }}
                       rows={3}
                       className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      Tilgjengelige variabler: {'{name}'}, {'{first_name}'}, {'{booking_link}'}, {'{clinic_name}'}
+                      Tilgjengelige variabler: {'{name}'}, {'{first_name}'}, {'{booking_link}'},{' '}
+                      {'{clinic_name}'}
                     </p>
                   </div>
 
@@ -479,7 +585,10 @@ const CRMSettings = () => {
                         type="number"
                         value={checkinSettings.maxAttempts}
                         onChange={(e) => {
-                          setCheckinSettings(prev => ({ ...prev, maxAttempts: parseInt(e.target.value) }));
+                          setCheckinSettings((prev) => ({
+                            ...prev,
+                            maxAttempts: parseInt(e.target.value),
+                          }));
                           setHasChanges(true);
                         }}
                         min={1}
@@ -495,7 +604,10 @@ const CRMSettings = () => {
                         type="number"
                         value={checkinSettings.daysBetweenAttempts}
                         onChange={(e) => {
-                          setCheckinSettings(prev => ({ ...prev, daysBetweenAttempts: parseInt(e.target.value) }));
+                          setCheckinSettings((prev) => ({
+                            ...prev,
+                            daysBetweenAttempts: parseInt(e.target.value),
+                          }));
                           setHasChanges(true);
                         }}
                         min={1}
@@ -511,7 +623,10 @@ const CRMSettings = () => {
                       type="checkbox"
                       checked={checkinSettings.excludeWeekends}
                       onChange={(e) => {
-                        setCheckinSettings(prev => ({ ...prev, excludeWeekends: e.target.checked }));
+                        setCheckinSettings((prev) => ({
+                          ...prev,
+                          excludeWeekends: e.target.checked,
+                        }));
                         setHasChanges(true);
                       }}
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
@@ -541,12 +656,13 @@ const CRMSettings = () => {
               </div>
 
               <p className="text-gray-500 mb-6">
-                Planlegg når du vil sende ut informasjon til pasientene dine. Perfekt for nyhetsbrev, sesongbaserte tips, eller helligdagshilsener.
+                Planlegg når du vil sende ut informasjon til pasientene dine. Perfekt for
+                nyhetsbrev, sesongbaserte tips, eller helligdagshilsener.
               </p>
 
               {/* Scheduled list */}
               <div className="space-y-3">
-                {scheduledDates.map(schedule => (
+                {scheduledDates.map((schedule) => (
                   <div
                     key={schedule.id}
                     className={`p-4 rounded-lg border ${
@@ -561,12 +677,16 @@ const CRMSettings = () => {
                             schedule.enabled ? 'bg-blue-500' : 'bg-gray-300'
                           }`}
                         >
-                          <div className={`absolute w-4 h-4 bg-white rounded-full top-0.5 transition-transform ${
-                            schedule.enabled ? 'translate-x-5' : 'translate-x-0.5'
-                          }`} />
+                          <div
+                            className={`absolute w-4 h-4 bg-white rounded-full top-0.5 transition-transform ${
+                              schedule.enabled ? 'translate-x-5' : 'translate-x-0.5'
+                            }`}
+                          />
                         </button>
                         <div>
-                          <p className={`font-medium ${schedule.enabled ? 'text-gray-900' : 'text-gray-500'}`}>
+                          <p
+                            className={`font-medium ${schedule.enabled ? 'text-gray-900' : 'text-gray-500'}`}
+                          >
                             {schedule.name}
                           </p>
                           <div className="flex items-center gap-3 text-sm text-gray-500">
@@ -579,11 +699,18 @@ const CRMSettings = () => {
                               {schedule.time}
                             </span>
                             <span className="flex items-center gap-1">
-                              {schedule.channel === 'EMAIL' ? <Mail className="w-3 h-3" /> : <MessageSquare className="w-3 h-3" />}
+                              {schedule.channel === 'EMAIL' ? (
+                                <Mail className="w-3 h-3" />
+                              ) : (
+                                <MessageSquare className="w-3 h-3" />
+                              )}
                               {schedule.channel}
                             </span>
                             <span className="px-2 py-0.5 bg-gray-100 rounded text-xs">
-                              {audienceOptions.find(a => a.value === schedule.targetAudience)?.label}
+                              {
+                                audienceOptions.find((a) => a.value === schedule.targetAudience)
+                                  ?.label
+                              }
                             </span>
                           </div>
                         </div>
@@ -631,57 +758,79 @@ const CRMSettings = () => {
                         <input
                           type="text"
                           value={newSchedule.name}
-                          onChange={(e) => setNewSchedule(prev => ({ ...prev, name: e.target.value }))}
+                          onChange={(e) =>
+                            setNewSchedule((prev) => ({ ...prev, name: e.target.value }))
+                          }
                           placeholder="F.eks. 'Nyhetsbrev Februar'"
                           className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Dato</label>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Dato
+                          </label>
                           <input
                             type="date"
                             value={newSchedule.date}
-                            onChange={(e) => setNewSchedule(prev => ({ ...prev, date: e.target.value }))}
+                            onChange={(e) =>
+                              setNewSchedule((prev) => ({ ...prev, date: e.target.value }))
+                            }
                             className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Tid</label>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Tid
+                          </label>
                           <input
                             type="time"
                             value={newSchedule.time}
-                            onChange={(e) => setNewSchedule(prev => ({ ...prev, time: e.target.value }))}
+                            onChange={(e) =>
+                              setNewSchedule((prev) => ({ ...prev, time: e.target.value }))
+                            }
                             className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                           />
                         </div>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Målgruppe</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Målgruppe
+                        </label>
                         <select
                           value={newSchedule.targetAudience}
-                          onChange={(e) => setNewSchedule(prev => ({ ...prev, targetAudience: e.target.value }))}
+                          onChange={(e) =>
+                            setNewSchedule((prev) => ({ ...prev, targetAudience: e.target.value }))
+                          }
                           className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                         >
-                          {audienceOptions.map(opt => (
-                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                          {audienceOptions.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
                           ))}
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Kanal</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Kanal
+                        </label>
                         <div className="flex gap-2">
-                          {['EMAIL', 'SMS'].map(channel => (
+                          {['EMAIL', 'SMS'].map((channel) => (
                             <button
                               key={channel}
-                              onClick={() => setNewSchedule(prev => ({ ...prev, channel }))}
+                              onClick={() => setNewSchedule((prev) => ({ ...prev, channel }))}
                               className={`flex-1 px-4 py-2 rounded-lg flex items-center justify-center gap-2 ${
                                 newSchedule.channel === channel
                                   ? 'bg-blue-100 text-blue-700 border-2 border-blue-500'
                                   : 'bg-gray-100 text-gray-700 border-2 border-transparent'
                               }`}
                             >
-                              {channel === 'EMAIL' ? <Mail className="w-4 h-4" /> : <MessageSquare className="w-4 h-4" />}
+                              {channel === 'EMAIL' ? (
+                                <Mail className="w-4 h-4" />
+                              ) : (
+                                <MessageSquare className="w-4 h-4" />
+                              )}
                               {channel === 'EMAIL' ? 'E-post' : 'SMS'}
                             </button>
                           ))}
@@ -717,7 +866,8 @@ const CRMSettings = () => {
               </h3>
 
               <p className="text-gray-500 mb-6">
-                Definer når pasienter automatisk flyttes mellom livssyklusstadier basert på aktivitet.
+                Definer når pasienter automatisk flyttes mellom livssyklusstadier basert på
+                aktivitet.
               </p>
 
               <div className="space-y-4">
@@ -730,12 +880,17 @@ const CRMSettings = () => {
                       type="number"
                       value={lifecycleSettings.newPatientDays}
                       onChange={(e) => {
-                        setLifecycleSettings(prev => ({ ...prev, newPatientDays: parseInt(e.target.value) }));
+                        setLifecycleSettings((prev) => ({
+                          ...prev,
+                          newPatientDays: parseInt(e.target.value),
+                        }));
                         setHasChanges(true);
                       }}
                       className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
-                    <p className="text-xs text-gray-500 mt-1">Pasient regnes som "ny" i {lifecycleSettings.newPatientDays} dager</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Pasient regnes som "ny" i {lifecycleSettings.newPatientDays} dager
+                    </p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -745,12 +900,17 @@ const CRMSettings = () => {
                       type="number"
                       value={lifecycleSettings.onboardingVisits}
                       onChange={(e) => {
-                        setLifecycleSettings(prev => ({ ...prev, onboardingVisits: parseInt(e.target.value) }));
+                        setLifecycleSettings((prev) => ({
+                          ...prev,
+                          onboardingVisits: parseInt(e.target.value),
+                        }));
                         setHasChanges(true);
                       }}
                       className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
-                    <p className="text-xs text-gray-500 mt-1">Onboarding varer til {lifecycleSettings.onboardingVisits} besøk</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Onboarding varer til {lifecycleSettings.onboardingVisits} besøk
+                    </p>
                   </div>
                 </div>
 
@@ -763,7 +923,10 @@ const CRMSettings = () => {
                       type="number"
                       value={lifecycleSettings.atRiskDays}
                       onChange={(e) => {
-                        setLifecycleSettings(prev => ({ ...prev, atRiskDays: parseInt(e.target.value) }));
+                        setLifecycleSettings((prev) => ({
+                          ...prev,
+                          atRiskDays: parseInt(e.target.value),
+                        }));
                         setHasChanges(true);
                       }}
                       className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
@@ -777,7 +940,10 @@ const CRMSettings = () => {
                       type="number"
                       value={lifecycleSettings.inactiveDays}
                       onChange={(e) => {
-                        setLifecycleSettings(prev => ({ ...prev, inactiveDays: parseInt(e.target.value) }));
+                        setLifecycleSettings((prev) => ({
+                          ...prev,
+                          inactiveDays: parseInt(e.target.value),
+                        }));
                         setHasChanges(true);
                       }}
                       className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
@@ -791,7 +957,10 @@ const CRMSettings = () => {
                       type="number"
                       value={lifecycleSettings.lostDays}
                       onChange={(e) => {
-                        setLifecycleSettings(prev => ({ ...prev, lostDays: parseInt(e.target.value) }));
+                        setLifecycleSettings((prev) => ({
+                          ...prev,
+                          lostDays: parseInt(e.target.value),
+                        }));
                         setHasChanges(true);
                       }}
                       className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
@@ -803,17 +972,29 @@ const CRMSettings = () => {
                 <div className="mt-6 p-4 bg-gray-50 rounded-lg">
                   <p className="text-sm font-medium text-gray-700 mb-3">Livssyklusflyt:</p>
                   <div className="flex items-center gap-2 text-sm">
-                    <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full">Ny ({lifecycleSettings.newPatientDays}d)</span>
+                    <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full">
+                      Ny ({lifecycleSettings.newPatientDays}d)
+                    </span>
                     <ChevronRight className="w-4 h-4 text-gray-400" />
-                    <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full">Onboarding ({lifecycleSettings.onboardingVisits} besøk)</span>
+                    <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full">
+                      Onboarding ({lifecycleSettings.onboardingVisits} besøk)
+                    </span>
                     <ChevronRight className="w-4 h-4 text-gray-400" />
-                    <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full">Aktiv</span>
+                    <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full">
+                      Aktiv
+                    </span>
                     <ChevronRight className="w-4 h-4 text-gray-400" />
-                    <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full">I Fare ({lifecycleSettings.atRiskDays}d)</span>
+                    <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full">
+                      I Fare ({lifecycleSettings.atRiskDays}d)
+                    </span>
                     <ChevronRight className="w-4 h-4 text-gray-400" />
-                    <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full">Inaktiv ({lifecycleSettings.inactiveDays}d)</span>
+                    <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full">
+                      Inaktiv ({lifecycleSettings.inactiveDays}d)
+                    </span>
                     <ChevronRight className="w-4 h-4 text-gray-400" />
-                    <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full">Tapt ({lifecycleSettings.lostDays}d)</span>
+                    <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full">
+                      Tapt ({lifecycleSettings.lostDays}d)
+                    </span>
                   </div>
                 </div>
               </div>
@@ -838,16 +1019,23 @@ const CRMSettings = () => {
                     </div>
                     <button
                       onClick={() => {
-                        setNotificationSettings(prev => ({ ...prev, appointmentReminder: !prev.appointmentReminder }));
+                        setNotificationSettings((prev) => ({
+                          ...prev,
+                          appointmentReminder: !prev.appointmentReminder,
+                        }));
                         setHasChanges(true);
                       }}
                       className={`relative w-12 h-6 rounded-full transition-colors ${
                         notificationSettings.appointmentReminder ? 'bg-blue-500' : 'bg-gray-300'
                       }`}
                     >
-                      <div className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
-                        notificationSettings.appointmentReminder ? 'translate-x-6' : 'translate-x-0.5'
-                      }`} />
+                      <div
+                        className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
+                          notificationSettings.appointmentReminder
+                            ? 'translate-x-6'
+                            : 'translate-x-0.5'
+                        }`}
+                      />
                     </button>
                   </div>
                   {notificationSettings.appointmentReminder && (
@@ -857,7 +1045,10 @@ const CRMSettings = () => {
                         type="number"
                         value={notificationSettings.appointmentReminderHours}
                         onChange={(e) => {
-                          setNotificationSettings(prev => ({ ...prev, appointmentReminderHours: parseInt(e.target.value) }));
+                          setNotificationSettings((prev) => ({
+                            ...prev,
+                            appointmentReminderHours: parseInt(e.target.value),
+                          }));
                           setHasChanges(true);
                         }}
                         className="w-20 px-3 py-1 border border-gray-200 rounded-lg text-sm"
@@ -872,20 +1063,29 @@ const CRMSettings = () => {
                   <div className="flex items-center justify-between mb-3">
                     <div>
                       <p className="font-medium text-gray-900">Oppfølging etter besøk</p>
-                      <p className="text-sm text-gray-500">Send melding for å sjekke hvordan det går</p>
+                      <p className="text-sm text-gray-500">
+                        Send melding for å sjekke hvordan det går
+                      </p>
                     </div>
                     <button
                       onClick={() => {
-                        setNotificationSettings(prev => ({ ...prev, followUpAfterVisit: !prev.followUpAfterVisit }));
+                        setNotificationSettings((prev) => ({
+                          ...prev,
+                          followUpAfterVisit: !prev.followUpAfterVisit,
+                        }));
                         setHasChanges(true);
                       }}
                       className={`relative w-12 h-6 rounded-full transition-colors ${
                         notificationSettings.followUpAfterVisit ? 'bg-blue-500' : 'bg-gray-300'
                       }`}
                     >
-                      <div className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
-                        notificationSettings.followUpAfterVisit ? 'translate-x-6' : 'translate-x-0.5'
-                      }`} />
+                      <div
+                        className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
+                          notificationSettings.followUpAfterVisit
+                            ? 'translate-x-6'
+                            : 'translate-x-0.5'
+                        }`}
+                      />
                     </button>
                   </div>
                   {notificationSettings.followUpAfterVisit && (
@@ -895,7 +1095,10 @@ const CRMSettings = () => {
                         type="number"
                         value={notificationSettings.followUpHours}
                         onChange={(e) => {
-                          setNotificationSettings(prev => ({ ...prev, followUpHours: parseInt(e.target.value) }));
+                          setNotificationSettings((prev) => ({
+                            ...prev,
+                            followUpHours: parseInt(e.target.value),
+                          }));
                           setHasChanges(true);
                         }}
                         className="w-20 px-3 py-1 border border-gray-200 rounded-lg text-sm"
@@ -910,20 +1113,29 @@ const CRMSettings = () => {
                   <div className="flex items-center justify-between mb-3">
                     <div>
                       <p className="font-medium text-gray-900">Bursdagshilsen</p>
-                      <p className="text-sm text-gray-500">Send automatisk hilsen på pasientens bursdag</p>
+                      <p className="text-sm text-gray-500">
+                        Send automatisk hilsen på pasientens bursdag
+                      </p>
                     </div>
                     <button
                       onClick={() => {
-                        setNotificationSettings(prev => ({ ...prev, birthdayGreeting: !prev.birthdayGreeting }));
+                        setNotificationSettings((prev) => ({
+                          ...prev,
+                          birthdayGreeting: !prev.birthdayGreeting,
+                        }));
                         setHasChanges(true);
                       }}
                       className={`relative w-12 h-6 rounded-full transition-colors ${
                         notificationSettings.birthdayGreeting ? 'bg-blue-500' : 'bg-gray-300'
                       }`}
                     >
-                      <div className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
-                        notificationSettings.birthdayGreeting ? 'translate-x-6' : 'translate-x-0.5'
-                      }`} />
+                      <div
+                        className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
+                          notificationSettings.birthdayGreeting
+                            ? 'translate-x-6'
+                            : 'translate-x-0.5'
+                        }`}
+                      />
                     </button>
                   </div>
                 </div>
@@ -933,20 +1145,27 @@ const CRMSettings = () => {
                   <div className="flex items-center justify-between mb-3">
                     <div>
                       <p className="font-medium text-gray-900">NPS undersøkelse</p>
-                      <p className="text-sm text-gray-500">Send tilfredshetundersøkelse etter behandlingsserier</p>
+                      <p className="text-sm text-gray-500">
+                        Send tilfredshetundersøkelse etter behandlingsserier
+                      </p>
                     </div>
                     <button
                       onClick={() => {
-                        setNotificationSettings(prev => ({ ...prev, npsAfterVisit: !prev.npsAfterVisit }));
+                        setNotificationSettings((prev) => ({
+                          ...prev,
+                          npsAfterVisit: !prev.npsAfterVisit,
+                        }));
                         setHasChanges(true);
                       }}
                       className={`relative w-12 h-6 rounded-full transition-colors ${
                         notificationSettings.npsAfterVisit ? 'bg-blue-500' : 'bg-gray-300'
                       }`}
                     >
-                      <div className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
-                        notificationSettings.npsAfterVisit ? 'translate-x-6' : 'translate-x-0.5'
-                      }`} />
+                      <div
+                        className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
+                          notificationSettings.npsAfterVisit ? 'translate-x-6' : 'translate-x-0.5'
+                        }`}
+                      />
                     </button>
                   </div>
                   {notificationSettings.npsAfterVisit && (
@@ -956,7 +1175,10 @@ const CRMSettings = () => {
                         type="number"
                         value={notificationSettings.npsAfterVisits}
                         onChange={(e) => {
-                          setNotificationSettings(prev => ({ ...prev, npsAfterVisits: parseInt(e.target.value) }));
+                          setNotificationSettings((prev) => ({
+                            ...prev,
+                            npsAfterVisits: parseInt(e.target.value),
+                          }));
                           setHasChanges(true);
                         }}
                         className="w-20 px-3 py-1 border border-gray-200 rounded-lg text-sm"
@@ -989,16 +1211,26 @@ const CRMSettings = () => {
                   <h4 className="font-medium text-gray-900 mb-2">Generelle innstillinger</h4>
                   <div className="space-y-3">
                     <label className="flex items-center gap-2">
-                      <input type="checkbox" defaultChecked className="rounded border-gray-300 text-blue-600" />
+                      <input
+                        type="checkbox"
+                        defaultChecked
+                        className="rounded border-gray-300 text-blue-600"
+                      />
                       <span className="text-sm">Aktiver alle automatiseringer</span>
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="checkbox" defaultChecked className="rounded border-gray-300 text-blue-600" />
+                      <input
+                        type="checkbox"
+                        defaultChecked
+                        className="rounded border-gray-300 text-blue-600"
+                      />
                       <span className="text-sm">Logg alle automatiske handlinger</span>
                     </label>
                     <label className="flex items-center gap-2">
                       <input type="checkbox" className="rounded border-gray-300 text-blue-600" />
-                      <span className="text-sm">Send kopi av alle meldinger til klinikk-e-post</span>
+                      <span className="text-sm">
+                        Send kopi av alle meldinger til klinikk-e-post
+                      </span>
                     </label>
                   </div>
                 </div>

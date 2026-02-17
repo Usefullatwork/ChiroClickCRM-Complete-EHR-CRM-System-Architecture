@@ -160,10 +160,14 @@ export const patientFromFHIR = (fhirPatient) => {
 
   // Extract contact info
   const phone = fhirPatient.telecom?.find((t) => t.system === 'phone');
-  if (phone) patient.phone = phone.value;
+  if (phone) {
+    patient.phone = phone.value;
+  }
 
   const email = fhirPatient.telecom?.find((t) => t.system === 'email');
-  if (email) patient.email = email.value;
+  if (email) {
+    patient.email = email.value;
+  }
 
   // Extract address
   if (fhirPatient.address?.[0]) {
@@ -184,250 +188,246 @@ export const patientFromFHIR = (fhirPatient) => {
 /**
  * Convert internal Encounter to FHIR Encounter resource
  */
-export const encounterToFHIR = (encounter, patient, practitioner) => {
-  return {
-    resourceType: 'Encounter',
-    id: encounter.id,
-    meta: {
-      lastUpdated: encounter.updated_at || encounter.created_at,
-    },
+export const encounterToFHIR = (encounter, patient, practitioner) => ({
+  resourceType: 'Encounter',
+  id: encounter.id,
+  meta: {
+    lastUpdated: encounter.updated_at || encounter.created_at,
+  },
 
-    status: encounter.is_signed ? 'finished' : 'in-progress',
+  status: encounter.is_signed ? 'finished' : 'in-progress',
 
-    class: {
-      system: 'http://terminology.hl7.org/CodeSystem/v3-ActCode',
-      code: 'AMB',
-      display: 'ambulatory',
-    },
+  class: {
+    system: 'http://terminology.hl7.org/CodeSystem/v3-ActCode',
+    code: 'AMB',
+    display: 'ambulatory',
+  },
 
-    type: [
-      {
-        coding: [
-          {
-            system: 'http://snomed.info/sct',
-            code: '185347001',
-            display: 'Encounter for problem (procedure)',
-          },
-        ],
-      },
-    ],
-
-    subject: {
-      reference: `Patient/${encounter.patient_id}`,
-      display: patient ? `${patient.first_name} ${patient.last_name}` : undefined,
-    },
-
-    participant: [
-      {
-        type: [
-          {
-            coding: [
-              {
-                system: 'http://terminology.hl7.org/CodeSystem/v3-ParticipationType',
-                code: 'PPRF',
-                display: 'primary performer',
-              },
-            ],
-          },
-        ],
-        individual: {
-          reference: `Practitioner/${encounter.practitioner_id}`,
-          display: practitioner?.name,
+  type: [
+    {
+      coding: [
+        {
+          system: 'http://snomed.info/sct',
+          code: '185347001',
+          display: 'Encounter for problem (procedure)',
         },
-      },
-    ],
-
-    period: {
-      start: encounter.encounter_date,
-      end: encounter.encounter_date, // Same day for chiropractic visits
+      ],
     },
+  ],
 
-    reasonCode:
-      encounter.icpc_codes?.map((code) => ({
-        coding: [
-          {
-            system: NORWEGIAN_OIDS.ICPC2,
-            code: code,
-            display: getICPC2Description(code),
-          },
-        ],
-      })) || [],
+  subject: {
+    reference: `Patient/${encounter.patient_id}`,
+    display: patient ? `${patient.first_name} ${patient.last_name}` : undefined,
+  },
 
-    // Link to SOAP notes (Composition resource)
-    contained: encounter.subjective ? [compositionToFHIR(encounter)] : [],
-  };
-};
+  participant: [
+    {
+      type: [
+        {
+          coding: [
+            {
+              system: 'http://terminology.hl7.org/CodeSystem/v3-ParticipationType',
+              code: 'PPRF',
+              display: 'primary performer',
+            },
+          ],
+        },
+      ],
+      individual: {
+        reference: `Practitioner/${encounter.practitioner_id}`,
+        display: practitioner?.name,
+      },
+    },
+  ],
+
+  period: {
+    start: encounter.encounter_date,
+    end: encounter.encounter_date, // Same day for chiropractic visits
+  },
+
+  reasonCode:
+    encounter.icpc_codes?.map((code) => ({
+      coding: [
+        {
+          system: NORWEGIAN_OIDS.ICPC2,
+          code: code,
+          display: getICPC2Description(code),
+        },
+      ],
+    })) || [],
+
+  // Link to SOAP notes (Composition resource)
+  contained: encounter.subjective ? [compositionToFHIR(encounter)] : [],
+});
 
 /**
  * Convert SOAP notes to FHIR Composition resource
  */
-export const compositionToFHIR = (encounter) => {
-  return {
-    resourceType: 'Composition',
-    id: `${encounter.id}-notes`,
-    status: encounter.is_signed ? 'final' : 'preliminary',
-    type: {
-      coding: [
-        {
-          system: 'http://loinc.org',
-          code: '11506-3',
-          display: 'Progress note',
-        },
-      ],
-    },
-    subject: {
-      reference: `Patient/${encounter.patient_id}`,
-    },
-    date: encounter.encounter_date,
-    author: [
+export const compositionToFHIR = (encounter) => ({
+  resourceType: 'Composition',
+  id: `${encounter.id}-notes`,
+  status: encounter.is_signed ? 'final' : 'preliminary',
+  type: {
+    coding: [
       {
-        reference: `Practitioner/${encounter.practitioner_id}`,
+        system: 'http://loinc.org',
+        code: '11506-3',
+        display: 'Progress note',
       },
     ],
-    title: 'Chiropractic SOAP Note',
+  },
+  subject: {
+    reference: `Patient/${encounter.patient_id}`,
+  },
+  date: encounter.encounter_date,
+  author: [
+    {
+      reference: `Practitioner/${encounter.practitioner_id}`,
+    },
+  ],
+  title: 'Chiropractic SOAP Note',
 
-    // SOAP sections
-    section: [
-      {
-        title: 'Subjective',
-        code: {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: '61150-9',
-              display: 'Subjective',
-            },
-          ],
-        },
-        text: {
-          status: 'generated',
-          div: `<div xmlns="http://www.w3.org/1999/xhtml">${escapeHtml(encounter.subjective)}</div>`,
-        },
+  // SOAP sections
+  section: [
+    {
+      title: 'Subjective',
+      code: {
+        coding: [
+          {
+            system: 'http://loinc.org',
+            code: '61150-9',
+            display: 'Subjective',
+          },
+        ],
       },
-      {
-        title: 'Objective',
-        code: {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: '61149-1',
-              display: 'Objective',
-            },
-          ],
-        },
-        text: {
-          status: 'generated',
-          div: `<div xmlns="http://www.w3.org/1999/xhtml">${escapeHtml(encounter.objective)}</div>`,
-        },
+      text: {
+        status: 'generated',
+        div: `<div xmlns="http://www.w3.org/1999/xhtml">${escapeHtml(encounter.subjective)}</div>`,
       },
-      {
-        title: 'Assessment',
-        code: {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: '51848-0',
-              display: 'Assessment',
-            },
-          ],
-        },
-        text: {
-          status: 'generated',
-          div: `<div xmlns="http://www.w3.org/1999/xhtml">${escapeHtml(encounter.assessment)}</div>`,
-        },
+    },
+    {
+      title: 'Objective',
+      code: {
+        coding: [
+          {
+            system: 'http://loinc.org',
+            code: '61149-1',
+            display: 'Objective',
+          },
+        ],
       },
-      {
-        title: 'Plan',
-        code: {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: '18776-5',
-              display: 'Plan of care',
-            },
-          ],
-        },
-        text: {
-          status: 'generated',
-          div: `<div xmlns="http://www.w3.org/1999/xhtml">${escapeHtml(encounter.plan)}</div>`,
-        },
+      text: {
+        status: 'generated',
+        div: `<div xmlns="http://www.w3.org/1999/xhtml">${escapeHtml(encounter.objective)}</div>`,
       },
-    ],
-  };
-};
+    },
+    {
+      title: 'Assessment',
+      code: {
+        coding: [
+          {
+            system: 'http://loinc.org',
+            code: '51848-0',
+            display: 'Assessment',
+          },
+        ],
+      },
+      text: {
+        status: 'generated',
+        div: `<div xmlns="http://www.w3.org/1999/xhtml">${escapeHtml(encounter.assessment)}</div>`,
+      },
+    },
+    {
+      title: 'Plan',
+      code: {
+        coding: [
+          {
+            system: 'http://loinc.org',
+            code: '18776-5',
+            display: 'Plan of care',
+          },
+        ],
+      },
+      text: {
+        status: 'generated',
+        div: `<div xmlns="http://www.w3.org/1999/xhtml">${escapeHtml(encounter.plan)}</div>`,
+      },
+    },
+  ],
+});
 
 /**
  * Convert internal Practitioner to FHIR Practitioner resource
  */
-export const practitionerToFHIR = (practitioner) => {
-  return {
-    resourceType: 'Practitioner',
-    id: practitioner.id,
-    meta: {
-      lastUpdated: practitioner.updated_at || practitioner.created_at,
+export const practitionerToFHIR = (practitioner) => ({
+  resourceType: 'Practitioner',
+  id: practitioner.id,
+  meta: {
+    lastUpdated: practitioner.updated_at || practitioner.created_at,
+  },
+
+  identifier: [
+    {
+      use: 'official',
+      system: NORWEGIAN_OIDS.HPR_NUMMER,
+      value: practitioner.hpr_nummer, // Health Personnel Register number
     },
+    {
+      use: 'usual',
+      system: 'urn:chiroclickcrm:practitioner-id',
+      value: practitioner.id,
+    },
+  ],
 
-    identifier: [
-      {
-        use: 'official',
-        system: NORWEGIAN_OIDS.HPR_NUMMER,
-        value: practitioner.hpr_nummer, // Health Personnel Register number
+  active: practitioner.is_active !== false,
+
+  name: [
+    {
+      use: 'official',
+      text: practitioner.name,
+      family: practitioner.last_name,
+      given: practitioner.first_name ? [practitioner.first_name] : [],
+    },
+  ],
+
+  telecom: [
+    practitioner.phone
+      ? {
+          system: 'phone',
+          value: practitioner.phone,
+        }
+      : null,
+    practitioner.email
+      ? {
+          system: 'email',
+          value: practitioner.email,
+        }
+      : null,
+  ].filter(Boolean),
+
+  qualification: [
+    {
+      code: {
+        coding: [
+          {
+            system: 'http://snomed.info/sct',
+            code: '3842006',
+            display: 'Chiropractor',
+          },
+        ],
       },
-      {
-        use: 'usual',
-        system: 'urn:chiroclickcrm:practitioner-id',
-        value: practitioner.id,
-      },
-    ],
-
-    active: practitioner.is_active !== false,
-
-    name: [
-      {
-        use: 'official',
-        text: practitioner.name,
-        family: practitioner.last_name,
-        given: practitioner.first_name ? [practitioner.first_name] : [],
-      },
-    ],
-
-    telecom: [
-      practitioner.phone
-        ? {
-            system: 'phone',
-            value: practitioner.phone,
-          }
-        : null,
-      practitioner.email
-        ? {
-            system: 'email',
-            value: practitioner.email,
-          }
-        : null,
-    ].filter(Boolean),
-
-    qualification: [
-      {
-        code: {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '3842006',
-              display: 'Chiropractor',
-            },
-          ],
-        },
-      },
-    ],
-  };
-};
+    },
+  ],
+});
 
 /**
  * Helper: Extract birth date from Norwegian fødselsnummer
  * Format: DDMMYYXXXXX
  */
 const extractBirthDateFromFodselsnummer = (fnr) => {
-  if (!fnr || fnr.length !== 11) return null;
+  if (!fnr || fnr.length !== 11) {
+    return null;
+  }
 
   try {
     const day = fnr.substring(0, 2);
@@ -437,11 +437,11 @@ const extractBirthDateFromFodselsnummer = (fnr) => {
     // Determine century (simplified - full logic is more complex)
     const individnummer = parseInt(fnr.substring(6, 9));
     if (individnummer < 500) {
-      year = '19' + year;
+      year = `19${year}`;
     } else if (individnummer >= 500 && individnummer < 750) {
-      year = '20' + year;
+      year = `20${year}`;
     } else {
-      year = '19' + year; // Fallback
+      year = `19${year}`; // Fallback
     }
 
     return `${year}-${month}-${day}`;
@@ -455,15 +455,15 @@ const extractBirthDateFromFodselsnummer = (fnr) => {
  * Helper: Get ICPC-2 description
  * Now loads from comprehensive ICPC-2 codes database (resolved TODO)
  */
-const getICPC2Description = (code) => {
-  return getICPC2Desc(code) || code;
-};
+const getICPC2Description = (code) => getICPC2Desc(code) || code;
 
 /**
  * Helper: Escape HTML for FHIR narrative
  */
 const escapeHtml = (text) => {
-  if (!text) return '';
+  if (!text) {
+    return '';
+  }
   return text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -476,18 +476,16 @@ const escapeHtml = (text) => {
 /**
  * Create FHIR Bundle for multiple resources
  */
-export const createBundle = (resources, type = 'collection') => {
-  return {
-    resourceType: 'Bundle',
-    type: type, // 'collection', 'searchset', 'transaction', etc.
-    timestamp: new Date().toISOString(),
-    total: resources.length,
-    entry: resources.map((resource) => ({
-      fullUrl: `${resource.resourceType}/${resource.id}`,
-      resource: resource,
-    })),
-  };
-};
+export const createBundle = (resources, type = 'collection') => ({
+  resourceType: 'Bundle',
+  type: type, // 'collection', 'searchset', 'transaction', etc.
+  timestamp: new Date().toISOString(),
+  total: resources.length,
+  entry: resources.map((resource) => ({
+    fullUrl: `${resource.resourceType}/${resource.id}`,
+    resource: resource,
+  })),
+});
 
 /**
  * Validate FHIR resource (basic validation)

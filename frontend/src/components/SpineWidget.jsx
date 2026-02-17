@@ -4,7 +4,7 @@
  * Used for manipulation/adjustment documentation
  */
 
-import React, { useState, useCallback, useMemo } from 'react';
+import _React, { useState, useCallback, useMemo } from 'react';
 
 // Vertebral segments configuration
 const SPINE_SEGMENTS = {
@@ -18,16 +18,16 @@ const SPINE_SEGMENTS = {
       { id: 'C4', label: 'C4', fullName: 'C4 vertebra' },
       { id: 'C5', label: 'C5', fullName: 'C5 vertebra' },
       { id: 'C6', label: 'C6', fullName: 'C6 vertebra' },
-      { id: 'C7', label: 'C7', fullName: 'C7 vertebra' }
-    ]
+      { id: 'C7', label: 'C7', fullName: 'C7 vertebra' },
+    ],
   },
   thoracic: {
     label: 'Thoracic',
     segments: Array.from({ length: 12 }, (_, i) => ({
       id: `T${i + 1}`,
       label: `T${i + 1}`,
-      fullName: `T${i + 1} vertebra`
-    }))
+      fullName: `T${i + 1} vertebra`,
+    })),
   },
   lumbar: {
     label: 'Lumbar',
@@ -36,8 +36,8 @@ const SPINE_SEGMENTS = {
       { id: 'L2', label: 'L2', fullName: 'L2 vertebra' },
       { id: 'L3', label: 'L3', fullName: 'L3 vertebra' },
       { id: 'L4', label: 'L4', fullName: 'L4 vertebra' },
-      { id: 'L5', label: 'L5', fullName: 'L5 vertebra' }
-    ]
+      { id: 'L5', label: 'L5', fullName: 'L5 vertebra' },
+    ],
   },
   sacral: {
     label: 'Sacral',
@@ -45,9 +45,9 @@ const SPINE_SEGMENTS = {
       { id: 'S1', label: 'Sacrum', fullName: 'Sacral base' },
       { id: 'SI-R', label: 'SI-H', fullName: 'Sacroiliac joint right' },
       { id: 'SI-L', label: 'SI-V', fullName: 'Sacroiliac joint left' },
-      { id: 'Coccyx', label: 'Coccyx', fullName: 'Coccyx' }
-    ]
-  }
+      { id: 'Coccyx', label: 'Coccyx', fullName: 'Coccyx' },
+    ],
+  },
 };
 
 // Finding types with colors
@@ -57,7 +57,7 @@ const FINDING_TYPES = [
   { id: 'tenderness', label: 'Ømhet', color: '#eab308', abbrev: 'Ø' },
   { id: 'muscle_tension', label: 'Muskelstramhet', color: '#84cc16', abbrev: 'M' },
   { id: 'adjustment', label: 'Justert', color: '#22c55e', abbrev: '✓' },
-  { id: 'mobilization', label: 'Mobilisert', color: '#06b6d4', abbrev: '~' }
+  { id: 'mobilization', label: 'Mobilisert', color: '#06b6d4', abbrev: '~' },
 ];
 
 // Direction/listing indicators
@@ -72,7 +72,7 @@ const DIRECTIONS = [
   { id: 'rotation_left', label: 'θV', description: 'Rotasjon venstre' },
   { id: 'rotation_right', label: 'θH', description: 'Rotasjon høyre' },
   { id: 'lateral_left', label: '←', description: 'Lateralfleksjon venstre' },
-  { id: 'lateral_right', label: '→', description: 'Lateralfleksjon høyre' }
+  { id: 'lateral_right', label: '→', description: 'Lateralfleksjon høyre' },
 ];
 
 /**
@@ -80,7 +80,7 @@ const DIRECTIONS = [
  */
 const VertebraButton = ({ segment, findings, isSelected, onClick, compact }) => {
   const hasFindings = findings && findings.length > 0;
-  const primaryFinding = hasFindings ? FINDING_TYPES.find(f => f.id === findings[0].type) : null;
+  const primaryFinding = hasFindings ? FINDING_TYPES.find((f) => f.id === findings[0].type) : null;
 
   return (
     <button
@@ -89,15 +89,18 @@ const VertebraButton = ({ segment, findings, isSelected, onClick, compact }) => 
         relative flex items-center justify-center
         ${compact ? 'w-8 h-8 text-xs' : 'w-12 h-10 text-sm'}
         rounded-lg font-medium transition-all duration-150
-        ${isSelected
-          ? 'ring-2 ring-blue-500 ring-offset-2 bg-blue-100 text-blue-700'
-          : hasFindings
-            ? 'bg-gray-100 hover:bg-gray-200'
-            : 'bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+        ${
+          isSelected
+            ? 'ring-2 ring-blue-500 ring-offset-2 bg-blue-100 text-blue-700'
+            : hasFindings
+              ? 'bg-gray-100 hover:bg-gray-200'
+              : 'bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50'
         }
       `}
       title={segment.fullName}
-      style={hasFindings && primaryFinding ? { borderLeft: `3px solid ${primaryFinding.color}` } : {}}
+      style={
+        hasFindings && primaryFinding ? { borderLeft: `3px solid ${primaryFinding.color}` } : {}
+      }
     >
       <span>{segment.label}</span>
       {hasFindings && (
@@ -115,7 +118,14 @@ const VertebraButton = ({ segment, findings, isSelected, onClick, compact }) => 
 /**
  * Spine Region Section
  */
-const SpineRegion = ({ region, segments, findingsMap, selectedSegment, onSegmentClick, compact }) => {
+const SpineRegion = ({
+  region,
+  segments,
+  findingsMap,
+  selectedSegment,
+  onSegmentClick,
+  compact,
+}) => {
   return (
     <div className="mb-4">
       <div className="text-xs font-medium text-gray-500 mb-2 uppercase tracking-wide">
@@ -155,11 +165,11 @@ const FindingEditor = ({ segment, finding, onSave, onDelete, onCancel }) => {
       direction,
       notes,
       technique,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   };
 
-  const selectedType = FINDING_TYPES.find(t => t.id === findingType);
+  const _selectedType = FINDING_TYPES.find((t) => t.id === findingType);
 
   return (
     <div className="bg-gray-50 rounded-lg p-4 space-y-4">
@@ -167,14 +177,14 @@ const FindingEditor = ({ segment, finding, onSave, onDelete, onCancel }) => {
         <h4 className="font-medium">
           {segment.label} - {segment.fullName}
         </h4>
-        <button onClick={onCancel} className="text-gray-400 hover:text-gray-600">✕</button>
+        <button onClick={onCancel} className="text-gray-400 hover:text-gray-600">
+          ✕
+        </button>
       </div>
 
       {/* Finding type */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Funn
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Funn</label>
         <div className="flex flex-wrap gap-2">
           {FINDING_TYPES.map((type) => (
             <button
@@ -186,8 +196,8 @@ const FindingEditor = ({ segment, finding, onSave, onDelete, onCancel }) => {
               `}
               style={{
                 borderColor: type.color,
-                backgroundColor: findingType === type.id ? type.color + '20' : 'white',
-                color: type.color
+                backgroundColor: findingType === type.id ? `${type.color}20` : 'white',
+                color: type.color,
               }}
             >
               {type.abbrev} {type.label}
@@ -198,9 +208,7 @@ const FindingEditor = ({ segment, finding, onSave, onDelete, onCancel }) => {
 
       {/* Direction */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Retning/Listing
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Retning/Listing</label>
         <div className="flex flex-wrap gap-1">
           {DIRECTIONS.map((dir) => (
             <button
@@ -208,9 +216,11 @@ const FindingEditor = ({ segment, finding, onSave, onDelete, onCancel }) => {
               onClick={() => setDirection(dir.id)}
               className={`
                 px-2 py-1 rounded text-sm transition-all
-                ${direction === dir.id
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white border border-gray-200 hover:bg-gray-50'}
+                ${
+                  direction === dir.id
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white border border-gray-200 hover:bg-gray-50'
+                }
               `}
               title={dir.description}
             >
@@ -223,9 +233,7 @@ const FindingEditor = ({ segment, finding, onSave, onDelete, onCancel }) => {
       {/* Technique (for adjustments) */}
       {(findingType === 'adjustment' || findingType === 'mobilization') && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Teknikk
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Teknikk</label>
           <select
             value={technique}
             onChange={(e) => setTechnique(e.target.value)}
@@ -248,9 +256,7 @@ const FindingEditor = ({ segment, finding, onSave, onDelete, onCancel }) => {
 
       {/* Notes */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Notater
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Notater</label>
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
@@ -294,7 +300,7 @@ export const SpineWidget = ({
   onChange,
   readOnly = false,
   compact = false,
-  showSummary = true
+  showSummary = true,
 }) => {
   const [findings, setFindings] = useState(initialFindings);
   const [selectedSegment, setSelectedSegment] = useState(null);
@@ -303,7 +309,7 @@ export const SpineWidget = ({
   // Group findings by segment
   const findingsMap = useMemo(() => {
     const map = {};
-    findings.forEach(f => {
+    findings.forEach((f) => {
       if (!map[f.segmentId]) {
         map[f.segmentId] = [];
       }
@@ -313,69 +319,83 @@ export const SpineWidget = ({
   }, [findings]);
 
   // Handle segment click
-  const handleSegmentClick = useCallback((segment) => {
-    if (readOnly) return;
+  const handleSegmentClick = useCallback(
+    (segment) => {
+      if (readOnly) {
+        return;
+      }
 
-    setSelectedSegment(segment.id);
+      setSelectedSegment(segment.id);
 
-    // Check if segment already has findings
-    const existingFindings = findingsMap[segment.id];
-    if (existingFindings && existingFindings.length > 0) {
-      setEditingFinding({ segment, finding: existingFindings[0] });
-    } else {
-      setEditingFinding({ segment, finding: null });
-    }
-  }, [findingsMap, readOnly]);
+      // Check if segment already has findings
+      const existingFindings = findingsMap[segment.id];
+      if (existingFindings && existingFindings.length > 0) {
+        setEditingFinding({ segment, finding: existingFindings[0] });
+      } else {
+        setEditingFinding({ segment, finding: null });
+      }
+    },
+    [findingsMap, readOnly]
+  );
 
   // Save finding
-  const handleSaveFinding = useCallback((finding) => {
-    let newFindings;
-    const existingIndex = findings.findIndex(f => f.id === finding.id);
+  const handleSaveFinding = useCallback(
+    (finding) => {
+      let newFindings;
+      const existingIndex = findings.findIndex((f) => f.id === finding.id);
 
-    if (existingIndex >= 0) {
-      newFindings = [...findings];
-      newFindings[existingIndex] = finding;
-    } else {
-      newFindings = [...findings, finding];
-    }
+      if (existingIndex >= 0) {
+        newFindings = [...findings];
+        newFindings[existingIndex] = finding;
+      } else {
+        newFindings = [...findings, finding];
+      }
 
-    setFindings(newFindings);
-    setEditingFinding(null);
-    setSelectedSegment(null);
+      setFindings(newFindings);
+      setEditingFinding(null);
+      setSelectedSegment(null);
 
-    if (onChange) {
-      onChange(newFindings);
-    }
-  }, [findings, onChange]);
+      if (onChange) {
+        onChange(newFindings);
+      }
+    },
+    [findings, onChange]
+  );
 
   // Delete finding
-  const handleDeleteFinding = useCallback((findingId) => {
-    const newFindings = findings.filter(f => f.id !== findingId);
-    setFindings(newFindings);
-    setEditingFinding(null);
-    setSelectedSegment(null);
+  const handleDeleteFinding = useCallback(
+    (findingId) => {
+      const newFindings = findings.filter((f) => f.id !== findingId);
+      setFindings(newFindings);
+      setEditingFinding(null);
+      setSelectedSegment(null);
 
-    if (onChange) {
-      onChange(newFindings);
-    }
-  }, [findings, onChange]);
+      if (onChange) {
+        onChange(newFindings);
+      }
+    },
+    [findings, onChange]
+  );
 
   // Generate text summary
   const generateSummary = useCallback(() => {
-    if (findings.length === 0) return '';
+    if (findings.length === 0) {
+      return '';
+    }
 
     const groups = {
       adjustment: [],
       mobilization: [],
       restriction: [],
-      other: []
+      other: [],
     };
 
-    findings.forEach(f => {
-      const type = FINDING_TYPES.find(t => t.id === f.type);
-      const dirLabel = f.direction !== 'none'
-        ? ` (${DIRECTIONS.find(d => d.id === f.direction)?.description || f.direction})`
-        : '';
+    findings.forEach((f) => {
+      const type = FINDING_TYPES.find((t) => t.id === f.type);
+      const dirLabel =
+        f.direction !== 'none'
+          ? ` (${DIRECTIONS.find((d) => d.id === f.direction)?.description || f.direction})`
+          : '';
 
       if (f.type === 'adjustment') {
         groups.adjustment.push(`${f.segmentLabel}${dirLabel}`);
@@ -402,7 +422,7 @@ export const SpineWidget = ({
       parts.push(groups.other.join('. '));
     }
 
-    return parts.join('. ') + '.';
+    return `${parts.join('. ')}.`;
   }, [findings]);
 
   return (
@@ -413,7 +433,9 @@ export const SpineWidget = ({
           <button
             onClick={() => {
               setFindings([]);
-              if (onChange) onChange([]);
+              if (onChange) {
+                onChange([]);
+              }
             }}
             className="text-sm text-red-600 hover:text-red-700"
           >
@@ -459,15 +481,15 @@ export const SpineWidget = ({
                 </h4>
                 <div className="space-y-2 max-h-48 overflow-y-auto">
                   {findings.map((f) => {
-                    const type = FINDING_TYPES.find(t => t.id === f.type);
+                    const type = FINDING_TYPES.find((t) => t.id === f.type);
                     return (
                       <div
                         key={f.id}
                         className="flex items-center justify-between p-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
                         onClick={() => {
                           const segment = Object.values(SPINE_SEGMENTS)
-                            .flatMap(r => r.segments)
-                            .find(s => s.id === f.segmentId);
+                            .flatMap((r) => r.segments)
+                            .find((s) => s.id === f.segmentId);
                           if (segment) {
                             setEditingFinding({ segment, finding: f });
                             setSelectedSegment(f.segmentId);
@@ -489,12 +511,8 @@ export const SpineWidget = ({
               </div>
 
               <div>
-                <h4 className="font-medium text-sm text-gray-700 mb-2">
-                  Tekstsammendrag
-                </h4>
-                <div className="p-3 bg-blue-50 rounded-lg text-sm">
-                  {generateSummary()}
-                </div>
+                <h4 className="font-medium text-sm text-gray-700 mb-2">Tekstsammendrag</h4>
+                <div className="p-3 bg-blue-50 rounded-lg text-sm">{generateSummary()}</div>
               </div>
             </div>
           ) : (
@@ -510,10 +528,7 @@ export const SpineWidget = ({
         <div className="flex flex-wrap gap-3 text-xs">
           {FINDING_TYPES.map((type) => (
             <div key={type.id} className="flex items-center gap-1">
-              <span
-                className="w-2.5 h-2.5 rounded"
-                style={{ backgroundColor: type.color }}
-              />
+              <span className="w-2.5 h-2.5 rounded" style={{ backgroundColor: type.color }} />
               <span className="text-gray-600">{type.label}</span>
             </div>
           ))}

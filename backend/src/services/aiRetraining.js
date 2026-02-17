@@ -8,9 +8,9 @@ import fs from 'fs';
 import path from 'path';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import { query, transaction, getClient } from '../config/database.js';
-import * as aiLearning from './aiLearning.js';
-import * as trainingAnonymization from './trainingAnonymization.js';
+import { query, _transaction, _getClient } from '../config/database.js';
+import * as _aiLearning from './aiLearning.js';
+import * as _trainingAnonymization from './trainingAnonymization.js';
 import * as outlookBridge from './outlookBridge.js';
 import logger from '../utils/logger.js';
 
@@ -485,8 +485,8 @@ const generateModelVersion = () => {
 /**
  * Get default system prompt
  */
-const getDefaultSystemPrompt = () => {
-  return `Du er en klinisk dokumentasjonsassistent for kiropraktorer i Norge.
+const getDefaultSystemPrompt =
+  () => `Du er en klinisk dokumentasjonsassistent for kiropraktorer i Norge.
 
 Din oppgave er å hjelpe med profesjonell klinisk dokumentasjon på norsk, inkludert:
 - SOPE/SOAP-notater (Subjektiv, Objektiv, Plan/Evaluering)
@@ -502,7 +502,6 @@ VIKTIGE RETNINGSLINJER:
 5. Bruk standardiserte kliniske termer
 
 Svar alltid på norsk med profesjonell klinisk dokumentasjon.`;
-};
 
 /**
  * Rebuild Ollama model with new Modelfile

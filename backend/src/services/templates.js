@@ -4,7 +4,7 @@
  */
 
 import { query } from '../config/database.js';
-import logger from '../config/logger.js';
+import _logger from '../config/logger.js';
 
 /**
  * Get all templates for an organization
@@ -18,7 +18,7 @@ export const getAllTemplates = async (organizationId, options = {}) => {
     favoritesOnly = false,
     search,
     limit = 100,
-    offset = 0
+    offset = 0,
   } = options;
 
   let sql = `
@@ -108,7 +108,7 @@ export const getAllTemplates = async (organizationId, options = {}) => {
     templates: result.rows,
     total: parseInt(countResult.rows[0].total),
     limit,
-    offset
+    offset,
   };
 };
 
@@ -140,7 +140,7 @@ export const getTemplatesByCategory = async (organizationId, language = 'NO') =>
 
   // Organize into nested structure
   const organized = {};
-  result.rows.forEach(row => {
+  result.rows.forEach((row) => {
     if (!organized[row.category]) {
       organized[row.category] = {};
     }
@@ -179,7 +179,7 @@ export const createTemplate = async (organizationId, userId, templateData) => {
     templateText,
     language = 'NO',
     soapSection,
-    isFavorite = false
+    isFavorite = false,
   } = templateData;
 
   const result = await query(
@@ -204,7 +204,7 @@ export const createTemplate = async (organizationId, userId, templateData) => {
       language,
       soapSection,
       isFavorite,
-      userId
+      userId,
     ]
   );
 
@@ -225,14 +225,7 @@ export const updateTemplate = async (organizationId, templateId, updates) => {
     throw new Error('Cannot modify templates from other organizations');
   }
 
-  const {
-    category,
-    subcategory,
-    templateName,
-    templateText,
-    soapSection,
-    isFavorite
-  } = updates;
+  const { category, subcategory, templateName, templateText, soapSection, isFavorite } = updates;
 
   const result = await query(
     `UPDATE clinical_templates
@@ -265,10 +258,7 @@ export const deleteTemplate = async (organizationId, templateId) => {
     throw new Error('Cannot delete templates from other organizations');
   }
 
-  await query(
-    `DELETE FROM clinical_templates WHERE id = $1`,
-    [templateId]
-  );
+  await query(`DELETE FROM clinical_templates WHERE id = $1`, [templateId]);
 
   return { message: 'Template deleted successfully' };
 };
@@ -297,10 +287,7 @@ export const toggleFavorite = async (organizationId, templateId) => {
  * Increment usage count
  */
 export const incrementUsage = async (templateId) => {
-  await query(
-    `SELECT increment_template_usage($1)`,
-    [templateId]
-  );
+  await query(`SELECT increment_template_usage($1)`, [templateId]);
 };
 
 /**
@@ -361,13 +348,7 @@ export const searchTemplates = async (organizationId, searchQuery, language = 'N
  * Get orthopedic tests library
  */
 export const getTestsLibrary = async (filters = {}) => {
-  const {
-    testCategory,
-    bodyRegion,
-    system,
-    search,
-    language = 'NO'
-  } = filters;
+  const { testCategory, bodyRegion, system, search, language = 'NO' } = filters;
 
   let sql = `
     SELECT
@@ -566,11 +547,7 @@ export const removeFavoriteTemplate = async (userId, organizationId, templateId)
  * Get clinical phrases
  */
 export const getPhrases = async (organizationId, options = {}) => {
-  const {
-    category,
-    language = 'NO',
-    search
-  } = options;
+  const { category, language = 'NO', search } = options;
 
   let sql = `
     SELECT
@@ -644,12 +621,7 @@ export const getPhrasesByRegion = async (organizationId, region, language = 'NO'
  * Get red flags library
  */
 export const getRedFlags = async (filters = {}) => {
-  const {
-    pathologyCategory,
-    bodyRegion,
-    significanceLevel,
-    language = 'NO'
-  } = filters;
+  const { pathologyCategory, bodyRegion, significanceLevel, language = 'NO' } = filters;
 
   let sql = `
     SELECT
@@ -723,7 +695,7 @@ export const screenRedFlags = async (patientData, symptoms, findings) => {
   const { age, gender } = patientData;
 
   // Get all relevant red flags based on symptoms and findings
-  let flagsFound = [];
+  const _flagsFound = [];
 
   // Check age-specific red flags
   const ageResult = await query(
@@ -747,7 +719,7 @@ export const screenRedFlags = async (patientData, symptoms, findings) => {
     screeningDate: new Date(),
     redFlagsIdentified: [],
     riskLevel: 'LOW',
-    recommendedActions: []
+    recommendedActions: [],
   };
 
   // Analyze symptoms and findings against red flags database
@@ -758,13 +730,13 @@ export const screenRedFlags = async (patientData, symptoms, findings) => {
     let isPresent = false;
 
     if (symptoms && Array.isArray(symptoms)) {
-      isPresent = symptoms.some(symptom =>
+      isPresent = symptoms.some((symptom) =>
         flag.description.toLowerCase().includes(symptom.toLowerCase())
       );
     }
 
     if (!isPresent && findings && Array.isArray(findings)) {
-      isPresent = findings.some(finding =>
+      isPresent = findings.some((finding) =>
         flag.description.toLowerCase().includes(finding.toLowerCase())
       );
     }
@@ -775,7 +747,7 @@ export const screenRedFlags = async (patientData, symptoms, findings) => {
         name: flag.flag_name,
         category: flag.pathology_category,
         significance: flag.significance_level,
-        action: flag.recommended_action
+        action: flag.recommended_action,
       });
 
       // Update risk level
@@ -786,7 +758,10 @@ export const screenRedFlags = async (patientData, symptoms, findings) => {
       }
 
       // Add recommended action if not already present
-      if (flag.recommended_action && !screening.recommendedActions.includes(flag.recommended_action)) {
+      if (
+        flag.recommended_action &&
+        !screening.recommendedActions.includes(flag.recommended_action)
+      ) {
         screening.recommendedActions.push(flag.recommended_action);
       }
     }
@@ -799,10 +774,7 @@ export const screenRedFlags = async (patientData, symptoms, findings) => {
  * Get test clusters
  */
 export const getTestClusters = async (filters = {}) => {
-  const {
-    bodyRegion,
-    language = 'NO'
-  } = filters;
+  const { bodyRegion, language = 'NO' } = filters;
 
   let sql = `
     SELECT
@@ -939,5 +911,5 @@ export default {
   screenRedFlags,
   getTestClusters,
   getTestClusterByCondition,
-  getFMSTemplates
+  getFMSTemplates,
 };

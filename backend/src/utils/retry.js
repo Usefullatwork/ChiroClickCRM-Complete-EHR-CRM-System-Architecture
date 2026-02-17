@@ -18,7 +18,7 @@ export const retryWithBackoff = async (fn, options = {}) => {
     maxDelay = 10000,
     backoffMultiplier = 2,
     onRetry = null,
-    shouldRetry = (error) => true
+    shouldRetry = (_error) => true,
   } = options;
 
   let lastError;
@@ -39,7 +39,7 @@ export const retryWithBackoff = async (fn, options = {}) => {
       if (attempt > maxRetries) {
         logger.error('Max retries exceeded', {
           attempts: attempt,
-          error: error.message
+          error: error.message,
         });
         throw error;
       }
@@ -47,7 +47,7 @@ export const retryWithBackoff = async (fn, options = {}) => {
       // Log the retry
       logger.warn(`Retry attempt ${attempt}/${maxRetries}`, {
         error: error.message,
-        nextRetryIn: `${delay}ms`
+        nextRetryIn: `${delay}ms`,
       });
 
       // Call onRetry callback if provided
@@ -56,7 +56,7 @@ export const retryWithBackoff = async (fn, options = {}) => {
       }
 
       // Wait before retrying
-      await new Promise(resolve => setTimeout(resolve, delay));
+      await new Promise((resolve) => setTimeout(resolve, delay));
 
       // Increase delay for next retry (exponential backoff)
       delay = Math.min(delay * backoffMultiplier, maxDelay);
@@ -73,10 +73,12 @@ export const retryWithBackoff = async (fn, options = {}) => {
  */
 export const isRetryableError = (error) => {
   // Network errors
-  if (error.code === 'ECONNRESET' ||
-      error.code === 'ETIMEDOUT' ||
-      error.code === 'ECONNREFUSED' ||
-      error.code === 'ENETUNREACH') {
+  if (
+    error.code === 'ECONNRESET' ||
+    error.code === 'ETIMEDOUT' ||
+    error.code === 'ECONNREFUSED' ||
+    error.code === 'ENETUNREACH'
+  ) {
     return true;
   }
 
@@ -87,11 +89,12 @@ export const isRetryableError = (error) => {
   }
 
   // Specific error messages
-  if (error.message && (
-      error.message.includes('timeout') ||
+  if (
+    error.message &&
+    (error.message.includes('timeout') ||
       error.message.includes('ENOTFOUND') ||
-      error.message.includes('socket hang up')
-  )) {
+      error.message.includes('socket hang up'))
+  ) {
     return true;
   }
 
@@ -104,28 +107,24 @@ export const isRetryableError = (error) => {
  * @param {Object} data - Message data
  * @returns {Promise<any>} Send result
  */
-export const retryCommunication = async (sendFn, data) => {
-  return retryWithBackoff(
-    () => sendFn(data),
-    {
-      maxRetries: 3,
-      initialDelay: 2000,
-      maxDelay: 10000,
-      shouldRetry: isRetryableError,
-      onRetry: (attempt, error) => {
-        logger.info('Retrying communication', {
-          attempt,
-          type: data.type,
-          patientId: data.patient_id,
-          error: error.message
-        });
-      }
-    }
-  );
-};
+export const retryCommunication = async (sendFn, data) =>
+  retryWithBackoff(() => sendFn(data), {
+    maxRetries: 3,
+    initialDelay: 2000,
+    maxDelay: 10000,
+    shouldRetry: isRetryableError,
+    onRetry: (attempt, error) => {
+      logger.info('Retrying communication', {
+        attempt,
+        type: data.type,
+        patientId: data.patient_id,
+        error: error.message,
+      });
+    },
+  });
 
 export default {
   retryWithBackoff,
   isRetryableError,
-  retryCommunication
+  retryCommunication,
 };

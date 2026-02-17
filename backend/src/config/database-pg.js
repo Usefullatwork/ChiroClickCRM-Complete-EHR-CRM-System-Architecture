@@ -42,7 +42,7 @@ const pool = new Pool(poolConfig);
 export { pool };
 
 // Pool event handlers with Winston logging
-pool.on('error', (err, client) => {
+pool.on('error', (err, _client) => {
   logger.error('Unexpected error on idle database client', {
     error: err.message,
     stack: err.stack,
@@ -55,7 +55,7 @@ pool.on('error', (err, client) => {
   }
 });
 
-pool.on('connect', (client) => {
+pool.on('connect', (_client) => {
   logger.info('New database client connected', {
     totalCount: pool.totalCount,
     idleCount: pool.idleCount,

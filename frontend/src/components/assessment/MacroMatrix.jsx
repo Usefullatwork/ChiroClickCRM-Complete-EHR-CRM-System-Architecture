@@ -1,5 +1,16 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { Settings, Plus, X, Edit2, Save, Grid, List, Star, Search, Loader2 } from 'lucide-react';
+import {
+  Settings,
+  _Plus,
+  _X,
+  _Edit2,
+  _Save,
+  Grid,
+  List,
+  Star,
+  Search,
+  Loader2,
+} from 'lucide-react';
 import { macrosAPI } from '../../services/api';
 
 /**
@@ -482,7 +493,7 @@ export default function MacroMatrix({
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState(initialViewMode);
   const [showCustomize, setShowCustomize] = useState(false);
-  const [editingMacro, setEditingMacro] = useState(null);
+  const [_editingMacro, _setEditingMacro] = useState(null);
   const [macroData, setMacroData] = useState(DEFAULT_MACROS);
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState(propFavorites);
@@ -510,7 +521,9 @@ export default function MacroMatrix({
   useEffect(() => {
     if (!activeCategory && macroData) {
       const firstKey = Object.keys(macroData)[0];
-      if (firstKey) setActiveCategory(firstKey);
+      if (firstKey) {
+        setActiveCategory(firstKey);
+      }
     }
   }, [macroData, activeCategory]);
 

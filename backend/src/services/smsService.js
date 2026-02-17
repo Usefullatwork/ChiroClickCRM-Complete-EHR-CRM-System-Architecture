@@ -6,8 +6,8 @@
  * @module services/smsService
  */
 
-import { query } from '../config/database.js'
-import logger from '../utils/logger.js'
+import { query } from '../config/database.js';
+import logger from '../utils/logger.js';
 
 // =============================================================================
 // CONFIGURATION
@@ -18,50 +18,49 @@ const config = {
     accountSid: process.env.TWILIO_ACCOUNT_SID,
     authToken: process.env.TWILIO_AUTH_TOKEN,
     fromNumber: process.env.TWILIO_FROM_NUMBER,
-    messagingServiceSid: process.env.TWILIO_MESSAGING_SERVICE_SID
+    messagingServiceSid: process.env.TWILIO_MESSAGING_SERVICE_SID,
   },
   defaults: {
     countryCode: '+47', // Norway
     maxLength: 1600, // Extended SMS limit
-    segmentLength: 160
+    segmentLength: 160,
   },
   rateLimits: {
     perPatientPerDay: parseInt(process.env.SMS_RATE_LIMIT_PER_PATIENT || '5'),
-    perOrgPerHour: parseInt(process.env.SMS_RATE_LIMIT_PER_ORG_HOUR || '100')
-  }
-}
+    perOrgPerHour: parseInt(process.env.SMS_RATE_LIMIT_PER_ORG_HOUR || '100'),
+  },
+};
 
 // =============================================================================
 // TWILIO CLIENT
 // =============================================================================
 
-let twilioClient = null
+let twilioClient = null;
 
 /**
  * Initialize Twilio client
  */
 const initializeTwilioClient = async () => {
-  if (twilioClient) return twilioClient
+  if (twilioClient) {
+    return twilioClient;
+  }
 
   if (!config.twilio.accountSid || !config.twilio.authToken) {
-    logger.warn('SMS service: Twilio not configured, SMS will be logged only')
-    return null
+    logger.warn('SMS service: Twilio not configured, SMS will be logged only');
+    return null;
   }
 
   try {
     // Dynamic import for Twilio
-    const twilio = await import('twilio')
-    twilioClient = twilio.default(
-      config.twilio.accountSid,
-      config.twilio.authToken
-    )
-    logger.info('Twilio client initialized')
-    return twilioClient
+    const twilio = await import('twilio');
+    twilioClient = twilio.default(config.twilio.accountSid, config.twilio.authToken);
+    logger.info('Twilio client initialized');
+    return twilioClient;
   } catch (error) {
-    logger.error('Failed to initialize Twilio client:', error)
-    return null
+    logger.error('Failed to initialize Twilio client:', error);
+    return null;
   }
-}
+};
 
 // =============================================================================
 // PHONE NUMBER UTILITIES
@@ -75,25 +74,27 @@ const initializeTwilioClient = async () => {
  * @returns {string} Normalized phone number
  */
 export const normalizePhoneNumber = (phone, defaultCountryCode = config.defaults.countryCode) => {
-  if (!phone) return null
+  if (!phone) {
+    return null;
+  }
 
   // Remove all non-digit characters except leading +
-  let normalized = phone.replace(/[^\d+]/g, '')
+  let normalized = phone.replace(/[^\d+]/g, '');
 
   // Handle various formats
   if (normalized.startsWith('00')) {
     // International format with 00
-    normalized = '+' + normalized.substring(2)
+    normalized = `+${normalized.substring(2)}`;
   } else if (!normalized.startsWith('+')) {
     // Assume local number, add country code
     if (normalized.startsWith('0')) {
-      normalized = normalized.substring(1)
+      normalized = normalized.substring(1);
     }
-    normalized = defaultCountryCode + normalized
+    normalized = defaultCountryCode + normalized;
   }
 
-  return normalized
-}
+  return normalized;
+};
 
 /**
  * Validate phone number format
@@ -102,13 +103,15 @@ export const normalizePhoneNumber = (phone, defaultCountryCode = config.defaults
  * @returns {boolean} Is valid
  */
 export const isValidPhoneNumber = (phone) => {
-  const normalized = normalizePhoneNumber(phone)
-  if (!normalized) return false
+  const normalized = normalizePhoneNumber(phone);
+  if (!normalized) {
+    return false;
+  }
 
   // Basic E.164 validation
-  const e164Regex = /^\+[1-9]\d{6,14}$/
-  return e164Regex.test(normalized)
-}
+  const e164Regex = /^\+[1-9]\d{6,14}$/;
+  return e164Regex.test(normalized);
+};
 
 // =============================================================================
 // SMS SENDING
@@ -125,54 +128,49 @@ export const isValidPhoneNumber = (phone) => {
  * @returns {Promise<Object>} Send result
  */
 export const sendSMS = async (options) => {
-  const {
-    to,
-    message,
-    from = config.twilio.fromNumber,
-    metadata = {}
-  } = options
+  const { to, message, from = config.twilio.fromNumber, _metadata = {} } = options;
 
   if (!to || !message) {
-    throw new Error('Missing required SMS fields: to, message')
+    throw new Error('Missing required SMS fields: to, message');
   }
 
-  const normalizedTo = normalizePhoneNumber(to)
+  const normalizedTo = normalizePhoneNumber(to);
 
   if (!isValidPhoneNumber(normalizedTo)) {
-    throw new Error(`Invalid phone number: ${to}`)
+    throw new Error(`Invalid phone number: ${to}`);
   }
 
   // Check message length
   if (message.length > config.defaults.maxLength) {
-    throw new Error(`Message too long. Max ${config.defaults.maxLength} characters.`)
+    throw new Error(`Message too long. Max ${config.defaults.maxLength} characters.`);
   }
 
-  const segments = Math.ceil(message.length / config.defaults.segmentLength)
+  const segments = Math.ceil(message.length / config.defaults.segmentLength);
 
   // Initialize Twilio client if needed
-  const client = await initializeTwilioClient()
+  const client = await initializeTwilioClient();
 
   if (client) {
     try {
       const messageOptions = {
         body: message,
-        to: normalizedTo
-      }
+        to: normalizedTo,
+      };
 
       // Use messaging service or from number
       if (config.twilio.messagingServiceSid) {
-        messageOptions.messagingServiceSid = config.twilio.messagingServiceSid
+        messageOptions.messagingServiceSid = config.twilio.messagingServiceSid;
       } else {
-        messageOptions.from = from
+        messageOptions.from = from;
       }
 
-      const result = await client.messages.create(messageOptions)
+      const result = await client.messages.create(messageOptions);
 
       logger.info(`SMS sent to ${normalizedTo}`, {
         sid: result.sid,
         status: result.status,
-        segments
-      })
+        segments,
+      });
 
       return {
         success: true,
@@ -180,19 +178,19 @@ export const sendSMS = async (options) => {
         messageId: result.sid,
         status: result.status,
         segments,
-        to: normalizedTo
-      }
+        to: normalizedTo,
+      };
     } catch (error) {
-      logger.error(`Failed to send SMS to ${normalizedTo}:`, error)
-      throw error
+      logger.error(`Failed to send SMS to ${normalizedTo}:`, error);
+      throw error;
     }
   } else {
     // Development mode - log SMS
     logger.info('SMS (not sent - Twilio not configured):', {
       to: normalizedTo,
       message: message.substring(0, 100) + (message.length > 100 ? '...' : ''),
-      segments
-    })
+      segments,
+    });
 
     return {
       success: false,
@@ -200,10 +198,10 @@ export const sendSMS = async (options) => {
       message: 'Twilio not configured. SMS logged for development.',
       segments,
       to: normalizedTo,
-      sms: { to: normalizedTo, message }
-    }
+      sms: { to: normalizedTo, message },
+    };
   }
-}
+};
 
 /**
  * Send SMS using a template
@@ -215,16 +213,16 @@ export const sendSMS = async (options) => {
  * @returns {Promise<Object>} Send result
  */
 export const sendTemplatedSMS = async (options) => {
-  const { to, template, variables = {} } = options
+  const { to, template, variables = {} } = options;
 
-  let message = template
+  let message = template;
   for (const [key, value] of Object.entries(variables)) {
-    const regex = new RegExp(`{{${key}}}`, 'g')
-    message = message.replace(regex, value || '')
+    const regex = new RegExp(`{{${key}}}`, 'g');
+    message = message.replace(regex, value || '');
   }
 
-  return sendSMS({ to, message })
-}
+  return sendSMS({ to, message });
+};
 
 /**
  * Send bulk SMS messages
@@ -238,35 +236,35 @@ export const sendBulkSMS = async (messages, delayMs = 500) => {
     total: messages.length,
     sent: 0,
     failed: 0,
-    details: []
-  }
+    details: [],
+  };
 
   for (const sms of messages) {
     try {
-      const result = await sendSMS(sms)
+      const result = await sendSMS(sms);
       if (result.success) {
-        results.sent++
+        results.sent++;
       } else {
-        results.failed++
+        results.failed++;
       }
-      results.details.push({ to: sms.to, ...result })
+      results.details.push({ to: sms.to, ...result });
 
       // Rate limiting delay
       if (delayMs > 0) {
-        await new Promise(resolve => setTimeout(resolve, delayMs))
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
       }
     } catch (error) {
-      results.failed++
+      results.failed++;
       results.details.push({
         to: sms.to,
         success: false,
-        error: error.message
-      })
+        error: error.message,
+      });
     }
   }
 
-  return results
-}
+  return results;
+};
 
 // =============================================================================
 // SPECIALIZED SMS FUNCTIONS
@@ -282,15 +280,15 @@ export const sendBulkSMS = async (messages, delayMs = 500) => {
  * @returns {Promise<Object>} Send result
  */
 export const sendExerciseProgramSMS = async (params) => {
-  const { patient, portalLink, organization } = params
+  const { patient, portalLink, organization } = params;
 
-  const patientPhone = patient.phone || patient.mobile
+  const patientPhone = patient.phone || patient.mobile;
 
   if (!patientPhone) {
-    throw new Error('Patient does not have a phone number')
+    throw new Error('Patient does not have a phone number');
   }
 
-  const message = `Hei ${patient.firstName || patient.first_name || ''}! Ovelsesprogrammet ditt fra ${organization.name} er klart. Se ovelsene med video her: ${portalLink}`
+  const message = `Hei ${patient.firstName || patient.first_name || ''}! Ovelsesprogrammet ditt fra ${organization.name} er klart. Se ovelsene med video her: ${portalLink}`;
 
   return sendSMS({
     to: patientPhone,
@@ -298,10 +296,10 @@ export const sendExerciseProgramSMS = async (params) => {
     metadata: {
       type: 'exercise_program',
       patientId: patient.id,
-      organizationId: organization.id
-    }
-  })
-}
+      organizationId: organization.id,
+    },
+  });
+};
 
 /**
  * Send appointment reminder via SMS
@@ -313,26 +311,26 @@ export const sendExerciseProgramSMS = async (params) => {
  * @returns {Promise<Object>} Send result
  */
 export const sendAppointmentReminderSMS = async (params) => {
-  const { patient, appointment, organization } = params
+  const { patient, appointment, organization } = params;
 
-  const patientPhone = patient.phone || patient.mobile
+  const patientPhone = patient.phone || patient.mobile;
 
   if (!patientPhone) {
-    throw new Error('Patient does not have a phone number')
+    throw new Error('Patient does not have a phone number');
   }
 
-  const appointmentDate = new Date(appointment.start_time || appointment.startTime)
+  const appointmentDate = new Date(appointment.start_time || appointment.startTime);
   const dateStr = appointmentDate.toLocaleDateString('nb-NO', {
     weekday: 'long',
     day: 'numeric',
-    month: 'long'
-  })
+    month: 'long',
+  });
   const timeStr = appointmentDate.toLocaleTimeString('nb-NO', {
     hour: '2-digit',
-    minute: '2-digit'
-  })
+    minute: '2-digit',
+  });
 
-  const message = `Paminnelse: Du har time hos ${organization.name} ${dateStr} kl. ${timeStr}. Kan du ikke mote? Ring oss pa ${organization.phone || 'klinikken'}.`
+  const message = `Paminnelse: Du har time hos ${organization.name} ${dateStr} kl. ${timeStr}. Kan du ikke mote? Ring oss pa ${organization.phone || 'klinikken'}.`;
 
   return sendSMS({
     to: patientPhone,
@@ -341,10 +339,10 @@ export const sendAppointmentReminderSMS = async (params) => {
       type: 'appointment_reminder',
       patientId: patient.id,
       appointmentId: appointment.id,
-      organizationId: organization.id
-    }
-  })
-}
+      organizationId: organization.id,
+    },
+  });
+};
 
 /**
  * Send appointment confirmation via SMS
@@ -353,26 +351,26 @@ export const sendAppointmentReminderSMS = async (params) => {
  * @returns {Promise<Object>} Send result
  */
 export const sendAppointmentConfirmationSMS = async (params) => {
-  const { patient, appointment, organization } = params
+  const { patient, appointment, organization } = params;
 
-  const patientPhone = patient.phone || patient.mobile
+  const patientPhone = patient.phone || patient.mobile;
 
   if (!patientPhone) {
-    throw new Error('Patient does not have a phone number')
+    throw new Error('Patient does not have a phone number');
   }
 
-  const appointmentDate = new Date(appointment.start_time || appointment.startTime)
+  const appointmentDate = new Date(appointment.start_time || appointment.startTime);
   const dateStr = appointmentDate.toLocaleDateString('nb-NO', {
     weekday: 'long',
     day: 'numeric',
-    month: 'long'
-  })
+    month: 'long',
+  });
   const timeStr = appointmentDate.toLocaleTimeString('nb-NO', {
     hour: '2-digit',
-    minute: '2-digit'
-  })
+    minute: '2-digit',
+  });
 
-  const message = `Bekreftelse: Timen din hos ${organization.name} er ${dateStr} kl. ${timeStr}. Vi gleder oss til a se deg! Adr: ${organization.address || 'Se nettsiden var'}`
+  const message = `Bekreftelse: Timen din hos ${organization.name} er ${dateStr} kl. ${timeStr}. Vi gleder oss til a se deg! Adr: ${organization.address || 'Se nettsiden var'}`;
 
   return sendSMS({
     to: patientPhone,
@@ -381,10 +379,10 @@ export const sendAppointmentConfirmationSMS = async (params) => {
       type: 'appointment_confirmation',
       patientId: patient.id,
       appointmentId: appointment.id,
-      organizationId: organization.id
-    }
-  })
-}
+      organizationId: organization.id,
+    },
+  });
+};
 
 // =============================================================================
 // RATE LIMITING
@@ -406,8 +404,8 @@ export const checkRateLimits = async (organizationId, patientId) => {
          AND type = 'SMS'
          AND sent_at > NOW() - INTERVAL '24 hours'`,
       [patientId]
-    )
-    const patientCount = parseInt(patientResult.rows[0].count)
+    );
+    const patientCount = parseInt(patientResult.rows[0].count);
 
     // Check organization rate limit (per hour)
     const orgResult = await query(
@@ -416,31 +414,31 @@ export const checkRateLimits = async (organizationId, patientId) => {
          AND type = 'SMS'
          AND sent_at > NOW() - INTERVAL '1 hour'`,
       [organizationId]
-    )
-    const orgCount = parseInt(orgResult.rows[0].count)
+    );
+    const orgCount = parseInt(orgResult.rows[0].count);
 
-    const patientAllowed = patientCount < config.rateLimits.perPatientPerDay
-    const orgAllowed = orgCount < config.rateLimits.perOrgPerHour
+    const patientAllowed = patientCount < config.rateLimits.perPatientPerDay;
+    const orgAllowed = orgCount < config.rateLimits.perOrgPerHour;
 
     return {
       allowed: patientAllowed && orgAllowed,
       patientLimit: {
         current: patientCount,
         max: config.rateLimits.perPatientPerDay,
-        allowed: patientAllowed
+        allowed: patientAllowed,
       },
       organizationLimit: {
         current: orgCount,
         max: config.rateLimits.perOrgPerHour,
-        allowed: orgAllowed
-      }
-    }
+        allowed: orgAllowed,
+      },
+    };
   } catch (error) {
-    logger.error('Error checking SMS rate limits:', error)
+    logger.error('Error checking SMS rate limits:', error);
     // Default to allowing on error to not block legitimate use
-    return { allowed: true }
+    return { allowed: true };
   }
-}
+};
 
 // =============================================================================
 // DELIVERY STATUS
@@ -454,13 +452,13 @@ export const checkRateLimits = async (organizationId, patientId) => {
  */
 export const handleDeliveryStatus = async (webhookData) => {
   try {
-    const { MessageSid, MessageStatus, ErrorCode, ErrorMessage } = webhookData
+    const { MessageSid, MessageStatus, ErrorCode, ErrorMessage } = webhookData;
 
     logger.info('SMS delivery status update:', {
       sid: MessageSid,
       status: MessageStatus,
-      errorCode: ErrorCode
-    })
+      errorCode: ErrorCode,
+    });
 
     // Map Twilio status to our status
     const statusMap = {
@@ -469,40 +467,37 @@ export const handleDeliveryStatus = async (webhookData) => {
       sent: 'SENT',
       delivered: 'DELIVERED',
       failed: 'FAILED',
-      undelivered: 'FAILED'
-    }
+      undelivered: 'FAILED',
+    };
 
-    const internalStatus = statusMap[MessageStatus] || MessageStatus
+    const internalStatus = statusMap[MessageStatus] || MessageStatus;
 
     // Update communication record
-    let updateQuery
+    let updateQuery;
     if (internalStatus === 'DELIVERED') {
       updateQuery = `
         UPDATE communications
         SET delivered_at = NOW(),
             external_status = $2
-        WHERE external_id = $1`
+        WHERE external_id = $1`;
     } else if (internalStatus === 'FAILED') {
       updateQuery = `
         UPDATE communications
         SET failed_at = NOW(),
             failure_reason = $2
-        WHERE external_id = $1`
+        WHERE external_id = $1`;
     } else {
       updateQuery = `
         UPDATE communications
         SET external_status = $2
-        WHERE external_id = $1`
+        WHERE external_id = $1`;
     }
 
-    await query(updateQuery, [
-      MessageSid,
-      ErrorMessage || MessageStatus
-    ])
+    await query(updateQuery, [MessageSid, ErrorMessage || MessageStatus]);
   } catch (error) {
-    logger.error('Error handling SMS delivery status:', error)
+    logger.error('Error handling SMS delivery status:', error);
   }
-}
+};
 
 // =============================================================================
 // CONFIGURATION CHECK
@@ -518,25 +513,25 @@ export const verifyConfiguration = async () => {
     configured: !!(config.twilio.accountSid && config.twilio.authToken),
     hasFromNumber: !!config.twilio.fromNumber,
     hasMessagingService: !!config.twilio.messagingServiceSid,
-    verified: false
-  }
+    verified: false,
+  };
 
   if (status.configured) {
-    const client = await initializeTwilioClient()
+    const client = await initializeTwilioClient();
     if (client) {
       try {
         // Verify by fetching account info
-        const account = await client.api.accounts(config.twilio.accountSid).fetch()
-        status.verified = true
-        status.accountStatus = account.status
+        const account = await client.api.accounts(config.twilio.accountSid).fetch();
+        status.verified = true;
+        status.accountStatus = account.status;
       } catch (error) {
-        status.error = error.message
+        status.error = error.message;
       }
     }
   }
 
-  return status
-}
+  return status;
+};
 
 // =============================================================================
 // EXPORT
@@ -553,5 +548,5 @@ export default {
   isValidPhoneNumber,
   checkRateLimits,
   handleDeliveryStatus,
-  verifyConfiguration
-}
+  verifyConfiguration,
+};

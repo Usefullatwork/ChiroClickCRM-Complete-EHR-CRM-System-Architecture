@@ -8,8 +8,8 @@ import fs from 'fs/promises';
 import path from 'path';
 import logger from '../utils/logger.js';
 import {
-  parseClinicalCase,
-  classifyCase,
+  _parseClinicalCase,
+  _classifyCase,
   convertToTrainingExample,
   convertToJSONL,
 } from '../services/clinicalDataParser.js';
@@ -64,7 +64,9 @@ const generateStatistics = (trainingExamples) => {
   };
 
   for (const example of trainingExamples) {
-    if (!example) continue;
+    if (!example) {
+      continue;
+    }
 
     // Count by region
     for (const region of example.metadata.classification.region) {

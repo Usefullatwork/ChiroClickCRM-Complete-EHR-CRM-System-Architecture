@@ -12,7 +12,8 @@ const GRAPH_API_BASE = 'https://graph.microsoft.com/v1.0';
 const OUTLOOK_CLIENT_ID = process.env.OUTLOOK_CLIENT_ID || null;
 const OUTLOOK_CLIENT_SECRET = process.env.OUTLOOK_CLIENT_SECRET || null;
 const OUTLOOK_TENANT_ID = process.env.OUTLOOK_TENANT_ID || 'common';
-const OUTLOOK_REDIRECT_URI = process.env.OUTLOOK_REDIRECT_URI || 'http://localhost:3000/api/v1/auth/outlook/callback';
+const OUTLOOK_REDIRECT_URI =
+  process.env.OUTLOOK_REDIRECT_URI || 'http://localhost:3000/api/v1/auth/outlook/callback';
 
 // Token storage (in production, use Redis or database)
 let accessToken = null;
@@ -24,7 +25,8 @@ let tokenExpiry = null;
  */
 export const getAuthorizationUrl = () => {
   const scopes = 'Mail.Send Mail.ReadWrite User.Read offline_access';
-  const authUrl = `https://login.microsoftonline.com/${OUTLOOK_TENANT_ID}/oauth2/v2.0/authorize?` +
+  const authUrl =
+    `https://login.microsoftonline.com/${OUTLOOK_TENANT_ID}/oauth2/v2.0/authorize?` +
     `client_id=${OUTLOOK_CLIENT_ID}` +
     `&response_type=code` +
     `&redirect_uri=${encodeURIComponent(OUTLOOK_REDIRECT_URI)}` +
@@ -45,21 +47,21 @@ export const exchangeCodeForToken = async (code) => {
         client_secret: OUTLOOK_CLIENT_SECRET,
         code: code,
         redirect_uri: OUTLOOK_REDIRECT_URI,
-        grant_type: 'authorization_code'
+        grant_type: 'authorization_code',
       }),
       {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       }
     );
 
     accessToken = response.data.access_token;
     refreshToken = response.data.refresh_token;
-    tokenExpiry = Date.now() + (response.data.expires_in * 1000);
+    tokenExpiry = Date.now() + response.data.expires_in * 1000;
 
     logger.info('Outlook access token obtained');
     return {
       success: true,
-      expiresIn: response.data.expires_in
+      expiresIn: response.data.expires_in,
     };
   } catch (error) {
     logger.error('Error exchanging code for token:', error.response?.data || error.message);
@@ -82,16 +84,16 @@ export const refreshAccessToken = async () => {
         client_id: OUTLOOK_CLIENT_ID,
         client_secret: OUTLOOK_CLIENT_SECRET,
         refresh_token: refreshToken,
-        grant_type: 'refresh_token'
+        grant_type: 'refresh_token',
       }),
       {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       }
     );
 
     accessToken = response.data.access_token;
     refreshToken = response.data.refresh_token || refreshToken;
-    tokenExpiry = Date.now() + (response.data.expires_in * 1000);
+    tokenExpiry = Date.now() + response.data.expires_in * 1000;
 
     logger.info('Outlook access token refreshed');
     return true;
@@ -113,7 +115,7 @@ const ensureValidToken = async () => {
   }
 
   // Refresh token if it expires in less than 5 minutes
-  if (tokenExpiry && Date.now() > (tokenExpiry - 300000)) {
+  if (tokenExpiry && Date.now() > tokenExpiry - 300000) {
     const refreshed = await refreshAccessToken();
     if (!refreshed) {
       throw new Error('Failed to refresh Outlook token. Re-authentication required.');
@@ -135,25 +137,31 @@ export const sendEmail = async (emailData) => {
       subject: subject,
       body: {
         contentType: 'HTML',
-        content: body
+        content: body,
       },
-      toRecipients: Array.isArray(to) ? to.map(email => ({ emailAddress: { address: email } })) : [{ emailAddress: { address: to } }]
+      toRecipients: Array.isArray(to)
+        ? to.map((email) => ({ emailAddress: { address: email } }))
+        : [{ emailAddress: { address: to } }],
     };
 
     if (cc) {
-      message.ccRecipients = Array.isArray(cc) ? cc.map(email => ({ emailAddress: { address: email } })) : [{ emailAddress: { address: cc } }];
+      message.ccRecipients = Array.isArray(cc)
+        ? cc.map((email) => ({ emailAddress: { address: email } }))
+        : [{ emailAddress: { address: cc } }];
     }
 
     if (bcc) {
-      message.bccRecipients = Array.isArray(bcc) ? bcc.map(email => ({ emailAddress: { address: email } })) : [{ emailAddress: { address: bcc } }];
+      message.bccRecipients = Array.isArray(bcc)
+        ? bcc.map((email) => ({ emailAddress: { address: email } }))
+        : [{ emailAddress: { address: bcc } }];
     }
 
     if (attachments && attachments.length > 0) {
-      message.attachments = attachments.map(att => ({
+      message.attachments = attachments.map((att) => ({
         '@odata.type': '#microsoft.graph.fileAttachment',
         name: att.name,
         contentBytes: att.content, // Base64 encoded
-        contentType: att.contentType || 'application/octet-stream'
+        contentType: att.contentType || 'application/octet-stream',
       }));
     }
 
@@ -162,13 +170,13 @@ export const sendEmail = async (emailData) => {
       `${GRAPH_API_BASE}/me/sendMail`,
       {
         message: message,
-        saveToSentItems: true
+        saveToSentItems: true,
       },
       {
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
       }
     );
 
@@ -176,11 +184,13 @@ export const sendEmail = async (emailData) => {
     return {
       success: true,
       messageId: response.headers['request-id'] || `OUTLOOK-${Date.now()}`,
-      method: 'outlook'
+      method: 'outlook',
     };
   } catch (error) {
     logger.error('Error sending email via Outlook:', error.response?.data || error.message);
-    throw new Error(`Outlook email send failed: ${error.response?.data?.error?.message || error.message}`);
+    throw new Error(
+      `Outlook email send failed: ${error.response?.data?.error?.message || error.message}`
+    );
   }
 };
 
@@ -213,14 +223,14 @@ export const getUserProfile = async () => {
 
     const response = await axios.get(`${GRAPH_API_BASE}/me`, {
       headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
+        Authorization: `Bearer ${accessToken}`,
+      },
     });
 
     return {
       email: response.data.mail || response.data.userPrincipalName,
       displayName: response.data.displayName,
-      id: response.data.id
+      id: response.data.id,
     };
   } catch (error) {
     logger.error('Error getting user profile:', error);
@@ -243,8 +253,8 @@ export const getInboxMessages = async (top = 10, filter = null) => {
 
     const response = await axios.get(url, {
       headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
+        Authorization: `Bearer ${accessToken}`,
+      },
     });
 
     return response.data.value || [];
@@ -263,7 +273,7 @@ export const checkConnection = async () => {
       return {
         connected: false,
         authenticated: false,
-        message: 'Not authenticated'
+        message: 'Not authenticated',
       };
     }
 
@@ -273,20 +283,20 @@ export const checkConnection = async () => {
         connected: true,
         authenticated: true,
         email: profile.email,
-        displayName: profile.displayName
+        displayName: profile.displayName,
       };
     } else {
       return {
         connected: false,
         authenticated: false,
-        message: 'Token invalid'
+        message: 'Token invalid',
       };
     }
   } catch (error) {
     return {
       connected: false,
       authenticated: false,
-      message: error.message
+      message: error.message,
     };
   }
 };
@@ -303,13 +313,11 @@ export const setTokens = (tokens) => {
 /**
  * Get tokens (for persistence)
  */
-export const getTokens = () => {
-  return {
-    accessToken,
-    refreshToken,
-    tokenExpiry
-  };
-};
+export const getTokens = () => ({
+  accessToken,
+  refreshToken,
+  tokenExpiry,
+});
 
 export default {
   getAuthorizationUrl,
@@ -321,5 +329,5 @@ export default {
   getInboxMessages,
   checkConnection,
   setTokens,
-  getTokens
+  getTokens,
 };

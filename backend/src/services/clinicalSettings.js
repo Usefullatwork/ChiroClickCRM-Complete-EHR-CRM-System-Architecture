@@ -5,7 +5,7 @@
  * and letter/document structure
  */
 
-import { query, transaction } from '../config/database.js';
+import { query, _transaction } from '../config/database.js';
 import logger from '../utils/logger.js';
 
 // Default clinical settings structure
@@ -30,8 +30,8 @@ export const DEFAULT_CLINICAL_SETTINGS = {
         // Sacrum: AS, AI, PI, PS, IN-EX, EX-IN
         sacrum: ['AS', 'AI', 'PI', 'PS', 'IN-EX', 'EX-IN'],
         // Pelvis: PI, AS, IN, EX
-        pelvis: ['PI', 'AS', 'IN', 'EX']
-      }
+        pelvis: ['PI', 'AS', 'IN', 'EX'],
+      },
     },
 
     // Diversified-specific settings (when style = 'diversified')
@@ -43,12 +43,12 @@ export const DEFAULT_CLINICAL_SETTINGS = {
       // Notation format options
       terminology: {
         restriction: ['Hypomobile', 'Fixation', 'Subluxation', 'Dysfunction'],
-        direction: ['Flexion', 'Extension', 'Lateral flexion', 'Rotation', 'Combined']
-      }
+        direction: ['Flexion', 'Extension', 'Lateral flexion', 'Rotation', 'Combined'],
+      },
     },
 
     // Custom abbreviations (user-defined)
-    customAbbreviations: {}
+    customAbbreviations: {},
   },
 
   // ============================================
@@ -65,9 +65,19 @@ export const DEFAULT_CLINICAL_SETTINGS = {
       includePainReproduction: true,
       // Common tests to show in quick-select
       quickTests: [
-        'Kemp', 'SLR', 'Braggard', 'Faber', 'Valsalva', 'Spurling',
-        'Adson', 'Milgram', 'Thomas', 'Ober', 'Nachlas', 'Yeoman'
-      ]
+        'Kemp',
+        'SLR',
+        'Braggard',
+        'Faber',
+        'Valsalva',
+        'Spurling',
+        'Adson',
+        'Milgram',
+        'Thomas',
+        'Ober',
+        'Nachlas',
+        'Yeoman',
+      ],
     },
 
     // Neurological test format
@@ -79,7 +89,7 @@ export const DEFAULT_CLINICAL_SETTINGS = {
       // Motor strength: 'oxford' (0-5), 'descriptive'
       motorGrading: 'oxford',
       // Include dermatome reference
-      includeDermatomes: true
+      includeDermatomes: true,
     },
 
     // Range of motion format
@@ -91,7 +101,7 @@ export const DEFAULT_CLINICAL_SETTINGS = {
       // Compare to contralateral
       compareContralateral: false,
       // Active vs passive
-      distinguishActivePassive: true
+      distinguishActivePassive: true,
     },
 
     // Palpation findings
@@ -101,8 +111,8 @@ export const DEFAULT_CLINICAL_SETTINGS = {
       // Muscle tone: 'descriptive', 'numeric'
       toneScale: 'descriptive',
       // Include specific structures
-      includeStructures: true
-    }
+      includeStructures: true,
+    },
   },
 
   // ============================================
@@ -117,7 +127,7 @@ export const DEFAULT_CLINICAL_SETTINGS = {
       includeClinicName: true,
       includeAddress: true,
       includePhone: true,
-      includeEmail: true
+      includeEmail: true,
     },
 
     // Default letter structure
@@ -129,7 +139,7 @@ export const DEFAULT_CLINICAL_SETTINGS = {
       // Patient reference format
       patientReference: 'name_dob',
       // Include reference number
-      includeReferenceNumber: true
+      includeReferenceNumber: true,
     },
 
     // Signature settings
@@ -139,7 +149,7 @@ export const DEFAULT_CLINICAL_SETTINGS = {
       // Signature format
       format: 'name_title_hpr',
       // Include digital signature
-      includeDigitalSignature: false
+      includeDigitalSignature: false,
     },
 
     // Letter templates preferences
@@ -149,8 +159,8 @@ export const DEFAULT_CLINICAL_SETTINGS = {
       // Auto-fill patient data
       autoFillPatientData: true,
       // Include clinical summary
-      includeClinicalSummary: true
-    }
+      includeClinicalSummary: true,
+    },
   },
 
   // ============================================
@@ -166,7 +176,7 @@ export const DEFAULT_CLINICAL_SETTINGS = {
       // Include functional questionnaires
       includeQuestionnaires: true,
       // Default questionnaires
-      defaultQuestionnaires: ['ODI', 'NDI', 'FABQ']
+      defaultQuestionnaires: ['ODI', 'NDI', 'FABQ'],
     },
 
     // Objective section
@@ -176,7 +186,7 @@ export const DEFAULT_CLINICAL_SETTINGS = {
       // Include posture analysis
       includePosture: true,
       // Include gait analysis
-      includeGait: false
+      includeGait: false,
     },
 
     // Assessment section
@@ -186,7 +196,7 @@ export const DEFAULT_CLINICAL_SETTINGS = {
       // Include clinical reasoning
       includeClinicalReasoning: true,
       // Include red flags check
-      includeRedFlagsCheck: true
+      includeRedFlagsCheck: true,
     },
 
     // Plan section
@@ -198,8 +208,8 @@ export const DEFAULT_CLINICAL_SETTINGS = {
       // Include advice given
       includeAdvice: true,
       // Include follow-up plan
-      includeFollowUp: true
-    }
+      includeFollowUp: true,
+    },
   },
 
   // ============================================
@@ -213,7 +223,7 @@ export const DEFAULT_CLINICAL_SETTINGS = {
     // Include placeholders for manual review
     includePlaceholders: true,
     // Auto-suggest based on findings
-    autoSuggest: true
+    autoSuggest: true,
   },
 
   // ============================================
@@ -229,8 +239,8 @@ export const DEFAULT_CLINICAL_SETTINGS = {
     // Default body chart view: 'front', 'back', 'both'
     defaultView: 'front',
     // Auto-generate narrative on save
-    autoGenerateNarrative: true
-  }
+    autoGenerateNarrative: true,
+  },
 };
 
 /**
@@ -270,10 +280,9 @@ export const getClinicalSettings = async (organizationId) => {
 export const updateClinicalSettings = async (organizationId, settings) => {
   try {
     // Get current settings
-    const currentResult = await query(
-      `SELECT settings FROM organizations WHERE id = $1`,
-      [organizationId]
-    );
+    const currentResult = await query(`SELECT settings FROM organizations WHERE id = $1`, [
+      organizationId,
+    ]);
 
     if (currentResult.rows.length === 0) {
       throw new Error('Organization not found');
@@ -352,8 +361,8 @@ export const getAdjustmentNotationTemplates = async (organizationId) => {
       thoracic: getRegionTemplates('thoracic', style, settings),
       lumbar: getRegionTemplates('lumbar', style, settings),
       sacrum: getRegionTemplates('sacrum', style, settings),
-      pelvis: getRegionTemplates('pelvis', style, settings)
-    }
+      pelvis: getRegionTemplates('pelvis', style, settings),
+    },
   };
 
   return templates;
@@ -379,35 +388,33 @@ function getGonsteadTemplates(region, gonsteadSettings) {
   const templates = [];
   const segments = getSegmentsForRegion(region);
 
-  segments.forEach(segment => {
+  segments.forEach((segment) => {
     if (region === 'cervical' || region === 'thoracic' || region === 'lumbar') {
-      gonsteadSettings.listings.posteriorRotation.forEach(listing => {
+      gonsteadSettings.listings.posteriorRotation.forEach((listing) => {
         templates.push({
           segment,
           listing,
-          text: gonsteadSettings.useFullNotation
-            ? `${segment} ${listing}`
-            : listing,
-          direction: getGonsteadDirection(listing)
+          text: gonsteadSettings.useFullNotation ? `${segment} ${listing}` : listing,
+          direction: getGonsteadDirection(listing),
         });
       });
     } else if (region === 'sacrum') {
-      gonsteadSettings.listings.sacrum.forEach(listing => {
+      gonsteadSettings.listings.sacrum.forEach((listing) => {
         templates.push({
           segment,
           listing,
           text: `${segment} ${listing}`,
-          direction: getSacrumDirection(listing)
+          direction: getSacrumDirection(listing),
         });
       });
     } else if (region === 'pelvis') {
-      gonsteadSettings.listings.pelvis.forEach(listing => {
-        ['høyre', 'venstre'].forEach(side => {
+      gonsteadSettings.listings.pelvis.forEach((listing) => {
+        ['høyre', 'venstre'].forEach((side) => {
           templates.push({
             segment: `${segment} ${side}`,
             listing,
             text: `${side.charAt(0).toUpperCase() + side.slice(1)} ilium ${listing}`,
-            direction: listing
+            direction: listing,
           });
         });
       });
@@ -424,16 +431,16 @@ function getDiversifiedTemplates(region, diversifiedSettings) {
   const templates = [];
   const segments = getSegmentsForRegion(region);
 
-  segments.forEach(segment => {
-    diversifiedSettings.terminology.restriction.forEach(restriction => {
-      diversifiedSettings.terminology.direction.forEach(direction => {
+  segments.forEach((segment) => {
+    diversifiedSettings.terminology.restriction.forEach((restriction) => {
+      diversifiedSettings.terminology.direction.forEach((direction) => {
         templates.push({
           segment,
           restriction,
           direction,
           text: diversifiedSettings.useAnatomicalTerms
             ? `${segment}: ${restriction} i ${direction.toLowerCase()}`
-            : `${segment} ${restriction.substring(0, 3)} ${direction.substring(0, 3)}`
+            : `${segment} ${restriction.substring(0, 3)} ${direction.substring(0, 3)}`,
         });
       });
     });
@@ -451,13 +458,13 @@ function getSegmentListingTemplates(region) {
 
   const directions = ['venstre', 'høyre', 'bilateral', 'posterior', 'anterior'];
 
-  segments.forEach(segment => {
-    directions.forEach(direction => {
+  segments.forEach((segment) => {
+    directions.forEach((direction) => {
       templates.push({
         segment,
         direction,
         text: `${segment} ${direction}`,
-        shortText: `${segment} ${direction.charAt(0).toUpperCase()}`
+        shortText: `${segment} ${direction.charAt(0).toUpperCase()}`,
       });
     });
   });
@@ -474,7 +481,7 @@ function getSegmentsForRegion(region) {
     thoracic: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
     lumbar: ['L1', 'L2', 'L3', 'L4', 'L5'],
     sacrum: ['Sacrum'],
-    pelvis: ['Ilium']
+    pelvis: ['Ilium'],
   };
   return regionSegments[region] || [];
 }
@@ -484,12 +491,12 @@ function getSegmentsForRegion(region) {
  */
 function getGonsteadDirection(listing) {
   const directions = {
-    'PR': 'posterior høyre',
-    'PL': 'posterior venstre',
-    'PRS': 'posterior høyre superior',
-    'PLS': 'posterior venstre superior',
-    'PRI': 'posterior høyre inferior',
-    'PLI': 'posterior venstre inferior'
+    PR: 'posterior høyre',
+    PL: 'posterior venstre',
+    PRS: 'posterior høyre superior',
+    PLS: 'posterior venstre superior',
+    PRI: 'posterior høyre inferior',
+    PLI: 'posterior venstre inferior',
   };
   return directions[listing] || listing;
 }
@@ -499,12 +506,12 @@ function getGonsteadDirection(listing) {
  */
 function getSacrumDirection(listing) {
   const directions = {
-    'AS': 'anterior superior',
-    'AI': 'anterior inferior',
-    'PI': 'posterior inferior',
-    'PS': 'posterior superior',
+    AS: 'anterior superior',
+    AI: 'anterior inferior',
+    PI: 'posterior inferior',
+    PS: 'posterior superior',
     'IN-EX': 'høyre base posterior',
-    'EX-IN': 'venstre base posterior'
+    'EX-IN': 'venstre base posterior',
   };
   return directions[listing] || listing;
 }
@@ -535,5 +542,5 @@ export default {
   getClinicalSettings,
   updateClinicalSettings,
   resetClinicalSettings,
-  getAdjustmentNotationTemplates
+  getAdjustmentNotationTemplates,
 };

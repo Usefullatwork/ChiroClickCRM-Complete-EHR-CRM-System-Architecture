@@ -4,7 +4,7 @@
  * Only visible in desktop (Electron) mode
  */
 
-import React, { useState, useEffect } from 'react';
+import _React, { useState, useEffect } from 'react';
 
 const StatusDot = ({ status, label }) => {
   const colors = {
@@ -35,30 +35,30 @@ const DesktopStatusBar = () => {
       try {
         const res = await fetch('/health', { credentials: 'include' });
         const data = await res.json();
-        setStatus(prev => ({
+        setStatus((prev) => ({
           ...prev,
           db: data.database === 'connected' ? 'ok' : 'error',
         }));
       } catch {
-        setStatus(prev => ({ ...prev, db: 'error' }));
+        setStatus((prev) => ({ ...prev, db: 'error' }));
       }
 
       try {
         const res = await fetch('/api/v1/ai/status', { credentials: 'include' });
         const data = await res.json();
-        setStatus(prev => ({
+        setStatus((prev) => ({
           ...prev,
           ai: data.available ? 'ok' : 'off',
         }));
       } catch {
-        setStatus(prev => ({ ...prev, ai: 'off' }));
+        setStatus((prev) => ({ ...prev, ai: 'off' }));
       }
 
       // Memory from Electron IPC (if available)
       if (window.electronAPI?.getInfo) {
         try {
           const info = await window.electronAPI.getInfo();
-          setStatus(prev => ({ ...prev, memory: info?.memoryUsage || 0 }));
+          setStatus((prev) => ({ ...prev, memory: info?.memoryUsage || 0 }));
         } catch {
           // Not in Electron
         }
@@ -75,13 +75,9 @@ const DesktopStatusBar = () => {
       <StatusDot status={status.db} label="Database" />
       <StatusDot status={status.ai} label="AI" />
       {status.memory > 0 && (
-        <span className="text-gray-400 dark:text-gray-500">
-          RAM: {Math.round(status.memory)}MB
-        </span>
+        <span className="text-gray-400 dark:text-gray-500">RAM: {Math.round(status.memory)}MB</span>
       )}
-      <span className="ml-auto text-gray-400 dark:text-gray-500">
-        ChiroClickCRM v2.0.0
-      </span>
+      <span className="ml-auto text-gray-400 dark:text-gray-500">ChiroClickCRM v2.0.0</span>
     </div>
   );
 };

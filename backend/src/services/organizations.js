@@ -14,8 +14,8 @@ export const getAllOrganizations = async (options = {}) => {
   const { page = 1, limit = 50, search = '', status = null } = options;
 
   const offset = (page - 1) * limit;
-  let whereConditions = [];
-  let params = [];
+  const whereConditions = [];
+  const params = [];
   let paramIndex = 1;
 
   if (search) {

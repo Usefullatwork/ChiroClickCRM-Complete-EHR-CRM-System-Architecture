@@ -8,7 +8,7 @@ import logger from '../utils/logger.js';
 /**
  * Initialize monitoring (no-op in desktop mode)
  */
-export const initSentry = (app) => {
+export const initSentry = (_app) => {
   // Sentry removed for standalone desktop mode
   logger.info('Monitoring: desktop mode (local metrics only)');
 };
@@ -43,16 +43,16 @@ export const healthCheckDetailed = async (req, res) => {
     services: {
       database: {
         status: 'unknown',
-        responseTime: null
+        responseTime: null,
       },
     },
     system: {
       memory: {
         used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
         total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
-        unit: 'MB'
+        unit: 'MB',
       },
-    }
+    },
   };
 
   // Check database
@@ -98,7 +98,7 @@ export const readinessProbe = async (req, res) => {
     res.status(503).json({
       status: 'not_ready',
       reason: 'database_error',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -134,7 +134,7 @@ export class MetricsCollector {
       httpRequests: 0,
       errors: 0,
       dbQueries: 0,
-      slowQueries: 0
+      slowQueries: 0,
     };
   }
 
@@ -161,7 +161,7 @@ export class MetricsCollector {
       httpRequests: 0,
       errors: 0,
       dbQueries: 0,
-      slowQueries: 0
+      slowQueries: 0,
     };
   }
 }
@@ -177,5 +177,5 @@ export default {
   livenessProbe,
   readinessProbe,
   metricsEndpoint,
-  metricsCollector
+  metricsCollector,
 };

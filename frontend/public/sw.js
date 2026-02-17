@@ -64,9 +64,9 @@ self.addEventListener('install', (event) => {
         return cache.addAll(STATIC_ASSETS);
       }),
       // Create exercise cache
-      caches.open(EXERCISE_CACHE_NAME).then((cache) => {
+      caches.open(EXERCISE_CACHE_NAME).then((_cache) => {
         console.log('[SW] Exercise cache initialized');
-      })
+      }),
     ])
   );
 
@@ -146,15 +146,15 @@ self.addEventListener('fetch', (event) => {
  * Check if URL is an exercise media resource
  */
 function isExerciseMedia(url) {
-  return EXERCISE_MEDIA_PATTERNS.some(pattern => pattern.test(url.href));
+  return EXERCISE_MEDIA_PATTERNS.some((pattern) => pattern.test(url.href));
 }
 
 /**
  * Check if URL is an exercise API route
  */
 function isExerciseApiRoute(url) {
-  return EXERCISE_CACHE_ROUTES.some(route =>
-    url.pathname.includes(route) || url.pathname.startsWith(route)
+  return EXERCISE_CACHE_ROUTES.some(
+    (route) => url.pathname.includes(route) || url.pathname.startsWith(route)
   );
 }
 
@@ -277,7 +277,7 @@ async function exerciseMediaStrategy(request) {
     // Return error response
     return new Response('Image not available offline', {
       status: 503,
-      headers: { 'Content-Type': 'text/plain' }
+      headers: { 'Content-Type': 'text/plain' },
     });
   }
 }
@@ -306,7 +306,7 @@ async function exerciseApiStrategy(request) {
       return new Response(cachedResponse.body, {
         status: cachedResponse.status,
         statusText: cachedResponse.statusText,
-        headers
+        headers,
       });
     }
 
@@ -315,11 +315,11 @@ async function exerciseApiStrategy(request) {
       JSON.stringify({
         error: 'offline',
         message: 'Exercise data not available offline. Please sync when online.',
-        cached: false
+        cached: false,
       }),
       {
         status: 503,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       }
     );
   }
@@ -355,7 +355,9 @@ self.addEventListener('sync', (event) => {
 async function syncAppointments() {
   try {
     const pending = await getFromIndexedDB('pending-appointments');
-    if (!pending || pending.length === 0) return;
+    if (!pending || pending.length === 0) {
+      return;
+    }
 
     for (const appointment of pending) {
       try {
@@ -380,7 +382,9 @@ async function syncAppointments() {
 async function syncNotes() {
   try {
     const pending = await getFromIndexedDB('pending-notes');
-    if (!pending || pending.length === 0) return;
+    if (!pending || pending.length === 0) {
+      return;
+    }
 
     for (const note of pending) {
       try {
@@ -405,7 +409,9 @@ async function syncNotes() {
 async function syncExercisePrescriptions() {
   try {
     const pending = await getFromExerciseDB('pendingPrescriptions');
-    if (!pending || pending.length === 0) return;
+    if (!pending || pending.length === 0) {
+      return;
+    }
 
     console.log(`[SW] Syncing ${pending.length} pending exercise prescriptions`);
 
@@ -434,7 +440,9 @@ async function syncExercisePrescriptions() {
 async function syncExerciseCompliance() {
   try {
     const pending = await getFromExerciseDB('pendingCompliance');
-    if (!pending || pending.length === 0) return;
+    if (!pending || pending.length === 0) {
+      return;
+    }
 
     console.log(`[SW] Syncing ${pending.length} pending compliance logs`);
 

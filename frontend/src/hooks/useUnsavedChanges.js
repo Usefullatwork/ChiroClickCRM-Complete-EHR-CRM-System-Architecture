@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState } from 'react';
+import { useEffect, useCallback, _useState } from 'react';
 import { useBlocker } from 'react-router-dom';
 
 /**
@@ -21,7 +21,9 @@ export default function useUnsavedChanges(isDirty, message) {
 
   // Handle browser close/refresh
   useEffect(() => {
-    if (!isDirty) return;
+    if (!isDirty) {
+      return;
+    }
 
     const handleBeforeUnload = (e) => {
       e.preventDefault();

@@ -3,7 +3,7 @@
  * Upload and organize old journal notes with AI assistance
  */
 
-import React, { useState, useEffect } from 'react';
+import _React, { useState, _useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import toast from '../utils/toast';
@@ -29,20 +29,18 @@ export default function OldNotesImporter({ patientId, onClose }) {
     queryKey: ['oldNotes', patientId],
     queryFn: async () => {
       const response = await axios.get(`${API_URL}/patients/${patientId}/old-notes`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       return response.data;
-    }
+    },
   });
 
   // Upload single note mutation
   const uploadNoteMutation = useMutation({
     mutationFn: async (data) => {
-      const response = await axios.post(
-        `${API_URL}/patients/${patientId}/old-notes`,
-        data,
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-      );
+      const response = await axios.post(`${API_URL}/patients/${patientId}/old-notes`, data, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
       return response.data;
     },
     onSuccess: () => {
@@ -53,17 +51,15 @@ export default function OldNotesImporter({ patientId, onClose }) {
     },
     onError: (error) => {
       toast.error(`Feil ved opplasting: ${error.response?.data?.error || error.message}`);
-    }
+    },
   });
 
   // Upload multiple notes mutation
   const uploadMultipleMutation = useMutation({
     mutationFn: async (data) => {
-      const response = await axios.post(
-        `${API_URL}/patients/${patientId}/old-notes/batch`,
-        data,
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-      );
+      const response = await axios.post(`${API_URL}/patients/${patientId}/old-notes/batch`, data, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
       return response.data;
     },
     onSuccess: () => {
@@ -73,7 +69,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
     },
     onError: (error) => {
       toast.error(`Feil ved opplasting: ${error.response?.data?.error || error.message}`);
-    }
+    },
   });
 
   // Process note mutation
@@ -92,7 +88,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
     },
     onError: (error) => {
       toast.error(`Feil ved prosessering: ${error.response?.data?.error || error.message}`);
-    }
+    },
   });
 
   // Approve note mutation
@@ -108,7 +104,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
     onSuccess: () => {
       queryClient.invalidateQueries(['oldNotes', patientId]);
       toast.success('Vurdering lagret!');
-    }
+    },
   });
 
   // Convert to encounter mutation
@@ -128,21 +124,21 @@ export default function OldNotesImporter({ patientId, onClose }) {
     },
     onError: (error) => {
       toast.error(`Feil ved konvertering: ${error.response?.data?.error || error.message}`);
-    }
+    },
   });
 
   // Delete note mutation
   const deleteNoteMutation = useMutation({
     mutationFn: async (noteId) => {
       await axios.delete(`${API_URL}/old-notes/${noteId}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['oldNotes', patientId]);
       setSelectedNoteId(null);
       toast.success('Notat slettet!');
-    }
+    },
   });
 
   const handleUploadSingle = () => {
@@ -154,12 +150,12 @@ export default function OldNotesImporter({ patientId, onClose }) {
     uploadNoteMutation.mutate({
       content: noteContent,
       filename: filename || 'manual-upload.txt',
-      processImmediately
+      processImmediately,
     });
   };
 
   const handleUploadMultiple = () => {
-    const validNotes = multipleNotes.filter(n => n.content.trim());
+    const validNotes = multipleNotes.filter((n) => n.content.trim());
 
     if (validNotes.length === 0) {
       toast.warning('Vennligst skriv inn minst ett notat');
@@ -169,7 +165,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
     uploadMultipleMutation.mutate({
       notes: validNotes,
       batchName: `Import ${new Date().toLocaleDateString()}`,
-      processImmediately
+      processImmediately,
     });
   };
 
@@ -193,7 +189,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
       processing: 'bg-blue-100 text-blue-800',
       completed: 'bg-green-100 text-green-800',
       failed: 'bg-red-100 text-red-800',
-      reviewed: 'bg-purple-100 text-purple-800'
+      reviewed: 'bg-purple-100 text-purple-800',
     };
 
     return (
@@ -203,7 +199,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
     );
   };
 
-  const selectedNote = existingNotes?.notes?.find(n => n.id === selectedNoteId);
+  const selectedNote = existingNotes?.notes?.find((n) => n.id === selectedNoteId);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -213,14 +209,18 @@ export default function OldNotesImporter({ patientId, onClose }) {
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-2xl font-bold">Import Old Journal Notes</h2>
-              <p className="text-blue-100 mt-1">Upload and organize historical patient notes with AI assistance</p>
+              <p className="text-blue-100 mt-1">
+                Upload and organize historical patient notes with AI assistance
+              </p>
             </div>
-            <button
-              onClick={onClose}
-              className="text-white hover:bg-blue-800 rounded-full p-2"
-            >
+            <button onClick={onClose} className="text-white hover:bg-blue-800 rounded-full p-2">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -377,7 +377,9 @@ export default function OldNotesImporter({ patientId, onClose }) {
                     disabled={uploadMultipleMutation.isPending}
                     className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 font-medium"
                   >
-                    {uploadMultipleMutation.isPending ? 'Uploading...' : `Upload ${multipleNotes.filter(n => n.content.trim()).length} Notes`}
+                    {uploadMultipleMutation.isPending
+                      ? 'Uploading...'
+                      : `Upload ${multipleNotes.filter((n) => n.content.trim()).length} Notes`}
                   </button>
                 </div>
               )}
@@ -430,9 +432,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
                       )}
 
                       {note.approved && (
-                        <div className="mt-2 text-xs text-green-600 font-medium">
-                          ✓ Approved
-                        </div>
+                        <div className="mt-2 text-xs text-green-600 font-medium">✓ Approved</div>
                       )}
 
                       {note.converted_to_encounter_id && (
@@ -485,13 +485,13 @@ export default function OldNotesImporter({ patientId, onClose }) {
                               toast.info('Vil du slette dette notatet?', {
                                 action: {
                                   label: 'Slett',
-                                  onClick: () => deleteNoteMutation.mutate(note.id)
+                                  onClick: () => deleteNoteMutation.mutate(note.id),
                                 },
                                 cancel: {
                                   label: 'Avbryt',
-                                  onClick: () => {}
+                                  onClick: () => {},
                                 },
-                                duration: 10000
+                                duration: 10000,
                               });
                             }}
                             className="text-xs text-red-600 hover:text-red-800"
@@ -529,25 +529,33 @@ export default function OldNotesImporter({ patientId, onClose }) {
                       {selectedNote.generated_soap.subjective && (
                         <div>
                           <div className="font-semibold text-green-900">Subjective:</div>
-                          <div className="text-gray-700 ml-2">{selectedNote.generated_soap.subjective.chief_complaint}</div>
+                          <div className="text-gray-700 ml-2">
+                            {selectedNote.generated_soap.subjective.chief_complaint}
+                          </div>
                         </div>
                       )}
                       {selectedNote.generated_soap.objective && (
                         <div>
                           <div className="font-semibold text-green-900">Objective:</div>
-                          <div className="text-gray-700 ml-2">{selectedNote.generated_soap.objective.observation}</div>
+                          <div className="text-gray-700 ml-2">
+                            {selectedNote.generated_soap.objective.observation}
+                          </div>
                         </div>
                       )}
                       {selectedNote.generated_soap.assessment && (
                         <div>
                           <div className="font-semibold text-green-900">Assessment:</div>
-                          <div className="text-gray-700 ml-2">{selectedNote.generated_soap.assessment.clinical_reasoning}</div>
+                          <div className="text-gray-700 ml-2">
+                            {selectedNote.generated_soap.assessment.clinical_reasoning}
+                          </div>
                         </div>
                       )}
                       {selectedNote.generated_soap.plan && (
                         <div>
                           <div className="font-semibold text-green-900">Plan:</div>
-                          <div className="text-gray-700 ml-2">{selectedNote.generated_soap.plan.treatment}</div>
+                          <div className="text-gray-700 ml-2">
+                            {selectedNote.generated_soap.plan.treatment}
+                          </div>
                         </div>
                       )}
                     </div>

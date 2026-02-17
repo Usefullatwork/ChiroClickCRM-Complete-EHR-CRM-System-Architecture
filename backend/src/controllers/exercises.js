@@ -7,7 +7,7 @@
 
 import exerciseLibraryService from '../services/exerciseLibrary.js';
 import exerciseDeliveryService from '../services/exerciseDelivery.js';
-import logger from '../utils/logger.js';
+import _logger from '../utils/logger.js';
 import { logAudit } from '../utils/audit.js';
 
 // ============================================================================

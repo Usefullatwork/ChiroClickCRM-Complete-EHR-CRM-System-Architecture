@@ -12,7 +12,9 @@ class SecretsManager {
   }
 
   async initialize() {
-    if (this.initialized) return;
+    if (this.initialized) {
+      return;
+    }
     this.initialized = true;
     logger.info('Using environment variables for secrets (standalone desktop mode)');
   }
@@ -24,12 +26,12 @@ class SecretsManager {
     await this.ensureInitialized();
 
     const envKeyMap = {
-      'encryption_key': 'ENCRYPTION_KEY',
-      'jwt_secret': 'JWT_SECRET',
-      'database_password': 'DB_PASSWORD',
-      'telnyx_api_key': 'TELNYX_API_KEY',
-      'helseid_client_secret': 'HELSEID_CLIENT_SECRET',
-      'backup_encryption_key': 'BACKUP_ENCRYPTION_KEY'
+      encryption_key: 'ENCRYPTION_KEY',
+      jwt_secret: 'JWT_SECRET',
+      database_password: 'DB_PASSWORD',
+      telnyx_api_key: 'TELNYX_API_KEY',
+      helseid_client_secret: 'HELSEID_CLIENT_SECRET',
+      backup_encryption_key: 'BACKUP_ENCRYPTION_KEY',
     };
 
     const envKey = envKeyMap[key] || envFallback || key.toUpperCase();
@@ -78,7 +80,7 @@ class SecretsManager {
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       host: process.env.DB_HOST,
-      database: process.env.DB_NAME
+      database: process.env.DB_NAME,
     };
   }
 

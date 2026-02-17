@@ -5,7 +5,7 @@
  * Individuelt ovelseskort i forskrivning med sett/repetisjoner konfigurasjon
  */
 
-import React, { useState } from 'react'
+import _React, { useState } from 'react';
 import {
   GripVertical,
   Trash2,
@@ -17,12 +17,12 @@ import {
   Target,
   Activity,
   AlertTriangle,
-  Info,
-  X,
-  Check,
+  _Info,
+  _X,
+  _Check,
   Minus,
-  Plus
-} from 'lucide-react'
+  Plus,
+} from 'lucide-react';
 
 /**
  * PrescriptionCard Component
@@ -54,28 +54,36 @@ const PrescriptionCard = ({
   canMoveUp = true,
   canMoveDown = true,
   getDifficultyColor,
-  getDifficultyLabel
+  getDifficultyLabel,
 }) => {
-  const [showNotes, setShowNotes] = useState(false)
+  const [_showNotes, _setShowNotes] = useState(false);
 
   // Helper to increment/decrement values
   const adjustValue = (field, currentValue, delta, min = 1, max = 100) => {
-    const newValue = Math.max(min, Math.min(max, (currentValue || 0) + delta))
-    onUpdate(field, newValue)
-  }
+    const newValue = Math.max(min, Math.min(max, (currentValue || 0) + delta));
+    onUpdate(field, newValue);
+  };
 
   // Get default difficulty helpers if not provided
-  const difficultyColor = getDifficultyColor ? getDifficultyColor(exercise.difficulty_level) :
-    exercise.difficulty_level === 'beginner' ? 'text-green-600 bg-green-50' :
-    exercise.difficulty_level === 'intermediate' ? 'text-yellow-600 bg-yellow-50' :
-    exercise.difficulty_level === 'advanced' ? 'text-red-600 bg-red-50' :
-    'text-gray-600 bg-gray-50'
+  const difficultyColor = getDifficultyColor
+    ? getDifficultyColor(exercise.difficulty_level)
+    : exercise.difficulty_level === 'beginner'
+      ? 'text-green-600 bg-green-50'
+      : exercise.difficulty_level === 'intermediate'
+        ? 'text-yellow-600 bg-yellow-50'
+        : exercise.difficulty_level === 'advanced'
+          ? 'text-red-600 bg-red-50'
+          : 'text-gray-600 bg-gray-50';
 
-  const difficultyLabel = getDifficultyLabel ? getDifficultyLabel(exercise.difficulty_level) :
-    exercise.difficulty_level === 'beginner' ? 'Nybegynner' :
-    exercise.difficulty_level === 'intermediate' ? 'Middels' :
-    exercise.difficulty_level === 'advanced' ? 'Avansert' :
-    exercise.difficulty_level
+  const difficultyLabel = getDifficultyLabel
+    ? getDifficultyLabel(exercise.difficulty_level)
+    : exercise.difficulty_level === 'beginner'
+      ? 'Nybegynner'
+      : exercise.difficulty_level === 'intermediate'
+        ? 'Middels'
+        : exercise.difficulty_level === 'advanced'
+          ? 'Avansert'
+          : exercise.difficulty_level;
 
   return (
     <div className="border-b border-gray-100 last:border-0">
@@ -289,7 +297,7 @@ const PrescriptionCard = ({
               Ukentlig frekvens
             </h5>
             <div className="flex items-center gap-2 flex-wrap">
-              {[1, 2, 3, 4, 5, 6, 7].map(day => (
+              {[1, 2, 3, 4, 5, 6, 7].map((day) => (
                 <button
                   key={day}
                   onClick={() => onUpdate('frequencyPerWeek', day)}
@@ -302,9 +310,7 @@ const PrescriptionCard = ({
                   {day}
                 </button>
               ))}
-              <span className="text-sm text-gray-500 ml-2">
-                dager per uke
-              </span>
+              <span className="text-sm text-gray-500 ml-2">dager per uke</span>
             </div>
           </div>
 
@@ -350,7 +356,7 @@ const PrescriptionCard = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default PrescriptionCard
+export default PrescriptionCard;

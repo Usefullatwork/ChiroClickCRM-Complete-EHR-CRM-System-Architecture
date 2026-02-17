@@ -25,16 +25,16 @@ import {
   Gift,
   Activity,
   Bell,
-  Settings,
+  _Settings,
   ChevronDown,
-  ChevronRight,
+  _ChevronRight,
   Save,
   X,
-  AlertCircle,
-  CheckCircle,
-  Users,
+  _AlertCircle,
+  _CheckCircle,
+  _Users,
   MessageSquare,
-  Mail
+  Mail,
 } from 'lucide-react';
 import { automationsAPI, communicationsAPI } from '../../services/api';
 import toast from '../../utils/toast';
@@ -44,34 +44,46 @@ const TRIGGER_TYPES = {
   APPOINTMENT_24H: {
     id: 'APPOINTMENT_24H',
     name: { no: '24 timer for time', en: '24 hours before appointment' },
-    description: { no: 'Send paminnelse 24 timer for timen', en: 'Send reminder 24 hours before appointment' },
+    description: {
+      no: 'Send paminnelse 24 timer for timen',
+      en: 'Send reminder 24 hours before appointment',
+    },
     icon: Calendar,
     color: 'blue',
-    category: 'appointment'
+    category: 'appointment',
   },
   APPOINTMENT_1H: {
     id: 'APPOINTMENT_1H',
     name: { no: '1 time for time', en: '1 hour before appointment' },
-    description: { no: 'Send paminnelse 1 time for timen', en: 'Send reminder 1 hour before appointment' },
+    description: {
+      no: 'Send paminnelse 1 time for timen',
+      en: 'Send reminder 1 hour before appointment',
+    },
     icon: Clock,
     color: 'green',
-    category: 'appointment'
+    category: 'appointment',
   },
   EXERCISE_INACTIVE: {
     id: 'EXERCISE_INACTIVE',
     name: { no: 'Inaktiv pa ovelser', en: 'Exercise program inactive' },
-    description: { no: 'Send paminnelse hvis pasient ikke har logget inn', en: 'Send reminder if patient has not logged in' },
+    description: {
+      no: 'Send paminnelse hvis pasient ikke har logget inn',
+      en: 'Send reminder if patient has not logged in',
+    },
     icon: Activity,
     color: 'orange',
-    category: 'exercise'
+    category: 'exercise',
   },
   FOLLOWUP_DUE: {
     id: 'FOLLOWUP_DUE',
     name: { no: 'Oppfolging forfaller', en: 'Follow-up due' },
-    description: { no: 'Send paminnelse nar oppfolging er forfalt', en: 'Send reminder when follow-up is due' },
+    description: {
+      no: 'Send paminnelse nar oppfolging er forfalt',
+      en: 'Send reminder when follow-up is due',
+    },
     icon: Bell,
     color: 'purple',
-    category: 'followup'
+    category: 'followup',
   },
   BIRTHDAY: {
     id: 'BIRTHDAY',
@@ -79,22 +91,25 @@ const TRIGGER_TYPES = {
     description: { no: 'Send gratulasjon pa bursdagen', en: 'Send birthday greeting' },
     icon: Gift,
     color: 'pink',
-    category: 'engagement'
+    category: 'engagement',
   },
   DAYS_SINCE_VISIT: {
     id: 'DAYS_SINCE_VISIT',
     name: { no: 'Dager siden besok', en: 'Days since last visit' },
-    description: { no: 'Send innkalling etter X dager uten besok', en: 'Send recall after X days without visit' },
+    description: {
+      no: 'Send innkalling etter X dager uten besok',
+      en: 'Send recall after X days without visit',
+    },
     icon: Clock,
     color: 'yellow',
-    category: 'recall'
-  }
+    category: 'recall',
+  },
 };
 
 // Message types
 const MESSAGE_TYPES = [
   { id: 'SMS', name: 'SMS', icon: MessageSquare },
-  { id: 'EMAIL', name: 'E-post', icon: Mail }
+  { id: 'EMAIL', name: 'E-post', icon: Mail },
 ];
 
 export default function AutomationRules({ language = 'no' }) {
@@ -115,8 +130,8 @@ export default function AutomationRules({ language = 'no' }) {
     settings: {
       days_threshold: 7, // For EXERCISE_INACTIVE and DAYS_SINCE_VISIT
       send_time: '09:00', // For BIRTHDAY
-      include_weekends: false
-    }
+      include_weekends: false,
+    },
   });
 
   // Labels
@@ -151,12 +166,12 @@ export default function AutomationRules({ language = 'no' }) {
         exercise: 'Ovelsespaminnelser',
         followup: 'Oppfolging',
         engagement: 'Engasjement',
-        recall: 'Innkalling'
+        recall: 'Innkalling',
       },
       lastTriggered: 'Sist utlost',
       totalSent: 'Totalt sendt',
       never: 'Aldri',
-      patientsAffected: 'pasienter'
+      patientsAffected: 'pasienter',
     },
     en: {
       title: 'Automation Rules',
@@ -188,13 +203,13 @@ export default function AutomationRules({ language = 'no' }) {
         exercise: 'Exercise Reminders',
         followup: 'Follow-up',
         engagement: 'Engagement',
-        recall: 'Recall'
+        recall: 'Recall',
       },
       lastTriggered: 'Last triggered',
       totalSent: 'Total sent',
       never: 'Never',
-      patientsAffected: 'patients'
-    }
+      patientsAffected: 'patients',
+    },
   };
 
   const t = labels[language] || labels.no;
@@ -206,13 +221,15 @@ export default function AutomationRules({ language = 'no' }) {
       try {
         const response = await automationsAPI.getWorkflows({ limit: 100 });
         // Filter for communication automations
-        return response.data?.workflows?.filter(w =>
-          Object.keys(TRIGGER_TYPES).includes(w.trigger_type)
-        ) || [];
+        return (
+          response.data?.workflows?.filter((w) =>
+            Object.keys(TRIGGER_TYPES).includes(w.trigger_type)
+          ) || []
+        );
       } catch {
         return [];
       }
-    }
+    },
   });
 
   // Fetch templates
@@ -225,7 +242,7 @@ export default function AutomationRules({ language = 'no' }) {
       } catch {
         return [];
       }
-    }
+    },
   });
 
   const rules = rulesData || [];
@@ -242,7 +259,7 @@ export default function AutomationRules({ language = 'no' }) {
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to create rule');
-    }
+    },
   });
 
   // Update rule mutation
@@ -257,7 +274,7 @@ export default function AutomationRules({ language = 'no' }) {
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to update rule');
-    }
+    },
   });
 
   // Delete rule mutation
@@ -269,7 +286,7 @@ export default function AutomationRules({ language = 'no' }) {
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to delete rule');
-    }
+    },
   });
 
   // Toggle rule mutation
@@ -281,7 +298,7 @@ export default function AutomationRules({ language = 'no' }) {
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to toggle rule');
-    }
+    },
   });
 
   // Reset form
@@ -295,8 +312,8 @@ export default function AutomationRules({ language = 'no' }) {
       settings: {
         days_threshold: 7,
         send_time: '09:00',
-        include_weekends: false
-      }
+        include_weekends: false,
+      },
     });
   };
 
@@ -312,8 +329,8 @@ export default function AutomationRules({ language = 'no' }) {
       settings: {
         days_threshold: rule.trigger_config?.days_threshold || 7,
         send_time: rule.trigger_config?.send_time || '09:00',
-        include_weekends: rule.trigger_config?.include_weekends || false
-      }
+        include_weekends: rule.trigger_config?.include_weekends || false,
+      },
     });
     setShowEditor(true);
   };
@@ -329,17 +346,17 @@ export default function AutomationRules({ language = 'no' }) {
       name: formData.name,
       trigger_type: formData.trigger_type,
       trigger_config: {
-        ...formData.settings
+        ...formData.settings,
       },
       actions: [
         {
           type: formData.message_type === 'SMS' ? 'SEND_SMS' : 'SEND_EMAIL',
           config: {
-            template_id: formData.template_id
-          }
-        }
+            template_id: formData.template_id,
+          },
+        },
       ],
-      is_active: formData.is_active
+      is_active: formData.is_active,
     };
 
     if (editingRule?.id) {
@@ -369,18 +386,22 @@ export default function AutomationRules({ language = 'no' }) {
 
   // Get trigger info
   const getTriggerInfo = (triggerType) => {
-    return TRIGGER_TYPES[triggerType] || {
-      id: triggerType,
-      name: { no: triggerType, en: triggerType },
-      icon: Zap,
-      color: 'gray'
-    };
+    return (
+      TRIGGER_TYPES[triggerType] || {
+        id: triggerType,
+        name: { no: triggerType, en: triggerType },
+        icon: Zap,
+        color: 'gray',
+      }
+    );
   };
 
   // Get filtered templates based on trigger type
   const getFilteredTemplates = () => {
     const triggerInfo = TRIGGER_TYPES[formData.trigger_type];
-    if (!triggerInfo) return templates;
+    if (!triggerInfo) {
+      return templates;
+    }
 
     // Map trigger categories to template categories
     const categoryMap = {
@@ -388,14 +409,16 @@ export default function AutomationRules({ language = 'no' }) {
       exercise: 'exercise_reminder',
       followup: 'followup_reminder',
       engagement: 'birthday',
-      recall: 'followup_reminder'
+      recall: 'followup_reminder',
     };
 
     const templateCategory = categoryMap[triggerInfo.category];
-    if (!templateCategory) return templates;
+    if (!templateCategory) {
+      return templates;
+    }
 
     // Return filtered templates, but also include all if none match
-    const filtered = templates.filter(t => t.category === templateCategory);
+    const filtered = templates.filter((t) => t.category === templateCategory);
     return filtered.length > 0 ? filtered : templates;
   };
 
@@ -428,30 +451,30 @@ export default function AutomationRules({ language = 'no' }) {
           </div>
         ) : rules.length > 0 ? (
           Object.entries(groupedRules).map(([category, categoryRules]) => (
-            <div key={category} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div
+              key={category}
+              className="bg-white rounded-lg border border-gray-200 overflow-hidden"
+            >
               {/* Category Header */}
               <div className="px-6 py-3 bg-gray-50 border-b border-gray-200">
-                <h3 className="font-medium text-gray-700">
-                  {t.category[category] || category}
-                </h3>
+                <h3 className="font-medium text-gray-700">{t.category[category] || category}</h3>
               </div>
 
               {/* Rules */}
               <div className="divide-y divide-gray-100">
-                {categoryRules.map(rule => {
+                {categoryRules.map((rule) => {
                   const triggerInfo = getTriggerInfo(rule.trigger_type);
                   const TriggerIcon = triggerInfo.icon;
                   const isExpanded = expandedRule === rule.id;
 
                   return (
-                    <div
-                      key={rule.id}
-                      className="px-6 py-4 hover:bg-gray-50 transition-colors"
-                    >
+                    <div key={rule.id} className="px-6 py-4 hover:bg-gray-50 transition-colors">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4 flex-1">
                           {/* Trigger Icon */}
-                          <div className={`w-10 h-10 rounded-lg bg-${triggerInfo.color}-100 flex items-center justify-center`}>
+                          <div
+                            className={`w-10 h-10 rounded-lg bg-${triggerInfo.color}-100 flex items-center justify-center`}
+                          >
                             <TriggerIcon className={`w-5 h-5 text-${triggerInfo.color}-600`} />
                           </div>
 
@@ -459,11 +482,13 @@ export default function AutomationRules({ language = 'no' }) {
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
                               <h4 className="font-medium text-gray-900">{rule.name}</h4>
-                              <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                                rule.is_active
-                                  ? 'bg-green-100 text-green-700'
-                                  : 'bg-gray-100 text-gray-500'
-                              }`}>
+                              <span
+                                className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                                  rule.is_active
+                                    ? 'bg-green-100 text-green-700'
+                                    : 'bg-gray-100 text-gray-500'
+                                }`}
+                              >
                                 {rule.is_active ? t.active : t.inactive}
                               </span>
                             </div>
@@ -475,7 +500,9 @@ export default function AutomationRules({ language = 'no' }) {
                           {/* Stats */}
                           <div className="hidden md:flex items-center gap-6 text-sm text-gray-500">
                             <div className="text-center">
-                              <div className="font-medium text-gray-900">{rule.execution_count || 0}</div>
+                              <div className="font-medium text-gray-900">
+                                {rule.execution_count || 0}
+                              </div>
                               <div className="text-xs">{t.totalSent}</div>
                             </div>
                             <div className="text-center">
@@ -521,7 +548,9 @@ export default function AutomationRules({ language = 'no' }) {
                             onClick={() => setExpandedRule(isExpanded ? null : rule.id)}
                             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
                           >
-                            <ChevronDown className={`w-5 h-5 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                            <ChevronDown
+                              className={`w-5 h-5 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                            />
                           </button>
 
                           {/* Delete */}
@@ -544,12 +573,16 @@ export default function AutomationRules({ language = 'no' }) {
                             </div>
                             <div>
                               <span className="text-gray-500">{t.messageType}:</span>
-                              <p className="font-medium">{rule.actions?.[0]?.type === 'SEND_SMS' ? 'SMS' : 'E-post'}</p>
+                              <p className="font-medium">
+                                {rule.actions?.[0]?.type === 'SEND_SMS' ? 'SMS' : 'E-post'}
+                              </p>
                             </div>
                             {rule.trigger_config?.days_threshold && (
                               <div>
                                 <span className="text-gray-500">{t.daysThreshold}:</span>
-                                <p className="font-medium">{rule.trigger_config.days_threshold} dager</p>
+                                <p className="font-medium">
+                                  {rule.trigger_config.days_threshold} dager
+                                </p>
                               </div>
                             )}
                             {rule.trigger_config?.send_time && (
@@ -589,7 +622,7 @@ export default function AutomationRules({ language = 'no' }) {
       {/* Quick Setup Cards for Empty State */}
       {rules.length === 0 && !rulesLoading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Object.values(TRIGGER_TYPES).map(trigger => {
+          {Object.values(TRIGGER_TYPES).map((trigger) => {
             const TriggerIcon = trigger.icon;
             return (
               <button
@@ -598,13 +631,15 @@ export default function AutomationRules({ language = 'no' }) {
                   setFormData({
                     ...formData,
                     name: trigger.name[language],
-                    trigger_type: trigger.id
+                    trigger_type: trigger.id,
                   });
                   setShowEditor(true);
                 }}
                 className="p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all text-left"
               >
-                <div className={`w-10 h-10 rounded-lg bg-${trigger.color}-100 flex items-center justify-center mb-3`}>
+                <div
+                  className={`w-10 h-10 rounded-lg bg-${trigger.color}-100 flex items-center justify-center mb-3`}
+                >
                   <TriggerIcon className={`w-5 h-5 text-${trigger.color}-600`} />
                 </div>
                 <h4 className="font-medium text-gray-900">{trigger.name[language]}</h4>
@@ -662,7 +697,7 @@ export default function AutomationRules({ language = 'no' }) {
                   onChange={(e) => setFormData({ ...formData, trigger_type: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 >
-                  {Object.values(TRIGGER_TYPES).map(trigger => (
+                  {Object.values(TRIGGER_TYPES).map((trigger) => (
                     <option key={trigger.id} value={trigger.id}>
                       {trigger.name[language]}
                     </option>
@@ -671,7 +706,8 @@ export default function AutomationRules({ language = 'no' }) {
               </div>
 
               {/* Settings based on trigger type */}
-              {(formData.trigger_type === 'EXERCISE_INACTIVE' || formData.trigger_type === 'DAYS_SINCE_VISIT') && (
+              {(formData.trigger_type === 'EXERCISE_INACTIVE' ||
+                formData.trigger_type === 'DAYS_SINCE_VISIT') && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     {t.daysThreshold}
@@ -681,10 +717,15 @@ export default function AutomationRules({ language = 'no' }) {
                     min="1"
                     max="365"
                     value={formData.settings.days_threshold}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      settings: { ...formData.settings, days_threshold: parseInt(e.target.value) }
-                    })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        settings: {
+                          ...formData.settings,
+                          days_threshold: parseInt(e.target.value),
+                        },
+                      })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -698,10 +739,12 @@ export default function AutomationRules({ language = 'no' }) {
                   <input
                     type="time"
                     value={formData.settings.send_time}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      settings: { ...formData.settings, send_time: e.target.value }
-                    })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        settings: { ...formData.settings, send_time: e.target.value },
+                      })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -713,7 +756,7 @@ export default function AutomationRules({ language = 'no' }) {
                   {t.messageType}
                 </label>
                 <div className="flex gap-4">
-                  {MESSAGE_TYPES.map(type => {
+                  {MESSAGE_TYPES.map((type) => {
                     const TypeIcon = type.icon;
                     return (
                       <button
@@ -736,18 +779,18 @@ export default function AutomationRules({ language = 'no' }) {
 
               {/* Template */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t.template}
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t.template}</label>
                 <select
                   value={formData.template_id || ''}
-                  onChange={(e) => setFormData({ ...formData, template_id: e.target.value || null })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, template_id: e.target.value || null })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">{t.selectTemplate}</option>
                   {getFilteredTemplates()
-                    .filter(t => t.type === formData.message_type)
-                    .map(template => (
+                    .filter((t) => t.type === formData.message_type)
+                    .map((template) => (
                       <option key={template.id || template.name} value={template.id}>
                         {template.name}
                       </option>
@@ -763,8 +806,12 @@ export default function AutomationRules({ language = 'no' }) {
                   </div>
                   <div className="text-sm text-gray-500">
                     {formData.is_active
-                      ? (language === 'no' ? 'Regelen vil kjore automatisk' : 'Rule will run automatically')
-                      : (language === 'no' ? 'Regelen er pauset' : 'Rule is paused')}
+                      ? language === 'no'
+                        ? 'Regelen vil kjore automatisk'
+                        : 'Rule will run automatically'
+                      : language === 'no'
+                        ? 'Regelen er pauset'
+                        : 'Rule is paused'}
                   </div>
                 </div>
                 <button

@@ -5,7 +5,7 @@
  * Form for vestibular assessment (dizziness, balance, oculomotor function)
  */
 
-import React, { useState, useCallback } from 'react'
+import _React, { useState, useCallback } from 'react';
 import {
   Eye,
   Activity,
@@ -14,14 +14,14 @@ import {
   Lock,
   ChevronDown,
   ChevronUp,
-  Check,
-  X,
-  Plus,
-  Minus,
+  _Check,
+  _X,
+  _Plus,
+  _Minus,
   HelpCircle,
   Clock,
-  Target
-} from 'lucide-react'
+  Target,
+} from 'lucide-react';
 
 /**
  * VestibularAssessment Component
@@ -40,61 +40,63 @@ export default function VestibularAssessment({
   patient,
   onSave,
   onLock,
-  readOnly = false
+  readOnly = false,
 }) {
   // State for assessment data
   // Tilstand for vurderingsdata
-  const [assessment, setAssessment] = useState(initialData || {
-    // Symptomer / Symptoms
-    symptoms: {
-      dizzinessType: '', // vertigo, lightheadedness, disequilibrium, presyncope
-      onset: '',
-      duration: '',
-      frequency: '',
-      triggers: [],
-      associatedSymptoms: []
-    },
-    // Okulomotorisk undersokelse / Oculomotor examination
-    oculomotor: {
-      pursuits: { horizontal: '', vertical: '', notes: '' },
-      saccades: { horizontal: '', vertical: '', notes: '' },
-      convergence: { nearPoint: '', notes: '' },
-      vrORVerifiability: '',
-      spontaneousNystagmus: { present: false, direction: '', notes: '' },
-      gazeStability: ''
-    },
-    // Vestibulare tester / Vestibular tests
-    vestibularTests: {
-      dixHallpike: { right: '', left: '', notes: '' },
-      supineRoll: { right: '', left: '', notes: '' },
-      headImpulseTest: { right: '', left: '', notes: '' },
-      headShakeNystagmus: { present: false, direction: '', notes: '' },
-      dynamicVisualAcuity: { result: '', notes: '' }
-    },
-    // Balanse / Balance
-    balance: {
-      romberg: { eyesOpen: '', eyesClosed: '', notes: '' },
-      tandemStance: { eyesOpen: '', eyesClosed: '', notes: '' },
-      singleLegStance: { right: '', left: '', notes: '' },
-      functionalgaitAssessment: '',
-      bergs: { score: '', notes: '' }
-    },
-    // Vurdering / Assessment
-    clinicalAssessment: {
-      diagnosis: '',
-      differentialDiagnosis: '',
-      redFlags: [],
-      prognosis: ''
-    },
-    // Plan
-    plan: {
-      treatment: '',
-      vestibularRehabilitation: '',
-      homeExercises: '',
-      followUp: '',
-      referrals: ''
+  const [assessment, setAssessment] = useState(
+    initialData || {
+      // Symptomer / Symptoms
+      symptoms: {
+        dizzinessType: '', // vertigo, lightheadedness, disequilibrium, presyncope
+        onset: '',
+        duration: '',
+        frequency: '',
+        triggers: [],
+        associatedSymptoms: [],
+      },
+      // Okulomotorisk undersokelse / Oculomotor examination
+      oculomotor: {
+        pursuits: { horizontal: '', vertical: '', notes: '' },
+        saccades: { horizontal: '', vertical: '', notes: '' },
+        convergence: { nearPoint: '', notes: '' },
+        vrORVerifiability: '',
+        spontaneousNystagmus: { present: false, direction: '', notes: '' },
+        gazeStability: '',
+      },
+      // Vestibulare tester / Vestibular tests
+      vestibularTests: {
+        dixHallpike: { right: '', left: '', notes: '' },
+        supineRoll: { right: '', left: '', notes: '' },
+        headImpulseTest: { right: '', left: '', notes: '' },
+        headShakeNystagmus: { present: false, direction: '', notes: '' },
+        dynamicVisualAcuity: { result: '', notes: '' },
+      },
+      // Balanse / Balance
+      balance: {
+        romberg: { eyesOpen: '', eyesClosed: '', notes: '' },
+        tandemStance: { eyesOpen: '', eyesClosed: '', notes: '' },
+        singleLegStance: { right: '', left: '', notes: '' },
+        functionalgaitAssessment: '',
+        bergs: { score: '', notes: '' },
+      },
+      // Vurdering / Assessment
+      clinicalAssessment: {
+        diagnosis: '',
+        differentialDiagnosis: '',
+        redFlags: [],
+        prognosis: '',
+      },
+      // Plan
+      plan: {
+        treatment: '',
+        vestibularRehabilitation: '',
+        homeExercises: '',
+        followUp: '',
+        referrals: '',
+      },
     }
-  })
+  );
 
   const [expandedSections, setExpandedSections] = useState({
     symptoms: true,
@@ -102,54 +104,64 @@ export default function VestibularAssessment({
     vestibular: true,
     balance: true,
     assessment: true,
-    plan: true
-  })
+    plan: true,
+  });
 
-  const [saving, setSaving] = useState(false)
+  const [saving, setSaving] = useState(false);
 
   /**
    * Toggle section expansion
    * Veksle seksjonsutviding
    */
   const toggleSection = (section) => {
-    setExpandedSections(prev => ({
+    setExpandedSections((prev) => ({
       ...prev,
-      [section]: !prev[section]
-    }))
-  }
+      [section]: !prev[section],
+    }));
+  };
 
   /**
    * Update assessment field
    * Oppdater vurderingsfelt
    */
-  const updateField = useCallback((section, field, value) => {
-    if (readOnly) return
-    setAssessment(prev => ({
-      ...prev,
-      [section]: {
-        ...prev[section],
-        [field]: value
+  const updateField = useCallback(
+    (section, field, value) => {
+      if (readOnly) {
+        return;
       }
-    }))
-  }, [readOnly])
+      setAssessment((prev) => ({
+        ...prev,
+        [section]: {
+          ...prev[section],
+          [field]: value,
+        },
+      }));
+    },
+    [readOnly]
+  );
 
   /**
    * Update nested field
    * Oppdater nestet felt
    */
-  const updateNestedField = useCallback((section, parent, field, value) => {
-    if (readOnly) return
-    setAssessment(prev => ({
-      ...prev,
-      [section]: {
-        ...prev[section],
-        [parent]: {
-          ...prev[section][parent],
-          [field]: value
-        }
+  const updateNestedField = useCallback(
+    (section, parent, field, value) => {
+      if (readOnly) {
+        return;
       }
-    }))
-  }, [readOnly])
+      setAssessment((prev) => ({
+        ...prev,
+        [section]: {
+          ...prev[section],
+          [parent]: {
+            ...prev[section][parent],
+            [field]: value,
+          },
+        },
+      }));
+    },
+    [readOnly]
+  );
 
   /**
    * Handle save
@@ -157,14 +169,14 @@ export default function VestibularAssessment({
    */
   const handleSave = async () => {
     try {
-      setSaving(true)
+      setSaving(true);
       if (onSave) {
-        await onSave(assessment)
+        await onSave(assessment);
       }
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   /**
    * Get result badge color
@@ -174,16 +186,16 @@ export default function VestibularAssessment({
     switch (result) {
       case 'normal':
       case 'negative':
-        return 'bg-green-100 text-green-800'
+        return 'bg-green-100 text-green-800';
       case 'abnormal':
       case 'positive':
-        return 'bg-red-100 text-red-800'
+        return 'bg-red-100 text-red-800';
       case 'inconclusive':
-        return 'bg-yellow-100 text-yellow-800'
+        return 'bg-yellow-100 text-yellow-800';
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 text-gray-800';
     }
-  }
+  };
 
   /**
    * Section component
@@ -207,13 +219,9 @@ export default function VestibularAssessment({
           <ChevronDown className="w-5 h-5 text-gray-500" />
         )}
       </button>
-      {expandedSections[id] && (
-        <div className="p-4 space-y-4">
-          {children}
-        </div>
-      )}
+      {expandedSections[id] && <div className="p-4 space-y-4">{children}</div>}
     </div>
-  )
+  );
 
   /**
    * Test result selector
@@ -223,7 +231,7 @@ export default function VestibularAssessment({
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
       <div className="flex gap-2">
-        {(options || ['normal', 'abnormal', 'not_tested']).map(opt => (
+        {(options || ['normal', 'abnormal', 'not_tested']).map((opt) => (
           <button
             key={opt}
             onClick={() => !readOnly && onChange(opt)}
@@ -243,7 +251,7 @@ export default function VestibularAssessment({
         ))}
       </div>
     </div>
-  )
+  );
 
   /**
    * Bilateral test component
@@ -288,7 +296,7 @@ export default function VestibularAssessment({
         />
       </div>
     </div>
-  )
+  );
 
   // Common dizziness triggers / Vanlige svimmelhetsutlosere
   const dizzinessTriggers = [
@@ -298,8 +306,8 @@ export default function VestibularAssessment({
     'Visuell stimulering',
     'Stress',
     'Tretthet',
-    'Ortostatisk'
-  ]
+    'Ortostatisk',
+  ];
 
   // Associated symptoms / Assosierte symptomer
   const associatedSymptomsList = [
@@ -310,8 +318,8 @@ export default function VestibularAssessment({
     'Tinnitus',
     'Aural fylde',
     'Synsforstyrrelser',
-    'Ustodighet'
-  ]
+    'Ustodighet',
+  ];
 
   return (
     <div className="space-y-6">
@@ -381,7 +389,9 @@ export default function VestibularAssessment({
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Varighet per episode</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Varighet per episode
+            </label>
             <input
               type="text"
               value={assessment.symptoms.duration}
@@ -408,18 +418,20 @@ export default function VestibularAssessment({
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Utlosende faktorer</label>
           <div className="flex flex-wrap gap-2">
-            {dizzinessTriggers.map(trigger => {
-              const isSelected = assessment.symptoms.triggers?.includes(trigger)
+            {dizzinessTriggers.map((trigger) => {
+              const isSelected = assessment.symptoms.triggers?.includes(trigger);
               return (
                 <button
                   key={trigger}
                   onClick={() => {
-                    if (readOnly) return
-                    const current = assessment.symptoms.triggers || []
+                    if (readOnly) {
+                      return;
+                    }
+                    const current = assessment.symptoms.triggers || [];
                     const updated = isSelected
-                      ? current.filter(t => t !== trigger)
-                      : [...current, trigger]
-                    updateField('symptoms', 'triggers', updated)
+                      ? current.filter((t) => t !== trigger)
+                      : [...current, trigger];
+                    updateField('symptoms', 'triggers', updated);
                   }}
                   disabled={readOnly}
                   className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
@@ -430,27 +442,31 @@ export default function VestibularAssessment({
                 >
                   {trigger}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
 
         {/* Associated Symptoms / Assosierte symptomer */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Ledsagende symptomer</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Ledsagende symptomer
+          </label>
           <div className="flex flex-wrap gap-2">
-            {associatedSymptomsList.map(symptom => {
-              const isSelected = assessment.symptoms.associatedSymptoms?.includes(symptom)
+            {associatedSymptomsList.map((symptom) => {
+              const isSelected = assessment.symptoms.associatedSymptoms?.includes(symptom);
               return (
                 <button
                   key={symptom}
                   onClick={() => {
-                    if (readOnly) return
-                    const current = assessment.symptoms.associatedSymptoms || []
+                    if (readOnly) {
+                      return;
+                    }
+                    const current = assessment.symptoms.associatedSymptoms || [];
                     const updated = isSelected
-                      ? current.filter(s => s !== symptom)
-                      : [...current, symptom]
-                    updateField('symptoms', 'associatedSymptoms', updated)
+                      ? current.filter((s) => s !== symptom)
+                      : [...current, symptom];
+                    updateField('symptoms', 'associatedSymptoms', updated);
                   }}
                   disabled={readOnly}
                   className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
@@ -461,7 +477,7 @@ export default function VestibularAssessment({
                 >
                   {symptom}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -493,11 +509,15 @@ export default function VestibularAssessment({
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Konvergens - N rpunkt (cm)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Konvergens - N rpunkt (cm)
+            </label>
             <input
               type="number"
               value={assessment.oculomotor.convergence?.nearPoint || ''}
-              onChange={(e) => updateNestedField('oculomotor', 'convergence', 'nearPoint', e.target.value)}
+              onChange={(e) =>
+                updateNestedField('oculomotor', 'convergence', 'nearPoint', e.target.value)
+              }
               disabled={readOnly}
               placeholder="Normal: 6-10 cm"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -515,7 +535,14 @@ export default function VestibularAssessment({
               <input
                 type="checkbox"
                 checked={assessment.oculomotor.spontaneousNystagmus?.present || false}
-                onChange={(e) => updateNestedField('oculomotor', 'spontaneousNystagmus', 'present', e.target.checked)}
+                onChange={(e) =>
+                  updateNestedField(
+                    'oculomotor',
+                    'spontaneousNystagmus',
+                    'present',
+                    e.target.checked
+                  )
+                }
                 disabled={readOnly}
                 className="rounded border-gray-300"
               />
@@ -529,7 +556,14 @@ export default function VestibularAssessment({
                 <input
                   type="text"
                   value={assessment.oculomotor.spontaneousNystagmus?.direction || ''}
-                  onChange={(e) => updateNestedField('oculomotor', 'spontaneousNystagmus', 'direction', e.target.value)}
+                  onChange={(e) =>
+                    updateNestedField(
+                      'oculomotor',
+                      'spontaneousNystagmus',
+                      'direction',
+                      e.target.value
+                    )
+                  }
                   disabled={readOnly}
                   placeholder="Venstre, hoyre, vertikal..."
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -540,7 +574,9 @@ export default function VestibularAssessment({
                 <input
                   type="text"
                   value={assessment.oculomotor.spontaneousNystagmus?.notes || ''}
-                  onChange={(e) => updateNestedField('oculomotor', 'spontaneousNystagmus', 'notes', e.target.value)}
+                  onChange={(e) =>
+                    updateNestedField('oculomotor', 'spontaneousNystagmus', 'notes', e.target.value)
+                  }
                   disabled={readOnly}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -579,14 +615,23 @@ export default function VestibularAssessment({
             <TestResultSelector
               label="Resultat"
               value={assessment.vestibularTests.dynamicVisualAcuity?.result}
-              onChange={(v) => updateNestedField('vestibularTests', 'dynamicVisualAcuity', 'result', v)}
+              onChange={(v) =>
+                updateNestedField('vestibularTests', 'dynamicVisualAcuity', 'result', v)
+              }
             />
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Notater</label>
               <input
                 type="text"
                 value={assessment.vestibularTests.dynamicVisualAcuity?.notes || ''}
-                onChange={(e) => updateNestedField('vestibularTests', 'dynamicVisualAcuity', 'notes', e.target.value)}
+                onChange={(e) =>
+                  updateNestedField(
+                    'vestibularTests',
+                    'dynamicVisualAcuity',
+                    'notes',
+                    e.target.value
+                  )
+                }
                 disabled={readOnly}
                 placeholder="Linjetap eller observasjoner..."
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -665,10 +710,14 @@ export default function VestibularAssessment({
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Differensialdiagnoser</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Differensialdiagnoser
+          </label>
           <textarea
             value={assessment.clinicalAssessment.differentialDiagnosis || ''}
-            onChange={(e) => updateField('clinicalAssessment', 'differentialDiagnosis', e.target.value)}
+            onChange={(e) =>
+              updateField('clinicalAssessment', 'differentialDiagnosis', e.target.value)
+            }
             disabled={readOnly}
             placeholder="Andre mulige diagnoser..."
             rows={2}
@@ -702,7 +751,9 @@ export default function VestibularAssessment({
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Vestibular rehabilitering</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Vestibular rehabilitering
+          </label>
           <textarea
             value={assessment.plan.vestibularRehabilitation || ''}
             onChange={(e) => updateField('plan', 'vestibularRehabilitation', e.target.value)}
@@ -749,5 +800,5 @@ export default function VestibularAssessment({
         </div>
       </Section>
     </div>
-  )
+  );
 }

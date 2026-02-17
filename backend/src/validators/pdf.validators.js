@@ -5,7 +5,7 @@
 import Joi from 'joi';
 
 const uuidSchema = Joi.string().uuid();
-const dateSchema = Joi.date().iso();
+const _dateSchema = Joi.date().iso();
 
 /**
  * Generate patient letter validation

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, _fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
@@ -12,11 +12,11 @@ const renderWithRouter = (component) => {
 };
 
 describe('ClinicalEncounter Component', () => {
-  const mockPatient = {
+  const _mockPatient = {
     id: 'patient-123',
     first_name: 'Ola',
     last_name: 'Nordmann',
-    date_of_birth: '1985-05-15'
+    date_of_birth: '1985-05-15',
   };
 
   it('should render SOAP note form', () => {
@@ -44,8 +44,8 @@ describe('ClinicalEncounter Component', () => {
       create: vi.fn().mockResolvedValue({
         id: 'encounter-123',
         patient_id: 'patient-123',
-        encounter_date: '2025-01-15T14:30:00Z'
-      })
+        encounter_date: '2025-01-15T14:30:00Z',
+      }),
     };
 
     vi.spyOn(api, 'encountersAPI').mockReturnValue(mockEncountersAPI);
@@ -54,7 +54,10 @@ describe('ClinicalEncounter Component', () => {
 
     // Fill out form
     await user.type(screen.getByLabelText(/chief complaint/i), 'Low back pain');
-    await user.type(screen.getByLabelText(/subjective/i), 'Patient reports 2 weeks of low back pain');
+    await user.type(
+      screen.getByLabelText(/subjective/i),
+      'Patient reports 2 weeks of low back pain'
+    );
     await user.type(screen.getByLabelText(/objective/i), 'Positive SLR at 45 degrees');
     await user.type(screen.getByLabelText(/assessment/i), 'L03 - Low back pain');
     await user.type(screen.getByLabelText(/plan/i), 'HVLA manipulation, home exercises');
@@ -65,7 +68,7 @@ describe('ClinicalEncounter Component', () => {
     await waitFor(() => {
       expect(mockEncountersAPI.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          chief_complaint: 'Low back pain'
+          chief_complaint: 'Low back pain',
         })
       );
     });
@@ -90,7 +93,7 @@ describe('ClinicalEncounter Component', () => {
     const signedEncounter = {
       id: 'encounter-123',
       is_signed: true,
-      soap_notes: { subjective: 'Test', objective: 'Test' }
+      soap_notes: { subjective: 'Test', objective: 'Test' },
     };
 
     renderWithRouter(<ClinicalEncounter encounter={signedEncounter} />);

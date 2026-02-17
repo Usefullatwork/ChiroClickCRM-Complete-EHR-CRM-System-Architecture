@@ -13,7 +13,7 @@ import { AppError } from '../utils/errors.js';
  * @param {Response} res - Express response
  * @param {NextFunction} next - Express next function
  */
-export const errorHandler = (err, req, res, next) => {
+export const errorHandler = (err, req, res, _next) => {
   // Log the error
   logger.error('Error occurred:', {
     name: err.name,
@@ -23,7 +23,7 @@ export const errorHandler = (err, req, res, next) => {
     path: req.path,
     method: req.method,
     userId: req.user?.id,
-    organizationId: req.organizationId
+    organizationId: req.organizationId,
   });
 
   // If it's an operational error (expected), send structured response
@@ -39,38 +39,41 @@ export const errorHandler = (err, req, res, next) => {
       error: 'ValidationError',
       code: 'VALIDATION_ERROR',
       message: 'Validation failed',
-      details: err.details.map(detail => ({
+      details: err.details.map((detail) => ({
         field: detail.path.join('.'),
-        message: detail.message
-      }))
+        message: detail.message,
+      })),
     });
   }
 
   // Database constraint errors
-  if (err.code === '23505') { // PostgreSQL unique violation
+  if (err.code === '23505') {
+    // PostgreSQL unique violation
     return res.status(409).json({
       error: 'ConflictError',
       code: 'RESOURCE_CONFLICT',
       message: 'Resource already exists',
-      details: { constraint: err.constraint }
+      details: { constraint: err.constraint },
     });
   }
 
-  if (err.code === '23503') { // PostgreSQL foreign key violation
+  if (err.code === '23503') {
+    // PostgreSQL foreign key violation
     return res.status(400).json({
       error: 'BadRequestError',
       code: 'INVALID_REFERENCE',
       message: 'Referenced resource does not exist',
-      details: { constraint: err.constraint }
+      details: { constraint: err.constraint },
     });
   }
 
-  if (err.code === '23502') { // PostgreSQL not null violation
+  if (err.code === '23502') {
+    // PostgreSQL not null violation
     return res.status(400).json({
       error: 'BadRequestError',
       code: 'MISSING_REQUIRED_FIELD',
       message: 'Required field is missing',
-      details: { column: err.column }
+      details: { column: err.column },
     });
   }
 
@@ -79,7 +82,7 @@ export const errorHandler = (err, req, res, next) => {
     return res.status(401).json({
       error: 'AuthenticationError',
       code: 'INVALID_TOKEN',
-      message: 'Invalid authentication token'
+      message: 'Invalid authentication token',
     });
   }
 
@@ -87,7 +90,7 @@ export const errorHandler = (err, req, res, next) => {
     return res.status(401).json({
       error: 'AuthenticationError',
       code: 'TOKEN_EXPIRED',
-      message: 'Authentication token has expired'
+      message: 'Authentication token has expired',
     });
   }
 
@@ -97,7 +100,7 @@ export const errorHandler = (err, req, res, next) => {
       error: 'BadRequestError',
       code: 'FILE_UPLOAD_ERROR',
       message: err.message,
-      details: { field: err.field }
+      details: { field: err.field },
     });
   }
 
@@ -109,7 +112,7 @@ export const errorHandler = (err, req, res, next) => {
     error: 'InternalServerError',
     code: 'INTERNAL_SERVER_ERROR',
     message: isDevelopment ? err.message : 'An unexpected error occurred',
-    ...(isDevelopment && { stack: err.stack })
+    ...(isDevelopment && { stack: err.stack }),
   });
 };
 
@@ -123,8 +126,8 @@ export const notFoundHandler = (req, res) => {
     message: `Cannot ${req.method} ${req.path}`,
     details: {
       method: req.method,
-      path: req.path
-    }
+      path: req.path,
+    },
   });
 };
 
@@ -132,14 +135,12 @@ export const notFoundHandler = (req, res) => {
  * Async error wrapper
  * Wraps async route handlers to catch errors
  */
-export const asyncHandler = (fn) => {
-  return (req, res, next) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
-  };
+export const asyncHandler = (fn) => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
 };
 
 export default {
   errorHandler,
   notFoundHandler,
-  asyncHandler
+  asyncHandler,
 };

@@ -8,16 +8,8 @@
  * Designed to integrate with BodyDiagram component.
  */
 
-import React, { useMemo, useState } from 'react';
-import {
-  Target,
-  ChevronDown,
-  ChevronUp,
-  Plus,
-  X,
-  Info,
-  Crosshair
-} from 'lucide-react';
+import _React, { useMemo, useState } from 'react';
+import { Target, ChevronDown, ChevronUp, Plus, X, Info, Crosshair } from 'lucide-react';
 
 // Tissue abnormality types
 const TISSUE_TYPES = [
@@ -30,7 +22,7 @@ const TISSUE_TYPES = [
     textColor: 'text-red-700',
     borderColor: 'border-red-300',
     description: 'Hyperirritable spot in skeletal muscle',
-    descriptionNo: 'Hyperirritabelt punkt i skjelettmuskel'
+    descriptionNo: 'Hyperirritabelt punkt i skjelettmuskel',
   },
   {
     id: 'LG',
@@ -41,7 +33,7 @@ const TISSUE_TYPES = [
     textColor: 'text-blue-700',
     borderColor: 'border-blue-300',
     description: 'Ligament tenderness or laxity',
-    descriptionNo: 'Ligamentømhet eller laksitet'
+    descriptionNo: 'Ligamentømhet eller laksitet',
   },
   {
     id: 'TN',
@@ -52,7 +44,7 @@ const TISSUE_TYPES = [
     textColor: 'text-purple-700',
     borderColor: 'border-purple-300',
     description: 'Tendon pathology (tendinopathy, tear)',
-    descriptionNo: 'Senepatologi (tendinopati, ruptur)'
+    descriptionNo: 'Senepatologi (tendinopati, ruptur)',
   },
   {
     id: 'SK',
@@ -63,7 +55,7 @@ const TISSUE_TYPES = [
     textColor: 'text-amber-700',
     borderColor: 'border-amber-300',
     description: 'Skin changes, scars, adhesions',
-    descriptionNo: 'Hudforandringer, arr, sammenvoksinger'
+    descriptionNo: 'Hudforandringer, arr, sammenvoksinger',
   },
   {
     id: 'FS',
@@ -74,7 +66,7 @@ const TISSUE_TYPES = [
     textColor: 'text-emerald-700',
     borderColor: 'border-emerald-300',
     description: 'Fascial tension or adhesion',
-    descriptionNo: 'Fasciespenning eller adhesjon'
+    descriptionNo: 'Fasciespenning eller adhesjon',
   },
   {
     id: 'MS',
@@ -85,7 +77,7 @@ const TISSUE_TYPES = [
     textColor: 'text-pink-700',
     borderColor: 'border-pink-300',
     description: 'Involuntary muscle contraction',
-    descriptionNo: 'Ufrivillig muskelkontraksjon'
+    descriptionNo: 'Ufrivillig muskelkontraksjon',
   },
   {
     id: 'ED',
@@ -96,7 +88,7 @@ const TISSUE_TYPES = [
     textColor: 'text-cyan-700',
     borderColor: 'border-cyan-300',
     description: 'Swelling or fluid accumulation',
-    descriptionNo: 'Hevelse eller væskeansamling'
+    descriptionNo: 'Hevelse eller væskeansamling',
   },
   {
     id: 'AT',
@@ -107,15 +99,20 @@ const TISSUE_TYPES = [
     textColor: 'text-gray-700',
     borderColor: 'border-gray-300',
     description: 'Muscle wasting',
-    descriptionNo: 'Muskelatrofi'
-  }
+    descriptionNo: 'Muskelatrofi',
+  },
 ];
 
 // Severity levels
 const SEVERITY_LEVELS = [
   { value: 'mild', label: 'Mild', labelNo: 'Mild', color: 'bg-green-100 text-green-700' },
-  { value: 'moderate', label: 'Moderate', labelNo: 'Moderat', color: 'bg-amber-100 text-amber-700' },
-  { value: 'severe', label: 'Severe', labelNo: 'Alvorlig', color: 'bg-red-100 text-red-700' }
+  {
+    value: 'moderate',
+    label: 'Moderate',
+    labelNo: 'Moderat',
+    color: 'bg-amber-100 text-amber-700',
+  },
+  { value: 'severe', label: 'Severe', labelNo: 'Alvorlig', color: 'bg-red-100 text-red-700' },
 ];
 
 // Common body regions for quick selection
@@ -139,31 +136,31 @@ const BODY_REGIONS = [
   { id: 'piriformis_left', name: 'Left Piriformis', nameNo: 'Venstre piriformis' },
   { id: 'piriformis_right', name: 'Right Piriformis', nameNo: 'Høyre piriformis' },
   { id: 'psoas_left', name: 'Left Psoas', nameNo: 'Venstre psoas' },
-  { id: 'psoas_right', name: 'Right Psoas', nameNo: 'Høyre psoas' }
+  { id: 'psoas_right', name: 'Right Psoas', nameNo: 'Høyre psoas' },
 ];
 
 /**
  * Single marker entry component
  */
-function MarkerEntry({ marker, index, onChange, onRemove, lang }) {
-  const tissueType = TISSUE_TYPES.find(t => t.id === marker.type);
+function MarkerEntry({ marker, _index, onChange, onRemove, lang }) {
+  const tissueType = TISSUE_TYPES.find((t) => t.id === marker.type);
 
   return (
-    <div className={`p-3 rounded-lg border ${tissueType?.bgColor || 'bg-gray-100'} ${tissueType?.borderColor || 'border-gray-300'}`}>
+    <div
+      className={`p-3 rounded-lg border ${tissueType?.bgColor || 'bg-gray-100'} ${tissueType?.borderColor || 'border-gray-300'}`}
+    >
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="flex items-center gap-2">
-          <span className={`px-2 py-0.5 text-xs font-bold rounded ${tissueType?.bgColor} ${tissueType?.textColor}`}>
+          <span
+            className={`px-2 py-0.5 text-xs font-bold rounded ${tissueType?.bgColor} ${tissueType?.textColor}`}
+          >
             {marker.type}
           </span>
           <span className="text-sm font-medium text-gray-700">
             {tissueType ? (lang === 'no' ? tissueType.nameNo : tissueType.name) : marker.type}
           </span>
         </div>
-        <button
-          type="button"
-          onClick={onRemove}
-          className="text-gray-400 hover:text-red-500"
-        >
+        <button type="button" onClick={onRemove} className="text-gray-400 hover:text-red-500">
           <X className="w-4 h-4" />
         </button>
       </div>
@@ -179,7 +176,7 @@ function MarkerEntry({ marker, index, onChange, onRemove, lang }) {
             className="w-full px-2 py-1 text-sm border border-gray-200 rounded"
           >
             <option value="">{lang === 'no' ? '-- Velg --' : '-- Select --'}</option>
-            {BODY_REGIONS.map(region => (
+            {BODY_REGIONS.map((region) => (
               <option key={region.id} value={region.id}>
                 {lang === 'no' ? region.nameNo : region.name}
               </option>
@@ -192,15 +189,17 @@ function MarkerEntry({ marker, index, onChange, onRemove, lang }) {
             {lang === 'no' ? 'Alvorlighetsgrad' : 'Severity'}
           </label>
           <div className="flex gap-1">
-            {SEVERITY_LEVELS.map(level => (
+            {SEVERITY_LEVELS.map((level) => (
               <button
                 key={level.value}
                 type="button"
                 onClick={() => onChange({ ...marker, severity: level.value })}
                 className={`flex-1 px-2 py-1 text-xs rounded border transition-colors
-                           ${marker.severity === level.value
-                             ? level.color + ' border-current font-medium'
-                             : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'}`}
+                           ${
+                             marker.severity === level.value
+                               ? `${level.color} border-current font-medium`
+                               : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'
+                           }`}
               >
                 {lang === 'no' ? level.labelNo : level.label}
               </button>
@@ -245,7 +244,7 @@ function QuickAddPanel({ onAdd, lang }) {
         {lang === 'no' ? 'Hurtigtillegg:' : 'Quick Add:'}
       </span>
       <div className="flex flex-wrap gap-2">
-        {TISSUE_TYPES.map(type => (
+        {TISSUE_TYPES.map((type) => (
           <button
             key={type.id}
             type="button"
@@ -265,21 +264,23 @@ function QuickAddPanel({ onAdd, lang }) {
 /**
  * Summary by type
  */
-function MarkerSummary({ markers, lang }) {
+function MarkerSummary({ markers, _lang }) {
   const summary = useMemo(() => {
     const counts = {};
-    markers.forEach(m => {
+    markers.forEach((m) => {
       counts[m.type] = (counts[m.type] || 0) + 1;
     });
     return counts;
   }, [markers]);
 
-  if (Object.keys(summary).length === 0) return null;
+  if (Object.keys(summary).length === 0) {
+    return null;
+  }
 
   return (
     <div className="flex flex-wrap gap-2">
       {Object.entries(summary).map(([type, count]) => {
-        const tissueType = TISSUE_TYPES.find(t => t.id === type);
+        const tissueType = TISSUE_TYPES.find((t) => t.id === type);
         return (
           <span
             key={type}
@@ -313,7 +314,7 @@ function MarkerLegend({ lang, expanded, onToggle }) {
 
       {expanded && (
         <div className="p-3 grid md:grid-cols-2 gap-2">
-          {TISSUE_TYPES.map(type => (
+          {TISSUE_TYPES.map((type) => (
             <div key={type.id} className="flex items-start gap-2">
               <span
                 className={`px-2 py-0.5 text-xs font-bold rounded ${type.bgColor} ${type.textColor}`}
@@ -344,9 +345,9 @@ export default function TissueAbnormalityMarkers({
   values = { markers: [] },
   onChange,
   lang = 'no',
-  readOnly = false,
+  _readOnly = false,
   onGenerateNarrative,
-  onSelectForDiagram // Callback to integrate with BodyDiagram
+  onSelectForDiagram, // Callback to integrate with BodyDiagram
 }) {
   const [showLegend, setShowLegend] = useState(false);
   const markers = values.markers || [];
@@ -357,7 +358,7 @@ export default function TissueAbnormalityMarkers({
       type,
       location: '',
       severity: 'moderate',
-      notes: ''
+      notes: '',
     };
     onChange({ ...values, markers: [...markers, newMarker] });
   };
@@ -375,27 +376,33 @@ export default function TissueAbnormalityMarkers({
   // Generate narrative
   const generateNarrative = useMemo(() => {
     if (markers.length === 0) {
-      return lang === 'no' ? 'Ingen vevsabnormaliteter registrert.' : 'No tissue abnormalities documented.';
+      return lang === 'no'
+        ? 'Ingen vevsabnormaliteter registrert.'
+        : 'No tissue abnormalities documented.';
     }
 
     // Group by type
     const byType = {};
-    markers.forEach(m => {
-      if (!byType[m.type]) byType[m.type] = [];
-      const tissueType = TISSUE_TYPES.find(t => t.id === m.type);
-      const region = BODY_REGIONS.find(r => r.id === m.location);
+    markers.forEach((m) => {
+      if (!byType[m.type]) {
+        byType[m.type] = [];
+      }
+      const _tissueType = TISSUE_TYPES.find((t) => t.id === m.type);
+      const region = BODY_REGIONS.find((r) => r.id === m.location);
       const locationName = region
-        ? (lang === 'no' ? region.nameNo : region.name)
+        ? lang === 'no'
+          ? region.nameNo
+          : region.name
         : m.customLocation || (lang === 'no' ? 'uspesifisert' : 'unspecified');
 
-      const severity = SEVERITY_LEVELS.find(s => s.value === m.severity);
+      const severity = SEVERITY_LEVELS.find((s) => s.value === m.severity);
       const severityName = severity ? (lang === 'no' ? severity.labelNo : severity.label) : '';
 
-      byType[m.type].push(`${locationName} (${severityName})${m.notes ? ': ' + m.notes : ''}`);
+      byType[m.type].push(`${locationName} (${severityName})${m.notes ? `: ${m.notes}` : ''}`);
     });
 
     const narrativeParts = Object.entries(byType).map(([type, locations]) => {
-      const tissueType = TISSUE_TYPES.find(t => t.id === type);
+      const tissueType = TISSUE_TYPES.find((t) => t.id === type);
       const typeName = tissueType ? (lang === 'no' ? tissueType.nameNo : tissueType.name) : type;
       return `${typeName}: ${locations.join(', ')}`;
     });
@@ -483,12 +490,18 @@ export default function TissueAbnormalityMarkers({
           <div className="text-blue-700">
             <p className="font-medium mb-1">{lang === 'no' ? 'Tips:' : 'Tips:'}</p>
             <ul className="space-y-0.5 text-blue-600">
-              <li>• {lang === 'no'
-                ? 'TP = Triggerpunkt, LG = Ligament, TN = Sene, SK = Hud, FS = Fascie'
-                : 'TP = Trigger Point, LG = Ligament, TN = Tendon, SK = Skin, FS = Fascia'}</li>
-              <li>• {lang === 'no'
-                ? 'Klikk "Merk på diagram" for å plassere markører visuelt på kroppsfiguren'
-                : 'Click "Mark on Diagram" to place markers visually on the body figure'}</li>
+              <li>
+                •{' '}
+                {lang === 'no'
+                  ? 'TP = Triggerpunkt, LG = Ligament, TN = Sene, SK = Hud, FS = Fascie'
+                  : 'TP = Trigger Point, LG = Ligament, TN = Tendon, SK = Skin, FS = Fascia'}
+              </li>
+              <li>
+                •{' '}
+                {lang === 'no'
+                  ? 'Klikk "Merk på diagram" for å plassere markører visuelt på kroppsfiguren'
+                  : 'Click "Mark on Diagram" to place markers visually on the body figure'}
+              </li>
             </ul>
           </div>
         </div>

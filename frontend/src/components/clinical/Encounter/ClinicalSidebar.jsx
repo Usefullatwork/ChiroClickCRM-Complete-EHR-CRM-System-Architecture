@@ -1,4 +1,4 @@
-import React from 'react';
+import _React from 'react';
 import {
   AlertTriangle,
   Activity,
@@ -7,7 +7,7 @@ import {
   ArrowLeft,
   Loader2,
   Sparkles,
-  BookOpen
+  BookOpen,
 } from 'lucide-react';
 
 export default function ClinicalSidebar({
@@ -18,7 +18,7 @@ export default function ClinicalSidebar({
   aiSuggestions,
   onOpenAIAssistant,
   onOpenTemplatePicker,
-  onBack
+  onBack,
 }) {
   const patientData = patient?.data;
   const patientAge = patientData?.date_of_birth
@@ -60,7 +60,8 @@ export default function ClinicalSidebar({
                 </h2>
                 <p className="text-sm text-slate-500">
                   {patientAge ? `${patientAge} år` : ''}
-                  {patientData?.national_id && ` • Fnr: ${patientData.national_id.substring(0, 6)}-*****`}
+                  {patientData?.national_id &&
+                    ` • Fnr: ${patientData.national_id.substring(0, 6)}-*****`}
                 </p>
               </div>
             </div>
@@ -174,7 +175,8 @@ export default function ClinicalSidebar({
             </button>
           </div>
           <p className="text-sm text-purple-600">
-            {aiSuggestions?.clinicalReasoning || 'Klikk "Åpne" for AI-assistert analyse basert på SOAP-notater.'}
+            {aiSuggestions?.clinicalReasoning ||
+              'Klikk "Åpne" for AI-assistert analyse basert på SOAP-notater.'}
           </p>
         </div>
 
