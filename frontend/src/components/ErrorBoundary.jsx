@@ -44,7 +44,10 @@ export class ErrorBoundary extends React.Component {
       }
 
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div
+          className="min-h-screen flex items-center justify-center bg-gray-50 px-4"
+          data-testid="error-boundary"
+        >
           <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
             <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full bg-red-100">
               <svg
@@ -62,20 +65,22 @@ export class ErrorBoundary extends React.Component {
               </svg>
             </div>
 
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              Noe gikk galt
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Noe gikk galt</h2>
 
             <p className="text-gray-600 mb-6">
-              En uventet feil oppstod. Prøv å laste siden på nytt eller kontakt
-              support hvis problemet vedvarer.
+              En uventet feil oppstod. Prøv å laste siden på nytt eller kontakt support hvis
+              problemet vedvarer.
             </p>
+
+            {this.state.error && (
+              <p data-testid="error-boundary-message" className="sr-only">
+                {this.state.error.toString()}
+              </p>
+            )}
 
             {import.meta.env.DEV && this.state.error && (
               <div className="mb-6 p-4 bg-gray-100 rounded-lg text-left overflow-auto max-h-40">
-                <p className="text-sm font-mono text-red-600">
-                  {this.state.error.toString()}
-                </p>
+                <p className="text-sm font-mono text-red-600">{this.state.error.toString()}</p>
                 {this.state.errorInfo && (
                   <pre className="text-xs text-gray-500 mt-2">
                     {this.state.errorInfo.componentStack}

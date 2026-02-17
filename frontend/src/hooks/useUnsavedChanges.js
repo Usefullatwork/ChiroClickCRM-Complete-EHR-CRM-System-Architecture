@@ -1,23 +1,23 @@
-import { useEffect, useCallback } from 'react';
-import { useBlocker } from 'react-router-dom';
+import { useEffect, useState, useCallback } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 /**
  * Hook to warn users about unsaved changes before navigating away.
- * Uses react-router-dom's useBlocker for in-app navigation
- * and the beforeunload event for browser close/refresh.
+ * Uses the beforeunload event for browser close/refresh and a manual
+ * navigation intercept for in-app route changes.
+ *
+ * Note: useBlocker requires a data router (createBrowserRouter) which
+ * this app doesn't use. Instead, we intercept navigation manually.
  *
  * @param {boolean} isDirty - Whether the form has unsaved changes
  * @param {string} [message] - Custom warning message
  * @returns {{ isBlocked, proceed, reset }}
  */
 export default function useUnsavedChanges(isDirty, message) {
-  const blocker = useBlocker(
-    useCallback(
-      ({ currentLocation, nextLocation }) =>
-        isDirty && currentLocation.pathname !== nextLocation.pathname,
-      [isDirty]
-    )
-  );
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [pendingPath, setPendingPath] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Handle browser close/refresh
   useEffect(() => {
@@ -34,9 +34,42 @@ export default function useUnsavedChanges(isDirty, message) {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [isDirty, message]);
 
+  // Intercept in-app navigation by patching pushState/replaceState
+  useEffect(() => {
+    if (!isDirty) {
+      return;
+    }
+
+    const handlePopState = () => {
+      if (isDirty) {
+        // User pressed back/forward — block it
+        setIsBlocked(true);
+        setPendingPath(null); // popstate doesn't give us the target path
+        // Push the current URL back to undo the navigation
+        window.history.pushState(null, '', location.pathname);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [isDirty, location.pathname]);
+
+  const proceed = useCallback(() => {
+    setIsBlocked(false);
+    if (pendingPath) {
+      navigate(pendingPath);
+    }
+    setPendingPath(null);
+  }, [pendingPath, navigate]);
+
+  const reset = useCallback(() => {
+    setIsBlocked(false);
+    setPendingPath(null);
+  }, []);
+
   return {
-    isBlocked: blocker.state === 'blocked',
-    proceed: blocker.state === 'blocked' ? () => blocker.proceed() : () => {},
-    reset: blocker.state === 'blocked' ? () => blocker.reset() : () => {},
+    isBlocked,
+    proceed,
+    reset,
   };
 }
