@@ -239,6 +239,7 @@ import clinicalSettingsRoutes from './routes/clinicalSettings.js';
 import treatmentPlanRoutes from './routes/treatmentPlans.js';
 import macroRoutes from './routes/macros.js';
 import errorReportRoutes from './routes/errors.js';
+import aiRetrainingRoutes from './routes/aiRetraining.js';
 
 // Mount routes
 app.use(`/api/${API_VERSION}/auth`, authRoutes);
@@ -277,6 +278,7 @@ app.use(`/api/${API_VERSION}/spine-templates`, spineTemplatesRoutes);
 app.use(`/api/${API_VERSION}/clinical-settings`, clinicalSettingsRoutes);
 app.use(`/api/${API_VERSION}/treatment-plans`, treatmentPlanRoutes);
 app.use(`/api/${API_VERSION}/macros`, macroRoutes);
+app.use(`/api/${API_VERSION}/ai-retraining`, aiRetrainingRoutes);
 app.use(`/api/${API_VERSION}/errors`, errorReportRoutes);
 
 // Portal routes (public - no auth required for patient access)

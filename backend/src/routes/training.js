@@ -5,6 +5,7 @@
 import express from 'express';
 import * as trainingController from '../controllers/training.js';
 import * as aiAnalyticsController from '../controllers/aiAnalytics.js';
+import * as dataCurationController from '../controllers/dataCuration.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
 import validate from '../middleware/validation.js';
 import {
@@ -497,5 +498,139 @@ router.get(
   requireRole(['ADMIN', 'PRACTITIONER']),
   aiAnalyticsController.getModelComparison
 );
+
+// ============================================================================
+// DATA CURATION ENDPOINTS
+// ============================================================================
+
+/**
+ * @swagger
+ * /training/curation/feedback:
+ *   get:
+ *     summary: Get feedback entries for curation
+ *     description: Paginated list with filters for type, rating, status, date range
+ *     tags: [Training]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [pending, approved, rejected, exported, all]
+ *     responses:
+ *       200:
+ *         description: Paginated feedback list
+ */
+router.get('/curation/feedback', requireRole(['ADMIN']), dataCurationController.getFeedback);
+
+/**
+ * @swagger
+ * /training/curation/stats:
+ *   get:
+ *     summary: Curation statistics
+ *     description: Aggregate counts by type, status, avg rating
+ *     tags: [Training]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Curation distribution summary
+ */
+router.get('/curation/stats', requireRole(['ADMIN']), dataCurationController.getStats);
+
+/**
+ * @swagger
+ * /training/curation/approve/{id}:
+ *   post:
+ *     summary: Approve feedback for training
+ *     tags: [Training]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               editedText:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Feedback approved
+ */
+router.post('/curation/approve/:id', requireRole(['ADMIN']), dataCurationController.approve);
+
+/**
+ * @swagger
+ * /training/curation/reject/{id}:
+ *   post:
+ *     summary: Reject feedback from training
+ *     tags: [Training]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Feedback rejected
+ */
+router.post('/curation/reject/:id', requireRole(['ADMIN']), dataCurationController.reject);
+
+/**
+ * @swagger
+ * /training/curation/bulk:
+ *   post:
+ *     summary: Bulk approve or reject feedback
+ *     tags: [Training]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [ids, action]
+ *             properties:
+ *               ids:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: uuid
+ *               action:
+ *                 type: string
+ *                 enum: [approve, reject]
+ *     responses:
+ *       200:
+ *         description: Bulk action completed
+ */
+router.post('/curation/bulk', requireRole(['ADMIN']), dataCurationController.bulk);
 
 export default router;
