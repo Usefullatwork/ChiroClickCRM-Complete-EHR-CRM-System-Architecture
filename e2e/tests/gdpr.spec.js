@@ -101,9 +101,16 @@ test.describe('Data Access via Patient Detail', () => {
 });
 
 test.describe('New Patient Consent Fields', () => {
+  // Navigate via SPA (click button) to avoid full-page-reload auth issues in CI
+  async function navigateToNewPatient(page) {
+    await page.goto('/patients');
+    await page.waitForSelector('[data-testid="patients-add-button"]', { timeout: 15000 });
+    await page.locator('[data-testid="patients-add-button"]').click();
+    await page.waitForSelector('[data-testid="new-patient-first-name"]', { timeout: 15000 });
+  }
+
   test('should have consent checkboxes on new patient form', async ({ authenticatedPage }) => {
-    await authenticatedPage.goto('/patients/new');
-    await authenticatedPage.waitForSelector('[data-testid="new-patient-first-name"]', { timeout: 15000 });
+    await navigateToNewPatient(authenticatedPage);
 
     // Consent section should be visible in the form
     // The actual text is "Consent to SMS notifications"
@@ -112,8 +119,7 @@ test.describe('New Patient Consent Fields', () => {
   });
 
   test('should submit new patient with consent fields', async ({ authenticatedPage }) => {
-    await authenticatedPage.goto('/patients/new');
-    await authenticatedPage.waitForSelector('[data-testid="new-patient-first-name"]', { timeout: 15000 });
+    await navigateToNewPatient(authenticatedPage);
 
     // Verify the submit button exists
     const submitButton = authenticatedPage.locator('[data-testid="new-patient-submit"]');

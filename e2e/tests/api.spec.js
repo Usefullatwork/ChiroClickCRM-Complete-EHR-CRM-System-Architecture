@@ -34,35 +34,41 @@ test.describe('Health Check API', () => {
 });
 
 test.describe('Authentication API', () => {
-  test('should reject unauthenticated requests', async ({ playwright }) => {
-    // Create a brand-new request context with NO cookies to ensure unauthenticated
-    const unauthContext = await playwright.request.newContext({
-      baseURL: API_BASE,
-    });
+  test('should reject unauthenticated requests', async ({ page }) => {
+    // Navigate to frontend so we have a proper origin for CORS
+    const appBase = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173';
+    await page.goto(appBase);
+    await page.waitForLoadState('networkidle');
 
-    try {
-      const response = await unauthContext.get(`${API_BASE}/api/v1/patients`);
-      expect(response.status()).toBe(401);
-    } finally {
-      await unauthContext.dispose();
-    }
+    // Use page.evaluate with credentials: 'omit' to guarantee no cookies are sent
+    const status = await page.evaluate(async (apiBase) => {
+      const res = await fetch(`${apiBase}/api/v1/patients`, {
+        credentials: 'omit',
+      });
+      return res.status;
+    }, API_BASE);
+
+    expect(status).toBe(401);
   });
 
-  test('should reject invalid tokens', async ({ playwright }) => {
-    // Create a brand-new request context with invalid auth header
-    const unauthContext = await playwright.request.newContext({
-      baseURL: API_BASE,
-      extraHTTPHeaders: {
-        Authorization: 'Bearer invalid-token',
-      },
-    });
+  test('should reject invalid tokens', async ({ page }) => {
+    // Navigate to frontend so we have a proper origin for CORS
+    const appBase = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173';
+    await page.goto(appBase);
+    await page.waitForLoadState('networkidle');
 
-    try {
-      const response = await unauthContext.get(`${API_BASE}/api/v1/patients`);
-      expect(response.status()).toBe(401);
-    } finally {
-      await unauthContext.dispose();
-    }
+    // Use page.evaluate with an invalid Bearer token
+    const status = await page.evaluate(async (apiBase) => {
+      const res = await fetch(`${apiBase}/api/v1/patients`, {
+        credentials: 'omit',
+        headers: {
+          Authorization: 'Bearer invalid-token',
+        },
+      });
+      return res.status;
+    }, API_BASE);
+
+    expect(status).toBe(401);
   });
 
   test('should login with valid credentials', async ({ request }) => {

@@ -57,10 +57,19 @@ test.describe('Patient List', () => {
 });
 
 test.describe('Create Patient', () => {
-  test('should display new patient form', async ({ authenticatedPage }) => {
-    await authenticatedPage.goto('/patients/new');
+  // Navigate via SPA (click button) instead of direct page.goto to avoid
+  // full-page-reload issues with cross-origin auth cookies in CI
+  async function navigateToNewPatient(page) {
+    await page.goto('/patients');
+    await page.waitForSelector('[data-testid="patients-add-button"]', { timeout: 15000 });
+    await page.locator('[data-testid="patients-add-button"]').click();
+    await page.waitForSelector('[data-testid="new-patient-first-name"]', { timeout: 15000 });
+  }
 
-    await expect(authenticatedPage.locator('[data-testid="new-patient-first-name"]')).toBeVisible({ timeout: 15000 });
+  test('should display new patient form', async ({ authenticatedPage }) => {
+    await navigateToNewPatient(authenticatedPage);
+
+    await expect(authenticatedPage.locator('[data-testid="new-patient-first-name"]')).toBeVisible();
     await expect(authenticatedPage.locator('[data-testid="new-patient-last-name"]')).toBeVisible();
     await expect(authenticatedPage.locator('[data-testid="new-patient-dob"]')).toBeVisible();
     await expect(authenticatedPage.locator('[data-testid="new-patient-submit"]')).toBeVisible();
@@ -68,8 +77,7 @@ test.describe('Create Patient', () => {
   });
 
   test('should validate required fields', async ({ authenticatedPage }) => {
-    await authenticatedPage.goto('/patients/new');
-    await authenticatedPage.waitForSelector('[data-testid="new-patient-first-name"]', { timeout: 15000 });
+    await navigateToNewPatient(authenticatedPage);
 
     // Submit empty form
     await authenticatedPage.locator('[data-testid="new-patient-submit"]').click();
@@ -82,8 +90,7 @@ test.describe('Create Patient', () => {
   });
 
   test('should fill patient form fields', async ({ authenticatedPage }) => {
-    await authenticatedPage.goto('/patients/new');
-    await authenticatedPage.waitForSelector('[data-testid="new-patient-first-name"]', { timeout: 15000 });
+    await navigateToNewPatient(authenticatedPage);
 
     const testPatient = createTestPatient();
 
@@ -97,8 +104,7 @@ test.describe('Create Patient', () => {
   });
 
   test('should fill contact information', async ({ authenticatedPage }) => {
-    await authenticatedPage.goto('/patients/new');
-    await authenticatedPage.waitForSelector('[data-testid="new-patient-first-name"]', { timeout: 15000 });
+    await navigateToNewPatient(authenticatedPage);
 
     const testPatient = createTestPatient();
 
@@ -110,8 +116,7 @@ test.describe('Create Patient', () => {
   });
 
   test('should cancel and go back to patients list', async ({ authenticatedPage }) => {
-    await authenticatedPage.goto('/patients/new');
-    await authenticatedPage.waitForSelector('[data-testid="new-patient-cancel"]', { timeout: 15000 });
+    await navigateToNewPatient(authenticatedPage);
 
     await authenticatedPage.locator('[data-testid="new-patient-cancel"]').click();
     await expect(authenticatedPage).toHaveURL(/.*patients$/);
