@@ -17,10 +17,7 @@ import {
   getAIMetricsHandler,
   getAIDashboardHandler,
 } from '../application/queries/GetAIMetricsQuery.js';
-import {
-  circuitBreakerRegistry,
-  _CircuitBreakers,
-} from '../infrastructure/resilience/CircuitBreaker.js';
+import { circuitBreakerRegistry } from '../infrastructure/resilience/CircuitBreaker.js';
 import { aiRetrainingService } from '../application/services/AIRetrainingService.js';
 import { aiFeedbackService } from '../application/services/AIFeedbackService.js';
 

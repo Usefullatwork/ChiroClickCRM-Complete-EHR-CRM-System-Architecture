@@ -4,7 +4,6 @@
  */
 
 import { query } from '../config/database.js';
-import _logger from '../config/logger.js';
 
 /**
  * Get all templates for an organization
