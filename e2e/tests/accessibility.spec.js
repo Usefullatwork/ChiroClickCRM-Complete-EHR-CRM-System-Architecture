@@ -61,8 +61,9 @@ test.describe('ARIA Labels', () => {
     await authenticatedPage.waitForSelector('[data-testid="dashboard-title"]', { timeout: 15000 });
 
     // Desktop sidebar nav should be visible at default viewport (1280px)
+    // Note: there are TWO nav elements (mobile + desktop). Use last() for the desktop one.
     const nav = authenticatedPage.locator('nav[aria-label="Main navigation"]');
-    await expect(nav.first()).toBeVisible({ timeout: 10000 });
+    await expect(nav.last()).toBeVisible({ timeout: 10000 });
   });
 
   test('should have labeled form inputs on new patient page', async ({ authenticatedPage }) => {
@@ -139,8 +140,10 @@ test.describe('Screen Reader Support', () => {
     await authenticatedPage.goto('/');
     await authenticatedPage.waitForSelector('[data-testid="dashboard-title"]', { timeout: 15000 });
 
+    // h1 appears in both mobile sidebar (hidden) and desktop sidebar/page (visible)
+    // Use last() to get the visible desktop h1
     const h1 = authenticatedPage.locator('h1');
-    await expect(h1.first()).toBeVisible();
+    await expect(h1.last()).toBeVisible();
 
     // DashboardLayout sidebar has an h1 "ChiroClickCRM" and Dashboard has another h1
     // So we allow up to 2 h1s (sidebar + page title)

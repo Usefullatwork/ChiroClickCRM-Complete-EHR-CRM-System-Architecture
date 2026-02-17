@@ -91,15 +91,17 @@ if (process.env.NODE_ENV === 'development') {
   );
 }
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'), // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'),
-  message: 'Too many requests from this IP, please try again later.',
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-app.use(`/api/${API_VERSION}`, limiter);
+// Rate limiting (skip in test/e2e to avoid 429s during Playwright runs)
+if (!['test', 'e2e'].includes(process.env.NODE_ENV)) {
+  const limiter = rateLimit({
+    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'), // 15 minutes
+    max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'),
+    message: 'Too many requests from this IP, please try again later.',
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+  app.use(`/api/${API_VERSION}`, limiter);
+}
 
 // ============================================================================
 // SWAGGER API DOCS
