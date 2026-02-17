@@ -143,7 +143,7 @@ export const loginLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: true, // Only count failed login attempts
-  skip: () => process.env.NODE_ENV === 'test',
+  skip: () => ['test', 'e2e'].includes(process.env.NODE_ENV),
   message: {
     error: 'LoginRateLimitError',
     code: 'LOGIN_RATE_LIMIT_EXCEEDED',

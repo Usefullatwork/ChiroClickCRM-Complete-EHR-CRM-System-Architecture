@@ -69,8 +69,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Cookie parsing (for session auth)
 app.use(cookieParser());
 
-// CSRF protection (skip in desktop/test mode)
-if (process.env.DESKTOP_MODE !== 'true' && process.env.NODE_ENV !== 'test') {
+// CSRF protection (skip in desktop/test/e2e mode)
+if (process.env.DESKTOP_MODE !== 'true' && !['test', 'e2e'].includes(process.env.NODE_ENV)) {
   app.use(csrfProtection);
   app.use(sendCsrfToken);
 }
