@@ -509,6 +509,56 @@ function AnalyticsTab() {
   const redFlag = redFlagQuery.data || { summary: {}, trend: [] };
   const suggestions = suggestionsQuery.data || [];
 
+  const exportSuggestionsCSV = () => {
+    if (!suggestions.length) return;
+    const headers = ['Dato', 'Type', 'Modell', 'Konfidens', 'Latens (ms)', 'Status', 'Vurdering'];
+    const rows = suggestions.map((s) => [
+      new Date(s.created_at).toLocaleDateString('nb-NO'),
+      s.task_type,
+      s.model_name,
+      s.confidence_score ? (s.confidence_score * 100).toFixed(0) + '%' : '',
+      s.latency_ms || '',
+      s.accepted === true ? 'Godkjent' : s.accepted === false ? 'Avvist' : 'Venter',
+      s.user_rating || '',
+    ]);
+    const csv = [headers, ...rows].map((r) => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ai-forslag-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportComparisonCSV = () => {
+    if (!comparison.length) return;
+    const headers = [
+      'Modell',
+      'Totale forslag',
+      'Godkjenningsrate (%)',
+      'Gj.sn. vurdering',
+      'Gj.sn. latens (ms)',
+      'Tilbakemeldinger',
+    ];
+    const rows = comparison.map((c) => [
+      c.model_name,
+      c.total_suggestions,
+      c.approval_rate,
+      c.avg_user_rating || '',
+      c.avg_latency_ms || '',
+      c.total_feedback,
+    ]);
+    const csv = [headers, ...rows].map((r) => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `modellsammenligning-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const isLoading = performanceQuery.isLoading || usageQuery.isLoading;
 
   if (isLoading) {
@@ -537,10 +587,21 @@ function AnalyticsTab() {
 
       {/* Model Comparison Chart */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          <BarChart3 className="w-5 h-5" />
-          Modellsammenligning
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            <BarChart3 className="w-5 h-5" />
+            Modellsammenligning
+          </h2>
+          {comparison.length > 0 && (
+            <button
+              onClick={exportComparisonCSV}
+              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              CSV
+            </button>
+          )}
+        </div>
         {comparison.length === 0 ? (
           <p className="text-gray-500 text-sm">
             Ingen data enna. AI-forslag vil vises her etter bruk.
@@ -661,7 +722,18 @@ function AnalyticsTab() {
 
       {/* Recent Suggestions Table */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-bold mb-4">Siste AI-forslag</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold">Siste AI-forslag</h2>
+          {suggestions.length > 0 && (
+            <button
+              onClick={exportSuggestionsCSV}
+              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              CSV
+            </button>
+          )}
+        </div>
         {suggestions.length === 0 ? (
           <p className="text-gray-500 text-sm">Ingen forslag registrert enna.</p>
         ) : (
