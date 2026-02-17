@@ -14,6 +14,7 @@ import { RateLimitError } from '../utils/errors.js';
 export const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100,
+  skip: () => ['test', 'e2e'].includes(process.env.NODE_ENV),
   standardHeaders: true,
   legacyHeaders: false,
   message: {

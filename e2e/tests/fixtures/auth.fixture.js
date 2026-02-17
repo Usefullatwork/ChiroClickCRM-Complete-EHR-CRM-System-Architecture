@@ -37,20 +37,26 @@ async function loginViaAPI(page, email, password) {
 }
 
 // Extend base test with authentication fixtures
+// NOTE: The 'setup' project (auth.setup.js) already logs in and saves
+// cookies to storageState. The chromium project loads that storageState,
+// so each test context already has valid session cookies. These fixtures
+// just navigate to the app — no need to re-login (avoids rate limiting).
 export const test = base.extend({
-  // Authenticated page context (admin user)
+  // Authenticated page context (admin user) — uses storageState cookies
   authenticatedPage: async ({ page }, use) => {
-    await loginViaAPI(page, 'admin@chiroclickcrm.no', 'admin123');
+    await page.goto(APP_BASE);
+    await page.waitForLoadState('networkidle');
     await use(page);
   },
 
-  // Admin user context
+  // Admin user context — uses storageState cookies
   adminPage: async ({ page }, use) => {
-    await loginViaAPI(page, 'admin@chiroclickcrm.no', 'admin123');
+    await page.goto(APP_BASE);
+    await page.waitForLoadState('networkidle');
     await use(page);
   },
 
-  // Practitioner user context
+  // Practitioner user context — needs separate login (different user)
   practitionerPage: async ({ page }, use) => {
     await loginViaAPI(page, 'kiropraktor@chiroclickcrm.no', 'admin123');
     await use(page);
