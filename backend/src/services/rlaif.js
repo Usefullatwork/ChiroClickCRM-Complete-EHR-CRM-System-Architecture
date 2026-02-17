@@ -5,7 +5,6 @@
  */
 
 import { query } from '../config/database.js';
-import * as _aiLearning from './aiLearning.js';
 import logger from '../utils/logger.js';
 
 /**

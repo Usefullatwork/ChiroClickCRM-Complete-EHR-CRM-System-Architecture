@@ -7,7 +7,6 @@
 import { normalizeSoapData, getRequiredFields } from '../utils/soapSchema.js';
 import { scanForRedFlags, calculateRiskScore } from './redFlagEngine.js';
 import { checkRedFlagsInContent, checkMedicationWarnings } from './clinicalValidation.js';
-import _logger from '../utils/logger.js';
 
 /**
  * ICPC-2 code format: letter + 2 digits (e.g. L03, A97)

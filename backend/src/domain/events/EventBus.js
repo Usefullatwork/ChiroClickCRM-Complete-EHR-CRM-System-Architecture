@@ -6,7 +6,7 @@
  */
 
 import logger from '../../utils/logger.js';
-import { _DOMAIN_EVENTS, DomainEvent } from './DomainEvents.js';
+import { DomainEvent } from './DomainEvents.js';
 
 /**
  * EventBus singleton for publishing and subscribing to domain events

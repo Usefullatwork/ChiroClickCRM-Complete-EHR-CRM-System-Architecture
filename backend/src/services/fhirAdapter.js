@@ -4,8 +4,6 @@
  * Supports Norwegian healthcare integration requirements
  */
 
-import _logger from '../utils/logger.js';
-
 // FHIR R4 Resource Types used
 const FHIR_RESOURCE_TYPES = {
   PATIENT: 'Patient',

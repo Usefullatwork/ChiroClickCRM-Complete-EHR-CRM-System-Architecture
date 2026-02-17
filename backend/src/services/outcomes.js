@@ -4,7 +4,6 @@
  */
 
 import { query } from '../config/database.js';
-import _logger from '../utils/logger.js';
 
 /**
  * Get patient outcome summary

@@ -4,7 +4,6 @@
  */
 
 import * as templateService from '../services/templates.js';
-import _logger from '../config/logger.js';
 
 /**
  * Get all templates

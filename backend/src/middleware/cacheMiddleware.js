@@ -3,7 +3,7 @@
  * Provides response caching and cache headers for API endpoints
  */
 
-import cache, { _CacheKeys } from '../utils/cache.js';
+import cache from '../utils/cache.js';
 import logger from '../utils/logger.js';
 
 /**
