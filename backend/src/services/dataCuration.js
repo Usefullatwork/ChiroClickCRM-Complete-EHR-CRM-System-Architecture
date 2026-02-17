@@ -6,7 +6,7 @@
 import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
 
-const log = logger.child({ service: 'dataCuration' });
+const log = logger;
 
 /**
  * Get feedback entries for curation with pagination and filters

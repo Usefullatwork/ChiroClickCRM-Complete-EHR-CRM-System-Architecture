@@ -6,7 +6,7 @@
 import * as dataCurationService from '../services/dataCuration.js';
 import logger from '../utils/logger.js';
 
-const log = logger.child({ controller: 'dataCuration' });
+const log = logger;
 
 /**
  * GET /training/curation/feedback
