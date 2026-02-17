@@ -11,29 +11,22 @@
 
 import express from 'express';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
-import { body, param, query, validationResult } from 'express-validator';
+import validate from '../middleware/validation.js';
+import {
+  listNeuroexamsSchema,
+  getNeuroexamSchema,
+  createNeuroexamSchema,
+  updateNeuroexamSchema,
+  completeNeuroexamSchema,
+  recordReferralSchema,
+  logBPPVTreatmentSchema,
+  getPatientHistorySchema,
+} from '../validators/neuroexam.validators.js';
 import { pool } from '../config/database.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 
 const router = express.Router();
-
-// =============================================================================
-// VALIDATION MIDDLEWARE
-// =============================================================================
-
-const validateExamId = [param('examId').isUUID().withMessage('Invalid examination ID')];
-
-const validateCreateExam = [
-  body('patientId').isUUID().withMessage('Valid patient ID required'),
-  body('encounterId').optional().isUUID(),
-  body('examType').optional().isIn(['COMPREHENSIVE', 'SCREENING', 'FOLLOW_UP']),
-];
-
-const validateTestResults = [
-  body('testResults').isObject().withMessage('Test results must be an object'),
-  body('clusterScores').optional().isObject(),
-];
 
 // =============================================================================
 // ROUTES
@@ -47,20 +40,9 @@ router.get(
   '/',
   requireAuth,
   requireOrganization,
-  [
-    query('patientId').optional().isUUID(),
-    query('status').optional().isIn(['IN_PROGRESS', 'COMPLETED', 'REVIEWED', 'AMENDED']),
-    query('hasRedFlags').optional().isBoolean(),
-    query('limit').optional().isInt({ min: 1, max: 100 }),
-    query('offset').optional().isInt({ min: 0 }),
-  ],
+  validate(listNeuroexamsSchema),
   async (req, res) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-
       const { patientId, status, hasRedFlags, limit = 50, offset = 0 } = req.query;
 
       let queryText = `
@@ -115,17 +97,17 @@ router.get(
  * GET /api/v1/neuroexam/:examId
  * Get single neurological examination
  */
-router.get('/:examId', requireAuth, requireOrganization, validateExamId, async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+router.get(
+  '/:examId',
+  requireAuth,
+  requireOrganization,
+  validate(getNeuroexamSchema),
+  async (req, res) => {
+    try {
+      const { examId } = req.params;
 
-    const { examId } = req.params;
-
-    const result = await pool.query(
-      `
+      const result = await pool.query(
+        `
         SELECT
           ne.*,
           p.first_name || ' ' || p.last_name as patient_name,
@@ -136,44 +118,45 @@ router.get('/:examId', requireAuth, requireOrganization, validateExamId, async (
         LEFT JOIN users u ON u.id = ne.practitioner_id
         WHERE ne.id = $1 AND ne.organization_id = $2
       `,
-      [examId, req.organizationId]
-    );
+        [examId, req.organizationId]
+      );
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Examination not found' });
-    }
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: 'Examination not found' });
+      }
 
-    // Get detailed test results
-    const testResults = await pool.query(
-      `
+      // Get detailed test results
+      const testResults = await pool.query(
+        `
         SELECT * FROM neuro_exam_test_results
         WHERE examination_id = $1
         ORDER BY cluster_id, test_id
       `,
-      [examId]
-    );
+        [examId]
+      );
 
-    // Get vestibular findings if present
-    const vestibularFindings = await pool.query(
-      `
+      // Get vestibular findings if present
+      const vestibularFindings = await pool.query(
+        `
         SELECT * FROM vestibular_findings
         WHERE examination_id = $1
       `,
-      [examId]
-    );
+        [examId]
+      );
 
-    res.json({
-      data: {
-        ...result.rows[0],
-        detailed_test_results: testResults.rows,
-        vestibular_findings: vestibularFindings.rows[0] || null,
-      },
-    });
-  } catch (error) {
-    logger.error('Error fetching examination:', error);
-    res.status(500).json({ error: 'Failed to fetch examination' });
+      res.json({
+        data: {
+          ...result.rows[0],
+          detailed_test_results: testResults.rows,
+          vestibular_findings: vestibularFindings.rows[0] || null,
+        },
+      });
+    } catch (error) {
+      logger.error('Error fetching examination:', error);
+      res.status(500).json({ error: 'Failed to fetch examination' });
+    }
   }
-});
+);
 
 /**
  * POST /api/v1/neuroexam
@@ -184,16 +167,11 @@ router.post(
   requireAuth,
   requireOrganization,
   requireRole(['ADMIN', 'PRACTITIONER']),
-  validateCreateExam,
+  validate(createNeuroexamSchema),
   async (req, res) => {
     const client = await pool.connect();
 
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-
       const {
         patientId,
         encounterId,
@@ -322,17 +300,11 @@ router.put(
   requireAuth,
   requireOrganization,
   requireRole(['ADMIN', 'PRACTITIONER']),
-  validateExamId,
-  validateTestResults,
+  validate(updateNeuroexamSchema),
   async (req, res) => {
     const client = await pool.connect();
 
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-
       const { examId } = req.params;
       const { testResults, clusterScores, redFlags, bppvDiagnosis, narrativeText, status } =
         req.body;
@@ -455,7 +427,7 @@ router.post(
   requireAuth,
   requireOrganization,
   requireRole(['ADMIN', 'PRACTITIONER']),
-  validateExamId,
+  validate(completeNeuroexamSchema),
   async (req, res) => {
     try {
       const { examId } = req.params;
@@ -499,18 +471,9 @@ router.post(
   requireAuth,
   requireOrganization,
   requireRole(['ADMIN', 'PRACTITIONER']),
-  validateExamId,
-  [
-    body('specialty').notEmpty().withMessage('Specialty required'),
-    body('urgency').isIn(['ROUTINE', 'URGENT', 'EMERGENT']),
-  ],
+  validate(recordReferralSchema),
   async (req, res) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-
       const { examId } = req.params;
       const { specialty, urgency, notes } = req.body;
 
@@ -561,20 +524,9 @@ router.post(
   requireAuth,
   requireOrganization,
   requireRole(['ADMIN', 'PRACTITIONER']),
-  [
-    body('examId').optional().isUUID(),
-    body('patientId').isUUID(),
-    body('canalAffected').isIn(['POSTERIOR', 'LATERAL', 'ANTERIOR']),
-    body('sideAffected').isIn(['LEFT', 'RIGHT']),
-    body('treatmentManeuver').notEmpty(),
-  ],
+  validate(logBPPVTreatmentSchema),
   async (req, res) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-
       const {
         examId,
         patientId,
@@ -672,7 +624,7 @@ router.get(
   '/patient/:patientId/history',
   requireAuth,
   requireOrganization,
-  [param('patientId').isUUID()],
+  validate(getPatientHistorySchema),
   async (req, res) => {
     try {
       const { patientId } = req.params;

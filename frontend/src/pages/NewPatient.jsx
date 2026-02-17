@@ -260,6 +260,7 @@ export default function NewPatient() {
               </label>
               <input
                 type="text"
+                data-testid="new-patient-first-name"
                 value={formData.first_name}
                 onChange={(e) => handleChange('first_name', e.target.value)}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
@@ -278,6 +279,7 @@ export default function NewPatient() {
               </label>
               <input
                 type="text"
+                data-testid="new-patient-last-name"
                 value={formData.last_name}
                 onChange={(e) => handleChange('last_name', e.target.value)}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
@@ -294,6 +296,7 @@ export default function NewPatient() {
               </label>
               <input
                 type="date"
+                data-testid="new-patient-dob"
                 value={formData.date_of_birth}
                 onChange={(e) => handleChange('date_of_birth', e.target.value)}
                 max={new Date().toISOString().split('T')[0]}
@@ -335,6 +338,7 @@ export default function NewPatient() {
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('phone')}</label>
               <input
                 type="tel"
+                data-testid="new-patient-phone"
                 value={formData.phone}
                 onChange={(e) => handleChange('phone', e.target.value)}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
@@ -349,6 +353,7 @@ export default function NewPatient() {
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
               <input
                 type="email"
+                data-testid="new-patient-email"
                 value={formData.email}
                 onChange={(e) => handleChange('email', e.target.value)}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
@@ -712,6 +717,7 @@ export default function NewPatient() {
         <div className="flex items-center justify-end gap-3 pb-6">
           <button
             type="button"
+            data-testid="new-patient-cancel"
             onClick={() => navigate('/patients')}
             className="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
           >
@@ -719,6 +725,7 @@ export default function NewPatient() {
           </button>
           <button
             type="submit"
+            data-testid="new-patient-submit"
             disabled={createMutation.isPending}
             className="flex items-center gap-2 px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
           >

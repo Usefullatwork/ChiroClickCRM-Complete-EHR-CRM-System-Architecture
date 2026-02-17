@@ -1,37 +1,29 @@
 /**
  * Authentication Setup for E2E Tests
- * Runs before tests to set up authentication state
+ * Runs before test suites to create an authenticated browser state
  */
 
 import { test as setup, expect } from '@playwright/test';
 
 const STORAGE_STATE_PATH = './tests/.auth/user.json';
+const API_BASE = process.env.PLAYWRIGHT_API_URL || 'http://localhost:3000';
+const APP_BASE = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173';
 
 setup('authenticate', async ({ page }) => {
-  // Navigate to the application
-  await page.goto('/');
-
-  // For testing purposes, we'll mock the authentication
-  // Desktop mode uses auto-authentication
-  await page.evaluate(() => {
-    const mockUser = {
-      id: 'e2e-test-user-id',
-      email: 'e2e@chiroclickcrm.no',
-      firstName: 'E2E',
-      lastName: 'Tester',
-      role: 'ADMIN',
-      organizationId: 'e2e-test-org-id',
-      permissions: ['read:all', 'write:all', 'delete:all', 'admin:all'],
-    };
-
-    sessionStorage.setItem('auth_token', 'e2e-test-token-' + Date.now());
-    sessionStorage.setItem('auth_expiry', (Date.now() + 3600000).toString());
-    sessionStorage.setItem('user', JSON.stringify(mockUser));
+  // Login via real backend API
+  const response = await page.request.post(`${API_BASE}/api/v1/auth/login`, {
+    data: {
+      email: 'admin@chiroclickcrm.no',
+      password: 'admin123',
+    },
   });
 
-  // Verify we're authenticated by checking for dashboard elements
-  await page.waitForTimeout(1000);
+  expect(response.ok()).toBeTruthy();
 
-  // Save storage state
+  // Navigate to app so cookie is associated with the frontend origin
+  await page.goto(APP_BASE);
+  await page.waitForLoadState('networkidle');
+
+  // Save storage state (cookies + localStorage) for reuse by other test projects
   await page.context().storageState({ path: STORAGE_STATE_PATH });
 });

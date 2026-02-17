@@ -6,6 +6,8 @@
 
 import express from 'express';
 import { query } from '../config/database.js';
+import validate from '../middleware/validation.js';
+import { pinAuthSchema, logComplianceSchema } from '../validators/patientPortal.validators.js';
 import logger from '../utils/logger.js';
 import crypto from 'crypto';
 
@@ -63,13 +65,9 @@ const requirePortalAuth = async (req, res, next) => {
  * POST /patient-portal/auth/pin
  * Authenticate patient with PIN
  */
-router.post('/auth/pin', async (req, res) => {
+router.post('/auth/pin', validate(pinAuthSchema), async (req, res) => {
   try {
     const { pin, patientId, dateOfBirth } = req.body;
-
-    if (!pin || (!patientId && !dateOfBirth)) {
-      return res.status(400).json({ error: 'PIN and patient identifier required' });
-    }
 
     // Find patient by ID or date of birth
     let patientResult;
@@ -247,31 +245,36 @@ router.get('/exercises', requirePortalAuth, async (req, res) => {
  * POST /patient-portal/exercises/:id/compliance
  * Log exercise compliance
  */
-router.post('/exercises/:id/compliance', requirePortalAuth, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { patient_id } = req.portalPatient;
-    const { completed, pain_level, difficulty_rating, notes } = req.body;
+router.post(
+  '/exercises/:id/compliance',
+  requirePortalAuth,
+  validate(logComplianceSchema),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { patient_id } = req.portalPatient;
+      const { completed, pain_level, difficulty_rating, notes } = req.body;
 
-    const result = await query(
-      `
+      const result = await query(
+        `
       INSERT INTO exercise_compliance_logs (
         prescription_id, patient_id, completed, pain_level, difficulty_rating, notes, logged_at
       ) VALUES ($1, $2, $3, $4, $5, $6, NOW())
       RETURNING *
     `,
-      [id, patient_id, completed !== false, pain_level, difficulty_rating, notes]
-    );
+        [id, patient_id, completed !== false, pain_level, difficulty_rating, notes]
+      );
 
-    res.status(201).json(result.rows[0]);
-  } catch (error) {
-    if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
-      return res.status(503).json({ error: 'Exercise compliance tracking not yet configured' });
+      res.status(201).json(result.rows[0]);
+    } catch (error) {
+      if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+        return res.status(503).json({ error: 'Exercise compliance tracking not yet configured' });
+      }
+      logger.error('Error logging compliance:', error);
+      res.status(500).json({ error: 'Failed to log compliance' });
     }
-    logger.error('Error logging compliance:', error);
-    res.status(500).json({ error: 'Failed to log compliance' });
   }
-});
+);
 
 /**
  * POST /patient-portal/logout

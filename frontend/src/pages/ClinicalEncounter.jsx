@@ -1124,7 +1124,10 @@ export default function ClinicalEncounter() {
               )}
 
               {/* S - SUBJECTIVE */}
-              <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+              <section
+                data-testid="encounter-subjective"
+                className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"
+              >
                 <div className="px-4 py-3 bg-gradient-to-r from-blue-50 to-white border-b border-slate-100 flex items-center justify-between">
                   <h3 className="font-semibold text-slate-800 flex items-center gap-2">
                     <span className="bg-blue-600 text-white h-6 w-6 rounded-md flex items-center justify-center text-sm font-bold">
@@ -1199,7 +1202,10 @@ export default function ClinicalEncounter() {
               </section>
 
               {/* O - OBJECTIVE */}
-              <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+              <section
+                data-testid="encounter-objective"
+                className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"
+              >
                 <div className="px-4 py-3 bg-gradient-to-r from-emerald-50 to-white border-b border-slate-100">
                   <h3 className="font-semibold text-slate-800 flex items-center gap-2">
                     <span className="bg-emerald-600 text-white h-6 w-6 rounded-md flex items-center justify-center text-sm font-bold">
@@ -1372,7 +1378,10 @@ export default function ClinicalEncounter() {
               </section>
 
               {/* A - ASSESSMENT / DIAGNOSIS */}
-              <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+              <section
+                data-testid="encounter-assessment"
+                className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"
+              >
                 <div className="px-4 py-3 bg-gradient-to-r from-amber-50 to-white border-b border-slate-100">
                   <h3 className="font-semibold text-slate-800 flex items-center gap-2">
                     <span className="bg-amber-500 text-white h-6 w-6 rounded-md flex items-center justify-center text-sm font-bold">
@@ -1422,7 +1431,10 @@ export default function ClinicalEncounter() {
               </section>
 
               {/* P - PLAN & TREATMENT (TAKSTER) */}
-              <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+              <section
+                data-testid="encounter-plan"
+                className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"
+              >
                 <div className="px-4 py-3 bg-gradient-to-r from-purple-50 to-white border-b border-slate-100 flex items-center justify-between">
                   <h3 className="font-semibold text-slate-800 flex items-center gap-2">
                     <span className="bg-purple-600 text-white h-6 w-6 rounded-md flex items-center justify-center text-sm font-bold">
@@ -1813,6 +1825,7 @@ export default function ClinicalEncounter() {
               <button
                 onClick={handleSave}
                 disabled={saveMutation.isPending}
+                data-testid="encounter-save-button"
                 className="px-6 py-2 text-sm font-semibold rounded-lg bg-teal-600 text-white hover:bg-teal-700 disabled:opacity-50 transition-colors flex items-center gap-2 shadow-sm"
               >
                 {saveMutation.isPending ? (

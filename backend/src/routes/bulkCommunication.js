@@ -5,6 +5,15 @@
 
 import express from 'express';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
+import validate from '../middleware/validation.js';
+import {
+  queueBulkSendSchema,
+  getBatchStatusSchema,
+  cancelBatchSchema,
+  getBatchesSchema,
+  previewMessageSchema,
+  getPatientsSchema,
+} from '../validators/bulkCommunication.validators.js';
 import * as bulkCommController from '../controllers/bulkCommunication.js';
 
 const router = express.Router();
@@ -18,18 +27,30 @@ router.get('/health', (req, res) => {
 });
 
 // Send bulk communications
-router.post('/send', requireRole(['ADMIN', 'PRACTITIONER']), bulkCommController.queueBulkSend);
+router.post(
+  '/send',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(queueBulkSendSchema),
+  bulkCommController.queueBulkSend
+);
 
 // Batch management
-router.get('/batches', requireRole(['ADMIN', 'PRACTITIONER']), bulkCommController.getBatches);
+router.get(
+  '/batches',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(getBatchesSchema),
+  bulkCommController.getBatches
+);
 router.get(
   '/queue/status/:batchId',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(getBatchStatusSchema),
   bulkCommController.getBatchStatus
 );
 router.post(
   '/queue/cancel/:batchId',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(cancelBatchSchema),
   bulkCommController.cancelBatch
 );
 router.get(
@@ -39,7 +60,12 @@ router.get(
 );
 
 // Preview & templates
-router.post('/preview', requireRole(['ADMIN', 'PRACTITIONER']), bulkCommController.previewMessage);
+router.post(
+  '/preview',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(previewMessageSchema),
+  bulkCommController.previewMessage
+);
 router.get(
   '/variables',
   requireRole(['ADMIN', 'PRACTITIONER']),
@@ -48,7 +74,12 @@ router.get(
 router.get('/templates', requireRole(['ADMIN', 'PRACTITIONER']), bulkCommController.getTemplates);
 
 // Patient selection
-router.get('/patients', requireRole(['ADMIN', 'PRACTITIONER']), bulkCommController.getPatients);
+router.get(
+  '/patients',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(getPatientsSchema),
+  bulkCommController.getPatients
+);
 
 // Queue processing (admin/cron)
 router.post('/process', requireRole(['ADMIN']), bulkCommController.processQueue);

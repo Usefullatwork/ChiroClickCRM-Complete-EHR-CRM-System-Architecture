@@ -8,6 +8,13 @@
 import express from 'express';
 import * as analyticsService from '../services/analytics.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
+import validate from '../middleware/validation.js';
+import {
+  dashboardSchema,
+  revenueSchema,
+  topExercisesSchema,
+  exportSchema,
+} from '../validators/analytics.validators.js';
 import logger from '../utils/logger.js';
 
 const router = express.Router();
@@ -21,8 +28,10 @@ router.use(requireOrganization);
  * @desc    Get comprehensive analytics dashboard data
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/dashboard',
+router.get(
+  '/dashboard',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(dashboardSchema),
   async (req, res) => {
     try {
       const { startDate, endDate } = req.query;
@@ -30,19 +39,19 @@ router.get('/dashboard',
 
       const data = await analyticsService.getDashboardAnalytics(organizationId, {
         startDate,
-        endDate
+        endDate,
       });
 
       res.json({
         success: true,
-        data
+        data,
       });
     } catch (error) {
       logger.error('Error fetching dashboard analytics:', error);
       res.status(500).json({
         success: false,
         message: 'Kunne ikke hente analysedata',
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -53,34 +62,32 @@ router.get('/dashboard',
  * @desc    Get patient statistics
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/patients',
-  requireRole(['ADMIN', 'PRACTITIONER']),
-  async (req, res) => {
-    try {
-      const organizationId = req.organization.id;
-      const data = await analyticsService.getPatientStats(organizationId);
+router.get('/patients', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
+  try {
+    const organizationId = req.organization.id;
+    const data = await analyticsService.getPatientStats(organizationId);
 
-      res.json({
-        success: true,
-        data
-      });
-    } catch (error) {
-      logger.error('Error fetching patient stats:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Kunne ikke hente pasientstatistikk',
-        error: error.message
-      });
-    }
+    res.json({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    logger.error('Error fetching patient stats:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Kunne ikke hente pasientstatistikk',
+      error: error.message,
+    });
   }
-);
+});
 
 /**
  * @route   GET /api/v1/analytics/appointments
  * @desc    Get appointment statistics
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.get('/appointments',
+router.get(
+  '/appointments',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   async (req, res) => {
     try {
@@ -89,14 +96,14 @@ router.get('/appointments',
 
       res.json({
         success: true,
-        data
+        data,
       });
     } catch (error) {
       logger.error('Error fetching appointment stats:', error);
       res.status(500).json({
         success: false,
         message: 'Kunne ikke hente avtalestatistikk',
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -107,8 +114,10 @@ router.get('/appointments',
  * @desc    Get revenue statistics
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/revenue',
+router.get(
+  '/revenue',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(revenueSchema),
   async (req, res) => {
     try {
       const { startDate, endDate } = req.query;
@@ -118,14 +127,14 @@ router.get('/revenue',
 
       res.json({
         success: true,
-        data
+        data,
       });
     } catch (error) {
       logger.error('Error fetching revenue stats:', error);
       res.status(500).json({
         success: false,
         message: 'Kunne ikke hente inntektsstatistikk',
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -136,8 +145,10 @@ router.get('/revenue',
  * @desc    Get most prescribed exercises
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/exercises/top',
+router.get(
+  '/exercises/top',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(topExercisesSchema),
   async (req, res) => {
     try {
       const { limit = 10 } = req.query;
@@ -147,14 +158,14 @@ router.get('/exercises/top',
 
       res.json({
         success: true,
-        data
+        data,
       });
     } catch (error) {
       logger.error('Error fetching top exercises:', error);
       res.status(500).json({
         success: false,
         message: 'Kunne ikke hente populaere ovelser',
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -165,79 +176,67 @@ router.get('/exercises/top',
  * @desc    Get exercise compliance statistics
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/exercises/compliance',
-  requireRole(['ADMIN', 'PRACTITIONER']),
-  async (req, res) => {
-    try {
-      const organizationId = req.organization.id;
-      const data = await analyticsService.getExerciseCompliance(organizationId);
+router.get('/exercises/compliance', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
+  try {
+    const organizationId = req.organization.id;
+    const data = await analyticsService.getExerciseCompliance(organizationId);
 
-      res.json({
-        success: true,
-        data
-      });
-    } catch (error) {
-      logger.error('Error fetching exercise compliance:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Kunne ikke hente etterlevelsesdata',
-        error: error.message
-      });
-    }
+    res.json({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    logger.error('Error fetching exercise compliance:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Kunne ikke hente etterlevelsesdata',
+      error: error.message,
+    });
   }
-);
+});
 
 /**
  * @route   GET /api/v1/analytics/trends/patients
  * @desc    Get patient volume trends
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/trends/patients',
-  requireRole(['ADMIN', 'PRACTITIONER']),
-  async (req, res) => {
-    try {
-      const organizationId = req.organization.id;
-      const data = await analyticsService.getPatientVolumeTrends(organizationId);
+router.get('/trends/patients', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
+  try {
+    const organizationId = req.organization.id;
+    const data = await analyticsService.getPatientVolumeTrends(organizationId);
 
-      res.json({
-        success: true,
-        data
-      });
-    } catch (error) {
-      logger.error('Error fetching patient trends:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Kunne ikke hente pasienttrender',
-        error: error.message
-      });
-    }
+    res.json({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    logger.error('Error fetching patient trends:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Kunne ikke hente pasienttrender',
+      error: error.message,
+    });
   }
-);
+});
 
 /**
  * @route   GET /api/v1/analytics/export/:type
  * @desc    Export analytics data to CSV
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/export/:type',
+router.get(
+  '/export/:type',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(exportSchema),
   async (req, res) => {
     try {
       const { type } = req.params;
       const { startDate, endDate } = req.query;
       const organizationId = req.organization.id;
 
-      const validTypes = ['patients', 'revenue', 'exercises', 'appointments', 'compliance'];
-      if (!validTypes.includes(type)) {
-        return res.status(400).json({
-          success: false,
-          message: `Ugyldig eksporttype. Gyldige typer: ${validTypes.join(', ')}`
-        });
-      }
-
       const csvContent = await analyticsService.exportAnalyticsCSV(organizationId, type, {
         startDate,
-        endDate
+        endDate,
       });
 
       const filename = `analyse-${type}-${new Date().toISOString().split('T')[0]}.csv`;
@@ -250,7 +249,7 @@ router.get('/export/:type',
       res.status(500).json({
         success: false,
         message: 'Kunne ikke eksportere data',
-        error: error.message
+        error: error.message,
       });
     }
   }

@@ -16,6 +16,12 @@ import {
   getPatientSchema,
   deletePatientSchema,
   searchPatientsSchema,
+  listPatientsSchema,
+  quickSearchPatientsSchema,
+  getPatientStatisticsSchema,
+  getLastSimilarEncounterSchema,
+  getPatientExercisesSchema,
+  patientIdParamSchema,
 } from '../validators/patient.validators.js';
 
 const router = express.Router();
@@ -49,7 +55,7 @@ router.use(requireOrganization);
  *       401:
  *         description: Unauthorized
  */
-router.get('/', patientController.getPatients);
+router.get('/', validate(listPatientsSchema), patientController.getPatients);
 
 /**
  * @swagger
@@ -69,7 +75,7 @@ router.get('/', patientController.getPatients);
  *       401:
  *         description: Unauthorized
  */
-router.get('/search', patientController.searchPatients);
+router.get('/search', validate(quickSearchPatientsSchema), patientController.searchPatients);
 
 /**
  * @route   GET /api/v1/patients/search/advanced
@@ -125,6 +131,7 @@ router.get('/:id', validate(getPatientSchema), patientController.getPatient);
 router.get(
   '/:id/statistics',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(getPatientStatisticsSchema),
   patientController.getPatientStatistics
 );
 
@@ -238,6 +245,7 @@ router.delete(
 router.get(
   '/:patientId/encounters/last-similar',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(getLastSimilarEncounterSchema),
   encounterController.getLastSimilarEncounter
 );
 
@@ -251,7 +259,11 @@ router.get(
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  * @query   status, includeCompleted, page, limit
  */
-router.get('/:patientId/exercises', exercisesController.getPatientPrescriptions);
+router.get(
+  '/:patientId/exercises',
+  validate(getPatientExercisesSchema),
+  exercisesController.getPatientPrescriptions
+);
 
 /**
  * @route   POST /api/v1/patients/:patientId/exercises
@@ -261,6 +273,7 @@ router.get('/:patientId/exercises', exercisesController.getPatientPrescriptions)
 router.post(
   '/:patientId/exercises',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(patientIdParamSchema),
   exercisesController.createPrescription
 );
 
@@ -272,6 +285,7 @@ router.post(
 router.post(
   '/:patientId/programs',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(patientIdParamSchema),
   exercisesController.createPrescription
 );
 
@@ -280,6 +294,10 @@ router.post(
  * @desc    Generate PDF handout of patient's exercise program
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.get('/:patientId/exercises/pdf', pdfController.generateExerciseHandout);
+router.get(
+  '/:patientId/exercises/pdf',
+  validate(patientIdParamSchema),
+  pdfController.generateExerciseHandout
+);
 
 export default router;

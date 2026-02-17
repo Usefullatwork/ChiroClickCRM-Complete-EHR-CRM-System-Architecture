@@ -7,6 +7,12 @@ import express from 'express';
 import multer from 'multer';
 import * as importController from '../controllers/import.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
+import validate from '../middleware/validation.js';
+import {
+  importPatientsExcelSchema,
+  parseTextSchema,
+  importPatientsFromTextSchema,
+} from '../validators/import.validators.js';
 
 const router = express.Router();
 
@@ -17,13 +23,13 @@ router.use(requireOrganization);
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB
+    fileSize: 10 * 1024 * 1024, // 10MB
   },
   fileFilter: (req, file, cb) => {
     const allowedTypes = [
       'application/vnd.ms-excel',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'text/csv'
+      'text/csv',
     ];
 
     if (allowedTypes.includes(file.mimetype)) {
@@ -31,7 +37,7 @@ const upload = multer({
     } else {
       cb(new Error('Invalid file type. Only Excel and CSV files are allowed.'));
     }
-  }
+  },
 });
 
 /**
@@ -39,9 +45,11 @@ const upload = multer({
  * @desc    Import patients from Excel file
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.post('/patients/excel',
+router.post(
+  '/patients/excel',
   requireRole(['ADMIN', 'PRACTITIONER']),
   upload.single('file'),
+  validate(importPatientsExcelSchema),
   importController.importPatientsExcel
 );
 
@@ -50,7 +58,8 @@ router.post('/patients/excel',
  * @desc    Download Excel import template
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.get('/patients/template',
+router.get(
+  '/patients/template',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   importController.downloadTemplate
 );
@@ -60,8 +69,10 @@ router.get('/patients/template',
  * @desc    Parse patient data from pasted text
  * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
  */
-router.post('/patients/parse-text',
+router.post(
+  '/patients/parse-text',
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
+  validate(parseTextSchema),
   importController.parseText
 );
 
@@ -70,8 +81,10 @@ router.post('/patients/parse-text',
  * @desc    Import patients from parsed text data
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.post('/patients/from-text',
+router.post(
+  '/patients/from-text',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(importPatientsFromTextSchema),
   importController.importPatientsFromText
 );
 

@@ -9,6 +9,16 @@ import { validateSession, getUserSessions, refreshSessionFreshness } from '../au
 import { requireLocalAuth, requireFreshSession } from '../middleware/auth.js';
 import { loginLimiter } from '../middleware/rateLimiting.js';
 import { authBruteForceLimit } from '../middleware/security.js';
+import validate from '../middleware/validation.js';
+import {
+  registerSchema,
+  loginSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  changePasswordSchema,
+  verifyEmailSchema,
+  confirmPasswordSchema,
+} from '../validators/auth.validators.js';
 import logger from '../utils/logger.js';
 
 const router = express.Router();
@@ -50,16 +60,9 @@ const router = express.Router();
  *       400:
  *         description: Validation error or registration failed
  */
-router.post('/register', loginLimiter, async (req, res) => {
+router.post('/register', loginLimiter, validate(registerSchema), async (req, res) => {
   try {
     const { email, password, firstName, lastName, organizationId, role, hprNumber } = req.body;
-
-    if (!email || !password || !firstName || !lastName || !organizationId) {
-      return res.status(400).json({
-        error: 'Validation Error',
-        message: 'Email, password, first name, last name, and organization ID are required',
-      });
-    }
 
     const result = await authService.registerUser({
       email,
@@ -121,42 +124,41 @@ router.post('/register', loginLimiter, async (req, res) => {
  *       401:
  *         description: Invalid credentials
  */
-router.post('/login', loginLimiter, authBruteForceLimit, async (req, res) => {
-  try {
-    const { email, password } = req.body;
+router.post(
+  '/login',
+  loginLimiter,
+  authBruteForceLimit,
+  validate(loginSchema),
+  async (req, res) => {
+    try {
+      const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({
-        error: 'Validation Error',
-        message: 'Email and password are required',
+      const result = await authService.loginWithPassword(email, password, {
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+      });
+
+      // Set session cookie
+      res.cookie('session', result.session.sessionId, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        expires: result.session.expiresAt,
+      });
+
+      res.json({
+        message: 'Login successful',
+        user: result.user,
+      });
+    } catch (error) {
+      logger.error('Login error:', error);
+      res.status(401).json({
+        error: 'Authentication Failed',
+        message: error.message,
       });
     }
-
-    const result = await authService.loginWithPassword(email, password, {
-      ipAddress: req.ip,
-      userAgent: req.headers['user-agent'],
-    });
-
-    // Set session cookie
-    res.cookie('session', result.session.sessionId, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      expires: result.session.expiresAt,
-    });
-
-    res.json({
-      message: 'Login successful',
-      user: result.user,
-    });
-  } catch (error) {
-    logger.error('Login error:', error);
-    res.status(401).json({
-      error: 'Authentication Failed',
-      message: error.message,
-    });
   }
-});
+);
 
 /**
  * @swagger
@@ -266,16 +268,9 @@ router.get('/sessions', requireLocalAuth, async (req, res) => {
  * POST /auth/forgot-password
  * Request password reset
  */
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', validate(forgotPasswordSchema), async (req, res) => {
   try {
     const { email } = req.body;
-
-    if (!email) {
-      return res.status(400).json({
-        error: 'Validation Error',
-        message: 'Email is required',
-      });
-    }
 
     const result = await authService.requestPasswordReset(email);
 
@@ -300,16 +295,9 @@ router.post('/forgot-password', async (req, res) => {
  * POST /auth/reset-password
  * Reset password with token
  */
-router.post('/reset-password', async (req, res) => {
+router.post('/reset-password', validate(resetPasswordSchema), async (req, res) => {
   try {
     const { token, password } = req.body;
-
-    if (!token || !password) {
-      return res.status(400).json({
-        error: 'Validation Error',
-        message: 'Token and new password are required',
-      });
-    }
 
     await authService.resetPassword(token, password);
 
@@ -329,43 +317,35 @@ router.post('/reset-password', async (req, res) => {
  * POST /auth/change-password
  * Change password (authenticated, requires fresh session)
  */
-router.post('/change-password', requireLocalAuth, requireFreshSession, async (req, res) => {
-  try {
-    const { currentPassword, newPassword } = req.body;
+router.post(
+  '/change-password',
+  requireLocalAuth,
+  requireFreshSession,
+  validate(changePasswordSchema),
+  async (req, res) => {
+    try {
+      const { currentPassword, newPassword } = req.body;
 
-    if (!currentPassword || !newPassword) {
-      return res.status(400).json({
-        error: 'Validation Error',
-        message: 'Current password and new password are required',
+      await authService.changePassword(req.user.id, currentPassword, newPassword);
+
+      res.json({ message: 'Password changed successfully' });
+    } catch (error) {
+      logger.error('Password change error:', error);
+      res.status(400).json({
+        error: 'Change Failed',
+        message: error.message,
       });
     }
-
-    await authService.changePassword(req.user.id, currentPassword, newPassword);
-
-    res.json({ message: 'Password changed successfully' });
-  } catch (error) {
-    logger.error('Password change error:', error);
-    res.status(400).json({
-      error: 'Change Failed',
-      message: error.message,
-    });
   }
-});
+);
 
 /**
  * POST /auth/verify-email
  * Verify email address
  */
-router.post('/verify-email', async (req, res) => {
+router.post('/verify-email', validate(verifyEmailSchema), async (req, res) => {
   try {
     const { token } = req.body;
-
-    if (!token) {
-      return res.status(400).json({
-        error: 'Validation Error',
-        message: 'Verification token is required',
-      });
-    }
 
     await authService.verifyEmail(token);
 
@@ -405,31 +385,29 @@ router.post('/resend-verification', requireLocalAuth, async (req, res) => {
  * POST /auth/confirm-password
  * Confirm password to make session "fresh" for sensitive operations
  */
-router.post('/confirm-password', requireLocalAuth, async (req, res) => {
-  try {
-    const { password } = req.body;
+router.post(
+  '/confirm-password',
+  requireLocalAuth,
+  validate(confirmPasswordSchema),
+  async (req, res) => {
+    try {
+      const { password } = req.body;
 
-    if (!password) {
-      return res.status(400).json({
-        error: 'Validation Error',
-        message: 'Password is required',
+      // Verify password by attempting login
+      await authService.loginWithPassword(req.user.email, password, {});
+
+      // Refresh session freshness
+      await refreshSessionFreshness(req.cookies?.session);
+
+      res.json({ message: 'Password confirmed, session is now fresh' });
+    } catch (error) {
+      logger.error('Password confirmation error:', error);
+      res.status(401).json({
+        error: 'Confirmation Failed',
+        message: 'Incorrect password',
       });
     }
-
-    // Verify password by attempting login
-    await authService.loginWithPassword(req.user.email, password, {});
-
-    // Refresh session freshness
-    await refreshSessionFreshness(req.cookies?.session);
-
-    res.json({ message: 'Password confirmed, session is now fresh' });
-  } catch (error) {
-    logger.error('Password confirmation error:', error);
-    res.status(401).json({
-      error: 'Confirmation Failed',
-      message: 'Incorrect password',
-    });
   }
-});
+);
 
 export default router;

@@ -7,6 +7,14 @@
 import express from 'express';
 import * as kioskController from '../controllers/kiosk.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
+import validate from '../middleware/validation.js';
+import {
+  checkInSchema,
+  getIntakeFormSchema,
+  submitIntakeFormSchema,
+  submitConsentSchema,
+  getQueueSchema,
+} from '../validators/kiosk.validators.js';
 
 const router = express.Router();
 
@@ -32,6 +40,7 @@ router.use(requireOrganization);
 router.post(
   '/check-in',
   requireRole(['ADMIN', 'PRACTITIONER', 'RECEPTIONIST']),
+  validate(checkInSchema),
   kioskController.checkIn
 );
 
@@ -44,6 +53,7 @@ router.post(
 router.get(
   '/intake/:patientId',
   requireRole(['ADMIN', 'PRACTITIONER', 'RECEPTIONIST']),
+  validate(getIntakeFormSchema),
   kioskController.getIntakeForm
 );
 
@@ -56,6 +66,7 @@ router.get(
 router.post(
   '/intake/:patientId',
   requireRole(['ADMIN', 'PRACTITIONER', 'RECEPTIONIST']),
+  validate(submitIntakeFormSchema),
   kioskController.submitIntakeForm
 );
 
@@ -68,6 +79,7 @@ router.post(
 router.post(
   '/consent/:patientId',
   requireRole(['ADMIN', 'PRACTITIONER', 'RECEPTIONIST']),
+  validate(submitConsentSchema),
   kioskController.submitConsent
 );
 
@@ -77,6 +89,11 @@ router.post(
  * @access  Private (ADMIN, PRACTITIONER)
  * @query   practitionerId - optional, defaults to authenticated user
  */
-router.get('/queue', requireRole(['ADMIN', 'PRACTITIONER']), kioskController.getQueue);
+router.get(
+  '/queue',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(getQueueSchema),
+  kioskController.getQueue
+);
 
 export default router;

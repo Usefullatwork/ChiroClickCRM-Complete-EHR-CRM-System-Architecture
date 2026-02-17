@@ -118,7 +118,7 @@ export default function PatientDetail() {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 data-testid="patient-detail-name" className="text-3xl font-bold text-gray-900">
               {patient.first_name} {patient.last_name}
             </h1>
             <p className="text-gray-600">
@@ -182,11 +182,11 @@ export default function PatientDetail() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div data-testid="patient-detail-tabs" className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Patient Info */}
-        <div className="lg:col-span-2 space-y-6">
+        <div data-testid="patient-detail-panel" className="lg:col-span-2 space-y-6">
           {/* Contact Information */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div data-testid="patient-detail-tab-contact" className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold mb-4">{t('contactInfo')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-start gap-3">
@@ -290,7 +290,7 @@ export default function PatientDetail() {
           </div>
 
           {/* Clinical Information */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div data-testid="patient-detail-tab-clinical" className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold mb-4">{t('clinical')}</h2>
             <div className="space-y-4">
               <div>
@@ -637,7 +637,7 @@ export default function PatientDetail() {
           </div>
 
           {/* Recent Encounters */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div data-testid="patient-detail-tab-visits" className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold mb-4">Recent Visits</h2>
             {encounters.length === 0 ? (
               <p className="text-gray-600">No visits recorded</p>

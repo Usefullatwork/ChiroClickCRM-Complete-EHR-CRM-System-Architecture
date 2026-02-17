@@ -23,38 +23,44 @@ const PHONE_VALIDATION_MODE = process.env.PHONE_VALIDATION_MODE || 'strict';
  * Norwegian (+47, 8 digits) is the default
  * Supports validation modes: 'strict', 'lenient', 'format-only'
  */
-const phoneSchema = Joi.string().max(20).custom((value, helpers) => {
-  if (!value) return value; // Allow empty/null
+const phoneSchema = Joi.string()
+  .max(20)
+  .custom((value, helpers) => {
+    if (!value) return value; // Allow empty/null
 
-  const result = validatePhoneWithOptions(value, { mode: PHONE_VALIDATION_MODE });
+    const result = validatePhoneWithOptions(value, { mode: PHONE_VALIDATION_MODE });
 
-  if (!result.valid) {
-    return helpers.error('phone.invalid', { message: result.error });
-  }
+    if (!result.valid) {
+      return helpers.error('phone.invalid', { message: result.error });
+    }
 
-  // Return the formatted E.164 number for storage
-  return result.fullNumber;
-}, 'Phone number validation').messages({
-  'phone.invalid': '{{#message}}'
-});
+    // Return the formatted E.164 number for storage
+    return result.fullNumber;
+  }, 'Phone number validation')
+  .messages({
+    'phone.invalid': '{{#message}}',
+  });
 
 /**
  * Custom fødselsnummer validation (11 digits with Modulus 11 checksum)
  */
-const fodselsnummerSchema = Joi.string().length(11).custom((value, helpers) => {
-  if (!value) return value;
+const fodselsnummerSchema = Joi.string()
+  .length(11)
+  .custom((value, helpers) => {
+    if (!value) return value;
 
-  // Remove spaces/dashes
-  const cleaned = value.replace(/[\s-]/g, '');
+    // Remove spaces/dashes
+    const cleaned = value.replace(/[\s-]/g, '');
 
-  if (!validateFodselsnummer(cleaned)) {
-    return helpers.error('fnr.invalid');
-  }
+    if (!validateFodselsnummer(cleaned)) {
+      return helpers.error('fnr.invalid');
+    }
 
-  return cleaned;
-}, 'Fødselsnummer validation').messages({
-  'fnr.invalid': 'Invalid fødselsnummer (must be 11 digits with valid checksum)'
-});
+    return cleaned;
+  }, 'Fødselsnummer validation')
+  .messages({
+    'fnr.invalid': 'Invalid fødselsnummer (must be 11 digits with valid checksum)',
+  });
 
 /**
  * Create patient validation
@@ -73,7 +79,7 @@ export const createPatientSchema = {
     emergency_contact: Joi.object({
       name: Joi.string().max(200),
       phone: phoneSchema, // Also validate emergency contact phone
-      relationship: Joi.string().max(100)
+      relationship: Joi.string().max(100),
     }),
     red_flags: Joi.array().items(Joi.string()),
     contraindications: Joi.array().items(Joi.string()),
@@ -93,8 +99,8 @@ export const createPatientSchema = {
     consent_marketing: Joi.boolean().default(false),
     preferred_contact_method: Joi.string().valid('SMS', 'EMAIL', 'PHONE'),
     preferred_therapist_id: uuidSchema,
-    internal_notes: Joi.string()
-  })
+    internal_notes: Joi.string(),
+  }),
 };
 
 /**
@@ -102,7 +108,7 @@ export const createPatientSchema = {
  */
 export const updatePatientSchema = {
   params: Joi.object({
-    id: uuidSchema.required()
+    id: uuidSchema.required(),
   }),
   body: Joi.object({
     first_name: Joi.string().max(100),
@@ -115,7 +121,7 @@ export const updatePatientSchema = {
     emergency_contact: Joi.object({
       name: Joi.string().max(200),
       phone: phoneSchema,
-      relationship: Joi.string().max(100)
+      relationship: Joi.string().max(100),
     }),
     red_flags: Joi.array().items(Joi.string()),
     contraindications: Joi.array().items(Joi.string()),
@@ -138,8 +144,8 @@ export const updatePatientSchema = {
     should_be_followed_up: dateSchema,
     main_problem: Joi.string(),
     needs_feedback: Joi.boolean(),
-    internal_notes: Joi.string()
-  }).min(1) // At least one field must be present
+    internal_notes: Joi.string(),
+  }).min(1), // At least one field must be present
 };
 
 /**
@@ -147,8 +153,8 @@ export const updatePatientSchema = {
  */
 export const getPatientSchema = {
   params: Joi.object({
-    id: uuidSchema.required()
-  })
+    id: uuidSchema.required(),
+  }),
 };
 
 /**
@@ -156,8 +162,8 @@ export const getPatientSchema = {
  */
 export const deletePatientSchema = {
   params: Joi.object({
-    id: uuidSchema.required()
-  })
+    id: uuidSchema.required(),
+  }),
 };
 
 /**
@@ -201,13 +207,92 @@ export const searchPatientsSchema = {
     followup_before: dateSchema, // Follow-up due before this date
 
     // Sorting
-    sort_by: Joi.string().valid('name', 'date_of_birth', 'last_visit', 'created_at', 'first_name', 'last_name').default('last_name'),
+    sort_by: Joi.string()
+      .valid('name', 'date_of_birth', 'last_visit', 'created_at', 'first_name', 'last_name')
+      .default('last_name'),
     sort_order: Joi.string().valid('asc', 'desc').default('asc'),
 
     // Pagination
     page: Joi.number().integer().min(1).default(1),
-    limit: Joi.number().integer().min(1).max(100).default(20)
-  })
+    limit: Joi.number().integer().min(1).max(100).default(20),
+  }),
+};
+
+/**
+ * List patients validation
+ */
+export const listPatientsSchema = {
+  query: Joi.object({
+    page: Joi.number().integer().min(1).default(1),
+    limit: Joi.number().integer().min(1).max(100).default(20),
+    status: Joi.string().valid('ACTIVE', 'INACTIVE', 'FINISHED', 'DECEASED'),
+    search: Joi.string().max(200),
+    sort_by: Joi.string().valid(
+      'name',
+      'date_of_birth',
+      'last_visit',
+      'created_at',
+      'first_name',
+      'last_name'
+    ),
+    sort_order: Joi.string().valid('asc', 'desc'),
+  }),
+};
+
+/**
+ * Quick search patients validation
+ */
+export const quickSearchPatientsSchema = {
+  query: Joi.object({
+    q: Joi.string().min(1).max(200),
+  }),
+};
+
+/**
+ * Get patient statistics validation
+ */
+export const getPatientStatisticsSchema = {
+  params: Joi.object({
+    id: uuidSchema.required(),
+  }),
+};
+
+/**
+ * Get last similar encounter (SALT) validation
+ */
+export const getLastSimilarEncounterSchema = {
+  params: Joi.object({
+    patientId: uuidSchema.required(),
+  }),
+  query: Joi.object({
+    chiefComplaint: Joi.string(),
+    excludeId: uuidSchema,
+    maxAgeDays: Joi.number().integer().min(1).max(3650),
+  }),
+};
+
+/**
+ * Patient exercise routes validation
+ */
+export const patientIdParamSchema = {
+  params: Joi.object({
+    patientId: uuidSchema.required(),
+  }),
+};
+
+/**
+ * Get patient exercises validation
+ */
+export const getPatientExercisesSchema = {
+  params: Joi.object({
+    patientId: uuidSchema.required(),
+  }),
+  query: Joi.object({
+    status: Joi.string(),
+    includeCompleted: Joi.string().valid('true', 'false'),
+    page: Joi.number().integer().min(1),
+    limit: Joi.number().integer().min(1).max(100),
+  }),
 };
 
 /**
@@ -245,6 +330,6 @@ export const crossValidatePatientIdentity = (patientData) => {
   return {
     valid: errors.length === 0,
     errors,
-    warnings
+    warnings,
   };
 };

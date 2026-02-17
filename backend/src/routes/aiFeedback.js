@@ -6,6 +6,15 @@
 import express from 'express';
 import * as aiFeedbackController from '../controllers/aiFeedback.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
+import validate from '../middleware/validation.js';
+import {
+  submitFeedbackSchema,
+  getMyFeedbackSchema,
+  getPerformanceSchema,
+  getSuggestionsReviewSchema,
+  rollbackModelSchema,
+  exportFeedbackSchema,
+} from '../validators/aiFeedback.validators.js';
 
 const router = express.Router();
 
@@ -21,14 +30,14 @@ router.use(requireOrganization);
  * @desc    Submit feedback on an AI suggestion
  * @access  Private (All authenticated users)
  */
-router.post('/feedback', aiFeedbackController.submitFeedback);
+router.post('/feedback', validate(submitFeedbackSchema), aiFeedbackController.submitFeedback);
 
 /**
  * @route   GET /api/v1/ai/feedback/me
  * @desc    Get current user's feedback history
  * @access  Private (All authenticated users)
  */
-router.get('/feedback/me', aiFeedbackController.getMyFeedback);
+router.get('/feedback/me', validate(getMyFeedbackSchema), aiFeedbackController.getMyFeedback);
 
 /**
  * @route   GET /api/v1/ai/feedback/me/stats
@@ -46,8 +55,10 @@ router.get('/feedback/me/stats', aiFeedbackController.getMyStats);
  * @desc    Get overall AI performance metrics
  * @access  Private (ADMIN only)
  */
-router.get('/performance',
+router.get(
+  '/performance',
   requireRole(['ADMIN']),
+  validate(getPerformanceSchema),
   aiFeedbackController.getPerformanceMetrics
 );
 
@@ -56,8 +67,10 @@ router.get('/performance',
  * @desc    Get suggestions that need human review
  * @access  Private (ADMIN only)
  */
-router.get('/suggestions/review',
+router.get(
+  '/suggestions/review',
   requireRole(['ADMIN']),
+  validate(getSuggestionsReviewSchema),
   aiFeedbackController.getSuggestionsNeedingReview
 );
 
@@ -66,7 +79,8 @@ router.get('/suggestions/review',
  * @desc    Get common correction patterns
  * @access  Private (ADMIN only)
  */
-router.get('/corrections/common',
+router.get(
+  '/corrections/common',
   requireRole(['ADMIN']),
   aiFeedbackController.getCommonCorrections
 );
@@ -80,27 +94,22 @@ router.get('/corrections/common',
  * @desc    Manually trigger AI model retraining
  * @access  Private (ADMIN only)
  */
-router.post('/retraining/trigger',
-  requireRole(['ADMIN']),
-  aiFeedbackController.triggerRetraining
-);
+router.post('/retraining/trigger', requireRole(['ADMIN']), aiFeedbackController.triggerRetraining);
 
 /**
  * @route   GET /api/v1/ai/retraining/status
  * @desc    Get current retraining status
  * @access  Private (ADMIN only)
  */
-router.get('/retraining/status',
-  requireRole(['ADMIN']),
-  aiFeedbackController.getRetrainingStatus
-);
+router.get('/retraining/status', requireRole(['ADMIN']), aiFeedbackController.getRetrainingStatus);
 
 /**
  * @route   GET /api/v1/ai/retraining/history
  * @desc    Get retraining history
  * @access  Private (ADMIN only)
  */
-router.get('/retraining/history',
+router.get(
+  '/retraining/history',
   requireRole(['ADMIN']),
   aiFeedbackController.getRetrainingHistory
 );
@@ -110,8 +119,10 @@ router.get('/retraining/history',
  * @desc    Rollback to a previous model version
  * @access  Private (ADMIN only)
  */
-router.post('/model/rollback/:versionId',
+router.post(
+  '/model/rollback/:versionId',
   requireRole(['ADMIN']),
+  validate(rollbackModelSchema),
   aiFeedbackController.rollbackModel
 );
 
@@ -124,8 +135,10 @@ router.post('/model/rollback/:versionId',
  * @desc    Export feedback data for training
  * @access  Private (ADMIN only)
  */
-router.get('/feedback/export',
+router.get(
+  '/feedback/export',
   requireRole(['ADMIN']),
+  validate(exportFeedbackSchema),
   aiFeedbackController.exportFeedback
 );
 

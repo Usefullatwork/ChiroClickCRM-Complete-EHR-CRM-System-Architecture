@@ -6,6 +6,17 @@ import express from 'express';
 import * as outcomeController from '../controllers/outcomes.js';
 import * as questionnaireController from '../controllers/outcomeQuestionnaires.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
+import validate from '../middleware/validation.js';
+import {
+  getPatientOutcomeSummarySchema,
+  getPatientLongitudinalSchema,
+  predictOutcomeSchema,
+  getDiagnosisOutcomeSchema,
+  submitQuestionnaireSchema,
+  getPatientQuestionnairesSchema,
+  getQuestionnaireByIdSchema,
+  deleteQuestionnaireSchema,
+} from '../validators/outcomes.validators.js';
 
 const router = express.Router();
 
@@ -20,6 +31,7 @@ router.use(requireOrganization);
 router.get(
   '/patient/:patientId/summary',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(getPatientOutcomeSummarySchema),
   outcomeController.getPatientOutcomeSummary
 );
 
@@ -31,6 +43,7 @@ router.get(
 router.get(
   '/patient/:patientId/longitudinal',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(getPatientLongitudinalSchema),
   outcomeController.getPatientLongitudinalData
 );
 
@@ -42,6 +55,7 @@ router.get(
 router.post(
   '/patient/:patientId/predict',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(predictOutcomeSchema),
   outcomeController.predictTreatmentOutcome
 );
 
@@ -53,6 +67,7 @@ router.post(
 router.get(
   '/diagnosis/:icpcCode',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(getDiagnosisOutcomeSchema),
   outcomeController.getDiagnosisOutcomeStats
 );
 
@@ -90,6 +105,7 @@ router.get(
 router.post(
   '/questionnaires',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(submitQuestionnaireSchema),
   questionnaireController.submitQuestionnaire
 );
 
@@ -101,6 +117,7 @@ router.post(
 router.get(
   '/questionnaires/patient/:patientId/trend',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(getPatientQuestionnairesSchema),
   questionnaireController.getPatientTrend
 );
 
@@ -112,6 +129,7 @@ router.get(
 router.get(
   '/questionnaires/patient/:patientId',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(getPatientQuestionnairesSchema),
   questionnaireController.getPatientQuestionnaires
 );
 
@@ -123,6 +141,7 @@ router.get(
 router.get(
   '/questionnaires/:id',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(getQuestionnaireByIdSchema),
   questionnaireController.getQuestionnaireById
 );
 
@@ -134,6 +153,7 @@ router.get(
 router.delete(
   '/questionnaires/:id',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(deleteQuestionnaireSchema),
   questionnaireController.deleteQuestionnaire
 );
 

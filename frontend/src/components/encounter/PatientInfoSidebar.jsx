@@ -52,7 +52,10 @@ export function PatientInfoSidebar({
                 {patientInitials}
               </div>
               <div>
-                <h2 className="font-semibold text-lg text-slate-800">
+                <h2
+                  data-testid="encounter-patient-name"
+                  className="font-semibold text-lg text-slate-800"
+                >
                   {patientData?.first_name} {patientData?.last_name}
                 </h2>
                 <p className="text-sm text-slate-500">

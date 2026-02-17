@@ -5,6 +5,16 @@
 import express from 'express';
 import * as vestibularController from '../controllers/vestibular.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
+import validate from '../middleware/validation.js';
+import {
+  createAssessmentSchema,
+  getAssessmentSchema,
+  getPatientAssessmentsSchema,
+  getEncounterAssessmentSchema,
+  updateAssessmentSchema,
+  deleteAssessmentSchema,
+  getBPPVTrendsSchema,
+} from '../validators/vestibular.validators.js';
 
 const router = express.Router();
 
@@ -16,8 +26,10 @@ router.use(requireOrganization);
  * @desc    Create new vestibular assessment
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.post('/',
+router.post(
+  '/',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(createAssessmentSchema),
   vestibularController.createAssessment
 );
 
@@ -26,8 +38,10 @@ router.post('/',
  * @desc    Get assessment by ID
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/:id',
+router.get(
+  '/:id',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(getAssessmentSchema),
   vestibularController.getAssessment
 );
 
@@ -36,8 +50,10 @@ router.get('/:id',
  * @desc    Get all assessments for a patient
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/patient/:patientId',
+router.get(
+  '/patient/:patientId',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(getPatientAssessmentsSchema),
   vestibularController.getPatientAssessments
 );
 
@@ -46,8 +62,10 @@ router.get('/patient/:patientId',
  * @desc    Get assessment by encounter ID
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/encounter/:encounterId',
+router.get(
+  '/encounter/:encounterId',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(getEncounterAssessmentSchema),
   vestibularController.getEncounterAssessment
 );
 
@@ -56,8 +74,10 @@ router.get('/encounter/:encounterId',
  * @desc    Update assessment
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.patch('/:id',
+router.patch(
+  '/:id',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(updateAssessmentSchema),
   vestibularController.updateAssessment
 );
 
@@ -66,8 +86,10 @@ router.patch('/:id',
  * @desc    Delete assessment
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.delete('/:id',
+router.delete(
+  '/:id',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(deleteAssessmentSchema),
   vestibularController.deleteAssessment
 );
 
@@ -76,8 +98,10 @@ router.delete('/:id',
  * @desc    Get BPPV trends for patient
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/patient/:patientId/bppv-trends',
+router.get(
+  '/patient/:patientId/bppv-trends',
   requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(getBPPVTrendsSchema),
   vestibularController.getBPPVTrends
 );
 
@@ -86,7 +110,8 @@ router.get('/patient/:patientId/bppv-trends',
  * @desc    Get common diagnoses statistics
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/stats/diagnoses',
+router.get(
+  '/stats/diagnoses',
   requireRole(['ADMIN', 'PRACTITIONER']),
   vestibularController.getCommonDiagnoses
 );
@@ -96,7 +121,8 @@ router.get('/stats/diagnoses',
  * @desc    Get treatment efficacy statistics
  * @access  Private (ADMIN, PRACTITIONER)
  */
-router.get('/stats/efficacy',
+router.get(
+  '/stats/efficacy',
   requireRole(['ADMIN', 'PRACTITIONER']),
   vestibularController.getTreatmentEfficacy
 );

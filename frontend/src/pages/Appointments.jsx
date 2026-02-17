@@ -3,82 +3,76 @@
  * Manage patient appointments and scheduling
  */
 
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
-import {
-  Calendar,
-  Plus,
-  Clock,
-  User,
-  CheckCircle,
-  XCircle
-} from 'lucide-react'
-import { appointmentsAPI } from '../services/api'
-import { useTranslation, formatDate, formatTime } from '../i18n'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { Calendar, Plus, Clock, User, CheckCircle, XCircle } from 'lucide-react';
+import { appointmentsAPI } from '../services/api';
+import { useTranslation, formatDate, formatTime } from '../i18n';
 
 export default function Appointments() {
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
-  const { t, lang } = useTranslation('appointments')
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
-  const [statusFilter, setStatusFilter] = useState('')
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { t, lang } = useTranslation('appointments');
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [statusFilter, setStatusFilter] = useState('');
 
   // Fetch appointments
   const { data: appointmentsResponse, isLoading } = useQuery({
     queryKey: ['appointments', selectedDate, statusFilter],
-    queryFn: () => appointmentsAPI.getAll({
-      date: selectedDate,
-      status: statusFilter
-    })
-  })
+    queryFn: () =>
+      appointmentsAPI.getAll({
+        date: selectedDate,
+        status: statusFilter,
+      }),
+  });
 
-  const appointments = appointmentsResponse?.data?.appointments || []
+  const appointments = appointmentsResponse?.data?.appointments || [];
 
   // Cancel appointment mutation
   const cancelMutation = useMutation({
     mutationFn: ({ id, reason }) => appointmentsAPI.cancel(id, reason),
     onSuccess: () => {
-      queryClient.invalidateQueries(['appointments'])
-    }
-  })
+      queryClient.invalidateQueries(['appointments']);
+    },
+  });
 
   // Confirm appointment mutation
   const confirmMutation = useMutation({
     mutationFn: (id) => appointmentsAPI.confirm(id),
     onSuccess: () => {
-      queryClient.invalidateQueries(['appointments'])
-    }
-  })
+      queryClient.invalidateQueries(['appointments']);
+    },
+  });
 
   const handleCancel = (appointment) => {
-    if (!confirm(t('cancelConfirmPrompt').replace('{name}', appointment.patient_name))) return
-    const reason = prompt(t('cancellationReasonPrompt'))
+    if (!confirm(t('cancelConfirmPrompt').replace('{name}', appointment.patient_name))) return;
+    const reason = prompt(t('cancellationReasonPrompt'));
     if (reason) {
-      cancelMutation.mutate({ id: appointment.id, reason })
+      cancelMutation.mutate({ id: appointment.id, reason });
     }
-  }
+  };
 
   const handleConfirm = (appointment) => {
-    confirmMutation.mutate(appointment.id)
-  }
+    confirmMutation.mutate(appointment.id);
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
       case 'CONFIRMED':
-        return 'bg-green-100 text-green-800'
+        return 'bg-green-100 text-green-800';
       case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800'
+        return 'bg-yellow-100 text-yellow-800';
       case 'COMPLETED':
-        return 'bg-blue-100 text-blue-800'
+        return 'bg-blue-100 text-blue-800';
       case 'CANCELLED':
-        return 'bg-red-100 text-red-800'
+        return 'bg-red-100 text-red-800';
       case 'NO_SHOW':
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 text-gray-800';
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 text-gray-800';
     }
-  }
+  };
 
   return (
     <div className="p-6">
@@ -86,9 +80,14 @@ export default function Appointments() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
-          <p className="text-gray-600 mt-1">{t('appointmentsOnDate').replace('{count}', appointments.length).replace('{date}', formatDate(selectedDate, lang))}</p>
+          <p className="text-gray-600 mt-1">
+            {t('appointmentsOnDate')
+              .replace('{count}', appointments.length)
+              .replace('{date}', formatDate(selectedDate, lang))}
+          </p>
         </div>
         <button
+          data-testid="appointments-new-button"
           onClick={() => navigate('/appointments/new')}
           className="flex items-center gap-2 px-4 py-2 text-white bg-teal-600 rounded-lg hover:bg-teal-700"
         >
@@ -103,6 +102,7 @@ export default function Appointments() {
           <label className="block text-sm font-medium text-gray-700 mb-2">{t('date')}</label>
           <input
             type="date"
+            data-testid="appointments-date-filter"
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -137,11 +137,12 @@ export default function Appointments() {
           <p className="text-gray-500 mt-2">{t('tryDifferentFilter')}</p>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div data-testid="appointments-list" className="bg-white rounded-lg shadow overflow-hidden">
           <div className="divide-y divide-gray-200">
             {appointments.map((appointment) => (
               <div
                 key={appointment.id}
+                data-testid="appointment-row"
                 className="p-6 hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center justify-between">
@@ -159,7 +160,8 @@ export default function Appointments() {
                         <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
                           <div className="flex items-center gap-1">
                             <Clock className="w-4 h-4" />
-                            {formatTime(appointment.start_time, lang)} - {formatTime(appointment.end_time, lang)}
+                            {formatTime(appointment.start_time, lang)} -{' '}
+                            {formatTime(appointment.end_time, lang)}
                           </div>
                           <div className="flex items-center gap-1">
                             <User className="w-4 h-4" />
@@ -174,7 +176,9 @@ export default function Appointments() {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(appointment.status)}`}>
+                    <span
+                      className={`px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(appointment.status)}`}
+                    >
                       {appointment.status}
                     </span>
 
@@ -214,5 +218,5 @@ export default function Appointments() {
         </div>
       )}
     </div>
-  )
+  );
 }

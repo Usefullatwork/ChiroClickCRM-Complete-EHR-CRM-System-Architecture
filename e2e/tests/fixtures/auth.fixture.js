@@ -1,86 +1,58 @@
 /**
  * Authentication Fixtures for E2E Tests
- * Provides authenticated user contexts
+ * Provides authenticated user contexts via real backend login
  */
 
 import { test as base, expect } from '@playwright/test';
 
+const API_BASE = process.env.PLAYWRIGHT_API_URL || 'http://localhost:3000';
+const APP_BASE = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173';
+
+/**
+ * Perform real login via backend API and set the session cookie
+ * on the page's browser context.
+ */
+async function loginViaAPI(page, email, password) {
+  // POST to real backend login endpoint
+  const response = await page.request.post(`${API_BASE}/api/v1/auth/login`, {
+    data: { email, password },
+  });
+
+  if (!response.ok()) {
+    const body = await response.text();
+    throw new Error(`Login failed (${response.status()}): ${body}`);
+  }
+
+  const data = await response.json();
+
+  // The backend sets an httpOnly 'session' cookie in the response.
+  // Playwright's page.request automatically handles cookies for the context.
+  // Navigate to the app so the cookie is sent on subsequent requests.
+  await page.goto(APP_BASE);
+
+  // Wait for the app to recognize auth and render the dashboard
+  await page.waitForLoadState('networkidle');
+
+  return data;
+}
+
 // Extend base test with authentication fixtures
 export const test = base.extend({
-  // Authenticated page context
+  // Authenticated page context (admin user)
   authenticatedPage: async ({ page }, use) => {
-    // Navigate to login
-    await page.goto('/login');
-
-    // Check if already authenticated (session cookie)
-    const isAuthenticated = await page.evaluate(() => {
-      return !!sessionStorage.getItem('auth_token');
-    }).catch(() => false);
-
-    if (!isAuthenticated) {
-      // Mock authentication for testing
-      await page.evaluate(() => {
-        // Set mock auth token
-        sessionStorage.setItem('auth_token', 'test-token-' + Date.now());
-        sessionStorage.setItem('auth_expiry', (Date.now() + 3600000).toString());
-        sessionStorage.setItem('user', JSON.stringify({
-          id: 'test-user-id',
-          email: 'test@chiroclickcrm.no',
-          firstName: 'Test',
-          lastName: 'User',
-          role: 'ADMIN',
-          organizationId: 'test-org-id',
-        }));
-      });
-    }
-
-    // Wait for auth to be recognized
-    await page.waitForTimeout(500);
-
+    await loginViaAPI(page, 'admin@chiroclickcrm.no', 'admin123');
     await use(page);
   },
 
   // Admin user context
   adminPage: async ({ page }, use) => {
-    await page.goto('/');
-
-    await page.evaluate(() => {
-      sessionStorage.setItem('auth_token', 'admin-test-token-' + Date.now());
-      sessionStorage.setItem('auth_expiry', (Date.now() + 3600000).toString());
-      sessionStorage.setItem('user', JSON.stringify({
-        id: 'admin-user-id',
-        email: 'admin@chiroclickcrm.no',
-        firstName: 'Admin',
-        lastName: 'User',
-        role: 'ADMIN',
-        organizationId: 'test-org-id',
-        permissions: ['read:all', 'write:all', 'delete:all', 'admin:all'],
-      }));
-    });
-
-    await page.waitForTimeout(500);
+    await loginViaAPI(page, 'admin@chiroclickcrm.no', 'admin123');
     await use(page);
   },
 
   // Practitioner user context
   practitionerPage: async ({ page }, use) => {
-    await page.goto('/');
-
-    await page.evaluate(() => {
-      sessionStorage.setItem('auth_token', 'practitioner-test-token-' + Date.now());
-      sessionStorage.setItem('auth_expiry', (Date.now() + 3600000).toString());
-      sessionStorage.setItem('user', JSON.stringify({
-        id: 'practitioner-user-id',
-        email: 'practitioner@chiroclickcrm.no',
-        firstName: 'Dr.',
-        lastName: 'Practitioner',
-        role: 'PRACTITIONER',
-        organizationId: 'test-org-id',
-        permissions: ['read:patients', 'write:encounters', 'read:appointments'],
-      }));
-    });
-
-    await page.waitForTimeout(500);
+    await loginViaAPI(page, 'kiropraktor@chiroclickcrm.no', 'admin123');
     await use(page);
   },
 });

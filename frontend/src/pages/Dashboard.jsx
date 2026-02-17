@@ -162,7 +162,12 @@ export default function Dashboard() {
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">{t('title')}</h1>
+        <h1
+          data-testid="dashboard-title"
+          className="text-2xl font-semibold text-gray-900 dark:text-white"
+        >
+          {t('title')}
+        </h1>
         <p className="text-sm text-gray-500 dark:text-gray-200 mt-1">
           {formatDateWithWeekday(new Date(), lang)}
         </p>
@@ -178,6 +183,7 @@ export default function Dashboard() {
             return (
               <div
                 key={stat.label}
+                data-testid="dashboard-stat-card"
                 className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5"
               >
                 <div className="flex items-center justify-between">
@@ -202,7 +208,10 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Today's Schedule */}
         <div className="lg:col-span-2">
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+          <div
+            data-testid="dashboard-chart"
+            className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+          >
             <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {t('todaysSchedule')}
@@ -321,7 +330,10 @@ export default function Dashboard() {
           </div>
 
           {/* Pending Follow-ups */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 mt-6">
+          <div
+            data-testid="dashboard-recent-patients"
+            className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 mt-6"
+          >
             <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {t('patientsNeedingFollowUp')}

@@ -11,7 +11,7 @@ import {
   createTestUser,
   createTestSession,
   cleanupTestData,
-  randomUUID
+  randomUUID,
 } from '../../helpers/testUtils.js';
 
 describe('Auth API Integration Tests', () => {
@@ -27,7 +27,7 @@ describe('Auth API Integration Tests', () => {
     testUser = await createTestUser(testOrg.id, {
       email: `authtest${Date.now()}@test.com`,
       first_name: 'Auth',
-      last_name: 'Tester'
+      last_name: 'Tester',
     });
 
     // Create session for authenticated tests
@@ -50,13 +50,10 @@ describe('Auth API Integration Tests', () => {
         password: 'SecurePassword123!',
         firstName: 'New',
         lastName: 'User',
-        organizationId: testOrg.id
+        organizationId: testOrg.id,
       };
 
-      const response = await request(app)
-        .post('/api/v1/auth/register')
-        .send(userData)
-        .expect(201);
+      const response = await request(app).post('/api/v1/auth/register').send(userData).expect(201);
 
       expect(response.body).toHaveProperty('user');
       expect(response.body.user.email).toBe(userData.email);
@@ -75,7 +72,7 @@ describe('Auth API Integration Tests', () => {
           password: 'SecurePassword123!',
           firstName: 'Test',
           lastName: 'User',
-          organizationId: testOrg.id
+          organizationId: testOrg.id,
         })
         .expect(400);
     });
@@ -87,7 +84,7 @@ describe('Auth API Integration Tests', () => {
           email: `nopass${Date.now()}@test.com`,
           firstName: 'Test',
           lastName: 'User',
-          organizationId: testOrg.id
+          organizationId: testOrg.id,
         })
         .expect(400);
     });
@@ -99,7 +96,7 @@ describe('Auth API Integration Tests', () => {
           email: `noorg${Date.now()}@test.com`,
           password: 'SecurePassword123!',
           firstName: 'Test',
-          lastName: 'User'
+          lastName: 'User',
         })
         .expect(400);
     });
@@ -115,7 +112,7 @@ describe('Auth API Integration Tests', () => {
           password: 'SecurePassword123!',
           firstName: 'First',
           lastName: 'User',
-          organizationId: testOrg.id
+          organizationId: testOrg.id,
         })
         .expect(201);
 
@@ -127,7 +124,7 @@ describe('Auth API Integration Tests', () => {
           password: 'AnotherPassword123!',
           firstName: 'Second',
           lastName: 'User',
-          organizationId: testOrg.id
+          organizationId: testOrg.id,
         })
         .expect(400);
     });
@@ -140,7 +137,7 @@ describe('Auth API Integration Tests', () => {
           password: 'SecurePassword123!',
           firstName: 'Dev',
           lastName: 'User',
-          organizationId: testOrg.id
+          organizationId: testOrg.id,
         })
         .expect(201);
 
@@ -168,7 +165,7 @@ describe('Auth API Integration Tests', () => {
           password: loginPassword,
           firstName: 'Login',
           lastName: 'User',
-          organizationId: testOrg.id
+          organizationId: testOrg.id,
         });
       loginUser = response.body.user;
     });
@@ -178,7 +175,7 @@ describe('Auth API Integration Tests', () => {
         .post('/api/v1/auth/login')
         .send({
           email: loginUser.email,
-          password: loginPassword
+          password: loginPassword,
         })
         .expect(200);
 
@@ -197,7 +194,7 @@ describe('Auth API Integration Tests', () => {
         .send({ password: 'SomePassword123!' })
         .expect(400);
 
-      expect(response.body.error).toBe('Validation Error');
+      expect(response.body.error).toBe('Validation failed');
     });
 
     it('should reject login without password', async () => {
@@ -206,7 +203,7 @@ describe('Auth API Integration Tests', () => {
         .send({ email: loginUser.email })
         .expect(400);
 
-      expect(response.body.error).toBe('Validation Error');
+      expect(response.body.error).toBe('Validation failed');
     });
 
     it('should reject login with wrong password', async () => {
@@ -214,7 +211,7 @@ describe('Auth API Integration Tests', () => {
         .post('/api/v1/auth/login')
         .send({
           email: loginUser.email,
-          password: 'WrongPassword123!'
+          password: 'WrongPassword123!',
         })
         .expect(401);
 
@@ -226,7 +223,7 @@ describe('Auth API Integration Tests', () => {
         .post('/api/v1/auth/login')
         .send({
           email: 'nonexistent@test.com',
-          password: 'SomePassword123!'
+          password: 'SomePassword123!',
         })
         .expect(401);
     });
@@ -246,7 +243,7 @@ describe('Auth API Integration Tests', () => {
           password: 'LogoutTest123!',
           firstName: 'Logout',
           lastName: 'User',
-          organizationId: testOrg.id
+          organizationId: testOrg.id,
         });
 
       const cookies = loginResponse.headers['set-cookie'];
@@ -264,9 +261,7 @@ describe('Auth API Integration Tests', () => {
     });
 
     it('should handle logout without session', async () => {
-      const response = await request(app)
-        .post('/api/v1/auth/logout')
-        .expect(200);
+      const response = await request(app).post('/api/v1/auth/logout').expect(200);
 
       expect(response.body.message).toBe('Logged out successfully');
     });
@@ -299,9 +294,7 @@ describe('Auth API Integration Tests', () => {
     });
 
     it('should require authentication', async () => {
-      await request(app)
-        .get('/api/v1/auth/me')
-        .expect(401);
+      await request(app).get('/api/v1/auth/me').expect(401);
     });
 
     it('should reject invalid session', async () => {
@@ -334,14 +327,12 @@ describe('Auth API Integration Tests', () => {
         .set('Cookie', testSession.cookie)
         .expect(200);
 
-      const currentSession = response.body.sessions.find(s => s.current);
+      const currentSession = response.body.sessions.find((s) => s.current);
       expect(currentSession).toBeDefined();
     });
 
     it('should require authentication', async () => {
-      await request(app)
-        .get('/api/v1/auth/sessions')
-        .expect(401);
+      await request(app).get('/api/v1/auth/sessions').expect(401);
     });
   });
 
@@ -353,7 +344,7 @@ describe('Auth API Integration Tests', () => {
     it('should logout from all devices', async () => {
       // Create user with multiple sessions
       const multiSessionUser = await createTestUser(testOrg.id, {
-        email: `multisession${Date.now()}@test.com`
+        email: `multisession${Date.now()}@test.com`,
       });
       const session1 = await createTestSession(multiSessionUser.id);
       await createTestSession(multiSessionUser.id); // Second session
@@ -367,9 +358,7 @@ describe('Auth API Integration Tests', () => {
     });
 
     it('should require authentication', async () => {
-      await request(app)
-        .post('/api/v1/auth/logout-all')
-        .expect(401);
+      await request(app).post('/api/v1/auth/logout-all').expect(401);
     });
   });
 
@@ -398,10 +387,7 @@ describe('Auth API Integration Tests', () => {
     });
 
     it('should reject request without email', async () => {
-      await request(app)
-        .post('/api/v1/auth/forgot-password')
-        .send({})
-        .expect(400);
+      await request(app).post('/api/v1/auth/forgot-password').send({}).expect(400);
     });
 
     it('should return reset token in development', async () => {
@@ -437,7 +423,7 @@ describe('Auth API Integration Tests', () => {
         .post('/api/v1/auth/reset-password')
         .send({
           token: 'invalid-token',
-          password: 'NewPassword123!'
+          password: 'NewPassword123!',
         })
         .expect(400);
     });
@@ -453,7 +439,7 @@ describe('Auth API Integration Tests', () => {
         .post('/api/v1/auth/change-password')
         .send({
           currentPassword: 'OldPassword123!',
-          newPassword: 'NewPassword123!'
+          newPassword: 'NewPassword123!',
         })
         .expect(401);
     });
@@ -487,10 +473,7 @@ describe('Auth API Integration Tests', () => {
 
   describe('POST /api/v1/auth/verify-email', () => {
     it('should reject without token', async () => {
-      await request(app)
-        .post('/api/v1/auth/verify-email')
-        .send({})
-        .expect(400);
+      await request(app).post('/api/v1/auth/verify-email').send({}).expect(400);
     });
 
     it('should reject invalid token', async () => {
@@ -503,9 +486,7 @@ describe('Auth API Integration Tests', () => {
 
   describe('POST /api/v1/auth/resend-verification', () => {
     it('should require authentication', async () => {
-      await request(app)
-        .post('/api/v1/auth/resend-verification')
-        .expect(401);
+      await request(app).post('/api/v1/auth/resend-verification').expect(401);
     });
 
     it('should handle resend verification request', async () => {
@@ -572,7 +553,7 @@ describe('Auth API Integration Tests', () => {
           password: 'SecurePassword123!',
           firstName: 'Http',
           lastName: 'Only',
-          organizationId: testOrg.id
+          organizationId: testOrg.id,
         })
         .expect(201);
 
@@ -588,7 +569,7 @@ describe('Auth API Integration Tests', () => {
           password: 'SecurePassword123!',
           firstName: 'Same',
           lastName: 'Site',
-          organizationId: testOrg.id
+          organizationId: testOrg.id,
         })
         .expect(201);
 

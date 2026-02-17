@@ -6,6 +6,18 @@
 import express from 'express';
 import * as aiRetrainingController from '../controllers/aiRetraining.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
+import validate from '../middleware/validation.js';
+import {
+  triggerRetrainingSchema,
+  getHistorySchema,
+  exportFeedbackSchema,
+  rollbackModelSchema,
+  testModelSchema,
+  generatePairsSchema,
+  evaluateSuggestionSchema,
+  augmentDataSchema,
+  triggerJobSchema,
+} from '../validators/aiRetraining.validators.js';
 
 const router = express.Router();
 
@@ -24,7 +36,11 @@ router.use(requireRole(['ADMIN']));
  * @access  Private (ADMIN only)
  * @body    { dryRun: boolean, options: object }
  */
-router.post('/trigger-retraining', aiRetrainingController.triggerRetraining);
+router.post(
+  '/trigger-retraining',
+  validate(triggerRetrainingSchema),
+  aiRetrainingController.triggerRetraining
+);
 
 /**
  * @route   GET /api/v1/ai-retraining/status
@@ -39,7 +55,7 @@ router.get('/status', aiRetrainingController.getRetrainingStatus);
  * @access  Private (ADMIN only)
  * @query   { limit: number }
  */
-router.get('/history', aiRetrainingController.getRetrainingHistory);
+router.get('/history', validate(getHistorySchema), aiRetrainingController.getRetrainingHistory);
 
 /**
  * @route   POST /api/v1/ai-retraining/export-feedback
@@ -47,7 +63,11 @@ router.get('/history', aiRetrainingController.getRetrainingHistory);
  * @access  Private (ADMIN only)
  * @body    { minRating: number, days: number, includeRejected: boolean }
  */
-router.post('/export-feedback', aiRetrainingController.exportFeedback);
+router.post(
+  '/export-feedback',
+  validate(exportFeedbackSchema),
+  aiRetrainingController.exportFeedback
+);
 
 // ============================================================
 // MODEL MANAGEMENT ROUTES
@@ -59,7 +79,7 @@ router.post('/export-feedback', aiRetrainingController.exportFeedback);
  * @access  Private (ADMIN only)
  * @body    { targetVersion: string }
  */
-router.post('/model/rollback', aiRetrainingController.rollbackModel);
+router.post('/model/rollback', validate(rollbackModelSchema), aiRetrainingController.rollbackModel);
 
 /**
  * @route   POST /api/v1/ai-retraining/model/test
@@ -67,7 +87,7 @@ router.post('/model/rollback', aiRetrainingController.rollbackModel);
  * @access  Private (ADMIN only)
  * @body    { modelName: string }
  */
-router.post('/model/test', aiRetrainingController.testModel);
+router.post('/model/test', validate(testModelSchema), aiRetrainingController.testModel);
 
 // ============================================================
 // RLAIF (AI-ASSISTED FEEDBACK) ROUTES
@@ -79,7 +99,11 @@ router.post('/model/test', aiRetrainingController.testModel);
  * @access  Private (ADMIN only)
  * @body    { suggestions: array, suggestionType: string, maxPairs: number }
  */
-router.post('/rlaif/generate-pairs', aiRetrainingController.generatePreferencePairs);
+router.post(
+  '/rlaif/generate-pairs',
+  validate(generatePairsSchema),
+  aiRetrainingController.generatePreferencePairs
+);
 
 /**
  * @route   POST /api/v1/ai-retraining/rlaif/evaluate
@@ -87,7 +111,11 @@ router.post('/rlaif/generate-pairs', aiRetrainingController.generatePreferencePa
  * @access  Private (ADMIN only)
  * @body    { suggestion: string, suggestionType: string, contextData: object }
  */
-router.post('/rlaif/evaluate', aiRetrainingController.evaluateSuggestion);
+router.post(
+  '/rlaif/evaluate',
+  validate(evaluateSuggestionSchema),
+  aiRetrainingController.evaluateSuggestion
+);
 
 /**
  * @route   GET /api/v1/ai-retraining/rlaif/stats
@@ -109,7 +137,11 @@ router.get('/rlaif/criteria', aiRetrainingController.getQualityCriteria);
  * @access  Private (ADMIN only)
  * @body    { baseExamples: array, targetCount: number, suggestionType: string }
  */
-router.post('/rlaif/augment', aiRetrainingController.augmentTrainingData);
+router.post(
+  '/rlaif/augment',
+  validate(augmentDataSchema),
+  aiRetrainingController.augmentTrainingData
+);
 
 // ============================================================
 // SCHEDULER MANAGEMENT ROUTES
@@ -121,7 +153,11 @@ router.post('/rlaif/augment', aiRetrainingController.augmentTrainingData);
  * @access  Private (ADMIN only)
  * @body    { jobName: string }
  */
-router.post('/scheduler/trigger', aiRetrainingController.triggerScheduledJob);
+router.post(
+  '/scheduler/trigger',
+  validate(triggerJobSchema),
+  aiRetrainingController.triggerScheduledJob
+);
 
 /**
  * @route   GET /api/v1/ai-retraining/scheduler/status

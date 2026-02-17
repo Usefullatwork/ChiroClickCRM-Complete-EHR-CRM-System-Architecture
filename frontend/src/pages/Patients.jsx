@@ -120,7 +120,12 @@ export default function Patients() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
+          <h1
+            data-testid="patients-page-title"
+            className="text-3xl font-bold text-gray-900 dark:text-white"
+          >
+            {t('title')}
+          </h1>
           <p className="text-gray-600 dark:text-gray-200 mt-1">
             {pagination.total} {t('totalPatients').toLowerCase()}
           </p>
@@ -142,6 +147,7 @@ export default function Patients() {
             Import
           </button>
           <button
+            data-testid="patients-add-button"
             className="flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
             onClick={() => navigate('/patients/new')}
           >
@@ -162,6 +168,7 @@ export default function Patients() {
           <input
             type="text"
             placeholder={t('searchPatients')}
+            data-testid="patients-search-input"
             className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -212,7 +219,10 @@ export default function Patients() {
         </div>
       ) : (
         <>
-          <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+          <div
+            data-testid="patients-list"
+            className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden"
+          >
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-900">
                 <tr>
@@ -255,6 +265,7 @@ export default function Patients() {
                 {patients.map((patient) => (
                   <tr
                     key={patient.id}
+                    data-testid="patient-row"
                     className="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
                     onClick={() => navigate(`/patients/${patient.id}`)}
                   >
