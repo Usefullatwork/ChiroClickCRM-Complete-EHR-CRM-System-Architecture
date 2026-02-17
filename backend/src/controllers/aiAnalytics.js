@@ -195,6 +195,22 @@ export const getRecentSuggestions = async (req, res) => {
 export const getRedFlagAccuracy = async (req, res) => {
   try {
     const orgId = req.organizationId;
+    const { startDate, endDate } = req.query;
+
+    let dateFilter = '';
+    const params = [orgId];
+    let paramIndex = 2;
+
+    if (startDate) {
+      dateFilter += ` AND s.created_at >= $${paramIndex}`;
+      params.push(startDate);
+      paramIndex++;
+    }
+    if (endDate) {
+      dateFilter += ` AND s.created_at <= $${paramIndex}`;
+      params.push(endDate);
+      paramIndex++;
+    }
 
     const result = await query(
       `SELECT
@@ -210,8 +226,8 @@ export const getRedFlagAccuracy = async (req, res) => {
       FROM ai_suggestions s
       LEFT JOIN ai_feedback f ON f.suggestion_id = s.id
       WHERE s.organization_id = $1
-        AND s.task_type = 'red_flag_analysis'`,
-      [orgId]
+        AND s.task_type = 'red_flag_analysis' ${dateFilter}`,
+      params
     );
 
     // Monthly trend
@@ -224,11 +240,11 @@ export const getRedFlagAccuracy = async (req, res) => {
       FROM ai_suggestions s
       LEFT JOIN ai_feedback f ON f.suggestion_id = s.id
       WHERE s.organization_id = $1
-        AND s.task_type = 'red_flag_analysis'
+        AND s.task_type = 'red_flag_analysis' ${dateFilter}
       GROUP BY DATE_TRUNC('month', s.created_at)
       ORDER BY month DESC
       LIMIT 12`,
-      [orgId]
+      params
     );
 
     res.json({
@@ -253,6 +269,22 @@ export const getRedFlagAccuracy = async (req, res) => {
 export const getModelComparison = async (req, res) => {
   try {
     const orgId = req.organizationId;
+    const { startDate, endDate } = req.query;
+
+    let dateFilter = '';
+    const params = [orgId];
+    let paramIndex = 2;
+
+    if (startDate) {
+      dateFilter += ` AND s.created_at >= $${paramIndex}`;
+      params.push(startDate);
+      paramIndex++;
+    }
+    if (endDate) {
+      dateFilter += ` AND s.created_at <= $${paramIndex}`;
+      params.push(endDate);
+      paramIndex++;
+    }
 
     const result = await query(
       `SELECT
@@ -270,10 +302,10 @@ export const getModelComparison = async (req, res) => {
         END as approval_rate
       FROM ai_suggestions s
       LEFT JOIN ai_feedback f ON f.suggestion_id = s.id
-      WHERE s.organization_id = $1
+      WHERE s.organization_id = $1 ${dateFilter}
       GROUP BY s.model_name
       ORDER BY total_suggestions DESC`,
-      [orgId]
+      params
     );
 
     res.json({
