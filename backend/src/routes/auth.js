@@ -193,8 +193,18 @@ router.post('/logout', async (req, res) => {
 });
 
 /**
- * POST /auth/logout-all
- * Logout from all devices
+ * @swagger
+ * /auth/logout-all:
+ *   post:
+ *     summary: Logout from all devices
+ *     tags: [Auth]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logged out from all devices
+ *       500:
+ *         description: Server error
  */
 router.post('/logout-all', requireLocalAuth, async (req, res) => {
   try {
@@ -265,8 +275,26 @@ router.get('/sessions', requireLocalAuth, async (req, res) => {
 });
 
 /**
- * POST /auth/forgot-password
- * Request password reset
+ * @swagger
+ * /auth/forgot-password:
+ *   post:
+ *     summary: Request password reset
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *     responses:
+ *       200:
+ *         description: Reset email sent (always returns success to prevent enumeration)
  */
 router.post('/forgot-password', validate(forgotPasswordSchema), async (req, res) => {
   try {
@@ -292,8 +320,29 @@ router.post('/forgot-password', validate(forgotPasswordSchema), async (req, res)
 });
 
 /**
- * POST /auth/reset-password
- * Reset password with token
+ * @swagger
+ * /auth/reset-password:
+ *   post:
+ *     summary: Reset password with token
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [token, password]
+ *             properties:
+ *               token:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password reset successfully
+ *       400:
+ *         description: Invalid or expired token
  */
 router.post('/reset-password', validate(resetPasswordSchema), async (req, res) => {
   try {
@@ -314,8 +363,32 @@ router.post('/reset-password', validate(resetPasswordSchema), async (req, res) =
 });
 
 /**
- * POST /auth/change-password
- * Change password (authenticated, requires fresh session)
+ * @swagger
+ * /auth/change-password:
+ *   post:
+ *     summary: Change password (requires fresh session)
+ *     tags: [Auth]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [currentPassword, newPassword]
+ *             properties:
+ *               currentPassword:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password changed
+ *       400:
+ *         description: Invalid current password
+ *       401:
+ *         description: Session not fresh
  */
 router.post(
   '/change-password',
@@ -340,8 +413,27 @@ router.post(
 );
 
 /**
- * POST /auth/verify-email
- * Verify email address
+ * @swagger
+ * /auth/verify-email:
+ *   post:
+ *     summary: Verify email address with token
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [token]
+ *             properties:
+ *               token:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Email verified
+ *       400:
+ *         description: Invalid or expired token
  */
 router.post('/verify-email', validate(verifyEmailSchema), async (req, res) => {
   try {
@@ -360,8 +452,18 @@ router.post('/verify-email', validate(verifyEmailSchema), async (req, res) => {
 });
 
 /**
- * POST /auth/resend-verification
- * Resend email verification
+ * @swagger
+ * /auth/resend-verification:
+ *   post:
+ *     summary: Resend email verification
+ *     tags: [Auth]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Verification email sent
+ *       400:
+ *         description: Email already verified
  */
 router.post('/resend-verification', requireLocalAuth, async (req, res) => {
   try {
@@ -382,8 +484,28 @@ router.post('/resend-verification', requireLocalAuth, async (req, res) => {
 });
 
 /**
- * POST /auth/confirm-password
- * Confirm password to make session "fresh" for sensitive operations
+ * @swagger
+ * /auth/confirm-password:
+ *   post:
+ *     summary: Confirm password to make session fresh for sensitive operations
+ *     tags: [Auth]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [password]
+ *             properties:
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Session refreshed
+ *       401:
+ *         description: Incorrect password
  */
 router.post(
   '/confirm-password',

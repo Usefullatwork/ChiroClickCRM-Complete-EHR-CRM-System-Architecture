@@ -23,23 +23,83 @@ router.use(requireAuth);
 router.use(requireOrganization);
 
 /**
- * @route   GET /api/v1/users/me
- * @desc    Get current user profile
- * @access  Private (All authenticated users)
+ * @swagger
+ * /users/me:
+ *   get:
+ *     summary: Get current user profile
+ *     tags: [Users]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Current user profile
+ *       401:
+ *         description: Unauthorized
  */
 router.get('/me', userController.getCurrentUser);
 
 /**
- * @route   PATCH /api/v1/users/me
- * @desc    Update current user profile
- * @access  Private (All authenticated users)
+ * @swagger
+ * /users/me:
+ *   patch:
+ *     summary: Update current user profile
+ *     tags: [Users]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               phone:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Profile updated
+ *       400:
+ *         description: Validation error
  */
 router.patch('/me', validate(updateCurrentUserSchema), userController.updateCurrentUser);
 
 /**
- * @route   GET /api/v1/users
- * @desc    Get all users in organization
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /users:
+ *   get:
+ *     summary: Get all users in organization
+ *     tags: [Users]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: role
+ *         schema:
+ *           type: string
+ *           enum: [ADMIN, PRACTITIONER, ASSISTANT]
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [active, inactive]
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Paginated list of users
+ *       403:
+ *         description: Insufficient permissions
  */
 router.get(
   '/',
@@ -49,9 +109,18 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/users/practitioners
- * @desc    Get all practitioners (for dropdowns)
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /users/practitioners:
+ *   get:
+ *     summary: Get all practitioners (for dropdowns)
+ *     tags: [Users]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of practitioners
+ *       403:
+ *         description: Insufficient permissions
  */
 router.get(
   '/practitioners',
@@ -60,9 +129,25 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/users/:id
- * @desc    Get user by ID
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /users/{id}:
+ *   get:
+ *     summary: Get user by ID
+ *     tags: [Users]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: User details
+ *       404:
+ *         description: User not found
  */
 router.get(
   '/:id',
@@ -72,23 +157,115 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/users
- * @desc    Create new user
- * @access  Private (ADMIN only)
+ * @swagger
+ * /users:
+ *   post:
+ *     summary: Create a new user
+ *     tags: [Users]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, name, role, password]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               name:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *                 enum: [ADMIN, PRACTITIONER, ASSISTANT]
+ *               password:
+ *                 type: string
+ *                 format: password
+ *     responses:
+ *       201:
+ *         description: User created
+ *       400:
+ *         description: Validation error
+ *       403:
+ *         description: Admin access required
  */
 router.post('/', requireRole(['ADMIN']), validate(createUserSchema), userController.createUser);
 
 /**
- * @route   PATCH /api/v1/users/:id
- * @desc    Update user
- * @access  Private (ADMIN)
+ * @swagger
+ * /users/{id}:
+ *   patch:
+ *     summary: Update a user
+ *     tags: [Users]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User updated
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: User not found
  */
 router.patch('/:id', requireRole(['ADMIN']), validate(updateUserSchema), userController.updateUser);
 
 /**
- * @route   PATCH /api/v1/users/:id/preferences
- * @desc    Update user preferences
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT - own preferences)
+ * @swagger
+ * /users/{id}/preferences:
+ *   patch:
+ *     summary: Update user preferences
+ *     tags: [Users]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               theme:
+ *                 type: string
+ *                 enum: [light, dark, system]
+ *               language:
+ *                 type: string
+ *                 enum: [nb, en]
+ *               notifications:
+ *                 type: object
+ *     responses:
+ *       200:
+ *         description: Preferences updated
+ *       404:
+ *         description: User not found
  */
 router.patch(
   '/:id/preferences',
@@ -98,9 +275,27 @@ router.patch(
 );
 
 /**
- * @route   POST /api/v1/users/:id/deactivate
- * @desc    Deactivate user
- * @access  Private (ADMIN only)
+ * @swagger
+ * /users/{id}/deactivate:
+ *   post:
+ *     summary: Deactivate a user
+ *     tags: [Users]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: User deactivated
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: User not found
  */
 router.post(
   '/:id/deactivate',
@@ -110,9 +305,27 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/users/:id/reactivate
- * @desc    Reactivate user
- * @access  Private (ADMIN only)
+ * @swagger
+ * /users/{id}/reactivate:
+ *   post:
+ *     summary: Reactivate a user
+ *     tags: [Users]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: User reactivated
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: User not found
  */
 router.post(
   '/:id/reactivate',
@@ -122,9 +335,25 @@ router.post(
 );
 
 /**
- * @route   GET /api/v1/users/:id/stats
- * @desc    Get user statistics
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /users/{id}/stats:
+ *   get:
+ *     summary: Get user statistics
+ *     tags: [Users]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: User statistics (appointments, encounters, patients)
+ *       404:
+ *         description: User not found
  */
 router.get(
   '/:id/stats',

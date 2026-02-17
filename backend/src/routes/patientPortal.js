@@ -13,7 +13,17 @@ import crypto from 'crypto';
 
 const router = express.Router();
 
-// Health check (no auth required)
+/**
+ * @swagger
+ * /patient-portal/health:
+ *   get:
+ *     summary: Patient portal health check
+ *     tags: [Portal]
+ *     security: []
+ *     responses:
+ *       200:
+ *         description: Module health status
+ */
 router.get('/health', (req, res) => {
   res.json({ status: 'ok', module: 'patient-portal' });
 });
@@ -62,8 +72,36 @@ const requirePortalAuth = async (req, res, next) => {
 };
 
 /**
- * POST /patient-portal/auth/pin
- * Authenticate patient with PIN
+ * @swagger
+ * /patient-portal/auth/pin:
+ *   post:
+ *     summary: Authenticate patient with PIN
+ *     tags: [Portal]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [pin]
+ *             properties:
+ *               pin:
+ *                 type: string
+ *                 pattern: '^\d{4}$'
+ *               patientId:
+ *                 type: string
+ *                 format: uuid
+ *               dateOfBirth:
+ *                 type: string
+ *                 format: date
+ *     responses:
+ *       200:
+ *         description: Authentication successful, portal session token returned
+ *       401:
+ *         description: Invalid credentials
+ *       503:
+ *         description: Portal not yet configured
  */
 router.post('/auth/pin', validate(pinAuthSchema), async (req, res) => {
   try {
@@ -161,8 +199,18 @@ router.post('/auth/pin', validate(pinAuthSchema), async (req, res) => {
 });
 
 /**
- * GET /patient-portal/profile
- * Get patient's own profile
+ * @swagger
+ * /patient-portal/profile:
+ *   get:
+ *     summary: Get patient's own profile
+ *     tags: [Portal]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Patient profile data
+ *       401:
+ *         description: Portal session expired
  */
 router.get('/profile', requirePortalAuth, async (req, res) => {
   try {
@@ -182,8 +230,18 @@ router.get('/profile', requirePortalAuth, async (req, res) => {
 });
 
 /**
- * GET /patient-portal/appointments
- * Get patient's upcoming appointments
+ * @swagger
+ * /patient-portal/appointments:
+ *   get:
+ *     summary: Get patient's upcoming appointments
+ *     tags: [Portal]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Upcoming appointments
+ *       401:
+ *         description: Portal session expired
  */
 router.get('/appointments', requirePortalAuth, async (req, res) => {
   try {
@@ -209,8 +267,18 @@ router.get('/appointments', requirePortalAuth, async (req, res) => {
 });
 
 /**
- * GET /patient-portal/exercises
- * Get patient's exercise programs
+ * @swagger
+ * /patient-portal/exercises:
+ *   get:
+ *     summary: Get patient's exercise programs
+ *     tags: [Portal]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Active exercise prescriptions
+ *       401:
+ *         description: Portal session expired
  */
 router.get('/exercises', requirePortalAuth, async (req, res) => {
   try {
@@ -242,8 +310,45 @@ router.get('/exercises', requirePortalAuth, async (req, res) => {
 });
 
 /**
- * POST /patient-portal/exercises/:id/compliance
- * Log exercise compliance
+ * @swagger
+ * /patient-portal/exercises/{id}/compliance:
+ *   post:
+ *     summary: Log exercise compliance
+ *     tags: [Portal]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Prescription ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               completed:
+ *                 type: boolean
+ *               pain_level:
+ *                 type: integer
+ *                 minimum: 0
+ *                 maximum: 10
+ *               difficulty_rating:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 5
+ *               notes:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Compliance logged
+ *       401:
+ *         description: Portal session expired
  */
 router.post(
   '/exercises/:id/compliance',
@@ -277,8 +382,16 @@ router.post(
 );
 
 /**
- * POST /patient-portal/logout
- * Invalidate portal session
+ * @swagger
+ * /patient-portal/logout:
+ *   post:
+ *     summary: Invalidate portal session
+ *     tags: [Portal]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logged out
  */
 router.post('/logout', requirePortalAuth, async (req, res) => {
   try {

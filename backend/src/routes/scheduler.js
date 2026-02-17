@@ -25,14 +25,52 @@ const router = express.Router();
 router.use(requireAuth);
 router.use(requireOrganization);
 
-// Health check
+/**
+ * @swagger
+ * /scheduler/health:
+ *   get:
+ *     summary: Scheduler module health check
+ *     tags: [Scheduler]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Module health status
+ */
 router.get('/health', (req, res) => {
   res.json({ status: 'ok', module: 'scheduler' });
 });
 
 /**
- * POST /scheduler/communications
- * Schedule a communication for a patient
+ * @swagger
+ * /scheduler/communications:
+ *   post:
+ *     summary: Schedule a communication for a patient
+ *     tags: [Scheduler]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [patientId, channel, message, scheduledAt]
+ *             properties:
+ *               patientId:
+ *                 type: string
+ *                 format: uuid
+ *               channel:
+ *                 type: string
+ *                 enum: [sms, email]
+ *               message:
+ *                 type: string
+ *               scheduledAt:
+ *                 type: string
+ *                 format: date-time
+ *     responses:
+ *       201:
+ *         description: Communication scheduled
  */
 router.post(
   '/communications',
@@ -55,8 +93,16 @@ router.post(
 );
 
 /**
- * GET /scheduler/pending
- * Get pending scheduled communications
+ * @swagger
+ * /scheduler/pending:
+ *   get:
+ *     summary: Get pending scheduled communications
+ *     tags: [Scheduler]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Pending communications and stats
  */
 router.get('/pending', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
   try {
@@ -71,8 +117,27 @@ router.get('/pending', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) 
 });
 
 /**
- * POST /scheduler/check-conflicts
- * Check booking conflicts for a scheduled communication
+ * @swagger
+ * /scheduler/check-conflicts:
+ *   post:
+ *     summary: Check booking conflicts for scheduled communication
+ *     tags: [Scheduler]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [appointmentId]
+ *             properties:
+ *               appointmentId:
+ *                 type: string
+ *                 format: uuid
+ *     responses:
+ *       200:
+ *         description: Conflict check results
  */
 router.post(
   '/check-conflicts',
@@ -95,8 +160,16 @@ router.post(
 );
 
 /**
- * GET /scheduler/decisions
- * Get items needing user approval (conflicts)
+ * @swagger
+ * /scheduler/decisions:
+ *   get:
+ *     summary: Get items needing user approval (conflicts)
+ *     tags: [Scheduler]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of pending scheduling decisions
  */
 router.get('/decisions', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
   try {
@@ -110,8 +183,40 @@ router.get('/decisions', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res
 });
 
 /**
- * POST /scheduler/decisions/:id
- * Approve/reject a scheduling decision
+ * @swagger
+ * /scheduler/decisions/{id}:
+ *   post:
+ *     summary: Approve or reject a scheduling decision
+ *     tags: [Scheduler]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [decision]
+ *             properties:
+ *               decision:
+ *                 type: string
+ *                 enum: [extend, cancel, send_anyway]
+ *               note:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Decision resolved
+ *       400:
+ *         description: Invalid decision
+ *       404:
+ *         description: Decision not found
  */
 router.post(
   '/decisions/:id',
@@ -142,8 +247,32 @@ router.post(
 );
 
 /**
- * POST /scheduler/decisions/bulk
- * Bulk resolve scheduling decisions
+ * @swagger
+ * /scheduler/decisions/bulk:
+ *   post:
+ *     summary: Bulk resolve scheduling decisions
+ *     tags: [Scheduler]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [decisionIds, decision]
+ *             properties:
+ *               decisionIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: uuid
+ *               decision:
+ *                 type: string
+ *                 enum: [extend, cancel, send_anyway]
+ *     responses:
+ *       200:
+ *         description: Bulk resolution results
  */
 router.post(
   '/decisions/bulk',
@@ -163,8 +292,16 @@ router.post(
 );
 
 /**
- * GET /scheduler/rules
- * Get communication rules
+ * @swagger
+ * /scheduler/rules:
+ *   get:
+ *     summary: Get communication scheduling rules
+ *     tags: [Scheduler]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of communication rules
  */
 router.get('/rules', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
   try {
@@ -178,8 +315,31 @@ router.get('/rules', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) =>
 });
 
 /**
- * PUT /scheduler/rules/:id
- * Update a communication rule
+ * @swagger
+ * /scheduler/rules/{id}:
+ *   put:
+ *     summary: Update a communication rule
+ *     tags: [Scheduler]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Rule updated
+ *       404:
+ *         description: Rule not found
  */
 router.put(
   '/rules/:id',
@@ -201,8 +361,23 @@ router.put(
 );
 
 /**
- * GET /scheduler/patient/:patientId
- * Get scheduled communications for a patient
+ * @swagger
+ * /scheduler/patient/{patientId}:
+ *   get:
+ *     summary: Get scheduled communications for a patient
+ *     tags: [Scheduler]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Patient's scheduled communications
  */
 router.get(
   '/patient/:patientId',
@@ -221,8 +396,16 @@ router.get(
 );
 
 /**
- * GET /scheduler/today
- * Get today's messages for review
+ * @swagger
+ * /scheduler/today:
+ *   get:
+ *     summary: Get today's messages for review
+ *     tags: [Scheduler]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Today's scheduled messages
  */
 router.get('/today', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
   try {
@@ -236,8 +419,23 @@ router.get('/today', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) =>
 });
 
 /**
- * DELETE /scheduler/messages/:id
- * Cancel a scheduled message
+ * @swagger
+ * /scheduler/messages/{id}:
+ *   delete:
+ *     summary: Cancel a scheduled message
+ *     tags: [Scheduler]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Message cancelled
  */
 router.delete(
   '/messages/:id',
@@ -257,8 +455,29 @@ router.delete(
 );
 
 /**
- * POST /scheduler/send
- * Send approved messages immediately
+ * @swagger
+ * /scheduler/send:
+ *   post:
+ *     summary: Send approved messages immediately
+ *     tags: [Scheduler]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [messageIds]
+ *             properties:
+ *               messageIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: uuid
+ *     responses:
+ *       200:
+ *         description: Messages sent
  */
 router.post(
   '/send',
@@ -278,8 +497,30 @@ router.post(
 );
 
 /**
- * POST /scheduler/import
- * Import appointments from external source
+ * @swagger
+ * /scheduler/import:
+ *   post:
+ *     summary: Import appointments from external source
+ *     tags: [Scheduler]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [appointments, source]
+ *             properties:
+ *               appointments:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *               source:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Import results
  */
 router.post(
   '/import',

@@ -33,9 +33,33 @@ router.use(requireOrganization);
 // ============================================================================
 
 /**
- * @route   GET /api/v1/progress/patient/:patientId/stats
- * @desc    Get comprehensive progress statistics for a patient
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /progress/patient/{patientId}/stats:
+ *   get:
+ *     summary: Get comprehensive progress statistics for a patient
+ *     tags: [Progress]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Patient progress statistics
  */
 router.get(
   '/patient/:patientId/stats',
@@ -68,9 +92,28 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/progress/patient/:patientId/weekly
- * @desc    Get weekly compliance data for a patient
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /progress/patient/{patientId}/weekly:
+ *   get:
+ *     summary: Get weekly compliance data for a patient
+ *     tags: [Progress]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: weeks
+ *         schema:
+ *           type: integer
+ *           default: 12
+ *     responses:
+ *       200:
+ *         description: Weekly compliance data
  */
 router.get(
   '/patient/:patientId/weekly',
@@ -104,9 +147,28 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/progress/patient/:patientId/daily
- * @desc    Get daily progress data for calendar view
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /progress/patient/{patientId}/daily:
+ *   get:
+ *     summary: Get daily progress data for calendar view
+ *     tags: [Progress]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: months
+ *         schema:
+ *           type: integer
+ *           default: 3
+ *     responses:
+ *       200:
+ *         description: Daily progress calendar data
  */
 router.get(
   '/patient/:patientId/daily',
@@ -140,9 +202,28 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/progress/patient/:patientId/pain
- * @desc    Get pain level history over time
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /progress/patient/{patientId}/pain:
+ *   get:
+ *     summary: Get pain level history over time
+ *     tags: [Progress]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: days
+ *         schema:
+ *           type: integer
+ *           default: 90
+ *     responses:
+ *       200:
+ *         description: Pain level history
  */
 router.get(
   '/patient/:patientId/pain',
@@ -172,9 +253,39 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/progress/patient/:patientId/pain
- * @desc    Log a pain entry for a patient
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /progress/patient/{patientId}/pain:
+ *   post:
+ *     summary: Log a pain entry for a patient
+ *     tags: [Progress]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [painLevel]
+ *             properties:
+ *               painLevel:
+ *                 type: integer
+ *                 minimum: 0
+ *                 maximum: 10
+ *               notes:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Pain entry logged
+ *       400:
+ *         description: Invalid pain level
  */
 router.post(
   '/patient/:patientId/pain',
@@ -221,9 +332,38 @@ router.post(
 // ============================================================================
 
 /**
- * @route   GET /api/v1/progress/compliance
- * @desc    Get all patients' compliance summary for therapist dashboard
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /progress/compliance:
+ *   get:
+ *     summary: Get all patients' compliance summary for therapist dashboard
+ *     tags: [Progress]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 50
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *           default: 0
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           default: compliance_rate
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *           enum: [ASC, DESC]
+ *           default: DESC
+ *     responses:
+ *       200:
+ *         description: Patient compliance summaries
  */
 router.get(
   '/compliance',
@@ -257,9 +397,16 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/progress/overview
- * @desc    Get clinic-wide exercise compliance overview
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /progress/overview:
+ *   get:
+ *     summary: Get clinic-wide exercise compliance overview
+ *     tags: [Progress]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Clinic-wide compliance overview
  */
 router.get('/overview', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
   try {

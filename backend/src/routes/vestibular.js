@@ -22,9 +22,24 @@ router.use(requireAuth);
 router.use(requireOrganization);
 
 /**
- * @route   POST /api/v1/vestibular
- * @desc    Create new vestibular assessment
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /vestibular:
+ *   post:
+ *     summary: Create new vestibular assessment
+ *     tags: [Vestibular]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/VestibularAssessment'
+ *     responses:
+ *       201:
+ *         description: Assessment created
+ *       400:
+ *         description: Validation error
  */
 router.post(
   '/',
@@ -34,9 +49,25 @@ router.post(
 );
 
 /**
- * @route   GET /api/v1/vestibular/:id
- * @desc    Get assessment by ID
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /vestibular/{id}:
+ *   get:
+ *     summary: Get vestibular assessment by ID
+ *     tags: [Vestibular]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Assessment details
+ *       404:
+ *         description: Not found
  */
 router.get(
   '/:id',
@@ -46,9 +77,23 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/vestibular/patient/:patientId
- * @desc    Get all assessments for a patient
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /vestibular/patient/{patientId}:
+ *   get:
+ *     summary: Get all vestibular assessments for a patient
+ *     tags: [Vestibular]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: List of patient assessments
  */
 router.get(
   '/patient/:patientId',
@@ -58,9 +103,23 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/vestibular/encounter/:encounterId
- * @desc    Get assessment by encounter ID
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /vestibular/encounter/{encounterId}:
+ *   get:
+ *     summary: Get vestibular assessment by encounter ID
+ *     tags: [Vestibular]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: encounterId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Assessment for encounter
  */
 router.get(
   '/encounter/:encounterId',
@@ -70,9 +129,29 @@ router.get(
 );
 
 /**
- * @route   PATCH /api/v1/vestibular/:id
- * @desc    Update assessment
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /vestibular/{id}:
+ *   patch:
+ *     summary: Update vestibular assessment
+ *     tags: [Vestibular]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Assessment updated
  */
 router.patch(
   '/:id',
@@ -82,9 +161,23 @@ router.patch(
 );
 
 /**
- * @route   DELETE /api/v1/vestibular/:id
- * @desc    Delete assessment
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /vestibular/{id}:
+ *   delete:
+ *     summary: Delete vestibular assessment
+ *     tags: [Vestibular]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Assessment deleted
  */
 router.delete(
   '/:id',
@@ -94,9 +187,23 @@ router.delete(
 );
 
 /**
- * @route   GET /api/v1/vestibular/patient/:patientId/bppv-trends
- * @desc    Get BPPV trends for patient
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /vestibular/patient/{patientId}/bppv-trends:
+ *   get:
+ *     summary: Get BPPV trends for patient
+ *     tags: [Vestibular]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: BPPV trend data over time
  */
 router.get(
   '/patient/:patientId/bppv-trends',
@@ -106,9 +213,16 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/vestibular/stats/diagnoses
- * @desc    Get common diagnoses statistics
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /vestibular/stats/diagnoses:
+ *   get:
+ *     summary: Get common vestibular diagnoses statistics
+ *     tags: [Vestibular]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Diagnosis frequency statistics
  */
 router.get(
   '/stats/diagnoses',
@@ -117,9 +231,16 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/vestibular/stats/efficacy
- * @desc    Get treatment efficacy statistics
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /vestibular/stats/efficacy:
+ *   get:
+ *     summary: Get treatment efficacy statistics
+ *     tags: [Vestibular]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Treatment efficacy data
  */
 router.get(
   '/stats/efficacy',

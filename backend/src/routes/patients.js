@@ -78,12 +78,47 @@ router.get('/', validate(listPatientsSchema), patientController.getPatients);
 router.get('/search', validate(quickSearchPatientsSchema), patientController.searchPatients);
 
 /**
- * @route   GET /api/v1/patients/search/advanced
- * @desc    Advanced patient search with multiple filters
- *          Supports: name, phone, email, date of birth (exact/range),
- *          last visit date range, first visit date range, status, category,
- *          therapist, follow-up filters, sorting, and pagination
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /patients/search/advanced:
+ *   get:
+ *     summary: Advanced patient search with multiple filters
+ *     tags: [Patients]
+ *     parameters:
+ *       - in: query
+ *         name: name
+ *         schema:
+ *           type: string
+ *         description: Search by name
+ *       - in: query
+ *         name: phone
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: email
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: date_of_birth
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Advanced search results
+ *       401:
+ *         description: Unauthorized
  */
 router.get(
   '/search/advanced',
@@ -92,9 +127,16 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/patients/follow-up/needed
- * @desc    Get patients needing follow-up
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /patients/follow-up/needed:
+ *   get:
+ *     summary: Get patients needing follow-up
+ *     tags: [Patients]
+ *     responses:
+ *       200:
+ *         description: List of patients needing follow-up
+ *       401:
+ *         description: Unauthorized
  */
 router.get(
   '/follow-up/needed',
@@ -124,9 +166,23 @@ router.get(
 router.get('/:id', validate(getPatientSchema), patientController.getPatient);
 
 /**
- * @route   GET /api/v1/patients/:id/statistics
- * @desc    Get patient statistics
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /patients/{id}/statistics:
+ *   get:
+ *     summary: Get patient statistics
+ *     tags: [Patients]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Patient statistics (visits, outcomes, compliance)
+ *       404:
+ *         description: Patient not found
  */
 router.get(
   '/:id/statistics',
@@ -235,12 +291,40 @@ router.delete(
 // ============================================================================
 
 /**
- * @route   GET /api/v1/patients/:patientId/encounters/last-similar
- * @desc    Get last similar encounter for SALT functionality
- * @access  Private (ADMIN, PRACTITIONER)
- * @query   chiefComplaint - optional complaint to match against
- * @query   excludeId - encounter ID to exclude from results
- * @query   maxAgeDays - max age of encounters to consider (default 365)
+ * @swagger
+ * /patients/{patientId}/encounters/last-similar:
+ *   get:
+ *     summary: Get last similar encounter for SALT (Same As Last Time) functionality
+ *     tags: [Patients]
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: chiefComplaint
+ *         schema:
+ *           type: string
+ *         description: Complaint to match against
+ *       - in: query
+ *         name: excludeId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Encounter ID to exclude
+ *       - in: query
+ *         name: maxAgeDays
+ *         schema:
+ *           type: integer
+ *           default: 365
+ *         description: Max age of encounters to consider
+ *     responses:
+ *       200:
+ *         description: Last similar encounter
+ *       404:
+ *         description: No similar encounter found
  */
 router.get(
   '/:patientId/encounters/last-similar',
@@ -254,10 +338,39 @@ router.get(
 // ============================================================================
 
 /**
- * @route   GET /api/v1/patients/:patientId/exercises
- * @desc    Get patient's exercise prescriptions
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
- * @query   status, includeCompleted, page, limit
+ * @swagger
+ * /patients/{patientId}/exercises:
+ *   get:
+ *     summary: Get patient's exercise prescriptions
+ *     tags: [Patients]
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: includeCompleted
+ *         schema:
+ *           type: boolean
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Patient exercise prescriptions
+ *       404:
+ *         description: Patient not found
  */
 router.get(
   '/:patientId/exercises',
@@ -266,9 +379,42 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/patients/:patientId/exercises
- * @desc    Prescribe an exercise to a patient
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /patients/{patientId}/exercises:
+ *   post:
+ *     summary: Prescribe an exercise to a patient
+ *     tags: [Patients]
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [exercise_id]
+ *             properties:
+ *               exercise_id:
+ *                 type: string
+ *                 format: uuid
+ *               sets:
+ *                 type: integer
+ *               reps:
+ *                 type: integer
+ *               frequency:
+ *                 type: string
+ *               notes:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Exercise prescribed
+ *       400:
+ *         description: Validation error
  */
 router.post(
   '/:patientId/exercises',
@@ -278,9 +424,34 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/patients/:patientId/programs
- * @desc    Assign an exercise program to a patient
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /patients/{patientId}/programs:
+ *   post:
+ *     summary: Assign an exercise program to a patient
+ *     tags: [Patients]
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [program_id]
+ *             properties:
+ *               program_id:
+ *                 type: string
+ *                 format: uuid
+ *     responses:
+ *       201:
+ *         description: Program assigned
+ *       400:
+ *         description: Validation error
  */
 router.post(
   '/:patientId/programs',
@@ -290,9 +461,28 @@ router.post(
 );
 
 /**
- * @route   GET /api/v1/patients/:patientId/exercises/pdf
- * @desc    Generate PDF handout of patient's exercise program
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /patients/{patientId}/exercises/pdf:
+ *   get:
+ *     summary: Generate PDF handout of patient's exercise program
+ *     tags: [Patients]
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: PDF file
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       404:
+ *         description: Patient or prescriptions not found
  */
 router.get(
   '/:patientId/exercises/pdf',

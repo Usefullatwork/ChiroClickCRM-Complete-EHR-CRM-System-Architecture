@@ -100,9 +100,34 @@ router.post(
 );
 
 /**
- * @route   PATCH /api/v1/appointments/:id/status
- * @desc    Update appointment status
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /appointments/{id}/status:
+ *   patch:
+ *     summary: Update appointment status
+ *     tags: [Appointments]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [status]
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [scheduled, confirmed, checked_in, completed, cancelled, no_show]
+ *     responses:
+ *       200:
+ *         description: Status updated
+ *       404:
+ *         description: Appointment not found
  */
 router.patch(
   '/:id/status',
@@ -146,16 +171,37 @@ router.post(
 );
 
 /**
- * @route   GET /api/v1/appointments/stats
- * @desc    Get appointment statistics
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /appointments/stats:
+ *   get:
+ *     summary: Get appointment statistics
+ *     tags: [Appointments]
+ *     responses:
+ *       200:
+ *         description: Appointment statistics (counts by status, no-show rate, etc.)
+ *       401:
+ *         description: Unauthorized
  */
 router.get('/stats', requireRole(['ADMIN', 'PRACTITIONER']), appointmentController.getStats);
 
 /**
- * @route   GET /api/v1/appointments/:id
- * @desc    Get appointment by ID
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /appointments/{id}:
+ *   get:
+ *     summary: Get appointment by ID
+ *     tags: [Appointments]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Appointment details
+ *       404:
+ *         description: Appointment not found
  */
 router.get(
   '/:id',
@@ -165,9 +211,40 @@ router.get(
 );
 
 /**
- * @route   PATCH /api/v1/appointments/:id
- * @desc    Update appointment
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /appointments/{id}:
+ *   patch:
+ *     summary: Update appointment details
+ *     tags: [Appointments]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               start_time:
+ *                 type: string
+ *                 format: date-time
+ *               end_time:
+ *                 type: string
+ *                 format: date-time
+ *               appointment_type:
+ *                 type: string
+ *               notes:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Appointment updated
+ *       404:
+ *         description: Appointment not found
  */
 router.patch(
   '/:id',
@@ -177,9 +254,23 @@ router.patch(
 );
 
 /**
- * @route   POST /api/v1/appointments/:id/confirm
- * @desc    Confirm appointment
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /appointments/{id}/confirm:
+ *   post:
+ *     summary: Confirm an appointment
+ *     tags: [Appointments]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Appointment confirmed
+ *       404:
+ *         description: Appointment not found
  */
 router.post(
   '/:id/confirm',

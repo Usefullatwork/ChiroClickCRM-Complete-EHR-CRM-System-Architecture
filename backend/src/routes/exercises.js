@@ -37,9 +37,44 @@ router.use(requireOrganization);
 // ============================================================================
 
 /**
- * @route   GET /api/v1/exercises
- * @desc    List exercises with filters (category, bodyRegion, difficulty, search)
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /exercises:
+ *   get:
+ *     summary: List exercises with filters
+ *     tags: [Exercises]
+ *     parameters:
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *         description: Filter by category (stretching, strengthening, mobility, etc.)
+ *       - in: query
+ *         name: bodyRegion
+ *         schema:
+ *           type: string
+ *         description: Filter by body region (cervical, lumbar, shoulder, etc.)
+ *       - in: query
+ *         name: difficulty
+ *         schema:
+ *           type: string
+ *           enum: [beginner, intermediate, advanced]
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Paginated list of exercises
+ *       401:
+ *         description: Unauthorized
  */
 router.get(
   '/',
@@ -49,9 +84,14 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/exercises/categories
- * @desc    Get available exercise categories
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /exercises/categories:
+ *   get:
+ *     summary: Get available exercise categories
+ *     tags: [Exercises]
+ *     responses:
+ *       200:
+ *         description: List of exercise categories
  */
 router.get(
   '/categories',
@@ -60,9 +100,14 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/exercises/templates
- * @desc    Get exercise program templates
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /exercises/templates:
+ *   get:
+ *     summary: Get exercise program templates
+ *     tags: [Exercises]
+ *     responses:
+ *       200:
+ *         description: List of exercise program templates
  */
 router.get(
   '/templates',
@@ -71,9 +116,40 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/exercises/templates
- * @desc    Create exercise program template
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /exercises/templates:
+ *   post:
+ *     summary: Create exercise program template
+ *     tags: [Exercises]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, exercises]
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               exercises:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     exercise_id:
+ *                       type: string
+ *                       format: uuid
+ *                     sets:
+ *                       type: integer
+ *                     reps:
+ *                       type: integer
+ *     responses:
+ *       201:
+ *         description: Template created
+ *       400:
+ *         description: Validation error
  */
 router.post(
   '/templates',
@@ -82,9 +158,38 @@ router.post(
 );
 
 /**
- * @route   PATCH /api/v1/exercises/templates/:id
- * @desc    Update exercise program template
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /exercises/templates/{id}:
+ *   patch:
+ *     summary: Update exercise program template
+ *     tags: [Exercises]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               exercises:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *     responses:
+ *       200:
+ *         description: Template updated
+ *       404:
+ *         description: Template not found
  */
 router.patch(
   '/templates/:id',
@@ -93,9 +198,23 @@ router.patch(
 );
 
 /**
- * @route   DELETE /api/v1/exercises/templates/:id
- * @desc    Delete exercise program template
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /exercises/templates/{id}:
+ *   delete:
+ *     summary: Delete exercise program template
+ *     tags: [Exercises]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Template deleted
+ *       404:
+ *         description: Template not found
  */
 router.delete(
   '/templates/:id',
@@ -104,9 +223,16 @@ router.delete(
 );
 
 /**
- * @route   POST /api/v1/exercises/seed
- * @desc    Seed default exercises for organization
- * @access  Private (ADMIN)
+ * @swagger
+ * /exercises/seed:
+ *   post:
+ *     summary: Seed default exercises for organization
+ *     tags: [Exercises]
+ *     responses:
+ *       200:
+ *         description: Default exercises seeded
+ *       403:
+ *         description: Admin role required
  */
 router.post('/seed', requireRole(['ADMIN']), exerciseController.seedDefaultExercises);
 
@@ -115,9 +241,40 @@ router.post('/seed', requireRole(['ADMIN']), exerciseController.seedDefaultExerc
 // ============================================================================
 
 /**
- * @route   POST /api/v1/exercises/prescriptions
- * @desc    Create a new exercise prescription
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /exercises/prescriptions:
+ *   post:
+ *     summary: Create a new exercise prescription
+ *     tags: [Exercises]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [patient_id, exercise_id]
+ *             properties:
+ *               patient_id:
+ *                 type: string
+ *                 format: uuid
+ *               exercise_id:
+ *                 type: string
+ *                 format: uuid
+ *               sets:
+ *                 type: integer
+ *               reps:
+ *                 type: integer
+ *               frequency:
+ *                 type: string
+ *               duration_weeks:
+ *                 type: integer
+ *               notes:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Prescription created
+ *       400:
+ *         description: Validation error
  */
 router.post(
   '/prescriptions',
@@ -127,9 +284,23 @@ router.post(
 );
 
 /**
- * @route   GET /api/v1/exercises/prescriptions/patient/:patientId
- * @desc    Get prescriptions for a patient
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /exercises/prescriptions/patient/{patientId}:
+ *   get:
+ *     summary: Get prescriptions for a patient
+ *     tags: [Exercises]
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: List of patient prescriptions
+ *       404:
+ *         description: Patient not found
  */
 router.get(
   '/prescriptions/patient/:patientId',
@@ -139,9 +310,23 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/exercises/prescriptions/:id
- * @desc    Get prescription by ID
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /exercises/prescriptions/{id}:
+ *   get:
+ *     summary: Get prescription by ID
+ *     tags: [Exercises]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Prescription details
+ *       404:
+ *         description: Prescription not found
  */
 router.get(
   '/prescriptions/:id',
@@ -151,9 +336,38 @@ router.get(
 );
 
 /**
- * @route   PATCH /api/v1/exercises/prescriptions/:id
- * @desc    Update an existing prescription
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /exercises/prescriptions/{id}:
+ *   patch:
+ *     summary: Update an existing prescription
+ *     tags: [Exercises]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               sets:
+ *                 type: integer
+ *               reps:
+ *                 type: integer
+ *               frequency:
+ *                 type: string
+ *               notes:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Prescription updated
+ *       404:
+ *         description: Prescription not found
  */
 router.patch(
   '/prescriptions/:id',
@@ -163,9 +377,23 @@ router.patch(
 );
 
 /**
- * @route   POST /api/v1/exercises/prescriptions/:id/duplicate
- * @desc    Duplicate a prescription
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /exercises/prescriptions/{id}/duplicate:
+ *   post:
+ *     summary: Duplicate a prescription
+ *     tags: [Exercises]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       201:
+ *         description: Prescription duplicated
+ *       404:
+ *         description: Prescription not found
  */
 router.post(
   '/prescriptions/:id/duplicate',
@@ -174,9 +402,34 @@ router.post(
 );
 
 /**
- * @route   PATCH /api/v1/exercises/prescriptions/:id/status
- * @desc    Update prescription status
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /exercises/prescriptions/{id}/status:
+ *   patch:
+ *     summary: Update prescription status
+ *     tags: [Exercises]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [status]
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [active, paused, completed, cancelled]
+ *     responses:
+ *       200:
+ *         description: Status updated
+ *       404:
+ *         description: Prescription not found
  */
 router.patch(
   '/prescriptions/:id/status',
@@ -186,9 +439,23 @@ router.patch(
 );
 
 /**
- * @route   GET /api/v1/exercises/prescriptions/:id/progress
- * @desc    Get progress history for a prescription
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /exercises/prescriptions/{id}/progress:
+ *   get:
+ *     summary: Get progress history for a prescription
+ *     tags: [Exercises]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Progress history with compliance data
+ *       404:
+ *         description: Prescription not found
  */
 router.get(
   '/prescriptions/:id/progress',
@@ -201,9 +468,28 @@ router.get(
 // ============================================================================
 
 /**
- * @route   GET /api/v1/exercises/prescriptions/:id/pdf
- * @desc    Generate prescription PDF handout
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /exercises/prescriptions/{id}/pdf:
+ *   get:
+ *     summary: Generate prescription PDF handout
+ *     tags: [Exercises]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: PDF file
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       404:
+ *         description: Prescription not found
  */
 router.get(
   '/prescriptions/:id/pdf',
@@ -212,9 +498,23 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/exercises/prescriptions/:id/send-email
- * @desc    Send prescription via email
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /exercises/prescriptions/{id}/send-email:
+ *   post:
+ *     summary: Send prescription via email to patient
+ *     tags: [Exercises]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Email sent
+ *       404:
+ *         description: Prescription not found
  */
 router.post(
   '/prescriptions/:id/send-email',
@@ -223,9 +523,23 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/exercises/prescriptions/:id/send-reminder
- * @desc    Send exercise reminder
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /exercises/prescriptions/{id}/send-reminder:
+ *   post:
+ *     summary: Send exercise reminder to patient
+ *     tags: [Exercises]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Reminder sent
+ *       404:
+ *         description: Prescription not found
  */
 router.post(
   '/prescriptions/:id/send-reminder',
@@ -234,9 +548,23 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/exercises/prescriptions/:id/send-sms
- * @desc    Send portal link via SMS
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /exercises/prescriptions/{id}/send-sms:
+ *   post:
+ *     summary: Send portal link via SMS to patient
+ *     tags: [Exercises]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: SMS sent
+ *       404:
+ *         description: Prescription not found
  */
 router.post(
   '/prescriptions/:id/send-sms',
@@ -249,9 +577,39 @@ router.post(
 // ============================================================================
 
 /**
- * @route   POST /api/v1/exercises
- * @desc    Create a new exercise
- * @access  Private (ADMIN)
+ * @swagger
+ * /exercises:
+ *   post:
+ *     summary: Create a new exercise in the library
+ *     tags: [Exercises]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, category, body_region]
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               category:
+ *                 type: string
+ *               body_region:
+ *                 type: string
+ *               difficulty:
+ *                 type: string
+ *                 enum: [beginner, intermediate, advanced]
+ *               instructions:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Exercise created
+ *       400:
+ *         description: Validation error
+ *       403:
+ *         description: Admin role required
  */
 router.post(
   '/',
@@ -261,9 +619,40 @@ router.post(
 );
 
 /**
- * @route   PATCH /api/v1/exercises/:id
- * @desc    Update an exercise
- * @access  Private (ADMIN)
+ * @swagger
+ * /exercises/{id}:
+ *   patch:
+ *     summary: Update an exercise in the library
+ *     tags: [Exercises]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               category:
+ *                 type: string
+ *               body_region:
+ *                 type: string
+ *               difficulty:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Exercise updated
+ *       404:
+ *         description: Exercise not found
  */
 router.patch(
   '/:id',
@@ -273,16 +662,44 @@ router.patch(
 );
 
 /**
- * @route   DELETE /api/v1/exercises/:id
- * @desc    Delete an exercise (soft delete)
- * @access  Private (ADMIN)
+ * @swagger
+ * /exercises/{id}:
+ *   delete:
+ *     summary: Delete an exercise (soft delete)
+ *     tags: [Exercises]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Exercise deleted
+ *       404:
+ *         description: Exercise not found
  */
 router.delete('/:id', requireRole(['ADMIN']), exerciseController.deleteExercise);
 
 /**
- * @route   GET /api/v1/exercises/:id
- * @desc    Get exercise by ID
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /exercises/{id}:
+ *   get:
+ *     summary: Get exercise by ID
+ *     tags: [Exercises]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Exercise details
+ *       404:
+ *         description: Exercise not found
  */
 router.get(
   '/:id',

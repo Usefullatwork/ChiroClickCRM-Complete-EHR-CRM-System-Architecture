@@ -21,38 +21,210 @@ const router = express.Router();
 // All routes require authentication
 router.use(authenticate);
 
-// GET /api/v1/spine-templates - Get all templates
+/**
+ * @swagger
+ * /spine-templates:
+ *   get:
+ *     summary: Get all spine palpation templates
+ *     tags: [Spine Templates]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of all templates
+ */
 router.get('/', validate(getAllTemplatesSchema), spineTemplatesController.getAll);
 
-// GET /api/v1/spine-templates/grouped - Get templates grouped by segment
+/**
+ * @swagger
+ * /spine-templates/grouped:
+ *   get:
+ *     summary: Get templates grouped by segment
+ *     tags: [Spine Templates]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Templates organized by spinal segment
+ */
 router.get('/grouped', spineTemplatesController.getGroupedBySegment);
 
-// GET /api/v1/spine-templates/segments - Get list of available segments
+/**
+ * @swagger
+ * /spine-templates/segments:
+ *   get:
+ *     summary: Get list of available spinal segments
+ *     tags: [Spine Templates]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Available segment names
+ */
 router.get('/segments', spineTemplatesController.getSegments);
 
-// GET /api/v1/spine-templates/directions - Get list of available directions
+/**
+ * @swagger
+ * /spine-templates/directions:
+ *   get:
+ *     summary: Get list of available palpation directions
+ *     tags: [Spine Templates]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Available direction names
+ */
 router.get('/directions', spineTemplatesController.getDirections);
 
-// GET /api/v1/spine-templates/:segment/:direction - Get template for segment+direction
+/**
+ * @swagger
+ * /spine-templates/{segment}/{direction}:
+ *   get:
+ *     summary: Get template for a specific segment and direction
+ *     tags: [Spine Templates]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: segment
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: direction
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Template text for segment+direction
+ *       404:
+ *         description: Template not found
+ */
 router.get(
   '/:segment/:direction',
   validate(getBySegmentDirectionSchema),
   spineTemplatesController.getBySegmentDirection
 );
 
-// POST /api/v1/spine-templates - Create custom template
+/**
+ * @swagger
+ * /spine-templates:
+ *   post:
+ *     summary: Create a custom palpation template
+ *     tags: [Spine Templates]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [segment, direction, text]
+ *             properties:
+ *               segment:
+ *                 type: string
+ *               direction:
+ *                 type: string
+ *               text:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Template created
+ */
 router.post('/', validate(createTemplateSchema), spineTemplatesController.create);
 
-// POST /api/v1/spine-templates/bulk - Bulk update templates
+/**
+ * @swagger
+ * /spine-templates/bulk:
+ *   post:
+ *     summary: Bulk update palpation templates
+ *     tags: [Spine Templates]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [templates]
+ *             properties:
+ *               templates:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *     responses:
+ *       200:
+ *         description: Templates updated
+ */
 router.post('/bulk', validate(bulkUpdateTemplatesSchema), spineTemplatesController.bulkUpdate);
 
-// POST /api/v1/spine-templates/reset - Reset to defaults
+/**
+ * @swagger
+ * /spine-templates/reset:
+ *   post:
+ *     summary: Reset all templates to defaults
+ *     tags: [Spine Templates]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Templates reset to defaults
+ */
 router.post('/reset', spineTemplatesController.resetToDefaults);
 
-// PATCH /api/v1/spine-templates/:id - Update template
+/**
+ * @swagger
+ * /spine-templates/{id}:
+ *   patch:
+ *     summary: Update a palpation template
+ *     tags: [Spine Templates]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               text:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Template updated
+ */
 router.patch('/:id', validate(updateTemplateSchema), spineTemplatesController.update);
 
-// DELETE /api/v1/spine-templates/:id - Delete custom template
+/**
+ * @swagger
+ * /spine-templates/{id}:
+ *   delete:
+ *     summary: Delete custom template (reverts to default)
+ *     tags: [Spine Templates]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Template deleted
+ */
 router.delete('/:id', validate(deleteTemplateSchema), spineTemplatesController.remove);
 
 export default router;

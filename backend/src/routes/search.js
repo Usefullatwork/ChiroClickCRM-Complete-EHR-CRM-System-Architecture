@@ -23,9 +23,43 @@ router.use(requireAuth);
 router.use(requireOrganization);
 
 /**
- * @route   GET /api/v1/search/patients
- * @desc    Search patients using full-text search
- * @access  Private
+ * @swagger
+ * /search/patients:
+ *   get:
+ *     summary: Search patients using full-text search
+ *     tags: [Search]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         required: true
+ *         schema:
+ *           type: string
+ *           minLength: 2
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *           default: 0
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: includeInactive
+ *         schema:
+ *           type: boolean
+ *     responses:
+ *       200:
+ *         description: Patient search results
+ *       400:
+ *         description: Query too short
  */
 router.get('/patients', validate(searchPatientsSchema), async (req, res) => {
   const { q, limit = 20, offset = 0, status, includeInactive } = req.query;
@@ -48,9 +82,32 @@ router.get('/patients', validate(searchPatientsSchema), async (req, res) => {
 });
 
 /**
- * @route   GET /api/v1/search/diagnosis
- * @desc    Search diagnosis codes (ICPC-2, ICD-10)
- * @access  Private
+ * @swagger
+ * /search/diagnosis:
+ *   get:
+ *     summary: Search diagnosis codes (ICPC-2, ICD-10)
+ *     tags: [Search]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 30
+ *       - in: query
+ *         name: system
+ *         schema:
+ *           type: string
+ *           enum: [icpc2, icd10]
+ *     responses:
+ *       200:
+ *         description: Diagnosis code search results
  */
 router.get('/diagnosis', validate(searchDiagnosisSchema), async (req, res) => {
   const { q, limit = 30, system } = req.query;
@@ -71,9 +128,45 @@ router.get('/diagnosis', validate(searchDiagnosisSchema), async (req, res) => {
 });
 
 /**
- * @route   GET /api/v1/search/encounters
- * @desc    Search clinical encounters (SOAP notes)
- * @access  Private
+ * @swagger
+ * /search/encounters:
+ *   get:
+ *     summary: Search clinical encounters (SOAP notes)
+ *     tags: [Search]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         required: true
+ *         schema:
+ *           type: string
+ *           minLength: 2
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *           default: 0
+ *       - in: query
+ *         name: patientId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: practitionerId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Encounter search results
+ *       400:
+ *         description: Query too short
  */
 router.get('/encounters', validate(searchEncountersSchema), async (req, res) => {
   const { q, limit = 20, offset = 0, patientId, practitionerId } = req.query;
@@ -96,9 +189,30 @@ router.get('/encounters', validate(searchEncountersSchema), async (req, res) => 
 });
 
 /**
- * @route   GET /api/v1/search/global
- * @desc    Global search across all entities
- * @access  Private
+ * @swagger
+ * /search/global:
+ *   get:
+ *     summary: Global search across all entities
+ *     tags: [Search]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         required: true
+ *         schema:
+ *           type: string
+ *           minLength: 2
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *     responses:
+ *       200:
+ *         description: Results across patients, encounters, and diagnoses
+ *       400:
+ *         description: Query too short
  */
 router.get('/global', validate(globalSearchSchema), async (req, res) => {
   const { q, limit = 10 } = req.query;
@@ -118,9 +232,34 @@ router.get('/global', validate(globalSearchSchema), async (req, res) => {
 });
 
 /**
- * @route   GET /api/v1/search/suggest
- * @desc    Get search suggestions (autocomplete)
- * @access  Private
+ * @swagger
+ * /search/suggest:
+ *   get:
+ *     summary: Get search suggestions (autocomplete)
+ *     tags: [Search]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         required: true
+ *         schema:
+ *           type: string
+ *           minLength: 2
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 5
+ *       - in: query
+ *         name: entity
+ *         schema:
+ *           type: string
+ *           enum: [patient, diagnosis, encounter]
+ *           default: patient
+ *     responses:
+ *       200:
+ *         description: Autocomplete suggestions
  */
 router.get('/suggest', validate(suggestSchema), async (req, res) => {
   try {

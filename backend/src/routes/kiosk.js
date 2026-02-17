@@ -18,7 +18,17 @@ import {
 
 const router = express.Router();
 
-// GET /api/v1/kiosk/health - Kiosk health check
+/**
+ * @swagger
+ * /kiosk/health:
+ *   get:
+ *     summary: Kiosk module health check
+ *     tags: [Kiosk]
+ *     security: []
+ *     responses:
+ *       200:
+ *         description: Module health status
+ */
 router.get('/health', (req, res) => {
   res.json({
     status: 'ok',
@@ -32,10 +42,32 @@ router.use(requireAuth);
 router.use(requireOrganization);
 
 /**
- * @route   POST /api/v1/kiosk/check-in
- * @desc    Check in patient for appointment
- * @access  Private (ADMIN, PRACTITIONER, RECEPTIONIST)
- * @body    { patientId, appointmentId }
+ * @swagger
+ * /kiosk/check-in:
+ *   post:
+ *     summary: Check in patient for appointment
+ *     tags: [Kiosk]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [patientId, appointmentId]
+ *             properties:
+ *               patientId:
+ *                 type: string
+ *                 format: uuid
+ *               appointmentId:
+ *                 type: string
+ *                 format: uuid
+ *     responses:
+ *       200:
+ *         description: Patient checked in
+ *       404:
+ *         description: Appointment not found
  */
 router.post(
   '/check-in',
@@ -45,10 +77,28 @@ router.post(
 );
 
 /**
- * @route   GET /api/v1/kiosk/intake/:patientId
- * @desc    Get intake form for a patient
- * @access  Private (ADMIN, PRACTITIONER, RECEPTIONIST)
- * @query   encounterType - optional encounter type to customize form
+ * @swagger
+ * /kiosk/intake/{patientId}:
+ *   get:
+ *     summary: Get intake form for a patient
+ *     tags: [Kiosk]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: encounterType
+ *         schema:
+ *           type: string
+ *           enum: [INITIAL, FOLLOW_UP, REASSESSMENT, EMERGENCY]
+ *     responses:
+ *       200:
+ *         description: Intake form fields
  */
 router.get(
   '/intake/:patientId',
@@ -58,10 +108,29 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/kiosk/intake/:patientId
- * @desc    Submit completed intake form
- * @access  Private (ADMIN, PRACTITIONER, RECEPTIONIST)
- * @body    Form data fields
+ * @swagger
+ * /kiosk/intake/{patientId}:
+ *   post:
+ *     summary: Submit completed intake form
+ *     tags: [Kiosk]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Intake form submitted
  */
 router.post(
   '/intake/:patientId',
@@ -71,10 +140,36 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/kiosk/consent/:patientId
- * @desc    Submit signed consent form
- * @access  Private (ADMIN, PRACTITIONER, RECEPTIONIST)
- * @body    { consentType, signature }
+ * @swagger
+ * /kiosk/consent/{patientId}:
+ *   post:
+ *     summary: Submit signed consent form
+ *     tags: [Kiosk]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [consentType, signature]
+ *             properties:
+ *               consentType:
+ *                 type: string
+ *               signature:
+ *                 type: string
+ *                 description: Base64-encoded signature image
+ *     responses:
+ *       200:
+ *         description: Consent recorded
  */
 router.post(
   '/consent/:patientId',
@@ -84,10 +179,23 @@ router.post(
 );
 
 /**
- * @route   GET /api/v1/kiosk/queue
- * @desc    Get practitioner's patient queue for today
- * @access  Private (ADMIN, PRACTITIONER)
- * @query   practitionerId - optional, defaults to authenticated user
+ * @swagger
+ * /kiosk/queue:
+ *   get:
+ *     summary: Get practitioner's patient queue for today
+ *     tags: [Kiosk]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: practitionerId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Defaults to authenticated user
+ *     responses:
+ *       200:
+ *         description: Today's patient queue
  */
 router.get(
   '/queue',

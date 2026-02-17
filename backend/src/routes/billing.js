@@ -78,8 +78,23 @@ router.post('/episodes', validate(createEpisodeSchema), async (req, res) => {
 });
 
 /**
- * GET /billing/episodes/patient/:patientId
- * Get all episodes for a patient
+ * @swagger
+ * /billing/episodes/patient/{patientId}:
+ *   get:
+ *     summary: Get all care episodes for a patient
+ *     tags: [Billing]
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: List of patient episodes
+ *       500:
+ *         description: Server error
  */
 router.get('/episodes/patient/:patientId', validate(getPatientEpisodesSchema), async (req, res) => {
   try {
@@ -95,8 +110,23 @@ router.get('/episodes/patient/:patientId', validate(getPatientEpisodesSchema), a
 });
 
 /**
- * GET /billing/episodes/patient/:patientId/active
- * Get active episode for a patient
+ * @swagger
+ * /billing/episodes/patient/{patientId}/active:
+ *   get:
+ *     summary: Get active care episode for a patient
+ *     tags: [Billing]
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Active episode details
+ *       404:
+ *         description: No active episode found
  */
 router.get(
   '/episodes/patient/:patientId/active',
@@ -119,8 +149,23 @@ router.get(
 );
 
 /**
- * GET /billing/episodes/:episodeId
- * Get episode details with billing info
+ * @swagger
+ * /billing/episodes/{episodeId}:
+ *   get:
+ *     summary: Get episode details with billing info
+ *     tags: [Billing]
+ *     parameters:
+ *       - in: path
+ *         name: episodeId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Episode summary with billing details
+ *       404:
+ *         description: Episode not found
  */
 router.get('/episodes/:episodeId', validate(getEpisodeSchema), async (req, res) => {
   try {
@@ -139,8 +184,36 @@ router.get('/episodes/:episodeId', validate(getEpisodeSchema), async (req, res) 
 });
 
 /**
- * PATCH /billing/episodes/:episodeId/progress
- * Update episode progress after a visit
+ * @swagger
+ * /billing/episodes/{episodeId}/progress:
+ *   patch:
+ *     summary: Update episode progress after a visit
+ *     tags: [Billing]
+ *     parameters:
+ *       - in: path
+ *         name: episodeId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               visit_number:
+ *                 type: integer
+ *               improvement_percentage:
+ *                 type: number
+ *               notes:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Episode progress updated
+ *       400:
+ *         description: Validation error
  */
 router.patch(
   '/episodes/:episodeId/progress',
@@ -161,8 +234,36 @@ router.patch(
 );
 
 /**
- * POST /billing/episodes/:episodeId/reeval
- * Perform re-evaluation
+ * @swagger
+ * /billing/episodes/{episodeId}/reeval:
+ *   post:
+ *     summary: Perform re-evaluation of care episode
+ *     tags: [Billing]
+ *     parameters:
+ *       - in: path
+ *         name: episodeId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               findings:
+ *                 type: string
+ *               updated_goals:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       200:
+ *         description: Re-evaluation recorded
+ *       400:
+ *         description: Validation error
  */
 router.post('/episodes/:episodeId/reeval', validate(episodeReevalSchema), async (req, res) => {
   try {
@@ -179,8 +280,34 @@ router.post('/episodes/:episodeId/reeval', validate(episodeReevalSchema), async 
 });
 
 /**
- * POST /billing/episodes/:episodeId/maintenance
- * Transition episode to maintenance status
+ * @swagger
+ * /billing/episodes/{episodeId}/maintenance:
+ *   post:
+ *     summary: Transition episode to maintenance status
+ *     tags: [Billing]
+ *     parameters:
+ *       - in: path
+ *         name: episodeId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               reason:
+ *                 type: string
+ *               mmi_date:
+ *                 type: string
+ *                 format: date
+ *     responses:
+ *       200:
+ *         description: Episode transitioned to maintenance
+ *       400:
+ *         description: Validation error
  */
 router.post(
   '/episodes/:episodeId/maintenance',
@@ -202,8 +329,35 @@ router.post(
 );
 
 /**
- * POST /billing/episodes/:episodeId/abn
- * Record ABN signature
+ * @swagger
+ * /billing/episodes/{episodeId}/abn:
+ *   post:
+ *     summary: Record ABN (Advance Beneficiary Notice) signature
+ *     tags: [Billing]
+ *     parameters:
+ *       - in: path
+ *         name: episodeId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               signed_by:
+ *                 type: string
+ *               signed_at:
+ *                 type: string
+ *                 format: date-time
+ *     responses:
+ *       200:
+ *         description: ABN recorded
+ *       400:
+ *         description: Validation error
  */
 router.post('/episodes/:episodeId/abn', validate(episodeABNSchema), async (req, res) => {
   try {
@@ -220,8 +374,34 @@ router.post('/episodes/:episodeId/abn', validate(episodeABNSchema), async (req, 
 });
 
 /**
- * POST /billing/episodes/:episodeId/discharge
- * Discharge episode
+ * @swagger
+ * /billing/episodes/{episodeId}/discharge:
+ *   post:
+ *     summary: Discharge a care episode
+ *     tags: [Billing]
+ *     parameters:
+ *       - in: path
+ *         name: episodeId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               reason:
+ *                 type: string
+ *               discharge_summary:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Episode discharged
+ *       400:
+ *         description: Validation error
  */
 router.post(
   '/episodes/:episodeId/discharge',
@@ -243,8 +423,16 @@ router.post(
 );
 
 /**
- * GET /billing/episodes/needing-reeval
- * Get episodes needing re-evaluation
+ * @swagger
+ * /billing/episodes-needing-reeval:
+ *   get:
+ *     summary: Get episodes needing re-evaluation
+ *     tags: [Billing]
+ *     responses:
+ *       200:
+ *         description: List of episodes due for re-evaluation
+ *       500:
+ *         description: Server error
  */
 router.get('/episodes-needing-reeval', async (req, res) => {
   try {
@@ -257,8 +445,29 @@ router.get('/episodes-needing-reeval', async (req, res) => {
 });
 
 /**
- * GET /billing/modifier/:episodeId/:patientId
- * Get billing modifier for episode/patient
+ * @swagger
+ * /billing/modifier/{episodeId}/{patientId}:
+ *   get:
+ *     summary: Get billing modifier for episode/patient
+ *     tags: [Billing]
+ *     parameters:
+ *       - in: path
+ *         name: episodeId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Billing modifier (AT, GA, GZ) with description
+ *       500:
+ *         description: Server error
  */
 router.get(
   '/modifier/:episodeId/:patientId',
@@ -353,8 +562,41 @@ router.get('/claims', validate(listClaimsSchema), async (req, res) => {
 });
 
 /**
- * POST /billing/claims
- * Create a new claim
+ * @swagger
+ * /billing/claims:
+ *   post:
+ *     summary: Create a new billing claim
+ *     tags: [Billing]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [patient_id, encounter_id]
+ *             properties:
+ *               patient_id:
+ *                 type: string
+ *                 format: uuid
+ *               encounter_id:
+ *                 type: string
+ *                 format: uuid
+ *               line_items:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     cpt_code:
+ *                       type: string
+ *                     units:
+ *                       type: integer
+ *                     amount:
+ *                       type: number
+ *     responses:
+ *       201:
+ *         description: Claim created
+ *       400:
+ *         description: Validation error
  */
 router.post('/claims', validate(createClaimSchema), async (req, res) => {
   try {
@@ -389,8 +631,16 @@ router.get('/claims/summary', async (req, res) => {
 });
 
 /**
- * GET /billing/claims/outstanding
- * Get outstanding claims
+ * @swagger
+ * /billing/claims/outstanding:
+ *   get:
+ *     summary: Get outstanding (unpaid) claims
+ *     tags: [Billing]
+ *     responses:
+ *       200:
+ *         description: List of outstanding claims
+ *       500:
+ *         description: Server error
  */
 router.get('/claims/outstanding', async (req, res) => {
   try {
@@ -403,8 +653,23 @@ router.get('/claims/outstanding', async (req, res) => {
 });
 
 /**
- * GET /billing/claims/:claimId
- * Get claim details
+ * @swagger
+ * /billing/claims/{claimId}:
+ *   get:
+ *     summary: Get claim details by ID
+ *     tags: [Billing]
+ *     parameters:
+ *       - in: path
+ *         name: claimId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Claim details
+ *       404:
+ *         description: Claim not found
  */
 router.get('/claims/:claimId', validate(getClaimSchema), async (req, res) => {
   try {
@@ -420,8 +685,42 @@ router.get('/claims/:claimId', validate(getClaimSchema), async (req, res) => {
 });
 
 /**
- * PUT /billing/claims/:claimId/line-items
- * Update claim line items
+ * @swagger
+ * /billing/claims/{claimId}/line-items:
+ *   put:
+ *     summary: Update claim line items
+ *     tags: [Billing]
+ *     parameters:
+ *       - in: path
+ *         name: claimId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [line_items]
+ *             properties:
+ *               line_items:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     cpt_code:
+ *                       type: string
+ *                     units:
+ *                       type: integer
+ *                     amount:
+ *                       type: number
+ *     responses:
+ *       200:
+ *         description: Line items updated
+ *       400:
+ *         description: Validation error
  */
 router.put(
   '/claims/:claimId/line-items',
@@ -442,8 +741,23 @@ router.put(
 );
 
 /**
- * POST /billing/claims/:claimId/submit
- * Submit claim for processing
+ * @swagger
+ * /billing/claims/{claimId}/submit:
+ *   post:
+ *     summary: Submit claim for processing
+ *     tags: [Billing]
+ *     parameters:
+ *       - in: path
+ *         name: claimId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Claim submitted
+ *       400:
+ *         description: Claim cannot be submitted
  */
 router.post(
   '/claims/:claimId/submit',
@@ -465,8 +779,37 @@ router.post(
 );
 
 /**
- * POST /billing/claims/:claimId/remittance
- * Process payment/remittance
+ * @swagger
+ * /billing/claims/{claimId}/remittance:
+ *   post:
+ *     summary: Process payment/remittance for a claim
+ *     tags: [Billing]
+ *     parameters:
+ *       - in: path
+ *         name: claimId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               amount_paid:
+ *                 type: number
+ *               payment_date:
+ *                 type: string
+ *                 format: date
+ *               reference_number:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Remittance processed
+ *       400:
+ *         description: Processing error
  */
 router.post(
   '/claims/:claimId/remittance',
@@ -488,8 +831,37 @@ router.post(
 );
 
 /**
- * POST /billing/claims/:claimId/appeal
- * Appeal a denied claim
+ * @swagger
+ * /billing/claims/{claimId}/appeal:
+ *   post:
+ *     summary: Appeal a denied claim
+ *     tags: [Billing]
+ *     parameters:
+ *       - in: path
+ *         name: claimId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [reason]
+ *             properties:
+ *               reason:
+ *                 type: string
+ *               supporting_documents:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       200:
+ *         description: Appeal submitted
+ *       400:
+ *         description: Appeal error
  */
 router.post(
   '/claims/:claimId/appeal',
@@ -511,8 +883,33 @@ router.post(
 );
 
 /**
- * POST /billing/claims/:claimId/write-off
- * Write off a claim
+ * @swagger
+ * /billing/claims/{claimId}/write-off:
+ *   post:
+ *     summary: Write off an uncollectable claim
+ *     tags: [Billing]
+ *     parameters:
+ *       - in: path
+ *         name: claimId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [reason]
+ *             properties:
+ *               reason:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Claim written off
+ *       400:
+ *         description: Write-off error
  */
 router.post(
   '/claims/:claimId/write-off',
@@ -538,8 +935,14 @@ router.post(
 // ============================================================================
 
 /**
- * GET /billing/cpt-codes
- * Get available CPT codes
+ * @swagger
+ * /billing/cpt-codes:
+ *   get:
+ *     summary: Get available CPT codes
+ *     tags: [Billing]
+ *     responses:
+ *       200:
+ *         description: CPT codes grouped by category (CMT, evaluation, therapy)
  */
 router.get('/cpt-codes', (req, res) => {
   res.json({
@@ -567,8 +970,14 @@ router.get('/cpt-codes', (req, res) => {
 });
 
 /**
- * GET /billing/modifiers
- * Get available modifiers
+ * @swagger
+ * /billing/modifiers:
+ *   get:
+ *     summary: Get available billing modifiers
+ *     tags: [Billing]
+ *     responses:
+ *       200:
+ *         description: Modifiers grouped by category (chiropractic, therapy, general)
  */
 router.get('/modifiers', (req, res) => {
   res.json({
@@ -594,8 +1003,28 @@ router.get('/modifiers', (req, res) => {
 });
 
 /**
- * POST /billing/suggest-cmt
- * Get suggested CMT code based on regions
+ * @swagger
+ * /billing/suggest-cmt:
+ *   post:
+ *     summary: Get suggested CMT code based on spinal regions count
+ *     tags: [Billing]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [regions_count]
+ *             properties:
+ *               regions_count:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 5
+ *     responses:
+ *       200:
+ *         description: Suggested CPT code with description
+ *       400:
+ *         description: Invalid regions count
  */
 router.post('/suggest-cmt', validate(suggestCMTSchema), async (req, res) => {
   try {

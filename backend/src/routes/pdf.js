@@ -31,9 +31,41 @@ router.use(requireOrganization);
 // ── Legacy routes (existing) ──────────────────────────────────────────
 
 /**
- * @route   POST /api/v1/pdf/letter/:encounterId
- * @desc    Generate patient letter (sick leave, referral, treatment summary)
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /pdf/letter/{encounterId}:
+ *   post:
+ *     summary: Generate patient letter (sick leave, referral, treatment summary)
+ *     tags: [PDF]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: encounterId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [letterType]
+ *             properties:
+ *               letterType:
+ *                 type: string
+ *                 enum: [referral, sick_leave, treatment_summary]
+ *     responses:
+ *       200:
+ *         description: PDF file
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       404:
+ *         description: Encounter not found
  */
 router.post(
   '/letter/:encounterId',
@@ -43,9 +75,30 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/pdf/invoice/:financialMetricId
- * @desc    Generate invoice PDF from financial metric
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /pdf/invoice/{financialMetricId}:
+ *   post:
+ *     summary: Generate invoice PDF from financial metric
+ *     tags: [PDF]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: financialMetricId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Invoice PDF file
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       404:
+ *         description: Financial metric not found
  */
 router.post(
   '/invoice/:financialMetricId',
@@ -57,9 +110,35 @@ router.post(
 // ── New enhanced PDF routes ───────────────────────────────────────────
 
 /**
- * @route   GET /api/v1/pdf/treatment-summary/:patientId
- * @desc    Generate treatment summary PDF with encounter history + outcome scores
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /pdf/treatment-summary/{patientId}:
+ *   get:
+ *     summary: Generate treatment summary PDF with encounter history and outcome scores
+ *     tags: [PDF]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: maxEncounters
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *     responses:
+ *       200:
+ *         description: Treatment summary PDF
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       404:
+ *         description: Patient not found
  */
 router.get(
   '/treatment-summary/:patientId',
@@ -101,9 +180,47 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/pdf/referral-letter
- * @desc    Generate referral letter (Henvisning) PDF
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /pdf/referral-letter:
+ *   post:
+ *     summary: Generate referral letter (Henvisning) PDF
+ *     tags: [PDF]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [patientId, encounterId]
+ *             properties:
+ *               patientId:
+ *                 type: string
+ *                 format: uuid
+ *               encounterId:
+ *                 type: string
+ *                 format: uuid
+ *               recipientName:
+ *                 type: string
+ *               recipientAddress:
+ *                 type: string
+ *               reasonForReferral:
+ *                 type: string
+ *               relevantFindings:
+ *                 type: string
+ *               relevantTestResults:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Referral letter PDF
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       404:
+ *         description: Encounter not found
  */
 router.post(
   '/referral-letter',
@@ -165,9 +282,55 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/pdf/sick-note
- * @desc    Generate sick note (Sykmelding) PDF
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /pdf/sick-note:
+ *   post:
+ *     summary: Generate sick note (Sykmelding) PDF
+ *     tags: [PDF]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [patientId, encounterId, startDate, endDate]
+ *             properties:
+ *               patientId:
+ *                 type: string
+ *                 format: uuid
+ *               encounterId:
+ *                 type: string
+ *                 format: uuid
+ *               diagnosisCode:
+ *                 type: string
+ *               diagnosisText:
+ *                 type: string
+ *               startDate:
+ *                 type: string
+ *                 format: date
+ *               endDate:
+ *                 type: string
+ *                 format: date
+ *               percentage:
+ *                 type: integer
+ *                 minimum: 0
+ *                 maximum: 100
+ *               functionalAssessment:
+ *                 type: string
+ *               workRestrictions:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Sick note PDF
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       404:
+ *         description: Patient not found
  */
 router.post(
   '/sick-note',
@@ -236,9 +399,61 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/pdf/invoice
- * @desc    Generate invoice (Faktura) PDF from line items
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /pdf/invoice:
+ *   post:
+ *     summary: Generate invoice (Faktura) PDF from line items
+ *     tags: [PDF]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [patientId, lineItems]
+ *             properties:
+ *               patientId:
+ *                 type: string
+ *                 format: uuid
+ *               invoiceNumber:
+ *                 type: string
+ *               invoiceDate:
+ *                 type: string
+ *                 format: date
+ *               dueDate:
+ *                 type: string
+ *                 format: date
+ *               lineItems:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     description:
+ *                       type: string
+ *                     quantity:
+ *                       type: integer
+ *                     unitPrice:
+ *                       type: number
+ *               vatRate:
+ *                 type: number
+ *               accountNumber:
+ *                 type: string
+ *               kidNumber:
+ *                 type: string
+ *               insuranceCompany:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Invoice PDF
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       404:
+ *         description: Patient not found
  */
 router.post(
   '/invoice',

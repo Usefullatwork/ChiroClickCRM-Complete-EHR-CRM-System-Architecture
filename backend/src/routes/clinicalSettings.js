@@ -25,20 +25,44 @@ router.use(requireAuth);
 // ============================================
 
 /**
- * GET /api/v1/clinical-settings
- * Get all clinical settings for the user's organization
+ * @swagger
+ * /clinical-settings:
+ *   get:
+ *     summary: Get all clinical settings for the organization
+ *     tags: [Clinical Settings]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Clinical settings object
  */
 router.get('/', clinicalSettingsController.getClinicalSettings);
 
 /**
- * GET /api/v1/clinical-settings/defaults
- * Get default clinical settings (for reference)
+ * @swagger
+ * /clinical-settings/defaults:
+ *   get:
+ *     summary: Get default clinical settings
+ *     tags: [Clinical Settings]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Default settings values
  */
 router.get('/defaults', clinicalSettingsController.getDefaultClinicalSettings);
 
 /**
- * GET /api/v1/clinical-settings/adjustment/templates
- * Get adjustment notation templates based on current settings
+ * @swagger
+ * /clinical-settings/adjustment/templates:
+ *   get:
+ *     summary: Get adjustment notation templates
+ *     tags: [Clinical Settings]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Notation templates for the configured adjustment style
  */
 router.get('/adjustment/templates', clinicalSettingsController.getAdjustmentNotationTemplates);
 
@@ -47,8 +71,22 @@ router.get('/adjustment/templates', clinicalSettingsController.getAdjustmentNota
 // ============================================
 
 /**
- * PATCH /api/v1/clinical-settings
- * Update clinical settings (partial update)
+ * @swagger
+ * /clinical-settings:
+ *   patch:
+ *     summary: Update clinical settings (partial update)
+ *     tags: [Clinical Settings]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Updated settings
  */
 router.patch(
   '/',
@@ -58,9 +96,29 @@ router.patch(
 );
 
 /**
- * PATCH /api/v1/clinical-settings/:section
- * Update a specific section of clinical settings
- * Valid sections: adjustment, tests, letters, soap, ai, display
+ * @swagger
+ * /clinical-settings/{section}:
+ *   patch:
+ *     summary: Update a specific section of clinical settings
+ *     tags: [Clinical Settings]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: section
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [adjustment, tests, letters, soap, ai, display]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Updated section settings
  */
 router.patch(
   '/:section',
@@ -70,9 +128,27 @@ router.patch(
 );
 
 /**
- * PUT /api/v1/clinical-settings/adjustment/style
- * Set adjustment notation style
- * Body: { style: 'gonstead' | 'diversified' | 'segment_listing' | 'activator' | 'custom' }
+ * @swagger
+ * /clinical-settings/adjustment/style:
+ *   put:
+ *     summary: Set adjustment notation style
+ *     tags: [Clinical Settings]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [style]
+ *             properties:
+ *               style:
+ *                 type: string
+ *                 enum: [gonstead, diversified, segment_listing, activator, custom]
+ *     responses:
+ *       200:
+ *         description: Style updated
  */
 router.put(
   '/adjustment/style',
@@ -82,9 +158,29 @@ router.put(
 );
 
 /**
- * PATCH /api/v1/clinical-settings/tests/:testType
- * Update test documentation settings
- * Valid testTypes: orthopedic, neurological, rom, palpation
+ * @swagger
+ * /clinical-settings/tests/{testType}:
+ *   patch:
+ *     summary: Update test documentation settings
+ *     tags: [Clinical Settings]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: testType
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [orthopedic, neurological, rom, palpation]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Test settings updated
  */
 router.patch(
   '/tests/:testType',
@@ -94,8 +190,22 @@ router.patch(
 );
 
 /**
- * PATCH /api/v1/clinical-settings/letters
- * Update letter/document settings
+ * @swagger
+ * /clinical-settings/letters:
+ *   patch:
+ *     summary: Update letter and document settings
+ *     tags: [Clinical Settings]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Letter settings updated
  */
 router.patch(
   '/letters',
@@ -109,9 +219,18 @@ router.patch(
 // ============================================
 
 /**
- * POST /api/v1/clinical-settings/reset
- * Reset all clinical settings to defaults
- * Admin only
+ * @swagger
+ * /clinical-settings/reset:
+ *   post:
+ *     summary: Reset all clinical settings to defaults
+ *     tags: [Clinical Settings]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Settings reset to defaults
+ *       403:
+ *         description: Admin only
  */
 router.post('/reset', requireRole(['ADMIN']), clinicalSettingsController.resetClinicalSettings);
 

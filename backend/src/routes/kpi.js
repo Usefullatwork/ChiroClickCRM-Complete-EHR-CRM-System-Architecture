@@ -14,9 +14,29 @@ router.use(requireAuth);
 router.use(requireOrganization);
 
 /**
- * @route   GET /api/v1/kpi/dashboard
- * @desc    Get dashboard KPIs
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /kpi/dashboard:
+ *   get:
+ *     summary: Get dashboard KPIs
+ *     tags: [KPI]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: start_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: end_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Dashboard KPI metrics
+ *       403:
+ *         description: Insufficient permissions
  */
 router.get(
   '/dashboard',
@@ -26,9 +46,29 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/kpi/retention
- * @desc    Get patient retention metrics
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /kpi/retention:
+ *   get:
+ *     summary: Get patient retention metrics
+ *     tags: [KPI]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: start_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: end_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Patient retention metrics
+ *       403:
+ *         description: Insufficient permissions
  */
 router.get(
   '/retention',
@@ -38,9 +78,29 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/kpi/rebooking-rate
- * @desc    Get rebooking rate
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /kpi/rebooking-rate:
+ *   get:
+ *     summary: Get rebooking rate
+ *     tags: [KPI]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: start_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: end_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Rebooking rate percentage and trends
+ *       403:
+ *         description: Insufficient permissions
  */
 router.get(
   '/rebooking-rate',
@@ -50,9 +110,29 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/kpi/top-diagnoses
- * @desc    Get top diagnoses
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /kpi/top-diagnoses:
+ *   get:
+ *     summary: Get top diagnoses
+ *     tags: [KPI]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: start_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: end_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Top diagnoses with counts
+ *       403:
+ *         description: Insufficient permissions
  */
 router.get(
   '/top-diagnoses',
@@ -62,9 +142,29 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/kpi/detailed
- * @desc    Get detailed KPI tracking dashboard (rebooking, categories, geography)
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /kpi/detailed:
+ *   get:
+ *     summary: Get detailed KPI tracking dashboard
+ *     tags: [KPI]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: start_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: end_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Detailed KPIs including rebooking, categories, geography
+ *       403:
+ *         description: Insufficient permissions
  */
 router.get(
   '/detailed',
@@ -74,9 +174,29 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/kpi/category-breakdown
- * @desc    Get patient category breakdown with rebooking rates
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /kpi/category-breakdown:
+ *   get:
+ *     summary: Get patient category breakdown with rebooking rates
+ *     tags: [KPI]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: start_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: end_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Patient category breakdown
+ *       403:
+ *         description: Insufficient permissions
  */
 router.get(
   '/category-breakdown',
@@ -86,9 +206,29 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/kpi/geographic
- * @desc    Get geographic distribution (Oslo vs Outside vs Traveling)
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /kpi/geographic:
+ *   get:
+ *     summary: Get geographic distribution of patients
+ *     tags: [KPI]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: start_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: end_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Geographic distribution (Oslo vs Outside vs Traveling)
+ *       403:
+ *         description: Insufficient permissions
  */
 router.get(
   '/geographic',
@@ -98,9 +238,40 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/kpi/import
- * @desc    Import KPI data from Excel spreadsheet
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /kpi/import:
+ *   post:
+ *     summary: Import KPI data from Excel spreadsheet
+ *     tags: [KPI]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     date:
+ *                       type: string
+ *                       format: date
+ *                     metric:
+ *                       type: string
+ *                     value:
+ *                       type: number
+ *     responses:
+ *       200:
+ *         description: KPI data imported successfully
+ *       400:
+ *         description: Validation error
+ *       403:
+ *         description: Insufficient permissions
  */
 router.post(
   '/import',
@@ -110,9 +281,29 @@ router.post(
 );
 
 /**
- * @route   GET /api/v1/kpi/daily
- * @desc    Get daily KPIs for a specific date
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /kpi/daily:
+ *   get:
+ *     summary: Get daily KPIs for a specific date
+ *     tags: [KPI]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: start_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: end_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Daily KPI data
+ *       403:
+ *         description: Insufficient permissions
  */
 router.get(
   '/daily',
@@ -122,9 +313,29 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/kpi/weekly
- * @desc    Get weekly KPIs for a date range
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /kpi/weekly:
+ *   get:
+ *     summary: Get weekly KPIs for a date range
+ *     tags: [KPI]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: start_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: end_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Weekly KPI data
+ *       403:
+ *         description: Insufficient permissions
  */
 router.get(
   '/weekly',
@@ -134,9 +345,29 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/kpi/monthly
- * @desc    Get monthly KPIs for a specific month
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /kpi/monthly:
+ *   get:
+ *     summary: Get monthly KPIs for a specific month
+ *     tags: [KPI]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: start_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: end_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Monthly KPI data
+ *       403:
+ *         description: Insufficient permissions
  */
 router.get(
   '/monthly',

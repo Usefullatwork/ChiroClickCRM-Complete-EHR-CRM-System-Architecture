@@ -200,5 +200,297 @@ describe('Encounters Service', () => {
         })
       ).rejects.toThrow(/signed/i);
     });
+
+    it('should return null for non-existent encounter', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      const result = await encountersService.updateEncounter(testOrgId, 'non-existent', {
+        subjective: { chief_complaint: 'Test' },
+      });
+
+      expect(result).toBeNull();
+    });
+
+    it('should throw when no fields to update', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [{ signed_at: null }],
+      });
+
+      await expect(
+        encountersService.updateEncounter(testOrgId, 'enc-123', {
+          invalid_field: 'test',
+        })
+      ).rejects.toThrow(/No fields to update/i);
+    });
+  });
+
+  // =============================================================================
+  // GET PATIENT ENCOUNTERS
+  // =============================================================================
+
+  describe('getPatientEncounters', () => {
+    it('should return encounters for a patient', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [
+          { id: 'enc-1', encounter_type: 'INITIAL', practitioner_name: 'Dr. Smith' },
+          { id: 'enc-2', encounter_type: 'FOLLOWUP', practitioner_name: 'Dr. Smith' },
+        ],
+      });
+
+      const result = await encountersService.getPatientEncounters(testOrgId, 'pat-123');
+
+      expect(result).toHaveLength(2);
+      expect(mockQuery).toHaveBeenCalledTimes(1);
+    });
+
+    it('should respect limit parameter', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [{ id: 'enc-1' }] });
+
+      await encountersService.getPatientEncounters(testOrgId, 'pat-123', 5);
+
+      const queryCall = mockQuery.mock.calls[0];
+      expect(queryCall[1]).toContain(5);
+    });
+
+    it('should return empty array for patient with no encounters', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      const result = await encountersService.getPatientEncounters(testOrgId, 'pat-new');
+
+      expect(result).toHaveLength(0);
+    });
+
+    it('should throw on database error', async () => {
+      mockQuery.mockRejectedValueOnce(new Error('DB error'));
+
+      await expect(encountersService.getPatientEncounters(testOrgId, 'pat-123')).rejects.toThrow(
+        'DB error'
+      );
+    });
+  });
+
+  // =============================================================================
+  // GET ALL ENCOUNTERS (ADDITIONAL TESTS)
+  // =============================================================================
+
+  describe('getAllEncounters - filters', () => {
+    it('should filter by patient ID', async () => {
+      mockQuery
+        .mockResolvedValueOnce({ rows: [{ count: '1' }] })
+        .mockResolvedValueOnce({ rows: [{ id: 'enc-1' }] });
+
+      const result = await encountersService.getAllEncounters(testOrgId, {
+        patientId: 'pat-123',
+      });
+
+      expect(result.encounters).toHaveLength(1);
+      const countQuery = mockQuery.mock.calls[0];
+      expect(countQuery[1]).toContain('pat-123');
+    });
+
+    it('should filter by encounter type', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [{ count: '3' }] }).mockResolvedValueOnce({
+        rows: [{ id: 'e1' }, { id: 'e2' }, { id: 'e3' }],
+      });
+
+      const result = await encountersService.getAllEncounters(testOrgId, {
+        encounterType: 'FOLLOWUP',
+      });
+
+      expect(result.encounters).toHaveLength(3);
+      const countQuery = mockQuery.mock.calls[0];
+      expect(countQuery[1]).toContain('FOLLOWUP');
+    });
+
+    it('should filter by signed status', async () => {
+      mockQuery
+        .mockResolvedValueOnce({ rows: [{ count: '2' }] })
+        .mockResolvedValueOnce({ rows: [{ id: 'e1' }, { id: 'e2' }] });
+
+      await encountersService.getAllEncounters(testOrgId, { signed: true });
+
+      const countQuery = mockQuery.mock.calls[0][0];
+      expect(countQuery).toContain('signed_at IS NOT NULL');
+    });
+
+    it('should filter unsigned encounters', async () => {
+      mockQuery
+        .mockResolvedValueOnce({ rows: [{ count: '1' }] })
+        .mockResolvedValueOnce({ rows: [{ id: 'e1' }] });
+
+      await encountersService.getAllEncounters(testOrgId, { signed: false });
+
+      const countQuery = mockQuery.mock.calls[0][0];
+      expect(countQuery).toContain('signed_at IS NULL');
+    });
+
+    it('should handle pagination correctly', async () => {
+      mockQuery
+        .mockResolvedValueOnce({ rows: [{ count: '100' }] })
+        .mockResolvedValueOnce({ rows: [] });
+
+      const result = await encountersService.getAllEncounters(testOrgId, {
+        page: 5,
+        limit: 10,
+      });
+
+      expect(result.pagination.page).toBe(5);
+      expect(result.pagination.limit).toBe(10);
+      expect(result.pagination.total).toBe(100);
+      expect(result.pagination.pages).toBe(10);
+    });
+
+    it('should throw on database error', async () => {
+      mockQuery.mockRejectedValueOnce(new Error('DB error'));
+
+      await expect(encountersService.getAllEncounters(testOrgId, {})).rejects.toThrow('DB error');
+    });
+  });
+
+  // =============================================================================
+  // GET PATIENT ENCOUNTER HISTORY
+  // =============================================================================
+
+  describe('getPatientEncounterHistory', () => {
+    it('should return encounter history', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [
+          {
+            id: 'enc-1',
+            encounter_date: '2026-02-01',
+            encounter_type: 'FOLLOWUP',
+            vas_pain_start: 5,
+            vas_pain_end: 3,
+          },
+          {
+            id: 'enc-2',
+            encounter_date: '2026-01-15',
+            encounter_type: 'INITIAL',
+            vas_pain_start: 7,
+            vas_pain_end: 5,
+          },
+        ],
+      });
+
+      const result = await encountersService.getPatientEncounterHistory(testOrgId, 'pat-123');
+
+      expect(result).toHaveLength(2);
+      expect(result[0].vas_pain_start).toBe(5);
+    });
+
+    it('should return empty array for new patient', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      const result = await encountersService.getPatientEncounterHistory(testOrgId, 'pat-new');
+
+      expect(result).toHaveLength(0);
+    });
+
+    it('should throw on database error', async () => {
+      mockQuery.mockRejectedValueOnce(new Error('History error'));
+
+      await expect(
+        encountersService.getPatientEncounterHistory(testOrgId, 'pat-123')
+      ).rejects.toThrow('History error');
+    });
+  });
+
+  // =============================================================================
+  // CHECK RED FLAGS
+  // =============================================================================
+
+  describe('checkRedFlags', () => {
+    it('should return alerts for patient with red flags', async () => {
+      // Patient query
+      mockQuery.mockResolvedValueOnce({
+        rows: [
+          {
+            red_flags: ['Cauda equina symptoms'],
+            contraindications: ['Severe osteoporosis'],
+            current_medications: [],
+            date_of_birth: '1980-01-01',
+          },
+        ],
+      });
+      // Recent visits query
+      mockQuery.mockResolvedValueOnce({ rows: [{ recent_visits: '2' }] });
+
+      const result = await encountersService.checkRedFlags('pat-123', {});
+
+      expect(result.alerts).toContain('Red flag: Cauda equina symptoms');
+      expect(result.alerts).toContain('Contraindication: Severe osteoporosis');
+    });
+
+    it('should warn about anticoagulant medications', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [
+          {
+            red_flags: [],
+            contraindications: [],
+            current_medications: ['Warfarin 5mg'],
+            date_of_birth: '1960-01-01',
+          },
+        ],
+      });
+      mockQuery.mockResolvedValueOnce({ rows: [{ recent_visits: '1' }] });
+
+      const result = await encountersService.checkRedFlags('pat-123', {});
+
+      expect(result.warnings.some((w) => w.includes('anticoagulant'))).toBe(true);
+    });
+
+    it('should warn about excessive visits', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [
+          {
+            red_flags: [],
+            contraindications: [],
+            current_medications: [],
+            date_of_birth: '1990-01-01',
+          },
+        ],
+      });
+      mockQuery.mockResolvedValueOnce({ rows: [{ recent_visits: '8' }] });
+
+      const result = await encountersService.checkRedFlags('pat-123', {});
+
+      expect(result.warnings.some((w) => w.includes('>6 visits'))).toBe(true);
+    });
+
+    it('should return empty alerts/warnings for healthy patient', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [
+          {
+            red_flags: [],
+            contraindications: [],
+            current_medications: [],
+            date_of_birth: '1990-01-01',
+          },
+        ],
+      });
+      mockQuery.mockResolvedValueOnce({ rows: [{ recent_visits: '2' }] });
+
+      const result = await encountersService.checkRedFlags('pat-123', {});
+
+      expect(result.alerts).toHaveLength(0);
+      expect(result.warnings).toHaveLength(0);
+    });
+
+    it('should return empty results for non-existent patient', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      const result = await encountersService.checkRedFlags('non-existent', {});
+
+      expect(result.alerts).toHaveLength(0);
+      expect(result.warnings).toHaveLength(0);
+    });
+
+    it('should throw on database error', async () => {
+      mockQuery.mockRejectedValueOnce(new Error('Red flags error'));
+
+      await expect(encountersService.checkRedFlags('pat-123', {})).rejects.toThrow(
+        'Red flags error'
+      );
+    });
   });
 });

@@ -18,14 +18,48 @@ const router = express.Router();
 router.use(requireAuth);
 router.use(requireOrganization);
 
-// Health check
+/**
+ * @swagger
+ * /notifications/health:
+ *   get:
+ *     summary: Notifications module health check
+ *     tags: [Notifications]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Module health status
+ */
 router.get('/health', (req, res) => {
   res.json({ status: 'ok', module: 'notifications' });
 });
 
 /**
- * GET /notifications
- * List user's notifications
+ * @swagger
+ * /notifications:
+ *   get:
+ *     summary: List user's notifications
+ *     tags: [Notifications]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *       - in: query
+ *         name: unreadOnly
+ *         schema:
+ *           type: boolean
+ *     responses:
+ *       200:
+ *         description: Paginated list of notifications
  */
 router.get('/', validate(listNotificationsSchema), async (req, res) => {
   const { organizationId, user } = req;
@@ -41,8 +75,23 @@ router.get('/', validate(listNotificationsSchema), async (req, res) => {
 });
 
 /**
- * GET /notifications/unread-count
- * Get unread notification count for badge
+ * @swagger
+ * /notifications/unread-count:
+ *   get:
+ *     summary: Get unread notification count for badge
+ *     tags: [Notifications]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Unread count
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: integer
  */
 router.get('/unread-count', async (req, res) => {
   const { organizationId, user } = req;
@@ -51,8 +100,25 @@ router.get('/unread-count', async (req, res) => {
 });
 
 /**
- * PUT /notifications/:id/read
- * Mark a notification as read
+ * @swagger
+ * /notifications/{id}/read:
+ *   put:
+ *     summary: Mark a notification as read
+ *     tags: [Notifications]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Notification marked as read
+ *       404:
+ *         description: Notification not found
  */
 router.put('/:id/read', validate(markAsReadSchema), async (req, res) => {
   const { id } = req.params;
@@ -67,8 +133,16 @@ router.put('/:id/read', validate(markAsReadSchema), async (req, res) => {
 });
 
 /**
- * PUT /notifications/read-all
- * Mark all notifications as read
+ * @swagger
+ * /notifications/read-all:
+ *   put:
+ *     summary: Mark all notifications as read
+ *     tags: [Notifications]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: All notifications marked as read
  */
 router.put('/read-all', async (req, res) => {
   const { organizationId, user } = req;
@@ -77,8 +151,25 @@ router.put('/read-all', async (req, res) => {
 });
 
 /**
- * DELETE /notifications/:id
- * Delete a notification
+ * @swagger
+ * /notifications/{id}:
+ *   delete:
+ *     summary: Delete a notification
+ *     tags: [Notifications]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Notification deleted
+ *       404:
+ *         description: Notification not found
  */
 router.delete('/:id', validate(deleteNotificationSchema), async (req, res) => {
   const { id } = req.params;

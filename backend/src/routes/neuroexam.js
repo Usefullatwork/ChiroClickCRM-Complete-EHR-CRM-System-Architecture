@@ -33,8 +33,40 @@ const router = express.Router();
 // =============================================================================
 
 /**
- * GET /api/v1/neuroexam
- * List neurological examinations for organization
+ * @swagger
+ * /neuroexam:
+ *   get:
+ *     summary: List neurological examinations
+ *     tags: [Neuroexam]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: patientId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: hasRedFlags
+ *         schema:
+ *           type: boolean
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 50
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *           default: 0
+ *     responses:
+ *       200:
+ *         description: Paginated list of examinations
  */
 router.get(
   '/',
@@ -94,8 +126,25 @@ router.get(
 );
 
 /**
- * GET /api/v1/neuroexam/:examId
- * Get single neurological examination
+ * @swagger
+ * /neuroexam/{examId}:
+ *   get:
+ *     summary: Get single neurological examination
+ *     tags: [Neuroexam]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: examId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Examination with test results and vestibular findings
+ *       404:
+ *         description: Examination not found
  */
 router.get(
   '/:examId',
@@ -159,8 +208,43 @@ router.get(
 );
 
 /**
- * POST /api/v1/neuroexam
- * Create new neurological examination
+ * @swagger
+ * /neuroexam:
+ *   post:
+ *     summary: Create new neurological examination
+ *     tags: [Neuroexam]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [patientId]
+ *             properties:
+ *               patientId:
+ *                 type: string
+ *                 format: uuid
+ *               encounterId:
+ *                 type: string
+ *                 format: uuid
+ *               examType:
+ *                 type: string
+ *                 enum: [COMPREHENSIVE, FOCUSED, SCREENING]
+ *               testResults:
+ *                 type: object
+ *               clusterScores:
+ *                 type: object
+ *               redFlags:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *               narrativeText:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Examination created
  */
 router.post(
   '/',
@@ -292,8 +376,31 @@ router.post(
 );
 
 /**
- * PUT /api/v1/neuroexam/:examId
- * Update neurological examination
+ * @swagger
+ * /neuroexam/{examId}:
+ *   put:
+ *     summary: Update neurological examination
+ *     tags: [Neuroexam]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: examId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Examination updated
+ *       404:
+ *         description: Examination not found
  */
 router.put(
   '/:examId',
@@ -419,8 +526,23 @@ router.put(
 );
 
 /**
- * POST /api/v1/neuroexam/:examId/complete
- * Mark examination as complete
+ * @swagger
+ * /neuroexam/{examId}/complete:
+ *   post:
+ *     summary: Mark examination as complete
+ *     tags: [Neuroexam]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: examId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Examination marked complete
  */
 router.post(
   '/:examId/complete',
@@ -463,8 +585,38 @@ router.post(
 );
 
 /**
- * POST /api/v1/neuroexam/:examId/referral
- * Record referral sent
+ * @swagger
+ * /neuroexam/{examId}/referral:
+ *   post:
+ *     summary: Record referral sent for examination
+ *     tags: [Neuroexam]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: examId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [specialty, urgency]
+ *             properties:
+ *               specialty:
+ *                 type: string
+ *               urgency:
+ *                 type: string
+ *                 enum: [EMERGENT, URGENT, ROUTINE]
+ *               notes:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Referral recorded
  */
 router.post(
   '/:examId/referral',
@@ -516,8 +668,40 @@ router.post(
 );
 
 /**
- * POST /api/v1/neuroexam/bppv-treatment
- * Log BPPV treatment
+ * @swagger
+ * /neuroexam/bppv-treatment:
+ *   post:
+ *     summary: Log BPPV treatment
+ *     tags: [Neuroexam]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [patientId, canalAffected, sideAffected, treatmentManeuver]
+ *             properties:
+ *               patientId:
+ *                 type: string
+ *                 format: uuid
+ *               examId:
+ *                 type: string
+ *                 format: uuid
+ *               canalAffected:
+ *                 type: string
+ *               sideAffected:
+ *                 type: string
+ *               treatmentManeuver:
+ *                 type: string
+ *               preVAS:
+ *                 type: number
+ *               postVAS:
+ *                 type: number
+ *     responses:
+ *       201:
+ *         description: BPPV treatment logged
  */
 router.post(
   '/bppv-treatment',
@@ -592,8 +776,16 @@ router.post(
 );
 
 /**
- * GET /api/v1/neuroexam/red-flags
- * Get all pending red flag alerts
+ * @swagger
+ * /neuroexam/alerts/red-flags:
+ *   get:
+ *     summary: Get all pending red flag alerts
+ *     tags: [Neuroexam]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Red flag alerts sorted by urgency
  */
 router.get('/alerts/red-flags', requireAuth, requireOrganization, async (req, res) => {
   try {
@@ -617,8 +809,23 @@ router.get('/alerts/red-flags', requireAuth, requireOrganization, async (req, re
 });
 
 /**
- * GET /api/v1/neuroexam/patient/:patientId/history
- * Get patient's neurological exam history
+ * @swagger
+ * /neuroexam/patient/{patientId}/history:
+ *   get:
+ *     summary: Get patient's neurological exam history
+ *     tags: [Neuroexam]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Exam history with BPPV treatments
  */
 router.get(
   '/patient/:patientId/history',

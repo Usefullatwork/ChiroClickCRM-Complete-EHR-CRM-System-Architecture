@@ -26,9 +26,34 @@ router.use(requireAuth);
 router.use(requireOrganization);
 
 /**
- * @route   POST /api/v1/encounters/validate
- * @desc    Validate SOAP data without saving
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /encounters/validate:
+ *   post:
+ *     summary: Validate SOAP data without saving
+ *     tags: [Encounters]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               encounterType:
+ *                 type: string
+ *                 enum: [SOAP, INITIAL, FOLLOW_UP, RE_EVALUATION]
+ *               subjective:
+ *                 type: string
+ *               objective:
+ *                 type: string
+ *               assessment:
+ *                 type: string
+ *               plan:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Validation result
+ *       500:
+ *         description: Validation failed
  */
 router.post('/validate', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
   try {
@@ -83,9 +108,29 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/encounters/:id
- * @desc    Get encounter by ID
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /encounters/{id}:
+ *   get:
+ *     summary: Get encounter by ID
+ *     tags: [Encounters]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Encounter details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ClinicalEncounter'
+ *       404:
+ *         description: Encounter not found
+ *       401:
+ *         description: Unauthorized
  */
 router.get(
   '/:id',
@@ -136,9 +181,40 @@ router.post(
 );
 
 /**
- * @route   PATCH /api/v1/encounters/:id
- * @desc    Update encounter
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /encounters/{id}:
+ *   patch:
+ *     summary: Update encounter
+ *     tags: [Encounters]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               subjective:
+ *                 type: string
+ *               objective:
+ *                 type: string
+ *               assessment:
+ *                 type: string
+ *               plan:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Encounter updated
+ *       404:
+ *         description: Encounter not found
+ *       409:
+ *         description: Encounter is signed and cannot be modified
  */
 router.patch(
   '/:id',
@@ -176,9 +252,32 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/encounters/:id/generate-note
- * @desc    Generate formatted note
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /encounters/{id}/generate-note:
+ *   post:
+ *     summary: Generate formatted clinical note
+ *     tags: [Encounters]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               format:
+ *                 type: string
+ *                 enum: [SOAP, NARRATIVE, STRUCTURED]
+ *     responses:
+ *       200:
+ *         description: Generated note
+ *       404:
+ *         description: Encounter not found
  */
 router.post(
   '/:id/generate-note',
@@ -192,9 +291,45 @@ router.post(
 // ==========================================
 
 /**
- * @route   GET /api/v1/encounters/:id/context
- * @desc    Load encounter with full patient history context
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /encounters/{id}/context:
+ *   get:
+ *     summary: Load encounter with full patient history context
+ *     tags: [Encounters]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Encounter with patient context
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 encounter:
+ *                   $ref: '#/components/schemas/ClinicalEncounter'
+ *                 context:
+ *                   type: object
+ *                   properties:
+ *                     previousEncounters:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/ClinicalEncounter'
+ *                     alerts:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                     warnings:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *       404:
+ *         description: Encounter not found
  */
 router.get('/:id/context', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
   try {
@@ -227,9 +362,38 @@ router.get('/:id/context', requireRole(['ADMIN', 'PRACTITIONER']), async (req, r
 });
 
 /**
- * @route   POST /api/v1/encounters/:id/examination
- * @desc    Record examination findings for an encounter
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /encounters/{id}/examination:
+ *   post:
+ *     summary: Record examination findings for an encounter
+ *     tags: [Encounters]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               orthopedic:
+ *                 type: object
+ *               neurological:
+ *                 type: object
+ *               rom:
+ *                 type: object
+ *               palpation:
+ *                 type: object
+ *     responses:
+ *       200:
+ *         description: Examination recorded
+ *       404:
+ *         description: Encounter not found
  */
 router.post('/:id/examination', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
   try {
@@ -249,9 +413,38 @@ router.post('/:id/examination', requireRole(['ADMIN', 'PRACTITIONER']), async (r
 });
 
 /**
- * @route   POST /api/v1/encounters/:id/treatment
- * @desc    Record treatment for an encounter
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /encounters/{id}/treatment:
+ *   post:
+ *     summary: Record treatment for an encounter
+ *     tags: [Encounters]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               treatment_codes:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               adjustments:
+ *                 type: object
+ *               notes:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Treatment recorded
+ *       404:
+ *         description: Encounter not found
  */
 router.post('/:id/treatment', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
   try {
@@ -271,9 +464,25 @@ router.post('/:id/treatment', requireRole(['ADMIN', 'PRACTITIONER']), async (req
 });
 
 /**
- * @route   POST /api/v1/encounters/:id/finalize
- * @desc    Finalize encounter (generate note, sign, suggest follow-up)
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /encounters/{id}/finalize:
+ *   post:
+ *     summary: Finalize encounter (generate note, sign, suggest follow-up)
+ *     tags: [Encounters]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Encounter finalized
+ *       404:
+ *         description: Encounter not found
+ *       409:
+ *         description: Encounter already finalized
  */
 router.post('/:id/finalize', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
   try {
@@ -297,9 +506,23 @@ router.post('/:id/finalize', requireRole(['ADMIN', 'PRACTITIONER']), async (req,
 // ==========================================
 
 /**
- * @route   GET /api/v1/encounters/:encounterId/amendments
- * @desc    Get all amendments for an encounter
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /encounters/{encounterId}/amendments:
+ *   get:
+ *     summary: Get all amendments for an encounter
+ *     tags: [Encounters]
+ *     parameters:
+ *       - in: path
+ *         name: encounterId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: List of amendments
+ *       404:
+ *         description: Encounter not found
  */
 router.get(
   '/:encounterId/amendments',
@@ -345,9 +568,31 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/encounters/:encounterId/amendments/:amendmentId/sign
- * @desc    Sign an amendment
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /encounters/{encounterId}/amendments/{amendmentId}/sign:
+ *   post:
+ *     summary: Sign an amendment
+ *     tags: [Encounters]
+ *     parameters:
+ *       - in: path
+ *         name: encounterId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: path
+ *         name: amendmentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Amendment signed
+ *       404:
+ *         description: Amendment not found
+ *       409:
+ *         description: Amendment already signed
  */
 router.post(
   '/:encounterId/amendments/:amendmentId/sign',
@@ -356,9 +601,31 @@ router.post(
 );
 
 /**
- * @route   DELETE /api/v1/encounters/:encounterId/amendments/:amendmentId
- * @desc    Delete unsigned amendment
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /encounters/{encounterId}/amendments/{amendmentId}:
+ *   delete:
+ *     summary: Delete unsigned amendment
+ *     tags: [Encounters]
+ *     parameters:
+ *       - in: path
+ *         name: encounterId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: path
+ *         name: amendmentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Amendment deleted
+ *       404:
+ *         description: Amendment not found
+ *       409:
+ *         description: Cannot delete signed amendment
  */
 router.delete(
   '/:encounterId/amendments/:amendmentId',

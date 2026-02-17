@@ -28,9 +28,37 @@ router.use(requireOrganization);
 // =================================================================
 
 /**
- * @route   POST /api/v1/ai/feedback
- * @desc    Record feedback on AI suggestion
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /ai/feedback:
+ *   post:
+ *     summary: Record feedback on AI suggestion
+ *     tags: [AI]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [suggestionId, rating]
+ *             properties:
+ *               suggestionId:
+ *                 type: string
+ *                 format: uuid
+ *               rating:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 5
+ *               comment:
+ *                 type: string
+ *               correctedText:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Feedback recorded
+ *       400:
+ *         description: Validation error
  */
 router.post(
   '/feedback',
@@ -40,16 +68,34 @@ router.post(
 );
 
 /**
- * @route   GET /api/v1/ai/metrics
- * @desc    Get AI performance metrics
- * @access  Private (ADMIN)
+ * @swagger
+ * /ai/metrics:
+ *   get:
+ *     summary: Get AI performance metrics
+ *     tags: [AI]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: AI performance metrics (accuracy, latency, usage)
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Admin only
  */
 router.get('/metrics', requireRole(['ADMIN']), aiController.getAIMetrics);
 
 /**
- * @route   GET /api/v1/ai/circuit-status
- * @desc    Get circuit breaker health status
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /ai/circuit-status:
+ *   get:
+ *     summary: Get circuit breaker health status
+ *     tags: [AI]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Circuit breaker status for each AI service
  */
 router.get(
   '/circuit-status',
@@ -58,9 +104,25 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/ai/circuit-reset/:service
- * @desc    Reset circuit breaker for a service
- * @access  Private (ADMIN)
+ * @swagger
+ * /ai/circuit-reset/{service}:
+ *   post:
+ *     summary: Reset circuit breaker for a service
+ *     tags: [AI]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: service
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Service name to reset
+ *     responses:
+ *       200:
+ *         description: Circuit breaker reset
+ *       403:
+ *         description: Admin only
  */
 router.post(
   '/circuit-reset/:service',
@@ -70,16 +132,32 @@ router.post(
 );
 
 /**
- * @route   GET /api/v1/ai/retraining-status
- * @desc    Check if AI retraining is needed
- * @access  Private (ADMIN)
+ * @swagger
+ * /ai/retraining-status:
+ *   get:
+ *     summary: Check if AI retraining is needed
+ *     tags: [AI]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Retraining status with thresholds and metrics
  */
 router.get('/retraining-status', requireRole(['ADMIN']), aiController.getRetrainingStatus);
 
 /**
- * @route   POST /api/v1/ai/trigger-retraining
- * @desc    Manually trigger AI retraining
- * @access  Private (ADMIN)
+ * @swagger
+ * /ai/trigger-retraining:
+ *   post:
+ *     summary: Manually trigger AI retraining
+ *     tags: [AI]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Retraining triggered
+ *       403:
+ *         description: Admin only
  */
 router.post('/trigger-retraining', requireRole(['ADMIN']), aiController.triggerRetraining);
 
@@ -88,9 +166,29 @@ router.post('/trigger-retraining', requireRole(['ADMIN']), aiController.triggerR
 // =================================================================
 
 /**
- * @route   POST /api/v1/ai/spell-check
- * @desc    Norwegian spell check for clinical notes
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /ai/spell-check:
+ *   post:
+ *     summary: Norwegian spell check for clinical notes
+ *     tags: [AI]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [text]
+ *             properties:
+ *               text:
+ *                 type: string
+ *                 description: Clinical note text to spell-check
+ *     responses:
+ *       200:
+ *         description: Spell check results with suggestions
+ *       400:
+ *         description: Validation error
  */
 router.post(
   '/spell-check',
@@ -100,10 +198,34 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/ai/soap-suggestion
- * @route   POST /api/v1/ai/soap-suggestions (alias)
- * @desc    Generate SOAP note suggestions based on chief complaint
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /ai/soap-suggestion:
+ *   post:
+ *     summary: Generate SOAP note suggestions based on chief complaint
+ *     tags: [AI]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [chiefComplaint]
+ *             properties:
+ *               chiefComplaint:
+ *                 type: string
+ *               patientId:
+ *                 type: string
+ *                 format: uuid
+ *               encounterType:
+ *                 type: string
+ *                 enum: [INITIAL, FOLLOW_UP, REASSESSMENT, EMERGENCY]
+ *     responses:
+ *       200:
+ *         description: Generated SOAP note suggestions
+ *       400:
+ *         description: Validation error
  */
 router.post(
   '/soap-suggestion',
@@ -119,9 +241,35 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/ai/suggest-diagnosis
- * @desc    Suggest ICPC-2 diagnosis codes based on clinical presentation
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /ai/suggest-diagnosis:
+ *   post:
+ *     summary: Suggest ICPC-2 diagnosis codes based on clinical presentation
+ *     tags: [AI]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [chiefComplaint]
+ *             properties:
+ *               chiefComplaint:
+ *                 type: string
+ *               soapNotes:
+ *                 type: object
+ *                 properties:
+ *                   subjective:
+ *                     type: string
+ *                   objective:
+ *                     type: string
+ *                   assessment:
+ *                     type: string
+ *     responses:
+ *       200:
+ *         description: Suggested diagnosis codes (ICPC-2 and ICD-10)
  */
 router.post(
   '/suggest-diagnosis',
@@ -131,9 +279,29 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/ai/analyze-red-flags
- * @desc    Analyze patient data for red flags and safety concerns
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /ai/analyze-red-flags:
+ *   post:
+ *     summary: Analyze patient data for red flags and safety concerns
+ *     tags: [AI]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [patientData]
+ *             properties:
+ *               patientData:
+ *                 type: object
+ *                 description: Patient clinical data to analyze
+ *               encounterNotes:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Red flag analysis with severity and recommendations
  */
 router.post(
   '/analyze-red-flags',
@@ -143,10 +311,30 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/ai/clinical-summary
- * @route   POST /api/v1/ai/generate-summary (alias)
- * @desc    Generate clinical summary from encounter
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /ai/clinical-summary:
+ *   post:
+ *     summary: Generate clinical summary from encounter data
+ *     tags: [AI]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [encounterId]
+ *             properties:
+ *               encounterId:
+ *                 type: string
+ *                 format: uuid
+ *               patientId:
+ *                 type: string
+ *                 format: uuid
+ *     responses:
+ *       200:
+ *         description: Generated clinical summary
  */
 router.post(
   '/clinical-summary',
@@ -162,9 +350,32 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/ai/outcome-feedback
- * @desc    Record outcome feedback for AI learning
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /ai/outcome-feedback:
+ *   post:
+ *     summary: Record outcome feedback for AI learning
+ *     tags: [AI]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [suggestionId, outcome]
+ *             properties:
+ *               suggestionId:
+ *                 type: string
+ *                 format: uuid
+ *               outcome:
+ *                 type: string
+ *                 enum: [improved, same, worse]
+ *               notes:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Outcome feedback recorded
  */
 router.post(
   '/outcome-feedback',
@@ -174,16 +385,30 @@ router.post(
 );
 
 /**
- * @route   GET /api/v1/ai/status
- * @desc    Get AI service status
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /ai/status:
+ *   get:
+ *     summary: Get AI service status
+ *     tags: [AI]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: AI service availability and model status
  */
 router.get('/status', requireRole(['ADMIN', 'PRACTITIONER']), aiController.getAIStatus);
 
 /**
- * @route   GET /api/v1/ai/metrics/dashboard
- * @desc    Get simplified AI metrics for dashboard display
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /ai/metrics/dashboard:
+ *   get:
+ *     summary: Get simplified AI metrics for dashboard display
+ *     tags: [AI]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Dashboard-friendly AI metrics summary
  */
 router.get(
   '/metrics/dashboard',
@@ -192,16 +417,30 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/ai/training/history
- * @desc    Get AI model training history
- * @access  Private (ADMIN)
+ * @swagger
+ * /ai/training/history:
+ *   get:
+ *     summary: Get AI model training history
+ *     tags: [AI]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of past training runs with results
  */
 router.get('/training/history', requireRole(['ADMIN']), aiController.getTrainingHistory);
 
 /**
- * @route   POST /api/v1/ai/training/trigger
- * @desc    Manually trigger model retraining
- * @access  Private (ADMIN)
+ * @swagger
+ * /ai/training/trigger:
+ *   post:
+ *     summary: Manually trigger model retraining
+ *     tags: [AI]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Training job triggered
  */
 router.post('/training/trigger', requireRole(['ADMIN']), aiController.triggerRetraining);
 

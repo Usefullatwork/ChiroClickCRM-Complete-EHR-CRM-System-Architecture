@@ -20,9 +20,16 @@ router.use(requireAuth);
 router.use(requireOrganization);
 
 /**
- * @route   GET /api/v1/macros
- * @desc    Get all macros organized by category (macro matrix)
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /macros:
+ *   get:
+ *     summary: Get all macros organized by category
+ *     tags: [Macros]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Macro matrix grouped by category
  */
 router.get(
   '/',
@@ -31,9 +38,22 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/macros/search
- * @desc    Search macros by text (query param: q)
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /macros/search:
+ *   get:
+ *     summary: Search macros by text
+ *     tags: [Macros]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Matching macros
  */
 router.get(
   '/search',
@@ -43,9 +63,16 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/macros/favorites
- * @desc    Get favorite macros for current user
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /macros/favorites:
+ *   get:
+ *     summary: Get favorite macros for current user
+ *     tags: [Macros]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User's favorite macros
  */
 router.get(
   '/favorites',
@@ -54,9 +81,34 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/macros
- * @desc    Create a new macro
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /macros:
+ *   post:
+ *     summary: Create a new macro
+ *     tags: [Macros]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, text, category]
+ *             properties:
+ *               name:
+ *                 type: string
+ *               text:
+ *                 type: string
+ *               category:
+ *                 type: string
+ *               variables:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       201:
+ *         description: Macro created
  */
 router.post(
   '/',
@@ -66,23 +118,73 @@ router.post(
 );
 
 /**
- * @route   PATCH /api/v1/macros/:id
- * @desc    Update an existing macro
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /macros/{id}:
+ *   patch:
+ *     summary: Update an existing macro
+ *     tags: [Macros]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Macro updated
  */
 router.patch('/:id', requireRole(['ADMIN', 'PRACTITIONER']), macroController.updateMacro);
 
 /**
- * @route   DELETE /api/v1/macros/:id
- * @desc    Soft-delete a macro
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /macros/{id}:
+ *   delete:
+ *     summary: Soft-delete a macro
+ *     tags: [Macros]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Macro deleted
  */
 router.delete('/:id', requireRole(['ADMIN', 'PRACTITIONER']), macroController.deleteMacro);
 
 /**
- * @route   POST /api/v1/macros/:id/expand
- * @desc    Expand macro with variable substitution
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /macros/{id}/expand:
+ *   post:
+ *     summary: Expand macro with variable substitution
+ *     tags: [Macros]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               variables:
+ *                 type: object
+ *     responses:
+ *       200:
+ *         description: Expanded macro text
  */
 router.post(
   '/:id/expand',
@@ -92,9 +194,23 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/macros/:id/favorite
- * @desc    Toggle favorite status for a macro
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /macros/{id}/favorite:
+ *   post:
+ *     summary: Toggle favorite status for a macro
+ *     tags: [Macros]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Favorite toggled
  */
 router.post(
   '/:id/favorite',
@@ -104,9 +220,23 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/macros/:id/usage
- * @desc    Record macro usage for analytics
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /macros/{id}/usage:
+ *   post:
+ *     summary: Record macro usage for analytics
+ *     tags: [Macros]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Usage recorded
  */
 router.post(
   '/:id/usage',

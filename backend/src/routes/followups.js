@@ -19,9 +19,32 @@ router.use(requireAuth);
 router.use(requireOrganization);
 
 /**
- * @route   GET /api/v1/followups
- * @desc    Get all follow-ups with filters
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /followups:
+ *   get:
+ *     summary: Get all follow-ups with filters
+ *     tags: [Follow-ups]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [pending, completed, skipped]
+ *       - in: query
+ *         name: patientId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: dueBefore
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Follow-up list
  */
 router.get(
   '/',
@@ -31,9 +54,16 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/followups/overdue
- * @desc    Get overdue follow-ups
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /followups/overdue:
+ *   get:
+ *     summary: Get overdue follow-ups
+ *     tags: [Follow-ups]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Overdue follow-ups
  */
 router.get(
   '/overdue',
@@ -42,9 +72,16 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/followups/upcoming
- * @desc    Get upcoming follow-ups
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /followups/upcoming:
+ *   get:
+ *     summary: Get upcoming follow-ups
+ *     tags: [Follow-ups]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Upcoming follow-ups
  */
 router.get(
   '/upcoming',
@@ -53,16 +90,30 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/followups/stats
- * @desc    Get follow-up statistics
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /followups/stats:
+ *   get:
+ *     summary: Get follow-up statistics
+ *     tags: [Follow-ups]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Follow-up statistics
  */
 router.get('/stats', requireRole(['ADMIN', 'PRACTITIONER']), followUpController.getStats);
 
 /**
- * @route   GET /api/v1/followups/patients/needingFollowUp
- * @desc    Get patients needing follow-up based on should_be_followed_up field
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /followups/patients/needingFollowUp:
+ *   get:
+ *     summary: Get patients needing follow-up
+ *     tags: [Follow-ups]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Patients needing follow-up
  */
 router.get(
   '/patients/needingFollowUp',
@@ -71,9 +122,23 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/followups/patients/:patientId/contacted
- * @desc    Mark patient as contacted for follow-up
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /followups/patients/{patientId}/contacted:
+ *   post:
+ *     summary: Mark patient as contacted for follow-up
+ *     tags: [Follow-ups]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Patient marked as contacted
  */
 router.post(
   '/patients/:patientId/contacted',
@@ -82,9 +147,23 @@ router.post(
 );
 
 /**
- * @route   GET /api/v1/followups/recall-schedule/:patientId
- * @desc    Get recall schedule for a patient
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /followups/recall-schedule/{patientId}:
+ *   get:
+ *     summary: Get recall schedule for a patient
+ *     tags: [Follow-ups]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Patient's recall schedule
  */
 router.get(
   '/recall-schedule/:patientId',
@@ -93,9 +172,16 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/followups/recall-rules
- * @desc    Get organization recall rules
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /followups/recall-rules:
+ *   get:
+ *     summary: Get organization recall rules
+ *     tags: [Follow-ups]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Recall rules configuration
  */
 router.get(
   '/recall-rules',
@@ -104,16 +190,45 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/followups/recall-rules
- * @desc    Update organization recall rules
- * @access  Private (ADMIN)
+ * @swagger
+ * /followups/recall-rules:
+ *   post:
+ *     summary: Update organization recall rules
+ *     tags: [Follow-ups]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Recall rules updated
  */
 router.post('/recall-rules', requireRole(['ADMIN']), followUpController.updateRecallRules);
 
 /**
- * @route   GET /api/v1/followups/:id
- * @desc    Get follow-up by ID
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /followups/{id}:
+ *   get:
+ *     summary: Get follow-up by ID
+ *     tags: [Follow-ups]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Follow-up details
+ *       404:
+ *         description: Follow-up not found
  */
 router.get(
   '/:id',
@@ -122,9 +237,34 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/followups
- * @desc    Create new follow-up
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /followups:
+ *   post:
+ *     summary: Create new follow-up
+ *     tags: [Follow-ups]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [patient_id, due_date, type]
+ *             properties:
+ *               patient_id:
+ *                 type: string
+ *                 format: uuid
+ *               due_date:
+ *                 type: string
+ *                 format: date
+ *               type:
+ *                 type: string
+ *               notes:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Follow-up created
  */
 router.post(
   '/',
@@ -134,9 +274,31 @@ router.post(
 );
 
 /**
- * @route   PATCH /api/v1/followups/:id
- * @desc    Update follow-up
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /followups/{id}:
+ *   patch:
+ *     summary: Update follow-up
+ *     tags: [Follow-ups]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Follow-up updated
+ *       404:
+ *         description: Follow-up not found
  */
 router.patch(
   '/:id',
@@ -146,9 +308,25 @@ router.patch(
 );
 
 /**
- * @route   POST /api/v1/followups/:id/complete
- * @desc    Complete follow-up
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /followups/{id}/complete:
+ *   post:
+ *     summary: Complete a follow-up
+ *     tags: [Follow-ups]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Follow-up completed
+ *       404:
+ *         description: Follow-up not found
  */
 router.post(
   '/:id/complete',
@@ -158,9 +336,33 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/followups/:id/skip
- * @desc    Skip follow-up with reason
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /followups/{id}/skip:
+ *   post:
+ *     summary: Skip follow-up with reason
+ *     tags: [Follow-ups]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               reason:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Follow-up skipped
+ *       404:
+ *         description: Follow-up not found
  */
 router.post(
   '/:id/skip',

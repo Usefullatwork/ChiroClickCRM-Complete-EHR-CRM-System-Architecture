@@ -20,16 +20,50 @@ const router = express.Router();
 router.use(requireAuth);
 
 /**
- * @route   GET /api/v1/organizations/current
- * @desc    Get current user's organization
- * @access  Private (All authenticated users)
+ * @swagger
+ * /organizations/current:
+ *   get:
+ *     summary: Get current user's organization
+ *     tags: [Organizations]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Current organization details
+ *       401:
+ *         description: Unauthorized
  */
 router.get('/current', organizationController.getCurrentOrganization);
 
 /**
- * @route   PATCH /api/v1/organizations/current
- * @desc    Update current organization
- * @access  Private (ADMIN)
+ * @swagger
+ * /organizations/current:
+ *   patch:
+ *     summary: Update current organization
+ *     tags: [Organizations]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
+ *     responses:
+ *       200:
+ *         description: Organization updated
+ *       403:
+ *         description: Admin access required
  */
 router.patch(
   '/current',
@@ -39,9 +73,18 @@ router.patch(
 );
 
 /**
- * @route   GET /api/v1/organizations/current/users
- * @desc    Get users in current organization
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /organizations/current/users:
+ *   get:
+ *     summary: Get users in current organization
+ *     tags: [Organizations]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of users in the organization
+ *       403:
+ *         description: Insufficient permissions
  */
 router.get(
   '/current/users',
@@ -50,9 +93,36 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/organizations/current/invite
- * @desc    Invite user to current organization
- * @access  Private (ADMIN)
+ * @swagger
+ * /organizations/current/invite:
+ *   post:
+ *     summary: Invite a user to the current organization
+ *     tags: [Organizations]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, role]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               role:
+ *                 type: string
+ *                 enum: [ADMIN, PRACTITIONER, ASSISTANT]
+ *               name:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Invitation sent
+ *       400:
+ *         description: Validation error
+ *       403:
+ *         description: Admin access required
  */
 router.post(
   '/current/invite',
@@ -62,16 +132,41 @@ router.post(
 );
 
 /**
- * @route   GET /api/v1/organizations
- * @desc    Get all organizations
- * @access  Private (ADMIN only - super admin)
+ * @swagger
+ * /organizations:
+ *   get:
+ *     summary: Get all organizations (super admin)
+ *     tags: [Organizations]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of all organizations
+ *       403:
+ *         description: Admin access required
  */
 router.get('/', requireRole(['ADMIN']), organizationController.getOrganizations);
 
 /**
- * @route   GET /api/v1/organizations/:id
- * @desc    Get organization by ID
- * @access  Private (ADMIN)
+ * @swagger
+ * /organizations/{id}:
+ *   get:
+ *     summary: Get organization by ID
+ *     tags: [Organizations]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Organization details
+ *       404:
+ *         description: Organization not found
  */
 router.get(
   '/:id',
@@ -81,9 +176,40 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/organizations
- * @desc    Create new organization
- * @access  Private (ADMIN only - super admin)
+ * @swagger
+ * /organizations:
+ *   post:
+ *     summary: Create a new organization (super admin)
+ *     tags: [Organizations]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name]
+ *             properties:
+ *               name:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               plan:
+ *                 type: string
+ *                 enum: [free, basic, pro, enterprise]
+ *     responses:
+ *       201:
+ *         description: Organization created
+ *       400:
+ *         description: Validation error
+ *       403:
+ *         description: Admin access required
  */
 router.post(
   '/',
@@ -93,9 +219,38 @@ router.post(
 );
 
 /**
- * @route   PATCH /api/v1/organizations/:id
- * @desc    Update organization
- * @access  Private (ADMIN)
+ * @swagger
+ * /organizations/{id}:
+ *   patch:
+ *     summary: Update an organization
+ *     tags: [Organizations]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Organization updated
+ *       404:
+ *         description: Organization not found
  */
 router.patch(
   '/:id',
@@ -105,9 +260,25 @@ router.patch(
 );
 
 /**
- * @route   GET /api/v1/organizations/:id/settings
- * @desc    Get organization settings
- * @access  Private (ADMIN)
+ * @swagger
+ * /organizations/{id}/settings:
+ *   get:
+ *     summary: Get organization settings
+ *     tags: [Organizations]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Organization settings
+ *       404:
+ *         description: Organization not found
  */
 router.get(
   '/:id/settings',
@@ -117,9 +288,40 @@ router.get(
 );
 
 /**
- * @route   PATCH /api/v1/organizations/:id/settings
- * @desc    Update organization settings
- * @access  Private (ADMIN)
+ * @swagger
+ * /organizations/{id}/settings:
+ *   patch:
+ *     summary: Update organization settings
+ *     tags: [Organizations]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               timezone:
+ *                 type: string
+ *               locale:
+ *                 type: string
+ *               business_hours:
+ *                 type: object
+ *               features:
+ *                 type: object
+ *     responses:
+ *       200:
+ *         description: Settings updated
+ *       404:
+ *         description: Organization not found
  */
 router.patch(
   '/:id/settings',
@@ -129,9 +331,25 @@ router.patch(
 );
 
 /**
- * @route   GET /api/v1/organizations/:id/stats
- * @desc    Get organization statistics
- * @access  Private (ADMIN)
+ * @swagger
+ * /organizations/{id}/stats:
+ *   get:
+ *     summary: Get organization statistics
+ *     tags: [Organizations]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Organization statistics (users, patients, encounters)
+ *       404:
+ *         description: Organization not found
  */
 router.get(
   '/:id/stats',
@@ -141,9 +359,25 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/organizations/:id/limits
- * @desc    Check organization limits
- * @access  Private (ADMIN)
+ * @swagger
+ * /organizations/{id}/limits:
+ *   get:
+ *     summary: Check organization plan limits
+ *     tags: [Organizations]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Organization limits and current usage
+ *       404:
+ *         description: Organization not found
  */
 router.get(
   '/:id/limits',

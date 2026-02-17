@@ -41,9 +41,30 @@ const upload = multer({
 });
 
 /**
- * @route   POST /api/v1/import/patients/excel
- * @desc    Import patients from Excel file
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /import/patients/excel:
+ *   post:
+ *     summary: Import patients from Excel file
+ *     tags: [Import]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required: [file]
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *                 description: Excel or CSV file (max 10MB)
+ *     responses:
+ *       200:
+ *         description: Import results with success/error counts
+ *       400:
+ *         description: Invalid file type
  */
 router.post(
   '/patients/excel',
@@ -54,9 +75,21 @@ router.post(
 );
 
 /**
- * @route   GET /api/v1/import/patients/template
- * @desc    Download Excel import template
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /import/patients/template:
+ *   get:
+ *     summary: Download Excel import template
+ *     tags: [Import]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Excel template file
+ *         content:
+ *           application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+ *             schema:
+ *               type: string
+ *               format: binary
  */
 router.get(
   '/patients/template',
@@ -65,9 +98,27 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/import/patients/parse-text
- * @desc    Parse patient data from pasted text
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /import/patients/parse-text:
+ *   post:
+ *     summary: Parse patient data from pasted text
+ *     tags: [Import]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [text]
+ *             properties:
+ *               text:
+ *                 type: string
+ *                 description: Raw text to parse for patient data
+ *     responses:
+ *       200:
+ *         description: Parsed patient data for review
  */
 router.post(
   '/patients/parse-text',
@@ -77,9 +128,28 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/import/patients/from-text
- * @desc    Import patients from parsed text data
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /import/patients/from-text:
+ *   post:
+ *     summary: Import patients from parsed text data
+ *     tags: [Import]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [patients]
+ *             properties:
+ *               patients:
+ *                 type: array
+ *                 items:
+ *                   $ref: '#/components/schemas/Patient'
+ *     responses:
+ *       200:
+ *         description: Import results
  */
 router.post(
   '/patients/from-text',

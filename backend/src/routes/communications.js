@@ -20,9 +20,32 @@ router.use(requireAuth);
 router.use(requireOrganization);
 
 /**
- * @route   GET /api/v1/communications
- * @desc    Get all communications with filters
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /communications:
+ *   get:
+ *     summary: Get all communications with filters
+ *     tags: [Communications]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: patientId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: channel
+ *         schema:
+ *           type: string
+ *           enum: [sms, email]
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [pending, sent, delivered, failed]
+ *     responses:
+ *       200:
+ *         description: Communication history
  */
 router.get(
   '/',
@@ -32,9 +55,34 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/communications/sms
- * @desc    Send SMS to patient
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /communications/sms:
+ *   post:
+ *     summary: Send SMS to patient
+ *     tags: [Communications]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [patientId, message]
+ *             properties:
+ *               patientId:
+ *                 type: string
+ *                 format: uuid
+ *               message:
+ *                 type: string
+ *               templateId:
+ *                 type: string
+ *                 format: uuid
+ *     responses:
+ *       200:
+ *         description: SMS sent or queued
+ *       429:
+ *         description: Rate limit exceeded
  */
 router.post(
   '/sms',
@@ -46,9 +94,36 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/communications/email
- * @desc    Send email to patient
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /communications/email:
+ *   post:
+ *     summary: Send email to patient
+ *     tags: [Communications]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [patientId, subject, body]
+ *             properties:
+ *               patientId:
+ *                 type: string
+ *                 format: uuid
+ *               subject:
+ *                 type: string
+ *               body:
+ *                 type: string
+ *               templateId:
+ *                 type: string
+ *                 format: uuid
+ *     responses:
+ *       200:
+ *         description: Email sent or queued
+ *       429:
+ *         description: Rate limit exceeded
  */
 router.post(
   '/email',
@@ -60,9 +135,16 @@ router.post(
 );
 
 /**
- * @route   GET /api/v1/communications/templates
- * @desc    Get message templates
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /communications/templates:
+ *   get:
+ *     summary: Get message templates
+ *     tags: [Communications]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of message templates
  */
 router.get(
   '/templates',
@@ -71,9 +153,33 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/communications/templates
- * @desc    Create message template
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /communications/templates:
+ *   post:
+ *     summary: Create a message template
+ *     tags: [Communications]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, channel, body]
+ *             properties:
+ *               name:
+ *                 type: string
+ *               channel:
+ *                 type: string
+ *                 enum: [sms, email]
+ *               subject:
+ *                 type: string
+ *               body:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Template created
  */
 router.post(
   '/templates',
@@ -83,9 +189,16 @@ router.post(
 );
 
 /**
- * @route   GET /api/v1/communications/stats
- * @desc    Get communication statistics
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /communications/stats:
+ *   get:
+ *     summary: Get communication statistics
+ *     tags: [Communications]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Communication delivery statistics
  */
 router.get('/stats', requireRole(['ADMIN', 'PRACTITIONER']), communicationController.getStats);
 

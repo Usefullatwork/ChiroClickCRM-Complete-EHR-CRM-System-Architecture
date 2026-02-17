@@ -20,16 +20,50 @@ router.use(requireAuth);
 router.use(requireOrganization);
 
 /**
- * @route   GET /api/v1/gdpr/requests
- * @desc    Get all GDPR requests
- * @access  Private (ADMIN)
+ * @swagger
+ * /gdpr/requests:
+ *   get:
+ *     summary: Get all GDPR requests
+ *     tags: [GDPR]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of GDPR data requests
+ *       403:
+ *         description: Admin access required
  */
 router.get('/requests', requireRole(['ADMIN']), gdprController.getGDPRRequests);
 
 /**
- * @route   POST /api/v1/gdpr/requests
- * @desc    Create new GDPR request
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /gdpr/requests:
+ *   post:
+ *     summary: Create a new GDPR request
+ *     tags: [GDPR]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [patient_id, type]
+ *             properties:
+ *               patient_id:
+ *                 type: string
+ *                 format: uuid
+ *               type:
+ *                 type: string
+ *                 enum: [access, portability, erasure, rectification, restriction]
+ *               reason:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: GDPR request created
+ *       400:
+ *         description: Validation error
  */
 router.post(
   '/requests',
@@ -39,9 +73,40 @@ router.post(
 );
 
 /**
- * @route   PATCH /api/v1/gdpr/requests/:requestId/status
- * @desc    Update GDPR request status
- * @access  Private (ADMIN)
+ * @swagger
+ * /gdpr/requests/{requestId}/status:
+ *   patch:
+ *     summary: Update GDPR request status
+ *     tags: [GDPR]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: requestId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [status]
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [pending, in_progress, completed, rejected]
+ *               notes:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Request status updated
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: Request not found
  */
 router.patch(
   '/requests/:requestId/status',
@@ -51,9 +116,27 @@ router.patch(
 );
 
 /**
- * @route   GET /api/v1/gdpr/patient/:patientId/data-access
- * @desc    Process data access request (Article 15)
- * @access  Private (ADMIN)
+ * @swagger
+ * /gdpr/patient/{patientId}/data-access:
+ *   get:
+ *     summary: Process data access request (GDPR Article 15)
+ *     tags: [GDPR]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Complete patient data export (JSON)
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: Patient not found
  */
 router.get(
   '/patient/:patientId/data-access',
@@ -63,9 +146,27 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/gdpr/patient/:patientId/data-portability
- * @desc    Process data portability request (Article 20)
- * @access  Private (ADMIN)
+ * @swagger
+ * /gdpr/patient/{patientId}/data-portability:
+ *   get:
+ *     summary: Process data portability request (GDPR Article 20)
+ *     tags: [GDPR]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Patient data in portable format (structured JSON/CSV)
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: Patient not found
  */
 router.get(
   '/patient/:patientId/data-portability',
@@ -75,9 +176,39 @@ router.get(
 );
 
 /**
- * @route   POST /api/v1/gdpr/requests/:requestId/erasure
- * @desc    Process erasure request (Article 17)
- * @access  Private (ADMIN)
+ * @swagger
+ * /gdpr/requests/{requestId}/erasure:
+ *   post:
+ *     summary: Process erasure request (GDPR Article 17 - Right to be forgotten)
+ *     tags: [GDPR]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: requestId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               confirm:
+ *                 type: boolean
+ *               retain_legal_basis:
+ *                 type: boolean
+ *                 description: Retain data required by law (e.g., Norwegian health records)
+ *     responses:
+ *       200:
+ *         description: Erasure processed (data anonymized/deleted)
+ *       400:
+ *         description: Erasure cannot be completed
+ *       403:
+ *         description: Admin access required
  */
 router.post(
   '/requests/:requestId/erasure',
@@ -87,9 +218,42 @@ router.post(
 );
 
 /**
- * @route   PATCH /api/v1/gdpr/patient/:patientId/consent
- * @desc    Update patient consent preferences
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /gdpr/patient/{patientId}/consent:
+ *   patch:
+ *     summary: Update patient consent preferences
+ *     tags: [GDPR]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               marketing:
+ *                 type: boolean
+ *               research:
+ *                 type: boolean
+ *               data_sharing:
+ *                 type: boolean
+ *               sms_reminders:
+ *                 type: boolean
+ *               email_communications:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: Consent preferences updated
+ *       404:
+ *         description: Patient not found
  */
 router.patch(
   '/patient/:patientId/consent',
@@ -99,9 +263,27 @@ router.patch(
 );
 
 /**
- * @route   GET /api/v1/gdpr/patient/:patientId/consent-audit
- * @desc    Get consent audit trail
- * @access  Private (ADMIN)
+ * @swagger
+ * /gdpr/patient/{patientId}/consent-audit:
+ *   get:
+ *     summary: Get consent audit trail
+ *     tags: [GDPR]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Chronological audit trail of consent changes
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: Patient not found
  */
 router.get(
   '/patient/:patientId/consent-audit',
