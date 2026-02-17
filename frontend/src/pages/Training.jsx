@@ -452,42 +452,54 @@ function ModelsTab({
 // Analytics Tab
 // ====================================================================
 function AnalyticsTab() {
+  const [dateRange, setDateRange] = useState('30');
+
+  const getDateParams = () => {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(start.getDate() - parseInt(dateRange));
+    return {
+      startDate: start.toISOString().split('T')[0],
+      endDate: end.toISOString().split('T')[0],
+    };
+  };
+
   const performanceQuery = useQuery({
-    queryKey: ['analytics-performance'],
+    queryKey: ['analytics-performance', dateRange],
     queryFn: async () => {
-      const res = await trainingAPI.getAnalyticsPerformance();
+      const res = await trainingAPI.getAnalyticsPerformance(getDateParams());
       return res.data.data;
     },
   });
 
   const usageQuery = useQuery({
-    queryKey: ['analytics-usage'],
+    queryKey: ['analytics-usage', dateRange],
     queryFn: async () => {
-      const res = await trainingAPI.getAnalyticsUsage();
+      const res = await trainingAPI.getAnalyticsUsage(getDateParams());
       return res.data.data;
     },
   });
 
   const suggestionsQuery = useQuery({
-    queryKey: ['analytics-suggestions'],
+    queryKey: ['analytics-suggestions', dateRange],
     queryFn: async () => {
-      const res = await trainingAPI.getAnalyticsSuggestions({ limit: 30 });
+      const res = await trainingAPI.getAnalyticsSuggestions({ limit: 30, ...getDateParams() });
       return res.data.data;
     },
   });
 
   const redFlagQuery = useQuery({
-    queryKey: ['analytics-red-flags'],
+    queryKey: ['analytics-red-flags', dateRange],
     queryFn: async () => {
-      const res = await trainingAPI.getAnalyticsRedFlags();
+      const res = await trainingAPI.getAnalyticsRedFlags(getDateParams());
       return res.data.data;
     },
   });
 
   const comparisonQuery = useQuery({
-    queryKey: ['analytics-comparison'],
+    queryKey: ['analytics-comparison', dateRange],
     queryFn: async () => {
-      const res = await trainingAPI.getAnalyticsComparison();
+      const res = await trainingAPI.getAnalyticsComparison(getDateParams());
       return res.data.data;
     },
   });
@@ -505,6 +517,24 @@ function AnalyticsTab() {
 
   return (
     <div className="space-y-6">
+      {/* Date Range Selector */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold">AI-analyse</h2>
+        <div className="flex items-center gap-2">
+          <label className="text-sm text-gray-600">Periode:</label>
+          <select
+            value={dateRange}
+            onChange={(e) => setDateRange(e.target.value)}
+            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm"
+          >
+            <option value="7">Siste 7 dager</option>
+            <option value="30">Siste 30 dager</option>
+            <option value="90">Siste 90 dager</option>
+            <option value="365">Siste 12 maneder</option>
+          </select>
+        </div>
+      </div>
+
       {/* Model Comparison Chart */}
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">

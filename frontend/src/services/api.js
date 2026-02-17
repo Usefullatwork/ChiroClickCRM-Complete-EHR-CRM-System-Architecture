@@ -782,8 +782,8 @@ export const trainingAPI = {
   getAnalyticsPerformance: (params) => apiClient.get('/training/analytics/performance', { params }),
   getAnalyticsUsage: (params) => apiClient.get('/training/analytics/usage', { params }),
   getAnalyticsSuggestions: (params) => apiClient.get('/training/analytics/suggestions', { params }),
-  getAnalyticsRedFlags: () => apiClient.get('/training/analytics/red-flags'),
-  getAnalyticsComparison: () => apiClient.get('/training/analytics/comparison'),
+  getAnalyticsRedFlags: (params) => apiClient.get('/training/analytics/red-flags', { params }),
+  getAnalyticsComparison: (params) => apiClient.get('/training/analytics/comparison', { params }),
 };
 
 // AI Service
