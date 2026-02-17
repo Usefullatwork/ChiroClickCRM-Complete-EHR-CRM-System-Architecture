@@ -10,7 +10,7 @@ on:
     branches: [main, develop]
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: "20"
 
 jobs:
   # ============================================
@@ -43,7 +43,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: "npm"
           cache-dependency-path: backend/package-lock.json
 
       - name: Install dependencies
@@ -89,7 +89,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: "npm"
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
@@ -225,7 +225,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: "npm"
           cache-dependency-path: |
             backend/package-lock.json
             frontend/package-lock.json
@@ -247,6 +247,13 @@ jobs:
         working-directory: ./e2e
         run: npx playwright install --with-deps chromium
 
+      - name: Initialize database schema
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -d chiroclickcrm_test -f database/schema.sql
+          for f in database/seeds/*.sql; do
+            PGPASSWORD=postgres psql -h localhost -U postgres -d chiroclickcrm_test -f "$f" || true
+          done
+
       - name: Build frontend
         working-directory: ./frontend
         run: npm run build
@@ -258,15 +265,16 @@ jobs:
         working-directory: ./backend
         run: npm start &
         env:
-          NODE_ENV: test
+          NODE_ENV: e2e
           PORT: 3000
           DB_HOST: localhost
           DB_PORT: 5432
           DB_NAME: chiroclickcrm_test
           DB_USER: postgres
           DB_PASSWORD: postgres
+          DB_ENGINE: postgres
           REDIS_URL: redis://localhost:6379
-          ENCRYPTION_KEY: test_encryption_key_32_chars__!
+          ENCRYPTION_KEY: test_encryption_key_32chars_ok!
           JWT_SECRET: test_jwt_secret
           CORS_ORIGIN: http://localhost:5173
 
@@ -276,8 +284,8 @@ jobs:
 
       - name: Wait for services
         run: |
-          sleep 10
-          curl --retry 10 --retry-delay 2 --retry-all-errors http://localhost:3000/health
+          sleep 5
+          curl --retry 30 --retry-delay 2 --retry-all-errors http://localhost:3000/health
 
       - name: Run E2E tests
         working-directory: ./e2e
