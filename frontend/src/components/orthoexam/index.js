@@ -3,8 +3,6 @@
  * Compact orthopedic examination components
  */
 
-import _React from 'react';
-
 export const OrthopedicExamCompact = ({ _patientId, _encounterId, _onDataChange }) => {
   return (
     <div className="p-3 border rounded-lg bg-white">

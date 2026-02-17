@@ -4,7 +4,7 @@
  */
 
 import { query } from '../config/database.js';
-import { generateToken, _hashToken } from './password.js';
+import { generateToken } from './password.js';
 import logger from '../utils/logger.js';
 
 // Session duration: 7 days

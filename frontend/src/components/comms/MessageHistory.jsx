@@ -11,8 +11,6 @@ import { useQuery } from '@tanstack/react-query';
 import {
   History,
   Search,
-  _Filter,
-  _Calendar,
   MessageSquare,
   Mail,
   CheckCircle,
@@ -20,14 +18,12 @@ import {
   Clock,
   AlertCircle,
   ChevronDown,
-  _ChevronRight,
   User,
   ExternalLink,
   RefreshCw,
   Download,
 } from 'lucide-react';
 import { communicationsAPI } from '../../services/api';
-import { _formatDate, _formatRelativeTime } from '../../lib/utils';
 
 // Status configurations
 const STATUS_CONFIG = {

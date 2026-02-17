@@ -6,7 +6,7 @@
  * and tracks payment history for Norwegian healthcare invoices
  */
 
-import _React, { useState } from 'react';
+import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   CreditCard,
@@ -19,7 +19,6 @@ import {
   Loader2,
   Calendar,
   Receipt,
-  _FileText,
 } from 'lucide-react';
 import { billingAPI } from '../../services/api';
 

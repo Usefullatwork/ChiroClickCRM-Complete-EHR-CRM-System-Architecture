@@ -6,18 +6,8 @@
  * Viser ovelsesfullforing over tid i kalenderformat
  */
 
-import _React, { useState, useMemo } from 'react';
-import {
-  ChevronLeft,
-  ChevronRight,
-  _Calendar,
-  CheckCircle,
-  _XCircle,
-  Activity,
-  Frown,
-  Meh,
-  Smile,
-} from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { ChevronLeft, ChevronRight, CheckCircle, Activity, Frown, Meh, Smile } from 'lucide-react';
 
 /**
  * ComplianceCalendar Component

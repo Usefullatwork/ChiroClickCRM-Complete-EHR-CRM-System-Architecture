@@ -5,8 +5,8 @@
  * location, triggers, associated symptoms, and red flag screening.
  */
 
-import _React, { useMemo, _useState } from 'react';
-import { AlertTriangle, Clock, Zap, Target, Activity, _Info, _CheckCircle } from 'lucide-react';
+import { useMemo } from 'react';
+import { AlertTriangle, Clock, Zap, Target, Activity } from 'lucide-react';
 
 // Headache types with diagnostic criteria
 const HEADACHE_TYPES = [

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { RotateCcw, _ChevronDown, _ChevronUp } from 'lucide-react';
+import { RotateCcw } from 'lucide-react';
 
 /**
  * SpineDiagram - Detailed vertebra-by-vertebra spine assessment

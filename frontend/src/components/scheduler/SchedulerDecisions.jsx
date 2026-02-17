@@ -3,7 +3,7 @@
  * Displays AI scheduling recommendations with approve/dismiss actions.
  */
 
-import _React, { useState } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { schedulerAPI } from '../../services/api';
 

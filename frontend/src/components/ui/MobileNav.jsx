@@ -10,7 +10,7 @@
  * - Safe area insets for notched devices
  */
 
-import _React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Menu,
@@ -23,7 +23,6 @@ import {
   User,
   LogOut,
   ChevronRight,
-  _Bell,
   Search,
   FileText,
   BarChart3,

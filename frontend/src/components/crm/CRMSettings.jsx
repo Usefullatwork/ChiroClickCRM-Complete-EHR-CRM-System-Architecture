@@ -1,6 +1,5 @@
-import _React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
-  _Settings,
   Clock,
   Calendar,
   Mail,
@@ -10,13 +9,10 @@ import {
   Plus,
   Trash2,
   Edit,
-  _Check,
   X,
   AlertCircle,
   Users,
   Zap,
-  _FileText,
-  _ChevronDown,
   ChevronRight,
   Loader2,
 } from 'lucide-react';

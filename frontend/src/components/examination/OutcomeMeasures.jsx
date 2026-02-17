@@ -3,8 +3,6 @@
  * Patient outcome questionnaires and tracking
  */
 
-import _React from 'react';
-
 export const OutcomeMeasureSelector = ({ _onSelect, _selectedMeasures = [] }) => {
   return (
     <div className="p-4 border rounded-lg bg-gray-50">

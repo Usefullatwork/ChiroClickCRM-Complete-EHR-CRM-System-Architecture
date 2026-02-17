@@ -12,27 +12,8 @@
  * - Bilingual support (EN/NO)
  */
 
-import { useState, _useEffect } from 'react';
-import {
-  Clock,
-  _User,
-  Phone,
-  _MessageSquare,
-  Plus,
-  _X,
-  _Check,
-  _AlertCircle,
-  _Calendar,
-  _Bell,
-  Send,
-  Trash2,
-  ChevronDown,
-  ChevronUp,
-  _Filter,
-  Search,
-  _Star,
-  _RefreshCw,
-} from 'lucide-react';
+import { useState } from 'react';
+import { Clock, Phone, Plus, _X, Send, Trash2, ChevronDown, ChevronUp, Search } from 'lucide-react';
 
 // Priority levels
 export const PRIORITY_LEVELS = {

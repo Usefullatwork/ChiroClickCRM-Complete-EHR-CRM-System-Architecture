@@ -4,8 +4,8 @@
  * Demonstrates the Same As Last Treatment functionality with mock data.
  */
 
-import _React, { useState } from 'react';
-import { Globe, FileText, Copy, Clock, _User, Calendar, RotateCcw } from 'lucide-react';
+import { useState } from 'react';
+import { Globe, FileText, Copy, Clock, Calendar, RotateCcw } from 'lucide-react';
 import SALTButton, { SALTButtonCompact, SALTQuickBar } from '../components/assessment/SALTButton';
 
 // Mock previous encounters

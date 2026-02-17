@@ -12,7 +12,7 @@
  * - Accessible design
  */
 
-import _React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Mic, MicOff, Square, AlertCircle } from 'lucide-react';
 
 // Check if browser supports speech recognition

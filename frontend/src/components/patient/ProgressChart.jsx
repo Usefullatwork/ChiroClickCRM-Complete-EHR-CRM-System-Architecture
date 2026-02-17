@@ -5,17 +5,8 @@
  * Displays patient's progress over time with charts
  */
 
-import _React, { useState, useMemo } from 'react';
-import {
-  TrendingUp,
-  TrendingDown,
-  Activity,
-  _Calendar,
-  _Target,
-  Award,
-  ChevronLeft,
-  ChevronRight,
-} from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { TrendingUp, TrendingDown, Activity, Award, ChevronLeft, ChevronRight } from 'lucide-react';
 
 /**
  * ProgressChart Component

@@ -19,7 +19,6 @@ import {
   XCircle,
   ChevronDown,
   ChevronUp,
-  _ArrowRight,
   Clipboard,
   FileText,
   RotateCcw,

@@ -1,5 +1,3 @@
-import _React from 'react';
-
 export const Card = ({ children, className = '', hover = false }) => (
   <div
     className={`bg-white rounded-xl border border-slate-200 shadow-sm ${hover ? 'hover:shadow-md transition-shadow' : ''} ${className}`}

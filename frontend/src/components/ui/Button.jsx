@@ -1,5 +1,3 @@
-import _React from 'react';
-
 export const Button = ({
   children,
   variant = 'primary',

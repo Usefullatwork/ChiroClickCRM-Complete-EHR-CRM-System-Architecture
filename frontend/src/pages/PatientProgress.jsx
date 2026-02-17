@@ -6,22 +6,18 @@
  * Viser pasientens treningsoverholdelse og terapeutens overvakningsvisning
  */
 
-import _React, { useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Activity,
-  _TrendingUp,
-  _TrendingDown,
   Calendar,
   Award,
   Users,
   ChevronLeft,
   ChevronRight,
   Search,
-  _Filter,
   Clock,
-  _AlertCircle,
   CheckCircle,
   Target,
   Frown,
@@ -34,7 +30,6 @@ import { progressAPI } from '../services/api';
 import ProgressChart from '../components/patient/ProgressChart';
 import ComplianceCalendar from '../components/patient/ComplianceCalendar';
 import PainTracker from '../components/patient/PainTracker';
-import _ExerciseLog from '../components/patient/ExerciseLog';
 
 /**
  * PatientProgress Component

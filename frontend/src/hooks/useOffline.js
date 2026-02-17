@@ -30,13 +30,10 @@ import {
   clearAllOfflineData,
 } from '../utils/offlineStorage';
 import {
-  _addToSyncQueue,
-  _getPendingItems,
   processSyncQueue,
   getSyncQueueStats,
   queueExerciseProgress,
   enableAutoSync,
-  triggerSync as _triggerSyncQueue,
   _SYNC_TYPES,
 } from '../utils/syncQueue';
 import logger from '../utils/logger';

@@ -11,7 +11,7 @@
  * Norwegian text as default language.
  */
 
-import { query, _transaction } from '../config/database.js';
+import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
 
 // Default templates (Norwegian)

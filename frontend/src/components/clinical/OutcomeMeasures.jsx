@@ -3,7 +3,7 @@
  * Allows practitioners to submit scored questionnaires for patients
  */
 
-import _React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { ClipboardList, Check, AlertCircle } from 'lucide-react';
 import { outcomesAPI } from '../../services/api';
 

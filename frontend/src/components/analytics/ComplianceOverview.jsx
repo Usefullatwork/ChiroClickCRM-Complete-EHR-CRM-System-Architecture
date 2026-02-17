@@ -5,19 +5,15 @@
  * @module components/analytics/ComplianceOverview
  */
 
-import _React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import {
   AreaChart,
   Area,
-  _BarChart,
-  _Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  _Legend,
-  _Cell,
 } from 'recharts';
 import {
   Activity,

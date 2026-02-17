@@ -9,7 +9,7 @@
  * - Bilingual support (Norwegian/English)
  */
 
-import _React, { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import {
   Layers,
   Eye,

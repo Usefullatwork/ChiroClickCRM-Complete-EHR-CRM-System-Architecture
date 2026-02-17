@@ -3,7 +3,7 @@
  * Shows confidence level with optional expandable reasoning
  */
 
-import _React, { useState } from 'react';
+import { useState } from 'react';
 import { Info, ChevronDown, ChevronUp } from 'lucide-react';
 
 const CONFIDENCE_LEVELS = {

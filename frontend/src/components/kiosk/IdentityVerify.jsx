@@ -7,7 +7,7 @@
  * - Security without revealing sensitive data
  */
 
-import _React, { useState } from 'react';
+import { useState } from 'react';
 import { Loader2, ShieldCheck, AlertCircle, ArrowLeft } from 'lucide-react';
 
 const TRANSLATIONS = {

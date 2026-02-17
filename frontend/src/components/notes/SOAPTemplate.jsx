@@ -11,9 +11,8 @@
  * - Full-screen modal on mobile
  */
 
-import _React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import {
-  _FileText,
   User,
   Stethoscope,
   ClipboardCheck,
@@ -26,8 +25,6 @@ import {
   Plus,
   Trash2,
   Copy,
-  _Clock,
-  _Calendar,
   X,
 } from 'lucide-react';
 import useMediaQuery from '../../hooks/useMediaQuery';

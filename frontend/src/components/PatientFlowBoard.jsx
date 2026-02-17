@@ -9,14 +9,12 @@
  * - Bilingual support (EN/NO)
  */
 
-import _React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   User,
   Clock,
-  _Phone,
   FileText,
-  _ChevronRight,
   MoreVertical,
   AlertTriangle,
   CheckCircle2,

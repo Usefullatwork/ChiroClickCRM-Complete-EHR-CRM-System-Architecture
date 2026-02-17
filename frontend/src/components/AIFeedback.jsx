@@ -3,7 +3,7 @@
  * Allows providers to give feedback on AI-generated suggestions
  */
 
-import _React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 // Feedback categories (should match database seed)
 const FEEDBACK_CATEGORIES = {

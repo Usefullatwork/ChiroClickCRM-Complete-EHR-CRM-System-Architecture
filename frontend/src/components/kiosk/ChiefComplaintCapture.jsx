@@ -8,7 +8,7 @@
  * - Generates narrative for SOAP
  */
 
-import _React, { useState } from 'react';
+import { useState } from 'react';
 import { ArrowLeft, MessageSquare } from 'lucide-react';
 
 const TRANSLATIONS = {

@@ -3,7 +3,7 @@
  * Business logic for SOAP documentation and clinical note management
  */
 
-import { query, _transaction } from '../config/database.js';
+import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
 import { BusinessLogicError } from '../utils/errors.js';
 import { validate as validateNote } from './noteValidator.js';

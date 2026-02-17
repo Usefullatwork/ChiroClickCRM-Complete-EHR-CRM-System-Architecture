@@ -2,7 +2,6 @@
  * SOAPNoteForm - Extracted from ClinicalEncounter.jsx
  * Contains the four SOAP sections: Subjective, Objective, Assessment, Plan
  */
-import _React from 'react';
 import { Activity, Target, Settings } from 'lucide-react';
 import { EnhancedClinicalTextarea, SALTBanner } from '../clinical';
 import {

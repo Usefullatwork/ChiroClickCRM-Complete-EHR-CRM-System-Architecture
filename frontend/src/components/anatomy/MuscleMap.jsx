@@ -4,7 +4,7 @@
  * Shows anterior and posterior muscle groups with click-to-select
  */
 
-import _React, { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { RotateCcw, Eye, EyeOff } from 'lucide-react';
 
 // Muscle definitions with Norwegian labels and clinical relevance

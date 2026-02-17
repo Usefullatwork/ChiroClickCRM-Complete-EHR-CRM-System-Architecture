@@ -1,4 +1,4 @@
-import _React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Star,
   ThumbsUp,
@@ -9,14 +9,10 @@ import {
   Send,
   Plus,
   Edit,
-  _Trash2,
   BarChart2,
   Users,
-  _Calendar,
   Mail,
   MessageSquare,
-  _ChevronRight,
-  _Filter,
   Eye,
   Loader2,
   AlertCircle,

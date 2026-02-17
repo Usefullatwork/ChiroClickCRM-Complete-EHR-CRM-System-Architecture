@@ -4,7 +4,6 @@
  */
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import _userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ExerciseCard from '../../components/patient/ExerciseCard';
 import { createMockExercise } from '../setup';

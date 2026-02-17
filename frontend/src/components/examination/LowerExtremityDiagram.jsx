@@ -9,8 +9,8 @@
  * - Test-specific overlays (SLR angle, etc.)
  */
 
-import _React, { useState, useCallback, useRef } from 'react';
-import { Trash2, _RotateCcw } from 'lucide-react';
+import { useState, useCallback, useRef } from 'react';
+import { Trash2 } from 'lucide-react';
 
 // Dermatome colors
 const DERMATOME_COLORS = {

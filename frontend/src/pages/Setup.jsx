@@ -4,7 +4,7 @@
  * Steps: Welcome → Organization → User Account → AI Models → Done
  */
 
-import _React, { useState } from 'react';
+import { useState } from 'react';
 
 const STEPS = ['Velkommen', 'Klinikk', 'Brukerkonto', 'AI-modeller', 'Ferdig'];
 

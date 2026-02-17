@@ -4,8 +4,8 @@
  * Enhanced version of SpineDiagram for clinical documentation
  */
 
-import _React, { useState, useCallback, useMemo } from 'react';
-import { RotateCcw, _Layers, Zap, Circle } from 'lucide-react';
+import { useState, useCallback, useMemo } from 'react';
+import { RotateCcw, Zap, Circle } from 'lucide-react';
 
 // Vertebrae with anatomical positions
 const VERTEBRAE = [

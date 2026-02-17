@@ -12,7 +12,6 @@ import {
   Search,
   Star,
   StarOff,
-  _Eye,
   Copy,
   Filter,
   X,

@@ -6,19 +6,8 @@
  * stereognosis, graphesthesia, and 2-point discrimination.
  */
 
-import _React, { useMemo, useState } from 'react';
-import {
-  Hand,
-  Zap,
-  CircleDot,
-  ChevronDown,
-  ChevronUp,
-  _AlertTriangle,
-  _CheckCircle,
-  _XCircle,
-  _MinusCircle,
-  Info,
-} from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Hand, Zap, CircleDot, ChevronDown, ChevronUp, Info } from 'lucide-react';
 
 // Sensory modalities
 const SENSORY_MODALITIES = [

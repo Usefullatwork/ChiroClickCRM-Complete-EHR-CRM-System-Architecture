@@ -1,4 +1,4 @@
-import _React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 /**
  * KPIChart Component

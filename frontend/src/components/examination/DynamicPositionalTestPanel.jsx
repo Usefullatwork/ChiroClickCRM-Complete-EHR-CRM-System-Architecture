@@ -5,7 +5,7 @@
  * to identify dysfunctional areas through position-specific weakness.
  */
 
-import _React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Activity,
   AlertTriangle,

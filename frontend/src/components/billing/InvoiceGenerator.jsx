@@ -6,21 +6,10 @@
  * with Norwegian takst codes and automatic HELFO calculations
  */
 
-import _React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import {
-  FileText,
-  User,
-  _Calendar,
-  Save,
-  Send,
-  X,
-  AlertCircle,
-  Check,
-  Loader2,
-  Search,
-} from 'lucide-react';
+import { FileText, User, Save, Send, X, AlertCircle, Check, Loader2, Search } from 'lucide-react';
 import { billingAPI, patientsAPI } from '../../services/api';
 import TakstCodes from './TakstCodes';
 

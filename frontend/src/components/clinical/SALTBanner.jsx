@@ -3,7 +3,6 @@
  * Shows when a similar previous encounter is found
  */
 
-import _React from 'react';
 import { ClipboardCopy, X, ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function SALTBanner({

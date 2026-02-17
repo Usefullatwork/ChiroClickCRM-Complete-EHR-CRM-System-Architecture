@@ -3,7 +3,7 @@
  * Model selection, feature toggles, and connection testing for the AI system.
  */
 
-import _React, { useState } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { aiAPI } from '../services/api';
 

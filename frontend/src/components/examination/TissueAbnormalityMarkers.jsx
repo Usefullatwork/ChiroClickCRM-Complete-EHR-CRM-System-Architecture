@@ -8,7 +8,7 @@
  * Designed to integrate with BodyDiagram component.
  */
 
-import _React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Target, ChevronDown, ChevronUp, Plus, X, Info, Crosshair } from 'lucide-react';
 
 // Tissue abnormality types

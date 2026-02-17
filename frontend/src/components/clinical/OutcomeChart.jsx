@@ -3,7 +3,7 @@
  * Uses recharts LineChart with color-coded severity zones
  */
 
-import _React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   LineChart,
   Line,

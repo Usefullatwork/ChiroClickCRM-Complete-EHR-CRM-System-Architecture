@@ -16,8 +16,6 @@ import {
   Search,
   RefreshCw,
   CheckCircle2,
-  _XCircle,
-  _Filter,
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';

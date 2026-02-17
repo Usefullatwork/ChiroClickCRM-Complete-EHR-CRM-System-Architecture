@@ -12,7 +12,7 @@
  * Integrates with existing SOAP documentation workflow
  */
 
-import _React, { useState, useCallback, useMemo, _useEffect } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import {
   AlertTriangle,
   CheckCircle,
@@ -26,7 +26,6 @@ import {
   RotateCcw,
   Save,
   AlertCircle,
-  _ArrowRight,
   Info,
 } from 'lucide-react';
 

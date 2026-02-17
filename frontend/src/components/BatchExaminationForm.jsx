@@ -1,4 +1,4 @@
-import { useState, _useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { examinationsAPI } from '../services/api';
 import { X, Save, CheckCircle, AlertTriangle, Zap, ListChecks } from 'lucide-react';

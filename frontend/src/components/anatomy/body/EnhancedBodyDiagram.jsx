@@ -8,7 +8,7 @@
  * - Muscle group highlighting
  * - Integration with text insertion system
  */
-import _React, { useState, useCallback, useRef, useMemo } from 'react';
+import { useState, useCallback, useRef, useMemo } from 'react';
 import Model from 'react-body-highlighter';
 import { RotateCcw, User, _Maximize2 } from 'lucide-react';
 

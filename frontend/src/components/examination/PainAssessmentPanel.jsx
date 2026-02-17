@@ -5,18 +5,8 @@
  * location, timing, and aggravating/relieving factors.
  */
 
-import _React, { useMemo, _useState } from 'react';
-import {
-  _Activity,
-  _Clock,
-  MapPin,
-  TrendingUp,
-  TrendingDown,
-  AlertCircle,
-  Zap,
-  _Flame,
-  Target,
-} from 'lucide-react';
+import { useMemo } from 'react';
+import { MapPin, TrendingUp, TrendingDown, AlertCircle, Zap, Target } from 'lucide-react';
 
 // Pain quality descriptors
 const PAIN_QUALITIES = [

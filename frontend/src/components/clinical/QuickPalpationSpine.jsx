@@ -5,7 +5,7 @@
  * Simple two-click flow, no mouse movement needed.
  */
 
-import _React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { ChevronDown, ChevronUp, X } from 'lucide-react';
 
 // Spine segment configuration

@@ -6,12 +6,11 @@
  * and quick actions for payment tracking
  */
 
-import _React, { useState } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   FileText,
   Search,
-  _Filter,
   ChevronLeft,
   ChevronRight,
   Eye,
@@ -22,7 +21,6 @@ import {
   AlertTriangle,
   XCircle,
   MoreVertical,
-  _Download,
   Ban,
   CreditCard,
 } from 'lucide-react';

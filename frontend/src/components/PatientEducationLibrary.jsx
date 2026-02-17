@@ -1,4 +1,4 @@
-import _React, { useState } from 'react';
+import { useState } from 'react';
 
 /**
  * Patient Education Library Component

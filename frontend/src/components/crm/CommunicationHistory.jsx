@@ -1,4 +1,4 @@
-import _React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Mail,
   MessageSquare,
@@ -7,7 +7,6 @@ import {
   Calendar,
   FileText,
   Search,
-  _Filter,
   ChevronRight,
   Clock,
   User,

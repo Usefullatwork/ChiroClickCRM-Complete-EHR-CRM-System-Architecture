@@ -3,7 +3,7 @@
  * Business logic for vestibular/dizziness assessments, BPPV testing, VNG, and treatment tracking
  */
 
-import { query, _transaction } from '../config/database.js';
+import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
 
 /**

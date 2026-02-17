@@ -7,7 +7,7 @@
  * Based on standardized neurological examination protocols.
  */
 
-import _React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Eye,
   Ear,

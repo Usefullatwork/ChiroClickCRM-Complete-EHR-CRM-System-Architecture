@@ -5,10 +5,8 @@
  * List of clinical notes for a patient
  */
 
-import _React from 'react';
 import {
   FileText,
-  _Calendar,
   User,
   Clock,
   ChevronRight,
@@ -18,7 +16,6 @@ import {
   Eye,
   Printer,
   Download,
-  _Plus,
   AlertTriangle,
 } from 'lucide-react';
 

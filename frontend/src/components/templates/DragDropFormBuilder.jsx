@@ -3,7 +3,7 @@
  * Visual form creation tool for clinical forms and templates
  */
 
-import _React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -11,7 +11,6 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  _DragOverlay,
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -26,9 +25,7 @@ import {
   Plus,
   Trash2,
   Copy,
-  _Settings,
   ChevronDown,
-  _ChevronUp,
   Type,
   AlignLeft,
   CheckSquare,
@@ -43,7 +40,6 @@ import {
   Save,
   Eye,
   X,
-  _Edit2,
 } from 'lucide-react';
 
 // Available field types

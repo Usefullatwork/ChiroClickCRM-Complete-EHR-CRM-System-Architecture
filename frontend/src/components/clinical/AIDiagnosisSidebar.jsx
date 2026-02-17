@@ -3,17 +3,8 @@
  * Non-intrusive way to show ICPC-2 code suggestions based on clinical findings
  */
 
-import _React, { useState, useEffect, useCallback } from 'react';
-import {
-  Brain,
-  _X,
-  ChevronRight,
-  _ChevronLeft,
-  ThumbsUp,
-  ThumbsDown,
-  Loader2,
-  RefreshCw,
-} from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Brain, _X, ChevronRight, ThumbsUp, ThumbsDown, Loader2, RefreshCw } from 'lucide-react';
 import { aiAPI } from '../../services/api';
 import AIConfidenceBadge from './AIConfidenceBadge';
 

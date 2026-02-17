@@ -7,7 +7,7 @@
  * - Template data from API
  * - Text insertion callback
  */
-import _React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { spineTemplatesAPI } from '../../services/api';
 

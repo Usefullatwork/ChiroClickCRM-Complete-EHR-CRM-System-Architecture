@@ -5,12 +5,10 @@
  * @module components/analytics/ComplianceChart
  */
 
-import _React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import {
   LineChart,
   Line,
-  _AreaChart,
-  _Area,
   PieChart,
   Pie,
   Cell,
@@ -21,7 +19,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import { CheckCircle2, Activity, Clock, _XCircle, PauseCircle, TrendingUp } from 'lucide-react';
+import { CheckCircle2, Activity, Clock, PauseCircle, TrendingUp } from 'lucide-react';
 
 /**
  * Status colors for pie chart

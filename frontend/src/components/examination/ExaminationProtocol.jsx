@@ -5,7 +5,7 @@
  * for each body region. Supports Norwegian and English labels.
  */
 
-import _React, { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import {
   ChevronDown,
   ChevronRight,

@@ -5,7 +5,7 @@
  * trigger points, and nerve zones for facial treatment.
  */
 
-import _React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Globe, Copy, Info, User, Zap, Activity, Layers } from 'lucide-react';
 import {
   FacialLinesChart,

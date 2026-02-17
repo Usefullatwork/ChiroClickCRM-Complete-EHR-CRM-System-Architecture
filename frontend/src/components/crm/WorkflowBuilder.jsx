@@ -13,12 +13,9 @@ import {
   Star,
   AlertTriangle,
   CheckCircle,
-  _XCircle,
   Edit,
-  _Trash2,
   Copy,
   ChevronRight,
-  _Settings,
   Activity,
   Loader2,
 } from 'lucide-react';

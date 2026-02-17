@@ -3,7 +3,7 @@
  * Step-by-step interface for creating communication templates
  */
 
-import _React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { aiAPI } from '../../services/api';
 
 // Template types with Norwegian translations

@@ -3,17 +3,8 @@
  * Combined panel for exercise prescription within clinical encounters
  */
 
-import _React, { useState, useEffect, _useCallback } from 'react';
-import {
-  X,
-  Dumbbell,
-  _ChevronLeft,
-  _ChevronRight,
-  AlertCircle,
-  Check,
-  Download,
-  Loader2,
-} from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Dumbbell, AlertCircle, Check, Download, Loader2 } from 'lucide-react';
 import ExerciseLibrary from './ExerciseLibrary';
 import ExercisePrescription from './ExercisePrescription';
 import api from '../../services/api';

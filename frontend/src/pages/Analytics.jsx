@@ -7,23 +7,18 @@
  * @module pages/Analytics
  */
 
-import _React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
-  _BarChart3,
   Users,
   UserPlus,
   Calendar,
   DollarSign,
-  _Activity,
   Download,
   Filter,
   RefreshCw,
-  _TrendingUp,
-  _TrendingDown,
   Dumbbell,
   Target,
-  _FileText,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';

@@ -5,24 +5,10 @@
  * Displays and manages patient's customized exercise programs
  */
 
-import _React, { useState } from 'react';
-import { _useQuery, _useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-  Dumbbell,
-  Plus,
-  Search,
-  _Filter,
-  _Play,
-  _Pause,
-  _CheckCircle,
-  _Clock,
-  _TrendingUp,
-  _Calendar,
-  _User,
-  ChevronRight,
-  _MoreVertical,
-} from 'lucide-react';
+import { Dumbbell, Plus, Search, ChevronRight } from 'lucide-react';
 
 /**
  * PatientExercises Component

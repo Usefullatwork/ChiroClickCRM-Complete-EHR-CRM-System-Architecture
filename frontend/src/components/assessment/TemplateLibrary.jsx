@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { X, Search, Star, Clock, _ChevronRight, _Filter } from 'lucide-react';
+import { X, Search, Star, Clock } from 'lucide-react';
 
 /**
  * TemplateLibrary - Jane App-style chart template library

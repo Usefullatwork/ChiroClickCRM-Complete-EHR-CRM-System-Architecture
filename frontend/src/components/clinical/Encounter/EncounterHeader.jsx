@@ -1,4 +1,3 @@
-import _React from 'react';
 import { Calendar, Clock, BookOpen, Check, Activity, Lock, Loader2 } from 'lucide-react';
 
 export default function EncounterHeader({

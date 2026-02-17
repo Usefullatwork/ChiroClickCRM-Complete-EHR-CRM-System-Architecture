@@ -5,13 +5,13 @@
  * for easy patient status tracking and workflow management.
  */
 
-import _React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Calendar, ChevronLeft, ChevronRight, _Filter, Monitor, Users } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, Monitor, Users } from 'lucide-react';
 import PatientFlowBoard from '../components/PatientFlowBoard';
 import { appointmentsAPI } from '../services/api';
-import { useTranslation, formatDate, _formatTime } from '../i18n';
+import { useTranslation, formatDate } from '../i18n';
 
 export default function PatientFlow() {
   const queryClient = useQueryClient();

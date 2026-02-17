@@ -8,7 +8,7 @@
  * - Click to mark symptom radiation
  */
 
-import _React, { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Trash2 } from 'lucide-react';
 
 // Dermatome colors for upper extremity

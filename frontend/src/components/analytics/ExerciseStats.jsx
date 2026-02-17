@@ -5,7 +5,7 @@
  * @module components/analytics/ExerciseStats
  */
 
-import _React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   BarChart,
   Bar,

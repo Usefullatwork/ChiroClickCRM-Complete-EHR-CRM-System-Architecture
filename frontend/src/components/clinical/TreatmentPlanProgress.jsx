@@ -2,7 +2,7 @@
  * TreatmentPlanProgress - Shows plan progress with session tracking and milestone checklist
  */
 
-import _React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Target,
   Calendar,

@@ -3,8 +3,8 @@
  * Shows in corner of screen to give clinicians confidence their work is saved
  */
 
-import _React, { useState, useEffect } from 'react';
-import { Wifi, WifiOff, _Cloud, _CloudOff, RefreshCw, Check, AlertCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Wifi, WifiOff, RefreshCw, Check, AlertCircle } from 'lucide-react';
 
 export default function ConnectionStatus({
   pendingChanges = 0,

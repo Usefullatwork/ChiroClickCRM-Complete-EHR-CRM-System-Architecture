@@ -5,7 +5,7 @@
 
 import express from 'express';
 import * as authService from '../auth/authService.js';
-import { _validateSession, getUserSessions, refreshSessionFreshness } from '../auth/sessions.js';
+import { getUserSessions, refreshSessionFreshness } from '../auth/sessions.js';
 import { requireLocalAuth, requireFreshSession } from '../middleware/auth.js';
 import { loginLimiter } from '../middleware/rateLimiting.js';
 import { authBruteForceLimit } from '../middleware/security.js';

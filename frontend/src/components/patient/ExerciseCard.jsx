@@ -5,10 +5,9 @@
  * Displays a single exercise in the patient's exercise program
  */
 
-import _React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Play,
-  _Pause,
   Check,
   ChevronDown,
   ChevronUp,
@@ -17,8 +16,6 @@ import {
   Target,
   Activity,
   AlertTriangle,
-  _Star,
-  _MoreVertical,
   Dumbbell,
 } from 'lucide-react';
 

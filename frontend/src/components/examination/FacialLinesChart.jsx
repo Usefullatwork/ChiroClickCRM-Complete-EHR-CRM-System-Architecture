@@ -12,14 +12,12 @@
  * Based on fascial line concepts and facial myofascial treatment protocols
  */
 
-import _React, { useState, useCallback, _useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import {
   Layers,
   Eye,
   EyeOff,
   Zap,
-  _Activity,
-  _Circle,
   RotateCcw,
   FileText,
   ChevronDown,

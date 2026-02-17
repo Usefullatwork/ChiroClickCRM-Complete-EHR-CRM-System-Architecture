@@ -4,7 +4,7 @@
  * Supports personalization, rate limiting, and retry logic
  */
 
-import { query, _transaction } from '../config/database.js';
+import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
 import * as communicationService from './communications.js';
 import { v4 as uuidv4 } from 'uuid';

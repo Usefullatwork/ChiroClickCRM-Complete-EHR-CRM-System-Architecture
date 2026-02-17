@@ -5,13 +5,12 @@
  * Filtrer og velg ovelser for treningsforskrivninger
  */
 
-import _React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Search,
   Filter,
   Grid,
   List,
-  _ChevronDown,
   Dumbbell,
   Play,
   Check,

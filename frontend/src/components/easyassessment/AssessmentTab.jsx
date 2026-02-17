@@ -1,7 +1,6 @@
 import {
   SmartTextInput,
   VASComparisonDisplay,
-  _OutcomeAssessment,
   CLINICAL_REASONING_PHRASES,
   QUESTIONNAIRE_TYPES,
 } from '../assessment';

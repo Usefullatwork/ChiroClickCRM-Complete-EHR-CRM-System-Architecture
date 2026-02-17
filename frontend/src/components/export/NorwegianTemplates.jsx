@@ -14,19 +14,7 @@
  */
 
 import { useState } from 'react';
-import {
-  FileText,
-  _Calendar,
-  _User,
-  _Building,
-  _Clipboard,
-  _Send,
-  _AlertCircle,
-  Check,
-  Copy,
-  Download,
-  _Eye,
-} from 'lucide-react';
+import { FileText, Check, Copy, Download } from 'lucide-react';
 
 // =============================================================================
 // DOCUMENT TEMPLATES

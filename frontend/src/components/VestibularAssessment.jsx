@@ -1,14 +1,5 @@
 import { useState } from 'react';
-import {
-  Activity,
-  Eye,
-  Brain,
-  Target,
-  RotateCw,
-  _TrendingDown,
-  ChevronDown,
-  ChevronUp,
-} from 'lucide-react';
+import { Activity, Eye, Brain, Target, RotateCw, ChevronDown, ChevronUp } from 'lucide-react';
 
 /**
  * Comprehensive Vestibular Assessment Component

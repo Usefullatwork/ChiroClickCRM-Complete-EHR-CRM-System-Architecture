@@ -12,7 +12,7 @@
  * Data flows to SOAP note pre-population for provider
  */
 
-import _React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useTranslation } from '../i18n';
 import KioskLayout from '../components/kiosk/KioskLayout';
 import PatientLookup from '../components/kiosk/PatientLookup';

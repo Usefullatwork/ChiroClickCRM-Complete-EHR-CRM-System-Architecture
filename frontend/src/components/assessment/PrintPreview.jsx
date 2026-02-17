@@ -1,5 +1,5 @@
-import { useState, useRef, _forwardRef } from 'react';
-import { Printer, _Download, Copy, Check, FileText, _Settings, X, ChevronDown } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Printer, Copy, Check, FileText, X, ChevronDown } from 'lucide-react';
 
 /**
  * PrintPreview - Professional narrative document generator

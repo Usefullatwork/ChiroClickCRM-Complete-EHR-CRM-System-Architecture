@@ -4,7 +4,7 @@
  * Used for manipulation/adjustment documentation
  */
 
-import _React, { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 
 // Vertebral segments configuration
 const SPINE_SEGMENTS = {

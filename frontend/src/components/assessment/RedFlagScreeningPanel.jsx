@@ -5,7 +5,7 @@
  * Provides visual alerts, acknowledgement workflow, and referral actions.
  */
 
-import _React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   AlertTriangle,
   Shield,
@@ -14,17 +14,12 @@ import {
   ShieldX,
   Check,
   _X,
-  _Eye,
-  _EyeOff,
   ChevronDown,
   ChevronUp,
-  _FileText,
-  _Phone,
   ExternalLink,
   Copy,
   Bell,
   BellOff,
-  _Clock,
   Activity,
 } from 'lucide-react';
 import { useRedFlagScreening } from '../../hooks/useRedFlagScreening';

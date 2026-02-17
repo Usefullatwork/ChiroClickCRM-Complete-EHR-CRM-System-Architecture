@@ -5,7 +5,6 @@
  * @module components/analytics/StatCard
  */
 
-import _React from 'react';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 /**

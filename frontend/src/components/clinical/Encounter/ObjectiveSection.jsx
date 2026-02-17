@@ -1,4 +1,3 @@
-import _React from 'react';
 import {
   Bone,
   Activity,

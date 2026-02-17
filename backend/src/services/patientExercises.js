@@ -5,7 +5,7 @@
  * @module services/patientExercises
  */
 
-import { query, _transaction } from '../config/database.js';
+import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
 import crypto from 'crypto';
 

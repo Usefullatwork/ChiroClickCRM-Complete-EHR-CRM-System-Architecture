@@ -4,18 +4,8 @@
  * Interactive demonstration of the real-time red flag auto-screening system.
  */
 
-import _React, { useState, useMemo } from 'react';
-import {
-  Globe,
-  Shield,
-  AlertTriangle,
-  _Activity,
-  FileText,
-  _Thermometer,
-  User,
-  _Calendar,
-  BookOpen,
-} from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Globe, Shield, AlertTriangle, FileText, User, BookOpen } from 'lucide-react';
 import RedFlagScreeningPanel from '../components/assessment/RedFlagScreeningPanel';
 import { useRedFlagScreening, useTextFieldScreening } from '../hooks/useRedFlagScreening';
 import {

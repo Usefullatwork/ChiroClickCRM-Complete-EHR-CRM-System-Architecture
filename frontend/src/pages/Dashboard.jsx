@@ -11,12 +11,10 @@ import {
   Clock,
   ArrowRight,
   X,
-  _Phone,
   ChevronDown,
   ChevronUp,
   Bell,
 } from 'lucide-react';
-import { _formatDate, _formatTime } from '../lib/utils';
 import { dashboardAPI, appointmentsAPI, followUpsAPI } from '../services/api';
 import {
   useTranslation,

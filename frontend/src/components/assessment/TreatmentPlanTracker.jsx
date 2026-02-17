@@ -1,15 +1,5 @@
 import { useState } from 'react';
-import {
-  Calendar,
-  _TrendingUp,
-  Target,
-  Clock,
-  Edit2,
-  Check,
-  X,
-  Plus,
-  AlertTriangle,
-} from 'lucide-react';
+import { Calendar, Target, Clock, Edit2, Check, X, Plus, AlertTriangle } from 'lucide-react';
 
 /**
  * TreatmentPlanTracker - Track treatment plan progress

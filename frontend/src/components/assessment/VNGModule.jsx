@@ -15,7 +15,7 @@
  * - Balance Tests (Romberg, etc.)
  */
 
-import _React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { t } from './translations';
 import {
   Eye,

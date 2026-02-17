@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, _Check, AlertCircle, FileText } from 'lucide-react';
+import { ChevronDown, ChevronUp, AlertCircle, FileText } from 'lucide-react';
 import QuickCheckboxGrid, {
   SHOULDER_ROM_OPTIONS,
   SHOULDER_IMPINGEMENT_OPTIONS,

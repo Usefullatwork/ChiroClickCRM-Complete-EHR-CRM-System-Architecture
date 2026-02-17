@@ -1,4 +1,4 @@
-import _React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Send,
   Mail,
@@ -9,8 +9,6 @@ import {
   Plus,
   Calendar,
   Clock,
-  _CheckCircle,
-  _XCircle,
   Edit,
   Trash2,
   Eye,

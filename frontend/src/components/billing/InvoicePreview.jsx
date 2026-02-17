@@ -6,13 +6,12 @@
  * record payments, and manage invoice status
  */
 
-import _React, { useState } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   FileText,
   X,
   Printer,
-  _Download,
   Send,
   CheckCircle,
   Clock,
@@ -20,13 +19,10 @@ import {
   CreditCard,
   User,
   Building,
-  _Calendar,
   Phone,
   Mail,
-  _MapPin,
   Loader2,
   Ban,
-  _Edit,
   ExternalLink,
 } from 'lucide-react';
 import { billingAPI } from '../../services/api';

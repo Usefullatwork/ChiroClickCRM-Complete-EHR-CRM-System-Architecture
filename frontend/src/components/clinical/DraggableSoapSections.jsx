@@ -3,7 +3,7 @@
  * Allows users to reorder SOAP note sections via drag-and-drop
  */
 
-import _React, { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -11,7 +11,6 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  _DragOverlay,
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -21,18 +20,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import {
-  GripVertical,
-  _ChevronDown,
-  _ChevronUp,
-  Maximize2,
-  Minimize2,
-  Eye,
-  EyeOff,
-  Settings,
-  _Save,
-  RotateCcw,
-} from 'lucide-react';
+import { GripVertical, Maximize2, Minimize2, Eye, EyeOff, Settings, RotateCcw } from 'lucide-react';
 
 // Default SOAP sections with Norwegian labels
 const DEFAULT_SECTIONS = [

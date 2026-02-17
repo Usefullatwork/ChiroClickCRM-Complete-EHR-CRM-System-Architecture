@@ -14,10 +14,10 @@
  * - Norwegian labels
  */
 
-import { useState, useEffect, useMemo, _useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { patientsAPI } from '../../services/api';
-import { format, parseISO, addMinutes, _isWithinInterval } from 'date-fns';
+import { format, parseISO, addMinutes } from 'date-fns';
 import { nb } from 'date-fns/locale';
 import {
   X,
@@ -29,7 +29,6 @@ import {
   CheckCircle,
   Loader2,
   Trash2,
-  _UserPlus,
 } from 'lucide-react';
 import toast from '../../utils/toast';
 

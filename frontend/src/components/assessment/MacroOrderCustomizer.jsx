@@ -3,7 +3,7 @@
  * Allows users to drag-and-drop macros and categories to customize their order
  */
 
-import _React, { useState, useEffect, _useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -11,7 +11,6 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  _DragOverlay,
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -33,7 +32,6 @@ import {
   RotateCcw,
   Settings,
   X,
-  _Check,
   Folder,
   FileText,
 } from 'lucide-react';

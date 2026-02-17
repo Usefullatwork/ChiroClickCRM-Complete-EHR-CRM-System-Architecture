@@ -5,12 +5,9 @@
  * Read-only preview of clinical note
  */
 
-import _React from 'react';
 import {
   FileText,
-  _Calendar,
   User,
-  _Clock,
   Edit,
   Trash2,
   Lock,

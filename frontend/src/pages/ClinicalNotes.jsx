@@ -5,32 +5,18 @@
  * Clinical notes and SOAP documentation management
  */
 
-import _React, { useState, useEffect, _useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   FileText,
   Plus,
   Search,
-  _Filter,
-  _Calendar,
   User,
-  _Clock,
-  _ChevronRight,
   ChevronDown,
   Edit,
-  _Trash2,
-  _Lock,
-  _Unlock,
-  _Download,
-  _AlertTriangle,
-  _CheckCircle,
-  _Eye,
-  _Printer,
   X,
   RefreshCw,
-  _FileCheck,
-  _Stethoscope,
   ClipboardList,
   Activity,
 } from 'lucide-react';

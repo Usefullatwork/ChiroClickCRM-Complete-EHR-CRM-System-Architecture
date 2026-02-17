@@ -6,7 +6,7 @@
  * membership freeze declarations, and work declarations.
  */
 
-import { useState, _useEffect } from 'react';
+import { useState } from 'react';
 import {
   FileText,
   Wand2,
@@ -19,7 +19,6 @@ import {
   RefreshCw,
   User,
   Building,
-  _Calendar,
   FileCheck,
 } from 'lucide-react';
 

@@ -1,4 +1,4 @@
-import _React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Users,
   Gift,
@@ -7,10 +7,8 @@ import {
   ChevronRight,
   Plus,
   Mail,
-  _MessageSquare,
   Copy,
   Check,
-  _Star,
   Calendar,
   DollarSign,
   UserPlus,

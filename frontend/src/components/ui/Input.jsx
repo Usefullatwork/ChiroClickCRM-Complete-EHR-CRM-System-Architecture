@@ -1,5 +1,3 @@
-import _React from 'react';
-
 export const Input = ({ label, error, helperText, required = false, className = '', ...props }) => (
   <div className="space-y-1">
     {label && (

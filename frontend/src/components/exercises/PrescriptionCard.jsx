@@ -5,7 +5,7 @@
  * Individuelt ovelseskort i forskrivning med sett/repetisjoner konfigurasjon
  */
 
-import _React, { useState } from 'react';
+import { useState } from 'react';
 import {
   GripVertical,
   Trash2,
@@ -17,9 +17,7 @@ import {
   Target,
   Activity,
   AlertTriangle,
-  _Info,
   _X,
-  _Check,
   Minus,
   Plus,
 } from 'lucide-react';

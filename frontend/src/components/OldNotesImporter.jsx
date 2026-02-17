@@ -3,7 +3,7 @@
  * Upload and organize old journal notes with AI assistance
  */
 
-import _React, { useState, _useEffect } from 'react';
+import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import toast from '../utils/toast';

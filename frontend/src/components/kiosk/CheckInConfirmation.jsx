@@ -7,7 +7,7 @@
  * - Auto-reset after timeout
  */
 
-import _React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CheckCircle2, Clock, MapPin } from 'lucide-react';
 
 const TRANSLATIONS = {

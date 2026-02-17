@@ -5,8 +5,8 @@
  * Demonstrates interactive body diagrams for marking pain and symptoms.
  */
 
-import _React, { useState, useCallback } from 'react';
-import { Globe, Copy, Trash2, FileText, User, _Eye, Maximize2, Info } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { Globe, Copy, Trash2, FileText, User, Maximize2, Info } from 'lucide-react';
 import { BodyChartPanel, QuickRegionButtons } from '../components/examination';
 
 // Symptom type reference

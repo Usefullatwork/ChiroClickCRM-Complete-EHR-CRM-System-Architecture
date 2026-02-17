@@ -1,4 +1,3 @@
-import _React from 'react';
 import { Search, X, Check } from 'lucide-react';
 import { useEncounter } from '../../../context/EncounterContext';
 

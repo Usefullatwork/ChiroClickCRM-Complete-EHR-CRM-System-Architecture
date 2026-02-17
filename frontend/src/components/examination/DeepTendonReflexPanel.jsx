@@ -5,8 +5,8 @@
  * bilateral comparison, and pathological reflex assessment.
  */
 
-import _React, { useMemo, useState } from 'react';
-import { AlertTriangle, _CheckCircle, Info } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { AlertTriangle, Info } from 'lucide-react';
 
 // DTR Grading Scale
 const DTR_GRADES = [

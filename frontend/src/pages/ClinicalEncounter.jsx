@@ -5,10 +5,10 @@
  * UI sections are extracted to components/encounter/.
  */
 
-import _React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { encountersAPI, patientsAPI, diagnosisAPI, _treatmentsAPI, aiAPI } from '../services/api';
+import { encountersAPI, patientsAPI, diagnosisAPI, aiAPI } from '../services/api';
 import TemplatePicker from '../components/TemplatePicker';
 import { usePatientIntake } from '../hooks/usePatientIntake';
 import { useClinicalPreferences } from '../hooks';

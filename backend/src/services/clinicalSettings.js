@@ -5,7 +5,7 @@
  * and letter/document structure
  */
 
-import { query, _transaction } from '../config/database.js';
+import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
 
 // Default clinical settings structure

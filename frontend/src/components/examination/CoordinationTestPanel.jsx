@@ -5,7 +5,7 @@
  * heel-to-shin, rapid alternating movements, Romberg, and gait tests.
  */
 
-import _React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Activity,
   AlertTriangle,

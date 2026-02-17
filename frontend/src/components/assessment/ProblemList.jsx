@@ -1,15 +1,5 @@
 import { useState } from 'react';
-import {
-  Plus,
-  X,
-  AlertCircle,
-  _Clock,
-  Calendar,
-  ChevronDown,
-  ChevronUp,
-  _Edit2,
-  _Check,
-} from 'lucide-react';
+import { Plus, X, AlertCircle, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
 
 /**
  * ProblemList - Patient problem/condition list panel

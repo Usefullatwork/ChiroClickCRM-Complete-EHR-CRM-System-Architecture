@@ -8,7 +8,7 @@ import toast from '../utils/toast';
  * New components should import from stores/encounterStore directly.
  */
 
-import _React, { createContext, useContext, useEffect, useRef } from 'react';
+import { createContext, useContext, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { encountersAPI, patientsAPI, diagnosisAPI } from '../services/api';

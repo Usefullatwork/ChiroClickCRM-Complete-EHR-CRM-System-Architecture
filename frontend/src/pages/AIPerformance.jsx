@@ -9,7 +9,7 @@
  * - Export feedback button
  */
 
-import _React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   TrendingUp,
   TrendingDown,
@@ -21,7 +21,6 @@ import {
   CheckCircle,
   XCircle,
   Edit3,
-  _AlertTriangle,
   BarChart3,
   LineChart,
   Clock,

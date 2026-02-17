@@ -5,7 +5,7 @@
  * Implements evidence-based test clusters with automatic scoring and alerts.
  */
 
-import _React, { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import {
   AlertTriangle,
   AlertCircle,

@@ -7,8 +7,8 @@
  * Based on standardized MMT protocols for chiropractic and physical therapy.
  */
 
-import _React, { useMemo, useState } from 'react';
-import { AlertTriangle, _CheckCircle, ChevronDown, ChevronUp, Info } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { AlertTriangle, ChevronDown, ChevronUp, Info } from 'lucide-react';
 
 // MMT Grading Scale with descriptions
 const MMT_GRADES = [

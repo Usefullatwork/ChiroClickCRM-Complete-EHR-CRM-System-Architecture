@@ -5,7 +5,7 @@
  * Visual weekly overview for exercise frequency
  */
 
-import _React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Calendar,
   Check,
@@ -15,7 +15,6 @@ import {
   ChevronRight,
   Sun,
   Moon,
-  _Info,
 } from 'lucide-react';
 
 /**

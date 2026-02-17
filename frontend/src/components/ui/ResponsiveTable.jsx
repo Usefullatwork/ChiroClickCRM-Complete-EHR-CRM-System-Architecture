@@ -10,16 +10,8 @@
  * - Proper accessibility
  */
 
-import _React, { useState, useRef, useEffect } from 'react';
-import {
-  ChevronRight,
-  ChevronDown,
-  ChevronUp,
-  _MoreVertical,
-  Eye,
-  Edit,
-  Trash2,
-} from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { ChevronRight, ChevronDown, ChevronUp, Eye, Edit, Trash2 } from 'lucide-react';
 import useMediaQuery from '../../hooks/useMediaQuery';
 
 /**

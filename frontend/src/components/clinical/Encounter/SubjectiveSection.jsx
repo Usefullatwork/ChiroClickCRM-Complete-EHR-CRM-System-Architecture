@@ -1,4 +1,3 @@
-import _React from 'react';
 import { useEncounter } from '../../../context/EncounterContext';
 
 export default function SubjectiveSection({

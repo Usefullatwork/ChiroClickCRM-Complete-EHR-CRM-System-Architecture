@@ -3,9 +3,9 @@
  * Comprehensive financial management and billing tracking
  */
 
-import { useState, _useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { financialAPI, _patientsAPI } from '../services/api';
+import { financialAPI } from '../services/api';
 import { formatDate, formatCurrency } from '../lib/utils';
 import {
   useTranslation,
@@ -19,13 +19,10 @@ import {
   AlertCircle,
   Download,
   Filter,
-  _Search,
   Plus,
   CheckCircle,
-  _XCircle,
   Clock,
   FileText,
-  _Calendar,
   ChevronDown,
 } from 'lucide-react';
 import {

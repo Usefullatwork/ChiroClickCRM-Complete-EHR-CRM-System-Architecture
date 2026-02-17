@@ -8,7 +8,7 @@
  * - Bilingual support
  */
 
-import _React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Search, Loader2, AlertCircle } from 'lucide-react';
 
 const TRANSLATIONS = {

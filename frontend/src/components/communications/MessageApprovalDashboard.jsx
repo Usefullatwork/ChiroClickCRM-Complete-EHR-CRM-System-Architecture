@@ -8,7 +8,7 @@
  * - Filter by type (no-show, follow-up, reminder)
  * - Preview how message will appear to patient
  */
-import _React, { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   MessageSquare,
@@ -17,17 +17,13 @@ import {
   Check,
   X,
   Edit2,
-  _AlertCircle,
   Clock,
   User,
-  _Calendar,
   ChevronDown,
   ChevronUp,
-  _Send,
   Filter,
   RefreshCw,
   CheckCircle2,
-  _XCircle,
 } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';

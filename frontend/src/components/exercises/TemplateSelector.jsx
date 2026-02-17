@@ -5,7 +5,7 @@
  * Select and load predefined exercise program templates
  */
 
-import _React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   FileText,
   Search,
@@ -14,13 +14,9 @@ import {
   Dumbbell,
   ChevronRight,
   Star,
-  _StarOff,
-  _Plus,
-  _Check,
   X,
   Loader2,
   Save,
-  _AlertCircle,
 } from 'lucide-react';
 
 /**

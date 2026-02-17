@@ -5,12 +5,11 @@
  * Preview of exercise prescription as it will appear to the patient
  */
 
-import _React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Dumbbell,
   User,
   Calendar,
-  _Phone,
   Play,
   Clock,
   Target,

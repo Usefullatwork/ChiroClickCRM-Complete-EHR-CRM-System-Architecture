@@ -9,11 +9,11 @@
  * - GLTF model support (when available)
  * - Fallback to procedural geometry
  */
-import _React, { useState, useRef, useCallback, Suspense, useMemo } from 'react';
+import { useState, useRef, useCallback, Suspense, useMemo } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, _Text, Html, _PerspectiveCamera, Environment } from '@react-three/drei';
+import { OrbitControls, Html, Environment } from '@react-three/drei';
 import * as THREE from 'three';
-import { RotateCcw, Rotate3D, _ZoomIn, _ZoomOut, Move } from 'lucide-react';
+import { RotateCcw, Rotate3D, Move } from 'lucide-react';
 
 // Vertebra configuration for 3D positioning
 const VERTEBRA_CONFIG = {

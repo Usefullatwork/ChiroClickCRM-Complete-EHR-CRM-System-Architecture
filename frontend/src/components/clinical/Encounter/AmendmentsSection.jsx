@@ -1,4 +1,3 @@
-import _React from 'react';
 import { FileText, Save, Loader2, Lock } from 'lucide-react';
 
 export default function AmendmentsSection({

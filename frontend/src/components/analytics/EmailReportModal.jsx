@@ -1,5 +1,5 @@
-import _React, { useState } from 'react';
-import { _Mail, Send, AlertCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Send, AlertCircle } from 'lucide-react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';

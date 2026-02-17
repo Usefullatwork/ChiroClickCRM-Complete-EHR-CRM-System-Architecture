@@ -6,7 +6,7 @@
 import * as encounterService from '../services/encounters.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
-import { NotFoundError, _BusinessLogicError } from '../utils/errors.js';
+import { NotFoundError } from '../utils/errors.js';
 import { broadcastToOrg } from '../services/websocket.js';
 
 /**

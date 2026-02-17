@@ -1,4 +1,3 @@
-import _React from 'react';
 import { AlertTriangle, CheckCircle2, Info, XCircle, X } from 'lucide-react';
 
 export const Alert = ({ children, variant = 'info', title, onClose, className = '' }) => {

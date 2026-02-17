@@ -12,31 +12,21 @@
  * Norwegian and English support
  */
 
-import { useState, _useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  _Brain,
-  _TrendingUp,
-  _TrendingDown,
   ThumbsUp,
-  _ThumbsDown,
   RefreshCw,
   AlertCircle,
   CheckCircle2,
   Clock,
-  _Calendar,
   ArrowUpRight,
   ArrowDownRight,
-  _Percent,
   Star,
   Activity,
-  _Database,
-  _Settings,
   Download,
   Loader2,
-  _FileText,
   GitBranch,
-  _RotateCcw,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../ui/Card';
 import { Button } from '../ui/Button';

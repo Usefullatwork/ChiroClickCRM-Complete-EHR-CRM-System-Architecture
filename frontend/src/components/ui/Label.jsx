@@ -1,5 +1,3 @@
-import _React from 'react';
-
 export const Label = ({ children, htmlFor, className = '', required = false }) => {
   return (
     <label

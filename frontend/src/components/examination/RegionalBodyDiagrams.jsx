@@ -16,7 +16,7 @@
  * - Anatomical landmarks
  */
 
-import _React, { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Trash2 } from 'lucide-react';
 
 // Marker types for all diagrams

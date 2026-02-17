@@ -3,7 +3,7 @@
  * File upload for ICS/CSV files with preview, conflict detection, and selective import.
  */
 
-import _React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { appointmentsAPI, schedulerAPI } from '../../services/api';
 

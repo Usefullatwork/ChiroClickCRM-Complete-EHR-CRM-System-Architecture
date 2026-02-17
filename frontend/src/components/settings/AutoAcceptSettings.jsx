@@ -3,13 +3,11 @@
  * Configure automatic acceptance of appointments and referrals
  */
 
-import _React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Calendar,
   Users,
   Bell,
-  _Clock,
-  _Shield,
   AlertCircle,
   Check,
   Save,
@@ -17,7 +15,6 @@ import {
   ChevronDown,
   ChevronUp,
   X,
-  _Info,
 } from 'lucide-react';
 import api from '../../services/api';
 

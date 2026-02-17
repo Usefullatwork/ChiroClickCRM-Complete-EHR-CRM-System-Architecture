@@ -5,7 +5,7 @@
  * featuring split-pane layout, safety alerts, and efficient SOAP documentation
  */
 
-import _React, { useState } from 'react';
+import { useState } from 'react';
 import {
   AlertTriangle,
   Calendar,
@@ -18,7 +18,6 @@ import {
   Clock,
   Phone,
   Mail,
-  _Star,
   Search,
   X,
   Sparkles,

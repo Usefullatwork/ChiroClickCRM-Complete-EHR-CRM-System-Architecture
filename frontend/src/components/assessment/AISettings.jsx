@@ -33,13 +33,11 @@ import {
   ChevronDown,
   ChevronUp,
   Zap,
-  _HardDrive,
 } from 'lucide-react';
 import {
   getAIConfig,
   saveAIConfig,
   checkOllamaStatus,
-  _listModels,
   generateText,
 } from '../../services/aiService';
 

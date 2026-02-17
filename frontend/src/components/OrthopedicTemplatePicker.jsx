@@ -3,7 +3,7 @@
  * Comprehensive click-to-text template system for SOAP documentation
  */
 
-import { useState, _useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { templatesAPI } from '../services/api';
 import {
@@ -13,8 +13,6 @@ import {
   ChevronRight,
   ChevronDown,
   X,
-  _Filter,
-  _Check,
   Copy,
   BookOpen,
   Activity,

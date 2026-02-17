@@ -4,7 +4,7 @@
  * Allows clicking/drawing to mark pain locations and patterns
  */
 
-import _React, { useState, _useRef, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 // Body region definitions with SVG path coordinates
 const BODY_REGIONS = {

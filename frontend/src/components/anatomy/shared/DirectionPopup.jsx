@@ -3,7 +3,7 @@
  *
  * Used by both 2D and 3D spine components for consistent UX
  */
-import _React, { useRef, useEffect, useMemo } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import { STANDARD_DIRECTIONS, SI_DIRECTIONS, FINDING_TYPES } from '../hooks/useAnatomyClick';
 
 export default function DirectionPopup({

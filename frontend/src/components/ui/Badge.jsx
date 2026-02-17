@@ -1,5 +1,3 @@
-import _React from 'react';
-
 export const Badge = ({ children, variant = 'default', size = 'md' }) => {
   const variants = {
     default: 'bg-slate-100 text-slate-800',

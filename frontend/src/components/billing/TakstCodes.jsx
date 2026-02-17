@@ -6,21 +6,18 @@
  * calculation of gross amount, HELFO refund, and patient share
  */
 
-import _React, { useState, _useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   Search,
   Plus,
   Minus,
-  _Info,
   Check,
   _X,
   Clock,
   MapPin,
   FileText,
   Users,
-  _Phone,
-  _Video,
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';

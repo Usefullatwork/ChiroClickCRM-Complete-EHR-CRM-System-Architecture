@@ -5,39 +5,26 @@
  * Complete interface for therapists to create exercise programs for patients
  */
 
-import _React, { useState, useEffect, useCallback } from 'react';
-import { useQuery, _useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState, useEffect, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Dumbbell,
   Save,
   Send,
   ArrowLeft,
-  _Plus,
-  _Trash2,
-  _GripVertical,
-  _Play,
   Clock,
-  _Target,
   AlertTriangle,
   CheckCircle,
-  _Copy,
   Eye,
   Mail,
   MessageSquare,
   FileText,
-  _Filter,
-  _Search,
   ChevronDown,
-  _ChevronUp,
   X,
   User,
-  _Calendar,
   Loader2,
   Download,
-  _Edit2,
-  _Info,
-  _RefreshCw,
 } from 'lucide-react';
 import { exercisesApi } from '../api/exercises';
 import PrescriptionBuilder from '../components/exercises/PrescriptionBuilder';

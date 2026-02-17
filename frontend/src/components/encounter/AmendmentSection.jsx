@@ -2,7 +2,6 @@
  * AmendmentSection - Extracted from ClinicalEncounter.jsx
  * Shows amendments/corrections for signed encounters
  */
-import _React from 'react';
 import { FileText, Save, Loader2, Lock } from 'lucide-react';
 
 export function AmendmentSection({

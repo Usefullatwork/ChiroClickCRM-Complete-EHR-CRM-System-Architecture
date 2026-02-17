@@ -12,7 +12,7 @@
  * - Privacy-first: all processing local via Ollama
  */
 
-import { useState, useEffect, useRef, _useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Mic,
   MicOff,
@@ -37,7 +37,6 @@ import {
   checkOllamaStatus,
   parseTranscriptionToSOAP,
   createSpeechRecognition,
-  _getAIConfig,
 } from '../../services/aiService';
 import logger from '../../utils/logger';
 

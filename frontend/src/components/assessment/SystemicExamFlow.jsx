@@ -4,7 +4,7 @@
  * Provides structured assessment for systemic conditions
  */
 
-import _React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 // ============================================================================
 // SYSTEMIC EXAM SECTIONS

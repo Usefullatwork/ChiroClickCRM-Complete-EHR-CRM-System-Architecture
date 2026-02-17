@@ -2,7 +2,6 @@
  * EncounterFooter - Extracted from ClinicalEncounter.jsx
  * Sticky footer with save/sign actions
  */
-import _React from 'react';
 import { Activity, Save, FileText, Lock, Loader2 } from 'lucide-react';
 
 export function EncounterFooter({

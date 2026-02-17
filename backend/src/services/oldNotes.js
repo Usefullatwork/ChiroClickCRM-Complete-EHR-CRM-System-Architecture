@@ -5,7 +5,7 @@
 
 import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
-import { organizeOldJournalNotes, _organizeMultipleNotes, _mergeOrganizedNotes } from './ai.js';
+import { organizeOldJournalNotes } from './ai.js';
 
 /**
  * Create a new batch for importing notes

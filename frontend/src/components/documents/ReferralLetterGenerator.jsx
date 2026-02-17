@@ -10,7 +10,7 @@
  * Supports bilingual output (English/Norwegian).
  */
 
-import _React, { useState, useCallback, _useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { t } from '../assessment/translations';
 import {
   FileText,

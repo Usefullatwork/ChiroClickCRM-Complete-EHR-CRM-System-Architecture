@@ -5,10 +5,9 @@
  * Template for follow-up consultation / return visit
  */
 
-import _React, { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import {
   User,
-  _FileText,
   Stethoscope,
   ClipboardCheck,
   Target,
@@ -24,7 +23,6 @@ import {
   Minus,
   Activity,
   CheckCircle,
-  _ArrowRight,
 } from 'lucide-react';
 import ICD10CodePicker from './ICD10CodePicker';
 

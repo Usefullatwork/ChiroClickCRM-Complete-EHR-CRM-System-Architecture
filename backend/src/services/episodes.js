@@ -8,7 +8,7 @@
  * - Modifier determines: AT (active), GA (ABN on file), GZ (no ABN, expect denial)
  */
 
-import { query, _transaction } from '../config/database.js';
+import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
 
 // Episode statuses and their meanings

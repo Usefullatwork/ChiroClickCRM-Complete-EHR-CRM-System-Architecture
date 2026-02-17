@@ -5,7 +5,7 @@
  * Subjective, Objective, Assessment, Plan format.
  */
 
-import _React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   MessageSquare,
   Stethoscope,
@@ -15,7 +15,6 @@ import {
   ChevronUp,
   Copy,
   FileText,
-  _AlertCircle,
   CheckCircle,
 } from 'lucide-react';
 

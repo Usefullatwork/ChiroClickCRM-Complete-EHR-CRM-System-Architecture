@@ -8,7 +8,7 @@
  * - Skipped for first-time patients
  */
 
-import _React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, TrendingUp, Minus, TrendingDown } from 'lucide-react';
 
 const TRANSLATIONS = {

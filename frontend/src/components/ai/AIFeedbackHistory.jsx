@@ -7,7 +7,7 @@
  * - Stats summary (acceptance rate, avg rating)
  */
 
-import _React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   History,
   Filter,

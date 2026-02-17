@@ -11,7 +11,7 @@
  * Bilingual: English/Norwegian
  */
 
-import _React, { useState, useMemo, _useCallback } from 'react';
+import { useState, useMemo } from 'react';
 
 // =============================================================================
 // TRANSLATIONS

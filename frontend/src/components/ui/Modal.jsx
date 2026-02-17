@@ -1,4 +1,4 @@
-import _React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { X } from 'lucide-react';
 
 export const Modal = ({ isOpen, onClose, title, children, size = 'md', footer }) => {

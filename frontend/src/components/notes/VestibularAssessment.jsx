@@ -5,7 +5,7 @@
  * Form for vestibular assessment (dizziness, balance, oculomotor function)
  */
 
-import _React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import {
   Eye,
   Activity,
@@ -14,10 +14,7 @@ import {
   Lock,
   ChevronDown,
   ChevronUp,
-  _Check,
   _X,
-  _Plus,
-  _Minus,
   HelpCircle,
   Clock,
   Target,

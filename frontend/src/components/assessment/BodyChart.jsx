@@ -1,4 +1,4 @@
-import _React, { useState, useRef, useCallback, _useEffect } from 'react';
+import { useState, useRef, useCallback } from 'react';
 
 // =============================================================================
 // BODY CHART WITH DRAWING TOOLS

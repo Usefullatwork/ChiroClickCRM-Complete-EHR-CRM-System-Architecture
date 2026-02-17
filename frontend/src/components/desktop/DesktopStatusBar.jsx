@@ -4,7 +4,7 @@
  * Only visible in desktop (Electron) mode
  */
 
-import _React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 const StatusDot = ({ status, label }) => {
   const colors = {

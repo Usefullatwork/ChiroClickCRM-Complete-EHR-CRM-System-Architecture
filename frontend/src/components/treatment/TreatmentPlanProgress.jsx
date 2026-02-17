@@ -3,7 +3,7 @@
  * Displays active plans with session completion, milestones, and quick actions
  */
 
-import _React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { treatmentPlansAPI } from '../../services/api';
 
 export default function TreatmentPlanProgress({

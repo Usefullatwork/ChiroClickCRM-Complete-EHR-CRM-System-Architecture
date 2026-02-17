@@ -5,7 +5,7 @@
  */
 
 import Joi from 'joi';
-import { _validatePhoneNumber, validatePhoneWithOptions } from '../utils/phoneValidation.js';
+import { validatePhoneWithOptions } from '../utils/phoneValidation.js';
 import { validateFodselsnummer, validateFodselsnummerWithDOB } from '../utils/encryption.js';
 
 // UUID validation pattern

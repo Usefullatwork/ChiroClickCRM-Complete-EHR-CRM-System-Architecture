@@ -16,7 +16,7 @@
  * Bilingual: English/Norwegian
  */
 
-import _React, { useState, _useEffect, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import {
   QUESTIONNAIRES,
   calculateScore,

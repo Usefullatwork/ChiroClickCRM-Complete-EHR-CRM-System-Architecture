@@ -5,7 +5,7 @@
  * Dix-Hallpike, Supine Roll, and treatment protocol support.
  */
 
-import _React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   RotateCcw,
   AlertTriangle,

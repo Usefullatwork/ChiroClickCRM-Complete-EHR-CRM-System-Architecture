@@ -5,7 +5,7 @@
  * for chiropractic assessment using the Activator protocol.
  */
 
-import _React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Zap,
   AlertTriangle,

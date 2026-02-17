@@ -10,7 +10,7 @@
  * Bilingual: English/Norwegian
  */
 
-import _React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { QUESTIONNAIRES, calculateChange } from './questionnaires';
 
 // =============================================================================

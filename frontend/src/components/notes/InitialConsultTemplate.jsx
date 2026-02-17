@@ -5,7 +5,7 @@
  * Template for initial consultation / first visit
  */
 
-import _React, { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import {
   User,
   FileText,
@@ -21,8 +21,6 @@ import {
   Trash2,
   Heart,
   Activity,
-  _Clock,
-  _Calendar,
   CheckCircle,
 } from 'lucide-react';
 import ICD10CodePicker from './ICD10CodePicker';

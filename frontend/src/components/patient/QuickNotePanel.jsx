@@ -8,7 +8,7 @@
  * - Optionally send SMS/email (queues for approval)
  * - View history of notes
  */
-import _React, { useState, useCallback, _useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   MessageSquare,
@@ -25,9 +25,8 @@ import {
   X,
   Plus,
   Calendar,
-  _User,
 } from 'lucide-react';
-import { format, _formatDistanceToNow, addDays, addWeeks } from 'date-fns';
+import { format, addDays, addWeeks } from 'date-fns';
 import { nb } from 'date-fns/locale';
 import { followUpsAPI } from '../../services/api';
 

@@ -5,7 +5,7 @@
  * @module components/analytics/PatientMetrics
  */
 
-import _React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import {
   LineChart,
   Line,

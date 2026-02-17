@@ -1,16 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import {
-  Settings,
-  _Plus,
-  _X,
-  _Edit2,
-  _Save,
-  Grid,
-  List,
-  Star,
-  Search,
-  Loader2,
-} from 'lucide-react';
+import { Settings, _X, Grid, List, Star, Search, Loader2 } from 'lucide-react';
 import { macrosAPI } from '../../services/api';
 
 /**

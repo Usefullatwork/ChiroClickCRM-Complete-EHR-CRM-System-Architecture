@@ -8,7 +8,7 @@
  * for musculoskeletal conditions within their scope of practice.
  */
 
-import _React, { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { t } from '../assessment/translations';
 import {
   FileText,
@@ -20,9 +20,7 @@ import {
   AlertTriangle,
   CheckCircle,
   Printer,
-  _Download,
   Copy,
-  _Send,
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';

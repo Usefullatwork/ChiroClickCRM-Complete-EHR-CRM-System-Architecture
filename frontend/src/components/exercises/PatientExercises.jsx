@@ -3,32 +3,23 @@
  * View and manage a patient's exercise prescriptions and compliance
  */
 
-import _React, { useState, _useCallback } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { exercisesAPI } from '../../services/api';
 import {
   Activity,
-  _Calendar,
   Check,
   ChevronDown,
   ChevronUp,
-  _Clock,
   Dumbbell,
-  _Download,
   Edit2,
   Loader2,
   Mail,
   MoreVertical,
-  _Pause,
   Play,
   Plus,
   Printer,
-  _Star,
-  _ThumbsUp,
-  _Trash2,
-  _TrendingUp,
   X,
-  _AlertTriangle,
 } from 'lucide-react';
 
 // Status labels

@@ -3,7 +3,7 @@
  * Components for exercise prescription and documentation
  */
 
-import _React, { useState, useEffect, _useMemo, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { exercisesAPI } from '../../services/api';
 import {
@@ -12,16 +12,12 @@ import {
   X,
   Plus,
   Check,
-  _ChevronDown,
-  _ChevronUp,
   Play,
   Clock,
   Dumbbell,
   Star,
   Loader2,
-  _AlertCircle,
   Info,
-  Image as _ImageIcon,
 } from 'lucide-react';
 
 // Body region labels in Norwegian

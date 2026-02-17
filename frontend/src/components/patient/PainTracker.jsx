@@ -6,10 +6,8 @@
  * Diagram som viser smerteniva over tid med emoji-ansikter
  */
 
-import _React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
-  _LineChart,
-  _Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -19,7 +17,7 @@ import {
   Area,
   AreaChart,
 } from 'recharts';
-import { TrendingUp, TrendingDown, Minus, _AlertTriangle, Activity, _Calendar } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Activity } from 'lucide-react';
 
 // Pain level emoji faces (1-10 scale)
 const painEmojis = {

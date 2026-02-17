@@ -30,7 +30,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { Card, _CardHeader, CardBody, _CardFooter } from '../ui/Card';
+import { Card, CardBody } from '../ui/Card';
 import { Alert } from '../ui/Alert';
 import { Modal } from '../ui/Modal';
 import logger from '../../utils/logger';

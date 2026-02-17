@@ -8,7 +8,7 @@ import fs from 'fs';
 import path from 'path';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import { query, _transaction, _getClient } from '../config/database.js';
+import { query } from '../config/database.js';
 import * as _aiLearning from './aiLearning.js';
 import * as _trainingAnonymization from './trainingAnonymization.js';
 import * as outlookBridge from './outlookBridge.js';

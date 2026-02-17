@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { appointmentsAPI, patientsAPI, usersAPI } from '../services/api';
 import { ArrowLeft, Save, Calendar, Clock, User, Repeat } from 'lucide-react';
-import { useTranslation, _formatDate, _formatTime } from '../i18n';
+import { useTranslation } from '../i18n';
 import Breadcrumbs from '../components/common/Breadcrumbs';
 
 export default function NewAppointment() {

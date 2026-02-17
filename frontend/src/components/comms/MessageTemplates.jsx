@@ -6,7 +6,7 @@
  * Norwegian and English language support.
  */
 
-import { useState, _useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   FileText,
@@ -14,19 +14,14 @@ import {
   Edit,
   Trash2,
   Search,
-  _Filter,
-  _Copy,
-  _Check,
   X,
   Save,
   ChevronDown,
   MessageSquare,
-  _Mail,
   Calendar,
   Gift,
   Activity,
   Clock,
-  _AlertTriangle,
   Eye,
   Tag,
 } from 'lucide-react';

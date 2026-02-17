@@ -7,17 +7,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { patientsAPI } from '../services/api';
-import {
-  ArrowLeft,
-  Save,
-  AlertCircle,
-  User,
-  Phone,
-  _Mail,
-  MapPin,
-  _Calendar,
-  FileText,
-} from 'lucide-react';
+import { ArrowLeft, Save, AlertCircle, User, Phone, MapPin, FileText } from 'lucide-react';
 import { useTranslation } from '../i18n';
 import useUnsavedChanges from '../hooks/useUnsavedChanges';
 import UnsavedChangesDialog from '../components/common/UnsavedChangesDialog';

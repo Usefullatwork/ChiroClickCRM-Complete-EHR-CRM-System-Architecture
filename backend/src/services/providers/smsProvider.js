@@ -4,7 +4,7 @@
  */
 
 import logger from '../../utils/logger.js';
-import { _query } from '../../config/database.js';
+// database query available via ../../config/database.js
 
 /**
  * MockSmsProvider — logs to console and writes to DB

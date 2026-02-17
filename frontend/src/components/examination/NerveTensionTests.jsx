@@ -5,18 +5,8 @@
  * Upper Limb Tension Tests (ULTT), femoral nerve stretch, and more.
  */
 
-import _React, { useMemo, useState } from 'react';
-import {
-  Zap,
-  AlertTriangle,
-  _CheckCircle,
-  _XCircle,
-  _MinusCircle,
-  Info,
-  ChevronDown,
-  ChevronUp,
-  Map,
-} from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Zap, AlertTriangle, Info, ChevronDown, ChevronUp, Map } from 'lucide-react';
 import LowerExtremityDiagram from './LowerExtremityDiagram';
 import UpperExtremityDiagram from './UpperExtremityDiagram';
 

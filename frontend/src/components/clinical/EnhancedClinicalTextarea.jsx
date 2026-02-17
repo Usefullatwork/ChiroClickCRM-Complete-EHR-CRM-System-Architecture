@@ -9,7 +9,7 @@
  * - Quick phrase chips below
  */
 
-import _React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useSlashCommands, SlashCommandMenu } from '../assessment/SlashCommands';
 import { Sparkles, Loader2, Mic, MicOff, Square } from 'lucide-react';
 import { aiAPI } from '../../services/api';

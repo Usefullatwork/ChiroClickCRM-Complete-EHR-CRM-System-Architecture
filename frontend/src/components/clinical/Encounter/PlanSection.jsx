@@ -1,4 +1,4 @@
-import _React, { useRef } from 'react';
+import { useRef } from 'react';
 import { ChevronDown, Check, Target, Settings, FileText } from 'lucide-react';
 import { useEncounter } from '../../../context/EncounterContext';
 import {

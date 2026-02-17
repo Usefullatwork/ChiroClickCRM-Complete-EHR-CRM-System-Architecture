@@ -11,19 +11,16 @@ import {
   Edit,
   Save,
   X,
-  _Calendar,
   Phone,
   Mail,
   MapPin,
-  _User,
   FileText,
-  _Clock,
   AlertCircle,
   MessageSquare,
   Globe,
   Shield,
 } from 'lucide-react';
-import { patientsAPI, encountersAPI, _appointmentsAPI } from '../services/api';
+import { patientsAPI, encountersAPI } from '../services/api';
 import { formatDate, formatPhone, calculateAge } from '../lib/utils';
 import GDPRExportModal from '../components/GDPRExportModal';
 import PatientSummaryCard from '../components/patients/PatientSummaryCard';

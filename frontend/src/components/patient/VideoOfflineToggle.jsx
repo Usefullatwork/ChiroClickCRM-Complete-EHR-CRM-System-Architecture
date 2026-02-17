@@ -11,7 +11,7 @@
  * Bilingual: English/Norwegian
  */
 
-import _React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Download,
   Trash2,

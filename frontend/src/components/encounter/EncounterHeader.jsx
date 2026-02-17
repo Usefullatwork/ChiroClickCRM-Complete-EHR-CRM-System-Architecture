@@ -2,7 +2,6 @@
  * EncounterHeader - Extracted from ClinicalEncounter.jsx
  * Top header bar with date, encounter type, timer, takster total, status indicators
  */
-import _React from 'react';
 import { Calendar, Check, Clock, Activity, BookOpen, Loader2, Lock } from 'lucide-react';
 
 export function EncounterHeader({

@@ -2,7 +2,6 @@
  * KeyboardShortcutsModal - Extracted from ClinicalEncounter.jsx
  * Shows keyboard shortcuts and macro reference
  */
-import _React from 'react';
 import { X } from 'lucide-react';
 
 export function KeyboardShortcutsModal({

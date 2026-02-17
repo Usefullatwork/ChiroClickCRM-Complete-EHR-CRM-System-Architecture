@@ -7,18 +7,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { patientsAPI } from '../services/api';
-import {
-  X,
-  Search,
-  _Filter,
-  Calendar,
-  User,
-  Phone,
-  Mail,
-  MapPin,
-  _Shield,
-  AlertCircle,
-} from 'lucide-react';
+import { X, Search, Calendar, User, Phone, Mail, MapPin, AlertCircle } from 'lucide-react';
 
 export default function AdvancedPatientSearch({ onClose, onSelect }) {
   const navigate = useNavigate();

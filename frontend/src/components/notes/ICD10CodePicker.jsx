@@ -5,7 +5,7 @@
  * Searchable ICD-10 code picker with common chiropractic codes
  */
 
-import _React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Search, X, ChevronDown, ChevronRight, Star, Clock, CheckCircle } from 'lucide-react';
 
 /**

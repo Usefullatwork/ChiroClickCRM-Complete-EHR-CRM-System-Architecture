@@ -11,11 +11,10 @@
  * - Norwegian and English text support
  */
 
-import _React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Check, X, Edit3, Star, Clock, Loader2, CheckCircle2, Send } from 'lucide-react';
 import { Card, CardBody } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { _Badge } from '../ui/Badge';
 import { Textarea } from '../ui/Textarea';
 import { AISuggestionCard } from './AISuggestionCard';
 

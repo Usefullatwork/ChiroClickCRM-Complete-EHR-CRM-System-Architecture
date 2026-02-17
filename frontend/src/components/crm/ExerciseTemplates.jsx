@@ -1,25 +1,19 @@
-import _React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   FileText,
-  _Mail,
   Plus,
   Edit,
-  _Trash2,
   Copy,
   Send,
   Search,
-  _Filter,
   Eye,
   Download,
   Paperclip,
   Check,
   X,
   Upload,
-  _FolderOpen,
   Tag,
   Clock,
-  _Users,
-  _ChevronRight,
   Loader2,
   AlertCircle,
 } from 'lucide-react';

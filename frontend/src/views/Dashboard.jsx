@@ -1,15 +1,6 @@
-import _React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Calendar,
-  Users,
-  Clock,
-  AlertTriangle,
-  Plus,
-  CheckCircle,
-  _XCircle,
-  TrendingUp,
-} from 'lucide-react';
+import { Calendar, Users, Clock, AlertTriangle, Plus, CheckCircle, TrendingUp } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';

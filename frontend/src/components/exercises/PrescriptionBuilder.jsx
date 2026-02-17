@@ -5,23 +5,8 @@
  * Dra-og-slipp programbygger for treningsforskrivninger
  */
 
-import _React, { useState, _useCallback, useRef } from 'react';
-import {
-  _GripVertical,
-  _Trash2,
-  _ChevronUp,
-  _ChevronDown,
-  _Edit2,
-  Plus,
-  Dumbbell,
-  _Clock,
-  _Target,
-  _Activity,
-  _AlertTriangle,
-  _Play,
-  Info,
-  _X,
-} from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Plus, Dumbbell, Info, _X } from 'lucide-react';
 import PrescriptionCard from './PrescriptionCard';
 
 /**

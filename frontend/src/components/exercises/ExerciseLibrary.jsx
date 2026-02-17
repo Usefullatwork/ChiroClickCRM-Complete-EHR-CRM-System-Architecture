@@ -10,7 +10,7 @@
  * - Horizontal scroll for category pills
  */
 
-import _React, { useState, _useEffect, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import {
   Search,
   Plus,
@@ -27,7 +27,6 @@ import {
   Target,
   Clock,
   Check,
-  _Video,
   Info,
   X,
 } from 'lucide-react';

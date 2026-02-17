@@ -14,10 +14,9 @@
  * - Bilingual support (EN/NO)
  */
 
-import { useState, _useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import {
   Play,
-  _Pause,
   Plus,
   Trash2,
   ChevronDown,
@@ -31,17 +30,13 @@ import {
   Calendar,
   Gift,
   Users,
-  _AlertCircle,
   CheckCircle,
   XCircle,
   Settings,
   Eye,
-  _History,
   Save,
   RefreshCw,
   Zap,
-  _ArrowRight,
-  _GripVertical,
 } from 'lucide-react';
 
 // =============================================================================

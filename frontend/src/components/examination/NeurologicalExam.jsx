@@ -3,8 +3,6 @@
  * Full neurological examination panel
  */
 
-import _React from 'react';
-
 const NeurologicalExam = ({ _patientId, _encounterId, _onDataChange }) => {
   return (
     <div className="p-4 border rounded-lg bg-white">

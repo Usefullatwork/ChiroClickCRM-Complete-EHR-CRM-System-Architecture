@@ -8,7 +8,7 @@
  * 4. Review and save
  */
 
-import React, { useState, _useEffect } from 'react';
+import React, { useState } from 'react';
 import { treatmentPlansAPI } from '../../services/api';
 import { PLAN_TEMPLATES } from './TreatmentPlan';
 

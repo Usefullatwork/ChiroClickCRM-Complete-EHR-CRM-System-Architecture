@@ -8,21 +8,9 @@
  * - Auto-generate SMS messages from templates
  * - Queue messages for approval
  */
-import _React, { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  Upload,
-  _FileText,
-  X,
-  Check,
-  AlertCircle,
-  _User,
-  Phone,
-  Mail,
-  _Calendar,
-  ChevronRight,
-  Loader2,
-} from 'lucide-react';
+import { Upload, X, Check, AlertCircle, Phone, Mail, ChevronRight, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { nb } from 'date-fns/locale';
 import { patientsAPI, communicationsAPI } from '../../services/api';

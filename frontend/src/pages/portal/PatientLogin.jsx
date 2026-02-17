@@ -4,18 +4,10 @@
  * Validates access token and redirects to exercises
  */
 
-import _React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import {
-  Dumbbell,
-  Loader2,
-  AlertTriangle,
-  CheckCircle,
-  ArrowRight,
-  _Phone,
-  _Mail,
-} from 'lucide-react';
-import { patientApi, storeToken, _getTokenFromUrl } from '../../api/patientApi';
+import { Dumbbell, Loader2, AlertTriangle, CheckCircle, ArrowRight } from 'lucide-react';
+import { patientApi, storeToken } from '../../api/patientApi';
 
 const PatientLogin = () => {
   const navigate = useNavigate();

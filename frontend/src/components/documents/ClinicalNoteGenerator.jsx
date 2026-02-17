@@ -20,7 +20,6 @@ import {
   Clipboard,
   Brain,
   Eye,
-  _Activity,
 } from 'lucide-react';
 
 // Referral types with Norwegian labels

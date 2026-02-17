@@ -12,18 +12,8 @@
  * - Referred pain patterns
  */
 
-import _React, { useState, useCallback, useRef } from 'react';
-import {
-  _RotateCcw,
-  _Circle,
-  X,
-  Trash2,
-  _Download,
-  ZoomIn,
-  ZoomOut,
-  _FlipHorizontal,
-  _Edit3,
-} from 'lucide-react';
+import { useState, useCallback, useRef } from 'react';
+import { X, Trash2, ZoomIn, ZoomOut } from 'lucide-react';
 
 // Marker types with colors - expanded for better clinical documentation
 const MARKER_TYPES = {

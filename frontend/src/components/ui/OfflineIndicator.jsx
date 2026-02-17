@@ -12,9 +12,8 @@
  * Bilingual: English/Norwegian
  */
 
-import _React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
-  _Wifi,
   WifiOff,
   Cloud,
   CloudOff,

@@ -14,8 +14,8 @@
  * IMPORTANT: This is an example file. Integrate these patterns into your actual pages.
  */
 
-import _React, { useState, useEffect, useCallback } from 'react';
-import { _useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Dumbbell,
   Loader2,

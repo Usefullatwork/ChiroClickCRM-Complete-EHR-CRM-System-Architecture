@@ -8,7 +8,7 @@
  * - Compact and expanded views
  */
 
-import _React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { ChevronDown, ChevronUp, Brain, AlertTriangle, Sparkles } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 

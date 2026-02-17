@@ -5,7 +5,7 @@
  * muscles, and trigger points.
  */
 
-import _React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Globe, Copy, Layers, Zap, Activity, Info } from 'lucide-react';
 import { AnatomicalBodyChart, DERMATOMES, MUSCLES } from '../components/examination';
 

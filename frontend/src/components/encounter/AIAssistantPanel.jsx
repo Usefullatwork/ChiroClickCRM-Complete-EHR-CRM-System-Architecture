@@ -2,7 +2,6 @@
  * AIAssistantPanel - Extracted from ClinicalEncounter.jsx
  * Floating AI clinical assistant panel
  */
-import _React from 'react';
 import { Brain, X, Sparkles, Loader2 } from 'lucide-react';
 
 export function AIAssistantPanel({

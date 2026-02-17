@@ -3,7 +3,6 @@
  * Displays Vimeo videos in an embedded player
  */
 
-import _React from 'react';
 import { X, ExternalLink } from 'lucide-react';
 
 const VimeoPlayer = ({ videoUrl, title, onClose, autoplay = true }) => {

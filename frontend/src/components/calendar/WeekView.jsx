@@ -12,8 +12,7 @@
  */
 
 import { useMemo, useRef, useEffect } from 'react';
-import { format, parseISO, isToday, differenceInMinutes, _isSameDay } from 'date-fns';
-import { _nb } from 'date-fns/locale';
+import { format, parseISO, isToday, differenceInMinutes } from 'date-fns';
 import AppointmentCard from './AppointmentCard';
 
 // =============================================================================

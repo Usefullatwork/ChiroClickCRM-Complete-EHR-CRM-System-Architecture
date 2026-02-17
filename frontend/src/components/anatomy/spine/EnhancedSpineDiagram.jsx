@@ -9,13 +9,9 @@
  * - Color-coded findings
  * - Smooth animations
  */
-import _React, { useState, useCallback, useRef, useMemo } from 'react';
+import { useState, useCallback, useRef, useMemo } from 'react';
 import { RotateCcw, ZoomIn, ZoomOut } from 'lucide-react';
-import _useAnatomyClick, {
-  FINDING_TYPES,
-  STANDARD_DIRECTIONS,
-  SI_DIRECTIONS,
-} from '../hooks/useAnatomyClick';
+import { FINDING_TYPES, STANDARD_DIRECTIONS, SI_DIRECTIONS } from '../hooks/useAnatomyClick';
 
 // Vertebra configuration with anatomically-informed shapes
 const VERTEBRAE = {

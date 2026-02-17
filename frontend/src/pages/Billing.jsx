@@ -6,30 +6,18 @@
  * chiropractic clinics with takst codes and HELFO integration
  */
 
-import _React, { useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import {
-  _CreditCard,
   Plus,
-  _Search,
-  _Filter,
   Download,
-  _Send,
-  _CheckCircle,
   Clock,
   AlertTriangle,
   FileText,
-  _DollarSign,
   TrendingUp,
-  _Calendar,
-  _User,
-  _MoreVertical,
-  _Eye,
-  _Printer,
   BarChart3,
   RefreshCw,
-  _Settings,
 } from 'lucide-react';
 import { billingAPI } from '../services/api';
 import toast from '../utils/toast';

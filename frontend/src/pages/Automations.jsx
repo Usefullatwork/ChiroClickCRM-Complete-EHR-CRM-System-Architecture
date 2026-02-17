@@ -22,32 +22,23 @@ import {
   Plus,
   Play,
   Pause,
-  _Settings,
   Clock,
   CheckCircle,
   XCircle,
-  _AlertCircle,
   Calendar,
   Gift,
   UserPlus,
   RefreshCw,
   Filter,
   Search,
-  _MoreVertical,
   Edit,
   Trash2,
   History,
-  _ChevronDown,
-  _ChevronRight,
   BarChart2,
-  _Users,
-  _MessageSquare,
-  _Mail,
-  _Bell,
 } from 'lucide-react';
 import WorkflowBuilder from '../components/workflows/WorkflowBuilder';
 import { automationsAPI, patientsAPI, usersAPI } from '../services/api';
-import { _formatDate, formatRelativeTime } from '../lib/utils';
+import { formatRelativeTime } from '../lib/utils';
 import toast from '../utils/toast';
 
 // =============================================================================

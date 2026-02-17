@@ -24,16 +24,12 @@ import {
   FolderOpen,
   RefreshCw,
   GripVertical,
-  _ChevronDown,
   Trash2,
   Eye,
-  _Download,
-  _Info,
-  _AlertCircle,
   CheckCircle2,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { Card, CardHeader, CardBody, _CardFooter } from '../ui/Card';
+import { Card, CardHeader, CardBody } from '../ui/Card';
 import { Alert } from '../ui/Alert';
 import { Input } from '../ui/Input';
 import { Modal } from '../ui/Modal';

@@ -4,7 +4,7 @@
  * Demonstrates the 15-second SOAP note capability with bilingual support.
  */
 
-import _React, { useState } from 'react';
+import { useState } from 'react';
 import { Globe, FileText, Zap, Clock, Copy, Trash2 } from 'lucide-react';
 import MacroMatrix, { MacroMatrixInline } from '../components/assessment/MacroMatrix';
 

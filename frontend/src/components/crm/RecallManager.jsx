@@ -14,28 +14,22 @@
  * - Bilingual support (EN/NO)
  */
 
-import { useState, _useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Bell,
   Calendar,
-  _User,
   Phone,
-  _Mail,
   MessageSquare,
   Send,
-  _Settings,
   Clock,
   CheckCircle,
   XCircle,
-  _AlertCircle,
   Plus,
   Edit3,
   Trash2,
   Play,
   Pause,
   BarChart2,
-  _Filter,
-  _RefreshCw,
   Gift,
   Heart,
 } from 'lucide-react';

@@ -4,7 +4,7 @@
  * Demo page to test all examination components.
  */
 
-import _React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Activity,
   Brain,

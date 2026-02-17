@@ -11,21 +11,8 @@
  * - Drawing tools for annotation
  */
 
-import _React, { useState, useCallback, useMemo } from 'react';
-import {
-  RotateCcw,
-  _ZoomIn,
-  _ZoomOut,
-  _Palette,
-  _Save,
-  FileText,
-  _Circle,
-  X,
-  _ChevronLeft,
-  _ChevronRight,
-  _AlertCircle,
-  _CheckCircle,
-} from 'lucide-react';
+import { useState, useCallback, useMemo } from 'react';
+import { RotateCcw, FileText, X } from 'lucide-react';
 
 // Bilingual labels
 const LABELS = {

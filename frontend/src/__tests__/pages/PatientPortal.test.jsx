@@ -4,9 +4,8 @@
  */
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import _userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { BrowserRouter, _MemoryRouter, _Route, _Routes } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import axios from 'axios';
 import PatientPortal from '../../pages/PatientPortal';
 import { createMockPrescription, createMockExercise } from '../setup';

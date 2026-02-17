@@ -1,5 +1,3 @@
-import _React from 'react';
-
 export const Textarea = ({
   className = '',
   placeholder,

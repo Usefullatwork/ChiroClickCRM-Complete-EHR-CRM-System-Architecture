@@ -5,7 +5,7 @@
  * @module components/analytics/RevenueChart
  */
 
-import _React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import {
   AreaChart,
   Area,
@@ -16,9 +16,8 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  _Legend,
 } from 'recharts';
-import { DollarSign, TrendingUp, TrendingDown, _Calendar } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
 
 /**
  * Format currency in Norwegian format

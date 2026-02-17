@@ -3,11 +3,10 @@
  * Real-time appointment board with WebSocket updates
  * Day view showing time slots with colored appointment blocks
  */
-import _React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Calendar,
   Clock,
-  _User,
   ChevronLeft,
   ChevronRight,
   RefreshCw,

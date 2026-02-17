@@ -5,29 +5,9 @@
  * @module components/analytics/AppointmentStats
  */
 
-import _React, { useMemo } from 'react';
-import {
-  PieChart,
-  Pie,
-  Cell,
-  _BarChart,
-  _Bar,
-  _XAxis,
-  _YAxis,
-  _CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  _Legend,
-} from 'recharts';
-import {
-  Calendar,
-  Clock,
-  CheckCircle,
-  XCircle,
-  _AlertTriangle,
-  UserX,
-  TrendingUp,
-} from 'lucide-react';
+import { useMemo } from 'react';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import { Calendar, Clock, CheckCircle, XCircle, UserX, TrendingUp } from 'lucide-react';
 
 /**
  * Status colors for appointment states

@@ -3,10 +3,8 @@
  * Create and manage exercise prescriptions for patients
  */
 
-import _React, { useState, _useCallback } from 'react';
+import { useState } from 'react';
 import {
-  _Plus,
-  _Minus,
   GripVertical,
   Trash2,
   ChevronUp,
@@ -21,7 +19,6 @@ import {
   Target,
   Activity,
   AlertTriangle,
-  _Check,
   _X,
   Edit2,
 } from 'lucide-react';

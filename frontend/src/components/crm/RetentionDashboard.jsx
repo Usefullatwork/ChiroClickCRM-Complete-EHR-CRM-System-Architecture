@@ -1,13 +1,9 @@
-import _React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   TrendingUp,
   TrendingDown,
-  _Users,
   UserPlus,
   UserMinus,
-  _UserCheck,
-  _Calendar,
-  _DollarSign,
   Activity,
   Clock,
   AlertTriangle,

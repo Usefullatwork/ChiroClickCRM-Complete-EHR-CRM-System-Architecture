@@ -5,16 +5,8 @@
  * Each region has normal (standard) tests and extra (special) tests.
  */
 
-import _React, { useState, useMemo, useCallback } from 'react';
-import {
-  ChevronDown,
-  ChevronRight,
-  _CheckCircle,
-  _XCircle,
-  FileText,
-  RefreshCw,
-  Activity,
-} from 'lucide-react';
+import { useState, useMemo, useCallback } from 'react';
+import { ChevronDown, ChevronRight, FileText, RefreshCw, Activity } from 'lucide-react';
 
 // Regional test definitions - Norwegian
 const REGIONAL_TESTS = {

@@ -1,4 +1,3 @@
-import _React from 'react';
 import { Activity, FileText, Save, Lock, Loader2 } from 'lucide-react';
 
 export default function EncounterFooter({

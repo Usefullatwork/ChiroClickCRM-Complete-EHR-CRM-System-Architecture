@@ -5,7 +5,7 @@
  * Log of patient's completed exercises
  */
 
-import _React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Calendar,
   Clock,

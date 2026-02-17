@@ -4,7 +4,7 @@
  * Critical for patient safety in Norwegian chiropractic practice
  */
 
-import _React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 // Severity level configurations
 const SEVERITY_CONFIG = {

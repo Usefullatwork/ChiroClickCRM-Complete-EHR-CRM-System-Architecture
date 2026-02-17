@@ -4,7 +4,7 @@
  * Provides a unified interface for spine and body visualization
  * with the ability to switch between 2D SVG and 3D WebGL modes.
  */
-import _React, { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { spineTemplatesAPI } from '../../services/api';
 import { Layers, Box, User, Activity, RotateCcw, Settings } from 'lucide-react';

@@ -23,7 +23,6 @@ import {
   Users,
   Smartphone,
   CheckCircle2,
-  _AlertCircle,
   X,
   Download,
   ArrowLeft,
@@ -31,7 +30,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { Card, CardHeader, CardBody, _CardFooter } from '../ui/Card';
+import { Card, CardHeader, CardBody } from '../ui/Card';
 import { Alert } from '../ui/Alert';
 import { Modal } from '../ui/Modal';
 import CSVColumnMapper from './CSVColumnMapper';

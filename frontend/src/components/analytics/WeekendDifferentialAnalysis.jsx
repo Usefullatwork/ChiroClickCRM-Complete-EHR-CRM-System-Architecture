@@ -1,9 +1,8 @@
-import _React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { Calendar, MapPin, TrendingUp, Users, Clock } from 'lucide-react';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { useWeekendDifferentials } from '../../hooks/useAnalytics';
-import { _getDistanceCategory, _isSaturday } from '../../utils/geographicUtils';
 
 /**
  * Weekend Differential Analysis Component

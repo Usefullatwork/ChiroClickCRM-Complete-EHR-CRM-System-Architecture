@@ -11,15 +11,9 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import {
-  _UserPlus,
   Phone,
   Mail,
   Calendar,
-  _MapPin,
-  _Star,
-  _Clock,
-  _ChevronRight,
-  _Filter,
   Search,
   Plus,
   MoreVertical,
@@ -27,8 +21,6 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  _TrendingUp,
-  _Target,
   Loader2,
 } from 'lucide-react';
 import { crmAPI } from '../../services/api';

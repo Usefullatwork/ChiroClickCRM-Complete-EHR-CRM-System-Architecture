@@ -3,7 +3,7 @@
  * Public-facing page for patients to view their exercise prescriptions
  */
 
-import _React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   Dumbbell,
@@ -18,7 +18,6 @@ import {
   Phone,
   Calendar,
   User,
-  _Star,
   X,
   Loader2,
 } from 'lucide-react';
