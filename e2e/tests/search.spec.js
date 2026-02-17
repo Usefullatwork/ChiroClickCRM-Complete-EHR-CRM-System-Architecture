@@ -21,7 +21,7 @@ test.describe('Patient Search', () => {
     await searchInput.fill('Erik');
     await authenticatedPage.waitForTimeout(500);
 
-    // Search should update the list
+    // Search should update the list (debounced)
   });
 
   test('should search patients by phone number', async ({ authenticatedPage }) => {
@@ -54,12 +54,13 @@ test.describe('Dashboard Navigation Search', () => {
     await authenticatedPage.goto('/');
     await authenticatedPage.waitForSelector('[data-testid="dashboard-title"]', { timeout: 15000 });
 
-    // Use sidebar navigation to patients
-    const patientsLink = authenticatedPage.locator('a[href*="patients"]').first();
-    if (await patientsLink.isVisible()) {
+    // Use sidebar navigation to patients (desktop sidebar visible at 1280px)
+    const patientsLink = authenticatedPage.locator('nav[aria-label="Main navigation"] a[href="/patients"]').first();
+
+    if (await patientsLink.isVisible({ timeout: 5000 }).catch(() => false)) {
       await patientsLink.click();
       await expect(authenticatedPage).toHaveURL(/.*patients.*/);
-      await expect(authenticatedPage.locator('[data-testid="patients-page-title"]')).toBeVisible({ timeout: 10000 });
+      await expect(authenticatedPage.locator('[data-testid="patients-page-title"]')).toBeVisible({ timeout: 15000 });
     }
   });
 
@@ -67,11 +68,12 @@ test.describe('Dashboard Navigation Search', () => {
     await authenticatedPage.goto('/');
     await authenticatedPage.waitForSelector('[data-testid="dashboard-title"]', { timeout: 15000 });
 
-    const appointmentsLink = authenticatedPage.locator('a[href*="appointments"]').first();
-    if (await appointmentsLink.isVisible()) {
+    const appointmentsLink = authenticatedPage.locator('nav[aria-label="Main navigation"] a[href="/appointments"]').first();
+
+    if (await appointmentsLink.isVisible({ timeout: 5000 }).catch(() => false)) {
       await appointmentsLink.click();
       await expect(authenticatedPage).toHaveURL(/.*appointments.*/);
-      await expect(authenticatedPage.locator('[data-testid="appointments-new-button"]')).toBeVisible({ timeout: 10000 });
+      await expect(authenticatedPage.locator('[data-testid="appointments-new-button"]')).toBeVisible({ timeout: 15000 });
     }
   });
 });

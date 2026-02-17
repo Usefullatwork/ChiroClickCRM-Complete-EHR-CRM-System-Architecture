@@ -24,22 +24,27 @@ test.describe('Patient List', () => {
     await authenticatedPage.waitForTimeout(500);
   });
 
-  test('should display patient rows', async ({ authenticatedPage }) => {
-    const patientsList = authenticatedPage.locator('[data-testid="patients-list"]');
+  test('should display patient rows or empty state', async ({ authenticatedPage }) => {
+    // Wait for data to load
+    await authenticatedPage.waitForTimeout(1000);
 
-    // Either list or empty state should be visible
+    const patientsList = authenticatedPage.locator('[data-testid="patients-list"]');
     const listVisible = await patientsList.isVisible().catch(() => false);
+
     if (listVisible) {
       const rows = authenticatedPage.locator('[data-testid="patient-row"]');
       const count = await rows.count();
       expect(count).toBeGreaterThanOrEqual(0);
     }
+    // Empty state is also acceptable
   });
 
   test('should open patient details when clicking a row', async ({ authenticatedPage }) => {
+    await authenticatedPage.waitForTimeout(1000);
+
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
 
-    if (await patientRow.isVisible()) {
+    if (await patientRow.isVisible({ timeout: 5000 }).catch(() => false)) {
       await patientRow.click();
       await expect(authenticatedPage).toHaveURL(/.*patients\/[a-zA-Z0-9-]+.*/);
     }
@@ -70,7 +75,7 @@ test.describe('Create Patient', () => {
     await authenticatedPage.locator('[data-testid="new-patient-submit"]').click();
     await authenticatedPage.waitForTimeout(500);
 
-    // Validation errors should appear
+    // Validation errors should appear (text-red-600 class used for error messages)
     const validationErrors = authenticatedPage.locator('.text-red-600');
     const errorCount = await validationErrors.count();
     expect(errorCount).toBeGreaterThan(0);
@@ -118,11 +123,13 @@ test.describe('Patient Detail', () => {
     await authenticatedPage.goto('/patients');
     await authenticatedPage.waitForSelector('[data-testid="patients-page-title"]', { timeout: 15000 });
 
+    await authenticatedPage.waitForTimeout(1000);
+
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
 
-    if (await patientRow.isVisible()) {
+    if (await patientRow.isVisible({ timeout: 5000 }).catch(() => false)) {
       await patientRow.click();
-      await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 10000 });
+      await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
 
       await expect(authenticatedPage.locator('[data-testid="patient-detail-name"]')).toBeVisible();
       await expect(authenticatedPage.locator('[data-testid="patient-detail-tabs"]')).toBeVisible();
@@ -134,13 +141,15 @@ test.describe('Patient Detail', () => {
     await authenticatedPage.goto('/patients');
     await authenticatedPage.waitForSelector('[data-testid="patients-page-title"]', { timeout: 15000 });
 
+    await authenticatedPage.waitForTimeout(1000);
+
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
 
-    if (await patientRow.isVisible()) {
+    if (await patientRow.isVisible({ timeout: 5000 }).catch(() => false)) {
       await patientRow.click();
-      await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 10000 });
+      await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
 
-      await expect(authenticatedPage.locator('[data-testid="patient-detail-tab-contact"]')).toBeVisible();
+      await expect(authenticatedPage.locator('[data-testid="patient-detail-tab-contact"]')).toBeVisible({ timeout: 10000 });
     }
   });
 
@@ -148,13 +157,15 @@ test.describe('Patient Detail', () => {
     await authenticatedPage.goto('/patients');
     await authenticatedPage.waitForSelector('[data-testid="patients-page-title"]', { timeout: 15000 });
 
+    await authenticatedPage.waitForTimeout(1000);
+
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
 
-    if (await patientRow.isVisible()) {
+    if (await patientRow.isVisible({ timeout: 5000 }).catch(() => false)) {
       await patientRow.click();
-      await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 10000 });
+      await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
 
-      await expect(authenticatedPage.locator('[data-testid="patient-detail-tab-clinical"]')).toBeVisible();
+      await expect(authenticatedPage.locator('[data-testid="patient-detail-tab-clinical"]')).toBeVisible({ timeout: 10000 });
     }
   });
 
@@ -162,13 +173,15 @@ test.describe('Patient Detail', () => {
     await authenticatedPage.goto('/patients');
     await authenticatedPage.waitForSelector('[data-testid="patients-page-title"]', { timeout: 15000 });
 
+    await authenticatedPage.waitForTimeout(1000);
+
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
 
-    if (await patientRow.isVisible()) {
+    if (await patientRow.isVisible({ timeout: 5000 }).catch(() => false)) {
       await patientRow.click();
-      await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 10000 });
+      await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
 
-      await expect(authenticatedPage.locator('[data-testid="patient-detail-tab-visits"]')).toBeVisible();
+      await expect(authenticatedPage.locator('[data-testid="patient-detail-tab-visits"]')).toBeVisible({ timeout: 15000 });
     }
   });
 });

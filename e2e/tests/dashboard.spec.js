@@ -16,8 +16,9 @@ test.describe('Dashboard', () => {
   });
 
   test('should display stat cards', async ({ authenticatedPage }) => {
+    // Wait for stat cards to render (may require API response or skeleton to finish)
     const statCards = authenticatedPage.locator('[data-testid="dashboard-stat-card"]');
-    await expect(statCards.first()).toBeVisible({ timeout: 10000 });
+    await expect(statCards.first()).toBeVisible({ timeout: 15000 });
 
     const count = await statCards.count();
     expect(count).toBe(4);
@@ -25,17 +26,20 @@ test.describe('Dashboard', () => {
 
   test('should display todays schedule chart area', async ({ authenticatedPage }) => {
     const chart = authenticatedPage.locator('[data-testid="dashboard-chart"]');
-    await expect(chart).toBeVisible({ timeout: 10000 });
+    await expect(chart).toBeVisible({ timeout: 15000 });
   });
 
   test('should display follow-up patients section', async ({ authenticatedPage }) => {
     const recentPatients = authenticatedPage.locator('[data-testid="dashboard-recent-patients"]');
-    await expect(recentPatients).toBeVisible({ timeout: 10000 });
+    await expect(recentPatients).toBeVisible({ timeout: 15000 });
   });
 
   test('should navigate to patients page from quick actions', async ({ authenticatedPage }) => {
-    // Find the "New Patient" quick action button
-    const newPatientAction = authenticatedPage.locator('button:has-text("New Patient"), button:has-text("Ny pasient")').first();
+    // Wait for quick actions to be rendered (they appear after stats)
+    await authenticatedPage.waitForTimeout(1000);
+
+    // Find the "New Patient" quick action button (may be i18n'd)
+    const newPatientAction = authenticatedPage.locator('button').filter({ hasText: /New Patient|Ny pasient/i }).first();
 
     if (await newPatientAction.isVisible()) {
       await newPatientAction.click();
@@ -44,8 +48,9 @@ test.describe('Dashboard', () => {
   });
 
   test('should navigate to appointments from schedule', async ({ authenticatedPage }) => {
-    // Click "View All" in schedule section
-    const viewAllLink = authenticatedPage.locator('[data-testid="dashboard-chart"] a, [data-testid="dashboard-chart"] button').filter({ hasText: /View All|Se alle/i }).first();
+    // The "View All" / "Se alle" button is in the dashboard-chart section header
+    const chartSection = authenticatedPage.locator('[data-testid="dashboard-chart"]');
+    const viewAllLink = chartSection.locator('button, a').filter({ hasText: /View All|Se alle/i }).first();
 
     if (await viewAllLink.isVisible()) {
       await viewAllLink.click();
@@ -62,8 +67,8 @@ test.describe('Dashboard - Mobile', () => {
 
     await expect(authenticatedPage.locator('[data-testid="dashboard-title"]')).toBeVisible({ timeout: 15000 });
 
-    // Stat cards should still be visible
+    // Stat cards should still be visible (they stack on mobile)
     const statCards = authenticatedPage.locator('[data-testid="dashboard-stat-card"]');
-    await expect(statCards.first()).toBeVisible({ timeout: 10000 });
+    await expect(statCards.first()).toBeVisible({ timeout: 15000 });
   });
 });

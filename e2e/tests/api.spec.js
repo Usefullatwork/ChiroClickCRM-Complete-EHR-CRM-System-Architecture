@@ -3,7 +3,7 @@
  * Tests for API endpoints and responses
  */
 
-import { test, expect } from './fixtures/auth.fixture.js';
+import { test, expect } from '@playwright/test';
 
 const API_BASE = process.env.PLAYWRIGHT_API_URL || 'http://localhost:3000';
 
@@ -34,20 +34,35 @@ test.describe('Health Check API', () => {
 });
 
 test.describe('Authentication API', () => {
-  test('should reject unauthenticated requests', async ({ request }) => {
-    const response = await request.get(`${API_BASE}/api/v1/patients`);
+  test('should reject unauthenticated requests', async ({ playwright }) => {
+    // Create a brand-new request context with NO cookies to ensure unauthenticated
+    const unauthContext = await playwright.request.newContext({
+      baseURL: API_BASE,
+    });
 
-    expect(response.status()).toBe(401);
+    try {
+      const response = await unauthContext.get(`${API_BASE}/api/v1/patients`);
+      expect(response.status()).toBe(401);
+    } finally {
+      await unauthContext.dispose();
+    }
   });
 
-  test('should reject invalid tokens', async ({ request }) => {
-    const response = await request.get(`${API_BASE}/api/v1/patients`, {
-      headers: {
+  test('should reject invalid tokens', async ({ playwright }) => {
+    // Create a brand-new request context with invalid auth header
+    const unauthContext = await playwright.request.newContext({
+      baseURL: API_BASE,
+      extraHTTPHeaders: {
         Authorization: 'Bearer invalid-token',
       },
     });
 
-    expect(response.status()).toBe(401);
+    try {
+      const response = await unauthContext.get(`${API_BASE}/api/v1/patients`);
+      expect(response.status()).toBe(401);
+    } finally {
+      await unauthContext.dispose();
+    }
   });
 
   test('should login with valid credentials', async ({ request }) => {

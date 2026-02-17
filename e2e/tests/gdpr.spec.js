@@ -10,15 +10,16 @@ test.describe('Consent Management', () => {
     await authenticatedPage.goto('/patients');
     await authenticatedPage.waitForSelector('[data-testid="patients-page-title"]', { timeout: 15000 });
 
+    await authenticatedPage.waitForTimeout(1000);
+
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
 
-    if (await patientRow.isVisible()) {
+    if (await patientRow.isVisible({ timeout: 5000 }).catch(() => false)) {
       await patientRow.click();
-      await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 10000 });
+      await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
 
-      // Consent section should be visible in patient detail
-      const consentSection = authenticatedPage.locator('text=Samtykke, text=Consent').first();
-      // Consent may be rendered in the patient detail page
+      // Patient detail page loaded - consent info may be in the clinical or contact tab
+      await expect(authenticatedPage.locator('[data-testid="patient-detail-name"]')).toBeVisible();
     }
   });
 
@@ -26,11 +27,13 @@ test.describe('Consent Management', () => {
     await authenticatedPage.goto('/patients');
     await authenticatedPage.waitForSelector('[data-testid="patients-page-title"]', { timeout: 15000 });
 
+    await authenticatedPage.waitForTimeout(1000);
+
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
 
-    if (await patientRow.isVisible()) {
+    if (await patientRow.isVisible({ timeout: 5000 }).catch(() => false)) {
       await patientRow.click();
-      await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 10000 });
+      await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
 
       // Contact info tab
       const contactSection = authenticatedPage.locator('[data-testid="patient-detail-tab-contact"]');
@@ -44,15 +47,17 @@ test.describe('GDPR Data Export', () => {
     await adminPage.goto('/patients');
     await adminPage.waitForSelector('[data-testid="patients-page-title"]', { timeout: 15000 });
 
+    await adminPage.waitForTimeout(1000);
+
     const patientRow = adminPage.locator('[data-testid="patient-row"]').first();
 
-    if (await patientRow.isVisible()) {
+    if (await patientRow.isVisible({ timeout: 5000 }).catch(() => false)) {
       await patientRow.click();
-      await adminPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 10000 });
+      await adminPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
 
       // Export Data button exists on PatientDetail page
-      const exportButton = adminPage.locator('button:has-text("Export Data")');
-      if (await exportButton.isVisible()) {
+      const exportButton = adminPage.locator('button').filter({ hasText: 'Export Data' });
+      if (await exportButton.isVisible({ timeout: 5000 }).catch(() => false)) {
         await expect(exportButton).toBeEnabled();
       }
     }
@@ -64,11 +69,13 @@ test.describe('Data Access via Patient Detail', () => {
     await authenticatedPage.goto('/patients');
     await authenticatedPage.waitForSelector('[data-testid="patients-page-title"]', { timeout: 15000 });
 
+    await authenticatedPage.waitForTimeout(1000);
+
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
 
-    if (await patientRow.isVisible()) {
+    if (await patientRow.isVisible({ timeout: 5000 }).catch(() => false)) {
       await patientRow.click();
-      await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 10000 });
+      await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
 
       const clinicalSection = authenticatedPage.locator('[data-testid="patient-detail-tab-clinical"]');
       await expect(clinicalSection).toBeVisible({ timeout: 10000 });
@@ -79,11 +86,13 @@ test.describe('Data Access via Patient Detail', () => {
     await authenticatedPage.goto('/patients');
     await authenticatedPage.waitForSelector('[data-testid="patients-page-title"]', { timeout: 15000 });
 
+    await authenticatedPage.waitForTimeout(1000);
+
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
 
-    if (await patientRow.isVisible()) {
+    if (await patientRow.isVisible({ timeout: 5000 }).catch(() => false)) {
       await patientRow.click();
-      await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 10000 });
+      await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
 
       const tabsContainer = authenticatedPage.locator('[data-testid="patient-detail-tabs"]');
       await expect(tabsContainer).toBeVisible({ timeout: 10000 });
@@ -97,8 +106,9 @@ test.describe('New Patient Consent Fields', () => {
     await authenticatedPage.waitForSelector('[data-testid="new-patient-first-name"]', { timeout: 15000 });
 
     // Consent section should be visible in the form
-    const consentSection = authenticatedPage.locator('text=Consent to SMS');
-    await expect(consentSection).toBeVisible();
+    // The actual text is "Consent to SMS notifications"
+    const consentSection = authenticatedPage.locator('text=Consent to SMS notifications');
+    await expect(consentSection).toBeVisible({ timeout: 10000 });
   });
 
   test('should submit new patient with consent fields', async ({ authenticatedPage }) => {

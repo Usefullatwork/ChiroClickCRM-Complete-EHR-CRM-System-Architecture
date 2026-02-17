@@ -8,6 +8,7 @@ import { test, expect } from './fixtures/auth.fixture.js';
 test.describe('Appointments Page', () => {
   test.beforeEach(async ({ authenticatedPage }) => {
     await authenticatedPage.goto('/appointments');
+    // Wait for the page to fully load - the new button is always rendered
     await authenticatedPage.waitForSelector('[data-testid="appointments-new-button"]', { timeout: 15000 });
   });
 
@@ -17,7 +18,7 @@ test.describe('Appointments Page', () => {
 
   test('should have date filter', async ({ authenticatedPage }) => {
     const dateFilter = authenticatedPage.locator('[data-testid="appointments-date-filter"]');
-    await expect(dateFilter).toBeVisible();
+    await expect(dateFilter).toBeVisible({ timeout: 10000 });
 
     // Should default to today
     const value = await dateFilter.inputValue();
@@ -38,17 +39,24 @@ test.describe('Appointments Page', () => {
   });
 
   test('should display appointment list or empty state', async ({ authenticatedPage }) => {
+    // Wait for loading to finish
+    await authenticatedPage.waitForTimeout(1000);
+
     // Either the list or empty state should be visible
     const list = authenticatedPage.locator('[data-testid="appointments-list"]');
-    const emptyState = authenticatedPage.locator('text=No appointments');
+    const emptyState = authenticatedPage.locator('text=/No appointments|Ingen timer/i');
 
     const listVisible = await list.isVisible().catch(() => false);
     const emptyVisible = await emptyState.isVisible().catch(() => false);
 
+    // At least one should be visible after loading
     expect(listVisible || emptyVisible).toBe(true);
   });
 
   test('should display appointment rows with patient info', async ({ authenticatedPage }) => {
+    // Wait for data to load
+    await authenticatedPage.waitForTimeout(1000);
+
     const rows = authenticatedPage.locator('[data-testid="appointment-row"]');
     const count = await rows.count();
 
@@ -56,6 +64,7 @@ test.describe('Appointments Page', () => {
       const firstRow = rows.first();
       await expect(firstRow).toBeVisible();
     }
+    // If no appointments, that's OK - the test passes trivially
   });
 
   test('should navigate to new appointment page', async ({ authenticatedPage }) => {
@@ -69,8 +78,8 @@ test.describe('Appointment Filtering', () => {
     await authenticatedPage.goto('/appointments');
     await authenticatedPage.waitForSelector('[data-testid="appointments-new-button"]', { timeout: 15000 });
 
-    // Find status select
-    const statusSelect = authenticatedPage.locator('select').last();
+    // The status filter is a <select> element in the filters section
+    const statusSelect = authenticatedPage.locator('select').first();
 
     if (await statusSelect.isVisible()) {
       await statusSelect.selectOption('CONFIRMED');
