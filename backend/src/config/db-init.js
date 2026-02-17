@@ -177,6 +177,19 @@ export async function initializeDatabase(db) {
     // Clinical encounter versions
     `ALTER TABLE clinical_encounter_versions ADD COLUMN IF NOT EXISTS changed_by UUID`,
     `ALTER TABLE clinical_encounter_versions ADD COLUMN IF NOT EXISTS changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP`,
+    // =========================================================================
+    // CRM columns on patients table (from migration 010_crm_full_features)
+    // Must be here (not in applySchemaPatches) so they run AFTER schema.sql
+    // =========================================================================
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS lifecycle_stage VARCHAR(30) DEFAULT 'NEW'`,
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS engagement_score INTEGER DEFAULT 50`,
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS is_vip BOOLEAN DEFAULT false`,
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS tags JSONB DEFAULT '[]'::jsonb`,
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS last_contact_date TIMESTAMP`,
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS acquisition_source VARCHAR(50)`,
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS acquisition_campaign VARCHAR(100)`,
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS visit_frequency_days NUMERIC`,
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS first_visit_date DATE`,
   ];
 
   for (const sql of missingColumns) {
@@ -189,6 +202,64 @@ export async function initializeDatabase(db) {
     }
   }
   logger.info('Missing columns added');
+
+  // 4b. Create CRM tables (from migration 010_crm_full_features)
+  // Must run after schema.sql so foreign key references resolve
+  const crmTables = [
+    `CREATE TABLE IF NOT EXISTS leads (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      organization_id UUID NOT NULL,
+      first_name VARCHAR(100) NOT NULL,
+      last_name VARCHAR(100),
+      email VARCHAR(255),
+      phone VARCHAR(50),
+      source VARCHAR(50) DEFAULT 'OTHER',
+      source_detail VARCHAR(255),
+      status VARCHAR(30) NOT NULL DEFAULT 'NEW',
+      score INTEGER DEFAULT 0,
+      temperature VARCHAR(10),
+      assigned_to UUID,
+      primary_interest VARCHAR(255),
+      chief_complaint TEXT,
+      main_complaint TEXT,
+      notes TEXT,
+      converted_patient_id UUID,
+      converted_at TIMESTAMP,
+      lost_reason VARCHAR(255),
+      next_follow_up_date TIMESTAMP,
+      follow_up_count INTEGER DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE TABLE IF NOT EXISTS lead_activities (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      lead_id UUID NOT NULL,
+      user_id UUID,
+      activity_type VARCHAR(50) NOT NULL,
+      description TEXT,
+      old_value VARCHAR(255),
+      new_value VARCHAR(255),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE TABLE IF NOT EXISTS patient_value_history (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      patient_id UUID NOT NULL,
+      metric_type VARCHAR(50),
+      value NUMERIC,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`,
+  ];
+
+  for (const sql of crmTables) {
+    try {
+      await db.query(sql);
+    } catch (err) {
+      if (!err.message.includes('already exists')) {
+        logger.warn(`CRM table creation skipped: ${err.message.substring(0, 80)}`);
+      }
+    }
+  }
+  logger.info('CRM tables created');
 
   // 5. Seed demo organization and users
   try {
@@ -283,6 +354,66 @@ async function applySchemaPatches(db) {
       user_agent TEXT,
       fresh BOOLEAN DEFAULT true,
       created_at TIMESTAMP DEFAULT NOW()
+    )`,
+    // =========================================================================
+    // CRM columns on patients table (from migration 010_crm_full_features)
+    // =========================================================================
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS lifecycle_stage VARCHAR(30) DEFAULT 'NEW'`,
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS engagement_score INTEGER DEFAULT 50`,
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS is_vip BOOLEAN DEFAULT false`,
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS tags JSONB DEFAULT '[]'::jsonb`,
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS last_contact_date TIMESTAMP`,
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS acquisition_source VARCHAR(50)`,
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS acquisition_campaign VARCHAR(100)`,
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS visit_frequency_days NUMERIC`,
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS first_visit_date DATE`,
+    // =========================================================================
+    // CRM Leads table (from migration 010_crm_full_features)
+    // Uses organization_id (not clinic_id) to match the service layer
+    // =========================================================================
+    `CREATE TABLE IF NOT EXISTS leads (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      organization_id UUID NOT NULL,
+      first_name VARCHAR(100) NOT NULL,
+      last_name VARCHAR(100),
+      email VARCHAR(255),
+      phone VARCHAR(50),
+      source VARCHAR(50) DEFAULT 'OTHER',
+      source_detail VARCHAR(255),
+      status VARCHAR(30) NOT NULL DEFAULT 'NEW',
+      score INTEGER DEFAULT 0,
+      temperature VARCHAR(10),
+      assigned_to UUID,
+      primary_interest VARCHAR(255),
+      chief_complaint TEXT,
+      main_complaint TEXT,
+      notes TEXT,
+      converted_patient_id UUID,
+      converted_at TIMESTAMP,
+      lost_reason VARCHAR(255),
+      next_follow_up_date TIMESTAMP,
+      follow_up_count INTEGER DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`,
+    // Lead activities table
+    `CREATE TABLE IF NOT EXISTS lead_activities (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      lead_id UUID NOT NULL,
+      user_id UUID,
+      activity_type VARCHAR(50) NOT NULL,
+      description TEXT,
+      old_value VARCHAR(255),
+      new_value VARCHAR(255),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`,
+    // Patient value history (used by retention/churn analysis)
+    `CREATE TABLE IF NOT EXISTS patient_value_history (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      patient_id UUID NOT NULL,
+      metric_type VARCHAR(50),
+      value NUMERIC,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`,
   ];
 
