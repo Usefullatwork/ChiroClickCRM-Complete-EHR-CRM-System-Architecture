@@ -231,11 +231,11 @@ describe('Encryption Utilities', () => {
       const encrypted = encrypt(original);
       const parts = encrypted.split(':');
 
-      // Corrupt the ciphertext padding
+      // Truncate the ciphertext to guarantee invalid block size (always fails)
       const ciphertext = parts[1];
-      const corrupted = ciphertext.slice(0, -2) + 'ff'; // Change last byte
+      const truncated = ciphertext.slice(0, 8); // Too short for a valid AES block
 
-      const corruptedEncrypted = parts[0] + ':' + corrupted;
+      const corruptedEncrypted = parts[0] + ':' + truncated;
 
       // Should throw error (not leak padding information)
       expect(() => decrypt(corruptedEncrypted)).toThrow();
