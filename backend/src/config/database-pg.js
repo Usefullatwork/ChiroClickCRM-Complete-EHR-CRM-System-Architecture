@@ -19,8 +19,10 @@ const poolConfig = {
   password: process.env.DB_PASSWORD,
   max: parseInt(process.env.DB_POOL_MAX || '10'),
   min: parseInt(process.env.DB_POOL_MIN || '2'),
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 10000,
+  idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT || '30000'),
+  connectionTimeoutMillis: parseInt(process.env.DB_CONNECT_TIMEOUT || '5000'),
+  statement_timeout: parseInt(process.env.DB_STATEMENT_TIMEOUT || '30000'),
+  allowExitOnIdle: false,
 };
 
 // Enable SSL in production with proper certificate validation
@@ -39,15 +41,41 @@ const pool = new Pool(poolConfig);
 // Export pool for direct access when needed (transactions, etc.)
 export { pool };
 
-// Connection error handling
+// Pool event handlers with Winston logging
 pool.on('error', (err, client) => {
-  logger.error('Unexpected error on idle client', { error: err.message, stack: err.stack });
-  process.exit(-1);
+  logger.error('Unexpected error on idle database client', {
+    error: err.message,
+    stack: err.stack,
+    code: err.code,
+  });
+  // Only exit on fatal connection errors, not transient issues
+  if (err.code === 'PROTOCOL_CONNECTION_LOST' || err.code === 'ECONNREFUSED') {
+    logger.error('Fatal database connection error, shutting down');
+    process.exit(-1);
+  }
 });
 
-// Test connection
-pool.on('connect', () => {
-  logger.info('Database connected successfully');
+pool.on('connect', (client) => {
+  logger.info('New database client connected', {
+    totalCount: pool.totalCount,
+    idleCount: pool.idleCount,
+    waitingCount: pool.waitingCount,
+  });
+});
+
+pool.on('acquire', () => {
+  logger.debug('Database client acquired from pool', {
+    totalCount: pool.totalCount,
+    idleCount: pool.idleCount,
+    waitingCount: pool.waitingCount,
+  });
+});
+
+pool.on('remove', () => {
+  logger.debug('Database client removed from pool', {
+    totalCount: pool.totalCount,
+    idleCount: pool.idleCount,
+  });
 });
 
 /**
@@ -63,7 +91,7 @@ export const query = async (text, params) => {
       logger.warn('Slow query detected', {
         text: text.substring(0, 100),
         duration: `${duration}ms`,
-        rows: res.rowCount
+        rows: res.rowCount,
       });
     }
 
@@ -72,7 +100,7 @@ export const query = async (text, params) => {
     logger.error('Database query error', {
       error: error.message,
       query: text.substring(0, 100),
-      stack: error.stack
+      stack: error.stack,
     });
     throw error;
   }
@@ -183,5 +211,5 @@ export default {
   closePool,
   setTenantContext,
   clearTenantContext,
-  queryWithTenant
+  queryWithTenant,
 };

@@ -191,6 +191,7 @@ app.get(`/api/${API_VERSION}`, (req, res) => {
       training: `/api/${API_VERSION}/training`,
       treatmentPlans: `/api/${API_VERSION}/treatment-plans`,
       macros: `/api/${API_VERSION}/macros`,
+      errors: `/api/${API_VERSION}/errors`,
     },
   });
 });
@@ -235,6 +236,7 @@ import spineTemplatesRoutes from './routes/spineTemplates.js';
 import clinicalSettingsRoutes from './routes/clinicalSettings.js';
 import treatmentPlanRoutes from './routes/treatmentPlans.js';
 import macroRoutes from './routes/macros.js';
+import errorReportRoutes from './routes/errors.js';
 
 // Mount routes
 app.use(`/api/${API_VERSION}/auth`, authRoutes);
@@ -273,6 +275,7 @@ app.use(`/api/${API_VERSION}/spine-templates`, spineTemplatesRoutes);
 app.use(`/api/${API_VERSION}/clinical-settings`, clinicalSettingsRoutes);
 app.use(`/api/${API_VERSION}/treatment-plans`, treatmentPlanRoutes);
 app.use(`/api/${API_VERSION}/macros`, macroRoutes);
+app.use(`/api/${API_VERSION}/errors`, errorReportRoutes);
 
 // Portal routes (public - no auth required for patient access)
 app.use(`/api/${API_VERSION}/portal`, portalRoutes);

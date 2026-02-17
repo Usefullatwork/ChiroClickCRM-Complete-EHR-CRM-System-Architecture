@@ -28,17 +28,27 @@ import { formatDate, formatPhone, calculateAge } from '../lib/utils';
 import GDPRExportModal from '../components/GDPRExportModal';
 import PatientSummaryCard from '../components/patients/PatientSummaryCard';
 import TreatmentPlanProgress from '../components/treatment/TreatmentPlanProgress';
+import ComplianceDashboard from '../components/clinical/ComplianceDashboard';
 import Breadcrumbs from '../components/common/Breadcrumbs';
 import { useTranslation } from '../i18n';
+import usePatientPresence from '../hooks/usePatientPresence';
+import { useAuth } from '../hooks/useAuth';
 
 export default function PatientDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { t, lang } = useTranslation('patients');
+  const { user: currentUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({});
   const [showGDPRModal, setShowGDPRModal] = useState(false);
+
+  // Track who else is viewing this patient
+  const patientViewers = usePatientPresence(
+    id,
+    currentUser?.name || currentUser?.full_name || currentUser?.email || 'Behandler'
+  );
 
   // Fetch patient data
   const { data: patientResponse, isLoading } = useQuery({
@@ -103,6 +113,35 @@ export default function PatientDetail() {
           { label: `${patient.first_name} ${patient.last_name}` },
         ]}
       />
+
+      {/* Presence Indicator - show who else is viewing this patient */}
+      {patientViewers.length > 0 && (
+        <div className="mb-4 flex items-center gap-2 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-lg">
+          <div className="flex -space-x-2">
+            {patientViewers.map((viewer) => (
+              <div
+                key={viewer.userId}
+                className="w-7 h-7 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs font-bold ring-2 ring-white"
+                title={viewer.name}
+              >
+                {viewer.name?.charAt(0)?.toUpperCase() || '?'}
+              </div>
+            ))}
+          </div>
+          <span className="text-sm text-amber-800">
+            {patientViewers.length === 1
+              ? `${patientViewers[0].name} ser ogsa pa denne pasienten`
+              : `${patientViewers.map((v) => v.name).join(', ')} ser ogsa pa denne pasienten`}
+          </span>
+          <div className="ml-auto flex items-center gap-1">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+            </span>
+            <span className="text-xs text-amber-600">Live</span>
+          </div>
+        </div>
+      )}
 
       {/* Patient Summary Card */}
       <PatientSummaryCard patient={patient} patientId={id} />
@@ -709,6 +748,9 @@ export default function PatientDetail() {
             onNewPlan={() => navigate(`/patients/${id}/treatment-plan/new`)}
             lang={lang === 'en' ? 'en' : 'no'}
           />
+
+          {/* Exercise Compliance */}
+          <ComplianceDashboard patientId={id} />
 
           {/* Follow-up Alert */}
           {patient.should_be_followed_up && (

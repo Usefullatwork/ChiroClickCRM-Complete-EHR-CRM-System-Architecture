@@ -3,125 +3,123 @@
  * Combined panel for exercise prescription within clinical encounters
  */
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   X,
   Dumbbell,
   ChevronLeft,
   ChevronRight,
   AlertCircle,
-  Check
-} from 'lucide-react'
-import ExerciseLibrary from './ExerciseLibrary'
-import ExercisePrescription from './ExercisePrescription'
-import api from '../../services/api'
+  Check,
+  Download,
+  Loader2,
+} from 'lucide-react';
+import ExerciseLibrary from './ExerciseLibrary';
+import ExercisePrescription from './ExercisePrescription';
+import api from '../../services/api';
 
-const ExercisePanel = ({
-  patient,
-  encounterId,
-  isOpen,
-  onClose,
-  onPrescriptionSaved
-}) => {
+const ExercisePanel = ({ patient, encounterId, isOpen, onClose, onPrescriptionSaved }) => {
   // State
-  const [exercises, setExercises] = useState([])
-  const [categories, setCategories] = useState([])
-  const [selectedExercises, setSelectedExercises] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [sending, setSending] = useState(false)
-  const [error, setError] = useState(null)
-  const [success, setSuccess] = useState(null)
-  const [panelWidth, setPanelWidth] = useState(50) // percentage
+  const [exercises, setExercises] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedExercises, setSelectedExercises] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const [panelWidth, setPanelWidth] = useState(50); // percentage
+  const [downloadingPDF, setDownloadingPDF] = useState(false);
 
   // Load exercises and categories
   useEffect(() => {
     if (isOpen) {
-      loadExercises()
-      loadCategories()
+      loadExercises();
+      loadCategories();
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   const loadExercises = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       const response = await api.get('/exercises', {
-        params: { limit: 500 }
-      })
-      setExercises(response.data.data || [])
+        params: { limit: 500 },
+      });
+      setExercises(response.data.data || []);
     } catch (err) {
-      console.error('Error loading exercises:', err)
-      setError('Kunne ikke laste øvelser')
+      setError('Kunne ikke laste øvelser');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const loadCategories = async () => {
     try {
-      const response = await api.get('/exercises/categories')
-      setCategories(response.data.data || [])
-    } catch (err) {
-      console.error('Error loading categories:', err)
+      const response = await api.get('/exercises/categories');
+      setCategories(response.data.data || []);
+    } catch {
+      // Categories are non-critical, silently fail
     }
-  }
+  };
 
   // Handle exercise selection
   const handleSelectExercise = (exercise) => {
     const isAlreadySelected = selectedExercises.some(
-      ex => ex.id === exercise.id || ex.exerciseId === exercise.id
-    )
+      (ex) => ex.id === exercise.id || ex.exerciseId === exercise.id
+    );
 
     if (isAlreadySelected) {
-      setSelectedExercises(prev =>
-        prev.filter(ex => ex.id !== exercise.id && ex.exerciseId !== exercise.id)
-      )
+      setSelectedExercises((prev) =>
+        prev.filter((ex) => ex.id !== exercise.id && ex.exerciseId !== exercise.id)
+      );
     } else {
-      setSelectedExercises(prev => [...prev, {
-        ...exercise,
-        exerciseId: exercise.id,
-        sets: exercise.sets_default,
-        reps: exercise.reps_default,
-        holdSeconds: exercise.hold_seconds,
-        frequencyPerDay: exercise.frequency_per_day,
-        frequencyPerWeek: exercise.frequency_per_week
-      }])
+      setSelectedExercises((prev) => [
+        ...prev,
+        {
+          ...exercise,
+          exerciseId: exercise.id,
+          sets: exercise.sets_default,
+          reps: exercise.reps_default,
+          holdSeconds: exercise.hold_seconds,
+          frequencyPerDay: exercise.frequency_per_day,
+          frequencyPerWeek: exercise.frequency_per_week,
+        },
+      ]);
     }
-  }
+  };
 
   // Save prescription
   const handleSave = async (prescriptionData) => {
     try {
-      setSaving(true)
-      setError(null)
+      setSaving(true);
+      setError(null);
 
       const response = await api.post('/exercises/prescriptions', {
         ...prescriptionData,
-        deliveryMethod: 'portal'
-      })
+        deliveryMethod: 'portal',
+      });
 
-      setSuccess('Øvelsesprogram lagret!')
-      setTimeout(() => setSuccess(null), 3000)
+      setSuccess('Øvelsesprogram lagret!');
+      setTimeout(() => setSuccess(null), 3000);
 
       if (onPrescriptionSaved) {
-        onPrescriptionSaved(response.data.data)
+        onPrescriptionSaved(response.data.data);
       }
 
-      return response.data.data
+      return response.data.data;
     } catch (err) {
-      console.error('Error saving prescription:', err)
-      setError('Kunne ikke lagre øvelsesprogram')
-      throw err
+      setError('Kunne ikke lagre øvelsesprogram');
+      throw err;
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   // Send email
   const handleSendEmail = async () => {
     try {
-      setSending(true)
-      setError(null)
+      setSending(true);
+      setError(null);
 
       // First save the prescription
       const prescription = await handleSave({
@@ -135,28 +133,27 @@ const ExercisePanel = ({
           frequencyPerDay: ex.frequencyPerDay,
           frequencyPerWeek: ex.frequencyPerWeek,
           customInstructions: ex.customInstructions,
-          displayOrder: index
-        }))
-      })
+          displayOrder: index,
+        })),
+      });
 
       // Then send email
-      await api.post(`/exercises/prescriptions/${prescription.id}/send-email`)
+      await api.post(`/exercises/prescriptions/${prescription.id}/send-email`);
 
-      setSuccess('E-post sendt til pasienten!')
-      setTimeout(() => setSuccess(null), 3000)
+      setSuccess('E-post sendt til pasienten!');
+      setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      console.error('Error sending email:', err)
-      setError(err.response?.data?.error || 'Kunne ikke sende e-post')
+      setError(err.response?.data?.error || 'Kunne ikke sende e-post');
     } finally {
-      setSending(false)
+      setSending(false);
     }
-  }
+  };
 
   // Send SMS
   const handleSendSMS = async () => {
     try {
-      setSending(true)
-      setError(null)
+      setSending(true);
+      setError(null);
 
       // First save the prescription
       const prescription = await handleSave({
@@ -170,28 +167,27 @@ const ExercisePanel = ({
           frequencyPerDay: ex.frequencyPerDay,
           frequencyPerWeek: ex.frequencyPerWeek,
           customInstructions: ex.customInstructions,
-          displayOrder: index
-        }))
-      })
+          displayOrder: index,
+        })),
+      });
 
       // Then send SMS
-      await api.post(`/exercises/prescriptions/${prescription.id}/send-sms`)
+      await api.post(`/exercises/prescriptions/${prescription.id}/send-sms`);
 
-      setSuccess('SMS sendt til pasienten!')
-      setTimeout(() => setSuccess(null), 3000)
+      setSuccess('SMS sendt til pasienten!');
+      setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      console.error('Error sending SMS:', err)
-      setError(err.response?.data?.error || 'Kunne ikke sende SMS')
+      setError(err.response?.data?.error || 'Kunne ikke sende SMS');
     } finally {
-      setSending(false)
+      setSending(false);
     }
-  }
+  };
 
   // Generate PDF
   const handleGeneratePDF = async () => {
     try {
-      setSending(true)
-      setError(null)
+      setSending(true);
+      setError(null);
 
       // First save the prescription
       const prescription = await handleSave({
@@ -205,44 +201,72 @@ const ExercisePanel = ({
           frequencyPerDay: ex.frequencyPerDay,
           frequencyPerWeek: ex.frequencyPerWeek,
           customInstructions: ex.customInstructions,
-          displayOrder: index
-        }))
-      })
+          displayOrder: index,
+        })),
+      });
 
       // Then download PDF
       const response = await api.get(`/exercises/prescriptions/${prescription.id}/pdf`, {
-        responseType: 'blob'
-      })
+        responseType: 'blob',
+      });
 
       // Create download link
-      const url = window.URL.createObjectURL(new Blob([response.data]))
-      const link = document.createElement('a')
-      link.href = url
-      link.setAttribute('download', `ovelsesprogram_${patient?.first_name || 'pasient'}_${new Date().toISOString().split('T')[0]}.pdf`)
-      document.body.appendChild(link)
-      link.click()
-      link.remove()
-      window.URL.revokeObjectURL(url)
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute(
+        'download',
+        `ovelsesprogram_${patient?.first_name || 'pasient'}_${new Date().toISOString().split('T')[0]}.pdf`
+      );
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
 
-      setSuccess('PDF lastet ned!')
-      setTimeout(() => setSuccess(null), 3000)
+      setSuccess('PDF lastet ned!');
+      setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      console.error('Error generating PDF:', err)
-      setError('Kunne ikke generere PDF')
+      setError('Kunne ikke generere PDF');
     } finally {
-      setSending(false)
+      setSending(false);
     }
-  }
+  };
 
-  if (!isOpen) return null
+  // Download PDF handout for the patient's current exercises
+  const handleDownloadPDFHandout = async () => {
+    if (!patient?.id) return;
+    try {
+      setDownloadingPDF(true);
+      setError(null);
+      const response = await api.get(`/patients/${patient.id}/exercises/pdf`, {
+        responseType: 'blob',
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute(
+        'download',
+        `ovelsesprogram_${patient.first_name || 'pasient'}_${new Date().toISOString().split('T')[0]}.pdf`
+      );
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      setSuccess('PDF-handout lastet ned!');
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      setError('Kunne ikke laste ned PDF-handout');
+    } finally {
+      setDownloadingPDF(false);
+    }
+  };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex">
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/50"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
       {/* Panel */}
       <div className="relative ml-auto w-full max-w-6xl bg-white shadow-xl flex flex-col">
@@ -260,12 +284,24 @@ const ExercisePanel = ({
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleDownloadPDFHandout}
+              disabled={downloadingPDF || !patient?.id}
+              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              title="Last ned PDF-handout"
+            >
+              {downloadingPDF ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Download className="w-4 h-4" />
+              )}
+              {downloadingPDF ? 'Laster...' : 'PDF-handout'}
+            </button>
+            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Notifications */}
@@ -307,23 +343,23 @@ const ExercisePanel = ({
           <div
             className="w-2 bg-gray-100 hover:bg-blue-200 cursor-col-resize flex items-center justify-center"
             onMouseDown={(e) => {
-              e.preventDefault()
-              const startX = e.clientX
-              const startWidth = panelWidth
+              e.preventDefault();
+              const startX = e.clientX;
+              const startWidth = panelWidth;
 
               const handleMouseMove = (e) => {
-                const delta = ((e.clientX - startX) / window.innerWidth) * 100
-                const newWidth = Math.min(Math.max(startWidth + delta, 30), 70)
-                setPanelWidth(newWidth)
-              }
+                const delta = ((e.clientX - startX) / window.innerWidth) * 100;
+                const newWidth = Math.min(Math.max(startWidth + delta, 30), 70);
+                setPanelWidth(newWidth);
+              };
 
               const handleMouseUp = () => {
-                document.removeEventListener('mousemove', handleMouseMove)
-                document.removeEventListener('mouseup', handleMouseUp)
-              }
+                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseup', handleMouseUp);
+              };
 
-              document.addEventListener('mousemove', handleMouseMove)
-              document.addEventListener('mouseup', handleMouseUp)
+              document.addEventListener('mousemove', handleMouseMove);
+              document.addEventListener('mouseup', handleMouseUp);
             }}
           >
             <div className="flex flex-col gap-1">
@@ -332,10 +368,7 @@ const ExercisePanel = ({
           </div>
 
           {/* Right Panel - Prescription */}
-          <div
-            className="overflow-hidden"
-            style={{ width: `${100 - panelWidth}%` }}
-          >
+          <div className="overflow-hidden" style={{ width: `${100 - panelWidth}%` }}>
             <ExercisePrescription
               patient={patient}
               encounterId={encounterId}
@@ -352,7 +385,7 @@ const ExercisePanel = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ExercisePanel
+export default ExercisePanel;

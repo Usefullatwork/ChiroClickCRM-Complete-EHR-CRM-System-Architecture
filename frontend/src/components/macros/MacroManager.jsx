@@ -3,9 +3,22 @@
  * Lists macros with category filter + search, create/edit modal, delete with confirmation
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, Plus, Edit2, Trash2, Star, X, Zap, Filter, Copy, Keyboard } from 'lucide-react';
+import {
+  Search,
+  Plus,
+  Edit2,
+  Trash2,
+  Star,
+  X,
+  Zap,
+  Filter,
+  Copy,
+  Keyboard,
+  ChevronDown,
+  ChevronRight,
+} from 'lucide-react';
 import { macrosAPI } from '../../services/api';
 import toast from '../../utils/toast';
 
@@ -16,6 +29,37 @@ const CATEGORIES = [
   { value: 'Billing', label: 'Fakturering' },
   { value: 'General', label: 'Generelt' },
 ];
+
+const CATEGORY_COLORS = {
+  SOAP: {
+    bg: 'bg-blue-50',
+    border: 'border-blue-200',
+    text: 'text-blue-800',
+    header: 'bg-blue-100',
+    badge: 'bg-blue-100 text-blue-700',
+  },
+  Treatment: {
+    bg: 'bg-green-50',
+    border: 'border-green-200',
+    text: 'text-green-800',
+    header: 'bg-green-100',
+    badge: 'bg-green-100 text-green-700',
+  },
+  Billing: {
+    bg: 'bg-amber-50',
+    border: 'border-amber-200',
+    text: 'text-amber-800',
+    header: 'bg-amber-100',
+    badge: 'bg-amber-100 text-amber-700',
+  },
+  General: {
+    bg: 'bg-gray-50',
+    border: 'border-gray-200',
+    text: 'text-gray-800',
+    header: 'bg-gray-100',
+    badge: 'bg-gray-100 text-gray-700',
+  },
+};
 
 const SOAP_SECTIONS = [
   { value: '', label: 'Ingen' },
@@ -32,6 +76,7 @@ export default function MacroManager() {
   const [showModal, setShowModal] = useState(false);
   const [editingMacro, setEditingMacro] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [collapsedCategories, setCollapsedCategories] = useState(new Set());
 
   // Fetch all macros
   const { data: matrixData, isLoading } = useQuery({
@@ -141,6 +186,49 @@ export default function MacroManager() {
     return counts;
   }, [allMacros]);
 
+  // Group filtered macros by category
+  const groupedMacros = useMemo(() => {
+    const groups = {};
+    for (const macro of filteredMacros) {
+      const cat = macro.category || 'General';
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(macro);
+    }
+    return groups;
+  }, [filteredMacros]);
+
+  // Toggle category expand/collapse
+  const toggleCategory = useCallback((category) => {
+    setCollapsedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(category)) {
+        next.delete(category);
+      } else {
+        next.add(category);
+      }
+      return next;
+    });
+  }, []);
+
+  // Keyboard shortcuts: Ctrl+1 through Ctrl+9 to copy the first 9 macros
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) return;
+      const num = parseInt(e.key);
+      if (num >= 1 && num <= 9) {
+        const index = num - 1;
+        if (index < filteredMacros.length) {
+          e.preventDefault();
+          const macro = filteredMacros[index];
+          navigator.clipboard.writeText(macro.text);
+          toast.info(`Makro "${macro.name}" kopiert (Ctrl+${num})`);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [filteredMacros]);
+
   return (
     <div className="space-y-6">
       {/* Stats cards */}
@@ -194,12 +282,22 @@ export default function MacroManager() {
         </div>
       </div>
 
-      {/* Macro list */}
-      <div className="bg-white rounded-lg shadow">
+      {/* Keyboard shortcut hint */}
+      {filteredMacros.length > 0 && (
+        <div className="bg-white rounded-lg shadow p-3 flex items-center gap-2 text-xs text-gray-500">
+          <Keyboard className="w-4 h-4" />
+          <span>Ctrl+1 til Ctrl+9 kopierer de forste 9 makroene raskt</span>
+        </div>
+      )}
+
+      {/* Macro list grouped by category */}
+      <div className="space-y-4">
         {isLoading ? (
-          <div className="p-8 text-center text-gray-500">Laster makroer...</div>
+          <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+            Laster makroer...
+          </div>
         ) : filteredMacros.length === 0 ? (
-          <div className="p-8 text-center">
+          <div className="bg-white rounded-lg shadow p-8 text-center">
             <Zap className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500">
               {searchQuery || categoryFilter
@@ -216,70 +314,125 @@ export default function MacroManager() {
             )}
           </div>
         ) : (
-          <div className="divide-y divide-gray-100">
-            {filteredMacros.map((macro) => (
+          Object.entries(groupedMacros).map(([category, macros]) => {
+            const colors = CATEGORY_COLORS[category] || CATEGORY_COLORS.General;
+            const isCollapsed = collapsedCategories.has(category);
+            const categoryLabel = CATEGORIES.find((c) => c.value === category)?.label || category;
+
+            // Calculate the global index offset for Ctrl+N shortcut display
+            let globalIndexOffset = 0;
+            const categoryOrder = Object.keys(groupedMacros);
+            for (const cat of categoryOrder) {
+              if (cat === category) break;
+              globalIndexOffset += groupedMacros[cat].length;
+            }
+
+            return (
               <div
-                key={macro.id}
-                className="p-4 hover:bg-gray-50 transition-colors flex items-start gap-4"
+                key={category}
+                className={`bg-white rounded-lg shadow overflow-hidden border ${colors.border}`}
               >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-medium text-gray-900 text-sm">{macro.name}</h3>
-                    <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
-                      {macro.category}
+                {/* Category Header */}
+                <button
+                  onClick={() => toggleCategory(category)}
+                  className={`w-full flex items-center justify-between px-4 py-3 ${colors.header} hover:opacity-90 transition-opacity`}
+                >
+                  <div className="flex items-center gap-3">
+                    {isCollapsed ? (
+                      <ChevronRight className={`w-4 h-4 ${colors.text}`} />
+                    ) : (
+                      <ChevronDown className={`w-4 h-4 ${colors.text}`} />
+                    )}
+                    <h3 className={`font-semibold text-sm ${colors.text}`}>{categoryLabel}</h3>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${colors.badge}`}
+                    >
+                      {macros.length}
                     </span>
-                    {macro.soapSection && (
-                      <span className="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded">
-                        {macro.soapSection}
-                      </span>
-                    )}
-                    {macro.shortcutKey && (
-                      <span className="px-1.5 py-0.5 bg-yellow-50 text-yellow-700 text-xs rounded flex items-center gap-1">
-                        <Keyboard className="w-3 h-3" />
-                        {macro.shortcutKey}
-                      </span>
-                    )}
                   </div>
-                  <p className="text-sm text-gray-600 line-clamp-2">{macro.text}</p>
-                  {macro.usageCount > 0 && (
-                    <p className="text-xs text-gray-400 mt-1">Brukt {macro.usageCount} ganger</p>
-                  )}
-                </div>
-                <div className="flex items-center gap-1 flex-shrink-0">
-                  <button
-                    onClick={() => favoriteMutation.mutate(macro.id)}
-                    className={`p-1.5 rounded hover:bg-gray-100 transition-colors ${
-                      macro.isFavorite ? 'text-yellow-500' : 'text-gray-400'
-                    }`}
-                    title="Favoritt"
-                  >
-                    <Star className="w-4 h-4" fill={macro.isFavorite ? 'currentColor' : 'none'} />
-                  </button>
-                  <button
-                    onClick={() => copyToClipboard(macro.text)}
-                    className="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
-                    title="Kopier"
-                  >
-                    <Copy className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleEdit(macro)}
-                    className="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-blue-600 transition-colors"
-                    title="Rediger"
-                  >
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => setDeleteTarget(macro)}
-                    className="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-red-600 transition-colors"
-                    title="Slett"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
+                </button>
+
+                {/* Macro Items */}
+                {!isCollapsed && (
+                  <div className="divide-y divide-gray-100">
+                    {macros.map((macro, idx) => {
+                      const globalIdx = globalIndexOffset + idx;
+                      return (
+                        <div
+                          key={macro.id}
+                          className="p-4 hover:bg-gray-50 transition-colors flex items-start gap-4"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-medium text-gray-900 text-sm">{macro.name}</h3>
+                              {macro.soapSection && (
+                                <span className="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded">
+                                  {macro.soapSection}
+                                </span>
+                              )}
+                              {macro.shortcutKey && (
+                                <span className="px-1.5 py-0.5 bg-yellow-50 text-yellow-700 text-xs rounded flex items-center gap-1">
+                                  <Keyboard className="w-3 h-3" />
+                                  {macro.shortcutKey}
+                                </span>
+                              )}
+                              {globalIdx < 9 && (
+                                <span className="px-1.5 py-0.5 bg-purple-50 text-purple-700 text-xs rounded flex items-center gap-1">
+                                  <Keyboard className="w-3 h-3" />
+                                  Ctrl+{globalIdx + 1}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-600 line-clamp-2">{macro.text}</p>
+                            {macro.usageCount > 0 && (
+                              <p className="text-xs text-gray-400 mt-1">
+                                Brukt {macro.usageCount} ganger
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            <button
+                              onClick={() => favoriteMutation.mutate(macro.id)}
+                              className={`p-1.5 rounded hover:bg-gray-100 transition-colors ${
+                                macro.isFavorite ? 'text-yellow-500' : 'text-gray-400'
+                              }`}
+                              title="Favoritt"
+                            >
+                              <Star
+                                className="w-4 h-4"
+                                fill={macro.isFavorite ? 'currentColor' : 'none'}
+                              />
+                            </button>
+                            <button
+                              onClick={() => copyToClipboard(macro.text)}
+                              className="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+                              title="Kopier"
+                            >
+                              <Copy className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleEdit(macro)}
+                              className="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-blue-600 transition-colors"
+                              title="Rediger"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => setDeleteTarget(macro)}
+                              className="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-red-600 transition-colors"
+                              title="Slett"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
+            );
+          })
         )}
       </div>
 

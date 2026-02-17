@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -11,6 +12,9 @@ import {
   ArrowRight,
   X,
   Phone,
+  ChevronDown,
+  ChevronUp,
+  Bell,
 } from 'lucide-react';
 import { formatDate, formatTime } from '../lib/utils';
 import { dashboardAPI, appointmentsAPI, followUpsAPI } from '../services/api';
@@ -26,11 +30,13 @@ import {
   AppointmentsListSkeleton,
   ListSkeleton,
 } from '../components/ui/Skeleton';
+import RecallDashboard from '../components/recall/RecallDashboard';
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { t, lang } = useTranslation('dashboard');
+  const [showRecall, setShowRecall] = useState(false);
 
   // Fetch dashboard stats from real API
   const { data: statsResponse, isLoading: statsLoading } = useQuery({
@@ -409,6 +415,31 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Recall Dashboard (collapsible) */}
+      <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+        <button
+          onClick={() => setShowRecall(!showRecall)}
+          className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors rounded-lg"
+        >
+          <div className="flex items-center gap-3">
+            <Bell className="w-5 h-5 text-blue-600" />
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              Recall Dashboard
+            </h2>
+          </div>
+          {showRecall ? (
+            <ChevronUp className="w-5 h-5 text-gray-400" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-gray-400" />
+          )}
+        </button>
+        {showRecall && (
+          <div className="border-t border-gray-200 dark:border-gray-700">
+            <RecallDashboard />
+          </div>
+        )}
       </div>
     </div>
   );

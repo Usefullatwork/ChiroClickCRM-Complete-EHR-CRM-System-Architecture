@@ -8,6 +8,7 @@ import logger from '../utils/logger.js';
 
 let io = null;
 const connectedUsers = new Map(); // userId -> Set<socketId>
+const patientViewers = new Map(); // patientId -> Map<userId, { name, socketId }>
 
 /**
  * Initialize WebSocket server
@@ -90,6 +91,57 @@ export function initializeWebSocket(httpServer) {
       connectedUsers.get(userId).add(socket.id);
     }
 
+    // Track which patient this socket is currently viewing
+    let currentViewingPatient = null;
+
+    // Patient presence: user starts viewing a patient
+    socket.on('patient:viewing', ({ patientId, userName }) => {
+      if (!patientId || !userId) return;
+
+      // Leave previous patient if any
+      if (currentViewingPatient && currentViewingPatient !== patientId) {
+        removePatientViewer(currentViewingPatient, userId, orgId);
+      }
+
+      currentViewingPatient = patientId;
+
+      if (!patientViewers.has(patientId)) {
+        patientViewers.set(patientId, new Map());
+      }
+      patientViewers.get(patientId).set(userId, {
+        name: userName || 'Ukjent bruker',
+        socketId: socket.id,
+      });
+
+      // Notify others in the org viewing the same patient
+      socket.to(`org:${orgId}`).emit('patient:user-joined', {
+        patientId,
+        userId,
+        userName: userName || 'Ukjent bruker',
+      });
+    });
+
+    // Patient presence: user leaves a patient view
+    socket.on('patient:leaving', ({ patientId }) => {
+      if (!patientId || !userId) return;
+      currentViewingPatient = null;
+      removePatientViewer(patientId, userId, orgId);
+    });
+
+    // Client requests who's viewing a specific patient
+    socket.on('patient:who-viewing', ({ patientId }, callback) => {
+      if (typeof callback !== 'function') return;
+      const viewers = patientViewers.get(patientId);
+      if (!viewers) return callback([]);
+      const result = [];
+      for (const [uid, data] of viewers) {
+        if (uid !== userId) {
+          result.push({ userId: uid, name: data.name });
+        }
+      }
+      callback(result);
+    });
+
     // Handle disconnect
     socket.on('disconnect', (reason) => {
       logger.info(`WebSocket disconnected: ${userId} (${reason})`);
@@ -98,6 +150,10 @@ export function initializeWebSocket(httpServer) {
         if (connectedUsers.get(userId).size === 0) {
           connectedUsers.delete(userId);
         }
+      }
+      // Clean up patient viewing on disconnect
+      if (currentViewingPatient) {
+        removePatientViewer(currentViewingPatient, userId, orgId);
       }
     });
 
@@ -111,6 +167,23 @@ export function initializeWebSocket(httpServer) {
 
   logger.info('WebSocket server initialized');
   return io;
+}
+
+/**
+ * Remove a user from patient viewers and notify org
+ */
+function removePatientViewer(patientId, userId, orgId) {
+  const viewers = patientViewers.get(patientId);
+  if (viewers) {
+    viewers.delete(userId);
+    if (viewers.size === 0) {
+      patientViewers.delete(patientId);
+    }
+  }
+  // Notify org
+  if (io && orgId) {
+    io.to(`org:${orgId}`).emit('patient:user-left', { patientId, userId });
+  }
 }
 
 /**

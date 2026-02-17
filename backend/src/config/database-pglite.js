@@ -29,6 +29,7 @@ try {
 
 let db = null;
 let initialized = false;
+let connectionHealthy = true;
 
 /**
  * Initialize PGlite database
@@ -76,6 +77,17 @@ export const initPGlite = async () => {
     }
 
     initialized = true;
+    connectionHealthy = true;
+
+    // Verify connection with a simple health check
+    try {
+      await db.query('SELECT 1 AS health');
+      logger.info('PGlite connection health check passed');
+    } catch (hcErr) {
+      logger.warn('PGlite connection health check failed on init:', hcErr.message);
+      connectionHealthy = false;
+    }
+
     logger.info('PGlite database initialized successfully');
 
     // Run first-time schema + seed setup if needed
@@ -100,11 +112,36 @@ export const initPGlite = async () => {
 
 /**
  * Get the PGlite instance (initializes if needed)
+ * Includes reconnection logic if the connection has dropped.
  */
 const getDB = async () => {
   if (!db || !initialized) {
     await initPGlite();
+    return db;
   }
+
+  // Reconnect if previous health check flagged connection as unhealthy
+  if (!connectionHealthy) {
+    logger.info('PGlite connection was unhealthy, attempting reconnection...');
+    try {
+      await db.query('SELECT 1 AS health');
+      connectionHealthy = true;
+      logger.info('PGlite reconnection check passed');
+    } catch {
+      // Close and reinitialize
+      logger.warn('PGlite reconnection failed, reinitializing...');
+      try {
+        await db.close();
+      } catch {
+        // ignore close errors
+      }
+      db = null;
+      initialized = false;
+      connectionHealthy = false;
+      await initPGlite();
+    }
+  }
+
   return db;
 };
 
@@ -139,6 +176,10 @@ export const query = async (text, params = []) => {
       fields: res.fields || [],
     };
   } catch (error) {
+    // Flag connection as unhealthy on connection-level errors
+    if (error.message && /connection|closed|terminated/i.test(error.message)) {
+      connectionHealthy = false;
+    }
     logger.error('PGlite query error', {
       error: error.message,
       query: text.substring(0, 100),
