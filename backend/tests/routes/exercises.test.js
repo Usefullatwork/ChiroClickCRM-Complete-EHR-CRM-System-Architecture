@@ -4,6 +4,7 @@
  */
 
 import { jest, describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
+import 'express-async-errors';
 import express from 'express';
 import request from 'supertest';
 import {

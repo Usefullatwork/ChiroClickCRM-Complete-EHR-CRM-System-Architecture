@@ -5,13 +5,12 @@
 
 import * as templateService from '../services/templates.js';
 import logger from '../config/logger.js';
-import { asyncRoute } from '../utils/asyncRoute.js';
 
 /**
  * Get all templates
  * GET /api/v1/templates
  */
-export const getAllTemplates = asyncRoute(async (req, res) => {
+export const getAllTemplates = async (req, res) => {
   const { organizationId } = req.user;
   const options = {
     category: req.query.category,
@@ -26,25 +25,25 @@ export const getAllTemplates = asyncRoute(async (req, res) => {
 
   const result = await templateService.getAllTemplates(organizationId, options);
   res.json(result);
-});
+};
 
 /**
  * Get templates grouped by category
  * GET /api/v1/templates/by-category
  */
-export const getTemplatesByCategory = asyncRoute(async (req, res) => {
+export const getTemplatesByCategory = async (req, res) => {
   const { organizationId } = req.user;
   const language = req.query.language || 'NO';
 
   const result = await templateService.getTemplatesByCategory(organizationId, language);
   res.json(result);
-});
+};
 
 /**
  * Get template by ID
  * GET /api/v1/templates/:id
  */
-export const getTemplateById = asyncRoute(async (req, res) => {
+export const getTemplateById = async (req, res) => {
   try {
     const { organizationId } = req.user;
     const { id } = req.params;
@@ -57,24 +56,24 @@ export const getTemplateById = asyncRoute(async (req, res) => {
     }
     throw error;
   }
-});
+};
 
 /**
  * Create new template
  * POST /api/v1/templates
  */
-export const createTemplate = asyncRoute(async (req, res) => {
+export const createTemplate = async (req, res) => {
   const { organizationId, userId } = req.user;
 
   const template = await templateService.createTemplate(organizationId, userId, req.body);
   res.status(201).json(template);
-});
+};
 
 /**
  * Update template
  * PATCH /api/v1/templates/:id
  */
-export const updateTemplate = asyncRoute(async (req, res) => {
+export const updateTemplate = async (req, res) => {
   try {
     const { organizationId } = req.user;
     const { id } = req.params;
@@ -87,13 +86,13 @@ export const updateTemplate = asyncRoute(async (req, res) => {
     }
     throw error;
   }
-});
+};
 
 /**
  * Delete template
  * DELETE /api/v1/templates/:id
  */
-export const deleteTemplate = asyncRoute(async (req, res) => {
+export const deleteTemplate = async (req, res) => {
   try {
     const { organizationId } = req.user;
     const { id } = req.params;
@@ -106,48 +105,48 @@ export const deleteTemplate = asyncRoute(async (req, res) => {
     }
     throw error;
   }
-});
+};
 
 /**
  * Toggle favorite status
  * POST /api/v1/templates/:id/favorite
  */
-export const toggleFavorite = asyncRoute(async (req, res) => {
+export const toggleFavorite = async (req, res) => {
   const { organizationId } = req.user;
   const { id } = req.params;
 
   const template = await templateService.toggleFavorite(organizationId, id);
   res.json(template);
-});
+};
 
 /**
  * Increment usage count
  * POST /api/v1/templates/:id/use
  */
-export const incrementUsage = asyncRoute(async (req, res) => {
+export const incrementUsage = async (req, res) => {
   const { id } = req.params;
 
   await templateService.incrementUsage(id);
   res.json({ message: 'Usage count incremented' });
-});
+};
 
 /**
  * Get template categories
  * GET /api/v1/templates/categories
  */
-export const getCategories = asyncRoute(async (req, res) => {
+export const getCategories = async (req, res) => {
   const { organizationId } = req.user;
   const language = req.query.language || 'NO';
 
   const categories = await templateService.getCategories(organizationId, language);
   res.json(categories);
-});
+};
 
 /**
  * Search templates
  * GET /api/v1/templates/search
  */
-export const searchTemplates = asyncRoute(async (req, res) => {
+export const searchTemplates = async (req, res) => {
   const { organizationId } = req.user;
   const { q } = req.query;
   const language = req.query.language || 'NO';
@@ -158,13 +157,13 @@ export const searchTemplates = asyncRoute(async (req, res) => {
 
   const templates = await templateService.searchTemplates(organizationId, q, language);
   res.json(templates);
-});
+};
 
 /**
  * Get orthopedic tests library
  * GET /api/v1/templates/tests/library
  */
-export const getTestsLibrary = asyncRoute(async (req, res) => {
+export const getTestsLibrary = async (req, res) => {
   const filters = {
     testCategory: req.query.testCategory,
     bodyRegion: req.query.bodyRegion,
@@ -175,13 +174,13 @@ export const getTestsLibrary = asyncRoute(async (req, res) => {
 
   const tests = await templateService.getTestsLibrary(filters);
   res.json(tests);
-});
+};
 
 /**
  * Get specific orthopedic test by code
  * GET /api/v1/templates/tests/:code
  */
-export const getTestByCode = asyncRoute(async (req, res) => {
+export const getTestByCode = async (req, res) => {
   try {
     const { code } = req.params;
     const language = req.query.language || 'NO';
@@ -194,48 +193,48 @@ export const getTestByCode = asyncRoute(async (req, res) => {
     }
     throw error;
   }
-});
+};
 
 /**
  * Get user template preferences
  * GET /api/v1/templates/preferences/user
  */
-export const getUserPreferences = asyncRoute(async (req, res) => {
+export const getUserPreferences = async (req, res) => {
   const { userId, organizationId } = req.user;
 
   const preferences = await templateService.getUserPreferences(userId, organizationId);
   res.json(preferences);
-});
+};
 
 /**
  * Add template to favorites
  * POST /api/v1/templates/preferences/favorites/:templateId
  */
-export const addFavorite = asyncRoute(async (req, res) => {
+export const addFavorite = async (req, res) => {
   const { userId, organizationId } = req.user;
   const { templateId } = req.params;
 
   await templateService.addFavoriteTemplate(userId, organizationId, templateId);
   res.json({ message: 'Template added to favorites' });
-});
+};
 
 /**
  * Remove template from favorites
  * DELETE /api/v1/templates/preferences/favorites/:templateId
  */
-export const removeFavorite = asyncRoute(async (req, res) => {
+export const removeFavorite = async (req, res) => {
   const { userId, organizationId } = req.user;
   const { templateId } = req.params;
 
   await templateService.removeFavoriteTemplate(userId, organizationId, templateId);
   res.json({ message: 'Template removed from favorites' });
-});
+};
 
 /**
  * Get clinical phrases
  * GET /api/v1/templates/phrases
  */
-export const getPhrases = asyncRoute(async (req, res) => {
+export const getPhrases = async (req, res) => {
   const { organizationId } = req.user;
   const options = {
     category: req.query.category,
@@ -245,26 +244,26 @@ export const getPhrases = asyncRoute(async (req, res) => {
 
   const phrases = await templateService.getPhrases(organizationId, options);
   res.json(phrases);
-});
+};
 
 /**
  * Get phrases by body region
  * GET /api/v1/templates/phrases/byregion/:region
  */
-export const getPhrasesByRegion = asyncRoute(async (req, res) => {
+export const getPhrasesByRegion = async (req, res) => {
   const { organizationId } = req.user;
   const { region } = req.params;
   const language = req.query.language || 'NO';
 
   const phrases = await templateService.getPhrasesByRegion(organizationId, region, language);
   res.json(phrases);
-});
+};
 
 /**
  * Get red flags library
  * GET /api/v1/templates/red-flags
  */
-export const getRedFlags = asyncRoute(async (req, res) => {
+export const getRedFlags = async (req, res) => {
   const filters = {
     pathologyCategory: req.query.pathologyCategory,
     bodyRegion: req.query.bodyRegion,
@@ -274,24 +273,24 @@ export const getRedFlags = asyncRoute(async (req, res) => {
 
   const redFlags = await templateService.getRedFlags(filters);
   res.json(redFlags);
-});
+};
 
 /**
  * Screen patient for red flags
  * POST /api/v1/templates/red-flags/screen
  */
-export const screenRedFlags = asyncRoute(async (req, res) => {
+export const screenRedFlags = async (req, res) => {
   const { patientData, symptoms, findings } = req.body;
 
   const screening = await templateService.screenRedFlags(patientData, symptoms, findings);
   res.json(screening);
-});
+};
 
 /**
  * Get test clusters
  * GET /api/v1/templates/test-clusters
  */
-export const getTestClusters = asyncRoute(async (req, res) => {
+export const getTestClusters = async (req, res) => {
   const filters = {
     bodyRegion: req.query.bodyRegion,
     language: req.query.language || 'NO',
@@ -299,13 +298,13 @@ export const getTestClusters = asyncRoute(async (req, res) => {
 
   const clusters = await templateService.getTestClusters(filters);
   res.json(clusters);
-});
+};
 
 /**
  * Get test cluster by condition
  * GET /api/v1/templates/test-clusters/:condition
  */
-export const getTestClusterByCondition = asyncRoute(async (req, res) => {
+export const getTestClusterByCondition = async (req, res) => {
   try {
     const { condition } = req.params;
     const language = req.query.language || 'NO';
@@ -318,18 +317,18 @@ export const getTestClusterByCondition = asyncRoute(async (req, res) => {
     }
     throw error;
   }
-});
+};
 
 /**
  * Get FMS templates
  * GET /api/v1/templates/fms
  */
-export const getFMSTemplates = asyncRoute(async (req, res) => {
+export const getFMSTemplates = async (req, res) => {
   const language = req.query.language || 'NO';
 
   const fmsTemplates = await templateService.getFMSTemplates(language);
   res.json(fmsTemplates);
-});
+};
 
 // ============================================
 // Document Type Template Endpoints
@@ -346,19 +345,19 @@ import {
  * Get all document types
  * GET /api/v1/templates/document-types
  */
-export const getDocumentTypes = asyncRoute(async (req, res) => {
+export const getDocumentTypes = async (req, res) => {
   const documentTypes = getAllDocumentTypes();
   res.json({
     success: true,
     documentTypes,
   });
-});
+};
 
 /**
  * Get templates for a specific document type
  * GET /api/v1/templates/for-document/:type
  */
-export const getTemplatesForDocument = asyncRoute(async (req, res) => {
+export const getTemplatesForDocument = async (req, res) => {
   const { type } = req.params;
   const { practitioner, specialty, bodyRegion } = req.query;
 
@@ -378,13 +377,13 @@ export const getTemplatesForDocument = asyncRoute(async (req, res) => {
     documentType: config,
     templates,
   });
-});
+};
 
 /**
  * Create a custom template set
  * POST /api/v1/templates/custom-set
  */
-export const createCustomTemplateSet = asyncRoute(async (req, res) => {
+export const createCustomTemplateSet = async (req, res) => {
   const { templateIds, languageLevel } = req.body;
 
   if (!templateIds || !Array.isArray(templateIds)) {
@@ -399,13 +398,13 @@ export const createCustomTemplateSet = asyncRoute(async (req, res) => {
     success: true,
     customSet,
   });
-});
+};
 
 /**
  * Get terminology for a specific term
  * GET /api/v1/templates/terminology/:term
  */
-export const getTerminology = asyncRoute(async (req, res) => {
+export const getTerminology = async (req, res) => {
   const { term } = req.params;
   const { level, documentType } = req.query;
 
@@ -425,13 +424,13 @@ export const getTerminology = asyncRoute(async (req, res) => {
     level: level || 'basic',
     terminology,
   });
-});
+};
 
 /**
  * Expand abbreviations in text
  * POST /api/v1/templates/expand
  */
-export const expandAbbreviations = asyncRoute(async (req, res) => {
+export const expandAbbreviations = async (req, res) => {
   const { text, documentType } = req.body;
 
   if (!text) {
@@ -448,13 +447,13 @@ export const expandAbbreviations = asyncRoute(async (req, res) => {
     original: text,
     expanded,
   });
-});
+};
 
 /**
  * Abbreviate text
  * POST /api/v1/templates/abbreviate
  */
-export const abbreviateText = asyncRoute(async (req, res) => {
+export const abbreviateText = async (req, res) => {
   const { text, documentType } = req.body;
 
   if (!text) {
@@ -468,13 +467,13 @@ export const abbreviateText = asyncRoute(async (req, res) => {
     original: text,
     abbreviated,
   });
-});
+};
 
 /**
  * Get terms by category
  * GET /api/v1/templates/terms/:category
  */
-export const getTermsByCategory = asyncRoute(async (req, res) => {
+export const getTermsByCategory = async (req, res) => {
   const { category } = req.params;
   const { level } = req.query;
 
@@ -493,7 +492,7 @@ export const getTermsByCategory = asyncRoute(async (req, res) => {
     level: level || 'basic',
     terms,
   });
-});
+};
 
 export default {
   getAllTemplates,

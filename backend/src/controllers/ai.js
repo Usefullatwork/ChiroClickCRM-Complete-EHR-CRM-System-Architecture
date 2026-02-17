@@ -23,7 +23,6 @@ import {
 } from '../infrastructure/resilience/CircuitBreaker.js';
 import { aiRetrainingService } from '../application/services/AIRetrainingService.js';
 import { aiFeedbackService } from '../application/services/AIFeedbackService.js';
-import { asyncRoute } from '../utils/asyncRoute.js';
 
 export const spellCheck = async (req, res) => {
   try {
@@ -250,7 +249,7 @@ export const generateFieldStream = async (req, res) => {
 /**
  * Generate field text without streaming (for non-SSE clients)
  */
-export const generateField = asyncRoute(async (req, res) => {
+export const generateField = async (req, res) => {
   const { fieldType, context = {}, language = 'no' } = req.body;
 
   if (!fieldType) {
@@ -259,7 +258,7 @@ export const generateField = asyncRoute(async (req, res) => {
 
   const result = await aiService.generateFieldText(fieldType, context, language);
   res.json(result);
-});
+};
 
 // =================================================================
 // AI Feedback & Metrics Handlers
@@ -268,7 +267,7 @@ export const generateField = asyncRoute(async (req, res) => {
 /**
  * Record feedback on AI suggestion
  */
-export const recordFeedback = asyncRoute(async (req, res) => {
+export const recordFeedback = async (req, res) => {
   const { suggestionId, feedbackType, rating, correctedText, comment, context } = req.body;
 
   if (!suggestionId || !feedbackType) {
@@ -287,12 +286,12 @@ export const recordFeedback = asyncRoute(async (req, res) => {
   });
 
   res.json(result);
-});
+};
 
 /**
  * Get AI feedback metrics
  */
-export const getAIFeedbackMetrics = asyncRoute(async (req, res) => {
+export const getAIFeedbackMetrics = async (req, res) => {
   const { period = 'week', fieldType } = req.query;
 
   const metrics = await aiFeedbackService.getMetrics({
@@ -302,12 +301,12 @@ export const getAIFeedbackMetrics = asyncRoute(async (req, res) => {
   });
 
   res.json(metrics);
-});
+};
 
 /**
  * Get circuit breaker health status
  */
-export const getCircuitStatus = asyncRoute(async (req, res) => {
+export const getCircuitStatus = async (req, res) => {
   const status = circuitBreakerRegistry.getHealthSummary();
   const allStatus = circuitBreakerRegistry.getAllStatus();
 
@@ -315,12 +314,12 @@ export const getCircuitStatus = asyncRoute(async (req, res) => {
     summary: status,
     services: allStatus,
   });
-});
+};
 
 /**
  * Get retraining status
  */
-export const getRetrainingStatus = asyncRoute(async (req, res) => {
+export const getRetrainingStatus = async (req, res) => {
   const checkStatus = await aiFeedbackService.checkRetrainingStatus(req.organizationId);
   const retrainingStatus = aiRetrainingService.getStatus();
 
@@ -329,13 +328,13 @@ export const getRetrainingStatus = asyncRoute(async (req, res) => {
     retraining: retrainingStatus,
     history: aiRetrainingService.getHistory(5),
   });
-});
+};
 
 /**
  * Record suggestion feedback (accept/reject/modify)
  * Uses CQRS Command pattern
  */
-export const recordSuggestionFeedback = asyncRoute(async (req, res) => {
+export const recordSuggestionFeedback = async (req, res) => {
   const { suggestionId, action, originalContent, modifiedContent, reason, responseTime } = req.body;
 
   if (!suggestionId || !action) {
@@ -362,13 +361,13 @@ export const recordSuggestionFeedback = asyncRoute(async (req, res) => {
     success: true,
     data: result,
   });
-});
+};
 
 /**
  * Get comprehensive AI metrics
  * Uses CQRS Query pattern
  */
-export const getAIMetrics = asyncRoute(async (req, res) => {
+export const getAIMetrics = async (req, res) => {
   const { days = 7, includeHistory = true, includeCircuitStatus = true } = req.query;
 
   const query = new GetAIMetricsQuery({
@@ -383,12 +382,12 @@ export const getAIMetrics = asyncRoute(async (req, res) => {
     success: true,
     data: metrics,
   });
-});
+};
 
 /**
  * Get simplified AI dashboard metrics
  */
-export const getAIDashboardMetrics = asyncRoute(async (req, res) => {
+export const getAIDashboardMetrics = async (req, res) => {
   const metrics = await getAIDashboardHandler.handle({
     organizationId: req.organizationId,
   });
@@ -397,12 +396,12 @@ export const getAIDashboardMetrics = asyncRoute(async (req, res) => {
     success: true,
     data: metrics,
   });
-});
+};
 
 /**
  * Reset circuit breaker for a specific service
  */
-export const resetCircuitBreaker = asyncRoute(async (req, res) => {
+export const resetCircuitBreaker = async (req, res) => {
   const { service } = req.params;
 
   const breaker = circuitBreakerRegistry.get(service);
@@ -422,12 +421,12 @@ export const resetCircuitBreaker = asyncRoute(async (req, res) => {
     message: `Circuit breaker "${service}" has been reset`,
     data: breaker.getStatus(),
   });
-});
+};
 
 /**
  * Get AI model training history
  */
-export const getTrainingHistory = asyncRoute(async (req, res) => {
+export const getTrainingHistory = async (req, res) => {
   const { limit = 10 } = req.query;
 
   const history = await aiRetrainingService.getTrainingHistory(parseInt(limit, 10));
@@ -440,12 +439,12 @@ export const getTrainingHistory = asyncRoute(async (req, res) => {
       history,
     },
   });
-});
+};
 
 /**
  * Manually trigger model retraining
  */
-export const triggerRetraining = asyncRoute(async (req, res) => {
+export const triggerRetraining = async (req, res) => {
   logger.info(`Manual retraining triggered by user ${req.user?.id}`);
 
   const result = await aiRetrainingService.triggerRetraining();
@@ -454,7 +453,7 @@ export const triggerRetraining = asyncRoute(async (req, res) => {
     success: true,
     data: result,
   });
-});
+};
 
 export default {
   spellCheck,

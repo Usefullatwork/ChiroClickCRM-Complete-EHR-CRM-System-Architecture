@@ -28,28 +28,23 @@ router.use(requireOrganization);
  * @access  Private
  */
 router.get('/patients', validate(searchPatientsSchema), async (req, res) => {
-  try {
-    const { q, limit = 20, offset = 0, status, includeInactive } = req.query;
+  const { q, limit = 20, offset = 0, status, includeInactive } = req.query;
 
-    if (!q || q.trim().length < 2) {
-      return res.status(400).json({
-        error: 'Bad Request',
-        message: 'Search query must be at least 2 characters',
-      });
-    }
-
-    const results = await searchService.searchPatients(req.organizationId, q, {
-      limit: parseInt(limit),
-      offset: parseInt(offset),
-      status,
-      includeInactive: includeInactive === 'true',
+  if (!q || q.trim().length < 2) {
+    return res.status(400).json({
+      error: 'Bad Request',
+      message: 'Search query must be at least 2 characters',
     });
-
-    res.json(results);
-  } catch (error) {
-    logger.error('Patient search route error:', error);
-    res.status(500).json({ error: 'Search failed', message: error.message });
   }
+
+  const results = await searchService.searchPatients(req.organizationId, q, {
+    limit: parseInt(limit),
+    offset: parseInt(offset),
+    status,
+    includeInactive: includeInactive === 'true',
+  });
+
+  res.json(results);
 });
 
 /**
@@ -58,26 +53,21 @@ router.get('/patients', validate(searchPatientsSchema), async (req, res) => {
  * @access  Private
  */
 router.get('/diagnosis', validate(searchDiagnosisSchema), async (req, res) => {
-  try {
-    const { q, limit = 30, system } = req.query;
+  const { q, limit = 30, system } = req.query;
 
-    if (!q || q.trim().length < 1) {
-      return res.status(400).json({
-        error: 'Bad Request',
-        message: 'Search query is required',
-      });
-    }
-
-    const results = await searchService.searchDiagnosis(q, {
-      limit: parseInt(limit),
-      system,
+  if (!q || q.trim().length < 1) {
+    return res.status(400).json({
+      error: 'Bad Request',
+      message: 'Search query is required',
     });
-
-    res.json(results);
-  } catch (error) {
-    logger.error('Diagnosis search route error:', error);
-    res.status(500).json({ error: 'Search failed', message: error.message });
   }
+
+  const results = await searchService.searchDiagnosis(q, {
+    limit: parseInt(limit),
+    system,
+  });
+
+  res.json(results);
 });
 
 /**
@@ -86,28 +76,23 @@ router.get('/diagnosis', validate(searchDiagnosisSchema), async (req, res) => {
  * @access  Private
  */
 router.get('/encounters', validate(searchEncountersSchema), async (req, res) => {
-  try {
-    const { q, limit = 20, offset = 0, patientId, practitionerId } = req.query;
+  const { q, limit = 20, offset = 0, patientId, practitionerId } = req.query;
 
-    if (!q || q.trim().length < 2) {
-      return res.status(400).json({
-        error: 'Bad Request',
-        message: 'Search query must be at least 2 characters',
-      });
-    }
-
-    const results = await searchService.searchEncounters(req.organizationId, q, {
-      limit: parseInt(limit),
-      offset: parseInt(offset),
-      patientId,
-      practitionerId,
+  if (!q || q.trim().length < 2) {
+    return res.status(400).json({
+      error: 'Bad Request',
+      message: 'Search query must be at least 2 characters',
     });
-
-    res.json(results);
-  } catch (error) {
-    logger.error('Encounter search route error:', error);
-    res.status(500).json({ error: 'Search failed', message: error.message });
   }
+
+  const results = await searchService.searchEncounters(req.organizationId, q, {
+    limit: parseInt(limit),
+    offset: parseInt(offset),
+    patientId,
+    practitionerId,
+  });
+
+  res.json(results);
 });
 
 /**
@@ -116,25 +101,20 @@ router.get('/encounters', validate(searchEncountersSchema), async (req, res) => 
  * @access  Private
  */
 router.get('/global', validate(globalSearchSchema), async (req, res) => {
-  try {
-    const { q, limit = 10 } = req.query;
+  const { q, limit = 10 } = req.query;
 
-    if (!q || q.trim().length < 2) {
-      return res.status(400).json({
-        error: 'Bad Request',
-        message: 'Search query must be at least 2 characters',
-      });
-    }
-
-    const results = await searchService.globalSearch(req.organizationId, q, {
-      limit: parseInt(limit),
+  if (!q || q.trim().length < 2) {
+    return res.status(400).json({
+      error: 'Bad Request',
+      message: 'Search query must be at least 2 characters',
     });
-
-    res.json(results);
-  } catch (error) {
-    logger.error('Global search route error:', error);
-    res.status(500).json({ error: 'Search failed', message: error.message });
   }
+
+  const results = await searchService.globalSearch(req.organizationId, q, {
+    limit: parseInt(limit),
+  });
+
+  res.json(results);
 });
 
 /**
@@ -157,6 +137,7 @@ router.get('/suggest', validate(suggestSchema), async (req, res) => {
 
     res.json(suggestions);
   } catch (error) {
+    // Graceful fallback: return empty suggestions rather than error
     logger.error('Suggest route error:', error);
     res.json([]);
   }

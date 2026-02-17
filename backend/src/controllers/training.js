@@ -8,7 +8,6 @@ import * as sindreJournalParser from '../services/sindreJournalParser.js';
 import * as sigrunJournalParser from '../services/sigrunJournalParser.js';
 import * as trainingService from '../services/training.js';
 import logger from '../utils/logger.js';
-import { asyncRoute } from '../utils/asyncRoute.js';
 
 // ============================================================================
 // MODEL MANAGEMENT (new endpoints)
@@ -17,65 +16,65 @@ import { asyncRoute } from '../utils/asyncRoute.js';
 /**
  * Get current model status
  */
-export const getModelStatus = asyncRoute(async (req, res) => {
+export const getModelStatus = async (req, res) => {
   const status = await trainingService.getStatus();
   res.json({ success: true, data: status });
-});
+};
 
 /**
  * Get training data file listing
  */
-export const getTrainingData = asyncRoute(async (req, res) => {
+export const getTrainingData = async (req, res) => {
   const data = trainingService.getTrainingData();
   res.json({ success: true, data });
-});
+};
 
 /**
  * Add new JSONL examples
  */
-export const addExamples = asyncRoute(async (req, res) => {
+export const addExamples = async (req, res) => {
   const { jsonlContent, targetFile } = req.body;
   if (!jsonlContent) {
     return res.status(400).json({ success: false, error: 'Missing jsonlContent' });
   }
   const result = trainingService.addExamples(jsonlContent, targetFile);
   res.json({ success: true, data: result });
-});
+};
 
 /**
  * Rebuild Modelfiles and re-create Ollama models
  */
-export const rebuildModels = asyncRoute(async (req, res) => {
+export const rebuildModels = async (req, res) => {
   logger.info('Starting model rebuild...');
   const result = await trainingService.rebuild();
   res.json({ success: true, data: result });
-});
+};
 
 /**
  * Backup models to project folder
  */
-export const backupModels = asyncRoute(async (req, res) => {
+export const backupModels = async (req, res) => {
   const result = await trainingService.backup();
   res.json({ success: true, data: result });
-});
+};
 
 /**
  * Restore models from backup
  */
-export const restoreModels = asyncRoute(async (req, res) => {
+export const restoreModels = async (req, res) => {
   const result = await trainingService.restore();
   res.json({ success: true, data: result });
-});
+};
 
 /**
  * Test a model with a prompt
  */
-export const testModel = asyncRoute(async (req, res) => {
+export const testModel = async (req, res) => {
   const { model } = req.params;
   const { prompt } = req.query;
   const result = await trainingService.testModel(model, prompt);
   res.json({ success: true, data: result });
-});
+};
 
 // ============================================================================
 // LEGACY PIPELINE
@@ -84,7 +83,7 @@ export const testModel = asyncRoute(async (req, res) => {
 /**
  * Run full training pipeline
  */
-export const runTrainingPipeline = asyncRoute(async (req, res) => {
+export const runTrainingPipeline = async (req, res) => {
   const { googleDriveFolderId, modelName, options } = req.body;
 
   if (!googleDriveFolderId || !modelName) {
@@ -107,12 +106,12 @@ export const runTrainingPipeline = asyncRoute(async (req, res) => {
     success: true,
     data: result,
   });
-});
+};
 
 /**
  * Fetch training documents from Google Drive
  */
-export const fetchDocuments = asyncRoute(async (req, res) => {
+export const fetchDocuments = async (req, res) => {
   const { folderId } = req.body;
 
   if (!folderId) {
@@ -128,24 +127,24 @@ export const fetchDocuments = asyncRoute(async (req, res) => {
     success: true,
     data: result,
   });
-});
+};
 
 /**
  * Parse training documents
  */
-export const parseDocuments = asyncRoute(async (req, res) => {
+export const parseDocuments = async (req, res) => {
   const result = await ollamaTraining.parseTrainingDocuments();
 
   res.json({
     success: true,
     data: result,
   });
-});
+};
 
 /**
  * Anonymize training data
  */
-export const anonymizeData = asyncRoute(async (req, res) => {
+export const anonymizeData = async (req, res) => {
   const { options } = req.body;
   const result = await ollamaTraining.anonymizeTrainingData(options || {});
 
@@ -153,12 +152,12 @@ export const anonymizeData = asyncRoute(async (req, res) => {
     success: true,
     data: result,
   });
-});
+};
 
 /**
  * Create training dataset
  */
-export const createDataset = asyncRoute(async (req, res) => {
+export const createDataset = async (req, res) => {
   const { clinicalEncounters } = req.body;
   const result = await ollamaTraining.createTrainingDataset(clinicalEncounters || []);
 
@@ -166,12 +165,12 @@ export const createDataset = asyncRoute(async (req, res) => {
     success: true,
     data: result,
   });
-});
+};
 
 /**
  * Train model
  */
-export const trainModel = asyncRoute(async (req, res) => {
+export const trainModel = async (req, res) => {
   const { modelName } = req.body;
 
   if (!modelName) {
@@ -187,12 +186,12 @@ export const trainModel = asyncRoute(async (req, res) => {
     success: true,
     data: result,
   });
-});
+};
 
 /**
  * Process Sindre's journal text and create training dataset
  */
-export const processSindreJournals = asyncRoute(async (req, res) => {
+export const processSindreJournals = async (req, res) => {
   const { journalsText } = req.body;
 
   if (!journalsText) {
@@ -210,12 +209,12 @@ export const processSindreJournals = asyncRoute(async (req, res) => {
     success: true,
     data: result,
   });
-});
+};
 
 /**
  * Get medical terminology dictionary from Sindre's journals
  */
-export const getMedicalTerminology = asyncRoute(async (req, res) => {
+export const getMedicalTerminology = async (req, res) => {
   const terminology = {
     anatomical: sindreJournalParser.ANATOMICAL_ABBREVIATIONS,
     treatments: sindreJournalParser.TREATMENT_ABBREVIATIONS,
@@ -227,12 +226,12 @@ export const getMedicalTerminology = asyncRoute(async (req, res) => {
     success: true,
     data: terminology,
   });
-});
+};
 
 /**
  * Extract follow-up patterns from journals
  */
-export const extractFollowUps = asyncRoute(async (req, res) => {
+export const extractFollowUps = async (req, res) => {
   const { journalsText } = req.body;
 
   if (!journalsText) {
@@ -250,12 +249,12 @@ export const extractFollowUps = asyncRoute(async (req, res) => {
     success: true,
     data: result,
   });
-});
+};
 
 /**
  * Parse individual journal entry
  */
-export const parseJournalEntry = asyncRoute(async (req, res) => {
+export const parseJournalEntry = async (req, res) => {
   const { journalText } = req.body;
 
   if (!journalText) {
@@ -281,12 +280,12 @@ export const parseJournalEntry = asyncRoute(async (req, res) => {
       },
     },
   });
-});
+};
 
 /**
  * Process Sigrun's journal text and create training dataset
  */
-export const processSigrunJournals = asyncRoute(async (req, res) => {
+export const processSigrunJournals = async (req, res) => {
   const { journalsText } = req.body;
 
   if (!journalsText) {
@@ -304,12 +303,12 @@ export const processSigrunJournals = asyncRoute(async (req, res) => {
     success: true,
     data: result,
   });
-});
+};
 
 /**
  * Process combined journals from both practitioners
  */
-export const processCombinedJournals = asyncRoute(async (req, res) => {
+export const processCombinedJournals = async (req, res) => {
   const { journalsText, practitioner } = req.body;
 
   if (!journalsText) {
@@ -377,12 +376,12 @@ export const processCombinedJournals = asyncRoute(async (req, res) => {
     success: true,
     data: result,
   });
-});
+};
 
 /**
  * Detect practitioner style from journal text
  */
-export const detectPractitionerStyle = asyncRoute(async (req, res) => {
+export const detectPractitionerStyle = async (req, res) => {
   const { journalsText } = req.body;
 
   if (!journalsText) {
@@ -398,7 +397,7 @@ export const detectPractitionerStyle = asyncRoute(async (req, res) => {
     success: true,
     data: detection,
   });
-});
+};
 
 export default {
   getModelStatus,

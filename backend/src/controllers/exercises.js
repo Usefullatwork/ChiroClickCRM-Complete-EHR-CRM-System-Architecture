@@ -9,7 +9,6 @@ import exerciseLibraryService from '../services/exerciseLibrary.js';
 import exerciseDeliveryService from '../services/exerciseDelivery.js';
 import logger from '../utils/logger.js';
 import { logAudit } from '../utils/audit.js';
-import { asyncRoute } from '../utils/asyncRoute.js';
 
 // ============================================================================
 // EXERCISE LIBRARY CRUD
@@ -19,7 +18,7 @@ import { asyncRoute } from '../utils/asyncRoute.js';
  * Get all exercises
  * @route GET /api/v1/exercises
  */
-export const getExercises = asyncRoute(async (req, res) => {
+export const getExercises = async (req, res) => {
   const { organizationId } = req;
   const { category, subcategory, bodyRegion, difficultyLevel, search, isActive, limit, offset } =
     req.query;
@@ -40,13 +39,13 @@ export const getExercises = asyncRoute(async (req, res) => {
     data: exercises,
     count: exercises.length,
   });
-});
+};
 
 /**
  * Get exercise by ID
  * @route GET /api/v1/exercises/:id
  */
-export const getExerciseById = asyncRoute(async (req, res) => {
+export const getExerciseById = async (req, res) => {
   const { organizationId } = req;
   const { id } = req.params;
 
@@ -60,13 +59,13 @@ export const getExerciseById = asyncRoute(async (req, res) => {
     success: true,
     data: exercise,
   });
-});
+};
 
 /**
  * Create a new exercise
  * @route POST /api/v1/exercises
  */
-export const createExercise = asyncRoute(async (req, res) => {
+export const createExercise = async (req, res) => {
   const { organizationId, user } = req;
 
   const exercise = await exerciseLibraryService.createExercise(organizationId, user.id, req.body);
@@ -86,13 +85,13 @@ export const createExercise = asyncRoute(async (req, res) => {
     success: true,
     data: exercise,
   });
-});
+};
 
 /**
  * Update an exercise
  * @route PUT /api/v1/exercises/:id
  */
-export const updateExercise = asyncRoute(async (req, res) => {
+export const updateExercise = async (req, res) => {
   const { organizationId, user } = req;
   const { id } = req.params;
 
@@ -117,13 +116,13 @@ export const updateExercise = asyncRoute(async (req, res) => {
     success: true,
     data: exercise,
   });
-});
+};
 
 /**
  * Delete an exercise (soft delete)
  * @route DELETE /api/v1/exercises/:id
  */
-export const deleteExercise = asyncRoute(async (req, res) => {
+export const deleteExercise = async (req, res) => {
   const { organizationId, user } = req;
   const { id } = req.params;
 
@@ -147,13 +146,13 @@ export const deleteExercise = asyncRoute(async (req, res) => {
     success: true,
     message: 'Exercise deleted successfully',
   });
-});
+};
 
 /**
  * Get exercise categories
  * @route GET /api/v1/exercises/categories
  */
-export const getCategories = asyncRoute(async (req, res) => {
+export const getCategories = async (req, res) => {
   const { organizationId } = req;
 
   const categories = await exerciseLibraryService.getCategories(organizationId);
@@ -162,13 +161,13 @@ export const getCategories = asyncRoute(async (req, res) => {
     success: true,
     data: categories,
   });
-});
+};
 
 /**
  * Seed default exercises for organization
  * @route POST /api/v1/exercises/seed
  */
-export const seedDefaultExercises = asyncRoute(async (req, res) => {
+export const seedDefaultExercises = async (req, res) => {
   const { organizationId, user } = req;
 
   await exerciseLibraryService.seedDefaultExercises(organizationId);
@@ -187,7 +186,7 @@ export const seedDefaultExercises = asyncRoute(async (req, res) => {
     success: true,
     message: 'Default exercises seeded successfully',
   });
-});
+};
 
 // ============================================================================
 // TEMPLATES
@@ -197,7 +196,7 @@ export const seedDefaultExercises = asyncRoute(async (req, res) => {
  * Get all exercise program templates
  * @route GET /api/v1/exercises/templates
  */
-export const getTemplates = asyncRoute(async (req, res) => {
+export const getTemplates = async (req, res) => {
   const { organizationId } = req;
   const { category, search } = req.query;
 
@@ -210,13 +209,13 @@ export const getTemplates = asyncRoute(async (req, res) => {
     success: true,
     data: templates,
   });
-});
+};
 
 /**
  * Create a new exercise program template
  * @route POST /api/v1/exercises/templates
  */
-export const createTemplate = asyncRoute(async (req, res) => {
+export const createTemplate = async (req, res) => {
   const { organizationId, user } = req;
 
   const template = await exerciseLibraryService.createTemplate(organizationId, {
@@ -239,13 +238,13 @@ export const createTemplate = asyncRoute(async (req, res) => {
     success: true,
     data: template,
   });
-});
+};
 
 /**
  * Update an exercise program template
  * @route PUT /api/v1/exercises/templates/:id
  */
-export const updateTemplate = asyncRoute(async (req, res) => {
+export const updateTemplate = async (req, res) => {
   const { organizationId, user } = req;
   const { id } = req.params;
 
@@ -270,13 +269,13 @@ export const updateTemplate = asyncRoute(async (req, res) => {
     success: true,
     data: template,
   });
-});
+};
 
 /**
  * Delete an exercise program template
  * @route DELETE /api/v1/exercises/templates/:id
  */
-export const deleteTemplate = asyncRoute(async (req, res) => {
+export const deleteTemplate = async (req, res) => {
   const { organizationId, user } = req;
   const { id } = req.params;
 
@@ -300,7 +299,7 @@ export const deleteTemplate = asyncRoute(async (req, res) => {
     success: true,
     message: 'Template deleted successfully',
   });
-});
+};
 
 // ============================================================================
 // PRESCRIPTIONS
@@ -310,7 +309,7 @@ export const deleteTemplate = asyncRoute(async (req, res) => {
  * Create a new prescription
  * @route POST /api/v1/exercises/prescriptions
  */
-export const createPrescription = asyncRoute(async (req, res) => {
+export const createPrescription = async (req, res) => {
   const { organizationId, user } = req;
 
   const prescription = await exerciseLibraryService.createPrescription(organizationId, {
@@ -336,13 +335,13 @@ export const createPrescription = asyncRoute(async (req, res) => {
     success: true,
     data: prescription,
   });
-});
+};
 
 /**
  * Get prescriptions for a patient
  * @route GET /api/v1/exercises/prescriptions/patient/:patientId
  */
-export const getPatientPrescriptions = asyncRoute(async (req, res) => {
+export const getPatientPrescriptions = async (req, res) => {
   const { organizationId } = req;
   const { patientId } = req.params;
   const { status } = req.query;
@@ -357,13 +356,13 @@ export const getPatientPrescriptions = asyncRoute(async (req, res) => {
     success: true,
     data: prescriptions,
   });
-});
+};
 
 /**
  * Get prescription by ID
  * @route GET /api/v1/exercises/prescriptions/:id
  */
-export const getPrescriptionById = asyncRoute(async (req, res) => {
+export const getPrescriptionById = async (req, res) => {
   const { organizationId } = req;
   const { id } = req.params;
 
@@ -377,13 +376,13 @@ export const getPrescriptionById = asyncRoute(async (req, res) => {
     success: true,
     data: prescription,
   });
-});
+};
 
 /**
  * Update an existing prescription
  * @route PUT /api/v1/exercises/prescriptions/:id
  */
-export const updatePrescription = asyncRoute(async (req, res) => {
+export const updatePrescription = async (req, res) => {
   const { organizationId, user } = req;
   const { id } = req.params;
 
@@ -414,13 +413,13 @@ export const updatePrescription = asyncRoute(async (req, res) => {
     success: true,
     data: prescription,
   });
-});
+};
 
 /**
  * Duplicate a prescription for the same or another patient
  * @route POST /api/v1/exercises/prescriptions/:id/duplicate
  */
-export const duplicatePrescription = asyncRoute(async (req, res) => {
+export const duplicatePrescription = async (req, res) => {
   const { organizationId, user } = req;
   const { id } = req.params;
   const { targetPatientId } = req.body;
@@ -450,13 +449,13 @@ export const duplicatePrescription = asyncRoute(async (req, res) => {
     success: true,
     data: prescription,
   });
-});
+};
 
 /**
  * Update prescription status
  * @route PATCH /api/v1/exercises/prescriptions/:id/status
  */
-export const updatePrescriptionStatus = asyncRoute(async (req, res) => {
+export const updatePrescriptionStatus = async (req, res) => {
   const { organizationId, user } = req;
   const { id } = req.params;
   const { status } = req.body;
@@ -486,13 +485,13 @@ export const updatePrescriptionStatus = asyncRoute(async (req, res) => {
     success: true,
     data: prescription,
   });
-});
+};
 
 /**
  * Get progress history for a prescription
  * @route GET /api/v1/exercises/prescriptions/:id/progress
  */
-export const getProgressHistory = asyncRoute(async (req, res) => {
+export const getProgressHistory = async (req, res) => {
   const { organizationId } = req;
   const { id } = req.params;
 
@@ -502,7 +501,7 @@ export const getProgressHistory = asyncRoute(async (req, res) => {
     success: true,
     data: progress,
   });
-});
+};
 
 // ============================================================================
 // DELIVERY
@@ -512,7 +511,7 @@ export const getProgressHistory = asyncRoute(async (req, res) => {
  * Generate prescription PDF
  * @route GET /api/v1/exercises/prescriptions/:id/pdf
  */
-export const generatePDF = asyncRoute(async (req, res) => {
+export const generatePDF = async (req, res) => {
   const { organizationId } = req;
   const { id } = req.params;
 
@@ -521,13 +520,13 @@ export const generatePDF = asyncRoute(async (req, res) => {
   res.setHeader('Content-Type', 'application/pdf');
   res.setHeader('Content-Disposition', `attachment; filename="exercise-program-${id}.pdf"`);
   res.send(pdfBuffer);
-});
+};
 
 /**
  * Send prescription via email
  * @route POST /api/v1/exercises/prescriptions/:id/send-email
  */
-export const sendEmail = asyncRoute(async (req, res) => {
+export const sendEmail = async (req, res) => {
   const { organizationId, user } = req;
   const { id } = req.params;
 
@@ -548,13 +547,13 @@ export const sendEmail = asyncRoute(async (req, res) => {
     message: 'Email sent successfully',
     data: result,
   });
-});
+};
 
 /**
  * Send exercise reminder
  * @route POST /api/v1/exercises/prescriptions/:id/send-reminder
  */
-export const sendReminder = asyncRoute(async (req, res) => {
+export const sendReminder = async (req, res) => {
   const { organizationId, user } = req;
   const { id } = req.params;
 
@@ -575,13 +574,13 @@ export const sendReminder = asyncRoute(async (req, res) => {
     message: 'Reminder sent successfully',
     data: result,
   });
-});
+};
 
 /**
  * Send portal link via SMS
  * @route POST /api/v1/exercises/prescriptions/:id/send-sms
  */
-export const sendSMS = asyncRoute(async (req, res) => {
+export const sendSMS = async (req, res) => {
   const { organizationId, user } = req;
   const { id } = req.params;
 
@@ -602,7 +601,7 @@ export const sendSMS = asyncRoute(async (req, res) => {
     message: 'SMS sent successfully',
     data: result,
   });
-});
+};
 
 export default {
   // Library
