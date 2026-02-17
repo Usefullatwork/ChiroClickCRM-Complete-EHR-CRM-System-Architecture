@@ -13,7 +13,6 @@ import {
   ShieldCheck,
   ShieldX,
   Check,
-  _X,
   ChevronDown,
   ChevronUp,
   ExternalLink,
@@ -23,7 +22,7 @@ import {
   Activity,
 } from 'lucide-react';
 import { useRedFlagScreening } from '../../hooks/useRedFlagScreening';
-import { SEVERITY, _CATEGORIES, getCategoryLabels } from '../../services/redFlagScreeningService';
+import { SEVERITY, getCategoryLabels } from '../../services/redFlagScreeningService';
 
 // Bilingual labels
 const LABELS = {

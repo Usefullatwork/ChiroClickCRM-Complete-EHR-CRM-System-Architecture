@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Brain, _X, ChevronRight, ThumbsUp, ThumbsDown, Loader2, RefreshCw } from 'lucide-react';
+import { Brain, ChevronRight, ThumbsUp, ThumbsDown, Loader2, RefreshCw } from 'lucide-react';
 import { aiAPI } from '../../services/api';
 import AIConfidenceBadge from './AIConfidenceBadge';
 

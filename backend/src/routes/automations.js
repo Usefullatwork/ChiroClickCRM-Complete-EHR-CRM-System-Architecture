@@ -14,7 +14,6 @@ import {
   deleteWorkflowSchema,
   toggleWorkflowSchema,
   workflowExecutionsSchema,
-  _allExecutionsSchema,
   testWorkflowSchema,
 } from '../validators/automation.validators.js';
 

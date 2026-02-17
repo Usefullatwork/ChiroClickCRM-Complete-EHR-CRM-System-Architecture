@@ -19,7 +19,6 @@ import {
   Target,
   Activity,
   AlertTriangle,
-  _X,
   Edit2,
 } from 'lucide-react';
 

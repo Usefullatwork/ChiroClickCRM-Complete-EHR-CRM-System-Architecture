@@ -17,9 +17,6 @@ import {
   getPrescriptionSchema,
   updatePrescriptionSchema,
   updatePrescriptionStatusSchema,
-  createTemplateSchema as _createExerciseTemplateSchema,
-  updateTemplateSchema as _updateExerciseTemplateSchema,
-  _deleteTemplateSchema,
 } from '../validators/exercise.validators.js';
 
 const router = express.Router();

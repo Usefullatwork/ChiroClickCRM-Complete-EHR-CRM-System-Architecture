@@ -10,7 +10,7 @@
  */
 import { useState, useCallback, useRef, useMemo } from 'react';
 import Model from 'react-body-highlighter';
-import { RotateCcw, User, _Maximize2 } from 'lucide-react';
+import { RotateCcw, User } from 'lucide-react';
 
 // Map our region IDs to react-body-highlighter muscle names
 const REGION_TO_MUSCLES = {

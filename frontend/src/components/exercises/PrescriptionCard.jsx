@@ -17,7 +17,6 @@ import {
   Target,
   Activity,
   AlertTriangle,
-  _X,
   Minus,
   Plus,
 } from 'lucide-react';

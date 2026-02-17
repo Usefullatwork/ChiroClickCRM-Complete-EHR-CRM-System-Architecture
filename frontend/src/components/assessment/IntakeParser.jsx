@@ -16,7 +16,6 @@ import {
   Sparkles,
   RefreshCw,
   Check,
-  _X,
   AlertCircle,
   Wifi,
   WifiOff,

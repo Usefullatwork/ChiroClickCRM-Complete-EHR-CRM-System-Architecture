@@ -16,7 +16,7 @@ import {
   Clipboard,
   FileText,
 } from 'lucide-react';
-import { EXAMINATION_REGIONS, _SEVERITY } from '../../data/examinationProtocols';
+import { EXAMINATION_REGIONS } from '../../data/examinationProtocols';
 
 // Region icons mapping
 const REGION_ICONS = {

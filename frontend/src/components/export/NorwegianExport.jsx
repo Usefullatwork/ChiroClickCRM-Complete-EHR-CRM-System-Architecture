@@ -23,7 +23,6 @@ import {
   ChevronDown,
   ChevronUp,
   Copy,
-  _X,
 } from 'lucide-react';
 
 // Export formats

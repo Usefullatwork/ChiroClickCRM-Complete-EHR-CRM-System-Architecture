@@ -7,12 +7,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import logger from '../utils/logger.js';
-import {
-  _parseClinicalCase,
-  _classifyCase,
-  convertToTrainingExample,
-  convertToJSONL,
-} from '../services/clinicalDataParser.js';
+import { convertToTrainingExample, convertToJSONL } from '../services/clinicalDataParser.js';
 
 /**
  * Split input text into individual cases

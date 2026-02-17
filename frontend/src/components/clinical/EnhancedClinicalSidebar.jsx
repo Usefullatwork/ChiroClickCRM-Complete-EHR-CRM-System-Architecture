@@ -12,9 +12,9 @@
  * while providing professional anatomical visualizations.
  */
 import { useState, useCallback } from 'react';
-import { Layers, Box, User, ChevronDown, ChevronUp, Settings, _X } from 'lucide-react';
+import { Layers, Box, User, ChevronDown, ChevronUp, Settings } from 'lucide-react';
 import QuickPalpationSpine from './QuickPalpationSpine';
-import { EnhancedSpineDiagram, Spine3DViewer, EnhancedBodyDiagram, _VIEW_MODES } from '../anatomy';
+import { EnhancedSpineDiagram, Spine3DViewer, EnhancedBodyDiagram } from '../anatomy';
 
 // Sidebar view modes
 const SIDEBAR_MODES = {

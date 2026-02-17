@@ -8,12 +8,7 @@ import { useState, useMemo } from 'react';
 import { Globe, Shield, AlertTriangle, FileText, User, BookOpen } from 'lucide-react';
 import RedFlagScreeningPanel from '../components/assessment/RedFlagScreeningPanel';
 import { useRedFlagScreening, useTextFieldScreening } from '../hooks/useRedFlagScreening';
-import {
-  getAllRedFlagDefinitions,
-  getCategoryLabels,
-  _SEVERITY,
-  _CATEGORIES,
-} from '../services/redFlagScreeningService';
+import { getAllRedFlagDefinitions, getCategoryLabels } from '../services/redFlagScreeningService';
 
 // Example scenarios for testing
 const TEST_SCENARIOS = {

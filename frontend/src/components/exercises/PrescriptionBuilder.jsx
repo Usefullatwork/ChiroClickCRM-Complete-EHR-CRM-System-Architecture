@@ -6,7 +6,7 @@
  */
 
 import { useState, useRef } from 'react';
-import { Plus, Dumbbell, Info, _X } from 'lucide-react';
+import { Plus, Dumbbell, Info } from 'lucide-react';
 import PrescriptionCard from './PrescriptionCard';
 
 /**

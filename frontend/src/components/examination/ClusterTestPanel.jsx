@@ -21,7 +21,7 @@ import {
   RefreshCw,
   Smile,
 } from 'lucide-react';
-import { CLUSTER_TESTS, _CLUSTER_THRESHOLDS, SEVERITY } from '../../data/examinationProtocols';
+import { CLUSTER_TESTS, SEVERITY } from '../../data/examinationProtocols';
 
 // Cluster type icons
 const CLUSTER_ICONS = {

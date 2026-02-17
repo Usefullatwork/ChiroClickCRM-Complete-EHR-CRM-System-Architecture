@@ -13,7 +13,6 @@ import {
   Plus,
   Minus,
   Check,
-  _X,
   Clock,
   MapPin,
   FileText,

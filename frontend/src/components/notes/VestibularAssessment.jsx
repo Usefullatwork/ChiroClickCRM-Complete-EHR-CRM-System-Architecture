@@ -14,7 +14,6 @@ import {
   Lock,
   ChevronDown,
   ChevronUp,
-  _X,
   HelpCircle,
   Clock,
   Target,

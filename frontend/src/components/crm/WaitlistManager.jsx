@@ -13,7 +13,7 @@
  */
 
 import { useState } from 'react';
-import { Clock, Phone, Plus, _X, Send, Trash2, ChevronDown, ChevronUp, Search } from 'lucide-react';
+import { Clock, Phone, Plus, Send, Trash2, ChevronDown, ChevronUp, Search } from 'lucide-react';
 
 // Priority levels
 export const PRIORITY_LEVELS = {

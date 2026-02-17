@@ -27,7 +27,6 @@ import {
   ChevronLeft,
   MoreVertical,
   Paperclip,
-  _X,
   RefreshCw,
 } from 'lucide-react';
 import {

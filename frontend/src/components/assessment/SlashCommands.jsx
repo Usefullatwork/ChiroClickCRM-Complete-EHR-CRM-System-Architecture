@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { Command, ChevronRight, _X } from 'lucide-react';
+import { Command, ChevronRight } from 'lucide-react';
 
 /**
  * SlashCommands - Jane App-style text expansion system

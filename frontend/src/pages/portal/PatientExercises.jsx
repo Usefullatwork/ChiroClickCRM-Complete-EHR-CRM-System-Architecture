@@ -16,7 +16,6 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import {
   Play,
   Check,
-  _X,
   Calendar,
   Download,
   Star,

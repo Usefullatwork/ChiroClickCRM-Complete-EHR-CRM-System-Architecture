@@ -21,7 +21,6 @@ import {
   Pause,
   RefreshCw,
   Check,
-  _X,
   AlertCircle,
   Wifi,
   WifiOff,
