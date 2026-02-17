@@ -18,6 +18,10 @@ setup('authenticate', async ({ page }) => {
     },
   });
 
+  if (!response.ok()) {
+    const body = await response.text();
+    console.error(`Login failed with status ${response.status()}: ${body}`);
+  }
   expect(response.ok()).toBeTruthy();
 
   // Navigate to app so cookie is associated with the frontend origin

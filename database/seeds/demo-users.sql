@@ -52,7 +52,7 @@ VALUES (
   password_hash = EXCLUDED.password_hash,
   email_verified = true;
 
--- Create receptionist user (password: admin123)
+-- Create assistant user (password: admin123)
 INSERT INTO users (id, organization_id, email, password_hash, first_name, last_name, role, is_active, email_verified)
 VALUES (
   'b0000000-0000-0000-0000-000000000003',
@@ -61,7 +61,7 @@ VALUES (
   '$2b$10$ohl4C6Xa9meLOVyotGbMq.80PrTc4I..sHs0a6zGj8OWVqQC5arFO',
   'Ole',
   'Hansen',
-  'RECEPTIONIST',
+  'ASSISTANT',
   true,
   true
 ) ON CONFLICT (id) DO UPDATE SET

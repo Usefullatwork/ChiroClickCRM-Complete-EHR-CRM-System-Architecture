@@ -206,7 +206,7 @@ export const authBruteForceLimit = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
   keyGenerator: (req) => req.ip,
-  skip: () => process.env.NODE_ENV === 'test',
+  skip: () => ['test', 'e2e'].includes(process.env.NODE_ENV),
   message: {
     error: 'Too Many Login Attempts',
     message:

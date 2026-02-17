@@ -250,6 +250,9 @@ jobs:
       - name: Initialize database schema
         run: |
           PGPASSWORD=postgres psql -h localhost -U postgres -d chiroclickcrm_test -f database/schema.sql
+          for f in database/migrations/*.sql; do
+            PGPASSWORD=postgres psql -h localhost -U postgres -d chiroclickcrm_test -f "$f" || true
+          done
           for f in database/seeds/*.sql; do
             PGPASSWORD=postgres psql -h localhost -U postgres -d chiroclickcrm_test -f "$f" || true
           done
@@ -274,7 +277,7 @@ jobs:
           DB_PASSWORD: postgres
           DB_ENGINE: postgres
           REDIS_URL: redis://localhost:6379
-          ENCRYPTION_KEY: test_encryption_key_32chars_ok!
+          ENCRYPTION_KEY: test_encryption_key_32chars_ok!!
           JWT_SECRET: test_jwt_secret
           CORS_ORIGIN: http://localhost:5173
 
