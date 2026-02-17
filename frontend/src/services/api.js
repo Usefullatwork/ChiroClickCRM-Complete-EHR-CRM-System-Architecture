@@ -769,6 +769,28 @@ export const clinicalSettingsAPI = {
   updateLetterSettings: (settings) => apiClient.patch('/clinical-settings/letters', settings),
 };
 
+// AI Retraining Pipeline Management
+export const aiRetrainingAPI = {
+  triggerRetraining: (opts) => apiClient.post('/ai-retraining/trigger-retraining', opts),
+  getStatus: () => apiClient.get('/ai-retraining/status'),
+  getHistory: (limit) => apiClient.get('/ai-retraining/history', { params: { limit } }),
+  exportFeedback: (opts) => apiClient.post('/ai-retraining/export-feedback', opts),
+  rollbackModel: (v) => apiClient.post('/ai-retraining/model/rollback', { targetVersion: v }),
+  testModel: (m) => apiClient.post('/ai-retraining/model/test', { modelName: m }),
+  generatePairs: (d) => apiClient.post('/ai-retraining/rlaif/generate-pairs', d),
+  getRLAIFStats: () => apiClient.get('/ai-retraining/rlaif/stats'),
+  getSchedulerStatus: () => apiClient.get('/ai-retraining/scheduler/status'),
+};
+
+// Data Curation for Training
+export const curationAPI = {
+  getFeedback: (params) => apiClient.get('/training/curation/feedback', { params }),
+  getStats: () => apiClient.get('/training/curation/stats'),
+  approve: (id, data) => apiClient.post(`/training/curation/approve/${id}`, data),
+  reject: (id) => apiClient.post(`/training/curation/reject/${id}`),
+  bulk: (data) => apiClient.post('/training/curation/bulk', data),
+};
+
 // AI Training Management
 export const trainingAPI = {
   getStatus: () => apiClient.get('/training/status'),

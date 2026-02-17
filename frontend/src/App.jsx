@@ -29,6 +29,7 @@ const Settings = lazy(() => import('./pages/Settings'));
 const PatientFlow = lazy(() => import('./pages/PatientFlow'));
 const CRM = lazy(() => import('./pages/CRM'));
 const Macros = lazy(() => import('./pages/Macros'));
+const AIPerformance = lazy(() => import('./pages/AIPerformance'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Patient Portal (public, no auth required)
@@ -307,6 +308,14 @@ function App() {
             element={
               <Suspense fallback={<PageLoader />}>
                 <Macros />
+              </Suspense>
+            }
+          />
+          <Route
+            path="ai-performance"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <AIPerformance />
               </Suspense>
             }
           />

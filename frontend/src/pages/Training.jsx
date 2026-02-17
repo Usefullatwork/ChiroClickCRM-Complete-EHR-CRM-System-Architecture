@@ -3,7 +3,7 @@
  * Manage AI model training pipeline, model lifecycle, and analytics
  */
 
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Brain,
@@ -43,9 +43,18 @@ import {
 import { trainingAPI } from '../services/api';
 import { useTranslation } from '../i18n';
 
+// Lazy load new tab components
+const DataCurationTab = lazy(() => import('../components/training/DataCurationTab'));
+const PipelineTab = lazy(() => import('../components/training/PipelineTab'));
+const PlaygroundTab = lazy(() => import('../components/training/PlaygroundTab'));
+
+const TAB_ICONS = { models: Server, curation: Database, pipeline: RefreshCw, playground: TestTube };
+
 const TABS = [
   { id: 'models', label: 'Modeller' },
-  { id: 'analytics', label: 'Analyse' },
+  { id: 'curation', label: 'Datakurering' },
+  { id: 'pipeline', label: 'Trening' },
+  { id: 'playground', label: 'Lekeplass' },
 ];
 
 const CHART_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
@@ -129,43 +138,68 @@ export default function Training() {
 
       {/* Tabs */}
       <div className="flex gap-1 mb-6 bg-gray-100 rounded-lg p-1 w-fit">
-        {TABS.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              activeTab === tab.id
-                ? 'bg-white text-blue-700 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+        {TABS.map((tab) => {
+          const Icon = TAB_ICONS[tab.id];
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                activeTab === tab.id
+                  ? 'bg-white text-blue-700 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              {Icon && <Icon className="w-4 h-4" />}
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
 
       {activeTab === 'models' && (
-        <ModelsTab
-          statusQuery={statusQuery}
-          dataQuery={dataQuery}
-          status={status}
-          trainingData={trainingData}
-          rebuildMutation={rebuildMutation}
-          backupMutation={backupMutation}
-          restoreMutation={restoreMutation}
-          addExamplesMutation={addExamplesMutation}
-          testMutation={testMutation}
-          newExamples={newExamples}
-          setNewExamples={setNewExamples}
-          testPrompt={testPrompt}
-          setTestPrompt={setTestPrompt}
-          selectedTestModel={selectedTestModel}
-          setSelectedTestModel={setSelectedTestModel}
-          testResult={testResult}
-        />
+        <>
+          <ModelsTab
+            statusQuery={statusQuery}
+            dataQuery={dataQuery}
+            status={status}
+            trainingData={trainingData}
+            rebuildMutation={rebuildMutation}
+            backupMutation={backupMutation}
+            restoreMutation={restoreMutation}
+            addExamplesMutation={addExamplesMutation}
+            testMutation={testMutation}
+            newExamples={newExamples}
+            setNewExamples={setNewExamples}
+            testPrompt={testPrompt}
+            setTestPrompt={setTestPrompt}
+            selectedTestModel={selectedTestModel}
+            setSelectedTestModel={setSelectedTestModel}
+            testResult={testResult}
+          />
+          <div className="mt-8">
+            <AnalyticsTab />
+          </div>
+        </>
       )}
 
-      {activeTab === 'analytics' && <AnalyticsTab />}
+      {activeTab === 'curation' && (
+        <Suspense fallback={<div className="text-gray-500 p-4">Laster datakurering...</div>}>
+          <DataCurationTab />
+        </Suspense>
+      )}
+
+      {activeTab === 'pipeline' && (
+        <Suspense fallback={<div className="text-gray-500 p-4">Laster treningspipeline...</div>}>
+          <PipelineTab />
+        </Suspense>
+      )}
+
+      {activeTab === 'playground' && (
+        <Suspense fallback={<div className="text-gray-500 p-4">Laster lekeplass...</div>}>
+          <PlaygroundTab />
+        </Suspense>
+      )}
     </div>
   );
 }
@@ -510,13 +544,15 @@ function AnalyticsTab() {
   const suggestions = suggestionsQuery.data || [];
 
   const exportSuggestionsCSV = () => {
-    if (!suggestions.length) return;
+    if (!suggestions.length) {
+      return;
+    }
     const headers = ['Dato', 'Type', 'Modell', 'Konfidens', 'Latens (ms)', 'Status', 'Vurdering'];
     const rows = suggestions.map((s) => [
       new Date(s.created_at).toLocaleDateString('nb-NO'),
       s.task_type,
       s.model_name,
-      s.confidence_score ? (s.confidence_score * 100).toFixed(0) + '%' : '',
+      s.confidence_score ? `${(s.confidence_score * 100).toFixed(0)}%` : '',
       s.latency_ms || '',
       s.accepted === true ? 'Godkjent' : s.accepted === false ? 'Avvist' : 'Venter',
       s.user_rating || '',
@@ -532,7 +568,9 @@ function AnalyticsTab() {
   };
 
   const exportComparisonCSV = () => {
-    if (!comparison.length) return;
+    if (!comparison.length) {
+      return;
+    }
     const headers = [
       'Modell',
       'Totale forslag',
