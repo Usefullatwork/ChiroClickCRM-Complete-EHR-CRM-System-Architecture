@@ -16,7 +16,6 @@ import {
   CheckCircle2,
   XCircle,
   Clock,
-  AlertCircle,
   RefreshCw,
   ChevronDown,
   Zap,
@@ -70,17 +69,27 @@ export default function PipelineTab() {
 
   const handleTrigger = () => {
     const opts = { dryRun };
-    if (selectedModel) opts.modelName = selectedModel;
+    if (selectedModel) {
+      opts.modelName = selectedModel;
+    }
     triggerMutation.mutate(opts);
   };
 
   const getStepStatus = (stepKey) => {
-    if (!status?.currentStep) return 'pending';
+    if (!status?.currentStep) {
+      return 'pending';
+    }
     const currentIdx = PIPELINE_STEPS.findIndex((s) => s.key === status.currentStep);
     const thisIdx = PIPELINE_STEPS.findIndex((s) => s.key === stepKey);
-    if (pipelineFailed && thisIdx === currentIdx) return 'failed';
-    if (thisIdx < currentIdx) return 'done';
-    if (thisIdx === currentIdx) return 'running';
+    if (pipelineFailed && thisIdx === currentIdx) {
+      return 'failed';
+    }
+    if (thisIdx < currentIdx) {
+      return 'done';
+    }
+    if (thisIdx === currentIdx) {
+      return 'running';
+    }
     return 'pending';
   };
 

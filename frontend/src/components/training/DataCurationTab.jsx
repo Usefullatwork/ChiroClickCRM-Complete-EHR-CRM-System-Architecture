@@ -93,8 +93,11 @@ export default function DataCurationTab() {
   const toggleSelect = (id) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
       return next;
     });
   };
@@ -351,7 +354,7 @@ function FeedbackRow({
   isRejecting,
 }) {
   const truncate = (text, len = 60) =>
-    text && text.length > len ? text.slice(0, len) + '...' : text || '-';
+    text && text.length > len ? `${text.slice(0, len)}...` : text || '-';
 
   return (
     <>

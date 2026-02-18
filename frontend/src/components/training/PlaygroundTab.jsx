@@ -75,7 +75,9 @@ export default function PlaygroundTab() {
   const isRunning = testMutationA.isPending || testMutationB.isPending;
 
   const handleRun = () => {
-    if (!prompt.trim()) return;
+    if (!prompt.trim()) {
+      return;
+    }
     setResultA(null);
     setResultB(null);
     testMutationA.mutate({ model: modelA, prompt });

@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { formatRelativeTime } from '../../lib/utils';
 
-const TRIGGER_ICONS = {
+const _TRIGGER_ICONS = {
   PATIENT_CREATED: () => null,
   APPOINTMENT_SCHEDULED: () => null,
   APPOINTMENT_COMPLETED: () => null,
