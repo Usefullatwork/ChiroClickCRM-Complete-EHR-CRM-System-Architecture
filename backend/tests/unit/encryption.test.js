@@ -91,8 +91,12 @@ describe('Encryption Utilities', () => {
       const original = 'test';
       const encrypted = encrypt(original);
 
-      // Corrupt the ciphertext
-      const corrupted = encrypted.replace('a', 'z');
+      // Corrupt the ciphertext by flipping a character at a known position
+      // Split into IV and ciphertext, then alter the first byte of ciphertext
+      const parts = encrypted.split(':');
+      const ct = parts[1];
+      const flipped = ct[0] === 'f' ? '0' : 'f';
+      const corrupted = parts[0] + ':' + flipped + ct.slice(1);
 
       expect(() => decrypt(corrupted)).toThrow();
     });
