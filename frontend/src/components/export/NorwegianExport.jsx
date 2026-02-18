@@ -14,6 +14,7 @@
  */
 
 import { useState } from 'react';
+import logger from '../../utils/logger';
 import {
   Download,
   FileText,
@@ -488,7 +489,7 @@ export default function NorwegianExport({
 
       onExport?.({ format: selectedFormat, filename, content });
     } catch (error) {
-      console.error('Export error:', error);
+      logger.error('Export error:', error);
     } finally {
       setIsExporting(false);
     }

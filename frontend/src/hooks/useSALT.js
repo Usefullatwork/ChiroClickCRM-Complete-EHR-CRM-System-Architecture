@@ -15,6 +15,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { encountersAPI } from '../services/api';
 
+import logger from '../utils/logger';
 /**
  * @param {string} patientId - Patient UUID
  * @param {object} options - Configuration options
@@ -60,7 +61,7 @@ export function useSALT(patientId, options = {}) {
 
         return encounter;
       } catch (err) {
-        console.error('SALT fetch failed:', err);
+        logger.error('SALT fetch failed:', err);
         setError(err.message || 'Failed to fetch similar encounter');
         return null;
       } finally {

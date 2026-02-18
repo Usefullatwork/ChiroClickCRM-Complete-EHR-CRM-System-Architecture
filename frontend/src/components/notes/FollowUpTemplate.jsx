@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import ICD10CodePicker from './ICD10CodePicker';
 
+import logger from '../../utils/logger';
 /**
  * FollowUpTemplate Component
  * Oppfolgingskonsultasjon-mal med fokus pa fremgang
@@ -156,7 +157,7 @@ export default function FollowUpTemplate({
           setHasChanges(false);
         }
       } catch (error) {
-        console.error('Auto-save failed:', error);
+        logger.error('Auto-save failed:', error);
       }
     }, 30000);
 

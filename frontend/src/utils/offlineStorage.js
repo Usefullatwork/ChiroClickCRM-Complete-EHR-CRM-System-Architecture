@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * Offline Storage Utility
  *
@@ -15,6 +14,8 @@
 // =============================================================================
 // DATABASE CONFIGURATION
 // =============================================================================
+
+import logger from '../utils/logger';
 
 const DB_NAME = 'ChiroClickOffline';
 const DB_VERSION = 2;
@@ -47,19 +48,19 @@ export async function openDatabase() {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
     request.onerror = () => {
-      console.error('[OfflineStorage] Database error:', request.error);
+      logger.error('[OfflineStorage] Database error:', request.error);
       reject(request.error);
     };
 
     request.onsuccess = () => {
       dbInstance = request.result;
-      console.log('[OfflineStorage] Database opened successfully');
+      logger.debug('[OfflineStorage] Database opened successfully');
       resolve(dbInstance);
     };
 
     request.onupgradeneeded = (event) => {
       const db = event.target.result;
-      console.log('[OfflineStorage] Upgrading database...');
+      logger.debug('[OfflineStorage] Upgrading database...');
 
       // Exercises store - cache individual exercises
       if (!db.objectStoreNames.contains(STORES.EXERCISES)) {
@@ -117,7 +118,7 @@ export function closeDatabase() {
   if (dbInstance) {
     dbInstance.close();
     dbInstance = null;
-    console.log('[OfflineStorage] Database closed');
+    logger.debug('[OfflineStorage] Database closed');
   }
 }
 
@@ -265,7 +266,7 @@ export async function cachePrescription(token, prescriptionData) {
     }
   }
 
-  console.log(
+  logger.debug(
     `[OfflineStorage] Cached prescription ${prescription.id} with ${exercises?.length || 0} exercises`
   );
 }
@@ -314,7 +315,7 @@ export async function removeCachedPrescription(prescriptionId) {
     await deleteItem(STORES.EXERCISES, exercise.id);
   }
 
-  console.log(`[OfflineStorage] Removed cached prescription ${prescriptionId}`);
+  logger.debug(`[OfflineStorage] Removed cached prescription ${prescriptionId}`);
 }
 
 // =============================================================================
@@ -356,7 +357,7 @@ export async function saveProgress(progressData) {
   };
 
   const id = await saveItem(STORES.PROGRESS, record);
-  console.log(`[OfflineStorage] Saved progress record ${id}`);
+  logger.debug(`[OfflineStorage] Saved progress record ${id}`);
   return id;
 }
 
@@ -422,7 +423,7 @@ export async function trackCachedVideo(url, exerciseId, size) {
     size,
     cachedAt: new Date().toISOString(),
   });
-  console.log(`[OfflineStorage] Tracked cached video: ${url}`);
+  logger.debug(`[OfflineStorage] Tracked cached video: ${url}`);
 }
 
 /**
@@ -509,7 +510,7 @@ export async function clearAllOfflineData() {
   await clearStore(STORES.PROGRESS);
   await clearStore(STORES.SYNC_QUEUE);
   await clearStore(STORES.CACHED_VIDEOS);
-  console.log('[OfflineStorage] All offline data cleared');
+  logger.debug('[OfflineStorage] All offline data cleared');
 }
 
 /**

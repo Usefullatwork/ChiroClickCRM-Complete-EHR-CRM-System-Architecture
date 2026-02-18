@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import logger from '../../utils/logger';
 import {
   FileText,
   Wand2,
@@ -267,7 +268,7 @@ export default function ClinicalNoteGenerator({
       setGeneratedContent(data.content);
       onGenerate?.({ type: selectedType, content: data.content });
     } catch (err) {
-      console.error('Generation error:', err);
+      logger.error('Generation error:', err);
       setError(t.errorGenerating);
     } finally {
       setIsGenerating(false);

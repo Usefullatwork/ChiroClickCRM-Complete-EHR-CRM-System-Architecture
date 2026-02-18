@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { useOffline } from '../../hooks/useOffline';
 
+import logger from '../../utils/logger';
 // =============================================================================
 // TRANSLATIONS
 // =============================================================================
@@ -149,7 +150,7 @@ export function VideoOfflineToggle({
         }
       }
     } catch (err) {
-      console.error('Error toggling video cache:', err);
+      logger.error('Error toggling video cache:', err);
       setError(t.downloadFailed);
     } finally {
       setIsLoading(false);

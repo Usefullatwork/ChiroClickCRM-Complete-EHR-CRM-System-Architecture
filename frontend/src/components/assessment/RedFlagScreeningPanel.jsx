@@ -24,6 +24,7 @@ import {
 import { useRedFlagScreening } from '../../hooks/useRedFlagScreening';
 import { SEVERITY, getCategoryLabels } from '../../services/redFlagScreeningService';
 
+import logger from '../../utils/logger';
 // Bilingual labels
 const LABELS = {
   en: {
@@ -276,7 +277,7 @@ export default function RedFlagScreeningPanel({
     autoScreen: true,
     onCriticalFlag: (criticalFlags) => {
       // Could trigger audio alert or notification here
-      console.warn('Critical red flags detected:', criticalFlags);
+      logger.warn('Critical red flags detected:', criticalFlags);
     },
   });
 

@@ -10,6 +10,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../services/api';
 
+import logger from '../utils/logger';
 // API endpoints for AI feedback
 const AI_FEEDBACK_API = {
   submit: (data) => apiClient.post('/ai/feedback', data),
@@ -47,7 +48,7 @@ export const useSubmitAIFeedback = () => {
         queryClient.invalidateQueries(['ai-performance-metrics']);
       },
       onError: (error) => {
-        console.error('Failed to submit AI feedback:', error);
+        logger.error('Failed to submit AI feedback:', error);
         throw error;
       },
     }
@@ -257,7 +258,7 @@ export const useExportAIFeedback = () => {
     },
     {
       onError: (error) => {
-        console.error('Failed to export AI feedback:', error);
+        logger.error('Failed to export AI feedback:', error);
         throw error;
       },
     }

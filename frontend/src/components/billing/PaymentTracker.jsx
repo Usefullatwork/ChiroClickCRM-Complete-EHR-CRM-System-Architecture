@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { billingAPI } from '../../services/api';
 
+import logger from '../../utils/logger';
 /**
  * Payment method configurations
  */
@@ -139,7 +140,7 @@ export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) 
         notes: notes || null,
       });
     } catch (error) {
-      console.error('Failed to record payment:', error);
+      logger.error('Failed to record payment:', error);
     }
   };
 

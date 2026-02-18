@@ -8,6 +8,7 @@ import { Brain, ChevronRight, ThumbsUp, ThumbsDown, Loader2, RefreshCw } from 'l
 import { aiAPI } from '../../services/api';
 import AIConfidenceBadge from './AIConfidenceBadge';
 
+import logger from '../../utils/logger';
 export default function AIDiagnosisSidebar({
   soapData,
   onSelectCode,
@@ -61,7 +62,7 @@ export default function AIDiagnosisSidebar({
 
       setSuggestions(codes.slice(0, 5)); // Max 5 suggestions
     } catch (err) {
-      console.error('AI diagnosis suggestion failed:', err);
+      logger.error('AI diagnosis suggestion failed:', err);
       setError('Kunne ikke hente forslag');
     } finally {
       setIsLoading(false);
@@ -82,7 +83,7 @@ export default function AIDiagnosisSidebar({
       // await aiAPI.recordFeedback({ type: 'diagnosis', code, positive: isPositive });
       // Feedback recorded successfully
     } catch (err) {
-      console.error('Failed to record feedback:', err);
+      logger.error('Failed to record feedback:', err);
     }
   };
 

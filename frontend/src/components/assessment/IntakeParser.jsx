@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { checkOllamaStatus, parseIntakeToSubjective, getAIConfig } from '../../services/aiService';
 
+import logger from '../../utils/logger';
 // =============================================================================
 // INTAKE PARSER BUTTON - Compact trigger button
 // =============================================================================
@@ -59,7 +60,7 @@ export function IntakeParserButton({
         onGenerate?.(result.fallback, 'fallback');
       }
     } catch (error) {
-      console.error('Intake parsing error:', error);
+      logger.error('Intake parsing error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -543,7 +544,7 @@ export function IntakeParserInline({
         onUpdate?.(newValue);
       }
     } catch (error) {
-      console.error('Generation error:', error);
+      logger.error('Generation error:', error);
     } finally {
       setIsGenerating(false);
     }

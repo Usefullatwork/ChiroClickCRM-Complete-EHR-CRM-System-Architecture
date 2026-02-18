@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * Sync Queue Utility
  *
@@ -15,6 +14,7 @@
 
 import { openDatabase, STORES } from './offlineStorage';
 
+import logger from '../utils/logger';
 // =============================================================================
 // QUEUE ITEM TYPES
 // =============================================================================
@@ -58,7 +58,7 @@ export async function addToSyncQueue(item) {
     const request = store.put(queueItem);
 
     request.onsuccess = () => {
-      console.log(`[SyncQueue] Added item ${queueItem.id} to queue`);
+      logger.debug(`[SyncQueue] Added item ${queueItem.id} to queue`);
 
       // Request background sync if available
       requestBackgroundSync();
@@ -157,7 +157,7 @@ export async function removeFromQueue(id) {
     const request = store.delete(id);
 
     request.onsuccess = () => {
-      console.log(`[SyncQueue] Removed item ${id} from queue`);
+      logger.debug(`[SyncQueue] Removed item ${id} from queue`);
       resolve();
     };
     request.onerror = () => reject(request.error);
@@ -177,7 +177,7 @@ export async function clearCompletedItems() {
     await removeFromQueue(item.id);
   }
 
-  console.log(`[SyncQueue] Cleared ${completedItems.length} completed items`);
+  logger.debug(`[SyncQueue] Cleared ${completedItems.length} completed items`);
   return completedItems.length;
 }
 
@@ -194,7 +194,7 @@ export async function clearQueue() {
     const request = store.clear();
 
     request.onsuccess = () => {
-      console.log('[SyncQueue] Queue cleared');
+      logger.debug('[SyncQueue] Queue cleared');
       resolve();
     };
     request.onerror = () => reject(request.error);
@@ -216,16 +216,16 @@ export async function clearQueue() {
 export async function processSyncQueue(options = {}) {
   const { onProgress, onItemComplete, onError } = options;
 
-  console.log('[SyncQueue] Processing sync queue...');
+  logger.debug('[SyncQueue] Processing sync queue...');
 
   const pendingItems = await getPendingItems();
 
   if (pendingItems.length === 0) {
-    console.log('[SyncQueue] No pending items to sync');
+    logger.debug('[SyncQueue] No pending items to sync');
     return { synced: 0, failed: 0, remaining: 0 };
   }
 
-  console.log(`[SyncQueue] Found ${pendingItems.length} items to sync`);
+  logger.debug(`[SyncQueue] Found ${pendingItems.length} items to sync`);
 
   let synced = 0;
   let failed = 0;
@@ -260,7 +260,7 @@ export async function processSyncQueue(options = {}) {
           onItemComplete(item, true);
         }
 
-        console.log(`[SyncQueue] Successfully synced item ${item.id}`);
+        logger.debug(`[SyncQueue] Successfully synced item ${item.id}`);
       } else {
         // API error - mark as failed
         const errorData = await response.json().catch(() => ({}));
@@ -275,7 +275,7 @@ export async function processSyncQueue(options = {}) {
           onError(item, new Error(errorData.message || `HTTP ${response.status}`));
         }
 
-        console.error(`[SyncQueue] Failed to sync item ${item.id}:`, response.status);
+        logger.error(`[SyncQueue] Failed to sync item ${item.id}:`, response.status);
       }
     } catch (error) {
       // Network error - keep in queue for retry
@@ -295,13 +295,13 @@ export async function processSyncQueue(options = {}) {
         onError(item, error);
       }
 
-      console.error(`[SyncQueue] Error syncing item ${item.id}:`, error);
+      logger.error(`[SyncQueue] Error syncing item ${item.id}:`, error);
     }
   }
 
   const remaining = pendingItems.length - synced - failed;
 
-  console.log(
+  logger.debug(
     `[SyncQueue] Sync complete: ${synced} synced, ${failed} failed, ${remaining} remaining`
   );
 
@@ -316,9 +316,9 @@ async function requestBackgroundSync() {
     try {
       const registration = await navigator.serviceWorker.ready;
       await registration.sync.register('sync-exercise-progress');
-      console.log('[SyncQueue] Background sync registered');
+      logger.debug('[SyncQueue] Background sync registered');
     } catch (error) {
-      console.warn('[SyncQueue] Background sync not available:', error);
+      logger.warn('[SyncQueue] Background sync not available:', error);
     }
   }
 }
@@ -435,7 +435,7 @@ export function enableAutoSync(options = {}) {
       return;
     }
 
-    console.log('[SyncQueue] Online - starting auto-sync');
+    logger.debug('[SyncQueue] Online - starting auto-sync');
     syncInProgress = true;
 
     try {
@@ -448,13 +448,13 @@ export function enableAutoSync(options = {}) {
   window.addEventListener('online', handleOnline);
   autoSyncEnabled = true;
 
-  console.log('[SyncQueue] Auto-sync enabled');
+  logger.debug('[SyncQueue] Auto-sync enabled');
 
   // Return cleanup function
   return () => {
     window.removeEventListener('online', handleOnline);
     autoSyncEnabled = false;
-    console.log('[SyncQueue] Auto-sync disabled');
+    logger.debug('[SyncQueue] Auto-sync disabled');
   };
 }
 
@@ -465,12 +465,12 @@ export function enableAutoSync(options = {}) {
  */
 export async function triggerSync(options = {}) {
   if (!navigator.onLine) {
-    console.log('[SyncQueue] Cannot sync - offline');
+    logger.debug('[SyncQueue] Cannot sync - offline');
     return null;
   }
 
   if (syncInProgress) {
-    console.log('[SyncQueue] Sync already in progress');
+    logger.debug('[SyncQueue] Sync already in progress');
     return null;
   }
 

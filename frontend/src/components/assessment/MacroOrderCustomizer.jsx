@@ -37,6 +37,7 @@ import {
 } from 'lucide-react';
 import api from '../../services/api';
 
+import logger from '../../utils/logger';
 // Sortable Category Item
 const SortableCategoryItem = ({
   category,
@@ -293,7 +294,7 @@ const MacroOrderCustomizer = ({ isOpen, onClose, onSave }) => {
         // No saved preferences found, using defaults
       }
     } catch (error) {
-      console.error('Error loading macro data:', error);
+      logger.error('Error loading macro data:', error);
     } finally {
       setLoading(false);
     }
@@ -395,7 +396,7 @@ const MacroOrderCustomizer = ({ isOpen, onClose, onSave }) => {
         onSave(preferences);
       }
     } catch (error) {
-      console.error('Error saving preferences:', error);
+      logger.error('Error saving preferences:', error);
     } finally {
       setSaving(false);
     }

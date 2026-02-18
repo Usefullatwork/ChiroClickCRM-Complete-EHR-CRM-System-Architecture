@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/client';
 
+import logger from '../utils/logger';
 /**
  * Analytics Hooks
  *
@@ -20,7 +21,7 @@ export const useKPIs = (timeRange, selectedDate) => {
     async () => {
       const params = {
         timeRange,
-        year: selectedDate.year
+        year: selectedDate.year,
       };
 
       if (timeRange === 'month') {
@@ -34,7 +35,7 @@ export const useKPIs = (timeRange, selectedDate) => {
       staleTime: 2 * 60 * 1000, // 2 minutes
       cacheTime: 10 * 60 * 1000, // 10 minutes
       refetchOnMount: true,
-      enabled: !!selectedDate.year
+      enabled: !!selectedDate.year,
     }
   );
 };
@@ -52,7 +53,7 @@ export const usePatientMetrics = (timeRange, selectedDate) => {
     async () => {
       const params = {
         timeRange,
-        year: selectedDate.year
+        year: selectedDate.year,
       };
 
       if (timeRange === 'month') {
@@ -64,7 +65,7 @@ export const usePatientMetrics = (timeRange, selectedDate) => {
     },
     {
       staleTime: 5 * 60 * 1000, // 5 minutes
-      enabled: !!selectedDate.year
+      enabled: !!selectedDate.year,
     }
   );
 };
@@ -107,7 +108,7 @@ export const useMessageStats = (dateRange) => {
     },
     {
       staleTime: 5 * 60 * 1000,
-      enabled: !!(dateRange?.startDate && dateRange?.endDate)
+      enabled: !!(dateRange?.startDate && dateRange?.endDate),
     }
   );
 };
@@ -134,7 +135,7 @@ export const useAppointmentAnalytics = (params) => {
     },
     {
       staleTime: 5 * 60 * 1000,
-      enabled: !!params.year
+      enabled: !!params.year,
     }
   );
 };
@@ -160,7 +161,7 @@ export const usePractitionerMetrics = (params) => {
     },
     {
       staleTime: 5 * 60 * 1000,
-      enabled: !!params.year
+      enabled: !!params.year,
     }
   );
 };
@@ -183,7 +184,7 @@ export const useSendKPIReport = () => {
         message,
         kpiData,
         dateRange,
-        timeRange
+        timeRange,
       });
       return response;
     },
@@ -193,9 +194,9 @@ export const useSendKPIReport = () => {
         queryClient.invalidateQueries(['audit-logs']);
       },
       onError: (error) => {
-        console.error('Failed to send KPI report:', error);
+        logger.error('Failed to send KPI report:', error);
         throw error;
-      }
+      },
     }
   );
 };
@@ -207,16 +208,14 @@ export const useSendKPIReport = () => {
  * @returns {object} Mutation result
  */
 export const useExportKPIData = () => {
-  return useMutation(
-    async ({ year, month, timeRange }) => {
-      const response = await api.analytics.exportKPIData({
-        year,
-        month,
-        timeRange
-      });
-      return response;
-    }
-  );
+  return useMutation(async ({ year, month, timeRange }) => {
+    const response = await api.analytics.exportKPIData({
+      year,
+      month,
+      timeRange,
+    });
+    return response;
+  });
 };
 
 /**
@@ -259,7 +258,7 @@ export const useRetentionCohorts = (year) => {
     },
     {
       staleTime: 60 * 60 * 1000, // 1 hour (cohort data changes slowly)
-      enabled: !!year
+      enabled: !!year,
     }
   );
 };
@@ -284,7 +283,7 @@ export const useWeekendDifferentials = (timeRange, selectedDate) => {
     async () => {
       const params = {
         timeRange,
-        year: selectedDate.year
+        year: selectedDate.year,
       };
 
       if (timeRange === 'month') {
@@ -296,7 +295,7 @@ export const useWeekendDifferentials = (timeRange, selectedDate) => {
     },
     {
       staleTime: 5 * 60 * 1000, // 5 minutes
-      enabled: !!selectedDate.year
+      enabled: !!selectedDate.year,
     }
   );
 };
@@ -319,7 +318,7 @@ export const useSaturdayVisits = (params) => {
     },
     {
       staleTime: 10 * 60 * 1000, // 10 minutes
-      enabled: !!params.year
+      enabled: !!params.year,
     }
   );
 };

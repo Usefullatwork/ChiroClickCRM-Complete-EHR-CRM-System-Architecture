@@ -19,6 +19,7 @@ import { formatPhone } from '../lib/utils';
 import { useTranslation, formatDate } from '../i18n';
 import toast from '../utils/toast';
 
+import logger from '../utils/logger';
 export default function Communications() {
   const { t, lang } = useTranslation('communications');
   const queryClient = useQueryClient();
@@ -94,7 +95,7 @@ export default function Communications() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy:', err);
+      logger.error('Failed to copy:', err);
     }
   };
 

@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * Exercise Sync Hook
  * Provides offline-first exercise data with IndexedDB caching and sync
@@ -8,6 +7,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { exercisesAPI } from '../services/api';
 
+import logger from '../utils/logger';
 // IndexedDB configuration
 const DB_NAME = 'ChiroClickExercises';
 const DB_VERSION = 1;
@@ -184,7 +184,7 @@ export const useExerciseSync = (patientId = null) => {
         };
       })
       .catch((error) => {
-        console.error('Failed to initialize IndexedDB:', error);
+        logger.error('Failed to initialize IndexedDB:', error);
       });
 
     return () => {
@@ -231,7 +231,7 @@ export const useExerciseSync = (patientId = null) => {
         const pendingPrescriptions = await getAllFromStore(db, STORES.PENDING_PRESCRIPTIONS);
         setPendingCount(pendingCompliance.length + pendingPrescriptions.length);
       } catch (error) {
-        console.error('Error counting pending items:', error);
+        logger.error('Error counting pending items:', error);
       }
     };
 
@@ -288,9 +288,9 @@ export const useExerciseSync = (patientId = null) => {
       await putItem(db, STORES.SYNC_META, { key: 'lastSync', value: now });
       setLastSyncTime(new Date(now));
 
-      console.log(`Exercise library synced: ${exercises.length} exercises`);
+      logger.debug(`Exercise library synced: ${exercises.length} exercises`);
     } catch (error) {
-      console.error('Error syncing exercise library:', error);
+      logger.error('Error syncing exercise library:', error);
     } finally {
       setIsSyncing(false);
     }
@@ -314,9 +314,9 @@ export const useExerciseSync = (patientId = null) => {
           await putItem(db, STORES.PRESCRIPTIONS, prescription);
         }
 
-        console.log(`Patient prescriptions synced: ${prescriptions.length} prescriptions`);
+        logger.debug(`Patient prescriptions synced: ${prescriptions.length} prescriptions`);
       } catch (error) {
-        console.error('Error syncing patient prescriptions:', error);
+        logger.error('Error syncing patient prescriptions:', error);
       }
     },
     [db, isOnline]
@@ -338,9 +338,9 @@ export const useExerciseSync = (patientId = null) => {
         try {
           await exercisesAPI.logCompliance(item.prescription_id, item.data);
           await deleteItem(db, STORES.PENDING_COMPLIANCE, item.localId);
-          console.log('Synced compliance log:', item.prescription_id);
+          logger.debug('Synced compliance log:', item.prescription_id);
         } catch (error) {
-          console.error('Error syncing compliance log:', error);
+          logger.error('Error syncing compliance log:', error);
         }
       }
 
@@ -350,9 +350,9 @@ export const useExerciseSync = (patientId = null) => {
         try {
           await exercisesAPI.prescribeToPatient(item.patient_id, item.data);
           await deleteItem(db, STORES.PENDING_PRESCRIPTIONS, item.localId);
-          console.log('Synced prescription:', item.patient_id);
+          logger.debug('Synced prescription:', item.patient_id);
         } catch (error) {
-          console.error('Error syncing prescription:', error);
+          logger.error('Error syncing prescription:', error);
         }
       }
 
@@ -363,7 +363,7 @@ export const useExerciseSync = (patientId = null) => {
       // Update pending count
       setPendingCount(0);
     } catch (error) {
-      console.error('Error syncing pending data:', error);
+      logger.error('Error syncing pending data:', error);
     } finally {
       setIsSyncing(false);
     }
@@ -400,7 +400,7 @@ export const useExerciseSync = (patientId = null) => {
 
         return exercises;
       } catch (error) {
-        console.error('Error getting cached exercises:', error);
+        logger.error('Error getting cached exercises:', error);
         return [];
       }
     },
@@ -419,7 +419,7 @@ export const useExerciseSync = (patientId = null) => {
       try {
         return await getByIndex(db, STORES.PRESCRIPTIONS, 'patient_id', patientId);
       } catch (error) {
-        console.error('Error getting cached prescriptions:', error);
+        logger.error('Error getting cached prescriptions:', error);
         return [];
       }
     },
@@ -473,7 +473,7 @@ export const useExerciseSync = (patientId = null) => {
 
         return true;
       } catch (error) {
-        console.error('Error queuing compliance log:', error);
+        logger.error('Error queuing compliance log:', error);
         return false;
       }
     },
@@ -505,7 +505,7 @@ export const useExerciseSync = (patientId = null) => {
 
         return true;
       } catch (error) {
-        console.error('Error queuing prescription:', error);
+        logger.error('Error queuing prescription:', error);
         return false;
       }
     },
@@ -536,9 +536,9 @@ export const useExerciseSync = (patientId = null) => {
       await clearStore(db, STORES.PRESCRIPTIONS);
       await clearStore(db, STORES.SYNC_META);
       setLastSyncTime(null);
-      console.log('Cache cleared');
+      logger.debug('Cache cleared');
     } catch (error) {
-      console.error('Error clearing cache:', error);
+      logger.error('Error clearing cache:', error);
     }
   }, [db]);
 

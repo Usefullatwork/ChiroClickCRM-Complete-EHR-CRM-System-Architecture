@@ -7,6 +7,7 @@
  */
 
 import { useState } from 'react';
+import logger from '../../utils/logger';
 import {
   FileText,
   Wand2,
@@ -186,7 +187,7 @@ export default function MedicalCertificateGenerator({
       setGeneratedContent(data.content);
       onGenerate?.({ type: selectedType, content: data.content });
     } catch (err) {
-      console.error('Letter generation error:', err);
+      logger.error('Letter generation error:', err);
       setError(t.errorGenerating);
     } finally {
       setIsGenerating(false);
@@ -242,7 +243,7 @@ export default function MedicalCertificateGenerator({
         onSave?.({ type: selectedType, content: generatedContent });
       }
     } catch (err) {
-      console.error('Error saving letter:', err);
+      logger.error('Error saving letter:', err);
     }
   };
 

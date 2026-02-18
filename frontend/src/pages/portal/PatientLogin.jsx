@@ -9,6 +9,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Dumbbell, Loader2, AlertTriangle, CheckCircle, ArrowRight } from 'lucide-react';
 import { patientApi, storeToken } from '../../api/patientApi';
 
+import logger from '../../utils/logger';
 const PatientLogin = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -54,7 +55,7 @@ const PatientLogin = () => {
         setShowManualEntry(true);
       }
     } catch (err) {
-      console.error('Token validation error:', err);
+      logger.error('Token validation error:', err);
       setError(err.message || 'Kunne ikke validere tilgangskoden');
       setShowManualEntry(true);
     } finally {

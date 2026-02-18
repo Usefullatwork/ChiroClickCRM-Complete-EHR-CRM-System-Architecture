@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * Offline Utilities Index
  *
@@ -77,6 +76,7 @@ export {
 
 // Default export as namespace
 import * as syncQueue from './syncQueue';
+import logger from '../utils/logger';
 export { syncQueue };
 
 // =============================================================================
@@ -100,7 +100,7 @@ export async function registerServiceWorker() {
         scope: '/',
       });
 
-      console.log('[Offline] Service worker registered:', registration.scope);
+      logger.debug('[Offline] Service worker registered:', registration.scope);
 
       // Check for updates periodically
       setInterval(
@@ -112,12 +112,12 @@ export async function registerServiceWorker() {
 
       return registration;
     } catch (error) {
-      console.error('[Offline] Service worker registration failed:', error);
+      logger.error('[Offline] Service worker registration failed:', error);
       return null;
     }
   }
 
-  console.warn('[Offline] Service workers not supported');
+  logger.warn('[Offline] Service workers not supported');
   return null;
 }
 
@@ -130,7 +130,7 @@ export async function unregisterServiceWorker() {
     for (const registration of registrations) {
       await registration.unregister();
     }
-    console.log('[Offline] Service workers unregistered');
+    logger.debug('[Offline] Service workers unregistered');
   }
 }
 

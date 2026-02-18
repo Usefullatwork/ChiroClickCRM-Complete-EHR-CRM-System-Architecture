@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * GoogleContactsService - Integration with Google People API
  *
@@ -13,6 +12,7 @@
 
 import React from 'react';
 
+import logger from '../utils/logger';
 // Google API configuration
 const GOOGLE_CONFIG = {
   // These should be set via environment variables or settings
@@ -105,7 +105,7 @@ class GoogleContactsService {
       scope: GOOGLE_CONFIG.scopes,
       callback: (response) => {
         if (response.error) {
-          console.error('Google OAuth error:', response.error);
+          logger.error('Google OAuth error:', response.error);
           return;
         }
         this.isSignedIn = true;
@@ -156,7 +156,7 @@ class GoogleContactsService {
     const token = sessionStorage.getItem('google_access_token');
     if (token) {
       window.google.accounts.oauth2.revoke(token, () => {
-        console.log('Google access revoked');
+        logger.debug('Google access revoked');
       });
     }
     sessionStorage.removeItem('google_access_token');
@@ -197,7 +197,7 @@ class GoogleContactsService {
       this.contactGroupId = createResponse.result.resourceName;
       return this.contactGroupId;
     } catch (error) {
-      console.error('Error managing contact group:', error);
+      logger.error('Error managing contact group:', error);
       throw error;
     }
   }
@@ -391,7 +391,7 @@ class GoogleContactsService {
         return { action: 'created', contact: response.result };
       }
     } catch (error) {
-      console.error('Error syncing patient to Google:', error);
+      logger.error('Error syncing patient to Google:', error);
       throw error;
     }
   }
@@ -420,7 +420,7 @@ class GoogleContactsService {
         return crmId && parseInt(crmId.value, 10) === patient.id;
       });
     } catch (error) {
-      console.error('Error finding existing contact:', error);
+      logger.error('Error finding existing contact:', error);
       return null;
     }
   }
@@ -452,7 +452,7 @@ class GoogleContactsService {
         )
       );
     } catch (error) {
-      console.error('Error fetching Google contacts:', error);
+      logger.error('Error fetching Google contacts:', error);
       throw error;
     }
   }
@@ -509,7 +509,7 @@ class GoogleContactsService {
       });
       return true;
     } catch (error) {
-      console.error('Error deleting Google contact:', error);
+      logger.error('Error deleting Google contact:', error);
       throw error;
     }
   }

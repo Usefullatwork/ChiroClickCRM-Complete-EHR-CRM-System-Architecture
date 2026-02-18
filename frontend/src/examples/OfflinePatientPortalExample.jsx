@@ -37,6 +37,7 @@ import { patientApi, getStoredToken } from '../api/patientApi';
 // Import your existing components
 import ExerciseCard from '../components/patient/ExerciseCard';
 
+import logger from '../utils/logger';
 /**
  * Example: Offline-Enabled My Exercises Page
  */
@@ -103,7 +104,7 @@ export default function OfflineMyExercisesExample() {
                   await cachePrescriptionOffline(detail.data);
                 }
               } catch (e) {
-                console.warn('Failed to cache prescription:', e);
+                logger.warn('Failed to cache prescription:', e);
               }
             }
           }
@@ -125,7 +126,7 @@ export default function OfflineMyExercisesExample() {
         }
       }
     } catch (err) {
-      console.error('Error loading data:', err);
+      logger.error('Error loading data:', err);
 
       // On error, try cache
       if (!isOnline) {
@@ -190,7 +191,7 @@ export default function OfflineMyExercisesExample() {
           setTodayProgress(progress);
         }
       } catch (err) {
-        console.error('Error loading prescription:', err);
+        logger.error('Error loading prescription:', err);
 
         // Try cache on error
         const cached = await getCachedPrescriptionData(prescriptionId);

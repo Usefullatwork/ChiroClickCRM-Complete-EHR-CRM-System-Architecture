@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * PWA Hook
  *
@@ -14,6 +13,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
+import logger from '../utils/logger';
 // =============================================================================
 // TRANSLATIONS
 // =============================================================================
@@ -61,7 +61,7 @@ export async function registerServiceWorker() {
         scope: '/',
       });
 
-      console.log('[PWA] Service worker registered:', registration.scope);
+      logger.debug('[PWA] Service worker registered:', registration.scope);
 
       // Check for updates periodically
       setInterval(
@@ -73,7 +73,7 @@ export async function registerServiceWorker() {
 
       return registration;
     } catch (error) {
-      console.error('[PWA] Service worker registration failed:', error);
+      logger.error('[PWA] Service worker registration failed:', error);
       return null;
     }
   }
@@ -89,7 +89,7 @@ export async function unregisterServiceWorker() {
     for (const registration of registrations) {
       await registration.unregister();
     }
-    console.log('[PWA] Service workers unregistered');
+    logger.debug('[PWA] Service workers unregistered');
   }
 }
 

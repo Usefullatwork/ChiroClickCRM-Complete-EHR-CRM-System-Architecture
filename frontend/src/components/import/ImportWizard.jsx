@@ -37,6 +37,7 @@ import CSVColumnMapper from './CSVColumnMapper';
 import VCardImport from './VCardImport';
 import { api } from '../../api/client';
 
+import logger from '../../utils/logger';
 // Norwegian translations
 const TRANSLATIONS = {
   en: {
@@ -286,7 +287,7 @@ export default function ImportWizard({
         setStep(3);
       }
     } catch (error) {
-      console.error('Parse error:', error);
+      logger.error('Parse error:', error);
     }
   }, [pastedText]);
 
@@ -311,7 +312,7 @@ export default function ImportWizard({
         link.remove();
       }
     } catch (error) {
-      console.error('Download error:', error);
+      logger.error('Download error:', error);
     }
   }, []);
 

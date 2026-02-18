@@ -6,6 +6,7 @@
  */
 
 import { useState, useMemo } from 'react';
+import logger from '../../utils/logger';
 import {
   FileText,
   Search,
@@ -109,7 +110,7 @@ const TemplateSelector = ({
       setNewTemplateCategory('');
       setNewTemplateDescription('');
     } catch (error) {
-      console.error('Error saving template:', error);
+      logger.error('Error saving template:', error);
     } finally {
       setSaving(false);
     }

@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { billingAPI } from '../../services/api';
 
+import logger from '../../utils/logger';
 /**
  * Get status configuration
  */
@@ -134,7 +135,7 @@ export default function InvoicePreview({ invoiceId, onClose, onRecordPayment }) 
       printWindow.document.close();
       setTimeout(() => printWindow.print(), 250);
     } catch (error) {
-      console.error('Failed to print:', error);
+      logger.error('Failed to print:', error);
     }
   };
 
@@ -145,7 +146,7 @@ export default function InvoicePreview({ invoiceId, onClose, onRecordPayment }) 
     try {
       await finalizeMutation.mutateAsync();
     } catch (error) {
-      console.error('Failed to send invoice:', error);
+      logger.error('Failed to send invoice:', error);
     }
   };
 

@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { crmAPI } from '../../services/api';
 
+import logger from '../../utils/logger';
 const PatientLifecycle = () => {
   const [selectedStage, setSelectedStage] = useState('ALL');
   const [searchTerm, setSearchTerm] = useState('');
@@ -131,7 +132,7 @@ const PatientLifecycle = () => {
         setPatients(patientData);
         setStats(statsRes.data);
       } catch (err) {
-        console.error('Error fetching lifecycle data:', err);
+        logger.error('Error fetching lifecycle data:', err);
         setError(err.message || 'Failed to load patient data');
       } finally {
         setLoading(false);

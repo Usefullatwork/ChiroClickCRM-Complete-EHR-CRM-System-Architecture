@@ -15,6 +15,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Mic, MicOff, Square, AlertCircle } from 'lucide-react';
 
+import logger from '../../utils/logger';
 // Check if browser supports speech recognition
 const SpeechRecognition =
   typeof window !== 'undefined' ? window.SpeechRecognition || window.webkitSpeechRecognition : null;
@@ -93,7 +94,7 @@ export default function VoiceInputButton({
     };
 
     recognition.onerror = (event) => {
-      console.error('Speech recognition error:', event.error);
+      logger.error('Speech recognition error:', event.error);
 
       // Norwegian error messages
       const errorMessages = {
@@ -130,7 +131,7 @@ export default function VoiceInputButton({
       try {
         recognitionRef.current?.start();
       } catch (err) {
-        console.warn('Recognition start error:', err);
+        logger.warn('Recognition start error:', err);
         setError('Kunne ikke starte talegjenkjenning');
       }
     }

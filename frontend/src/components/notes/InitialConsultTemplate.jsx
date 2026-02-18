@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import ICD10CodePicker from './ICD10CodePicker';
 
+import logger from '../../utils/logger';
 /**
  * InitialConsultTemplate Component
  * Forstegangskonsultasjon-mal med utvidet anamnese
@@ -202,7 +203,7 @@ export default function InitialConsultTemplate({
           setHasChanges(false);
         }
       } catch (error) {
-        console.error('Auto-save failed:', error);
+        logger.error('Auto-save failed:', error);
       }
     }, 30000);
 

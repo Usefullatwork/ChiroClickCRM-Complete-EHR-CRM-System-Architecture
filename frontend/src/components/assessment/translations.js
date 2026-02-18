@@ -3,6 +3,8 @@
  * Supports English (en) and Norwegian (no)
  */
 
+import logger from '../../utils/logger';
+
 export const TRANSLATIONS = {
   // =============================================================================
   // COMMON / SHARED
@@ -755,13 +757,13 @@ export const TRANSLATIONS = {
 export function t(section, key, lang = 'en') {
   const sectionData = TRANSLATIONS[section];
   if (!sectionData) {
-    console.warn(`Translation section not found: ${section}`);
+    logger.warn(`Translation section not found: ${section}`);
     return key;
   }
 
   const langData = sectionData[lang] || sectionData['en'];
   if (!langData) {
-    console.warn(`Language not found: ${lang} in section ${section}`);
+    logger.warn(`Language not found: ${lang} in section ${section}`);
     return key;
   }
 
@@ -773,7 +775,7 @@ export function t(section, key, lang = 'en') {
       return enTranslation;
     }
 
-    console.warn(`Translation key not found: ${key} in section ${section}`);
+    logger.warn(`Translation key not found: ${key} in section ${section}`);
     return key;
   }
 

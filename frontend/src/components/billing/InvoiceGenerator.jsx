@@ -13,6 +13,7 @@ import { FileText, User, Save, Send, X, AlertCircle, Check, Loader2, Search } fr
 import { billingAPI, patientsAPI } from '../../services/api';
 import TakstCodes from './TakstCodes';
 
+import logger from '../../utils/logger';
 /**
  * InvoiceGenerator Component
  * @param {Object} props
@@ -161,7 +162,7 @@ export default function InvoiceGenerator({
         await billingAPI.finalizeInvoice(response.data.id);
       }
     } catch (error) {
-      console.error('Failed to create invoice:', error);
+      logger.error('Failed to create invoice:', error);
     }
   };
 

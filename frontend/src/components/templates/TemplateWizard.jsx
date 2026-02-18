@@ -6,6 +6,7 @@
 import { useState, useCallback } from 'react';
 import { aiAPI } from '../../services/api';
 
+import logger from '../../utils/logger';
 // Template types with Norwegian translations
 const TEMPLATE_TYPES = [
   { value: 'recall_3m', label: 'Recall (3 måneder)', labelNo: '3-måneders innkalling' },
@@ -120,7 +121,7 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
         generateSampleContent(formData.type, formData.tone, formData.channel, 3),
       ]);
     } catch (error) {
-      console.error('Error generating template:', error);
+      logger.error('Error generating template:', error);
     } finally {
       setIsGenerating(false);
     }

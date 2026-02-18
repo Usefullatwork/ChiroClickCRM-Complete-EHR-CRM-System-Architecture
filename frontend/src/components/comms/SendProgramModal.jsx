@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import api from '../../api/client';
 
+import logger from '../../utils/logger';
 /**
  * Send Program Modal Component
  * Modal for sending exercise programs to patients via email and/or SMS
@@ -117,7 +118,7 @@ export default function SendProgramModal({ isOpen, onClose, prescription, patien
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      console.error('Failed to copy link:', error);
+      logger.error('Failed to copy link:', error);
     }
   };
 

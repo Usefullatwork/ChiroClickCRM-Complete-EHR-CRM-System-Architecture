@@ -25,6 +25,7 @@ import {
 import { patientApi, getStoredToken, clearStoredToken } from '../../api/patientApi';
 import VimeoPlayer from '../../components/exercises/VimeoPlayer';
 
+import logger from '../../utils/logger';
 const ExerciseDetail = () => {
   const navigate = useNavigate();
   const { prescriptionId, exerciseId } = useParams();
@@ -78,7 +79,7 @@ const ExerciseDetail = () => {
         }));
       }
     } catch (err) {
-      console.error('Error loading exercise:', err);
+      logger.error('Error loading exercise:', err);
       if (err.status === 401) {
         clearStoredToken();
         navigate('/portal/login');
@@ -108,7 +109,7 @@ const ExerciseDetail = () => {
         loadExercise();
       }
     } catch (err) {
-      console.error('Error recording progress:', err);
+      logger.error('Error recording progress:', err);
       setError(err.message || 'Kunne ikke registrere fremgang');
     } finally {
       setSubmitting(false);

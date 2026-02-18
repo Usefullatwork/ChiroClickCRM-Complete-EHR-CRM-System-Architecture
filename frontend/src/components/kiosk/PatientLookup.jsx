@@ -11,6 +11,7 @@
 import { useState, useCallback } from 'react';
 import { Search, Loader2, AlertCircle } from 'lucide-react';
 
+import logger from '../../utils/logger';
 const TRANSLATIONS = {
   en: {
     title: 'Check In',
@@ -95,7 +96,7 @@ export default function PatientLookup({ onSelect, lang = 'no', apiBase = '/api/v
       const data = await res.json();
       setResults(data.appointments || []);
     } catch (err) {
-      console.error('Kiosk lookup error:', err);
+      logger.error('Kiosk lookup error:', err);
       setError(lang === 'no' ? 'Søk mislyktes. Prøv igjen.' : 'Search failed. Please try again.');
       setResults([]);
     } finally {

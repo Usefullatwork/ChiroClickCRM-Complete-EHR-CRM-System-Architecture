@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { crmAPI } from '../../services/api';
 
+import logger from '../../utils/logger';
 const RetentionDashboard = () => {
   const [timeRange, setTimeRange] = useState('30d');
   const [_selectedMetric, _setSelectedMetric] = useState('retention');
@@ -85,7 +86,7 @@ const RetentionDashboard = () => {
           );
         }
       } catch (err) {
-        console.error('Error fetching retention data:', err);
+        logger.error('Error fetching retention data:', err);
         setError(err.message || 'Failed to load retention data');
       } finally {
         setLoading(false);

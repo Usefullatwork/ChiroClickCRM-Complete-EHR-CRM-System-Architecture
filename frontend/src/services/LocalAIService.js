@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * LocalAIService - Integration with Local LLM
  *
@@ -10,6 +9,7 @@
 
 import React from 'react';
 
+import logger from '../utils/logger';
 // Default configuration - can be overridden via settings
 const DEFAULT_CONFIG = {
   // Ollama default endpoint
@@ -274,7 +274,7 @@ class LocalAIService {
         const data = await response.json();
         this.isAvailable = true;
         this.config.endpoint = DEFAULT_CONFIG.endpoints.ollama;
-        console.log('Local AI: Connected to Ollama', data.models?.length, 'models available');
+        logger.debug('Local AI: Connected to Ollama', data.models?.length, 'models available');
         return { available: true, backend: 'ollama', models: data.models };
       }
     } catch (e) {
@@ -288,7 +288,7 @@ class LocalAIService {
         if (response.ok) {
           this.isAvailable = true;
           this.config.endpoint = DEFAULT_CONFIG.endpoints.textGenWebUI;
-          console.log('Local AI: Connected to text-generation-webui');
+          logger.debug('Local AI: Connected to text-generation-webui');
           return { available: true, backend: 'textGenWebUI' };
         }
       } catch (e2) {

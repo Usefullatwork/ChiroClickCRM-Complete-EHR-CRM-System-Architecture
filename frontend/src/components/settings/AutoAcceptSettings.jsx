@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import api from '../../services/api';
 
+import logger from '../../utils/logger';
 const AutoAcceptSettings = () => {
   // State
   const [settings, setSettings] = useState({
@@ -95,7 +96,7 @@ const AutoAcceptSettings = () => {
         });
       }
     } catch (err) {
-      console.error('Error loading settings:', err);
+      logger.error('Error loading settings:', err);
       setError('Kunne ikke laste innstillinger');
     } finally {
       setLoading(false);
@@ -109,7 +110,7 @@ const AutoAcceptSettings = () => {
       });
       setLog(response.data.data || []);
     } catch (err) {
-      console.error('Error loading log:', err);
+      logger.error('Error loading log:', err);
     }
   };
 
@@ -124,7 +125,7 @@ const AutoAcceptSettings = () => {
       setSuccess('Innstillinger lagret!');
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      console.error('Error saving settings:', err);
+      logger.error('Error saving settings:', err);
       setError('Kunne ikke lagre innstillinger');
     } finally {
       setSaving(false);

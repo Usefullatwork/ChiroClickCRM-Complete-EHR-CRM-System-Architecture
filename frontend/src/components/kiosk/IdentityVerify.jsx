@@ -10,6 +10,7 @@
 import { useState } from 'react';
 import { Loader2, ShieldCheck, AlertCircle, ArrowLeft } from 'lucide-react';
 
+import logger from '../../utils/logger';
 const TRANSLATIONS = {
   en: {
     title: 'Verify Your Identity',
@@ -103,7 +104,7 @@ export default function IdentityVerify({
         setError(t.failed);
       }
     } catch (err) {
-      console.error('Verify error:', err);
+      logger.error('Verify error:', err);
       setError(lang === 'no' ? 'Bekreftelse mislyktes' : 'Verification failed');
     } finally {
       setLoading(false);

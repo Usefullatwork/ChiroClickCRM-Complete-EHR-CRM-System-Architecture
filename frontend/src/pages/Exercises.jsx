@@ -25,6 +25,7 @@ import { exercisesApi } from '../api/exercises';
 import ExerciseLibrary from '../components/exercises/ExerciseLibrary';
 import ExercisePrescription from '../components/exercises/ExercisePrescription';
 
+import logger from '../utils/logger';
 export default function Exercises() {
   const { patientId } = useParams();
   const navigate = useNavigate();
@@ -84,7 +85,7 @@ export default function Exercises() {
         setPrescriptions(prescriptionsRes.data || []);
       }
     } catch (err) {
-      console.error('Failed to load exercises:', err);
+      logger.error('Failed to load exercises:', err);
       setError(language === 'no' ? 'Kunne ikke laste øvelser' : 'Failed to load exercises');
     } finally {
       setLoading(false);
@@ -144,7 +145,7 @@ export default function Exercises() {
 
       return response.data;
     } catch (err) {
-      console.error('Save failed:', err);
+      logger.error('Save failed:', err);
       setError(language === 'no' ? 'Kunne ikke lagre øvelsesprogram' : 'Failed to save program');
       throw err;
     } finally {
@@ -161,7 +162,7 @@ export default function Exercises() {
       setSuccess(language === 'no' ? 'E-post sendt!' : 'Email sent!');
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      console.error('Send email failed:', err);
+      logger.error('Send email failed:', err);
       setError(language === 'no' ? 'Kunne ikke sende e-post' : 'Failed to send email');
     } finally {
       setSending(false);
@@ -177,7 +178,7 @@ export default function Exercises() {
       setSuccess(language === 'no' ? 'SMS sendt!' : 'SMS sent!');
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      console.error('Send SMS failed:', err);
+      logger.error('Send SMS failed:', err);
       setError(language === 'no' ? 'Kunne ikke sende SMS' : 'Failed to send SMS');
     } finally {
       setSending(false);
@@ -203,7 +204,7 @@ export default function Exercises() {
       setSuccess(language === 'no' ? 'PDF lastet ned!' : 'PDF downloaded!');
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      console.error('PDF generation failed:', err);
+      logger.error('PDF generation failed:', err);
       setError(language === 'no' ? 'Kunne ikke generere PDF' : 'Failed to generate PDF');
     } finally {
       setSending(false);
@@ -219,7 +220,7 @@ export default function Exercises() {
       setTimeout(() => setSuccess(null), 3000);
       await loadData();
     } catch (err) {
-      console.error('Seed failed:', err);
+      logger.error('Seed failed:', err);
       setError(language === 'no' ? 'Kunne ikke legge til øvelser' : 'Failed to add exercises');
     } finally {
       setLoading(false);

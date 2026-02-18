@@ -13,6 +13,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
+import logger from '../../utils/logger';
 import {
   Play,
   Check,
@@ -462,7 +463,7 @@ const PatientExercises = () => {
       const data = await response.json();
       setPrescriptions(data.data || []);
     } catch (err) {
-      console.error('Failed to load exercises:', err);
+      logger.error('Failed to load exercises:', err);
       setError(err.message);
     }
   };
@@ -504,7 +505,7 @@ const PatientExercises = () => {
         })
       );
     } catch (err) {
-      console.error('Failed to log compliance:', err);
+      logger.error('Failed to log compliance:', err);
       setError('Kunne ikke lagre gjennomføring');
     }
   };
@@ -526,7 +527,7 @@ const PatientExercises = () => {
         prev.map((p) => (p.id === prescriptionId ? { ...p, patient_rating: rating } : p))
       );
     } catch (err) {
-      console.error('Failed to rate exercise:', err);
+      logger.error('Failed to rate exercise:', err);
     }
   };
 
@@ -556,7 +557,7 @@ const PatientExercises = () => {
       window.URL.revokeObjectURL(url);
       a.remove();
     } catch (err) {
-      console.error('Failed to download PDF:', err);
+      logger.error('Failed to download PDF:', err);
       setError('Kunne ikke laste ned PDF');
     }
   };

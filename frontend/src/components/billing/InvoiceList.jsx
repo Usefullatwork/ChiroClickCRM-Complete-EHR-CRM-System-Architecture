@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { billingAPI } from '../../services/api';
 
+import logger from '../../utils/logger';
 /**
  * Get status badge styling and label
  */
@@ -161,7 +162,7 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
       await finalizeMutation.mutateAsync(invoiceId);
       setActiveDropdown(null);
     } catch (error) {
-      console.error('Failed to send invoice:', error);
+      logger.error('Failed to send invoice:', error);
     }
   };
 
@@ -178,7 +179,7 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
       await cancelMutation.mutateAsync({ invoiceId, reason });
       setActiveDropdown(null);
     } catch (error) {
-      console.error('Failed to cancel invoice:', error);
+      logger.error('Failed to cancel invoice:', error);
     }
   };
 
@@ -193,7 +194,7 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
       printWindow.document.close();
       setTimeout(() => printWindow.print(), 250);
     } catch (error) {
-      console.error('Failed to print invoice:', error);
+      logger.error('Failed to print invoice:', error);
     }
   };
 

@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { lettersApi } from '../api/letters';
 
+import logger from '../utils/logger';
 // Letter type definitions
 const LETTER_TYPES = {
   SICK_NOTE: {
@@ -94,7 +95,7 @@ export default function Letters() {
       const response = await lettersApi.getLetterTypes();
       setLetterTypes(response.types || response || []);
     } catch (err) {
-      console.error('Error fetching letter types:', err);
+      logger.error('Error fetching letter types:', err);
       // Use default types on error
       setLetterTypes(Object.values(LETTER_TYPES));
     }
@@ -144,7 +145,7 @@ export default function Letters() {
         },
       ]);
     } catch (err) {
-      console.error('Error fetching letters:', err);
+      logger.error('Error fetching letters:', err);
       setError(language === 'no' ? 'Kunne ikke laste brev' : 'Failed to load letters');
     } finally {
       setLoading(false);

@@ -14,6 +14,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
+import logger from '../../utils/logger';
 import {
   MessageSquare,
   Send,
@@ -168,7 +169,7 @@ export default function SMSConversation({
       setNewMessage('');
       loadConversations();
     } catch (error) {
-      console.error('Failed to send message:', error);
+      logger.error('Failed to send message:', error);
     } finally {
       setIsSending(false);
     }

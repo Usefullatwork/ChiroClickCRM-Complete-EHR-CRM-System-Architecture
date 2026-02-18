@@ -5,6 +5,7 @@
 
 import { useState, useCallback } from 'react';
 
+import logger from '../utils/logger';
 // Feedback categories (should match database seed)
 const FEEDBACK_CATEGORIES = {
   positive: [
@@ -41,7 +42,7 @@ export const QuickFeedback = ({ suggestionId, onFeedback }) => {
       try {
         await onFeedback(suggestionId, { wasHelpful: isHelpful });
       } catch (error) {
-        console.error('Failed to submit feedback:', error);
+        logger.error('Failed to submit feedback:', error);
         setSubmitted(false);
       }
     },
@@ -113,7 +114,7 @@ export const DetailedFeedback = ({ suggestionId, suggestionText, onSubmit, onCan
         decision: modifiedText !== suggestionText ? 'MODIFIED' : 'APPROVED',
       });
     } catch (error) {
-      console.error('Failed to submit feedback:', error);
+      logger.error('Failed to submit feedback:', error);
     } finally {
       setIsSubmitting(false);
     }

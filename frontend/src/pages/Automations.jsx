@@ -41,6 +41,7 @@ import { automationsAPI, patientsAPI, usersAPI } from '../services/api';
 import { formatRelativeTime } from '../lib/utils';
 import toast from '../utils/toast';
 
+import logger from '../utils/logger';
 // =============================================================================
 // API HELPERS
 // =============================================================================
@@ -342,7 +343,7 @@ export default function Automations() {
       const result = await api.testWorkflow(testData);
       return result;
     } catch (error) {
-      console.error('Test error:', error);
+      logger.error('Test error:', error);
       throw error;
     }
   };

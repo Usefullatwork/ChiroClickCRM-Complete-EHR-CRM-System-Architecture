@@ -6,6 +6,7 @@
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
+import logger from '../utils/logger';
 /**
  * Single Macro Button
  */
@@ -17,7 +18,7 @@ const MacroButton = React.memo(({ macro, onInsert, isLoading }) => {
 
     // Log if insertion exceeds target
     if (insertTime > 100) {
-      console.warn(`Macro insertion exceeded 100ms target: ${insertTime.toFixed(2)}ms`);
+      logger.warn(`Macro insertion exceeded 100ms target: ${insertTime.toFixed(2)}ms`);
     }
   }, [macro, onInsert]);
 

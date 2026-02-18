@@ -18,6 +18,7 @@ import { Button } from '../ui/Button';
 import { Textarea } from '../ui/Textarea';
 import { AISuggestionCard } from './AISuggestionCard';
 
+import logger from '../../utils/logger';
 // Bilingual text support
 const TEXTS = {
   NO: {
@@ -219,7 +220,7 @@ export const AIFeedbackPanel = ({
       await onSubmitFeedback(feedbackData);
       setIsSubmitted(true);
     } catch (error) {
-      console.error('Failed to submit feedback:', error);
+      logger.error('Failed to submit feedback:', error);
     } finally {
       setIsSubmitting(false);
     }

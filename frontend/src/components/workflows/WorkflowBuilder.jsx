@@ -15,6 +15,7 @@
  */
 
 import { useState, useCallback } from 'react';
+import logger from '../../utils/logger';
 import {
   Play,
   Plus,
@@ -397,7 +398,7 @@ export default function WorkflowBuilder({
 
       await onSave?.(workflowData);
     } catch (error) {
-      console.error('Error saving workflow:', error);
+      logger.error('Error saving workflow:', error);
     } finally {
       setIsSaving(false);
     }
@@ -423,7 +424,7 @@ export default function WorkflowBuilder({
       });
       setTestResult(result);
     } catch (error) {
-      console.error('Error testing workflow:', error);
+      logger.error('Error testing workflow:', error);
       setTestResult({ success: false, error: error.message });
     } finally {
       setIsTesting(false);

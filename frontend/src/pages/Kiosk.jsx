@@ -22,6 +22,7 @@ import PainAssessment from '../components/kiosk/PainAssessment';
 import QuickScreening from '../components/kiosk/QuickScreening';
 import CheckInConfirmation from '../components/kiosk/CheckInConfirmation';
 
+import logger from '../utils/logger';
 const STEPS = {
   LOOKUP: 'lookup',
   VERIFY: 'verify',
@@ -125,7 +126,7 @@ export default function Kiosk() {
         setData((prev) => ({ ...prev, screening: screeningData }));
         setCurrentStep(STEPS.CONFIRMATION);
       } catch (error) {
-        console.error('Check-in error:', error);
+        logger.error('Check-in error:', error);
         // Still show confirmation but log error
         setData((prev) => ({ ...prev, screening: screeningData }));
         setCurrentStep(STEPS.CONFIRMATION);

@@ -34,6 +34,7 @@ import { Alert } from '../ui/Alert';
 import { Input } from '../ui/Input';
 import { Modal } from '../ui/Modal';
 
+import logger from '../../utils/logger';
 // Patient field definitions with Norwegian labels
 export const PATIENT_FIELDS = [
   { field: 'first_name', label: 'First Name', labelNo: 'Fornavn', required: true, group: 'basic' },
@@ -484,7 +485,7 @@ export default function CSVColumnMapper({
         setSavedTemplates(JSON.parse(stored));
       }
     } catch (e) {
-      console.error('Error loading templates:', e);
+      logger.error('Error loading templates:', e);
     }
   }, []);
 

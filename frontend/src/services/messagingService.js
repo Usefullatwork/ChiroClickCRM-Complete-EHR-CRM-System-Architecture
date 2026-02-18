@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * Messaging Service
  *
@@ -15,6 +14,8 @@
  */
 
 // Storage keys
+import logger from '../utils/logger';
+
 const STORAGE_KEYS = {
   CONFIG: 'chiroclick_messaging_config',
   CONVERSATIONS: 'chiroclick_conversations',
@@ -234,7 +235,7 @@ export async function sendSMS(to, message, options = {}) {
   const config = getMessagingConfig();
 
   if (!config.enabled) {
-    console.warn('Messaging is not enabled');
+    logger.warn('Messaging is not enabled');
     return { success: false, error: 'Messaging not enabled' };
   }
 
@@ -257,7 +258,7 @@ export async function sendSMS(to, message, options = {}) {
     // For now, we'll simulate the send
     if (config.provider === 'mock' || !config.apiKey) {
       // Mock mode - simulate successful send
-      console.log('[MOCK SMS]', { to: normalizedTo, message });
+      logger.debug('[MOCK SMS]', { to: normalizedTo, message });
       messageRecord.status = MESSAGE_STATUS.SENT;
 
       // Store in conversation history
@@ -365,7 +366,7 @@ function storeMessage(message) {
 
     localStorage.setItem(STORAGE_KEYS.CONVERSATIONS, JSON.stringify(conversations));
   } catch (e) {
-    console.error('Failed to store message:', e);
+    logger.error('Failed to store message:', e);
   }
 }
 
@@ -403,7 +404,7 @@ export function markConversationRead(phone) {
       localStorage.setItem(STORAGE_KEYS.CONVERSATIONS, JSON.stringify(conversations));
     }
   } catch (e) {
-    console.error('Failed to mark conversation read:', e);
+    logger.error('Failed to mark conversation read:', e);
   }
 }
 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { authAPI, setOrganizationId } from '../services/api';
 
+import logger from '../utils/logger';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -28,7 +29,7 @@ export default function Login() {
       toast.success('Successfully logged in');
       navigate('/');
     } catch (error) {
-      console.error('Login error:', error);
+      logger.error('Login error:', error);
       const msg = error.response?.data?.message || 'Failed to login';
       setErrorMessage(msg);
       toast.error(msg);
@@ -118,7 +119,7 @@ export default function Login() {
                     toast.success('Dev Login Successful');
                     navigate('/');
                   } catch (error) {
-                    console.error('Dev login failed', error);
+                    logger.error('Dev login failed', error);
                     toast.error('Dev Login Failed');
                   } finally {
                     setLoading(false);

@@ -33,6 +33,7 @@ import PrescriptionPreview from '../components/exercises/PrescriptionPreview';
 import TemplateSelector from '../components/exercises/TemplateSelector';
 import WeeklyScheduleView from '../components/exercises/WeeklyScheduleView';
 
+import logger from '../utils/logger';
 /**
  * ExercisePrescription Component
  * Hovedkomponent for treningsforskrivningsbygger
@@ -255,7 +256,7 @@ export default function ExercisePrescription() {
         refetchTemplates();
         setTimeout(() => setSuccess(null), 3000);
       } catch (err) {
-        console.error('Error saving template:', err);
+        logger.error('Error saving template:', err);
         setError('Kunne ikke opprette mal');
         throw err;
       }
@@ -305,7 +306,7 @@ export default function ExercisePrescription() {
 
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      console.error('Save failed:', err);
+      logger.error('Save failed:', err);
       setError(err.message || 'Kunne ikke lagre treningsprogram');
     } finally {
       setSaving(false);
@@ -329,7 +330,7 @@ export default function ExercisePrescription() {
       setSuccess('E-post sendt til pasient!');
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      console.error('Send email failed:', err);
+      logger.error('Send email failed:', err);
       setError('Kunne ikke sende e-post');
     } finally {
       setSending(false);
@@ -353,7 +354,7 @@ export default function ExercisePrescription() {
       setSuccess('SMS sendt til pasient!');
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      console.error('Send SMS failed:', err);
+      logger.error('Send SMS failed:', err);
       setError('Kunne ikke sende SMS');
     } finally {
       setSending(false);
@@ -389,7 +390,7 @@ export default function ExercisePrescription() {
       setSuccess('PDF lastet ned!');
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      console.error('PDF download failed:', err);
+      logger.error('PDF download failed:', err);
       setError('Kunne ikke generere PDF');
     } finally {
       setSending(false);

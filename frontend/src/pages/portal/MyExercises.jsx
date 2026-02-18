@@ -31,6 +31,7 @@ import { patientApi, getStoredToken, clearStoredToken } from '../../api/patientA
 import ExerciseCard from '../../components/patient/ExerciseCard';
 import useMediaQuery from '../../hooks/useMediaQuery';
 
+import logger from '../../utils/logger';
 const MyExercises = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -120,7 +121,7 @@ const MyExercises = () => {
         }
       }
     } catch (err) {
-      console.error('Error loading prescriptions:', err);
+      logger.error('Error loading prescriptions:', err);
       if (err.status === 401) {
         // Token expired - redirect to login
         clearStoredToken();
@@ -151,7 +152,7 @@ const MyExercises = () => {
         setDailySummary(summaryResponse.data);
       }
     } catch (err) {
-      console.error('Error loading prescription detail:', err);
+      logger.error('Error loading prescription detail:', err);
       setError(err.message || 'Kunne ikke laste øvelsene');
     } finally {
       setRefreshing(false);

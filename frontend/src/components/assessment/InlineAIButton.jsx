@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Sparkles, Square, Loader2, Check, AlertCircle } from 'lucide-react';
 import { API_URL } from '../../services/api';
 
+import logger from '../../utils/logger';
 /**
  * InlineAIButton - Small AI generation button for individual fields
  * Features:
@@ -143,7 +144,7 @@ export default function InlineAIButton({
           onTextGenerated(streamText);
         }
       } else {
-        console.error('AI generation error:', err);
+        logger.error('AI generation error:', err);
         setError(err.message);
       }
     } finally {

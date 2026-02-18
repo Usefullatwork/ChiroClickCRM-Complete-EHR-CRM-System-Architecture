@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 
+import logger from '../utils/logger';
 const API_BASE = import.meta.env.VITE_API_URL || '/api/v1';
 
 const PatientPortal = () => {
@@ -62,7 +63,7 @@ const PatientPortal = () => {
       // Load progress history
       loadProgressHistory();
     } catch (err) {
-      console.error('Error loading prescription:', err);
+      logger.error('Error loading prescription:', err);
       setError(err.response?.data?.message || 'Kunne ikke laste øvelsesprogrammet');
     } finally {
       setLoading(false);
@@ -84,7 +85,7 @@ const PatientPortal = () => {
       });
       setCompletedExercises(completedToday);
     } catch (err) {
-      console.error('Error loading progress:', err);
+      logger.error('Error loading progress:', err);
     }
   };
 
@@ -116,7 +117,7 @@ const PatientPortal = () => {
       // Refresh progress
       loadProgressHistory();
     } catch (err) {
-      console.error('Error recording progress:', err);
+      logger.error('Error recording progress:', err);
     }
   };
 

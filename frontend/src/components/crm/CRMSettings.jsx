@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { crmAPI } from '../../services/api';
 
+import logger from '../../utils/logger';
 const CRMSettings = () => {
   const [activeSection, setActiveSection] = useState('checkin');
   const [hasChanges, setHasChanges] = useState(false);
@@ -316,7 +317,7 @@ const CRMSettings = () => {
       await crmAPI.updateSettings?.(settingsPayload);
       setHasChanges(false);
     } catch (err) {
-      console.error('Failed to save settings:', err);
+      logger.error('Failed to save settings:', err);
       setError(err.message || 'Kunne ikke lagre innstillinger');
     } finally {
       setSaving(false);
