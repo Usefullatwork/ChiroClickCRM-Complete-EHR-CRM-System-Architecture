@@ -419,6 +419,38 @@ const getModelForTask = async (taskType) => {
 const isAIAvailable = () => AI_ENABLED;
 
 /**
+ * Log an AI suggestion to the database for analytics tracking.
+ * Runs asynchronously — callers should .catch() to avoid blocking.
+ */
+const logSuggestion = async ({
+  organizationId,
+  suggestionType,
+  modelName,
+  inputText,
+  suggestedText,
+  confidenceScore,
+  requestDurationMs,
+  abVariant,
+}) => {
+  await query(
+    `INSERT INTO ai_suggestions
+      (organization_id, suggestion_type, model_name, input_text, suggested_text,
+       confidence_score, request_duration_ms, model_version, created_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())`,
+    [
+      organizationId,
+      suggestionType,
+      modelName,
+      inputText,
+      suggestedText,
+      confidenceScore,
+      requestDurationMs,
+      abVariant || null,
+    ]
+  );
+};
+
+/**
  * Generate AI completion using selected provider
  *
  * Enhanced with:
@@ -550,6 +582,23 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
 
     currentLoadedModel = model;
     rawOutput = response.data.response;
+
+    // Log suggestion to ai_suggestions table (non-blocking)
+    if (organizationId && taskType) {
+      const durationMs = response.data.total_duration
+        ? Math.round(response.data.total_duration / 1e6)
+        : null;
+      logSuggestion({
+        organizationId,
+        suggestionType: taskType,
+        modelName: model,
+        inputText: sanitizedPrompt.substring(0, 500),
+        suggestedText: rawOutput.substring(0, 2000),
+        confidenceScore: null,
+        requestDurationMs: durationMs,
+        abVariant,
+      }).catch((err) => logger.warn('Failed to log AI suggestion:', err.message));
+    }
   } catch (error) {
     logger.error('AI completion error:', error.message);
     throw new Error('AI service unavailable');

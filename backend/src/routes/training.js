@@ -499,6 +499,50 @@ router.get(
   aiAnalyticsController.getModelComparison
 );
 
+/**
+ * @swagger
+ * /training/analytics/feedback:
+ *   post:
+ *     summary: Submit feedback for an AI suggestion
+ *     description: Records whether a suggestion was accepted/rejected with optional rating
+ *     tags: [Training]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - suggestionId
+ *             properties:
+ *               suggestionId:
+ *                 type: string
+ *                 format: uuid
+ *               accepted:
+ *                 type: boolean
+ *               rating:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 5
+ *               correctionText:
+ *                 type: string
+ *               feedbackStatus:
+ *                 type: string
+ *                 enum: [APPROVED, MODIFIED, REJECTED]
+ *     responses:
+ *       200:
+ *         description: Feedback recorded
+ *       404:
+ *         description: Suggestion not found
+ */
+router.post(
+  '/analytics/feedback',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  aiAnalyticsController.submitFeedback
+);
+
 // ============================================================================
 // DATA CURATION ENDPOINTS
 // ============================================================================
