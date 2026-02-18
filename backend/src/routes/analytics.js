@@ -24,9 +24,33 @@ router.use(requireAuth);
 router.use(requireOrganization);
 
 /**
- * @route   GET /api/v1/analytics/dashboard
- * @desc    Get comprehensive analytics dashboard data
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /analytics/dashboard:
+ *   get:
+ *     summary: Get comprehensive analytics dashboard data
+ *     tags: [Analytics]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Start date for analytics range (YYYY-MM-DD)
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: End date for analytics range (YYYY-MM-DD)
+ *     responses:
+ *       200:
+ *         description: Dashboard analytics data
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
  */
 router.get(
   '/dashboard',
@@ -58,9 +82,20 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/analytics/patients
- * @desc    Get patient statistics
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /analytics/patients:
+ *   get:
+ *     summary: Get patient statistics
+ *     tags: [Analytics]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Patient statistics
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
  */
 router.get('/patients', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
   try {
@@ -82,9 +117,20 @@ router.get('/patients', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res)
 });
 
 /**
- * @route   GET /api/v1/analytics/appointments
- * @desc    Get appointment statistics
- * @access  Private (ADMIN, PRACTITIONER, ASSISTANT)
+ * @swagger
+ * /analytics/appointments:
+ *   get:
+ *     summary: Get appointment statistics
+ *     tags: [Analytics]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Appointment statistics
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
  */
 router.get(
   '/appointments',
@@ -110,9 +156,33 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/analytics/revenue
- * @desc    Get revenue statistics
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /analytics/revenue:
+ *   get:
+ *     summary: Get revenue statistics
+ *     tags: [Analytics]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Start date for revenue range (YYYY-MM-DD)
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: End date for revenue range (YYYY-MM-DD)
+ *     responses:
+ *       200:
+ *         description: Revenue statistics
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
  */
 router.get(
   '/revenue',
@@ -141,9 +211,27 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/analytics/exercises/top
- * @desc    Get most prescribed exercises
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /analytics/exercises/top:
+ *   get:
+ *     summary: Get most prescribed exercises
+ *     tags: [Analytics]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of top exercises to return
+ *     responses:
+ *       200:
+ *         description: List of top prescribed exercises
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
  */
 router.get(
   '/exercises/top',
@@ -172,9 +260,20 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/analytics/exercises/compliance
- * @desc    Get exercise compliance statistics
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /analytics/exercises/compliance:
+ *   get:
+ *     summary: Get exercise compliance statistics
+ *     tags: [Analytics]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Exercise compliance statistics
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
  */
 router.get('/exercises/compliance', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
   try {
@@ -196,9 +295,20 @@ router.get('/exercises/compliance', requireRole(['ADMIN', 'PRACTITIONER']), asyn
 });
 
 /**
- * @route   GET /api/v1/analytics/trends/patients
- * @desc    Get patient volume trends
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /analytics/trends/patients:
+ *   get:
+ *     summary: Get patient volume trends
+ *     tags: [Analytics]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Patient volume trend data
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
  */
 router.get('/trends/patients', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
   try {
@@ -220,9 +330,43 @@ router.get('/trends/patients', requireRole(['ADMIN', 'PRACTITIONER']), async (re
 });
 
 /**
- * @route   GET /api/v1/analytics/export/:type
- * @desc    Export analytics data to CSV
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /analytics/export/{type}:
+ *   get:
+ *     summary: Export analytics data to CSV
+ *     tags: [Analytics]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: type
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Export type (e.g. patients, appointments, revenue)
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Start date for export range (YYYY-MM-DD)
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: End date for export range (YYYY-MM-DD)
+ *     responses:
+ *       200:
+ *         description: CSV file download
+ *         content:
+ *           text/csv:
+ *             schema:
+ *               type: string
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
  */
 router.get(
   '/export/:type',

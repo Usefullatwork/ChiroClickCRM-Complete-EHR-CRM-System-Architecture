@@ -46,8 +46,52 @@ const authenticateMobile = async (req, res, next) => {
 // ============================================
 
 /**
- * POST /api/v1/mobile/auth/send-otp
- * Send OTP code to phone number
+ * @swagger
+ * /mobile/auth/send-otp:
+ *   post:
+ *     summary: Send OTP code to phone number
+ *     description: >
+ *       Initiates OTP-based authentication by sending a one-time password
+ *       to the provided phone number. This is a public endpoint — no authentication required.
+ *     tags:
+ *       - Mobile
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - phoneNumber
+ *             properties:
+ *               phoneNumber:
+ *                 type: string
+ *                 description: The mobile phone number to send the OTP to (E.164 format recommended)
+ *                 example: "+4791234567"
+ *     responses:
+ *       200:
+ *         description: OTP sent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "OTP sent"
+ *       400:
+ *         description: Phone number missing or OTP delivery failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Phone number is required"
  */
 router.post('/auth/send-otp', async (req, res) => {
   try {
@@ -66,8 +110,61 @@ router.post('/auth/send-otp', async (req, res) => {
 });
 
 /**
- * POST /api/v1/mobile/auth/verify-otp
- * Verify OTP and login/register user
+ * @swagger
+ * /mobile/auth/verify-otp:
+ *   post:
+ *     summary: Verify OTP and login or register user
+ *     description: >
+ *       Verifies the OTP code sent to the user's phone number. On success, returns
+ *       access and refresh tokens. A new mobile user account is created automatically
+ *       if one does not already exist for the phone number. This is a public endpoint.
+ *     tags:
+ *       - Mobile
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - phoneNumber
+ *               - code
+ *             properties:
+ *               phoneNumber:
+ *                 type: string
+ *                 description: The phone number the OTP was sent to
+ *                 example: "+4791234567"
+ *               code:
+ *                 type: string
+ *                 description: The 6-digit OTP code received via SMS
+ *                 example: "123456"
+ *     responses:
+ *       200:
+ *         description: OTP verified — returns JWT tokens
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                   description: Short-lived JWT for API authentication
+ *                 refreshToken:
+ *                   type: string
+ *                   description: Long-lived token used to obtain new access tokens
+ *                 user:
+ *                   type: object
+ *                   description: The authenticated mobile user profile
+ *       400:
+ *         description: Missing fields or invalid/expired OTP
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Phone number and code are required"
  */
 router.post('/auth/verify-otp', async (req, res) => {
   try {
@@ -86,8 +183,53 @@ router.post('/auth/verify-otp', async (req, res) => {
 });
 
 /**
- * POST /api/v1/mobile/auth/google
- * Login with Google
+ * @swagger
+ * /mobile/auth/google:
+ *   post:
+ *     summary: Login with Google
+ *     description: >
+ *       Authenticates a mobile user using a Google ID token obtained from the
+ *       Google Sign-In SDK. Creates a new mobile user account if one does not
+ *       already exist. This is a public endpoint.
+ *     tags:
+ *       - Mobile
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - idToken
+ *             properties:
+ *               idToken:
+ *                 type: string
+ *                 description: The Google ID token from the client-side Google Sign-In flow
+ *                 example: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *     responses:
+ *       200:
+ *         description: Google authentication successful — returns JWT tokens
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                 refreshToken:
+ *                   type: string
+ *                 user:
+ *                   type: object
+ *       400:
+ *         description: Missing ID token or Google token verification failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "ID token is required"
  */
 router.post('/auth/google', async (req, res) => {
   try {
@@ -106,8 +248,69 @@ router.post('/auth/google', async (req, res) => {
 });
 
 /**
- * POST /api/v1/mobile/auth/apple
- * Login with Apple
+ * @swagger
+ * /mobile/auth/apple:
+ *   post:
+ *     summary: Login with Apple
+ *     description: >
+ *       Authenticates a mobile user using an Apple identity token obtained from
+ *       the Sign in with Apple SDK. The optional `user` object is provided by Apple
+ *       only on the first sign-in and contains name and email. This is a public endpoint.
+ *     tags:
+ *       - Mobile
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - identityToken
+ *             properties:
+ *               identityToken:
+ *                 type: string
+ *                 description: The identity token from Apple's Sign in with Apple flow
+ *                 example: "eyJraWQiOiJZdXlYb1kiLCJhbGciOiJSUzI1NiJ9..."
+ *               user:
+ *                 type: object
+ *                 description: Optional user info provided by Apple on first sign-in only
+ *                 properties:
+ *                   name:
+ *                     type: object
+ *                     properties:
+ *                       firstName:
+ *                         type: string
+ *                         example: "Mads"
+ *                       lastName:
+ *                         type: string
+ *                         example: "Fjeldheim"
+ *                   email:
+ *                     type: string
+ *                     example: "mads@example.com"
+ *     responses:
+ *       200:
+ *         description: Apple authentication successful — returns JWT tokens
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                 refreshToken:
+ *                   type: string
+ *                 user:
+ *                   type: object
+ *       400:
+ *         description: Missing identity token or Apple token verification failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Identity token is required"
  */
 router.post('/auth/apple', async (req, res) => {
   try {
@@ -126,8 +329,53 @@ router.post('/auth/apple', async (req, res) => {
 });
 
 /**
- * POST /api/v1/mobile/auth/refresh
- * Refresh access token
+ * @swagger
+ * /mobile/auth/refresh:
+ *   post:
+ *     summary: Refresh access token
+ *     description: >
+ *       Exchanges a valid refresh token for a new access token. Use this when the
+ *       access token has expired. The refresh token must not have been revoked.
+ *       This is a public endpoint — no Bearer token required.
+ *     tags:
+ *       - Mobile
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - refreshToken
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 description: The refresh token previously issued by send-otp, verify-otp, Google, or Apple auth
+ *                 example: "dGhpcyBpcyBhIHJlZnJlc2ggdG9rZW4..."
+ *     responses:
+ *       200:
+ *         description: New access token issued
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                   description: A new short-lived JWT access token
+ *                 refreshToken:
+ *                   type: string
+ *                   description: A new or existing refresh token
+ *       401:
+ *         description: Refresh token missing, invalid, or revoked
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Refresh token is required"
  */
 router.post('/auth/refresh', async (req, res) => {
   try {
@@ -146,8 +394,38 @@ router.post('/auth/refresh', async (req, res) => {
 });
 
 /**
- * POST /api/v1/mobile/auth/logout
- * Logout (revoke refresh token)
+ * @swagger
+ * /mobile/auth/logout:
+ *   post:
+ *     summary: Logout and revoke refresh token
+ *     description: >
+ *       Logs the user out by revoking the provided refresh token. If no refresh token
+ *       is supplied, the call is still treated as successful. Always returns
+ *       `{ success: true }` regardless of errors.
+ *     tags:
+ *       - Mobile
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 description: The refresh token to revoke
+ *                 example: "dGhpcyBpcyBhIHJlZnJlc2ggdG9rZW4..."
+ *     responses:
+ *       200:
+ *         description: Logout successful (always returned, even on errors)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
  */
 router.post('/auth/logout', async (req, res) => {
   try {
@@ -169,8 +447,66 @@ router.post('/auth/logout', async (req, res) => {
 // ============================================
 
 /**
- * GET /api/v1/mobile/me
- * Get current user profile
+ * @swagger
+ * /mobile/me:
+ *   get:
+ *     summary: Get current user profile
+ *     description: >
+ *       Returns the authenticated mobile user's profile data along with their
+ *       current and longest workout streak information.
+ *     tags:
+ *       - Mobile
+ *     security:
+ *       - mobileBearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User profile with streak data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   format: uuid
+ *                 phoneNumber:
+ *                   type: string
+ *                 firstName:
+ *                   type: string
+ *                 lastName:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 currentStreak:
+ *                   type: integer
+ *                   description: Consecutive days with at least one logged workout
+ *                   example: 7
+ *                 longestStreak:
+ *                   type: integer
+ *                   description: All-time longest consecutive-day streak
+ *                   example: 30
+ *       401:
+ *         description: Missing or invalid Bearer token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid or expired token"
+ *       404:
+ *         description: Authenticated user record not found in the database
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "User not found"
+ *       500:
+ *         description: Internal server error
  */
 router.get('/me', authenticateMobile, async (req, res) => {
   try {
@@ -202,8 +538,59 @@ router.get('/me', authenticateMobile, async (req, res) => {
 });
 
 /**
- * PATCH /api/v1/mobile/me
- * Update user profile
+ * @swagger
+ * /mobile/me:
+ *   patch:
+ *     summary: Update user profile
+ *     description: Partially updates the authenticated mobile user's profile fields.
+ *     tags:
+ *       - Mobile
+ *     security:
+ *       - mobileBearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *                 example: "Mads"
+ *               lastName:
+ *                 type: string
+ *                 example: "Fjeldheim"
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: "mads@example.com"
+ *               preferredLanguage:
+ *                 type: string
+ *                 enum: [no, en]
+ *                 example: "no"
+ *               avatarUrl:
+ *                 type: string
+ *                 format: uri
+ *                 example: "https://cdn.example.com/avatars/user123.jpg"
+ *     responses:
+ *       200:
+ *         description: Updated user profile object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               description: The full updated mobile user profile
+ *       400:
+ *         description: Validation error or invalid field value
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *       401:
+ *         description: Missing or invalid Bearer token
  */
 router.patch('/me', authenticateMobile, async (req, res) => {
   try {
@@ -220,8 +607,72 @@ router.patch('/me', authenticateMobile, async (req, res) => {
 // ============================================
 
 /**
- * POST /api/v1/mobile/device-token
- * Register device token for push notifications
+ * @swagger
+ * /mobile/device-token:
+ *   post:
+ *     summary: Register device token for push notifications
+ *     description: >
+ *       Registers the mobile device's push notification token (APNs or FCM) with the
+ *       server so the clinic can send push notifications to this device.
+ *     tags:
+ *       - Mobile
+ *     security:
+ *       - mobileBearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - token
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 description: The push notification device token (APNs or FCM)
+ *                 example: "ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]"
+ *               deviceInfo:
+ *                 type: object
+ *                 description: Optional metadata about the device
+ *                 properties:
+ *                   platform:
+ *                     type: string
+ *                     enum: [ios, android]
+ *                     example: "ios"
+ *                   osVersion:
+ *                     type: string
+ *                     example: "17.4"
+ *                   appVersion:
+ *                     type: string
+ *                     example: "1.2.0"
+ *                   deviceModel:
+ *                     type: string
+ *                     example: "iPhone 15 Pro"
+ *     responses:
+ *       200:
+ *         description: Device token registered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *       400:
+ *         description: Device token is missing
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Device token is required"
+ *       401:
+ *         description: Missing or invalid Bearer token
+ *       500:
+ *         description: Internal server error
  */
 router.post('/device-token', authenticateMobile, async (req, res) => {
   try {
@@ -240,8 +691,55 @@ router.post('/device-token', authenticateMobile, async (req, res) => {
 });
 
 /**
- * DELETE /api/v1/mobile/device-token
- * Unregister device token
+ * @swagger
+ * /mobile/device-token:
+ *   delete:
+ *     summary: Unregister device token
+ *     description: >
+ *       Removes a previously registered push notification device token. Call this
+ *       when the user logs out or disables push notifications on their device.
+ *     tags:
+ *       - Mobile
+ *     security:
+ *       - mobileBearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - token
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 description: The push notification device token to remove
+ *                 example: "ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]"
+ *     responses:
+ *       200:
+ *         description: Device token unregistered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *       400:
+ *         description: Device token is missing
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Device token is required"
+ *       401:
+ *         description: Missing or invalid Bearer token
+ *       500:
+ *         description: Internal server error
  */
 router.delete('/device-token', authenticateMobile, async (req, res) => {
   try {
@@ -264,8 +762,125 @@ router.delete('/device-token', authenticateMobile, async (req, res) => {
 // ============================================
 
 /**
- * GET /api/v1/mobile/exercises
- * Get all exercises (with filtering)
+ * @swagger
+ * /mobile/exercises:
+ *   get:
+ *     summary: Get exercise library
+ *     description: >
+ *       Returns a paginated list of active exercises from the exercise library.
+ *       Results can be filtered by category, body region, difficulty level, and
+ *       a free-text search that matches against both Norwegian and English name/description fields.
+ *     tags:
+ *       - Mobile
+ *     security:
+ *       - mobileBearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *         description: Filter by exercise category (e.g. "stretching", "strengthening")
+ *         example: "stretching"
+ *       - in: query
+ *         name: bodyRegion
+ *         schema:
+ *           type: string
+ *         description: Filter by body region (e.g. "cervical", "lumbar", "shoulder")
+ *         example: "cervical"
+ *       - in: query
+ *         name: difficulty
+ *         schema:
+ *           type: string
+ *           enum: [beginner, intermediate, advanced]
+ *         description: Filter by difficulty level
+ *         example: "beginner"
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Free-text search across name and description in Norwegian and English
+ *         example: "nakke"
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 50
+ *           minimum: 1
+ *           maximum: 200
+ *         description: Maximum number of exercises to return
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *           default: 0
+ *           minimum: 0
+ *         description: Number of exercises to skip for pagination
+ *     responses:
+ *       200:
+ *         description: Paginated list of exercises
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 exercises:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         format: uuid
+ *                       name:
+ *                         type: string
+ *                       name_norwegian:
+ *                         type: string
+ *                       description:
+ *                         type: string
+ *                       description_norwegian:
+ *                         type: string
+ *                       category:
+ *                         type: string
+ *                       subcategory:
+ *                         type: string
+ *                       body_region:
+ *                         type: string
+ *                       difficulty_level:
+ *                         type: string
+ *                       instructions:
+ *                         type: string
+ *                       instructions_norwegian:
+ *                         type: string
+ *                       sets_default:
+ *                         type: integer
+ *                       reps_default:
+ *                         type: integer
+ *                       hold_seconds:
+ *                         type: integer
+ *                       video_url:
+ *                         type: string
+ *                         format: uri
+ *                       thumbnail_url:
+ *                         type: string
+ *                         format: uri
+ *                       image_url:
+ *                         type: string
+ *                         format: uri
+ *                       tags:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *                 total:
+ *                   type: integer
+ *                   description: Number of exercises returned in this page
+ *                 limit:
+ *                   type: integer
+ *                 offset:
+ *                   type: integer
+ *       401:
+ *         description: Missing or invalid Bearer token
+ *       500:
+ *         description: Internal server error
  */
 router.get('/exercises', authenticateMobile, async (req, res) => {
   try {
@@ -336,8 +951,46 @@ router.get('/exercises', authenticateMobile, async (req, res) => {
 });
 
 /**
- * GET /api/v1/mobile/exercises/:id
- * Get single exercise details
+ * @swagger
+ * /mobile/exercises/{id}:
+ *   get:
+ *     summary: Get single exercise details
+ *     description: Returns the full details of an active exercise by its UUID.
+ *     tags:
+ *       - Mobile
+ *     security:
+ *       - mobileBearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: The UUID of the exercise
+ *         example: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+ *     responses:
+ *       200:
+ *         description: Full exercise record
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               description: All columns from the exercise_library table
+ *       401:
+ *         description: Missing or invalid Bearer token
+ *       404:
+ *         description: Exercise not found or is inactive
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Exercise not found"
+ *       500:
+ *         description: Internal server error
  */
 router.get('/exercises/:id', authenticateMobile, async (req, res) => {
   try {
@@ -361,8 +1014,35 @@ router.get('/exercises/:id', authenticateMobile, async (req, res) => {
 });
 
 /**
- * GET /api/v1/mobile/exercises/categories
- * Get exercise categories
+ * @swagger
+ * /mobile/exercise-categories:
+ *   get:
+ *     summary: Get exercise categories
+ *     description: Returns all distinct exercise categories with a count of exercises in each category.
+ *     tags:
+ *       - Mobile
+ *     security:
+ *       - mobileBearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of categories with exercise counts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   category:
+ *                     type: string
+ *                     example: "stretching"
+ *                   count:
+ *                     type: integer
+ *                     example: 12
+ *       401:
+ *         description: Missing or invalid Bearer token
+ *       500:
+ *         description: Internal server error
  */
 router.get('/exercise-categories', authenticateMobile, async (req, res) => {
   try {
@@ -386,8 +1066,74 @@ router.get('/exercise-categories', authenticateMobile, async (req, res) => {
 // ============================================
 
 /**
- * GET /api/v1/mobile/programs
- * Get available programs
+ * @swagger
+ * /mobile/programs:
+ *   get:
+ *     summary: Get available coaching programs
+ *     description: >
+ *       Returns all active, publicly available coaching programs. Results can be
+ *       filtered by program type, difficulty level, and a name search. The creator's
+ *       name and total enrollment count are included with each program.
+ *     tags:
+ *       - Mobile
+ *     security:
+ *       - mobileBearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *         description: Filter by program type (e.g. "rehabilitation", "strength")
+ *         example: "rehabilitation"
+ *       - in: query
+ *         name: difficulty
+ *         schema:
+ *           type: string
+ *           enum: [beginner, intermediate, advanced]
+ *         description: Filter by difficulty level
+ *         example: "beginner"
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Free-text search against program name in Norwegian and English
+ *         example: "nakke"
+ *     responses:
+ *       200:
+ *         description: List of available programs
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     format: uuid
+ *                   name:
+ *                     type: string
+ *                   name_norwegian:
+ *                     type: string
+ *                   description:
+ *                     type: string
+ *                   program_type:
+ *                     type: string
+ *                   duration_weeks:
+ *                     type: integer
+ *                   difficulty_level:
+ *                     type: string
+ *                   cover_image_url:
+ *                     type: string
+ *                     format: uri
+ *                   created_by_name:
+ *                     type: string
+ *                   enrollment_count:
+ *                     type: integer
+ *       401:
+ *         description: Missing or invalid Bearer token
+ *       500:
+ *         description: Internal server error
  */
 router.get('/programs', authenticateMobile, async (req, res) => {
   try {
@@ -434,8 +1180,119 @@ router.get('/programs', authenticateMobile, async (req, res) => {
 });
 
 /**
- * GET /api/v1/mobile/programs/:id
- * Get program details with weeks and exercises
+ * @swagger
+ * /mobile/programs/{id}:
+ *   get:
+ *     summary: Get program details with weeks and exercises
+ *     description: >
+ *       Returns the full details of a single coaching program, including all
+ *       weekly plans and per-day exercises. Also indicates whether the currently
+ *       authenticated user is enrolled and their enrollment record if so.
+ *     tags:
+ *       - Mobile
+ *     security:
+ *       - mobileBearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: The UUID of the coaching program
+ *         example: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+ *     responses:
+ *       200:
+ *         description: Program details with weeks, exercises, and enrollment status
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   format: uuid
+ *                 name:
+ *                   type: string
+ *                 name_norwegian:
+ *                   type: string
+ *                 created_by_name:
+ *                   type: string
+ *                 weeks:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         format: uuid
+ *                       week_number:
+ *                         type: integer
+ *                       focus_area:
+ *                         type: string
+ *                       exercises:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             id:
+ *                               type: string
+ *                               format: uuid
+ *                             exerciseId:
+ *                               type: string
+ *                               format: uuid
+ *                             dayOfWeek:
+ *                               type: integer
+ *                               description: 1=Monday, 7=Sunday
+ *                             orderIndex:
+ *                               type: integer
+ *                             sets:
+ *                               type: integer
+ *                             reps:
+ *                               type: integer
+ *                             holdSeconds:
+ *                               type: integer
+ *                             restSeconds:
+ *                               type: integer
+ *                             rirTarget:
+ *                               type: integer
+ *                             notes:
+ *                               type: string
+ *                             exercise:
+ *                               type: object
+ *                               properties:
+ *                                 id:
+ *                                   type: string
+ *                                 name:
+ *                                   type: string
+ *                                 nameNorwegian:
+ *                                   type: string
+ *                                 videoUrl:
+ *                                   type: string
+ *                                 thumbnailUrl:
+ *                                   type: string
+ *                                 category:
+ *                                   type: string
+ *                 isEnrolled:
+ *                   type: boolean
+ *                 enrollment:
+ *                   type: object
+ *                   nullable: true
+ *                   description: Active enrollment record, or null if not enrolled
+ *       401:
+ *         description: Missing or invalid Bearer token
+ *       404:
+ *         description: Program not found or inactive
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Program not found"
+ *       500:
+ *         description: Internal server error
  */
 router.get('/programs/:id', authenticateMobile, async (req, res) => {
   try {
@@ -515,8 +1372,66 @@ router.get('/programs/:id', authenticateMobile, async (req, res) => {
 });
 
 /**
- * POST /api/v1/mobile/programs/:id/enroll
- * Enroll in a program
+ * @swagger
+ * /mobile/programs/{id}/enroll:
+ *   post:
+ *     summary: Enroll in a coaching program
+ *     description: >
+ *       Creates an active enrollment for the authenticated user in the specified
+ *       program. Returns 400 if the user is already actively enrolled.
+ *     tags:
+ *       - Mobile
+ *     security:
+ *       - mobileBearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: The UUID of the program to enroll in
+ *         example: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+ *     responses:
+ *       200:
+ *         description: Enrollment created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               description: The newly created enrollment record from user_program_enrollments
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   format: uuid
+ *                 mobile_user_id:
+ *                   type: string
+ *                   format: uuid
+ *                 program_id:
+ *                   type: string
+ *                   format: uuid
+ *                 status:
+ *                   type: string
+ *                   example: "active"
+ *                 started_at:
+ *                   type: string
+ *                   format: date-time
+ *                 current_week:
+ *                   type: integer
+ *       400:
+ *         description: User is already enrolled in this program
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Already enrolled in this program"
+ *       401:
+ *         description: Missing or invalid Bearer token
+ *       500:
+ *         description: Internal server error
  */
 router.post('/programs/:id/enroll', authenticateMobile, async (req, res) => {
   try {
@@ -551,8 +1466,65 @@ router.post('/programs/:id/enroll', authenticateMobile, async (req, res) => {
 });
 
 /**
- * GET /api/v1/mobile/my-programs
- * Get user's enrolled programs
+ * @swagger
+ * /mobile/my-programs:
+ *   get:
+ *     summary: Get the user's enrolled programs
+ *     description: >
+ *       Returns all programs the authenticated user has enrolled in, including
+ *       both active and completed enrollments. Active enrollments are listed first,
+ *       then sorted by most recently started.
+ *     tags:
+ *       - Mobile
+ *     security:
+ *       - mobileBearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of enrollment records with program details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     format: uuid
+ *                     description: Enrollment ID
+ *                   mobile_user_id:
+ *                     type: string
+ *                     format: uuid
+ *                   program_id:
+ *                     type: string
+ *                     format: uuid
+ *                   status:
+ *                     type: string
+ *                     enum: [active, completed, paused]
+ *                   current_week:
+ *                     type: integer
+ *                   started_at:
+ *                     type: string
+ *                     format: date-time
+ *                   name:
+ *                     type: string
+ *                   name_norwegian:
+ *                     type: string
+ *                   description:
+ *                     type: string
+ *                   program_type:
+ *                     type: string
+ *                   duration_weeks:
+ *                     type: integer
+ *                   difficulty_level:
+ *                     type: string
+ *                   cover_image_url:
+ *                     type: string
+ *                     format: uri
+ *       401:
+ *         description: Missing or invalid Bearer token
+ *       500:
+ *         description: Internal server error
  */
 router.get('/my-programs', authenticateMobile, async (req, res) => {
   try {
@@ -582,8 +1554,98 @@ router.get('/my-programs', authenticateMobile, async (req, res) => {
 // ============================================
 
 /**
- * GET /api/v1/mobile/today
- * Get today's workout based on active programs
+ * @swagger
+ * /mobile/today:
+ *   get:
+ *     summary: Get today's workout
+ *     description: >
+ *       Returns all exercises scheduled for today (based on server date and day of week)
+ *       across all of the authenticated user's active program enrollments. Each exercise
+ *       includes a `completedToday` flag indicating whether it has already been logged.
+ *       Results are grouped by program.
+ *     tags:
+ *       - Mobile
+ *     security:
+ *       - mobileBearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Today's workout data grouped by program
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 date:
+ *                   type: string
+ *                   format: date
+ *                   example: "2026-02-18"
+ *                 dayOfWeek:
+ *                   type: integer
+ *                   description: ISO day of week — 1=Monday, 7=Sunday
+ *                   example: 3
+ *                 programs:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       programId:
+ *                         type: string
+ *                         format: uuid
+ *                       programName:
+ *                         type: string
+ *                       programNameNorwegian:
+ *                         type: string
+ *                       enrollmentId:
+ *                         type: string
+ *                         format: uuid
+ *                       currentWeek:
+ *                         type: integer
+ *                       weekFocus:
+ *                         type: string
+ *                       exercises:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             programExerciseId:
+ *                               type: string
+ *                               format: uuid
+ *                             exerciseId:
+ *                               type: string
+ *                               format: uuid
+ *                             name:
+ *                               type: string
+ *                             nameNorwegian:
+ *                               type: string
+ *                             videoUrl:
+ *                               type: string
+ *                               format: uri
+ *                             thumbnailUrl:
+ *                               type: string
+ *                               format: uri
+ *                             category:
+ *                               type: string
+ *                             instructions:
+ *                               type: string
+ *                             sets:
+ *                               type: integer
+ *                             reps:
+ *                               type: integer
+ *                             holdSeconds:
+ *                               type: integer
+ *                             restSeconds:
+ *                               type: integer
+ *                             rirTarget:
+ *                               type: integer
+ *                             notes:
+ *                               type: string
+ *                             completedToday:
+ *                               type: boolean
+ *                               description: Whether this exercise has been logged today
+ *       401:
+ *         description: Missing or invalid Bearer token
+ *       500:
+ *         description: Internal server error
  */
 router.get('/today', authenticateMobile, async (req, res) => {
   try {
@@ -681,8 +1743,105 @@ router.get('/today', authenticateMobile, async (req, res) => {
 // ============================================
 
 /**
- * POST /api/v1/mobile/log
- * Log a completed exercise
+ * @swagger
+ * /mobile/log:
+ *   post:
+ *     summary: Log a completed exercise
+ *     description: >
+ *       Records a completed exercise set for the authenticated user. All numeric
+ *       rating fields (pain, difficulty, soreness) are optional and typically use a
+ *       1-10 scale. Logging a workout also triggers the streak update logic.
+ *     tags:
+ *       - Mobile
+ *     security:
+ *       - mobileBearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               programExerciseId:
+ *                 type: string
+ *                 format: uuid
+ *                 description: ID from program_exercises (for program-based workouts)
+ *               exerciseId:
+ *                 type: string
+ *                 format: uuid
+ *                 description: ID from exercise_library
+ *               enrollmentId:
+ *                 type: string
+ *                 format: uuid
+ *                 description: ID from user_program_enrollments
+ *               setsCompleted:
+ *                 type: integer
+ *                 example: 3
+ *               repsCompleted:
+ *                 type: integer
+ *                 example: 12
+ *               weightKg:
+ *                 type: number
+ *                 format: float
+ *                 example: 10.5
+ *               holdSecondsCompleted:
+ *                 type: integer
+ *                 example: 30
+ *               rirActual:
+ *                 type: integer
+ *                 description: Reps in Reserve — actual RIR achieved
+ *                 example: 2
+ *               painRating:
+ *                 type: integer
+ *                 minimum: 0
+ *                 maximum: 10
+ *                 description: Pain level during exercise (0=none, 10=worst)
+ *                 example: 2
+ *               difficultyRating:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 10
+ *                 description: Perceived difficulty (1=very easy, 10=maximal effort)
+ *                 example: 7
+ *               sorenessRating:
+ *                 type: integer
+ *                 minimum: 0
+ *                 maximum: 10
+ *                 description: Muscle soreness level before/after exercise
+ *                 example: 3
+ *               notes:
+ *                 type: string
+ *                 description: Free-text notes about this exercise session
+ *                 example: "Felt good, increased weight slightly"
+ *     responses:
+ *       200:
+ *         description: Workout log entry created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               description: The newly created workout_logs record
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   format: uuid
+ *                 mobile_user_id:
+ *                   type: string
+ *                   format: uuid
+ *                 exercise_id:
+ *                   type: string
+ *                   format: uuid
+ *                 sets_completed:
+ *                   type: integer
+ *                 reps_completed:
+ *                   type: integer
+ *                 completed_at:
+ *                   type: string
+ *                   format: date-time
+ *       401:
+ *         description: Missing or invalid Bearer token
+ *       500:
+ *         description: Internal server error
  */
 router.post('/log', authenticateMobile, async (req, res) => {
   try {
@@ -739,8 +1898,85 @@ router.post('/log', authenticateMobile, async (req, res) => {
 });
 
 /**
- * GET /api/v1/mobile/progress
- * Get user progress statistics
+ * @swagger
+ * /mobile/progress:
+ *   get:
+ *     summary: Get user progress statistics
+ *     description: >
+ *       Returns workout statistics for the authenticated user over a configurable
+ *       number of past days. Includes per-day workout counts and average ratings,
+ *       the current and longest streak, and all-time totals.
+ *     tags:
+ *       - Mobile
+ *     security:
+ *       - mobileBearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: days
+ *         schema:
+ *           type: integer
+ *           default: 30
+ *           minimum: 1
+ *           maximum: 365
+ *         description: Number of past days to include in the per-date breakdown
+ *         example: 30
+ *     responses:
+ *       200:
+ *         description: Progress statistics
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 streak:
+ *                   type: object
+ *                   properties:
+ *                     current_streak:
+ *                       type: integer
+ *                       example: 7
+ *                     longest_streak:
+ *                       type: integer
+ *                       example: 30
+ *                     last_workout_date:
+ *                       type: string
+ *                       format: date
+ *                     streak_start_date:
+ *                       type: string
+ *                       format: date
+ *                 workoutsByDate:
+ *                   type: array
+ *                   description: Daily aggregates for the requested time window, ordered newest first
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       date:
+ *                         type: string
+ *                         format: date
+ *                       workout_count:
+ *                         type: integer
+ *                       avg_pain:
+ *                         type: number
+ *                         format: float
+ *                         nullable: true
+ *                       avg_difficulty:
+ *                         type: number
+ *                         format: float
+ *                         nullable: true
+ *                 totalStats:
+ *                   type: object
+ *                   properties:
+ *                     total_workouts:
+ *                       type: integer
+ *                     active_days:
+ *                       type: integer
+ *                     avg_pain_overall:
+ *                       type: number
+ *                       format: float
+ *                       nullable: true
+ *       401:
+ *         description: Missing or invalid Bearer token
+ *       500:
+ *         description: Internal server error
  */
 router.get('/progress', authenticateMobile, async (req, res) => {
   try {
@@ -796,8 +2032,51 @@ router.get('/progress', authenticateMobile, async (req, res) => {
 });
 
 /**
- * GET /api/v1/mobile/achievements
- * Get user achievements
+ * @swagger
+ * /mobile/achievements:
+ *   get:
+ *     summary: Get user achievements
+ *     description: >
+ *       Returns all achievements earned by the authenticated user, ordered by
+ *       most recently earned first. Achievements are awarded automatically for
+ *       streak milestones (7, 14, 30, 60, 100 days).
+ *     tags:
+ *       - Mobile
+ *     security:
+ *       - mobileBearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of earned achievements
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     format: uuid
+ *                   mobile_user_id:
+ *                     type: string
+ *                     format: uuid
+ *                   achievement_type:
+ *                     type: string
+ *                     description: Machine-readable type identifier
+ *                     example: "streak_30"
+ *                   achievement_name:
+ *                     type: string
+ *                     example: "Monthly Master"
+ *                   description:
+ *                     type: string
+ *                     example: "Completed 30 consecutive days of workouts!"
+ *                   earned_at:
+ *                     type: string
+ *                     format: date-time
+ *       401:
+ *         description: Missing or invalid Bearer token
+ *       500:
+ *         description: Internal server error
  */
 router.get('/achievements', authenticateMobile, async (req, res) => {
   try {
@@ -822,8 +2101,53 @@ router.get('/achievements', authenticateMobile, async (req, res) => {
 // ============================================
 
 /**
- * GET /api/v1/mobile/social-links
- * Get clinician social links
+ * @swagger
+ * /mobile/social-links:
+ *   get:
+ *     summary: Get clinician social links
+ *     description: >
+ *       Returns all public social media profile links for clinicians in the system,
+ *       grouped by clinician. Useful for the mobile app's "Meet the Team" or
+ *       social follow section.
+ *     tags:
+ *       - Mobile
+ *     security:
+ *       - mobileBearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Clinicians with their public social links
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   userId:
+ *                     type: string
+ *                     format: uuid
+ *                   name:
+ *                     type: string
+ *                     example: "Mads Fjeldheim"
+ *                   links:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         platform:
+ *                           type: string
+ *                           example: "instagram"
+ *                         url:
+ *                           type: string
+ *                           format: uri
+ *                           example: "https://instagram.com/chiroclickno"
+ *                         displayName:
+ *                           type: string
+ *                           example: "@chiroclickno"
+ *       401:
+ *         description: Missing or invalid Bearer token
+ *       500:
+ *         description: Internal server error
  */
 router.get('/social-links', authenticateMobile, async (req, res) => {
   try {

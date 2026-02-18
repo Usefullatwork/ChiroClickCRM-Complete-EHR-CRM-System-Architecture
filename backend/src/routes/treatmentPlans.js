@@ -29,9 +29,70 @@ router.use(requireOrganization);
 // ============================================================================
 
 /**
- * @route   POST /api/v1/treatment-plans
- * @desc    Create a new treatment plan
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /treatment-plans:
+ *   post:
+ *     summary: Create a new treatment plan
+ *     tags: [Treatment Plans]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - patientId
+ *               - title
+ *             properties:
+ *               patientId:
+ *                 type: string
+ *                 format: uuid
+ *                 description: UUID of the patient this plan belongs to
+ *               title:
+ *                 type: string
+ *                 minLength: 1
+ *                 maxLength: 255
+ *                 description: Title of the treatment plan
+ *               description:
+ *                 type: string
+ *                 maxLength: 2000
+ *               diagnosisCodes:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   maxLength: 20
+ *               goals:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   maxLength: 500
+ *               estimatedSessions:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 200
+ *               frequency:
+ *                 type: string
+ *                 maxLength: 100
+ *               startDate:
+ *                 type: string
+ *                 format: date
+ *               endDate:
+ *                 type: string
+ *                 format: date
+ *               status:
+ *                 type: string
+ *                 enum: [draft, active, paused, completed, cancelled]
+ *     responses:
+ *       201:
+ *         description: Treatment plan created successfully
+ *       400:
+ *         description: Validation error
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - requires ADMIN or PRACTITIONER role
  */
 router.post(
   '/',
@@ -50,9 +111,34 @@ router.post(
 );
 
 /**
- * @route   GET /api/v1/treatment-plans/patient/:patientId
- * @desc    Get all plans for a patient
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /treatment-plans/patient/{patientId}:
+ *   get:
+ *     summary: Get all treatment plans for a patient
+ *     tags: [Treatment Plans]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: patientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: UUID of the patient
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [draft, active, paused, completed, cancelled]
+ *         description: Filter plans by status
+ *     responses:
+ *       200:
+ *         description: List of treatment plans for the patient
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - requires ADMIN or PRACTITIONER role
  */
 router.get(
   '/patient/:patientId',
@@ -68,9 +154,30 @@ router.get(
 );
 
 /**
- * @route   GET /api/v1/treatment-plans/:id
- * @desc    Get a single plan with milestones and sessions
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /treatment-plans/{planId}:
+ *   get:
+ *     summary: Get a single treatment plan with its milestones and sessions
+ *     tags: [Treatment Plans]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: planId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: UUID of the treatment plan
+ *     responses:
+ *       200:
+ *         description: Treatment plan with milestones and sessions
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - requires ADMIN or PRACTITIONER role
+ *       404:
+ *         description: Treatment plan not found
  */
 router.get(
   '/:id',
@@ -87,9 +194,73 @@ router.get(
 );
 
 /**
- * @route   PATCH /api/v1/treatment-plans/:id
- * @desc    Update a treatment plan
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /treatment-plans/{planId}:
+ *   patch:
+ *     summary: Update a treatment plan
+ *     tags: [Treatment Plans]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: planId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: UUID of the treatment plan
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             minProperties: 1
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 minLength: 1
+ *                 maxLength: 255
+ *               description:
+ *                 type: string
+ *                 maxLength: 2000
+ *               diagnosisCodes:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   maxLength: 20
+ *               goals:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   maxLength: 500
+ *               estimatedSessions:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 200
+ *               frequency:
+ *                 type: string
+ *                 maxLength: 100
+ *               startDate:
+ *                 type: string
+ *                 format: date
+ *               endDate:
+ *                 type: string
+ *                 format: date
+ *               status:
+ *                 type: string
+ *                 enum: [draft, active, paused, completed, cancelled]
+ *     responses:
+ *       200:
+ *         description: Treatment plan updated successfully
+ *       400:
+ *         description: Validation error
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - requires ADMIN or PRACTITIONER role
+ *       404:
+ *         description: Treatment plan not found
  */
 router.patch(
   '/:id',
@@ -106,9 +277,30 @@ router.patch(
 );
 
 /**
- * @route   GET /api/v1/treatment-plans/:id/progress
- * @desc    Get plan progress (sessions + milestones)
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /treatment-plans/{planId}/progress:
+ *   get:
+ *     summary: Get plan progress including sessions and milestones completion
+ *     tags: [Treatment Plans]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: planId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: UUID of the treatment plan
+ *     responses:
+ *       200:
+ *         description: Plan progress data with session and milestone summaries
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - requires ADMIN or PRACTITIONER role
+ *       404:
+ *         description: Treatment plan not found
  */
 router.get(
   '/:id/progress',
@@ -128,9 +320,58 @@ router.get(
 // ============================================================================
 
 /**
- * @route   POST /api/v1/treatment-plans/:planId/milestones
- * @desc    Add a milestone to a plan
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /treatment-plans/{planId}/milestones:
+ *   post:
+ *     summary: Add a milestone to a treatment plan
+ *     tags: [Treatment Plans]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: planId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: UUID of the treatment plan
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 minLength: 1
+ *                 maxLength: 255
+ *                 description: Title of the milestone
+ *               description:
+ *                 type: string
+ *                 maxLength: 1000
+ *               targetDate:
+ *                 type: string
+ *                 format: date
+ *               targetSessionNumber:
+ *                 type: integer
+ *                 minimum: 1
+ *                 description: Session number at which this milestone should be reached
+ *               criteria:
+ *                 type: string
+ *                 maxLength: 1000
+ *                 description: Success criteria for the milestone
+ *     responses:
+ *       201:
+ *         description: Milestone added successfully
+ *       400:
+ *         description: Validation error
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - requires ADMIN or PRACTITIONER role
  */
 router.post(
   '/:planId/milestones',
@@ -143,9 +384,62 @@ router.post(
 );
 
 /**
- * @route   PATCH /api/v1/treatment-plans/milestones/:milestoneId
- * @desc    Update a milestone
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /treatment-plans/milestones/{milestoneId}:
+ *   patch:
+ *     summary: Update a milestone
+ *     tags: [Treatment Plans]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: milestoneId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: UUID of the milestone
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             minProperties: 1
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 minLength: 1
+ *                 maxLength: 255
+ *               description:
+ *                 type: string
+ *                 maxLength: 1000
+ *               targetDate:
+ *                 type: string
+ *                 format: date
+ *               targetSessionNumber:
+ *                 type: integer
+ *                 minimum: 1
+ *               criteria:
+ *                 type: string
+ *                 maxLength: 1000
+ *               status:
+ *                 type: string
+ *                 enum: [pending, achieved, missed]
+ *               achievedDate:
+ *                 type: string
+ *                 format: date
+ *     responses:
+ *       200:
+ *         description: Milestone updated successfully
+ *       400:
+ *         description: Validation error
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - requires ADMIN or PRACTITIONER role
+ *       404:
+ *         description: Milestone not found
  */
 router.patch(
   '/milestones/:milestoneId',
@@ -165,9 +459,56 @@ router.patch(
 // ============================================================================
 
 /**
- * @route   POST /api/v1/treatment-plans/:planId/sessions
- * @desc    Add a session to a plan
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /treatment-plans/{planId}/sessions:
+ *   post:
+ *     summary: Add a session to a treatment plan
+ *     tags: [Treatment Plans]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: planId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: UUID of the treatment plan
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               encounterId:
+ *                 type: string
+ *                 format: uuid
+ *                 description: UUID of the linked clinical encounter
+ *               sessionNumber:
+ *                 type: integer
+ *                 minimum: 1
+ *                 description: Sequential number of this session within the plan
+ *               notes:
+ *                 type: string
+ *                 maxLength: 2000
+ *               sessionDate:
+ *                 type: string
+ *                 format: date
+ *               treatments:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                 description: Treatment codes or details applied in this session
+ *     responses:
+ *       201:
+ *         description: Session added successfully
+ *       400:
+ *         description: Validation error
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - requires ADMIN or PRACTITIONER role
  */
 router.post(
   '/:planId/sessions',
@@ -180,9 +521,52 @@ router.post(
 );
 
 /**
- * @route   POST /api/v1/treatment-plans/sessions/:sessionId/complete
- * @desc    Mark a session as completed
- * @access  Private (ADMIN, PRACTITIONER)
+ * @swagger
+ * /treatment-plans/sessions/{sessionId}/complete:
+ *   post:
+ *     summary: Mark a session as completed
+ *     tags: [Treatment Plans]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: sessionId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: UUID of the session to complete
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               notes:
+ *                 type: string
+ *                 maxLength: 2000
+ *                 description: Session notes
+ *               outcomeNotes:
+ *                 type: string
+ *                 maxLength: 2000
+ *                 description: Notes on treatment outcome
+ *               vasScore:
+ *                 type: integer
+ *                 minimum: 0
+ *                 maximum: 10
+ *                 description: Visual Analogue Scale pain score (0-10)
+ *     responses:
+ *       200:
+ *         description: Session marked as completed
+ *       400:
+ *         description: Validation error
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - requires ADMIN or PRACTITIONER role
+ *       404:
+ *         description: Session not found
  */
 router.post(
   '/sessions/:sessionId/complete',
