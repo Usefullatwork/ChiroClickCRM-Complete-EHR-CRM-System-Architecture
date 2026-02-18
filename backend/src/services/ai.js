@@ -10,11 +10,11 @@
  * - RAG-augmented context retrieval
  * - Safety guardrails and output filtering
  *
- * Model Configuration (12GB RAM optimized):
- * - chiro-no (Mistral 7B Q4_K_M ~4.5GB) - Default clinical documentation
- * - chiro-fast (Llama 3.2 3B Q4_K_M ~2GB) - Quick autocomplete
- * - chiro-norwegian (NorwAI-Mistral-7B Q4_K_M ~4.5GB) - Norwegian language specialist
- * - chiro-medical (MedGemma 4B Q4_K_M ~2.5GB) - Clinical reasoning and safety
+ * Model Configuration (12GB RAM optimized, all Qwen2.5 architecture):
+ * - chiro-no (Qwen2.5-7B ~4.5GB) - Default clinical documentation
+ * - chiro-fast (Qwen2.5-1.5B ~1GB) - Quick autocomplete
+ * - chiro-norwegian (Qwen2.5-7B ~4.5GB) - Norwegian language specialist
+ * - chiro-medical (Qwen2.5-3B ~2GB) - Clinical reasoning and safety
  *
  * Requires: Minimum 8GB RAM, recommended 12-16GB for multi-model routing
  */
@@ -105,7 +105,7 @@ const checkGuardrailsForTask = (taskType, skipGuardrails = false) => {
 };
 
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
-const AI_MODEL = process.env.AI_MODEL || 'chiro-no'; // Default: chiro-no (Mistral 7B fine-tuned)
+const AI_MODEL = process.env.AI_MODEL || 'chiro-no'; // Default: chiro-no (Qwen2.5-7B)
 const AI_ENABLED = process.env.AI_ENABLED !== 'false'; // Default: true unless explicitly disabled
 const GUARDRAILS_ENABLED = process.env.GUARDRAILS_ENABLED !== 'false'; // Default: true
 const RAG_ENABLED = process.env.RAG_ENABLED !== 'false'; // Default: true
@@ -189,86 +189,83 @@ const MODEL_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 /**
  * Model configurations with metadata
- * Based on 2025 research: NorwAI-Mistral-7B achieves 95% accuracy for Norwegian clinical text
+ * Sprint 2: All models unified on Qwen2.5-Instruct architecture (ChatML template)
+ * Base models are vanilla Qwen2.5; LoRA variants are fine-tuned on clinical data
  */
 const MODEL_CONFIG = {
   'chiro-no': {
     name: 'chiro-no',
-    base: 'Mistral 7B',
+    base: 'Qwen2.5-7B-Instruct',
     description: 'Primary clinical documentation model',
-    size: '~4.5GB (Q4_K_M)',
+    size: '~4.5GB',
     maxTokens: 4096,
     temperature: 0.3,
-    expectedAccuracy: '85-90%',
+    baseline: '56%',
   },
   'chiro-fast': {
     name: 'chiro-fast',
-    base: 'Llama 3.2 3B',
+    base: 'Qwen2.5-1.5B-Instruct',
     description: 'Fast autocomplete and suggestions',
-    size: '~2GB (Q4_K_M)',
+    size: '~1GB',
     maxTokens: 2048,
     temperature: 0.5,
-    expectedAccuracy: '80-85%',
+    baseline: '48%',
   },
   'chiro-norwegian': {
     name: 'chiro-norwegian',
-    base: 'NorwAI-Mistral-7B-Instruct', // Changed from Viking 7B
-    description: 'Norwegian language specialist (95% accuracy after fine-tuning)',
-    size: '~4.5GB (Q4_K_M)',
+    base: 'Qwen2.5-7B-Instruct',
+    description: 'Norwegian language specialist',
+    size: '~4.5GB',
     maxTokens: 4096,
     temperature: 0.3,
-    expectedAccuracy: '95%', // Based on research
+    baseline: '44%',
   },
   'chiro-medical': {
     name: 'chiro-medical',
-    base: 'MedGemma 4B',
+    base: 'Qwen2.5-3B-Instruct',
     description: 'Clinical reasoning and safety analysis',
-    size: '~2.5GB (Q4_K_M)',
+    size: '~2GB',
     maxTokens: 2048,
-    temperature: 0.2, // Lower for safety-critical tasks
-    expectedAccuracy: '85-88%',
+    temperature: 0.2,
+    baseline: '54%',
   },
 
   // LoRA fine-tuned variants (deployed to Ollama)
-  // Key finding: 7B LoRA > originals; 1.5B/3B LoRA < originals
+  // All use same Qwen2.5 base as above, fine-tuned on 12K+ clinical examples
   'chiro-fast-lora': {
     name: 'chiro-fast-lora',
-    base: 'Llama 3.2 1.5B + LoRA',
-    description: 'LoRA variant of fast model (NOT recommended - LoRA hurts small models)',
+    base: 'Qwen2.5-1.5B-Instruct + LoRA',
+    description: 'LoRA-tuned fast model for autocomplete',
     size: '~3.1GB',
     maxTokens: 2048,
     temperature: 0.5,
-    expectedAccuracy: '< chiro-fast original',
     fallbackModel: 'chiro-fast',
   },
   'chiro-medical-lora': {
     name: 'chiro-medical-lora',
-    base: 'MedGemma 3B + LoRA',
-    description: 'LoRA variant of medical model (NOT recommended - LoRA hurts small models)',
+    base: 'Qwen2.5-3B-Instruct + LoRA',
+    description: 'LoRA-tuned medical model for safety analysis',
     size: '~6.2GB',
     maxTokens: 2048,
     temperature: 0.2,
-    expectedAccuracy: '< chiro-medical original',
     fallbackModel: 'chiro-medical',
   },
   'chiro-norwegian-lora': {
     name: 'chiro-norwegian-lora',
-    base: 'NorwAI-Mistral-7B + LoRA',
-    description: 'Best SOAP accuracy (89.8%) - recommended for clinical documentation',
+    base: 'Qwen2.5-7B-Instruct + LoRA',
+    description: 'LoRA-tuned for Norwegian clinical documentation',
     size: '~14.2GB',
     maxTokens: 4096,
     temperature: 0.3,
-    expectedAccuracy: '89.8%',
     fallbackModel: 'chiro-norwegian',
   },
   'chiro-no-lora': {
     name: 'chiro-no-lora',
-    base: 'Mistral 7B + LoRA',
-    description: '100% red flag detection - recommended for safety analysis',
+    base: 'Qwen2.5-7B-Instruct + LoRA',
+    description: 'LoRA-tuned default clinical model',
     size: '~15GB',
     maxTokens: 4096,
     temperature: 0.2,
-    expectedAccuracy: '85.6% (100% red flag detection)',
     fallbackModel: 'chiro-no',
   },
 };
@@ -277,11 +274,11 @@ const MODEL_CONFIG = {
  * Task-based model routing
  * Routes different clinical tasks to the most appropriate specialized model
  *
- * Routing strategy (MoMA-inspired):
- * - Norwegian text generation → chiro-norwegian (NorwAI-Mistral-7B)
- * - Safety-critical analysis → chiro-medical (MedGemma)
- * - Fast completions → chiro-fast (Llama 3.2)
- * - General clinical → chiro-no (Mistral 7B)
+ * Routing strategy (MoMA-inspired, all Qwen2.5 architecture):
+ * - Norwegian text generation → chiro-norwegian (Qwen2.5-7B)
+ * - Safety-critical analysis → chiro-medical (Qwen2.5-3B)
+ * - Fast completions → chiro-fast (Qwen2.5-1.5B)
+ * - General clinical → chiro-no (Qwen2.5-7B)
  */
 const MODEL_ROUTING = {
   // SOAP & clinical documentation → chiro-norwegian-lora (89.8% SOAP accuracy)

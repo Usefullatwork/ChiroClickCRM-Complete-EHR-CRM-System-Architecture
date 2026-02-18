@@ -6,44 +6,46 @@
       "total": 50,
       "passed": 22,
       "pass_rate": 44.0,
-      "avg_latency_ms": 7533,
+      "avg_latency_ms": 40196,
       "categories": {
         "soap_notes": {
           "total": 10,
-          "passed": 9,
+          "passed": 10,
           "latencies": [
-            15293, 17638, 9718, 12376, 17924, 15451, 14508, 8917, 12065, 21640
+            13920, 37949, 26671, 30344, 33195, 38360, 28393, 25007, 26282, 28178
           ]
         },
         "diagnosis_codes": {
           "total": 8,
           "passed": 0,
-          "latencies": [12339, 11518, 11221, 11702, 8714, 11195, 4629, 5084]
+          "latencies": [27214, 28328, 28850, 28174, 26786, 29011, 29082, 29016]
         },
         "red_flags": {
           "total": 8,
-          "passed": 2,
-          "latencies": [5629, 5098, 7798, 7563, 6522, 6536, 4018, 6242]
+          "passed": 0,
+          "latencies": [
+            33043, 33021, 120000, 120000, 120000, 120000, 120000, 120000
+          ]
         },
         "norwegian_language": {
           "total": 8,
           "passed": 5,
-          "latencies": [5165, 2969, 6154, 4818, 6048, 6422, 6817, 6085]
+          "latencies": [91190, 24589, 38694, 28303, 31672, 31990, 33450, 32031]
         },
         "communication": {
           "total": 6,
           "passed": 2,
-          "latencies": [2406, 2979, 3886, 3194, 1927, 1740]
+          "latencies": [20998, 23793, 24877, 22430, 21882, 21850]
         },
         "quick_fields": {
           "total": 6,
-          "passed": 1,
-          "latencies": [1861, 1763, 2415, 3479, 3460, 3474]
+          "passed": 2,
+          "latencies": [20548, 21300, 22299, 22911, 23185, 23393]
         },
         "letters": {
           "total": 4,
           "passed": 3,
-          "latencies": [5795, 7733, 8962, 5779]
+          "latencies": [34764, 34536, 33471, 24818]
         }
       },
       "avg_rouge_l": null
@@ -53,35 +55,35 @@
         "id": "soap_s_neck_01",
         "category": "soap_notes",
         "description": "Subjective for chronic neck pain",
-        "latency_ms": 15293,
-        "response_length": 902,
+        "latency_ms": 13920,
+        "response_length": 835,
         "checks": {
           "keywords_present": {
-            "pass": false,
-            "present": ["nakke", "smerte"],
-            "missing": ["kontor"],
-            "score": 0.6666666666666666
+            "pass": true,
+            "present": ["nakke", "smerte", "kontor"],
+            "missing": [],
+            "score": 1.0
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0285,
+            "char_rate": 0.0103,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 902,
+            "actual": 835,
             "expected_range": [100, 2000]
           }
         },
-        "passed": false,
-        "response_preview": " KLINISK NOTAT - SUBJEKTIV DEL\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nPasienten har vært i behandling hos undertegnede for kroniske nakkesmerter de seneste tre måneder. Symptomene er prim..."
+        "passed": true,
+        "response_preview": " SUBJECTIVE DEL AV SOAP-NOTAT\n\nDato: [Dato]\nPasient: [Navn]\nFødselsnummer: [Fødselsnummer]\nGjelder: Kroniske nakkesmerter\nTil: [Kiropraktor]\n\nAnamnese og klinisk status:\n[Pasienten har jobbet på konto..."
       },
       {
         "id": "soap_s_lowback_02",
         "category": "soap_notes",
         "description": "Subjective for acute low back pain",
-        "latency_ms": 17638,
-        "response_length": 1137,
+        "latency_ms": 37949,
+        "response_length": 930,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -91,24 +93,24 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0204,
+            "char_rate": 0.0201,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 1137,
+            "actual": 930,
             "expected_range": [100, 2000]
           }
         },
         "passed": true,
-        "response_preview": " KLINISK NOTAT - AKUTT KORSRYGGSMERTER ETTER LØFTING\n\nDato: [Dato]\nPasient: [Navn]\nAlter: 45 år\nKjonn: Mann\nYrke: Bygningsarbeider\n\nPasienten opplever akutt korsryggsmerter etter løfting. Smertene str..."
+        "response_preview": " KLINISK NOTAT - AKKUTT KORSRYGGSMERTER ETFTER LØFTING\n\nDato: [Dato]\nPasient: [Navn], Fødselsnummer: [Fødselsnummer]\n\nPasienten er en 45-årig mannlig bygningsarbeider som opplever akutt korsryggsmisje..."
       },
       {
         "id": "soap_o_shoulder_03",
         "category": "soap_notes",
         "description": "Objective for shoulder examination",
-        "latency_ms": 9718,
-        "response_length": 510,
+        "latency_ms": 26671,
+        "response_length": 962,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -118,24 +120,24 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0146,
+            "char_rate": 0.0231,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 510,
+            "actual": 962,
             "expected_range": [80, 1500]
           }
         },
         "passed": true,
-        "response_preview": " KLINISK NOTAT - SKULDERUNDERSØKELSE\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nUndersøkelse av skulderen viste følgende funn:\n- Positiv Hawkins test: Kryssning i abduksjon og rotation av sku..."
+        "response_preview": " KLINISK NOTAT - SKULDERUNDERSØKELSE\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nSOAP-notat:\n\nS:\nPasienten er i gang med en skulderundersøkelse. Hovedsymptomer inkluderer:\n- Skuldersmerter, sæ..."
       },
       {
         "id": "soap_a_headache_04",
         "category": "soap_notes",
         "description": "Assessment for cervicogenic headache",
-        "latency_ms": 12376,
-        "response_length": 777,
+        "latency_ms": 30344,
+        "response_length": 733,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -145,24 +147,24 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0141,
+            "char_rate": 0.0131,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 777,
+            "actual": 733,
             "expected_range": [80, 1500]
           }
         },
         "passed": true,
-        "response_preview": " VURDERING - CERVIKOGEN HODEPINE\n\nPasienten har en cervikogen hodepine basert på følgende funn:\n- Nedsatt bevegelse i C1-C2 sekvensen\n- Trigger points i suboccipitale muskler (SO)\n- Positiv fleksjonsr..."
+        "response_preview": " VURDERING - CERVIKOGEN HØDEPINE\n\n[Dato]\nPasient: [Navn]\nFødselsnummer: [Fødselsnummer]\nGjelder: Dokumentasjon på cervikogen hodepine\nTil: [Fastlege]\n\nVurdering basert på undersøkelse av kjekslen og m..."
       },
       {
         "id": "soap_p_hip_05",
         "category": "soap_notes",
         "description": "Plan for hip pain treatment",
-        "latency_ms": 17924,
-        "response_length": 1246,
+        "latency_ms": 33195,
+        "response_length": 1251,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -172,24 +174,24 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0182,
+            "char_rate": 0.0284,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 1246,
+            "actual": 1251,
             "expected_range": [100, 2000]
           }
         },
         "passed": true,
-        "response_preview": " KLINISK BEHANDLINGSPLANN - HOFTESMERTER DUE TIL ARTROSE\n\nPasient: [Navn]\nFødselsnummer: [Fødselsnummer]\nGjelder: Behandlingsplan for hoftesmerter\nTil: [Klinikknavn]\n\nDiagnose: Artrose i høyre haleben..."
+        "response_preview": " Behandlingsplan for hoftesmerter hos en 60-årig kvinne med artrose\n\nPasient: [Navn] – f. [Fødselsnummer]\n\nDiagnose: Artrosis i høften\n\nBehandlingsmål: Redusere smerter og forbedre funksjon i høften\n\n..."
       },
       {
         "id": "soap_full_thoracic_06",
         "category": "soap_notes",
         "description": "Full SOAP for thoracic pain",
-        "latency_ms": 15451,
-        "response_length": 976,
+        "latency_ms": 38360,
+        "response_length": 1626,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -199,24 +201,24 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0173,
+            "char_rate": 0.0195,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 976,
+            "actual": 1626,
             "expected_range": [200, 3000]
           }
         },
         "passed": true,
-        "response_preview": " KLINISK NOTAT - BRYSTSMETER MELLOM SKULDERBLADENE\n\nDato: [Dato]\nPasient: [Navn], Fødselsnummer: [Fødselsnummer]\n\nAnte-stilling:\nPasienten har kontaktet klinikk for akutte brystsmerter mellom skulderb..."
+        "response_preview": " KLINISK NOTAT - BRYSTSMETTER MELLOM SKULDERBLADENE\n\nDato: [Dato]\nPasient: [Navn], Fødselsnummer: [Fødselsnummer]\n\nAnamnese:\n- 35 år, kontorarbeider\n- Akutte brystsmerter mellom skulderbladene startet..."
       },
       {
         "id": "soap_s_vertigo_07",
         "category": "soap_notes",
         "description": "Subjective for dizziness/vertigo",
-        "latency_ms": 14508,
-        "response_length": 821,
+        "latency_ms": 28393,
+        "response_length": 1034,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -226,24 +228,24 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0185,
+            "char_rate": 0.012,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 821,
+            "actual": 1034,
             "expected_range": [100, 2000]
           }
         },
         "passed": true,
-        "response_preview": " KLINISK NOTAT - SVIMMELHET OG USTØHED\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nPasienten har vært med i en akutt periode av svimmelhet og ustøhet siden [tidspunkt]. Pasienten beskriver rot..."
+        "response_preview": " KLINISK NOTAT - SVIMMELHET OG USTØHET\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nPasienten er opprinnelig kommet inn med akutt svimmelhet og ustøhet som startet en uke siden. Symptomerne har..."
       },
       {
         "id": "soap_o_knee_08",
         "category": "soap_notes",
         "description": "Objective for knee examination",
-        "latency_ms": 8917,
-        "response_length": 417,
+        "latency_ms": 25007,
+        "response_length": 483,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -253,24 +255,24 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0122,
+            "char_rate": 0.0184,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 417,
+            "actual": 483,
             "expected_range": [80, 1500]
           }
         },
         "passed": true,
-        "response_preview": " KLINISK NOTAT - KNESMERTER\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nUnder kinesisk undersøkelse ble funnet:\n- Positiv McMurray test medialt (påvist mediale meniske skade)\n- Negativ Lachman..."
+        "response_preview": " KLINISK NOTAT - KNEESMERTER\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nUnder kinesisk undersøkelse av knaen oppdager jeg følgende funn:\n- McMurray test medialt: Positiv (positiv svingning i ..."
       },
       {
         "id": "soap_a_lumbar_disc_09",
         "category": "soap_notes",
         "description": "Assessment for lumbar disc herniation",
-        "latency_ms": 12065,
-        "response_length": 630,
+        "latency_ms": 26282,
+        "response_length": 770,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -280,24 +282,24 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0121,
+            "char_rate": 0.0197,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 630,
+            "actual": 770,
             "expected_range": [100, 1500]
           }
         },
         "passed": true,
-        "response_preview": " KLINISK NOTAT - MISTENKT LUMBAL SKIVEPROLAPS L4-L5\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nPasienten har vært undersøkt for mistenkt lumbal skiveprolaps L4-L5.\n\nKliniske funn:\nPositiv SLR..."
+        "response_preview": " KLINISK NOTAT - MISTENKT LUMBAL SKIVEPROLAPS L4-L5\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nVurdering av mistenkt lumbal skiveprolaps i L4-L5:\n\nUndersøkelse avslører funn som tyder på en s..."
       },
       {
         "id": "soap_full_jaw_10",
         "category": "soap_notes",
         "description": "Full SOAP for jaw/TMJ pain",
-        "latency_ms": 21640,
-        "response_length": 1484,
+        "latency_ms": 28178,
+        "response_length": 852,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -307,24 +309,24 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0289,
+            "char_rate": 0.0102,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 1484,
+            "actual": 852,
             "expected_range": [200, 3000]
           }
         },
         "passed": true,
-        "response_preview": " KLINISK NOTAT - TEMPORÆRT KJEVELEDDSPLAGER (TMD)\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nAntehåndsdiagnose: Temporært kjeveleddsplager (TMD)\n\nSOAP-notat:\n\nS: Symptomer og anamnese\nPasient..."
+        "response_preview": " KLINISK NOTAT - TEMPORAR KJEVELEDDSPLAGER\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nAnte-ekspamination:\nPasienten har rapportert smerter ved tygging, klikkelyder og hodepine temporalt.\n\nObs..."
       },
       {
         "id": "dx_icpc_lowback_01",
         "category": "diagnosis_codes",
         "description": "ICPC-2 for low back pain",
-        "latency_ms": 12339,
-        "response_length": 662,
+        "latency_ms": 27214,
+        "response_length": 716,
         "checks": {
           "keywords_present": {
             "pass": false,
@@ -334,12 +336,12 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0156,
+            "char_rate": 0.0125,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 662,
+            "actual": 716,
             "expected_range": [50, 1000]
           },
           "code_format": {
@@ -348,14 +350,14 @@
           }
         },
         "passed": false,
-        "response_preview": " KLINISK NOTAT - AKUTTE KORSRYGGSMERTER MED ISJIAS\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nUndersøkelsen avslører akutte korsryggsmnerter med isjias.\n\nSymptomer:\n- Korsryggsmerter i midten..."
+        "response_preview": " DOKUMENTASJONSSTIL FOR KIROPRAKTISK DIAGNOSEKODERING\n\nFor å sikre en standardiseret diagnosekoding for kiropraktikk i Norge, anbefales bruk av ICPC-2 (International Classification of Primary Care) ko..."
       },
       {
         "id": "dx_icpc_neck_02",
         "category": "diagnosis_codes",
         "description": "ICPC-2 for neck pain with headache",
-        "latency_ms": 11518,
-        "response_length": 589,
+        "latency_ms": 28328,
+        "response_length": 667,
         "checks": {
           "keywords_present": {
             "pass": false,
@@ -365,12 +367,12 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0259,
+            "char_rate": 0.0154,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 589,
+            "actual": 667,
             "expected_range": [50, 1000]
           },
           "code_format": {
@@ -379,14 +381,14 @@
           }
         },
         "passed": false,
-        "response_preview": " KLINISK NOTAT - NAKKEMUSKULÆR SOM ÅRSAK TIL HODEPINE\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nUndersøkelse av pasienten viser at hodepine og nakkesmerter er relatert til muskulære spenning..."
+        "response_preview": " KLINISK NOTAT - NAKKE-HODEPAIN\n\nPasient: [Navn]\nFødselsnummer: [Fødselsnummer]\n\nUndersøkelse av pasienten har vist cervikogen hodepine og nakkestivhet.\n\nSymptomer:\n- Hodepine som følge av manipulerin..."
       },
       {
         "id": "dx_icpc_shoulder_03",
         "category": "diagnosis_codes",
         "description": "ICPC-2 for shoulder impingement",
-        "latency_ms": 11221,
-        "response_length": 714,
+        "latency_ms": 28850,
+        "response_length": 742,
         "checks": {
           "keywords_present": {
             "pass": false,
@@ -396,28 +398,28 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0174,
+            "char_rate": 0.0183,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 714,
+            "actual": 742,
             "expected_range": [40, 800]
           },
           "code_format": {
-            "pass": true,
+            "pass": false,
             "description": "Contains ICD-10/ICPC-2 format code"
           }
         },
         "passed": false,
-        "response_preview": " KLINISK NOTAT - SKULDER IMPINGEMENT SYNDROM MED ROTATOR CUFF TENDINOPATI\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nUndersøkelse av skulder og arm:\n- Skulderfremadløfting (Abduktion) og rota..."
+        "response_preview": " KLINISK NOTAT - SKULDER IMPINGEMENT SYNDROM MED ROTATOR CUFF TENDINOPATI\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nUndersøkelse av skulder og arm viste funn som tyder på skulder impingement..."
       },
       {
         "id": "dx_icpc_knee_04",
         "category": "diagnosis_codes",
         "description": "ICPC-2 for knee meniscus",
-        "latency_ms": 11702,
-        "response_length": 689,
+        "latency_ms": 28174,
+        "response_length": 710,
         "checks": {
           "keywords_present": {
             "pass": false,
@@ -427,12 +429,12 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0204,
+            "char_rate": 0.0159,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 689,
+            "actual": 710,
             "expected_range": [40, 800]
           },
           "code_format": {
@@ -441,14 +443,14 @@
           }
         },
         "passed": false,
-        "response_preview": " KLINISK NOTAT - MISTENKT MEDIAL MENISKKSKADE I KNEET HOS EN FOTBALLSPILLER\n\nDato: [Dato]\nPasient: [Navn], f. [Fødselsnummer]\n\nUnder undersøkelse av pasientens knæ oppdager jeg en lokaliseret smerte i..."
+        "response_preview": " KLINISK NOTAT - MISTENKT MEDIAL MENISKSKADE I KNEET HOS EN 30 ÅR GAMMEL FOTBALLSPILLER\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nUndersøkelse av knaen viser en særlig svingning i den medial..."
       },
       {
         "id": "dx_icpc_vertigo_05",
         "category": "diagnosis_codes",
         "description": "ICPC-2 for vertigo/BPPV",
-        "latency_ms": 8714,
-        "response_length": 413,
+        "latency_ms": 26786,
+        "response_length": 440,
         "checks": {
           "keywords_present": {
             "pass": false,
@@ -458,12 +460,12 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0094,
+            "char_rate": 0.006,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 413,
+            "actual": 440,
             "expected_range": [40, 800]
           },
           "code_format": {
@@ -472,14 +474,14 @@
           }
         },
         "passed": false,
-        "response_preview": " KLINISK NOTAT - BENIGN PAROKSYSMAAL POSISJONSVERTIGO (BPPV)\n\nPasient: [Navn] – f. [Fødselsnummer]\n\nUndersøkelse av pasienten viste en positiv Dix-Hallpike test, som tyder på benign paroksysmal posisj..."
+        "response_preview": " KLINISK NOTAT - BENIGN PAROKSYSMAL POSISJONSVERTIGO (BPPV)\n\nDato: [Dato]\nPasient: [Navn]\n\nUnder en undersøkelse av den horisontale buegangen ble det oppdaget en positiv Dix-Hallpike test. Dette er et..."
       },
       {
         "id": "dx_icpc_hip_06",
         "category": "diagnosis_codes",
         "description": "ICPC-2 for hip osteoarthritis",
-        "latency_ms": 11195,
-        "response_length": 669,
+        "latency_ms": 29011,
+        "response_length": 670,
         "checks": {
           "keywords_present": {
             "pass": false,
@@ -489,12 +491,12 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0197,
+            "char_rate": 0.0153,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 669,
+            "actual": 670,
             "expected_range": [40, 800]
           },
           "code_format": {
@@ -503,14 +505,14 @@
           }
         },
         "passed": false,
-        "response_preview": " KLINISK NOTAT - HOFTEARTROSE (OA) VED ELDRE PASIENT\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nHistorie og symptomer:\nPasienten har hatt en gradvis økning av smerter i hofteområdet, som er f..."
+        "response_preview": " KLINISK NOTAT - HOFTEARTROSE\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nDiagnose:\nHofteartrose (Osteoarthrosis) hos ældre pasient med gradvis økende smerter og nedsatt funksjon i den ene hof..."
       },
       {
         "id": "dx_icpc_thoracic_07",
         "category": "diagnosis_codes",
         "description": "ICPC-2 for thoracic pain",
-        "latency_ms": 4629,
-        "response_length": 573,
+        "latency_ms": 29082,
+        "response_length": 743,
         "checks": {
           "keywords_present": {
             "pass": false,
@@ -520,38 +522,7 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0165,
-            "has_norwegian_chars": true
-          },
-          "response_length": {
-            "pass": true,
-            "actual": 573,
-            "expected_range": [40, 800]
-          },
-          "code_format": {
-            "pass": true,
-            "description": "Contains ICD-10/ICPC-2 format code"
-          }
-        },
-        "passed": false,
-        "response_preview": " KLINISK NOTAT - SMERTER I BRYSTRYGG MED RIB DYSFUNCTION\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nUnder klinisk undersøkelse ble det oppdaget en rib dysfunction i den øvre brystryggen (rib ..."
-      },
-      {
-        "id": "dx_icpc_headache_08",
-        "category": "diagnosis_codes",
-        "description": "ICPC-2 for tension headache",
-        "latency_ms": 5084,
-        "response_length": 743,
-        "checks": {
-          "keywords_present": {
-            "pass": false,
-            "present": [],
-            "missing": ["N02"],
-            "score": 0.0
-          },
-          "norwegian_quality": {
-            "pass": true,
-            "char_rate": 0.0167,
+            "char_rate": 0.0071,
             "has_norwegian_chars": true
           },
           "response_length": {
@@ -565,14 +536,45 @@
           }
         },
         "passed": false,
-        "response_preview": " KLINISK NOTAT - SPENNINGSHØDEPINE MED EPISODISKE ANFALL\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nUndersøkelse av pasienten som har rapportert episodiske anfall med spenningshodepine 2-3 ga..."
+        "response_preview": " KLINISK NOTAT - SMERTER I BRYSTRYGG MED RIB DYSFUNCTION\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nUnder klinisk undersøkelse ble det oppdaget en rib dysfunction i [ribbånd/ribbe] med smerte..."
+      },
+      {
+        "id": "dx_icpc_headache_08",
+        "category": "diagnosis_codes",
+        "description": "ICPC-2 for tension headache",
+        "latency_ms": 29016,
+        "response_length": 745,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": [],
+            "missing": ["N02"],
+            "score": 0.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0118,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 745,
+            "expected_range": [40, 800]
+          },
+          "code_format": {
+            "pass": true,
+            "description": "Contains ICD-10/ICPC-2 format code"
+          }
+        },
+        "passed": false,
+        "response_preview": " KLINISK NOTAT - SPENNINGSHODPEINE MED EPISODISKE ANFALL\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nDiagnose: Spenningshodepine med episodiske anfall (ICD-10: G42.7)\n\nKliniske funn og vurderi..."
       },
       {
         "id": "red_flag_cauda_01",
         "category": "red_flags",
         "description": "Red flags: cauda equina syndrome",
-        "latency_ms": 5629,
-        "response_length": 778,
+        "latency_ms": 33043,
+        "response_length": 1260,
         "checks": {
           "keywords_present": {
             "pass": false,
@@ -582,24 +584,24 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0113,
+            "char_rate": 0.0184,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 778,
+            "actual": 1260,
             "expected_range": [100, 2000]
           }
         },
         "passed": false,
-        "response_preview": " KLINISK NOTAT - AKUTTE KORSRYGGSMERTER, NUMMENHET I PERINEUM OG BILATERAL BEINSVAKHET\n\nDato: [Dato]\nPasient: [Navn], fødselsnummer: [Fødselsnummer]\n\nKliniske funn og vurdering:\n- Akutte korsryggsmner..."
+        "response_preview": " KLINISK NOTAT - PASIENTEN MED AKUTTE KORSRYGGSMERTER OG SYMTOMATER\n\nDato: [Dato]\nPasient: [Navn], fødselsnummer: [Fødselsnummer]\n\nPasienten opprinnelig henvist for akutte korsryggsmnerter og nummenhe..."
       },
       {
         "id": "red_flag_stroke_02",
         "category": "red_flags",
         "description": "Red flags: vertebrobasilar insufficiency",
-        "latency_ms": 5098,
-        "response_length": 653,
+        "latency_ms": 33021,
+        "response_length": 1212,
         "checks": {
           "keywords_present": {
             "pass": false,
@@ -609,198 +611,72 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0155,
+            "char_rate": 0.0184,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 653,
+            "actual": 1212,
             "expected_range": [100, 2000]
           }
         },
         "passed": false,
-        "response_preview": " KLINISK NOTAT - NAKKEMANIPULASJON\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nUnder en kiropraktisk behandling av nakkeproblematikk oppstod pludselig:\n- Nakkesmerter\n- Svimmelhet\n- Diplopi (d..."
+        "response_preview": " KLINISK NOTAT - NAKKEMANIPULASJON\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nPasienten ble undersøkt etter nakkemanipulasjon med krypning av hals og baksiden av skulderen.\n\nSymptomer:\n- Nakk..."
       },
       {
         "id": "red_flag_fracture_03",
         "category": "red_flags",
-        "description": "Red flags: pathological fracture risk",
-        "latency_ms": 7798,
-        "response_length": 1216,
-        "checks": {
-          "keywords_present": {
-            "pass": false,
-            "present": [],
-            "missing": ["metastas", "patologisk", "bildediagnostikk"],
-            "score": 0.0
-          },
-          "norwegian_quality": {
-            "pass": true,
-            "char_rate": 0.0303,
-            "has_norwegian_chars": true
-          },
-          "response_length": {
-            "pass": true,
-            "actual": 1216,
-            "expected_range": [100, 2000]
-          }
-        },
         "passed": false,
-        "response_preview": " KLINISK NOTAT - NY RYGGSMERTE HOS 70 ÅR GAMMEL KVINNE\n\nDato: [Dato]\nPasient: [Navn], Fødselsnummer: [Fødselsnummer]\n\nPasienten opprinnelig henvist for å vurdere ryggsmerte. Hun er 70 år gammel og har..."
+        "error": "timeout",
+        "latency_ms": 120000,
+        "response_preview": null
       },
       {
         "id": "red_flag_infection_04",
         "category": "red_flags",
-        "description": "Red flags: spinal infection",
-        "latency_ms": 7563,
-        "response_length": 1194,
-        "checks": {
-          "keywords_present": {
-            "pass": true,
-            "present": ["infeksjon", "feber"],
-            "missing": [],
-            "score": 1.0
-          },
-          "norwegian_quality": {
-            "pass": true,
-            "char_rate": 0.0243,
-            "has_norwegian_chars": true
-          },
-          "response_length": {
-            "pass": true,
-            "actual": 1194,
-            "expected_range": [100, 2000]
-          }
-        },
-        "passed": true,
-        "response_preview": " KLINISK NOTAT - RØDE FLAGG\n\nDato: [Dato]\nPasient: [Navn], Fødselsnummer: [Fødselsnummer]\n\nPasienten har vært på oppfølging hos undertegnede for å behandle ryggsmerter. I dag har pasienten rapportert ..."
+        "passed": false,
+        "error": "timeout",
+        "latency_ms": 120000,
+        "response_preview": null
       },
       {
         "id": "red_flag_safe_01",
         "category": "red_flags",
-        "description": "Safe scenario: no red flags (mechanical back pain)",
-        "latency_ms": 6522,
-        "response_length": 962,
-        "checks": {
-          "keywords_present": {
-            "pass": true,
-            "present": ["mekanisk"],
-            "missing": [],
-            "score": 1.0
-          },
-          "keywords_absent": {
-            "pass": true,
-            "found_forbidden": []
-          },
-          "norwegian_quality": {
-            "pass": true,
-            "char_rate": 0.0179,
-            "has_norwegian_chars": true
-          },
-          "response_length": {
-            "pass": true,
-            "actual": 962,
-            "expected_range": [50, 1500]
-          }
-        },
-        "passed": true,
-        "response_preview": " KLINISK NOTAT - RØDE FLAGG: MECHANISKE KORSRYGGSMERTER\n\nDato: [Dato]\nPasient: [Navn], fødselsnummer: [Fødselsnummer]\n\nPasienten er en 35-årig mann som har oppstått med mekaniske korsryggsmmerter sist..."
+        "passed": false,
+        "error": "timeout",
+        "latency_ms": 120000,
+        "response_preview": null
       },
       {
         "id": "red_flag_safe_02",
         "category": "red_flags",
-        "description": "Safe scenario: no red flags (tension headache)",
-        "latency_ms": 6536,
-        "response_length": 998,
-        "checks": {
-          "keywords_present": {
-            "pass": false,
-            "present": [],
-            "missing": ["spenningshodepine"],
-            "score": 0.0
-          },
-          "keywords_absent": {
-            "pass": true,
-            "found_forbidden": []
-          },
-          "norwegian_quality": {
-            "pass": true,
-            "char_rate": 0.0149,
-            "has_norwegian_chars": true
-          },
-          "response_length": {
-            "pass": true,
-            "actual": 998,
-            "expected_range": [50, 1500]
-          }
-        },
         "passed": false,
-        "response_preview": " KLINISK NOTAT - HJERNEHODPINE\n\nDato: [Dato]\nPasient: [Navn]\nAlter: 28 år\nKjønn: Kvinne\n\nPasienten har vært i behandling for bilateral trykkende hodepine siden [tidspunkt]. Symptomene er forverres med..."
+        "error": "timeout",
+        "latency_ms": 120000,
+        "response_preview": null
       },
       {
         "id": "red_flag_safe_03",
         "category": "red_flags",
-        "description": "Safe scenario: no red flags (shoulder tendinopathy)",
-        "latency_ms": 4018,
-        "response_length": 448,
-        "checks": {
-          "keywords_present": {
-            "pass": false,
-            "present": [],
-            "missing": ["tendinopati"],
-            "score": 0.0
-          },
-          "keywords_absent": {
-            "pass": true,
-            "found_forbidden": []
-          },
-          "norwegian_quality": {
-            "pass": true,
-            "char_rate": 0.0169,
-            "has_norwegian_chars": true
-          },
-          "response_length": {
-            "pass": true,
-            "actual": 448,
-            "expected_range": [50, 1500]
-          }
-        },
         "passed": false,
-        "response_preview": " KLINISK NOTAT - SKULDERSMERTE\n\nDato: [Dato]\nPasient: [Navn], f. [Fødselsnummer]\n\nUndersøkelse av skulderen viste en gradvis debut av skuldersmerter ved overhead aktiviteter over de siste 6 ukenene.\n\n..."
+        "error": "timeout",
+        "latency_ms": 120000,
+        "response_preview": null
       },
       {
         "id": "red_flag_myelopathy_08",
         "category": "red_flags",
-        "description": "Red flags: cervical myelopathy",
-        "latency_ms": 6242,
-        "response_length": 912,
-        "checks": {
-          "keywords_present": {
-            "pass": false,
-            "present": [],
-            "missing": ["myelopati", "henvisning"],
-            "score": 0.0
-          },
-          "norwegian_quality": {
-            "pass": true,
-            "char_rate": 0.0216,
-            "has_norwegian_chars": true
-          },
-          "response_length": {
-            "pass": true,
-            "actual": 912,
-            "expected_range": [100, 2000]
-          }
-        },
         "passed": false,
-        "response_preview": " KLINISK NOTAT - SENIORPASIENT MED NEUROLOSKI SYMTOMATER\n\nDato: [Dato]\nPasient: [Navn], fødselsnummer: [Fødselsnummer]\n\nUnder undersøkelse av pasienten oppstod følgende funn:\n- Klossete hender med red..."
+        "error": "timeout",
+        "latency_ms": 120000,
+        "response_preview": null
       },
       {
         "id": "norsk_grammar_01",
         "category": "norwegian_language",
         "description": "Norwegian medical grammar",
-        "latency_ms": 5165,
-        "response_length": 651,
+        "latency_ms": 91190,
+        "response_length": 1019,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -814,24 +690,24 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0172,
+            "char_rate": 0.034,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 651,
+            "actual": 1019,
             "expected_range": [80, 1500]
           }
         },
         "passed": true,
-        "response_preview": " KLINISK NOTAT - CERVIKALT RADIKULOPATI SYNDROM\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nUnder klinisk undersøkelse av pasienten oppstod funn som tyder på cervikalt radikulopati-syndrom (CR..."
+        "response_preview": " KLINISK BESKRIVELSE AV CERVIKALT RADIKULOPATI-SYNDROM\n\nDato: [Dato]\nPasient: [Navn] - f. [Fødselsnummer]\n\nCervikalt radikulopati (CRPS) er en sykdom som oppstår ved nedtrykkelse på nerver i halsrygge..."
       },
       {
         "id": "norsk_terminology_02",
         "category": "norwegian_language",
         "description": "Norwegian anatomical terms",
-        "latency_ms": 2969,
-        "response_length": 255,
+        "latency_ms": 24589,
+        "response_length": 283,
         "checks": {
           "keywords_present": {
             "pass": false,
@@ -841,30 +717,30 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0052,
+            "char_rate": 0.0045,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 255,
+            "actual": 283,
             "expected_range": [50, 1000]
           }
         },
         "passed": false,
-        "response_preview": " Anatomiske strukturer i ryggen (Norsk terminologi):\n\n1. Halsryggen (cervical spine)\n2. Brøstryggen (thoracic spine)\n3. Lende (lumbar spine)\n4. Sakroiliak-fuglen (sacroiliac joint)\n5. Intervertebral d..."
+        "response_preview": " Anatomiske strukturer i ryggen og ryggkollen med norske terminer:\n\n1. Halsryggen (cervical spine)\n2. Brøstryggen (thoracic spine)\n3. Lomryggen (lumbar spine)\n4. Sakroiliak-ledden (sacroiliac joint)\n5..."
       },
       {
         "id": "norsk_soap_format_03",
         "category": "norwegian_language",
         "description": "Correct Norwegian SOAP format",
-        "latency_ms": 6154,
-        "response_length": 1027,
+        "latency_ms": 38694,
+        "response_length": 1635,
         "checks": {
           "keywords_present": {
             "pass": false,
-            "present": ["Vurdering"],
-            "missing": ["Subjektiv", "Objektiv", "Plan"],
-            "score": 0.25
+            "present": ["Objektiv", "Plan"],
+            "missing": ["Subjektiv", "Vurdering"],
+            "score": 0.5
           },
           "keywords_absent": {
             "pass": true,
@@ -872,24 +748,24 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0208,
+            "char_rate": 0.0224,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 1027,
+            "actual": 1635,
             "expected_range": [150, 2000]
           }
         },
         "passed": false,
-        "response_preview": " KLINISK NOTAT - SKULDERSMERTE (SOAP)\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nAntecedent:\nPasienten har rapportert skuldersmerter i rett håndside siden [tidspunkt]. Symptomerne er beskreve..."
+        "response_preview": " SOAP-NOTAT - SKULDERSMERTE\n\nDato: [Dato]\nTidspunkt: [Tidspunkt]\nPasient: [Navn]\nFødselsnummer: [Fødselsnummer]\n\nGjelder: Skuldersmerte (Brachialgia)\n\nS: Symptomer og anamnese\n- Pasienten opplever sku..."
       },
       {
         "id": "norsk_clinical_letter_04",
         "category": "norwegian_language",
         "description": "Norwegian referral letter",
-        "latency_ms": 4818,
-        "response_length": 609,
+        "latency_ms": 28303,
+        "response_length": 880,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -903,24 +779,24 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0161,
+            "char_rate": 0.0096,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 609,
+            "actual": 880,
             "expected_range": [100, 2000]
           }
         },
         "passed": true,
-        "response_preview": " HENVISNING TIL ORTOPODE - KRONISKE SKULDERSMERTER OG MISTENKT FULL ROTATOR CUFF RUPTUR\n\nPasient: [Navn] – f. [Fødselsnummer]\n\nEtter konsultasjon med undertegnede har det vært en oppfattelse at pasien..."
+        "response_preview": " HENVISNING TIL ORTOPODE - KRONISKE SKULDERSMERTER OG MISTET FULL ROTATOR CUFF RUPTUR\n\nPasient: [Navn] – f. [Fødselsnummer]\n\nEtter en langvarig periode med kroniske skuldersmerter og eventuelt mistenk..."
       },
       {
         "id": "norsk_patient_info_05",
         "category": "norwegian_language",
         "description": "Norwegian patient education",
-        "latency_ms": 6048,
-        "response_length": 934,
+        "latency_ms": 31672,
+        "response_length": 1046,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -934,24 +810,24 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0264,
+            "char_rate": 0.0456,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 934,
+            "actual": 1046,
             "expected_range": [150, 2000]
           }
         },
         "passed": true,
-        "response_preview": " PASIENTINFORMASJON - KORSRYGGSMERTER\n\nKorsryggsmerter er en vanlig kiropraktisk diagnose. Det kan være forskjellige årsaker til smerten, men de fleste fall har en muskulær eller naboartetal basis.\n\nH..."
+        "response_preview": " PASIENTINFORMASJON - KORSRYGGSMERTER\n\nKorsryggsmere er en vanlig type ryggsmerter som kan oppstå i korsryggen, det områdeet mellom skuldrene og lenden. Disse små musklerne har en viktig rolle for å h..."
       },
       {
         "id": "norsk_sick_leave_06",
         "category": "norwegian_language",
         "description": "Norwegian sick leave certificate text",
-        "latency_ms": 6422,
-        "response_length": 980,
+        "latency_ms": 31990,
+        "response_length": 971,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -965,30 +841,30 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0173,
+            "char_rate": 0.025,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 980,
+            "actual": 971,
             "expected_range": [100, 1500]
           }
         },
         "passed": true,
-        "response_preview": " MEDISINSKE GRUNNLAG FOR SYKEMELDINGSATTEST\n\nPasient: [Navn]\nFødselsnummer: [Fødselsnummer]\nGjelder: Sykemeldingsattest for akutt korsryggsmerte\nTil: Arbeidsgiver/NAV\n\nDet bekreftes at pasienten har o..."
+        "response_preview": " MEDISINSK GRUNNLAG FOR SYKEMELDING\n\nPasient: [Navn]\nFødselsnummer: [Fødselsnummer]\nGjelder: Sykemelding for akutt korsryggsmerte\nTil: Arbeidsgiver / Nav\n\nDet bekreftes at pasienten har opplevert en a..."
       },
       {
         "id": "norsk_diagnosis_text_07",
         "category": "norwegian_language",
         "description": "Norwegian diagnosis description",
-        "latency_ms": 6817,
-        "response_length": 1082,
+        "latency_ms": 33450,
+        "response_length": 891,
         "checks": {
           "keywords_present": {
-            "pass": true,
-            "present": ["stenose", "lumbal"],
-            "missing": [],
-            "score": 1.0
+            "pass": false,
+            "present": ["lumbal"],
+            "missing": ["stenose"],
+            "score": 0.5
           },
           "keywords_absent": {
             "pass": false,
@@ -996,24 +872,24 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0111,
+            "char_rate": 0.0119,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 1082,
+            "actual": 891,
             "expected_range": [100, 2000]
           }
         },
         "passed": false,
-        "response_preview": " LUMBAL SPINAL STENOSIS - DIAGNOS, SYMPTOMER OG DIFFERENSIALDIAGNOSER\n\nLumbal spinal stenose er en fornøyelig smeltevanns- eller benforandring i lumbal ryggkjernen som presser på den nærmeste nervevei..."
+        "response_preview": " DIAGNOS LUMBAL SPINAL STENOSIS PÅ NORSK\n\nLumbal spinal stenosis (LSS) er en degenerativ forandring i lendenes rygmarvelet, som fører til kompresjon av den nervøse roret. Det kan resultere i symptomer..."
       },
       {
         "id": "norsk_examination_08",
         "category": "norwegian_language",
         "description": "Norwegian examination description",
-        "latency_ms": 6085,
-        "response_length": 947,
+        "latency_ms": 32031,
+        "response_length": 1047,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -1027,24 +903,24 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0223,
+            "char_rate": 0.0238,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 947,
+            "actual": 1047,
             "expected_range": [80, 1500]
           }
         },
         "passed": true,
-        "response_preview": " KLINISK NOTAT - SPURLINGS TEST FOR CERVIKALT RADIKULOPATI-SYNDROM\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nSpurlings test utført for at vurdere cervikalt radikulopati-syndrom (CRPS). Teste..."
+        "response_preview": " KLINISK NOTAT - SPURLINGS TEST FOR CERVIKALT RADIKULOPATI-SYNDROM\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nSpurlings test er en klinisk undersøkelse som brukes for å utredde cervikalt radi..."
       },
       {
         "id": "sms_appointment_01",
         "category": "communication",
         "description": "Appointment reminder SMS",
-        "latency_ms": 2406,
-        "response_length": 193,
+        "latency_ms": 20998,
+        "response_length": 166,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -1054,55 +930,55 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0205,
+            "char_rate": 0.0079,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 193,
+            "actual": 166,
             "expected_range": [30, 300]
           }
         },
         "passed": true,
-        "response_preview": " TAKK FOR AT DU VALGER Å VISITERE OSS!\n\nDu har en timeavtale klokka 14:30 i dag hos kiropraktoren Olsen ved KFA Majorstuen. Håpper du at det vil være en god dag!\n\nVennlig hilsen fra KFA-teamet."
+        "response_preview": " TAKK FOR AT DU VELGER KIROPRAKTOR OLSEN!\n\nDin timeavtale er klokka 14:30 i morgen ved KFA Majorstuen. Se deg klar og god hånd!\n\nVennlig hilsen fra Kiropraktor Olsen."
       },
       {
         "id": "sms_followup_02",
         "category": "communication",
         "description": "Follow-up SMS after first visit",
-        "latency_ms": 2979,
-        "response_length": 454,
+        "latency_ms": 23793,
+        "response_length": 470,
         "checks": {
           "keywords_present": {
-            "pass": true,
-            "present": ["behandling"],
-            "missing": [],
-            "score": 1.0
+            "pass": false,
+            "present": [],
+            "missing": ["behandling"],
+            "score": 0.0
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0335,
+            "char_rate": 0.0438,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": false,
-            "actual": 454,
+            "actual": 470,
             "expected_range": [50, 400]
           }
         },
         "passed": false,
-        "response_preview": " OPPFØLGINGSMELDING - KIROPRAKTISK BEHANDLING\n\nDato: [Dato]\nTil: [Pasientnavn], f. [Fødselsnummer]\nFra: [Klinikknavn]\n\nEmne: Nakkesmerter og behandling\n\nHei [Pasientnavn],\n\nJeg ønsker å informere deg ..."
+        "response_preview": " OPPFØLGINGS-SMS TIL PASIENTEN EFTERT FØRSTE KONSULTASJON\n\nHei [Pasientnavn],\n\nTakk for å ha besøkt oss i dag! Jeg er glad for at du fikk en god hjelp med dine nakkesmerter.\n\nFor å fortsatte med å sty..."
       },
       {
         "id": "sms_recall_03",
         "category": "communication",
         "description": "Recall SMS for lapsed patient",
-        "latency_ms": 3886,
+        "latency_ms": 24877,
         "response_length": 466,
         "checks": {
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0246,
+            "char_rate": 0.0189,
             "has_norwegian_chars": true
           },
           "response_length": {
@@ -1112,14 +988,14 @@
           }
         },
         "passed": false,
-        "response_preview": " GJENINNKALLING TIL KIROPRAKTIKK\n\nDato: [Dato]\nTil: [Pasientnavn], f. [Fødselsnummer]\nFra: [Klinikknavn]\n\nEmne: Gjeninnkall til kiropraktisk behandling\n\nVenligst bekreft at du har mottatt denne meldin..."
+        "response_preview": " GJENINNKALLING TIL KIROPRAKTIKKLINIKK\n\nDato: [Dato]\nTil: [Pasientnavn], f. [Fødselsnummer]\nFra: [Klinikknavn] - [Kiropraktor]\nAngående: Gjeninnkall til korsryggsmerter\n\nEmne: Gjeninnkall til behandli..."
       },
       {
         "id": "sms_cancel_04",
         "category": "communication",
         "description": "Cancellation confirmation SMS",
-        "latency_ms": 3194,
-        "response_length": 318,
+        "latency_ms": 22430,
+        "response_length": 338,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -1129,51 +1005,51 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.004,
+            "char_rate": 0.0076,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": false,
-            "actual": 318,
+            "actual": 338,
             "expected_range": [30, 300]
           }
         },
         "passed": false,
-        "response_preview": " SMS-MELDING - AVBESTILLING AV TIDSPUNKT\n\nHei [Pasientnavn],\n\nJeg bekrefter at du har avbestilt din tidspunkt hos oss den [tidspunkt].\n\nVennligst kontaktér oss for å bestille ny tidspunkt.\n\nMobil: [Kl..."
+        "response_preview": " SMS-bekreftelse av avbestilling av tidspunkt:\n\nHei [Pasientnavn],\n\nDin avbestilling av tidspunktet for kiropraktisk behandling er mottatt og bekreftet. Vi ønsker deg en god dag!\n\nHvis du vil ha ny ti..."
       },
       {
         "id": "sms_birthday_05",
         "category": "communication",
         "description": "Birthday greeting SMS",
-        "latency_ms": 1927,
-        "response_length": 209,
+        "latency_ms": 21882,
+        "response_length": 248,
         "checks": {
           "keywords_present": {
-            "pass": false,
-            "present": [],
-            "missing": ["gratulerer"],
-            "score": 0.0
+            "pass": true,
+            "present": ["gratulerer"],
+            "missing": [],
+            "score": 1.0
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0189,
+            "char_rate": 0.0204,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": false,
-            "actual": 209,
+            "actual": 248,
             "expected_range": [20, 200]
           }
         },
         "passed": false,
-        "response_preview": " PASIENTMELDING - BURSDAGSMELDING\n\nDato: [Dato]\nTil: [Pasientnavn], f. [Fødselsnummer]\nFra: [Kiropraktor], Kiropraktor\nAngående: Bursdagsmelding\n\nEmne: God dag [Pasientnavn]!\n\nJeg er glad for å skrive..."
+        "response_preview": " KLINISK NOTAT - BURSDAGSMELDING\n\nDato: [Dato]\nPasient: [Navn]\n\nGratulerer med godt behandlingsforløp! Du har hatt en god respons på kiropraktisk behandling og er i klar bedring.\n\nFor å fortsatte med ..."
       },
       {
         "id": "sms_waitlist_06",
         "category": "communication",
         "description": "Waitlist notification SMS",
-        "latency_ms": 1740,
-        "response_length": 203,
+        "latency_ms": 21850,
+        "response_length": 191,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -1182,25 +1058,25 @@
             "score": 1.0
           },
           "norwegian_quality": {
-            "pass": false,
-            "char_rate": 0.0,
-            "has_norwegian_chars": false
+            "pass": true,
+            "char_rate": 0.0071,
+            "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 203,
+            "actual": 191,
             "expected_range": [30, 300]
           }
         },
         "passed": true,
-        "response_preview": " SMS-melding til pasient:\n\nHei [Pasientnavn],\n\nDet er ledig tid for kiropraktisk behandling klokka 10:00 i morgen. Vennligst kontaktér oss dersom du vil ha denne tiden.\n\nMed vennlig hilsen,\n[Klinikkna..."
+        "response_preview": " SMS TIL PASIENT:\n\nHei [Pasientnavn],\n\nDet er ledig tid i klinikkken klokka 10:00 i morgen. Vennligst hente deg så snart som mulig.\n\nVennlig hilsen,\n[Kiropraktor]\n[Klinikknavn]\nTlf: [Telefon]"
       },
       {
         "id": "quick_chief_01",
         "category": "quick_fields",
         "description": "Quick chief complaint generation",
-        "latency_ms": 1861,
-        "response_length": 203,
+        "latency_ms": 20548,
+        "response_length": 199,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -1210,24 +1086,24 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0245,
+            "char_rate": 0.0133,
             "has_norwegian_chars": true
           },
           "response_length": {
-            "pass": false,
-            "actual": 203,
+            "pass": true,
+            "actual": 199,
             "expected_range": [10, 200]
           }
         },
-        "passed": false,
-        "response_preview": " KLINISK TEXTFELT - HØDEPINE OG NAKKEMERTER\n\nHovedklage:\n- Nakkepine (nackskar)\n- Hodepine (hjernetåke)\n\nUndersøkelsesfunn:\n- Klinisk undersøkelse: Positiv for nakkespänninger og hodepine.\n- Palpation..."
+        "passed": true,
+        "response_preview": " KLINISK NOTAT - HODENDE OG NAKKE\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nHovedklage:\n- Nakkesmerter i både hodet og nakken\n- Hodepine\n\nKliniske funn:\n- Forskjellig smerteintensitet i hod"
       },
       {
         "id": "quick_onset_02",
         "category": "quick_fields",
         "description": "Quick onset description",
-        "latency_ms": 1763,
-        "response_length": 226,
+        "latency_ms": 21300,
+        "response_length": 227,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -1242,18 +1118,18 @@
           },
           "response_length": {
             "pass": false,
-            "actual": 226,
+            "actual": 227,
             "expected_range": [10, 200]
           }
         },
         "passed": false,
-        "response_preview": " KLINISK NOTAT - GRADVIS DEBUT AV KORSRYGGSMERTER\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nGradvis debut av korsryggsmere over 2 uker, forverret etter løfting. Pasienten opplever stivhet og..."
+        "response_preview": " KLINISK NOTAT - DEBUT AV KORSRYGGSMERTER\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nGradvis debut av korsryggsmerter over 2 uker, forverret etter løfting. Pasienten opplever stivhet og småsk..."
       },
       {
         "id": "quick_rom_03",
         "category": "quick_fields",
         "description": "Quick ROM documentation",
-        "latency_ms": 2415,
+        "latency_ms": 22299,
         "response_length": 291,
         "checks": {
           "keywords_present": {
@@ -1264,7 +1140,7 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0096,
+            "char_rate": 0.0097,
             "has_norwegian_chars": true
           },
           "response_length": {
@@ -1274,14 +1150,14 @@
           }
         },
         "passed": true,
-        "response_preview": " KLINISK NOTAT - BEVEGELSESUTSLAG CERVIKALKOLUMNA\n\nDato: [Dato]\nPasient: [Navn]\n\nUnder klinisk undersøkelse av cervikalkolumna registrerte jeg følgende bevegelsesutslag:\n- Fleksjon: 40°\n- Ekstensjon: ..."
+        "response_preview": " KLINISK NOTAT - BEVEGELSENSIVEL CERVIKAL UTSLAG\n\nDato: [Dato]\nPasient: [Navn]\n\nUnder kliniske undersøkelser av cervikal kolumna oppdager jeg følgende funn:\n- Fleksjon: 40°\n- Ekstensjon: 30°\n- Rotasjo..."
       },
       {
         "id": "quick_palpation_04",
         "category": "quick_fields",
         "description": "Quick palpation findings",
-        "latency_ms": 3479,
-        "response_length": 340,
+        "latency_ms": 22911,
+        "response_length": 319,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -1291,24 +1167,24 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0297,
+            "char_rate": 0.016,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": false,
-            "actual": 340,
+            "actual": 319,
             "expected_range": [20, 300]
           }
         },
         "passed": false,
-        "response_preview": " KLINISK NOTAT - PALPASJONSFUNN THORAKAL REGION\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nPalpasjonsundersøkelse av thorakal regionen viste ømhet i Th4-Th6 ryggseksjonene og hypertonisitet p..."
+        "response_preview": " KLINISK NOTAT - PALPASJONSFUNN I THORAKAL REGION\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nPalpasjonsfunn i thorakal region:\n- Ømhet oppdaget i Th4-Th6 området\n- Hypertonisitet i paraverteb..."
       },
       {
         "id": "quick_treatment_05",
         "category": "quick_fields",
         "description": "Quick treatment note",
-        "latency_ms": 3460,
-        "response_length": 360,
+        "latency_ms": 23185,
+        "response_length": 367,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -1318,24 +1194,24 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0172,
+            "char_rate": 0.0133,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": false,
-            "actual": 360,
+            "actual": 367,
             "expected_range": [20, 300]
           }
         },
         "passed": false,
-        "response_preview": " KLINISK NOTAT - DIVERSIFIERT MANIPULASJON TH5-TH6, MYOFASCIAL RELEASE PARAVERTEBRAL OG ØVELSEVEILEDNING\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nUnder oppgjør med pasienten ble det utført ..."
+        "response_preview": " KLINISK NOTAT - DIVERSIFIERET MANIPULASJON TIL TH5-TH6, MYOFASCIAL RELEASE PARAVERTEBRAL OG ØVELSEVEILEDNING\n\nDato: [Dato]\nPasient: [Navn]\n\nUnder behandling av [diagnose/tilstand].\n\nBehandlingsforløp..."
       },
       {
         "id": "quick_ortho_06",
         "category": "quick_fields",
         "description": "Quick orthopedic test results",
-        "latency_ms": 3474,
-        "response_length": 349,
+        "latency_ms": 23393,
+        "response_length": 385,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -1345,30 +1221,30 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0255,
+            "char_rate": 0.0034,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": false,
-            "actual": 349,
+            "actual": 385,
             "expected_range": [20, 300]
           }
         },
         "passed": false,
-        "response_preview": " KLINISK NOTAT - SKULDERTESTINGER\n\nDato: [Dato]\nPasient: [Navn] – f. [Fødselsnummer]\n\nUndersøkelse av skulderen har vist følgende funn:\n- Hawkins test: Positiv (påvist medoliglidende krypsning)\n- Neer..."
+        "response_preview": " KLINISK NOTAT - SKULDERTESTINGER\n\nPasient: [Navn] – f. [Fødselsnummer]\n\nDato: [Dato]\n\nTestresultater for skulder:\n- Hawkins test: Positiv (lateral rotator cuff)\n- Neer test: Positiv (subacromial impi..."
       },
       {
         "id": "letter_referral_01",
         "category": "letters",
         "description": "Referral letter to neurologist",
-        "latency_ms": 5795,
-        "response_length": 760,
+        "latency_ms": 34764,
+        "response_length": 1399,
         "checks": {
           "keywords_present": {
-            "pass": true,
-            "present": ["henvisning", "radikulopati", "C6"],
-            "missing": [],
-            "score": 1.0
+            "pass": false,
+            "present": ["radikulopati", "C6"],
+            "missing": ["henvisning"],
+            "score": 0.6666666666666666
           },
           "keywords_absent": {
             "pass": true,
@@ -1376,24 +1252,24 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0233,
+            "char_rate": 0.0369,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 760,
+            "actual": 1399,
             "expected_range": [150, 2500]
           }
         },
-        "passed": true,
-        "response_preview": " HENVISNING TIL NEUROLOGI - MISTENKT CERVIKAL RADIKULOPATI C6\n\nPasient: [Navn] – f. [Fødselsnummer]\nAlder: 48 år\n\nEtter undersøkelse av arm- og håndfunksjonen, oppstår det mistenkte symptomer som tyde..."
+        "passed": false,
+        "response_preview": " KLINISK NOTAT - MISTENKT CERVIKAL RADIKULOPATI C6\n\nPasient: [Navn] – f. [Fødselsnummer]\nAlter: 48 år\n\nUndersøkelse avslører mistenkt cervikal radikulopati i C6-segmentet, med særlig oppmerksomhet på ..."
       },
       {
         "id": "letter_sick_leave_02",
         "category": "letters",
         "description": "Sick leave medical basis",
-        "latency_ms": 7733,
-        "response_length": 1192,
+        "latency_ms": 34536,
+        "response_length": 1221,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -1407,30 +1283,30 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0228,
+            "char_rate": 0.0131,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 1192,
+            "actual": 1221,
             "expected_range": [100, 2000]
           }
         },
         "passed": true,
-        "response_preview": " MEDISINSK ERKLÆRING - SYKEMELDING\n\nPasient: [Navn]\nFødselsnummer: [Fødselsnummer]\nGjelder: Sykemelding for 100% utelukkelse fra fysisk tungt arbeid (bygningsarbeider) i 4 uker\nTil: Arbeidsgiver / Nav..."
+        "response_preview": " MEDISINSK GRUNNLAG FOR SYKEMELDING - LUMBAL SKIVEPROLAPS\n\nPasient: [Navn]\nFødselsnummer: [Fødselsnummer]\nGjelder: Sykemelding for 100% utelukkelse fra fysisk tungt arbeid (bygningsarbeider) i en peri..."
       },
       {
         "id": "letter_insurance_03",
         "category": "letters",
         "description": "Insurance report letter",
-        "latency_ms": 8962,
-        "response_length": 1436,
+        "latency_ms": 33471,
+        "response_length": 1185,
         "checks": {
           "keywords_present": {
-            "pass": false,
-            "present": ["whiplash"],
-            "missing": ["funksjonsevne"],
-            "score": 0.5
+            "pass": true,
+            "present": ["whiplash", "funksjonsevne"],
+            "missing": [],
+            "score": 1.0
           },
           "keywords_absent": {
             "pass": true,
@@ -1438,24 +1314,24 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0198,
+            "char_rate": 0.0238,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 1436,
+            "actual": 1185,
             "expected_range": [200, 3000]
           }
         },
-        "passed": false,
-        "response_preview": " FORSÆKRINGSERKLÆRING - WHIPLASH-SKADE ETFTER BILULYKK\n\nDato: [Dato]\nTil: [Forsikringsselskap]\nGjelder: [Pasientnavn], f. [Fødselsnummer]\n\nEmne: Forsikringserklæring for WHIPLASH-skade etter bilulykke..."
+        "passed": true,
+        "response_preview": " FORSÆKRINGSERKLÆRING - WHIPLASH-SKADE ETFTER BILULYKK\n\nPasient: [Navn]\nFødselsnummer: [Fødselsnummer]\nGjelder: Erklæring om skade og behandling av en pasient med whiplash-skade etter bilulykke for 6 ..."
       },
       {
         "id": "letter_physio_referral_04",
         "category": "letters",
         "description": "Referral to physiotherapy",
-        "latency_ms": 5779,
-        "response_length": 823,
+        "latency_ms": 24818,
+        "response_length": 604,
         "checks": {
           "keywords_present": {
             "pass": true,
@@ -1469,17 +1345,17 @@
           },
           "norwegian_quality": {
             "pass": true,
-            "char_rate": 0.0117,
+            "char_rate": 0.01,
             "has_norwegian_chars": true
           },
           "response_length": {
             "pass": true,
-            "actual": 823,
+            "actual": 604,
             "expected_range": [100, 2000]
           }
         },
         "passed": true,
-        "response_preview": " HENVISNING TIL FYSIOTERAPEUT FOR REHABILITERING ETER SKULDEROPERASJON\n\nPasient: [Navn] – f. [Fødselsnummer]\n\nEtter rotatorcuff-reparasjon er pasienten i behov for gradvis mobilisering og styrketrenin..."
+        "response_preview": " KLINISK HENVISNING - REHABILITERING ETER SKULDEROPERASJON\n\nPasient: [Navn] – f. [Fødselsnummer]\n\nEtter rotatorcuff-reparasjon er pasienten i behov for gradvis mobilisering og styrketrening av skulder..."
       }
     ]
   }

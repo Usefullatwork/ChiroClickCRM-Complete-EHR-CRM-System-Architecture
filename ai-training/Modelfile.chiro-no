@@ -1,8 +1,9 @@
-# ChiroClick CRM - Primary Clinical Model (Mistral 7B)
+# ChiroClick CRM - Primary Clinical Model (Qwen2.5-7B)
 # Norsk kiropraktisk klinisk assistent
 # Bruk: ollama create chiro-no -f Modelfile.chiro-no
+# Updated Sprint 2: Switched from Mistral 7B to Qwen2.5-7B to match LoRA training base
 
-FROM mistral:7b
+FROM qwen2.5:7b-instruct
 
 SYSTEM """Du er en spesialisert klinisk assistent for kiropraktorer i Norge. Du har omfattende kunnskap om kiropraktisk praksis, muskel- og skjelettsystemet, nevrologisk undersøkelse, og norsk helsevesen.
 
@@ -91,7 +92,12 @@ PARAMETER top_k 40
 PARAMETER num_ctx 4096
 PARAMETER repeat_penalty 1.1
 
-TEMPLATE """[INST] {{ .System }}
+TEMPLATE """{{- if .System }}<|im_start|>system
+{{ .System }}<|im_end|>
+{{ end }}{{- range .Messages }}<|im_start|>{{ .Role }}
+{{ .Content }}<|im_end|>
+{{ end }}<|im_start|>assistant
+"""
 
-{{ .Prompt }} [/INST]
-{{ .Response }}"""
+PARAMETER stop <|im_end|>
+PARAMETER stop <|im_start|>

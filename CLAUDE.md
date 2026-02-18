@@ -32,18 +32,21 @@ Norwegian-compliant EHR-CRM-PMS system for chiropractic practices.
 - **Location**: `D:\ChiroClickCRM-Complete-EHR-CRM-System-Architecture`
 - **Tech Stack**: React + Vite + Node.js + PostgreSQL + Ollama AI
 
-## Multi-Model AI System (Updated 2026-01-29)
+## Multi-Model AI System (Updated 2026-02-18)
 
 ### Models
 
-| Model             | Base                  | Size   | Purpose            | Accuracy |
-| ----------------- | --------------------- | ------ | ------------------ | -------- |
-| `chiro-no`        | Mistral 7B            | ~4.5GB | Default/balanced   | 85-90%   |
-| `chiro-fast`      | Llama 3.2 3B          | ~2GB   | Quick autocomplete | 80-85%   |
-| `chiro-norwegian` | **NorwAI-Mistral-7B** | ~4.5GB | Norwegian language | **95%**  |
-| `chiro-medical`   | MedGemma 4B           | ~2.5GB | Clinical reasoning | 85-88%   |
+All models now use **Qwen2.5-Instruct** as base (Sprint 2 migration from mixed architectures).
+LoRA fine-tuned variants (suffix `-lora`) are the production models.
 
-**Note:** Changed chiro-norwegian from Viking 7B to NorwAI-Mistral-7B based on 2025 research showing 95% vs 82% accuracy after LoRA fine-tuning.
+| Model             | Base         | Size   | Purpose            | Baseline |
+| ----------------- | ------------ | ------ | ------------------ | -------- |
+| `chiro-no`        | Qwen2.5-7B   | ~4.5GB | Default/balanced   | 56%      |
+| `chiro-fast`      | Qwen2.5-1.5B | ~1GB   | Quick autocomplete | 48%      |
+| `chiro-norwegian` | Qwen2.5-7B   | ~4.5GB | Norwegian language | 44%      |
+| `chiro-medical`   | Qwen2.5-3B   | ~2GB   | Clinical reasoning | 54%      |
+
+**Sprint 2 changes:** Unified all models on Qwen2.5 architecture (was: Mistral/Llama/NorwAI/MedGemma mix). This fixes chiro-medical 29s→~2s latency and enables fair base vs LoRA comparison. All use ChatML template format.
 
 ### Task Routing
 

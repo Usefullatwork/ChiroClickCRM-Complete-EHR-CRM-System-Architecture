@@ -31,13 +31,15 @@ from pathlib import Path
 SYSTEM_PROMPT_NO = (
     'Du er en medisinsk sikkerhetsrådgiver for kiropraktikk. '
     'Identifiser røde flagg, gi differensialdiagnostikk og klinisk resonnering. '
-    'Prioriter alltid pasientsikkerhet.'
+    'Prioriter alltid pasientsikkerhet. '
+    'Klassifiser hastegrad: AKUTT (ring 113), HENVIS SAMME DAG, HENVIS RUTINE, MONITORÉR, eller TRYGT.'
 )
 
 SYSTEM_PROMPT_EN = (
     'You are a medical safety advisor for chiropractic. '
     'Identify red flags, provide differential diagnosis and clinical reasoning. '
-    'Always prioritize patient safety.'
+    'Always prioritize patient safety. '
+    'Classify urgency: URGENT (call ambulance), REFER SAME-DAY, REFER ROUTINE, MONITOR, or SAFE.'
 )
 
 # ============================================================
@@ -790,6 +792,565 @@ EXTRA_EN_NEGATIVE = [
 ]
 
 # ============================================================
+# TRICKY NEGATIVES — Cases that mimic red flags but are safe
+# These are critical for preventing false positives
+# ============================================================
+
+TRICKY_NEGATIVES_NO = [
+    # Mimics cauda equina
+    {
+        'scenario': '50 år mann med bilateral beintyngde etter 10 km løpetur. Nummenhet i føtter bilateralt som gikk over etter 20 minutter. Normal vannlating. Ingen ryggsmerte.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor dette IKKE er cauda equina:\n- Bilateral beintyngde etter langvarig løping er normalt (muskulær fatigue)\n- Forbigående nummenhet i føtter = kompresjonsneuropati fra sko/belastning, IKKE sadelanestesi\n- Sadelanestesi betyr nummenhet i PERINEUM (skritt/anus), ikke føtter\n- Normal blærefunksjon utelukker sfinkteraffeksjon\n- Ingen ryggsmerte (CES har nesten alltid ryggsmerte)\n\nKlinisk bilde: Anstrengelsesrelatert forbigående perifer neuropati.\n\nTrygt å behandle. Anbefal skobytte og gradert treningsøkning.'
+    },
+    # Mimics cauda equina — stress urinary symptoms
+    {
+        'scenario': '45 år kvinne med korsryggsmerte og rapporterer urinlekkasje ved hoste/nysing. 3 barn. Ingen nummenhet i skrittet. Normal kraft i bena.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor dette IKKE er cauda equina:\n- Stressinkontinens (lekkasje ved hoste/nysing) er IKKE det samme som CES-blæredysfunksjon\n- CES gir urinretensjon (kan ikke tisse) eller overløpsinkontinens, IKKE stressinkontinens\n- 3 barn = bekkenbunnssvakhet er sannsynlig årsak\n- Ingen sadelanestesi, ingen bilateral svakhet\n- Korsryggsmerte alene uten nevrologiske funn = mekanisk\n\nKlinisk bilde: Mekanisk korsryggsmerte + stressinkontinens (bekkenbunnsrelatert).\n\nTrygt å behandle ryggsmertene. Henvis til bekkenbunnsfysioterapeut for inkontinensen.'
+    },
+    # Mimics cancer — night pain
+    {
+        'scenario': '42 år mann med korsryggsmerte som er verre om natten. Sover dårlig pga smerte. Smerter lindres noe ved stillingsendring. Normal appetitt, stabil vekt. Ingen tidligere sykdommer.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor nattsmerter IKKE betyr kreft her:\n- Nattsmerter som BEDRES ved stillingsendring = mekanisk årsak (diskogen, fasett)\n- Kreftrelaterte nattsmerter er KONSTANTE, uavhengig av stilling\n- Ingen vekttap, ingen appetittendring, ingen tidligere kreft\n- Alder 42 uten risikofaktorer = lav pre-test sannsynlighet for malignitet\n- \"Verre om natten\" er vanlig ved inflammatorisk/diskogen smerte pga. økt intradiskal trykk i liggende\n\nKlinisk bilde: Mekanisk/diskogen korsryggsmerte med nattlig komponent.\n\nTrygt å behandle konservativt. Prøv McKenzie-vurdering for stillingspreferanse.'
+    },
+    # Mimics infection — post-exercise fever
+    {
+        'scenario': '25 år mann med ryggsmerte etter CrossFit. Føler seg varm, målt temp 37.6°C. Muskelømhet i hele ryggen. Ingen fokal perkusjonsømhet. Startet i går.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor dette IKKE er spinal infeksjon:\n- Temp 37.6°C er subklinisk og vanlig etter intens trening (exercise-induced hyperthermia)\n- Spinal infeksjon gir feber >38°C, typisk med nattsvette\n- Diffus muskelømhet (DOMS) vs. fokal perkusjonsømhet ved infeksjon\n- Ingen risikofaktorer (IV-stoffbruk, immunsuppresjon, nylig kirurgi)\n- Akutt debut etter klar mekanisk utløser\n\nKlinisk bilde: Delayed onset muscle soreness (DOMS) med mild hypertermi.\n\nTrygt å behandle. Hvile, hydrering, gradert aktivitet.'
+    },
+    # Mimics fracture — osteoporosis age but no fracture
+    {
+        'scenario': '72 år kvinne med korsryggsmerte etter hagearbeid. Gradvis debut over dagen. Diffus ømhet L3-L5 bilateralt. Ingen fokal perkusjonsømhet. Kan sitte og stå uten problemer.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor dette sannsynligvis IKKE er fraktur til tross for alder:\n- Gradvis debut (fraktur gir vanligvis akutt, skarp smerte)\n- DIFFUS ømhet bilateralt = muskulært, ikke fokalt/ossøst\n- Ingen FOKAL perkusjonsømhet over enkelt virvel (viktigste tegn)\n- Kan sitte og stå funksjonelt (frakturpasienter har ofte uttalt funksjonsbegrensning)\n- Hagearbeid = moderat mekanisk belastning, ikke falltraume\n\nOBS: Alder >70 er en risikofaktor. Ved fokal ømhet eller manglende bedring etter 2 uker → røntgen.\n\nKlinisk bilde: Mekanisk muskulær korsryggsmerte.\n\nTrygt å behandle forsiktig med mobilisering og øvelser.'
+    },
+    # Mimics inflammatory — morning stiffness but mechanical
+    {
+        'scenario': '30 år mann med korsryggsmerte, stiv om morgenen i ca 20 minutter. Bedres med bevegelse. Forverres etter langvarig sitting. Ingen nattlige smerter. Normal blodprøver.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor dette IKKE er inflammatorisk ryggsmerte (Bekhterev):\n- Morgenstivhet 20 min = under 30 min-grensen for inflammatorisk\n- Inflammatorisk ryggsmerte (ASAS): morgenstivhet >30 min, bedres med aktivitet, NATTLIGE smerter\n- Ingen nattlige smerter (viktig kriterium)\n- Normale blodprøver (CRP, SR ville typisk vært forhøyet)\n- \"Bedres med bevegelse\" er også vanlig ved mekanisk smerte\n- Forverres etter sitting = diskogen/mekanisk mønster\n\nKlinisk bilde: Mekanisk korsryggsmerte med kort morgenstivhet.\n\nTrygt å behandle konservativt.'
+    },
+    # Mimics stroke — migraine with aura
+    {
+        'scenario': '35 år kvinne med tilbakevendende episoder med synsforstyrrelser (flimmerskotom) etterfulgt av ensidig hodepine, kvalme, lyssky. Episodene varer 4-6 timer. Helt normal mellom anfall. Kjent migrene fra 20 år.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor dette IKKE er slag/TIA:\n- KJENT migrene med aura i 15 år (etablert diagnose)\n- Episodene følger typisk migrene-sekvens: aura → hodepine → kvalme\n- Visuell aura (flimmerskotom) er KLASSISK migrene, varer 20-60 min\n- Helt normal mellom anfall (vedvarende utfall ville vært alarmsignal)\n- TIA/slag: plutselig debut, IKKE etterfulgt av hodepine, vedvarende utfall\n\nOBS: Ny type aura, vedvarende utfall >60 min, eller ensidig svakhet → revurder.\n\nKlinisk bilde: Migrene med typisk visuell aura.\n\nTrygt å behandle med cervikal behandling for utløsende triggere.'
+    },
+    # Mimics progressive neuro — benign fasciculations
+    {
+        'scenario': '32 år mann, bekymret for muskelrykninger (fascikulasjoner) i leggene bilateralt siste 2 måneder. Googlet ALS. Normal kraft, normale reflekser, ingen muskelatrofi. Mye stress og kaffe.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor dette IKKE er ALS/motonevronsykdom:\n- Benigne fascikulasjoner er EKSTREMT vanlige (opptil 70% av befolkningen)\n- ALS-fascikulasjoner ledsages ALLTID av svakhet og muskelatrofi\n- Normal kraft og reflekser utelukker klinisk signifikant motonevronsykdom\n- Ingen muskelatrofi (ALS gir progressiv atrofi)\n- Stress og koffein er kjente triggere for benigne fascikulasjoner\n- Alder 32 = svært uvanlig for ALS (typisk 50-70 år)\n\nKlinisk bilde: Benignt fascikulasjonssyndrom.\n\nTrygt å behandle. Reassurering er viktigste tiltak. Reduser koffein, stresshåndtering.'
+    },
+    # Mimics cord compression — bilateral carpal tunnel
+    {
+        'scenario': '55 år kvinne med nummenhet i begge hender, verre om natten, våkner med numne hender. Shaking hands lindrer. Positiv Phalen test bilateralt. Normal gange.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor bilateral håndnummenhet IKKE er myelopati:\n- Nattlig forverring med \"flick sign\" (shaking lindrer) = KLASSISK karpaltunnelsyndrom\n- Myelopati gir nummenhet som IKKE bedres ved shaking\n- Positiv Phalen bilateralt bekrefter perifer kompresjon (n. medianus)\n- Normal gange (myelopati gir gangataksi)\n- Ingen hyperrefleksi, ingen Babinski, ingen blæresymptomer\n- Bilateral CTS er vanlig (opptil 50% av tilfellene)\n\nKlinisk bilde: Bilateral karpaltunnelsyndrom.\n\nTrygt å behandle med nattskinner, nervegliding, ergonomisk rådgivning.'
+    },
+    # Mimics DVT — post-exercise calf pain
+    {
+        'scenario': '28 år mann med ensidig leggsmerte etter fotballkamp. Øm i gastrocnemius. Lett hevelse vs. frisk side. Ingen rødme. Kan gå på tå. Smerter ved belastning.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor dette sannsynligvis IKKE er DVT:\n- Klar traumatisk/overbelastningsmekanisme (fotball)\n- Ung mann uten DVT-risikofaktorer (ingen immobilisering, ingen p-piller, ingen familieanamnese)\n- Øm i muskelbuken (gastrocnemius) = muskelstrekk\n- Kan gå på tå = intakt muskel-sene-enhet\n- Ingen rødme (DVT gir typisk rubor og calor)\n- Lett hevelse = muskulær hevelse etter skade\n\nOBS: Ved ØKENDE hevelse, rødme og varme uten bedring → revurder for DVT.\n\nKlinisk bilde: Gastrocnemius muskelstrekk grad I.\n\nTrygt å behandle med RICE, gradert belastning.'
+    },
+    # Mimics vertebral artery dissection — cervicogenic headache
+    {
+        'scenario': '40 år kvinne med ensidig nakkesmerte og hodepine bak høyre øre etter nakkekrampe. Hodepinen er stikkende. Ingen synsforstyrrelser, ingen ataksi, ingen svakhet. Normal pupillereaksjon.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor dette IKKE er arteriell disseksjon:\n- Nakkekrampe (muskelspasme) som utløser = mekanisk årsak\n- Retroaurikulær hodepine finnes OGSÅ ved C2-radikulopati/cervikogen hodepine\n- Ingen nevrologiske utfall: ingen Horners syndrom, ingen diplopi, ingen ataksi\n- Normal pupillereaksjon (disseksjon gir ofte ptose + miose)\n- Disseksjon: typisk etter traume/manipulasjon med NEUROLOGISKE utfall\n\nOBS: Ved nye nevrologiske symptomer → akutt revurdering.\n\nKlinisk bilde: Cervikogen hodepine med muskulær komponent.\n\nTrygt å behandle med forsiktig cervikal mobilisering og myofascielle teknikker.'
+    },
+    # Mimics AAA — mechanical low back with pulsation anxiety
+    {
+        'scenario': '55 år mann som kjenner pulsering i magen når han ligger på ryggen. Bekymret for aortaaneurysme. Normal BMI. Ingen korsryggsmerte. Normal blodtrykk. Ingen røykehistorie.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor dette sannsynligvis IKKE er AAA:\n- Å kjenne egen aortapulsasjon i liggende er NORMALT hos slanke personer\n- AAA: palpabel EKSPANDERENDE masse, ikke bare pulsering\n- Ingen korsryggsmerte (AAA gir ofte pulserende ryggsmerte)\n- Normalt blodtrykk (rupturerende AAA gir hypotensjon)\n- Ingen risikofaktorer (røyking, hypertensjon, aterosklerose)\n- Alder 55 uten risikofaktorer = lav pre-test sannsynlighet\n\nKlinisk bilde: Normal aortapulsasjon kjent gjennom tynn bukvegg.\n\nTrygt. Reassurering. Ved vedvarende bekymring → ultralyd abdomen for bekreftelse.'
+    },
+    # Mimics GCA — tension headache in elderly
+    {
+        'scenario': '68 år kvinne med bilateral hodepine frontalt i 3 uker. Stramhetskarakter. Ingen tinningsømhet. Normal tygging. Normalt syn. SR 15, CRP 3.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor dette IKKE er kjempecellearteritt (GCA):\n- BILATERAL frontal stramhetshodepine = typisk tensjonshodepine\n- GCA gir typisk UNILATERAL temporal hodepine\n- Ingen tinningsømhet (temporal arterie-ømhet er klassisk for GCA)\n- Normal tygging (tyggeclaudicatio er nesten patognomonisk for GCA)\n- Normalt syn (GCA truer synet)\n- SR 15 og CRP 3 = NORMALE verdier (GCA gir typisk SR >50, ofte >80)\n\nKlinisk bilde: Kronisk tensjonshodepine.\n\nTrygt å behandle med cervikal/suboccipital behandling, ergonomi, stresshåndtering.'
+    },
+    # Mimics spinal infection — normal post-surgical recovery
+    {
+        'scenario': '45 år mann, 10 dager etter ukomplisert diskektomi L5-S1. Moderat smerter i operasjonsområdet. Temp 37.2°C. CRP 25 (fallende fra 80 postoperativt). Såret tørt og pent.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor dette er NORMAL postoperativ tilheling:\n- Temp 37.2°C = normalt postoperativt (inntil 2 uker)\n- CRP 25 og FALLENDE fra 80 = normal postoperativ inflammasjonsrespons\n- Infeksjon: CRP ville vært STIGENDE eller platå, ikke fallende\n- Såret er tørt og pent (infeksjon: rødhet, varme, sekresjon)\n- Moderat smerter 10 dager postop = forventet\n\nOBS: Ved stigende CRP, feber >38°C, eller sårforandringer → kontakt opererende avdeling.\n\nKlinisk bilde: Normal postoperativ rekonvalesens.\n\nTrygt å starte forsiktig mobilisering iht. postoperative retningslinjer.'
+    },
+    # Mimics myelopathy — normal aging clumsiness
+    {
+        'scenario': '70 år mann med gradvis vanskeligheter med finmotorikk (knapper, mynter). Artrose i fingre bilateralt. Heberdens knuter. Normal gange. Normale reflekser. Normal sensibilitet.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor finmotorikk-vansker IKKE er myelopati her:\n- Artrose i fingre med Heberdens knuter = DEGENERATIV årsak til klossete fingre\n- Myelopati: finmotorikk-svikt + GANGFORSTYRRELSE + hyperrefleksi\n- Normal gange (myelopati gir ataktisk/spastisk gange)\n- Normale reflekser (myelopati gir hyperrefleksi)\n- Normal sensibilitet (myelopati gir ofte sensoriske forandringer)\n- Isolert finmotorikk-problem med synlige leddforandringer = artrose\n\nKlinisk bilde: Fingerartrose med mekanisk funksjonsbegrensning.\n\nTrygt å behandle med håndøvelser, varmebehandling, ergonomisk tilpasning.'
+    },
+]
+
+TRICKY_NEGATIVES_EN = [
+    # Mimics cauda equina
+    {
+        'scenario': 'Assess red flags: 50-year-old male with bilateral leg heaviness after 10 km run. Bilateral foot numbness that resolved after 20 minutes. Normal urination. No back pain.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — why this is NOT cauda equina:\n- Bilateral leg heaviness after prolonged running is normal (muscular fatigue)\n- Transient foot numbness = compression neuropathy from shoes/loading, NOT saddle anesthesia\n- Saddle anesthesia means numbness in the PERINEUM (groin/anus), not feet\n- Normal bladder function rules out sphincter involvement\n- No back pain (CES almost always presents with back pain)\n\nClinical picture: Exertion-related transient peripheral neuropathy.\n\nSafe to treat. Recommend footwear change and gradual training progression.'
+    },
+    # Mimics cauda equina — stress incontinence
+    {
+        'scenario': 'Assess red flags: 45-year-old female with low back pain reports urine leakage when coughing/sneezing. 3 children. No perineal numbness. Normal leg strength.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — why this is NOT cauda equina:\n- Stress incontinence (leakage with coughing/sneezing) is NOT the same as CES bladder dysfunction\n- CES causes urinary RETENTION (cannot void) or overflow incontinence, NOT stress incontinence\n- 3 children = pelvic floor weakness is the likely cause\n- No saddle anesthesia, no bilateral weakness\n- Low back pain alone without neurological findings = mechanical\n\nClinical picture: Mechanical low back pain + stress incontinence (pelvic floor-related).\n\nSafe to treat the back pain. Refer to pelvic floor physiotherapist for incontinence.'
+    },
+    # Mimics cancer — night pain
+    {
+        'scenario': 'Assess red flags: 42-year-old male with low back pain worse at night. Sleeps poorly due to pain. Pain eases somewhat with position change. Normal appetite, stable weight. No medical history.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — why night pain does NOT mean cancer here:\n- Night pain that IMPROVES with position change = mechanical cause (discogenic, facet)\n- Cancer-related night pain is CONSTANT, regardless of position\n- No weight loss, no appetite change, no cancer history\n- Age 42 without risk factors = low pre-test probability for malignancy\n- "Worse at night" is common in inflammatory/discogenic pain due to increased intradiscal pressure when supine\n\nClinical picture: Mechanical/discogenic low back pain with nocturnal component.\n\nSafe to treat conservatively. Try McKenzie assessment for directional preference.'
+    },
+    # Mimics progressive neuro — benign fasciculations
+    {
+        'scenario': 'Assess red flags: 32-year-old male worried about muscle twitching (fasciculations) in both calves for 2 months. Googled ALS. Normal strength, normal reflexes, no muscle wasting. High stress and caffeine intake.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — why this is NOT ALS/motor neuron disease:\n- Benign fasciculations are EXTREMELY common (up to 70% of population)\n- ALS fasciculations are ALWAYS accompanied by weakness and muscle atrophy\n- Normal strength and reflexes rules out clinically significant motor neuron disease\n- No muscle wasting (ALS causes progressive atrophy)\n- Stress and caffeine are known triggers for benign fasciculations\n- Age 32 = very unusual for ALS (typically 50-70 years)\n\nClinical picture: Benign fasciculation syndrome.\n\nSafe to treat. Reassurance is the most important intervention. Reduce caffeine, stress management.'
+    },
+    # Mimics cord compression — bilateral carpal tunnel
+    {
+        'scenario': 'Assess red flags: 55-year-old female with numbness in both hands, worse at night, wakes with numb hands. Shaking hands relieves symptoms. Positive Phalen test bilaterally. Normal gait.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — why bilateral hand numbness is NOT myelopathy:\n- Nocturnal worsening with "flick sign" (shaking relieves) = CLASSIC carpal tunnel syndrome\n- Myelopathy causes numbness that does NOT improve with shaking\n- Positive bilateral Phalen confirms peripheral compression (median nerve)\n- Normal gait (myelopathy causes gait ataxia)\n- No hyperreflexia, no Babinski, no bladder symptoms\n- Bilateral CTS is common (up to 50% of cases)\n\nClinical picture: Bilateral carpal tunnel syndrome.\n\nSafe to treat with night splints, nerve gliding exercises, ergonomic advice.'
+    },
+    # Mimics GCA — tension headache in elderly
+    {
+        'scenario': 'Assess red flags: 68-year-old female with bilateral frontal headache for 3 weeks. Tightness character. No temporal tenderness. Normal chewing. Normal vision. ESR 15, CRP 3.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — why this is NOT giant cell arteritis (GCA):\n- BILATERAL frontal tightness headache = typical tension headache\n- GCA typically causes UNILATERAL temporal headache\n- No temporal tenderness (temporal artery tenderness is classic for GCA)\n- Normal chewing (jaw claudication is nearly pathognomonic for GCA)\n- Normal vision (GCA threatens vision)\n- ESR 15 and CRP 3 = NORMAL values (GCA typically causes ESR >50, often >80)\n\nClinical picture: Chronic tension-type headache.\n\nSafe to treat with cervical/suboccipital treatment, ergonomics, stress management.'
+    },
+    # Mimics DVT — post-exercise calf pain
+    {
+        'scenario': 'Assess red flags: 28-year-old male with unilateral calf pain after football match. Tender gastrocnemius. Slight swelling vs. other side. No redness. Can walk on toes. Pain with loading.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — why this is likely NOT DVT:\n- Clear traumatic/overuse mechanism (football)\n- Young male without DVT risk factors (no immobilization, no family history)\n- Tender in muscle belly (gastrocnemius) = muscle strain\n- Can walk on toes = intact muscle-tendon unit\n- No redness (DVT typically causes erythema and warmth)\n- Slight swelling = muscular swelling post-injury\n\nNOTE: If INCREASING swelling, redness and warmth without improvement → reassess for DVT.\n\nClinical picture: Grade I gastrocnemius muscle strain.\n\nSafe to treat with RICE protocol, graduated loading.'
+    },
+    # Mimics infection — DOMS with low-grade warmth
+    {
+        'scenario': 'Assess red flags: 25-year-old male with back pain after CrossFit. Feels warm, measured temp 37.6C. Diffuse muscle soreness throughout back. No focal percussion tenderness. Started yesterday.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — why this is NOT spinal infection:\n- Temp 37.6C is subclinical and common after intense exercise (exercise-induced hyperthermia)\n- Spinal infection causes fever >38C, typically with night sweats\n- DIFFUSE muscle soreness (DOMS) vs. FOCAL percussion tenderness in infection\n- No risk factors (IV drug use, immunosuppression, recent surgery)\n- Acute onset after clear mechanical trigger\n\nClinical picture: Delayed onset muscle soreness (DOMS) with mild hyperthermia.\n\nSafe to treat. Rest, hydration, gradual return to activity.'
+    },
+    # Mimics fracture — elderly without focal signs
+    {
+        'scenario': 'Assess red flags: 72-year-old female with low back pain after gardening. Gradual onset over the day. Diffuse tenderness L3-L5 bilaterally. No focal percussion tenderness. Sits and stands without difficulty.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — why this is probably NOT a fracture despite age:\n- Gradual onset (fractures typically cause acute, sharp pain)\n- DIFFUSE tenderness bilaterally = muscular, not focal/osseous\n- No FOCAL percussion tenderness over single vertebra (key sign)\n- Can sit and stand functionally (fracture patients often have severe functional limitation)\n- Gardening = moderate mechanical load, not fall trauma\n\nNOTE: Age >70 is a risk factor. If focal tenderness develops or no improvement at 2 weeks → X-ray.\n\nClinical picture: Mechanical muscular low back pain.\n\nSafe to treat gently with mobilization and exercises.'
+    },
+    # Mimics inflammatory — short morning stiffness
+    {
+        'scenario': 'Assess red flags: 30-year-old male with low back pain, stiff in morning for about 20 minutes. Improves with movement. Worsens after prolonged sitting. No night pain. Normal blood work.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — why this is NOT inflammatory back pain (ankylosing spondylitis):\n- Morning stiffness 20 min = under the 30-minute threshold for inflammatory\n- Inflammatory back pain (ASAS criteria): morning stiffness >30 min, improves with activity, NIGHT PAIN\n- No night pain (important criterion)\n- Normal blood work (CRP, ESR would typically be elevated)\n- "Improves with movement" is also common in mechanical pain\n- Worsens after sitting = discogenic/mechanical pattern\n\nClinical picture: Mechanical low back pain with brief morning stiffness.\n\nSafe to treat conservatively.'
+    },
+    # Mimics vertebral artery dissection — cervicogenic headache
+    {
+        'scenario': 'Assess red flags: 40-year-old female with unilateral neck pain and headache behind right ear after neck cramp. Stabbing headache. No visual disturbances, no ataxia, no weakness. Normal pupil reaction.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — why this is NOT arterial dissection:\n- Neck cramp (muscle spasm) as trigger = mechanical cause\n- Retroauricular headache also occurs with C2 radiculopathy/cervicogenic headache\n- No neurological deficits: no Horner syndrome, no diplopia, no ataxia\n- Normal pupil reaction (dissection often causes ptosis + miosis)\n- Dissection: typically after trauma/manipulation WITH neurological deficits\n\nNOTE: If new neurological symptoms develop → urgent reassessment.\n\nClinical picture: Cervicogenic headache with muscular component.\n\nSafe to treat with gentle cervical mobilization and myofascial techniques.'
+    },
+    # Mimics myelopathy — age-related finger stiffness
+    {
+        'scenario': 'Assess red flags: 70-year-old male with gradual difficulty with fine motor tasks (buttons, coins). Osteoarthritis in fingers bilaterally. Heberden nodes. Normal gait. Normal reflexes. Normal sensation.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — why fine motor difficulty is NOT myelopathy here:\n- Osteoarthritis in fingers with Heberden nodes = DEGENERATIVE cause of clumsy fingers\n- Myelopathy: fine motor impairment + GAIT DISTURBANCE + hyperreflexia\n- Normal gait (myelopathy causes ataxic/spastic gait)\n- Normal reflexes (myelopathy causes hyperreflexia)\n- Normal sensation (myelopathy often causes sensory changes)\n- Isolated fine motor problem with visible joint changes = arthritis\n\nClinical picture: Finger osteoarthritis with mechanical functional limitation.\n\nSafe to treat with hand exercises, heat therapy, ergonomic adaptation.'
+    },
+]
+
+# ============================================================
+# COMBINATION PRESENTATIONS — Red flag buried in benign context
+# ============================================================
+
+COMBINATION_NO = [
+    {
+        'scenario': '55 år mann, kronisk korsryggsmerte i 5 år, kjent degenerasjon L4-L5. Kommer for vanlig behandling. Ved anamnese nevner han at han de siste 2 ukene har merket nummenhet i skrittet og må presse mer for å tisse. \"Det er sikkert bare prostata.\"',
+        'response': 'HASTEGRAD: AKUTT — Ring 113\n\nRØDE FLAGG IDENTIFISERT: Mulig cauda equina syndrom.\n\nKlinisk resonnering:\n- Pasienten bagatelliserer symptomene og attribuerer til prostata\n- Men: NY sadelanestesi (nummenhet i skrittet) + endret blærefunksjon hos pasient med KJENT diskuspatologi = CES til det motsatte er bevist\n- Kronisk korsryggsmerte maskerer ikke alvoret av nye nevrologiske symptomer\n- Prostatisme gir pollakisuri/nykturi, IKKE nummenhet i perineum\n\nFunn som KREVER akutt handling:\n- Sadelanestesi (ny)\n- Blæredysfunksjon (hesitasjon)\n- Kjent degenerasjon (anatomisk substrat for kompresjon)\n\nHANDLING: IKKE behandle som vanlig. Ring 113. Akutt MR lumbalcolumna. Nevrokirurgisk tilsyn. Forklare pasienten at dette IKKE er prostata.'
+    },
+    {
+        'scenario': '42 år kvinne med kronisk nakkestivhet og spenningshodepine, kommer regelmessig til behandling. I dag nevner hun i forbifarten at hun har hatt en ny type hodepine siste 3 dager — intens, bak venstre øre, annerledes enn vanlig. Ellers føler hun seg fin.',
+        'response': 'HASTEGRAD: HENVIS SAMME DAG\n\nRØDE FLAGG IDENTIFISERT: Ny type hodepine krever utredning.\n\nKlinisk resonnering:\n- \"Annerledes enn vanlig\" er NØKKELORDET — ny hodepine-type hos kjent hodepine-pasient\n- Retroaurikulær lokalisasjon = cervikal arterie-patologi må utelukkes\n- Pasienten bagatelliserer (\"ellers fin\") men disseksjon kan presentere uten dramatiske symptomer initialt\n- Selv uten nevrologiske utfall NÅ, kan disseksjon gi slag timer-dager senere\n\nOBS: Fravær av nevrologiske utfall utelukker IKKE disseksjon.\n\nFunn som krever utredning:\n- Ny hodepine-type (endret mønster)\n- Retroaurikulær lokalisasjon\n- Akutt debut (3 dager)\n\nHANDLING: Ikke utfør cervikal behandling i dag. Henvisning til CT-angiografi/MR-angiografi av halskar SAMME DAG. Dokumentér grundig.'
+    },
+    {
+        'scenario': '65 år mann, fast pasient med kjent thorakal stivhet. Kommer for vedlikeholdsbehandling. Nevner at han har vært litt mer sliten enn vanlig, gått ned noen kilo uten å prøve. Har hatt noe nattsvette. Ryggsmerter omtrent som vanlig.',
+        'response': 'HASTEGRAD: HENVIS SAMME DAG\n\nRØDE FLAGG IDENTIFISERT: Konstitusjonelle B-symptomer ved kjent ryggsmerte.\n\nKlinisk resonnering:\n- Isolert sett er fatigue, vekttap og nattsvette uspesifikke\n- Men KOMBINASJONEN av alle tre = B-symptomer (malignitets-/infeksjonsmarkører)\n- Alder >50 med B-symptomer + ryggsmerte = kreft/myelom/lymfom/infeksjon\n- At ryggsmerter er \"som vanlig\" betyr IKKE at underliggende patologi kan utelukkes\n- Langvarig kjent ryggsmerte kan maskere ny patologisk prosess\n\nFunn som krever utredning:\n- Uforklarlig vekttap\n- Nattsvette (B-symptom)\n- Fatigue (B-symptom)\n- Alder >50\n\nHANDLING: IKKE utfør vanlig behandling. Blodprøver (SR, CRP, hematologi, ALP, PSA). Henvisning fastlege HASTEGRA.'
+    },
+    {
+        'scenario': '38 år kvinne med mekanisk skuldersmerte høyre, behandlet 3 ganger med god effekt. I dag under undersøkelse oppdager du at hun har nedsatt kraft i tommelens opposisjon bilateralt (4/5) og sier at hun har hatt litt ustø gange siste måneden. Hun relaterer det til tretthet.',
+        'response': 'HASTEGRAD: HENVIS SAMME DAG\n\nRØDE FLAGG IDENTIFISERT: Mulig cervikal myelopati — uventet funn under skulderundersøkelse.\n\nKlinisk resonnering:\n- Skuldersmerten er sannsynlig mekanisk og separat problemstilling\n- MEN: bilateral nedsatt kraft i tommelens opposisjon = bilateral C8/T1 motorisk affeksjon\n- Bilateral = IKKE perifer nerve/radikulopati (ville vært unilateral)\n- Ustø gange + bilateral håndsvakhet = øvre motornevron-patologi (myelopati)\n- Pasienten attribuerer gangvansker til tretthet — vanlig feilattribuering\n\nKombinasjon som KREVER akutt utredning:\n- Bilateral motorisk utfall (hender)\n- Gangforstyrrelse\n- Progressivt forløp (1 måned)\n\nHANDLING: Ikke utfør cervikal behandling. Skulderbehandling kan fortsette. Akutt MR cervikalcolumna. Nevrokirurgisk henvisning. Dokumentér nevrologi grundig.'
+    },
+    {
+        'scenario': '48 år mann, kontorarbeider med vanlig nakkesmerte. Ved rutineanamnese oppgir han at han har tatt Marevan (warfarin) for ny atrieflimmer de siste 4 ukene. INR-nivå ukjent.',
+        'response': 'HASTEGRAD: MONITORÉR\n\nIngen akutte røde flagg, men VIKTIG medikamentell kontraindikasjon.\n\nKlinisk resonnering:\n- Warfarin = antikoagulasjon = økt blødningsrisiko\n- Spinal manipulasjon hos antikoagulerte pasienter medfører risiko for epiduralt hematom\n- INR ukjent = kan være i terapeutisk eller supratherapeutisk område\n- Ny warfarin (4 uker) = INR kan være ustabilt\n\nDette er IKKE en akutt nødsituasjon, men endrer behandlingsplanen:\n\nHANDLING:\n1. INGEN spinal manipulasjon (høyhastighetsteknikker) før INR er kjent og stabil\n2. Be pasient kontakte fastlege for INR-måling\n3. Forsiktig mobilisering og myofascielle teknikker kan brukes\n4. Dokumentér medikamentbruk og tilpasset behandlingsplan\n5. Ved INR <3.0 og stabil: forsiktig mobilisering OK. Ved INR >3.0: kun myofascielt.'
+    },
+]
+
+COMBINATION_EN = [
+    {
+        'scenario': 'Assess red flags: 55-year-old male, chronic low back pain for 5 years, known L4-L5 degeneration. Comes for regular treatment. During history, mentions he has noticed perineal numbness and difficulty voiding for the past 2 weeks. "It\'s probably just my prostate."',
+        'response': 'URGENCY: URGENT — Call emergency services\n\nRED FLAGS IDENTIFIED: Possible cauda equina syndrome.\n\nClinical reasoning:\n- Patient is trivializing symptoms and attributing to prostate\n- But: NEW saddle anesthesia (perineal numbness) + altered bladder function in patient with KNOWN disc pathology = CES until proven otherwise\n- Chronic low back pain does not mask the severity of new neurological symptoms\n- Prostatism causes frequency/nocturia, NOT perineal numbness\n\nFindings REQUIRING urgent action:\n- Saddle anesthesia (new onset)\n- Bladder dysfunction (hesitancy)\n- Known degeneration (anatomical substrate for compression)\n\nACTION: Do NOT treat as usual. Call emergency services. Urgent MRI lumbar spine. Neurosurgical consultation. Explain to patient that this is NOT prostate.'
+    },
+    {
+        'scenario': 'Assess red flags: 42-year-old female with chronic neck stiffness and tension headaches, regular patient. Today mentions in passing that she has had a new type of headache for 3 days — intense, behind left ear, different from usual. Otherwise feels fine.',
+        'response': 'URGENCY: REFER SAME-DAY\n\nRED FLAGS IDENTIFIED: New headache type requires investigation.\n\nClinical reasoning:\n- "Different from usual" is the KEY PHRASE — new headache type in known headache patient\n- Retroauricular location = cervical artery pathology must be excluded\n- Patient trivializes ("otherwise fine") but dissection can present without dramatic symptoms initially\n- Even without neurological deficits NOW, dissection can cause stroke hours-days later\n\nNOTE: Absence of neurological deficits does NOT rule out dissection.\n\nFindings requiring investigation:\n- New headache type (changed pattern)\n- Retroauricular location\n- Acute onset (3 days)\n\nACTION: Do not perform cervical treatment today. Refer for CT angiography/MR angiography of neck vessels SAME DAY. Document thoroughly.'
+    },
+    {
+        'scenario': 'Assess red flags: 65-year-old male, regular patient with known thoracic stiffness. Comes for maintenance treatment. Mentions feeling more tired than usual, lost some weight without trying, some night sweats. Back pain about the same as usual.',
+        'response': 'URGENCY: REFER SAME-DAY\n\nRED FLAGS IDENTIFIED: Constitutional B-symptoms with known back pain.\n\nClinical reasoning:\n- Individually, fatigue, weight loss and night sweats are nonspecific\n- But the COMBINATION of all three = B-symptoms (malignancy/infection markers)\n- Age >50 with B-symptoms + back pain = cancer/myeloma/lymphoma/infection\n- That back pain is "the same as usual" does NOT mean underlying pathology can be excluded\n- Long-standing known back pain can mask a new pathological process\n\nFindings requiring investigation:\n- Unexplained weight loss\n- Night sweats (B-symptom)\n- Fatigue (B-symptom)\n- Age >50\n\nACTION: Do NOT perform usual treatment. Blood work (ESR, CRP, hematology, ALP, PSA). URGENT referral to GP.'
+    },
+    {
+        'scenario': 'Assess red flags: 38-year-old female with mechanical right shoulder pain, treated 3 times with good effect. Today during exam you discover bilateral reduced thumb opposition strength (4/5) and she mentions unsteady gait for the past month, attributing it to tiredness.',
+        'response': 'URGENCY: REFER SAME-DAY\n\nRED FLAGS IDENTIFIED: Possible cervical myelopathy — unexpected finding during shoulder exam.\n\nClinical reasoning:\n- Shoulder pain is likely mechanical and a separate issue\n- BUT: bilateral reduced thumb opposition = bilateral C8/T1 motor involvement\n- Bilateral = NOT peripheral nerve/radiculopathy (would be unilateral)\n- Unsteady gait + bilateral hand weakness = upper motor neuron pathology (myelopathy)\n- Patient attributes gait difficulty to tiredness — common misattribution\n\nCombination REQUIRING urgent investigation:\n- Bilateral motor deficit (hands)\n- Gait disturbance\n- Progressive course (1 month)\n\nACTION: Do not perform cervical treatment. Shoulder treatment can continue. Urgent MRI cervical spine. Neurosurgical referral. Document neurology thoroughly.'
+    },
+    {
+        'scenario': 'Assess red flags: 48-year-old male, office worker with typical neck pain. During routine history reveals he started warfarin for new atrial fibrillation 4 weeks ago. INR level unknown.',
+        'response': 'URGENCY: MONITOR\n\nNo acute red flags, but IMPORTANT medication contraindication.\n\nClinical reasoning:\n- Warfarin = anticoagulation = increased bleeding risk\n- Spinal manipulation in anticoagulated patients carries risk of epidural hematoma\n- INR unknown = could be in therapeutic or supratherapeutic range\n- New warfarin (4 weeks) = INR may be unstable\n\nThis is NOT an acute emergency, but changes the treatment plan:\n\nACTION:\n1. NO spinal manipulation (high-velocity techniques) until INR is known and stable\n2. Ask patient to contact GP for INR measurement\n3. Gentle mobilization and myofascial techniques can be used\n4. Document medication use and adapted treatment plan\n5. If INR <3.0 and stable: gentle mobilization OK. If INR >3.0: myofascial only.'
+    },
+]
+
+# ============================================================
+# URGENCY-GRADED EXAMPLES — Explicit urgency classification
+# ============================================================
+
+URGENCY_GRADED_NO = [
+    # AKUTT (call ambulance)
+    {
+        'scenario': '60 år mann faller fra stige 3 meter. Kan ikke bevege bena. Nummenhet fra navlen og ned. Urininkontinens.',
+        'response': 'HASTEGRAD: AKUTT — Ring 113\n\nRØDE FLAGG IDENTIFISERT: Akutt ryggmargskompresjon.\n\nKlinisk resonnering:\n- Høyenergitraume (fall fra høyde) + bilaterale nevrologiske utfall = spinal fraktur med medullaaffeksjon\n- Nummenhet fra navlen (Th10-nivå) = komplett sensorisk nivå\n- Inkontinent = sfinkteraffeksjon\n- Bilateral lammelse = akutt medullaskade\n\nDette er en livstruende nødsituasjon. Hvert minutt teller.\n\nHANDLING: Ring 113. Immobiliser pasienten FULLSTENDIG. Ikke beveg. Spinal immobilisering. CT og MR akutt. Nevrokirurgisk vurdering for akutt dekompresjon.'
+    },
+    # HENVIS SAMME DAG
+    {
+        'scenario': '45 år mann med gradvis forverring av droppfot høyre over 5 dager. Korsryggsmerte med utstråling til legg og fotrygg. Kraft 3/5 dorsalfleksjon. Ingen blæresymptomer.',
+        'response': 'HASTEGRAD: HENVIS SAMME DAG\n\nRØDE FLAGG IDENTIFISERT: Progressivt motorisk utfall — raskt progredierende.\n\nKlinisk resonnering:\n- Droppfot som forverres over dager = progressiv L5-radikulopati\n- Kraft 3/5 (kan ikke overvinne motstand) = signifikant motorisk utfall\n- 5 dagers progresjon = rask nok til å kreve akutt utredning\n- Ingen blære/tarm = IKKE CES (ennå), men kan utvikle seg\n- Progressivt motorisk utfall har dårligere prognose ved forsinket dekompresjon\n\nDette er IKKE like akutt som CES, men krever utredning SAMME DAG.\n\nHANDLING: MR lumbalcolumna SAMME DAG. Nevrokirurgisk vurdering. Ingen manipulasjon. Dokumentér nøyaktig kraft og sensibilitet for baseline.'
+    },
+    # HENVIS RUTINE
+    {
+        'scenario': '25 år mann med inflammatorisk korsryggsmerte: gradvis debut >3 mnd, morgenstivhet 45 min, bedres med aktivitet, nattlige smerter. Familieanamnese: far har Bekhterevs.',
+        'response': 'HASTEGRAD: HENVIS RUTINE\n\nMistanke om inflammatorisk ryggsmerte — trolig aksial spondyloartritt.\n\nKlinisk resonnering:\n- Oppfyller ASAS-kriterier for inflammatorisk ryggsmerte (4 av 5):\n  1. Insidiøs debut ✓\n  2. Morgenstivhet >30 min ✓\n  3. Bedring med aktivitet ✓\n  4. Nattlige smerter ✓\n  5. Alder <40 ✓\n- Familieanamnese for Bekhterev = sterk risikofaktor\n- Ingen akutte nevrologiske utfall = ikke haster akutt\n- Men: TIDLIG diagnose er viktig for å forhindre strukturell progresjon\n\nDette er IKKE akutt, men krever utredning innen uker.\n\nHANDLING: Blodprøver (HLA-B27, CRP, SR). MR sacroiliacaledd. Revmatolog-henvisning (normal ventetid OK). Kiropraktisk behandling kan FORTSETTE som supplement. Treningsveiledning.'
+    },
+    # MONITORÉR
+    {
+        'scenario': '50 år kvinne med unilateral isjiassmerte ned til fot. Positiv SLR 40°. Nedsatt akillesrefleks høyre. Kraft 4+/5 plantarfleksjon. Stabil i 3 uker. Ingen blæresymptomer.',
+        'response': 'HASTEGRAD: MONITORÉR — reassessment neste konsultasjon\n\nIngen akutte røde flagg, men gul flagg som krever oppfølging.\n\nKlinisk resonnering:\n- Unilateral = IKKE bilateral (viktig for CES-screening)\n- Nedsatt refleks = nerverotsaffeksjon (L5-S1)\n- Kraft 4+/5 og STABIL i 3 uker = ikke progredierende\n- Stabil motorisk utfall ≠ akutt kirurgisk indikasjon\n- Ingen blære-/tarmsymptomer = ingen CES-mistanke\n\nHvorfor dette IKKE er rødt flagg:\n- Stabil (ikke progressiv) motorisk endring\n- Unilateral presentasjon\n- Ingen sfinkteraffeksjon\n\nOBS: Blir RØDT FLAGG hvis:\n- Kraft forverres (under 4/5)\n- Bilateral symptomer utvikles\n- Blæresymptomer tilkommer\n\nHANDLING: Konservativ behandling er førstevalg. Dokumentér kraft HVER konsultasjon. Revurder om 2-4 uker. MR lumbal ved manglende bedring.'
+    },
+    # TRYGT
+    {
+        'scenario': '35 år mann med akutt mekanisk korsryggsmerte etter å ha løftet tungt i går. Lokaliserte smerter L4-L5, verst ved fleksjon. Ingen utstråling. Full kraft bilateralt. Normal sensibilitet. Normal reflekser. Kan gå uten problemer.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering:\n- Alle 5 CES-tegn er FRAVÆRENDE: ✗ sadelanestesi, ✗ blæredysfunksjon, ✗ bilateral svakhet, ✗ bilateral utstråling, ✗ analsfinkterforstyrrelse\n- Klar mekanisk utløser (tung løfting)\n- Lokaliserte smerter uten nevrologisk affeksjon\n- Ung pasient uten risikofaktorer for malignitet/infeksjon/fraktur\n- Full nevrologi = ingen nerverotsaffeksjon\n\nDette er klassisk akutt mekanisk korsryggsmerte med UTMERKET prognose.\n\nHANDLING: Manuell terapi, aktive øvelser, gradert aktivitet. Forventet bedring 2-6 uker. Reassurering om god prognose. Unngå langvarig sengeleie.'
+    },
+]
+
+URGENCY_GRADED_EN = [
+    # URGENT (call ambulance)
+    {
+        'scenario': 'Assess red flags: 60-year-old male falls from ladder 3 meters. Cannot move legs. Numbness from navel down. Urinary incontinence.',
+        'response': 'URGENCY: URGENT — Call emergency services\n\nRED FLAGS IDENTIFIED: Acute spinal cord compression.\n\nClinical reasoning:\n- High-energy trauma (fall from height) + bilateral neurological deficits = spinal fracture with cord involvement\n- Numbness from navel (T10 level) = complete sensory level\n- Incontinent = sphincter involvement\n- Bilateral paralysis = acute cord injury\n\nThis is a life-threatening emergency. Every minute counts.\n\nACTION: Call emergency services. FULLY immobilize patient. Do not move. Spinal immobilization. Urgent CT and MRI. Neurosurgical evaluation for emergency decompression.'
+    },
+    # REFER SAME-DAY
+    {
+        'scenario': 'Assess red flags: 45-year-old male with progressive right foot drop worsening over 5 days. Low back pain radiating to lateral calf and dorsum of foot. Strength 3/5 dorsiflexion. No bladder symptoms.',
+        'response': 'URGENCY: REFER SAME-DAY\n\nRED FLAGS IDENTIFIED: Progressive motor deficit — rapidly worsening.\n\nClinical reasoning:\n- Foot drop worsening over days = progressive L5 radiculopathy\n- Strength 3/5 (cannot overcome resistance) = significant motor deficit\n- 5-day progression = fast enough to require urgent investigation\n- No bladder/bowel = NOT CES (yet), but can develop\n- Progressive motor deficit has worse prognosis with delayed decompression\n\nThis is NOT as urgent as CES, but requires investigation SAME DAY.\n\nACTION: MRI lumbar spine SAME DAY. Neurosurgical evaluation. No manipulation. Document exact strength and sensation for baseline.'
+    },
+    # REFER ROUTINE
+    {
+        'scenario': 'Assess red flags: 25-year-old male with inflammatory low back pain: gradual onset >3 months, morning stiffness 45 minutes, improves with activity, night pain. Family history: father has ankylosing spondylitis.',
+        'response': 'URGENCY: REFER ROUTINE\n\nSuspected inflammatory back pain — probable axial spondyloarthritis.\n\nClinical reasoning:\n- Meets ASAS criteria for inflammatory back pain (4 of 5):\n  1. Insidious onset ✓\n  2. Morning stiffness >30 min ✓\n  3. Improvement with activity ✓\n  4. Night pain ✓\n  5. Age <40 ✓\n- Family history of AS = strong risk factor\n- No acute neurological deficits = not acutely urgent\n- But: EARLY diagnosis is important to prevent structural progression\n\nThis is NOT acute, but requires investigation within weeks.\n\nACTION: Blood work (HLA-B27, CRP, ESR). MRI sacroiliac joints. Rheumatology referral (normal waiting time OK). Chiropractic treatment can CONTINUE as supplement. Exercise guidance.'
+    },
+    # MONITOR
+    {
+        'scenario': 'Assess red flags: 50-year-old female with unilateral sciatica to foot. Positive SLR 40 degrees. Diminished right ankle reflex. Strength 4+/5 plantarflexion. Stable for 3 weeks. No bladder symptoms.',
+        'response': 'URGENCY: MONITOR — reassess next visit\n\nNo acute red flags, but yellow flag requiring follow-up.\n\nClinical reasoning:\n- Unilateral = NOT bilateral (important for CES screening)\n- Diminished reflex = nerve root involvement (L5-S1)\n- Strength 4+/5 and STABLE for 3 weeks = not progressive\n- Stable motor deficit ≠ acute surgical indication\n- No bladder/bowel symptoms = no CES suspicion\n\nWhy this is NOT a red flag:\n- Stable (not progressive) motor change\n- Unilateral presentation\n- No sphincter involvement\n\nNOTE: BECOMES a red flag if:\n- Strength worsens (below 4/5)\n- Bilateral symptoms develop\n- Bladder symptoms appear\n\nACTION: Conservative treatment is first-line. Document strength at EVERY visit. Reassess in 2-4 weeks. MRI lumbar if no improvement.'
+    },
+    # SAFE
+    {
+        'scenario': 'Assess red flags: 35-year-old male with acute mechanical low back pain after heavy lifting yesterday. Localized pain L4-L5, worst with flexion. No radiation. Full strength bilaterally. Normal sensation. Normal reflexes. Walks without difficulty.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning:\n- All 5 CES signs are ABSENT: ✗ saddle anesthesia, ✗ bladder dysfunction, ✗ bilateral weakness, ✗ bilateral radiation, ✗ anal sphincter disturbance\n- Clear mechanical trigger (heavy lifting)\n- Localized pain without neurological involvement\n- Young patient without risk factors for malignancy/infection/fracture\n- Full neurology = no nerve root involvement\n\nThis is classic acute mechanical low back pain with EXCELLENT prognosis.\n\nACTION: Manual therapy, active exercises, graded activity. Expected improvement 2-6 weeks. Reassurance about good prognosis. Avoid prolonged bed rest.'
+    },
+]
+
+# ============================================================
+# MORE TRICKY NEGATIVES — Additional mimics (batch 2)
+# ============================================================
+
+TRICKY_NEGATIVES_NO_2 = [
+    # Mimics bilateral sciatica / CES — piriformis
+    {
+        'scenario': '40 år kvinne med smerter i begge seteregioner og baksiden av begge lår. Smerter verre ved langvarig sitting. Øm ved palpasjon av piriformis bilateralt. Normal SLR. Normal perineal sensibilitet. Normal vannlating.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor bilateral setesmerte IKKE er CES:\n- Bilateral setesmerte er vanlig ved piriformis/gluteal dysfunksjon, spesielt ved langvarig sitting\n- Smerter stopper ved LÅR, ikke ned til fot (CES gir typisk bilateral ischias TIL FOT)\n- Normal SLR bilateralt = ingen nerverotsirrtiasjon\n- KRITISK: Normal perineal sensibilitet og normal vannlating utelukker CES\n- Sadelanestesi = nummenhet i skritt/anus, IKKE i setemuskulaturen\n- Bilateral piriformis-syndrom er vanlig ved stillesittende arbeid\n\nKlinisk bilde: Bilateral piriformis-syndrom / dyp gluteal smerte.\n\nTrygt å behandle med piriformis-tøyning, gluteal styrke, sitte-ergonomi.'
+    },
+    # Mimics progressive neuro — anxiety about symptoms
+    {
+        'scenario': '28 år kvinne som er bekymret fordi hun opplever \"nummenhet\" i hele kroppen intermitterende. Verst ved stress. Undersøkelse viser normal kraft, reflekser og sensibilitet. Hyperventilerer under konsultasjonen.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor diffus \"nummenhet\" IKKE er nevrologisk:\n- \"Nummenhet i hele kroppen\" følger INGEN dermatomal eller nevrologisk distribusjon\n- Verst ved stress = psykosomatisk/angstrelatert\n- Hyperventilasjon gir parestesier (prikking/nummenhet) bilateralt i hender, føtter, rundt munnen\n- HELT NORMAL nevrologisk undersøkelse (kraft, reflekser, sensibilitet)\n- Nevrologisk sykdom (MS, myelopati, radikulopati) gir SPESIFIKKE utfallsmønstre, ikke diffus global nummenhet\n- Angstrelaterte parestesier er svært vanlige\n\nKlinisk bilde: Funksjonelle/angstrelaterte parestesier.\n\nTrygt å behandle. Reassurering, pusteøvelser, stresshåndtering. Evt. henvisning til psykolog ved vedvarende angst.'
+    },
+    # Mimics spinal cord — peripheral neuropathy
+    {
+        'scenario': '62 år mann med diabetes type 2. Gradvis nummenhet og prikking i begge føtter siste året. Symmetrisk. Nedsatt vibrasjonssans distalt. Normale reflekser. Normal gange. Strømpelignende distribusjon.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor bilateral fotnummenhet IKKE er myelopati/CES:\n- Symmetrisk, distal, strømpelignende distribusjon = klassisk PERIFER polynevropati\n- Diabetes type 2 = vanligste årsak til perifer nevropati\n- Myelopati/CES: nummenhet i SADELANESTESI-område (perineum), ofte med motorisk svakhet\n- Perifer nevropati: starter distalt (tær/føtter), beveger seg proksimalt gradvis\n- Nedsatt vibrasjonssans = tidlig tegn på perifer nevropati (store fibre)\n- Normale reflekser og normal gange = ingen øvre motornevron-patologi\n\nKlinisk bilde: Diabetisk perifer polynevropati.\n\nTrygt å behandle muskuloskeletalt. Henvis til fastlege for HbA1c-kontroll og nevropati-oppfølging.'
+    },
+    # Mimics malignancy — benign weight loss
+    {
+        'scenario': '55 år mann med korsryggsmerte. Har gått ned 5 kg siste 3 måneder. Startet bevisst med kostholdsendring og trening for 4 måneder siden. Mekanisk ryggsmerte etter hagearbeid. Normal appetitt. Føler seg i god form.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor vekttap IKKE er alarmsignal her:\n- Vekttap er FORKLART (bevisst kostholdsendring + trening)\n- UFORKLARLIG vekttap er rødt flagg, ikke tilsiktet vekttap\n- Normal appetitt (malignitet gir typisk anoreksi)\n- Føler seg i god form (malignitet gir fatigue, malaise)\n- Mekanisk ryggsmerte med klar utløser (hagearbeid)\n- Ingen nattlige smerter, ingen B-symptomer\n\nKlinisk bilde: Mekanisk korsryggsmerte hos pasient med tilsiktet livsstilsendring.\n\nTrygt å behandle konservativt. Gratulér med livsstilsendring!'
+    },
+    # Mimics infection — normal inflammatory response
+    {
+        'scenario': '35 år mann med korsryggsmerte etter løfting for 3 dager siden. CRP 18 (tatt hos fastlege). Ingen feber. Ingen nattsvette. Mekanisk smertemønster.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor forhøyet CRP IKKE betyr infeksjon her:\n- Mild CRP-forhøyelse (18 mg/L) er vanlig ved akutt muskuloskeletalt traume\n- Spinal infeksjon gir typisk CRP >40-80 mg/L\n- INGEN feber (infeksjon: feber >38°C)\n- INGEN nattsvette\n- Klar mekanisk utløser (løfting) med mekanisk smertemønster\n- CRP kan stige 2-3 dager etter akutt vevsskade\n- Viktig: CRP alene uten klinisk kontekst er IKKE et rødt flagg\n\nKlinisk bilde: Akutt mekanisk korsryggsmerte med forventet inflammasjonsrespons.\n\nTrygt å behandle. CRP vil normaliseres med klinisk bedring.'
+    },
+    # Mimics aortic dissection — costochondritis
+    {
+        'scenario': '38 år mann med akutt brystsmerte mellom skulderbladene etter styrketrening (bench press). Skarp, lokalisert smerte. Reproduserbar ved palpasjon over kostovertebrale ledd Th4-Th6. Normal BT, symmetrisk. Normal puls.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor interskapulær smerte IKKE er aortadisseksjon her:\n- Smertene er REPRODUSERBARE ved palpasjon (mekanisk årsak)\n- Aortadisseksjon: smerte er IKKE reproduserbar ved palpasjon\n- Normal og SYMMETRISK blodtrykk (disseksjon gir BT-asymmetri >20 mmHg)\n- Normal puls (disseksjon gir takykardi, hemodynamisk ustabilitet)\n- Klar mekanisk utløser (bench press = thorakal belastning)\n- Ung alder uten risikofaktorer (ingen Marfan, hypertensjon, aterosklerose)\n\nKlinisk bilde: Akutt costovertebral ledddysfunksjon Th4-Th6 etter styrketrening.\n\nTrygt å behandle med torakal mobilisering/manipulasjon.'
+    },
+    # Mimics pulmonary embolism — costochondritis
+    {
+        'scenario': '45 år kvinne med venstresidige brystsmerter som forverres ved dyp inspirasjon. Ingen dyspné. SpO2 98%. Normal puls 72/min. Reproduserbar smerte ved palpasjon av sternocostale ledd. Ingen leggsmerte.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor pleuritisk brystsmerte IKKE er lungeemboli her:\n- Smerte er REPRODUSERBAR ved palpasjon (mekanisk årsak)\n- Normal SpO2 (98%) — LE gir typisk SpO2 <95%\n- Normal puls (LE gir takykardi >100)\n- Ingen dyspné (LE gir nesten alltid dyspné)\n- Ingen leggsmerte/hevelse (LE starter ofte med DVT)\n- Ingen risikofaktorer (immobilisering, p-piller, nylig kirurgi)\n\nKlinisk bilde: Costokondritt/sternocostal dysfunksjon.\n\nTrygt å behandle med mobilisering av sternocostale ledd, tøyning, kuldeterapi.'
+    },
+    # Mimics cancer — degenerative changes on imaging
+    {
+        'scenario': '58 år mann, fått MR av korsrygg som viser \"multiple degenerative forandringer, Modic type 1 endringer L4-L5, annulusruptur L5-S1\". Mekanisk korsryggsmerte. Ingen nattlige smerter. Stabil vekt. Normal blodprøver.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor alarmerende MR-funn IKKE betyr kreft/alvorlig patologi:\n- \"Multiple degenerative forandringer\" er ALDERSRELATERTE og finnes hos opptil 90% av asymptomatiske 60-åringer\n- Modic type 1 = inflammatorisk vertebral endring, IKKE malignitet (type 1 = ødem, type 2 = fett, type 3 = sklerose)\n- Annulusruptur er svært vanlig og korrelerer dårlig med symptomer\n- Mekanisk smertemønster med normale blodprøver = ingen malignitetsmistanke\n- MR-funn må ALLTID tolkes i klinisk kontekst\n- Mange pasienter blir unødvendig engstelige av MR-rapporter\n\nKlinisk bilde: Degenerativ korsryggsmerte med forventede aldersrelaterte MR-funn.\n\nTrygt å behandle. Reassurering om at MR-funn er \"normalt unormale\" for alder.'
+    },
+]
+
+TRICKY_NEGATIVES_EN_2 = [
+    # Mimics bilateral sciatica / CES — piriformis
+    {
+        'scenario': 'Assess red flags: 40-year-old female with pain in both buttock regions and back of both thighs. Worse with prolonged sitting. Tender piriformis bilaterally. Normal SLR. Normal perineal sensation. Normal urination.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — why bilateral buttock pain is NOT CES:\n- Bilateral buttock pain is common with piriformis/gluteal dysfunction, especially with prolonged sitting\n- Pain stops at THIGH, not down to foot (CES typically causes bilateral sciatica TO FOOT)\n- Normal SLR bilaterally = no nerve root irritation\n- CRITICAL: Normal perineal sensation and normal urination rules out CES\n- Saddle anesthesia = numbness in groin/anus, NOT in gluteal muscles\n- Bilateral piriformis syndrome is common with sedentary work\n\nClinical picture: Bilateral piriformis syndrome / deep gluteal pain.\n\nSafe to treat with piriformis stretching, gluteal strengthening, sitting ergonomics.'
+    },
+    # Mimics progressive neuro — anxiety
+    {
+        'scenario': 'Assess red flags: 28-year-old female worried about "numbness" throughout her body, intermittent. Worst with stress. Examination shows normal strength, reflexes and sensation. Hyperventilating during consultation.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — why diffuse "numbness" is NOT neurological:\n- "Numbness throughout body" follows NO dermatomal or neurological distribution\n- Worst with stress = psychosomatic/anxiety-related\n- Hyperventilation causes bilateral paresthesias in hands, feet, perioral area\n- COMPLETELY NORMAL neurological examination (strength, reflexes, sensation)\n- Neurological disease (MS, myelopathy, radiculopathy) causes SPECIFIC deficit patterns, not diffuse global numbness\n- Anxiety-related paresthesias are extremely common\n\nClinical picture: Functional/anxiety-related paresthesias.\n\nSafe to treat. Reassurance, breathing exercises, stress management. Consider referral to psychologist if anxiety persists.'
+    },
+    # Mimics spinal cord — diabetic neuropathy
+    {
+        'scenario': 'Assess red flags: 62-year-old male with type 2 diabetes. Gradual numbness and tingling in both feet over past year. Symmetric. Decreased vibration sense distally. Normal reflexes. Normal gait. Stocking distribution.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — why bilateral foot numbness is NOT myelopathy/CES:\n- Symmetric, distal, stocking distribution = classic PERIPHERAL polyneuropathy\n- Type 2 diabetes = most common cause of peripheral neuropathy\n- Myelopathy/CES: numbness in SADDLE area (perineum), often with motor weakness\n- Peripheral neuropathy: starts distally (toes/feet), moves proximally gradually\n- Decreased vibration sense = early sign of peripheral neuropathy (large fiber)\n- Normal reflexes and normal gait = no upper motor neuron pathology\n\nClinical picture: Diabetic peripheral polyneuropathy.\n\nSafe to treat musculoskeletally. Refer to GP for HbA1c check and neuropathy follow-up.'
+    },
+    # Mimics malignancy — intentional weight loss
+    {
+        'scenario': 'Assess red flags: 55-year-old male with low back pain. Lost 5 kg in 3 months. Started intentional diet and exercise program 4 months ago. Mechanical back pain after gardening. Normal appetite. Feels great.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — why weight loss is NOT alarming here:\n- Weight loss is EXPLAINED (intentional diet change + exercise)\n- UNEXPLAINED weight loss is the red flag, not intentional weight loss\n- Normal appetite (malignancy typically causes anorexia)\n- Feels great (malignancy causes fatigue, malaise)\n- Mechanical back pain with clear trigger (gardening)\n- No night pain, no B-symptoms\n\nClinical picture: Mechanical low back pain in patient with intentional lifestyle change.\n\nSafe to treat conservatively.'
+    },
+    # Mimics infection — normal inflammatory response
+    {
+        'scenario': 'Assess red flags: 35-year-old male with low back pain after lifting 3 days ago. CRP 18 (taken at GP). No fever. No night sweats. Mechanical pain pattern.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — why elevated CRP does NOT mean infection here:\n- Mild CRP elevation (18 mg/L) is common with acute musculoskeletal trauma\n- Spinal infection typically causes CRP >40-80 mg/L\n- NO fever (infection: fever >38C)\n- NO night sweats\n- Clear mechanical trigger (lifting) with mechanical pain pattern\n- CRP can rise 2-3 days after acute tissue injury\n- Important: CRP alone without clinical context is NOT a red flag\n\nClinical picture: Acute mechanical low back pain with expected inflammatory response.\n\nSafe to treat. CRP will normalize as clinical improvement occurs.'
+    },
+    # Mimics aortic dissection — costovertebral dysfunction
+    {
+        'scenario': 'Assess red flags: 38-year-old male with acute chest pain between shoulder blades after weight training (bench press). Sharp, localized pain. Reproducible with palpation over costovertebral joints T4-T6. Normal BP, symmetric. Normal pulse.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — why interscapular pain is NOT aortic dissection here:\n- Pain is REPRODUCIBLE with palpation (mechanical cause)\n- Aortic dissection: pain is NOT reproducible with palpation\n- Normal and SYMMETRIC blood pressure (dissection causes BP asymmetry >20 mmHg)\n- Normal pulse (dissection causes tachycardia, hemodynamic instability)\n- Clear mechanical trigger (bench press = thoracic loading)\n- Young age without risk factors (no Marfan, hypertension, atherosclerosis)\n\nClinical picture: Acute costovertebral joint dysfunction T4-T6 after weight training.\n\nSafe to treat with thoracic mobilization/manipulation.'
+    },
+    # Mimics PE — costochondritis
+    {
+        'scenario': 'Assess red flags: 45-year-old female with left-sided chest pain worse with deep inspiration. No dyspnea. SpO2 98%. Normal pulse 72/min. Reproducible pain with palpation of sternocostal joints. No calf pain.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — why pleuritic chest pain is NOT pulmonary embolism here:\n- Pain is REPRODUCIBLE with palpation (mechanical cause)\n- Normal SpO2 (98%) — PE typically causes SpO2 <95%\n- Normal pulse (PE causes tachycardia >100)\n- No dyspnea (PE almost always causes dyspnea)\n- No calf pain/swelling (PE often starts with DVT)\n- No risk factors (immobilization, OCP, recent surgery)\n\nClinical picture: Costochondritis/sternocostal dysfunction.\n\nSafe to treat with sternocostal joint mobilization, stretching, cryotherapy.'
+    },
+    # Mimics cancer — scary MRI report
+    {
+        'scenario': 'Assess red flags: 58-year-old male with MRI report showing "multiple degenerative changes, Modic type 1 changes L4-L5, annular tear L5-S1." Mechanical low back pain. No night pain. Stable weight. Normal blood work.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — why alarming MRI findings do NOT mean cancer/serious pathology:\n- "Multiple degenerative changes" are AGE-RELATED, found in up to 90% of asymptomatic 60-year-olds\n- Modic type 1 = inflammatory vertebral endplate change, NOT malignancy (type 1 = edema, type 2 = fat, type 3 = sclerosis)\n- Annular tear is very common and correlates poorly with symptoms\n- Mechanical pain pattern with normal blood work = no malignancy suspicion\n- MRI findings must ALWAYS be interpreted in clinical context\n- Many patients become unnecessarily anxious from MRI reports\n\nClinical picture: Degenerative low back pain with expected age-related MRI findings.\n\nSafe to treat. Reassurance that MRI findings are "normally abnormal" for age.'
+    },
+]
+
+# ============================================================
+# MORE COMBINATION PRESENTATIONS (batch 2)
+# ============================================================
+
+COMBINATION_NO_2 = [
+    {
+        'scenario': '70 år kvinne med kjent kneartrose, kommer for knebehandling. Under anamneseopptaket nevner hun ny hodepine over tinningen venstre side siste uken, og at det gjør vondt å tygge brødskorpe. \"Det er sikkert bare kjeveledd.\"',
+        'response': 'HASTEGRAD: AKUTT — Oppstart behandling SAMME DAG\n\nRØDE FLAGG IDENTIFISERT: Mulig kjempecellearteritt (GCA) - oppdaget tilfeldig under knebehandling.\n\nKlinisk resonnering:\n- Kneartrose er separat, uproblematisk tilstand\n- MEN: ny UNILATERAL temporal hodepine hos kvinne >50 = GCA til det motsatte er bevist\n- Tyggeclaudicatio (smerter ved tygging) er NESTEN PATOGNOMONISK for GCA\n- Pasienten tror det er kjeveledd, men TMD gir BILATERAL kjevesmerte, IKKE temporal hodepine med tyggeclaudicatio\n- GCA = risiko for PERMANENT BLINDHET uten behandling\n\nHANDLING: Knebehandling kan vente. AKUTT blodprøver (SR, CRP). Kontakt fastlege UMIDDELBART for oppstart prednisolon SAMME DAG. Øyelegevurdering. Temporal arteriebiopsi innen 2 uker.'
+    },
+    {
+        'scenario': '52 år mann, langdistanseløper, kommer for behandling av iliotibial båndsyndrom. Nevner i forbifarten at han har hatt smerter i venstre legg som han trodde var muskelstrekk. Leggen er hoven, varm og rød. Han løp maraton for 5 dager siden.',
+        'response': 'HASTEGRAD: HENVIS SAMME DAG\n\nRØDE FLAGG IDENTIFISERT: Mulig dyp venetrombose (DVT) — misidentifisert som idrettsskade.\n\nKlinisk resonnering:\n- IT-båndsyndrom er separat, uproblematisk tilstand\n- MEN: ENSIDIG legghevelse med rubor og calor ≠ muskelstrekk\n- Muskelstrekk: øm muskel, gradvis bedring, INGEN rødme/varme\n- DVT: hevelse + rødme + varme = klassisk triade\n- Maraton = langvarig fysisk belastning + dehydrering = DVT-risikofaktor\n- Ubehandlet DVT kan gi lungeemboli (potensielt livstruende)\n\nHANDLING: Ikke behandle leggen. IT-båndet kan vente. D-dimer + doppler-ultralyd SAMME DAG. Legevakt/akuttmottak. Pasienten skal IKKE løpe eller belaste leggen.'
+    },
+    {
+        'scenario': '45 år kvinne med kronisk nakkesmerte, følges regelmessig. I dag forteller hun om episoder med nummenhet og svakhet i høyre arm og ben som varer 10-15 minutter og går helt over. Har skjedd 3 ganger siste måneden. \"Armen sovner bare.\"',
+        'response': 'HASTEGRAD: HENVIS SAMME DAG\n\nRØDE FLAGG IDENTIFISERT: Mulig TIA (transitorisk iskemisk anfall) — feilattribuert til nakkeproblemer.\n\nKlinisk resonnering:\n- Kronisk nakkesmerte er separat, kjent tilstand\n- MEN: episodisk, SAMTIDIG arm + ben svakhet på SAMME side = ikke cervikal radikulopati\n- Cervikal radikulopati: gir arm-symptomer ALENE (unilevel), IKKE arm+ben\n- Ipsilateral arm + ben (hemiparese) = sentral nervesystem-patologi\n- Forbigående episoder (10-15 min) med full restitusjon = klassisk TIA\n- TIA er forvarsel om slag (30% risiko innen 90 dager uten behandling)\n\nHANDLING: IKKE utfør cervikal manipulasjon. Akuttmottak SAMME DAG. CT/MR cerebrum, CT-angiografi halskar, EKG. Nevrologisk vurdering. Antiplatelet-behandling kan bli aktuelt.'
+    },
+]
+
+COMBINATION_EN_2 = [
+    {
+        'scenario': 'Assess red flags: 70-year-old female with known knee osteoarthritis, comes for knee treatment. During history mentions new headache over left temple for the past week, and pain when chewing bread crust. "It\'s probably just my jaw."',
+        'response': 'URGENCY: URGENT — Start treatment SAME DAY\n\nRED FLAGS IDENTIFIED: Possible giant cell arteritis (GCA) — discovered incidentally during knee treatment.\n\nClinical reasoning:\n- Knee osteoarthritis is a separate, unproblematic condition\n- BUT: new UNILATERAL temporal headache in woman >50 = GCA until proven otherwise\n- Jaw claudication (pain with chewing) is NEARLY PATHOGNOMONIC for GCA\n- Patient thinks it is jaw joint, but TMD causes BILATERAL jaw pain, NOT temporal headache with jaw claudication\n- GCA = risk of PERMANENT BLINDNESS without treatment\n\nACTION: Knee treatment can wait. URGENT blood work (ESR, CRP). Contact GP IMMEDIATELY to start prednisolone SAME DAY. Ophthalmology review. Temporal artery biopsy within 2 weeks.'
+    },
+    {
+        'scenario': 'Assess red flags: 52-year-old male, distance runner, comes for IT band syndrome treatment. Mentions in passing left calf pain he thought was a muscle strain. Calf is swollen, warm and red. Ran a marathon 5 days ago.',
+        'response': 'URGENCY: REFER SAME-DAY\n\nRED FLAGS IDENTIFIED: Possible deep vein thrombosis (DVT) — misidentified as sports injury.\n\nClinical reasoning:\n- IT band syndrome is a separate, unproblematic condition\n- BUT: UNILATERAL calf swelling with redness and warmth ≠ muscle strain\n- Muscle strain: tender muscle, gradual improvement, NO redness/warmth\n- DVT: swelling + redness + warmth = classic triad\n- Marathon = prolonged physical exertion + dehydration = DVT risk factor\n- Untreated DVT can cause pulmonary embolism (potentially life-threatening)\n\nACTION: Do not treat the calf. IT band can wait. D-dimer + Doppler ultrasound SAME DAY. Emergency department. Patient must NOT run or load the leg.'
+    },
+    {
+        'scenario': 'Assess red flags: 45-year-old female with chronic neck pain, regular follow-up. Today reports episodes of numbness and weakness in right arm AND right leg lasting 10-15 minutes, resolving completely. Happened 3 times in past month. "My arm just falls asleep."',
+        'response': 'URGENCY: REFER SAME-DAY\n\nRED FLAGS IDENTIFIED: Possible TIA (transient ischemic attack) — misattributed to neck problems.\n\nClinical reasoning:\n- Chronic neck pain is a separate, known condition\n- BUT: episodic, SIMULTANEOUS arm + leg weakness on SAME side = not cervical radiculopathy\n- Cervical radiculopathy: causes arm symptoms ALONE (single level), NOT arm+leg\n- Ipsilateral arm + leg (hemiparesis) = central nervous system pathology\n- Transient episodes (10-15 min) with full recovery = classic TIA\n- TIA is warning sign for stroke (30% risk within 90 days without treatment)\n\nACTION: Do NOT perform cervical manipulation. Emergency department SAME DAY. CT/MRI brain, CT angiography neck vessels, ECG. Neurological assessment. Antiplatelet therapy may be needed.'
+    },
+]
+
+# ============================================================
+# ADDITIONAL URGENCY-GRADED EXAMPLES (batch 2)
+# ============================================================
+
+URGENCY_GRADED_NO_2 = [
+    # AKUTT — spinal cord from thoracic disc
+    {
+        'scenario': '52 år mann med akutt debut av svakhet i begge bena, nummenhet fra brystlinjen og ned, og vannlatingsproblemer etter å ha løftet tungt. Kjent torakal diskusherniering.',
+        'response': 'HASTEGRAD: AKUTT — Ring 113\n\nRØDE FLAGG IDENTIFISERT: Akutt torakal myelopati.\n\nKlinisk resonnering:\n- Bilateral beinsvakhet med sensorisk nivå ved brystlinjen = torakal medullakompresjon\n- Kjent torakal diskusherniering = anatomisk årsak identifisert\n- Vannlatingsproblemer = sfinkteraffeksjon (alvorlig prognostisk markør)\n- Akutt debut etter løfting = mulig akutt diskusherniering\n- Torakal medullakompresjon har DÅRLIGERE prognose enn lumbal CES pga. ryggmargen\n\nDette er AKUTT: ryggmargen tolererer kompresjon dårligere enn cauda equina.\n\nHANDLING: Ring 113. Akutt MR torakalcolumna. Nevrokirurgisk vurdering for dekompresjon. INGEN manipulasjon. Fullstendig immobilisering av thorakalcolumna.'
+    },
+    # HENVIS SAMME DAG — acute monoarthritis
+    {
+        'scenario': '55 år mann med akutt, ekstremt smertefullt, rødt og hovnet kne. Feber 38.5°C. Kan ikke belaste. Ingen forutgående traume.',
+        'response': 'HASTEGRAD: HENVIS SAMME DAG (akuttmottak)\n\nRØDE FLAGG IDENTIFISERT: Akutt monoartritt — septisk artritt inntil det motsatte er bevist.\n\nKlinisk resonnering:\n- Akutt monoartritt med feber = septisk artritt FØRST i differensialdiagnosen\n- Rubor + tumor + calor + dolor + functio laesa = klassisk akutt inflammasjon\n- Septisk artritt er en KIRURGISK NØDSITUASJON (leddskylling)\n- Urinsyregikt gir lignende bilde, men behandlingsforsinkling ved septisk artritt = leddødeleggelse\n- Regel: \"Hovent, varmt ledd med feber = leddpunksjon FØRST\"\n- Leddpunksjon skiller septisk artritt fra krystallartritt (gikt)\n\nHANDLING: Akuttmottak SAMME DAG. Leddpunksjon for dyrkning og krystallundersøkelse. Blodkulturer. IKKE gi antibiotika før prøver er tatt. INGEN manuell behandling av leddet.'
+    },
+    # HENVIS RUTINE — possible RA
+    {
+        'scenario': '48 år kvinne med symmetrisk hevelse og smerter i MCP-ledd (2.-4. finger bilateralt) og PIP-ledd i 8 uker. Morgenstivhet 50 minutter. Tretthet. Ingen tidligere leddproblemer.',
+        'response': 'HASTEGRAD: HENVIS RUTINE (innen 2-4 uker)\n\nMistanke om revmatoid artritt (RA).\n\nKlinisk resonnering:\n- Symmetrisk polyartritt i MCP/PIP-ledd = klassisk for RA\n- Morgenstivhet >30 min = inflammatorisk mønster (mekanisk: <30 min)\n- Tretthet = systemisk inflammasjon\n- Debut 48 år = typisk for RA (40-60 år)\n- Ingen akutt fare, men TIDLIG behandling (innen 3 mnd) gir betydelig bedre langtidsprognose\n- \"Window of opportunity\" = de første 3-6 månedene er kritiske for å forhindre ledderosjon\n\nHANDLING: Blodprøver (anti-CCP, RF, CRP, SR, hematologi). Henvisning revmatolog innen 2-4 uker. Kiropraktisk behandling av nakke/rygg kan fortsette. IKKE manipuler hovne ledd direkte.'
+    },
+    # MONITORÉR — yellow flag chronic pain
+    {
+        'scenario': '40 år mann med kronisk korsryggsmerte i 2 år. Har vært hos mange behandlere uten bedring. Katastrofetenkning (\"ryggen min er ødelagt\"). Unngår all fysisk aktivitet. Søvnproblemer. Sykemeldt 6 måneder.',
+        'response': 'HASTEGRAD: MONITORÉR — psykososiale gule flagg\n\nIngen røde flagg identifisert, men BETYDELIGE gule flagg.\n\nKlinisk resonnering:\n- Ingen nevrologiske utfall, ingen systemiske symptomer = ingen røde flagg\n- Men GULE FLAGG som forutsier kronifisering og dårlig prognose:\n  1. Katastrofetenkning (\"ødelagt rygg\") = kognitiv risikofaktor\n  2. Unngåelsesatferd (fear-avoidance) = atferdsmessig risikofaktor\n  3. Langvarig sykemelding (6 mnd) = sterk prediktor for permanent uførhet\n  4. Søvnforstyrrelser = opprettholdende faktor\n  5. Multiple mislykkede behandlinger = mulig feil tilnærming\n\nDette er IKKE en nødsituasjon, men krever endret behandlingstilnærming.\n\nHANDLING: Gradert aktivitetstilnærming, IKKE smerteavhengig. Kognitiv tilnærming til katastrofetenkning. Tverrfaglig smerteklinikk-henvisning. Edukasjon om smerte. Samarbeid med fastlege om arbeidsrettet rehabilitering.'
+    },
+]
+
+URGENCY_GRADED_EN_2 = [
+    # URGENT — thoracic cord
+    {
+        'scenario': 'Assess red flags: 52-year-old male with acute onset bilateral leg weakness, numbness from chest level down, and urinary difficulty after heavy lifting. Known thoracic disc herniation.',
+        'response': 'URGENCY: URGENT — Call emergency services\n\nRED FLAGS IDENTIFIED: Acute thoracic myelopathy.\n\nClinical reasoning:\n- Bilateral leg weakness with sensory level at chest = thoracic cord compression\n- Known thoracic disc herniation = anatomical cause identified\n- Urinary difficulty = sphincter involvement (severe prognostic marker)\n- Acute onset after lifting = possible acute disc herniation\n- Thoracic cord compression has WORSE prognosis than lumbar CES because of spinal cord\n\nThis is ACUTE: the spinal cord tolerates compression worse than cauda equina.\n\nACTION: Call emergency services. Urgent MRI thoracic spine. Neurosurgical evaluation for decompression. NO manipulation. Complete thoracic spine immobilization.'
+    },
+    # REFER SAME-DAY — septic joint
+    {
+        'scenario': 'Assess red flags: 55-year-old male with acute, extremely painful, red and swollen knee. Fever 38.5C. Cannot weight-bear. No preceding trauma.',
+        'response': 'URGENCY: REFER SAME-DAY (emergency department)\n\nRED FLAGS IDENTIFIED: Acute monoarthritis — septic arthritis until proven otherwise.\n\nClinical reasoning:\n- Acute monoarthritis with fever = septic arthritis FIRST in differential\n- Redness + swelling + warmth + pain + loss of function = classic acute inflammation\n- Septic arthritis is a SURGICAL EMERGENCY (joint washout)\n- Gout can look similar, but delayed treatment of septic arthritis = joint destruction\n- Rule: "Hot, swollen joint with fever = joint aspiration FIRST"\n- Joint aspiration distinguishes septic arthritis from crystal arthritis (gout)\n\nACTION: Emergency department SAME DAY. Joint aspiration for culture and crystal analysis. Blood cultures. Do NOT give antibiotics before samples taken. NO manual treatment of the joint.'
+    },
+    # REFER ROUTINE — possible RA
+    {
+        'scenario': 'Assess red flags: 48-year-old female with symmetric swelling and pain in MCP joints (2nd-4th finger bilaterally) and PIP joints for 8 weeks. Morning stiffness 50 minutes. Fatigue. No previous joint problems.',
+        'response': 'URGENCY: REFER ROUTINE (within 2-4 weeks)\n\nSuspected rheumatoid arthritis (RA).\n\nClinical reasoning:\n- Symmetric polyarthritis in MCP/PIP joints = classic for RA\n- Morning stiffness >30 min = inflammatory pattern (mechanical: <30 min)\n- Fatigue = systemic inflammation\n- Onset age 48 = typical for RA (40-60 years)\n- No acute danger, but EARLY treatment (within 3 months) gives significantly better long-term prognosis\n- "Window of opportunity" = first 3-6 months are critical to prevent joint erosion\n\nACTION: Blood work (anti-CCP, RF, CRP, ESR, CBC). Rheumatology referral within 2-4 weeks. Chiropractic treatment of neck/back can continue. Do NOT manipulate swollen joints directly.'
+    },
+    # MONITOR — psychosocial yellow flags
+    {
+        'scenario': 'Assess red flags: 40-year-old male with chronic low back pain for 2 years. Seen many practitioners without improvement. Catastrophizing ("my back is broken"). Avoids all physical activity. Sleep problems. On sick leave for 6 months.',
+        'response': 'URGENCY: MONITOR — psychosocial yellow flags\n\nNo red flags identified, but SIGNIFICANT yellow flags.\n\nClinical reasoning:\n- No neurological deficits, no systemic symptoms = no red flags\n- But YELLOW FLAGS predicting chronification and poor prognosis:\n  1. Catastrophizing ("broken back") = cognitive risk factor\n  2. Avoidance behavior (fear-avoidance) = behavioral risk factor\n  3. Prolonged sick leave (6 months) = strong predictor of permanent disability\n  4. Sleep disturbance = maintaining factor\n  5. Multiple failed treatments = possibly wrong approach\n\nThis is NOT an emergency, but requires a changed treatment approach.\n\nACTION: Graded activity approach, NOT pain-contingent. Cognitive approach to catastrophizing. Multidisciplinary pain clinic referral. Pain education. Collaborate with GP on vocational rehabilitation.'
+    },
+]
+
+# ============================================================
+# FINAL BATCH — Push past 300 threshold
+# Reasoning-heavy examples across all urgency levels
+# ============================================================
+
+REASONING_HEAVY_NO = [
+    # Subtle CES — incomplete, patient minimizing
+    {
+        'scenario': '60 år mann med kjent spinal stenose. Har hatt bilateral claudicatio i år. I dag rapporterer han at han de siste dagene har hatt redusert evne til å kontrollere avføring. Ingen endring i ryggsmerter.',
+        'response': 'HASTEGRAD: AKUTT — Ring 113\n\nRØDE FLAGG IDENTIFISERT: Mulig cauda equina syndrom — sfinkteraffeksjon ved kjent stenose.\n\nKlinisk resonnering:\n- Pasienten har KJENT stenose med langvarig claudicatio — dette er hans \"baseline\"\n- NY sfinkteraffeksjon (fekal inkontinens) = ny nevrologisk forverring\n- Fekal inkontinens er et SENT tegn på CES (mer alarmerende enn urinretensjon alene)\n- At ryggsmerter er UENDRET betyr ingenting — CES kan progrediere uten smerteforverring\n- Kjent stenose = anatomisk substrat for akutt kompresjon\n\nViktig lærdom: Ny sfinkteraffeksjon hos pasient med kjent stenose = CES uavhengig av smertenivå.\n\nHANDLING: Ring 113. Akutt MR. Nevrokirurgisk tilsyn for dekompresjon.'
+    },
+    # Tricky safe — bilateral numbness but benign
+    {
+        'scenario': '45 år kvinne, snekker. Bilateral nummenhet i 4. og 5. finger etter langvarig bruk av vibrerende verktøy. Verst etter arbeid. Tinel positiv i begge Guyons kanaler. Normal kraft. Normal gange.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor bilateral fingerummenhet IKKE er myelopati:\n- Nummenhet begrenset til ulnarisnerven (4.-5. finger) = perifer entrapment\n- Guyon kanal-kompresjon er kjent yrkessykdom hos snekkere (vibrasjon + grep)\n- Myelopati: ville gitt bredere distribusjon, IKKE isolert til ulnaris-territoriet\n- Positiv Tinel bilateralt bekrefter PERIFER nervekompresjon\n- Normal kraft og gange = ingen sentral patologi\n- Vibrerende verktøy som utløser = klar yrkesrelatert årsak\n\nKlinisk bilde: Bilateral ulnar neuropati i Guyons kanal (yrkesrelatert).\n\nTrygt å behandle med ergonomisk rådgivning, vibrasjonsdemping, nervegliding.'
+    },
+    # Refer routine — cervicogenic dizziness vs central
+    {
+        'scenario': '50 år kvinne med svimmelhet utløst av nakkerotasjon. Ingen spontannystagmus. Negativ Dix-Hallpike. Ingen hørselstap. Nakkesmerte og redusert ROM. Svimmelheten er kortvarig (<30 sek) og alltid relatert til nakkebevegelse.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — hvorfor denne svimmelheten er cervikal og IKKE sentral:\n- Utløst kun ved nakkebevegelse (cervikogent mønster)\n- Negativ Dix-Hallpike (utelukker BPPV)\n- Ingen spontannystagmus (sentral patologi gir ofte spontannystagmus)\n- Kortvarig (<30 sek) og REPRODUSERBAR ved nakke-rotasjon\n- Ingen hørselstap (utelukker Ménière)\n- Fravær av sentrale tegn: ingen diplopi, ingen dysartri, ingen dysfagi, ingen ataksi\n\nSentral svimmelhet (vertebrobasilær insuffisiens):\n- Ville gitt tilleggssymptomer (5 D-er: dizziness, diplopia, dysarthria, dysphagia, drop attacks)\n- Ville vært UPROVOSERT eller ved spesielle hodestillinger\n\nKlinisk bilde: Cervikogen svimmelhet.\n\nTrygt å behandle med cervikal mobilisering, vestibulær rehabilitering, øvelser.'
+    },
+    # Monitor — chronic headache change pattern
+    {
+        'scenario': '35 år mann med kjent migrene i 15 år. Rapporterer at migreneanfallene hans har endret karakter de siste 2 månedene: hyppigere (fra 2/mnd til 8/mnd), lengre varighet, og nå også hodepine mellom anfallene. Ellers frisk.',
+        'response': 'HASTEGRAD: MONITORÉR — endret hodepine-mønster\n\nIngen akutte røde flagg, men ENDRET mønster krever utredning.\n\nKlinisk resonnering:\n- Kjent migrene i 15 år = etablert diagnose\n- MEN: ENDRING i mønster er alarmsignal ved kjent hodepine:\n  1. Økt frekvens (2→8/mnd) = kronifisering\n  2. Lengre varighet = endret sykdomsaktivitet\n  3. Interiktal hodepine (mellom anfall) = ny hodepine-type\n\nMulige forklaringer (rangert):\n1. Medikamentoverforbrukshodepine (MOH) — sjekk analgetika-bruk\n2. Kronisk migrene (>15 dager/mnd) — krever profylaktisk behandling\n3. Ny sekundær hodepine (sjeldnere, men MÅ utelukkes ved endret mønster)\n\nHANDLING: Hodepinedagbok i 4 uker. Kartlegg medikamentbruk. Henvisning nevrolog for revurdering innen 4-6 uker. Fortsett cervikal behandling, men dokumentér hodepine-respons grundig.'
+    },
+    # Safe with explicit reasoning checklist
+    {
+        'scenario': '48 år mann med akutt torticollis etter å ha snudd seg brått i bilen. Smerter venstre side nakke, redusert rotasjon til venstre. Full kraft i armer. Normale reflekser. Ingen hodepine. Ingen svimmelhet. Ingen synsforstyrrelser.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nSystematisk rød-flagg screening:\n\n✗ Vaskulær: Ingen hodepine, ingen svimmelhet, ingen synsforstyrrelser, ingen Horners tegn → UTELUKKET\n✗ Fraktur: Ikke høyenergitraume (bilrotasjon ≠ kollisjon), ingen fokal perkusjonsømhet → UTELUKKET\n✗ Infeksjon: Ingen feber, ingen nattsvette, ingen immunsuppresjon → UTELUKKET\n✗ Malignitet: Under 50, ingen vekttap, ingen tidligere kreft → UTELUKKET\n✗ Myelopati: Full kraft bilateralt, normale reflekser, normal gange → UTELUKKET\n✗ Radikulopati: Ingen utstråling til arm, normal sensibilitet → UTELUKKET\n\nKlinisk bilde: Akutt mekanisk torticollis.\n\nTrygt å behandle med forsiktig mobilisering, varme, NSAID ved behov. Forventet bedring 3-7 dager.'
+    },
+]
+
+REASONING_HEAVY_EN = [
+    # Subtle CES with sphincter involvement
+    {
+        'scenario': 'Assess red flags: 60-year-old male with known spinal stenosis. Has had bilateral claudication for years. Today reports reduced ability to control bowel movements over past few days. No change in back pain.',
+        'response': 'URGENCY: URGENT — Call emergency services\n\nRED FLAGS IDENTIFIED: Possible cauda equina syndrome — sphincter involvement in known stenosis.\n\nClinical reasoning:\n- Patient has KNOWN stenosis with longstanding claudication — this is his "baseline"\n- NEW sphincter dysfunction (fecal incontinence) = new neurological deterioration\n- Fecal incontinence is a LATE sign of CES (more alarming than urinary retention alone)\n- That back pain is UNCHANGED is irrelevant — CES can progress without pain worsening\n- Known stenosis = anatomical substrate for acute compression\n\nKey lesson: New sphincter dysfunction in patient with known stenosis = CES regardless of pain level.\n\nACTION: Call emergency services. Urgent MRI. Neurosurgical consultation for decompression.'
+    },
+    # Tricky safe — bilateral ulnar neuropathy
+    {
+        'scenario': 'Assess red flags: 45-year-old female carpenter. Bilateral numbness in 4th and 5th fingers after prolonged use of vibrating tools. Worst after work. Positive Tinel at both Guyon canals. Normal strength. Normal gait.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — why bilateral finger numbness is NOT myelopathy:\n- Numbness limited to ulnar nerve (4th-5th finger) = peripheral entrapment\n- Guyon canal compression is known occupational disease in carpenters (vibration + grip)\n- Myelopathy: would cause broader distribution, NOT isolated to ulnar territory\n- Positive bilateral Tinel confirms PERIPHERAL nerve compression\n- Normal strength and gait = no central pathology\n- Vibrating tools as trigger = clear occupational cause\n\nClinical picture: Bilateral ulnar neuropathy at Guyon canal (occupational).\n\nSafe to treat with ergonomic advice, vibration dampening, nerve gliding exercises.'
+    },
+    # Safe — cervicogenic dizziness
+    {
+        'scenario': 'Assess red flags: 50-year-old female with dizziness triggered by neck rotation. No spontaneous nystagmus. Negative Dix-Hallpike. No hearing loss. Neck pain and reduced ROM. Dizziness is brief (<30 sec) and always related to neck movement.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — why this dizziness is cervical and NOT central:\n- Triggered only by neck movement (cervicogenic pattern)\n- Negative Dix-Hallpike (rules out BPPV)\n- No spontaneous nystagmus (central pathology often causes spontaneous nystagmus)\n- Brief (<30 sec) and REPRODUCIBLE with neck rotation\n- No hearing loss (rules out Meniere)\n- Absence of central signs: no diplopia, no dysarthria, no dysphagia, no ataxia\n\nCentral dizziness (vertebrobasilar insufficiency):\n- Would cause additional symptoms (5 Ds: dizziness, diplopia, dysarthria, dysphagia, drop attacks)\n- Would be UNPROVOKED or with specific head positions\n\nClinical picture: Cervicogenic dizziness.\n\nSafe to treat with cervical mobilization, vestibular rehabilitation, exercises.'
+    },
+    # Monitor — changed headache pattern
+    {
+        'scenario': 'Assess red flags: 35-year-old male with known migraine for 15 years. Reports migraines have changed character over past 2 months: more frequent (from 2/month to 8/month), longer duration, and now headache between attacks too. Otherwise healthy.',
+        'response': 'URGENCY: MONITOR — changed headache pattern\n\nNo acute red flags, but CHANGED pattern requires investigation.\n\nClinical reasoning:\n- Known migraine for 15 years = established diagnosis\n- BUT: CHANGE in pattern is alarm signal in known headache:\n  1. Increased frequency (2→8/month) = chronification\n  2. Longer duration = changed disease activity\n  3. Interictal headache (between attacks) = new headache type\n\nPossible explanations (ranked):\n1. Medication overuse headache (MOH) — check analgesic use\n2. Chronic migraine (>15 days/month) — requires prophylactic treatment\n3. New secondary headache (rarer, but MUST be excluded with changed pattern)\n\nACTION: Headache diary for 4 weeks. Map medication use. Neurology referral for reassessment within 4-6 weeks. Continue cervical treatment, but document headache response thoroughly.'
+    },
+    # Safe with systematic checklist
+    {
+        'scenario': 'Assess red flags: 48-year-old male with acute torticollis after turning suddenly in car. Left-sided neck pain, reduced left rotation. Full arm strength. Normal reflexes. No headache. No dizziness. No visual disturbances.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nSystematic red flag screening:\n\n✗ Vascular: No headache, no dizziness, no visual disturbances, no Horner signs → EXCLUDED\n✗ Fracture: Not high-energy trauma (car turning ≠ collision), no focal percussion tenderness → EXCLUDED\n✗ Infection: No fever, no night sweats, no immunosuppression → EXCLUDED\n✗ Malignancy: Under 50, no weight loss, no cancer history → EXCLUDED\n✗ Myelopathy: Full bilateral strength, normal reflexes, normal gait → EXCLUDED\n✗ Radiculopathy: No arm radiation, normal sensation → EXCLUDED\n\nClinical picture: Acute mechanical torticollis.\n\nSafe to treat with gentle mobilization, heat, NSAID if needed. Expected improvement 3-7 days.'
+    },
+    # Refer same-day — new onset seizure with back pain
+    {
+        'scenario': 'Assess red flags: 55-year-old male with chronic mid-back pain, comes for usual treatment. In waiting room, experienced what wife describes as a brief seizure — stiffened, fell from chair, tonic-clonic movements for 30 seconds. Now confused and drowsy.',
+        'response': 'URGENCY: URGENT — Call emergency services\n\nRED FLAGS IDENTIFIED: New-onset seizure — requires emergent evaluation.\n\nClinical reasoning:\n- New-onset seizure in adult = NEVER benign until proven otherwise\n- In context of back pain: could indicate spinal/intracranial metastasis with seizure\n- Post-ictal confusion and drowsiness = consistent with generalized seizure\n- Differential for new seizure at age 55: brain metastasis, primary brain tumor, vascular event\n- Back pain + seizure in older adult = concerning for metastatic disease\n\nThis is a medical emergency regardless of back pain history.\n\nACTION: Call emergency services. Keep patient safe (recovery position). Do not restrain. CT brain urgently. Monitor airway and consciousness. Do NOT attempt any manual treatment. This patient needs emergency department evaluation.'
+    },
+    # Safe — chronic pain with normal distress
+    {
+        'scenario': 'Assess red flags: 42-year-old female teacher with 3-year history of chronic neck and shoulder pain. Reports occasional tingling in fingers when working overhead. Symptoms always resolve within minutes. Full strength, normal reflexes. No clumsiness. Pain varies with work load.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning:\n- Chronic neck/shoulder pain with clear occupational trigger (teaching = overhead, sustained postures)\n- Occasional finger tingling with overhead work = thoracic outlet-type provocation or cervical foraminal narrowing\n- Key reassuring features:\n  1. Symptoms ALWAYS resolve within minutes (transient, positional)\n  2. Full strength (no motor deficit)\n  3. Normal reflexes (no myelopathy signs)\n  4. No clumsiness (no upper motor neuron involvement)\n  5. Pain varies with workload (mechanical correlation)\n- Myelopathy tingling would be PERSISTENT, not positional and transient\n- 3-year stable history without progression = benign natural history\n\nClinical picture: Chronic mechanical cervicothoracic pain with positional neurocompressive symptoms.\n\nSafe to treat with thoracic outlet stretches, cervical mobilization, postural strengthening, ergonomic modification for classroom.'
+    },
+]
+
+# ============================================================
+# FINAL PUSH — 12 more examples to clear 300
+# ============================================================
+
+FINAL_PUSH_NO = [
+    {
+        'scenario': '75 år mann med akutt forvirring, nakkestivhet, feber 39°C, fotofobi. Ble brakt inn av pårørende. Kjent korsryggsmerte.',
+        'response': 'HASTEGRAD: AKUTT — Ring 113\n\nRØDE FLAGG IDENTIFISERT: Mistanke om meningitt.\n\nKlinisk resonnering:\n- Triaden: nakkestivhet + feber + forvirring = meningitt til det motsatte er bevist\n- Fotofobi bekrefter meningeal irritasjon\n- Korsryggsmerten er IRRELEVANT — dette er en livstruende infeksjon\n- Eldre er mer utsatt for alvorlig forløp\n- Nakkestivheten er IKKE muskulær — det er meningisme (ufrivillig nakkemotstand)\n\nHANDLING: Ring 113 UMIDDELBART. Lumbalpunksjon og blodkulturer på sykehus. Antibiotika innen 1 time etter ankomst. INGEN manuell behandling.'
+    },
+    {
+        'scenario': '30 år kvinne med akutt korsryggsmerte etter kettlebell-trening. Bilateral muskelstramhet i paraspinale muskler. Kan ikke bøye seg forover. Ingen utstråling. Normal kraft, reflekser og sensibilitet. Vannlating normal.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — systematisk sjekkliste:\n✗ CES: Ingen sadelanestesi, normal vannlating, ingen bilateral svakhet → UTELUKKET\n✗ Fraktur: Ung uten osteoporose, ikke fall/traume, ingen perkusjonsømhet → UTELUKKET\n✗ Infeksjon: Ingen feber, ingen nattsvette, ingen immunsuppresjon → UTELUKKET\n✗ Kreft: 30 år, ingen vekttap, ingen tidligere kreft → UTELUKKET\n\nBilateral muskelstramhet etter intens trening er NORMALT — ikke forveksle med bilateral nevrologisk affeksjon.\n\nTrygt å behandle med mobilisering, aktive øvelser, gradert belastning.'
+    },
+    {
+        'scenario': '55 år kvinne med plutselig synstap på høyre øye siste 24 timer. Nakkesmerte siste uken. Ingen hodepine, ingen tinningsømhet. Normal temporal arteriepulsasjon.',
+        'response': 'HASTEGRAD: AKUTT — Akuttmottak\n\nRØDE FLAGG IDENTIFISERT: Akutt monokulært synstap.\n\nKlinisk resonnering:\n- Plutselig synstap = øyemedisinsk/nevrologisk akuttsituasjon UANSETT årsak\n- Mulige årsaker: retinal arterieokklusjon, optikusnevritt, GCA (selv uten typiske symptomer)\n- Fravær av tinningsømhet og hodepine utelukker IKKE GCA — opptil 20% har atypisk presentasjon\n- Nakkesmerte + synstap kan også indikere carotisdisseksjon med retinal emboli\n\nHANDLING: Akuttmottak/øyelegevakt UMIDDELBART. SR/CRP akutt (GCA-screening). Oftalmoskopi. CT-angiografi halskar. Ikke utfør cervikal behandling.'
+    },
+    {
+        'scenario': '43 år mann med mekanisk brystryggsmerte etter fallskjermhopping for 2 dager siden. Smerter mellom skulderbladene. Reproduserbar ved rotasjon og palpasjon. Normal pust, normal SpO2. Ingen nevrologiske symptomer.',
+        'response': 'HASTEGRAD: MONITORÉR\n\nIngen akutte røde flagg, men OBS fallskjermhopping = betydelig aksial belastning.\n\nKlinisk resonnering:\n- Smerter er reproduserbare = mekanisk komponent bekreftet\n- Normal pust og SpO2 = ingen pneumothorax/lungepatologi\n- Ingen nevrologiske symptomer = ingen medullakompresjon\n- MEN: fallskjermhopping = betydelig aksial belastning ved landing\n- Kompresjonsfraktur kan ha subtil presentasjon initialt\n\nForsiktighetstiltak:\n- Palpér hvert segment for fokal perkusjonsømhet (vs. diffus muskulær ømhet)\n- Ved ENHVER fokal ømhet over processus spinosus → røntgen\n\nHANDLING: Forsiktig behandling. Røntgen thorakalcolumna anbefales pga. traumemekanisme. Revurder om 3-5 dager.'
+    },
+    {
+        'scenario': '68 år kvinne med akutt hoftesmerte etter å ha snublet i teppet. Kan belaste men med smerter. Forkortet og utadrotert bein. Kjent osteoporose.',
+        'response': 'HASTEGRAD: HENVIS SAMME DAG\n\nRØDE FLAGG IDENTIFISERT: Sannsynlig hoftefraktur.\n\nKlinisk resonnering:\n- Forkortet og utadrotert bein etter fall = klassisk for collum femoris-fraktur\n- At hun KAN belaste utelukker IKKE fraktur — uforskyvet fraktur tillater vektbelastning\n- Kjent osteoporose = høy frakturrisiko selv ved lavenergitraume (snubling)\n- Alder >65 + fall + osteoporose + klinisk deformitet = fraktur til det motsatte er bevist\n\nHANDLING: Akutt røntgen hofte (to plan). Ortopedisk vurdering SAMME DAG. Smertelindring. Avlast vekt. INGEN hoftemobilisering.'
+    },
+    {
+        'scenario': '33 år mann med intermitterende korsryggsmerte i 4 uker, verst om morgenen med 20 min stivhet. Treningsaktiv. Normal nevrologi. Ingen nattlige smerter. Normal blodprøver inkl. CRP og SR. Negativ HLA-B27.',
+        'response': 'HASTEGRAD: TRYGT\n\nIngen røde flagg identifisert.\n\nKlinisk resonnering — systematisk inflammatorisk screening:\n- Alder <40 med ryggsmerte >3 mnd ✓ (trigger for inflammatorisk screening)\n- MEN: morgenstivhet 20 min < 30 min-grensen\n- Ingen nattlige smerter\n- Normale inflammasjonsmarkører (CRP, SR)\n- Negativ HLA-B27 (reduserer sannsynligheten for Bekhterev med ~90%)\n\nInflammatorisk ryggsmerte UTELUKKET basert på:\n1. Kort morgenstivhet (<30 min)\n2. Ingen nattlige smerter\n3. Normale blodprøver\n4. Negativ HLA-B27\n\nKlinisk bilde: Mekanisk korsryggsmerte hos ung aktiv mann.\n\nTrygt å behandle konservativt med stabiliserende øvelser og treningsveiledning.'
+    },
+]
+
+FINAL_PUSH_EN = [
+    {
+        'scenario': 'Assess red flags: 75-year-old male with acute confusion, neck stiffness, fever 39C, photophobia. Brought in by family. Known chronic low back pain.',
+        'response': 'URGENCY: URGENT — Call emergency services\n\nRED FLAGS IDENTIFIED: Suspected meningitis.\n\nClinical reasoning:\n- The triad: neck stiffness + fever + confusion = meningitis until proven otherwise\n- Photophobia confirms meningeal irritation\n- The low back pain is IRRELEVANT — this is a life-threatening infection\n- Elderly are more susceptible to severe course\n- The neck stiffness is NOT muscular — it is meningism (involuntary neck resistance)\n\nACTION: Call emergency services IMMEDIATELY. Lumbar puncture and blood cultures at hospital. Antibiotics within 1 hour of arrival. NO manual treatment.'
+    },
+    {
+        'scenario': 'Assess red flags: 30-year-old female with acute low back pain after kettlebell training. Bilateral paraspinal muscle tightness. Cannot bend forward. No radiation. Normal strength, reflexes and sensation. Normal urination.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — systematic checklist:\n✗ CES: No saddle anesthesia, normal urination, no bilateral weakness → EXCLUDED\n✗ Fracture: Young without osteoporosis, no fall/trauma, no percussion tenderness → EXCLUDED\n✗ Infection: No fever, no night sweats, no immunosuppression → EXCLUDED\n✗ Cancer: Age 30, no weight loss, no cancer history → EXCLUDED\n\nBilateral muscle tightness after intense training is NORMAL — do not confuse with bilateral neurological involvement.\n\nSafe to treat with mobilization, active exercises, graded loading.'
+    },
+    {
+        'scenario': 'Assess red flags: 55-year-old female with sudden vision loss in right eye over past 24 hours. Neck pain for the past week. No headache, no temporal tenderness. Normal temporal artery pulsation.',
+        'response': 'URGENCY: URGENT — Emergency department\n\nRED FLAGS IDENTIFIED: Acute monocular vision loss.\n\nClinical reasoning:\n- Sudden vision loss = ophthalmological/neurological emergency REGARDLESS of cause\n- Possible causes: retinal artery occlusion, optic neuritis, GCA (even without typical symptoms)\n- Absence of temporal tenderness and headache does NOT exclude GCA — up to 20% have atypical presentation\n- Neck pain + vision loss can also indicate carotid dissection with retinal emboli\n\nACTION: Emergency department/eye emergency IMMEDIATELY. Urgent ESR/CRP (GCA screening). Ophthalmoscopy. CT angiography neck vessels. Do not perform cervical treatment.'
+    },
+    {
+        'scenario': 'Assess red flags: 68-year-old female with acute hip pain after tripping on carpet. Can weight-bear but painful. Shortened and externally rotated leg. Known osteoporosis.',
+        'response': 'URGENCY: REFER SAME-DAY\n\nRED FLAGS IDENTIFIED: Probable hip fracture.\n\nClinical reasoning:\n- Shortened and externally rotated leg after fall = classic for femoral neck fracture\n- Being ABLE to weight-bear does NOT exclude fracture — undisplaced fracture allows weight-bearing\n- Known osteoporosis = high fracture risk even with low-energy trauma (tripping)\n- Age >65 + fall + osteoporosis + clinical deformity = fracture until proven otherwise\n\nACTION: Urgent hip X-ray (two views). Orthopedic assessment SAME DAY. Pain management. Non-weight-bearing. NO hip mobilization.'
+    },
+    {
+        'scenario': 'Assess red flags: 33-year-old male with intermittent low back pain for 4 weeks, worst in morning with 20 min stiffness. Physically active. Normal neurology. No night pain. Normal blood work including CRP and ESR. Negative HLA-B27.',
+        'response': 'URGENCY: SAFE\n\nNo red flags identified.\n\nClinical reasoning — systematic inflammatory screening:\n- Age <40 with back pain >3 months ✓ (triggers inflammatory screening)\n- BUT: morning stiffness 20 min < 30 min threshold\n- No night pain\n- Normal inflammatory markers (CRP, ESR)\n- Negative HLA-B27 (reduces probability of AS by ~90%)\n\nInflammatory back pain EXCLUDED based on:\n1. Short morning stiffness (<30 min)\n2. No night pain\n3. Normal blood work\n4. Negative HLA-B27\n\nClinical picture: Mechanical low back pain in young active male.\n\nSafe to treat conservatively with stabilization exercises and training guidance.'
+    },
+    {
+        'scenario': 'Assess red flags: 43-year-old male with mechanical thoracic back pain after skydiving 2 days ago. Pain between shoulder blades. Reproducible with rotation and palpation. Normal breathing, normal SpO2. No neurological symptoms.',
+        'response': 'URGENCY: MONITOR\n\nNo acute red flags, but NOTE: skydiving = significant axial loading.\n\nClinical reasoning:\n- Pain is reproducible = mechanical component confirmed\n- Normal breathing and SpO2 = no pneumothorax/pulmonary pathology\n- No neurological symptoms = no cord compression\n- BUT: skydiving = significant axial loading at landing\n- Compression fracture can have subtle initial presentation\n\nPrecaution:\n- Palpate each segment for focal percussion tenderness (vs. diffuse muscular soreness)\n- If ANY focal tenderness over spinous process → X-ray\n\nACTION: Gentle treatment. Thoracic spine X-ray recommended due to trauma mechanism. Reassess in 3-5 days.'
+    },
+]
+
+# ============================================================
 # Generation Functions
 # ============================================================
 
@@ -875,6 +1436,38 @@ def generate_all_examples():
     add(EXTRA_NO_NEGATIVE, 'no')
     add(EXTRA_EN_NEGATIVE, 'en')
 
+    # === NEW: Tricky negatives (mimics that fool naive classifiers) ===
+    add(TRICKY_NEGATIVES_NO, 'no')
+    add(TRICKY_NEGATIVES_EN, 'en')
+
+    # === NEW: Combination presentations (red flag buried in benign context) ===
+    add(COMBINATION_NO, 'no')
+    add(COMBINATION_EN, 'en')
+
+    # === NEW: Urgency-graded examples (AKUTT/URGENT to TRYGT/SAFE) ===
+    add(URGENCY_GRADED_NO, 'no')
+    add(URGENCY_GRADED_EN, 'en')
+
+    # === NEW BATCH 2: More tricky negatives ===
+    add(TRICKY_NEGATIVES_NO_2, 'no')
+    add(TRICKY_NEGATIVES_EN_2, 'en')
+
+    # === NEW BATCH 2: More combination presentations ===
+    add(COMBINATION_NO_2, 'no')
+    add(COMBINATION_EN_2, 'en')
+
+    # === NEW BATCH 2: More urgency-graded examples ===
+    add(URGENCY_GRADED_NO_2, 'no')
+    add(URGENCY_GRADED_EN_2, 'en')
+
+    # === FINAL BATCH: Reasoning-heavy examples (push past 300) ===
+    add(REASONING_HEAVY_NO, 'no')
+    add(REASONING_HEAVY_EN, 'en')
+
+    # === ABSOLUTE FINAL: Push past 300 threshold ===
+    add(FINAL_PUSH_NO, 'no')
+    add(FINAL_PUSH_EN, 'en')
+
     return examples
 
 
@@ -894,23 +1487,41 @@ def main():
     # Count categories
     positive_no = sum(1 for ex in examples
                       if ('RØDE FLAGG' in ex['messages'][-1]['content']
-                          or 'Klinisk bilde forenlig' in ex['messages'][-1]['content'])
+                          or 'Klinisk bilde forenlig' in ex['messages'][-1]['content']
+                          or 'Mistanke om inflammatorisk' in ex['messages'][-1]['content'])
                       and ex['messages'][0]['content'] == SYSTEM_PROMPT_NO)
     positive_en = sum(1 for ex in examples
-                      if 'RED FLAGS' in ex['messages'][-1]['content']
+                      if ('RED FLAGS' in ex['messages'][-1]['content']
+                          or 'Suspected' in ex['messages'][-1]['content']
+                          or 'Probable' in ex['messages'][-1]['content'])
                       and ex['messages'][0]['content'] == SYSTEM_PROMPT_EN)
     negative_no = sum(1 for ex in examples
-                      if 'Ingen røde flagg' in ex['messages'][-1]['content']
-                      or 'Ingen akutte røde flagg' in ex['messages'][-1]['content'])
+                      if ('Ingen røde flagg' in ex['messages'][-1]['content']
+                          or 'Ingen akutte røde flagg' in ex['messages'][-1]['content']
+                          or 'HASTEGRAD: TRYGT' in ex['messages'][-1]['content'])
+                      and ex['messages'][0]['content'] == SYSTEM_PROMPT_NO)
     negative_en = sum(1 for ex in examples
                       if ('No red flags' in ex['messages'][-1]['content']
-                          or 'No acute red flags' in ex['messages'][-1]['content']))
+                          or 'No acute red flags' in ex['messages'][-1]['content']
+                          or 'URGENCY: SAFE' in ex['messages'][-1]['content'])
+                      and ex['messages'][0]['content'] == SYSTEM_PROMPT_EN)
     diff_no = sum(1 for ex in examples
                   if 'Differensialdiagnoser' in ex['messages'][-1]['content']
                   and ex['messages'][0]['content'] == SYSTEM_PROMPT_NO)
     diff_en = sum(1 for ex in examples
                   if 'Differential diagnos' in ex['messages'][-1]['content']
                   and ex['messages'][0]['content'] == SYSTEM_PROMPT_EN)
+    combo_no = sum(1 for ex in examples
+                   if 'bagatelliserer' in ex['messages'][-1]['content']
+                   or 'maskerer' in ex['messages'][-1]['content']
+                   or 'kontraindikasjon' in ex['messages'][-1]['content'])
+    combo_en = sum(1 for ex in examples
+                   if 'trivializ' in ex['messages'][-1]['content']
+                   or 'contraindication' in ex['messages'][-1]['content']
+                   or 'misattribution' in ex['messages'][-1]['content'])
+    urgency_graded = sum(1 for ex in examples
+                         if 'HASTEGRAD:' in ex['messages'][-1]['content']
+                         or 'URGENCY:' in ex['messages'][-1]['content'])
 
     print(f"Generated {len(examples)} red flag training examples")
     print(f"  Norwegian positive (red flags): {positive_no}")
@@ -919,6 +1530,9 @@ def main():
     print(f"  English positive (red flags): {positive_en}")
     print(f"  English negative (safe): {negative_en}")
     print(f"  English differential: {diff_en}")
+    print(f"  Combination presentations (NO): {combo_no}")
+    print(f"  Combination presentations (EN): {combo_en}")
+    print(f"  Urgency-graded (total): {urgency_graded}")
     print(f"  Output: {output_file}")
 
 

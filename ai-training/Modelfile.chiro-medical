@@ -1,8 +1,10 @@
-# ChiroClick CRM - Clinical Reasoning Model (MedGemma 4B)
+# ChiroClick CRM - Clinical Reasoning Model (Qwen2.5-3B)
 # Klinisk resonnering og pasientsikkerhet
 # Bruk: ollama create chiro-medical -f Modelfile.chiro-medical
+# Updated Sprint 2: Switched from MedGemma 4B (29s latency) to Qwen2.5-3B (~2s)
+# to match LoRA training base and fix architecture mismatch
 
-FROM alibayram/medgemma:4b
+FROM qwen2.5:3b-instruct
 
 SYSTEM """Du er en klinisk resonneringsassistent spesialisert for kiropraktisk praksis i Norge. Din primære oppgave er å støtte klinisk beslutningstaking med fokus på pasientsikkerhet, røde flagg, differensialdiagnostikk og behandlingssikkerhet.
 
@@ -98,12 +100,15 @@ VIKTIGE REGLER:
 PARAMETER temperature 0.4
 PARAMETER top_p 0.85
 PARAMETER top_k 40
-PARAMETER num_ctx 4096
+PARAMETER num_ctx 2048
 PARAMETER repeat_penalty 1.2
 
-TEMPLATE """<start_of_turn>user
-{{ .System }}
+TEMPLATE """{{- if .System }}<|im_start|>system
+{{ .System }}<|im_end|>
+{{ end }}{{- range .Messages }}<|im_start|>{{ .Role }}
+{{ .Content }}<|im_end|>
+{{ end }}<|im_start|>assistant
+"""
 
-{{ .Prompt }}<end_of_turn>
-<start_of_turn>model
-{{ .Response }}<end_of_turn>"""
+PARAMETER stop <|im_end|>
+PARAMETER stop <|im_start|>

@@ -58,49 +58,33 @@ echo.
 
 set "PULL_ERRORS=0"
 
-echo   Pulling mistral:7b ...
-ollama pull mistral:7b
+echo   Pulling qwen2.5:7b-instruct (for chiro-no and chiro-norwegian)...
+ollama pull qwen2.5:7b-instruct
 if %errorlevel% neq 0 (
-    echo   FEIL: Kunne ikke laste ned mistral:7b
+    echo   FEIL: Kunne ikke laste ned qwen2.5:7b-instruct
     set /a PULL_ERRORS+=1
 ) else (
-    echo   OK - mistral:7b lastet ned.
+    echo   OK - qwen2.5:7b-instruct lastet ned.
 )
 echo.
 
-echo   Pulling llama3.2:3b ...
-ollama pull llama3.2:3b
+echo   Pulling qwen2.5:1.5b-instruct (for chiro-fast)...
+ollama pull qwen2.5:1.5b-instruct
 if %errorlevel% neq 0 (
-    echo   FEIL: Kunne ikke laste ned llama3.2:3b
+    echo   FEIL: Kunne ikke laste ned qwen2.5:1.5b-instruct
     set /a PULL_ERRORS+=1
 ) else (
-    echo   OK - llama3.2:3b lastet ned.
+    echo   OK - qwen2.5:1.5b-instruct lastet ned.
 )
 echo.
 
-echo   Pulling NorwAI/NorwAI-Mistral-7B-Instruct (for chiro-norwegian)...
-ollama pull NorwAI/NorwAI-Mistral-7B-Instruct
+echo   Pulling qwen2.5:3b-instruct (for chiro-medical)...
+ollama pull qwen2.5:3b-instruct
 if %errorlevel% neq 0 (
-    echo   ADVARSEL: NorwAI-Mistral-7B ikke tilgjengelig. Proever mistral:7b som fallback...
-    ollama pull mistral:7b
-    if %errorlevel% neq 0 (
-        echo   FEIL: Kunne ikke laste ned noen norsk modell
-        set /a PULL_ERRORS+=1
-    ) else (
-        echo   OK - mistral:7b lastet ned som fallback for norsk.
-    )
-) else (
-    echo   OK - NorwAI/NorwAI-Mistral-7B-Instruct lastet ned.
-)
-echo.
-
-echo   Pulling alibayram/medgemma:4b (for chiro-medical)...
-ollama pull alibayram/medgemma:4b
-if %errorlevel% neq 0 (
-    echo   FEIL: Kunne ikke laste ned alibayram/medgemma:4b
+    echo   FEIL: Kunne ikke laste ned qwen2.5:3b-instruct
     set /a PULL_ERRORS+=1
 ) else (
-    echo   OK - alibayram/medgemma:4b lastet ned.
+    echo   OK - qwen2.5:3b-instruct lastet ned.
 )
 echo.
 

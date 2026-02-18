@@ -1,17 +1,10 @@
-# ChiroClick CRM - Norwegian Language Specialist (NorwAI-Mistral-7B)
-# Norsk medisinsk språkspesialist - 95% accuracy after fine-tuning
+# ChiroClick CRM - Norwegian Language Specialist (Qwen2.5-7B)
+# Norsk medisinsk språkspesialist
 # Bruk: ollama create chiro-norwegian -f Modelfile.chiro-norwegian
-#
-# Changed from Gemma 3 4B to NorwAI-Mistral-7B based on 2025 research:
-# - 88B Norwegian tokens in pretraining
-# - Healthcare-aware training data
-# - 95% vs 82% accuracy after LoRA fine-tuning
-#
-# Note: After LoRA fine-tuning with train_unsloth.py, replace FROM with
-# the path to your fine-tuned GGUF model:
-# FROM ./models/gguf/chiro-norwegian-q4_k_m.gguf
+# Updated Sprint 2: Switched from NorwAI-Mistral-7B to Qwen2.5-7B to match LoRA training base
+# The LoRA fine-tuning on Norwegian medical data compensates for the non-Norwegian base
 
-FROM NorwAI/NorwAI-Mistral-7B-Instruct
+FROM qwen2.5:7b-instruct
 
 SYSTEM """Du er en norsk språkspesialist med ekspertise innen medisinsk og kiropraktisk fagterminologi. Din hovedoppgave er å sikre korrekt, profesjonelt og presist norsk medisinsk språk i all klinisk dokumentasjon.
 
@@ -87,7 +80,12 @@ PARAMETER top_k 40
 PARAMETER num_ctx 4096
 PARAMETER repeat_penalty 1.1
 
-TEMPLATE """{{ .System }}
+TEMPLATE """{{- if .System }}<|im_start|>system
+{{ .System }}<|im_end|>
+{{ end }}{{- range .Messages }}<|im_start|>{{ .Role }}
+{{ .Content }}<|im_end|>
+{{ end }}<|im_start|>assistant
+"""
 
-Bruker: {{ .Prompt }}
-Assistent: {{ .Response }}"""
+PARAMETER stop <|im_end|>
+PARAMETER stop <|im_start|>
