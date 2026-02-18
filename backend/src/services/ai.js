@@ -121,6 +121,67 @@ const AI_MODEL_MEDICAL = process.env.AI_MODEL_MEDICAL || null;
 const KEEP_ALIVE = process.env.AI_KEEP_ALIVE || '2m'; // Unload after 2 min idle
 let currentLoadedModel = null;
 
+/**
+ * A/B Testing Configuration
+ *
+ * Controls traffic split between base and LoRA model variants.
+ * loraPercent: 0-100 — percentage of requests routed to LoRA variant
+ * enabled: whether A/B testing is active for this model pair
+ *
+ * When disabled or not configured, the default MODEL_ROUTING is used.
+ * Override via env vars: AB_SPLIT_NORWEGIAN=50 (sends 50% to LoRA)
+ */
+const AB_SPLIT_CONFIG = {
+  'chiro-norwegian': {
+    loraModel: 'chiro-norwegian-lora',
+    loraPercent: parseInt(process.env.AB_SPLIT_NORWEGIAN || '0', 10),
+    enabled: process.env.AB_SPLIT_NORWEGIAN !== undefined,
+  },
+  'chiro-no': {
+    loraModel: 'chiro-no-lora',
+    loraPercent: parseInt(process.env.AB_SPLIT_NO || '0', 10),
+    enabled: process.env.AB_SPLIT_NO !== undefined,
+  },
+  'chiro-medical': {
+    loraModel: 'chiro-medical-lora',
+    loraPercent: parseInt(process.env.AB_SPLIT_MEDICAL || '0', 10),
+    enabled: process.env.AB_SPLIT_MEDICAL !== undefined,
+  },
+  'chiro-fast': {
+    loraModel: 'chiro-fast-lora',
+    loraPercent: parseInt(process.env.AB_SPLIT_FAST || '0', 10),
+    enabled: process.env.AB_SPLIT_FAST !== undefined,
+  },
+};
+
+/**
+ * Apply A/B split to a model selection.
+ * Returns the LoRA variant with configured probability, otherwise the base model.
+ */
+const applyABSplit = async (selectedModel) => {
+  const config = AB_SPLIT_CONFIG[selectedModel];
+  if (!config || !config.enabled || config.loraPercent <= 0) {
+    return { model: selectedModel, abVariant: null };
+  }
+
+  // Check if LoRA variant is available
+  const loraAvailable = await isModelAvailable(config.loraModel);
+  if (!loraAvailable) {
+    return { model: selectedModel, abVariant: null };
+  }
+
+  // Random split
+  const roll = Math.random() * 100;
+  if (roll < config.loraPercent) {
+    logger.debug(
+      `A/B split: ${selectedModel} → ${config.loraModel} (roll=${roll.toFixed(1)}, threshold=${config.loraPercent}%)`
+    );
+    return { model: config.loraModel, abVariant: 'lora' };
+  }
+
+  return { model: selectedModel, abVariant: 'base' };
+};
+
 // Model availability cache — refreshed every 5 minutes
 let availableModelsCache = null;
 let availableModelsCacheTime = 0;
@@ -306,8 +367,11 @@ const isModelAvailable = async (modelName) => {
 
 /**
  * Get the appropriate model for a given task type
- * Priority: env var override > MODEL_ROUTING > AI_MODEL fallback
+ * Priority: env var override > A/B split > MODEL_ROUTING > AI_MODEL fallback
  * If selected model is unavailable, falls back to its base model
+ *
+ * Returns: { model: string, abVariant: string|null }
+ * abVariant is 'base', 'lora', or null (no A/B test active)
  */
 const getModelForTask = async (taskType) => {
   // 1. Check env var override
@@ -315,7 +379,7 @@ const getModelForTask = async (taskType) => {
   if (envOverride) {
     const available = await isModelAvailable(envOverride);
     if (available) {
-      return envOverride;
+      return { model: envOverride, abVariant: null };
     }
     logger.warn(
       `Env override model "${envOverride}" unavailable for task "${taskType}", using routing`
@@ -328,7 +392,9 @@ const getModelForTask = async (taskType) => {
   // 3. Check availability and fall back if needed
   const available = await isModelAvailable(routedModel);
   if (available) {
-    return routedModel;
+    // 3b. Apply A/B split if configured
+    const abResult = await applyABSplit(routedModel);
+    return abResult;
   }
 
   // 4. Check if model config has a fallback
@@ -339,13 +405,15 @@ const getModelForTask = async (taskType) => {
       logger.info(
         `Model "${routedModel}" unavailable, falling back to "${config.fallbackModel}" for task "${taskType}"`
       );
-      return config.fallbackModel;
+      // Apply A/B split to fallback model too
+      const abResult = await applyABSplit(config.fallbackModel);
+      return abResult;
     }
   }
 
   // 5. Ultimate fallback to AI_MODEL
   logger.warn(`No available model found for task "${taskType}", using default "${AI_MODEL}"`);
-  return AI_MODEL;
+  return { model: AI_MODEL, abVariant: null };
 };
 
 /**
@@ -374,7 +442,11 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
     clinicalContext = null,
   } = options;
 
-  const model = taskType ? await getModelForTask(taskType) : AI_MODEL;
+  const modelResult = taskType
+    ? await getModelForTask(taskType)
+    : { model: AI_MODEL, abVariant: null };
+  const model = modelResult.model;
+  const abVariant = modelResult.abVariant;
   const modelConfig = MODEL_CONFIG[model] || MODEL_CONFIG['chiro-no'];
   const effectiveTemperature = temperature ?? modelConfig.temperature ?? 0.3;
 
@@ -508,6 +580,7 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
         metadata: {
           model,
           modelConfig: modelConfig.description,
+          abVariant,
           inputWarnings,
           outputFlags: outputResult.flags,
           hallucinationRisk: outputResult.hallucinationRisk,
@@ -542,6 +615,7 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
       metadata: {
         model,
         modelConfig: modelConfig.description,
+        abVariant,
         inputWarnings,
         guardrailsApplied: false,
         requiresReview: true,
@@ -1382,6 +1456,7 @@ export const getAIStatus = async () => {
       enabled: true,
       defaultModel: AI_MODEL,
       routing: MODEL_ROUTING,
+      abTesting: AB_SPLIT_CONFIG,
       models: installedModels,
       modelStatus,
       modelConfigs: MODEL_CONFIG,
@@ -1406,6 +1481,7 @@ export {
   refreshAvailableModels,
   MODEL_ROUTING,
   MODEL_CONFIG,
+  AB_SPLIT_CONFIG,
   extractCompletionText,
 };
 
@@ -1427,7 +1503,8 @@ export const getModelForField = async (fieldType) => {
   };
   const taskType = fieldTaskMap[fieldType];
   if (taskType) {
-    return await getModelForTask(taskType);
+    const result = await getModelForTask(taskType);
+    return result.model;
   }
   return AI_MODEL || 'chiro-no';
 };

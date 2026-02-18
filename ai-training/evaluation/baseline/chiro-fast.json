@@ -1,0 +1,1486 @@
+{
+  "model_a": {
+    "model": "chiro-fast",
+    "summary": {
+      "model": "chiro-fast",
+      "total": 50,
+      "passed": 24,
+      "pass_rate": 48.0,
+      "avg_latency_ms": 1669,
+      "categories": {
+        "soap_notes": {
+          "total": 10,
+          "passed": 9,
+          "latencies": [
+            4108, 2815, 2144, 1508, 3352, 3608, 2714, 1474, 1736, 1464
+          ]
+        },
+        "diagnosis_codes": {
+          "total": 8,
+          "passed": 0,
+          "latencies": [1776, 580, 971, 1501, 951, 1031, 1235, 1307]
+        },
+        "red_flags": {
+          "total": 8,
+          "passed": 1,
+          "latencies": [2446, 1714, 2571, 2902, 2666, 2922, 1662, 1830]
+        },
+        "norwegian_language": {
+          "total": 8,
+          "passed": 5,
+          "latencies": [2367, 994, 1039, 629, 2733, 2255, 3447, 2418]
+        },
+        "communication": {
+          "total": 6,
+          "passed": 2,
+          "latencies": [475, 764, 1115, 433, 779, 416]
+        },
+        "quick_fields": {
+          "total": 6,
+          "passed": 4,
+          "latencies": [437, 653, 694, 531, 621, 506]
+        },
+        "letters": {
+          "total": 4,
+          "passed": 3,
+          "latencies": [936, 2336, 2746, 1130]
+        }
+      },
+      "avg_rouge_l": null
+    },
+    "results": [
+      {
+        "id": "soap_s_neck_01",
+        "category": "soap_notes",
+        "description": "Subjective for chronic neck pain",
+        "latency_ms": 4108,
+        "response_length": 1099,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["nakke", "smerte", "kontor"],
+            "missing": [],
+            "score": 1.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0286,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 1099,
+            "expected_range": [100, 2000]
+          }
+        },
+        "passed": true,
+        "response_preview": "**SUBJektiv del (SO)**\n\nPasienten, [Navn], er en 35-årig mann som har opplevd kroniske nakkesmerter i det siste 3 månedene. Han har prøvd flere ulike behandlinger og home remedies uten å få noen betyd..."
+      },
+      {
+        "id": "soap_s_lowback_02",
+        "category": "soap_notes",
+        "description": "Subjective for acute low back pain",
+        "latency_ms": 2815,
+        "response_length": 1199,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["korsrygg", "smerte"],
+            "missing": [],
+            "score": 1.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0334,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 1199,
+            "expected_range": [100, 2000]
+          }
+        },
+        "passed": true,
+        "response_preview": "**SUBJEKTIV**\n\nPasienten, en 45-år gammel mannlig bygningsarbeider, kom inn med akutt korsryggsmerter etter løfting av tung gjenstand på arbeidsplassen. Smertene stråler ned i venstre bein og er meget..."
+      },
+      {
+        "id": "soap_o_shoulder_03",
+        "category": "soap_notes",
+        "description": "Objective for shoulder examination",
+        "latency_ms": 2144,
+        "response_length": 831,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["Hawkins", "abduksjon"],
+            "missing": [],
+            "score": 1.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0223,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 831,
+            "expected_range": [80, 1500]
+          }
+        },
+        "passed": true,
+        "response_preview": "**Objektiv del**\n\n* **Fysisk undersøkning**: Udført en grundig fysisk undersøgelse av skulderregionen.\n* **Testresultater**:\n\t+ Hawkins-test: Positiv (indikator for diskusprolaps)\n\t+ Speeds-test: Nega..."
+      },
+      {
+        "id": "soap_a_headache_04",
+        "category": "soap_notes",
+        "description": "Assessment for cervicogenic headache",
+        "latency_ms": 1508,
+        "response_length": 581,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["cervikogen", "hodepine"],
+            "missing": [],
+            "score": 1.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0102,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 581,
+            "expected_range": [80, 1500]
+          }
+        },
+        "passed": true,
+        "response_preview": "VURDERING\n\nPasienten viser tegn på cervikogen hodepine med nedsatt bevegelse i C1-C2- og subluxasjon av atlas. Trigger points er oppdaget i suboccipitale muskler, og fleksjonsrotasjonstest er positiv...."
+      },
+      {
+        "id": "soap_p_hip_05",
+        "category": "soap_notes",
+        "description": "Plan for hip pain treatment",
+        "latency_ms": 3352,
+        "response_length": 1326,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["hofte", "behandling"],
+            "missing": [],
+            "score": 1.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0203,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 1326,
+            "expected_range": [100, 2000]
+          }
+        },
+        "passed": true,
+        "response_preview": "**Behandlingsplan**\n\n**Pasientinformasjon:**\n\n* Navn: [Navn]\n* Alder: 60 år\n* Diagnose: Hoftesmerter med artrose\n\n**Behandlingsformål:**\n\n* Redusering av smerte og bevegelsesbegrennings\n* Forbedring a..."
+      },
+      {
+        "id": "soap_full_thoracic_06",
+        "category": "soap_notes",
+        "description": "Full SOAP for thoracic pain",
+        "latency_ms": 3608,
+        "response_length": 1556,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["bryst", "skulderblad"],
+            "missing": [],
+            "score": 1.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0304,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 1556,
+            "expected_range": [200, 3000]
+          }
+        },
+        "passed": true,
+        "response_preview": "**SOAP-Notat**\n\n**S**: Symptom\n Pasienten opplever akutt brystsmerter mellom skulderbladene. Smertene er stive og verkende, og pasienten rapporterer at de er på sin verste etter en langvarig stilling...."
+      },
+      {
+        "id": "soap_s_vertigo_07",
+        "category": "soap_notes",
+        "description": "Subjective for dizziness/vertigo",
+        "latency_ms": 2714,
+        "response_length": 1141,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["svimmelhet"],
+            "missing": [],
+            "score": 1.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0229,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 1141,
+            "expected_range": [100, 2000]
+          }
+        },
+        "passed": true,
+        "response_preview": "**Klinisk dokumentasjon**\n\n**Pasient:** [Navn]\n**Dato:** [Dato]\n**Diagnose:** Rotatorisk svimmelhet\n\n**Symptombeskrivelse:**\nPasienten beskriver en akutt start på svimmelhet og ustøhet i de sidste 7 d..."
+      },
+      {
+        "id": "soap_o_knee_08",
+        "category": "soap_notes",
+        "description": "Objective for knee examination",
+        "latency_ms": 1474,
+        "response_length": 557,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["McMurray", "kne"],
+            "missing": [],
+            "score": 1.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0196,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 557,
+            "expected_range": [80, 1500]
+          }
+        },
+        "passed": true,
+        "response_preview": "Objektiv undersøkelse:\n\nKnesmerter ble oppdaget ved [dato] under [beskrivelse av situasjon]. Pasienten rapporterte smerte og stikking i [knemmen].\n\nUnder undersøkelsen ble McMurray-test utført, som vi..."
+      },
+      {
+        "id": "soap_a_lumbar_disc_09",
+        "category": "soap_notes",
+        "description": "Assessment for lumbar disc herniation",
+        "latency_ms": 1736,
+        "response_length": 709,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["prolaps", "L4", "L5"],
+            "missing": [],
+            "score": 1.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0125,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 709,
+            "expected_range": [100, 1500]
+          }
+        },
+        "passed": true,
+        "response_preview": "VURDERING\n\nMistenskt diagnose: Lumbal skiveprolaps L4-L5.\n\nFunn: Det er en positiv SLR (SpondyloLysis and Resection) på 40 grader V, indikasjon for en mulig skiveprolaps. Redusert dorsalfleksjon fot V..."
+      },
+      {
+        "id": "soap_full_jaw_10",
+        "category": "soap_notes",
+        "description": "Full SOAP for jaw/TMJ pain",
+        "latency_ms": 1464,
+        "response_length": 652,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": [],
+            "missing": ["kjeve"],
+            "score": 0.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0232,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 652,
+            "expected_range": [200, 3000]
+          }
+        },
+        "passed": false,
+        "response_preview": "**SOAP-Notat**\n\n**S**: Symptomene er: Tyggingssmerter, klikkelyde og hodepine temporalt.\n\n**O**: Oppsøkingens bakgrunn: Pasienten har sørget behandling ved en annen lege uten suksess. Siden har pasien..."
+      },
+      {
+        "id": "dx_icpc_lowback_01",
+        "category": "diagnosis_codes",
+        "description": "ICPC-2 for low back pain",
+        "latency_ms": 1776,
+        "response_length": 682,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": [],
+            "missing": ["L86", "L03"],
+            "score": 0.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0113,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 682,
+            "expected_range": [50, 1000]
+          },
+          "code_format": {
+            "pass": true,
+            "description": "Contains ICD-10/ICPC-2 format code"
+          }
+        },
+        "passed": false,
+        "response_preview": "For akutte korsryggsmerter med ischias, foreslår jeg følgende ICPC-2 diagnosekoder:\n\n* M54.5: Akutt lumbalisk ryggsmerte\n* M52.9: Ischias (ikke spesifisert type)\n* M54.0: Lumbalisk ryggsmerte med isch..."
+      },
+      {
+        "id": "dx_icpc_neck_02",
+        "category": "diagnosis_codes",
+        "description": "ICPC-2 for neck pain with headache",
+        "latency_ms": 580,
+        "response_length": 153,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": [],
+            "missing": ["L83"],
+            "score": 0.0
+          },
+          "norwegian_quality": {
+            "pass": false,
+            "char_rate": 0.0,
+            "has_norwegian_chars": false
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 153,
+            "expected_range": [50, 1000]
+          },
+          "code_format": {
+            "pass": true,
+            "description": "Contains ICD-10/ICPC-2 format code"
+          }
+        },
+        "passed": false,
+        "response_preview": "Basiskode: M54.9 - Akutt eller subakutt hodepine\nEkokode: S62.0 - Nakkestivhet\nEkokode: G93.3 - Cervikalhodepine\n\nFulle diagnosekode: M54.9, S62.0, G93.3"
+      },
+      {
+        "id": "dx_icpc_shoulder_03",
+        "category": "diagnosis_codes",
+        "description": "ICPC-2 for shoulder impingement",
+        "latency_ms": 971,
+        "response_length": 306,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": [],
+            "missing": ["L92"],
+            "score": 0.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0048,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 306,
+            "expected_range": [40, 800]
+          },
+          "code_format": {
+            "pass": true,
+            "description": "Contains ICD-10/ICPC-2 format code"
+          }
+        },
+        "passed": false,
+        "response_preview": "ICPC-2-koder for skulderimpingement syndrom med rotator cuff tendinopati:\n\n* PFA00: Skulder og rygg\n\t+ PFA01: Skulder og rygg - impingement\n* PFA03: Rotator cuff - patologi\n\t+ PFA031: Rotator cuff - t..."
+      },
+      {
+        "id": "dx_icpc_knee_04",
+        "category": "diagnosis_codes",
+        "description": "ICPC-2 for knee meniscus",
+        "latency_ms": 1501,
+        "response_length": 632,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": [],
+            "missing": ["L96"],
+            "score": 0.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0264,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 632,
+            "expected_range": [40, 800]
+          },
+          "code_format": {
+            "pass": true,
+            "description": "Contains ICD-10/ICPC-2 format code"
+          }
+        },
+        "passed": false,
+        "response_preview": "I Norge brukes ICD-10-kodene for å beskrive diagnoser.\n\nMistetenksomt medial meniskskade hos en 30 år gammel fotballspiller kan foreslås å være diagnosticert med:\n\nM53.9 - Ubestemt skade av meniskus\n\n..."
+      },
+      {
+        "id": "dx_icpc_vertigo_05",
+        "category": "diagnosis_codes",
+        "description": "ICPC-2 for vertigo/BPPV",
+        "latency_ms": 951,
+        "response_length": 379,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": [],
+            "missing": ["N17", "H82"],
+            "score": 0.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0139,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 379,
+            "expected_range": [40, 800]
+          },
+          "code_format": {
+            "pass": true,
+            "description": "Contains ICD-10/ICPC-2 format code"
+          }
+        },
+        "passed": false,
+        "response_preview": "For BPPV med positiv Dix-Hallpike test og symptomer på vertigo, kan følgende ICPC-2-koder foreslås:\n\n* F70.0: Vertigo\n* F72.8: Andre form for vertigo\n* F72.9: Vertigo ukjent type\n\nDette er en generell..."
+      },
+      {
+        "id": "dx_icpc_hip_06",
+        "category": "diagnosis_codes",
+        "description": "ICPC-2 for hip osteoarthritis",
+        "latency_ms": 1031,
+        "response_length": 395,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": [],
+            "missing": ["L89"],
+            "score": 0.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0228,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 395,
+            "expected_range": [40, 800]
+          },
+          "code_format": {
+            "pass": true,
+            "description": "Contains ICD-10/ICPC-2 format code"
+          }
+        },
+        "passed": false,
+        "response_preview": "Fordi pasienten har en gradvis økende smerte og nedsatt funksjon i hoften, kan jeg foreslå diagnosekoder:\n\n* G53.9: Hofteartrose, ukjent årsak\n* M84.9: Nedsatt muskulatur og/eller tendoner i hofte\n* S..."
+      },
+      {
+        "id": "dx_icpc_thoracic_07",
+        "category": "diagnosis_codes",
+        "description": "ICPC-2 for thoracic pain",
+        "latency_ms": 1235,
+        "response_length": 426,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": [],
+            "missing": ["L04"],
+            "score": 0.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0197,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 426,
+            "expected_range": [40, 800]
+          },
+          "code_format": {
+            "pass": true,
+            "description": "Contains ICD-10/ICPC-2 format code"
+          }
+        },
+        "passed": false,
+        "response_preview": "For smerter i brystrygg med rib dysfunction vil jeg foreslå følgende ICPC-2-koder:\n\n* M80.0: Smerte i ryggen\n* M82.9: Rygg- og skulderproblemer\n* M84.8: Rib- og brystproblemer\n\nDisse kodes kan kombine..."
+      },
+      {
+        "id": "dx_icpc_headache_08",
+        "category": "diagnosis_codes",
+        "description": "ICPC-2 for tension headache",
+        "latency_ms": 1307,
+        "response_length": 473,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": [],
+            "missing": ["N02"],
+            "score": 0.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0083,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 473,
+            "expected_range": [40, 800]
+          },
+          "code_format": {
+            "pass": true,
+            "description": "Contains ICD-10/ICPC-2 format code"
+          }
+        },
+        "passed": false,
+        "response_preview": "I henhold til den norske diagnosekodesystemet (IKT) og WHO-klassifikasjonen for hode- og nevropasjoner, kan følgende diagnosekoder foreslås:\n\n* G43.0: Episodisk spenningshodepine\n* G44.9: Spenningshod..."
+      },
+      {
+        "id": "red_flag_cauda_01",
+        "category": "red_flags",
+        "description": "Red flags: cauda equina syndrome",
+        "latency_ms": 2446,
+        "response_length": 1114,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": ["akutt"],
+            "missing": ["cauda equina", "henvisning"],
+            "score": 0.3333333333333333
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0316,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 1114,
+            "expected_range": [100, 2000]
+          }
+        },
+        "passed": false,
+        "response_preview": "Det er en alvorlig situasjon som trenger hurtig og nødvendig behandling.\n\n**Røde flagg:**\n\n1. **Nummenhet i perineum**: Dette kan indikere en nerveskade eller en infeksjon, som er behovet for å vurder..."
+      },
+      {
+        "id": "red_flag_stroke_02",
+        "category": "red_flags",
+        "description": "Red flags: vertebrobasilar insufficiency",
+        "latency_ms": 1714,
+        "response_length": 691,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": ["akutt"],
+            "missing": ["vertebrobasilær"],
+            "score": 0.5
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.028,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 691,
+            "expected_range": [100, 2000]
+          }
+        },
+        "passed": false,
+        "response_preview": "JA, RØDE FLAGG\n\nDette er en alvorlig kombinasjon av symtom som indikerer en potensiell nerveskade eller hjerneskade. Pasientens svimmelhet og diplopi (dobbeltsyn) er spesielt bekymrende og kan tyde på..."
+      },
+      {
+        "id": "red_flag_fracture_03",
+        "category": "red_flags",
+        "description": "Red flags: pathological fracture risk",
+        "latency_ms": 2571,
+        "response_length": 1184,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": [],
+            "missing": ["metastas", "patologisk", "bildediagnostikk"],
+            "score": 0.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0308,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 1184,
+            "expected_range": [100, 2000]
+          }
+        },
+        "passed": false,
+        "response_preview": "Det er en kombinasjon av faktorer som er viktig å være oppmerksom på her:\n\n- Alden: 70 år gammel\n- Ryggsmerte: ny og sannsynligvis knyttet til den tidligere brystkreftdiagnosen\n- Vekttap: 8kg i 3 måne..."
+      },
+      {
+        "id": "red_flag_infection_04",
+        "category": "red_flags",
+        "description": "Red flags: spinal infection",
+        "latency_ms": 2902,
+        "response_length": 1241,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["infeksjon", "feber"],
+            "missing": [],
+            "score": 1.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0128,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 1241,
+            "expected_range": [100, 2000]
+          }
+        },
+        "passed": true,
+        "response_preview": "**RODE FLAGG**\n\nPasienten har en kombinasjon av faktorer som indikerer en alvorlig tilstand:\n\n* Økende ryggsmerter: kan være et tegn på at smerten er mer intens eller spreder seg\n* Feber 39.2°C: kan i..."
+      },
+      {
+        "id": "red_flag_safe_01",
+        "category": "red_flags",
+        "description": "Safe scenario: no red flags (mechanical back pain)",
+        "latency_ms": 2666,
+        "response_length": 1041,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["mekanisk"],
+            "missing": [],
+            "score": 1.0
+          },
+          "keywords_absent": {
+            "pass": false,
+            "found_forbidden": ["infeksjon"]
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0318,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 1041,
+            "expected_range": [50, 1500]
+          }
+        },
+        "passed": false,
+        "response_preview": "Det er en alvorlig situasjon.\n\nRøde flagg:\n\n* Aldersgruppe: 35 år gammel, som er relativt ung\n* Symptomene: Mekaniske korsryggsmerter siste 2 uker, hvilige og uten utstråling\n* Ingen nattesmerter elle..."
+      },
+      {
+        "id": "red_flag_safe_02",
+        "category": "red_flags",
+        "description": "Safe scenario: no red flags (tension headache)",
+        "latency_ms": 2922,
+        "response_length": 1293,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": [],
+            "missing": ["spenningshodepine"],
+            "score": 0.0
+          },
+          "keywords_absent": {
+            "pass": true,
+            "found_forbidden": []
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0304,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 1293,
+            "expected_range": [50, 1500]
+          }
+        },
+        "passed": false,
+        "response_preview": "Det er en vurdning som forespeiler en potensiell neurologisk forkelse.\n\nRøde flagg:\n\n* Bilateral trykkende hodepine\n* Forverres med stress\n* Bedres ikke eller bare delvis med hvile\n* Gradvis debut, me..."
+      },
+      {
+        "id": "red_flag_safe_03",
+        "category": "red_flags",
+        "description": "Safe scenario: no red flags (shoulder tendinopathy)",
+        "latency_ms": 1662,
+        "response_length": 664,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": [],
+            "missing": ["tendinopati"],
+            "score": 0.0
+          },
+          "keywords_absent": {
+            "pass": true,
+            "found_forbidden": []
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0239,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 664,
+            "expected_range": [50, 1500]
+          }
+        },
+        "passed": false,
+        "response_preview": "Rød flagg!\n\nPasienten er 45 år gammel med skuldersmerte som debutert gradvis over 6 uker. Denne alderen og denne type smerte kan indikere en potensialt diskusprolaps eller en forsvunnende disk.\n\nPosit..."
+      },
+      {
+        "id": "red_flag_myelopathy_08",
+        "category": "red_flags",
+        "description": "Red flags: cervical myelopathy",
+        "latency_ms": 1830,
+        "response_length": 875,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": [],
+            "missing": ["myelopati", "henvisning"],
+            "score": 0.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0191,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 875,
+            "expected_range": [100, 2000]
+          }
+        },
+        "passed": false,
+        "response_preview": "Det er en alvorlig og kompleks pasientsituasjon som indikerer mulig Parkinsons sykeleg.\n\nRøde flagg er opprinnelig knyttet til risiko for stroke, men i denne situasjonen ser det ut som om pasienten ha..."
+      },
+      {
+        "id": "norsk_grammar_01",
+        "category": "norwegian_language",
+        "description": "Norwegian medical grammar",
+        "latency_ms": 2367,
+        "response_length": 897,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["radikulopati"],
+            "missing": [],
+            "score": 1.0
+          },
+          "keywords_absent": {
+            "pass": true,
+            "found_forbidden": []
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.022,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 897,
+            "expected_range": [80, 1500]
+          }
+        },
+        "passed": true,
+        "response_preview": "Klinisk beskrivelse:\n\nPasienten, [Navn], 45 år gammel, kom inn med symptomer på cervikalt radikulopati-syndrom (CRPS). Symptomene hadde vedvart i 6 måneder og inkluderte:\n\n* Stivhet og smerte i halsen..."
+      },
+      {
+        "id": "norsk_terminology_02",
+        "category": "norwegian_language",
+        "description": "Norwegian anatomical terms",
+        "latency_ms": 994,
+        "response_length": 280,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": [],
+            "missing": ["nakkevirvelsøyle", "brystvirvelsøyle", "bekkenleddet"],
+            "score": 0.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0047,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 280,
+            "expected_range": [50, 1000]
+          }
+        },
+        "passed": false,
+        "response_preview": "Her er de norske termene for de oppgivne anatomiske strukturene:\n\n1. Cervical spine - Halsryggen\n2. Thoracic spine - Brystryggen\n3. Lumbar spine - Lommebryn\n4. Sacroiliac joint - Sakkjønnet (eller Sak..."
+      },
+      {
+        "id": "norsk_soap_format_03",
+        "category": "norwegian_language",
+        "description": "Correct Norwegian SOAP format",
+        "latency_ms": 1039,
+        "response_length": 405,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": ["Plan"],
+            "missing": ["Subjektiv", "Objektiv", "Vurdering"],
+            "score": 0.25
+          },
+          "keywords_absent": {
+            "pass": true,
+            "found_forbidden": []
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0127,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 405,
+            "expected_range": [150, 2000]
+          }
+        },
+        "passed": false,
+        "response_preview": "**SOAP-Notat**\n\n**S**: Symptom: Pasienten opplever smerter i skulderen som har utviklet seg gradvis.\n\n**O**: Opphav: Smerten begynte etter en langvarig arbeid ved dataskjerm.\n\n**A**: Avhengighet: Smer..."
+      },
+      {
+        "id": "norsk_clinical_letter_04",
+        "category": "norwegian_language",
+        "description": "Norwegian referral letter",
+        "latency_ms": 629,
+        "response_length": 197,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["henvisning", "skulder", "rotator"],
+            "missing": [],
+            "score": 1.0
+          },
+          "keywords_absent": {
+            "pass": true,
+            "found_forbidden": []
+          },
+          "norwegian_quality": {
+            "pass": false,
+            "char_rate": 0.0,
+            "has_norwegian_chars": false
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 197,
+            "expected_range": [100, 2000]
+          }
+        },
+        "passed": true,
+        "response_preview": "HENVISNING\n\nPasient: [Navn], f. [FN]\nHenvises til: Ortopedisk avdeling\nProblemstilling: Kronisk skuldersmerte, mistenkt full rotator cuff ruptur\nFunn: [Viktigste funn]\n\nMvh [Kiropraktor], HPR [HPR]"
+      },
+      {
+        "id": "norsk_patient_info_05",
+        "category": "norwegian_language",
+        "description": "Norwegian patient education",
+        "latency_ms": 2733,
+        "response_length": 1191,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["korsrygg", "smerte"],
+            "missing": [],
+            "score": 1.0
+          },
+          "keywords_absent": {
+            "pass": true,
+            "found_forbidden": []
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0269,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 1191,
+            "expected_range": [150, 2000]
+          }
+        },
+        "passed": true,
+        "response_preview": "**Pasientinformasjon: Korsryggsmerter**\n\nHva er korsryggsmerter?\n\nKorsryggsmerter er smerte eller onnenskap i ryggen, vanligst i den nedre delen av ryggen. Smerten kan være skarp og lokaliseret til en..."
+      },
+      {
+        "id": "norsk_sick_leave_06",
+        "category": "norwegian_language",
+        "description": "Norwegian sick leave certificate text",
+        "latency_ms": 2255,
+        "response_length": 785,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": ["korsrygg"],
+            "missing": ["sykemelding"],
+            "score": 0.5
+          },
+          "keywords_absent": {
+            "pass": true,
+            "found_forbidden": []
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0086,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 785,
+            "expected_range": [100, 1500]
+          }
+        },
+        "passed": false,
+        "response_preview": "Syke melding:\n\nI henhold til § 5, alder 1-18, § 6, alder 19-64 og § 7, alder 65+, Lov om sykepenger og sykeforsikring (Sykefor-sikringsloven), kapittel 3, § 4, nr. 2, har pasienten [Navn] opphav til å..."
+      },
+      {
+        "id": "norsk_diagnosis_text_07",
+        "category": "norwegian_language",
+        "description": "Norwegian diagnosis description",
+        "latency_ms": 3447,
+        "response_length": 1421,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["stenose", "lumbal"],
+            "missing": [],
+            "score": 1.0
+          },
+          "keywords_absent": {
+            "pass": true,
+            "found_forbidden": []
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0122,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 1421,
+            "expected_range": [100, 2000]
+          }
+        },
+        "passed": true,
+        "response_preview": "**Lumbal Spinal Stenose**\n\nLumbal spinal stenose er en akut eller kronisk tilstand hvor det utvides segmene i lommen, noe som kan føre til smerte og bevegelsesproblemer.\n\n**Symptomer:**\n\n* Smerte elle..."
+      },
+      {
+        "id": "norsk_examination_08",
+        "category": "norwegian_language",
+        "description": "Norwegian examination description",
+        "latency_ms": 2418,
+        "response_length": 1044,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["Spurling"],
+            "missing": [],
+            "score": 1.0
+          },
+          "keywords_absent": {
+            "pass": true,
+            "found_forbidden": []
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0268,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 1044,
+            "expected_range": [80, 1500]
+          }
+        },
+        "passed": true,
+        "response_preview": "Spurlings test er et klinisk prøveverktøy brukt til å diagnostisere og utværte cervicalt radikulopati-syndrom. Testet utføres ved å presse på den overleggende armens skulder, mens pasienten holder arm..."
+      },
+      {
+        "id": "sms_appointment_01",
+        "category": "communication",
+        "description": "Appointment reminder SMS",
+        "latency_ms": 475,
+        "response_length": 73,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": ["14:30"],
+            "missing": ["Majorstuen"],
+            "score": 0.5
+          },
+          "norwegian_quality": {
+            "pass": false,
+            "char_rate": 0.0,
+            "has_norwegian_chars": false
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 73,
+            "expected_range": [30, 300]
+          }
+        },
+        "passed": false,
+        "response_preview": "\"Hei! Minne om tidspunktet i morgen kl 14:30 hos deg. Se frem til i dag!\""
+      },
+      {
+        "id": "sms_followup_02",
+        "category": "communication",
+        "description": "Follow-up SMS after first visit",
+        "latency_ms": 764,
+        "response_length": 301,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": [],
+            "missing": ["behandling"],
+            "score": 0.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0253,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 301,
+            "expected_range": [50, 400]
+          }
+        },
+        "passed": false,
+        "response_preview": "\"Hei [Navn], vi har nå sett deg i kliniken og behandlet din nakkesmerte med led-dmobilisering og BVM. For å forbedre resultater, er det viktig å holde hodet og ryggen varme og fleksible. Propper ising..."
+      },
+      {
+        "id": "sms_recall_03",
+        "category": "communication",
+        "description": "Recall SMS for lapsed patient",
+        "latency_ms": 1115,
+        "response_length": 455,
+        "checks": {
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0343,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": false,
+            "actual": 455,
+            "expected_range": [40, 400]
+          }
+        },
+        "passed": false,
+        "response_preview": "Hei [Navn],\n\nVi håper at du har blitt bedre etter behandlingen din hos oss. Vi ønsker å se deg igjen og se om vi kan hjelpe deg videre.\n\nKorsryggsmerter kan være en del av en mer kompleks problemstill..."
+      },
+      {
+        "id": "sms_cancel_04",
+        "category": "communication",
+        "description": "Cancellation confirmation SMS",
+        "latency_ms": 433,
+        "response_length": 151,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["avbestill"],
+            "missing": [],
+            "score": 1.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0261,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 151,
+            "expected_range": [30, 300]
+          }
+        },
+        "passed": true,
+        "response_preview": "\"Hei, takk for at du kom inn til oss i dag. Av bestilling må vi avbestille din tid. Vennligst kontakt oss på [telefonnummer] for å bestille en ny tid.\""
+      },
+      {
+        "id": "sms_birthday_05",
+        "category": "communication",
+        "description": "Birthday greeting SMS",
+        "latency_ms": 779,
+        "response_length": 291,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": [],
+            "missing": ["gratulerer"],
+            "score": 0.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0311,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": false,
+            "actual": 291,
+            "expected_range": [20, 200]
+          }
+        },
+        "passed": false,
+        "response_preview": "Hei [Navn],\n\nHåper din dag er full av lykke, varme og smil! Vi ønsker deg et spesielt og hyggelig fellesskap på din fødselsdag.\n\nVi har vært glade for å hjelpe deg med dine muskel- og ryggsmerter, og ..."
+      },
+      {
+        "id": "sms_waitlist_06",
+        "category": "communication",
+        "description": "Waitlist notification SMS",
+        "latency_ms": 416,
+        "response_length": 82,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["10:00", "ledig"],
+            "missing": [],
+            "score": 1.0
+          },
+          "norwegian_quality": {
+            "pass": false,
+            "char_rate": 0.0,
+            "has_norwegian_chars": false
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 82,
+            "expected_range": [30, 300]
+          }
+        },
+        "passed": true,
+        "response_preview": "\"Hei [Navn], vi har en ledig tid i morgen kl 10:00. Vennlig hilsen, [Kiropraktor]\""
+      },
+      {
+        "id": "quick_chief_01",
+        "category": "quick_fields",
+        "description": "Quick chief complaint generation",
+        "latency_ms": 437,
+        "response_length": 133,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["nakke", "hodepine"],
+            "missing": [],
+            "score": 1.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.019,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 133,
+            "expected_range": [10, 200]
+          }
+        },
+        "passed": true,
+        "response_preview": "**Hovedklage**\n\n* Nakkesmerte: stivhet, smerte ved løftning\n* Hodepine: trykkende, bankende hodepine, følelse av stramhet rundt hodet"
+      },
+      {
+        "id": "quick_onset_02",
+        "category": "quick_fields",
+        "description": "Quick onset description",
+        "latency_ms": 653,
+        "response_length": 243,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["gradvis", "korsrygg"],
+            "missing": [],
+            "score": 1.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0147,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": false,
+            "actual": 243,
+            "expected_range": [10, 200]
+          }
+        },
+        "passed": false,
+        "response_preview": "DEBUTBESKRIVELSE\n\nKorsryggsmerter debuterte gradvis over 2 uker med stigende intensitet. Smertene oppstod plutselig ved løfting av tung gjenstand og forverret seg etter hvert. Pasienten rapporterer en..."
+      },
+      {
+        "id": "quick_rom_03",
+        "category": "quick_fields",
+        "description": "Quick ROM documentation",
+        "latency_ms": 694,
+        "response_length": 162,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": ["fleksjon"],
+            "missing": ["rotasjon"],
+            "score": 0.5
+          },
+          "norwegian_quality": {
+            "pass": false,
+            "char_rate": 0.0,
+            "has_norwegian_chars": false
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 162,
+            "expected_range": [30, 300]
+          }
+        },
+        "passed": false,
+        "response_preview": "BEVEGELSE UTSLAG CERVIKALKOMNOLA:\n\nFLEKSJON: 40°\nEKSTENSJON: 30°\nROTSJON:\n- VENDE SIDE: 60°\n- HORDET SIDE: 70°\nLATERALFLEKSN:\n- VENDE SIDE: 35°\n- HORDET SIDE: 40°"
+      },
+      {
+        "id": "quick_palpation_04",
+        "category": "quick_fields",
+        "description": "Quick palpation findings",
+        "latency_ms": 531,
+        "response_length": 172,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["Th4", "Th5", "Th6"],
+            "missing": [],
+            "score": 1.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0075,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 172,
+            "expected_range": [20, 300]
+          }
+        },
+        "passed": true,
+        "response_preview": "Palpasjonsfunn:\n\n- Ømhet i Th4-Th6-regionen\n- Hypertonisitet i paravertebral muskulatur\n- Segmental dysfunksjon Th5 med:\n  - Redusert mobilitet\n  - Stivholdning og spenning"
+      },
+      {
+        "id": "quick_treatment_05",
+        "category": "quick_fields",
+        "description": "Quick treatment note",
+        "latency_ms": 621,
+        "response_length": 190,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["manipulasjon", "Th5"],
+            "missing": [],
+            "score": 1.0
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0248,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 190,
+            "expected_range": [20, 300]
+          }
+        },
+        "passed": true,
+        "response_preview": "BEHANDLINGSNOTAT\n\nTh5/Th6-Diversifisert manipulasjon med god respons.\nParavertebralt myofasial-utløsing med fortsatt bedring.\nØvelseveiledning instruert for hemmebruk.\n\nFortsatt å følge opp!"
+      },
+      {
+        "id": "quick_ortho_06",
+        "category": "quick_fields",
+        "description": "Quick orthopedic test results",
+        "latency_ms": 506,
+        "response_length": 172,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["Hawkins", "Neer"],
+            "missing": [],
+            "score": 1.0
+          },
+          "norwegian_quality": {
+            "pass": false,
+            "char_rate": 0.0,
+            "has_norwegian_chars": false
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 172,
+            "expected_range": [20, 300]
+          }
+        },
+        "passed": true,
+        "response_preview": "**ORTOPEDEKKE TESTER FOR SKULDER**\n\n* **Hawkins-test**: Positiv\n* **Neer-test**: Positiv\n* **Empty can-test**: Negativ\n* **Speed-test**: Negativ\n* **O'Brien-test**: Negativ"
+      },
+      {
+        "id": "letter_referral_01",
+        "category": "letters",
+        "description": "Referral letter to neurologist",
+        "latency_ms": 936,
+        "response_length": 323,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["henvisning", "radikulopati", "C6"],
+            "missing": [],
+            "score": 1.0
+          },
+          "keywords_absent": {
+            "pass": true,
+            "found_forbidden": []
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0151,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 323,
+            "expected_range": [150, 2500]
+          }
+        },
+        "passed": true,
+        "response_preview": "HENVISNING\n\nPasient: [Navn], f. [FN]\nHenvises til: Nyeckirken Norge, Neuroradiologisk avdeling\nProblemstilling: Mistenkt cervikal radikulopati C6 med smerter og parestesier i høyre arm\nFunn: Redusert ..."
+      },
+      {
+        "id": "letter_sick_leave_02",
+        "category": "letters",
+        "description": "Sick leave medical basis",
+        "latency_ms": 2336,
+        "response_length": 1000,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["sykemelding", "prolaps"],
+            "missing": [],
+            "score": 1.0
+          },
+          "keywords_absent": {
+            "pass": true,
+            "found_forbidden": []
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0153,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 1000,
+            "expected_range": [100, 2000]
+          }
+        },
+        "passed": true,
+        "response_preview": "**Syke melding**\n\n**Pasient:** [Navn]\n**Fødselsnummer:** [FN]\n**Diagnose:** Akutt lumbal skiveprolaps\n**Grunn for sykemelding:**\nPasienten har blitt diagnostisert med akutt lumbal skiveprolaps, en alv..."
+      },
+      {
+        "id": "letter_insurance_03",
+        "category": "letters",
+        "description": "Insurance report letter",
+        "latency_ms": 2746,
+        "response_length": 1092,
+        "checks": {
+          "keywords_present": {
+            "pass": true,
+            "present": ["whiplash", "funksjonsevne"],
+            "missing": [],
+            "score": 1.0
+          },
+          "keywords_absent": {
+            "pass": true,
+            "found_forbidden": []
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0201,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 1092,
+            "expected_range": [200, 3000]
+          }
+        },
+        "passed": true,
+        "response_preview": "ERKLÆRING TIL FORSIKRINGSSELSKAP\n\nForsikringsoppgave:\n\nNavnet på pasienten: [Navn]\nDato for bilulykke: [Dato]\nDiagnose og skadebeskrivelse: Pasienten har en akutt whiplash-skade etter bilulykke 6 måne..."
+      },
+      {
+        "id": "letter_physio_referral_04",
+        "category": "letters",
+        "description": "Referral to physiotherapy",
+        "latency_ms": 1130,
+        "response_length": 305,
+        "checks": {
+          "keywords_present": {
+            "pass": false,
+            "present": ["fysioterapeut", "skulder"],
+            "missing": ["rehabilitering"],
+            "score": 0.6666666666666666
+          },
+          "keywords_absent": {
+            "pass": true,
+            "found_forbidden": []
+          },
+          "norwegian_quality": {
+            "pass": true,
+            "char_rate": 0.0081,
+            "has_norwegian_chars": true
+          },
+          "response_length": {
+            "pass": true,
+            "actual": 305,
+            "expected_range": [100, 2000]
+          }
+        },
+        "passed": false,
+        "response_preview": "HENVISNING\n\nPasient: [Navn], f. [FN]\nHenvises til: Fysioterapeut, [Fysioterapeuten] i [Klinikk]\nProblemstilling: Skulderoperasjon (rotatorcuff-reparasjon)\nFokus: Gradvis mobilisering og styrketrening\n..."
+      }
+    ]
+  }
+}

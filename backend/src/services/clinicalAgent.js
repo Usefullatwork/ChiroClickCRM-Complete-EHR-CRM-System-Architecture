@@ -59,7 +59,7 @@ export const runClinicalPipeline = async (patientData, soapData, options = {}) =
     results.clinical = extractCompletionText(clinicalResult);
     results.steps.push({
       step: 'clinical',
-      model: getModelForTask('clinical_summary'),
+      model: (await getModelForTask('clinical_summary')).model,
       success: true,
     });
   } catch (error) {
@@ -86,7 +86,7 @@ export const runClinicalPipeline = async (patientData, soapData, options = {}) =
       results.polished = extractCompletionText(polishResult);
       results.steps.push({
         step: 'language',
-        model: getModelForTask('norwegian_text'),
+        model: (await getModelForTask('norwegian_text')).model,
         success: true,
       });
     } catch (error) {
