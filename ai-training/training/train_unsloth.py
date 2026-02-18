@@ -106,9 +106,11 @@ TRAINING_CONFIG = {
     'max_grad_norm': 0.3,
     'optim': "adamw_torch",
     'logging_steps': 10,
-    'save_strategy': "epoch",
-    'eval_strategy': "epoch",
-    'save_total_limit': 2,
+    'save_strategy': "steps",
+    'save_steps': 200,
+    'eval_strategy': "steps",
+    'eval_steps': 200,
+    'save_total_limit': 3,
 }
 
 # Low-VRAM overrides (for 6GB GPUs like RTX 2060)
@@ -456,9 +458,12 @@ def train(
         gradient_accumulation_steps=t_config['gradient_accumulation_steps'],
         num_train_epochs=t_config['num_train_epochs'],
         save_strategy=t_config['save_strategy'],
+        save_steps=t_config.get('save_steps', 200),
         eval_strategy=t_config['eval_strategy'],
+        eval_steps=t_config.get('eval_steps', 200),
         save_total_limit=t_config['save_total_limit'],
         load_best_model_at_end=True,
+        metric_for_best_model="eval_loss",
         optim=t_config['optim'],
         weight_decay=t_config['weight_decay'],
         max_grad_norm=t_config['max_grad_norm'],
@@ -501,8 +506,15 @@ def train(
     except RuntimeError as e:
         if "out of memory" in str(e).lower():
             logger.warning("OOM detected! Clearing cache and retrying with reduced settings...")
-            torch.cuda.empty_cache()
+            try:
+                torch.cuda.empty_cache()
+            except Exception:
+                pass
             gc.collect()
+            try:
+                torch.cuda.empty_cache()
+            except Exception:
+                pass
 
             retry_seq_len = ULTRA_LOW_VRAM_CONFIG['max_seq_length_override']
             logger.info(f"Retrying with seq_len={retry_seq_len}, batch=1, grad_accum=8")
