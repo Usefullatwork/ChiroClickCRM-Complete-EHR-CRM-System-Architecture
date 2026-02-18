@@ -4,15 +4,20 @@
  * Provides a unified interface for spine and body visualization
  * with the ability to switch between 2D SVG and 3D WebGL modes.
  */
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, lazy, Suspense } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { spineTemplatesAPI } from '../../services/api';
 import { Layers, Box, User, Activity, RotateCcw, Settings } from 'lucide-react';
 
-// Import anatomy components
+// Import lightweight 2D components eagerly
 import EnhancedSpineDiagram, { CompactSpineDiagram } from './spine/EnhancedSpineDiagram';
-import Spine3DViewer, { CompactSpine3D } from './spine/Spine3DViewer';
 import EnhancedBodyDiagram, { CompactBodyDiagram } from './body/EnhancedBodyDiagram';
+
+// Lazy-load Three.js 3D components (~300KB three + fiber + drei)
+const Spine3DViewer = lazy(() => import('./spine/Spine3DViewer'));
+const CompactSpine3D = lazy(() =>
+  import('./spine/Spine3DViewer').then((m) => ({ default: m.CompactSpine3D }))
+);
 
 // View modes
 export const VIEW_MODES = {
@@ -136,19 +141,29 @@ export default function AnatomyViewer({
         );
 
       case VIEW_MODES.SPINE_3D:
-        return compact ? (
-          <CompactSpine3D
-            findings={spineFindings}
-            onInsertText={onInsertText}
-            templates={templates}
-          />
-        ) : (
-          <Spine3DViewer
-            findings={spineFindings}
-            onChange={onSpineFindingsChange}
-            onInsertText={onInsertText}
-            templates={templates}
-          />
+        return (
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center h-48 text-gray-400">
+                Laster 3D-modell...
+              </div>
+            }
+          >
+            {compact ? (
+              <CompactSpine3D
+                findings={spineFindings}
+                onInsertText={onInsertText}
+                templates={templates}
+              />
+            ) : (
+              <Spine3DViewer
+                findings={spineFindings}
+                onChange={onSpineFindingsChange}
+                onInsertText={onInsertText}
+                templates={templates}
+              />
+            )}
+          </Suspense>
         );
 
       case VIEW_MODES.BODY_2D:

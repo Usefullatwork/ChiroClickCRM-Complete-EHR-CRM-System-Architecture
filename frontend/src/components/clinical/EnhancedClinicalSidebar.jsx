@@ -11,10 +11,13 @@
  * The sidebar maintains the same click-to-insert-text workflow
  * while providing professional anatomical visualizations.
  */
-import { useState, useCallback } from 'react';
+import { useState, useCallback, lazy, Suspense } from 'react';
 import { Layers, Box, User, ChevronDown, ChevronUp, Settings } from 'lucide-react';
 import QuickPalpationSpine from './QuickPalpationSpine';
-import { EnhancedSpineDiagram, Spine3DViewer, EnhancedBodyDiagram } from '../anatomy';
+import { EnhancedSpineDiagram, EnhancedBodyDiagram } from '../anatomy';
+
+// Lazy-load Three.js 3D viewer (~300KB)
+const Spine3DViewer = lazy(() => import('../anatomy/spine/Spine3DViewer'));
 
 // Sidebar view modes
 const SIDEBAR_MODES = {
@@ -117,13 +120,21 @@ export default function EnhancedClinicalSidebar({
       case SIDEBAR_MODES.SPINE_3D:
         return (
           <div className="h-full">
-            <Spine3DViewer
-              findings={spineFindings}
-              onChange={onSpineFindingsChange}
-              onInsertText={handleTextInsert}
-              templates={templates}
-              className="border-0 rounded-none h-full"
-            />
+            <Suspense
+              fallback={
+                <div className="flex items-center justify-center h-48 text-gray-400">
+                  Laster 3D-modell...
+                </div>
+              }
+            >
+              <Spine3DViewer
+                findings={spineFindings}
+                onChange={onSpineFindingsChange}
+                onInsertText={handleTextInsert}
+                templates={templates}
+                className="border-0 rounded-none h-full"
+              />
+            </Suspense>
           </div>
         );
 

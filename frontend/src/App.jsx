@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import DashboardLayout from './components/layouts/DashboardLayout';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import PageErrorBoundary from './components/PageErrorBoundary';
 import { setOrganizationId, getApiBaseUrl } from './services/api';
 import useGlobalKeyboardShortcuts from './hooks/useGlobalKeyboardShortcuts';
 import KeyboardShortcutsModal from './components/common/KeyboardShortcutsModal';
@@ -109,214 +110,193 @@ function App() {
           <Route
             index
             element={
-              <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Dashboard">
                 <Dashboard />
-              </Suspense>
+              </PageErrorBoundary>
             }
           />
           <Route
             path="patients"
             element={
-              <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Pasienter">
                 <Patients />
-              </Suspense>
+              </PageErrorBoundary>
             }
           />
           <Route
             path="patients/new"
             element={
-              <ErrorBoundary
-                fallback={
-                  <div className="p-6 max-w-5xl mx-auto">
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-                      <h2 className="text-lg font-semibold text-red-900 mb-2">
-                        Could not load form
-                      </h2>
-                      <p className="text-red-700 mb-4">
-                        An error occurred loading the new patient form.
-                      </p>
-                      <button
-                        onClick={() => window.location.reload()}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                      >
-                        Reload Page
-                      </button>
-                    </div>
-                  </div>
-                }
-              >
-                <Suspense fallback={<PageLoader />}>
-                  <NewPatient />
-                </Suspense>
-              </ErrorBoundary>
+              <PageErrorBoundary pageName="Ny pasient">
+                <NewPatient />
+              </PageErrorBoundary>
             }
           />
           <Route
             path="patients/:id"
             element={
-              <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Pasientdetaljer">
                 <PatientDetail />
-              </Suspense>
+              </PageErrorBoundary>
             }
           />
           <Route
             path="patients/:patientId/encounter"
             element={
-              <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Konsultasjon">
                 <ClinicalEncounter />
-              </Suspense>
+              </PageErrorBoundary>
             }
           />
           <Route
             path="patients/:patientId/encounter/:encounterId"
             element={
-              <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Konsultasjon">
                 <ClinicalEncounter />
-              </Suspense>
+              </PageErrorBoundary>
             }
           />
           <Route
             path="patients/:patientId/easy-assessment"
             element={
-              <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Hurtigvurdering">
                 <EasyAssessment />
-              </Suspense>
+              </PageErrorBoundary>
             }
           />
           <Route
             path="patients/:patientId/easy-assessment/:encounterId"
             element={
-              <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Hurtigvurdering">
                 <EasyAssessment />
-              </Suspense>
+              </PageErrorBoundary>
             }
           />
           <Route
             path="appointments"
             element={
-              <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Timer">
                 <Appointments />
-              </Suspense>
+              </PageErrorBoundary>
             }
           />
           <Route
             path="appointments/new"
             element={
-              <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Ny time">
                 <NewAppointment />
-              </Suspense>
+              </PageErrorBoundary>
             }
           />
           <Route
             path="calendar"
             element={
-              <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Kalender">
                 <Calendar />
-              </Suspense>
+              </PageErrorBoundary>
             }
           />
           <Route
             path="patient-flow"
             element={
-              <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Pasientflyt">
                 <PatientFlow />
-              </Suspense>
+              </PageErrorBoundary>
             }
           />
           <Route
             path="communications"
             element={
-              <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Kommunikasjon">
                 <Communications />
-              </Suspense>
+              </PageErrorBoundary>
             }
           />
           <Route
             path="follow-ups"
             element={
-              <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Oppfølginger">
                 <FollowUps />
-              </Suspense>
+              </PageErrorBoundary>
             }
           />
           <Route
             path="financial"
             element={
-              <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Økonomi">
                 <Financial />
-              </Suspense>
+              </PageErrorBoundary>
             }
           />
           <Route
             path="kpi"
             element={
-              <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="KPI">
                 <KPI />
-              </Suspense>
+              </PageErrorBoundary>
             }
           />
           <Route
             path="import"
             element={
-              <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Import">
                 <Import />
-              </Suspense>
+              </PageErrorBoundary>
             }
           />
           <Route
             path="training"
             element={
-              <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="AI-trening">
                 <Training />
-              </Suspense>
+              </PageErrorBoundary>
             }
           />
           <Route
             path="audit-logs"
             element={
-              <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Revisjonslogg">
                 <AuditLogs />
-              </Suspense>
+              </PageErrorBoundary>
             }
           />
           <Route
             path="templates"
             element={
-              <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Maler">
                 <Templates />
-              </Suspense>
+              </PageErrorBoundary>
             }
           />
           <Route
             path="settings"
             element={
-              <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Innstillinger">
                 <Settings />
-              </Suspense>
+              </PageErrorBoundary>
             }
           />
           <Route
             path="crm"
             element={
-              <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="CRM">
                 <CRM />
-              </Suspense>
+              </PageErrorBoundary>
             }
           />
           <Route
             path="macros"
             element={
-              <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Makroer">
                 <Macros />
-              </Suspense>
+              </PageErrorBoundary>
             }
           />
           <Route
             path="ai-performance"
             element={
-              <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="AI-ytelse">
                 <AIPerformance />
-              </Suspense>
+              </PageErrorBoundary>
             }
           />
         </Route>
@@ -325,17 +305,17 @@ function App() {
         <Route
           path="/portal/exercises"
           element={
-            <Suspense fallback={<PageLoader />}>
+            <PageErrorBoundary pageName="Øvelser">
               <PatientExercises />
-            </Suspense>
+            </PageErrorBoundary>
           }
         />
         <Route
           path="/portal/exercises/:patientId"
           element={
-            <Suspense fallback={<PageLoader />}>
+            <PageErrorBoundary pageName="Øvelser">
               <PatientExercises />
-            </Suspense>
+            </PageErrorBoundary>
           }
         />
 
