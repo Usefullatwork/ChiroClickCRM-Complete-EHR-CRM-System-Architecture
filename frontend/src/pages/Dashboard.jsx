@@ -14,6 +14,14 @@ import {
   ChevronDown,
   ChevronUp,
   Bell,
+  Brain,
+  AlertCircle,
+  Mail,
+  CreditCard,
+  Activity,
+  UserPlus,
+  Keyboard,
+  Search,
 } from 'lucide-react';
 import { dashboardAPI, appointmentsAPI, followUpsAPI } from '../services/api';
 import {
@@ -28,6 +36,9 @@ import {
   AppointmentsListSkeleton,
   ListSkeleton,
 } from '../components/ui/Skeleton';
+import StatCard from '../components/ui/StatCard';
+import StatusBadge from '../components/ui/StatusBadge';
+import EmptyState from '../components/ui/EmptyState';
 import RecallDashboard from '../components/recall/RecallDashboard';
 
 export default function Dashboard() {
@@ -35,14 +46,15 @@ export default function Dashboard() {
   const queryClient = useQueryClient();
   const { t, lang } = useTranslation('dashboard');
   const [showRecall, setShowRecall] = useState(false);
+  const [showActivity, setShowActivity] = useState(true);
 
-  // Fetch dashboard stats from real API
+  // ─── Data queries ──────────────────────────────────────────
+
   const { data: statsResponse, isLoading: statsLoading } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: () => dashboardAPI.getStats(),
   });
 
-  // Fetch today's appointments from real API
   const {
     data: appointmentsResponse,
     isLoading: appointmentsLoading,
@@ -52,7 +64,6 @@ export default function Dashboard() {
     queryFn: () => dashboardAPI.getTodayAppointments(),
   });
 
-  // Fetch patients needing follow-up
   const { data: followUpPatientsResponse, isLoading: followUpLoading } = useQuery({
     queryKey: ['patients-needing-followup'],
     queryFn: () => followUpsAPI.getPatientsNeedingFollowUp(),
@@ -62,13 +73,23 @@ export default function Dashboard() {
   const appointments = appointmentsResponse?.data?.appointments || [];
   const followUpPatients = followUpPatientsResponse?.data || [];
 
-  // Handle appointment cancellation
+  // Derived data
+  const overdueFollowUps = followUpPatients.filter((p) => new Date(p.follow_up_date) < new Date());
+  const now = new Date();
+  const greeting =
+    now.getHours() < 12
+      ? t('goodMorning') || 'God morgen'
+      : now.getHours() < 17
+        ? t('goodAfternoon') || 'God ettermiddag'
+        : t('goodEvening') || 'God kveld';
+
+  // ─── Mutations ─────────────────────────────────────────────
+
   const handleCancelAppointment = async (appointmentId, patientName) => {
-    // Use toast confirmation instead of browser confirm
     toast.promise(
       new Promise((resolve, reject) => {
-        const _toastId = toast.info(
-          `${t('cancelAppointmentConfirm').replace('{name}', patientName)}`,
+        toast.info(
+          `${(t('cancelAppointmentConfirm') || 'Avbestill time for {name}?').replace('{name}', patientName)}`,
           {
             action: {
               label: t('confirm') || 'Bekreft',
@@ -98,7 +119,6 @@ export default function Dashboard() {
     );
   };
 
-  // Mark patient as contacted for follow-up
   const markContactedMutation = useMutation({
     mutationFn: ({ patientId, method }) => followUpsAPI.markPatientAsContacted(patientId, method),
     onSuccess: () => {
@@ -109,7 +129,7 @@ export default function Dashboard() {
 
   const handleMarkContacted = (patient, method) => {
     const patientName = `${patient.first_name} ${patient.last_name}`;
-    toast.info(t('markContactedConfirm').replace('{name}', patientName), {
+    toast.info((t('markContactedConfirm') || 'Kontaktet {name}?').replace('{name}', patientName), {
       action: {
         label: t('confirm') || 'Bekreft',
         onClick: () => markContactedMutation.mutate({ patientId: patient.id, method }),
@@ -122,166 +142,282 @@ export default function Dashboard() {
     });
   };
 
-  // Quick actions
+  // ─── Quick actions with keyboard shortcuts ─────────────────
+
   const quickActions = [
-    { name: t('newPatient'), icon: Users, color: 'blue', action: () => navigate('/patients/new') },
     {
-      name: t('newAppointment'),
+      name: t('newPatient') || 'Ny pasient',
+      icon: UserPlus,
+      bgClass: 'bg-blue-50',
+      iconClass: 'text-blue-600',
+      shortcut: 'Ctrl+N',
+      action: () => navigate('/patients/new'),
+    },
+    {
+      name: t('newAppointment') || 'Ny time',
       icon: Calendar,
-      color: 'green',
+      bgClass: 'bg-green-50',
+      iconClass: 'text-green-600',
+      shortcut: 'Ctrl+T',
       action: () => navigate('/appointments/new'),
     },
     {
-      name: t('sendSMS'),
+      name: t('startEncounter') || 'Start konsultasjon',
+      icon: FileText,
+      bgClass: 'bg-teal-50',
+      iconClass: 'text-teal-600',
+      shortcut: 'Ctrl+E',
+      action: () => navigate('/patients'),
+    },
+    {
+      name: t('sendSMS') || 'Send SMS',
       icon: MessageSquare,
-      color: 'purple',
+      bgClass: 'bg-purple-50',
+      iconClass: 'text-purple-600',
+      shortcut: 'Ctrl+M',
       action: () => navigate('/communications'),
     },
-    { name: t('soapNote'), icon: FileText, color: 'orange', action: () => navigate('/patients') },
   ];
+
+  // ─── Stat cards config ─────────────────────────────────────
 
   const statCards = [
     {
-      label: t('todaysAppointments'),
+      label: t('todaysAppointments') || 'Timer i dag',
       value: stats?.todayAppointments || 0,
       icon: Calendar,
-      color: 'blue',
+      bgClass: 'bg-blue-50',
+      iconClass: 'text-blue-600',
+      trend: stats?.appointmentsTrend,
+      trendLabel: t('vsLastWeek') || 'vs forrige uke',
     },
-    { label: t('activePatients'), value: stats?.activePatients || 0, icon: Users, color: 'green' },
     {
-      label: t('pendingFollowUps'),
+      label: t('activePatients') || 'Aktive pasienter',
+      value: stats?.activePatients || 0,
+      icon: Users,
+      bgClass: 'bg-green-50',
+      iconClass: 'text-green-600',
+      trend: stats?.patientsTrend,
+      trendLabel: t('vsLastMonth') || 'vs forrige mnd',
+    },
+    {
+      label: t('pendingFollowUps') || 'Oppfølginger',
       value: stats?.pendingFollowUps || 0,
       icon: CheckCircle2,
-      color: 'orange',
+      bgClass: 'bg-orange-50',
+      iconClass: 'text-orange-600',
     },
     {
-      label: t('revenueThisMonth'),
+      label: t('revenueThisMonth') || 'Omsetning mnd',
       value: stats?.monthRevenue ? `${(stats.monthRevenue / 1000).toFixed(0)}k kr` : '0 kr',
       icon: TrendingUp,
-      color: 'purple',
+      bgClass: 'bg-purple-50',
+      iconClass: 'text-purple-600',
+      trend: stats?.revenueTrend,
+      trendLabel: t('vsLastMonth') || 'vs forrige mnd',
+    },
+    {
+      label: t('aiInsights') || 'AI-innsikt',
+      value: stats?.aiRedFlags || 0,
+      icon: Brain,
+      bgClass: 'bg-teal-50',
+      iconClass: 'text-teal-600',
+      trend: stats?.aiTrend,
+      trendLabel: t('redFlagsToday') || 'røde flagg i dag',
     },
   ];
 
+  // ─── Alerts ────────────────────────────────────────────────
+
+  const alerts = [
+    {
+      id: 'overdue',
+      icon: AlertCircle,
+      label: `${overdueFollowUps.length} ${t('overdueFollowUps') || 'forfalte oppfølginger'}`,
+      color:
+        overdueFollowUps.length > 0
+          ? 'text-red-600 dark:text-red-400'
+          : 'text-green-600 dark:text-green-400',
+      dot: overdueFollowUps.length > 0 ? 'bg-red-500' : 'bg-green-500',
+      action: () => navigate('/follow-ups'),
+    },
+    {
+      id: 'messages',
+      icon: Mail,
+      label: `${stats?.unreadMessages || 0} ${t('unreadMessages') || 'uleste meldinger'}`,
+      color:
+        (stats?.unreadMessages || 0) > 0
+          ? 'text-yellow-600 dark:text-yellow-400'
+          : 'text-green-600 dark:text-green-400',
+      dot: (stats?.unreadMessages || 0) > 0 ? 'bg-yellow-500' : 'bg-green-500',
+      action: () => navigate('/communications'),
+    },
+    {
+      id: 'billing',
+      icon: CreditCard,
+      label: t('billingOk') || 'Fakturering OK',
+      color: 'text-green-600 dark:text-green-400',
+      dot: 'bg-green-500',
+      action: () => navigate('/billing'),
+    },
+  ];
+
+  // ═══════════════════════════════════════════════════════════
+  //  RENDER
+  // ═══════════════════════════════════════════════════════════
+
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="mb-6">
-        <h1
-          data-testid="dashboard-title"
-          className="text-2xl font-semibold text-gray-900 dark:text-white"
-        >
-          {t('title')}
-        </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-200 mt-1">
-          {formatDateWithWeekday(new Date(), lang)}
-        </p>
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6">
+      {/* ── Header ─────────────────────────────────────────── */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1
+            data-testid="dashboard-title"
+            className="text-2xl font-semibold text-gray-900 dark:text-white"
+          >
+            {greeting}
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+            {formatDateWithWeekday(new Date(), lang)}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigate('/search')}
+            className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            title={t('search') || 'Søk (Ctrl+K)'}
+          >
+            <Search className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => navigate('/notifications')}
+            className="relative p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            title={t('notifications') || 'Varsler'}
+          >
+            <Bell className="w-5 h-5" />
+            {(stats?.unreadMessages || 0) > 0 && (
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+            )}
+          </button>
+        </div>
       </div>
 
-      {/* Stats Grid */}
+      {/* ── Stat Cards (5-column grid) ─────────────────────── */}
       {statsLoading ? (
-        <StatsGridSkeleton count={4} className="mb-6" />
+        <StatsGridSkeleton count={5} className="" />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          {statCards.map((stat) => {
-            const Icon = stat.icon;
-            return (
-              <div
-                key={stat.label}
-                data-testid="dashboard-stat-card"
-                className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-white">{stat.label}</p>
-                    <p className="text-2xl font-semibold text-gray-900 dark:text-white mt-1">
-                      {stat.value}
-                    </p>
-                  </div>
-                  <div
-                    className={`w-12 h-12 rounded-lg bg-${stat.color}-50 flex items-center justify-center`}
-                  >
-                    <Icon className={`w-6 h-6 text-${stat.color}-600`} />
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {statCards.map((stat) => (
+            <StatCard
+              key={stat.label}
+              label={stat.label}
+              value={stat.value}
+              icon={stat.icon}
+              bgClass={stat.bgClass}
+              iconClass={stat.iconClass}
+              trend={stat.trend}
+              trendLabel={stat.trendLabel}
+            />
+          ))}
         </div>
       )}
 
+      {/* ── Main content: Schedule + Sidebar ───────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Today's Schedule */}
-        <div className="lg:col-span-2">
+        {/* ─ Left: Today's Schedule (2/3 width) ─────────── */}
+        <div className="lg:col-span-2 space-y-6">
           <div
             data-testid="dashboard-chart"
-            className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-soft-sm"
           >
             <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {t('todaysSchedule')}
-              </h2>
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                  <Calendar className="w-4 h-4 text-blue-600" />
+                </div>
+                <h2 className="text-base font-semibold text-gray-900 dark:text-white">
+                  {t('todaysSchedule') || 'Dagens timeplan'}
+                </h2>
+                {appointments.length > 0 && (
+                  <span className="text-xs font-medium text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">
+                    {appointments.length} {t('appointments') || 'timer'}
+                  </span>
+                )}
+              </div>
               <button
                 onClick={() => navigate('/appointments')}
-                className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1"
+                className="text-sm text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 flex items-center gap-1 font-medium"
               >
-                {t('viewAll')}
+                {t('viewAll') || 'Se alle'}
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
+
             <div className="divide-y divide-gray-100 dark:divide-gray-700">
               {appointmentsLoading ? (
-                <AppointmentsListSkeleton items={5} />
-              ) : appointments && appointments.length > 0 ? (
+                <AppointmentsListSkeleton items={6} />
+              ) : appointments.length > 0 ? (
                 appointments.map((apt) => (
                   <div
                     key={apt.id}
-                    className="px-5 py-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group"
+                    className="px-5 py-3.5 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors group"
                   >
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-3">
                       <div
-                        className="flex items-center gap-4 flex-1 cursor-pointer"
+                        className="flex items-center gap-4 flex-1 cursor-pointer min-w-0"
                         onClick={() => navigate(`/patients/${apt.patient_id}`)}
                       >
-                        <div className="text-center">
+                        {/* Time */}
+                        <div className="text-center w-14 flex-shrink-0">
                           <div className="text-sm font-semibold text-gray-900 dark:text-white">
                             {i18nFormatTime(apt.start_time, lang)}
                           </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-200">
-                            {apt.duration_minutes || 30} {t('min')}
+                          <div className="text-xs text-gray-400">
+                            {apt.duration_minutes || 30} {t('min') || 'min'}
                           </div>
                         </div>
-                        <div className="h-10 w-px bg-gray-200 dark:bg-gray-600" />
-                        <div>
-                          <p className="text-sm font-medium text-gray-900 dark:text-white">
-                            {apt.patient_name}
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-200">
-                            {apt.appointment_type || t('appointment')}
+
+                        {/* Divider */}
+                        <div className="h-10 w-px bg-gray-200 dark:bg-gray-600 flex-shrink-0" />
+
+                        {/* Patient info */}
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                              {apt.patient_name}
+                            </p>
+                            {apt.is_new_patient && (
+                              <span className="text-xs bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 px-1.5 py-0.5 rounded font-medium">
+                                {t('new') || 'NY'}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                            {apt.appointment_type || t('appointment') || 'Konsultasjon'}
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            apt.status === 'CONFIRMED'
-                              ? 'bg-green-50 text-green-700'
-                              : apt.status === 'PENDING'
-                                ? 'bg-yellow-50 text-yellow-700'
-                                : apt.status === 'CANCELLED'
-                                  ? 'bg-red-50 text-red-700'
-                                  : 'bg-gray-50 text-gray-700'
-                          }`}
-                        >
-                          {t(apt.status?.toLowerCase(), apt.status)}
-                        </span>
+
+                      {/* Status + actions */}
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {apt.red_flags && (
+                          <span className="text-xs bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300 px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <AlertCircle className="w-3 h-3" />
+                            {t('redFlag') || 'Rødt flagg'}
+                          </span>
+                        )}
+                        <StatusBadge
+                          status={apt.status}
+                          label={t(apt.status?.toLowerCase(), apt.status)}
+                        />
                         {apt.status !== 'CANCELLED' && apt.status !== 'COMPLETED' && (
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleCancelAppointment(apt.id, apt.patient_name);
                             }}
-                            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-red-50 text-red-600 transition-opacity"
-                            title={t('cancelAppointment')}
+                            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 transition-all"
+                            title={t('cancelAppointment') || 'Avbestill'}
                           >
                             <X className="w-4 h-4" />
                           </button>
@@ -291,42 +427,124 @@ export default function Dashboard() {
                   </div>
                 ))
               ) : (
-                <div className="px-5 py-12 text-center">
-                  <Clock className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-                  <p className="text-sm text-gray-500 dark:text-gray-200">
-                    {t('noAppointmentsToday')}
-                  </p>
-                </div>
+                <EmptyState
+                  icon={Clock}
+                  title={t('noAppointmentsToday') || 'Ingen timer i dag'}
+                  description={
+                    t('noAppointmentsDesc') || 'Nyt en rolig dag, eller book en ny time.'
+                  }
+                  action={
+                    <button
+                      onClick={() => navigate('/appointments/new')}
+                      className="text-sm font-medium text-teal-600 hover:text-teal-700"
+                    >
+                      {t('bookAppointment') || '+ Ny time'}
+                    </button>
+                  }
+                />
               )}
             </div>
           </div>
+
+          {/* ─ Recent Activity (collapsible) ─────────────── */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-soft-sm">
+            <button
+              onClick={() => setShowActivity(!showActivity)}
+              className="w-full px-5 py-3.5 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors rounded-xl"
+            >
+              <div className="flex items-center gap-3">
+                <Activity className="w-4 h-4 text-gray-400" />
+                <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
+                  {t('recentActivity') || 'Siste aktivitet'}
+                </h2>
+              </div>
+              {showActivity ? (
+                <ChevronUp className="w-4 h-4 text-gray-400" />
+              ) : (
+                <ChevronDown className="w-4 h-4 text-gray-400" />
+              )}
+            </button>
+            {showActivity && (
+              <div className="border-t border-gray-100 dark:border-gray-700 px-5 py-3 space-y-3">
+                {/* Activity items — will populate from API when available */}
+                <ActivityItem
+                  icon={FileText}
+                  text={t('encounterSigned') || 'Konsultasjon signert'}
+                  time="2t"
+                  color="text-teal-500"
+                />
+                <ActivityItem
+                  icon={MessageSquare}
+                  text={t('smsSent') || 'SMS sendt til pasient'}
+                  time="3t"
+                  color="text-purple-500"
+                />
+                <ActivityItem
+                  icon={CheckCircle2}
+                  text={t('treatmentPlanCompleted') || 'Behandlingsplan fullført'}
+                  time="5t"
+                  color="text-green-500"
+                />
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Quick Actions */}
-        <div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+        {/* ─ Right Sidebar ──────────────────────────────── */}
+        <div className="space-y-6">
+          {/* Quick Actions */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-soft-sm">
             <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {t('quickActions')}
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
+                {t('quickActions') || 'Hurtigvalg'}
               </h2>
             </div>
-            <div className="p-4 space-y-2">
+            <div className="p-3 space-y-1.5">
               {quickActions.map((action) => {
                 const Icon = action.icon;
                 return (
                   <button
                     key={action.name}
                     onClick={action.action}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors text-left"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors text-left group"
                   >
                     <div
-                      className={`w-10 h-10 rounded-lg bg-${action.color}-50 flex items-center justify-center`}
+                      className={`w-9 h-9 rounded-lg ${action.bgClass} flex items-center justify-center flex-shrink-0`}
                     >
-                      <Icon className={`w-5 h-5 text-${action.color}-600`} />
+                      <Icon className={`w-4 h-4 ${action.iconClass}`} />
                     </div>
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200 flex-1">
                       {action.name}
                     </span>
+                    <kbd className="hidden sm:inline text-[10px] font-mono text-gray-400 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                      {action.shortcut}
+                    </kbd>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Alerts */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-soft-sm">
+            <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
+                {t('alerts') || 'Varsler'}
+              </h2>
+            </div>
+            <div className="p-3 space-y-1">
+              {alerts.map((alert) => {
+                const Icon = alert.icon;
+                return (
+                  <button
+                    key={alert.id}
+                    onClick={alert.action}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors text-left"
+                  >
+                    <span className={`w-2 h-2 rounded-full ${alert.dot} flex-shrink-0`} />
+                    <Icon className={`w-4 h-4 ${alert.color} flex-shrink-0`} />
+                    <span className={`text-sm ${alert.color} flex-1`}>{alert.label}</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-gray-300" />
                   </button>
                 );
               })}
@@ -336,24 +554,24 @@ export default function Dashboard() {
           {/* Pending Follow-ups */}
           <div
             data-testid="dashboard-recent-patients"
-            className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 mt-6"
+            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-soft-sm"
           >
             <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {t('patientsNeedingFollowUp')}
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
+                {t('patientsNeedingFollowUp') || 'Oppfølging'}
               </h2>
               <button
                 onClick={() => navigate('/follow-ups')}
-                className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1"
+                className="text-xs text-teal-600 dark:text-teal-400 hover:text-teal-700 font-medium flex items-center gap-0.5"
               >
-                {t('viewAll')}
-                <ArrowRight className="w-4 h-4" />
+                {t('viewAll') || 'Se alle'}
+                <ArrowRight className="w-3 h-3" />
               </button>
             </div>
             <div className="divide-y divide-gray-100 dark:divide-gray-700">
               {followUpLoading ? (
-                <ListSkeleton items={5} showAvatar={false} />
-              ) : followUpPatients && followUpPatients.length > 0 ? (
+                <ListSkeleton items={4} showAvatar={false} />
+              ) : followUpPatients.length > 0 ? (
                 followUpPatients.slice(0, 5).map((patient) => {
                   const followUpDate = new Date(patient.follow_up_date);
                   const isOverdue = followUpDate < new Date();
@@ -361,9 +579,9 @@ export default function Dashboard() {
                   return (
                     <div
                       key={patient.id}
-                      className="px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                      className="px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors"
                     >
-                      <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start justify-between gap-2">
                         <div
                           className="flex-1 cursor-pointer min-w-0"
                           onClick={() => navigate(`/patients/${patient.id}`)}
@@ -371,21 +589,18 @@ export default function Dashboard() {
                           <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                             {patient.first_name} {patient.last_name}
                           </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-200 truncate mt-0.5">
-                            {patient.main_problem || t('noProblemSpecified')}
+                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                            {patient.main_problem || t('noProblemSpecified') || 'Ikke spesifisert'}
                           </p>
                           <div className="flex items-center gap-2 mt-1">
                             <span
-                              className={`text-xs font-medium ${isOverdue ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-white'}`}
+                              className={`text-xs font-medium ${isOverdue ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'}`}
                             >
-                              {isOverdue ? `${t('overdue')}: ` : `${t('due')}: `}
+                              {isOverdue
+                                ? `${t('overdue') || 'Forfalt'}: `
+                                : `${t('due') || 'Frist'}: `}
                               {formatDateShort(followUpDate, lang)}
                             </span>
-                            {patient.preferred_contact_method && (
-                              <span className="text-xs text-gray-400 dark:text-gray-500">
-                                • {patient.preferred_contact_method}
-                              </span>
-                            )}
                           </div>
                         </div>
                         <button
@@ -393,8 +608,8 @@ export default function Dashboard() {
                             handleMarkContacted(patient, patient.preferred_contact_method || 'SMS')
                           }
                           disabled={markContactedMutation.isPending}
-                          className="flex-shrink-0 px-2 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50 rounded transition-colors disabled:opacity-50"
-                          title={t('markAsContacted')}
+                          className="flex-shrink-0 p-1.5 text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/20 rounded-lg transition-colors disabled:opacity-50"
+                          title={t('markAsContacted') || 'Merk som kontaktet'}
                         >
                           <CheckCircle2 className="w-4 h-4" />
                         </button>
@@ -403,28 +618,28 @@ export default function Dashboard() {
                   );
                 })
               ) : (
-                <div className="px-5 py-8 text-center">
-                  <CheckCircle2 className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                  <p className="text-sm text-gray-500 dark:text-gray-200">
-                    {t('noFollowUpsNeeded')}
-                  </p>
-                </div>
+                <EmptyState
+                  icon={CheckCircle2}
+                  title={t('noFollowUpsNeeded') || 'Alt oppdatert!'}
+                  description={t('allCaughtUp') || 'Ingen oppfølginger venter.'}
+                  className="py-8"
+                />
               )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Recall Dashboard (collapsible) */}
-      <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+      {/* ── Recall Dashboard (collapsible) ───────────────── */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-soft-sm">
         <button
           onClick={() => setShowRecall(!showRecall)}
-          className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors rounded-lg"
+          className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors rounded-xl"
         >
           <div className="flex items-center gap-3">
-            <Bell className="w-5 h-5 text-blue-600" />
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Recall Dashboard
+            <Bell className="w-5 h-5 text-teal-600" />
+            <h2 className="text-base font-semibold text-gray-900 dark:text-white">
+              {t('recallDashboard') || 'Recall Dashboard'}
             </h2>
           </div>
           {showRecall ? (
@@ -439,6 +654,18 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+// ─── Sub-components ──────────────────────────────────────────
+
+function ActivityItem({ icon: Icon, text, time, color }) {
+  return (
+    <div className="flex items-center gap-3 text-sm">
+      <Icon className={`w-4 h-4 ${color} flex-shrink-0`} />
+      <span className="text-gray-600 dark:text-gray-300 flex-1">{text}</span>
+      <span className="text-xs text-gray-400 flex-shrink-0">{time}</span>
     </div>
   );
 }

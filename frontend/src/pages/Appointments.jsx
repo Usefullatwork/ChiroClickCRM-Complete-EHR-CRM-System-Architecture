@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { Calendar, Plus, Clock, User, CheckCircle, XCircle, List, LayoutGrid } from 'lucide-react';
 import { appointmentsAPI } from '../services/api';
 import { useTranslation, formatDate, formatTime } from '../i18n';
+import { useConfirm } from '../components/ui/ConfirmDialog';
 import LiveAppointmentBoard from '../components/appointments/LiveAppointmentBoard';
 
 export default function Appointments() {
@@ -18,6 +19,7 @@ export default function Appointments() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [statusFilter, setStatusFilter] = useState('');
   const [viewMode, setViewMode] = useState('list');
+  const confirm = useConfirm();
 
   // Fetch appointments
   const { data: appointmentsResponse, isLoading } = useQuery({

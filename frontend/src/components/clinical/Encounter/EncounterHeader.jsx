@@ -71,28 +71,36 @@ export default function EncounterHeader({
         >
           ⌨️
         </button>
-        {/* Auto-save indicator */}
-        {autoSaveStatus === 'saving' && (
-          <span className="text-xs text-slate-500 flex items-center gap-1">
-            <Loader2 className="h-3 w-3 animate-spin" />
-            Lagrer...
-          </span>
-        )}
-        {autoSaveStatus === 'saved' && lastSaved && (
-          <span
-            className="text-xs text-green-600 flex items-center gap-1"
-            title={`Lagret ${lastSaved.toLocaleTimeString()}`}
-          >
-            <Check className="h-3 w-3" />
-            Auto-lagret
-          </span>
-        )}
-        {autoSaveStatus === 'unsaved' && encounterId && !isSigned && (
-          <span className="text-xs text-amber-500 flex items-center gap-1">
-            <Activity className="h-3 w-3" />
-            Ulagrede endringer
-          </span>
-        )}
+        {/* Auto-save indicator with timestamp */}
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+          {autoSaveStatus === 'saving' && (
+            <span className="text-xs text-slate-500 flex items-center gap-1.5">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              Lagrer...
+            </span>
+          )}
+          {autoSaveStatus === 'saved' && lastSaved && (
+            <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1.5">
+              <Check className="h-3 w-3" />
+              <span>
+                Lagret{' '}
+                {lastSaved.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            </span>
+          )}
+          {autoSaveStatus === 'saved' && !lastSaved && (
+            <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1.5">
+              <Check className="h-3 w-3" />
+              Lagret
+            </span>
+          )}
+          {autoSaveStatus === 'unsaved' && encounterId && !isSigned && (
+            <span className="text-xs text-amber-500 flex items-center gap-1.5">
+              <Activity className="h-3 w-3" />
+              Ulagrede endringer
+            </span>
+          )}
+        </div>
         {isSigned ? (
           <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-green-100 text-green-700 text-xs font-medium">
             <Lock className="h-3 w-3" />

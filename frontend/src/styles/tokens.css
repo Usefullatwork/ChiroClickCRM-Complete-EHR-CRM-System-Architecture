@@ -1,0 +1,105 @@
+/*
+ * ChiroClick CRM — Scandi-Clinical Design Tokens
+ * ─────────────────────────────────────────────────
+ * Warm Nordic palette with clinical precision.
+ * All values are HSL triples (H S% L%) so Tailwind can
+ * compose them with its opacity utilities.
+ *
+ * Usage: hsl(var(--primary))          → solid color
+ *        hsl(var(--primary) / 0.5)    → 50 % opacity
+ */
+
+/* ═══════════════════ LIGHT MODE ═══════════════════ */
+:root {
+  /* ── Base ────────────────────────────────────── */
+  --background:            40 20% 99%;       /* warm off-white */
+  --foreground:            220 25% 12%;      /* deep charcoal  */
+
+  /* ── Surfaces ───────────────────────────────── */
+  --card:                  40 15% 98%;       /* warm card bg */
+  --card-foreground:       220 25% 12%;
+  --popover:               0 0% 100%;
+  --popover-foreground:    220 25% 12%;
+
+  /* ── Primary — Teal (clinical trust) ────────── */
+  --primary:               174 62% 38%;      /* teal-600 */
+  --primary-foreground:    0 0% 100%;
+
+  /* ── Secondary — Warm neutral ───────────────── */
+  --secondary:             35 15% 95%;       /* warm gray */
+  --secondary-foreground:  220 20% 20%;
+
+  /* ── Muted ──────────────────────────────────── */
+  --muted:                 35 12% 93%;
+  --muted-foreground:      220 10% 45%;
+
+  /* ── Accent — Amber (energy, attention) ─────── */
+  --accent:                38 90% 55%;       /* amber-500 */
+  --accent-foreground:     25 80% 18%;
+
+  /* ── Destructive ────────────────────────────── */
+  --destructive:           0 72% 55%;        /* red-500 */
+  --destructive-foreground: 0 0% 100%;
+
+  /* ── Semantic status ────────────────────────── */
+  --clinical:              174 62% 38%;      /* teal primary */
+  --clinical-foreground:   0 0% 100%;
+  --success:               152 60% 40%;      /* green-600 */
+  --success-foreground:    0 0% 100%;
+  --warning:               38 90% 55%;       /* amber-500 */
+  --warning-foreground:    25 80% 18%;
+  --info:                  210 70% 52%;      /* blue-500 */
+  --info-foreground:       0 0% 100%;
+
+  /* ── Chrome ─────────────────────────────────── */
+  --border:                35 15% 88%;       /* warm border */
+  --input:                 35 15% 88%;
+  --ring:                  174 62% 38%;      /* teal ring */
+
+  /* ── Radii ──────────────────────────────────── */
+  --radius:                0.5rem;           /* 8px base */
+
+  /* ── Elevation (used via Tailwind shadow utils) */
+  --shadow-color:          35 20% 60%;
+}
+
+/* ═══════════════════ DARK MODE ═══════════════════ */
+.dark {
+  --background:            220 20% 8%;       /* dark charcoal */
+  --foreground:            35 15% 92%;       /* warm off-white */
+
+  --card:                  220 18% 11%;
+  --card-foreground:       35 15% 92%;
+  --popover:               220 18% 11%;
+  --popover-foreground:    35 15% 92%;
+
+  --primary:               174 55% 48%;      /* brighter teal */
+  --primary-foreground:    220 20% 8%;
+
+  --secondary:             220 15% 18%;
+  --secondary-foreground:  35 12% 85%;
+
+  --muted:                 220 15% 18%;
+  --muted-foreground:      35 10% 60%;
+
+  --accent:                38 85% 58%;
+  --accent-foreground:     220 20% 8%;
+
+  --destructive:           0 65% 45%;
+  --destructive-foreground: 35 15% 92%;
+
+  --clinical:              174 55% 48%;
+  --clinical-foreground:   220 20% 8%;
+  --success:               152 55% 45%;
+  --success-foreground:    220 20% 8%;
+  --warning:               38 85% 58%;
+  --warning-foreground:    220 20% 8%;
+  --info:                  210 65% 55%;
+  --info-foreground:       220 20% 8%;
+
+  --border:                220 15% 20%;
+  --input:                 220 15% 20%;
+  --ring:                  174 55% 48%;
+
+  --shadow-color:          220 30% 5%;
+}
