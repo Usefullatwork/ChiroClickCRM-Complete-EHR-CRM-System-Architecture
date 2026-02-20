@@ -107,7 +107,7 @@ describe('Dashboard Component', () => {
 
     await waitFor(() => {
       const statCards = screen.getAllByTestId('dashboard-stat-card');
-      expect(statCards.length).toBe(4);
+      expect(statCards.length).toBe(5);
     });
   });
 

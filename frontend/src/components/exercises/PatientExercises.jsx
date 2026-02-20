@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { exercisesAPI } from '../../services/api';
+import { useConfirm } from '../ui/ConfirmDialog';
 import {
   Activity,
   Check,
@@ -451,6 +452,7 @@ const PrescriptionCard = ({ prescription, onLogCompliance, onDiscontinue, onComp
  */
 export const PatientExercises = ({ patientId, patientName }) => {
   const queryClient = useQueryClient();
+  const confirm = useConfirm();
 
   // State
   const [statusFilter, setStatusFilter] = useState('active');
@@ -513,9 +515,13 @@ export const PatientExercises = ({ patientId, patientName }) => {
   };
 
   const handleComplete = async (prescription) => {
-    if (window.confirm(`Merk "${prescription.exercise_name}" som fullført?`)) {
-      completeMutation.mutate(prescription.id);
-    }
+    const ok = await confirm({
+      title: 'Fullfør øvelse',
+      description: `Merk "${prescription.exercise_name}" som fullført?`,
+      variant: 'warning',
+      confirmText: 'Fullfør',
+    });
+    if (ok) completeMutation.mutate(prescription.id);
   };
 
   return (

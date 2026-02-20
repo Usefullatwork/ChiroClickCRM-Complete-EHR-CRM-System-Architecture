@@ -31,6 +31,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import toast from '../../utils/toast';
+import { useConfirm } from '../ui/ConfirmDialog';
 
 // =============================================================================
 // CONSTANTS
@@ -210,6 +211,8 @@ export default function BookingModal({
   isCancelling,
   typeOptions,
 }) {
+  const confirm = useConfirm();
+
   // Form state
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [practitionerId, setPractitionerId] = useState('');
@@ -327,9 +330,12 @@ export default function BookingModal({
     }
 
     if (conflicts.length > 0) {
-      const confirmed = window.confirm(
-        'Det er en tidskonflikt. Er du sikker pa at du vil opprette denne avtalen likevel?'
-      );
+      const confirmed = await confirm({
+        title: 'Tidskonflikt',
+        description:
+          'Det er en tidskonflikt. Er du sikker på at du vil opprette denne avtalen likevel?',
+        variant: 'warning',
+      });
       if (!confirmed) {
         return;
       }

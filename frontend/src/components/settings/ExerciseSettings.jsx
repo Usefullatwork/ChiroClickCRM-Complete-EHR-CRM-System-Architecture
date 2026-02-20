@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useConfirm } from '../ui/ConfirmDialog';
 import {
   Dumbbell,
   Search,
@@ -55,6 +56,7 @@ const getYouTubeVideoId = (url) => {
 
 export default function ExerciseSettings({ lang }) {
   const queryClient = useQueryClient();
+  const confirm = useConfirm();
 
   // Local state
   const [exerciseSearch, setExerciseSearch] = useState('');
@@ -202,16 +204,16 @@ export default function ExerciseSettings({ lang }) {
     setExerciseFormData({});
   };
 
-  const handleDeleteExercise = (exercise) => {
-    if (
-      window.confirm(
+  const handleDeleteExercise = async (exercise) => {
+    const ok = await confirm({
+      title: lang === 'no' ? 'Slett øvelse' : 'Delete exercise',
+      description:
         lang === 'no'
           ? `Er du sikker på at du vil slette "${exercise.name_no}"?`
-          : `Are you sure you want to delete "${exercise.name_en || exercise.name_no}"?`
-      )
-    ) {
-      deleteExerciseMutation.mutate(exercise.id);
-    }
+          : `Are you sure you want to delete "${exercise.name_en || exercise.name_no}"?`,
+      variant: 'destructive',
+    });
+    if (ok) deleteExerciseMutation.mutate(exercise.id);
   };
 
   return (

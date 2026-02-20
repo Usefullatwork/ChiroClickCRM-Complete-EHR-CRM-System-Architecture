@@ -8,6 +8,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useConfirm } from '../ui/ConfirmDialog';
 import {
   FileText,
   Plus,
@@ -186,6 +187,7 @@ Med vennlig hilsen,
 
 export default function MessageTemplates({ language = 'no' }) {
   const queryClient = useQueryClient();
+  const confirm = useConfirm();
 
   // State
   const [searchTerm, setSearchTerm] = useState('');
@@ -388,14 +390,13 @@ export default function MessageTemplates({ language = 'no' }) {
   };
 
   // Handle delete
-  const handleDelete = (template) => {
+  const handleDelete = async (template) => {
     if (template.is_system) {
       toast.error('Cannot delete system templates');
       return;
     }
-    if (window.confirm(t.confirmDelete)) {
-      deleteMutation.mutate(template.id);
-    }
+    const ok = await confirm({ title: t.confirmDelete, variant: 'destructive' });
+    if (ok) deleteMutation.mutate(template.id);
   };
 
   // Insert variable into body

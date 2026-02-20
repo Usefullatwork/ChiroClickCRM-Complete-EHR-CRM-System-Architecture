@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useConfirm } from '../components/ui/ConfirmDialog';
 import {
   ArrowLeft,
   Edit,
@@ -43,6 +44,7 @@ export const PatientDetail = () => {
   const { patientId } = useParams();
   const navigate = useNavigate();
   const { hasPermission } = useAuth();
+  const confirm = useConfirm();
   const [showSoapBuilder, setShowSoapBuilder] = useState(false);
 
   // Fetch patient data
@@ -304,12 +306,14 @@ export const PatientDetail = () => {
                       size="sm"
                       className="w-full justify-start"
                       icon={Trash2}
-                      onClick={() => {
-                        if (
-                          confirm(
-                            'Are you sure you want to delete this patient? This action cannot be undone.'
-                          )
-                        ) {
+                      onClick={async () => {
+                        const ok = await confirm({
+                          title: 'Slett pasientdata',
+                          description:
+                            'Are you sure you want to delete this patient? This action cannot be undone.',
+                          variant: 'destructive',
+                        });
+                        if (ok) {
                           // Delete patient data (GDPR right to be forgotten)
                           // Implementation needed
                         }

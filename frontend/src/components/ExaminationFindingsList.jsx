@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { examinationsAPI } from '../services/api';
+import { useConfirm } from '../components/ui/ConfirmDialog';
 import {
   Edit2,
   Trash2,
@@ -18,6 +19,7 @@ import toast from '../utils/toast';
 
 export default function ExaminationFindingsList({ encounterId }) {
   const queryClient = useQueryClient();
+  const confirm = useConfirm();
   const [editingFinding, setEditingFinding] = useState(null);
   const [showEditForm, setShowEditForm] = useState(false);
   const [expandedRegions, setExpandedRegions] = useState({});
@@ -47,10 +49,13 @@ export default function ExaminationFindingsList({ encounterId }) {
     setShowEditForm(true);
   };
 
-  const handleDelete = (findingId) => {
-    if (window.confirm('Er du sikker på at du vil slette dette funnet?')) {
-      deleteFindingMutation.mutate(findingId);
-    }
+  const handleDelete = async (findingId) => {
+    const ok = await confirm({
+      title: 'Slett funn',
+      description: 'Er du sikker på at du vil slette dette funnet?',
+      variant: 'destructive',
+    });
+    if (ok) deleteFindingMutation.mutate(findingId);
   };
 
   const toggleRegion = (region) => {

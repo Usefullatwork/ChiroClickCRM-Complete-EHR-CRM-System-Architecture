@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useConfirm } from '../ui/ConfirmDialog';
 import {
   FileText,
   Globe,
@@ -86,6 +87,7 @@ const ADJUSTMENT_NOTATION_METHODS = [
 
 export default function ClinicalSettings({ t, clinicalPrefs, onClinicalPrefChange }) {
   const queryClient = useQueryClient();
+  const confirm = useConfirm();
   const lang = clinicalPrefs.language || 'no';
 
   // Spine templates state
@@ -180,16 +182,16 @@ export default function ClinicalSettings({ t, clinicalPrefs, onClinicalPrefChang
     setTemplateEditText('');
   };
 
-  const handleResetTemplates = () => {
-    if (
-      window.confirm(
+  const handleResetTemplates = async () => {
+    const ok = await confirm({
+      title: lang === 'no' ? 'Tilbakestill maler' : 'Reset templates',
+      description:
         lang === 'no'
           ? 'Er du sikker på at du vil tilbakestille alle palpasjonsmaler til standard? Dette kan ikke angres.'
-          : 'Are you sure you want to reset all palpation templates to defaults? This cannot be undone.'
-      )
-    ) {
-      resetSpineTemplatesMutation.mutate();
-    }
+          : 'Are you sure you want to reset all palpation templates to defaults? This cannot be undone.',
+      variant: 'destructive',
+    });
+    if (ok) resetSpineTemplatesMutation.mutate();
   };
 
   return (

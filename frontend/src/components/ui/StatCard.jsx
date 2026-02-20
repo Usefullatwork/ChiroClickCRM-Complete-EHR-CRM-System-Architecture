@@ -39,6 +39,7 @@ export default function StatCard({
 
   return (
     <Wrapper
+      data-testid="dashboard-stat-card"
       onClick={onClick}
       className={`bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 shadow-soft-sm transition-all ${
         onClick ? 'hover:shadow-soft cursor-pointer' : ''

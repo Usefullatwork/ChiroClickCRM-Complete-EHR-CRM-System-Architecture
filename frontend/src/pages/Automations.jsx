@@ -17,6 +17,7 @@
 import { useState, lazy, Suspense } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from '../i18n';
+import { useConfirm } from '../components/ui/ConfirmDialog';
 import {
   Zap,
   Plus,
@@ -235,6 +236,7 @@ const TRIGGER_LABELS = {
 export default function Automations() {
   const queryClient = useQueryClient();
   const { lang: language, setLang: setLanguage } = useTranslation();
+  const confirm = useConfirm();
 
   // UI State
   const [activeTab, setActiveTab] = useState('workflows');
@@ -368,10 +370,9 @@ export default function Automations() {
     }
   };
 
-  const handleDeleteWorkflow = (workflow) => {
-    if (window.confirm(t.confirmDelete)) {
-      deleteMutation.mutate(workflow.id);
-    }
+  const handleDeleteWorkflow = async (workflow) => {
+    const ok = await confirm({ title: t.confirmDelete, variant: 'destructive' });
+    if (ok) deleteMutation.mutate(workflow.id);
   };
 
   const handleEditWorkflow = (workflow) => {

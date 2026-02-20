@@ -13,6 +13,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useConfirm } from '../ui/ConfirmDialog';
 import {
   Zap,
   Plus,
@@ -109,6 +110,7 @@ const MESSAGE_TYPES = [
 
 export default function AutomationRules({ language = 'no' }) {
   const queryClient = useQueryClient();
+  const confirm = useConfirm();
 
   // State
   const [showEditor, setShowEditor] = useState(false);
@@ -362,10 +364,9 @@ export default function AutomationRules({ language = 'no' }) {
   };
 
   // Handle delete
-  const handleDelete = (rule) => {
-    if (window.confirm(t.confirmDelete)) {
-      deleteMutation.mutate(rule.id);
-    }
+  const handleDelete = async (rule) => {
+    const ok = await confirm({ title: t.confirmDelete, variant: 'destructive' });
+    if (ok) deleteMutation.mutate(rule.id);
   };
 
   // Group rules by category

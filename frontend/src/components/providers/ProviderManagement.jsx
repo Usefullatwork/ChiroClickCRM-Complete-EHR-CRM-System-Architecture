@@ -11,6 +11,7 @@
  */
 
 import { useState } from 'react';
+import { useConfirm } from '../ui/ConfirmDialog';
 
 // =============================================================================
 // TRANSLATIONS
@@ -418,6 +419,7 @@ function WorkingHoursEditor({ hours, onChange, lang }) {
  * Provider Form
  */
 function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
+  const confirm = useConfirm();
   const t = TRANSLATIONS[lang];
   const isNew = !provider?.id;
 
@@ -657,10 +659,9 @@ function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
           {!isNew && onDelete && (
             <button
               type="button"
-              onClick={() => {
-                if (confirm(t.confirmDelete)) {
-                  onDelete(provider.id);
-                }
+              onClick={async () => {
+                const ok = await confirm({ title: t.confirmDelete, variant: 'destructive' });
+                if (ok) onDelete(provider.id);
               }}
               className="px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
             >

@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useConfirm } from '../components/ui/ConfirmDialog';
 import {
   FileText,
   Plus,
@@ -42,6 +43,7 @@ export default function ClinicalNotes() {
   const [searchParams, _setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const confirm = useConfirm();
 
   // State management
   const [selectedPatientId, setSelectedPatientId] = useState(routePatientId || null);
@@ -250,7 +252,12 @@ export default function ClinicalNotes() {
    * Handterer sletting av notat
    */
   const handleDeleteNote = async (noteId) => {
-    if (window.confirm('Er du sikker pa at du vil slette dette notatet? Dette kan ikke angres.')) {
+    const ok = await confirm({
+      title: 'Slett notat',
+      description: 'Er du sikker på at du vil slette dette notatet? Dette kan ikke angres.',
+      variant: 'destructive',
+    });
+    if (ok) {
       await deleteNoteMutation.mutateAsync(noteId);
       if (showPreview && previewNoteId === noteId) {
         setShowPreview(false);
