@@ -31,12 +31,171 @@ except ImportError:
     subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'requests', '-q'])
     import requests
 
+import re
+
 OLLAMA_URL = os.environ.get('OLLAMA_BASE_URL', 'http://localhost:11434')
 EVAL_DIR = Path(__file__).parent
 BENCHMARK_FILE = EVAL_DIR / 'benchmark_cases.jsonl'
 BASELINE_DIR = EVAL_DIR / 'baseline'
 
 NORWEGIAN_CHARS = set('æøåÆØÅ')
+
+# ============================================================
+# Synonym map for Norwegian medical terms
+# Keys are the benchmark keyword; values are acceptable alternatives.
+# Matching is case-insensitive substring.
+# ============================================================
+SYNONYMS = {
+    "cauda equina": ["cauda equina", "cauda equina syndrom", "hestehalesyndrom", "cauda equina-syndrom"],
+    "henvisning": ["henvisning", "henvis", "referer", "akutt overgang", "hastehenvisning"],
+    "myelopati": ["myelopati", "ryggmargsaffeksjon", "myelopatisk", "cervikal myelopati"],
+    "vertebrobasilær": ["vertebrobasilær", "vbi", "vertebrobasilær insuffisiens", "vertebrobasil"],
+    "spenningshodepine": ["spenningshodepine", "tensjonshodepine", "tension-type", "spennings-hodepine"],
+    "tendinopati": ["tendinopati", "tendinitt", "senebetennelse", "tendinose"],
+    "mekanisk": ["mekanisk", "muskuloskeletalt", "bevegelsesrelatert", "mekaniske"],
+    "metastas": ["metastas", "spredning", "sekundær tumor", "metastase"],
+    "bildediagnostikk": ["bildediagnostikk", "billeddiagnostikk", "røntgen", "mr", "ct", "mri"],
+    "infeksjon": ["infeksjon", "infeksiøs", "septisk", "bakteriell"],
+    "feber": ["feber", "febril", "temperaturforhøyelse", "pyreksi"],
+    "akutt": ["akutt", "umiddelbar", "øyeblikkelig", "haster"],
+    "prolaps": ["prolaps", "skiveprolaps", "diskusprolaps", "herniering", "herniert"],
+    "radikulopati": ["radikulopati", "nerverotaffeksjon", "radikulær", "rotaffeksjon"],
+    "stenose": ["stenose", "trang spinalkanal", "spinal stenose"],
+    "sykemelding": ["sykemelding", "sykmelding", "sykemeldt", "sykmeldt"],
+    "avbestill": ["avbestill", "avbestilling", "kanseller", "avlys"],
+    "gratulerer": ["gratulerer", "gratulasjon", "bursdagsønske", "gratulere"],
+    "nakkevirvelsøyle": ["nakkevirvelsøyle", "cervikalcolumna", "cervikalsøylen", "nakkevirvler", "halsvirvelsøyle"],
+    "brystvirvelsøyle": ["brystvirvelsøyle", "torakalcolumna", "thorakalcolumna", "brystvirvler", "torakalsøylen"],
+    "bekkenleddet": ["bekkenleddet", "iliosakralleddet", "si-leddet", "sacroiliacaleddet", "si-ledd"],
+}
+
+# Negation words — if a forbidden keyword is preceded (within 5 tokens) by
+# one of these, it should NOT count as a true positive for the forbidden check.
+NEGATION_WORDS = [
+    "ikke", "ingen", "uten", "utelukk", "utelukker", "utelukkes",
+    "fravær", "negativ", "avkrefter",
+    "no ", "not ", "rules out", "ruled out", "absence", "negative",
+    "unlikely", "usannsynlig",
+]
+
+
+def keyword_present(keyword, response_lower):
+    """Check if a keyword (or any synonym) is present in the response."""
+    synonyms = SYNONYMS.get(keyword.lower(), [keyword])
+    for syn in synonyms:
+        if syn.lower() in response_lower:
+            return True
+    # Fall back to exact keyword if not in synonym map
+    if keyword.lower() not in [s.lower() for syns in SYNONYMS.values() for s in syns]:
+        return keyword.lower() in response_lower
+    return False
+
+
+def is_negated(keyword, response_lower):
+    """Check if a keyword appears only in negated context.
+
+    Returns True if every occurrence of the keyword is preceded by a negation
+    word within a ~60-character window (approx 5-8 Norwegian tokens).
+    """
+    kw_lower = keyword.lower()
+    idx = 0
+    occurrences = []
+    while True:
+        pos = response_lower.find(kw_lower, idx)
+        if pos == -1:
+            break
+        occurrences.append(pos)
+        idx = pos + 1
+
+    if not occurrences:
+        return False  # Not found at all — not negated
+
+    for pos in occurrences:
+        window_start = max(0, pos - 60)
+        window = response_lower[window_start:pos]
+        negated = any(neg in window for neg in NEGATION_WORDS)
+        if not negated:
+            return False  # At least one non-negated occurrence
+    return True  # All occurrences are negated
+
+
+def compute_partial_score(case, result):
+    """Compute a 0-100 partial credit score for a benchmark case result.
+
+    Scoring breakdown:
+    - Keywords present: up to 30 points (proportional to found/required)
+    - Keywords absent: up to 20 points (proportional to avoided/forbidden)
+    - Length in range: 15 points
+    - Norwegian chars present: 10 points
+    - Code format correct: 15 points (if applicable, else redistributed)
+    - ROUGE-L score: 10 points (proportional, if reference exists)
+    """
+    if result.get('error'):
+        return 0
+
+    score = 0.0
+    checks = result.get('checks', {})
+
+    # Keywords present (30 pts)
+    kw_check = checks.get('keywords_present', {})
+    if kw_check:
+        score += 30 * kw_check.get('score', 0)
+    else:
+        score += 30  # No required keywords → full credit
+
+    # Keywords absent (20 pts)
+    kw_absent = checks.get('keywords_absent', {})
+    if kw_absent:
+        forbidden = case.get('forbidden_keywords', [])
+        found_count = len(kw_absent.get('found_forbidden', []))
+        if forbidden:
+            score += 20 * (1 - found_count / len(forbidden))
+        else:
+            score += 20
+    else:
+        score += 20
+
+    # Length in range (15 pts)
+    len_check = checks.get('response_length', {})
+    if len_check.get('pass', False):
+        score += 15
+    else:
+        # Partial credit based on how close to range
+        actual = len_check.get('actual', 0)
+        expected = len_check.get('expected_range', [10, 5000])
+        if actual > 0:
+            mid = (expected[0] + expected[1]) / 2
+            distance = abs(actual - mid) / max(mid, 1)
+            score += max(0, 15 * (1 - distance))
+
+    # Norwegian quality (10 pts)
+    no_check = checks.get('norwegian_quality', {})
+    if no_check:
+        rate = no_check.get('char_rate', 0)
+        if rate > 0.005:
+            score += 10
+        elif rate > 0.001:
+            score += 7
+        elif rate > 0:
+            score += 3
+    else:
+        score += 10  # Not required
+
+    # Code format (15 pts) — only for diagnosis code cases
+    code_check = checks.get('code_format', {})
+    if code_check:
+        score += 15 if code_check.get('pass', False) else 0
+    elif not case.get('must_contain_code_format'):
+        score += 15  # Not applicable → full credit
+
+    # ROUGE-L (10 pts)
+    rouge_check = checks.get('rouge_l', {})
+    if rouge_check:
+        score += 10 * min(1.0, rouge_check.get('score', 0) / 0.3)
+    elif not case.get('reference_answer'):
+        score += 10  # No reference → full credit
+
+    return round(score, 1)
 
 
 def load_benchmark():
@@ -139,13 +298,15 @@ def evaluate_case(case, response, latency_ms):
         result['error'] = 'no_response'
         return result
 
-    # 1. Keyword presence
+    response_lower = response.lower()
+
+    # 1. Keyword presence (with synonym support)
     required_keywords = case.get('required_keywords', [])
     if required_keywords:
         present = []
         missing = []
         for kw in required_keywords:
-            if kw.lower() in response.lower():
+            if keyword_present(kw, response_lower):
                 present.append(kw)
             else:
                 missing.append(kw)
@@ -158,10 +319,15 @@ def evaluate_case(case, response, latency_ms):
         if missing:
             result['passed'] = False
 
-    # 2. Keyword absence (hallucination check)
+    # 2. Keyword absence — negation-aware (hallucination check)
     forbidden_keywords = case.get('forbidden_keywords', [])
     if forbidden_keywords:
-        found = [kw for kw in forbidden_keywords if kw.lower() in response.lower()]
+        found = []
+        for kw in forbidden_keywords:
+            if kw.lower() in response_lower:
+                # Only count as forbidden if NOT negated
+                if not is_negated(kw, response_lower):
+                    found.append(kw)
         result['checks']['keywords_absent'] = {
             'pass': len(found) == 0,
             'found_forbidden': found,
@@ -203,7 +369,6 @@ def evaluate_case(case, response, latency_ms):
     # 6. Custom validators
     if case.get('must_contain_code_format'):
         # Check for ICD-10 or ICPC-2 code format
-        import re
         has_code = bool(re.search(r'[A-Z]\d{2}(\.\d)?', response))
         result['checks']['code_format'] = {
             'pass': has_code,
@@ -211,6 +376,9 @@ def evaluate_case(case, response, latency_ms):
         }
         if not has_code:
             result['passed'] = False
+
+    # 7. Partial credit score (0-100)
+    result['partial_score'] = compute_partial_score(case, result)
 
     return result
 
@@ -248,10 +416,13 @@ def run_evaluation(model, cases, verbose=False):
             print(f'  [{i}/{len(cases)}] {status} {case.get("id", "?")} '
                   f'({latency}ms, {len(response)} chars)')
 
-            if verbose and not result['passed']:
-                for check_name, check_data in result.get('checks', {}).items():
-                    if not check_data.get('pass', True):
-                        print(f'         FAIL: {check_name} — {check_data}')
+            if verbose:
+                p_score = result.get('partial_score', 0)
+                if not result['passed']:
+                    for check_name, check_data in result.get('checks', {}).items():
+                        if not check_data.get('pass', True):
+                            print(f'         FAIL: {check_name} — {check_data}')
+                    print(f'         Partial score: {p_score}/100')
 
         result['response_preview'] = (response[:200] + '...') if response and len(response) > 200 else response
         results.append(result)
@@ -261,6 +432,9 @@ def run_evaluation(model, cases, verbose=False):
         if result.get('passed'):
             categories[cat]['passed'] += 1
         categories[cat]['latencies'].append(latency)
+        categories[cat].setdefault('partial_scores', []).append(
+            result.get('partial_score', 0)
+        )
 
     return results, dict(categories)
 
@@ -276,6 +450,12 @@ def print_summary(model, results, categories):
     print(f'  {"=" * 50}')
     print(f'  Pass rate: {passed}/{total} ({round(passed/max(total,1)*100, 1)}%)')
 
+    # Partial scores
+    partial_scores = [r.get('partial_score', 0) for r in results if 'partial_score' in r]
+    if partial_scores:
+        avg_partial = round(sum(partial_scores) / len(partial_scores), 1)
+        print(f'  Avg partial score: {avg_partial}/100')
+
     if latencies:
         avg_latency = round(sum(latencies) / len(latencies))
         print(f'  Avg latency: {avg_latency}ms')
@@ -286,8 +466,11 @@ def print_summary(model, results, categories):
     for cat, data in sorted(categories.items()):
         rate = round(data['passed'] / max(data['total'], 1) * 100, 1)
         avg_lat = round(sum(data['latencies']) / max(len(data['latencies']), 1))
+        p_scores = data.get('partial_scores', [])
+        avg_p = round(sum(p_scores) / max(len(p_scores), 1), 1) if p_scores else 0
         status = '✓' if data['passed'] == data['total'] else '◐'
-        print(f'    {status} {cat:25s} {data["passed"]}/{data["total"]} ({rate}%) avg {avg_lat}ms')
+        print(f'    {status} {cat:25s} {data["passed"]}/{data["total"]} ({rate}%) '
+              f'avg {avg_lat}ms  score {avg_p}/100')
 
     # ROUGE-L scores
     rouge_scores = [
@@ -307,6 +490,7 @@ def print_summary(model, results, categories):
         'avg_latency_ms': round(sum(latencies) / max(len(latencies), 1)) if latencies else 0,
         'categories': categories,
         'avg_rouge_l': round(sum(rouge_scores) / len(rouge_scores), 4) if rouge_scores else None,
+        'avg_partial_score': round(sum(partial_scores) / len(partial_scores), 1) if partial_scores else None,
     }
 
 

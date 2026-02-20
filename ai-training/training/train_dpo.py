@@ -186,8 +186,19 @@ def train_dpo(model_key, data_dir, args, logger):
     logger.info(f'Output: {output_dir}')
 
     # Check if SFT LoRA exists (DPO should be applied on top of SFT)
-    sft_lora_dir = Path(__file__).parent.parent / 'models' / f'{config["output_name"]}-lora'
-    use_sft_base = sft_lora_dir.exists()
+    # train_unsloth.py saves to models/{output_name}/ with checkpoint-* subdirs
+    sft_base_dir = Path(__file__).parent.parent / 'models' / config["output_name"]
+    sft_lora_dir = None
+    if sft_base_dir.exists():
+        # Look for latest checkpoint with adapter_model.safetensors
+        checkpoints = sorted(sft_base_dir.glob("checkpoint-*"))
+        for ckpt in reversed(checkpoints):
+            if (ckpt / "adapter_model.safetensors").exists():
+                sft_lora_dir = ckpt
+                break
+        if sft_lora_dir is None and (sft_base_dir / "adapter_model.safetensors").exists():
+            sft_lora_dir = sft_base_dir
+    use_sft_base = sft_lora_dir is not None
     if use_sft_base:
         logger.info(f'Found SFT LoRA at {sft_lora_dir} — will apply DPO on top of SFT')
     else:
@@ -269,7 +280,7 @@ def train_dpo(model_key, data_dir, args, logger):
         warmup_steps=20,
         weight_decay=0.01,
         max_grad_norm=0.3,
-        logging_steps=10,
+        logging_steps=5,
         save_strategy="epoch",
         eval_strategy="epoch",
         save_total_limit=2,
@@ -279,6 +290,12 @@ def train_dpo(model_key, data_dir, args, logger):
         max_prompt_length=config['max_seq_length'] // 2,
         report_to="none",
         remove_unused_columns=False,
+        # Critical for RTX 4070 (12GB): precompute ref log probs to avoid
+        # loading both policy and reference models simultaneously
+        precompute_ref_log_probs=True,
+        gradient_checkpointing=True,
+        dataloader_num_workers=0,
+        seed=42,
     )
 
     # Create DPO trainer

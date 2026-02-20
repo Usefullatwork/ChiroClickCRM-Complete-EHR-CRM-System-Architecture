@@ -1,0 +1,10519 @@
+{
+  "input_file": "C:\\Users\\MadsF\\Desktop\\ChiroClickCRM-Complete-EHR-CRM-System-Architecture\\ai-training\\data\\processed\\general-clinical\\train.jsonl",
+  "total_examples": 9971,
+  "scored_examples": 500,
+  "overall_average": 3.9,
+  "dimension_averages": {
+    "format": 4.95,
+    "norwegian": 3.21,
+    "completeness": 3.43,
+    "accuracy": 3.99
+  },
+  "triage": {
+    "keep_count": 247,
+    "rewrite_count": 253,
+    "remove_count": 0
+  },
+  "scores": [
+    {
+      "index": 1,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 33,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 52,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 90,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 112,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 5,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 3,
+        "note": "contradictory: flags found + no flags"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 130,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 136,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 157,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 173,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 203,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 236,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 275,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 319,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 334,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 355,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "colloquial: slitasje"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 388,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 429,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 459,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 467,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 489,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 493,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 505,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 521,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 543,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 556,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "colloquial: nummen"
+      },
+      "completeness": {
+        "score": 5,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 577,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 13,
+      "average": 3.25
+    },
+    {
+      "index": 612,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "colloquial: hevelse"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 13,
+      "average": 3.25
+    },
+    {
+      "index": 633,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 638,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 13,
+      "average": 3.25
+    },
+    {
+      "index": 640,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 652,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 5,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 1,
+        "note": "Non-clinical contamination: component"
+      },
+      "total": 13,
+      "average": 3.25
+    },
+    {
+      "index": 654,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 667,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 700,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 713,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 730,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 732,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 737,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 774,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 788,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 789,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 802,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 803,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 826,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 874,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 880,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 889,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 5,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 3,
+        "note": "contradictory: flags found + no flags"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 897,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 912,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 916,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "colloquial: nummen"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 922,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 942,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 967,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 976,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 988,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 1007,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "colloquial: nummen"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 1024,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 1040,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 1041,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 1059,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 13,
+      "average": 3.25
+    },
+    {
+      "index": 1063,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 1077,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 1096,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 1101,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 13,
+      "average": 3.25
+    },
+    {
+      "index": 1122,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 1139,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "colloquial: stiv nakke, nummen"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 1142,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 1155,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 1172,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 5,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 18,
+      "average": 4.5
+    },
+    {
+      "index": 1193,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 1204,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 1218,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 1236,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "colloquial: stiv nakke"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 1239,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 1251,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 1269,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 13,
+      "average": 3.25
+    },
+    {
+      "index": 1299,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 1347,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 1374,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 1384,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 5,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 18,
+      "average": 4.5
+    },
+    {
+      "index": 1436,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 1445,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 1449,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 1470,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "colloquial: stiv nakke"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 1482,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 13,
+      "average": 3.25
+    },
+    {
+      "index": 1530,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 1533,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 1546,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 1676,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 1688,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 1694,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 1729,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 1731,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 1735,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 1763,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 1800,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 1808,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 5,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 18,
+      "average": 4.5
+    },
+    {
+      "index": 1810,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 1814,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 13,
+      "average": 3.25
+    },
+    {
+      "index": 1818,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 1824,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 1852,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 1865,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 1885,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 1915,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 1923,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 1932,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 1936,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 1950,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 1976,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 1980,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2005,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2039,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2054,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2098,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2130,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 2136,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 2148,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2159,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2170,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2194,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 2222,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2283,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 2289,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2294,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 2310,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 2350,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2372,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 2375,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 5,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 2378,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 2385,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 2389,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 12,
+      "average": 3.0
+    },
+    {
+      "index": 2391,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 2401,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 13,
+      "average": 3.25
+    },
+    {
+      "index": 2451,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2453,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 2461,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 2469,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2480,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 2513,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 2533,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 2562,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 2568,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 2571,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2572,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 2574,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2576,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 2647,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 2677,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 2682,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 2683,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2708,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2711,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2739,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2784,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2788,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2810,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 2860,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 2879,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2893,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2903,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 2927,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 5,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 2939,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 13,
+      "average": 3.25
+    },
+    {
+      "index": 2955,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 2990,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 2991,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 3003,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 3007,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 3053,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 1,
+        "note": "low Norwegian char rate; colloquial: hevelse"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 12,
+      "average": 3.0
+    },
+    {
+      "index": 3058,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 3092,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 3132,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 3146,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 3178,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 3225,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 3238,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 3240,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 3309,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 3328,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 3423,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 3428,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 3499,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 3544,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 3550,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 3557,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 3566,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 13,
+      "average": 3.25
+    },
+    {
+      "index": 3636,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 3642,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 3645,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 3673,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 3692,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 3724,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 3760,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 3761,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 3762,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 3770,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 3771,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 3848,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 3935,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 3967,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 4004,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 4006,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 4043,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 4056,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 4067,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 4085,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 5,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 18,
+      "average": 4.5
+    },
+    {
+      "index": 4093,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 4175,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 4189,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 4207,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 4220,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 4224,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "colloquial: nummen"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 4273,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 4281,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 4317,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 4340,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 4346,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 4355,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 4364,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 4389,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 4404,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 4428,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 4435,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "colloquial: hevelse"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 4443,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 4459,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 4466,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 4477,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 4480,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 4519,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 4535,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 4560,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 4563,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 4601,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 4654,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 13,
+      "average": 3.25
+    },
+    {
+      "index": 4681,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 4713,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 4715,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 4719,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 4723,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 4740,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 4816,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 4836,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 4853,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 4869,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 4986,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 5,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 3,
+        "note": "contradictory: flags found + no flags"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 4990,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 13,
+      "average": 3.25
+    },
+    {
+      "index": 4991,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 5020,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 13,
+      "average": 3.25
+    },
+    {
+      "index": 5054,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 12,
+      "average": 3.0
+    },
+    {
+      "index": 5073,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "colloquial: nummen"
+      },
+      "completeness": {
+        "score": 5,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 5118,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 5137,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5144,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 1,
+        "note": "low Norwegian char rate; colloquial: nummen"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 5148,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5159,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "colloquial: nummen"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 5176,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5187,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 5202,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 5215,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 5223,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 5249,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 5272,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 5297,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5313,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 5329,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 12,
+      "average": 3.0
+    },
+    {
+      "index": 5335,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 5349,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 5375,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 5401,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5436,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 5437,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 5467,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5502,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5543,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "colloquial: nummen"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 5544,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 5578,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5591,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5619,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5627,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 13,
+      "average": 3.25
+    },
+    {
+      "index": 5636,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 5673,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 5679,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5682,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5696,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5716,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 5722,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 5725,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 5743,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 5,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 18,
+      "average": 4.5
+    },
+    {
+      "index": 5746,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5752,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5755,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 5791,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 13,
+      "average": 3.25
+    },
+    {
+      "index": 5799,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5813,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5835,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 5850,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 5857,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5886,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5888,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 13,
+      "average": 3.25
+    },
+    {
+      "index": 5896,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 5900,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 5914,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5923,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 5940,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5943,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 5944,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5961,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5969,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 5986,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 6012,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 6068,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 6080,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 6084,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 6109,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 6110,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 6173,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 6241,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 6253,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 6254,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 6285,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 6287,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 6293,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 5,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 18,
+      "average": 4.5
+    },
+    {
+      "index": 6296,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 6303,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 6306,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 6307,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 6308,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 6320,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 6338,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 6355,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 6358,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 6364,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 6377,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 6409,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 6418,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 6425,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 6457,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 6459,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 6500,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 6506,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 6568,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 6602,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "colloquial: nummen"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 6622,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 6624,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 6678,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 6695,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 6696,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 6699,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 6738,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 6741,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 6764,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 6798,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 6815,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 6864,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 6867,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 6872,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 6964,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 6977,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 6982,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 6998,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 7019,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 7025,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 7026,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 7053,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 7060,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 7100,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 7111,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "colloquial: hevelse"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 7147,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 7166,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 7172,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "colloquial: nummen"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 7205,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "colloquial: nummen"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 7206,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 7221,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 7238,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 7270,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 7271,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 7337,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 7340,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 7361,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 13,
+      "average": 3.25
+    },
+    {
+      "index": 7377,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "colloquial: nummen"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 7428,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 7437,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 7441,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 7510,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 7526,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 7529,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 7534,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 7585,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 7633,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 7668,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 7676,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 7723,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 5,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 18,
+      "average": 4.5
+    },
+    {
+      "index": 7725,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 7729,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 7813,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 7817,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 7847,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 7868,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 7884,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 7888,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 7903,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 7968,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 5,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 18,
+      "average": 4.5
+    },
+    {
+      "index": 8017,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 8036,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 8047,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "colloquial: nummen"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 8100,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 8101,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 8135,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 8153,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 8185,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 8211,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 8255,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 8260,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 5,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 18,
+      "average": 4.5
+    },
+    {
+      "index": 8278,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 8346,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 8349,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 8350,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 8377,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 8383,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "colloquial: nummen"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 8401,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 8402,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "colloquial: nummen"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 8406,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 8407,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 8413,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 8444,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 8449,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 8480,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 8490,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "colloquial: nummen"
+      },
+      "completeness": {
+        "score": 5,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 8508,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 8562,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 8568,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 8623,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 5,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 8646,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 8665,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 8699,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 8711,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 8719,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 8799,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "colloquial: hevelse"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 8816,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 8823,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 8893,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 8925,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 8950,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 8955,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 8972,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 8976,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 8997,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 9039,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 9055,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 9059,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 9097,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 9103,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 9105,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 9112,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 9125,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 9132,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 9148,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 5,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 18,
+      "average": 4.5
+    },
+    {
+      "index": 9161,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 9166,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 9190,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 9220,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 9224,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 9225,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 5,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 9230,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 9232,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 9274,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 9318,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 9384,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 5,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 9397,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 9404,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 9422,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 9453,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "colloquial: hevelse, nummen"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 9464,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 9466,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 9467,
+      "format": {
+        "score": 4,
+        "note": "missing system prompt"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 12,
+      "average": 3.0
+    },
+    {
+      "index": 9476,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 9519,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 9535,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 9537,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 9595,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 9608,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 5,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 9632,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 14,
+      "average": 3.5
+    },
+    {
+      "index": 9731,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 9756,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 9758,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 9781,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 9784,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 9791,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 9797,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 9800,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 9803,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 3,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 9818,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 9826,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 9852,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 9867,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 15,
+      "average": 3.75
+    },
+    {
+      "index": 9873,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 4,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 17,
+      "average": 4.25
+    },
+    {
+      "index": 9891,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 9925,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 9956,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 4,
+        "note": "OK"
+      },
+      "completeness": {
+        "score": 3,
+        "note": "OK"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 16,
+      "average": 4.0
+    },
+    {
+      "index": 9965,
+      "format": {
+        "score": 5,
+        "note": "OK"
+      },
+      "norwegian": {
+        "score": 2,
+        "note": "low Norwegian char rate"
+      },
+      "completeness": {
+        "score": 2,
+        "note": "low prompt-response overlap"
+      },
+      "accuracy": {
+        "score": 4,
+        "note": "OK"
+      },
+      "total": 13,
+      "average": 3.25
+    }
+  ]
+}
