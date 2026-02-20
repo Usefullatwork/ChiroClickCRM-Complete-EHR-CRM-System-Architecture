@@ -5,6 +5,7 @@
  * List of clinical notes for a patient
  */
 
+import { ListSkeleton } from '../ui/Skeleton';
 import {
   FileText,
   User,
@@ -148,9 +149,8 @@ export default function NotesList({
   // Show loading state
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="text-sm text-gray-500 mt-3">Laster notater...</p>
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <ListSkeleton items={5} showAvatar={false} />
       </div>
     );
   }

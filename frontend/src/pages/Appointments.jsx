@@ -11,6 +11,7 @@ import { appointmentsAPI } from '../services/api';
 import { useTranslation, formatDate, formatTime } from '../i18n';
 import { useConfirm } from '../components/ui/ConfirmDialog';
 import LiveAppointmentBoard from '../components/appointments/LiveAppointmentBoard';
+import { AppointmentsListSkeleton } from '../components/ui/Skeleton';
 
 export default function Appointments() {
   const navigate = useNavigate();
@@ -167,8 +168,8 @@ export default function Appointments() {
 
           {/* Appointments List */}
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+              <AppointmentsListSkeleton items={6} />
             </div>
           ) : appointments.length === 0 ? (
             <div className="text-center py-12 bg-gray-50 rounded-lg">

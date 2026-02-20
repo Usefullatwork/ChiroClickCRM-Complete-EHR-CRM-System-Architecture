@@ -21,6 +21,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { useTranslation } from '../i18n';
+import { AppointmentsListSkeleton } from '../components/ui/Skeleton';
 import {
   startOfMonth,
   endOfMonth,
@@ -377,9 +378,7 @@ export default function Calendar() {
 
           <div className="p-6">
             {isLoading ? (
-              <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              </div>
+              <AppointmentsListSkeleton items={5} />
             ) : getAppointmentsForDate(selectedDate).length === 0 ? (
               <div className="text-center py-12">
                 <CalendarIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
