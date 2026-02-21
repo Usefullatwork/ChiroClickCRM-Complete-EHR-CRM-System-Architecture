@@ -47,12 +47,12 @@ NORWEGIAN_CHARS = set('æøåÆØÅ')
 # ============================================================
 SYNONYMS = {
     "cauda equina": ["cauda equina", "cauda equina syndrom", "hestehalesyndrom", "cauda equina-syndrom"],
-    "henvisning": ["henvisning", "henvis", "referer", "akutt overgang", "hastehenvisning"],
+    "henvisning": ["henvisning", "henvis", "referer", "akutt overgang", "hastehenvisning", "113", "legevakt", "øyeblikkelig hjelp", "akuttmottak", "sykehus"],
     "myelopati": ["myelopati", "ryggmargsaffeksjon", "myelopatisk", "cervikal myelopati"],
     "vertebrobasilær": ["vertebrobasilær", "vbi", "vertebrobasilær insuffisiens", "vertebrobasil"],
-    "spenningshodepine": ["spenningshodepine", "tensjonshodepine", "tension-type", "spennings-hodepine"],
+    "spenningshodepine": ["spenningshodepine", "tensjonshodepine", "tension-type", "spennings-hodepine", "tensjon"],
     "tendinopati": ["tendinopati", "tendinitt", "senebetennelse", "tendinose"],
-    "mekanisk": ["mekanisk", "muskuloskeletalt", "bevegelsesrelatert", "mekaniske"],
+    "mekanisk": ["mekanisk", "muskuloskeletalt", "bevegelsesrelatert", "mekaniske", "trygt", "ingen røde flagg", "lav risiko", "ikke-alvorlig", "godartet", "benign"],
     "metastas": ["metastas", "spredning", "sekundær tumor", "metastase"],
     "bildediagnostikk": ["bildediagnostikk", "billeddiagnostikk", "røntgen", "mr", "ct", "mri"],
     "infeksjon": ["infeksjon", "infeksiøs", "septisk", "bakteriell"],
@@ -62,11 +62,25 @@ SYNONYMS = {
     "radikulopati": ["radikulopati", "nerverotaffeksjon", "radikulær", "rotaffeksjon"],
     "stenose": ["stenose", "trang spinalkanal", "spinal stenose"],
     "sykemelding": ["sykemelding", "sykmelding", "sykemeldt", "sykmeldt"],
-    "avbestill": ["avbestill", "avbestilling", "kanseller", "avlys"],
-    "gratulerer": ["gratulerer", "gratulasjon", "bursdagsønske", "gratulere"],
-    "nakkevirvelsøyle": ["nakkevirvelsøyle", "cervikalcolumna", "cervikalsøylen", "nakkevirvler", "halsvirvelsøyle"],
-    "brystvirvelsøyle": ["brystvirvelsøyle", "torakalcolumna", "thorakalcolumna", "brystvirvler", "torakalsøylen"],
+    "avbestill": ["avbestill", "avbestilling", "kanseller", "avlys", "kansellert", "avlyst"],
+    "gratulerer": ["gratulerer", "gratulasjon", "bursdagsønske", "gratulere", "bursdag", "fødselsdag"],
+    "nakkevirvelsøyle": ["nakkevirvelsøyle", "cervikalcolumna", "cervikalsøylen", "nakkevirvler", "halsvirvelsøyle", "cervikal"],
+    "brystvirvelsøyle": ["brystvirvelsøyle", "torakalcolumna", "thorakalcolumna", "brystvirvler", "torakalsøylen", "torakal"],
     "bekkenleddet": ["bekkenleddet", "iliosakralleddet", "si-leddet", "sacroiliacaleddet", "si-ledd"],
+
+    # Clinical term synonyms for safe scenarios and documentation
+    "BPPV": ["bppv", "krystallsyke", "benign paroksysmal", "posisjonsvertigo", "posisjonssvimmelhet"],
+    "Subjektiv": ["Subjektiv", "subjektiv", "S:", "S :", "Subjektivt"],
+    "Objektiv": ["Objektiv", "objektiv", "O:", "O :", "Objektivt"],
+    "Vurdering": ["Vurdering", "vurdering", "A:", "Analyse", "analyse", "Assessment"],
+    "Plan": ["Plan", "plan", "P:", "Behandlingsplan", "behandlingsplan"],
+    "hofte": ["hofte", "hofteledd", "hoftesmerte", "coxartrose", "hofteartrose"],
+    "bekken": ["bekken", "bekkenledd", "bekkenledds", "bekkensmerter", "bekkenring", "bekkenbelte"],
+    "barn": ["barn", "gutt", "jente", "pediatrisk", "barnet", "ungdom"],
+    "whiplash": ["whiplash", "nakkesleng", "nakkeskade", "wad", "piskesnert"],
+    "patologisk": ["patologisk", "malign", "kreft", "tumor", "onkologisk", "malignt"],
+    "ledig": ["ledig", "tilgjengelig", "åpnet", "blitt ledig", "fri time"],
+    "funksjonsevne": ["funksjonsevne", "funksjonsnivå", "funksjonsgrad", "funksjon", "adl"],
 
     # ICPC-2 code synonyms — clinically equivalent alternative codes
     # Low back / back pain codes
