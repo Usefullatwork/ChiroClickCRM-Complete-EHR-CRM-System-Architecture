@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { templatesAPI } from '../services/api';
+import TemplateVariableModal from './clinical/TemplateVariableModal';
 import {
   Search,
   Star,
@@ -52,6 +53,7 @@ export default function OrthopedicTemplatePicker({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBodyRegion, setSelectedBodyRegion] = useState(null);
   const [selectedTemplateType, _setSelectedTemplateType] = useState(null);
+  const [variableModal, setVariableModal] = useState(null);
 
   // Fetch template categories
   const { data: categories } = useQuery({
@@ -129,8 +131,8 @@ export default function OrthopedicTemplatePicker({
 
     // If template has variables, show a modal to fill them
     if (template.template_data?.variables && template.template_data.variables.length > 0) {
-      // TODO: Show variable input modal
-      // For now, just insert template with placeholder variables
+      setVariableModal({ variables: template.template_data.variables, content, template });
+      return; // Don't close picker yet — wait for modal
     }
 
     // Call the parent's onSelectTemplate callback
@@ -290,189 +292,211 @@ export default function OrthopedicTemplatePicker({
   );
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] flex flex-col">
-        {/* Header */}
-        <div className="border-b p-4 flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-bold">Kliniske Maler</h2>
-            <p className="text-sm text-gray-500">
-              {soapSection ? `${SOAP_SECTIONS.find((s) => s.value === soapSection)?.label} - ` : ''}
-              Velg mal for å sette inn tekst
-            </p>
-          </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-            <X size={20} />
-          </button>
-        </div>
-
-        {/* Tabs */}
-        <div className="border-b flex">
-          <button
-            onClick={() => setActiveTab('templates')}
-            className={`px-4 py-3 font-medium text-sm transition-colors ${
-              activeTab === 'templates'
-                ? 'border-b-2 border-blue-500 text-blue-600'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <BookOpen size={16} className="inline mr-2" />
-            Maler
-          </button>
-          <button
-            onClick={() => setActiveTab('tests')}
-            className={`px-4 py-3 font-medium text-sm transition-colors ${
-              activeTab === 'tests'
-                ? 'border-b-2 border-green-500 text-green-600'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <Bone size={16} className="inline mr-2" />
-            Ortopediske Tester
-          </button>
-          <button
-            onClick={() => setActiveTab('phrases')}
-            className={`px-4 py-3 font-medium text-sm transition-colors ${
-              activeTab === 'phrases'
-                ? 'border-b-2 border-purple-500 text-purple-600'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <Copy size={16} className="inline mr-2" />
-            Fraser
-          </button>
-          <button
-            onClick={() => setActiveTab('favorites')}
-            className={`px-4 py-3 font-medium text-sm transition-colors ${
-              activeTab === 'favorites'
-                ? 'border-b-2 border-yellow-500 text-yellow-600'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <Star size={16} className="inline mr-2" />
-            Favoritter
-          </button>
-        </div>
-
-        {/* Search and Filters */}
-        <div className="p-4 border-b bg-gray-50">
-          <div className="flex gap-3">
-            <div className="flex-1 relative">
-              <Search
-                size={18}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              />
-              <input
-                type="text"
-                placeholder="Søk maler, tester, fraser..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+    <>
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] flex flex-col">
+          {/* Header */}
+          <div className="border-b p-4 flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold">Kliniske Maler</h2>
+              <p className="text-sm text-gray-500">
+                {soapSection
+                  ? `${SOAP_SECTIONS.find((s) => s.value === soapSection)?.label} - `
+                  : ''}
+                Velg mal for å sette inn tekst
+              </p>
             </div>
-
-            {/* Body Region Filter */}
-            <select
-              value={selectedBodyRegion || ''}
-              onChange={(e) => setSelectedBodyRegion(e.target.value || null)}
-              className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <option value="">Alle områder</option>
-              {BODY_REGIONS.map((region) => (
-                <option key={region.value} value={region.value}>
-                  {region.icon} {region.label}
-                </option>
-              ))}
-            </select>
+              <X size={20} />
+            </button>
           </div>
-        </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-hidden flex">
-          {/* Sidebar - Categories (only for templates tab) */}
-          {activeTab === 'templates' && categories && (
-            <div className="w-64 border-r overflow-y-auto bg-gray-50">
-              <div className="p-3">
-                <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Kategorier</h3>
-                {renderCategoryTree(categories.data)}
+          {/* Tabs */}
+          <div className="border-b flex">
+            <button
+              onClick={() => setActiveTab('templates')}
+              className={`px-4 py-3 font-medium text-sm transition-colors ${
+                activeTab === 'templates'
+                  ? 'border-b-2 border-blue-500 text-blue-600'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <BookOpen size={16} className="inline mr-2" />
+              Maler
+            </button>
+            <button
+              onClick={() => setActiveTab('tests')}
+              className={`px-4 py-3 font-medium text-sm transition-colors ${
+                activeTab === 'tests'
+                  ? 'border-b-2 border-green-500 text-green-600'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <Bone size={16} className="inline mr-2" />
+              Ortopediske Tester
+            </button>
+            <button
+              onClick={() => setActiveTab('phrases')}
+              className={`px-4 py-3 font-medium text-sm transition-colors ${
+                activeTab === 'phrases'
+                  ? 'border-b-2 border-purple-500 text-purple-600'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <Copy size={16} className="inline mr-2" />
+              Fraser
+            </button>
+            <button
+              onClick={() => setActiveTab('favorites')}
+              className={`px-4 py-3 font-medium text-sm transition-colors ${
+                activeTab === 'favorites'
+                  ? 'border-b-2 border-yellow-500 text-yellow-600'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <Star size={16} className="inline mr-2" />
+              Favoritter
+            </button>
+          </div>
+
+          {/* Search and Filters */}
+          <div className="p-4 border-b bg-gray-50">
+            <div className="flex gap-3">
+              <div className="flex-1 relative">
+                <Search
+                  size={18}
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                />
+                <input
+                  type="text"
+                  placeholder="Søk maler, tester, fraser..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
               </div>
+
+              {/* Body Region Filter */}
+              <select
+                value={selectedBodyRegion || ''}
+                onChange={(e) => setSelectedBodyRegion(e.target.value || null)}
+                className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Alle områder</option>
+                {BODY_REGIONS.map((region) => (
+                  <option key={region.value} value={region.value}>
+                    {region.icon} {region.label}
+                  </option>
+                ))}
+              </select>
             </div>
-          )}
-
-          {/* Main Content Area */}
-          <div className="flex-1 overflow-y-auto p-4">
-            {activeTab === 'templates' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {templatesLoading ? (
-                  <p className="text-gray-500 col-span-2 text-center py-8">Laster maler...</p>
-                ) : templates?.data && templates.data.length > 0 ? (
-                  templates.data.map(renderTemplate)
-                ) : (
-                  <p className="text-gray-500 col-span-2 text-center py-8">Ingen maler funnet</p>
-                )}
-              </div>
-            )}
-
-            {activeTab === 'tests' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {testsLoading ? (
-                  <p className="text-gray-500 col-span-2 text-center py-8">Laster tester...</p>
-                ) : tests?.data && tests.data.length > 0 ? (
-                  tests.data.map(renderTest)
-                ) : (
-                  <p className="text-gray-500 col-span-2 text-center py-8">Ingen tester funnet</p>
-                )}
-              </div>
-            )}
-
-            {activeTab === 'phrases' && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                {phrasesLoading ? (
-                  <p className="text-gray-500 col-span-3 text-center py-8">Laster fraser...</p>
-                ) : phrases?.data && phrases.data.length > 0 ? (
-                  phrases.data.map(renderPhrase)
-                ) : (
-                  <p className="text-gray-500 col-span-3 text-center py-8">Ingen fraser funnet</p>
-                )}
-              </div>
-            )}
-
-            {activeTab === 'favorites' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {templatesLoading ? (
-                  <p className="text-gray-500 col-span-2 text-center py-8">Laster favoritter...</p>
-                ) : templates?.data && templates.data.length > 0 ? (
-                  templates.data.map(renderTemplate)
-                ) : (
-                  <p className="text-gray-500 col-span-2 text-center py-8">
-                    Ingen favoritter ennå. Klikk på stjerne-ikonet på en mal for å legge til
-                    favoritter.
-                  </p>
-                )}
-              </div>
-            )}
           </div>
-        </div>
 
-        {/* Footer */}
-        <div className="border-t p-4 bg-gray-50 flex items-center justify-between">
-          <div className="text-sm text-gray-500">
-            {activeTab === 'templates' &&
-              templates?.pagination &&
-              `Viser ${templates.data.length} av ${templates.pagination.total} maler`}
-            {activeTab === 'tests' && tests?.data && `${tests.data.length} tester tilgjengelig`}
-            {activeTab === 'phrases' &&
-              phrases?.data &&
-              `${phrases.data.length} fraser tilgjengelig`}
+          {/* Content */}
+          <div className="flex-1 overflow-hidden flex">
+            {/* Sidebar - Categories (only for templates tab) */}
+            {activeTab === 'templates' && categories && (
+              <div className="w-64 border-r overflow-y-auto bg-gray-50">
+                <div className="p-3">
+                  <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Kategorier</h3>
+                  {renderCategoryTree(categories.data)}
+                </div>
+              </div>
+            )}
+
+            {/* Main Content Area */}
+            <div className="flex-1 overflow-y-auto p-4">
+              {activeTab === 'templates' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {templatesLoading ? (
+                    <p className="text-gray-500 col-span-2 text-center py-8">Laster maler...</p>
+                  ) : templates?.data && templates.data.length > 0 ? (
+                    templates.data.map(renderTemplate)
+                  ) : (
+                    <p className="text-gray-500 col-span-2 text-center py-8">Ingen maler funnet</p>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'tests' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {testsLoading ? (
+                    <p className="text-gray-500 col-span-2 text-center py-8">Laster tester...</p>
+                  ) : tests?.data && tests.data.length > 0 ? (
+                    tests.data.map(renderTest)
+                  ) : (
+                    <p className="text-gray-500 col-span-2 text-center py-8">Ingen tester funnet</p>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'phrases' && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {phrasesLoading ? (
+                    <p className="text-gray-500 col-span-3 text-center py-8">Laster fraser...</p>
+                  ) : phrases?.data && phrases.data.length > 0 ? (
+                    phrases.data.map(renderPhrase)
+                  ) : (
+                    <p className="text-gray-500 col-span-3 text-center py-8">Ingen fraser funnet</p>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'favorites' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {templatesLoading ? (
+                    <p className="text-gray-500 col-span-2 text-center py-8">
+                      Laster favoritter...
+                    </p>
+                  ) : templates?.data && templates.data.length > 0 ? (
+                    templates.data.map(renderTemplate)
+                  ) : (
+                    <p className="text-gray-500 col-span-2 text-center py-8">
+                      Ingen favoritter ennå. Klikk på stjerne-ikonet på en mal for å legge til
+                      favoritter.
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
-          <button
-            onClick={onClose}
-            className="px-4 py-2 border rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            Lukk
-          </button>
+
+          {/* Footer */}
+          <div className="border-t p-4 bg-gray-50 flex items-center justify-between">
+            <div className="text-sm text-gray-500">
+              {activeTab === 'templates' &&
+                templates?.pagination &&
+                `Viser ${templates.data.length} av ${templates.pagination.total} maler`}
+              {activeTab === 'tests' && tests?.data && `${tests.data.length} tester tilgjengelig`}
+              {activeTab === 'phrases' &&
+                phrases?.data &&
+                `${phrases.data.length} fraser tilgjengelig`}
+            </div>
+            <button
+              onClick={onClose}
+              className="px-4 py-2 border rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              Lukk
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+      {variableModal && (
+        <TemplateVariableModal
+          isOpen={!!variableModal}
+          onClose={() => setVariableModal(null)}
+          variables={variableModal.variables}
+          content={variableModal.content}
+          onConfirm={(resolvedContent) => {
+            onSelectTemplate(resolvedContent, variableModal.template);
+            setVariableModal(null);
+            onClose();
+          }}
+        />
+      )}
+    </>
   );
 }

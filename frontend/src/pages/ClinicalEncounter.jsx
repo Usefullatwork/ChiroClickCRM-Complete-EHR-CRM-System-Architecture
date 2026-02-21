@@ -5,15 +5,16 @@
  * UI sections are extracted to components/encounter/.
  */
 
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { encountersAPI, patientsAPI, diagnosisAPI, aiAPI } from '../services/api';
-import TemplatePicker from '../components/TemplatePicker';
 import { usePatientIntake } from '../hooks/usePatientIntake';
 import { useClinicalPreferences } from '../hooks';
-import QuickPalpationSpine from '../components/clinical/QuickPalpationSpine';
-import { AIDiagnosisSidebar } from '../components/clinical';
+
+const TemplatePicker = lazy(() => import('../components/TemplatePicker'));
+const QuickPalpationSpine = lazy(() => import('../components/clinical/QuickPalpationSpine'));
+const AIDiagnosisSidebar = lazy(() => import('../components/clinical/AIDiagnosisSidebar'));
 import { ConnectionStatus } from '../components/common';
 import toast from '../utils/toast';
 
@@ -777,7 +778,9 @@ export default function ClinicalEncounter() {
     <div className="flex h-screen bg-slate-50 text-slate-900 overflow-hidden font-sans">
       {/* Quick Palpation Spine Sidebar */}
       <div className="fixed right-0 top-0 w-44 h-full z-20 shadow-lg">
-        <QuickPalpationSpine onInsertText={handleSpineTextInsert} disabled={isSigned} />
+        <Suspense fallback={<div className="animate-pulse bg-slate-100 rounded-lg h-full" />}>
+          <QuickPalpationSpine onInsertText={handleSpineTextInsert} disabled={isSigned} />
+        </Suspense>
       </div>
 
       <div className="flex flex-1 mr-44">
@@ -922,29 +925,33 @@ export default function ClinicalEncounter() {
       </div>
 
       {/* AI DIAGNOSIS SIDEBAR */}
-      <AIDiagnosisSidebar
-        soapData={encounterData}
-        onSelectCode={(suggestion) => {
-          if (suggestion.code && !encounterData.icpc_codes.includes(suggestion.code)) {
-            setEncounterData((prev) => ({
-              ...prev,
-              icpc_codes: [...prev.icpc_codes, suggestion.code],
-            }));
-            setAutoSaveStatus('unsaved');
-          }
-        }}
-        isCollapsed={!showAIDiagnosisSidebar}
-        onToggle={() => setShowAIDiagnosisSidebar(!showAIDiagnosisSidebar)}
-        disabled={isSigned}
-      />
+      <Suspense fallback={<div className="animate-pulse bg-slate-100 rounded-lg h-full" />}>
+        <AIDiagnosisSidebar
+          soapData={encounterData}
+          onSelectCode={(suggestion) => {
+            if (suggestion.code && !encounterData.icpc_codes.includes(suggestion.code)) {
+              setEncounterData((prev) => ({
+                ...prev,
+                icpc_codes: [...prev.icpc_codes, suggestion.code],
+              }));
+              setAutoSaveStatus('unsaved');
+            }
+          }}
+          isCollapsed={!showAIDiagnosisSidebar}
+          onToggle={() => setShowAIDiagnosisSidebar(!showAIDiagnosisSidebar)}
+          disabled={isSigned}
+        />
+      </Suspense>
 
       {/* TEMPLATE PICKER SIDEBAR */}
-      <TemplatePicker
-        isOpen={showTemplatePicker}
-        onClose={() => setShowTemplatePicker(false)}
-        onSelectTemplate={handleTemplateSelect}
-        soapSection={activeField?.split('.')[0] || 'subjective'}
-      />
+      <Suspense fallback={<div className="animate-pulse bg-slate-100 rounded-lg h-full" />}>
+        <TemplatePicker
+          isOpen={showTemplatePicker}
+          onClose={() => setShowTemplatePicker(false)}
+          onSelectTemplate={handleTemplateSelect}
+          soapSection={activeField?.split('.')[0] || 'subjective'}
+        />
+      </Suspense>
 
       {/* CONNECTION STATUS INDICATOR */}
       <ConnectionStatus

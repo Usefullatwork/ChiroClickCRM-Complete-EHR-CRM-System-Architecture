@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useId } from 'react';
 import { X } from 'lucide-react';
 
 export const Modal = ({ isOpen, onClose, title, children, size = 'md', footer }) => {
@@ -9,6 +9,33 @@ export const Modal = ({ isOpen, onClose, title, children, size = 'md', footer })
     xl: 'max-w-6xl',
     full: 'max-w-full mx-4',
   };
+
+  const titleId = useId();
+  const modalRef = useRef(null);
+
+  // Focus trap
+  useEffect(() => {
+    if (!isOpen || !modalRef.current) return;
+    const focusable = modalRef.current.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusable.length) focusable[0].focus();
+
+    const handleTab = (e) => {
+      if (e.key !== 'Tab' || !focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', handleTab);
+    return () => document.removeEventListener('keydown', handleTab);
+  }, [isOpen]);
 
   // Close on ESC key
   useEffect(() => {
@@ -40,14 +67,21 @@ export const Modal = ({ isOpen, onClose, title, children, size = 'md', footer })
 
       {/* Modal */}
       <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={title ? titleId : undefined}
         className={`relative bg-white rounded-xl shadow-2xl w-full ${sizes[size]} max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-200`}
       >
         {/* Header */}
         {title && (
           <div className="flex items-center justify-between p-6 border-b border-slate-200">
-            <h2 className="text-xl font-bold text-slate-900">{title}</h2>
+            <h2 id={titleId} className="text-xl font-bold text-slate-900">
+              {title}
+            </h2>
             <button
               onClick={onClose}
+              aria-label="Lukk"
               className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
             >
               <X size={20} />

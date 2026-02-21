@@ -8,6 +8,30 @@ import logger from '../utils/logger';
 
 const log = logger.scope('ErrorBoundary');
 
+function logErrorToService(error, errorInfo) {
+  if (import.meta.env.DEV) return; // Skip in dev — already logging locally
+
+  try {
+    const payload = {
+      message: error?.message || String(error),
+      stack: error?.stack || null,
+      componentStack: errorInfo?.componentStack || null,
+      url: window.location.href,
+      userAgent: navigator.userAgent,
+      timestamp: new Date().toISOString(),
+    };
+
+    // Fire-and-forget — don't block UI on error reporting
+    fetch('/api/v1/errors', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch(() => {}); // Silently fail if error reporting itself fails
+  } catch {
+    // Never let error reporting cause more errors
+  }
+}
+
 export class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -24,8 +48,7 @@ export class ErrorBoundary extends React.Component {
     // Log error
     log.error('ErrorBoundary caught an error', { error: error.message, errorInfo });
 
-    // TODO: Send error to logging service in production
-    // logErrorToService(error, errorInfo);
+    logErrorToService(error, errorInfo);
   }
 
   handleRetry = () => {
