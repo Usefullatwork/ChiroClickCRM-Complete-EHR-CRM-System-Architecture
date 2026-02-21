@@ -6,6 +6,7 @@
 import { query } from '../../config/database.js';
 import logger from '../../utils/logger.js';
 import * as communicationService from '../communications.js';
+import { createNotification, NOTIFICATION_TYPES } from '../notifications.js';
 
 // =============================================================================
 // ACTION TYPES
@@ -225,7 +226,7 @@ const executeNotifyStaff = async (organizationId, action, patient) => {
 
   const staffResult = await query(staffQuery, params);
 
-  // Create notifications (could be expanded to send actual notifications)
+  // Create follow-ups and in-app notifications for each staff member
   for (const staff of staffResult.rows) {
     await query(
       `INSERT INTO follow_ups (
@@ -241,6 +242,22 @@ const executeNotifyStaff = async (organizationId, action, patient) => {
       ) VALUES ($1, $2, 'CUSTOM', $3, $4, NOW(), $5, true, 'Staff notification')`,
       [organizationId, patient?.id || null, message, action.priority || 'MEDIUM', staff.id]
     );
+
+    // Send in-app notification
+    try {
+      await createNotification({
+        organizationId,
+        userId: staff.id,
+        type: NOTIFICATION_TYPES.STAFF_NOTIFICATION,
+        title: 'Automatisk varsling',
+        message,
+        priority: action.priority || 'MEDIUM',
+        link: patient?.id ? `/patients/${patient.id}` : null,
+        metadata: { automationTriggered: true, patientId: patient?.id },
+      });
+    } catch (_) {
+      // Best-effort — follow_up is the primary record
+    }
   }
 
   return { success: true, notifiedCount: staffResult.rows.length };

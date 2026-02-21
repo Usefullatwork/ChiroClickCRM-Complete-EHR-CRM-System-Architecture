@@ -6,6 +6,7 @@
 
 import pool from '../config/database.js';
 import logger from '../utils/logger.js';
+import { notifyByRole, NOTIFICATION_TYPES } from './notifications.js';
 
 /**
  * Record user feedback on AI suggestion
@@ -327,6 +328,22 @@ const notifyRetrainingNeeded = async (suggestionType, metrics) => {
     );
   } catch (alertError) {
     logger.error('Failed to persist retraining notification', { error: alertError.message });
+  }
+
+  // Notify admins via in-app notification
+  try {
+    const orgResult = await pool.query('SELECT id FROM organizations LIMIT 1');
+    if (orgResult.rows.length > 0) {
+      await notifyByRole(orgResult.rows[0].id, ['ADMIN', 'PRACTITIONER'], {
+        type: NOTIFICATION_TYPES.AI_RETRAINING_READY,
+        title: 'AI modell trenger opplæring',
+        message: `${metrics.feedbackCount} tilbakemeldinger (${metrics.rejectionCount} avvist) for ${suggestionType}. Vurder ny trening.`,
+        priority: 'MEDIUM',
+        metadata: { suggestionType, ...metrics },
+      });
+    }
+  } catch (_) {
+    // Best-effort
   }
 };
 

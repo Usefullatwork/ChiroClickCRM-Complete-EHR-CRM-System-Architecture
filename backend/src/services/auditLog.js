@@ -6,6 +6,7 @@
 
 import pool from '../config/database.js';
 import logger from '../utils/logger.js';
+import { notifyByRole, NOTIFICATION_TYPES } from './notifications.js';
 
 /**
  * Action types for audit logging
@@ -314,6 +315,22 @@ const alertAuditFailure = async (error, context) => {
       originalError: error.message,
       alertError: alertError.message,
     });
+  }
+
+  // Notify admins via in-app notification (best-effort)
+  try {
+    const orgResult = await pool.query('SELECT id FROM organizations LIMIT 1');
+    if (orgResult.rows.length > 0) {
+      await notifyByRole(orgResult.rows[0].id, ['ADMIN'], {
+        type: NOTIFICATION_TYPES.SECURITY_ALERT,
+        title: 'Kritisk: Revisjonslogg feilet',
+        message: `Revisjonslogging feilet for ${context.actionType}. Sjekk systemlogger.`,
+        priority: 'HIGH',
+        metadata: { error: error.message, context },
+      });
+    }
+  } catch (_) {
+    // Best-effort — system_alerts fallback above is sufficient
   }
 };
 
