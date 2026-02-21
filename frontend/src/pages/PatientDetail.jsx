@@ -25,6 +25,7 @@ import { formatDate, formatPhone, calculateAge } from '../lib/utils';
 import GDPRExportModal from '../components/GDPRExportModal';
 import PatientSummaryCard from '../components/patients/PatientSummaryCard';
 import TreatmentPlanProgress from '../components/treatment/TreatmentPlanProgress';
+import OutcomeChart from '../components/clinical/OutcomeChart';
 import ComplianceDashboard from '../components/clinical/ComplianceDashboard';
 import Breadcrumbs from '../components/common/Breadcrumbs';
 import { useTranslation } from '../i18n';
@@ -745,6 +746,9 @@ export default function PatientDetail() {
             onNewPlan={() => navigate(`/patients/${id}/treatment-plan/new`)}
             lang={lang === 'en' ? 'en' : 'no'}
           />
+
+          {/* Outcome Measure Trends */}
+          <OutcomeChart patientId={id} />
 
           {/* Exercise Compliance */}
           <ComplianceDashboard patientId={id} />

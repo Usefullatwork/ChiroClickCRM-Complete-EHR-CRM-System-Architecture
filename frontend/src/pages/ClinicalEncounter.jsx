@@ -5,7 +5,7 @@
  * UI sections are extracted to components/encounter/.
  */
 
-import { useEffect, lazy, Suspense } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { encountersAPI, patientsAPI, diagnosisAPI, aiAPI } from '../services/api';
@@ -28,6 +28,7 @@ import { EncounterFooter } from '../components/encounter/EncounterFooter';
 import { AmendmentSection } from '../components/encounter/AmendmentSection';
 import { AIAssistantPanel } from '../components/encounter/AIAssistantPanel';
 import { KeyboardShortcutsModal } from '../components/encounter/KeyboardShortcutsModal';
+import ComplianceScan from '../components/clinical/Encounter/ComplianceScan';
 
 // --- STATIC DATA ---
 
@@ -204,6 +205,9 @@ export default function ClinicalEncounter() {
     sectionRefs,
     timerIntervalRef,
   } = state;
+
+  // Compliance scan before signing
+  const [showComplianceScan, setShowComplianceScan] = useState(false);
 
   // Clinical Preferences
   const {
@@ -556,7 +560,10 @@ export default function ClinicalEncounter() {
 
   const handleSave = () => saveMutation.mutate(buildSavePayload());
 
+  const handlePreSign = () => setShowComplianceScan(true);
+
   const handleSignAndLock = async () => {
+    setShowComplianceScan(false);
     if (!encounterId) {
       try {
         const response = await encountersAPI.create(buildSavePayload());
@@ -903,13 +910,22 @@ export default function ClinicalEncounter() {
             )}
           </div>
 
+          <ComplianceScan
+            encounterData={encounterData}
+            selectedTakster={selectedTakster}
+            redFlagAlerts={redFlagAlerts}
+            visible={showComplianceScan}
+            onDismiss={() => setShowComplianceScan(false)}
+            onProceed={handleSignAndLock}
+          />
+
           <EncounterFooter
             patientId={patientId}
             isSigned={isSigned}
             saveMutation={saveMutation}
             signMutation={signMutation}
             handleSave={handleSave}
-            handleSignAndLock={handleSignAndLock}
+            handleSignAndLock={handlePreSign}
             navigate={navigate}
           />
         </main>
