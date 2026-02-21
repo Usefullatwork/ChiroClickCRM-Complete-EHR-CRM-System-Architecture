@@ -155,7 +155,7 @@ if [ "$ONLY_EVAL" = false ] && [ "$SKIP_SFT" = false ]; then
   log "============================================================"
   log "Phase 2: SFT Training — chiro-no v3"
   log "============================================================"
-  log "Config: batch=2, seq=1024, epochs=1, lr=2e-4"
+  log "Config: batch=2, seq=1024, epochs=1, lr=1.5e-4, cosine scheduler"
   log "Expected duration: 5-7 hours"
   log ""
 
@@ -167,8 +167,7 @@ if [ "$ONLY_EVAL" = false ] && [ "$SKIP_SFT" = false ]; then
     --epochs 1 \
     --batch-size 2 \
     --max-seq-length 1024 \
-    --learning-rate 2e-4 \
-    --gradient-accumulation 4 \
+    --lr 1.5e-4 \
     --low-vram"
 
   log "SFT chiro-no v3 training complete."
@@ -329,8 +328,7 @@ if [ "$ONLY_EVAL" = false ] && [ "$SKIP_SFT" = false ]; then
     --epochs 1 \
     --batch-size 2 \
     --max-seq-length 1024 \
-    --learning-rate 2e-4 \
-    --gradient-accumulation 4 \
+    --lr 1.5e-4 \
     --low-vram"
 
   log "SFT chiro-norwegian v3 training complete."

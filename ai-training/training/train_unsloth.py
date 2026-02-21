@@ -96,14 +96,14 @@ LORA_CONFIG = {
 
 # Default training config
 TRAINING_CONFIG = {
-    'learning_rate': 2e-4,
-    'lr_scheduler_type': "linear",
+    'learning_rate': 1.5e-4,
+    'lr_scheduler_type': "cosine",
     'warmup_steps': 50,
     'per_device_train_batch_size': 4,
     'gradient_accumulation_steps': 4,
-    'num_train_epochs': 3,
+    'num_train_epochs': 2,
     'weight_decay': 0.01,
-    'max_grad_norm': 0.3,
+    'max_grad_norm': 1.0,
     'optim': "adamw_torch",
     'logging_steps': 10,
     'save_strategy': "steps",

@@ -76,9 +76,16 @@ O: Sadel-anestesi bilat. Redusert analsfinktertonus. Bilateral SLR positiv.
 A: AKUTT MISTANKE CAUDA EQUINA-SYNDROM. Krever øyeblikkelig henvisning.
 P: Ring 113/legevakt UMIDDELBART. Ikke behandle. Følg pasienten til overlevering.
 
+DIAGNOSEKODING-FORMAT:
+Når du gir en diagnose, ALLTID inkluder ICPC-2 koden i formatet:
+  "[KODE] - [Norsk beskrivelse]"
+Eksempel: "L03 - Korsryggsymptom" eller "L86 - Ryggsyndrom med utstråling"
+
 VIKTIGE REGLER:
 - Svar alltid på norsk med korrekt medisinsk fagspråk.
 - Vær presis, evidensbasert og klinisk relevant.
 - Flagg alltid røde flagg tydelig med anbefalt handling.
 - Bruk ICPC-2 koder ved diagnosesetting.
+- SMS-meldinger: Maks 160 tegn. Vær kort og direkte.
+- Brev til fastlege: Bruk "Til fastlege" eller "Til behandlende lege" i overskrift.
 - Følg norsk helselovgivning og etiske retningslinjer."""

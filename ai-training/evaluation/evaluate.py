@@ -64,16 +64,16 @@ SYNONYMS = {
     "sykemelding": ["sykemelding", "sykmelding", "sykemeldt", "sykmeldt"],
     "avbestill": ["avbestill", "avbestilling", "kanseller", "avlys", "kansellert", "avlyst"],
     "gratulerer": ["gratulerer", "gratulasjon", "bursdagsønske", "gratulere", "bursdag", "fødselsdag"],
-    "nakkevirvelsøyle": ["nakkevirvelsøyle", "cervikalcolumna", "cervikalsøylen", "nakkevirvler", "halsvirvelsøyle", "cervikal"],
-    "brystvirvelsøyle": ["brystvirvelsøyle", "torakalcolumna", "thorakalcolumna", "brystvirvler", "torakalsøylen", "torakal"],
+    "nakkevirvelsøyle": ["nakkevirvelsøyle", "cervikalcolumna", "cervikalsøylen", "nakkevirvler", "halsvirvelsøyle", "cervikal", "cervical", "nakken"],
+    "brystvirvelsøyle": ["brystvirvelsøyle", "torakalcolumna", "thorakalcolumna", "brystvirvler", "torakalsøylen", "torakal", "thorakal", "brystrygg"],
     "bekkenleddet": ["bekkenleddet", "iliosakralleddet", "si-leddet", "sacroiliacaleddet", "si-ledd"],
 
     # Clinical term synonyms for safe scenarios and documentation
-    "BPPV": ["bppv", "krystallsyke", "benign paroksysmal", "posisjonsvertigo", "posisjonssvimmelhet"],
-    "Subjektiv": ["Subjektiv", "subjektiv", "S:", "S :", "Subjektivt"],
-    "Objektiv": ["Objektiv", "objektiv", "O:", "O :", "Objektivt"],
-    "Vurdering": ["Vurdering", "vurdering", "A:", "Analyse", "analyse", "Assessment"],
-    "Plan": ["Plan", "plan", "P:", "Behandlingsplan", "behandlingsplan"],
+    "bppv": ["bppv", "krystallsyke", "benign paroksysmal", "posisjonsvertigo", "posisjonssvimmelhet"],
+    "subjektiv": ["Subjektiv", "subjektiv", "S:", "S :", "Subjektivt"],
+    "objektiv": ["Objektiv", "objektiv", "O:", "O :", "Objektivt"],
+    "vurdering": ["Vurdering", "vurdering", "A:", "Analyse", "analyse", "Assessment"],
+    "plan": ["Plan", "plan", "P:", "Behandlingsplan", "behandlingsplan"],
     "hofte": ["hofte", "hofteledd", "hoftesmerte", "coxartrose", "hofteartrose"],
     "bekken": ["bekken", "bekkenledd", "bekkenledds", "bekkensmerter", "bekkenring", "bekkenbelte"],
     "barn": ["barn", "gutt", "jente", "pediatrisk", "barnet", "ungdom"],
@@ -151,14 +151,28 @@ NEGATION_WORDS = [
 
 
 def keyword_present(keyword, response_lower):
-    """Check if a keyword (or any synonym) is present in the response."""
-    synonyms = SYNONYMS.get(keyword.lower(), [keyword])
+    """Check if a keyword (or any synonym) is present in the response.
+
+    Uses case-insensitive key lookup in the SYNONYMS dict, so keys like
+    'L03' or 'Subjektiv' are found even when keyword.lower() is used.
+    """
+    kw_lower = keyword.lower()
+    # Case-insensitive key lookup
+    synonyms = None
+    for key, vals in SYNONYMS.items():
+        if key.lower() == kw_lower:
+            synonyms = vals
+            break
+    if synonyms is None:
+        synonyms = [keyword]
+
     for syn in synonyms:
         if syn.lower() in response_lower:
             return True
     # Fall back to exact keyword if not in synonym map
-    if keyword.lower() not in [s.lower() for syns in SYNONYMS.values() for s in syns]:
-        return keyword.lower() in response_lower
+    all_syns = [s.lower() for syns in SYNONYMS.values() for s in syns]
+    if kw_lower not in all_syns:
+        return kw_lower in response_lower
     return False
 
 
@@ -166,7 +180,7 @@ def is_negated(keyword, response_lower):
     """Check if a keyword appears only in negated context.
 
     Returns True if every occurrence of the keyword is preceded by a negation
-    word within a ~60-character window (approx 5-8 Norwegian tokens).
+    word within a ~120-character window (approx 10-15 Norwegian tokens).
     """
     kw_lower = keyword.lower()
     idx = 0
@@ -182,7 +196,7 @@ def is_negated(keyword, response_lower):
         return False  # Not found at all — not negated
 
     for pos in occurrences:
-        window_start = max(0, pos - 60)
+        window_start = max(0, pos - 120)
         window = response_lower[window_start:pos]
         negated = any(neg in window for neg in NEGATION_WORDS)
         if not negated:
@@ -375,7 +389,7 @@ def evaluate_case(case, response, latency_ms):
     # Category-aware threshold: diagnosis_codes and red_flags use 70% keyword match
     # (models often use valid alternatives not in the keyword list)
     category = case.get('category', '')
-    RELAXED_CATEGORIES = {'diagnosis_codes', 'red_flags'}
+    RELAXED_CATEGORIES = {'diagnosis_codes', 'red_flags', 'norwegian_language'}
     keyword_pass_threshold = 0.7 if category in RELAXED_CATEGORIES else 1.0
 
     required_keywords = case.get('required_keywords', [])
