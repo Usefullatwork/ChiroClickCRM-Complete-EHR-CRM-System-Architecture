@@ -133,12 +133,12 @@ let currentLoadedModel = null;
  */
 const AB_SPLIT_CONFIG = {
   'chiro-norwegian': {
-    loraModel: 'chiro-norwegian-lora',
+    loraModel: 'chiro-norwegian-lora-v2',
     loraPercent: parseInt(process.env.AB_SPLIT_NORWEGIAN || '0', 10),
     enabled: process.env.AB_SPLIT_NORWEGIAN !== undefined,
   },
   'chiro-no': {
-    loraModel: 'chiro-no-lora',
+    loraModel: 'chiro-no-lora-v2',
     loraPercent: parseInt(process.env.AB_SPLIT_NO || '0', 10),
     enabled: process.env.AB_SPLIT_NO !== undefined,
   },
@@ -253,7 +253,7 @@ const MODEL_CONFIG = {
   'chiro-norwegian-lora': {
     name: 'chiro-norwegian-lora',
     base: 'Qwen2.5-7B-Instruct + LoRA',
-    description: 'LoRA-tuned for Norwegian clinical documentation',
+    description: 'LoRA-tuned for Norwegian clinical documentation (v1)',
     size: '~14.2GB',
     maxTokens: 4096,
     temperature: 0.3,
@@ -262,11 +262,32 @@ const MODEL_CONFIG = {
   'chiro-no-lora': {
     name: 'chiro-no-lora',
     base: 'Qwen2.5-7B-Instruct + LoRA',
-    description: 'LoRA-tuned default clinical model',
+    description: 'LoRA-tuned default clinical model (v1)',
     size: '~15GB',
     maxTokens: 4096,
     temperature: 0.2,
     fallbackModel: 'chiro-no',
+  },
+
+  // v2 LoRA models — ADAPTER deployment (4.8GB, 3.5s load)
+  'chiro-no-lora-v2': {
+    name: 'chiro-no-lora-v2',
+    base: 'Qwen2.5-7B-Instruct + LoRA v2',
+    description: 'LoRA v2 clinical model (58.6% eval, ADAPTER method)',
+    size: '~4.8GB',
+    maxTokens: 4096,
+    temperature: 0.3,
+    fallbackModel: 'chiro-no-lora',
+    evalScore: '58.6%',
+  },
+  'chiro-norwegian-lora-v2': {
+    name: 'chiro-norwegian-lora-v2',
+    base: 'Qwen2.5-7B-Instruct + LoRA v2',
+    description: 'LoRA v2 Norwegian specialist (ADAPTER method)',
+    size: '~4.8GB',
+    maxTokens: 4096,
+    temperature: 0.3,
+    fallbackModel: 'chiro-norwegian-lora',
   },
 };
 
@@ -281,13 +302,13 @@ const MODEL_CONFIG = {
  * - General clinical → chiro-no (Qwen2.5-7B)
  */
 const MODEL_ROUTING = {
-  // SOAP & clinical documentation → chiro-norwegian-lora (89.8% SOAP accuracy)
-  // Falls back to chiro-norwegian if LoRA unavailable
-  soap_notes: 'chiro-norwegian-lora',
-  clinical_summary: 'chiro-norwegian-lora',
-  journal_organization: 'chiro-norwegian-lora',
-  diagnosis_suggestion: 'chiro-no',
-  sick_leave: 'chiro-no',
+  // SOAP & clinical documentation → chiro-norwegian-lora-v2 (enriched system prompt)
+  // Fallback chain: v2 → v1 → chiro-norwegian base
+  soap_notes: 'chiro-norwegian-lora-v2',
+  clinical_summary: 'chiro-norwegian-lora-v2',
+  journal_organization: 'chiro-norwegian-lora-v2',
+  diagnosis_suggestion: 'chiro-no-lora-v2',
+  sick_leave: 'chiro-no-lora-v2',
 
   // Fast autocomplete → chiro-fast ORIGINAL (LoRA hurts small models)
   autocomplete: 'chiro-fast',
@@ -296,21 +317,21 @@ const MODEL_ROUTING = {
   quick_suggestion: 'chiro-fast',
 
   // Norwegian language specialist
-  norwegian_text: 'chiro-norwegian',
-  patient_communication: 'chiro-norwegian',
-  referral_letter: 'chiro-norwegian',
-  report_writing: 'chiro-norwegian',
-  patient_education: 'chiro-norwegian',
-  consent_form: 'chiro-norwegian',
+  norwegian_text: 'chiro-norwegian-lora-v2',
+  patient_communication: 'chiro-norwegian-lora-v2',
+  referral_letter: 'chiro-norwegian-lora-v2',
+  report_writing: 'chiro-norwegian-lora-v2',
+  patient_education: 'chiro-norwegian-lora-v2',
+  consent_form: 'chiro-norwegian-lora-v2',
 
-  // Safety & red flags → chiro-no-lora (100% red flag detection)
-  // Falls back to chiro-medical if LoRA unavailable
-  red_flag_analysis: 'chiro-no-lora',
+  // Safety & red flags → chiro-no-lora-v2 (enriched red flag guidance)
+  // Fallback chain: v2 → v1 → chiro-medical base
+  red_flag_analysis: 'chiro-no-lora-v2',
   differential_diagnosis: 'chiro-medical',
-  treatment_safety: 'chiro-no-lora',
+  treatment_safety: 'chiro-no-lora-v2',
   clinical_reasoning: 'chiro-medical',
   medication_interaction: 'chiro-medical',
-  contraindication_check: 'chiro-no-lora',
+  contraindication_check: 'chiro-no-lora-v2',
 };
 
 /**

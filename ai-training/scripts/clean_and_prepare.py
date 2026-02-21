@@ -34,6 +34,15 @@ DEFAULT_INPUT_DIRS = [
 ]
 DEFAULT_OUTPUT_DIR = AI_TRAINING_DIR / "data" / "processed"
 
+# v2 high-quality synthetic data files to upsample (2x duplication)
+# These contain targeted examples for weak categories (red flags, ICPC-2, comms)
+V2_UPSAMPLE_PATTERNS = [
+    "red-flags-v2-synthetic.jsonl",
+    "icpc2-v2-synthetic.jsonl",
+    "comms-norwegian-v2-synthetic.jsonl",
+]
+V2_UPSAMPLE_FACTOR = 2  # Duplicate v2 data this many times (total = original + N copies)
+
 # Keywords that indicate non-clinical contamination
 CONTAMINATION_KEYWORDS = [
     "bubble.io", "bubble io", "react", "github", "codespaces",
@@ -435,6 +444,41 @@ def main():
     print(f"\nFilter results:")
     for k, v in sorted(stats.items()):
         print(f"  {k}: {v}")
+
+    # Phase 2.5: Upsample v2 high-quality data (after dedup, before categorization)
+    # This ensures targeted examples for weak categories are ~15% of training set
+    v2_upsampled = 0
+    v2_originals = [
+        ex for ex in clean
+        if any(pat in ex.get("messages", [{}])[0].get("_source", ex.get("_source", ""))
+               for pat in V2_UPSAMPLE_PATTERNS)
+    ]
+    # Fallback: check _source on the raw items that were kept
+    if not v2_originals:
+        # The _source tag is on the raw item, not on the filtered messages-only dict.
+        # Re-scan: match by checking if any message content matches v2 patterns
+        # Simpler approach: just re-load v2 files and add duplicates directly
+        for d in DEFAULT_INPUT_DIRS:
+            if not d.exists():
+                continue
+            for f in sorted(d.glob("*.jsonl")):
+                if any(pat in f.name for pat in V2_UPSAMPLE_PATTERNS):
+                    items, _ = load_jsonl(f)
+                    for item in items:
+                        msgs = to_chatml(item)
+                        if msgs and not is_too_short(msgs, min_chars=30):
+                            for _ in range(V2_UPSAMPLE_FACTOR):
+                                clean.append({"messages": msgs})
+                                v2_upsampled += 1
+    else:
+        for ex in v2_originals:
+            for _ in range(V2_UPSAMPLE_FACTOR):
+                clean.append(dict(ex))
+                v2_upsampled += 1
+
+    if v2_upsampled:
+        print(f"\n[Phase 2.5] Upsampled v2 data: +{v2_upsampled} examples")
+        print(f"Total after upsampling: {len(clean)}")
 
     # Phase 3: Categorize
     print(f"\n[Phase 3] Categorizing {len(clean)} clean examples...")
