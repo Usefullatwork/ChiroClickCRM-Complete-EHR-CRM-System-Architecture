@@ -1,5 +1,52 @@
 # ChiroClick CRM - Claude Code Memory
 
+## 5-Phase Improvement Sprint (2026-02-21)
+
+### Phase 1: AI Training Data Cleanup (commit 4d703aa)
+
+- Moved 6 duplicate JSONL files, legacy Modelfiles, legacy .bat scripts to `_archive/`
+- Re-ran `clean_and_prepare.py`: 9,115 clean examples (8,802 dupes removed)
+- Verified 100 benchmark cases, 540 DPO pairs, dry-run passed
+
+### Phase 2: Frontend UI/UX Polish (commit 3dfb614)
+
+- **Bundle splitting**: ClinicalEncounter 678KB → 570KB (lazy-load TemplatePicker, QuickPalpationSpine, AIDiagnosisSidebar)
+- **Accessibility**: Modal.jsx: role="dialog", aria-modal, focus trap, ESC close
+- **ErrorBoundary**: Wired `logErrorToService()` to POST `/api/v1/errors`
+- **TemplateVariableModal**: New component for `{{variable}}` substitution
+- **CRM tests**: 31 new (ReferralProgram 9, CampaignManager 10, WaitlistManager 12)
+
+### Phase 3: EHR Clinical Features (commit ec04e13)
+
+- **ComplianceScan**: Wired into encounter signing flow (pre-sign checklist)
+- **OutcomeChart**: Wired into PatientDetail (trend visualization)
+- **OrthopedicTemplatePicker**: Added tmj (Kjeve) + hand (Hånd) body regions
+- **Cleanup**: Deleted orphaned clinical/TreatmentPlanProgress, removed SoapNoteBuilder from barrel
+- **Tests**: 42 new OrthopedicTemplatePicker tests
+
+### Phase 4: CRM & Backend Hardening (commit df83c5f)
+
+- **Security alerts**: `alertAuditFailure()` → admin notifications via `notifyByRole()`
+- **AI retraining**: `notifyRetrainingNeeded()` → admin+practitioner notifications
+- **Automations**: Staff notifications → `createNotification()` + WebSocket push
+- **Notification types**: Added SECURITY_ALERT, AI_RETRAINING_READY, SYSTEM_ERROR, STAFF_NOTIFICATION
+- **CRM integration tests**: 39 tests (lead pipeline, campaigns, retention, waitlist, workflows)
+
+### Phase 5: Integration QA (this commit)
+
+- Build: ✓ (7.7s), Lint: 0 warnings (frontend + backend)
+- Frontend: **493 tests** (27 suites), Backend: **1445+ tests** (52 suites)
+- E2E: crm-flow.spec.js added (7 Playwright specs)
+- **i18n audit**: 75+ hardcoded strings in 6 new/modified components (audit only, not fixed)
+
+### Current Test Counts
+
+- Frontend: 493 tests (27 suites)
+- Backend: 1598 tests (60 suites, 52 pass — 8 PGlite parallel failures)
+- E2E: 11 Playwright spec files
+
+---
+
 ## RECENT FIXES (Session 2026-02-03)
 
 ### Backend Fixes
