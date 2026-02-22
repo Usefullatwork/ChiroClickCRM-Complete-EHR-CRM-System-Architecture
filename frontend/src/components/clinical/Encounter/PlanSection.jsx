@@ -56,6 +56,7 @@ export default function PlanSection({
               setEncounterData((prev) => ({ ...prev, vas_pain_end: parseInt(e.target.value) }))
             }
             disabled={isSigned}
+            aria-label="VAS smerteskala slutt"
             className="w-20 h-1.5 accent-purple-600 disabled:opacity-50 disabled:cursor-not-allowed"
           />
           <span className="text-sm font-semibold text-purple-600 w-6">
@@ -150,6 +151,7 @@ export default function PlanSection({
                       ? 'SOAP narrativ: beskriv behandlingen i detalj...'
                       : 'Utført behandling... (bruk .hvla for makro)'
             }
+            aria-label="Utfort behandling"
             className="w-full min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
             value={encounterData.plan.treatment}
             onChange={(e) => {
@@ -167,6 +169,7 @@ export default function PlanSection({
           <button
             onClick={() => setShowTakster(!showTakster)}
             className="w-full flex items-center justify-between px-4 py-3 bg-purple-50 hover:bg-purple-100 transition-colors"
+            aria-expanded={showTakster}
           >
             <div className="flex items-center gap-2">
               <FileText className="w-5 h-5 text-purple-600" />
@@ -233,6 +236,7 @@ export default function PlanSection({
         {/* Exercises & Advice */}
         <textarea
           placeholder="Hjemmeøvelser og råd..."
+          aria-label="Hjemmeovelser og rad"
           className="w-full min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
           value={encounterData.plan.exercises}
           onChange={(e) => updateField('plan', 'exercises', e.target.value)}
@@ -249,6 +253,7 @@ export default function PlanSection({
             value={encounterData.plan.follow_up}
             onChange={(e) => updateField('plan', 'follow_up', e.target.value)}
             disabled={isSigned}
+            aria-label="Oppfolging"
             className="flex-1 px-3 py-1.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-purple-500 text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
           />
         </div>

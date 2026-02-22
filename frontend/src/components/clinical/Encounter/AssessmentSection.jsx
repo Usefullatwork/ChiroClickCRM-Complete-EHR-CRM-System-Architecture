@@ -31,6 +31,7 @@ export default function AssessmentSection({
             <input
               type="text"
               placeholder="Søk ICPC-2 kode eller diagnose (f.eks. L02, rygg)..."
+              aria-label="Sok diagnosekode"
               className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm"
               value={diagnosisSearch}
               onChange={(e) => {
@@ -83,6 +84,7 @@ export default function AssessmentSection({
                   onClick={() => removeDiagnosisCode(code)}
                   className="ml-1 hover:text-amber-900"
                   disabled={isSigned}
+                  aria-label={`Fjern diagnosekode ${code}`}
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -93,6 +95,7 @@ export default function AssessmentSection({
 
         <textarea
           placeholder="Klinisk resonnering og vurdering..."
+          aria-label="Klinisk resonnering og vurdering"
           className="w-full min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
           value={encounterData.assessment.clinical_reasoning}
           onChange={(e) => {

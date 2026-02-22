@@ -82,7 +82,12 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Avansert pasientsok"
+    >
       <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
@@ -93,7 +98,11 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
               <p className="text-sm text-gray-600">Search patients using multiple criteria</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-lg"
+            aria-label="Lukk sok"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -294,10 +303,11 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
               </div>
               <div className="space-y-3">
                 {patients.map((patient) => (
-                  <div
+                  <button
+                    type="button"
                     key={patient.id}
                     onClick={() => handlePatientClick(patient)}
-                    className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                    className="w-full text-left p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-4 flex-1">
@@ -341,7 +351,7 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
