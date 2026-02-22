@@ -62,14 +62,12 @@ export const PatientList = () => {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">Patients</h1>
-              <p className="text-sm text-slate-600 mt-1">
-                {totalCount} total patient{totalCount !== 1 ? 's' : ''}
-              </p>
+              <h1 className="text-2xl font-bold text-slate-900">Pasienter</h1>
+              <p className="text-sm text-slate-600 mt-1">{totalCount} totalt</p>
             </div>
 
             <Button variant="primary" onClick={() => navigate('/patients/new')} icon={Plus}>
-              New Patient
+              Ny pasient
             </Button>
           </div>
         </div>
@@ -89,7 +87,7 @@ export const PatientList = () => {
                   />
                   <Input
                     type="text"
-                    placeholder="Search by name, fødselsnummer, email, or phone..."
+                    placeholder="Sok etter navn, fodselsnummer, e-post eller telefon..."
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
@@ -111,10 +109,10 @@ export const PatientList = () => {
                   }}
                   className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                 >
-                  <option value="all">All Statuses</option>
-                  <option value="ACTIVE">Active</option>
-                  <option value="INACTIVE">Inactive</option>
-                  <option value="ARCHIVED">Archived</option>
+                  <option value="all">Alle statuser</option>
+                  <option value="ACTIVE">Aktiv</option>
+                  <option value="INACTIVE">Inaktiv</option>
+                  <option value="ARCHIVED">Arkivert</option>
                 </select>
               </div>
             </div>
@@ -130,7 +128,7 @@ export const PatientList = () => {
           <Card>
             <Card.Body>
               <div className="text-center py-8 text-red-600">
-                <p className="font-medium">Error loading patients</p>
+                <p className="font-medium">Feil ved lasting av pasienter</p>
                 <p className="text-sm mt-1">{error.message}</p>
               </div>
             </Card.Body>
@@ -140,11 +138,11 @@ export const PatientList = () => {
             <Card.Body>
               <div className="text-center py-12 text-slate-500">
                 <User size={48} className="mx-auto mb-3 text-slate-300" />
-                <p className="font-medium">No patients found</p>
+                <p className="font-medium">Ingen pasienter funnet</p>
                 <p className="text-sm mt-1">
                   {searchQuery
-                    ? 'Try adjusting your search criteria'
-                    : 'Get started by registering your first patient'}
+                    ? 'Prov a justere sokekriteriene dine'
+                    : 'Kom i gang ved a registrere din forste pasient'}
                 </p>
                 {!searchQuery && (
                   <Button
@@ -153,7 +151,7 @@ export const PatientList = () => {
                     icon={Plus}
                     className="mt-4"
                   >
-                    Register New Patient
+                    Registrer ny pasient
                   </Button>
                 )}
               </div>
@@ -198,9 +196,7 @@ export const PatientList = () => {
                                 <span className="font-mono">
                                   {maskFodselsnummer(patient.fodselsnummer, 6, 0)}
                                 </span>
-                                {age !== null && (
-                                  <span className="text-slate-400">({age} years)</span>
-                                )}
+                                {age !== null && <span className="text-slate-400">({age} ar)</span>}
                               </div>
                             )}
 
@@ -222,7 +218,7 @@ export const PatientList = () => {
                               <div className="flex items-center gap-1">
                                 <Calendar size={14} />
                                 <span>
-                                  Last visit:{' '}
+                                  Siste besok:{' '}
                                   {new Date(patient.lastVisit).toLocaleDateString('nb-NO')}
                                 </span>
                               </div>
@@ -245,8 +241,8 @@ export const PatientList = () => {
         {totalPages > 1 && (
           <div className="flex items-center justify-between mt-6">
             <div className="text-sm text-slate-600">
-              Showing {(page - 1) * limit + 1} to {Math.min(page * limit, totalCount)} of{' '}
-              {totalCount} patients
+              Viser {(page - 1) * limit + 1} til {Math.min(page * limit, totalCount)} av{' '}
+              {totalCount} pasienter
             </div>
 
             <div className="flex items-center gap-2">
@@ -256,7 +252,7 @@ export const PatientList = () => {
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
               >
-                Previous
+                Forrige
               </Button>
 
               <div className="flex items-center gap-1">
@@ -294,7 +290,7 @@ export const PatientList = () => {
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
               >
-                Next
+                Neste
               </Button>
             </div>
           </div>

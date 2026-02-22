@@ -521,7 +521,7 @@ export default function MacroMatrix({
     const combined = { ...macroData };
     if (customMacros.length > 0) {
       combined.custom = {
-        name: 'My Macros',
+        name: 'Mine makroer',
         icon: '⭐',
         color: 'purple',
         macros: customMacros,
@@ -628,7 +628,7 @@ export default function MacroMatrix({
         className={`bg-white rounded-lg shadow-sm border border-gray-200 p-8 flex items-center justify-center ${className}`}
       >
         <Loader2 className="w-5 h-5 animate-spin text-gray-400 mr-2" />
-        <span className="text-sm text-gray-500">Loading macros...</span>
+        <span className="text-sm text-gray-500">Laster makroer...</span>
       </div>
     );
   }
@@ -650,7 +650,7 @@ export default function MacroMatrix({
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search macros..."
+                placeholder="Sok i makroer..."
                 className="pl-8 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg w-40 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -688,7 +688,7 @@ export default function MacroMatrix({
       {searchResults && (
         <div className="p-4 border-b border-gray-200 bg-yellow-50">
           <p className="text-sm text-gray-600 mb-2">
-            Found {searchResults.length} macros matching "{searchTerm}"
+            Fant {searchResults.length} makroer for &quot;{searchTerm}&quot;
           </p>
           <div className="space-y-2 max-h-60 overflow-y-auto">
             {searchResults.map((macro) => (

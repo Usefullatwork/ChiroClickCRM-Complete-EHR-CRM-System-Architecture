@@ -578,7 +578,9 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
                         )}
                       </div>
                       <span className="text-xs text-slate-500">
-                        {event.created_at ? new Date(event.created_at).toLocaleDateString() : '-'}
+                        {event.created_at
+                          ? new Date(event.created_at).toLocaleDateString('nb-NO')
+                          : '-'}
                       </span>
                     </div>
                   ))}

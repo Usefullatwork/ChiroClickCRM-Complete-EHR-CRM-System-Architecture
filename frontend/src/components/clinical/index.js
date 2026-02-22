@@ -22,3 +22,4 @@ export { default as AIDiagnosisSidebar } from './AIDiagnosisSidebar';
 export { default as EnhancedClinicalTextarea, MACROS } from './EnhancedClinicalTextarea';
 export { default as VoiceInputButton, useVoiceInput } from './VoiceInputButton';
 export { default as TemplateVariableModal } from './TemplateVariableModal';
+export { default as RedFlagModal } from './RedFlagModal';

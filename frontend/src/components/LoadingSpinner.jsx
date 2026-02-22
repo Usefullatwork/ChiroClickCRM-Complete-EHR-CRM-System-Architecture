@@ -95,7 +95,7 @@ export const Skeleton = ({ className = '', variant = 'text', width, height }) =>
       className={`animate-pulse bg-gray-200 ${variantClasses[variant]} ${className}`}
       style={style}
       role="status"
-      aria-label="Loading..."
+      aria-label="Laster..."
     />
   );
 };

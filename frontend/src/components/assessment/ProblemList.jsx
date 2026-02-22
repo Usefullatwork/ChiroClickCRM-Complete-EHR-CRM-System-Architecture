@@ -194,7 +194,7 @@ export default function ProblemList({
                 ))}
                 {filteredConditions.length === 0 && (
                   <p className="text-sm text-gray-500 text-center py-2">
-                    No matching conditions found
+                    Ingen matchende tilstander funnet
                   </p>
                 )}
               </div>
@@ -295,7 +295,7 @@ export default function ProblemList({
                   {problem.onsetDate && (
                     <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
                       <Calendar className="w-3 h-3" />
-                      Onset: {new Date(problem.onsetDate).toLocaleDateString()}
+                      Onset: {new Date(problem.onsetDate).toLocaleDateString('nb-NO')}
                     </div>
                   )}
                 </div>

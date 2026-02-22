@@ -908,8 +908,8 @@ const PatientEducationLibrary = ({ _onSelectMaterial, onSendToPatient }) => {
 
           {filteredMaterials.length === 0 ? (
             <div className="no-results">
-              <h3>No materials found</h3>
-              <p>Try adjusting your search or filters</p>
+              <h3>Ingen materialer funnet</h3>
+              <p>Prov a justere soket eller filtrene</p>
             </div>
           ) : (
             <div className="materials-grid">
@@ -940,7 +940,7 @@ const PatientEducationLibrary = ({ _onSelectMaterial, onSendToPatient }) => {
             </button>
             {onSendToPatient && (
               <button className="send-button" onClick={() => onSendToPatient(selectedMaterial)}>
-                📧 Send to Patient
+                📧 Send til pasient
               </button>
             )}
           </div>
@@ -949,55 +949,52 @@ const PatientEducationLibrary = ({ _onSelectMaterial, onSendToPatient }) => {
             <div className="material-category">{selectedMaterial.category}</div>
             <h2 className="detail-title">{selectedMaterial.title}</h2>
             <div className="detail-meta">
-              <span className="meta-item">📖 {selectedMaterial.readingLevel} Level</span>
-              <span className="meta-item">⏱️ {selectedMaterial.estimatedTime} read</span>
+              <span className="meta-item">📖 {selectedMaterial.readingLevel} niva</span>
+              <span className="meta-item">⏱️ {selectedMaterial.estimatedTime} lesetid</span>
             </div>
           </div>
 
           {selectedMaterial.content.overview && (
             <div className="overview-box">
-              <h3>Overview</h3>
+              <h3>Oversikt</h3>
               <p>{selectedMaterial.content.overview}</p>
             </div>
           )}
 
-          {renderContentSection('What Is It?', selectedMaterial.content.whatIsIt)}
-          {renderContentSection('Common Causes', selectedMaterial.content.causes)}
-          {renderContentSection('Why It Matters', selectedMaterial.content.whyItMatters)}
-          {renderContentSection('Symptoms', selectedMaterial.content.symptoms)}
-          {renderContentSection('Treatment Approach', selectedMaterial.content.treatment)}
-          {renderContentSection('Self-Care Tips', selectedMaterial.content.selfCare)}
-          {renderContentSection('Recommended Exercises', selectedMaterial.content.exercises)}
-          {renderContentSection('Core Exercises', selectedMaterial.content.coreExercises)}
-          {renderContentSection(
-            'Lower Back Exercises',
-            selectedMaterial.content.lowerBackExercises
-          )}
-          {renderContentSection('Neck Exercises', selectedMaterial.content.neckExercises)}
-          {renderContentSection('Guidelines', selectedMaterial.content.guidelines)}
-          {renderContentSection('Computer Setup', selectedMaterial.content.computerSetup)}
-          {renderContentSection('Chair Setup', selectedMaterial.content.chairSetup)}
-          {renderContentSection('Desk Setup', selectedMaterial.content.deskSetup)}
-          {renderContentSection('Movement Breaks', selectedMaterial.content.movementBreaks)}
-          {renderContentSection('Sitting Posture', selectedMaterial.content.sittingPosture)}
-          {renderContentSection('Standing Posture', selectedMaterial.content.standingPosture)}
-          {renderContentSection('Sleeping Posture', selectedMaterial.content.sleepingPosture)}
-          {renderContentSection('Benefits', selectedMaterial.content.benefits)}
-          {renderContentSection('Common Problems', selectedMaterial.content.commonProblems)}
+          {renderContentSection('Hva er det?', selectedMaterial.content.whatIsIt)}
+          {renderContentSection('Vanlige arsaker', selectedMaterial.content.causes)}
+          {renderContentSection('Hvorfor det er viktig', selectedMaterial.content.whyItMatters)}
+          {renderContentSection('Symptomer', selectedMaterial.content.symptoms)}
+          {renderContentSection('Behandlingstilnaerming', selectedMaterial.content.treatment)}
+          {renderContentSection('Egentiltak', selectedMaterial.content.selfCare)}
+          {renderContentSection('Anbefalte ovelser', selectedMaterial.content.exercises)}
+          {renderContentSection('Kjerneovelser', selectedMaterial.content.coreExercises)}
+          {renderContentSection('Korsrygg-ovelser', selectedMaterial.content.lowerBackExercises)}
+          {renderContentSection('Nakkeovelser', selectedMaterial.content.neckExercises)}
+          {renderContentSection('Retningslinjer', selectedMaterial.content.guidelines)}
+          {renderContentSection('PC-oppsett', selectedMaterial.content.computerSetup)}
+          {renderContentSection('Stoloppsett', selectedMaterial.content.chairSetup)}
+          {renderContentSection('Skrivebordoppsett', selectedMaterial.content.deskSetup)}
+          {renderContentSection('Bevegelsespauser', selectedMaterial.content.movementBreaks)}
+          {renderContentSection('Sittestilling', selectedMaterial.content.sittingPosture)}
+          {renderContentSection('Staende stilling', selectedMaterial.content.standingPosture)}
+          {renderContentSection('Sovestilling', selectedMaterial.content.sleepingPosture)}
+          {renderContentSection('Fordeler', selectedMaterial.content.benefits)}
+          {renderContentSection('Vanlige problemer', selectedMaterial.content.commonProblems)}
           {renderContentSection('Tips', selectedMaterial.content.tips)}
-          {renderContentSection('Prevention', selectedMaterial.content.prevention)}
-          {renderContentSection('Safety', selectedMaterial.content.safety)}
+          {renderContentSection('Forebygging', selectedMaterial.content.prevention)}
+          {renderContentSection('Sikkerhet', selectedMaterial.content.safety)}
 
           {selectedMaterial.content.expectedRecovery && (
             <div className="content-section">
-              <h4>Expected Recovery Timeline</h4>
+              <h4>Forventet rehabiliteringsforlop</h4>
               <p>{selectedMaterial.content.expectedRecovery}</p>
             </div>
           )}
 
           {selectedMaterial.content.whenToSeek && (
             <div className="warning-box">
-              <h4>⚠️ When to Seek Immediate Medical Attention</h4>
+              <h4>⚠️ Nar du bor soke umiddelbar legehjelp</h4>
               <ul>
                 {selectedMaterial.content.whenToSeek.map((item, idx) => (
                   <li key={idx}>{item}</li>

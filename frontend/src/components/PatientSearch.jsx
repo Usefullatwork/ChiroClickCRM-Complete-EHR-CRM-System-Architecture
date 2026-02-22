@@ -33,7 +33,12 @@ export default function PatientSearch({
 
   return (
     <div>
-      <input type="text" placeholder="Search patients..." value={query} onChange={handleChange} />
+      <input
+        type="text"
+        placeholder="Sok etter pasienter..."
+        value={query}
+        onChange={handleChange}
+      />
       {results.length > 0 && (
         <ul>
           {results.map((patient) => (
@@ -45,7 +50,7 @@ export default function PatientSearch({
           ))}
         </ul>
       )}
-      {searchPerformed && results.length === 0 && <p>No patients found</p>}
+      {searchPerformed && results.length === 0 && <p>Ingen pasienter funnet</p>}
     </div>
   );
 }

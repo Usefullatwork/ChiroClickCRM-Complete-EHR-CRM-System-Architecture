@@ -16,6 +16,8 @@ const TemplatePicker = lazy(() => import('../components/TemplatePicker'));
 const QuickPalpationSpine = lazy(() => import('../components/clinical/QuickPalpationSpine'));
 const AIDiagnosisSidebar = lazy(() => import('../components/clinical/AIDiagnosisSidebar'));
 import { ConnectionStatus } from '../components/common';
+import { RedFlagModal } from '../components/clinical';
+import { useRedFlagScreening } from '../hooks/useRedFlagScreening';
 import toast from '../utils/toast';
 
 // Extracted components
@@ -209,9 +211,23 @@ export default function ClinicalEncounter() {
   // Compliance scan before signing
   const [showComplianceScan, setShowComplianceScan] = useState(false);
 
+  // Red flag modal state
+  const [showRedFlagModal, setShowRedFlagModal] = useState(false);
+  const [criticalFlagsForModal, setCriticalFlagsForModal] = useState([]);
+
+  const { screenText: screenForRedFlags } = useRedFlagScreening({
+    lang: 'no',
+    autoScreen: false,
+    onCriticalFlag: (criticalFlags) => {
+      setCriticalFlagsForModal(criticalFlags);
+      setShowRedFlagModal(true);
+    },
+  });
+
   // Clinical Preferences
   const {
     preferences: clinicalPrefs,
+    updatePreference,
     currentNotationMethod,
     getNotationName,
     isVisualNotation,
@@ -491,6 +507,26 @@ export default function ClinicalEncounter() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isSigned, encounterId]);
+
+  // Screen SOAP text for red flags when subjective/assessment fields change
+  useEffect(() => {
+    const textToScreen = [
+      encounterData.subjective?.chief_complaint,
+      encounterData.subjective?.history,
+      encounterData.assessment?.clinical_reasoning,
+    ]
+      .filter(Boolean)
+      .join(' ');
+
+    if (textToScreen.length > 10) {
+      screenForRedFlags(textToScreen);
+    }
+  }, [
+    encounterData.subjective?.chief_complaint,
+    encounterData.subjective?.history,
+    encounterData.assessment?.clinical_reasoning,
+    screenForRedFlags,
+  ]);
 
   useEffect(() => {
     if (encounterId && !isSigned) {
@@ -839,6 +875,31 @@ export default function ClinicalEncounter() {
             </div>
           )}
 
+          {/* SOAP ORDER TOGGLE */}
+          <div className="flex items-center justify-end px-6 pt-2">
+            <button
+              onClick={() => {
+                const current = clinicalPrefs.soapSectionOrder || 'soap';
+                const next = current === 'soap' ? 'asoap' : 'soap';
+                updatePreference('soapSectionOrder', next);
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors"
+              title={
+                (clinicalPrefs.soapSectionOrder || 'soap') === 'soap'
+                  ? 'Bytt til Vurdering-forst (ASOAP)'
+                  : 'Bytt til standard SOAP'
+              }
+            >
+              <span className="font-bold">
+                {(clinicalPrefs.soapSectionOrder || 'soap') === 'soap' ? 'SOAP' : 'ASOAP'}
+              </span>
+              <span className="text-slate-400">|</span>
+              <span className="text-slate-400">
+                {(clinicalPrefs.soapSectionOrder || 'soap') === 'soap' ? 'ASOAP' : 'SOAP'}
+              </span>
+            </button>
+          </div>
+
           {/* SCROLLABLE SOAP FORM */}
           <div className="flex-1 overflow-y-auto">
             <SOAPNoteForm
@@ -886,6 +947,7 @@ export default function ClinicalEncounter() {
               showExercisePanel={showExercisePanel}
               setShowExercisePanel={setShowExercisePanel}
               setAutoSaveStatus={setAutoSaveStatus}
+              sectionOrder={clinicalPrefs.soapSectionOrder || 'soap'}
             />
 
             {/* Amendments (signed encounters only) */}
@@ -968,6 +1030,18 @@ export default function ClinicalEncounter() {
           soapSection={activeField?.split('.')[0] || 'subjective'}
         />
       </Suspense>
+
+      {/* RED FLAG BLOCKING MODAL */}
+      <RedFlagModal
+        isOpen={showRedFlagModal}
+        onClose={() => setShowRedFlagModal(false)}
+        criticalFlags={criticalFlagsForModal}
+        onAcknowledge={(flags) => {
+          const flagAlerts = flags.map((f) => `RED_FLAG: ${f.description}`);
+          setRedFlagAlerts((prev) => [...prev, ...flagAlerts]);
+        }}
+        lang="no"
+      />
 
       {/* CONNECTION STATUS INDICATOR */}
       <ConnectionStatus

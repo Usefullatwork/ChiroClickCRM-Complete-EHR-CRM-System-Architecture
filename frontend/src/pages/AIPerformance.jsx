@@ -149,7 +149,7 @@ const AcceptanceLineChart = ({ data = [], color = '#14b8a6' }) => {
   if (!data || data.length === 0) {
     return (
       <div className="flex items-center justify-center h-64 text-slate-400">
-        <p>No data available</p>
+        <p>Ingen data tilgjengelig</p>
       </div>
     );
   }

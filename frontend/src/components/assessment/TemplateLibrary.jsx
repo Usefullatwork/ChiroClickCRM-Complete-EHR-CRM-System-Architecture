@@ -658,7 +658,7 @@ export default function TemplateLibrary({
             <div className="space-y-2">
               {filteredTemplates.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
-                  No templates found matching your criteria
+                  Ingen maler funnet som matcher dine kriterier
                 </div>
               ) : (
                 filteredTemplates.map((template) => (

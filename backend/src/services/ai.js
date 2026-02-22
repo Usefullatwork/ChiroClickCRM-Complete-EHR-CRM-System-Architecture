@@ -482,6 +482,87 @@ const getModelForTask = async (taskType) => {
 const isAIAvailable = () => AI_ENABLED;
 
 /**
+ * Calculate confidence score for an AI response.
+ * Returns 0-1 score compatible with frontend AIConfidenceBadge.
+ *
+ * @param {string} response - The AI-generated text
+ * @param {string} taskType - The task type (e.g. 'soap_notes', 'red_flag_analysis')
+ * @param {string} modelName - The model that generated the response
+ * @returns {{ score: number, factors: string[], level: 'high'|'medium'|'low' }}
+ */
+const calculateConfidence = (response, taskType, modelName) => {
+  let score = 0.5;
+  const factors = [];
+
+  // Factor 1: Response length
+  if (response.length > 200) {
+    score += 0.1;
+    factors.push('adequate_length');
+  }
+  if (response.length < 30) {
+    score -= 0.2;
+    factors.push('very_short');
+  }
+
+  // Factor 2: Task-model alignment (strip LoRA suffixes for matching)
+  const baseModel = modelName?.replace(/-lora(-v\d+)?$/, '') || '';
+  const modelTaskFit = {
+    'chiro-medical': [
+      'red_flag_analysis',
+      'diagnosis_suggestion',
+      'differential_diagnosis',
+      'clinical_reasoning',
+    ],
+    'chiro-norwegian': [
+      'soap_notes',
+      'clinical_summary',
+      'referral_letter',
+      'patient_communication',
+      'report_writing',
+    ],
+    'chiro-fast': ['autocomplete', 'spell_check', 'abbreviation', 'quick_suggestion'],
+    'chiro-no': [
+      'general',
+      'journal_organization',
+      'treatment_safety',
+      'contraindication_check',
+      'sick_leave',
+    ],
+  };
+  if (modelTaskFit[baseModel]?.includes(taskType)) {
+    score += 0.15;
+    factors.push('model_task_match');
+  }
+
+  // Factor 3: Response coherence (has sentences)
+  if (response.includes('.') && response.length > 50) {
+    score += 0.1;
+    factors.push('structured_response');
+  }
+
+  // Factor 4: Medical terminology presence (for clinical tasks)
+  const medicalTerms = /diagnos|behandl|smert|funn|vurder|palpas|ROM|VAS|terapi/i;
+  const clinicalTasks = [
+    'soap_notes',
+    'red_flag_analysis',
+    'diagnosis_suggestion',
+    'clinical_summary',
+    'differential_diagnosis',
+  ];
+  if (clinicalTasks.includes(taskType) && medicalTerms.test(response)) {
+    score += 0.1;
+    factors.push('medical_terminology');
+  }
+
+  // Clamp to 0-1
+  score = Math.max(0, Math.min(1, score));
+
+  const level = score >= 0.75 ? 'high' : score >= 0.45 ? 'medium' : 'low';
+
+  return { score, factors, level };
+};
+
+/**
  * Log an AI suggestion to the database for analytics tracking.
  * Runs asynchronously — callers should .catch() to avoid blocking.
  */
@@ -674,6 +755,9 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
       currentLoadedModel = model;
       rawOutput = response.data.response;
 
+      // Calculate confidence score for this response
+      const confidence = calculateConfidence(rawOutput, taskType, model);
+
       // Log suggestion to ai_suggestions table (non-blocking)
       if (organizationId && taskType) {
         const durationMs = response.data.total_duration
@@ -685,7 +769,7 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
           modelName: model,
           inputText: sanitizedPrompt.substring(0, 500),
           suggestedText: rawOutput.substring(0, 2000),
-          confidenceScore: null,
+          confidenceScore: confidence.score,
           requestDurationMs: durationMs,
           abVariant,
         }).catch((err) => logger.warn('Failed to log AI suggestion:', err.message));
@@ -746,6 +830,7 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
       // Return enhanced result with metadata
       return {
         text: outputResult.output,
+        confidence,
         metadata: {
           model,
           modelConfig: modelConfig.description,
@@ -781,6 +866,7 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
       'Klinisk gjennomgang er PÅKREVD før bruk.';
     return {
       text: rawOutput + disclaimer,
+      confidence,
       metadata: {
         model,
         modelConfig: modelConfig.description,
@@ -794,7 +880,8 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
   }
 
   // Return simple string for backward compatibility when guardrails disabled
-  return rawOutput;
+  // Attach confidence as a property when possible
+  return { text: rawOutput, confidence };
 };
 
 /**
@@ -839,6 +926,7 @@ Behold alle medisinske fagtermer. Svar kun med den korrigerte teksten uten forkl
       original: text,
       corrected: correctedText.trim(),
       hasChanges: text.trim() !== correctedText.trim(),
+      confidence: result?.confidence || null,
       aiAvailable: true,
     };
   } catch (error) {
@@ -916,6 +1004,7 @@ export const generateSOAPSuggestions = async (chiefComplaint, section = 'subject
       section,
       chiefComplaint,
       suggestion: suggestion.trim(),
+      confidence: result?.confidence || null,
       aiAvailable: true,
       metadata: result?.metadata || null,
     };
@@ -975,24 +1064,26 @@ Vurdering: ${assessment?.clinical_reasoning || ''}
 Foreslå ICPC-2 koder:`;
 
   try {
-    const suggestion = await generateCompletion(prompt, systemPrompt, {
+    const result = await generateCompletion(prompt, systemPrompt, {
       maxTokens: 300,
       temperature: 0.5,
       taskType: 'diagnosis_suggestion',
     });
+    const suggestionText = extractCompletionText(result);
 
     // Extract codes from response
     const suggestedCodes = [];
     for (const code of availableCodes) {
-      if (suggestion.includes(code.code)) {
+      if (suggestionText.includes(code.code)) {
         suggestedCodes.push(code.code);
       }
     }
 
     return {
-      suggestion: suggestion.trim(),
+      suggestion: suggestionText.trim(),
       codes: suggestedCodes,
-      reasoning: suggestion,
+      reasoning: suggestionText,
+      confidence: result?.confidence || null,
       aiAvailable: true,
     };
   } catch (error) {
@@ -1099,17 +1190,18 @@ ${redFlagsDetected.length > 0 ? `MERK: Følgende røde flagg ble oppdaget automa
 Analyser røde flagg og gi anbefaling:`;
 
   try {
-    const analysis = await generateCompletion(prompt, systemPrompt, {
+    const result = await generateCompletion(prompt, systemPrompt, {
       maxTokens: 400,
       temperature: 0.4,
       taskType: 'red_flag_analysis',
     });
+    const analysisText = extractCompletionText(result);
 
     // Combine AI analysis with rule-based detection
     let riskLevel = validationResult.riskLevel;
 
     // AI can upgrade but not downgrade risk level
-    const lowercaseAnalysis = analysis.toLowerCase();
+    const lowercaseAnalysis = analysisText.toLowerCase();
     if (
       lowercaseAnalysis.includes('akutt henvisning') ||
       lowercaseAnalysis.includes('øyeblikkelig') ||
@@ -1126,13 +1218,13 @@ Analyser røde flagg og gi anbefaling:`;
     }
 
     return {
-      analysis: analysis.trim(),
+      analysis: analysisText.trim(),
       riskLevel,
       canTreat: riskLevel === 'LOW' || riskLevel === 'MODERATE',
       recommendReferral: riskLevel === 'HIGH' || riskLevel === 'CRITICAL',
       detectedFlags: redFlagsDetected,
       medicationWarnings,
-      confidence: validationResult.confidence,
+      confidence: result?.confidence || validationResult.confidence,
       source: 'combined',
       aiAvailable: true,
     };
@@ -1192,15 +1284,17 @@ Oppfølging: ${encounter.plan?.follow_up || ''}
 Generer kort sammendrag (2-3 setninger):`;
 
   try {
-    const summary = await generateCompletion(prompt, systemPrompt, {
+    const result = await generateCompletion(prompt, systemPrompt, {
       maxTokens: 200,
       temperature: 0.6,
       taskType: 'clinical_summary',
     });
+    const summaryText = extractCompletionText(result);
 
     return {
-      summary: summary.trim(),
+      summary: summaryText.trim(),
       encounterId: encounter.id,
+      confidence: result?.confidence || null,
       aiAvailable: true,
     };
   } catch (error) {
@@ -1381,11 +1475,12 @@ VIKTIG: Identifiser ALLE handlingsoppgaver som må følges opp!
 Svar kun med JSON.`;
 
   try {
-    const response = await generateCompletion(prompt, systemPrompt, {
+    const completionResult = await generateCompletion(prompt, systemPrompt, {
       maxTokens: 2000,
       temperature: 0.4, // Lower temperature for more consistent structured output
       taskType: 'journal_organization',
     });
+    const response = extractCompletionText(completionResult);
 
     // Parse JSON response
     let organizedData;
@@ -1533,15 +1628,16 @@ ${notesText}
 Lag ett samlet, kronologisk SOAP-notat som fanger hele pasienthistorikken.`;
 
   try {
-    const merged = await generateCompletion(prompt, systemPrompt, {
+    const mergeResult = await generateCompletion(prompt, systemPrompt, {
       maxTokens: 2000,
       temperature: 0.5,
       taskType: 'clinical_summary',
     });
+    const mergedText = extractCompletionText(mergeResult);
 
     return {
       success: true,
-      mergedNote: merged.trim(),
+      mergedNote: mergedText.trim(),
       sourceNotesCount: organizedNotes.length,
       dateRange: {
         earliest: organizedNotes.reduce(
@@ -1652,6 +1748,7 @@ export {
   MODEL_CONFIG,
   AB_SPLIT_CONFIG,
   extractCompletionText,
+  calculateConfidence,
 };
 
 /**

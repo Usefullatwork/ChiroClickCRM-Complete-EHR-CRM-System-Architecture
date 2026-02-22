@@ -25,13 +25,13 @@ const ClinicalProgressTracking = ({ _patientId, encountersData = [] }) => {
     );
 
     const painScores = sortedEncounters.map((e) => ({
-      date: new Date(e.encounter_date).toLocaleDateString(),
+      date: new Date(e.encounter_date).toLocaleDateString('nb-NO'),
       start: e.vas_pain_start || 0,
       end: e.vas_pain_end || 0,
     }));
 
     const visitDates = sortedEncounters.map((e) =>
-      new Date(e.encounter_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      new Date(e.encounter_date).toLocaleDateString('nb-NO', { month: 'short', day: 'numeric' })
     );
 
     setChartData({
@@ -51,7 +51,9 @@ const ClinicalProgressTracking = ({ _patientId, encountersData = [] }) => {
 
     if (!data || data.length === 0) {
       return (
-        <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>No data available</div>
+        <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
+          Ingen data tilgjengelig
+        </div>
       );
     }
 
@@ -214,7 +216,7 @@ const ClinicalProgressTracking = ({ _patientId, encountersData = [] }) => {
               <div className="timeline-marker"></div>
               <div className="timeline-content">
                 <div className="timeline-date">
-                  {new Date(encounter.encounter_date).toLocaleDateString('en-US', {
+                  {new Date(encounter.encounter_date).toLocaleDateString('nb-NO', {
                     month: 'long',
                     day: 'numeric',
                     year: 'numeric',

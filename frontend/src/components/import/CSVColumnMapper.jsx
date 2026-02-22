@@ -1159,7 +1159,7 @@ export default function CSVColumnMapper({
                     <p className="font-medium text-slate-900">{template.name}</p>
                     <p className="text-xs text-slate-500">
                       {Object.keys(template.mappings).length} mappings |{' '}
-                      {new Date(template.createdAt).toLocaleDateString()}
+                      {new Date(template.createdAt).toLocaleDateString('nb-NO')}
                     </p>
                   </div>
                   <div className="flex gap-2">

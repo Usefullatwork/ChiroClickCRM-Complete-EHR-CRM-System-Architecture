@@ -27,7 +27,7 @@ export const KPIChart = ({ data = [], type = 'line', color = '#14b8a6', label = 
   if (!chartData || chartData.length === 0) {
     return (
       <div className="flex items-center justify-center h-64 text-slate-400">
-        <p>No data available</p>
+        <p>Ingen data tilgjengelig</p>
       </div>
     );
   }

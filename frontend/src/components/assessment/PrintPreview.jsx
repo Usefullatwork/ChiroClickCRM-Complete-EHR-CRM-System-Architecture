@@ -325,13 +325,13 @@ export default function PrintPreview({
 
   // Format date
   const encounterDate = encounterData.encounter_date
-    ? new Date(encounterData.encounter_date).toLocaleDateString('en-US', {
+    ? new Date(encounterData.encounter_date).toLocaleDateString('nb-NO', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
         day: 'numeric',
       })
-    : new Date().toLocaleDateString();
+    : new Date().toLocaleDateString('nb-NO');
 
   // Copy to clipboard
   const handleCopy = async () => {
@@ -544,7 +544,8 @@ ${plan || 'No plan documented.'}
                 {patientData?.last_name || ''}
                 {patientData?.date_of_birth && (
                   <span className="ml-4">
-                    <strong>DOB:</strong> {new Date(patientData.date_of_birth).toLocaleDateString()}
+                    <strong>DOB:</strong>{' '}
+                    {new Date(patientData.date_of_birth).toLocaleDateString('nb-NO')}
                   </span>
                 )}
               </div>

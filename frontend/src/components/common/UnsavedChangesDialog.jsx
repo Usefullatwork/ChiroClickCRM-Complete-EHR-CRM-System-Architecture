@@ -18,24 +18,24 @@ export default function UnsavedChangesDialog({ isBlocked, onProceed, onCancel })
         aria-describedby="unsaved-desc"
       >
         <h2 id="unsaved-title" className="text-lg font-semibold text-gray-900 dark:text-white">
-          Unsaved Changes
+          Ulagrede endringer
         </h2>
         <p id="unsaved-desc" className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-          You have unsaved changes. Are you sure you want to leave this page? Your changes will be
-          lost.
+          Du har ulagrede endringer. Er du sikker pa at du vil forlate denne siden? Endringene dine
+          vil ga tapt.
         </p>
         <div className="mt-5 flex justify-end gap-3">
           <button
             onClick={onCancel}
             className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
           >
-            Stay on page
+            Bli pa siden
           </button>
           <button
             onClick={onProceed}
             className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
           >
-            Leave page
+            Forlat siden
           </button>
         </div>
       </div>

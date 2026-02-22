@@ -26,7 +26,7 @@ export const LoadingSpinner = ({ size = 'md', className = '' }) => {
   );
 };
 
-export const LoadingOverlay = ({ message = 'Loading...' }) => (
+export const LoadingOverlay = ({ message = 'Laster...' }) => (
   <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
     <div className="bg-white rounded-lg p-6 shadow-xl flex flex-col items-center gap-4">
       <LoadingSpinner size="lg" />

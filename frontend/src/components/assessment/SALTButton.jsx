@@ -129,7 +129,7 @@ export default function SALTButton({
   };
 
   const previousDate = previousEncounter?.encounter_date
-    ? new Date(previousEncounter.encounter_date).toLocaleDateString('en-US', {
+    ? new Date(previousEncounter.encounter_date).toLocaleDateString('nb-NO', {
         month: 'short',
         day: 'numeric',
         year: 'numeric',

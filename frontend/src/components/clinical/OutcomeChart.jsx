@@ -116,11 +116,11 @@ export default function OutcomeChart({ patientId, typeFilter }) {
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <div className="flex items-center gap-2 mb-4">
           <TrendingUp className="w-5 h-5 text-teal-600" />
-          <h3 className="text-lg font-semibold text-gray-800">Outcome Trends</h3>
+          <h3 className="text-lg font-semibold text-gray-800">Utfallstrender</h3>
         </div>
         <div className="flex items-center justify-center py-12 text-gray-400">
           <div className="animate-spin rounded-full h-5 w-5 border-2 border-teal-600 border-t-transparent" />
-          <span className="ml-2">Loading trend data...</span>
+          <span className="ml-2">Laster trenddata...</span>
         </div>
       </div>
     );
@@ -131,7 +131,7 @@ export default function OutcomeChart({ patientId, typeFilter }) {
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <div className="flex items-center gap-2 mb-4">
           <TrendingUp className="w-5 h-5 text-teal-600" />
-          <h3 className="text-lg font-semibold text-gray-800">Outcome Trends</h3>
+          <h3 className="text-lg font-semibold text-gray-800">Utfallstrender</h3>
         </div>
         <p className="text-sm text-red-600">{error}</p>
       </div>
@@ -143,10 +143,10 @@ export default function OutcomeChart({ patientId, typeFilter }) {
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <div className="flex items-center gap-2 mb-4">
           <TrendingUp className="w-5 h-5 text-teal-600" />
-          <h3 className="text-lg font-semibold text-gray-800">Outcome Trends</h3>
+          <h3 className="text-lg font-semibold text-gray-800">Utfallstrender</h3>
         </div>
         <p className="text-sm text-gray-500">
-          No outcome data recorded yet. Submit questionnaires above to track progress.
+          Ingen utfallsdata registrert enna. Fyll ut sporreskjemaer ovenfor for a folge utvikling.
         </p>
       </div>
     );
@@ -179,7 +179,7 @@ export default function OutcomeChart({ patientId, typeFilter }) {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <TrendingUp className="w-5 h-5 text-teal-600" />
-          <h3 className="text-lg font-semibold text-gray-800">Outcome Trends</h3>
+          <h3 className="text-lg font-semibold text-gray-800">Utfallstrender</h3>
         </div>
         <div className="flex items-center gap-1">
           <Filter className="w-4 h-4 text-gray-400" />
