@@ -1,5 +1,39 @@
 # ChiroClick CRM - Claude Code Memory
 
+## Healthcare UX Feature Sprint (2026-02-22)
+
+### Text Expansion & AI Ghost Text (commits 654954c, 424c6d0)
+
+Completed the final 3/12 Healthcare UX Implementation Plan features. Extracted and upgraded slash commands from the 540-line `EnhancedClinicalTextarea` monolith into reusable components.
+
+**3 New Files:**
+
+| File                                         | Lines | Purpose                                                                                                                                                                  |
+| -------------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `hooks/useTextExpansion.js`                  | ~170  | API-backed `/` template hook — fetches from `templatesAPI`, falls back to `DEFAULT_COMMANDS`, variable substitution (`{{today}}`, `{{followUp.2weeks}}`), usage tracking |
+| `components/clinical/TextExpansionPopup.jsx` | ~150  | Cursor-positioned floating dropdown via mirror-div technique, Norwegian category badges, grouped results, max 8                                                          |
+| `components/clinical/AITextarea.jsx`         | ~115  | Lightweight `<textarea>` with ghost text AI suggestions, Tab-to-accept, AbortController for stale requests, no macros/voice/slash                                        |
+
+**4 Modified Files:**
+
+| File                           | Change                                                                                               |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| `EnhancedClinicalTextarea.jsx` | `useSlashCommands` → `useTextExpansion`, `SlashCommandMenu` → `TextExpansionPopup`                   |
+| `SOAPNoteForm.jsx`             | 3 plain `<textarea>` (ROM, ortho_tests, neuro_tests) → `<AITextarea>` with field-specific ghost text |
+| `hooks/index.js`               | Added `useTextExpansion` barrel export                                                               |
+| `components/clinical/index.js` | Added `TextExpansionPopup` + `AITextarea` barrel exports                                             |
+
+**Key Design Decisions:**
+
+- Tab key priority: expansion popup open → insert template; popup closed + ghost text → accept AI suggestion; neither → normal Tab
+- `useTextExpansion` merges API templates (priority) with local `DEFAULT_COMMANDS` (fallback when API unavailable)
+- `AITextarea` is intentionally minimal (~115 lines) vs `EnhancedClinicalTextarea` (540 lines) — only ghost text, no macros/voice/slash
+- Mirror-div technique for caret position avoids external dependencies
+
+**Healthcare UX Plan Status: 12/12 COMPLETE**
+
+---
+
 ## 5-Phase Improvement Sprint (2026-02-21)
 
 ### Phase 1: AI Training Data Cleanup (commit 4d703aa)
@@ -41,8 +75,8 @@
 
 ### Current Test Counts
 
-- Frontend: 493 tests (27 suites)
-- Backend: 1598 tests (60 suites, 52 pass — 8 PGlite parallel failures)
+- Frontend: **589 tests** (36 suites) — all pass
+- Backend: 1720 tests (65 suites, 54 pass — 11 PGlite/Ollama-dependent failures)
 - E2E: 11 Playwright spec files
 
 ---
