@@ -39,6 +39,7 @@ DEFAULT_OUTPUT_DIR = AI_TRAINING_DIR / "data" / "processed"
 V2_UPSAMPLE_PATTERNS = [
     "red-flags-v2-synthetic.jsonl",
     "icpc2-v2-synthetic.jsonl",
+    "icpc2-v3-targeted.jsonl",
     "comms-norwegian-v2-synthetic.jsonl",
 ]
 V2_UPSAMPLE_FACTOR = 2  # Duplicate v2 data this many times (total = original + N copies)
