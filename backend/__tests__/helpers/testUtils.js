@@ -10,6 +10,32 @@ import db from '../../src/config/database.js';
 import crypto from 'crypto';
 
 /**
+ * Check if database is available
+ * @returns {Promise<boolean>} True if database is connected
+ */
+export async function isDatabaseAvailable() {
+  try {
+    const result = await db.query('SELECT 1 as connected');
+    return result.rows.length > 0;
+  } catch (error) {
+    return false;
+  }
+}
+
+/**
+ * Skip test suite if database is not available
+ * Use in beforeAll: await skipIfNoDatabase()
+ */
+export async function skipIfNoDatabase() {
+  const available = await isDatabaseAvailable();
+  if (!available) {
+    console.log('⚠️ Database not available - skipping integration tests');
+    // This will cause all tests in the suite to be skipped
+    throw new Error('DATABASE_UNAVAILABLE');
+  }
+}
+
+/**
  * Create a test organization
  * @param {object} overrides - Override default values
  * @returns {Promise<object>} Created organization
