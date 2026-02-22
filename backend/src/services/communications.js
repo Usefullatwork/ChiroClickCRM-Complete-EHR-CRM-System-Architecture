@@ -8,6 +8,7 @@ import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
 import { createSmsProvider } from './providers/smsProvider.js';
 import { createEmailProvider } from './providers/emailProvider.js';
+import { DEFAULT_PAGE_SIZE } from '../config/constants.js';
 
 // Provider selection — defaults to 'mock' when DESKTOP_MODE is true
 const DESKTOP_MODE = process.env.DESKTOP_MODE === 'true';
@@ -29,7 +30,7 @@ logger.info('Communications providers initialized', {
 export const getAllCommunications = async (organizationId, options = {}) => {
   const {
     page = 1,
-    limit = 20,
+    limit = DEFAULT_PAGE_SIZE,
     patientId = null,
     type = null,
     startDate = null,

@@ -30,14 +30,50 @@ import {
 
 // Import guardrails for input validation and output filtering
 let guardrailsService = null;
+let guardrailsAvailable = false;
 let guardrailsLoadError = null;
 try {
   const guardrails = await import('./guardrails.js');
   guardrailsService = guardrails.guardrailsService;
+  guardrailsAvailable = true;
 } catch (e) {
+  guardrailsAvailable = false;
   guardrailsLoadError = e.message;
-  logger.warn('Guardrails service not available:', e.message);
+  logger.error('Failed to load guardrails service — safety filtering unavailable', {
+    error: e.message,
+    stack: e.stack,
+  });
 }
+
+// Fallback guardrails: basic safety defaults when guardrails module fails to load
+const FALLBACK_GUARDRAILS = {
+  blockedPatterns: [
+    /\b(ignore previous|disregard instructions|pretend you are)\b/i,
+    /\b(system prompt|jailbreak|bypass safety)\b/i,
+  ],
+  maxInputLength: 10000,
+  maxOutputLength: 5000,
+};
+
+const applyFallbackInputValidation = (prompt) => {
+  if (!prompt || typeof prompt !== 'string') {
+    return { proceed: false, sanitized: '', issues: [{ message: 'Invalid input' }], warnings: [] };
+  }
+  if (prompt.length > FALLBACK_GUARDRAILS.maxInputLength) {
+    return { proceed: false, sanitized: '', issues: [{ message: 'Input too long' }], warnings: [] };
+  }
+  for (const pattern of FALLBACK_GUARDRAILS.blockedPatterns) {
+    if (pattern.test(prompt)) {
+      return {
+        proceed: false,
+        sanitized: '',
+        issues: [{ message: 'Blocked input pattern detected' }],
+        warnings: [],
+      };
+    }
+  }
+  return { proceed: true, sanitized: prompt, issues: [], warnings: [] };
+};
 
 // Import RAG service for context augmentation
 let ragService = null;
@@ -68,7 +104,6 @@ const SAFETY_CRITICAL_TASKS = [
  */
 const checkGuardrailsForTask = (taskType, skipGuardrails = false) => {
   const isSafetyCritical = SAFETY_CRITICAL_TASKS.includes(taskType);
-  const guardrailsAvailable = guardrailsService !== null;
   const guardrailsEnabled = process.env.GUARDRAILS_ENABLED !== 'false';
 
   // Safety-critical tasks MUST have guardrails in production
@@ -513,10 +548,23 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
     );
   }
 
-  // Step 1: Validate input through guardrails
+  // Step 1: Validate input through guardrails (or fallback)
   let sanitizedPrompt = prompt;
   let inputWarnings = [];
   let _guardrailsValidationFailed = false;
+
+  if (GUARDRAILS_ENABLED && !skipGuardrails && !guardrailsService && !guardrailsAvailable) {
+    // Apply fallback guardrails when main service is unavailable
+    const fallbackResult = applyFallbackInputValidation(prompt);
+    if (!fallbackResult.proceed) {
+      logger.warn('Input blocked by fallback guardrails', { issues: fallbackResult.issues });
+      throw new Error(
+        `Input validation failed (fallback): ${fallbackResult.issues.map((i) => i.message).join('; ')}`
+      );
+    }
+    sanitizedPrompt = fallbackResult.sanitized;
+    inputWarnings = [{ message: 'Using fallback guardrails — full safety service unavailable' }];
+  }
 
   if (GUARDRAILS_ENABLED && guardrailsService && !skipGuardrails) {
     try {
@@ -579,50 +627,95 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
 
   // Step 3: Generate completion via Ollama (local)
   // Smart lifecycle: track loaded model for VRAM management
+  // Includes retry logic: 1 retry with 2s backoff for timeout errors only
+  const OLLAMA_TIMEOUT_MS = 30000; // 30s timeout per request
+  const OLLAMA_RETRY_BACKOFF_MS = 2000; // 2s backoff before retry
+  const OLLAMA_MAX_RETRIES = 1;
   let rawOutput;
 
-  try {
-    if (currentLoadedModel && currentLoadedModel !== model) {
-      logger.debug(`Model switch: ${currentLoadedModel} → ${model}`);
+  const ollamaPayload = {
+    model,
+    prompt: systemPrompt ? `${systemPrompt}\n\n${augmentedPrompt}` : augmentedPrompt,
+    stream: false,
+    keep_alive: KEEP_ALIVE,
+    options: {
+      temperature: effectiveTemperature,
+      num_predict: maxTokens,
+    },
+  };
+
+  let lastError = null;
+  for (let attempt = 0; attempt <= OLLAMA_MAX_RETRIES; attempt++) {
+    try {
+      if (attempt > 0) {
+        logger.warn(`Ollama retry attempt ${attempt} for model "${model}" (task: ${taskType})`, {
+          previousError: lastError?.message,
+        });
+        await new Promise((resolve) => setTimeout(resolve, OLLAMA_RETRY_BACKOFF_MS));
+      }
+
+      if (currentLoadedModel && currentLoadedModel !== model) {
+        logger.debug(`Model switch: ${currentLoadedModel} → ${model}`);
+      }
+
+      const response = await axios.post(`${OLLAMA_BASE_URL}/api/generate`, ollamaPayload, {
+        timeout: OLLAMA_TIMEOUT_MS,
+      });
+
+      currentLoadedModel = model;
+      rawOutput = response.data.response;
+
+      // Log suggestion to ai_suggestions table (non-blocking)
+      if (organizationId && taskType) {
+        const durationMs = response.data.total_duration
+          ? Math.round(response.data.total_duration / 1e6)
+          : null;
+        logSuggestion({
+          organizationId,
+          suggestionType: taskType,
+          modelName: model,
+          inputText: sanitizedPrompt.substring(0, 500),
+          suggestedText: rawOutput.substring(0, 2000),
+          confidenceScore: null,
+          requestDurationMs: durationMs,
+          abVariant,
+        }).catch((err) => logger.warn('Failed to log AI suggestion:', err.message));
+      }
+
+      lastError = null;
+      break; // Success — exit retry loop
+    } catch (error) {
+      lastError = error;
+      const isTimeout =
+        error.code === 'ECONNABORTED' ||
+        error.code === 'ETIMEDOUT' ||
+        (error.message && error.message.includes('timeout'));
+
+      if (isTimeout) {
+        logger.warn('Ollama request timed out', {
+          model,
+          taskType,
+          attempt: attempt + 1,
+          timeoutMs: OLLAMA_TIMEOUT_MS,
+        });
+        // Continue to retry for timeout errors
+        continue;
+      }
+
+      // Non-timeout errors: do not retry
+      logger.error('AI completion error:', error.message);
+      throw new Error('AI service unavailable');
     }
+  }
 
-    const response = await axios.post(
-      `${OLLAMA_BASE_URL}/api/generate`,
-      {
-        model,
-        prompt: systemPrompt ? `${systemPrompt}\n\n${augmentedPrompt}` : augmentedPrompt,
-        stream: false,
-        keep_alive: KEEP_ALIVE, // Auto-unload after idle period
-        options: {
-          temperature: effectiveTemperature,
-          num_predict: maxTokens,
-        },
-      },
-      { timeout: 60000 } // 60s for model loading + generation
-    );
-
-    currentLoadedModel = model;
-    rawOutput = response.data.response;
-
-    // Log suggestion to ai_suggestions table (non-blocking)
-    if (organizationId && taskType) {
-      const durationMs = response.data.total_duration
-        ? Math.round(response.data.total_duration / 1e6)
-        : null;
-      logSuggestion({
-        organizationId,
-        suggestionType: taskType,
-        modelName: model,
-        inputText: sanitizedPrompt.substring(0, 500),
-        suggestedText: rawOutput.substring(0, 2000),
-        confidenceScore: null,
-        requestDurationMs: durationMs,
-        abVariant,
-      }).catch((err) => logger.warn('Failed to log AI suggestion:', err.message));
-    }
-  } catch (error) {
-    logger.error('AI completion error:', error.message);
-    throw new Error('AI service unavailable');
+  if (lastError) {
+    logger.error('AI completion failed after all retries', {
+      model,
+      taskType,
+      retries: OLLAMA_MAX_RETRIES,
+      error: lastError.message,
+    });
+    throw new Error('AI service unavailable (timeout after retries)');
   }
 
   // Step 4: Filter output through guardrails
@@ -1599,7 +1692,7 @@ export const generateCompletionStream = async (model, prompt, res) => {
         stream: true,
         keep_alive: KEEP_ALIVE,
       },
-      { responseType: 'stream', timeout: 60000 }
+      { responseType: 'stream', timeout: 30000 }
     );
 
     response.data.on('data', (chunk) => {

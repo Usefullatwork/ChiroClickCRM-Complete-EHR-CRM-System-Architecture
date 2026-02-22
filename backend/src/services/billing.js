@@ -9,6 +9,7 @@
 import { createRequire } from 'module';
 import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
+import { DEFAULT_PAGE_SIZE_LARGE, DEFAULT_INVOICE_DUE_DAYS } from '../config/constants.js';
 
 const require = createRequire(import.meta.url);
 const takstCodes = require('../data/takst-codes.json');
@@ -155,7 +156,7 @@ export const createInvoice = async (organizationId, invoiceData) => {
     practitioner_id,
     items = [],
     notes = null,
-    due_days = 14,
+    due_days = DEFAULT_INVOICE_DUE_DAYS,
     is_child = false,
     has_exemption = false,
   } = invoiceData;
@@ -264,7 +265,7 @@ export const getInvoiceById = async (organizationId, invoiceId) => {
 export const getInvoices = async (organizationId, options = {}) => {
   const {
     page = 1,
-    limit = 50,
+    limit = DEFAULT_PAGE_SIZE_LARGE,
     status = null,
     patient_id = null,
     start_date = null,

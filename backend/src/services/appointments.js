@@ -5,6 +5,7 @@
 
 import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
+import { DEFAULT_PAGE_SIZE_LARGE } from '../config/constants.js';
 
 /**
  * Get appointment by ID
@@ -141,7 +142,7 @@ export const checkInAppointment = async (organizationId, appointmentId) => {
 export const getAllAppointments = async (organizationId, options = {}) => {
   const {
     page = 1,
-    limit = 50,
+    limit = DEFAULT_PAGE_SIZE_LARGE,
     startDate = null,
     endDate = null,
     practitionerId = null,

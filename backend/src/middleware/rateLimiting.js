@@ -6,14 +6,24 @@
 import rateLimit from 'express-rate-limit';
 import logger from '../utils/logger.js';
 import { RateLimitError } from '../utils/errors.js';
+import {
+  RATE_LIMIT_WINDOW_GENERAL,
+  RATE_LIMIT_MAX_GENERAL,
+  RATE_LIMIT_WINDOW_SMS,
+  RATE_LIMIT_MAX_SMS,
+  RATE_LIMIT_WINDOW_EMAIL,
+  RATE_LIMIT_MAX_EMAIL,
+  RATE_LIMIT_WINDOW_AUTH,
+  RATE_LIMIT_MAX_AUTH,
+} from '../config/constants.js';
 
 /**
  * General API rate limiter
  * 100 requests per 15 minutes per IP
  */
 export const generalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  windowMs: RATE_LIMIT_WINDOW_GENERAL,
+  max: RATE_LIMIT_MAX_GENERAL,
   skip: () => ['test', 'e2e'].includes(process.env.NODE_ENV),
   standardHeaders: true,
   legacyHeaders: false,
@@ -37,8 +47,8 @@ export const generalLimiter = rateLimit({
  * 10 SMS per hour per user to prevent spam and cost overruns
  */
 export const smsLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10,
+  windowMs: RATE_LIMIT_WINDOW_SMS,
+  max: RATE_LIMIT_MAX_SMS,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) =>
@@ -47,9 +57,9 @@ export const smsLimiter = rateLimit({
   message: {
     error: 'SMSRateLimitError',
     code: 'SMS_RATE_LIMIT_EXCEEDED',
-    message: 'SMS rate limit exceeded. Maximum 10 SMS per hour.',
+    message: `SMS rate limit exceeded. Maximum ${RATE_LIMIT_MAX_SMS} SMS per hour.`,
     details: {
-      limit: 10,
+      limit: RATE_LIMIT_MAX_SMS,
       window: '1 hour',
     },
   },
@@ -71,17 +81,17 @@ export const smsLimiter = rateLimit({
  * 20 emails per hour per user
  */
 export const emailLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 20,
+  windowMs: RATE_LIMIT_WINDOW_EMAIL,
+  max: RATE_LIMIT_MAX_EMAIL,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => req.user?.id || req.ip,
   message: {
     error: 'EmailRateLimitError',
     code: 'EMAIL_RATE_LIMIT_EXCEEDED',
-    message: 'Email rate limit exceeded. Maximum 20 emails per hour.',
+    message: `Email rate limit exceeded. Maximum ${RATE_LIMIT_MAX_EMAIL} emails per hour.`,
     details: {
-      limit: 20,
+      limit: RATE_LIMIT_MAX_EMAIL,
       window: '1 hour',
     },
   },
@@ -139,8 +149,8 @@ export const perPatientLimiter = rateLimit({
  * 5 login attempts per 15 minutes per IP
  */
 export const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5,
+  windowMs: RATE_LIMIT_WINDOW_AUTH,
+  max: RATE_LIMIT_MAX_AUTH,
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: true, // Only count failed login attempts
@@ -150,7 +160,7 @@ export const loginLimiter = rateLimit({
     code: 'LOGIN_RATE_LIMIT_EXCEEDED',
     message: 'Too many login attempts. Please try again later.',
     details: {
-      limit: 5,
+      limit: RATE_LIMIT_MAX_AUTH,
       window: '15 minutes',
     },
   },
