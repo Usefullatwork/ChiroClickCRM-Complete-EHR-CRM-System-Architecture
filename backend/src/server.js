@@ -15,8 +15,10 @@ import 'express-async-errors';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
-import { healthCheck } from './config/database.js';
+import { healthCheck, query as dbQuery } from './config/database.js';
 import logger from './utils/logger.js';
+import { requireAuth, requireRole } from './middleware/auth.js';
+import circuitBreakerRegistry from './infrastructure/resilience/CircuitBreakerRegistry.js';
 import { securityHeaders, csrfProtection, sendCsrfToken } from './middleware/security.js';
 import { scheduleKeyRotation, createKeyRotationTable } from './utils/keyRotation.js';
 import { initializeScheduler, shutdownScheduler } from './jobs/scheduler.js';
@@ -148,6 +150,94 @@ app.get('/health', async (req, res) => {
     version: API_VERSION,
     database: dbHealthy ? 'connected' : 'disconnected',
   });
+});
+
+/**
+ * @swagger
+ * /health/detailed:
+ *   get:
+ *     summary: Detailed health check (admin only)
+ *     description: Returns comprehensive system health including database, Ollama AI, circuit breakers, and last migration version
+ *     tags: [System]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Detailed health information
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Admin access required
+ */
+app.get('/health/detailed', requireAuth, requireRole(['ADMIN']), async (req, res) => {
+  const details = {
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV,
+    version: API_VERSION,
+  };
+
+  // 1. Database connection status
+  try {
+    const dbHealthy = await healthCheck();
+    details.database = {
+      status: dbHealthy ? 'connected' : 'disconnected',
+      healthy: dbHealthy,
+    };
+  } catch (err) {
+    details.database = { status: 'error', healthy: false, error: err.message };
+  }
+
+  // 2. Ollama connection status
+  const ollamaBaseUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
+  try {
+    const { default: axios } = await import('axios');
+    const ollamaRes = await axios.get(`${ollamaBaseUrl}/api/tags`, { timeout: 5000 });
+    const models = ollamaRes.data.models?.map((m) => m.name) || [];
+    details.ollama = {
+      status: 'connected',
+      healthy: true,
+      url: ollamaBaseUrl,
+      models,
+      modelCount: models.length,
+    };
+  } catch (err) {
+    details.ollama = {
+      status: 'disconnected',
+      healthy: false,
+      url: ollamaBaseUrl,
+      error: err.message,
+    };
+  }
+
+  // 3. Circuit breaker states
+  try {
+    details.circuitBreakers = circuitBreakerRegistry.getAllStatus();
+  } catch (err) {
+    details.circuitBreakers = { error: err.message };
+  }
+
+  // 4. Last migration version
+  try {
+    const migrationResult = await dbQuery(
+      `SELECT version, name, applied_at FROM schema_migrations ORDER BY version DESC LIMIT 1`
+    );
+    if (migrationResult.rows.length > 0) {
+      details.lastMigration = migrationResult.rows[0];
+    } else {
+      details.lastMigration = { status: 'no migrations found' };
+    }
+  } catch (err) {
+    // Migration table may not exist
+    details.lastMigration = { status: 'unavailable', error: err.message };
+  }
+
+  // Overall status
+  const isHealthy = details.database?.healthy !== false && details.ollama?.healthy !== false;
+  details.status = isHealthy ? 'healthy' : 'degraded';
+
+  res.status(isHealthy ? 200 : 503).json(details);
 });
 
 // API root

@@ -27,6 +27,13 @@ import {
   checkRedFlagsInContent,
   checkMedicationWarnings,
 } from './clinicalValidation.js';
+import circuitBreakerRegistry from '../infrastructure/resilience/CircuitBreakerRegistry.js';
+
+// Get the pre-registered Ollama circuit breaker and set requestTimeout
+// to exceed the per-request axios timeout (30s) so the breaker tracks
+// failures from real timeouts rather than racing with its own timer.
+const ollamaBreaker = circuitBreakerRegistry.getBreaker('ollama');
+ollamaBreaker.requestTimeout = 35000;
 
 // Import guardrails for input validation and output filtering
 let guardrailsService = null;
@@ -658,9 +665,11 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
         logger.debug(`Model switch: ${currentLoadedModel} → ${model}`);
       }
 
-      const response = await axios.post(`${OLLAMA_BASE_URL}/api/generate`, ollamaPayload, {
-        timeout: OLLAMA_TIMEOUT_MS,
-      });
+      const response = await ollamaBreaker.execute(() =>
+        axios.post(`${OLLAMA_BASE_URL}/api/generate`, ollamaPayload, {
+          timeout: OLLAMA_TIMEOUT_MS,
+        })
+      );
 
       currentLoadedModel = model;
       rawOutput = response.data.response;
@@ -1684,15 +1693,17 @@ export const buildFieldPrompt = (fieldType, context = {}, _language = 'no') => {
  */
 export const generateCompletionStream = async (model, prompt, res) => {
   try {
-    const response = await axios.post(
-      `${OLLAMA_BASE_URL}/api/generate`,
-      {
-        model: model || AI_MODEL,
-        prompt,
-        stream: true,
-        keep_alive: KEEP_ALIVE,
-      },
-      { responseType: 'stream', timeout: 30000 }
+    const response = await ollamaBreaker.execute(() =>
+      axios.post(
+        `${OLLAMA_BASE_URL}/api/generate`,
+        {
+          model: model || AI_MODEL,
+          prompt,
+          stream: true,
+          keep_alive: KEEP_ALIVE,
+        },
+        { responseType: 'stream', timeout: 30000 }
+      )
     );
 
     response.data.on('data', (chunk) => {
