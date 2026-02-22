@@ -116,7 +116,7 @@ describe('AdvancedPatientSearch Component', () => {
   it('should show initial state message before searching', () => {
     renderWithProviders();
     expect(
-      screen.getByText('Set your search criteria and click Search to find patients')
+      screen.getByText('Angi sokekriterier og klikk Sok for a finne pasienter')
     ).toBeInTheDocument();
   });
 

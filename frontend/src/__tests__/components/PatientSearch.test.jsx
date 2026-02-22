@@ -5,7 +5,7 @@ import PatientSearch from '../../components/PatientSearch';
 describe('PatientSearch Component', () => {
   it('should render search input', () => {
     render(<PatientSearch onSelect={vi.fn()} />);
-    expect(screen.getByPlaceholderText(/search patients/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/sok etter pasienter/i)).toBeInTheDocument();
   });
 
   it('should debounce search input', async () => {
@@ -14,7 +14,7 @@ describe('PatientSearch Component', () => {
 
     render(<PatientSearch onSearch={onSearch} onSelect={vi.fn()} />);
 
-    const input = screen.getByPlaceholderText(/search patients/i);
+    const input = screen.getByPlaceholderText(/sok etter pasienter/i);
     fireEvent.change(input, { target: { value: 'Ola' } });
 
     // Should not call immediately
@@ -31,7 +31,7 @@ describe('PatientSearch Component', () => {
   it('should display search results', async () => {
     const mockPatients = [
       { id: '1', first_name: 'Ola', last_name: 'Nordmann' },
-      { id: '2', first_name: 'Kari', last_name: 'Hansen' }
+      { id: '2', first_name: 'Kari', last_name: 'Hansen' },
     ];
 
     render(<PatientSearch results={mockPatients} onSelect={vi.fn()} />);
@@ -42,9 +42,7 @@ describe('PatientSearch Component', () => {
 
   it('should call onSelect when patient is clicked', () => {
     const onSelect = vi.fn();
-    const mockPatients = [
-      { id: '1', first_name: 'Ola', last_name: 'Nordmann' }
-    ];
+    const mockPatients = [{ id: '1', first_name: 'Ola', last_name: 'Nordmann' }];
 
     render(<PatientSearch results={mockPatients} onSelect={onSelect} />);
 
@@ -56,6 +54,6 @@ describe('PatientSearch Component', () => {
   it('should show "No results" message when search returns empty', () => {
     render(<PatientSearch results={[]} onSelect={vi.fn()} searchPerformed={true} />);
 
-    expect(screen.getByText(/no patients found/i)).toBeInTheDocument();
+    expect(screen.getByText(/ingen pasienter funnet/i)).toBeInTheDocument();
   });
 });

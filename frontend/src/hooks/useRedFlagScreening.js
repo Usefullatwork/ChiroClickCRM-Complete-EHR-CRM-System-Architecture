@@ -45,23 +45,6 @@ export function useRedFlagScreening({
   const debounceTimerRef = useRef(null);
   const previousCriticalRef = useRef(false);
 
-  // Screen text with debouncing
-  const screenTextDebounced = useCallback(
-    (text) => {
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
-
-      debounceTimerRef.current = setTimeout(() => {
-        setIsScreening(true);
-        const results = screenText(text, lang);
-        updateFlags(results);
-        setIsScreening(false);
-      }, debounceMs);
-    },
-    [lang, debounceMs, updateFlags]
-  );
-
   // Update flags and trigger callbacks
   const updateFlags = useCallback(
     (newFlags) => {
@@ -88,6 +71,23 @@ export function useRedFlagScreening({
       previousCriticalRef.current = hasCritical;
     },
     [onCriticalFlag]
+  );
+
+  // Screen text with debouncing
+  const screenTextDebounced = useCallback(
+    (text) => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+
+      debounceTimerRef.current = setTimeout(() => {
+        setIsScreening(true);
+        const results = screenText(text, lang);
+        updateFlags(results);
+        setIsScreening(false);
+      }, debounceMs);
+    },
+    [lang, debounceMs, updateFlags]
   );
 
   // Screen full patient data

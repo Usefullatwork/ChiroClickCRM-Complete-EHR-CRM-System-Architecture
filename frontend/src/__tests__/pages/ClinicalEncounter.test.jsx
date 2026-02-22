@@ -159,6 +159,42 @@ vi.mock('../../components/clinical/QuickPalpationSpine', () => ({
 
 vi.mock('../../components/clinical', () => ({
   AIDiagnosisSidebar: () => null,
+  RedFlagModal: () => null,
+}));
+
+vi.mock('../../hooks/useRedFlagScreening', () => ({
+  useRedFlagScreening: () => ({
+    flags: [],
+    summary: {
+      total: 0,
+      critical: 0,
+      high: 0,
+      medium: 0,
+      low: 0,
+      requiresImmediateAction: false,
+      categories: [],
+    },
+    isScreening: false,
+    lastScreened: null,
+    acknowledgedFlags: new Set(),
+    unacknowledgedFlags: [],
+    hasUnacknowledgedCritical: false,
+    screenText: vi.fn(),
+    screenTextImmediate: vi.fn(),
+    screenFullPatient: vi.fn(),
+    screenPatientAge: vi.fn(),
+    screenExam: vi.fn(),
+    acknowledgeFlag: vi.fn(),
+    acknowledgeAllFlags: vi.fn(),
+    resetAcknowledgements: vi.fn(),
+    clearFlags: vi.fn(),
+  }),
+  default: () => ({
+    flags: [],
+    summary: { total: 0, critical: 0 },
+    screenText: vi.fn(),
+    clearFlags: vi.fn(),
+  }),
 }));
 
 vi.mock('../../components/common', () => ({
