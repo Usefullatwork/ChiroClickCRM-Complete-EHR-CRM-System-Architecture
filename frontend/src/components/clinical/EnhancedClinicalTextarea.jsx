@@ -10,7 +10,8 @@
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { useSlashCommands, SlashCommandMenu } from '../assessment/SlashCommands';
+import useTextExpansion from '../../hooks/useTextExpansion';
+import TextExpansionPopup from './TextExpansionPopup';
 import { Sparkles, Loader2, Mic, MicOff, Square } from 'lucide-react';
 import { aiAPI } from '../../services/api';
 import logger from '../../utils/logger';
@@ -115,18 +116,17 @@ export default function EnhancedClinicalTextarea({
     setVoiceSupported(!!SpeechRecognition);
   }, []);
 
-  // Slash commands hook
+  // Text expansion (slash commands) hook
   const {
-    showMenu,
-    menuPosition,
-    filteredCommands,
-    selectedIndex,
-    _setSelectedIndex,
-    handleKeyDown: slashKeyDown,
-    handleChange: slashChange,
-    selectCommand,
-    closeMenu,
-  } = useSlashCommands();
+    suggestions: expansionSuggestions,
+    isOpen: expansionOpen,
+    searchTerm: expansionSearch,
+    selectedIndex: expansionIndex,
+    handleKeyDown: expansionKeyDown,
+    handleInput: expansionInput,
+    insertTemplate,
+    close: closeExpansion,
+  } = useTextExpansion();
 
   // Initialize speech recognition
   const initRecognition = useCallback(() => {
@@ -278,14 +278,21 @@ export default function EnhancedClinicalTextarea({
       setShowMacroHint(false);
     }
 
-    // Also check for slash commands
-    slashChange(e, onChange);
+    // Also check for text expansion (slash commands)
+    onChange(newValue);
+    expansionInput(newValue, cursorPos);
   };
 
   // Handle key down
   const handleKeyDown = (e) => {
-    // Tab to accept AI suggestion
-    if (e.key === 'Tab' && aiSuggestion && !showMenu) {
+    // Text expansion popup takes priority when open
+    if (expansionOpen) {
+      const handled = expansionKeyDown(e, textareaRef, value, onChange);
+      if (handled) return;
+    }
+
+    // Tab to accept AI suggestion (only when expansion popup is closed)
+    if (e.key === 'Tab' && aiSuggestion && !expansionOpen) {
       e.preventDefault();
       onChange(value + aiSuggestion);
       setAiSuggestion('');
@@ -302,14 +309,7 @@ export default function EnhancedClinicalTextarea({
         setAiSuggestion('');
         return;
       }
-      if (showMenu) {
-        closeMenu();
-        return;
-      }
     }
-
-    // Pass to slash command handler
-    slashKeyDown(e, textareaRef, value, onChange);
   };
 
   // Insert quick phrase at cursor
@@ -507,14 +507,25 @@ export default function EnhancedClinicalTextarea({
         </div>
       )}
 
-      {/* Slash command menu */}
-      <SlashCommandMenu
-        show={showMenu}
-        position={menuPosition}
-        commands={filteredCommands}
-        selectedIndex={selectedIndex}
-        onSelect={(cmd, data) => selectCommand(cmd, data, value, onChange, textareaRef)}
-        onClose={closeMenu}
+      {/* Text expansion popup */}
+      <TextExpansionPopup
+        suggestions={expansionSuggestions}
+        isOpen={expansionOpen}
+        searchTerm={expansionSearch}
+        selectedIndex={expansionIndex}
+        inputRef={textareaRef}
+        onSelect={(tmpl) => {
+          const cursorPos = textareaRef.current?.selectionStart || value.length;
+          const newPos = insertTemplate(tmpl, value, cursorPos, onChange);
+          setTimeout(() => {
+            if (textareaRef.current) {
+              textareaRef.current.selectionStart = newPos;
+              textareaRef.current.selectionEnd = newPos;
+              textareaRef.current.focus();
+            }
+          }, 0);
+        }}
+        onClose={closeExpansion}
       />
 
       {/* Quick phrases */}

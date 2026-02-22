@@ -3,7 +3,7 @@
  * Contains the four SOAP sections: Subjective, Objective, Assessment, Plan
  */
 import { Activity, Target, Settings } from 'lucide-react';
-import { EnhancedClinicalTextarea, SALTBanner } from '../clinical';
+import { EnhancedClinicalTextarea, SALTBanner, AITextarea } from '../clinical';
 import {
   BodyChartPanel,
   AnatomicalBodyChart,
@@ -196,12 +196,14 @@ export function SOAPNoteForm({
         </div>
 
         {/* ROM */}
-        <textarea
-          placeholder="Range of Motion (ROM)..."
+        <AITextarea
           value={encounterData.objective.rom}
-          onChange={(e) => updateField('objective', 'rom', e.target.value)}
+          onChange={(val) => updateField('objective', 'rom', val)}
+          placeholder="Range of Motion (ROM)..."
+          fieldType="rom"
+          context={{ chiefComplaint: encounterData.subjective?.chief_complaint }}
           disabled={isSigned}
-          className="w-full min-h-[60px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-500 resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
+          rows={2}
         />
 
         {/* All exam panels via ExamPanelManager */}
@@ -293,24 +295,26 @@ export function SOAPNoteForm({
           encounterData={encounterData}
         />
 
-        <textarea
-          ref={(el) => (textAreaRefs.current['objective.ortho_tests'] = el)}
-          placeholder="Ortopediske tester (sammendrag)..."
+        <AITextarea
           value={encounterData.objective.ortho_tests}
-          onChange={(e) => updateField('objective', 'ortho_tests', e.target.value)}
-          onFocus={() => setActiveField('objective.ortho_tests')}
+          onChange={(val) => updateField('objective', 'ortho_tests', val)}
+          placeholder="Ortopediske tester (sammendrag)..."
+          fieldType="ortho_tests"
+          context={{ chiefComplaint: encounterData.subjective?.chief_complaint }}
           disabled={isSigned}
-          className="w-full min-h-[60px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-500 resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
+          rows={2}
+          onFocus={() => setActiveField('objective.ortho_tests')}
         />
 
-        <textarea
-          ref={(el) => (textAreaRefs.current['objective.neuro_tests'] = el)}
-          placeholder="Nevrologiske tester (sammendrag)..."
+        <AITextarea
           value={encounterData.objective.neuro_tests}
-          onChange={(e) => updateField('objective', 'neuro_tests', e.target.value)}
-          onFocus={() => setActiveField('objective.neuro_tests')}
+          onChange={(val) => updateField('objective', 'neuro_tests', val)}
+          placeholder="Nevrologiske tester (sammendrag)..."
+          fieldType="neuro_tests"
+          context={{ chiefComplaint: encounterData.subjective?.chief_complaint }}
           disabled={isSigned}
-          className="w-full min-h-[60px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-500 resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
+          rows={2}
+          onFocus={() => setActiveField('objective.neuro_tests')}
         />
 
         {!isSigned && (

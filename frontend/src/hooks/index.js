@@ -45,3 +45,6 @@ export { default as useRedFlagScreening } from './useRedFlagScreening';
 
 // Patient Presence (WebSocket)
 export { default as usePatientPresence } from './usePatientPresence';
+
+// Text Expansion (slash commands)
+export { default as useTextExpansion } from './useTextExpansion';

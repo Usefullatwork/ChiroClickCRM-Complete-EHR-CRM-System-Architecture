@@ -23,3 +23,5 @@ export { default as EnhancedClinicalTextarea, MACROS } from './EnhancedClinicalT
 export { default as VoiceInputButton, useVoiceInput } from './VoiceInputButton';
 export { default as TemplateVariableModal } from './TemplateVariableModal';
 export { default as RedFlagModal } from './RedFlagModal';
+export { default as TextExpansionPopup } from './TextExpansionPopup';
+export { default as AITextarea } from './AITextarea';
