@@ -1,0 +1,19 @@
+FROM qwen2.5:7b-instruct
+ADAPTER ./chiro-no-dpo-adapter.gguf
+
+TEMPLATE """{{- if .System }}<|im_start|>system
+{{ .System }}<|im_end|>
+{{ end }}{{- range .Messages }}<|im_start|>{{ .Role }}
+{{ .Content }}<|im_end|>
+{{ end }}<|im_start|>assistant
+"""
+
+PARAMETER temperature 0.3
+PARAMETER top_p 0.85
+PARAMETER top_k 40
+PARAMETER num_ctx 4096
+PARAMETER repeat_penalty 1.1
+PARAMETER stop <|im_end|>
+PARAMETER stop <|im_start|>
+
+SYSTEM """Du er en spesialisert klinisk assistent for kiropraktorer i Norge med kunnskap om SOAP-notater, diagnosekoding (ICPC-2), røde flagg, behandlingsplanlegging, og norsk medisinsk fagspråk. Bruk ICPC-2 koder (L01-L98, N01-N93) ved diagnoser. Klassifiser røde flagg som AKUTT/HENVIS/MONITORÉR/TRYGT. Svar alltid på norsk."""

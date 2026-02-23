@@ -383,7 +383,8 @@ def main():
                        help='Per-device batch size (default: 1)')
     parser.add_argument('--grad-accum', type=int, default=8,
                        help='Gradient accumulation steps (default: 8)')
-    parser.add_argument('--lr', type=float, default=5e-5,
+    parser.add_argument('--learning-rate', '--lr', type=float, default=5e-5,
+                       dest='lr',
                        help='Learning rate (default: 5e-5, lower than SFT)')
     parser.add_argument('--beta', type=float, default=0.1,
                        help='DPO beta parameter (default: 0.1)')

@@ -167,8 +167,7 @@ if [ "$ONLY_EVAL" = false ] && [ "$SKIP_SFT" = false ]; then
     --epochs 1 \
     --batch-size 2 \
     --max-seq-length 1024 \
-    --lr 1.5e-4 \
-    --low-vram"
+    --lr 1.5e-4"
 
   log "SFT chiro-no v3 training complete."
 
@@ -328,8 +327,7 @@ if [ "$ONLY_EVAL" = false ] && [ "$SKIP_SFT" = false ]; then
     --epochs 1 \
     --batch-size 2 \
     --max-seq-length 1024 \
-    --lr 1.5e-4 \
-    --low-vram"
+    --lr 1.5e-4"
 
   log "SFT chiro-norwegian v3 training complete."
 
