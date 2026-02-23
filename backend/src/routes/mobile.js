@@ -3,18 +3,20 @@
  * All endpoints for the ChiroClick mobile app
  */
 
-const express = require('express');
+import express from 'express';
+import * as mobileAuth from '../services/mobileAuth.js';
+
 const router = express.Router();
-const mobileAuth = require('../services/mobileAuth');
+
 // Logger - noop fallback avoids raw console usage
 const noop = () => {};
 const fallbackLogger = { info: noop, error: noop, warn: noop, debug: noop };
 let logger = fallbackLogger;
 try {
-  const mod = require('../utils/logger');
+  const mod = await import('../utils/logger.js');
   logger = mod.default || mod;
 } catch {
-  // Logger not available in CJS context; structured logging disabled
+  // Logger not available; structured logging disabled
 }
 
 /**
@@ -2287,4 +2289,4 @@ async function checkStreakAchievements(db, userId, streak) {
   }
 }
 
-module.exports = router;
+export default router;

@@ -3,16 +3,19 @@
  * Handles phone OTP, social login (Google/Apple), and JWT management
  */
 
-const crypto = require('crypto');
-const jwt = require('jsonwebtoken');
+import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
+import { OAuth2Client } from 'google-auth-library';
+import jwksClient from 'jwks-rsa';
+
 const noop = () => {};
 const fallbackLogger = { info: noop, error: noop, warn: noop, debug: noop };
 let logger = fallbackLogger;
 try {
-  const mod = require('../utils/logger');
+  const mod = await import('../utils/logger.js');
   logger = mod.default || mod;
 } catch {
-  // Logger not available in CJS context
+  // Logger not available; structured logging disabled
 }
 
 // Configuration
@@ -79,7 +82,10 @@ async function sendOTP(db, phoneNumber) {
 
   // Send via Twilio (or mock in development)
   if (process.env.NODE_ENV === 'production' && process.env.TWILIO_ACCOUNT_SID) {
-    const twilio = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+    const twilio = (await import('twilio')).default(
+      process.env.TWILIO_ACCOUNT_SID,
+      process.env.TWILIO_AUTH_TOKEN
+    );
 
     await twilio.messages.create({
       body: `Din ChiroClick-kode er: ${code}. Gyldig i ${OTP_EXPIRY_MINUTES} minutter.`,
@@ -204,7 +210,6 @@ async function verifyOTP(db, phoneNumber, code) {
  * Verify Google Sign-In token
  */
 async function verifyGoogleToken(db, idToken) {
-  const { OAuth2Client } = require('google-auth-library');
   const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
   try {
@@ -280,9 +285,6 @@ async function verifyGoogleToken(db, idToken) {
  * Verify Apple Sign-In token
  */
 async function verifyAppleToken(db, identityToken, appleUser) {
-  const jwt = require('jsonwebtoken');
-  const jwksClient = require('jwks-rsa');
-
   try {
     // Decode token header to get key id
     const decoded = jwt.decode(identityToken, { complete: true });
@@ -632,7 +634,7 @@ async function updateProfile(db, userId, updates) {
   return sanitizeUser(result.rows[0]);
 }
 
-module.exports = {
+export {
   sendOTP,
   verifyOTP,
   verifyGoogleToken,

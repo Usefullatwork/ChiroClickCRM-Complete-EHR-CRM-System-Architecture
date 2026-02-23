@@ -8,7 +8,7 @@
  * - Keyboard navigation (ArrowUp/Down, Tab/Enter insert, Esc close)
  */
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { templatesAPI } from '../services/api';
 import { DEFAULT_COMMANDS } from '../components/assessment/SlashCommands';
 import logger from '../utils/logger';
@@ -69,7 +69,6 @@ export default function useTextExpansion() {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const abortRef = useRef(null);
 
   // Fetch templates from API on mount
   useEffect(() => {
@@ -106,7 +105,9 @@ export default function useTextExpansion() {
   // Merged template list: API templates first, then local defaults
   const allTemplates = useMemo(() => {
     const localDefaults = commandsToArray(DEFAULT_COMMANDS);
-    if (!apiTemplates || apiTemplates.length === 0) return localDefaults;
+    if (!apiTemplates || apiTemplates.length === 0) {
+      return localDefaults;
+    }
     // De-duplicate: API templates override locals with same shortcut
     const apiShortcuts = new Set(apiTemplates.map((t) => t.shortcut.toLowerCase()));
     const filteredLocals = localDefaults.filter((t) => !apiShortcuts.has(t.shortcut.toLowerCase()));
@@ -115,7 +116,9 @@ export default function useTextExpansion() {
 
   // Filtered suggestions based on search term
   const suggestions = useMemo(() => {
-    if (!searchTerm) return [];
+    if (!searchTerm) {
+      return [];
+    }
     const search = searchTerm.toLowerCase();
     return allTemplates
       .filter(
@@ -137,7 +140,9 @@ export default function useTextExpansion() {
       // Find the "/" that started this search
       const beforeCursor = value.substring(0, cursorPos);
       const slashIndex = beforeCursor.lastIndexOf('/');
-      if (slashIndex === -1) return cursorPos;
+      if (slashIndex === -1) {
+        return cursorPos;
+      }
 
       const expandedText = substituteVariables(template.text);
       const newValue = value.substring(0, slashIndex) + expandedText + value.substring(cursorPos);
@@ -173,7 +178,9 @@ export default function useTextExpansion() {
   // Keyboard handler for the popup navigation
   const handleKeyDown = useCallback(
     (e, textareaRef, value, onChange) => {
-      if (!isOpen || suggestions.length === 0) return false;
+      if (!isOpen || suggestions.length === 0) {
+        return false;
+      }
 
       if (e.key === 'ArrowDown') {
         e.preventDefault();

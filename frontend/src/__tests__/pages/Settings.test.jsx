@@ -96,17 +96,21 @@ vi.mock('../../components/settings/ExerciseSettings', () => ({
   default: () => <div data-testid="exercise-settings">Exercise Settings</div>,
 }));
 
-vi.mock('lucide-react', () => ({
-  Building2: () => <span>Building2</span>,
-  User: () => <span>User</span>,
-  Bell: () => <span>Bell</span>,
-  Users: () => <span>Users</span>,
-  Database: () => <span>Database</span>,
-  Brain: () => <span>Brain</span>,
-  Stethoscope: () => <span>Stethoscope</span>,
-  Dumbbell: () => <span>Dumbbell</span>,
-  Loader2: () => <span>Loader2</span>,
-}));
+vi.mock('lucide-react', () => {
+  return new Proxy(
+    {},
+    {
+      get: (_target, prop) => {
+        if (prop === '__esModule') {
+          return true;
+        }
+        const Stub = (props) => <span {...props}>{String(prop)}</span>;
+        Stub.displayName = String(prop);
+        return Stub;
+      },
+    }
+  );
+});
 
 import Settings from '../../pages/Settings';
 import { organizationAPI, usersAPI } from '../../services/api';
