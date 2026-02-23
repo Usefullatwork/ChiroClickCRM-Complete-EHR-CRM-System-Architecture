@@ -23,6 +23,7 @@ const UserManagement = lazy(() => import('../components/settings/UserManagement'
 const NotificationSettings = lazy(() => import('../components/settings/NotificationSettings'));
 const IntegrationSettings = lazy(() => import('../components/settings/IntegrationSettings'));
 const AISettings = lazy(() => import('../components/AISettings'));
+const TrainingDataExport = lazy(() => import('../components/settings/TrainingDataExport'));
 const ClinicalSettings = lazy(() => import('../components/settings/ClinicalSettings'));
 const ExerciseSettings = lazy(() => import('../components/settings/ExerciseSettings'));
 
@@ -292,7 +293,14 @@ export default function Settings() {
 
         {activeTab === 'integrations' && <IntegrationSettings t={t} />}
 
-        {activeTab === 'ai' && <AISettings />}
+        {activeTab === 'ai' && (
+          <>
+            <AISettings />
+            <div className="mt-6">
+              <TrainingDataExport />
+            </div>
+          </>
+        )}
 
         {activeTab === 'clinical' && (
           <ClinicalSettings

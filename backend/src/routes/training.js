@@ -16,6 +16,7 @@ import {
   combinedJournalsSchema,
   analyticsQuerySchema,
 } from '../validators/training.validators.js';
+import { exportTrainingData, getExportStats } from '../services/trainingExport.js';
 
 const router = express.Router();
 
@@ -676,5 +677,66 @@ router.post('/curation/reject/:id', requireRole(['ADMIN']), dataCurationControll
  *         description: Bulk action completed
  */
 router.post('/curation/bulk', requireRole(['ADMIN']), dataCurationController.bulk);
+
+// ============================================================================
+// TRAINING DATA EXPORT ENDPOINTS
+// ============================================================================
+
+/**
+ * @swagger
+ * /training/export/stats:
+ *   get:
+ *     summary: Get training export statistics
+ *     description: Returns counts of available SFT and DPO training examples
+ *     tags: [Training]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Export statistics
+ */
+router.get('/export/stats', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
+  try {
+    const stats = await getExportStats(req.organizationId);
+    res.json({ success: true, data: stats });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+/**
+ * @swagger
+ * /training/export:
+ *   get:
+ *     summary: Export anonymized training data as JSONL
+ *     description: Downloads all feedback-bearing AI suggestions as anonymized JSONL for model retraining
+ *     tags: [Training]
+ *     security:
+ *       - BearerAuth: []
+ *     produces:
+ *       - application/jsonlines
+ *     responses:
+ *       200:
+ *         description: JSONL file download
+ */
+router.get('/export', requireRole(['ADMIN']), async (req, res) => {
+  try {
+    const data = await exportTrainingData(req.organizationId);
+
+    // Build JSONL content
+    const lines = [];
+    data.sft.forEach((ex) => lines.push(JSON.stringify(ex)));
+    data.dpo.forEach((pair) => lines.push(JSON.stringify({ ...pair, type: 'dpo' })));
+
+    const jsonl = lines.join('\n');
+    const filename = `training-export-${new Date().toISOString().slice(0, 10)}.jsonl`;
+
+    res.setHeader('Content-Type', 'application/jsonlines');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(jsonl);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
 
 export default router;
