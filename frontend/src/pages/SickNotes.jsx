@@ -22,7 +22,7 @@ export default function SickNotes() {
   const { patientId } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { lang: language, setLang: setLanguage } = useTranslation();
+  const { t, lang: language, setLang: setLanguage } = useTranslation('letters');
   const [view, setView] = useState(searchParams.get('new') ? 'create' : 'list');
   const [sickNoteData, setSickNoteData] = useState(getDefaultSickNoteData());
   const [searchTerm, setSearchTerm] = useState('');
@@ -61,7 +61,7 @@ export default function SickNotes() {
       }
     } catch (err) {
       logger.error('Failed to fetch sick notes:', err);
-      setError(language === 'no' ? 'Kunne ikke laste sykemeldinger' : 'Failed to load sick notes');
+      setError(t('failedToLoadSickNotes'));
       // Fall back to empty array
       setSickNotes([]);
     } finally {
@@ -106,7 +106,7 @@ export default function SickNotes() {
       }
     } catch (err) {
       logger.error('AI generation failed:', err);
-      setError(language === 'no' ? 'AI-generering feilet' : 'AI generation failed');
+      setError(t('aiGenerationFailed'));
     } finally {
       setGenerating(false);
     }
@@ -124,12 +124,12 @@ export default function SickNotes() {
         status: 'DRAFT',
       });
 
-      toast.success(language === 'no' ? 'Sykemelding lagret!' : 'Sick note saved!');
+      toast.success(t('sickNoteSaved'));
       setView('list');
       fetchSickNotes(); // Refresh list
     } catch (err) {
       logger.error('Save failed:', err);
-      setError(language === 'no' ? 'Kunne ikke lagre sykemelding' : 'Failed to save sick note');
+      setError(t('failedToSaveSickNote'));
     } finally {
       setSaving(false);
     }
@@ -158,9 +158,7 @@ export default function SickNotes() {
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <div>
-                <h1 className="text-xl font-semibold text-gray-900">
-                  {language === 'no' ? 'Ny sykemelding' : 'New Sick Note'}
-                </h1>
+                <h1 className="text-xl font-semibold text-gray-900">{t('newSickNote')}</h1>
                 {patient && <p className="text-sm text-gray-500">{patient.name}</p>}
               </div>
             </div>
@@ -177,7 +175,7 @@ export default function SickNotes() {
                 ) : (
                   <Sparkles className="w-4 h-4" />
                 )}
-                {language === 'no' ? 'Generer med AI' : 'Generate with AI'}
+                {t('generateWithAI')}
               </button>
 
               {/* Language toggle */}
@@ -242,12 +240,8 @@ export default function SickNotes() {
               </button>
             )}
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">
-                {language === 'no' ? 'Sykemeldinger' : 'Sick Notes'}
-              </h1>
-              <p className="text-sm text-gray-500">
-                {language === 'no' ? 'NAV-kompatible sykemeldinger' : 'NAV-compliant sick notes'}
-              </p>
+              <h1 className="text-xl font-semibold text-gray-900">{t('sickNotes')}</h1>
+              <p className="text-sm text-gray-500">{t('navCompliant')}</p>
             </div>
           </div>
 
@@ -277,7 +271,7 @@ export default function SickNotes() {
               className="flex items-center gap-2 px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
             >
               <Plus className="w-4 h-4" />
-              {language === 'no' ? 'Ny sykemelding' : 'New Sick Note'}
+              {t('newSickNote')}
             </button>
           </div>
         </div>
@@ -292,7 +286,7 @@ export default function SickNotes() {
             onClick={fetchSickNotes}
             className="ml-auto text-red-700 hover:text-red-800 underline text-sm"
           >
-            {language === 'no' ? 'Prøv igjen' : 'Try again'}
+            {t('tryAgain')}
           </button>
         </div>
       )}
@@ -304,11 +298,7 @@ export default function SickNotes() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder={
-                language === 'no'
-                  ? 'Søk etter pasient eller diagnose...'
-                  : 'Search by patient or diagnosis...'
-              }
+              placeholder={t('searchByPatientOrDiagnosis')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -316,7 +306,7 @@ export default function SickNotes() {
           </div>
           <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
             <Filter className="w-4 h-4" />
-            {language === 'no' ? 'Filter' : 'Filter'}
+            {t('filter')}
           </button>
         </div>
       </div>
@@ -327,28 +317,26 @@ export default function SickNotes() {
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
-              <span className="ml-2 text-gray-500">
-                {language === 'no' ? 'Laster...' : 'Loading...'}
-              </span>
+              <span className="ml-2 text-gray-500">{t('loading')}</span>
             </div>
           ) : (
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {language === 'no' ? 'Pasient' : 'Patient'}
+                    {t('patient')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {language === 'no' ? 'Diagnose' : 'Diagnosis'}
+                    {t('diagnosis')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {language === 'no' ? 'Periode' : 'Period'}
+                    {t('period')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {language === 'no' ? 'Grad' : 'Grade'}
+                    {t('grade')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {language === 'no' ? 'Status' : 'Status'}
+                    Status
                   </th>
                 </tr>
               </thead>
@@ -383,16 +371,10 @@ export default function SickNotes() {
                         }`}
                       >
                         {note.status === 'active' || note.status === 'FINALIZED'
-                          ? language === 'no'
-                            ? 'Aktiv'
-                            : 'Active'
+                          ? t('active')
                           : note.status === 'DRAFT'
-                            ? language === 'no'
-                              ? 'Utkast'
-                              : 'Draft'
-                            : language === 'no'
-                              ? 'Utløpt'
-                              : 'Expired'}
+                            ? t('draft')
+                            : t('expired')}
                       </span>
                     </td>
                   </tr>
@@ -400,7 +382,7 @@ export default function SickNotes() {
                 {filteredNotes.length === 0 && !loading && (
                   <tr>
                     <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
-                      {language === 'no' ? 'Ingen sykemeldinger funnet' : 'No sick notes found'}
+                      {t('noSickNotes')}
                     </td>
                   </tr>
                 )}

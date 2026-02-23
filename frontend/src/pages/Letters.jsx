@@ -80,7 +80,7 @@ const STATUS_COLORS = {
 export default function Letters() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { lang: language, setLang: setLanguage } = useTranslation();
+  const { t, lang: language, setLang: setLanguage } = useTranslation('letters');
   const [letters, setLetters] = useState([]);
   const [_letterTypes, setLetterTypes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -146,7 +146,7 @@ export default function Letters() {
       ]);
     } catch (err) {
       logger.error('Error fetching letters:', err);
-      setError(language === 'no' ? 'Kunne ikke laste brev' : 'Failed to load letters');
+      setError(t('failedToLoad'));
     } finally {
       setLoading(false);
     }
@@ -184,9 +184,7 @@ export default function Letters() {
     <div className="space-y-8">
       {/* Quick Actions */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          {language === 'no' ? 'Opprett nytt dokument' : 'Create New Document'}
-        </h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('createNewDocument')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {Object.values(LETTER_TYPES).map((type) => {
             const Icon = type.icon;
@@ -216,19 +214,13 @@ export default function Letters() {
             <Sparkles className="w-6 h-6" />
           </div>
           <div className="flex-1">
-            <h3 className="text-lg font-semibold mb-2">
-              {language === 'no' ? 'AI-assistert brevgenerering' : 'AI-Assisted Letter Generation'}
-            </h3>
-            <p className="text-white/80 mb-4">
-              {language === 'no'
-                ? 'La AI hjelpe deg med å generere profesjonelle medisinske brev basert på pasientdata og kliniske funn.'
-                : 'Let AI help you generate professional medical letters based on patient data and clinical findings.'}
-            </p>
+            <h3 className="text-lg font-semibold mb-2">{t('aiLetterGeneration')}</h3>
+            <p className="text-white/80 mb-4">{t('aiLetterDescription')}</p>
             <button
               onClick={() => navigate('/ai-letters')}
               className="px-4 py-2 bg-white text-purple-600 rounded-lg font-medium hover:bg-white/90 transition-colors"
             >
-              {language === 'no' ? 'Prøv AI-generering' : 'Try AI Generation'}
+              {t('tryAiGeneration')}
             </button>
           </div>
         </div>
@@ -237,14 +229,12 @@ export default function Letters() {
       {/* Recent Letters */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">
-            {language === 'no' ? 'Nylige dokumenter' : 'Recent Documents'}
-          </h2>
+          <h2 className="text-lg font-semibold text-gray-900">{t('recentDocuments')}</h2>
           <button
             onClick={() => setView('list')}
             className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
           >
-            {language === 'no' ? 'Se alle' : 'View all'}
+            {t('viewAll')}
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
@@ -298,9 +288,7 @@ export default function Letters() {
             })}
 
             {filteredLetters.length === 0 && (
-              <div className="p-8 text-center text-gray-500">
-                {language === 'no' ? 'Ingen dokumenter funnet' : 'No documents found'}
-              </div>
+              <div className="p-8 text-center text-gray-500">{t('noDocuments')}</div>
             )}
           </div>
         )}
@@ -317,11 +305,7 @@ export default function Letters() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
-            placeholder={
-              language === 'no'
-                ? 'Søk etter pasient eller tittel...'
-                : 'Search by patient or title...'
-            }
+            placeholder={t('searchByPatientOrTitle')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -332,7 +316,7 @@ export default function Letters() {
           onChange={(e) => setSelectedType(e.target.value)}
           className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         >
-          <option value="all">{language === 'no' ? 'Alle typer' : 'All types'}</option>
+          <option value="all">{t('allTypes')}</option>
           {Object.values(LETTER_TYPES).map((type) => (
             <option key={type.id} value={type.id}>
               {type.name[language]}
@@ -341,7 +325,7 @@ export default function Letters() {
         </select>
         <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
           <Filter className="w-4 h-4" />
-          {language === 'no' ? 'Filter' : 'Filter'}
+          {t('filter')}
         </button>
       </div>
 
@@ -356,19 +340,19 @@ export default function Letters() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {language === 'no' ? 'Dokument' : 'Document'}
+                  {t('document')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {language === 'no' ? 'Type' : 'Type'}
+                  {t('type')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {language === 'no' ? 'Pasient' : 'Patient'}
+                  {t('patient')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {language === 'no' ? 'Dato' : 'Date'}
+                  {t('date')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {language === 'no' ? 'Status' : 'Status'}
+                  Status
                 </th>
               </tr>
             </thead>
@@ -415,7 +399,7 @@ export default function Letters() {
               {filteredLetters.length === 0 && (
                 <tr>
                   <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
-                    {language === 'no' ? 'Ingen dokumenter funnet' : 'No documents found'}
+                    {t('noDocuments')}
                   </td>
                 </tr>
               )}
@@ -432,14 +416,8 @@ export default function Letters() {
       <div className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold text-gray-900">
-              {language === 'no' ? 'Dokumenter & Brev' : 'Documents & Letters'}
-            </h1>
-            <p className="text-sm text-gray-500">
-              {language === 'no'
-                ? 'Administrer kliniske dokumenter og brev'
-                : 'Manage clinical documents and letters'}
-            </p>
+            <h1 className="text-xl font-semibold text-gray-900">{t('documentsAndLetters')}</h1>
+            <p className="text-sm text-gray-500">{t('manageDocuments')}</p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -451,7 +429,7 @@ export default function Letters() {
                   view === 'dashboard' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
                 }`}
               >
-                {language === 'no' ? 'Oversikt' : 'Dashboard'}
+                {t('overview')}
               </button>
               <button
                 onClick={() => setView('list')}
@@ -459,7 +437,7 @@ export default function Letters() {
                   view === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
                 }`}
               >
-                {language === 'no' ? 'Liste' : 'List'}
+                {t('list')}
               </button>
             </div>
 
@@ -498,7 +476,7 @@ export default function Letters() {
               className="flex items-center gap-2 px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
             >
               <Plus className="w-4 h-4" />
-              {language === 'no' ? 'Nytt dokument' : 'New Document'}
+              {t('newDocument')}
             </button>
           </div>
         </div>
@@ -510,7 +488,7 @@ export default function Letters() {
           <AlertCircle className="w-5 h-5" />
           {error}
           <button onClick={fetchLetters} className="ml-auto text-sm underline">
-            {language === 'no' ? 'Prøv igjen' : 'Try again'}
+            {t('tryAgain')}
           </button>
         </div>
       )}

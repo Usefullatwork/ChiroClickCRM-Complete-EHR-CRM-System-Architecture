@@ -8,7 +8,7 @@
  * Supports hybrid search with pgvector for RAG retrieval.
  */
 
-const logger = require('../utils/logger');
+import logger from '../utils/logger.js';
 
 // Embedding model configuration
 const EMBEDDING_CONFIG = {
@@ -266,13 +266,10 @@ class EmbeddingsService {
 // Singleton instance
 const embeddingsService = new EmbeddingsService();
 
-module.exports = {
-  EmbeddingsService,
-  embeddingsService,
+export { EmbeddingsService, embeddingsService };
 
-  // Convenience functions
-  embed: (text, type) => embeddingsService.embed(text, type),
-  embedBatch: (texts, type) => embeddingsService.embedBatch(texts, type),
-  toPgVector: (embedding) => embeddingsService.toPgVector(embedding),
-  cosineSimilarity: (a, b) => embeddingsService.cosineSimilarity(a, b),
-};
+// Convenience functions
+export const embed = (text, type) => embeddingsService.embed(text, type);
+export const embedBatch = (texts, type) => embeddingsService.embedBatch(texts, type);
+export const toPgVector = (embedding) => embeddingsService.toPgVector(embedding);
+export const cosineSimilarity = (a, b) => embeddingsService.cosineSimilarity(a, b);

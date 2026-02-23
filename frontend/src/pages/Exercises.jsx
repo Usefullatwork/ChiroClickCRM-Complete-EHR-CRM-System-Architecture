@@ -32,7 +32,7 @@ export default function Exercises() {
 
   // View state
   const [activeTab, setActiveTab] = useState('library'); // library, prescriptions, create
-  const { lang: language, setLang: setLanguage } = useTranslation();
+  const { t, lang: language, setLang: setLanguage } = useTranslation('exercises');
 
   // Data state
   const [exercises, setExercises] = useState([]);
@@ -86,7 +86,7 @@ export default function Exercises() {
       }
     } catch (err) {
       logger.error('Failed to load exercises:', err);
-      setError(language === 'no' ? 'Kunne ikke laste øvelser' : 'Failed to load exercises');
+      setError(t('failedToLoad'));
     } finally {
       setLoading(false);
     }
@@ -130,7 +130,7 @@ export default function Exercises() {
         deliveryMethod: 'portal',
       });
 
-      setSuccess(language === 'no' ? 'Øvelsesprogram lagret!' : 'Exercise program saved!');
+      setSuccess(t('programSaved'));
       setTimeout(() => setSuccess(null), 3000);
 
       // Refresh prescriptions list
@@ -146,7 +146,7 @@ export default function Exercises() {
       return response.data;
     } catch (err) {
       logger.error('Save failed:', err);
-      setError(language === 'no' ? 'Kunne ikke lagre øvelsesprogram' : 'Failed to save program');
+      setError(t('failedToSave'));
       throw err;
     } finally {
       setSaving(false);
@@ -159,11 +159,11 @@ export default function Exercises() {
       setSending(true);
       setError(null);
       await exercisesApi.sendEmail(prescriptionId);
-      setSuccess(language === 'no' ? 'E-post sendt!' : 'Email sent!');
+      setSuccess(t('emailSent'));
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       logger.error('Send email failed:', err);
-      setError(language === 'no' ? 'Kunne ikke sende e-post' : 'Failed to send email');
+      setError(t('failedToSendEmail'));
     } finally {
       setSending(false);
     }
@@ -175,11 +175,11 @@ export default function Exercises() {
       setSending(true);
       setError(null);
       await exercisesApi.sendSMS(prescriptionId);
-      setSuccess(language === 'no' ? 'SMS sendt!' : 'SMS sent!');
+      setSuccess(t('smsSent'));
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       logger.error('Send SMS failed:', err);
-      setError(language === 'no' ? 'Kunne ikke sende SMS' : 'Failed to send SMS');
+      setError(t('failedToSendSMS'));
     } finally {
       setSending(false);
     }
@@ -201,11 +201,11 @@ export default function Exercises() {
       link.remove();
       window.URL.revokeObjectURL(url);
 
-      setSuccess(language === 'no' ? 'PDF lastet ned!' : 'PDF downloaded!');
+      setSuccess(t('pdfDownloaded'));
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       logger.error('PDF generation failed:', err);
-      setError(language === 'no' ? 'Kunne ikke generere PDF' : 'Failed to generate PDF');
+      setError(t('failedToGeneratePDF'));
     } finally {
       setSending(false);
     }
@@ -216,12 +216,12 @@ export default function Exercises() {
     try {
       setLoading(true);
       await exercisesApi.seedDefaultExercises();
-      setSuccess(language === 'no' ? 'Standard øvelser lagt til!' : 'Default exercises added!');
+      setSuccess(t('defaultExercisesAdded'));
       setTimeout(() => setSuccess(null), 3000);
       await loadData();
     } catch (err) {
       logger.error('Seed failed:', err);
-      setError(language === 'no' ? 'Kunne ikke legge til øvelser' : 'Failed to add exercises');
+      setError(t('failedToAddExercises'));
     } finally {
       setLoading(false);
     }
@@ -281,9 +281,7 @@ export default function Exercises() {
             <div className="flex items-center gap-2">
               <Dumbbell className="w-6 h-6 text-blue-600" />
               <div>
-                <h1 className="text-xl font-semibold text-gray-900">
-                  {language === 'no' ? 'Øvelsesbibliotek' : 'Exercise Library'}
-                </h1>
+                <h1 className="text-xl font-semibold text-gray-900">{t('exerciseLibrary')}</h1>
                 {patient && (
                   <p className="text-sm text-gray-500">
                     {patient.first_name} {patient.last_name}
@@ -321,7 +319,7 @@ export default function Exercises() {
                 className="flex items-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
               >
                 <Download className="w-4 h-4" />
-                {language === 'no' ? 'Last inn standardøvelser' : 'Load default exercises'}
+                {t('loadDefaultExercises')}
               </button>
             )}
 
@@ -332,7 +330,7 @@ export default function Exercises() {
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <FileText className="w-4 h-4" />
-                {language === 'no' ? 'Lag program' : 'Create Program'}
+                {t('createProgram')}
                 <span className="px-1.5 py-0.5 bg-blue-500 rounded text-xs">
                   {selectedExercises.length}
                 </span>
@@ -354,7 +352,7 @@ export default function Exercises() {
             >
               <div className="flex items-center gap-2">
                 <Dumbbell className="w-4 h-4" />
-                {language === 'no' ? 'Bibliotek' : 'Library'}
+                {t('library')}
               </div>
             </button>
             <button
@@ -367,7 +365,7 @@ export default function Exercises() {
             >
               <div className="flex items-center gap-2">
                 <History className="w-4 h-4" />
-                {language === 'no' ? 'Programmer' : 'Programs'}
+                {t('programs')}
                 {prescriptions.length > 0 && (
                   <span className="px-1.5 py-0.5 bg-gray-200 rounded-full text-xs">
                     {prescriptions.length}
@@ -386,7 +384,7 @@ export default function Exercises() {
               >
                 <div className="flex items-center gap-2">
                   <Plus className="w-4 h-4" />
-                  {language === 'no' ? 'Nytt program' : 'New Program'}
+                  {t('newProgram')}
                   <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs">
                     {selectedExercises.length}
                   </span>
@@ -420,9 +418,7 @@ export default function Exercises() {
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-            <span className="ml-3 text-gray-500">
-              {language === 'no' ? 'Laster øvelser...' : 'Loading exercises...'}
-            </span>
+            <span className="ml-3 text-gray-500">{t('loadingExercises')}</span>
           </div>
         ) : activeTab === 'library' ? (
           /* Exercise Library Tab */
@@ -442,21 +438,15 @@ export default function Exercises() {
             <div className="p-4 border-b border-gray-200">
               <div className="flex items-center gap-2">
                 <History className="w-5 h-5 text-blue-600" />
-                <h2 className="text-lg font-semibold text-gray-900">
-                  {language === 'no' ? 'Øvelsesprogrammer' : 'Exercise Programs'}
-                </h2>
+                <h2 className="text-lg font-semibold text-gray-900">{t('exercisePrograms')}</h2>
               </div>
             </div>
 
             {prescriptions.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-gray-500">
                 <FileText className="w-12 h-12 text-gray-300 mb-3" />
-                <p>{language === 'no' ? 'Ingen programmer opprettet' : 'No programs created'}</p>
-                <p className="text-sm text-gray-400">
-                  {language === 'no'
-                    ? 'Velg øvelser fra biblioteket for å opprette et program'
-                    : 'Select exercises from the library to create a program'}
-                </p>
+                <p>{t('noProgramsCreated')}</p>
+                <p className="text-sm text-gray-400">{t('selectFromLibrary')}</p>
               </div>
             ) : (
               <div className="divide-y divide-gray-200">
@@ -466,8 +456,7 @@ export default function Exercises() {
                       <div>
                         <div className="flex items-center gap-2">
                           <h3 className="font-medium text-gray-900">
-                            {prescription.exercises?.length || 0}{' '}
-                            {language === 'no' ? 'øvelser' : 'exercises'}
+                            {prescription.exercises?.length || 0} {t('exercises')}
                           </h3>
                           <span
                             className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(prescription.status)}`}
@@ -476,8 +465,7 @@ export default function Exercises() {
                           </span>
                         </div>
                         <p className="text-sm text-gray-500 mt-1">
-                          {language === 'no' ? 'Opprettet' : 'Created'}:{' '}
-                          {formatDate(prescription.created_at)}
+                          {t('created')}: {formatDate(prescription.created_at)}
                         </p>
                         {prescription.patient_instructions && (
                           <p className="text-sm text-gray-600 mt-2 italic">
@@ -491,7 +479,7 @@ export default function Exercises() {
                           onClick={() => handleDownloadPDF(prescription.id)}
                           disabled={sending}
                           className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
-                          title={language === 'no' ? 'Last ned PDF' : 'Download PDF'}
+                          title={t('downloadPDF')}
                         >
                           <Download className="w-4 h-4" />
                         </button>
@@ -499,7 +487,7 @@ export default function Exercises() {
                           onClick={() => handleSendEmail(prescription.id)}
                           disabled={sending}
                           className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
-                          title={language === 'no' ? 'Send e-post' : 'Send email'}
+                          title={t('sendEmail')}
                         >
                           <Mail className="w-4 h-4" />
                         </button>
@@ -507,14 +495,14 @@ export default function Exercises() {
                           onClick={() => handleSendSMS(prescription.id)}
                           disabled={sending}
                           className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
-                          title={language === 'no' ? 'Send SMS' : 'Send SMS'}
+                          title={t('sendSMS')}
                         >
                           <MessageSquare className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => setSelectedPrescription(prescription)}
                           className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
-                          title={language === 'no' ? 'Vis detaljer' : 'View details'}
+                          title={t('viewDetails')}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -534,8 +522,7 @@ export default function Exercises() {
                         ))}
                         {prescription.exercises.length > 5 && (
                           <span className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-500">
-                            +{prescription.exercises.length - 5}{' '}
-                            {language === 'no' ? 'til' : 'more'}
+                            +{prescription.exercises.length - 5} {t('more')}
                           </span>
                         )}
                       </div>
@@ -588,9 +575,7 @@ export default function Exercises() {
           <div className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold">
-                  {language === 'no' ? 'Programdetaljer' : 'Program Details'}
-                </h3>
+                <h3 className="text-lg font-semibold">{t('programDetails')}</h3>
                 <button
                   onClick={() => setSelectedPrescription(null)}
                   className="p-2 hover:bg-gray-100 rounded-lg"
@@ -613,17 +598,13 @@ export default function Exercises() {
 
                 {selectedPrescription.patient_instructions && (
                   <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-1">
-                      {language === 'no' ? 'Instruksjoner' : 'Instructions'}
-                    </h4>
+                    <h4 className="text-sm font-medium text-gray-700 mb-1">{t('instructions')}</h4>
                     <p className="text-gray-600">{selectedPrescription.patient_instructions}</p>
                   </div>
                 )}
 
                 <div>
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">
-                    {language === 'no' ? 'Øvelser' : 'Exercises'}
-                  </h4>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">{t('exercisesLabel')}</h4>
                   <div className="space-y-2">
                     {selectedPrescription.exercises?.map((ex, i) => (
                       <div key={i} className="p-3 bg-gray-50 rounded-lg">
@@ -655,7 +636,7 @@ export default function Exercises() {
                   className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
                   <Mail className="w-4 h-4" />
-                  {language === 'no' ? 'Send e-post' : 'Send Email'}
+                  {t('sendEmail')}
                 </button>
               </div>
             </div>

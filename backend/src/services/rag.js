@@ -9,9 +9,9 @@
  * Based on CLI-RAG framework for medical documentation.
  */
 
-const { pool } = require('../db');
-const { embeddingsService, toPgVector } = require('./embeddings');
-const logger = require('../utils/logger');
+import { pool } from '../db/index.js';
+import { embeddingsService, toPgVector } from './embeddings.js';
+import logger from '../utils/logger.js';
 
 // SOAP section patterns for parsing
 const SOAP_PATTERNS = {
@@ -157,17 +157,21 @@ class RAGService {
   /**
    * Index a clinical encounter for RAG retrieval
    */
-  async indexEncounter(encounterId, noteText, patientId, organizationId, visitDate, noteType = 'clinical_encounter') {
+  async indexEncounter(
+    encounterId,
+    noteText,
+    patientId,
+    organizationId,
+    visitDate,
+    noteType = 'clinical_encounter'
+  ) {
     const client = await pool.connect();
 
     try {
       await client.query('BEGIN');
 
       // Delete existing chunks for this encounter
-      await client.query(
-        'DELETE FROM clinical_chunks WHERE encounter_id = $1',
-        [encounterId]
-      );
+      await client.query('DELETE FROM clinical_chunks WHERE encounter_id = $1', [encounterId]);
 
       // Parse SOAP structure
       const sections = this.parseSOAPStructure(noteText);
@@ -280,7 +284,7 @@ class RAGService {
       ]
     );
 
-    return result.rows.map(row => ({
+    return result.rows.map((row) => ({
       chunkId: row.chunk_id,
       patientId: row.patient_id,
       visitDate: row.visit_date,
@@ -299,8 +303,9 @@ class RAGService {
   async getSimilarCases(patientId, currentNote, organizationId, limit = 3) {
     // Parse and embed the current note's assessment section
     const sections = this.parseSOAPStructure(currentNote);
-    const assessmentText = sections.Assessment.map(s => s.text).join(' ') ||
-      sections.Unlabeled.map(s => s.text).join(' ');
+    const assessmentText =
+      sections.Assessment.map((s) => s.text).join(' ') ||
+      sections.Unlabeled.map((s) => s.text).join(' ');
 
     if (!assessmentText) {
       return [];
@@ -322,12 +327,7 @@ class RAGService {
    * Augment a prompt with relevant context
    */
   async augmentPrompt(query, context, options = {}) {
-    const {
-      organizationId,
-      patientId = null,
-      maxChunks = 3,
-      maxContextLength = 2000,
-    } = options;
+    const { organizationId, patientId = null, maxChunks = 3, maxContextLength = 2000 } = options;
 
     // Search for relevant chunks
     const chunks = await this.search(query, {
@@ -380,7 +380,7 @@ ${query}`;
 
     return {
       deleted: result.rowCount,
-      chunkIds: result.rows.map(r => r.chunk_id),
+      chunkIds: result.rows.map((r) => r.chunk_id),
     };
   }
 
@@ -441,9 +441,8 @@ ${query}`;
       );
 
       return {
-        available: pgvectorCheck.rows.length > 0 &&
-                   embeddingCheck.available &&
-                   tableCheck.rows[0].exists,
+        available:
+          pgvectorCheck.rows.length > 0 && embeddingCheck.available && tableCheck.rows[0].exists,
         pgvector: pgvectorCheck.rows.length > 0,
         embeddings: embeddingCheck,
         table: tableCheck.rows[0].exists,
@@ -460,12 +459,9 @@ ${query}`;
 // Singleton instance
 const ragService = new RAGService();
 
-module.exports = {
-  RAGService,
-  ragService,
+export { RAGService, ragService };
 
-  // Convenience exports
-  indexEncounter: (...args) => ragService.indexEncounter(...args),
-  search: (...args) => ragService.search(...args),
-  augmentPrompt: (...args) => ragService.augmentPrompt(...args),
-};
+// Convenience exports
+export const indexEncounter = (...args) => ragService.indexEncounter(...args);
+export const search = (...args) => ragService.search(...args);
+export const augmentPrompt = (...args) => ragService.augmentPrompt(...args);

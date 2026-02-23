@@ -10,7 +10,7 @@
  * Reference: Clinical LLM safety best practices (2025)
  */
 
-const logger = require('../utils/logger');
+import logger from '../utils/logger.js';
 
 // =============================================================================
 // Configuration
@@ -692,16 +692,16 @@ class GuardrailsService {
 // Singleton instance
 const guardrailsService = new GuardrailsService();
 
-module.exports = {
+export {
   GuardrailsService,
   guardrailsService,
   InputValidator,
   OutputFilter,
   ClinicalHeuristics,
   GUARDRAILS_CONFIG,
-
-  // Convenience exports
-  validateInput: (input, options) => InputValidator.validate(input, options),
-  filterOutput: (output, options) => OutputFilter.filter(output, options),
-  checkClinical: (response, context) => ClinicalHeuristics.check(response, context),
 };
+
+// Convenience exports
+export const validateInput = (input, options) => InputValidator.validate(input, options);
+export const filterOutput = (output, options) => OutputFilter.filter(output, options);
+export const checkClinical = (response, context) => ClinicalHeuristics.check(response, context);
