@@ -78,6 +78,7 @@ bin/pgsql/
 
 # PGlite data directory (runtime database)
 data/pglite/
+data/ollama/
 
 # Session cookies
 cookies.txt

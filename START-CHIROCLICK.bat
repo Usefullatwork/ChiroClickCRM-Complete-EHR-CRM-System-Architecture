@@ -24,6 +24,10 @@ set AI_MODE=enabled
 echo.
 echo  Starting with AI enabled...
 
+:: Set portable model storage
+set OLLAMA_MODELS=%~dp0data\ollama
+echo       Using portable models: %OLLAMA_MODELS%
+
 :: Update .env to enable AI
 powershell -Command "(Get-Content '%~dp0\backend\.env') -replace '^AI_ENABLED=.*', 'AI_ENABLED=true' | Set-Content '%~dp0\backend\.env'"
 
@@ -34,7 +38,7 @@ if "%ERRORLEVEL%"=="0" (
     echo       Ollama is already running
 ) else (
     echo       Starting Ollama...
-    start "" ollama serve
+    start "" cmd /c "set OLLAMA_MODELS=%~dp0data\ollama && ollama serve"
     timeout /t 3 /nobreak >nul
 )
 
@@ -63,7 +67,7 @@ if !MODELS_MISSING! gtr 0 (
     if exist "%~dp0ollama-models\blobs" (
         echo  Fant modeller i prosjektmappen. Kopierer til Ollama...
         echo  Dette kan ta noen minutter...
-        powershell -Command "Copy-Item -Path '%~dp0ollama-models\*' -Destination '%USERPROFILE%\.ollama\models' -Recurse -Force"
+        powershell -Command "Copy-Item -Path '%~dp0ollama-models\*' -Destination '%~dp0data\ollama' -Recurse -Force"
         echo  Modeller kopiert!
         timeout /t 2 /nobreak >nul
     ) else if exist "%~dp0ai-training\models-cache" (
@@ -137,7 +141,7 @@ echo   Backend:  http://localhost:3000
 if "%AI_MODE%"=="disabled" (
     echo   AI Model: DISABLED (Skip mode)
 ) else (
-    echo   AI Models: chiro-no, chiro-fast, chiro-norwegian, chiro-medical
+    echo   AI Models: Portable (%~dp0data\ollama)
 )
 echo.
 echo   To stop: Close the terminal windows
