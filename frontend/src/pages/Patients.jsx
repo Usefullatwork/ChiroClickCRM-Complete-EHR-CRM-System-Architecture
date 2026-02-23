@@ -85,7 +85,7 @@ export default function Patients() {
 
   const handleExport = () => {
     if (!patients || patients.length === 0) {
-      toast.warning(t('noExportData') || 'Ingen pasienter å eksportere');
+      toast.warning(t('noExportData'));
       return;
     }
     const headers = [
@@ -142,10 +142,10 @@ export default function Patients() {
             data-testid="patients-page-title"
             className="text-2xl font-semibold text-gray-900 dark:text-white"
           >
-            {t('title') || 'Pasienter'}
+            {t('title')}
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-            {pagination.total} {(t('totalPatients') || 'pasienter totalt').toLowerCase()}
+            {pagination.total} {t('totalPatients').toLowerCase()}
           </p>
         </div>
 
@@ -170,7 +170,7 @@ export default function Patients() {
             onClick={() => navigate('/patients/new')}
           >
             <Plus className="w-4 h-4" />
-            {t('newPatient') || 'Ny pasient'}
+            {t('newPatient')}
           </button>
         </div>
       </div>
@@ -187,7 +187,7 @@ export default function Patients() {
             )}
             <input
               type="text"
-              placeholder={t('searchPatients') || 'Søk etter navn, telefon, e-post...'}
+              placeholder={t('searchPatients')}
               data-testid="patients-search-input"
               className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-shadow"
               value={searchTerm}
@@ -209,10 +209,10 @@ export default function Patients() {
             value={filters.status}
             onChange={(e) => handleFilterChange('status', e.target.value)}
           >
-            <option value="">{t('allStatuses') || 'Alle statuser'}</option>
-            <option value="ACTIVE">{t('active') || 'Aktiv'}</option>
-            <option value="INACTIVE">{t('inactive') || 'Inaktiv'}</option>
-            <option value="FINISHED">{t('finished') || 'Ferdig'}</option>
+            <option value="">{t('allStatuses')}</option>
+            <option value="ACTIVE">{t('active')}</option>
+            <option value="INACTIVE">{t('inactive')}</option>
+            <option value="FINISHED">{t('finished')}</option>
           </select>
 
           <select
@@ -220,7 +220,7 @@ export default function Patients() {
             value={filters.category}
             onChange={(e) => handleFilterChange('category', e.target.value)}
           >
-            <option value="">{t('allCategories') || 'Alle kategorier'}</option>
+            <option value="">{t('allCategories')}</option>
             <option value="OSLO">Oslo</option>
             <option value="OUTSIDE_OSLO">Utenfor Oslo</option>
             <option value="TRAVELING">Tilreisende</option>
@@ -231,7 +231,7 @@ export default function Patients() {
         {/* Active filter chips */}
         {activeFilters.length > 0 && (
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500">{t('filters') || 'Filtre'}:</span>
+            <span className="text-xs text-gray-500">{t('filters')}:</span>
             {activeFilters.map((f) => (
               <span
                 key={f.key}
@@ -253,7 +253,7 @@ export default function Patients() {
               }}
               className="text-xs text-gray-400 hover:text-gray-600 underline"
             >
-              {t('clearAll') || 'Fjern alle'}
+              {t('clearAll')}
             </button>
           </div>
         )}
@@ -265,22 +265,17 @@ export default function Patients() {
       ) : error ? (
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
           <p className="text-red-700 dark:text-red-400 text-sm">
-            {t('loadError') || 'Feil ved lasting av pasienter'}: {error.message}
+            {t('loadError')}: {error.message}
           </p>
         </div>
       ) : patients.length === 0 ? (
         <EmptyState
           icon={UserPlus}
-          title={
-            debouncedSearch
-              ? t('noSearchResults') || 'Ingen treff'
-              : t('noPatients') || 'Ingen pasienter ennå'
-          }
+          title={debouncedSearch ? t('noSearchResults') : t('noPatients')}
           description={
             debouncedSearch
-              ? t('noSearchResultsDesc') ||
-                `Ingen pasienter matcher "${debouncedSearch}". Prøv et annet søkeord.`
-              : t('noPatientsDesc') || 'Registrer din første pasient for å komme i gang.'
+              ? t('noSearchResultsDesc').replace('{query}', debouncedSearch)
+              : t('noPatientsDesc')
           }
           action={
             !debouncedSearch && (
@@ -288,7 +283,7 @@ export default function Patients() {
                 onClick={() => navigate('/patients/new')}
                 className="text-sm font-medium text-teal-600 hover:text-teal-700"
               >
-                + {t('newPatient') || 'Ny pasient'}
+                + {t('newPatient')}
               </button>
             )
           }
@@ -307,34 +302,34 @@ export default function Patients() {
                     className="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                     onClick={() => handleSort('last_name')}
                   >
-                    {t('name') || 'Navn'}
+                    {t('name')}
                     {filters.sortBy === 'last_name' && (
                       <span className="ml-1">{filters.sortOrder === 'asc' ? '↑' : '↓'}</span>
                     )}
                   </th>
                   <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {t('age') || 'Alder'}
+                    {t('age')}
                   </th>
                   <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {t('contact') || 'Kontakt'}
+                    {t('contact')}
                   </th>
                   <th
                     className="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                     onClick={() => handleSort('last_visit_date')}
                   >
-                    {t('lastVisit') || 'Siste besøk'}
+                    {t('lastVisit')}
                     {filters.sortBy === 'last_visit_date' && (
                       <span className="ml-1">{filters.sortOrder === 'asc' ? '↑' : '↓'}</span>
                     )}
                   </th>
                   <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {t('totalVisits') || 'Besøk'}
+                    {t('totalVisits')}
                   </th>
                   <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Status
                   </th>
                   <th className="px-5 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {t('actions') || ''}
+                    {t('actions')}
                   </th>
                 </tr>
               </thead>
@@ -404,7 +399,7 @@ export default function Patients() {
                           navigate(`/patients/${patient.id}/encounter`);
                         }}
                       >
-                        {t('newVisit') || 'Ny konsultasjon'}
+                        {t('newVisit')}
                       </button>
                     </td>
                   </tr>
@@ -426,7 +421,7 @@ export default function Patients() {
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
                 >
-                  {t('previous') || 'Forrige'}
+                  {t('previous')}
                 </button>
                 {[...Array(pagination.pages)].map((_, i) => {
                   const pageNum = i + 1;
@@ -462,7 +457,7 @@ export default function Patients() {
                   onClick={() => setPage((p) => Math.min(pagination.pages, p + 1))}
                   disabled={page === pagination.pages}
                 >
-                  {t('next') || 'Neste'}
+                  {t('next')}
                 </button>
               </div>
             </div>

@@ -7,6 +7,7 @@ import PageErrorBoundary from './components/PageErrorBoundary';
 import { setOrganizationId, getApiBaseUrl } from './services/api';
 import useGlobalKeyboardShortcuts from './hooks/useGlobalKeyboardShortcuts';
 import KeyboardShortcutsModal from './components/common/KeyboardShortcutsModal';
+import { useTranslation } from './i18n';
 
 // Lazy load all pages for code splitting
 const Dashboard = lazy(() => import('./pages/Dashboard'));
@@ -38,6 +39,7 @@ const PatientExercises = lazy(() => import('./pages/portal/PatientExercises'));
 
 // Page loader component for Suspense fallback
 function PageLoader() {
+  const { t } = useTranslation('common');
   return (
     <div
       className="flex items-center justify-center min-h-[400px]"
@@ -49,7 +51,7 @@ function PageLoader() {
           className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"
           aria-hidden="true"
         ></div>
-        <p className="mt-4 text-gray-600">Laster...</p>
+        <p className="mt-4 text-gray-600">{t('loading')}</p>
       </div>
     </div>
   );

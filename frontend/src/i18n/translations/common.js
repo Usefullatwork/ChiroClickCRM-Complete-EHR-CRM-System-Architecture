@@ -86,7 +86,8 @@ export const common = {
     uploadAndImport: 'Upload and Import',
     uploading: 'Uploading...',
     howToUse: 'How to use',
-    howToUseDesc: 'Copy patient data from Solvit or Excel and paste below. Supports both table format (multiple patients) and single patient data.',
+    howToUseDesc:
+      'Copy patient data from Solvit or Excel and paste below. Supports both table format (multiple patients) and single patient data.',
     pastePatientData: 'Paste Patient Data',
     pasteHere: 'Paste patient data here...',
     parseData: 'Parse Data',
@@ -110,7 +111,8 @@ export const common = {
     configuration: 'Configuration',
     googleDriveFolderId: 'Google Drive Folder ID',
     folderIdPlaceholder: 'Folder ID containing PDFs and Word documents',
-    folderIdHint: 'Find this in the Google Drive folder URL: drive.google.com/drive/folders/[FOLDER_ID]',
+    folderIdHint:
+      'Find this in the Google Drive folder URL: drive.google.com/drive/folders/[FOLDER_ID]',
     modelName: 'Model Name',
     modelNamePlaceholder: 'chiroclickcrm-custom',
     modelNameHint: 'Choose a unique name for your trained model',
@@ -146,7 +148,8 @@ export const common = {
     auditLogsSubtitle: 'GDPR Article 30 - Record of processing activities',
     exportLogs: 'Export Logs',
     gdprCompliance: 'GDPR Compliance',
-    gdprComplianceDesc: 'All system activities are logged in compliance with GDPR Article 30. These logs record all processing activities involving personal data and must be retained for compliance purposes. Access to this audit trail is restricted to administrators.',
+    gdprComplianceDesc:
+      'All system activities are logged in compliance with GDPR Article 30. These logs record all processing activities involving personal data and must be retained for compliance purposes. Access to this audit trail is restricted to administrators.',
     startDate: 'Start Date',
     endDate: 'End Date',
     action: 'Action',
@@ -194,6 +197,12 @@ export const common = {
     // NotFound page
     pageNotFound: 'Page not found',
     goBackHome: 'Go back home',
+    // Error boundary
+    errorTitle: 'Something went wrong',
+    errorMessage: 'An unexpected error occurred. Please try again.',
+    tryAgain: 'Try again',
+    reloadPage: 'Reload page',
+    pageErrorMessage: 'This page encountered an error',
   },
   no: {
     save: 'Lagre',
@@ -282,7 +291,8 @@ export const common = {
     uploadAndImport: 'Last opp og importer',
     uploading: 'Laster opp...',
     howToUse: 'Slik bruker du',
-    howToUseDesc: 'Kopier pasientdata fra Solvit eller Excel og lim inn nedenfor. Støtter både tabellformat (flere pasienter) og enkeltpasientdata.',
+    howToUseDesc:
+      'Kopier pasientdata fra Solvit eller Excel og lim inn nedenfor. Støtter både tabellformat (flere pasienter) og enkeltpasientdata.',
     pastePatientData: 'Lim inn pasientdata',
     pasteHere: 'Lim inn pasientdata her...',
     parseData: 'Analyser data',
@@ -306,7 +316,8 @@ export const common = {
     configuration: 'Konfigurasjon',
     googleDriveFolderId: 'Google Drive mappe-ID',
     folderIdPlaceholder: 'Mappe-ID som inneholder PDF-er og Word-dokumenter',
-    folderIdHint: 'Finn dette i Google Drive-mappens URL: drive.google.com/drive/folders/[FOLDER_ID]',
+    folderIdHint:
+      'Finn dette i Google Drive-mappens URL: drive.google.com/drive/folders/[FOLDER_ID]',
     modelName: 'Modellnavn',
     modelNamePlaceholder: 'chiroclickcrm-custom',
     modelNameHint: 'Velg et unikt navn for din trente modell',
@@ -342,7 +353,8 @@ export const common = {
     auditLogsSubtitle: 'GDPR artikkel 30 - Oversikt over behandlingsaktiviteter',
     exportLogs: 'Eksporter logger',
     gdprCompliance: 'GDPR-samsvar',
-    gdprComplianceDesc: 'Alle systemaktiviteter logges i samsvar med GDPR artikkel 30. Disse loggene registrerer alle behandlingsaktiviteter som involverer personopplysninger og må beholdes for samsvarsformål. Tilgang til dette revisjonssporet er begrenset til administratorer.',
+    gdprComplianceDesc:
+      'Alle systemaktiviteter logges i samsvar med GDPR artikkel 30. Disse loggene registrerer alle behandlingsaktiviteter som involverer personopplysninger og må beholdes for samsvarsformål. Tilgang til dette revisjonssporet er begrenset til administratorer.',
     startDate: 'Startdato',
     endDate: 'Sluttdato',
     action: 'Handling',
@@ -390,5 +402,11 @@ export const common = {
     // NotFound page
     pageNotFound: 'Siden ble ikke funnet',
     goBackHome: 'Gå tilbake til forsiden',
-  }
-}
+    // Error boundary
+    errorTitle: 'Noe gikk galt',
+    errorMessage: 'En uventet feil oppstod. Vennligst prøv igjen.',
+    tryAgain: 'Prøv igjen',
+    reloadPage: 'Last inn siden på nytt',
+    pageErrorMessage: 'Denne siden fikk en feil',
+  },
+};

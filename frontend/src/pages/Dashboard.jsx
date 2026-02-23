@@ -78,42 +78,39 @@ export default function Dashboard() {
   const now = new Date();
   const greeting =
     now.getHours() < 12
-      ? t('goodMorning') || 'God morgen'
+      ? t('goodMorning')
       : now.getHours() < 17
-        ? t('goodAfternoon') || 'God ettermiddag'
-        : t('goodEvening') || 'God kveld';
+        ? t('goodAfternoon')
+        : t('goodEvening');
 
   // ─── Mutations ─────────────────────────────────────────────
 
   const handleCancelAppointment = async (appointmentId, patientName) => {
     toast.promise(
       new Promise((resolve, reject) => {
-        toast.info(
-          `${(t('cancelAppointmentConfirm') || 'Avbestill time for {name}?').replace('{name}', patientName)}`,
-          {
-            action: {
-              label: t('confirm') || 'Bekreft',
-              onClick: async () => {
-                try {
-                  await appointmentsAPI.cancel(appointmentId, 'Cancelled by practitioner');
-                  refetchAppointments();
-                  resolve();
-                } catch (error) {
-                  reject(error);
-                }
-              },
+        toast.info(`${t('cancelAppointmentConfirm').replace('{name}', patientName)}`, {
+          action: {
+            label: t('confirm'),
+            onClick: async () => {
+              try {
+                await appointmentsAPI.cancel(appointmentId, 'Cancelled by practitioner');
+                refetchAppointments();
+                resolve();
+              } catch (error) {
+                reject(error);
+              }
             },
-            cancel: {
-              label: t('cancel') || 'Avbryt',
-              onClick: () => reject(new Error('Cancelled')),
-            },
-            duration: 10000,
-          }
-        );
+          },
+          cancel: {
+            label: t('cancel'),
+            onClick: () => reject(new Error('Cancelled')),
+          },
+          duration: 10000,
+        });
       }),
       {
-        loading: t('cancelling') || 'Avbestiller...',
-        success: t('appointmentCancelled') || 'Time avbestilt',
+        loading: t('cancelling'),
+        success: t('appointmentCancelled'),
         error: (err) => (err.message === 'Cancelled' ? '' : t('cancelFailed')),
       }
     );
@@ -129,13 +126,13 @@ export default function Dashboard() {
 
   const handleMarkContacted = (patient, method) => {
     const patientName = `${patient.first_name} ${patient.last_name}`;
-    toast.info((t('markContactedConfirm') || 'Kontaktet {name}?').replace('{name}', patientName), {
+    toast.info(t('markContactedConfirm').replace('{name}', patientName), {
       action: {
-        label: t('confirm') || 'Bekreft',
+        label: t('confirm'),
         onClick: () => markContactedMutation.mutate({ patientId: patient.id, method }),
       },
       cancel: {
-        label: t('cancel') || 'Avbryt',
+        label: t('cancel'),
         onClick: () => {},
       },
       duration: 10000,
@@ -146,7 +143,7 @@ export default function Dashboard() {
 
   const quickActions = [
     {
-      name: t('newPatient') || 'Ny pasient',
+      name: t('newPatient'),
       icon: UserPlus,
       bgClass: 'bg-blue-50',
       iconClass: 'text-blue-600',
@@ -154,7 +151,7 @@ export default function Dashboard() {
       action: () => navigate('/patients/new'),
     },
     {
-      name: t('newAppointment') || 'Ny time',
+      name: t('newAppointment'),
       icon: Calendar,
       bgClass: 'bg-green-50',
       iconClass: 'text-green-600',
@@ -162,7 +159,7 @@ export default function Dashboard() {
       action: () => navigate('/appointments/new'),
     },
     {
-      name: t('startEncounter') || 'Start konsultasjon',
+      name: t('startEncounter'),
       icon: FileText,
       bgClass: 'bg-teal-50',
       iconClass: 'text-teal-600',
@@ -170,7 +167,7 @@ export default function Dashboard() {
       action: () => navigate('/patients'),
     },
     {
-      name: t('sendSMS') || 'Send SMS',
+      name: t('sendSMS'),
       icon: MessageSquare,
       bgClass: 'bg-purple-50',
       iconClass: 'text-purple-600',
@@ -183,47 +180,47 @@ export default function Dashboard() {
 
   const statCards = [
     {
-      label: t('todaysAppointments') || 'Timer i dag',
+      label: t('todaysAppointments'),
       value: stats?.todayAppointments || 0,
       icon: Calendar,
       bgClass: 'bg-blue-50',
       iconClass: 'text-blue-600',
       trend: stats?.appointmentsTrend,
-      trendLabel: t('vsLastWeek') || 'vs forrige uke',
+      trendLabel: t('vsLastWeek'),
     },
     {
-      label: t('activePatients') || 'Aktive pasienter',
+      label: t('activePatients'),
       value: stats?.activePatients || 0,
       icon: Users,
       bgClass: 'bg-green-50',
       iconClass: 'text-green-600',
       trend: stats?.patientsTrend,
-      trendLabel: t('vsLastMonth') || 'vs forrige mnd',
+      trendLabel: t('vsLastMonth'),
     },
     {
-      label: t('pendingFollowUps') || 'Oppfølginger',
+      label: t('pendingFollowUps'),
       value: stats?.pendingFollowUps || 0,
       icon: CheckCircle2,
       bgClass: 'bg-orange-50',
       iconClass: 'text-orange-600',
     },
     {
-      label: t('revenueThisMonth') || 'Omsetning mnd',
+      label: t('revenueThisMonth'),
       value: stats?.monthRevenue ? `${(stats.monthRevenue / 1000).toFixed(0)}k kr` : '0 kr',
       icon: TrendingUp,
       bgClass: 'bg-purple-50',
       iconClass: 'text-purple-600',
       trend: stats?.revenueTrend,
-      trendLabel: t('vsLastMonth') || 'vs forrige mnd',
+      trendLabel: t('vsLastMonth'),
     },
     {
-      label: t('aiInsights') || 'AI-innsikt',
+      label: t('aiInsights'),
       value: stats?.aiRedFlags || 0,
       icon: Brain,
       bgClass: 'bg-teal-50',
       iconClass: 'text-teal-600',
       trend: stats?.aiTrend,
-      trendLabel: t('redFlagsToday') || 'røde flagg i dag',
+      trendLabel: t('redFlagsToday'),
     },
   ];
 
@@ -233,7 +230,7 @@ export default function Dashboard() {
     {
       id: 'overdue',
       icon: AlertCircle,
-      label: `${overdueFollowUps.length} ${t('overdueFollowUps') || 'forfalte oppfølginger'}`,
+      label: `${overdueFollowUps.length} ${t('overdueFollowUps')}`,
       color:
         overdueFollowUps.length > 0
           ? 'text-red-600 dark:text-red-400'
@@ -244,7 +241,7 @@ export default function Dashboard() {
     {
       id: 'messages',
       icon: Mail,
-      label: `${stats?.unreadMessages || 0} ${t('unreadMessages') || 'uleste meldinger'}`,
+      label: `${stats?.unreadMessages || 0} ${t('unreadMessages')}`,
       color:
         (stats?.unreadMessages || 0) > 0
           ? 'text-yellow-600 dark:text-yellow-400'
@@ -255,7 +252,7 @@ export default function Dashboard() {
     {
       id: 'billing',
       icon: CreditCard,
-      label: t('billingOk') || 'Fakturering OK',
+      label: t('billingOk'),
       color: 'text-green-600 dark:text-green-400',
       dot: 'bg-green-500',
       action: () => navigate('/billing'),
@@ -285,14 +282,14 @@ export default function Dashboard() {
           <button
             onClick={() => navigate('/search')}
             className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            title={t('search') || 'Søk (Ctrl+K)'}
+            title={t('search')}
           >
             <Search className="w-5 h-5" />
           </button>
           <button
             onClick={() => navigate('/notifications')}
             className="relative p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            title={t('notifications') || 'Varsler'}
+            title={t('notifications')}
           >
             <Bell className="w-5 h-5" />
             {(stats?.unreadMessages || 0) > 0 && (
@@ -336,11 +333,11 @@ export default function Dashboard() {
                   <Calendar className="w-4 h-4 text-blue-600" />
                 </div>
                 <h2 className="text-base font-semibold text-gray-900 dark:text-white">
-                  {t('todaysSchedule') || 'Dagens timeplan'}
+                  {t('todaysSchedule')}
                 </h2>
                 {appointments.length > 0 && (
                   <span className="text-xs font-medium text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">
-                    {appointments.length} {t('appointments') || 'timer'}
+                    {appointments.length} {t('appointments')}
                   </span>
                 )}
               </div>
@@ -348,7 +345,7 @@ export default function Dashboard() {
                 onClick={() => navigate('/appointments')}
                 className="text-sm text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 flex items-center gap-1 font-medium"
               >
-                {t('viewAll') || 'Se alle'}
+                {t('viewAll')}
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -373,7 +370,7 @@ export default function Dashboard() {
                             {i18nFormatTime(apt.start_time, lang)}
                           </div>
                           <div className="text-xs text-gray-400">
-                            {apt.duration_minutes || 30} {t('min') || 'min'}
+                            {apt.duration_minutes || 30} {t('min')}
                           </div>
                         </div>
 
@@ -388,12 +385,12 @@ export default function Dashboard() {
                             </p>
                             {apt.is_new_patient && (
                               <span className="text-xs bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 px-1.5 py-0.5 rounded font-medium">
-                                {t('new') || 'NY'}
+                                {t('new')}
                               </span>
                             )}
                           </div>
                           <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                            {apt.appointment_type || t('appointment') || 'Konsultasjon'}
+                            {apt.appointment_type || t('appointment')}
                           </p>
                         </div>
                       </div>
@@ -403,7 +400,7 @@ export default function Dashboard() {
                         {apt.red_flags && (
                           <span className="text-xs bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300 px-2 py-0.5 rounded-full flex items-center gap-1">
                             <AlertCircle className="w-3 h-3" />
-                            {t('redFlag') || 'Rødt flagg'}
+                            {t('redFlag')}
                           </span>
                         )}
                         <StatusBadge
@@ -417,7 +414,7 @@ export default function Dashboard() {
                               handleCancelAppointment(apt.id, apt.patient_name);
                             }}
                             className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 transition-all"
-                            title={t('cancelAppointment') || 'Avbestill'}
+                            title={t('cancelAppointment')}
                           >
                             <X className="w-4 h-4" />
                           </button>
@@ -429,16 +426,14 @@ export default function Dashboard() {
               ) : (
                 <EmptyState
                   icon={Clock}
-                  title={t('noAppointmentsToday') || 'Ingen timer i dag'}
-                  description={
-                    t('noAppointmentsDesc') || 'Nyt en rolig dag, eller book en ny time.'
-                  }
+                  title={t('noAppointmentsToday')}
+                  description={t('noAppointmentsDesc')}
                   action={
                     <button
                       onClick={() => navigate('/appointments/new')}
                       className="text-sm font-medium text-teal-600 hover:text-teal-700"
                     >
-                      {t('bookAppointment') || '+ Ny time'}
+                      {t('bookAppointment')}
                     </button>
                   }
                 />
@@ -455,7 +450,7 @@ export default function Dashboard() {
               <div className="flex items-center gap-3">
                 <Activity className="w-4 h-4 text-gray-400" />
                 <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
-                  {t('recentActivity') || 'Siste aktivitet'}
+                  {t('recentActivity')}
                 </h2>
               </div>
               {showActivity ? (
@@ -469,19 +464,19 @@ export default function Dashboard() {
                 {/* Activity items — will populate from API when available */}
                 <ActivityItem
                   icon={FileText}
-                  text={t('encounterSigned') || 'Konsultasjon signert'}
+                  text={t('encounterSigned')}
                   time="2t"
                   color="text-teal-500"
                 />
                 <ActivityItem
                   icon={MessageSquare}
-                  text={t('smsSent') || 'SMS sendt til pasient'}
+                  text={t('smsSent')}
                   time="3t"
                   color="text-purple-500"
                 />
                 <ActivityItem
                   icon={CheckCircle2}
-                  text={t('treatmentPlanCompleted') || 'Behandlingsplan fullført'}
+                  text={t('treatmentPlanCompleted')}
                   time="5t"
                   color="text-green-500"
                 />
@@ -496,7 +491,7 @@ export default function Dashboard() {
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-soft-sm">
             <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
               <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
-                {t('quickActions') || 'Hurtigvalg'}
+                {t('quickActions')}
               </h2>
             </div>
             <div className="p-3 space-y-1.5">
@@ -528,9 +523,7 @@ export default function Dashboard() {
           {/* Alerts */}
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-soft-sm">
             <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
-                {t('alerts') || 'Varsler'}
-              </h2>
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('alerts')}</h2>
             </div>
             <div className="p-3 space-y-1">
               {alerts.map((alert) => {
@@ -558,13 +551,13 @@ export default function Dashboard() {
           >
             <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
               <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
-                {t('patientsNeedingFollowUp') || 'Oppfølging'}
+                {t('patientsNeedingFollowUp')}
               </h2>
               <button
                 onClick={() => navigate('/follow-ups')}
                 className="text-xs text-teal-600 dark:text-teal-400 hover:text-teal-700 font-medium flex items-center gap-0.5"
               >
-                {t('viewAll') || 'Se alle'}
+                {t('viewAll')}
                 <ArrowRight className="w-3 h-3" />
               </button>
             </div>
@@ -590,15 +583,13 @@ export default function Dashboard() {
                             {patient.first_name} {patient.last_name}
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
-                            {patient.main_problem || t('noProblemSpecified') || 'Ikke spesifisert'}
+                            {patient.main_problem || t('noProblemSpecified')}
                           </p>
                           <div className="flex items-center gap-2 mt-1">
                             <span
                               className={`text-xs font-medium ${isOverdue ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'}`}
                             >
-                              {isOverdue
-                                ? `${t('overdue') || 'Forfalt'}: `
-                                : `${t('due') || 'Frist'}: `}
+                              {isOverdue ? `${t('overdue')}: ` : `${t('due')}: `}
                               {formatDateShort(followUpDate, lang)}
                             </span>
                           </div>
@@ -609,7 +600,7 @@ export default function Dashboard() {
                           }
                           disabled={markContactedMutation.isPending}
                           className="flex-shrink-0 p-1.5 text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/20 rounded-lg transition-colors disabled:opacity-50"
-                          title={t('markAsContacted') || 'Merk som kontaktet'}
+                          title={t('markAsContacted')}
                         >
                           <CheckCircle2 className="w-4 h-4" />
                         </button>
@@ -620,8 +611,8 @@ export default function Dashboard() {
               ) : (
                 <EmptyState
                   icon={CheckCircle2}
-                  title={t('noFollowUpsNeeded') || 'Alt oppdatert!'}
-                  description={t('allCaughtUp') || 'Ingen oppfølginger venter.'}
+                  title={t('noFollowUpsNeeded')}
+                  description={t('allCaughtUp')}
                   className="py-8"
                 />
               )}
@@ -639,7 +630,7 @@ export default function Dashboard() {
           <div className="flex items-center gap-3">
             <Bell className="w-5 h-5 text-teal-600" />
             <h2 className="text-base font-semibold text-gray-900 dark:text-white">
-              {t('recallDashboard') || 'Recall Dashboard'}
+              {t('recallDashboard')}
             </h2>
           </div>
           {showRecall ? (
