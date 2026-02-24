@@ -1,11 +1,12 @@
 /**
  * AI Settings Component
  * Model selection, feature toggles, and connection testing for the AI system.
+ * Persists settings via clinicalSettingsAPI and tests connection via aiAPI.
  */
 
-import { useState } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { aiAPI } from '../services/api';
+import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { aiAPI, clinicalSettingsAPI } from '../services/api';
 
 const AI_MODELS = [
   {
@@ -38,23 +39,38 @@ const AI_MODELS = [
   },
 ];
 
-const AISettings = () => {
-  const [selectedModel, setSelectedModel] = useState('chiro-no');
-  const [features, setFeatures] = useState({
-    spellCheck: true,
-    soapSuggestions: true,
-    diagnosisSuggestion: true,
-    redFlagAnalysis: true,
-    autoComplete: true,
-    narrativeGeneration: true,
-  });
-  const [testResult, setTestResult] = useState(null);
+const DEFAULT_FEATURES = {
+  spellCheck: true,
+  soapSuggestions: true,
+  diagnosisSuggestion: true,
+  redFlagAnalysis: true,
+  autoComplete: true,
+  narrativeGeneration: true,
+};
 
-  const {
-    data: aiStatus,
-    isLoading: statusLoading,
-    refetch: _refetchStatus,
-  } = useQuery({
+const AISettings = () => {
+  const queryClient = useQueryClient();
+  const [selectedModel, setSelectedModel] = useState('chiro-no');
+  const [features, setFeatures] = useState(DEFAULT_FEATURES);
+  const [testResult, setTestResult] = useState(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  const { data: settingsData, isLoading: settingsLoading } = useQuery({
+    queryKey: ['clinical-settings'],
+    queryFn: () => clinicalSettingsAPI.getAll(),
+    retry: false,
+  });
+
+  // Load saved AI settings when data arrives
+  useEffect(() => {
+    const ai = settingsData?.data?.ai || settingsData?.data?.settings?.ai;
+    if (ai) {
+      if (ai.model) setSelectedModel(ai.model);
+      if (ai.features) setFeatures((prev) => ({ ...prev, ...ai.features }));
+    }
+  }, [settingsData]);
+
+  const { data: aiStatus, isLoading: statusLoading } = useQuery({
     queryKey: ['ai-status'],
     queryFn: () => aiAPI.getStatus(),
     retry: false,
@@ -70,8 +86,26 @@ const AISettings = () => {
     },
   });
 
+  const saveMutation = useMutation({
+    mutationFn: (settings) => clinicalSettingsAPI.update({ ai: settings }),
+    onSuccess: () => {
+      setHasUnsavedChanges(false);
+      queryClient.invalidateQueries({ queryKey: ['clinical-settings'] });
+    },
+  });
+
   const toggleFeature = (feature) => {
     setFeatures((prev) => ({ ...prev, [feature]: !prev[feature] }));
+    setHasUnsavedChanges(true);
+  };
+
+  const handleModelChange = (modelId) => {
+    setSelectedModel(modelId);
+    setHasUnsavedChanges(true);
+  };
+
+  const handleSave = () => {
+    saveMutation.mutate({ model: selectedModel, features });
   };
 
   const status = aiStatus?.data;
@@ -141,36 +175,44 @@ const AISettings = () => {
       {/* Model Selection */}
       <div className="p-4 border rounded-lg bg-white shadow-sm">
         <h3 className="text-lg font-medium text-slate-800 mb-3">Modellvalg</h3>
-        <div className="space-y-2">
-          {AI_MODELS.map((model) => (
-            <label
-              key={model.id}
-              className={`flex items-center p-3 rounded-lg border cursor-pointer transition-colors ${
-                selectedModel === model.id
-                  ? 'border-teal-500 bg-teal-50'
-                  : 'border-slate-200 hover:bg-slate-50'
-              }`}
-            >
-              <input
-                type="radio"
-                name="aiModel"
-                value={model.id}
-                checked={selectedModel === model.id}
-                onChange={() => setSelectedModel(model.id)}
-                className="mr-3 text-teal-600 focus:ring-teal-500"
-              />
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium text-slate-800">{model.name}</span>
-                  <span className="text-xs text-slate-400">{model.size}</span>
+        {settingsLoading ? (
+          <div className="animate-pulse space-y-2">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-16 bg-slate-100 rounded-lg" />
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {AI_MODELS.map((model) => (
+              <label
+                key={model.id}
+                className={`flex items-center p-3 rounded-lg border cursor-pointer transition-colors ${
+                  selectedModel === model.id
+                    ? 'border-teal-500 bg-teal-50'
+                    : 'border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="aiModel"
+                  value={model.id}
+                  checked={selectedModel === model.id}
+                  onChange={() => handleModelChange(model.id)}
+                  className="mr-3 text-teal-600 focus:ring-teal-500"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-slate-800">{model.name}</span>
+                    <span className="text-xs text-slate-400">{model.size}</span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {model.base} - {model.purpose}
+                  </p>
                 </div>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  {model.base} - {model.purpose}
-                </p>
-              </div>
-            </label>
-          ))}
-        </div>
+              </label>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Feature Toggles */}
@@ -215,6 +257,8 @@ const AISettings = () => {
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                   features[feature.key] ? 'bg-teal-600' : 'bg-slate-300'
                 }`}
+                role="switch"
+                aria-checked={features[feature.key]}
               >
                 <span
                   className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -226,6 +270,27 @@ const AISettings = () => {
           ))}
         </div>
       </div>
+
+      {/* Save Button */}
+      {hasUnsavedChanges && (
+        <div className="sticky bottom-4 flex justify-end">
+          <button
+            onClick={handleSave}
+            disabled={saveMutation.isPending}
+            className="px-6 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium shadow-lg hover:bg-teal-700 disabled:opacity-50 transition-colors"
+          >
+            {saveMutation.isPending ? 'Lagrer...' : 'Lagre innstillinger'}
+          </button>
+          {saveMutation.isError && (
+            <span className="ml-3 text-sm text-red-600 self-center">
+              Kunne ikke lagre: {saveMutation.error?.message}
+            </span>
+          )}
+          {saveMutation.isSuccess && (
+            <span className="ml-3 text-sm text-green-600 self-center">Lagret!</span>
+          )}
+        </div>
+      )}
     </div>
   );
 };

@@ -287,6 +287,10 @@ export const dashboardAPI = {
   getStats: () => apiClient.get('/dashboard/stats'),
   getTodayAppointments: () => apiClient.get('/dashboard/appointments/today'),
   getPendingTasks: () => apiClient.get('/dashboard/tasks/pending'),
+  getRevenueTrend: (params) => apiClient.get('/dashboard/revenue-trend', { params }),
+  getUtilization: (params) => apiClient.get('/dashboard/utilization', { params }),
+  getNoShowTrend: (params) => apiClient.get('/dashboard/no-show-trend', { params }),
+  getPatientFlow: (params) => apiClient.get('/dashboard/patient-flow', { params }),
 };
 
 // KPI Dashboard
@@ -988,6 +992,31 @@ export const outcomesAPI = {
   getPatientSummary: (patientId) => apiClient.get(`/outcomes/patient/${patientId}/summary`),
   getPatientLongitudinal: (patientId) =>
     apiClient.get(`/outcomes/patient/${patientId}/longitudinal`),
+};
+
+// Auto-Accept API
+export const autoAcceptAPI = {
+  getSettings: () => apiClient.get('/auto-accept/settings'),
+  updateSettings: (data) => apiClient.put('/auto-accept/settings', data),
+  getLog: (params) => apiClient.get('/auto-accept/log', { params }),
+  evaluate: (appointmentId) => apiClient.post('/auto-accept/evaluate', { appointmentId }),
+  toggleAppointments: () => apiClient.post('/auto-accept/toggle/appointments'),
+  toggleReferrals: () => apiClient.post('/auto-accept/toggle/referrals'),
+  processPending: () => apiClient.post('/auto-accept/process'),
+};
+
+// Portal API (practitioner-facing patient portal management)
+export const portalAPI = {
+  getPatientDashboard: (patientId) => apiClient.get(`/portal/patient/${patientId}`),
+  getPatientAppointments: (patientId, params) =>
+    apiClient.get(`/portal/patient/${patientId}/appointments`, { params }),
+  createPatientAppointment: (patientId, data) =>
+    apiClient.post(`/portal/patient/${patientId}/appointments`, data),
+  getPatientExercises: (patientId) => apiClient.get(`/portal/patient/${patientId}/exercises`),
+  getPatientOutcomes: (patientId) => apiClient.get(`/portal/patient/${patientId}/outcomes`),
+  generateMagicLink: (patientId) => apiClient.post('/portal/auth/magic-link', { patientId }),
+  setPortalAccess: (patientId, pin) =>
+    apiClient.post(`/portal/patient/${patientId}/portal-access`, { pin }),
 };
 
 // Export API URL for streaming endpoints
