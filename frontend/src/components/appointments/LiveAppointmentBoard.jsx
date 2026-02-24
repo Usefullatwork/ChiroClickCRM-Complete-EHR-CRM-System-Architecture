@@ -191,6 +191,18 @@ export default function LiveAppointmentBoard() {
     );
   });
 
+  // WebSocket: appointment status changed (checked-in, in-progress, completed, no-show)
+  useSocketEvent('appointment:status-changed', (data) => {
+    if (!data?.appointmentId || !data?.status) {
+      return;
+    }
+    setAppointments((prev) =>
+      prev.map((a) =>
+        a.id === data.appointmentId ? { ...(data.appointment || a), status: data.status } : a
+      )
+    );
+  });
+
   // Navigate dates
   const goToDay = (offset) => {
     setSelectedDate((prev) => {

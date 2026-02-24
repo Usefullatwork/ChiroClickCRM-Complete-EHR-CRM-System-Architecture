@@ -136,6 +136,11 @@ export const checkInAppointment = async (req, res) => {
     }
 
     broadcastToOrg(organizationId, 'appointment:updated', { appointment });
+    broadcastToOrg(organizationId, 'appointment:status-changed', {
+      appointmentId: appointment.id,
+      status: appointment.status,
+      appointment,
+    });
 
     res.json({ success: true, data: appointment, message: 'Patient checked in' });
   } catch (error) {
@@ -174,6 +179,16 @@ export const updateStatus = async (req, res) => {
     });
 
     broadcastToOrg(organizationId, 'appointment:updated', { appointment });
+
+    // Emit specific status-changed event for live board
+    const liveStatuses = ['checked_in', 'in_progress', 'completed', 'no_show'];
+    if (liveStatuses.includes(status)) {
+      broadcastToOrg(organizationId, 'appointment:status-changed', {
+        appointmentId: appointment.id,
+        status,
+        appointment,
+      });
+    }
 
     res.json(appointment);
   } catch (error) {

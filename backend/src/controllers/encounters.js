@@ -4,10 +4,40 @@
  */
 
 import * as encounterService from '../services/encounters.js';
+import { ragService } from '../services/rag.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 import { NotFoundError } from '../utils/errors.js';
 import { broadcastToOrg } from '../services/websocket.js';
+
+/**
+ * Build a plain-text SOAP note from encounter JSON fields for RAG indexing
+ */
+function buildNoteText(encounter) {
+  const parts = [];
+  const s = encounter.subjective || {};
+  const o = encounter.objective || {};
+  const a = encounter.assessment || {};
+  const p = encounter.plan || {};
+
+  if (s.chief_complaint || s.history || s.onset || s.pain_description) {
+    parts.push(
+      `Subjektiv: ${[s.chief_complaint, s.history, s.onset, s.pain_description].filter(Boolean).join('. ')}`
+    );
+  }
+  if (o.observation || o.palpation || o.rom || o.ortho_tests || o.neuro_tests) {
+    parts.push(
+      `Objektiv: ${[o.observation, o.palpation, o.rom, o.ortho_tests, o.neuro_tests].filter(Boolean).join('. ')}`
+    );
+  }
+  if (a.clinical_reasoning || a.prognosis) {
+    parts.push(`Vurdering: ${[a.clinical_reasoning, a.prognosis].filter(Boolean).join('. ')}`);
+  }
+  if (p.treatment || p.exercises || p.follow_up) {
+    parts.push(`Plan: ${[p.treatment, p.exercises, p.follow_up].filter(Boolean).join('. ')}`);
+  }
+  return parts.join('\n\n');
+}
 
 /**
  * Get all encounters
@@ -165,6 +195,27 @@ export const createEncounter = async (req, res) => {
       userAgent: req.get('user-agent'),
     });
 
+    // Index encounter for RAG retrieval
+    if (process.env.RAG_ENABLED === 'true') {
+      try {
+        const noteText = buildNoteText(encounter);
+        if (noteText) {
+          await ragService.indexEncounter(
+            encounter.id,
+            noteText,
+            encounter.patient_id,
+            organizationId,
+            encounter.visit_date || encounter.encounter_date
+          );
+        }
+      } catch (ragErr) {
+        logger.warn('RAG indexing failed for encounter', {
+          encounterId: encounter.id,
+          error: ragErr.message,
+        });
+      }
+    }
+
     res.status(201).json({
       ...encounter,
       redFlagAlerts: alerts,
@@ -213,6 +264,31 @@ export const updateEncounter = async (req, res) => {
       userAgent: req.get('user-agent'),
     });
 
+    // Re-index encounter for RAG if SOAP fields changed
+    if (process.env.RAG_ENABLED === 'true') {
+      const soapFields = ['subjective', 'objective', 'assessment', 'plan'];
+      const hasSoapChange = soapFields.some((f) => encounterData[f] !== undefined);
+      if (hasSoapChange) {
+        try {
+          const noteText = buildNoteText(updatedEncounter);
+          if (noteText) {
+            await ragService.indexEncounter(
+              id,
+              noteText,
+              updatedEncounter.patient_id,
+              organizationId,
+              updatedEncounter.visit_date || updatedEncounter.encounter_date
+            );
+          }
+        } catch (ragErr) {
+          logger.warn('RAG re-indexing failed for encounter', {
+            encounterId: id,
+            error: ragErr.message,
+          });
+        }
+      }
+    }
+
     res.json(updatedEncounter);
   } catch (error) {
     // Re-throw custom errors to be handled by centralized error handler
@@ -254,6 +330,27 @@ export const signEncounter = async (req, res) => {
     });
 
     broadcastToOrg(organizationId, 'encounter:locked', { encounterId: id, lockedBy: user.id });
+
+    // Final RAG indexing on sign (ensures signed encounters are indexed)
+    if (process.env.RAG_ENABLED === 'true') {
+      try {
+        const noteText = buildNoteText(signedEncounter);
+        if (noteText) {
+          await ragService.indexEncounter(
+            id,
+            noteText,
+            signedEncounter.patient_id,
+            organizationId,
+            signedEncounter.visit_date || signedEncounter.encounter_date
+          );
+        }
+      } catch (ragErr) {
+        logger.warn('RAG indexing failed on encounter sign', {
+          encounterId: id,
+          error: ragErr.message,
+        });
+      }
+    }
 
     res.json(signedEncounter);
   } catch (error) {
