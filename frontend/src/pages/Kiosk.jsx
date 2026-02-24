@@ -4,10 +4,12 @@
  * Full-screen kiosk mode for patient self-service:
  * 1. Patient lookup by name/phone
  * 2. Identity verification (DOB)
- * 3. Chief complaint capture
- * 4. Pain assessment
- * 5. Quick screening (follow-up visits)
- * 6. Confirmation
+ * 3. Contact info update
+ * 4. Intake form (first-visit patients only)
+ * 5. Chief complaint capture
+ * 6. Pain assessment
+ * 7. Quick screening (follow-up visits)
+ * 8. Confirmation
  *
  * Data flows to SOAP note pre-population for provider
  */
@@ -17,6 +19,8 @@ import { useTranslation } from '../i18n';
 import KioskLayout from '../components/kiosk/KioskLayout';
 import PatientLookup from '../components/kiosk/PatientLookup';
 import IdentityVerify from '../components/kiosk/IdentityVerify';
+import ContactUpdate from '../components/kiosk/ContactUpdate';
+import IntakeForm from '../components/kiosk/IntakeForm';
 import ChiefComplaintCapture from '../components/kiosk/ChiefComplaintCapture';
 import PainAssessment from '../components/kiosk/PainAssessment';
 import QuickScreening from '../components/kiosk/QuickScreening';
@@ -26,6 +30,8 @@ import logger from '../utils/logger';
 const STEPS = {
   LOOKUP: 'lookup',
   VERIFY: 'verify',
+  CONTACT: 'contact',
+  INTAKE: 'intake',
   COMPLAINT: 'complaint',
   PAIN: 'pain',
   SCREENING: 'screening',
@@ -35,6 +41,8 @@ const STEPS = {
 const STEP_ORDER = [
   STEPS.LOOKUP,
   STEPS.VERIFY,
+  STEPS.CONTACT,
+  STEPS.INTAKE,
   STEPS.COMPLAINT,
   STEPS.PAIN,
   STEPS.SCREENING,
@@ -52,6 +60,8 @@ export default function Kiosk() {
   // Collected data
   const [data, setData] = useState({
     appointment: null,
+    contact: null,
+    intake: null,
     complaint: null,
     pain: null,
     screening: null,
@@ -60,32 +70,26 @@ export default function Kiosk() {
   // Get current step number for progress indicator
   const stepNumber = STEP_ORDER.indexOf(currentStep);
 
-  // Update data and go to next step
-  const nextStep = useCallback(
-    (stepData, stepKey) => {
-      setData((prev) => ({ ...prev, [stepKey]: stepData }));
-
-      const currentIndex = STEP_ORDER.indexOf(currentStep);
-      if (currentIndex < STEP_ORDER.length - 1) {
-        setCurrentStep(STEP_ORDER[currentIndex + 1]);
-      }
-    },
-    [currentStep]
-  );
-
   // Go back one step
   const prevStep = useCallback(() => {
     const currentIndex = STEP_ORDER.indexOf(currentStep);
     if (currentIndex > 0) {
-      setCurrentStep(STEP_ORDER[currentIndex - 1]);
+      // Skip intake step when going back if not first visit
+      let targetIndex = currentIndex - 1;
+      if (STEP_ORDER[targetIndex] === STEPS.INTAKE && !data.appointment?.isFirstVisit) {
+        targetIndex = targetIndex - 1;
+      }
+      setCurrentStep(STEP_ORDER[Math.max(0, targetIndex)]);
     }
-  }, [currentStep]);
+  }, [currentStep, data.appointment?.isFirstVisit]);
 
   // Reset to beginning
   const reset = useCallback(() => {
     setCurrentStep(STEPS.LOOKUP);
     setData({
       appointment: null,
+      contact: null,
+      intake: null,
       complaint: null,
       pain: null,
       screening: null,
@@ -103,6 +107,8 @@ export default function Kiosk() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             appointmentId: data.appointment?.id,
+            contactUpdate: data.contact,
+            intakeForm: data.intake,
             complaintCategories: data.complaint?.complaintCategories || [],
             chiefComplaint: data.complaint?.chiefComplaint || data.complaint?.narrative || '',
             painLocations: data.pain?.painLocations || [],
@@ -132,7 +138,7 @@ export default function Kiosk() {
         setCurrentStep(STEPS.CONFIRMATION);
       }
     },
-    [data.appointment, data.complaint, data.pain, startTime, lang]
+    [data.appointment, data.complaint, data.pain, data.contact, data.intake, startTime, lang]
   );
 
   // Render current step
@@ -144,7 +150,7 @@ export default function Kiosk() {
             lang={lang}
             apiBase={API_BASE}
             onSelect={(appointment) => {
-              nextStep(appointment, 'appointment');
+              setData((prev) => ({ ...prev, appointment }));
               setCurrentStep(STEPS.VERIFY);
             }}
           />
@@ -157,7 +163,37 @@ export default function Kiosk() {
             lang={lang}
             apiBase={API_BASE}
             onVerified={(verifiedAppointment) => {
-              nextStep(verifiedAppointment, 'appointment');
+              setData((prev) => ({ ...prev, appointment: verifiedAppointment }));
+              setCurrentStep(STEPS.CONTACT);
+            }}
+            onBack={prevStep}
+          />
+        );
+
+      case STEPS.CONTACT:
+        return (
+          <ContactUpdate
+            appointment={data.appointment}
+            lang={lang}
+            onNext={(contactData) => {
+              setData((prev) => ({ ...prev, contact: contactData }));
+              // Skip intake for returning patients
+              if (data.appointment?.isFirstVisit) {
+                setCurrentStep(STEPS.INTAKE);
+              } else {
+                setCurrentStep(STEPS.COMPLAINT);
+              }
+            }}
+            onBack={prevStep}
+          />
+        );
+
+      case STEPS.INTAKE:
+        return (
+          <IntakeForm
+            lang={lang}
+            onNext={(intakeData) => {
+              setData((prev) => ({ ...prev, intake: intakeData }));
               setCurrentStep(STEPS.COMPLAINT);
             }}
             onBack={prevStep}
@@ -169,7 +205,7 @@ export default function Kiosk() {
           <ChiefComplaintCapture
             lang={lang}
             onNext={(complaint) => {
-              nextStep(complaint, 'complaint');
+              setData((prev) => ({ ...prev, complaint }));
               setCurrentStep(STEPS.PAIN);
             }}
             onBack={prevStep}
@@ -181,7 +217,7 @@ export default function Kiosk() {
           <PainAssessment
             lang={lang}
             onNext={(pain) => {
-              nextStep(pain, 'pain');
+              setData((prev) => ({ ...prev, pain }));
               setCurrentStep(STEPS.SCREENING);
             }}
             onBack={prevStep}

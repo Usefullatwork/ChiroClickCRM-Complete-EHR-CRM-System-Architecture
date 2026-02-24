@@ -932,9 +932,15 @@ export const notificationsAPI = {
 export const patientPortalAPI = {
   loginWithPin: (pin, patientId) => apiClient.post('/patient-portal/auth/pin', { pin, patientId }),
   getProfile: () => apiClient.get('/patient-portal/profile'),
+  updateProfile: (data) => apiClient.put('/patient-portal/profile', data),
   getAppointments: () => apiClient.get('/patient-portal/appointments'),
+  requestAppointment: (data) => apiClient.post('/patient-portal/appointments/request', data),
+  cancelAppointment: (id) => apiClient.post(`/patient-portal/appointments/${id}/cancel`),
   getExercises: () => apiClient.get('/patient-portal/exercises'),
   logCompliance: (id, data) => apiClient.post(`/patient-portal/exercises/${id}/compliance`, data),
+  getOutcomes: () => apiClient.get('/patient-portal/outcomes'),
+  submitOutcome: (data) => apiClient.post('/patient-portal/outcomes', data),
+  logout: () => apiClient.post('/patient-portal/logout'),
 };
 
 // Encounter Validation API

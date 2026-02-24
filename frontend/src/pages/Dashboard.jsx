@@ -40,6 +40,7 @@ import StatCard from '../components/ui/StatCard';
 import StatusBadge from '../components/ui/StatusBadge';
 import EmptyState from '../components/ui/EmptyState';
 import RecallDashboard from '../components/recall/RecallDashboard';
+import DashboardAnalytics from '../components/dashboard/DashboardAnalytics';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -645,6 +646,9 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+
+      {/* ── Analytics Charts ────────────────────────────────── */}
+      <DashboardAnalytics />
     </div>
   );
 }

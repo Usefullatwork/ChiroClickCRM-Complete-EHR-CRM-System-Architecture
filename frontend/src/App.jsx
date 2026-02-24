@@ -36,6 +36,14 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Patient Portal (public, no auth required)
 const PatientExercises = lazy(() => import('./pages/portal/PatientExercises'));
+const PortalDashboard = lazy(() => import('./pages/portal/PortalDashboard'));
+const PortalAppointments = lazy(() => import('./pages/portal/PortalAppointments'));
+const PortalOutcomes = lazy(() => import('./pages/portal/PortalOutcomes'));
+const PortalProfile = lazy(() => import('./pages/portal/PortalProfile'));
+const PatientLogin = lazy(() => import('./pages/portal/PatientLogin'));
+
+// Kiosk (full-screen, no auth)
+const Kiosk = lazy(() => import('./pages/Kiosk'));
 
 // Page loader component for Suspense fallback
 function PageLoader() {
@@ -305,19 +313,95 @@ function App() {
 
         {/* Patient Portal Routes (public, no authentication required) */}
         <Route
+          path="/portal/login"
+          element={
+            <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Portal Innlogging">
+                <PatientLogin />
+              </PageErrorBoundary>
+            </Suspense>
+          }
+        />
+        <Route
+          path="/portal"
+          element={
+            <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Portal">
+                <PortalDashboard />
+              </PageErrorBoundary>
+            </Suspense>
+          }
+        />
+        <Route
+          path="/portal/appointments"
+          element={
+            <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Mine timer">
+                <PortalAppointments />
+              </PageErrorBoundary>
+            </Suspense>
+          }
+        />
+        <Route
+          path="/portal/outcomes"
+          element={
+            <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Skjemaer">
+                <PortalOutcomes />
+              </PageErrorBoundary>
+            </Suspense>
+          }
+        />
+        <Route
+          path="/portal/profile"
+          element={
+            <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Min profil">
+                <PortalProfile />
+              </PageErrorBoundary>
+            </Suspense>
+          }
+        />
+        <Route
           path="/portal/exercises"
           element={
-            <PageErrorBoundary pageName="Øvelser">
-              <PatientExercises />
-            </PageErrorBoundary>
+            <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Øvelser">
+                <PatientExercises />
+              </PageErrorBoundary>
+            </Suspense>
           }
         />
         <Route
           path="/portal/exercises/:patientId"
           element={
-            <PageErrorBoundary pageName="Øvelser">
-              <PatientExercises />
-            </PageErrorBoundary>
+            <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Øvelser">
+                <PatientExercises />
+              </PageErrorBoundary>
+            </Suspense>
+          }
+        />
+        <Route
+          path="/portal/mine-ovelser"
+          element={
+            <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Øvelser">
+                <PatientExercises />
+              </PageErrorBoundary>
+            </Suspense>
+          }
+        />
+
+        {/* Kiosk Route (full-screen, no auth) */}
+        <Route
+          path="/kiosk"
+          element={
+            <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Kiosk">
+                <Kiosk />
+              </PageErrorBoundary>
+            </Suspense>
           }
         />
 
