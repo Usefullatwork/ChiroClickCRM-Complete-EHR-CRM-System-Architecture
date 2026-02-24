@@ -288,7 +288,9 @@ export default function EnhancedClinicalTextarea({
     // Text expansion popup takes priority when open
     if (expansionOpen) {
       const handled = expansionKeyDown(e, textareaRef, value, onChange);
-      if (handled) return;
+      if (handled) {
+        return;
+      }
     }
 
     // Tab to accept AI suggestion (only when expansion popup is closed)

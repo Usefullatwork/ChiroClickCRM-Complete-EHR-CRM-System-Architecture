@@ -16,9 +16,9 @@ export default function PlanSection({
   Checkbox,
   addRedFlag,
   removeRedFlag,
-  handleCodeSelect,
+  handleCodeSelect: _handleCodeSelect,
   removeCode,
-  showCodePicker,
+  showCodePicker: _showCodePicker,
   setShowCodePicker,
 }) {
   return (

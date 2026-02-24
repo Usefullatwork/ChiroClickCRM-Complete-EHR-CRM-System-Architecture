@@ -37,7 +37,9 @@ export default function ComplianceScan({
   const [expanded, setExpanded] = useState(true);
 
   const checks = useMemo(() => {
-    if (!encounterData) return [];
+    if (!encounterData) {
+      return [];
+    }
 
     const results = [];
 
@@ -143,7 +145,9 @@ export default function ComplianceScan({
   const allPassed = failCount === 0 && warnCount === 0;
   const hasErrors = failCount > 0;
 
-  if (!visible) return null;
+  if (!visible) {
+    return null;
+  }
 
   return (
     <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-850">

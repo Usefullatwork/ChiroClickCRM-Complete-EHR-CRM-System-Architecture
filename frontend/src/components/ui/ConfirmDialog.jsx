@@ -25,7 +25,9 @@ export default function ConfirmDialog({
   variant = 'destructive',
   loading = false,
 }) {
-  if (!open) return null;
+  if (!open) {
+    return null;
+  }
 
   const icon = variant === 'destructive' ? Trash2 : AlertTriangle;
   const Icon = icon;

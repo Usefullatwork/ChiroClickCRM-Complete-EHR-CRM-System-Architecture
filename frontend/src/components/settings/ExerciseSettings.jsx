@@ -213,7 +213,9 @@ export default function ExerciseSettings({ lang }) {
           : `Are you sure you want to delete "${exercise.name_en || exercise.name_no}"?`,
       variant: 'destructive',
     });
-    if (ok) deleteExerciseMutation.mutate(exercise.id);
+    if (ok) {
+      deleteExerciseMutation.mutate(exercise.id);
+    }
   };
 
   return (

@@ -18,7 +18,7 @@ import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { Alert } from '../components/ui/Alert';
-import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+// LoadingSpinner available from ../components/ui/LoadingSpinner if needed
 import { Skeleton } from '../components/ui/Skeleton';
 import { SoapNoteBuilder } from '../components/clinical/SoapNoteBuilder';
 import { usePatient, usePatientEncounters } from '../hooks/usePatients';

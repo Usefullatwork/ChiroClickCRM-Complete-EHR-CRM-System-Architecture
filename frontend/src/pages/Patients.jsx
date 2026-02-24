@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { patientsAPI } from '../services/api';
-import { formatDate, formatPhone, calculateAge, getStatusColor } from '../lib/utils';
+import { formatDate, formatPhone, calculateAge } from '../lib/utils';
 import { Search, Plus, Download, Upload, X, Loader2, UserPlus } from 'lucide-react';
 import { useTranslation } from '../i18n';
 import { PatientsTableSkeleton } from '../components/ui/Skeleton';
@@ -12,13 +12,19 @@ import toast from '../utils/toast';
 
 // Risk indicator colors based on patient status + recency
 function getRiskDot(patient) {
-  if (patient.status === 'INACTIVE' || patient.status === 'DECEASED') return 'bg-gray-400';
+  if (patient.status === 'INACTIVE' || patient.status === 'DECEASED') {
+    return 'bg-gray-400';
+  }
   if (patient.last_visit_date) {
     const daysSince = Math.floor(
       (Date.now() - new Date(patient.last_visit_date).getTime()) / 86400000
     );
-    if (daysSince > 90) return 'bg-red-500'; // at-risk
-    if (daysSince > 30) return 'bg-yellow-500'; // overdue
+    if (daysSince > 90) {
+      return 'bg-red-500';
+    } // at-risk
+    if (daysSince > 30) {
+      return 'bg-yellow-500';
+    } // overdue
   }
   return 'bg-green-500'; // active
 }
@@ -40,7 +46,9 @@ export default function Patients() {
 
   // Debounce search input with searching indicator
   useEffect(() => {
-    if (searchTerm !== debouncedSearch) setIsSearching(true);
+    if (searchTerm !== debouncedSearch) {
+      setIsSearching(true);
+    }
     const timer = setTimeout(() => {
       setDebouncedSearch(searchTerm);
       setIsSearching(false);
@@ -130,8 +138,12 @@ export default function Patients() {
 
   // Active filter chips
   const activeFilters = [];
-  if (filters.status) activeFilters.push({ key: 'status', label: filters.status });
-  if (filters.category) activeFilters.push({ key: 'category', label: filters.category });
+  if (filters.status) {
+    activeFilters.push({ key: 'status', label: filters.status });
+  }
+  if (filters.category) {
+    activeFilters.push({ key: 'category', label: filters.category });
+  }
 
   return (
     <div className="p-4 sm:p-6 max-w-7xl mx-auto">

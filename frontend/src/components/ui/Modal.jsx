@@ -15,14 +15,20 @@ export const Modal = ({ isOpen, onClose, title, children, size = 'md', footer })
 
   // Focus trap
   useEffect(() => {
-    if (!isOpen || !modalRef.current) return;
+    if (!isOpen || !modalRef.current) {
+      return;
+    }
     const focusable = modalRef.current.querySelectorAll(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
-    if (focusable.length) focusable[0].focus();
+    if (focusable.length) {
+      focusable[0].focus();
+    }
 
     const handleTab = (e) => {
-      if (e.key !== 'Tab' || !focusable.length) return;
+      if (e.key !== 'Tab' || !focusable.length) {
+        return;
+      }
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
       if (e.shiftKey && document.activeElement === first) {

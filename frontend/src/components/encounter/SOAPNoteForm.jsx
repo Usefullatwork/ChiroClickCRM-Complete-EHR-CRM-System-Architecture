@@ -31,7 +31,7 @@ export function SOAPNoteForm({
   handleSALT,
   // VAS
   // Objective section
-  textAreaRefs,
+  textAreaRefs: _textAreaRefs,
   setActiveField,
   // Exam panel manager
   state,

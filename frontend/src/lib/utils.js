@@ -170,7 +170,9 @@ export function formatPersonnummer(personnummer) {
  * Format relative time (e.g., "2 min ago", "3h ago")
  */
 export function formatRelativeTime(date) {
-  if (!date) return '-';
+  if (!date) {
+    return '-';
+  }
   const now = new Date();
   const d = new Date(date);
   const diffMs = now - d;
@@ -179,10 +181,18 @@ export function formatRelativeTime(date) {
   const diffHr = Math.floor(diffMin / 60);
   const diffDay = Math.floor(diffHr / 24);
 
-  if (diffSec < 60) return 'just now';
-  if (diffMin < 60) return `${diffMin}m ago`;
-  if (diffHr < 24) return `${diffHr}h ago`;
-  if (diffDay < 7) return `${diffDay}d ago`;
+  if (diffSec < 60) {
+    return 'just now';
+  }
+  if (diffMin < 60) {
+    return `${diffMin}m ago`;
+  }
+  if (diffHr < 24) {
+    return `${diffHr}h ago`;
+  }
+  if (diffDay < 7) {
+    return `${diffDay}d ago`;
+  }
   return d.toLocaleDateString('no-NO');
 }
 

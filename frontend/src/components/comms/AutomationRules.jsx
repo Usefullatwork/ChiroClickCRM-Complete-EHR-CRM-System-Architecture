@@ -366,7 +366,9 @@ export default function AutomationRules({ language = 'no' }) {
   // Handle delete
   const handleDelete = async (rule) => {
     const ok = await confirm({ title: t.confirmDelete, variant: 'destructive' });
-    if (ok) deleteMutation.mutate(rule.id);
+    if (ok) {
+      deleteMutation.mutate(rule.id);
+    }
   };
 
   // Group rules by category

@@ -4,7 +4,7 @@
  * Tests AI model performance display, metrics cards, date filters, and bilingual text
  */
 
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock hooks

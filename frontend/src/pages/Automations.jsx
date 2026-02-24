@@ -372,7 +372,9 @@ export default function Automations() {
 
   const handleDeleteWorkflow = async (workflow) => {
     const ok = await confirm({ title: t.confirmDelete, variant: 'destructive' });
-    if (ok) deleteMutation.mutate(workflow.id);
+    if (ok) {
+      deleteMutation.mutate(workflow.id);
+    }
   };
 
   const handleEditWorkflow = (workflow) => {

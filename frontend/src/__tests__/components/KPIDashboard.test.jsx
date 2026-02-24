@@ -4,7 +4,7 @@
  * Tests stat cards, date range, view modes, chart areas, and export
  */
 
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock hooks
@@ -69,16 +69,16 @@ vi.mock('../../components/analytics/WeekendDifferentialAnalysis', () => ({
 }));
 
 vi.mock('lucide-react', () => ({
-  TrendingUp: ({ size }) => <span>TrendingUp</span>,
-  TrendingDown: ({ size }) => <span>TrendingDown</span>,
-  Users: ({ size }) => <span>Users</span>,
-  Calendar: ({ size }) => <span>Calendar</span>,
-  MessageSquare: ({ size }) => <span>MessageSquare</span>,
-  Activity: ({ size }) => <span>Activity</span>,
+  TrendingUp: () => <span>TrendingUp</span>,
+  TrendingDown: () => <span>TrendingDown</span>,
+  Users: () => <span>Users</span>,
+  Calendar: () => <span>Calendar</span>,
+  MessageSquare: () => <span>MessageSquare</span>,
+  Activity: () => <span>Activity</span>,
   Mail: () => <span>Mail</span>,
   Download: () => <span>Download</span>,
-  Filter: ({ size }) => <span>Filter</span>,
-  BarChart3: ({ size }) => <span>BarChart3</span>,
+  Filter: () => <span>Filter</span>,
+  BarChart3: () => <span>BarChart3</span>,
   MapPin: () => <span>MapPin</span>,
 }));
 

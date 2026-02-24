@@ -25,7 +25,7 @@ const TRANSLATIONS = {
   },
 };
 
-export default function ContactUpdate({ appointment, lang = 'no', onNext, onBack }) {
+export default function ContactUpdate({ appointment, lang = 'no', onNext, onBack: _onBack }) {
   const t = TRANSLATIONS[lang];
   const [phone, setPhone] = useState(appointment?.phone || '');
   const [email, setEmail] = useState(appointment?.email || '');

@@ -197,7 +197,9 @@ export default function InitialConsultTemplate({
 
   const updateField = useCallback(
     (section, field, value) => {
-      if (readOnly) return;
+      if (readOnly) {
+        return;
+      }
       setConsultData((prev) => ({
         ...prev,
         [section]: {
@@ -212,7 +214,9 @@ export default function InitialConsultTemplate({
 
   const updateNestedField = useCallback(
     (section, parent, field, value) => {
-      if (readOnly) return;
+      if (readOnly) {
+        return;
+      }
       setConsultData((prev) => ({
         ...prev,
         [section]: {
@@ -230,7 +234,9 @@ export default function InitialConsultTemplate({
 
   const updateRootField = useCallback(
     (field, value) => {
-      if (readOnly) return;
+      if (readOnly) {
+        return;
+      }
       setConsultData((prev) => ({
         ...prev,
         [field]: value,
@@ -241,7 +247,9 @@ export default function InitialConsultTemplate({
   );
 
   const addRedFlag = (flag) => {
-    if (readOnly || !flag) return;
+    if (readOnly || !flag) {
+      return;
+    }
     setConsultData((prev) => ({
       ...prev,
       assessment: {
@@ -253,7 +261,9 @@ export default function InitialConsultTemplate({
   };
 
   const removeRedFlag = (index) => {
-    if (readOnly) return;
+    if (readOnly) {
+      return;
+    }
     setConsultData((prev) => ({
       ...prev,
       assessment: {
@@ -265,7 +275,9 @@ export default function InitialConsultTemplate({
   };
 
   const handleCodeSelect = (code) => {
-    if (readOnly) return;
+    if (readOnly) {
+      return;
+    }
     setConsultData((prev) => ({
       ...prev,
       icd10_codes: [...(prev.icd10_codes || []), code.code],
@@ -274,7 +286,9 @@ export default function InitialConsultTemplate({
   };
 
   const removeCode = (codeToRemove) => {
-    if (readOnly) return;
+    if (readOnly) {
+      return;
+    }
     setConsultData((prev) => ({
       ...prev,
       icd10_codes: prev.icd10_codes.filter((code) => code !== codeToRemove),

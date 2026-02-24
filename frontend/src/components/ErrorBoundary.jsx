@@ -9,7 +9,9 @@ import logger from '../utils/logger';
 const log = logger.scope('ErrorBoundary');
 
 function logErrorToService(error, errorInfo) {
-  if (import.meta.env.DEV) return; // Skip in dev — already logging locally
+  if (import.meta.env.DEV) {
+    return;
+  } // Skip in dev — already logging locally
 
   try {
     const payload = {

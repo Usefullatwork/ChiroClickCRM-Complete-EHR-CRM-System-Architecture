@@ -661,7 +661,9 @@ function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
               type="button"
               onClick={async () => {
                 const ok = await confirm({ title: t.confirmDelete, variant: 'destructive' });
-                if (ok) onDelete(provider.id);
+                if (ok) {
+                  onDelete(provider.id);
+                }
               }}
               className="px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
             >

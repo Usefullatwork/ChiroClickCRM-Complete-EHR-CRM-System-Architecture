@@ -8,7 +8,7 @@ export default function ExaminationSection({
   consultData,
   updateField,
   updateNestedField,
-  readOnly,
+  readOnly: _readOnly,
   Section,
   TextField,
   InputField,

@@ -107,7 +107,9 @@ export default function DashboardAnalytics() {
                 dataKey="date"
                 tick={{ fontSize: 11, fill: '#94a3b8' }}
                 tickFormatter={(v) => {
-                  if (v.includes('-W') || v.length === 7) return v;
+                  if (v.includes('-W') || v.length === 7) {
+                    return v;
+                  }
                   return v.slice(5); // MM-DD
                 }}
               />
@@ -173,16 +175,24 @@ export default function DashboardAnalytics() {
               />
               <Tooltip
                 formatter={(value, name) => {
-                  if (name === 'rate') return [`${value}%`, 'Uteblivelsesrate'];
-                  if (name === 'noShows') return [value, 'Uteblivelser'];
+                  if (name === 'rate') {
+                    return [`${value}%`, 'Uteblivelsesrate'];
+                  }
+                  if (name === 'noShows') {
+                    return [value, 'Uteblivelser'];
+                  }
                   return [value, name];
                 }}
                 contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }}
               />
               <Legend
                 formatter={(value) => {
-                  if (value === 'rate') return 'Rate (%)';
-                  if (value === 'noShows') return 'Antall';
+                  if (value === 'rate') {
+                    return 'Rate (%)';
+                  }
+                  if (value === 'noShows') {
+                    return 'Antall';
+                  }
                   return value;
                 }}
               />
@@ -229,17 +239,27 @@ export default function DashboardAnalytics() {
               <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} />
               <Tooltip
                 formatter={(value, name) => {
-                  if (name === 'newPatients') return [value, 'Nye pasienter'];
-                  if (name === 'returningPatients') return [value, 'Gjenbesokende'];
-                  if (name === 'totalVisits') return [value, 'Totale besok'];
+                  if (name === 'newPatients') {
+                    return [value, 'Nye pasienter'];
+                  }
+                  if (name === 'returningPatients') {
+                    return [value, 'Gjenbesokende'];
+                  }
+                  if (name === 'totalVisits') {
+                    return [value, 'Totale besok'];
+                  }
                   return [value, name];
                 }}
                 contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }}
               />
               <Legend
                 formatter={(value) => {
-                  if (value === 'newPatients') return 'Nye';
-                  if (value === 'returningPatients') return 'Gjenbesokende';
+                  if (value === 'newPatients') {
+                    return 'Nye';
+                  }
+                  if (value === 'returningPatients') {
+                    return 'Gjenbesokende';
+                  }
                   return value;
                 }}
               />
@@ -331,15 +351,25 @@ function UtilizationHeatmap({ data }) {
   for (const item of data) {
     const key = `${item.dayOfWeek}-${item.hour}`;
     lookup[key] = item;
-    if (item.count > maxCount) maxCount = item.count;
+    if (item.count > maxCount) {
+      maxCount = item.count;
+    }
   }
 
   const getColor = (count) => {
-    if (!count || count === 0) return 'bg-gray-100 dark:bg-gray-700';
+    if (!count || count === 0) {
+      return 'bg-gray-100 dark:bg-gray-700';
+    }
     const intensity = Math.min(count / Math.max(maxCount, 1), 1);
-    if (intensity < 0.25) return 'bg-teal-100';
-    if (intensity < 0.5) return 'bg-teal-200';
-    if (intensity < 0.75) return 'bg-teal-400';
+    if (intensity < 0.25) {
+      return 'bg-teal-100';
+    }
+    if (intensity < 0.5) {
+      return 'bg-teal-200';
+    }
+    if (intensity < 0.75) {
+      return 'bg-teal-400';
+    }
     return 'bg-teal-600';
   };
 

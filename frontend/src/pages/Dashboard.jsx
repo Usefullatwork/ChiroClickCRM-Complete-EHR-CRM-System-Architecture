@@ -20,7 +20,6 @@ import {
   CreditCard,
   Activity,
   UserPlus,
-  Keyboard,
   Search,
 } from 'lucide-react';
 import { dashboardAPI, appointmentsAPI, followUpsAPI } from '../services/api';

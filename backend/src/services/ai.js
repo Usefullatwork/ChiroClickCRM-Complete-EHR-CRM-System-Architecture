@@ -720,6 +720,7 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
   const OLLAMA_RETRY_BACKOFF_MS = 2000; // 2s backoff before retry
   const OLLAMA_MAX_RETRIES = 1;
   let rawOutput;
+  let confidence;
 
   const ollamaPayload = {
     model,
@@ -756,7 +757,7 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
       rawOutput = response.data.response;
 
       // Calculate confidence score for this response
-      const confidence = calculateConfidence(rawOutput, taskType, model);
+      confidence = calculateConfidence(rawOutput, taskType, model);
 
       // Log suggestion to ai_suggestions table (non-blocking)
       if (organizationId && taskType) {

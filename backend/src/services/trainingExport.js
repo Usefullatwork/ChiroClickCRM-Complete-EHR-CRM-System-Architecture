@@ -13,7 +13,9 @@ import logger from '../utils/logger.js';
  * @returns {string} Anonymized text
  */
 export function anonymizeText(text) {
-  if (!text) return '';
+  if (!text) {
+    return '';
+  }
 
   let cleaned = text;
 
@@ -41,7 +43,9 @@ export function anonymizeText(text) {
  * @returns {string} Decade string (e.g., "40s")
  */
 export function anonymizeAge(age) {
-  if (age == null || isNaN(age)) return 'unknown';
+  if (age === null || age === undefined || isNaN(age)) {
+    return 'unknown';
+  }
   return `${Math.floor(age / 10) * 10}s`;
 }
 

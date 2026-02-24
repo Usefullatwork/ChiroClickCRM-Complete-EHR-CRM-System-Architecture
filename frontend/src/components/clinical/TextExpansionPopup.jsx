@@ -5,7 +5,7 @@
  * Norwegian UI labels, category badges, max 8 results.
  */
 
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect } from 'react';
 import { Command } from 'lucide-react';
 
 // Category badge colors
@@ -24,7 +24,9 @@ const DEFAULT_BADGE = 'bg-gray-100 text-gray-600';
  * Calculate caret pixel position inside a textarea using a mirror div.
  */
 function getCaretCoordinates(textarea) {
-  if (!textarea) return { top: 0, left: 0 };
+  if (!textarea) {
+    return { top: 0, left: 0 };
+  }
 
   const mirror = document.createElement('div');
   const style = window.getComputedStyle(textarea);
@@ -98,7 +100,9 @@ export default function TextExpansionPopup({
 
   // Click outside to close
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      return;
+    }
 
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -111,7 +115,9 @@ export default function TextExpansionPopup({
 
   // Recalculate position when open/searchTerm changes
   useEffect(() => {
-    if (!isOpen || !inputRef?.current) return;
+    if (!isOpen || !inputRef?.current) {
+      return;
+    }
 
     const textarea = inputRef.current;
     const rect = textarea.getBoundingClientRect();
@@ -127,18 +133,24 @@ export default function TextExpansionPopup({
 
   // Scroll selected item into view
   useEffect(() => {
-    if (!isOpen || !menuRef.current) return;
+    if (!isOpen || !menuRef.current) {
+      return;
+    }
     const selected = menuRef.current.querySelector('[data-selected="true"]');
     selected?.scrollIntoView({ block: 'nearest' });
   }, [selectedIndex, isOpen]);
 
-  if (!isOpen || suggestions.length === 0) return null;
+  if (!isOpen || suggestions.length === 0) {
+    return null;
+  }
 
   // Group by category
   const grouped = {};
   suggestions.forEach((tmpl, idx) => {
     const cat = tmpl.category || 'Annet';
-    if (!grouped[cat]) grouped[cat] = [];
+    if (!grouped[cat]) {
+      grouped[cat] = [];
+    }
     grouped[cat].push({ ...tmpl, _idx: idx });
   });
 

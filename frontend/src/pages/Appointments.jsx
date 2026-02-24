@@ -55,7 +55,9 @@ export default function Appointments() {
       title: t('cancelConfirmPrompt').replace('{name}', appointment.patient_name),
       variant: 'destructive',
     });
-    if (!ok) return;
+    if (!ok) {
+      return;
+    }
     const reason = window.prompt(t('cancellationReasonPrompt'));
     if (reason) {
       cancelMutation.mutate({ id: appointment.id, reason });

@@ -55,7 +55,9 @@ export default function ExaminationFindingsList({ encounterId }) {
       description: 'Er du sikker på at du vil slette dette funnet?',
       variant: 'destructive',
     });
-    if (ok) deleteFindingMutation.mutate(findingId);
+    if (ok) {
+      deleteFindingMutation.mutate(findingId);
+    }
   };
 
   const toggleRegion = (region) => {

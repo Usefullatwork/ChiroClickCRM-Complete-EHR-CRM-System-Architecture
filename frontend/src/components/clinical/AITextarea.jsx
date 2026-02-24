@@ -38,7 +38,9 @@ export default function AITextarea({
     }
 
     // Skip if text ends with a command in progress
-    if (/[./][a-z]*$/i.test(value)) return;
+    if (/[./][a-z]*$/i.test(value)) {
+      return;
+    }
 
     const timer = setTimeout(async () => {
       // Abort any previous in-flight request
@@ -54,7 +56,9 @@ export default function AITextarea({
           'no'
         );
 
-        if (controller.signal.aborted) return;
+        if (controller.signal.aborted) {
+          return;
+        }
 
         const text = res?.data?.text || res?.data?.continuation || '';
         if (text.length > 5 && !value.includes(text.trim())) {
@@ -69,7 +73,9 @@ export default function AITextarea({
           setSuggestion('');
         }
       } finally {
-        if (!controller.signal.aborted) setIsLoading(false);
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
       }
     }, debounceMs);
 

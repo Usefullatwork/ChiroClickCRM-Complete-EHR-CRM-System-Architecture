@@ -65,8 +65,12 @@ const AISettings = () => {
   useEffect(() => {
     const ai = settingsData?.data?.ai || settingsData?.data?.settings?.ai;
     if (ai) {
-      if (ai.model) setSelectedModel(ai.model);
-      if (ai.features) setFeatures((prev) => ({ ...prev, ...ai.features }));
+      if (ai.model) {
+        setSelectedModel(ai.model);
+      }
+      if (ai.features) {
+        setFeatures((prev) => ({ ...prev, ...ai.features }));
+      }
     }
   }, [settingsData]);
 

@@ -7,7 +7,7 @@
 
 import { useState } from 'react';
 import { AlertTriangle, ExternalLink, ShieldX } from 'lucide-react';
-import { SEVERITY } from '../../services/redFlagScreeningService';
+// SEVERITY available from ../../services/redFlagScreeningService if needed
 
 const LABELS = {
   no: {
@@ -69,7 +69,9 @@ export default function RedFlagModal({
   }
 
   const handleAcknowledge = () => {
-    if (!checked) return;
+    if (!checked) {
+      return;
+    }
     onAcknowledge?.(criticalFlags);
     setChecked(false);
     onClose?.();

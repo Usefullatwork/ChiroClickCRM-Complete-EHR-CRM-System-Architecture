@@ -191,7 +191,9 @@ export default function ClinicalSettings({ t, clinicalPrefs, onClinicalPrefChang
           : 'Are you sure you want to reset all palpation templates to defaults? This cannot be undone.',
       variant: 'destructive',
     });
-    if (ok) resetSpineTemplatesMutation.mutate();
+    if (ok) {
+      resetSpineTemplatesMutation.mutate();
+    }
   };
 
   return (

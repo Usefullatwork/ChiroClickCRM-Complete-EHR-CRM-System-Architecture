@@ -521,7 +521,9 @@ export const PatientExercises = ({ patientId, patientName }) => {
       variant: 'warning',
       confirmText: 'Fullfør',
     });
-    if (ok) completeMutation.mutate(prescription.id);
+    if (ok) {
+      completeMutation.mutate(prescription.id);
+    }
   };
 
   return (

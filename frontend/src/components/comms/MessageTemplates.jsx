@@ -396,7 +396,9 @@ export default function MessageTemplates({ language = 'no' }) {
       return;
     }
     const ok = await confirm({ title: t.confirmDelete, variant: 'destructive' });
-    if (ok) deleteMutation.mutate(template.id);
+    if (ok) {
+      deleteMutation.mutate(template.id);
+    }
   };
 
   // Insert variable into body

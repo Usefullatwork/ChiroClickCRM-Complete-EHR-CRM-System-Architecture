@@ -16,7 +16,7 @@ import {
   TrendingUp,
   Send,
 } from 'lucide-react';
-import { patientPortalAPI } from '../../services/api';
+// patientPortalAPI available via ../../services/api if needed
 import logger from '../../utils/logger';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
@@ -246,7 +246,9 @@ export default function PortalOutcomes() {
   };
 
   const handleSubmit = async () => {
-    if (!activeQuestionnaire) return;
+    if (!activeQuestionnaire) {
+      return;
+    }
 
     try {
       setSubmitting(true);
@@ -430,7 +432,9 @@ export default function PortalOutcomes() {
             <h2 className="text-sm font-medium text-gray-500 px-1">Tilgjengelige skjemaer</h2>
             {pendingTypes.map((type) => {
               const qt = QUESTIONNAIRE_TYPES[type];
-              if (!qt) return null;
+              if (!qt) {
+                return null;
+              }
               return (
                 <button
                   key={type}
