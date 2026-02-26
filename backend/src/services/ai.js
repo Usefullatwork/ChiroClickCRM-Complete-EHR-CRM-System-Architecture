@@ -157,6 +157,8 @@ const AI_MODEL_SOAP = process.env.AI_MODEL_SOAP || null;
 const AI_MODEL_REDFLAGS = process.env.AI_MODEL_REDFLAGS || null;
 const AI_MODEL_FAST = process.env.AI_MODEL_FAST || null;
 const AI_MODEL_MEDICAL = process.env.AI_MODEL_MEDICAL || null;
+const AI_MODEL_COMMS = process.env.AI_MODEL_COMMS || null;
+const AI_MODEL_LETTERS = process.env.AI_MODEL_LETTERS || null;
 
 // Smart model lifecycle: keep_alive controls how long models stay in VRAM
 // On 16GB systems, only 1 model should be resident at a time
@@ -337,20 +339,20 @@ const MODEL_CONFIG = {
  * Task-based model routing
  * Routes different clinical tasks to the most appropriate specialized model
  *
- * Routing strategy (MoMA-inspired, all Qwen2.5 architecture):
- * - Norwegian text generation → chiro-norwegian (Qwen2.5-7B)
- * - Safety-critical analysis → chiro-medical (Qwen2.5-3B)
+ * Routing strategy (v4 split — clinical vs communication):
+ * - SOAP, letters, reports, red flags → chiro-no-lora-v4 (best clinical quality)
+ * - SMS/communication → chiro-no-lora-v2 (concise, length-appropriate)
+ * - Norwegian text generation → chiro-norwegian-lora-v2
+ * - Medical reasoning → chiro-medical (Qwen2.5-3B)
  * - Fast completions → chiro-fast (Qwen2.5-1.5B)
- * - General clinical → chiro-no (Qwen2.5-7B)
  */
 const MODEL_ROUTING = {
-  // SOAP & clinical documentation → chiro-norwegian-lora-v2 (enriched system prompt)
-  // Fallback chain: v2 → v1 → chiro-norwegian base
-  soap_notes: 'chiro-norwegian-lora-v2',
-  clinical_summary: 'chiro-norwegian-lora-v2',
-  journal_organization: 'chiro-norwegian-lora-v2',
-  diagnosis_suggestion: 'chiro-no-lora-v2',
-  sick_leave: 'chiro-no-lora-v2',
+  // SOAP & clinical documentation → v4 (90% pass rate, +10% vs v2)
+  soap_notes: 'chiro-no-lora-v4',
+  clinical_summary: 'chiro-no-lora-v4',
+  journal_organization: 'chiro-no-lora-v4',
+  diagnosis_suggestion: 'chiro-no-lora-v4',
+  sick_leave: 'chiro-no-lora-v4',
 
   // Fast autocomplete → chiro-fast ORIGINAL (LoRA hurts small models)
   autocomplete: 'chiro-fast',
@@ -358,22 +360,25 @@ const MODEL_ROUTING = {
   abbreviation: 'chiro-fast',
   quick_suggestion: 'chiro-fast',
 
+  // Letters & reports → v4 (85.7% pass rate, +14% vs v2)
+  referral_letter: 'chiro-no-lora-v4',
+  report_writing: 'chiro-no-lora-v4',
+
+  // Communication (SMS) → v2 (81.2% pass rate, concise output)
+  patient_communication: 'chiro-no-lora-v2',
+  patient_education: 'chiro-no-lora-v2',
+  consent_form: 'chiro-no-lora-v2',
+
   // Norwegian language specialist
   norwegian_text: 'chiro-norwegian-lora-v2',
-  patient_communication: 'chiro-norwegian-lora-v2',
-  referral_letter: 'chiro-norwegian-lora-v2',
-  report_writing: 'chiro-norwegian-lora-v2',
-  patient_education: 'chiro-norwegian-lora-v2',
-  consent_form: 'chiro-norwegian-lora-v2',
 
-  // Safety & red flags → chiro-no-lora-v2 (enriched red flag guidance)
-  // Fallback chain: v2 → v1 → chiro-medical base
-  red_flag_analysis: 'chiro-no-lora-v2',
+  // Safety & red flags → v4 for analysis, chiro-medical for reasoning
+  red_flag_analysis: 'chiro-no-lora-v4',
   differential_diagnosis: 'chiro-medical',
-  treatment_safety: 'chiro-no-lora-v2',
+  treatment_safety: 'chiro-no-lora-v4',
   clinical_reasoning: 'chiro-medical',
   medication_interaction: 'chiro-medical',
-  contraindication_check: 'chiro-no-lora-v2',
+  contraindication_check: 'chiro-no-lora-v4',
 };
 
 /**
@@ -394,6 +399,10 @@ const TASK_ENV_OVERRIDES = {
   differential_diagnosis: AI_MODEL_MEDICAL,
   clinical_reasoning: AI_MODEL_MEDICAL,
   medication_interaction: AI_MODEL_MEDICAL,
+  patient_communication: AI_MODEL_COMMS,
+  patient_education: AI_MODEL_COMMS,
+  referral_letter: AI_MODEL_LETTERS,
+  report_writing: AI_MODEL_LETTERS,
 };
 
 /**
@@ -507,26 +516,24 @@ const calculateConfidence = (response, taskType, modelName) => {
   // Factor 2: Task-model alignment (strip LoRA suffixes for matching)
   const baseModel = modelName?.replace(/-lora(-v\d+)?$/, '') || '';
   const modelTaskFit = {
-    'chiro-medical': [
-      'red_flag_analysis',
-      'diagnosis_suggestion',
-      'differential_diagnosis',
-      'clinical_reasoning',
-    ],
-    'chiro-norwegian': [
-      'soap_notes',
-      'clinical_summary',
-      'referral_letter',
-      'patient_communication',
-      'report_writing',
-    ],
+    'chiro-medical': ['differential_diagnosis', 'clinical_reasoning', 'medication_interaction'],
+    'chiro-norwegian': ['norwegian_text'],
     'chiro-fast': ['autocomplete', 'spell_check', 'abbreviation', 'quick_suggestion'],
     'chiro-no': [
-      'general',
+      'soap_notes',
+      'clinical_summary',
       'journal_organization',
+      'diagnosis_suggestion',
+      'sick_leave',
+      'referral_letter',
+      'report_writing',
+      'red_flag_analysis',
       'treatment_safety',
       'contraindication_check',
-      'sick_leave',
+      'patient_communication',
+      'patient_education',
+      'consent_form',
+      'general',
     ],
   };
   if (modelTaskFit[baseModel]?.includes(taskType)) {
@@ -713,6 +720,18 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
     }
   }
 
+  // Step 2b: Add length constraints for communication/SMS tasks
+  let effectiveSystemPrompt = systemPrompt;
+  if (taskType === 'patient_communication') {
+    const smsConstraint =
+      'VIKTIG: Skriv en kort SMS-melding. Maks 160 tegn (én SMS). ' +
+      'Bruk direkte, vennlig språk. Ingen hilsener, ingen signatur, bare selve meldingen. ' +
+      'Svar KUN med selve SMS-teksten.';
+    effectiveSystemPrompt = effectiveSystemPrompt
+      ? `${effectiveSystemPrompt}\n\n${smsConstraint}`
+      : smsConstraint;
+  }
+
   // Step 3: Generate completion via Ollama (local)
   // Smart lifecycle: track loaded model for VRAM management
   // Includes retry logic: 1 retry with 2s backoff for timeout errors only
@@ -724,7 +743,9 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
 
   const ollamaPayload = {
     model,
-    prompt: systemPrompt ? `${systemPrompt}\n\n${augmentedPrompt}` : augmentedPrompt,
+    prompt: effectiveSystemPrompt
+      ? `${effectiveSystemPrompt}\n\n${augmentedPrompt}`
+      : augmentedPrompt,
     stream: false,
     keep_alive: KEEP_ALIVE,
     options: {

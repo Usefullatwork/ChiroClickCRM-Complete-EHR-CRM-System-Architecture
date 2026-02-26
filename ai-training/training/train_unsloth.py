@@ -19,6 +19,7 @@ import argparse
 import gc
 import logging
 import os
+import signal
 import sys
 import time
 from datetime import datetime
@@ -110,7 +111,7 @@ TRAINING_CONFIG = {
     'save_steps': 200,
     'eval_strategy': "steps",
     'eval_steps': 200,
-    'save_total_limit': 3,
+    'save_total_limit': 5,
 }
 
 # Low-VRAM overrides (for 6GB GPUs like RTX 2060)
@@ -363,6 +364,8 @@ def train(
     epochs=None,
     learning_rate=None,
     batch_size=None,
+    gradient_accumulation_steps=None,
+    save_steps=None,
     low_vram=False,
     max_seq_length=None,
     resume_from_checkpoint=False,
@@ -408,6 +411,14 @@ def train(
         t_config['learning_rate'] = learning_rate
     if batch_size is not None:
         t_config['per_device_train_batch_size'] = batch_size
+    if gradient_accumulation_steps is not None:
+        t_config['gradient_accumulation_steps'] = gradient_accumulation_steps
+    if save_steps is not None:
+        t_config['save_steps'] = save_steps
+        t_config['eval_steps'] = save_steps  # keep eval aligned with save
+
+    logger.info(f"Effective batch size: {t_config['per_device_train_batch_size']} x {t_config['gradient_accumulation_steps']} = {t_config['per_device_train_batch_size'] * t_config['gradient_accumulation_steps']}")
+    logger.info(f"Checkpoint interval: every {t_config['save_steps']} steps")
 
     # Load model
     load_start = time.time()
@@ -490,10 +501,28 @@ def train(
         args=sft_config,
     )
 
-    # Train with OOM recovery
+    # Train with OOM recovery and signal handling
     logger.info("=" * 60)
     logger.info("STARTING TRAINING")
     logger.info("=" * 60)
+
+    # Signal handler for OS-level kills (Windows OOM kills the process silently)
+    def _sigterm_handler(signum, frame):
+        sig_name = signal.Signals(signum).name if hasattr(signal, 'Signals') else str(signum)
+        logger.error(f"Process received {sig_name} — likely OS OOM kill or external termination")
+        try:
+            peak = torch.cuda.max_memory_allocated(0) / 1e9
+            logger.error(f"Peak GPU memory at termination: {peak:.2f} GB")
+        except Exception:
+            pass
+        sys.exit(137)
+
+    prev_sigterm = signal.getsignal(signal.SIGTERM)
+    signal.signal(signal.SIGTERM, _sigterm_handler)
+
+    # Reset peak memory tracking for this training run
+    if torch.cuda.is_available():
+        torch.cuda.reset_peak_memory_stats(0)
 
     train_start = time.time()
     try:
@@ -534,12 +563,25 @@ def train(
 
             try:
                 trainer.train()
-            except RuntimeError as e2:
+            except Exception as e2:
                 logger.error(f"Training failed even with reduced settings: {e2}")
                 return None, None, None
         else:
             logger.error(f"Training error: {e}")
             return None, None, None
+    except Exception as e:
+        logger.error(f"Unexpected training error ({type(e).__name__}): {e}")
+        return None, None, None
+    finally:
+        # Log peak memory regardless of success/failure
+        try:
+            if torch.cuda.is_available():
+                peak = torch.cuda.max_memory_allocated(0) / 1e9
+                logger.info(f"Peak GPU memory during training: {peak:.2f} GB")
+        except Exception:
+            pass
+        # Restore previous signal handler
+        signal.signal(signal.SIGTERM, prev_sigterm)
 
     train_time = time.time() - train_start
     logger.info(f"Training completed in {train_time/60:.1f} minutes")
@@ -641,6 +683,10 @@ Examples:
                         help='Resume training from latest checkpoint in output dir')
     parser.add_argument('--no-packing', action='store_true',
                         help='Disable sequence packing (recommended for 7B models on <=12GB VRAM)')
+    parser.add_argument('--gradient-accumulation-steps', type=int, default=None,
+                        help='Override gradient accumulation steps (default: 4, or from config)')
+    parser.add_argument('--save-steps', type=int, default=None,
+                        help='Override checkpoint save interval (default: 200 steps)')
 
     args = parser.parse_args()
 
@@ -667,6 +713,8 @@ Examples:
         epochs=args.epochs,
         learning_rate=args.lr,
         batch_size=args.batch_size,
+        gradient_accumulation_steps=args.gradient_accumulation_steps,
+        save_steps=args.save_steps,
         low_vram=args.low_vram,
         max_seq_length=args.max_seq_length,
         resume_from_checkpoint=args.resume,
