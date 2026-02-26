@@ -1,0 +1,161 @@
+{
+  "version": "v4",
+  "file_stats": {
+    "data\\raw\\clinical-fields-training.jsonl": {
+      "loaded": 103,
+      "errors": 0
+    },
+    "data\\raw\\communication-tones-training.jsonl": {
+      "loaded": 210,
+      "errors": 0
+    },
+    "data\\raw\\letters-training.jsonl": {
+      "loaded": 14,
+      "errors": 0
+    },
+    "data\\raw\\training-data.jsonl": {
+      "loaded": 58,
+      "errors": 0
+    },
+    "data\\raw\\training-expansion.jsonl": {
+      "loaded": 21,
+      "errors": 0
+    },
+    "data\\raw\\v4-targeted.jsonl": {
+      "loaded": 96,
+      "errors": 0
+    },
+    "data\\mined\\all-mined.jsonl": {
+      "loaded": 7223,
+      "errors": 0
+    },
+    "data\\mined\\comms-norwegian-v2-synthetic.jsonl": {
+      "loaded": 200,
+      "errors": 0
+    },
+    "data\\mined\\concise-responses.jsonl": {
+      "loaded": 56,
+      "errors": 0
+    },
+    "data\\mined\\edge-cases-synthetic.jsonl": {
+      "loaded": 49,
+      "errors": 0
+    },
+    "data\\mined\\english-mined.jsonl": {
+      "loaded": 3020,
+      "errors": 0
+    },
+    "data\\mined\\icpc2-codes-synthetic.jsonl": {
+      "loaded": 205,
+      "errors": 0
+    },
+    "data\\mined\\icpc2-v2-synthetic.jsonl": {
+      "loaded": 300,
+      "errors": 0
+    },
+    "data\\mined\\icpc2-v3-targeted.jsonl": {
+      "loaded": 80,
+      "errors": 0
+    },
+    "data\\mined\\medical-safety-mined.jsonl": {
+      "loaded": 732,
+      "errors": 0
+    },
+    "data\\mined\\norwegian-mined.jsonl": {
+      "loaded": 4203,
+      "errors": 0
+    },
+    "data\\mined\\quick-fields-mined.jsonl": {
+      "loaded": 845,
+      "errors": 0
+    },
+    "data\\mined\\red-flags-synthetic.jsonl": {
+      "loaded": 301,
+      "errors": 0
+    },
+    "data\\mined\\red-flags-v2-synthetic.jsonl": {
+      "loaded": 300,
+      "errors": 0
+    },
+    "data\\mined\\structured-output.jsonl": {
+      "loaded": 60,
+      "errors": 0
+    },
+    "data\\mined\\website-conditions-v2.jsonl": {
+      "loaded": 7962,
+      "errors": 0
+    },
+    "data\\expanded_norwegian_letters.jsonl": {
+      "loaded": 37,
+      "errors": 0
+    },
+    "data\\norwegian_letters.jsonl": {
+      "loaded": 11,
+      "errors": 0
+    }
+  },
+  "filter_stats": {
+    "total": 26086,
+    "kept": 17235,
+    "too_short": 3,
+    "duplicate": 8802,
+    "contaminated": 46
+  },
+  "v4_caps": {
+    "patient_education": 300,
+    "patient_communication": 500,
+    "clinical_summary": 400,
+    "red_flag_analysis": null,
+    "differential_diagnosis": null
+  },
+  "v4_upsample_factor": 3,
+  "v4_upsample_patterns": [
+    "red-flags-v2-synthetic.jsonl",
+    "icpc2-v2-synthetic.jsonl",
+    "icpc2-v3-targeted.jsonl",
+    "comms-norwegian-v2-synthetic.jsonl"
+  ],
+  "v4_cap_stats": {
+    "non_website_count": 11931,
+    "website_before_caps": 7944,
+    "website_clinical_summary": "984 -> 400 (cap=400)",
+    "website_differential_diagnosis": "1120 -> 1120 (cap=uncapped)",
+    "website_patient_communication": "2695 -> 500 (cap=500)",
+    "website_patient_education": "1172 -> 300 (cap=300)",
+    "website_red_flag_analysis": "1973 -> 1973 (cap=uncapped)",
+    "website_after_caps": 4293,
+    "total_after_caps": 16224
+  },
+  "datasets": {
+    "all-clean": {
+      "total": 17236,
+      "train": 13788,
+      "validation": 1723,
+      "test": 1725
+    },
+    "quick-fields": {
+      "total": 6717,
+      "train": 5373,
+      "validation": 671,
+      "test": 673
+    },
+    "medical-safety": {
+      "total": 8441,
+      "train": 6752,
+      "validation": 844,
+      "test": 845
+    },
+    "norwegian-clinical": {
+      "total": 7909,
+      "train": 6327,
+      "validation": 790,
+      "test": 792
+    },
+    "general-clinical": {
+      "total": 13585,
+      "train": 10868,
+      "validation": 1358,
+      "test": 1359
+    }
+  }
+}

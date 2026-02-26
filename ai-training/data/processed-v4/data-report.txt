@@ -1,0 +1,57 @@
+ChiroClickCRM v4 Curated Training Data Report
+==================================================
+
+v4 Strategy: Task-type caps + 3x upsampling
+Upsample factor: 3x
+Task-type caps: {"patient_education": 300, "patient_communication": 500, "clinical_summary": 400, "red_flag_analysis": null, "differential_diagnosis": null}
+
+Source Files:
+  data\raw\clinical-fields-training.jsonl: 103 items
+  data\raw\communication-tones-training.jsonl: 210 items
+  data\raw\letters-training.jsonl: 14 items
+  data\raw\training-data.jsonl: 58 items
+  data\raw\training-expansion.jsonl: 21 items
+  data\raw\v4-targeted.jsonl: 96 items
+  data\mined\all-mined.jsonl: 7223 items
+  data\mined\comms-norwegian-v2-synthetic.jsonl: 200 items
+  data\mined\concise-responses.jsonl: 56 items
+  data\mined\edge-cases-synthetic.jsonl: 49 items
+  data\mined\english-mined.jsonl: 3020 items
+  data\mined\icpc2-codes-synthetic.jsonl: 205 items
+  data\mined\icpc2-v2-synthetic.jsonl: 300 items
+  data\mined\icpc2-v3-targeted.jsonl: 80 items
+  data\mined\medical-safety-mined.jsonl: 732 items
+  data\mined\norwegian-mined.jsonl: 4203 items
+  data\mined\quick-fields-mined.jsonl: 845 items
+  data\mined\red-flags-synthetic.jsonl: 301 items
+  data\mined\red-flags-v2-synthetic.jsonl: 300 items
+  data\mined\structured-output.jsonl: 60 items
+  data\mined\website-conditions-v2.jsonl: 7962 items
+  data\expanded_norwegian_letters.jsonl: 37 items
+  data\norwegian_letters.jsonl: 11 items
+
+Total raw: 26086
+Kept after filtering: 17235
+Removed - invalid format: 0
+Removed - duplicates: 8802
+Removed - echo responses: 0
+Removed - too short: 3
+Removed - contaminated: 46
+
+v4 Cap Stats:
+  non_website_count: 11931
+  total_after_caps: 16224
+  website_after_caps: 4293
+  website_before_caps: 7944
+  website_clinical_summary: 984 -> 400 (cap=400)
+  website_differential_diagnosis: 1120 -> 1120 (cap=uncapped)
+  website_patient_communication: 2695 -> 500 (cap=500)
+  website_patient_education: 1172 -> 300 (cap=300)
+  website_red_flag_analysis: 1973 -> 1973 (cap=uncapped)
+
+Datasets:
+  all-clean: 17236 (train=13788, val=1723, test=1725)
+  quick-fields: 6717 (train=5373, val=671, test=673)
+  medical-safety: 8441 (train=6752, val=844, test=845)
+  norwegian-clinical: 7909 (train=6327, val=790, test=792)
+  general-clinical: 13585 (train=10868, val=1358, test=1359)

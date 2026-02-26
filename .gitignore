@@ -76,9 +76,11 @@ nul
 bin/ollama/
 bin/pgsql/
 
-# PGlite data directory (runtime database)
-data/pglite/
-data/ollama/
+# Runtime data directories (PGlite, Ollama, backups, uploads)
+/data/
+
+# Local model weights (too large for git)
+/models/
 
 # Session cookies
 cookies.txt
