@@ -9,4 +9,5 @@ process.env.DB_ENGINE = 'pglite';
 process.env.ENCRYPTION_KEY = 'abcdefghijklmnopqrstuvwxyz123456';
 process.env.JWT_SECRET = 'test_jwt_secret';
 process.env.AI_ENABLED = 'false';
+process.env.RAG_ENABLED = 'false';
 process.env.GUARDRAILS_ENABLED = 'false';

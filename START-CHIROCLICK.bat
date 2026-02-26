@@ -100,6 +100,13 @@ echo [1/4] Skipping Ollama AI (disabled)
 goto START_BACKEND
 
 :START_BACKEND
+:: Backup PGlite database before starting
+if exist "%~dp0data\pglite\PG_VERSION" (
+    echo.
+    echo  Backing up PGlite database...
+    powershell -Command "& { $ts = Get-Date -Format 'yyyy-MM-dd-HHmm'; $src = '%~dp0data\pglite'; $dir = '%~dp0data\backups'; if (!(Test-Path $dir)) { New-Item -ItemType Directory -Path $dir | Out-Null }; $dest = Join-Path $dir ('pglite-' + $ts); Copy-Item $src $dest -Recurse -Force; Write-Host ('  Backup: ' + $dest) }" 2>nul || echo  [Note] Backup skipped
+)
+
 :: Start Backend
 echo.
 if "%AI_MODE%"=="enabled" (

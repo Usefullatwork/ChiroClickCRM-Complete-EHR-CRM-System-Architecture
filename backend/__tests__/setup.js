@@ -12,6 +12,9 @@ process.env.CACHE_ENGINE = 'memory';
 process.env.DB_ENGINE = 'pglite';
 process.env.ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'abcdefghijklmnopqrstuvwxyz123456';
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'test_jwt_secret';
+process.env.AI_ENABLED = 'false';
+process.env.RAG_ENABLED = 'false';
+process.env.GUARDRAILS_ENABLED = 'false';
 process.env.DATABASE_URL =
   process.env.TEST_DATABASE_URL ||
   'postgresql://postgres:postgres@localhost:5432/chiroclickcrm_test';
