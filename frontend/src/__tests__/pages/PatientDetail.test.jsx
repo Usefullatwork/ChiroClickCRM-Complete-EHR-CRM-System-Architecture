@@ -51,6 +51,17 @@ vi.mock('../../i18n', () => ({
         savePatient: 'Save',
         consentGiven: 'Consent Given',
         sms: 'SMS',
+        treatmentPreferences: 'Treatment Preferences',
+        needles: 'Needles',
+        adjustments: 'Adjustments',
+        neckAdjustments: 'Neck Adjustments',
+        prefOk: 'OK',
+        prefNotOk: 'Not OK',
+        prefNotCleared: 'Not cleared',
+        preferenceNotes: 'Preference notes',
+        treatmentNotesPlaceholder: 'Any notes about treatment preferences...',
+        recentVisits: 'Recent Visits',
+        noVisitsRecorded: 'No visits recorded',
       };
       return map[key] || key;
     },

@@ -9,9 +9,11 @@
 import { Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ErrorBoundary } from './ErrorBoundary';
+import { useTranslation } from '../i18n';
 
 function PageErrorFallback({ pageName }) {
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
 
   return (
     <div className="flex items-center justify-center min-h-[50vh] px-4">
@@ -33,11 +35,14 @@ function PageErrorFallback({ pageName }) {
         </div>
 
         <h2 className="text-lg font-semibold text-gray-900 mb-2">
-          {pageName ? `Feil i ${pageName}` : 'Noe gikk galt'}
+          {pageName ? `${t('pageErrorIn', 'Feil i')} ${pageName}` : t('errorTitle')}
         </h2>
 
         <p className="text-gray-600 mb-6 text-sm">
-          En feil oppstod på denne siden. Resten av applikasjonen fungerer fortsatt normalt.
+          {t(
+            'pageErrorDesc',
+            'An error occurred on this page. The rest of the application still works normally.'
+          )}
         </p>
 
         <div className="flex gap-3 justify-center">
@@ -45,13 +50,13 @@ function PageErrorFallback({ pageName }) {
             onClick={() => navigate(-1)}
             className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
           >
-            Tilbake
+            {t('back')}
           </button>
           <button
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm"
           >
-            Last siden på nytt
+            {t('reloadPage')}
           </button>
         </div>
       </div>

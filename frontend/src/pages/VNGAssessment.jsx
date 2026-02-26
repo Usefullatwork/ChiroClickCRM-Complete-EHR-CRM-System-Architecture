@@ -10,7 +10,7 @@ import toast from '../utils/toast';
 export default function VNGAssessment() {
   const { patientId } = useParams();
   const navigate = useNavigate();
-  const { lang: language, setLang: setLanguage } = useTranslation();
+  const { t, lang: language, setLang: setLanguage } = useTranslation('clinical');
   const [vngData, setVngData] = useState(getDefaultVNGData());
   const [isSaving, setIsSaving] = useState(false);
   const [patient, setPatient] = useState(null);
@@ -44,10 +44,10 @@ export default function VNGAssessment() {
         assessment_data: vngData,
       };
       await vestibularAPI.create(payload);
-      toast.success(language === 'no' ? 'VNG-undersøkelse lagret!' : 'VNG assessment saved!');
+      toast.success(t('vngSaved'));
     } catch (error) {
       logger.error('Error saving VNG data:', error);
-      toast.error(language === 'no' ? 'Feil ved lagring' : 'Error saving');
+      toast.error(t('vngSaveError'));
     } finally {
       setIsSaving(false);
     }
@@ -70,13 +70,9 @@ export default function VNGAssessment() {
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">
-                {language === 'no' ? 'VNG-undersøkelse' : 'VNG Assessment'}
-              </h1>
+              <h1 className="text-xl font-semibold text-gray-900">{t('vngAssessment')}</h1>
               {isLoadingPatient ? (
-                <p className="text-sm text-gray-400">
-                  {language === 'no' ? 'Laster...' : 'Loading...'}
-                </p>
+                <p className="text-sm text-gray-400">{t('loading')}</p>
               ) : (
                 patient && <p className="text-sm text-gray-500">{patient.name}</p>
               )}
@@ -113,7 +109,7 @@ export default function VNGAssessment() {
               className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
             >
               <Printer className="w-4 h-4" />
-              {language === 'no' ? 'Skriv ut' : 'Print'}
+              {t('print')}
             </button>
 
             <button
@@ -122,13 +118,7 @@ export default function VNGAssessment() {
               className="flex items-center gap-2 px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 rounded-lg transition-colors"
             >
               <Save className="w-4 h-4" />
-              {isSaving
-                ? language === 'no'
-                  ? 'Lagrer...'
-                  : 'Saving...'
-                : language === 'no'
-                  ? 'Lagre'
-                  : 'Save'}
+              {isSaving ? t('saving') : t('save')}
             </button>
           </div>
         </div>

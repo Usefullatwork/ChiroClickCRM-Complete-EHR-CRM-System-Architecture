@@ -401,7 +401,7 @@ export default function PatientDetail() {
 
           {/* Treatment Preferences */}
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-4">Behandlingspreferanser</h2>
+            <h2 className="text-lg font-semibold mb-4">{t('treatmentPreferences')}</h2>
             <div className="space-y-4">
               {/* Preference indicators when not editing */}
               {!isEditing ? (
@@ -433,13 +433,13 @@ export default function PatientDetail() {
                       </span>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">Nåler</p>
+                      <p className="text-sm text-gray-600">{t('needles')}</p>
                       <p className="font-medium">
                         {patient.treatment_pref_needles === true
-                          ? 'OK'
+                          ? t('prefOk')
                           : patient.treatment_pref_needles === false
-                            ? 'Ikke OK'
-                            : 'Ikke avklart'}
+                            ? t('prefNotOk')
+                            : t('prefNotCleared')}
                       </p>
                     </div>
                   </div>
@@ -471,13 +471,13 @@ export default function PatientDetail() {
                       </span>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">Justeringer</p>
+                      <p className="text-sm text-gray-600">{t('adjustments')}</p>
                       <p className="font-medium">
                         {patient.treatment_pref_adjustments === true
-                          ? 'OK'
+                          ? t('prefOk')
                           : patient.treatment_pref_adjustments === false
-                            ? 'Ikke OK'
-                            : 'Ikke avklart'}
+                            ? t('prefNotOk')
+                            : t('prefNotCleared')}
                       </p>
                     </div>
                   </div>
@@ -509,13 +509,13 @@ export default function PatientDetail() {
                       </span>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">Nakkejusteringer</p>
+                      <p className="text-sm text-gray-600">{t('neckAdjustments')}</p>
                       <p className="font-medium">
                         {patient.treatment_pref_neck_adjustments === true
-                          ? 'OK'
+                          ? t('prefOk')
                           : patient.treatment_pref_neck_adjustments === false
-                            ? 'Ikke OK'
-                            : 'Ikke avklart'}
+                            ? t('prefNotOk')
+                            : t('prefNotCleared')}
                       </p>
                     </div>
                   </div>
@@ -524,7 +524,7 @@ export default function PatientDetail() {
                 /* Edit mode */
                 <div className="space-y-3">
                   <div className="flex items-center gap-6">
-                    <span className="text-sm font-medium text-gray-700 w-32">Nåler:</span>
+                    <span className="text-sm font-medium text-gray-700 w-32">{t('needles')}:</span>
                     <div className="flex items-center gap-4">
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
@@ -536,7 +536,7 @@ export default function PatientDetail() {
                           }
                           className="w-4 h-4 text-green-600"
                         />
-                        <span className="text-sm text-green-700">OK</span>
+                        <span className="text-sm text-green-700">{t('prefOk')}</span>
                       </label>
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
@@ -548,7 +548,7 @@ export default function PatientDetail() {
                           }
                           className="w-4 h-4 text-red-600"
                         />
-                        <span className="text-sm text-red-700">Ikke OK</span>
+                        <span className="text-sm text-red-700">{t('prefNotOk')}</span>
                       </label>
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
@@ -560,13 +560,15 @@ export default function PatientDetail() {
                           }
                           className="w-4 h-4 text-gray-600"
                         />
-                        <span className="text-sm text-gray-500">Ikke avklart</span>
+                        <span className="text-sm text-gray-500">{t('prefNotCleared')}</span>
                       </label>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-6">
-                    <span className="text-sm font-medium text-gray-700 w-32">Justeringer:</span>
+                    <span className="text-sm font-medium text-gray-700 w-32">
+                      {t('adjustments')}:
+                    </span>
                     <div className="flex items-center gap-4">
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
@@ -578,7 +580,7 @@ export default function PatientDetail() {
                           }
                           className="w-4 h-4 text-green-600"
                         />
-                        <span className="text-sm text-green-700">OK</span>
+                        <span className="text-sm text-green-700">{t('prefOk')}</span>
                       </label>
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
@@ -590,7 +592,7 @@ export default function PatientDetail() {
                           }
                           className="w-4 h-4 text-red-600"
                         />
-                        <span className="text-sm text-red-700">Ikke OK</span>
+                        <span className="text-sm text-red-700">{t('prefNotOk')}</span>
                       </label>
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
@@ -602,14 +604,14 @@ export default function PatientDetail() {
                           }
                           className="w-4 h-4 text-gray-600"
                         />
-                        <span className="text-sm text-gray-500">Ikke avklart</span>
+                        <span className="text-sm text-gray-500">{t('prefNotCleared')}</span>
                       </label>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-6">
                     <span className="text-sm font-medium text-gray-700 w-32">
-                      Nakkejusteringer:
+                      {t('neckAdjustments')}:
                     </span>
                     <div className="flex items-center gap-4">
                       <label className="flex items-center gap-2 cursor-pointer">
@@ -622,7 +624,7 @@ export default function PatientDetail() {
                           }
                           className="w-4 h-4 text-green-600"
                         />
-                        <span className="text-sm text-green-700">OK</span>
+                        <span className="text-sm text-green-700">{t('prefOk')}</span>
                       </label>
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
@@ -634,7 +636,7 @@ export default function PatientDetail() {
                           }
                           className="w-4 h-4 text-red-600"
                         />
-                        <span className="text-sm text-red-700">Ikke OK</span>
+                        <span className="text-sm text-red-700">{t('prefNotOk')}</span>
                       </label>
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
@@ -646,7 +648,7 @@ export default function PatientDetail() {
                           }
                           className="w-4 h-4 text-gray-600"
                         />
-                        <span className="text-sm text-gray-500">Ikke avklart</span>
+                        <span className="text-sm text-gray-500">{t('prefNotCleared')}</span>
                       </label>
                     </div>
                   </div>
@@ -655,7 +657,7 @@ export default function PatientDetail() {
 
               {/* Notes */}
               <div className="mt-4">
-                <label className="block text-sm text-gray-600 mb-1">Preferansenotater</label>
+                <label className="block text-sm text-gray-600 mb-1">{t('preferenceNotes')}</label>
                 {isEditing ? (
                   <textarea
                     value={formData.treatment_pref_notes || ''}
@@ -663,7 +665,7 @@ export default function PatientDetail() {
                       setFormData({ ...formData, treatment_pref_notes: e.target.value })
                     }
                     rows={2}
-                    placeholder="Eventuelle notater om behandlingspreferanser..."
+                    placeholder={t('treatmentNotesPlaceholder')}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   />
                 ) : (
@@ -675,9 +677,9 @@ export default function PatientDetail() {
 
           {/* Recent Encounters */}
           <div data-testid="patient-detail-tab-visits" className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-4">Recent Visits</h2>
+            <h2 className="text-lg font-semibold mb-4">{t('recentVisits')}</h2>
             {encounters.length === 0 ? (
-              <p className="text-gray-600">No visits recorded</p>
+              <p className="text-gray-600">{t('noVisitsRecorded')}</p>
             ) : (
               <div className="space-y-3">
                 {encounters.slice(0, 5).map((encounter) => (

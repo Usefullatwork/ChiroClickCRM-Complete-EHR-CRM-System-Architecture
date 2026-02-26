@@ -203,6 +203,9 @@ export const common = {
     tryAgain: 'Try again',
     reloadPage: 'Reload page',
     pageErrorMessage: 'This page encountered an error',
+    pageErrorIn: 'Error in',
+    pageErrorDesc:
+      'An error occurred on this page. The rest of the application still works normally.',
   },
   no: {
     save: 'Lagre',
@@ -408,5 +411,8 @@ export const common = {
     tryAgain: 'Prøv igjen',
     reloadPage: 'Last inn siden på nytt',
     pageErrorMessage: 'Denne siden fikk en feil',
+    pageErrorIn: 'Feil i',
+    pageErrorDesc:
+      'En feil oppstod på denne siden. Resten av applikasjonen fungerer fortsatt normalt.',
   },
 };

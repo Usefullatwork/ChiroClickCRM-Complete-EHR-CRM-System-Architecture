@@ -68,6 +68,7 @@ function PageLoader() {
 function App() {
   const [isAuthReady, setIsAuthReady] = useState(false);
   const { showHelp, setShowHelp } = useGlobalKeyboardShortcuts();
+  const { t } = useTranslation('navigation');
 
   // Auto-login on startup
   useEffect(() => {
@@ -120,7 +121,7 @@ function App() {
           <Route
             index
             element={
-              <PageErrorBoundary pageName="Dashboard">
+              <PageErrorBoundary pageName={t('dashboard')}>
                 <Dashboard />
               </PageErrorBoundary>
             }
@@ -128,7 +129,7 @@ function App() {
           <Route
             path="patients"
             element={
-              <PageErrorBoundary pageName="Pasienter">
+              <PageErrorBoundary pageName={t('patients')}>
                 <Patients />
               </PageErrorBoundary>
             }
@@ -136,7 +137,7 @@ function App() {
           <Route
             path="patients/new"
             element={
-              <PageErrorBoundary pageName="Ny pasient">
+              <PageErrorBoundary pageName={t('newPatient')}>
                 <NewPatient />
               </PageErrorBoundary>
             }
@@ -144,7 +145,7 @@ function App() {
           <Route
             path="patients/:id"
             element={
-              <PageErrorBoundary pageName="Pasientdetaljer">
+              <PageErrorBoundary pageName={t('patientDetail')}>
                 <PatientDetail />
               </PageErrorBoundary>
             }
@@ -152,7 +153,7 @@ function App() {
           <Route
             path="patients/:patientId/encounter"
             element={
-              <PageErrorBoundary pageName="Konsultasjon">
+              <PageErrorBoundary pageName={t('encounter')}>
                 <ClinicalEncounter />
               </PageErrorBoundary>
             }
@@ -160,7 +161,7 @@ function App() {
           <Route
             path="patients/:patientId/encounter/:encounterId"
             element={
-              <PageErrorBoundary pageName="Konsultasjon">
+              <PageErrorBoundary pageName={t('encounter')}>
                 <ClinicalEncounter />
               </PageErrorBoundary>
             }
@@ -168,7 +169,7 @@ function App() {
           <Route
             path="patients/:patientId/easy-assessment"
             element={
-              <PageErrorBoundary pageName="Hurtigvurdering">
+              <PageErrorBoundary pageName={t('easyAssessment')}>
                 <EasyAssessment />
               </PageErrorBoundary>
             }
@@ -176,7 +177,7 @@ function App() {
           <Route
             path="patients/:patientId/easy-assessment/:encounterId"
             element={
-              <PageErrorBoundary pageName="Hurtigvurdering">
+              <PageErrorBoundary pageName={t('easyAssessment')}>
                 <EasyAssessment />
               </PageErrorBoundary>
             }
@@ -184,7 +185,7 @@ function App() {
           <Route
             path="appointments"
             element={
-              <PageErrorBoundary pageName="Timer">
+              <PageErrorBoundary pageName={t('appointments')}>
                 <Appointments />
               </PageErrorBoundary>
             }
@@ -192,7 +193,7 @@ function App() {
           <Route
             path="appointments/new"
             element={
-              <PageErrorBoundary pageName="Ny time">
+              <PageErrorBoundary pageName={t('newAppointment')}>
                 <NewAppointment />
               </PageErrorBoundary>
             }
@@ -200,7 +201,7 @@ function App() {
           <Route
             path="calendar"
             element={
-              <PageErrorBoundary pageName="Kalender">
+              <PageErrorBoundary pageName={t('calendar')}>
                 <Calendar />
               </PageErrorBoundary>
             }
@@ -208,7 +209,7 @@ function App() {
           <Route
             path="patient-flow"
             element={
-              <PageErrorBoundary pageName="Pasientflyt">
+              <PageErrorBoundary pageName={t('patientFlow')}>
                 <PatientFlow />
               </PageErrorBoundary>
             }
@@ -216,7 +217,7 @@ function App() {
           <Route
             path="communications"
             element={
-              <PageErrorBoundary pageName="Kommunikasjon">
+              <PageErrorBoundary pageName={t('communications')}>
                 <Communications />
               </PageErrorBoundary>
             }
@@ -224,7 +225,7 @@ function App() {
           <Route
             path="follow-ups"
             element={
-              <PageErrorBoundary pageName="Oppfølginger">
+              <PageErrorBoundary pageName={t('followUps')}>
                 <FollowUps />
               </PageErrorBoundary>
             }
@@ -232,7 +233,7 @@ function App() {
           <Route
             path="financial"
             element={
-              <PageErrorBoundary pageName="Økonomi">
+              <PageErrorBoundary pageName={t('financial')}>
                 <Financial />
               </PageErrorBoundary>
             }
@@ -240,7 +241,7 @@ function App() {
           <Route
             path="kpi"
             element={
-              <PageErrorBoundary pageName="KPI">
+              <PageErrorBoundary pageName={t('kpi')}>
                 <KPI />
               </PageErrorBoundary>
             }
@@ -248,7 +249,7 @@ function App() {
           <Route
             path="import"
             element={
-              <PageErrorBoundary pageName="Import">
+              <PageErrorBoundary pageName={t('import')}>
                 <Import />
               </PageErrorBoundary>
             }
@@ -256,7 +257,7 @@ function App() {
           <Route
             path="training"
             element={
-              <PageErrorBoundary pageName="AI-trening">
+              <PageErrorBoundary pageName={t('aiTraining')}>
                 <Training />
               </PageErrorBoundary>
             }
@@ -264,7 +265,7 @@ function App() {
           <Route
             path="audit-logs"
             element={
-              <PageErrorBoundary pageName="Revisjonslogg">
+              <PageErrorBoundary pageName={t('auditLogs')}>
                 <AuditLogs />
               </PageErrorBoundary>
             }
@@ -272,7 +273,7 @@ function App() {
           <Route
             path="templates"
             element={
-              <PageErrorBoundary pageName="Maler">
+              <PageErrorBoundary pageName={t('templates')}>
                 <Templates />
               </PageErrorBoundary>
             }
@@ -280,7 +281,7 @@ function App() {
           <Route
             path="settings"
             element={
-              <PageErrorBoundary pageName="Innstillinger">
+              <PageErrorBoundary pageName={t('settings')}>
                 <Settings />
               </PageErrorBoundary>
             }
@@ -288,7 +289,7 @@ function App() {
           <Route
             path="crm"
             element={
-              <PageErrorBoundary pageName="CRM">
+              <PageErrorBoundary pageName={t('crm')}>
                 <CRM />
               </PageErrorBoundary>
             }
@@ -296,7 +297,7 @@ function App() {
           <Route
             path="macros"
             element={
-              <PageErrorBoundary pageName="Makroer">
+              <PageErrorBoundary pageName={t('macros')}>
                 <Macros />
               </PageErrorBoundary>
             }
@@ -304,7 +305,7 @@ function App() {
           <Route
             path="ai-performance"
             element={
-              <PageErrorBoundary pageName="AI-ytelse">
+              <PageErrorBoundary pageName={t('aiPerformance')}>
                 <AIPerformance />
               </PageErrorBoundary>
             }
@@ -316,7 +317,7 @@ function App() {
           path="/portal/login"
           element={
             <Suspense fallback={<PageLoader />}>
-              <PageErrorBoundary pageName="Portal Innlogging">
+              <PageErrorBoundary pageName={t('portalLogin')}>
                 <PatientLogin />
               </PageErrorBoundary>
             </Suspense>
@@ -326,7 +327,7 @@ function App() {
           path="/portal"
           element={
             <Suspense fallback={<PageLoader />}>
-              <PageErrorBoundary pageName="Portal">
+              <PageErrorBoundary pageName={t('portal')}>
                 <PortalDashboard />
               </PageErrorBoundary>
             </Suspense>
@@ -336,7 +337,7 @@ function App() {
           path="/portal/appointments"
           element={
             <Suspense fallback={<PageLoader />}>
-              <PageErrorBoundary pageName="Mine timer">
+              <PageErrorBoundary pageName={t('myAppointments')}>
                 <PortalAppointments />
               </PageErrorBoundary>
             </Suspense>
@@ -346,7 +347,7 @@ function App() {
           path="/portal/outcomes"
           element={
             <Suspense fallback={<PageLoader />}>
-              <PageErrorBoundary pageName="Skjemaer">
+              <PageErrorBoundary pageName={t('forms')}>
                 <PortalOutcomes />
               </PageErrorBoundary>
             </Suspense>
@@ -356,7 +357,7 @@ function App() {
           path="/portal/profile"
           element={
             <Suspense fallback={<PageLoader />}>
-              <PageErrorBoundary pageName="Min profil">
+              <PageErrorBoundary pageName={t('myProfile')}>
                 <PortalProfile />
               </PageErrorBoundary>
             </Suspense>
@@ -366,7 +367,7 @@ function App() {
           path="/portal/exercises"
           element={
             <Suspense fallback={<PageLoader />}>
-              <PageErrorBoundary pageName="Øvelser">
+              <PageErrorBoundary pageName={t('exercises')}>
                 <PatientExercises />
               </PageErrorBoundary>
             </Suspense>
@@ -376,7 +377,7 @@ function App() {
           path="/portal/exercises/:patientId"
           element={
             <Suspense fallback={<PageLoader />}>
-              <PageErrorBoundary pageName="Øvelser">
+              <PageErrorBoundary pageName={t('exercises')}>
                 <PatientExercises />
               </PageErrorBoundary>
             </Suspense>
@@ -386,7 +387,7 @@ function App() {
           path="/portal/mine-ovelser"
           element={
             <Suspense fallback={<PageLoader />}>
-              <PageErrorBoundary pageName="Øvelser">
+              <PageErrorBoundary pageName={t('exercises')}>
                 <PatientExercises />
               </PageErrorBoundary>
             </Suspense>
@@ -398,7 +399,7 @@ function App() {
           path="/kiosk"
           element={
             <Suspense fallback={<PageLoader />}>
-              <PageErrorBoundary pageName="Kiosk">
+              <PageErrorBoundary pageName={t('kiosk')}>
                 <Kiosk />
               </PageErrorBoundary>
             </Suspense>

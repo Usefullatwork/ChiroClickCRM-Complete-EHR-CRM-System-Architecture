@@ -19,6 +19,11 @@ export const clinical = {
     noEncounters: 'No encounters recorded',
     startEncounter: 'Start Encounter',
     completeEncounter: 'Complete Encounter',
+    macros: 'Macros',
+    macrosDescription: 'Manage clinical text macros for quick documentation in SOAP notes.',
+    vngAssessment: 'VNG Assessment',
+    vngSaved: 'VNG assessment saved!',
+    vngSaveError: 'Error saving',
   },
   no: {
     clinicalEncounter: 'Klinisk konsultasjon',
@@ -35,5 +40,10 @@ export const clinical = {
     noEncounters: 'Ingen konsultasjoner registrert',
     startEncounter: 'Start konsultasjon',
     completeEncounter: 'Fullfør konsultasjon',
-  }
-}
+    macros: 'Makroer',
+    macrosDescription: 'Administrer kliniske tekstmakroer for rask dokumentasjon i SOAP-notater.',
+    vngAssessment: 'VNG-undersøkelse',
+    vngSaved: 'VNG-undersøkelse lagret!',
+    vngSaveError: 'Feil ved lagring',
+  },
+};
