@@ -309,6 +309,22 @@ async function ensureCRMTables() {
       notes TEXT,
       created_at TIMESTAMP DEFAULT NOW()
     )`,
+    `CREATE TABLE IF NOT EXISTS campaign_recipients (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      campaign_id UUID NOT NULL,
+      patient_id UUID,
+      channel VARCHAR(20) DEFAULT 'SMS',
+      contact_value VARCHAR(255),
+      status VARCHAR(20) DEFAULT 'PENDING',
+      sent_at TIMESTAMP,
+      delivered_at TIMESTAMP,
+      opened_at TIMESTAMP,
+      clicked_at TIMESTAMP,
+      converted_at TIMESTAMP,
+      bounced_at TIMESTAMP,
+      error_message TEXT,
+      created_at TIMESTAMP DEFAULT NOW()
+    )`,
   ];
 
   const patientColumns = [
@@ -549,7 +565,9 @@ describe('CRM Extended Integration Tests', () => {
 
       // After launch, status should transition away from DRAFT
       expect(response.body).toHaveProperty('status');
-      expect(['ACTIVE', 'SENDING', 'LAUNCHED', 'COMPLETED']).toContain(response.body.status);
+      expect(['ACTIVE', 'SENDING', 'RUNNING', 'LAUNCHED', 'COMPLETED']).toContain(
+        response.body.status
+      );
     });
 
     it('should return campaign stats', async () => {

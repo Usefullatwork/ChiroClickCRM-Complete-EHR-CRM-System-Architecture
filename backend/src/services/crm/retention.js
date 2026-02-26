@@ -26,7 +26,7 @@ export const getRetentionDashboard = async (clinicId, period = '30d') => {
   const metrics = metricsResult.rows[0];
   const retentionRate =
     metrics.total_trackable > 0
-      ? ((metrics.retained / metrics.total_trackable) * 100).toFixed(1)
+      ? Math.min(100, (metrics.retained / metrics.total_trackable) * 100).toFixed(1)
       : 0;
 
   // Lifecycle distribution needs GROUP BY, kept separate

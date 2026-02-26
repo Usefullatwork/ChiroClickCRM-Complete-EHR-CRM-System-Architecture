@@ -101,7 +101,15 @@ export const convertLead = async (req, res) => {
   const { organizationId, user } = req;
   const { id } = req.params;
 
-  const result = await crmService.convertLeadToPatient(organizationId, id, req.body);
+  let result;
+  try {
+    result = await crmService.convertLeadToPatient(organizationId, id, req.body);
+  } catch (err) {
+    if (err.message === 'Lead not found') {
+      return res.status(404).json({ error: 'Lead not found' });
+    }
+    throw err;
+  }
 
   await logAudit({
     organizationId,
