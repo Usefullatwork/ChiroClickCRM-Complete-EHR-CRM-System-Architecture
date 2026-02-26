@@ -9,6 +9,9 @@
 
 import { PGlite } from '@electric-sql/pglite';
 import { getPGliteDataDir, ensureDataDirectories } from './data-paths.js';
+import { rename, mkdir } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
 import logger from '../utils/logger.js';
 
 // Optional contrib extensions
@@ -30,6 +33,33 @@ try {
 let db = null;
 let initialized = false;
 let connectionHealthy = true;
+
+/** Recovery counter — only attempt auto-recovery ONCE per process lifetime */
+let recoveryAttempted = false;
+
+/**
+ * Detect if an error indicates PGlite/WASM corruption.
+ * These errors mean the data directory is unrecoverable and must be replaced.
+ */
+const isCorruptionError = (error) => {
+  const message = (error?.message || '').toLowerCase();
+  const name = (error?.name || '').toLowerCase();
+
+  // WASM RuntimeError (abort signal from the WASM module)
+  if (name === 'runtimeerror' || error instanceof WebAssembly?.RuntimeError) {
+    return true;
+  }
+
+  const corruptionPatterns = [
+    'abort', // WASM abort
+    'invalid_state', // PGlite internal state corruption
+    'could not read', // Filesystem read failure on data files
+    'could not open', // Filesystem open failure on data files
+    'checksum', // WAL or page checksum mismatch
+  ];
+
+  return corruptionPatterns.some((pattern) => message.includes(pattern));
+};
 
 /**
  * Initialize PGlite database
@@ -106,6 +136,59 @@ export const initPGlite = async () => {
     return db;
   } catch (error) {
     logger.error('Failed to initialize PGlite:', error);
+
+    // Auto-recovery: if corruption detected and we haven't tried yet, nuke and retry
+    if (isCorruptionError(error) && !recoveryAttempted) {
+      recoveryAttempted = true;
+      logger.warn('PGlite corruption detected — attempting auto-recovery...');
+
+      // 1. Close the old db instance if possible
+      if (db) {
+        try {
+          await db.close();
+        } catch {
+          // Ignore close errors on a corrupted instance
+        }
+        db = null;
+        initialized = false;
+        connectionHealthy = false;
+      }
+
+      // 2. Rename corrupted data dir to data/pglite-corrupted-{timestamp}
+      const corruptedDir = dataDir;
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const parentDir = path.dirname(corruptedDir);
+      const corruptedDest = path.join(parentDir, `pglite-corrupted-${timestamp}`);
+
+      try {
+        if (existsSync(corruptedDir)) {
+          await rename(corruptedDir, corruptedDest);
+          logger.warn(`Moved corrupted PGlite data to: ${corruptedDest}`);
+        }
+      } catch (moveErr) {
+        logger.error('Failed to move corrupted PGlite data dir:', moveErr.message);
+        throw error; // Can't recover if we can't move the dir
+      }
+
+      // 3. Create a fresh data/pglite directory
+      try {
+        await mkdir(corruptedDir, { recursive: true });
+        logger.info(`Created fresh PGlite data directory: ${corruptedDir}`);
+      } catch (mkdirErr) {
+        logger.error('Failed to create fresh PGlite data dir:', mkdirErr.message);
+        throw error;
+      }
+
+      // 4. Retry initialization ONCE
+      try {
+        logger.info('Retrying PGlite initialization with fresh data directory...');
+        return await initPGlite();
+      } catch (retryErr) {
+        logger.error('PGlite retry after recovery also failed:', retryErr);
+        throw error; // Throw the original error for clarity
+      }
+    }
+
     throw error;
   }
 };
