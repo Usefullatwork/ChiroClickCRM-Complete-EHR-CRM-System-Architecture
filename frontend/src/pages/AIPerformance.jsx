@@ -37,119 +37,16 @@ import {
   useAIRetrainingStatus,
   useExportAIFeedback,
 } from '../hooks/useAIFeedback';
-
-// Bilingual text support
-const TEXTS = {
-  NO: {
-    title: 'AI-ytelse',
-    subtitle: 'Overvak og analyser AI-forslagsytelse',
-    acceptanceRate: 'Akseptrate',
-    avgRating: 'Gjennomsnittlig vurdering',
-    totalSuggestions: 'Totale forslag',
-    avgDecisionTime: 'Gjennomsnittlig beslutningstid',
-    acceptanceOverTime: 'Akseptrate over tid',
-    byType: 'Etter forslagstype',
-    recentCorrections: 'Nylige korreksjoner',
-    retrainingStatus: 'Opplaeringstatus',
-    export: 'Eksporter data',
-    exporting: 'Eksporterer...',
-    refresh: 'Oppdater',
-    filters: 'Filtre',
-    dateRange: 'Tidsperiode',
-    last7Days: 'Siste 7 dager',
-    last30Days: 'Siste 30 dager',
-    last90Days: 'Siste 90 dager',
-    lastYear: 'Siste ar',
-    groupBy: 'Grupper etter',
-    day: 'Dag',
-    week: 'Uke',
-    month: 'Maned',
-    noData: 'Ingen data tilgjengelig',
-    loading: 'Laster...',
-    types: {
-      subjective: 'Subjektiv',
-      objective: 'Objektiv',
-      assessment: 'Vurdering',
-      plan: 'Plan',
-      diagnosis: 'Diagnose',
-      treatment: 'Behandling',
-      summary: 'Sammendrag',
-    },
-    retraining: {
-      ready: 'Klar for opplaering',
-      inProgress: 'Opplaering pagar',
-      scheduled: 'Planlagt',
-      notNeeded: 'Ikke nodvendig',
-      pendingFeedback: 'Ventende tilbakemeldinger',
-      lastTrained: 'Sist opplaert',
-      threshold: 'Terskel',
-    },
-    actions: {
-      accepted: 'Godkjent',
-      modified: 'Redigert',
-      rejected: 'Avvist',
-    },
-  },
-  EN: {
-    title: 'AI Performance',
-    subtitle: 'Monitor and analyze AI suggestion performance',
-    acceptanceRate: 'Acceptance Rate',
-    avgRating: 'Average Rating',
-    totalSuggestions: 'Total Suggestions',
-    avgDecisionTime: 'Avg Decision Time',
-    acceptanceOverTime: 'Acceptance Rate Over Time',
-    byType: 'By Suggestion Type',
-    recentCorrections: 'Recent Corrections',
-    retrainingStatus: 'Retraining Status',
-    export: 'Export Data',
-    exporting: 'Exporting...',
-    refresh: 'Refresh',
-    filters: 'Filters',
-    dateRange: 'Date Range',
-    last7Days: 'Last 7 days',
-    last30Days: 'Last 30 days',
-    last90Days: 'Last 90 days',
-    lastYear: 'Last year',
-    groupBy: 'Group by',
-    day: 'Day',
-    week: 'Week',
-    month: 'Month',
-    noData: 'No data available',
-    loading: 'Loading...',
-    types: {
-      subjective: 'Subjective',
-      objective: 'Objective',
-      assessment: 'Assessment',
-      plan: 'Plan',
-      diagnosis: 'Diagnosis',
-      treatment: 'Treatment',
-      summary: 'Summary',
-    },
-    retraining: {
-      ready: 'Ready for Retraining',
-      inProgress: 'Retraining in Progress',
-      scheduled: 'Scheduled',
-      notNeeded: 'Not Needed',
-      pendingFeedback: 'Pending Feedback',
-      lastTrained: 'Last Trained',
-      threshold: 'Threshold',
-    },
-    actions: {
-      accepted: 'Accepted',
-      modified: 'Modified',
-      rejected: 'Rejected',
-    },
-  },
-};
+import { useTranslation } from '../i18n';
 
 /**
  * Simple Line Chart Component (CSS-based, like KPIChart)
  */
-const AcceptanceLineChart = ({ data = [], color = '#14b8a6' }) => {
+const AcceptanceLineChart = ({ data = [], color = '#14b8a6', t }) => {
   if (!data || data.length === 0) {
     return (
       <div className="flex items-center justify-center h-64 text-slate-400">
-        <p>Ingen data tilgjengelig</p>
+        <p>{t('noData')}</p>
       </div>
     );
   }
@@ -255,13 +152,11 @@ const AcceptanceLineChart = ({ data = [], color = '#14b8a6' }) => {
 /**
  * Bar Chart Component for type breakdown
  */
-const TypeBarChart = ({ data = [], language = 'NO' }) => {
-  const t = TEXTS[language] || TEXTS.NO;
-
+const TypeBarChart = ({ data = [], t }) => {
   if (!data || data.length === 0) {
     return (
       <div className="flex items-center justify-center h-64 text-slate-400">
-        <p>{t.noData}</p>
+        <p>{t('noData')}</p>
       </div>
     );
   }
@@ -284,16 +179,19 @@ const TypeBarChart = ({ data = [], language = 'NO' }) => {
         const _percentage = maxValue > 0 ? (item.total / maxValue) * 100 : 0;
         const acceptedPercentage = item.total > 0 ? (item.accepted / item.total) * 100 : 0;
         const color = colors[item.type?.toLowerCase()] || '#6b7280';
-        const typeLabel = t.types[item.type?.toLowerCase()] || item.type;
+        const typeKey = `type${(item.type || '').charAt(0).toUpperCase()}${(item.type || '').slice(1).toLowerCase()}`;
+        const typeLabel = t(typeKey, item.type);
 
         return (
           <div key={index} className="space-y-1">
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium text-slate-700">{typeLabel}</span>
               <div className="flex items-center gap-3">
-                <span className="text-slate-500">{item.total} total</span>
+                <span className="text-slate-500">
+                  {item.total} {t('total')}
+                </span>
                 <span className="text-green-600 font-medium">
-                  {acceptedPercentage.toFixed(0)}% accepted
+                  {acceptedPercentage.toFixed(0)}% {t('accepted')}
                 </span>
               </div>
             </div>
@@ -334,15 +232,15 @@ const TypeBarChart = ({ data = [], language = 'NO' }) => {
       <div className="flex items-center gap-4 pt-4 border-t border-slate-200">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded bg-teal-500" />
-          <span className="text-xs text-slate-600">{t.actions.accepted}</span>
+          <span className="text-xs text-slate-600">{t('actionAccepted')}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded bg-teal-500 opacity-60" />
-          <span className="text-xs text-slate-600">{t.actions.modified}</span>
+          <span className="text-xs text-slate-600">{t('actionModified')}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded bg-red-400" />
-          <span className="text-xs text-slate-600">{t.actions.rejected}</span>
+          <span className="text-xs text-slate-600">{t('actionRejected')}</span>
         </div>
       </div>
     </div>
@@ -352,21 +250,19 @@ const TypeBarChart = ({ data = [], language = 'NO' }) => {
 /**
  * Retraining Status Component
  */
-const RetrainingStatusCard = ({ status, language = 'NO' }) => {
-  const t = TEXTS[language] || TEXTS.NO;
-
+const RetrainingStatusCard = ({ status, t }) => {
   const getStatusConfig = (retrainingStatus) => {
     switch (retrainingStatus) {
       case 'ready':
         return {
-          label: t.retraining.ready,
+          label: t('retrainingReady'),
           icon: Zap,
           color: 'text-amber-600 bg-amber-100',
           badgeVariant: 'warning',
         };
       case 'in_progress':
         return {
-          label: t.retraining.inProgress,
+          label: t('retrainingInProgress'),
           icon: RefreshCw,
           color: 'text-blue-600 bg-blue-100',
           badgeVariant: 'info',
@@ -374,14 +270,14 @@ const RetrainingStatusCard = ({ status, language = 'NO' }) => {
         };
       case 'scheduled':
         return {
-          label: t.retraining.scheduled,
+          label: t('retrainingScheduled'),
           icon: Calendar,
           color: 'text-purple-600 bg-purple-100',
           badgeVariant: 'default',
         };
       default:
         return {
-          label: t.retraining.notNeeded,
+          label: t('retrainingNotNeeded'),
           icon: CheckCircle,
           color: 'text-green-600 bg-green-100',
           badgeVariant: 'success',
@@ -397,7 +293,7 @@ const RetrainingStatusCard = ({ status, language = 'NO' }) => {
       <CardHeader>
         <div className="flex items-center gap-2">
           <Brain size={20} className="text-teal-600" />
-          <h3 className="text-lg font-semibold text-slate-900">{t.retrainingStatus}</h3>
+          <h3 className="text-lg font-semibold text-slate-900">{t('retrainingStatus')}</h3>
         </div>
       </CardHeader>
       <CardBody>
@@ -417,22 +313,20 @@ const RetrainingStatusCard = ({ status, language = 'NO' }) => {
           {/* Stats */}
           <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-200">
             <div>
-              <p className="text-xs text-slate-500">{t.retraining.pendingFeedback}</p>
+              <p className="text-xs text-slate-500">{t('retrainingPendingFeedback')}</p>
               <p className="text-lg font-bold text-slate-900">
                 {status?.pendingFeedbackCount || 0}
               </p>
             </div>
             <div>
-              <p className="text-xs text-slate-500">{t.retraining.threshold}</p>
+              <p className="text-xs text-slate-500">{t('retrainingThreshold')}</p>
               <p className="text-lg font-bold text-slate-900">{status?.threshold || 50}</p>
             </div>
             {status?.lastTrainedAt && (
               <div className="col-span-2">
-                <p className="text-xs text-slate-500">{t.retraining.lastTrained}</p>
+                <p className="text-xs text-slate-500">{t('retrainingLastTrained')}</p>
                 <p className="text-sm font-medium text-slate-700">
-                  {new Date(status.lastTrainedAt).toLocaleString(
-                    language === 'NO' ? 'nb-NO' : 'en-US'
-                  )}
+                  {new Date(status.lastTrainedAt).toLocaleString('nb-NO')}
                 </p>
               </div>
             )}
@@ -442,7 +336,7 @@ const RetrainingStatusCard = ({ status, language = 'NO' }) => {
           {status?.threshold && (
             <div className="pt-2">
               <div className="flex justify-between text-xs text-slate-500 mb-1">
-                <span>Progress to retraining</span>
+                <span>{t('retrainingProgress')}</span>
                 <span>
                   {Math.min(
                     100,
@@ -470,9 +364,7 @@ const RetrainingStatusCard = ({ status, language = 'NO' }) => {
 /**
  * Recent Corrections Table
  */
-const RecentCorrectionsTable = ({ corrections = [], language = 'NO' }) => {
-  const t = TEXTS[language] || TEXTS.NO;
-
+const RecentCorrectionsTable = ({ corrections = [], t }) => {
   const getActionIcon = (correctionType) => {
     switch (correctionType) {
       case 'accepted_as_is':
@@ -487,7 +379,7 @@ const RecentCorrectionsTable = ({ corrections = [], language = 'NO' }) => {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString(language === 'NO' ? 'nb-NO' : 'en-US', {
+    return new Date(dateString).toLocaleDateString('nb-NO', {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
@@ -498,7 +390,7 @@ const RecentCorrectionsTable = ({ corrections = [], language = 'NO' }) => {
   if (corrections.length === 0) {
     return (
       <div className="text-center py-8 text-slate-400">
-        <p>{t.noData}</p>
+        <p>{t('noData')}</p>
       </div>
     );
   }
@@ -520,18 +412,23 @@ const RecentCorrectionsTable = ({ corrections = [], language = 'NO' }) => {
             <tr key={correction.id || idx} className="hover:bg-slate-50">
               <td className="px-4 py-3">
                 <Badge variant="default" size="sm">
-                  {t.types[correction.suggestionType?.toLowerCase()] || correction.suggestionType}
+                  {t(
+                    `type${(correction.suggestionType || '').charAt(0).toUpperCase()}${(correction.suggestionType || '').slice(1).toLowerCase()}`,
+                    correction.suggestionType
+                  )}
                 </Badge>
               </td>
               <td className="px-4 py-3">
                 <div className="flex items-center gap-2">
                   {getActionIcon(correction.correctionType)}
                   <span className="text-sm text-slate-700">
-                    {t.actions[
-                      correction.correctionType === 'accepted_as_is'
-                        ? 'accepted'
-                        : correction.correctionType
-                    ] || correction.correctionType}
+                    {correction.correctionType === 'accepted_as_is'
+                      ? t('actionAccepted')
+                      : correction.correctionType === 'modified'
+                        ? t('actionModified')
+                        : correction.correctionType === 'rejected'
+                          ? t('actionRejected')
+                          : correction.correctionType}
                   </span>
                 </div>
               </td>
@@ -563,8 +460,7 @@ const RecentCorrectionsTable = ({ corrections = [], language = 'NO' }) => {
  * Main AIPerformance Page Component
  */
 export default function AIPerformance() {
-  const language = 'NO'; // Could be from context/settings
-  const t = TEXTS[language] || TEXTS.NO;
+  const { t } = useTranslation('analytics');
 
   // Filter state
   const [dateRange, setDateRange] = useState('30');
@@ -669,9 +565,9 @@ export default function AIPerformance() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
             <Brain size={28} className="text-teal-600" />
-            {t.title}
+            {t('title')}
           </h1>
-          <p className="text-sm text-slate-600 mt-1">{t.subtitle}</p>
+          <p className="text-sm text-slate-600 mt-1">{t('subtitle')}</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -683,7 +579,7 @@ export default function AIPerformance() {
             icon={RefreshCw}
             className={isLoading ? 'animate-pulse' : ''}
           >
-            {t.refresh}
+            {t('refresh')}
           </Button>
           <Button
             variant="primary"
@@ -693,7 +589,7 @@ export default function AIPerformance() {
             loading={exportMutation.isLoading}
             icon={Download}
           >
-            {exportMutation.isLoading ? t.exporting : t.export}
+            {exportMutation.isLoading ? t('exporting') : t('exportData')}
           </Button>
         </div>
       </div>
@@ -704,7 +600,7 @@ export default function AIPerformance() {
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
               <Filter size={16} className="text-slate-400" />
-              <span className="text-sm font-medium text-slate-700">{t.filters}:</span>
+              <span className="text-sm font-medium text-slate-700">{t('filters')}:</span>
             </div>
 
             {/* Date Range */}
@@ -715,10 +611,10 @@ export default function AIPerformance() {
                 onChange={(e) => setDateRange(e.target.value)}
                 className="text-sm border border-slate-300 rounded-md px-3 py-1.5 focus:ring-2 focus:ring-teal-500"
               >
-                <option value="7">{t.last7Days}</option>
-                <option value="30">{t.last30Days}</option>
-                <option value="90">{t.last90Days}</option>
-                <option value="365">{t.lastYear}</option>
+                <option value="7">{t('last7Days')}</option>
+                <option value="30">{t('last30Days')}</option>
+                <option value="90">{t('last90Days')}</option>
+                <option value="365">{t('lastYear')}</option>
               </select>
             </div>
 
@@ -730,9 +626,9 @@ export default function AIPerformance() {
                 onChange={(e) => setGroupBy(e.target.value)}
                 className="text-sm border border-slate-300 rounded-md px-3 py-1.5 focus:ring-2 focus:ring-teal-500"
               >
-                <option value="day">{t.day}</option>
-                <option value="week">{t.week}</option>
-                <option value="month">{t.month}</option>
+                <option value="day">{t('day')}</option>
+                <option value="week">{t('week')}</option>
+                <option value="month">{t('month')}</option>
               </select>
             </div>
           </div>
@@ -746,7 +642,7 @@ export default function AIPerformance() {
           <CardBody>
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600">{t.acceptanceRate}</p>
+                <p className="text-sm font-medium text-slate-600">{t('acceptanceRate')}</p>
                 <p className="text-3xl font-bold text-slate-900 mt-2">
                   {overallStats.acceptanceRate?.toFixed(1) || 0}%
                 </p>
@@ -759,7 +655,7 @@ export default function AIPerformance() {
                   <span
                     className={`text-xs ${overallStats.acceptanceRate >= 70 ? 'text-green-600' : 'text-red-600'}`}
                   >
-                    {overallStats.acceptanceRate >= 70 ? 'Good' : 'Needs improvement'}
+                    {overallStats.acceptanceRate >= 70 ? t('good') : t('needsImprovement')}
                   </span>
                 </div>
               </div>
@@ -775,7 +671,7 @@ export default function AIPerformance() {
           <CardBody>
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600">{t.avgRating}</p>
+                <p className="text-sm font-medium text-slate-600">{t('avgRating')}</p>
                 <p className="text-3xl font-bold text-slate-900 mt-2">
                   {overallStats.avgRating?.toFixed(1) || 0}
                   <span className="text-lg font-normal text-slate-500">/5</span>
@@ -806,11 +702,11 @@ export default function AIPerformance() {
           <CardBody>
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600">{t.totalSuggestions}</p>
+                <p className="text-sm font-medium text-slate-600">{t('totalSuggestions')}</p>
                 <p className="text-3xl font-bold text-slate-900 mt-2">
                   {overallStats.totalFeedback || 0}
                 </p>
-                <p className="text-xs text-slate-500 mt-1">In selected period</p>
+                <p className="text-xs text-slate-500 mt-1">{t('inSelectedPeriod')}</p>
               </div>
               <div className="p-3 bg-blue-100 rounded-lg">
                 <Brain size={24} className="text-blue-600" />
@@ -824,13 +720,13 @@ export default function AIPerformance() {
           <CardBody>
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600">{t.avgDecisionTime}</p>
+                <p className="text-sm font-medium text-slate-600">{t('avgDecisionTime')}</p>
                 <p className="text-3xl font-bold text-slate-900 mt-2">
                   {overallStats.avgDecisionTime
                     ? `${Math.round(overallStats.avgDecisionTime / 1000)}s`
                     : '0s'}
                 </p>
-                <p className="text-xs text-slate-500 mt-1">Per suggestion</p>
+                <p className="text-xs text-slate-500 mt-1">{t('perSuggestion')}</p>
               </div>
               <div className="p-3 bg-purple-100 rounded-lg">
                 <Clock size={24} className="text-purple-600" />
@@ -847,7 +743,7 @@ export default function AIPerformance() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <LineChart size={20} className="text-teal-600" />
-              <h3 className="text-lg font-semibold text-slate-900">{t.acceptanceOverTime}</h3>
+              <h3 className="text-lg font-semibold text-slate-900">{t('acceptanceOverTime')}</h3>
             </div>
           </CardHeader>
           <CardBody>
@@ -856,7 +752,7 @@ export default function AIPerformance() {
                 <RefreshCw size={24} className="text-teal-600 animate-spin" />
               </div>
             ) : (
-              <AcceptanceLineChart data={acceptanceOverTime} color="#14b8a6" />
+              <AcceptanceLineChart data={acceptanceOverTime} color="#14b8a6" t={t} />
             )}
           </CardBody>
         </Card>
@@ -866,7 +762,7 @@ export default function AIPerformance() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <BarChart3 size={20} className="text-teal-600" />
-              <h3 className="text-lg font-semibold text-slate-900">{t.byType}</h3>
+              <h3 className="text-lg font-semibold text-slate-900">{t('byType')}</h3>
             </div>
           </CardHeader>
           <CardBody>
@@ -875,7 +771,7 @@ export default function AIPerformance() {
                 <RefreshCw size={24} className="text-teal-600 animate-spin" />
               </div>
             ) : (
-              <TypeBarChart data={byTypeData} language={language} />
+              <TypeBarChart data={byTypeData} t={t} />
             )}
           </CardBody>
         </Card>
@@ -889,7 +785,7 @@ export default function AIPerformance() {
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Edit3 size={20} className="text-teal-600" />
-                <h3 className="text-lg font-semibold text-slate-900">{t.recentCorrections}</h3>
+                <h3 className="text-lg font-semibold text-slate-900">{t('recentCorrections')}</h3>
               </div>
             </CardHeader>
             <CardBody>
@@ -898,17 +794,14 @@ export default function AIPerformance() {
                   <RefreshCw size={24} className="text-teal-600 animate-spin" />
                 </div>
               ) : (
-                <RecentCorrectionsTable
-                  corrections={feedbackData?.feedback || []}
-                  language={language}
-                />
+                <RecentCorrectionsTable corrections={feedbackData?.feedback || []} t={t} />
               )}
             </CardBody>
           </Card>
         </div>
 
         {/* Retraining Status */}
-        <RetrainingStatusCard status={retrainingStatus} language={language} />
+        <RetrainingStatusCard status={retrainingStatus} t={t} />
       </div>
     </div>
   );

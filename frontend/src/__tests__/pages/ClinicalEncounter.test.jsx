@@ -205,6 +205,13 @@ vi.mock('../../utils/toast', () => ({
   default: { info: vi.fn(), success: vi.fn(), error: vi.fn(), promise: vi.fn() },
 }));
 
+vi.mock('../../i18n', () => ({
+  useTranslation: () => ({
+    t: (key) => key,
+    lang: 'no',
+  }),
+}));
+
 vi.mock('../../components/encounter/PatientInfoSidebar', () => ({
   PatientInfoSidebar: ({ patientData }) => (
     <div data-testid="patient-sidebar">

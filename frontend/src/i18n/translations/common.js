@@ -206,6 +206,17 @@ export const common = {
     pageErrorIn: 'Error in',
     pageErrorDesc:
       'An error occurred on this page. The rest of the application still works normally.',
+    // Training page
+    aiModelManagement: 'AI Model Management',
+    aiModelManagementDesc: 'Manage AI models, training data and model building for ChiroClick.',
+    tabModels: 'Models',
+    tabDataCuration: 'Data Curation',
+    tabTraining: 'Training',
+    tabPlayground: 'Playground',
+    loadingAnalytics: 'Loading analytics...',
+    loadingDataCuration: 'Loading data curation...',
+    loadingTrainingPipeline: 'Loading training pipeline...',
+    loadingPlayground: 'Loading playground...',
   },
   no: {
     save: 'Lagre',
@@ -414,5 +425,16 @@ export const common = {
     pageErrorIn: 'Feil i',
     pageErrorDesc:
       'En feil oppstod på denne siden. Resten av applikasjonen fungerer fortsatt normalt.',
+    // Training page
+    aiModelManagement: 'AI Model Management',
+    aiModelManagementDesc: 'Administrer AI-modeller, treningsdata og modellbygging for ChiroClick.',
+    tabModels: 'Modeller',
+    tabDataCuration: 'Datakurering',
+    tabTraining: 'Trening',
+    tabPlayground: 'Lekeplass',
+    loadingAnalytics: 'Laster analyse...',
+    loadingDataCuration: 'Laster datakurering...',
+    loadingTrainingPipeline: 'Laster treningspipeline...',
+    loadingPlayground: 'Laster lekeplass...',
   },
 };

@@ -25,6 +25,7 @@ import {
 import { analyticsAPI } from '../services/api';
 import toast from '../utils/toast';
 import logger from '../utils/logger';
+import { useTranslation } from '../i18n';
 
 // Analytics components
 import { StatCard, StatCardGrid } from '../components/analytics/StatCard';
@@ -35,23 +36,25 @@ import { RevenueChart } from '../components/analytics/RevenueChart';
 import { ComplianceOverview } from '../components/analytics/ComplianceOverview';
 
 /**
- * Format Norwegian date range label
- */
-const DATE_RANGE_LABELS = {
-  week: 'Denne uken',
-  month: 'Denne maneden',
-  quarter: 'Dette kvartalet',
-  year: 'I ar',
-  custom: 'Egendefinert',
-};
-
-/**
  * Analytics Component
  * Main analytics dashboard with all metrics and charts
  *
  * @returns {JSX.Element} Analytics dashboard page
  */
 export default function Analytics() {
+  const { t } = useTranslation('dashboard');
+
+  const DATE_RANGE_LABELS = useMemo(
+    () => ({
+      week: t('dateRangeWeek'),
+      month: t('dateRangeMonth'),
+      quarter: t('dateRangeQuarter'),
+      year: t('dateRangeYear'),
+      custom: t('dateRangeCustom'),
+    }),
+    [t]
+  );
+
   // State for date range filter
   const [dateRange, setDateRange] = useState('month');
   const [selectedMonth, setSelectedMonth] = useState(() => {
@@ -156,7 +159,7 @@ export default function Analytics() {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       logger.error('Export failed:', err);
-      toast.error('Kunne ikke eksportere data. Vennligst prov igjen.');
+      toast.error(t('exportError'));
     }
   };
 
@@ -165,42 +168,40 @@ export default function Analytics() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Analyse</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Oversikt over klinikkens nokeltall og trender
-          </p>
+          <h1 className="text-2xl font-semibold text-gray-900">{t('analyticsTitle')}</h1>
+          <p className="text-sm text-gray-500 mt-1">{t('analyticsSubtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
           {/* Export dropdown */}
           <div className="relative group">
             <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
               <Download className="w-4 h-4" />
-              Eksporter
+              {t('export')}
             </button>
             <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
               <button
                 onClick={() => handleExport('patients')}
                 className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
               >
-                <Users size={14} /> Pasienter
+                <Users size={14} /> {t('exportPatients')}
               </button>
               <button
                 onClick={() => handleExport('appointments')}
                 className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
               >
-                <Calendar size={14} /> Avtaler
+                <Calendar size={14} /> {t('exportAppointments')}
               </button>
               <button
                 onClick={() => handleExport('exercises')}
                 className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
               >
-                <Dumbbell size={14} /> Ovelser
+                <Dumbbell size={14} /> {t('exportExercises')}
               </button>
               <button
                 onClick={() => handleExport('revenue')}
                 className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
               >
-                <DollarSign size={14} /> Inntekter
+                <DollarSign size={14} /> {t('exportRevenue')}
               </button>
             </div>
           </div>
@@ -211,7 +212,7 @@ export default function Analytics() {
             className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-            Oppdater
+            {t('refresh')}
           </button>
         </div>
       </div>
@@ -222,7 +223,7 @@ export default function Analytics() {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <Filter className="w-4 h-4 text-gray-400" />
-              <span className="text-sm font-medium text-gray-700">Periode:</span>
+              <span className="text-sm font-medium text-gray-700">{t('period')}:</span>
             </div>
             <div className="flex gap-2">
               {['week', 'month', 'quarter', 'year'].map((range) => (
@@ -267,43 +268,41 @@ export default function Analytics() {
       {/* Error State */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-          <p className="text-sm text-red-700">
-            Kunne ikke laste analysedata. Vennligst prov igjen.
-          </p>
+          <p className="text-sm text-red-700">{t('loadAnalyticsError')}</p>
         </div>
       )}
 
       {/* Key Metrics Cards */}
       <StatCardGrid columns={4} className="mb-6">
         <StatCard
-          title="Totalt pasienter"
+          title={t('totalPatientsCount')}
           value={patients.totalPatients || 0}
           changePercent={patients.changePercent}
-          changeLabel="vs forrige mnd"
+          changeLabel={t('vsLastMonthShort')}
           icon={Users}
           iconColor="bg-blue-100 text-blue-600"
           loading={isLoading}
         />
         <StatCard
-          title="Nye pasienter"
+          title={t('newPatientsLabel')}
           value={patients.newPatientsThisMonth || 0}
-          subtitle={`${patients.newPatientsLastMonth || 0} forrige mnd`}
+          subtitle={`${patients.newPatientsLastMonth || 0} ${t('vsLastMonth')}`}
           icon={UserPlus}
           iconColor="bg-green-100 text-green-600"
           loading={isLoading}
         />
         <StatCard
-          title="Fullforte avtaler"
+          title={t('completedAppointments')}
           value={appointments.completedThisMonth || 0}
-          subtitle={`${appointments.today?.total || 0} i dag`}
+          subtitle={`${appointments.today?.total || 0} ${t('appointmentsToday').toLowerCase()}`}
           icon={Calendar}
           iconColor="bg-teal-100 text-teal-600"
           loading={isLoading}
         />
         <StatCard
-          title="Etterlevelse"
+          title={t('complianceLabel')}
           value={exercises.compliance?.avgProgressRate || 0}
-          subtitle="Gjennomsnittlig ovelsesetterlevelse"
+          subtitle={t('avgExerciseCompliance')}
           icon={Target}
           iconColor="bg-indigo-100 text-indigo-600"
           loading={isLoading}
@@ -329,28 +328,28 @@ export default function Analytics() {
 
       {/* Quick Stats Footer */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Hurtigstatistikk</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('quickStats')}</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <p className="text-xs text-gray-500 mb-1">Aktive pasienter</p>
+            <p className="text-xs text-gray-500 mb-1">{t('activePatients')}</p>
             <p className="text-xl font-bold text-gray-900">
               {isLoading ? '-' : patients.activePatients || 0}
             </p>
           </div>
           <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <p className="text-xs text-gray-500 mb-1">Avtaler i dag</p>
+            <p className="text-xs text-gray-500 mb-1">{t('appointmentsToday')}</p>
             <p className="text-xl font-bold text-gray-900">
               {isLoading ? '-' : appointments.today?.total || 0}
             </p>
           </div>
           <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <p className="text-xs text-gray-500 mb-1">Denne uken</p>
+            <p className="text-xs text-gray-500 mb-1">{t('thisWeekLabel')}</p>
             <p className="text-xl font-bold text-gray-900">
               {isLoading ? '-' : appointments.thisWeek?.total || 0}
             </p>
           </div>
           <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <p className="text-xs text-gray-500 mb-1">No-show rate</p>
+            <p className="text-xs text-gray-500 mb-1">{t('noShowRateLabel')}</p>
             <p className="text-xl font-bold text-gray-900">
               {isLoading
                 ? '-'
@@ -364,7 +363,7 @@ export default function Analytics() {
             </p>
           </div>
           <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <p className="text-xs text-gray-500 mb-1">Inntekt denne mnd</p>
+            <p className="text-xs text-gray-500 mb-1">{t('revenueThisMonthShort')}</p>
             <p className="text-xl font-bold text-green-600">
               {isLoading
                 ? '-'
@@ -376,7 +375,7 @@ export default function Analytics() {
             </p>
           </div>
           <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <p className="text-xs text-gray-500 mb-1">Endring inntekt</p>
+            <p className="text-xs text-gray-500 mb-1">{t('revenueChangeLabel')}</p>
             <p
               className={`text-xl font-bold ${
                 (revenue.changePercent || 0) >= 0 ? 'text-green-600' : 'text-red-600'

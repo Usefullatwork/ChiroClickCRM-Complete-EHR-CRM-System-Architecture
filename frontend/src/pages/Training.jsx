@@ -3,11 +3,12 @@
  * Manage AI model training pipeline, model lifecycle, and analytics
  */
 
-import { useState, lazy, Suspense } from 'react';
+import { useState, useMemo, lazy, Suspense } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Brain, Database, RefreshCw, TestTube, Server } from 'lucide-react';
 import { trainingAPI } from '../services/api';
 import { ModelsTab } from '../components/training';
+import { useTranslation } from '../i18n';
 
 // Lazy load tab components
 const AnalyticsTab = lazy(() => import('../components/training/AnalyticsTab'));
@@ -17,15 +18,19 @@ const PlaygroundTab = lazy(() => import('../components/training/PlaygroundTab'))
 
 const TAB_ICONS = { models: Server, curation: Database, pipeline: RefreshCw, playground: TestTube };
 
-const TABS = [
-  { id: 'models', label: 'Modeller' },
-  { id: 'curation', label: 'Datakurering' },
-  { id: 'pipeline', label: 'Trening' },
-  { id: 'playground', label: 'Lekeplass' },
-];
-
 export default function Training() {
+  const { t } = useTranslation('common');
   const queryClient = useQueryClient();
+
+  const TABS = useMemo(
+    () => [
+      { id: 'models', label: t('tabModels') },
+      { id: 'curation', label: t('tabDataCuration') },
+      { id: 'pipeline', label: t('tabTraining') },
+      { id: 'playground', label: t('tabPlayground') },
+    ],
+    [t]
+  );
   const [activeTab, setActiveTab] = useState('models');
   const [newExamples, setNewExamples] = useState('');
   const [testPrompt, setTestPrompt] = useState('');
@@ -93,11 +98,9 @@ export default function Training() {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <Brain className="w-8 h-8 text-blue-600" />
-          <h1 className="text-3xl font-bold">AI Model Management</h1>
+          <h1 className="text-3xl font-bold">{t('aiModelManagement')}</h1>
         </div>
-        <p className="text-gray-600">
-          Administrer AI-modeller, treningsdata og modellbygging for ChiroClick.
-        </p>
+        <p className="text-gray-600">{t('aiModelManagementDesc')}</p>
       </div>
 
       {/* Tabs */}
@@ -142,7 +145,7 @@ export default function Training() {
             testResult={testResult}
           />
           <div className="mt-8">
-            <Suspense fallback={<div className="text-gray-500 p-4">Laster analyse...</div>}>
+            <Suspense fallback={<div className="text-gray-500 p-4">{t('loadingAnalytics')}</div>}>
               <AnalyticsTab />
             </Suspense>
           </div>
@@ -150,19 +153,21 @@ export default function Training() {
       )}
 
       {activeTab === 'curation' && (
-        <Suspense fallback={<div className="text-gray-500 p-4">Laster datakurering...</div>}>
+        <Suspense fallback={<div className="text-gray-500 p-4">{t('loadingDataCuration')}</div>}>
           <DataCurationTab />
         </Suspense>
       )}
 
       {activeTab === 'pipeline' && (
-        <Suspense fallback={<div className="text-gray-500 p-4">Laster treningspipeline...</div>}>
+        <Suspense
+          fallback={<div className="text-gray-500 p-4">{t('loadingTrainingPipeline')}</div>}
+        >
           <PipelineTab />
         </Suspense>
       )}
 
       {activeTab === 'playground' && (
-        <Suspense fallback={<div className="text-gray-500 p-4">Laster lekeplass...</div>}>
+        <Suspense fallback={<div className="text-gray-500 p-4">{t('loadingPlayground')}</div>}>
           <PlaygroundTab />
         </Suspense>
       )}

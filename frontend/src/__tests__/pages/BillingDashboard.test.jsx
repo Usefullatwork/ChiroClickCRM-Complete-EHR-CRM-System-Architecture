@@ -32,6 +32,13 @@ vi.mock('../../utils/logger', () => ({
   default: { scope: () => ({ error: vi.fn() }), error: vi.fn() },
 }));
 
+vi.mock('../../i18n', () => ({
+  useTranslation: () => ({
+    t: (key) => key,
+    lang: 'no',
+  }),
+}));
+
 // Mock child billing components
 vi.mock('../../components/billing/InvoiceList', () => ({
   default: () => <div data-testid="invoice-list">Invoice List</div>,
@@ -105,26 +112,26 @@ describe('Billing Page', () => {
 
   it('should render billing page title', async () => {
     renderWithProviders(<Billing />);
-    expect(screen.getByText('Fakturering')).toBeInTheDocument();
-    expect(screen.getByText('Administrer fakturaer, takstkoder og betalinger')).toBeInTheDocument();
+    expect(screen.getByText('billingTitle')).toBeInTheDocument();
+    expect(screen.getByText('billingSubtitle')).toBeInTheDocument();
   });
 
   it('should display statistics cards', async () => {
     renderWithProviders(<Billing />);
 
     await waitFor(() => {
-      expect(screen.getByText('Utstaende')).toBeInTheDocument();
-      expect(screen.getByText('Betalt totalt')).toBeInTheDocument();
-      expect(screen.getByText('Forfalt')).toBeInTheDocument();
-      expect(screen.getByText('HELFO-refusjon')).toBeInTheDocument();
+      expect(screen.getByText('outstandingAmount')).toBeInTheDocument();
+      expect(screen.getByText('totalPaidAmount')).toBeInTheDocument();
+      expect(screen.getByText('overdueCount')).toBeInTheDocument();
+      expect(screen.getByText('helfoRefund')).toBeInTheDocument();
     });
   });
 
   it('should show tab navigation', () => {
     renderWithProviders(<Billing />);
-    expect(screen.getByText('Fakturaer')).toBeInTheDocument();
-    expect(screen.getByText('Takstkoder')).toBeInTheDocument();
-    expect(screen.getByText('Rapporter')).toBeInTheDocument();
+    expect(screen.getByText('invoices')).toBeInTheDocument();
+    expect(screen.getByText('takstCodesTab')).toBeInTheDocument();
+    expect(screen.getByText('reportsTab')).toBeInTheDocument();
   });
 
   it('should render invoice list by default', () => {
@@ -134,50 +141,50 @@ describe('Billing Page', () => {
 
   it('should switch to takst codes tab', async () => {
     renderWithProviders(<Billing />);
-    fireEvent.click(screen.getByText('Takstkoder'));
+    fireEvent.click(screen.getByText('takstCodesTab'));
 
     await waitFor(() => {
-      expect(screen.getByText('Norske takstkoder for kiropraktorer')).toBeInTheDocument();
+      expect(screen.getByText('norwegianTakstCodes')).toBeInTheDocument();
     });
   });
 
   it('should switch to reports tab', async () => {
     renderWithProviders(<Billing />);
-    fireEvent.click(screen.getByText('Rapporter'));
+    fireEvent.click(screen.getByText('reportsTab'));
 
     await waitFor(() => {
-      expect(screen.getByText('Okonomiske rapporter')).toBeInTheDocument();
+      expect(screen.getByText('financialReports')).toBeInTheDocument();
     });
   });
 
-  it('should have Ny faktura button', () => {
+  it('should have new invoice button', () => {
     renderWithProviders(<Billing />);
-    expect(screen.getByText('Ny faktura')).toBeInTheDocument();
+    expect(screen.getByText('newInvoiceBtn')).toBeInTheDocument();
   });
 
-  it('should open invoice generator when Ny faktura is clicked', async () => {
+  it('should open invoice generator when new invoice is clicked', async () => {
     renderWithProviders(<Billing />);
-    fireEvent.click(screen.getByText('Ny faktura'));
+    fireEvent.click(screen.getByText('newInvoiceBtn'));
 
     await waitFor(() => {
       expect(screen.getByTestId('invoice-generator')).toBeInTheDocument();
     });
   });
 
-  it('should have HELFO-rapport export button', () => {
+  it('should have HELFO report export button', () => {
     renderWithProviders(<Billing />);
-    expect(screen.getByText('HELFO-rapport')).toBeInTheDocument();
+    expect(screen.getByText('helfoReport')).toBeInTheDocument();
   });
 
   it('should show report cards in reports tab', async () => {
     renderWithProviders(<Billing />);
-    fireEvent.click(screen.getByText('Rapporter'));
+    fireEvent.click(screen.getByText('reportsTab'));
 
     await waitFor(() => {
-      // HELFO-rapport appears in both header and reports tab
-      expect(screen.getAllByText('HELFO-rapport').length).toBeGreaterThanOrEqual(1);
-      expect(screen.getByText('Utstaende fordringer')).toBeInTheDocument();
-      expect(screen.getByText('Inntektsrapport')).toBeInTheDocument();
+      // helfoReport appears in both header and reports tab
+      expect(screen.getAllByText('helfoReport').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getByText('outstandingClaims')).toBeInTheDocument();
+      expect(screen.getByText('revenueReportTitle')).toBeInTheDocument();
     });
   });
 });

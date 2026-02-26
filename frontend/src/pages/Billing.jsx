@@ -22,6 +22,7 @@ import {
 import { billingAPI } from '../services/api';
 import toast from '../utils/toast';
 import logger from '../utils/logger';
+import { useTranslation } from '../i18n';
 import InvoiceList from '../components/billing/InvoiceList';
 import InvoiceGenerator from '../components/billing/InvoiceGenerator';
 import InvoicePreview from '../components/billing/InvoicePreview';
@@ -35,6 +36,7 @@ import PaymentTracker from '../components/billing/PaymentTracker';
  * @returns {JSX.Element} Billing management page
  */
 export default function Billing() {
+  const { t } = useTranslation('financial');
   const _navigate = useNavigate();
 
   // State for tabs and modals
@@ -143,7 +145,7 @@ export default function Billing() {
       link.click();
     } catch (error) {
       logger.error('Export failed:', error);
-      toast.error('Kunne ikke eksportere rapport');
+      toast.error(t('exportReportError'));
     }
   };
 
@@ -174,16 +176,14 @@ export default function Billing() {
       {/* Header / Overskrift */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Fakturering</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Administrer fakturaer, takstkoder og betalinger
-          </p>
+          <h1 className="text-2xl font-semibold text-gray-900">{t('billingTitle')}</h1>
+          <p className="text-sm text-gray-500 mt-1">{t('billingSubtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
           <button
             onClick={() => refetchStats()}
             className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            title="Oppdater statistikk"
+            title={t('refreshStatsTooltip')}
           >
             <RefreshCw className="w-4 h-4 text-gray-600" />
           </button>
@@ -192,14 +192,14 @@ export default function Billing() {
             className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <Download className="w-4 h-4" />
-            HELFO-rapport
+            {t('helfoReport')}
           </button>
           <button
             onClick={handleCreateInvoice}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4" />
-            Ny faktura
+            {t('newInvoiceBtn')}
           </button>
         </div>
       </div>
@@ -209,12 +209,12 @@ export default function Billing() {
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Utstaende</p>
+              <p className="text-sm text-gray-600">{t('outstandingAmount')}</p>
               <p className="text-2xl font-semibold text-gray-900 mt-1">
                 {statsLoading ? '...' : formatCurrency(stats.total_outstanding)}
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                {stats.pending_count || 0} ventende fakturaer
+                {t('pendingInvoices').replace('{count}', stats.pending_count || 0)}
               </p>
             </div>
             <div className="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center">
@@ -225,12 +225,12 @@ export default function Billing() {
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Betalt totalt</p>
+              <p className="text-sm text-gray-600">{t('totalPaidAmount')}</p>
               <p className="text-2xl font-semibold text-gray-900 mt-1">
                 {statsLoading ? '...' : formatCurrency(stats.total_paid)}
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                {stats.paid_count || 0} betalte fakturaer
+                {t('paidInvoices').replace('{count}', stats.paid_count || 0)}
               </p>
             </div>
             <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
@@ -241,12 +241,12 @@ export default function Billing() {
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Forfalt</p>
+              <p className="text-sm text-gray-600">{t('overdueCount')}</p>
               <p className="text-2xl font-semibold text-gray-900 mt-1">
                 {statsLoading ? '...' : stats.overdue_count || 0}
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                {formatCurrency(stats.total_overdue)} utstaende
+                {t('outstandingBalance').replace('{amount}', formatCurrency(stats.total_overdue))}
               </p>
             </div>
             <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center">
@@ -257,12 +257,12 @@ export default function Billing() {
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">HELFO-refusjon</p>
+              <p className="text-sm text-gray-600">{t('helfoRefund')}</p>
               <p className="text-2xl font-semibold text-gray-900 mt-1">
                 {statsLoading ? '...' : formatCurrency(stats.total_helfo_refund)}
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                {stats.total_invoices || 0} totalt fakturaer
+                {t('totalInvoicesCount').replace('{count}', stats.total_invoices || 0)}
               </p>
             </div>
             <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
@@ -284,7 +284,7 @@ export default function Billing() {
             }`}
           >
             <FileText className="w-4 h-4" />
-            Fakturaer
+            {t('invoices')}
           </button>
           <button
             onClick={() => setActiveTab('takst')}
@@ -295,7 +295,7 @@ export default function Billing() {
             }`}
           >
             <BarChart3 className="w-4 h-4" />
-            Takstkoder
+            {t('takstCodesTab')}
           </button>
           <button
             onClick={() => setActiveTab('reports')}
@@ -306,7 +306,7 @@ export default function Billing() {
             }`}
           >
             <TrendingUp className="w-4 h-4" />
-            Rapporter
+            {t('reportsTab')}
           </button>
         </nav>
       </div>
@@ -320,12 +320,8 @@ export default function Billing() {
       {activeTab === 'takst' && (
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Norske takstkoder for kiropraktorer
-            </h3>
-            <p className="text-sm text-gray-500 mt-1">
-              Oversikt over gjeldende takstkoder med HELFO-refusjon og egenandeler
-            </p>
+            <h3 className="text-lg font-semibold text-gray-900">{t('norwegianTakstCodes')}</h3>
+            <p className="text-sm text-gray-500 mt-1">{t('takstCodesDescription')}</p>
           </div>
           <TakstCodes
             selectedCodes={takstCodesReadOnly}
@@ -339,7 +335,7 @@ export default function Billing() {
       {activeTab === 'reports' && (
         <div className="space-y-6">
           <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Okonomiske rapporter</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('financialReports')}</h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* HELFO Report Card */}
@@ -352,13 +348,11 @@ export default function Billing() {
                     <Download className="w-5 h-5 text-green-600" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900">HELFO-rapport</h4>
-                    <p className="text-sm text-gray-500">Manedlig refusjonsrapport</p>
+                    <h4 className="font-medium text-gray-900">{t('helfoReport')}</h4>
+                    <p className="text-sm text-gray-500">{t('monthlyRefundReport')}</p>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600">
-                  Eksporter oversikt over HELFO-refusjoner for innevarende maned.
-                </p>
+                <p className="text-sm text-gray-600">{t('exportHelfoDesc')}</p>
               </div>
 
               {/* Outstanding Report Card */}
@@ -368,13 +362,11 @@ export default function Billing() {
                     <Clock className="w-5 h-5 text-orange-600" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900">Utstaende fordringer</h4>
-                    <p className="text-sm text-gray-500">Ubetalte fakturaer</p>
+                    <h4 className="font-medium text-gray-900">{t('outstandingClaims')}</h4>
+                    <p className="text-sm text-gray-500">{t('unpaidInvoicesLabel')}</p>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600">
-                  Oversikt over alle utstaende og forfalte fakturaer.
-                </p>
+                <p className="text-sm text-gray-600">{t('outstandingClaimsDesc')}</p>
               </div>
 
               {/* Revenue Report Card */}
@@ -384,29 +376,27 @@ export default function Billing() {
                     <TrendingUp className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900">Inntektsrapport</h4>
-                    <p className="text-sm text-gray-500">Periodens inntekter</p>
+                    <h4 className="font-medium text-gray-900">{t('revenueReportTitle')}</h4>
+                    <p className="text-sm text-gray-500">{t('periodRevenue')}</p>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600">
-                  Detaljert oversikt over inntekter fordelt pa takstkoder.
-                </p>
+                <p className="text-sm text-gray-600">{t('revenueReportDesc')}</p>
               </div>
             </div>
           </div>
 
           {/* Quick Stats */}
           <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Statistikk oversikt</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('statsOverview')}</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div>
-                <p className="text-sm text-gray-500">Totalt fakturert</p>
+                <p className="text-sm text-gray-500">{t('totalBilled')}</p>
                 <p className="text-xl font-semibold text-gray-900 mt-1">
                   {formatCurrency((stats.total_paid || 0) + (stats.total_outstanding || 0))}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Gjennomsnittlig faktura</p>
+                <p className="text-sm text-gray-500">{t('averageInvoice')}</p>
                 <p className="text-xl font-semibold text-gray-900 mt-1">
                   {formatCurrency(
                     stats.total_invoices > 0
@@ -417,7 +407,7 @@ export default function Billing() {
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Betalingsgrad</p>
+                <p className="text-sm text-gray-500">{t('paymentRateLabel')}</p>
                 <p className="text-xl font-semibold text-green-600 mt-1">
                   {stats.total_invoices > 0
                     ? Math.round(((stats.paid_count || 0) / stats.total_invoices) * 100)
@@ -426,7 +416,7 @@ export default function Billing() {
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Utkast</p>
+                <p className="text-sm text-gray-500">{t('draftsCount')}</p>
                 <p className="text-xl font-semibold text-gray-900 mt-1">{stats.draft_count || 0}</p>
               </div>
             </div>

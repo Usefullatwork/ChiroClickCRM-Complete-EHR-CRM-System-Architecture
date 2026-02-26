@@ -24,6 +24,12 @@ export const clinical = {
     vngAssessment: 'VNG Assessment',
     vngSaved: 'VNG assessment saved!',
     vngSaveError: 'Error saving',
+    // ClinicalEncounter UI
+    noPreviousEncounter: 'No previous encounter found for this patient.',
+    switchToASOAP: 'Switch to Assessment-first (ASOAP)',
+    switchToSOAP: 'Switch to standard SOAP',
+    riskLevel: 'Risk level',
+    fillSoapForAI: 'Fill in subjective and objective findings for AI suggestions.',
   },
   no: {
     clinicalEncounter: 'Klinisk konsultasjon',
@@ -45,5 +51,11 @@ export const clinical = {
     vngAssessment: 'VNG-undersøkelse',
     vngSaved: 'VNG-undersøkelse lagret!',
     vngSaveError: 'Feil ved lagring',
+    // ClinicalEncounter UI
+    noPreviousEncounter: 'Ingen tidligere konsultasjon funnet for denne pasienten.',
+    switchToASOAP: 'Bytt til Vurdering-først (ASOAP)',
+    switchToSOAP: 'Bytt til standard SOAP',
+    riskLevel: 'Risikonivå',
+    fillSoapForAI: 'Fyll ut subjektive og objektive funn for AI-forslag.',
   },
 };

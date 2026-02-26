@@ -39,6 +39,13 @@ vi.mock('../../components/ui/Badge', () => ({
   Badge: ({ children }) => <span>{children}</span>,
 }));
 
+vi.mock('../../i18n', () => ({
+  useTranslation: () => ({
+    t: (key) => key,
+    lang: 'no',
+  }),
+}));
+
 vi.mock('lucide-react', () => ({
   TrendingUp: () => <span>TrendingUp</span>,
   TrendingDown: () => <span>TrendingDown</span>,
@@ -114,62 +121,62 @@ describe('AIPerformance Page', () => {
     useExportAIFeedback.mockReturnValue({ mutate: vi.fn(), isPending: false });
   });
 
-  it('should render the AI performance title in Norwegian', () => {
+  it('should render the AI performance title', () => {
     render(<AIPerformance />);
-    expect(screen.getByText('AI-ytelse')).toBeInTheDocument();
+    expect(screen.getByText('title')).toBeInTheDocument();
   });
 
   it('should display acceptance rate stat card', () => {
     render(<AIPerformance />);
-    expect(screen.getByText('Akseptrate')).toBeInTheDocument();
+    expect(screen.getByText('acceptanceRate')).toBeInTheDocument();
   });
 
   it('should display total suggestions stat card', () => {
     render(<AIPerformance />);
-    expect(screen.getByText('Totale forslag')).toBeInTheDocument();
+    expect(screen.getByText('totalSuggestions')).toBeInTheDocument();
   });
 
   it('should display average rating stat card', () => {
     render(<AIPerformance />);
-    expect(screen.getByText('Gjennomsnittlig vurdering')).toBeInTheDocument();
+    expect(screen.getByText('avgRating')).toBeInTheDocument();
   });
 
   it('should display average decision time stat card', () => {
     render(<AIPerformance />);
-    expect(screen.getByText('Gjennomsnittlig beslutningstid')).toBeInTheDocument();
+    expect(screen.getByText('avgDecisionTime')).toBeInTheDocument();
   });
 
   it('should have date range filter options', () => {
     render(<AIPerformance />);
-    expect(screen.getByText('Siste 7 dager')).toBeInTheDocument();
-    expect(screen.getByText('Siste 30 dager')).toBeInTheDocument();
-    expect(screen.getByText('Siste 90 dager')).toBeInTheDocument();
+    expect(screen.getByText('last7Days')).toBeInTheDocument();
+    expect(screen.getByText('last30Days')).toBeInTheDocument();
+    expect(screen.getByText('last90Days')).toBeInTheDocument();
   });
 
   it('should have group by options', () => {
     render(<AIPerformance />);
-    expect(screen.getByText('Dag')).toBeInTheDocument();
-    expect(screen.getByText('Uke')).toBeInTheDocument();
-    expect(screen.getByText('Maned')).toBeInTheDocument();
+    expect(screen.getByText('day')).toBeInTheDocument();
+    expect(screen.getByText('week')).toBeInTheDocument();
+    expect(screen.getByText('month')).toBeInTheDocument();
   });
 
   it('should display acceptance over time chart heading', () => {
     render(<AIPerformance />);
-    expect(screen.getByText('Akseptrate over tid')).toBeInTheDocument();
+    expect(screen.getByText('acceptanceOverTime')).toBeInTheDocument();
   });
 
   it('should display by suggestion type chart heading', () => {
     render(<AIPerformance />);
-    expect(screen.getByText('Etter forslagstype')).toBeInTheDocument();
+    expect(screen.getByText('byType')).toBeInTheDocument();
   });
 
   it('should have export button', () => {
     render(<AIPerformance />);
-    expect(screen.getByText('Eksporter data')).toBeInTheDocument();
+    expect(screen.getByText('exportData')).toBeInTheDocument();
   });
 
   it('should display retraining status section', () => {
     render(<AIPerformance />);
-    expect(screen.getByText('Opplaeringstatus')).toBeInTheDocument();
+    expect(screen.getByText('retrainingStatus')).toBeInTheDocument();
   });
 });

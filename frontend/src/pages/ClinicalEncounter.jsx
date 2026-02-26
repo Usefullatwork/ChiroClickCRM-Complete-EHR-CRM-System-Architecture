@@ -19,6 +19,7 @@ import { ConnectionStatus } from '../components/common';
 import { RedFlagModal } from '../components/clinical';
 import { useRedFlagScreening } from '../hooks/useRedFlagScreening';
 import toast from '../utils/toast';
+import { useTranslation } from '../i18n';
 
 // Extracted components
 import { useClinicalEncounterState } from '../hooks/useClinicalEncounterState';
@@ -136,6 +137,7 @@ const keyboardShortcuts = {
 
 export default function ClinicalEncounter() {
   const { patientId, encounterId } = useParams();
+  const { t } = useTranslation('clinical');
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -411,7 +413,7 @@ export default function ClinicalEncounter() {
   // SALT
   const handleSALT = (section = null) => {
     if (!previousEncounters) {
-      toast.info('Ingen tidligere konsultasjon funnet for denne pasienten.');
+      toast.info(t('noPreviousEncounter'));
       return;
     }
     const prev = previousEncounters;
@@ -693,7 +695,7 @@ export default function ClinicalEncounter() {
           suggestions.followUp.push(`\u26A0\uFE0F ${redFlagData.analysis}`);
         }
         if (redFlagData.riskLevel && redFlagData.riskLevel !== 'LOW') {
-          suggestions.clinicalReasoning += `\n\nRisikoniv\u00E5: ${redFlagData.riskLevel}`;
+          suggestions.clinicalReasoning += `\n\n${t('riskLevel')}: ${redFlagData.riskLevel}`;
         }
       }
       if (suggestions.diagnosis.length === 0 && !suggestions.clinicalReasoning) {
@@ -725,7 +727,7 @@ export default function ClinicalEncounter() {
         'Nakkesmertepresentasjon tyder p\u00E5 cervikal facettdysfunksjon eller muskelspenning.';
     }
     if (suggestions.diagnosis.length === 0) {
-      suggestions.clinicalReasoning = 'Fyll ut subjektive og objektive funn for AI-forslag.';
+      suggestions.clinicalReasoning = t('fillSoapForAI');
     }
     return suggestions;
   };
@@ -886,8 +888,8 @@ export default function ClinicalEncounter() {
               className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors"
               title={
                 (clinicalPrefs.soapSectionOrder || 'soap') === 'soap'
-                  ? 'Bytt til Vurdering-forst (ASOAP)'
-                  : 'Bytt til standard SOAP'
+                  ? t('switchToASOAP')
+                  : t('switchToSOAP')
               }
             >
               <span className="font-bold">
