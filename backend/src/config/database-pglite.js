@@ -70,10 +70,14 @@ export const initPGlite = async () => {
     return db;
   }
 
-  ensureDataDirectories();
-  const dataDir = getPGliteDataDir();
+  const isTestMode = process.env.NODE_ENV === 'test';
 
-  logger.info(`Initializing PGlite database at: ${dataDir}`);
+  if (!isTestMode) {
+    ensureDataDirectories();
+  }
+  const dataDir = isTestMode ? undefined : getPGliteDataDir();
+
+  logger.info(`Initializing PGlite database${dataDir ? ` at: ${dataDir}` : ' (in-memory)'}`);
 
   try {
     const extensions = {};
@@ -84,9 +88,7 @@ export const initPGlite = async () => {
       extensions.uuid_ossp = uuid_ossp;
     }
 
-    db = new PGlite(dataDir, {
-      extensions,
-    });
+    db = dataDir ? new PGlite(dataDir, { extensions }) : new PGlite({ extensions });
 
     // Wait for PGlite to be ready
     await db.waitReady;
@@ -138,7 +140,7 @@ export const initPGlite = async () => {
     logger.error('Failed to initialize PGlite:', error);
 
     // Auto-recovery: if corruption detected and we haven't tried yet, nuke and retry
-    if (isCorruptionError(error) && !recoveryAttempted) {
+    if (isCorruptionError(error) && !recoveryAttempted && !isTestMode) {
       recoveryAttempted = true;
       logger.warn('PGlite corruption detected — attempting auto-recovery...');
 
