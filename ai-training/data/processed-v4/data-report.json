@@ -57,6 +57,10 @@
       "loaded": 80,
       "errors": 0
     },
+    "data\\mined\\icpc2-v4-benchmark-targeted.jsonl": {
+      "loaded": 46,
+      "errors": 0
+    },
     "data\\mined\\medical-safety-mined.jsonl": {
       "loaded": 732,
       "errors": 0
@@ -95,8 +99,8 @@
     }
   },
   "filter_stats": {
-    "total": 26086,
-    "kept": 17235,
+    "total": 26132,
+    "kept": 17281,
     "too_short": 3,
     "duplicate": 8802,
     "contaminated": 46
@@ -113,10 +117,11 @@
     "red-flags-v2-synthetic.jsonl",
     "icpc2-v2-synthetic.jsonl",
     "icpc2-v3-targeted.jsonl",
+    "icpc2-v4-benchmark-targeted.jsonl",
     "comms-norwegian-v2-synthetic.jsonl"
   ],
   "v4_cap_stats": {
-    "non_website_count": 11931,
+    "non_website_count": 12115,
     "website_before_caps": 7944,
     "website_clinical_summary": "984 -> 400 (cap=400)",
     "website_differential_diagnosis": "1120 -> 1120 (cap=uncapped)",
@@ -124,38 +129,38 @@
     "website_patient_education": "1172 -> 300 (cap=300)",
     "website_red_flag_analysis": "1973 -> 1973 (cap=uncapped)",
     "website_after_caps": 4293,
-    "total_after_caps": 16224
+    "total_after_caps": 16408
   },
   "datasets": {
     "all-clean": {
-      "total": 17236,
-      "train": 13788,
-      "validation": 1723,
-      "test": 1725
+      "total": 17282,
+      "train": 13825,
+      "validation": 1728,
+      "test": 1729
     },
     "quick-fields": {
-      "total": 6717,
-      "train": 5373,
-      "validation": 671,
-      "test": 673
+      "total": 6763,
+      "train": 5410,
+      "validation": 676,
+      "test": 677
     },
     "medical-safety": {
-      "total": 8441,
-      "train": 6752,
-      "validation": 844,
-      "test": 845
+      "total": 8487,
+      "train": 6789,
+      "validation": 848,
+      "test": 850
     },
     "norwegian-clinical": {
-      "total": 7909,
-      "train": 6327,
-      "validation": 790,
+      "total": 7911,
+      "train": 6328,
+      "validation": 791,
       "test": 792
     },
     "general-clinical": {
-      "total": 13585,
-      "train": 10868,
-      "validation": 1358,
-      "test": 1359
+      "total": 13631,
+      "train": 10904,
+      "validation": 1363,
+      "test": 1364
     }
   }
 }

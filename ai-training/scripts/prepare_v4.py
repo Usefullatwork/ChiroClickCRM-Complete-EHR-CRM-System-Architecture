@@ -64,6 +64,7 @@ V4_UPSAMPLE_PATTERNS = [
     "red-flags-v2-synthetic.jsonl",
     "icpc2-v2-synthetic.jsonl",
     "icpc2-v3-targeted.jsonl",
+    "icpc2-v4-benchmark-targeted.jsonl",
     "comms-norwegian-v2-synthetic.jsonl",
 ]
 

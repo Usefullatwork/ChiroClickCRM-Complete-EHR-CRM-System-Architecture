@@ -20,6 +20,7 @@ Source Files:
   data\mined\icpc2-codes-synthetic.jsonl: 205 items
   data\mined\icpc2-v2-synthetic.jsonl: 300 items
   data\mined\icpc2-v3-targeted.jsonl: 80 items
+  data\mined\icpc2-v4-benchmark-targeted.jsonl: 46 items
   data\mined\medical-safety-mined.jsonl: 732 items
   data\mined\norwegian-mined.jsonl: 4203 items
   data\mined\quick-fields-mined.jsonl: 845 items
@@ -30,8 +31,8 @@ Source Files:
   data\expanded_norwegian_letters.jsonl: 37 items
   data\norwegian_letters.jsonl: 11 items
 
-Total raw: 26086
-Kept after filtering: 17235
+Total raw: 26132
+Kept after filtering: 17281
 Removed - invalid format: 0
 Removed - duplicates: 8802
 Removed - echo responses: 0
@@ -39,8 +40,8 @@ Removed - too short: 3
 Removed - contaminated: 46
 
 v4 Cap Stats:
-  non_website_count: 11931
-  total_after_caps: 16224
+  non_website_count: 12115
+  total_after_caps: 16408
   website_after_caps: 4293
   website_before_caps: 7944
   website_clinical_summary: 984 -> 400 (cap=400)
@@ -50,8 +51,8 @@ v4 Cap Stats:
   website_red_flag_analysis: 1973 -> 1973 (cap=uncapped)
 
 Datasets:
-  all-clean: 17236 (train=13788, val=1723, test=1725)
-  quick-fields: 6717 (train=5373, val=671, test=673)
-  medical-safety: 8441 (train=6752, val=844, test=845)
-  norwegian-clinical: 7909 (train=6327, val=790, test=792)
-  general-clinical: 13585 (train=10868, val=1358, test=1359)
+  all-clean: 17282 (train=13825, val=1728, test=1729)
+  quick-fields: 6763 (train=5410, val=676, test=677)
+  medical-safety: 8487 (train=6789, val=848, test=850)
+  norwegian-clinical: 7911 (train=6328, val=791, test=792)
+  general-clinical: 13631 (train=10904, val=1363, test=1364)
