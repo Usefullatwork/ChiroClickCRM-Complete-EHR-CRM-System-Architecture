@@ -829,6 +829,12 @@ export const aiAPI = {
   // Feedback on AI suggestions (thumbs up/down, corrections)
   submitFeedback: (data) => apiClient.post('/ai/feedback', data),
   recordOutcomeFeedback: (data) => apiClient.post('/ai/outcome-feedback', data),
+  // Claude extended thinking analysis (differential diagnosis, red flags)
+  extendedAnalysis: (data) => apiClient.post('/ai/extended-analysis', data),
+  // Claude vision image analysis (X-ray, MRI, posture)
+  analyzeImage: (data) => apiClient.post('/ai/analyze-image', data),
+  // Claude tool_use structured extraction (SOAP, diagnoses)
+  extractStructured: (data) => apiClient.post('/ai/extract-structured', data),
 };
 
 // Macros API - Clinical text hot buttons

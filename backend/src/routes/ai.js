@@ -444,4 +444,108 @@ router.get('/training/history', requireRole(['ADMIN']), aiController.getTraining
  */
 router.post('/training/trigger', requireRole(['ADMIN']), aiController.triggerRetraining);
 
+// =================================================================
+// Claude Extended Thinking & Vision Endpoints
+// =================================================================
+
+/**
+ * @swagger
+ * /ai/extended-analysis:
+ *   post:
+ *     summary: Run extended thinking analysis (differential diagnosis, red flags)
+ *     tags: [AI]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               prompt:
+ *                 type: string
+ *               soapData:
+ *                 type: object
+ *               patientData:
+ *                 type: object
+ *               analysisType:
+ *                 type: string
+ *                 enum: [differential, red_flags, clinical_reasoning]
+ *     responses:
+ *       200:
+ *         description: Extended analysis with reasoning chain and conclusion
+ */
+router.post(
+  '/extended-analysis',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  aiController.extendedAnalysis
+);
+
+/**
+ * @swagger
+ * /ai/analyze-image:
+ *   post:
+ *     summary: Analyze clinical image (X-ray, MRI, posture) using Claude vision
+ *     tags: [AI]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [base64]
+ *             properties:
+ *               base64:
+ *                 type: string
+ *                 description: Base64-encoded image data
+ *               mediaType:
+ *                 type: string
+ *                 enum: [image/jpeg, image/png, image/webp, image/gif]
+ *               analysisType:
+ *                 type: string
+ *                 enum: [xray, mri, posture, general]
+ *               additionalContext:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Image analysis results with disclaimer
+ *       400:
+ *         description: Missing image data
+ */
+router.post('/analyze-image', requireRole(['ADMIN', 'PRACTITIONER']), aiController.analyzeImage);
+
+/**
+ * @swagger
+ * /ai/extract-structured:
+ *   post:
+ *     summary: Extract structured data from clinical text using Claude tool_use
+ *     tags: [AI]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [text]
+ *             properties:
+ *               text:
+ *                 type: string
+ *               type:
+ *                 type: string
+ *                 enum: [soap, diagnoses]
+ *               availableCodes:
+ *                 type: array
+ *     responses:
+ *       200:
+ *         description: Structured extraction result
+ */
+router.post(
+  '/extract-structured',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  aiController.extractStructured
+);
+
 export default router;

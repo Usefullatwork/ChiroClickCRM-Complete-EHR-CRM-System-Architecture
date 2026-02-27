@@ -330,6 +330,8 @@ import treatmentPlanRoutes from './routes/treatmentPlans.js';
 import macroRoutes from './routes/macros.js';
 import errorReportRoutes from './routes/errors.js';
 import aiRetrainingRoutes from './routes/aiRetraining.js';
+import aiCostRoutes from './routes/aiCost.js';
+import batchRoutes from './routes/batch.js';
 
 // Mount routes
 app.use(`/api/${API_VERSION}/auth`, authRoutes);
@@ -369,6 +371,8 @@ app.use(`/api/${API_VERSION}/clinical-settings`, clinicalSettingsRoutes);
 app.use(`/api/${API_VERSION}/treatment-plans`, treatmentPlanRoutes);
 app.use(`/api/${API_VERSION}/macros`, macroRoutes);
 app.use(`/api/${API_VERSION}/ai-retraining`, aiRetrainingRoutes);
+app.use(`/api/${API_VERSION}/ai-cost`, aiCostRoutes);
+app.use(`/api/${API_VERSION}/batch`, batchRoutes);
 app.use(`/api/${API_VERSION}/errors`, errorReportRoutes);
 
 // Portal routes (public - no auth required for patient access)

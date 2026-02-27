@@ -155,6 +155,68 @@ class RAGService {
   }
 
   /**
+   * Contextualize a chunk by adding context prefix using Claude Haiku.
+   * This follows the Contextual Retrieval pattern from Anthropic's cookbook.
+   * Falls back to template-based context without API key.
+   *
+   * @param {string} chunk - The text chunk to contextualize
+   * @param {string} fullDocument - The full document for context
+   * @param {Object} metadata - { patientId, visitDate, noteType }
+   * @returns {string} Contextualized chunk with prefix
+   */
+  async contextualizeChunk(chunk, fullDocument, metadata = {}) {
+    const apiKey = process.env.CLAUDE_API_KEY;
+
+    // Fallback: template-based context (no API needed)
+    if (!apiKey) {
+      const prefix = metadata.noteType
+        ? `[${metadata.noteType}${metadata.visitDate ? ` - ${metadata.visitDate}` : ''}] `
+        : '';
+      return `${prefix}${chunk}`;
+    }
+
+    try {
+      let Anthropic;
+      try {
+        const sdk = await import('@anthropic-ai/sdk');
+        Anthropic = sdk.default || sdk.Anthropic;
+      } catch {
+        // SDK not installed — use template fallback
+        const prefix = metadata.noteType ? `[${metadata.noteType}] ` : '';
+        return `${prefix}${chunk}`;
+      }
+
+      const client = new Anthropic({ apiKey });
+      const response = await client.messages.create({
+        model: 'claude-haiku-4-5',
+        max_tokens: 100,
+        system: [
+          {
+            type: 'text',
+            text: fullDocument.substring(0, 8000),
+            cache_control: { type: 'ephemeral' },
+          },
+        ],
+        messages: [
+          {
+            role: 'user',
+            content: `Gi en kort kontekst (1-2 setninger) som plasserer denne tekstbiten i dokumentet. Ikke gjenta innholdet, bare konteksten.\n\nTekstbit: ${chunk}`,
+          },
+        ],
+      });
+
+      const context = response.content
+        .filter((b) => b.type === 'text')
+        .map((b) => b.text)
+        .join('');
+      return `${context}\n${chunk}`;
+    } catch (error) {
+      logger.warn('Chunk contextualization failed, using raw chunk:', error.message);
+      return chunk;
+    }
+  }
+
+  /**
    * Index a clinical encounter for RAG retrieval
    */
   async indexEncounter(

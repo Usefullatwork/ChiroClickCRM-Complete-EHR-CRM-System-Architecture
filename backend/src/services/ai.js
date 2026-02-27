@@ -28,6 +28,7 @@ import {
   checkMedicationWarnings,
 } from './clinicalValidation.js';
 import circuitBreakerRegistry from '../infrastructure/resilience/CircuitBreakerRegistry.js';
+import { getAIProvider } from './providers/aiProviderFactory.js';
 
 // Get the pre-registered Ollama circuit breaker and set requestTimeout
 // to exceed the per-request axios timeout (30s) so the breaker tracks
@@ -732,105 +733,37 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
       : smsConstraint;
   }
 
-  // Step 3: Generate completion via Ollama (local)
-  // Smart lifecycle: track loaded model for VRAM management
-  // Includes retry logic: 1 retry with 2s backoff for timeout errors only
-  const OLLAMA_TIMEOUT_MS = 30000; // 30s timeout per request
-  const OLLAMA_RETRY_BACKOFF_MS = 2000; // 2s backoff before retry
-  const OLLAMA_MAX_RETRIES = 1;
+  // Step 3: Generate completion via AI provider (Ollama, Claude, or fallback)
+  // Provider handles retry logic, model routing, and streaming internally
   let rawOutput;
   let confidence;
 
-  const ollamaPayload = {
+  const provider = getAIProvider();
+  const providerResult = await provider.generate(augmentedPrompt, effectiveSystemPrompt, {
+    maxTokens,
+    temperature: effectiveTemperature,
     model,
-    prompt: effectiveSystemPrompt
-      ? `${effectiveSystemPrompt}\n\n${augmentedPrompt}`
-      : augmentedPrompt,
-    stream: false,
-    keep_alive: KEEP_ALIVE,
-    options: {
-      temperature: effectiveTemperature,
-      num_predict: maxTokens,
-    },
-  };
+    taskType,
+    organizationId,
+  });
 
-  let lastError = null;
-  for (let attempt = 0; attempt <= OLLAMA_MAX_RETRIES; attempt++) {
-    try {
-      if (attempt > 0) {
-        logger.warn(`Ollama retry attempt ${attempt} for model "${model}" (task: ${taskType})`, {
-          previousError: lastError?.message,
-        });
-        await new Promise((resolve) => setTimeout(resolve, OLLAMA_RETRY_BACKOFF_MS));
-      }
+  rawOutput = providerResult.text;
 
-      if (currentLoadedModel && currentLoadedModel !== model) {
-        logger.debug(`Model switch: ${currentLoadedModel} → ${model}`);
-      }
+  // Calculate confidence score for this response
+  confidence = calculateConfidence(rawOutput, taskType, model);
 
-      const response = await ollamaBreaker.execute(() =>
-        axios.post(`${OLLAMA_BASE_URL}/api/generate`, ollamaPayload, {
-          timeout: OLLAMA_TIMEOUT_MS,
-        })
-      );
-
-      currentLoadedModel = model;
-      rawOutput = response.data.response;
-
-      // Calculate confidence score for this response
-      confidence = calculateConfidence(rawOutput, taskType, model);
-
-      // Log suggestion to ai_suggestions table (non-blocking)
-      if (organizationId && taskType) {
-        const durationMs = response.data.total_duration
-          ? Math.round(response.data.total_duration / 1e6)
-          : null;
-        logSuggestion({
-          organizationId,
-          suggestionType: taskType,
-          modelName: model,
-          inputText: sanitizedPrompt.substring(0, 500),
-          suggestedText: rawOutput.substring(0, 2000),
-          confidenceScore: confidence.score,
-          requestDurationMs: durationMs,
-          abVariant,
-        }).catch((err) => logger.warn('Failed to log AI suggestion:', err.message));
-      }
-
-      lastError = null;
-      break; // Success — exit retry loop
-    } catch (error) {
-      lastError = error;
-      const isTimeout =
-        error.code === 'ECONNABORTED' ||
-        error.code === 'ETIMEDOUT' ||
-        (error.message && error.message.includes('timeout'));
-
-      if (isTimeout) {
-        logger.warn('Ollama request timed out', {
-          model,
-          taskType,
-          attempt: attempt + 1,
-          timeoutMs: OLLAMA_TIMEOUT_MS,
-        });
-        // Continue to retry for timeout errors
-        continue;
-      }
-
-      // Non-timeout errors: do not retry
-      logger.error('AI completion error:', error.message);
-      throw new Error('AI service unavailable');
-    }
-  }
-
-  if (lastError) {
-    logger.error('AI completion failed after all retries', {
-      model,
-      taskType,
-      retries: OLLAMA_MAX_RETRIES,
-      error: lastError.message,
-    });
-    throw new Error('AI service unavailable (timeout after retries)');
+  // Log suggestion to ai_suggestions table (non-blocking)
+  if (organizationId && taskType) {
+    logSuggestion({
+      organizationId,
+      suggestionType: taskType,
+      modelName: providerResult.model || model,
+      inputText: sanitizedPrompt.substring(0, 500),
+      suggestedText: rawOutput.substring(0, 2000),
+      confidenceScore: confidence.score,
+      requestDurationMs: providerResult.durationMs || null,
+      abVariant,
+    }).catch((err) => logger.warn('Failed to log AI suggestion:', err.message));
   }
 
   // Step 4: Filter output through guardrails
@@ -1809,45 +1742,11 @@ export const buildFieldPrompt = (fieldType, context = {}, _language = 'no') => {
 
 /**
  * Generate AI completion as a stream (SSE)
+ * Delegates to the active AI provider (Ollama, Claude, or fallback)
  */
 export const generateCompletionStream = async (model, prompt, res) => {
-  try {
-    const response = await ollamaBreaker.execute(() =>
-      axios.post(
-        `${OLLAMA_BASE_URL}/api/generate`,
-        {
-          model: model || AI_MODEL,
-          prompt,
-          stream: true,
-          keep_alive: KEEP_ALIVE,
-        },
-        { responseType: 'stream', timeout: 30000 }
-      )
-    );
-
-    response.data.on('data', (chunk) => {
-      try {
-        const parsed = JSON.parse(chunk.toString());
-        if (parsed.response) {
-          res.write(`data: ${JSON.stringify({ text: parsed.response })}\n\n`);
-        }
-        if (parsed.done) {
-          res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
-          res.end();
-        }
-      } catch (e) {
-        // Skip unparseable chunks
-      }
-    });
-
-    response.data.on('error', (err) => {
-      res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
-      res.end();
-    });
-  } catch (error) {
-    res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
-    res.end();
-  }
+  const provider = getAIProvider();
+  await provider.generateStream(model, prompt, res);
 };
 
 export default {

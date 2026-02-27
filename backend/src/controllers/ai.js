@@ -6,6 +6,13 @@
 import crypto from 'crypto';
 import * as aiService from '../services/ai.js';
 import { generateCompletionStream, getModelForField, buildFieldPrompt } from '../services/ai.js';
+import {
+  analyzeWithThinking,
+  differentialDiagnosis,
+  analyzeRedFlagsWithThinking,
+} from '../services/extendedThinking.js';
+import { analyzeImage as analyzeVisionImage } from '../services/clinicalVision.js';
+import { extractSOAP, extractDiagnoses } from '../services/structuredExtraction.js';
 import logger from '../utils/logger.js';
 import cache from '../utils/cache.js';
 import {
@@ -452,6 +459,95 @@ export const triggerRetraining = async (req, res) => {
   });
 };
 
+/**
+ * Extended analysis using Claude extended thinking
+ * Supports differential diagnosis and red flag analysis with transparent reasoning
+ */
+export const extendedAnalysis = async (req, res) => {
+  try {
+    const { prompt, soapData, patientData, analysisType = 'differential' } = req.body;
+
+    let result;
+    if (analysisType === 'red_flags' && soapData) {
+      result = await analyzeRedFlagsWithThinking(soapData, patientData || {});
+    } else if (analysisType === 'differential' && soapData) {
+      result = await differentialDiagnosis(soapData, patientData || {});
+    } else {
+      result = await analyzeWithThinking(prompt || '', { taskType: analysisType });
+    }
+
+    res.json({ success: true, ...result });
+  } catch (error) {
+    if (error.message.includes('CLAUDE_API_KEY')) {
+      return res.json({
+        success: false,
+        error: 'Claude API not configured',
+        requiresClaudeAPI: true,
+      });
+    }
+    logger.error('Error in extendedAnalysis controller:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+/**
+ * Analyze clinical images using Claude vision
+ */
+export const analyzeImage = async (req, res) => {
+  try {
+    const { base64, mediaType, analysisType, additionalContext } = req.body;
+    if (!base64) {
+      return res.status(400).json({ success: false, error: 'base64 image data required' });
+    }
+
+    const result = await analyzeVisionImage(
+      { base64, mediaType },
+      { analysisType, additionalContext }
+    );
+    res.json({ success: true, ...result });
+  } catch (error) {
+    if (error.message.includes('CLAUDE_API_KEY')) {
+      return res.json({
+        success: false,
+        error: 'Claude API not configured',
+        requiresClaudeAPI: true,
+      });
+    }
+    logger.error('Error in analyzeImage controller:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+/**
+ * Extract structured SOAP or diagnosis data from clinical text using Claude tool_use
+ */
+export const extractStructured = async (req, res) => {
+  try {
+    const { text, type = 'soap', availableCodes } = req.body;
+    if (!text) {
+      return res.status(400).json({ success: false, error: 'Clinical text required' });
+    }
+
+    let result;
+    if (type === 'diagnoses') {
+      result = await extractDiagnoses(text, availableCodes || []);
+    } else {
+      result = await extractSOAP(text);
+    }
+    res.json({ success: true, data: result });
+  } catch (error) {
+    if (error.message.includes('CLAUDE_API_KEY')) {
+      return res.json({
+        success: false,
+        error: 'Claude API not configured',
+        requiresClaudeAPI: true,
+      });
+    }
+    logger.error('Error in extractStructured controller:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
 export default {
   spellCheck,
   generateSOAPSuggestion,
@@ -466,4 +562,7 @@ export default {
   resetCircuitBreaker,
   getTrainingHistory,
   triggerRetraining,
+  extendedAnalysis,
+  analyzeImage,
+  extractStructured,
 };
