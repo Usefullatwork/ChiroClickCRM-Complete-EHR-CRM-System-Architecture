@@ -137,7 +137,7 @@ vi.mock('../../components/notes/NotePreview', () => ({
 }));
 
 vi.mock('../../components/notes/SOAPTemplate', () => ({
-  default: ({ patient, onSave, onLock, readOnly }) => (
+  default: ({ onSave, onLock, readOnly }) => (
     <div data-testid="soap-template">
       <span data-testid="soap-readonly">{readOnly ? 'readonly' : 'editable'}</span>
       <button data-testid="soap-save" onClick={() => onSave({ content: 'test' })}>
@@ -151,7 +151,7 @@ vi.mock('../../components/notes/SOAPTemplate', () => ({
 }));
 
 vi.mock('../../components/notes/InitialConsultTemplate', () => ({
-  default: ({ patient, onSave, readOnly }) => (
+  default: ({ onSave, readOnly }) => (
     <div data-testid="initial-consult-template">
       <span data-testid="initial-readonly">{readOnly ? 'readonly' : 'editable'}</span>
       <button data-testid="initial-save" onClick={() => onSave({ content: 'initial' })}>
@@ -162,7 +162,7 @@ vi.mock('../../components/notes/InitialConsultTemplate', () => ({
 }));
 
 vi.mock('../../components/notes/FollowUpTemplate', () => ({
-  default: ({ patient, onSave, readOnly }) => (
+  default: ({ onSave, readOnly }) => (
     <div data-testid="followup-template">
       <span data-testid="followup-readonly">{readOnly ? 'readonly' : 'editable'}</span>
       <button data-testid="followup-save" onClick={() => onSave({ content: 'followup' })}>
@@ -173,7 +173,7 @@ vi.mock('../../components/notes/FollowUpTemplate', () => ({
 }));
 
 vi.mock('../../components/notes/VestibularAssessment', () => ({
-  default: ({ patient, onSave, readOnly }) => (
+  default: ({ onSave, readOnly }) => (
     <div data-testid="vestibular-template">
       <span data-testid="vestibular-readonly">{readOnly ? 'readonly' : 'editable'}</span>
       <button data-testid="vestibular-save" onClick={() => onSave({ content: 'vestibular' })}>
@@ -188,7 +188,7 @@ vi.mock('../../components/notes/VestibularAssessment', () => ({
 import ClinicalNotes from '../../pages/ClinicalNotes';
 import { clinicalNotesAPI } from '../../api/clinicalNotes';
 import { api } from '../../api/client';
-import toast from '../../utils/toast';
+// toast mock is used by the component, not directly in tests
 
 // --- Test helpers ---
 

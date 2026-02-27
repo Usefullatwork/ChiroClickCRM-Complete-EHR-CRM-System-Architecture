@@ -357,9 +357,10 @@ describe('RecallDashboard Component', () => {
       render(<RecallDashboard />, { wrapper: createWrapper() });
 
       await waitFor(() => {
-        expect(screen.getByText('4')).toBeInTheDocument(); // total
-        expect(screen.getByText('2')).toBeInTheDocument(); // overdue
-        expect(screen.getByText('1')).toBeInTheDocument(); // due today and upcoming
+        // Numbers appear in multiple stat cards, so use getAllByText
+        expect(screen.getAllByText('4').length).toBeGreaterThanOrEqual(1); // total
+        expect(screen.getAllByText('2').length).toBeGreaterThanOrEqual(1); // overdue
+        expect(screen.getAllByText('1').length).toBeGreaterThanOrEqual(1); // due today and upcoming
       });
     });
   });
@@ -427,10 +428,11 @@ describe('RecallDashboard Component', () => {
       render(<RecallDashboard />, { wrapper: createWrapper() });
 
       await waitFor(() => {
-        expect(screen.getByText(/Pasient/)).toBeInTheDocument();
-        expect(screen.getByText(/Siste besok/)).toBeInTheDocument();
-        expect(screen.getByText(/Tilstand/)).toBeInTheDocument();
-        expect(screen.getByText(/Dager forfalt/)).toBeInTheDocument();
+        // /Pasient/ matches description text and <th>, so use getAllByText
+        expect(screen.getAllByText(/Pasient/).length).toBeGreaterThanOrEqual(1);
+        expect(screen.getAllByText(/Siste besok/).length).toBeGreaterThanOrEqual(1);
+        expect(screen.getAllByText(/Tilstand/).length).toBeGreaterThanOrEqual(1);
+        expect(screen.getAllByText(/Dager forfalt/).length).toBeGreaterThanOrEqual(1);
       });
     });
   });

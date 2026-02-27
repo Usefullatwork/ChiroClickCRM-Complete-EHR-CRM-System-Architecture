@@ -497,9 +497,10 @@ describe('MacroManager Component', () => {
 
       await waitFor(() => {
         // Should have stats: 3 total, 2 SOAP, 1 Behandling
+        // "SOAP" also appears in category filter dropdown, so use getAllByText
         expect(screen.getByText('Totalt makroer')).toBeInTheDocument();
-        expect(screen.getByText('SOAP')).toBeTruthy();
-        expect(screen.getByText('Behandling')).toBeTruthy();
+        expect(screen.getAllByText('SOAP').length).toBeGreaterThanOrEqual(1);
+        expect(screen.getAllByText('Behandling').length).toBeGreaterThanOrEqual(1);
       });
     });
   });
