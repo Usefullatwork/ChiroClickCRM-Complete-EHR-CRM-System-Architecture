@@ -1,0 +1,49 @@
+{"type": "icpc2", "code": "L01", "chapter": "L", "name_no": "Nakkesymptom", "description": "Symptom fra nakkeregionen uten spesifikk diagnose"}
+{"type": "icpc2", "code": "L02", "chapter": "L", "name_no": "Ryggsymptom", "description": "Symptom fra ryggregionen generelt"}
+{"type": "icpc2", "code": "L03", "chapter": "L", "name_no": "Korsryggssymptom", "description": "Symptom fra korsryggen/lumbalt"}
+{"type": "icpc2", "code": "L04", "chapter": "L", "name_no": "Brystsymptom muskuloskeletalt", "description": "Muskuloskeletale symptomer fra brystregionen"}
+{"type": "icpc2", "code": "L08", "chapter": "L", "name_no": "Skuldersymptom", "description": "Symptom fra skulderregionen"}
+{"type": "icpc2", "code": "L10", "chapter": "L", "name_no": "Albuesymptom", "description": "Symptom fra albueregionen"}
+{"type": "icpc2", "code": "L12", "chapter": "L", "name_no": "Hånd-/håndleddssymptom", "description": "Symptom fra hånd eller håndledd"}
+{"type": "icpc2", "code": "L13", "chapter": "L", "name_no": "Hoftesymptom", "description": "Symptom fra hofteregionen"}
+{"type": "icpc2", "code": "L15", "chapter": "L", "name_no": "Knesymptom", "description": "Symptom fra kneregionen"}
+{"type": "icpc2", "code": "L16", "chapter": "L", "name_no": "Ankelsymptom", "description": "Symptom fra ankelregionen"}
+{"type": "icpc2", "code": "L17", "chapter": "L", "name_no": "Fotsymptom", "description": "Symptom fra foten"}
+{"type": "icpc2", "code": "L18", "chapter": "L", "name_no": "Muskelsmerter", "description": "Generelle muskelsmerter, myalgi"}
+{"type": "icpc2", "code": "L19", "chapter": "L", "name_no": "Andre muskelsymptom", "description": "Andre symptomer relatert til muskulatur"}
+{"type": "icpc2", "code": "L76", "chapter": "L", "name_no": "Brudd annet", "description": "Fraktur ikke spesifisert andre steder"}
+{"type": "icpc2", "code": "L77", "chapter": "L", "name_no": "Forstuing ankel", "description": "Forstuing/forstuving av ankel"}
+{"type": "icpc2", "code": "L78", "chapter": "L", "name_no": "Forstuing kne", "description": "Forstuing/forstuving av kne"}
+{"type": "icpc2", "code": "L83", "chapter": "L", "name_no": "Nakkesyndrom", "description": "Cervikalt syndrom, nakkelidelse med smerte og stivhet"}
+{"type": "icpc2", "code": "L84", "chapter": "L", "name_no": "Ryggsyndrom uten utstråling", "description": "Ryggsmerte uten nevrologisk utstråling"}
+{"type": "icpc2", "code": "L86", "chapter": "L", "name_no": "Ryggsyndrom med utstråling", "description": "Ryggsmerte med radikulopati/isjias"}
+{"type": "icpc2", "code": "L87", "chapter": "L", "name_no": "Bursitt/tendinitt/synovitt", "description": "Betennelse i bursa, sene eller synovium"}
+{"type": "icpc2", "code": "L89", "chapter": "L", "name_no": "Hofteartrose", "description": "Degenerativ leddforandring i hofte, coxartrose"}
+{"type": "icpc2", "code": "L92", "chapter": "L", "name_no": "Skuldersyndrom", "description": "Impingement, rotatorcuff-lidelse, frossen skulder"}
+{"type": "icpc2", "code": "L93", "chapter": "L", "name_no": "Tennisalbue", "description": "Lateral epikondylitt"}
+{"type": "icpc2", "code": "L94", "chapter": "L", "name_no": "Perifert entesopatisyndrom", "description": "Smerter ved sene-benfester"}
+{"type": "icpc2", "code": "L96", "chapter": "L", "name_no": "Kne intern derangement", "description": "Meniskskade, korsbåndskade"}
+{"type": "icpc2", "code": "L98", "chapter": "L", "name_no": "Fotlidelse", "description": "Plantar fasciitt, hallux valgus, andre fotproblemer"}
+{"type": "icpc2", "code": "L99", "chapter": "L", "name_no": "Annen muskuloskelettal lidelse", "description": "Uspesifisert MSK-lidelse"}
+{"type": "icpc2", "code": "N01", "chapter": "N", "name_no": "Hodepine", "description": "Hodepine generelt, uspesifisert"}
+{"type": "icpc2", "code": "N02", "chapter": "N", "name_no": "Spenningshodepine", "description": "Tensjonshodepine, muskulær hodepine"}
+{"type": "icpc2", "code": "N17", "chapter": "N", "name_no": "Svimmelhet/vertigo", "description": "Svimmelhet, vertigo, ubalanse"}
+{"type": "icpc2", "code": "N89", "chapter": "N", "name_no": "Migrene", "description": "Migrene med eller uten aura"}
+{"type": "icpc2", "code": "N93", "chapter": "N", "name_no": "Karpaltunnelsyndrom", "description": "Kompresjon av n. medianus i håndledd"}
+{"type": "icpc2", "code": "H82", "chapter": "H", "name_no": "BPPV/vestibulær", "description": "Benign paroksysmal posisjonsvertigo, krystallsyke"}
+{"type": "icpc2", "code": "D20", "chapter": "D", "name_no": "Munn-/kjevesymptom", "description": "TMD, kjevesmerter, kjeveproblemer"}
+{"type": "red_flag", "name": "Cauda equina syndrom", "criteria": "Bilateral beinsmerte, sadel-anestesi, urinretensjon/inkontinens, anal sfinkter-hypotoni. AKUTT henvisning til kirurg/akuttmottak.", "urgency": "AKUTT", "action": "Ring 113 eller hastehenvisning til akuttmottak"}
+{"type": "red_flag", "name": "Cervikal myelopati", "criteria": "Progressiv bilateral klossete hender, gangvansker, spastisitet, positiv Hoffman test, hyperrefleksi. Kan skyldes spinal stenose eller skiveprolaps.", "urgency": "AKUTT/SUBAKUTT", "action": "Hastehenvisning til nevrolog/nevrokirurg"}
+{"type": "red_flag", "name": "Vertebrobasilær insuffisiens (VBI)", "criteria": "5 D's: Dizziness, Diplopi, Dysartri, Dysfagi, Drop attacks. Spesielt ved nakkesmerter + svimmelhet + nevrologiske utfall. Risiko ved cervical manipulasjon.", "urgency": "AKUTT", "action": "Ikke manipuler nakke. Akutt henvisning ved slagmistanke (113)."}
+{"type": "red_flag", "name": "Fraktur", "criteria": "Traume + lokal ømhet + hevelse. Osteoporose-risiko (eldre, steroider, menopause). Patologisk fraktur: nattsmerter + vekttap + kjent malignitet.", "urgency": "AKUTT/SUBAKUTT", "action": "Bildediagnostikk (røntgen). Hastehenvisning ved deformitet eller nevrologisk utfall."}
+{"type": "red_flag", "name": "Infeksjon (spinal)", "criteria": "Feber + rygg-/nakkesmerter + nattesvette. Risikofaktorer: IV-misbruk, immunsuppresjon, nylig operasjon. Diskitt, osteomyelitt, epidural abscess.", "urgency": "AKUTT", "action": "Blodprøver (CRP, SR, leukocytter). Hastehenvisning til infeksjonsmedisin."}
+{"type": "red_flag", "name": "Malignitet/metastaser", "criteria": "Alder >50 eller <20 med nyoppstått ryggsmerte + nattsmerter + uforklart vekttap + tidligere krefthistorie. Progressiv smerte uavhengig av stilling.", "urgency": "SUBAKUTT", "action": "Blodprøver + bildediagnostikk (MR). Henvisning til onkologi."}
+{"type": "red_flag", "name": "Progressiv nevrologisk utfall", "criteria": "Tiltagende muskelsvakhet, utbredende sensibilitetsutfall, refleksendringer over dager/uker. Drop-fot, bilateral radikulopati.", "urgency": "SUBAKUTT", "action": "MR-undersøkelse. Henvisning til nevrolog/nevrokirurg."}
+{"type": "red_flag", "name": "Subaraknoidalblødning (SAB)", "criteria": "'Verste hodepine i livet', thunderclap onset, nakkestivhet, foto-/fonofobi, bevissthetspåvirkning. Kan presentere som nakkesmerte + hodepine.", "urgency": "AKUTT", "action": "Ring 113. CT-caput akutt. IKKE manipuler."}
+{"type": "red_flag", "name": "Temporalisarteritt", "criteria": "Alder >50, ny hodepine (temporal), kjevekladikasjon, synsforstyrrelser, forhøyet CRP/SR. Risiko for irreversibelt synstap.", "urgency": "AKUTT", "action": "Blodprøver (CRP, SR) SAMME DAG. Hastehenvisning til revmatolog. Starter ofte prednisolon før biopsi."}
+{"type": "red_flag", "name": "Aortaaneurisme/disseksjon", "criteria": "Akutt interskapsulær smerte + brystsmerte + ulik blodtrykk i armene. Kan presentere som 'ryggsmerte'. Risikofaktorer: hypertensjon, Marfan, alder.", "urgency": "AKUTT", "action": "Ring 113. CT-angiografi akutt."}
+{"type": "red_flag", "name": "Kardial årsak", "criteria": "Brystsmerte + utstråling til venstre arm/kjeve + dyspné + kvalme. Kan feiltolkes som thorakal ryggsmerte. Viktig differensialdiagnose.", "urgency": "AKUTT", "action": "Ring 113 ved mistanke om akutt koronarsyndrom."}
+{"type": "red_flag", "name": "Ankyloserende spondylitt", "criteria": "Alder <40 + morgensstivhet >30 min + bedring med aktivitet + forverring med hvile + inflammatorisk ryggsmerte. HLA-B27 positiv.", "urgency": "SUBAKUTT", "action": "Blodprøver (CRP, SR, HLA-B27). Henvisning til revmatolog."}
+{"type": "red_flag", "name": "Abusmistanke (barn)", "criteria": "Uforklarte skader, inkonsistent historie, forsinkelse i å søke hjelp, uvanlige skademønstre. Spesielt ved gjentatte konsultasjoner.", "urgency": "AKUTT", "action": "Meldeplikt til barnevernet. Dokumenter funn nøye."}
+{"type": "red_flag", "name": "Traume med nevrologisk utfall", "criteria": "Hodeskade/nakkeskade + nevrologisk utfall (svakhet, nummenhet, bevissthetspåvirkning). Stabiliser nakke.", "urgency": "AKUTT", "action": "Ring 113. Stabiliser cervikalcolumna. IKKE flytt pasienten."}
+{"type": "red_flag", "name": "Akutt abdomen", "criteria": "Alvorlig magesmerte + rygg-/flankesmerte + peritonitt-tegn. Kan presentere som korsryggsmerte. Differensialdiagnose: nyrestein, appendisitt, AAA.", "urgency": "AKUTT", "action": "Akuttmottak. Ikke behandle som MSK-smerte."}

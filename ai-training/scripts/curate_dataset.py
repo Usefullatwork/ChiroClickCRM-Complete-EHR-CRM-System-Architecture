@@ -255,6 +255,195 @@ def passes_pii_check(example):
 
 
 # ============================================================
+# Claude Quality Gate (Batch API)
+# ============================================================
+
+def run_quality_gate(examples, model='claude-haiku-4-5'):
+    """Run Claude-as-judge quality gate on all examples via Batch API.
+
+    Submits all examples for binary classification (ACCEPT/REJECT).
+    Uses Haiku for cost efficiency.
+
+    Returns list of examples that pass the quality gate (score >= 3/5).
+    """
+    client = get_client()
+    batch_requests = []
+
+    quality_system = (
+        "Du er en kvalitetsvurdering-ekspert for AI-treningsdata for norsk kiropraktikk. "
+        "Vurder om dette eksempelet er godt nok for å trene en klinisk AI-modell. "
+        "ACCEPT eksempler som er klinisk korrekte, godt formulert på norsk, "
+        "og relevante for kiropraktisk praksis. "
+        "REJECT eksempler med feil, dårlig norsk, eller irrelevant innhold."
+    )
+
+    for idx, ex in enumerate(examples):
+        # Build content summary for judging
+        if ex['format'] == 'dpo':
+            content = f"Prompt: {ex['prompt'][:300]}\nChosen: {ex['chosen'][:300]}"
+        else:
+            msgs = ex.get('messages', [])
+            parts = []
+            for m in msgs:
+                if m['role'] in ('user', 'assistant'):
+                    parts.append(f"{m['role'].upper()}: {m['content'][:200]}")
+            content = '\n'.join(parts)
+
+        user_prompt = (
+            f"Kategori: {ex.get('category', 'unknown')}\n"
+            f"Kilde: {ex.get('source', 'unknown')}\n\n"
+            f"{content}\n\n"
+            "Vurder kvaliteten. Bruk quality_judgment-verktøyet."
+        )
+
+        req = build_batch_request(
+            custom_id=f'qg_{idx}',
+            system_prompt=quality_system,
+            user_content=user_prompt,
+            model=model,
+            max_tokens=256,
+            tools=[QUALITY_JUDGE_TOOL],
+            tool_choice={'type': 'tool', 'name': 'quality_judgment'},
+        )
+        batch_requests.append(req)
+
+    print(f'  Quality gate: submitting {len(batch_requests)} examples to Claude...')
+    results = submit_batch(client, batch_requests, poll_interval=15)
+
+    # Process results
+    accepted_indices = set()
+    rejected_count = 0
+    for custom_id, result in results:
+        idx = int(custom_id.split('_')[1])
+        parsed = extract_batch_tool_use(result, 'quality_judgment')
+        if parsed and parsed.get('verdict') == 'ACCEPT' and parsed.get('quality_score', 0) >= 3:
+            accepted_indices.add(idx)
+        else:
+            rejected_count += 1
+
+    accepted = [ex for i, ex in enumerate(examples) if i in accepted_indices]
+    # Also keep examples that weren't processed (batch errors)
+    unprocessed = [ex for i, ex in enumerate(examples)
+                   if i not in accepted_indices and i >= len(results)]
+    accepted.extend(unprocessed)
+
+    print(f'  Quality gate: {len(accepted)} accepted, {rejected_count} rejected')
+    return accepted
+
+
+# ============================================================
+# Diversity Scoring (TF-IDF cosine similarity)
+# ============================================================
+
+def compute_tfidf_vectors(texts):
+    """Compute TF-IDF vectors for a list of texts.
+
+    Simple implementation without external dependencies (no sklearn needed).
+    Returns list of dicts mapping term -> tfidf score.
+    """
+    # Tokenize
+    tokenized = []
+    for text in texts:
+        tokens = re.findall(r'\w+', text.lower())
+        tokenized.append(tokens)
+
+    # Document frequency
+    df = defaultdict(int)
+    for tokens in tokenized:
+        unique = set(tokens)
+        for t in unique:
+            df[t] += 1
+
+    n_docs = len(texts)
+    vectors = []
+
+    for tokens in tokenized:
+        # Term frequency
+        tf = defaultdict(int)
+        for t in tokens:
+            tf[t] += 1
+
+        # TF-IDF
+        vec = {}
+        for t, count in tf.items():
+            idf = math.log((n_docs + 1) / (df[t] + 1)) + 1
+            vec[t] = (count / max(len(tokens), 1)) * idf
+        vectors.append(vec)
+
+    return vectors
+
+
+def cosine_similarity(vec_a, vec_b):
+    """Compute cosine similarity between two sparse vectors (dicts)."""
+    common = set(vec_a.keys()) & set(vec_b.keys())
+    if not common:
+        return 0.0
+
+    dot = sum(vec_a[k] * vec_b[k] for k in common)
+    norm_a = math.sqrt(sum(v * v for v in vec_a.values()))
+    norm_b = math.sqrt(sum(v * v for v in vec_b.values()))
+
+    if norm_a == 0 or norm_b == 0:
+        return 0.0
+    return dot / (norm_a * norm_b)
+
+
+def deduplicate_by_diversity(examples, similarity_threshold=0.85):
+    """Remove near-duplicate examples within each category using TF-IDF cosine.
+
+    For clusters of >5 near-duplicate instructions, keeps only the highest-quality one.
+    Returns deduplicated examples and count of removed items.
+    """
+    by_category = defaultdict(list)
+    for i, ex in enumerate(examples):
+        by_category[ex.get('category', 'general')].append((i, ex))
+
+    keep_indices = set(range(len(examples)))
+    removed = 0
+
+    for cat, cat_items in by_category.items():
+        if len(cat_items) < 3:
+            continue
+
+        # Extract instruction text for comparison
+        texts = []
+        for idx, ex in cat_items:
+            if ex['format'] == 'dpo':
+                texts.append(ex.get('prompt', ''))
+            else:
+                user_msgs = [m['content'] for m in ex.get('messages', []) if m['role'] == 'user']
+                texts.append(' '.join(user_msgs))
+
+        vectors = compute_tfidf_vectors(texts)
+
+        # Find clusters of similar items
+        used = set()
+        for i in range(len(cat_items)):
+            if i in used:
+                continue
+            cluster = [i]
+            for j in range(i + 1, len(cat_items)):
+                if j in used:
+                    continue
+                sim = cosine_similarity(vectors[i], vectors[j])
+                if sim >= similarity_threshold:
+                    cluster.append(j)
+
+            if len(cluster) > 1:
+                # Keep the highest quality one, remove the rest
+                best_idx = max(cluster, key=lambda ci: cat_items[ci][1].get('quality_score', 3))
+                for ci in cluster:
+                    if ci != best_idx:
+                        orig_idx = cat_items[ci][0]
+                        keep_indices.discard(orig_idx)
+                        removed += 1
+                        used.add(ci)
+
+    result = [ex for i, ex in enumerate(examples) if i in keep_indices]
+    return result, removed
+
+
+# ============================================================
 # Category Balancing
 # ============================================================
 
@@ -420,6 +609,12 @@ def main():
                         help='Min quality score threshold')
     parser.add_argument('--seed', type=int, default=42,
                         help='Random seed for reproducibility')
+    parser.add_argument('--quality-gate', action='store_true',
+                        help='Run Claude quality gate (Batch API, uses Haiku)')
+    parser.add_argument('--diversity', action='store_true',
+                        help='Run TF-IDF diversity dedup (remove near-duplicates)')
+    parser.add_argument('--similarity-threshold', type=float, default=0.85,
+                        help='Cosine similarity threshold for diversity dedup')
     parser.add_argument('--dry-run', action='store_true',
                         help='Show composition without saving')
     parser.add_argument('--output-dir', default=str(OUTPUT_DIR),
@@ -511,6 +706,23 @@ def main():
     all_sft = quality_sft
     print(f'  Quality filter (>={args.min_quality}): removed {filtered_count}, kept {len(all_sft)}')
 
+    # ── Diversity dedup (TF-IDF cosine) ──
+    diversity_removed = 0
+    if args.diversity:
+        all_sft, diversity_removed = deduplicate_by_diversity(
+            all_sft, similarity_threshold=args.similarity_threshold
+        )
+        print(f'  Diversity dedup (>={args.similarity_threshold}): '
+              f'removed {diversity_removed}, kept {len(all_sft)}')
+
+    # ── Claude quality gate ──
+    quality_gate_rejected = 0
+    if args.quality_gate and not args.dry_run:
+        pre_gate = len(all_sft)
+        all_sft = run_quality_gate(all_sft)
+        quality_gate_rejected = pre_gate - len(all_sft)
+        print(f'  Claude quality gate: rejected {quality_gate_rejected}, kept {len(all_sft)}')
+
     # ── Category balancing ──
     all_sft = balance_categories(
         all_sft,
@@ -525,6 +737,9 @@ def main():
 
     # ── Report ──
     report = build_composition_report(train, val, test, all_dpo, dedup_count, filtered_count, pii_count)
+    # Add diversity and quality gate stats to report
+    report['filtering']['diversity_removed'] = diversity_removed
+    report['filtering']['quality_gate_rejected'] = quality_gate_rejected if args.quality_gate else 0
 
     print(f'\n  {"=" * 60}')
     print(f'  CURATED DATASET COMPOSITION')
