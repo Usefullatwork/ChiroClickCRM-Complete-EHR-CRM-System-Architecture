@@ -1,0 +1,70 @@
+{
+  "timestamp": "2026-02-27T14:04:20Z",
+  "total_examples": 11983,
+  "splits": {
+    "train": 9593,
+    "validation": 1195,
+    "test": 1195,
+    "dpo": 335
+  },
+  "filtering": {
+    "duplicates_removed": 10025,
+    "quality_filtered": 0,
+    "pii_filtered": 0,
+    "diversity_removed": 3013,
+    "quality_gate_rejected": 0
+  },
+  "by_category": {
+    "communication": {
+      "count": 247,
+      "pct": 2.1
+    },
+    "diagnosis_codes": {
+      "count": 643,
+      "pct": 5.4
+    },
+    "general": {
+      "count": 3350,
+      "pct": 28.0
+    },
+    "letters": {
+      "count": 171,
+      "pct": 1.4
+    },
+    "norwegian_language": {
+      "count": 1210,
+      "pct": 10.1
+    },
+    "quick_fields": {
+      "count": 2867,
+      "pct": 23.9
+    },
+    "red_flags": {
+      "count": 1286,
+      "pct": 10.7
+    },
+    "soap_notes": {
+      "count": 2209,
+      "pct": 18.4
+    }
+  },
+  "by_source": {
+    "claude_generated": {
+      "count": 73,
+      "pct": 0.6
+    },
+    "template_processed": {
+      "count": 11018,
+      "pct": 91.9
+    },
+    "template_v4": {
+      "count": 892,
+      "pct": 7.4
+    }
+  },
+  "quality": {
+    "mean": 3.0,
+    "min": 3,
+    "max": 3
+  }
+}
