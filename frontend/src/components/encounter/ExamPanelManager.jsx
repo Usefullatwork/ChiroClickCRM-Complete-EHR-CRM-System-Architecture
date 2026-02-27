@@ -11,23 +11,22 @@ import {
 } from 'lucide-react';
 import { NeurologicalExamCompact } from '../neuroexam';
 import { OrthopedicExamCompact } from '../orthoexam';
-import {
-  ExaminationProtocol,
-  ClusterTestPanel,
-  BodyDiagram,
-  VisualROMSelector,
-  RegionalExamination,
-  ManualMuscleTesting,
-  CranialNervePanel,
-  SensoryExamination,
-  PainAssessmentPanel,
-  DeepTendonReflexPanel,
-  CoordinationTestPanel,
-  NerveTensionTests,
-  HeadacheAssessment,
-  TissueAbnormalityMarkers,
-  RegionalBodyDiagram,
-} from '../examination';
+// Direct imports to avoid examination barrel bloat (~750KB)
+import ExaminationProtocol from '../examination/ExaminationProtocol';
+import ClusterTestPanel from '../examination/ClusterTestPanel';
+import BodyDiagram from '../examination/BodyDiagram';
+import VisualROMSelector from '../examination/VisualROMSelector';
+import RegionalExamination from '../examination/RegionalExamination';
+import ManualMuscleTesting from '../examination/ManualMuscleTesting';
+import CranialNervePanel from '../examination/CranialNervePanel';
+import SensoryExamination from '../examination/SensoryExamination';
+import PainAssessmentPanel from '../examination/PainAssessmentPanel';
+import DeepTendonReflexPanel from '../examination/DeepTendonReflexPanel';
+import CoordinationTestPanel from '../examination/CoordinationTestPanel';
+import NerveTensionTests from '../examination/NerveTensionTests';
+import HeadacheAssessment from '../examination/HeadacheAssessment';
+import TissueAbnormalityMarkers from '../examination/TissueAbnormalityMarkers';
+import RegionalBodyDiagram from '../examination/RegionalBodyDiagrams';
 import NeurologicalExam from '../examination/NeurologicalExam';
 import OutcomeMeasures, { OutcomeMeasureSelector } from '../examination/OutcomeMeasures';
 

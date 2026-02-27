@@ -17,16 +17,15 @@ import {
   Mic,
   Cpu,
 } from 'lucide-react';
-import TemplatePicker from '../components/TemplatePicker';
-import {
-  ProblemList,
-  TreatmentPlanTracker,
-  VisitCounter,
-  SALTButton,
-  ComplianceIndicator,
-  AIStatusIndicator,
-  OutcomeAssessment,
-} from '../components/assessment';
+// Direct file imports to avoid barrel bundling all 40+ assessment modules
+import ProblemList from '../components/assessment/ProblemList';
+import TreatmentPlanTracker, { VisitCounter } from '../components/assessment/TreatmentPlanTracker';
+import SALTButton from '../components/assessment/SALTButton';
+import { ComplianceIndicator } from '../components/assessment/ComplianceEngine';
+import { AIStatusIndicator } from '../components/assessment/AISettings';
+import OutcomeAssessment from '../components/assessment/OutcomeAssessment';
+
+const TemplatePicker = lazy(() => import('../components/TemplatePicker'));
 
 // Lazy-load modal-only components (shown conditionally via state flags)
 const MacroMatrix = lazy(() => import('../components/assessment/MacroMatrix'));
@@ -43,10 +42,12 @@ const SlashCommandReference = lazy(() =>
 );
 
 import useEasyAssessmentState from '../hooks/useEasyAssessmentState';
-import SubjectiveTab from '../components/easyassessment/SubjectiveTab';
-import ObjectiveTab from '../components/easyassessment/ObjectiveTab';
-import AssessmentTab from '../components/easyassessment/AssessmentTab';
-import PlanTab from '../components/easyassessment/PlanTab';
+
+// Lazy-load SOAP tabs (only one visible at a time)
+const SubjectiveTab = lazy(() => import('../components/easyassessment/SubjectiveTab'));
+const ObjectiveTab = lazy(() => import('../components/easyassessment/ObjectiveTab'));
+const AssessmentTab = lazy(() => import('../components/easyassessment/AssessmentTab'));
+const PlanTab = lazy(() => import('../components/easyassessment/PlanTab'));
 
 export default function EasyAssessment() {
   const state = useEasyAssessmentState();
@@ -457,60 +458,62 @@ export default function EasyAssessment() {
                 </button>
               </div>
 
-              {activeTab === 'subjective' && (
-                <SubjectiveTab
-                  encounterData={encounterData}
-                  viewMode={viewMode}
-                  language={language}
-                  aiAvailable={aiAvailable}
-                  updateField={updateField}
-                  updateQuickSelect={updateQuickSelect}
-                  buildAIContext={buildAIContext}
-                  setShowBodyChart={setShowBodyChart}
-                />
-              )}
+              <Suspense fallback={<div className="animate-pulse bg-gray-50 rounded-lg h-64" />}>
+                {activeTab === 'subjective' && (
+                  <SubjectiveTab
+                    encounterData={encounterData}
+                    viewMode={viewMode}
+                    language={language}
+                    aiAvailable={aiAvailable}
+                    updateField={updateField}
+                    updateQuickSelect={updateQuickSelect}
+                    buildAIContext={buildAIContext}
+                    setShowBodyChart={setShowBodyChart}
+                  />
+                )}
 
-              {activeTab === 'objective' && (
-                <ObjectiveTab
-                  encounterData={encounterData}
-                  viewMode={viewMode}
-                  language={language}
-                  aiAvailable={aiAvailable}
-                  updateField={updateField}
-                  updateQuickSelect={updateQuickSelect}
-                  buildAIContext={buildAIContext}
-                />
-              )}
+                {activeTab === 'objective' && (
+                  <ObjectiveTab
+                    encounterData={encounterData}
+                    viewMode={viewMode}
+                    language={language}
+                    aiAvailable={aiAvailable}
+                    updateField={updateField}
+                    updateQuickSelect={updateQuickSelect}
+                    buildAIContext={buildAIContext}
+                  />
+                )}
 
-              {activeTab === 'assessment' && (
-                <AssessmentTab
-                  encounterData={encounterData}
-                  setEncounterData={setEncounterData}
-                  language={language}
-                  aiAvailable={aiAvailable}
-                  updateField={updateField}
-                  addDiagnosisCode={addDiagnosisCode}
-                  removeDiagnosisCode={removeDiagnosisCode}
-                  commonDiagnoses={commonDiagnoses}
-                  buildAIContext={buildAIContext}
-                  showOutcomeAssessment={showOutcomeAssessment}
-                  setShowOutcomeAssessment={setShowOutcomeAssessment}
-                  outcomeType={outcomeType}
-                  setOutcomeType={setOutcomeType}
-                />
-              )}
+                {activeTab === 'assessment' && (
+                  <AssessmentTab
+                    encounterData={encounterData}
+                    setEncounterData={setEncounterData}
+                    language={language}
+                    aiAvailable={aiAvailable}
+                    updateField={updateField}
+                    addDiagnosisCode={addDiagnosisCode}
+                    removeDiagnosisCode={removeDiagnosisCode}
+                    commonDiagnoses={commonDiagnoses}
+                    buildAIContext={buildAIContext}
+                    showOutcomeAssessment={showOutcomeAssessment}
+                    setShowOutcomeAssessment={setShowOutcomeAssessment}
+                    outcomeType={outcomeType}
+                    setOutcomeType={setOutcomeType}
+                  />
+                )}
 
-              {activeTab === 'plan' && (
-                <PlanTab
-                  encounterData={encounterData}
-                  viewMode={viewMode}
-                  language={language}
-                  aiAvailable={aiAvailable}
-                  updateField={updateField}
-                  updateQuickSelect={updateQuickSelect}
-                  buildAIContext={buildAIContext}
-                />
-              )}
+                {activeTab === 'plan' && (
+                  <PlanTab
+                    encounterData={encounterData}
+                    viewMode={viewMode}
+                    language={language}
+                    aiAvailable={aiAvailable}
+                    updateField={updateField}
+                    updateQuickSelect={updateQuickSelect}
+                    buildAIContext={buildAIContext}
+                  />
+                )}
+              </Suspense>
             </div>
           )}
         </div>
@@ -577,30 +580,36 @@ export default function EasyAssessment() {
         )}
 
         {/* Template Picker */}
-        <TemplatePicker
-          isOpen={showTemplatePicker}
-          onClose={() => setShowTemplatePicker(false)}
-          onSelectTemplate={(text) => {
-            if (activeTab === 'subjective') {
-              updateField('subjective', 'history', `${encounterData.subjective.history}\n${text}`);
-            } else if (activeTab === 'objective') {
-              updateField(
-                'objective',
-                'observation',
-                `${encounterData.objective.observation}\n${text}`
-              );
-            } else if (activeTab === 'assessment') {
-              updateField(
-                'assessment',
-                'clinical_reasoning',
-                `${encounterData.assessment.clinical_reasoning}\n${text}`
-              );
-            } else if (activeTab === 'plan') {
-              updateField('plan', 'treatment', `${encounterData.plan.treatment}\n${text}`);
-            }
-          }}
-          soapSection={activeTab}
-        />
+        <Suspense fallback={null}>
+          <TemplatePicker
+            isOpen={showTemplatePicker}
+            onClose={() => setShowTemplatePicker(false)}
+            onSelectTemplate={(text) => {
+              if (activeTab === 'subjective') {
+                updateField(
+                  'subjective',
+                  'history',
+                  `${encounterData.subjective.history}\n${text}`
+                );
+              } else if (activeTab === 'objective') {
+                updateField(
+                  'objective',
+                  'observation',
+                  `${encounterData.objective.observation}\n${text}`
+                );
+              } else if (activeTab === 'assessment') {
+                updateField(
+                  'assessment',
+                  'clinical_reasoning',
+                  `${encounterData.assessment.clinical_reasoning}\n${text}`
+                );
+              } else if (activeTab === 'plan') {
+                updateField('plan', 'treatment', `${encounterData.plan.treatment}\n${text}`);
+              }
+            }}
+            soapSection={activeTab}
+          />
+        </Suspense>
 
         {/* Body Chart Modal */}
         {showBodyChart && (

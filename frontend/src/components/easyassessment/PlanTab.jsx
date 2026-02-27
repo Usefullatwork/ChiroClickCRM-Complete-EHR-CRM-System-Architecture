@@ -1,11 +1,8 @@
-import {
-  QuickCheckboxGrid,
-  SmartTextInput,
+import QuickCheckboxGrid, {
   TREATMENT_OPTIONS,
   EXERCISE_OPTIONS,
-  ADVICE_PHRASES,
-  FOLLOW_UP_PHRASES,
-} from '../assessment';
+} from '../assessment/QuickCheckboxGrid';
+import SmartTextInput, { ADVICE_PHRASES, FOLLOW_UP_PHRASES } from '../assessment/SmartTextInput';
 
 export default function PlanTab({
   encounterData,

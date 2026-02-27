@@ -1,9 +1,6 @@
-import {
-  SmartTextInput,
-  VASComparisonDisplay,
-  CLINICAL_REASONING_PHRASES,
-  QUESTIONNAIRE_TYPES,
-} from '../assessment';
+import SmartTextInput, { CLINICAL_REASONING_PHRASES } from '../assessment/SmartTextInput';
+import { VASComparisonDisplay } from '../assessment/VASPainScale';
+import { QUESTIONNAIRE_TYPES } from '../assessment/OutcomeAssessment';
 
 export default function AssessmentTab({
   encounterData,

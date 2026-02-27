@@ -1,18 +1,17 @@
 import { Sparkles } from 'lucide-react';
-import {
-  QuickCheckboxGrid,
-  SmartTextInput,
-  BodyDiagram,
-  QuickRegionSelect,
-  BodyChartGallery,
-  IntakeParserButton,
+import QuickCheckboxGrid, {
   PAIN_QUALITY_OPTIONS,
   AGGRAVATING_FACTORS_OPTIONS,
   RELIEVING_FACTORS_OPTIONS,
+} from '../assessment/QuickCheckboxGrid';
+import SmartTextInput, {
   CHIEF_COMPLAINT_PHRASES,
   ONSET_PHRASES,
   HISTORY_PHRASES,
-} from '../assessment';
+} from '../assessment/SmartTextInput';
+import BodyDiagram, { QuickRegionSelect } from '../assessment/BodyDiagram';
+import { BodyChartGallery } from '../assessment/BodyChart';
+import { IntakeParserButton } from '../assessment/IntakeParser';
 
 export default function SubjectiveTab({
   encounterData,

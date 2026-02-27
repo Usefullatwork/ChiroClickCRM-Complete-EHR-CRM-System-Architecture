@@ -15,8 +15,8 @@ import { useClinicalPreferences } from '../hooks';
 const TemplatePicker = lazy(() => import('../components/TemplatePicker'));
 const QuickPalpationSpine = lazy(() => import('../components/clinical/QuickPalpationSpine'));
 const AIDiagnosisSidebar = lazy(() => import('../components/clinical/AIDiagnosisSidebar'));
-import { ConnectionStatus } from '../components/common';
-import { RedFlagModal } from '../components/clinical';
+import ConnectionStatus from '../components/common/ConnectionStatus';
+import RedFlagModal from '../components/clinical/RedFlagModal';
 import { useRedFlagScreening } from '../hooks/useRedFlagScreening';
 import toast from '../utils/toast';
 import { useTranslation } from '../i18n';
@@ -28,10 +28,20 @@ import { taksterNorwegian } from '../components/encounter/TaksterPanel';
 import { SOAPNoteForm } from '../components/encounter/SOAPNoteForm';
 import { EncounterHeader } from '../components/encounter/EncounterHeader';
 import { EncounterFooter } from '../components/encounter/EncounterFooter';
-import { AmendmentSection } from '../components/encounter/AmendmentSection';
-import { AIAssistantPanel } from '../components/encounter/AIAssistantPanel';
-import { KeyboardShortcutsModal } from '../components/encounter/KeyboardShortcutsModal';
-import ComplianceScan from '../components/clinical/Encounter/ComplianceScan';
+
+// Lazy-loaded: conditionally-rendered panels and modals
+const AmendmentSection = lazy(() =>
+  import('../components/encounter/AmendmentSection').then((m) => ({ default: m.AmendmentSection }))
+);
+const AIAssistantPanel = lazy(() =>
+  import('../components/encounter/AIAssistantPanel').then((m) => ({ default: m.AIAssistantPanel }))
+);
+const KeyboardShortcutsModal = lazy(() =>
+  import('../components/encounter/KeyboardShortcutsModal').then((m) => ({
+    default: m.KeyboardShortcutsModal,
+  }))
+);
+const ComplianceScan = lazy(() => import('../components/clinical/Encounter/ComplianceScan'));
 
 // --- STATIC DATA ---
 
@@ -863,12 +873,14 @@ export default function ClinicalEncounter() {
             setShowKeyboardHelp={setShowKeyboardHelp}
           />
 
-          <KeyboardShortcutsModal
-            showKeyboardHelp={showKeyboardHelp}
-            setShowKeyboardHelp={setShowKeyboardHelp}
-            keyboardShortcuts={keyboardShortcuts}
-            macros={macros}
-          />
+          <Suspense fallback={null}>
+            <KeyboardShortcutsModal
+              showKeyboardHelp={showKeyboardHelp}
+              setShowKeyboardHelp={setShowKeyboardHelp}
+              keyboardShortcuts={keyboardShortcuts}
+              macros={macros}
+            />
+          </Suspense>
 
           {/* Macro hint tooltip */}
           {showMacroHint && currentMacroMatch && (
@@ -954,34 +966,38 @@ export default function ClinicalEncounter() {
 
             {/* Amendments (signed encounters only) */}
             {isSigned && (
-              <div className="max-w-4xl mx-auto px-6 pb-6">
-                <AmendmentSection
-                  isSigned={isSigned}
-                  amendments={amendments}
-                  showAmendmentForm={showAmendmentForm}
-                  setShowAmendmentForm={setShowAmendmentForm}
-                  amendmentContent={amendmentContent}
-                  setAmendmentContent={setAmendmentContent}
-                  amendmentType={amendmentType}
-                  setAmendmentType={setAmendmentType}
-                  amendmentReason={amendmentReason}
-                  setAmendmentReason={setAmendmentReason}
-                  handleCreateAmendment={handleCreateAmendment}
-                  createAmendmentMutation={createAmendmentMutation}
-                  signAmendmentMutation={signAmendmentMutation}
-                />
-              </div>
+              <Suspense fallback={null}>
+                <div className="max-w-4xl mx-auto px-6 pb-6">
+                  <AmendmentSection
+                    isSigned={isSigned}
+                    amendments={amendments}
+                    showAmendmentForm={showAmendmentForm}
+                    setShowAmendmentForm={setShowAmendmentForm}
+                    amendmentContent={amendmentContent}
+                    setAmendmentContent={setAmendmentContent}
+                    amendmentType={amendmentType}
+                    setAmendmentType={setAmendmentType}
+                    amendmentReason={amendmentReason}
+                    setAmendmentReason={setAmendmentReason}
+                    handleCreateAmendment={handleCreateAmendment}
+                    createAmendmentMutation={createAmendmentMutation}
+                    signAmendmentMutation={signAmendmentMutation}
+                  />
+                </div>
+              </Suspense>
             )}
           </div>
 
-          <ComplianceScan
-            encounterData={encounterData}
-            selectedTakster={selectedTakster}
-            redFlagAlerts={redFlagAlerts}
-            visible={showComplianceScan}
-            onDismiss={() => setShowComplianceScan(false)}
-            onProceed={handleSignAndLock}
-          />
+          <Suspense fallback={null}>
+            <ComplianceScan
+              encounterData={encounterData}
+              selectedTakster={selectedTakster}
+              redFlagAlerts={redFlagAlerts}
+              visible={showComplianceScan}
+              onDismiss={() => setShowComplianceScan(false)}
+              onProceed={handleSignAndLock}
+            />
+          </Suspense>
 
           <EncounterFooter
             patientId={patientId}
@@ -995,13 +1011,15 @@ export default function ClinicalEncounter() {
         </main>
 
         {/* AI ASSISTANT PANEL */}
-        <AIAssistantPanel
-          showAIAssistant={showAIAssistant}
-          setShowAIAssistant={setShowAIAssistant}
-          aiSuggestions={aiSuggestions}
-          aiLoading={aiLoading}
-          getAISuggestions={getAISuggestions}
-        />
+        <Suspense fallback={null}>
+          <AIAssistantPanel
+            showAIAssistant={showAIAssistant}
+            setShowAIAssistant={setShowAIAssistant}
+            aiSuggestions={aiSuggestions}
+            aiLoading={aiLoading}
+            getAISuggestions={getAISuggestions}
+          />
+        </Suspense>
       </div>
 
       {/* AI DIAGNOSIS SIDEBAR */}
