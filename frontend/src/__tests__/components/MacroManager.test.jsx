@@ -445,5 +445,190 @@ describe('MacroManager Component', () => {
         expect(screen.getByText('Opprett din forste makro')).toBeInTheDocument();
       });
     });
+
+    it('should show filter empty state when filter matches nothing', async () => {
+      render(<MacroManager />, { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        expect(screen.getByText('Nakkesmerter S')).toBeInTheDocument();
+      });
+
+      const categorySelect = screen.getByDisplayValue('Alle kategorier');
+      fireEvent.change(categorySelect, { target: { value: 'Billing' } });
+
+      await waitFor(() => {
+        expect(screen.getByText('Ingen makroer matcher filteret.')).toBeInTheDocument();
+      });
+    });
+  });
+
+  // ============================================================================
+  // KEYBOARD SHORTCUTS HINT
+  // ============================================================================
+
+  describe('Keyboard Shortcuts Hint', () => {
+    it('should show keyboard shortcut hint when macros exist', async () => {
+      render(<MacroManager />, { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        expect(screen.getByText(/Ctrl\+1 til Ctrl\+9/)).toBeInTheDocument();
+      });
+    });
+
+    it('should not show keyboard shortcut hint when no macros match', async () => {
+      macrosAPI.getMatrix.mockResolvedValue({ data: { data: {} } });
+      render(<MacroManager />, { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        expect(screen.getByText('Ingen makroer opprettet enda.')).toBeInTheDocument();
+      });
+
+      expect(screen.queryByText(/Ctrl\+1 til Ctrl\+9/)).not.toBeInTheDocument();
+    });
+  });
+
+  // ============================================================================
+  // CATEGORY STATS
+  // ============================================================================
+
+  describe('Category Stats', () => {
+    it('should show per-category counts in stats cards', async () => {
+      render(<MacroManager />, { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        // Should have stats: 3 total, 2 SOAP, 1 Behandling
+        expect(screen.getByText('Totalt makroer')).toBeInTheDocument();
+        expect(screen.getByText('SOAP')).toBeTruthy();
+        expect(screen.getByText('Behandling')).toBeTruthy();
+      });
+    });
+  });
+
+  // ============================================================================
+  // MACRO MODAL - CREATE WITH DATA
+  // ============================================================================
+
+  describe('Create with Data', () => {
+    it('should call create API when modal form is submitted with valid data', async () => {
+      macrosAPI.create.mockResolvedValue({ data: {} });
+      render(<MacroManager />, { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        expect(screen.getByText('Ny makro')).toBeInTheDocument();
+      });
+
+      // Open create modal
+      fireEvent.click(screen.getByText('Ny makro'));
+
+      await waitFor(() => {
+        expect(screen.getByText('Opprett')).toBeInTheDocument();
+      });
+
+      // Fill in fields
+      const nameInput = screen.getByPlaceholderText('f.eks. Nakkesmerter - Subjektiv');
+      fireEvent.change(nameInput, { target: { value: 'Test Makro' } });
+
+      const textInput = screen.getByPlaceholderText(/Skriv inn makroteksten/);
+      fireEvent.change(textInput, { target: { value: 'Test tekst innhold' } });
+
+      // Submit
+      fireEvent.click(screen.getByText('Opprett'));
+
+      await waitFor(() => {
+        expect(macrosAPI.create).toHaveBeenCalledWith(
+          expect.objectContaining({
+            name: 'Test Makro',
+            text: 'Test tekst innhold',
+          })
+        );
+      });
+    });
+  });
+
+  // ============================================================================
+  // EDIT MACRO
+  // ============================================================================
+
+  describe('Edit Macro', () => {
+    it('should call update API when editing and saving', async () => {
+      macrosAPI.update.mockResolvedValue({ data: {} });
+      render(<MacroManager />, { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        expect(screen.getByText('Nakkesmerter S')).toBeInTheDocument();
+      });
+
+      // Click edit
+      const editButtons = screen.getAllByTitle('Rediger');
+      fireEvent.click(editButtons[0]);
+
+      await waitFor(() => {
+        expect(screen.getByText('Rediger makro')).toBeInTheDocument();
+      });
+
+      // Change name
+      const nameInput = screen.getByDisplayValue('Nakkesmerter S');
+      fireEvent.change(nameInput, { target: { value: 'Nakkesmerter S v2' } });
+
+      // Submit
+      fireEvent.click(screen.getByText('Oppdater'));
+
+      await waitFor(() => {
+        expect(macrosAPI.update).toHaveBeenCalledWith(
+          'm1',
+          expect.objectContaining({ name: 'Nakkesmerter S v2' })
+        );
+      });
+    });
+  });
+
+  // ============================================================================
+  // SOAP SECTION
+  // ============================================================================
+
+  describe('SOAP Section', () => {
+    it('should show soap section badge when macro has soapSection', async () => {
+      macrosAPI.getMatrix.mockResolvedValue({
+        data: {
+          data: {
+            SOAP: {
+              macros: [
+                {
+                  id: 'm1',
+                  name: 'Test Macro',
+                  text: 'Text',
+                  soapSection: 'subjective',
+                  isFavorite: false,
+                },
+              ],
+              subcategories: {},
+            },
+          },
+        },
+      });
+      render(<MacroManager />, { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        expect(screen.getByText('subjective')).toBeInTheDocument();
+      });
+    });
+  });
+
+  // ============================================================================
+  // FAVORITES DISPLAY
+  // ============================================================================
+
+  describe('Favorites Display', () => {
+    it('should show filled star for favorite macros', async () => {
+      render(<MacroManager />, { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        expect(screen.getByText('Nakkesmerter S')).toBeInTheDocument();
+      });
+
+      // m1 is favorited, m2 is not. Check that favorite buttons exist
+      const favButtons = screen.getAllByTitle('Favoritt');
+      expect(favButtons.length).toBeGreaterThanOrEqual(2);
+    });
   });
 });

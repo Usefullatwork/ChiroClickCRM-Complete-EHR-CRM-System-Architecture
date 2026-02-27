@@ -273,5 +273,215 @@ describe('RecallDashboard Component', () => {
         expect(followUpsAPI.markPatientAsContacted).toHaveBeenCalledWith('p1', 'sms');
       });
     });
+
+    it('should call markPatientAsContacted with "phone" when phone button clicked', async () => {
+      followUpsAPI.markPatientAsContacted.mockResolvedValue({ data: {} });
+      followUpsAPI.getPatientsNeedingFollowUp.mockResolvedValue({
+        data: {
+          patients: [{ id: 'p1', first_name: 'Ola', last_name: 'N', days_overdue: 5 }],
+        },
+      });
+
+      render(<RecallDashboard />, { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        expect(screen.getByTitle('Ring pasient')).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTitle('Ring pasient'));
+
+      await waitFor(() => {
+        expect(followUpsAPI.markPatientAsContacted).toHaveBeenCalledWith('p1', 'phone');
+      });
+    });
+
+    it('should call markPatientAsContacted with "dismissed" when dismiss button clicked', async () => {
+      followUpsAPI.markPatientAsContacted.mockResolvedValue({ data: {} });
+      followUpsAPI.getPatientsNeedingFollowUp.mockResolvedValue({
+        data: {
+          patients: [{ id: 'p1', first_name: 'Ola', last_name: 'N', days_overdue: 5 }],
+        },
+      });
+
+      render(<RecallDashboard />, { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        expect(screen.getByTitle('Avvis recall')).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTitle('Avvis recall'));
+
+      await waitFor(() => {
+        expect(followUpsAPI.markPatientAsContacted).toHaveBeenCalledWith('p1', 'dismissed');
+      });
+    });
+  });
+
+  // ============================================================================
+  // FUTURE DUE PATIENTS
+  // ============================================================================
+
+  describe('Future Due Patients', () => {
+    it('should show "Om X d." for patients with negative days_overdue', async () => {
+      followUpsAPI.getPatientsNeedingFollowUp.mockResolvedValue({
+        data: {
+          patients: [{ id: '1', first_name: 'Fremtidig', last_name: 'Pasient', days_overdue: -7 }],
+        },
+      });
+
+      render(<RecallDashboard />, { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        expect(screen.getByText('Om 7 d.')).toBeInTheDocument();
+      });
+    });
+  });
+
+  // ============================================================================
+  // STATS BREAKDOWN
+  // ============================================================================
+
+  describe('Stats Breakdown', () => {
+    it('should calculate correct overdue, today, and upcoming counts', async () => {
+      followUpsAPI.getPatientsNeedingFollowUp.mockResolvedValue({
+        data: {
+          patients: [
+            { id: '1', first_name: 'A', last_name: 'Overdue', days_overdue: 20 },
+            { id: '2', first_name: 'B', last_name: 'Overdue2', days_overdue: 5 },
+            { id: '3', first_name: 'C', last_name: 'Today', days_overdue: 0 },
+            { id: '4', first_name: 'D', last_name: 'Upcoming', days_overdue: -3 },
+          ],
+        },
+      });
+
+      render(<RecallDashboard />, { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        expect(screen.getByText('4')).toBeInTheDocument(); // total
+        expect(screen.getByText('2')).toBeInTheDocument(); // overdue
+        expect(screen.getByText('1')).toBeInTheDocument(); // due today and upcoming
+      });
+    });
+  });
+
+  // ============================================================================
+  // RECALL RULES
+  // ============================================================================
+
+  describe('Recall Rules', () => {
+    it('should show recall rules section when rules exist', async () => {
+      followUpsAPI.getRecallRules.mockResolvedValue({
+        data: {
+          data: [
+            { category: 'Nakke', interval_days: 28, priority: 'high' },
+            { category: 'Korsrygg', interval_days: 42, priority: 'medium' },
+          ],
+        },
+      });
+
+      render(<RecallDashboard />, { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        expect(screen.getByText(/Recall-regler \(2 kategorier\)/)).toBeInTheDocument();
+      });
+    });
+
+    it('should expand rules when header is clicked', async () => {
+      followUpsAPI.getRecallRules.mockResolvedValue({
+        data: {
+          data: [{ category: 'Nakke', interval_days: 28, priority: 'high' }],
+        },
+      });
+
+      render(<RecallDashboard />, { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        expect(screen.getByText(/Recall-regler/)).toBeInTheDocument();
+      });
+
+      // Rules content should be hidden initially
+      expect(screen.queryByText('Nakke')).not.toBeInTheDocument();
+
+      // Click to expand
+      fireEvent.click(screen.getByText(/Recall-regler/));
+
+      await waitFor(() => {
+        expect(screen.getByText('Nakke')).toBeInTheDocument();
+        expect(screen.getByText(/Intervall: 28 dager/)).toBeInTheDocument();
+      });
+    });
+  });
+
+  // ============================================================================
+  // SORT FUNCTIONALITY
+  // ============================================================================
+
+  describe('Sort Functionality', () => {
+    it('should render sortable column headers', async () => {
+      followUpsAPI.getPatientsNeedingFollowUp.mockResolvedValue({
+        data: {
+          patients: [{ id: '1', first_name: 'Ola', last_name: 'N', days_overdue: 5 }],
+        },
+      });
+
+      render(<RecallDashboard />, { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        expect(screen.getByText(/Pasient/)).toBeInTheDocument();
+        expect(screen.getByText(/Siste besok/)).toBeInTheDocument();
+        expect(screen.getByText(/Tilstand/)).toBeInTheDocument();
+        expect(screen.getByText(/Dager forfalt/)).toBeInTheDocument();
+      });
+    });
+  });
+
+  // ============================================================================
+  // PATIENT PHONE DISPLAY
+  // ============================================================================
+
+  describe('Patient Phone Display', () => {
+    it('should show phone number when available', async () => {
+      followUpsAPI.getPatientsNeedingFollowUp.mockResolvedValue({
+        data: {
+          patients: [
+            { id: '1', first_name: 'Ola', last_name: 'N', days_overdue: 5, phone: '90123456' },
+          ],
+        },
+      });
+
+      render(<RecallDashboard />, { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        expect(screen.getByText('90123456')).toBeInTheDocument();
+      });
+    });
+  });
+
+  // ============================================================================
+  // CONDITION BADGE
+  // ============================================================================
+
+  describe('Condition Badge', () => {
+    it('should show condition badge when condition is provided', async () => {
+      followUpsAPI.getPatientsNeedingFollowUp.mockResolvedValue({
+        data: {
+          patients: [
+            {
+              id: '1',
+              first_name: 'Ola',
+              last_name: 'N',
+              days_overdue: 5,
+              condition: 'Nakkesmerter',
+            },
+          ],
+        },
+      });
+
+      render(<RecallDashboard />, { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        expect(screen.getByText('Nakkesmerter')).toBeInTheDocument();
+      });
+    });
   });
 });
