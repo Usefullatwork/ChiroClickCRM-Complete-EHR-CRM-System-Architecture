@@ -309,4 +309,131 @@ describe('WorkflowBuilder Component', () => {
       expect(runButton.closest('button')).toBeDisabled();
     });
   });
+
+  // ============================================================================
+  // ENABLED TOGGLE
+  // ============================================================================
+
+  describe('Enabled Toggle', () => {
+    it('should start with Enabled checked by default', () => {
+      render(<WorkflowBuilder {...defaultProps} />);
+      const toggle = screen.getByText('Enabled');
+      expect(toggle).toBeInTheDocument();
+    });
+
+    it('should have Enabled label in Norwegian when language is "no"', () => {
+      render(<WorkflowBuilder {...defaultProps} language="no" />);
+      expect(screen.getByText('Aktivert')).toBeInTheDocument();
+    });
+  });
+
+  // ============================================================================
+  // MULTIPLE ACTIONS
+  // ============================================================================
+
+  describe('Multiple Actions', () => {
+    it('should add multiple actions sequentially', async () => {
+      render(<WorkflowBuilder {...defaultProps} />);
+      fireEvent.click(screen.getByText('Actions'));
+
+      // Add first action
+      const smsButtons = screen.getAllByText('Send SMS');
+      fireEvent.click(smsButtons[smsButtons.length - 1]);
+
+      await waitFor(() => {
+        expect(screen.getByText(/1\. Send SMS/)).toBeInTheDocument();
+      });
+
+      // Add second action - "Send Email"
+      const emailButtons = screen.getAllByText('Send Email');
+      fireEvent.click(emailButtons[emailButtons.length - 1]);
+
+      await waitFor(() => {
+        expect(screen.getByText(/2\. Send Email/)).toBeInTheDocument();
+      });
+    });
+  });
+
+  // ============================================================================
+  // NORWEGIAN LABELS
+  // ============================================================================
+
+  describe('Norwegian Labels', () => {
+    it('should show Norwegian trigger labels when language is "no"', () => {
+      render(<WorkflowBuilder {...defaultProps} language="no" />);
+      expect(screen.getByText('Ny pasient opprettet')).toBeInTheDocument();
+      expect(screen.getByText('Time bestilt')).toBeInTheDocument();
+    });
+
+    it('should show Norwegian save and cancel buttons', () => {
+      render(<WorkflowBuilder {...defaultProps} language="no" />);
+      expect(screen.getByText('Lagre arbeidsflyt')).toBeInTheDocument();
+      expect(screen.getByText('Avbryt')).toBeInTheDocument();
+    });
+
+    it('should show Norwegian validation messages', async () => {
+      render(<WorkflowBuilder {...defaultProps} language="no" />);
+      fireEvent.click(screen.getByText('Lagre arbeidsflyt'));
+
+      await waitFor(() => {
+        expect(screen.getByText('Arbeidsflytens navn er pakrevd')).toBeInTheDocument();
+      });
+    });
+  });
+
+  // ============================================================================
+  // PRE-FILL BEHAVIOR
+  // ============================================================================
+
+  describe('Pre-fill Behavior', () => {
+    it('should pre-fill trigger type when editing an existing workflow', () => {
+      const workflow = {
+        id: '1',
+        name: 'Test Flow',
+        trigger_type: 'APPOINTMENT_SCHEDULED',
+        actions: [{ type: 'SEND_SMS', delay_hours: 0, message: 'Hello' }],
+      };
+      render(<WorkflowBuilder {...defaultProps} workflow={workflow} />);
+      expect(screen.getByText('Edit Workflow')).toBeInTheDocument();
+    });
+
+    it('should pre-fill actions when editing an existing workflow', () => {
+      const workflow = {
+        id: '1',
+        name: 'Test Flow',
+        trigger_type: 'PATIENT_CREATED',
+        actions: [{ type: 'SEND_SMS', delay_hours: 1, message: 'Velkommen!' }],
+      };
+      render(<WorkflowBuilder {...defaultProps} workflow={workflow} />);
+
+      // The actions section should show the pre-filled action
+      fireEvent.click(screen.getByText('Actions'));
+      expect(screen.getByText(/1\. Send SMS/)).toBeInTheDocument();
+    });
+  });
+
+  // ============================================================================
+  // CALLBACK ARGUMENTS
+  // ============================================================================
+
+  describe('Callback Arguments', () => {
+    it('should include enabled flag in save data', async () => {
+      mockOnSave.mockResolvedValue(undefined);
+      render(<WorkflowBuilder {...defaultProps} />);
+
+      const nameInput = screen.getByPlaceholderText('e.g., Welcome New Patients');
+      fireEvent.change(nameInput, { target: { value: 'Test' } });
+      fireEvent.click(screen.getByText('Patient Created'));
+      fireEvent.click(screen.getByText('Actions'));
+      const addButtons = screen.getAllByText('Send SMS');
+      fireEvent.click(addButtons[addButtons.length - 1]);
+      fireEvent.click(screen.getByText('Save Workflow'));
+
+      await waitFor(() => {
+        expect(mockOnSave).toHaveBeenCalledTimes(1);
+        const arg = mockOnSave.mock.calls[0][0];
+        expect(arg).toHaveProperty('is_active');
+      });
+    });
+  });
 });

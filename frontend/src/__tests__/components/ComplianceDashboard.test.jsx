@@ -245,4 +245,216 @@ describe('ComplianceDashboard Component', () => {
       expect(screen.queryByText('Pain Trend')).not.toBeInTheDocument();
     });
   });
+
+  // ============================================================================
+  // ACTIVE PRESCRIPTIONS DISPLAY
+  // ============================================================================
+
+  describe('Active Prescriptions Display', () => {
+    it('should show exercise names and compliance bars for active prescriptions', async () => {
+      exercisesAPI.getPatientExercises.mockResolvedValue({
+        data: [
+          { id: '1', status: 'active', compliance_percentage: 80, exercise_name: 'Chin Tuck' },
+          { id: '2', status: 'active', compliance_percentage: 45, exercise_name: 'Side Plank' },
+        ],
+      });
+      render(<ComplianceDashboard patientId="p1" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Chin Tuck')).toBeInTheDocument();
+        expect(screen.getByText('Side Plank')).toBeInTheDocument();
+        expect(screen.getByText('80%')).toBeInTheDocument();
+        expect(screen.getByText('45%')).toBeInTheDocument();
+      });
+    });
+
+    it('should show "Active Prescriptions" section heading', async () => {
+      exercisesAPI.getPatientExercises.mockResolvedValue({
+        data: [{ id: '1', status: 'active', compliance_percentage: 60, exercise_name: 'Stretch' }],
+      });
+      render(<ComplianceDashboard patientId="p1" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Active Prescriptions')).toBeInTheDocument();
+      });
+    });
+
+    it('should not show Active Prescriptions section when all are completed', async () => {
+      exercisesAPI.getPatientExercises.mockResolvedValue({
+        data: [
+          { id: '1', status: 'completed', compliance_percentage: 100, exercise_name: 'Done Ex' },
+        ],
+      });
+      render(<ComplianceDashboard patientId="p1" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Overall Compliance')).toBeInTheDocument();
+      });
+      expect(screen.queryByText('Active Prescriptions')).not.toBeInTheDocument();
+    });
+
+    it('should display sets and frequency when provided', async () => {
+      exercisesAPI.getPatientExercises.mockResolvedValue({
+        data: [
+          {
+            id: '1',
+            status: 'active',
+            compliance_percentage: 70,
+            exercise_name: 'Bird Dog',
+            sets: 3,
+            reps: 10,
+            frequency: '2x daglig',
+          },
+        ],
+      });
+      render(<ComplianceDashboard patientId="p1" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Bird Dog')).toBeInTheDocument();
+        expect(screen.getByText(/3x10/)).toBeInTheDocument();
+        expect(screen.getByText(/2x daglig/)).toBeInTheDocument();
+      });
+    });
+  });
+
+  // ============================================================================
+  // RE-FETCH BEHAVIOR
+  // ============================================================================
+
+  describe('Re-fetch Behavior', () => {
+    it('should re-fetch when patientId prop changes', async () => {
+      exercisesAPI.getPatientExercises.mockResolvedValue({ data: [] });
+      const { rerender } = render(<ComplianceDashboard patientId="p1" />);
+
+      await waitFor(() => {
+        expect(exercisesAPI.getPatientExercises).toHaveBeenCalledWith('p1');
+      });
+
+      rerender(<ComplianceDashboard patientId="p2" />);
+
+      await waitFor(() => {
+        expect(exercisesAPI.getPatientExercises).toHaveBeenCalledWith('p2');
+        expect(exercisesAPI.getPatientExercises).toHaveBeenCalledTimes(2);
+      });
+    });
+
+    it('should handle camelCase field names (compliancePercentage)', async () => {
+      exercisesAPI.getPatientExercises.mockResolvedValue({
+        data: [{ id: '1', status: 'active', compliancePercentage: 55, exerciseName: 'Curl Up' }],
+      });
+      render(<ComplianceDashboard patientId="p1" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('55%')).toBeInTheDocument();
+        expect(screen.getByText('Curl Up')).toBeInTheDocument();
+      });
+    });
+  });
+
+  // ============================================================================
+  // PAIN TREND COLORS
+  // ============================================================================
+
+  describe('Pain Trend Colors', () => {
+    it('should render green bars for low pain levels (<=3)', async () => {
+      const today = new Date().toISOString().split('T')[0];
+      const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+      exercisesAPI.getPatientExercises.mockResolvedValue({
+        data: [
+          {
+            id: '1',
+            status: 'active',
+            compliance_percentage: 60,
+            compliance_logs: [
+              { date: yesterday, pain_level: 2 },
+              { date: today, pain_level: 3 },
+            ],
+          },
+        ],
+      });
+      render(<ComplianceDashboard patientId="p1" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Pain Trend')).toBeInTheDocument();
+        const bars = document.querySelectorAll('.bg-green-400');
+        expect(bars.length).toBe(2);
+      });
+    });
+
+    it('should render red bars for high pain levels (>6)', async () => {
+      const today = new Date().toISOString().split('T')[0];
+      const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+      exercisesAPI.getPatientExercises.mockResolvedValue({
+        data: [
+          {
+            id: '1',
+            status: 'active',
+            compliance_percentage: 60,
+            compliance_logs: [
+              { date: yesterday, pain_level: 8 },
+              { date: today, pain_level: 9 },
+            ],
+          },
+        ],
+      });
+      render(<ComplianceDashboard patientId="p1" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Pain Trend')).toBeInTheDocument();
+        const bars = document.querySelectorAll('.bg-red-400');
+        expect(bars.length).toBe(2);
+      });
+    });
+
+    it('should limit pain trend to last 10 entries', async () => {
+      const logs = [];
+      for (let i = 0; i < 15; i++) {
+        const date = new Date(Date.now() - (14 - i) * 86400000).toISOString().split('T')[0];
+        logs.push({ date, pain_level: 5 });
+      }
+      exercisesAPI.getPatientExercises.mockResolvedValue({
+        data: [{ id: '1', status: 'active', compliance_percentage: 60, compliance_logs: logs }],
+      });
+      render(<ComplianceDashboard patientId="p1" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Pain Trend')).toBeInTheDocument();
+        const bars = document.querySelectorAll('.bg-yellow-400');
+        expect(bars.length).toBe(10);
+      });
+    });
+  });
+
+  // ============================================================================
+  // TOTAL PRESCRIPTIONS
+  // ============================================================================
+
+  describe('Total Prescriptions', () => {
+    it('should show singular "prescription" when exactly 1 active', async () => {
+      exercisesAPI.getPatientExercises.mockResolvedValue({
+        data: [{ id: '1', status: 'active', compliance_percentage: 50 }],
+      });
+      render(<ComplianceDashboard patientId="p1" />);
+
+      await waitFor(() => {
+        expect(screen.getByText(/active prescription$/)).toBeInTheDocument();
+      });
+    });
+
+    it('should show total prescriptions count including completed', async () => {
+      exercisesAPI.getPatientExercises.mockResolvedValue({
+        data: [
+          { id: '1', status: 'active', compliance_percentage: 80 },
+          { id: '2', status: 'completed', compliance_percentage: 100 },
+          { id: '3', status: 'active', compliance_percentage: 60 },
+        ],
+      });
+      render(<ComplianceDashboard patientId="p1" />);
+
+      await waitFor(() => {
+        const totalEl = screen.getByText('3');
+        expect(totalEl).toBeInTheDocument();
+      });
+    });
+  });
 });

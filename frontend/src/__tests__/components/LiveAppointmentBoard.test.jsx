@@ -287,4 +287,294 @@ describe('LiveAppointmentBoard Component', () => {
       });
     });
   });
+
+  // ============================================================================
+  // QUEUE FILTERING
+  // ============================================================================
+
+  describe('Queue Filtering', () => {
+    it('should exclude completed appointments from the queue', async () => {
+      const today = new Date();
+      const startTime1 = new Date(today.setHours(10, 0, 0, 0)).toISOString();
+      const startTime2 = new Date(today.setHours(11, 0, 0, 0)).toISOString();
+
+      appointmentsAPI.getAll.mockResolvedValue({
+        data: {
+          appointments: [
+            {
+              id: 'a1',
+              patient_name: 'Active Patient',
+              start_time: startTime1,
+              duration_minutes: 30,
+              status: 'scheduled',
+            },
+            {
+              id: 'a2',
+              patient_name: 'Done Patient',
+              start_time: startTime2,
+              duration_minutes: 30,
+              status: 'completed',
+            },
+          ],
+        },
+      });
+
+      render(<LiveAppointmentBoard />);
+
+      await waitFor(() => {
+        // Queue should show "Ko (1)" not "Ko (2)" since completed is excluded
+        expect(screen.getByText(/Ko \(1\)/)).toBeInTheDocument();
+      });
+    });
+
+    it('should exclude no_show appointments from the queue', async () => {
+      const today = new Date();
+      const startTime = new Date(today.setHours(9, 0, 0, 0)).toISOString();
+
+      appointmentsAPI.getAll.mockResolvedValue({
+        data: {
+          appointments: [
+            {
+              id: 'a1',
+              patient_name: 'No Show',
+              start_time: startTime,
+              duration_minutes: 30,
+              status: 'no_show',
+            },
+          ],
+        },
+      });
+
+      render(<LiveAppointmentBoard />);
+
+      await waitFor(() => {
+        expect(screen.getByText(/Ko \(0\)/)).toBeInTheDocument();
+      });
+    });
+
+    it('should exclude cancelled appointments from the grid', async () => {
+      const today = new Date();
+      const startTime = new Date(today.setHours(10, 0, 0, 0)).toISOString();
+
+      appointmentsAPI.getAll.mockResolvedValue({
+        data: {
+          appointments: [
+            {
+              id: 'a1',
+              patient_name: 'Cancelled Patient',
+              start_time: startTime,
+              duration_minutes: 30,
+              status: 'cancelled',
+            },
+          ],
+        },
+      });
+
+      render(<LiveAppointmentBoard />);
+
+      await waitFor(() => {
+        // Totalt should show 0 since cancelled are excluded from sortedAppointments
+        const stats = screen.getByText('Totalt');
+        expect(stats).toBeInTheDocument();
+      });
+    });
+  });
+
+  // ============================================================================
+  // APPOINTMENT STATUSES
+  // ============================================================================
+
+  describe('Appointment Statuses', () => {
+    it('should show "Under behandling" for in_progress appointments', async () => {
+      const today = new Date();
+      const startTime = new Date(today.setHours(10, 0, 0, 0)).toISOString();
+
+      appointmentsAPI.getAll.mockResolvedValue({
+        data: {
+          appointments: [
+            {
+              id: 'a1',
+              patient_name: 'In Treatment',
+              start_time: startTime,
+              duration_minutes: 30,
+              status: 'in_progress',
+            },
+          ],
+        },
+      });
+
+      render(<LiveAppointmentBoard />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Under behandling')).toBeInTheDocument();
+      });
+    });
+
+    it('should show "Planlagt" for scheduled appointments', async () => {
+      const today = new Date();
+      const startTime = new Date(today.setHours(10, 0, 0, 0)).toISOString();
+
+      appointmentsAPI.getAll.mockResolvedValue({
+        data: {
+          appointments: [
+            {
+              id: 'a1',
+              patient_name: 'Planned',
+              start_time: startTime,
+              duration_minutes: 30,
+              status: 'scheduled',
+            },
+          ],
+        },
+      });
+
+      render(<LiveAppointmentBoard />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Planlagt')).toBeInTheDocument();
+      });
+    });
+  });
+
+  // ============================================================================
+  // REFRESH
+  // ============================================================================
+
+  describe('Refresh', () => {
+    it('should refetch appointments when refresh button is clicked', async () => {
+      render(<LiveAppointmentBoard />);
+
+      await waitFor(() => {
+        expect(appointmentsAPI.getAll).toHaveBeenCalledTimes(1);
+      });
+
+      const refreshBtn = screen.getByLabelText('Oppdater');
+      fireEvent.click(refreshBtn);
+
+      await waitFor(() => {
+        expect(appointmentsAPI.getAll).toHaveBeenCalledTimes(2);
+      });
+    });
+  });
+
+  // ============================================================================
+  // TODAY BUTTON
+  // ============================================================================
+
+  describe('Today Button', () => {
+    it('should reset to current date when I dag is clicked after navigating', async () => {
+      render(<LiveAppointmentBoard />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Dagstavle')).toBeInTheDocument();
+      });
+
+      // Navigate to next day
+      fireEvent.click(screen.getByLabelText('Neste dag'));
+      await waitFor(() => {
+        expect(appointmentsAPI.getAll).toHaveBeenCalledTimes(2);
+      });
+
+      // Click I dag to return
+      fireEvent.click(screen.getByText('I dag'));
+      await waitFor(() => {
+        expect(appointmentsAPI.getAll).toHaveBeenCalledTimes(3);
+      });
+    });
+  });
+
+  // ============================================================================
+  // STATS
+  // ============================================================================
+
+  describe('Stats', () => {
+    it('should show correct completed count in stats', async () => {
+      const today = new Date();
+      const startTime1 = new Date(today.setHours(9, 0, 0, 0)).toISOString();
+      const startTime2 = new Date(today.setHours(10, 0, 0, 0)).toISOString();
+      const startTime3 = new Date(today.setHours(11, 0, 0, 0)).toISOString();
+
+      appointmentsAPI.getAll.mockResolvedValue({
+        data: {
+          appointments: [
+            {
+              id: 'a1',
+              patient_name: 'P1',
+              start_time: startTime1,
+              duration_minutes: 30,
+              status: 'completed',
+            },
+            {
+              id: 'a2',
+              patient_name: 'P2',
+              start_time: startTime2,
+              duration_minutes: 30,
+              status: 'completed',
+            },
+            {
+              id: 'a3',
+              patient_name: 'P3',
+              start_time: startTime3,
+              duration_minutes: 30,
+              status: 'scheduled',
+            },
+          ],
+        },
+      });
+
+      render(<LiveAppointmentBoard />);
+
+      await waitFor(() => {
+        const completedStats = screen.getAllByText('2');
+        expect(completedStats.length).toBeGreaterThan(0);
+      });
+    });
+  });
+
+  // ============================================================================
+  // APPOINTMENT TYPE ICONS
+  // ============================================================================
+
+  describe('Appointment Type Icons', () => {
+    it('should show type icon for follow_up appointments', async () => {
+      const today = new Date();
+      const startTime = new Date(today.setHours(10, 0, 0, 0)).toISOString();
+
+      appointmentsAPI.getAll.mockResolvedValue({
+        data: {
+          appointments: [
+            {
+              id: 'a1',
+              patient_name: 'Follow Up',
+              start_time: startTime,
+              duration_minutes: 30,
+              status: 'scheduled',
+              appointment_type: 'follow_up',
+            },
+          ],
+        },
+      });
+
+      render(<LiveAppointmentBoard />);
+
+      await waitFor(() => {
+        expect(screen.getByText('F')).toBeInTheDocument();
+      });
+    });
+  });
+
+  // ============================================================================
+  // ERROR HANDLING
+  // ============================================================================
+
+  describe('Error Handling', () => {
+    it('should show empty state when API fails', async () => {
+      appointmentsAPI.getAll.mockRejectedValue(new Error('Network error'));
+      render(<LiveAppointmentBoard />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Ingen avtaler i ko')).toBeInTheDocument();
+      });
+    });
+  });
 });

@@ -321,5 +321,199 @@ describe('AnatomyViewer Component', () => {
         expect(buttons.length).toBeGreaterThan(0);
       });
     });
+
+    it('should render compact body diagram when BODY_2D mode in compact', async () => {
+      render(
+        <AnatomyViewer compact={true} allowModeSwitch={true} initialMode={VIEW_MODES.BODY_2D} />,
+        { wrapper: createWrapper() }
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('compact-body-diagram')).toBeInTheDocument();
+      });
+    });
+  });
+
+  // ============================================================================
+  // CALLBACKS
+  // ============================================================================
+
+  describe('Callbacks', () => {
+    it('should call onSpineFindingsChange when findings are cleared', async () => {
+      const onSpineFindingsChange = vi.fn();
+      render(
+        <AnatomyViewer
+          spineFindings={{ C2: { vertebra: 'C2', type: 'restriction' } }}
+          onSpineFindingsChange={onSpineFindingsChange}
+          onBodyRegionsChange={vi.fn()}
+        />,
+        { wrapper: createWrapper() }
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTitle('Nullstill alle funn')).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTitle('Nullstill alle funn'));
+      expect(onSpineFindingsChange).toHaveBeenCalledWith({});
+    });
+
+    it('should call onBodyRegionsChange with empty array when cleared', async () => {
+      const onBodyRegionsChange = vi.fn();
+      render(
+        <AnatomyViewer
+          spineFindings={{ C2: { vertebra: 'C2', type: 'restriction' } }}
+          bodyRegions={['neck', 'shoulder']}
+          onSpineFindingsChange={vi.fn()}
+          onBodyRegionsChange={onBodyRegionsChange}
+        />,
+        { wrapper: createWrapper() }
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTitle('Nullstill alle funn')).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTitle('Nullstill alle funn'));
+      expect(onBodyRegionsChange).toHaveBeenCalledWith([]);
+    });
+  });
+
+  // ============================================================================
+  // MULTIPLE FINDINGS COUNT
+  // ============================================================================
+
+  describe('Multiple Findings Count', () => {
+    it('should count multiple spine findings correctly', async () => {
+      render(
+        <AnatomyViewer
+          spineFindings={{
+            C2: { vertebra: 'C2', type: 'restriction' },
+            C5: { vertebra: 'C5', type: 'fixation' },
+            T4: { vertebra: 'T4', type: 'tenderness' },
+          }}
+        />,
+        { wrapper: createWrapper() }
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('3 funn')).toBeInTheDocument();
+      });
+    });
+
+    it('should count spine findings + body regions together', async () => {
+      render(
+        <AnatomyViewer
+          spineFindings={{
+            C2: { vertebra: 'C2', type: 'restriction' },
+          }}
+          bodyRegions={['neck', 'shoulder', 'lower_back']}
+        />,
+        { wrapper: createWrapper() }
+      );
+
+      await waitFor(() => {
+        // 1 spine finding + 3 body regions = 4 funn
+        expect(screen.getByText('4 funn')).toBeInTheDocument();
+      });
+    });
+
+    it('should show "1 funn" for single finding', async () => {
+      render(<AnatomyViewer spineFindings={{ C2: { vertebra: 'C2', type: 'restriction' } }} />, {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText('1 funn')).toBeInTheDocument();
+      });
+    });
+  });
+
+  // ============================================================================
+  // MODE CYCLING
+  // ============================================================================
+
+  describe('Mode Cycling', () => {
+    it('should cycle through all three modes', async () => {
+      render(<AnatomyViewer />, { wrapper: createWrapper() });
+
+      // Start in SPINE_2D
+      await waitFor(() => {
+        expect(screen.getByTestId('enhanced-spine-diagram')).toBeInTheDocument();
+      });
+
+      // Switch to SPINE_3D
+      fireEvent.click(screen.getByTitle('3D interaktiv modell'));
+      await waitFor(() => {
+        expect(screen.getByTestId('spine-3d-viewer')).toBeInTheDocument();
+      });
+
+      // Switch to BODY_2D
+      fireEvent.click(screen.getByTitle('Kroppskart for smertelokalisering'));
+      await waitFor(() => {
+        expect(screen.getByTestId('enhanced-body-diagram')).toBeInTheDocument();
+      });
+
+      // Switch back to SPINE_2D
+      fireEvent.click(screen.getByTitle('SVG ryggraddiagram'));
+      await waitFor(() => {
+        expect(screen.getByTestId('enhanced-spine-diagram')).toBeInTheDocument();
+      });
+    });
+  });
+
+  // ============================================================================
+  // SETTINGS TOGGLES
+  // ============================================================================
+
+  describe('Settings Toggles', () => {
+    it('should show narrative and explanation toggles in settings panel', async () => {
+      render(<AnatomyViewer />, { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        expect(screen.getByTitle('Innstillinger')).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTitle('Innstillinger'));
+
+      await waitFor(() => {
+        expect(screen.getByText('Vis narrativ')).toBeInTheDocument();
+        expect(screen.getByText('Vis forklaring')).toBeInTheDocument();
+      });
+    });
+
+    it('should close settings panel when clicking settings button again', async () => {
+      render(<AnatomyViewer />, { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        expect(screen.getByTitle('Innstillinger')).toBeInTheDocument();
+      });
+
+      // Open
+      fireEvent.click(screen.getByTitle('Innstillinger'));
+      await waitFor(() => {
+        expect(screen.getByText('Vis narrativ')).toBeInTheDocument();
+      });
+
+      // Close
+      fireEvent.click(screen.getByTitle('Innstillinger'));
+      await waitFor(() => {
+        expect(screen.queryByText('Vis narrativ')).not.toBeInTheDocument();
+      });
+    });
+  });
+
+  // ============================================================================
+  // API INTEGRATION
+  // ============================================================================
+
+  describe('API Integration', () => {
+    it('should call spineTemplatesAPI on mount', async () => {
+      render(<AnatomyViewer />, { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        expect(spineTemplatesAPI.getGrouped).toHaveBeenCalled();
+      });
+    });
   });
 });
