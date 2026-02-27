@@ -65,10 +65,10 @@ vi.mock('../../components/exercises/ExerciseLibrary', () => ({
   default: function MockExerciseLibrary({
     exercises,
     categories,
-    selectedExercises,
+    _selectedExercises,
     onSelectExercise,
     selectionMode,
-    loading,
+    _loading,
   }) {
     return (
       <div data-testid="exercise-library">
@@ -94,10 +94,10 @@ vi.mock('../../components/exercises/ExercisePrescription', () => ({
   default: function MockExercisePrescription({
     patient,
     selectedExercises,
-    onExercisesChange,
+    _onExercisesChange,
     onSave,
     saving,
-    sending,
+    _sending,
   }) {
     return (
       <div data-testid="exercise-prescription">
