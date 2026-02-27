@@ -7,7 +7,7 @@
  * mark-paid mutation.
  */
 
-import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -37,7 +37,7 @@ vi.mock('../../i18n', () => ({
 
 vi.mock('../../lib/utils', () => ({
   formatDate: (d) => (d ? new Date(d).toISOString().split('T')[0] : '-'),
-  formatCurrency: (v) => (v != null ? `${v} kr` : '-'),
+  formatCurrency: (v) => (v !== null && v !== undefined ? `${v} kr` : '-'),
 }));
 
 vi.mock('../../utils/toast', () => ({
@@ -831,7 +831,9 @@ describe('Financial Page', () => {
     const originalCreateElement = document.createElement.bind(document);
     const mockLink = { setAttribute: vi.fn(), click: vi.fn() };
     const createElementSpy = vi.spyOn(document, 'createElement').mockImplementation((tag) => {
-      if (tag === 'a') return mockLink;
+      if (tag === 'a') {
+        return mockLink;
+      }
       return originalCreateElement(tag);
     });
     vi.spyOn(document.body, 'appendChild').mockImplementation(() => {});
