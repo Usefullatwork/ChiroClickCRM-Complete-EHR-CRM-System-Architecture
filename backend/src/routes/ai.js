@@ -548,4 +548,54 @@ router.post(
   aiController.extractStructured
 );
 
+/**
+ * @swagger
+ * /ai/clinical-pipeline:
+ *   post:
+ *     summary: Run multi-provider clinical analysis pipeline
+ *     tags: [AI]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [patientData, soapData]
+ *             properties:
+ *               patientData:
+ *                 type: object
+ *                 description: Patient demographics (age, name, etc.)
+ *               soapData:
+ *                 type: object
+ *                 description: SOAP note fields (subjective, objective, assessment, plan)
+ *               options:
+ *                 type: object
+ *                 properties:
+ *                   language:
+ *                     type: string
+ *                     default: 'no'
+ *                   includeDifferential:
+ *                     type: boolean
+ *                     default: true
+ *                   includeLetterDraft:
+ *                     type: boolean
+ *                     default: false
+ *     responses:
+ *       200:
+ *         description: Clinical pipeline results
+ *       400:
+ *         description: Missing required fields
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ */
+router.post(
+  '/clinical-pipeline',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  aiController.runClinicalPipeline
+);
+
 export default router;

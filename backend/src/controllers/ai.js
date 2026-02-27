@@ -13,6 +13,7 @@ import {
 } from '../services/extendedThinking.js';
 import { analyzeImage as analyzeVisionImage } from '../services/clinicalVision.js';
 import { extractSOAP, extractDiagnoses } from '../services/structuredExtraction.js';
+import { orchestrate } from '../services/clinicalOrchestrator.js';
 import logger from '../utils/logger.js';
 import cache from '../utils/cache.js';
 import {
@@ -548,6 +549,36 @@ export const extractStructured = async (req, res) => {
   }
 };
 
+/**
+ * Run multi-provider clinical analysis pipeline
+ * Calls orchestrator directly for the full result (clinical, differential, letter, synthesis)
+ */
+export const runClinicalPipeline = async (req, res) => {
+  try {
+    const { patientData, soapData, options = {} } = req.body;
+
+    if (!patientData || !soapData) {
+      return res.status(400).json({ error: 'patientData and soapData are required' });
+    }
+
+    const result = await orchestrate(patientData, soapData, {
+      language: options.language || 'no',
+      includeDifferential: options.includeDifferential !== false,
+      includeLetterDraft: options.includeLetterDraft || false,
+    });
+
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error('Error in runClinicalPipeline controller:', error);
+    res.json({
+      success: false,
+      data: null,
+      aiAvailable: false,
+      error: error.message,
+    });
+  }
+};
+
 export default {
   spellCheck,
   generateSOAPSuggestion,
@@ -565,4 +596,5 @@ export default {
   extendedAnalysis,
   analyzeImage,
   extractStructured,
+  runClinicalPipeline,
 };

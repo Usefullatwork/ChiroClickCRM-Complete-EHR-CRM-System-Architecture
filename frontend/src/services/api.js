@@ -835,6 +835,8 @@ export const aiAPI = {
   analyzeImage: (data) => apiClient.post('/ai/analyze-image', data),
   // Claude tool_use structured extraction (SOAP, diagnoses)
   extractStructured: (data) => apiClient.post('/ai/extract-structured', data),
+  // Multi-provider clinical pipeline (safety → parallel assessments → synthesis)
+  clinicalPipeline: (data) => apiClient.post('/ai/clinical-pipeline', data),
 };
 
 // Macros API - Clinical text hot buttons
