@@ -7,8 +7,8 @@ import toast from '../utils/toast';
 import {
   generateFullNarrative,
   generateEncounterSummary,
-  createTranslator,
-} from '../components/assessment';
+} from '../components/assessment/NarrativeGenerator';
+import { createTranslator } from '../components/assessment/translations';
 
 /**
  * Custom hook that consolidates all EasyAssessment state.

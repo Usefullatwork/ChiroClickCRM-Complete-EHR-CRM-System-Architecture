@@ -2,18 +2,24 @@
  * SOAPNoteForm - Extracted from ClinicalEncounter.jsx
  * Contains the four SOAP sections: Subjective, Objective, Assessment, Plan
  */
+import { lazy, Suspense } from 'react';
 import { Activity, Target, Settings } from 'lucide-react';
-import { EnhancedClinicalTextarea, SALTBanner, AITextarea } from '../clinical';
-import {
-  BodyChartPanel,
-  AnatomicalBodyChart,
-  ActivatorMethodPanel,
-  FacialLinesChart,
-} from '../examination';
-import { ExercisePanel } from '../exercises';
+// Direct imports to avoid barrel re-export bloat
+import EnhancedClinicalTextarea from '../clinical/EnhancedClinicalTextarea';
+import SALTBanner from '../clinical/SALTBanner';
+import AITextarea from '../clinical/AITextarea';
+import BodyChartPanel from '../examination/BodyChartPanel';
+import AnatomicalBodyChart from '../examination/AnatomicalBodyChart';
+import ActivatorMethodPanel from '../examination/ActivatorMethodPanel';
+import FacialLinesChart from '../examination/FacialLinesChart';
 import { DiagnosisPanel } from './DiagnosisPanel';
 import { TaksterPanel } from './TaksterPanel';
-import { ExamPanelManager } from './ExamPanelManager';
+
+// Lazy-load heavy sub-components (only rendered conditionally)
+const ExercisePanel = lazy(() => import('../exercises/ExercisePanel'));
+const ExamPanelManager = lazy(() =>
+  import('./ExamPanelManager').then((m) => ({ default: m.ExamPanelManager }))
+);
 
 export function SOAPNoteForm({
   encounterData,
@@ -206,94 +212,96 @@ export function SOAPNoteForm({
           rows={2}
         />
 
-        {/* All exam panels via ExamPanelManager */}
-        <ExamPanelManager
-          patientId={patientId}
-          encounterId={encounterId}
-          isSigned={isSigned}
-          showOrthoExam={state.showOrthoExam}
-          setShowOrthoExam={state.setShowOrthoExam}
-          orthoExamData={state.orthoExamData}
-          onOrthoExamChange={handleOrthoExamChange}
-          showNeuroExam={state.showNeuroExam}
-          setShowNeuroExam={state.setShowNeuroExam}
-          neuroExamData={state.neuroExamData}
-          onNeuroExamChange={handleNeuroExamChange}
-          showROMTable={state.showROMTable}
-          setShowROMTable={state.setShowROMTable}
-          romTableData={state.romTableData}
-          setRomTableData={state.setRomTableData}
-          showBodyDiagram={state.showBodyDiagram}
-          setShowBodyDiagram={state.setShowBodyDiagram}
-          bodyDiagramMarkers={state.bodyDiagramMarkers}
-          setBodyDiagramMarkers={state.setBodyDiagramMarkers}
-          showExamProtocol={state.showExamProtocol}
-          setShowExamProtocol={state.setShowExamProtocol}
-          examProtocolData={state.examProtocolData}
-          setExamProtocolData={state.setExamProtocolData}
-          showClusterTests={state.showClusterTests}
-          setShowClusterTests={state.setShowClusterTests}
-          clusterTestData={state.clusterTestData}
-          setClusterTestData={state.setClusterTestData}
-          showRegionalExam={state.showRegionalExam}
-          setShowRegionalExam={state.setShowRegionalExam}
-          regionalExamData={state.regionalExamData}
-          setRegionalExamData={state.setRegionalExamData}
-          showNeurologicalExam={state.showNeurologicalExam}
-          setShowNeurologicalExam={state.setShowNeurologicalExam}
-          neurologicalExamData={state.neurologicalExamData}
-          setNeurologicalExamData={state.setNeurologicalExamData}
-          showOutcomeMeasures={state.showOutcomeMeasures}
-          setShowOutcomeMeasures={state.setShowOutcomeMeasures}
-          outcomeMeasureType={state.outcomeMeasureType}
-          setOutcomeMeasureType={state.setOutcomeMeasureType}
-          outcomeMeasureData={state.outcomeMeasureData}
-          setOutcomeMeasureData={state.setOutcomeMeasureData}
-          showMMT={state.showMMT}
-          setShowMMT={state.setShowMMT}
-          mmtData={state.mmtData}
-          setMmtData={state.setMmtData}
-          showDTR={state.showDTR}
-          setShowDTR={state.setShowDTR}
-          dtrData={state.dtrData}
-          setDtrData={state.setDtrData}
-          showSensoryExam={state.showSensoryExam}
-          setShowSensoryExam={state.setShowSensoryExam}
-          sensoryExamData={state.sensoryExamData}
-          setSensoryExamData={state.setSensoryExamData}
-          showCranialNerves={state.showCranialNerves}
-          setShowCranialNerves={state.setShowCranialNerves}
-          cranialNerveData={state.cranialNerveData}
-          setCranialNerveData={state.setCranialNerveData}
-          showCoordination={state.showCoordination}
-          setShowCoordination={state.setShowCoordination}
-          coordinationData={state.coordinationData}
-          setCoordinationData={state.setCoordinationData}
-          showNerveTension={state.showNerveTension}
-          setShowNerveTension={state.setShowNerveTension}
-          nerveTensionData={state.nerveTensionData}
-          setNerveTensionData={state.setNerveTensionData}
-          showRegionalDiagrams={state.showRegionalDiagrams}
-          setShowRegionalDiagrams={state.setShowRegionalDiagrams}
-          regionalDiagramData={state.regionalDiagramData}
-          setRegionalDiagramData={state.setRegionalDiagramData}
-          selectedRegion={state.selectedRegion}
-          setSelectedRegion={state.setSelectedRegion}
-          showPainAssessment={state.showPainAssessment}
-          setShowPainAssessment={state.setShowPainAssessment}
-          painAssessmentData={state.painAssessmentData}
-          setPainAssessmentData={state.setPainAssessmentData}
-          showHeadacheAssessment={state.showHeadacheAssessment}
-          setShowHeadacheAssessment={state.setShowHeadacheAssessment}
-          headacheData={state.headacheData}
-          setHeadacheData={state.setHeadacheData}
-          showTissueMarkers={state.showTissueMarkers}
-          setShowTissueMarkers={state.setShowTissueMarkers}
-          tissueMarkerData={state.tissueMarkerData}
-          setTissueMarkerData={state.setTissueMarkerData}
-          updateField={updateField}
-          encounterData={encounterData}
-        />
+        {/* All exam panels via ExamPanelManager (lazy-loaded) */}
+        <Suspense fallback={<div className="animate-pulse bg-slate-100 rounded-lg h-16 m-4" />}>
+          <ExamPanelManager
+            patientId={patientId}
+            encounterId={encounterId}
+            isSigned={isSigned}
+            showOrthoExam={state.showOrthoExam}
+            setShowOrthoExam={state.setShowOrthoExam}
+            orthoExamData={state.orthoExamData}
+            onOrthoExamChange={handleOrthoExamChange}
+            showNeuroExam={state.showNeuroExam}
+            setShowNeuroExam={state.setShowNeuroExam}
+            neuroExamData={state.neuroExamData}
+            onNeuroExamChange={handleNeuroExamChange}
+            showROMTable={state.showROMTable}
+            setShowROMTable={state.setShowROMTable}
+            romTableData={state.romTableData}
+            setRomTableData={state.setRomTableData}
+            showBodyDiagram={state.showBodyDiagram}
+            setShowBodyDiagram={state.setShowBodyDiagram}
+            bodyDiagramMarkers={state.bodyDiagramMarkers}
+            setBodyDiagramMarkers={state.setBodyDiagramMarkers}
+            showExamProtocol={state.showExamProtocol}
+            setShowExamProtocol={state.setShowExamProtocol}
+            examProtocolData={state.examProtocolData}
+            setExamProtocolData={state.setExamProtocolData}
+            showClusterTests={state.showClusterTests}
+            setShowClusterTests={state.setShowClusterTests}
+            clusterTestData={state.clusterTestData}
+            setClusterTestData={state.setClusterTestData}
+            showRegionalExam={state.showRegionalExam}
+            setShowRegionalExam={state.setShowRegionalExam}
+            regionalExamData={state.regionalExamData}
+            setRegionalExamData={state.setRegionalExamData}
+            showNeurologicalExam={state.showNeurologicalExam}
+            setShowNeurologicalExam={state.setShowNeurologicalExam}
+            neurologicalExamData={state.neurologicalExamData}
+            setNeurologicalExamData={state.setNeurologicalExamData}
+            showOutcomeMeasures={state.showOutcomeMeasures}
+            setShowOutcomeMeasures={state.setShowOutcomeMeasures}
+            outcomeMeasureType={state.outcomeMeasureType}
+            setOutcomeMeasureType={state.setOutcomeMeasureType}
+            outcomeMeasureData={state.outcomeMeasureData}
+            setOutcomeMeasureData={state.setOutcomeMeasureData}
+            showMMT={state.showMMT}
+            setShowMMT={state.setShowMMT}
+            mmtData={state.mmtData}
+            setMmtData={state.setMmtData}
+            showDTR={state.showDTR}
+            setShowDTR={state.setShowDTR}
+            dtrData={state.dtrData}
+            setDtrData={state.setDtrData}
+            showSensoryExam={state.showSensoryExam}
+            setShowSensoryExam={state.setShowSensoryExam}
+            sensoryExamData={state.sensoryExamData}
+            setSensoryExamData={state.setSensoryExamData}
+            showCranialNerves={state.showCranialNerves}
+            setShowCranialNerves={state.setShowCranialNerves}
+            cranialNerveData={state.cranialNerveData}
+            setCranialNerveData={state.setCranialNerveData}
+            showCoordination={state.showCoordination}
+            setShowCoordination={state.setShowCoordination}
+            coordinationData={state.coordinationData}
+            setCoordinationData={state.setCoordinationData}
+            showNerveTension={state.showNerveTension}
+            setShowNerveTension={state.setShowNerveTension}
+            nerveTensionData={state.nerveTensionData}
+            setNerveTensionData={state.setNerveTensionData}
+            showRegionalDiagrams={state.showRegionalDiagrams}
+            setShowRegionalDiagrams={state.setShowRegionalDiagrams}
+            regionalDiagramData={state.regionalDiagramData}
+            setRegionalDiagramData={state.setRegionalDiagramData}
+            selectedRegion={state.selectedRegion}
+            setSelectedRegion={state.setSelectedRegion}
+            showPainAssessment={state.showPainAssessment}
+            setShowPainAssessment={state.setShowPainAssessment}
+            painAssessmentData={state.painAssessmentData}
+            setPainAssessmentData={state.setPainAssessmentData}
+            showHeadacheAssessment={state.showHeadacheAssessment}
+            setShowHeadacheAssessment={state.setShowHeadacheAssessment}
+            headacheData={state.headacheData}
+            setHeadacheData={state.setHeadacheData}
+            showTissueMarkers={state.showTissueMarkers}
+            setShowTissueMarkers={state.setShowTissueMarkers}
+            tissueMarkerData={state.tissueMarkerData}
+            setTissueMarkerData={state.setTissueMarkerData}
+            updateField={updateField}
+            encounterData={encounterData}
+          />
+        </Suspense>
 
         <AITextarea
           value={encounterData.objective.ortho_tests}
@@ -543,22 +551,28 @@ export function SOAPNoteForm({
             </button>
           </div>
           {showExercisePanel && (
-            <div className="border border-green-200 rounded-lg overflow-hidden">
-              <ExercisePanel
-                patientId={patientId}
-                encounterId={encounterId}
-                onExercisesChange={(exercises) => {
-                  const exerciseText = exercises
-                    .map(
-                      (e) =>
-                        `${e.name_no || e.name_en}: ${e.sets || 3}x${e.reps || 10}, ${e.frequency || 'daglig'}`
-                    )
-                    .join('\n');
-                  updateField('plan', 'exercises', exerciseText);
-                }}
-                compact={true}
-              />
-            </div>
+            <Suspense
+              fallback={
+                <div className="animate-pulse bg-green-50 rounded-lg h-24 border border-green-200" />
+              }
+            >
+              <div className="border border-green-200 rounded-lg overflow-hidden">
+                <ExercisePanel
+                  patientId={patientId}
+                  encounterId={encounterId}
+                  onExercisesChange={(exercises) => {
+                    const exerciseText = exercises
+                      .map(
+                        (e) =>
+                          `${e.name_no || e.name_en}: ${e.sets || 3}x${e.reps || 10}, ${e.frequency || 'daglig'}`
+                      )
+                      .join('\n');
+                    updateField('plan', 'exercises', exerciseText);
+                  }}
+                  compact={true}
+                />
+              </div>
+            </Suspense>
           )}
           <EnhancedClinicalTextarea
             value={encounterData.plan.exercises}

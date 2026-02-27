@@ -1,13 +1,12 @@
-import {
-  QuickCheckboxGrid,
-  SmartTextInput,
-  SpineDiagram,
+import QuickCheckboxGrid, {
   OBSERVATION_FINDINGS_OPTIONS,
   PALPATION_FINDINGS_OPTIONS,
   ROM_FINDINGS_OPTIONS,
   ORTHO_TESTS_OPTIONS,
   NEURO_TESTS_OPTIONS,
-} from '../assessment';
+} from '../assessment/QuickCheckboxGrid';
+import SmartTextInput from '../assessment/SmartTextInput';
+import SpineDiagram from '../assessment/SpineDiagram';
 
 export default function ObjectiveTab({
   encounterData,
