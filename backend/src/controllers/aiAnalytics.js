@@ -371,3 +371,184 @@ export const submitFeedback = async (req, res) => {
     res.status(500).json({ success: false, error: 'Failed to submit feedback' });
   }
 };
+
+/**
+ * Get cost per suggestion by joining ai_api_usage with ai_suggestions
+ * Bridges cost data with quality data to answer: "What does each approved suggestion cost?"
+ */
+export const getCostPerSuggestion = async (req, res) => {
+  try {
+    const orgId = req.organizationId;
+    const { startDate, endDate } = req.query;
+
+    let dateFilter = '';
+    const params = [orgId];
+    let paramIndex = 2;
+
+    if (startDate) {
+      dateFilter += ` AND s.created_at >= $${paramIndex}`;
+      params.push(startDate);
+      paramIndex++;
+    }
+    if (endDate) {
+      dateFilter += ` AND s.created_at <= $${paramIndex}`;
+      params.push(endDate);
+      paramIndex++;
+    }
+
+    const result = await query(
+      `SELECT
+        s.suggestion_type,
+        u.provider,
+        COUNT(DISTINCT s.id) as total_suggestions,
+        SUM(CASE WHEN s.feedback_status = 'APPROVED' THEN 1 ELSE 0 END) as approved_count,
+        CASE WHEN COUNT(DISTINCT s.id) > 0
+          THEN ROUND((SUM(CASE WHEN s.feedback_status = 'APPROVED' THEN 1 ELSE 0 END)::numeric / COUNT(DISTINCT s.id) * 100), 1)
+          ELSE 0
+        END as approval_rate,
+        ROUND(AVG(u.cost_usd)::numeric, 6) as avg_cost_usd,
+        CASE WHEN SUM(CASE WHEN s.feedback_status = 'APPROVED' THEN 1 ELSE 0 END) > 0
+          THEN ROUND((SUM(u.cost_usd)::numeric / SUM(CASE WHEN s.feedback_status = 'APPROVED' THEN 1 ELSE 0 END)), 6)
+          ELSE NULL
+        END as cost_per_approved_suggestion,
+        ROUND(AVG(u.duration_ms)::numeric, 0) as avg_latency_ms
+      FROM ai_suggestions s
+      JOIN ai_api_usage u ON u.task_type = s.suggestion_type AND u.organization_id = s.organization_id
+      WHERE s.organization_id = $1 ${dateFilter}
+      GROUP BY s.suggestion_type, u.provider
+      ORDER BY total_suggestions DESC`,
+      params
+    );
+
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    if (error.message?.includes('does not exist')) {
+      return res.json({ success: true, data: [] });
+    }
+    logger.error('Error getting cost per suggestion:', error);
+    res.status(500).json({ success: false, error: 'Failed to get cost per suggestion' });
+  }
+};
+
+/**
+ * Get provider value comparison — merges cost metrics with quality metrics
+ * Two-query approach: ai_api_usage (cost) + ai_suggestions (quality), merged by model name
+ */
+export const getProviderValue = async (req, res) => {
+  try {
+    const orgId = req.organizationId;
+    const days = Math.min(parseInt(req.query.days || '30', 10), 365);
+
+    // Query 1: Cost metrics from ai_api_usage
+    const costResult = await query(
+      `SELECT
+        provider,
+        model,
+        COUNT(*) as total_requests,
+        ROUND(AVG(cost_usd)::numeric, 6) as avg_cost_per_request,
+        ROUND(AVG(duration_ms)::numeric, 0) as avg_latency_ms,
+        ROUND(SUM(cost_usd)::numeric, 4) as total_cost,
+        CASE WHEN SUM(input_tokens) > 0
+          THEN ROUND((SUM(cache_read_tokens)::numeric / SUM(input_tokens) * 100), 1)
+          ELSE 0
+        END as cache_hit_rate
+      FROM ai_api_usage
+      WHERE organization_id = $1
+        AND created_at >= NOW() - INTERVAL '1 day' * $2
+      GROUP BY provider, model
+      ORDER BY total_requests DESC`,
+      [orgId, days]
+    );
+
+    // Query 2: Quality metrics from ai_suggestions
+    const qualityResult = await query(
+      `SELECT
+        model_name,
+        ROUND(AVG(confidence_score)::numeric, 3) as avg_confidence,
+        COUNT(*) as total_suggestions,
+        SUM(CASE WHEN feedback_status = 'APPROVED' THEN 1 ELSE 0 END) as approved_count,
+        CASE WHEN COUNT(*) > 0
+          THEN ROUND((SUM(CASE WHEN feedback_status = 'APPROVED' THEN 1 ELSE 0 END)::numeric / COUNT(*) * 100), 1)
+          ELSE 0
+        END as approval_rate
+      FROM ai_suggestions
+      WHERE organization_id = $1
+        AND created_at >= NOW() - INTERVAL '1 day' * $2
+      GROUP BY model_name`,
+      [orgId, days]
+    );
+
+    // Merge by model name
+    const qualityMap = new Map();
+    for (const row of qualityResult.rows) {
+      qualityMap.set(row.model_name, row);
+    }
+
+    const merged = costResult.rows.map((cost) => {
+      const quality = qualityMap.get(cost.model) || {};
+      const totalCost = parseFloat(cost.total_cost) || 0;
+      const approvedCount = parseInt(quality.approved_count) || 0;
+
+      return {
+        provider: cost.provider,
+        model: cost.model,
+        total_requests: cost.total_requests,
+        avg_confidence: quality.avg_confidence || null,
+        approval_rate: quality.approval_rate || null,
+        avg_cost_per_request: cost.avg_cost_per_request,
+        avg_latency_ms: cost.avg_latency_ms,
+        suggestions_per_dollar:
+          totalCost > 0 ? parseFloat((approvedCount / totalCost).toFixed(1)) : null,
+        cache_hit_rate: cost.cache_hit_rate,
+      };
+    });
+
+    res.json({ success: true, data: merged });
+  } catch (error) {
+    if (error.message?.includes('does not exist')) {
+      return res.json({ success: true, data: [] });
+    }
+    logger.error('Error getting provider value:', error);
+    res.status(500).json({ success: false, error: 'Failed to get provider value' });
+  }
+};
+
+/**
+ * Get cache utilization trends — daily cache reads and estimated savings
+ * Only queries ai_api_usage (cache is purely a cost optimization metric)
+ */
+export const getCacheTrends = async (req, res) => {
+  try {
+    const days = Math.min(parseInt(req.query.days || '30', 10), 365);
+
+    const result = await query(
+      `SELECT
+        DATE(created_at) as date,
+        model,
+        COUNT(*) as total_requests,
+        SUM(cache_read_tokens) as cache_reads,
+        CASE WHEN SUM(input_tokens) > 0
+          THEN ROUND((SUM(cache_read_tokens)::numeric / SUM(input_tokens) * 100), 1)
+          ELSE 0
+        END as cache_read_pct,
+        ROUND((SUM(cache_read_tokens) * CASE
+          WHEN model LIKE 'claude-haiku%' THEN (0.8 - 0.08) / 1000000.0
+          ELSE (3.0 - 0.3) / 1000000.0
+        END)::numeric, 6) as estimated_savings_usd
+      FROM ai_api_usage
+      WHERE provider = 'claude'
+        AND created_at >= NOW() - INTERVAL '1 day' * $1
+      GROUP BY DATE(created_at), model
+      ORDER BY date DESC, model`,
+      [days]
+    );
+
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    if (error.message?.includes('does not exist')) {
+      return res.json({ success: true, data: [] });
+    }
+    logger.error('Error getting cache trends:', error);
+    res.status(500).json({ success: false, error: 'Failed to get cache trends' });
+  }
+};

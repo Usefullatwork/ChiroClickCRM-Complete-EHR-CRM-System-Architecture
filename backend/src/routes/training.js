@@ -544,6 +544,89 @@ router.post(
   aiAnalyticsController.submitFeedback
 );
 
+/**
+ * @swagger
+ * /training/analytics/cost-per-suggestion:
+ *   get:
+ *     summary: Cost per approved suggestion
+ *     description: Joins ai_api_usage with ai_suggestions to show cost efficiency by task type and provider
+ *     tags: [Training]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Cost per suggestion breakdown
+ */
+router.get(
+  '/analytics/cost-per-suggestion',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(analyticsQuerySchema),
+  aiAnalyticsController.getCostPerSuggestion
+);
+
+/**
+ * @swagger
+ * /training/analytics/provider-value:
+ *   get:
+ *     summary: Provider value comparison
+ *     description: Compares cost, quality, and efficiency across AI providers and models
+ *     tags: [Training]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: days
+ *         schema:
+ *           type: integer
+ *           default: 30
+ *     responses:
+ *       200:
+ *         description: Provider value comparison data
+ */
+router.get(
+  '/analytics/provider-value',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(analyticsQuerySchema),
+  aiAnalyticsController.getProviderValue
+);
+
+/**
+ * @swagger
+ * /training/analytics/cache-trends:
+ *   get:
+ *     summary: Cache utilization trends
+ *     description: Daily cache read rates and estimated savings for Claude API calls
+ *     tags: [Training]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: days
+ *         schema:
+ *           type: integer
+ *           default: 30
+ *     responses:
+ *       200:
+ *         description: Cache trend data with estimated savings
+ */
+router.get(
+  '/analytics/cache-trends',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(analyticsQuerySchema),
+  aiAnalyticsController.getCacheTrends
+);
+
 // ============================================================================
 // DATA CURATION ENDPOINTS
 // ============================================================================
@@ -677,6 +760,81 @@ router.post('/curation/reject/:id', requireRole(['ADMIN']), dataCurationControll
  *         description: Bulk action completed
  */
 router.post('/curation/bulk', requireRole(['ADMIN']), dataCurationController.bulk);
+
+// ============================================================================
+// TRAINING DATA PIPELINE ENDPOINTS
+// ============================================================================
+
+/**
+ * @swagger
+ * /training/export-feedback-data:
+ *   get:
+ *     summary: Export rejected/modified suggestions as anonymized JSONL
+ *     description: Downloads production feedback data as anonymized ChatML training examples for LoRA fine-tuning. PII is scrubbed and fødselsnummer-containing records are excluded.
+ *     tags: [Training]
+ *     security:
+ *       - BearerAuth: []
+ *     produces:
+ *       - application/jsonlines
+ *     responses:
+ *       200:
+ *         description: JSONL file download with anonymized training examples
+ *       403:
+ *         description: Admin only
+ */
+router.get('/export-feedback-data', requireRole(['ADMIN']), trainingController.exportFeedbackData);
+
+/**
+ * @swagger
+ * /training/gap-report:
+ *   get:
+ *     summary: Identify weak AI categories from recent feedback
+ *     description: Analyzes the last 30 days of ai_suggestions feedback to find categories with low approval rates that need more training data.
+ *     tags: [Training]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Gap report with weak categories and approval rates
+ *       403:
+ *         description: Admin only
+ */
+router.get('/gap-report', requireRole(['ADMIN']), trainingController.getGapReport);
+
+/**
+ * @swagger
+ * /training/generate-targeted:
+ *   post:
+ *     summary: Generate targeted training data using Claude
+ *     description: Uses Claude to generate synthetic training examples for a specific category. Examples are validated for compliance and stored in ai_training_data table for review.
+ *     tags: [Training]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [category]
+ *             properties:
+ *               category:
+ *                 type: string
+ *                 enum: [icpc2_codes, red_flags, soap_notes, letters, differential_diagnosis, treatment_plans, patient_communication, quick_fields]
+ *               count:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 50
+ *                 default: 10
+ *     responses:
+ *       200:
+ *         description: Generated training examples
+ *       400:
+ *         description: Missing category or invalid count
+ *       403:
+ *         description: Admin only
+ */
+router.post('/generate-targeted', requireRole(['ADMIN']), trainingController.generateTargeted);
 
 // ============================================================================
 // TRAINING DATA EXPORT ENDPOINTS
