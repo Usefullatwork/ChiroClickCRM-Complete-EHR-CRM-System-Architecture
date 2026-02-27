@@ -10,6 +10,7 @@
 
 import logger from '../../utils/logger.js';
 import { AIProviderBase } from './aiProvider.js';
+import clinicalPromptCache from './clinicalPromptCache.js';
 
 // Lazy-load the SDK to avoid import errors when not installed
 let Anthropic = null;
@@ -92,6 +93,13 @@ class ClaudeProvider extends AIProviderBase {
    * Caching saves ~90% on repeated system prompts (charged at 1/10th rate).
    */
   _buildSystemMessages(systemPrompt, taskType) {
+    // Try cache-based composition first
+    const cachedMessages = clinicalPromptCache.buildCacheableMessages(taskType, systemPrompt);
+    if (cachedMessages) {
+      return cachedMessages;
+    }
+
+    // Fallback: original logic for unmapped task types
     const messages = [];
 
     // Add cacheable clinical base context
@@ -284,5 +292,11 @@ class ClaudeProvider extends AIProviderBase {
   }
 }
 
-export { ClaudeProvider, CLAUDE_MODEL_MAP, CACHEABLE_SYSTEM_PROMPTS, DEFAULT_CLAUDE_MODEL };
+export {
+  ClaudeProvider,
+  CLAUDE_MODEL_MAP,
+  CACHEABLE_SYSTEM_PROMPTS,
+  DEFAULT_CLAUDE_MODEL,
+  clinicalPromptCache,
+};
 export default ClaudeProvider;

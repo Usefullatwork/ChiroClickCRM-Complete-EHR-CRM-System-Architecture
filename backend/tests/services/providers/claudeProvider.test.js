@@ -5,6 +5,12 @@
 
 import { jest } from '@jest/globals';
 
+// Mock database (clinicalPromptCache → redFlagEngine → database import chain)
+jest.unstable_mockModule('../../../src/config/database.js', () => ({
+  query: jest.fn(),
+  default: { query: jest.fn() },
+}));
+
 // Mock logger
 jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
   default: {
@@ -31,7 +37,7 @@ jest.unstable_mockModule('@anthropic-ai/sdk', () => ({
 // Set API key before import
 process.env.CLAUDE_API_KEY = 'test-api-key';
 
-const { ClaudeProvider, CLAUDE_MODEL_MAP } =
+const { ClaudeProvider, CLAUDE_MODEL_MAP, clinicalPromptCache } =
   await import('../../../src/services/providers/claudeProvider.js');
 
 describe('ClaudeProvider', () => {
@@ -267,6 +273,60 @@ describe('ClaudeProvider', () => {
       expect(CLAUDE_MODEL_MAP['chiro-no-lora-v4']).toBe('claude-sonnet-4-6');
       expect(CLAUDE_MODEL_MAP['chiro-medical']).toBe('claude-sonnet-4-6');
       expect(CLAUDE_MODEL_MAP['chiro-norwegian-lora-v2']).toBe('claude-sonnet-4-6');
+    });
+  });
+
+  describe('_buildSystemMessages() with cache', () => {
+    it('should use cache for known taskType (spell_check)', async () => {
+      mockCreate.mockResolvedValueOnce({
+        content: [{ type: 'text', text: 'korrigert tekst' }],
+        usage: { input_tokens: 50, output_tokens: 10 },
+      });
+
+      await provider.generate('test', null, { taskType: 'spell_check' });
+
+      const call = mockCreate.mock.calls[0][0];
+      const systemTexts = call.system.map((s) => s.text);
+      expect(systemTexts.some((t) => t.includes('klinisk assistent'))).toBe(true);
+      expect(systemTexts.some((t) => t.includes('stavefeil'))).toBe(true);
+    });
+
+    it('should fall back to original logic for unknown taskType', async () => {
+      mockCreate.mockResolvedValueOnce({
+        content: [{ type: 'text', text: 'ok' }],
+        usage: { input_tokens: 10, output_tokens: 5 },
+      });
+
+      await provider.generate('test', null, { taskType: 'unknown_task' });
+
+      const call = mockCreate.mock.calls[0][0];
+      // Original logic: no safety_context for unknown type, uses clinical_base fallback
+      expect(call.system.length).toBeGreaterThan(0);
+      expect(call.system[0].text).toContain('klinisk assistent');
+    });
+
+    it('should compose letter prompts with base + type-specific', async () => {
+      mockCreate.mockResolvedValueOnce({
+        content: [{ type: 'text', text: 'Medisinsk erklæring generert' }],
+        usage: { input_tokens: 100, output_tokens: 30 },
+      });
+
+      await provider.generate('Generer brev', null, {
+        taskType: 'letter_MEDICAL_CERTIFICATE',
+      });
+
+      const call = mockCreate.mock.calls[0][0];
+      const systemTexts = call.system.map((s) => s.text);
+      expect(systemTexts.some((t) => t.includes('VIKTIGE RETNINGSLINJER'))).toBe(true);
+      expect(systemTexts.some((t) => t.includes('MEDISINSK ERKLÆRING'))).toBe(true);
+    });
+  });
+
+  describe('clinicalPromptCache export', () => {
+    it('should export clinicalPromptCache from claudeProvider', () => {
+      expect(clinicalPromptCache).toBeDefined();
+      expect(typeof clinicalPromptCache.buildCacheableMessages).toBe('function');
+      expect(typeof clinicalPromptCache.getStats).toBe('function');
     });
   });
 });
