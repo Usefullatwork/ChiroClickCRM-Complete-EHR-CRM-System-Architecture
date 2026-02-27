@@ -192,4 +192,92 @@ export async function getEvalSummary() {
   }
 }
 
+/**
+ * Export rejected/modified suggestions as anonymized JSONL training examples.
+ * These represent cases where the AI failed and the clinician corrected or rejected
+ * the output — ideal negative examples for LoRA fine-tuning.
+ */
+export async function exportFailedCases() {
+  const { anonymizeText } = await import('../services/trainingExport.js');
+  const { validateForCloudAPI } = await import('../services/complianceValidator.js');
+
+  // Fødselsnummer pattern: 11 digits (6 birth + 5 personal)
+  const fnummerPattern = /\b\d{6}\s?\d{5}\b/;
+
+  const result = await query(
+    `SELECT id, suggestion_type, input_text, suggested_text, modified_text,
+            feedback_status, confidence_score, model_name
+     FROM ai_suggestions
+     WHERE feedback_status IN ('REJECTED', 'MODIFIED')
+     ORDER BY created_at DESC`
+  );
+
+  const rows = result.rows || [];
+  const examples = [];
+  const skipped = { pii: 0, compliance: 0 };
+
+  for (const row of rows) {
+    const inputText = row.input_text || '';
+    const suggestedText = row.suggested_text || '';
+    const modifiedText = row.modified_text || '';
+
+    // Refuse to export data containing fødselsnummer
+    if (
+      fnummerPattern.test(inputText) ||
+      fnummerPattern.test(suggestedText) ||
+      fnummerPattern.test(modifiedText)
+    ) {
+      skipped.pii++;
+      continue;
+    }
+
+    // Validate compliance before export
+    const validation = validateForCloudAPI(inputText);
+    if (!validation.valid) {
+      skipped.compliance++;
+      continue;
+    }
+
+    // Determine the correct output: for MODIFIED, use the human-corrected text;
+    // for REJECTED, use a system message indicating rejection
+    const correctOutput =
+      row.feedback_status === 'MODIFIED' && modifiedText
+        ? anonymizeText(modifiedText)
+        : '[AVVIST — utilstrekkelig kvalitet]';
+
+    examples.push({
+      messages: [
+        {
+          role: 'system',
+          content: 'Du er en klinisk assistent for kiropraktorer i Norge. Skriv på norsk bokmål.',
+        },
+        {
+          role: 'user',
+          content: anonymizeText(inputText),
+        },
+        {
+          role: 'assistant',
+          content: correctOutput,
+        },
+      ],
+      metadata: {
+        source: 'production_feedback',
+        category: row.suggestion_type || 'general',
+        feedback_status: row.feedback_status,
+        original_model: row.model_name,
+        original_confidence: row.confidence_score,
+        rejected_output: anonymizeText(suggestedText),
+      },
+    });
+  }
+
+  logger.info('Exported failed cases for training', {
+    total: rows.length,
+    exported: examples.length,
+    skipped,
+  });
+
+  return examples;
+}
+
 export { GRADING_SYSTEM };

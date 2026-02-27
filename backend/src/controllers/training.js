@@ -399,6 +399,115 @@ export const detectPractitionerStyle = async (req, res) => {
   });
 };
 
+// ============================================================================
+// TRAINING DATA PIPELINE
+// ============================================================================
+
+/**
+ * Export rejected/modified AI suggestions as anonymized JSONL training examples
+ */
+export const exportFeedbackData = async (req, res) => {
+  try {
+    const { exportFailedCases } = await import('../services/clinicalEvals.js');
+    const examples = await exportFailedCases();
+
+    // Build JSONL content
+    const jsonl = examples.map((ex) => JSON.stringify(ex)).join('\n');
+    const filename = `feedback-export-${new Date().toISOString().slice(0, 10)}.jsonl`;
+
+    res.setHeader('Content-Type', 'application/jsonlines');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(jsonl);
+  } catch (error) {
+    logger.error('Failed to export feedback data:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+/**
+ * Get a gap report — identify weak categories based on recent suggestion feedback
+ */
+export const getGapReport = async (req, res) => {
+  try {
+    const { query } = await import('../config/database.js');
+
+    // Aggregate feedback stats by suggestion_type to find weak categories
+    const result = await query(
+      `SELECT
+         suggestion_type AS category,
+         COUNT(*) AS total,
+         COUNT(*) FILTER (WHERE feedback_status = 'APPROVED') AS approved,
+         COUNT(*) FILTER (WHERE feedback_status = 'MODIFIED') AS modified,
+         COUNT(*) FILTER (WHERE feedback_status = 'REJECTED') AS rejected,
+         ROUND(AVG(confidence_score)::numeric, 2) AS avg_confidence,
+         ROUND(
+           (COUNT(*) FILTER (WHERE feedback_status = 'APPROVED')::numeric /
+            NULLIF(COUNT(*), 0) * 100), 1
+         ) AS approval_rate
+       FROM ai_suggestions
+       WHERE created_at > NOW() - INTERVAL '30 days'
+         AND feedback_status IS NOT NULL
+       GROUP BY suggestion_type
+       ORDER BY approval_rate ASC NULLS FIRST`
+    );
+
+    const categories = (result.rows || []).map((row) => ({
+      category: row.category,
+      total: parseInt(row.total, 10),
+      approved: parseInt(row.approved, 10),
+      modified: parseInt(row.modified, 10),
+      rejected: parseInt(row.rejected, 10),
+      avg_confidence: parseFloat(row.avg_confidence) || 0,
+      approval_rate: parseFloat(row.approval_rate) || 0,
+      needs_improvement: parseFloat(row.approval_rate || 0) < 70,
+    }));
+
+    const weakCategories = categories.filter((c) => c.needs_improvement);
+
+    res.json({
+      success: true,
+      data: {
+        period_days: 30,
+        categories,
+        weak_categories: weakCategories,
+        summary: {
+          total_categories: categories.length,
+          weak_count: weakCategories.length,
+          strongest: categories.length > 0 ? categories[categories.length - 1].category : null,
+          weakest: weakCategories.length > 0 ? weakCategories[0].category : null,
+        },
+      },
+    });
+  } catch (error) {
+    logger.error('Failed to generate gap report:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+/**
+ * Generate targeted training data for a specific category using Claude
+ */
+export const generateTargeted = async (req, res) => {
+  try {
+    const { category, count = 10 } = req.body;
+
+    if (!category) {
+      return res.status(400).json({ success: false, error: 'Missing required field: category' });
+    }
+
+    if (count < 1 || count > 50) {
+      return res.status(400).json({ success: false, error: 'count must be between 1 and 50' });
+    }
+
+    logger.info(`Generating ${count} targeted training examples for category: ${category}`);
+    const result = await trainingService.generateTargetedData(category, count);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error('Failed to generate targeted data:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
 export default {
   getModelStatus,
   getTrainingData,
@@ -420,4 +529,7 @@ export default {
   getMedicalTerminology,
   extractFollowUps,
   parseJournalEntry,
+  exportFeedbackData,
+  getGapReport,
+  generateTargeted,
 };

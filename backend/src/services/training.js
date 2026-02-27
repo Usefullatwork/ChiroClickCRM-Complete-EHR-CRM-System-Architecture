@@ -300,6 +300,139 @@ export async function testModel(modelName, prompt) {
   });
 }
 
+/**
+ * Category-specific prompts for targeted training data generation
+ */
+const CATEGORY_PROMPTS = {
+  icpc2_codes: `Generer kliniske eksempler der en kiropraktor må velge riktig ICPC-2 diagnosekode.
+Inkluder pasientbeskrivelse, relevante funn, og korrekt ICPC-2 kode med begrunnelse.
+Bruk vanlige muskel- og skjelettdiagnoser (L01-L99, N01-N99).`,
+
+  red_flags: `Generer kliniske scenarier der pasienten presenterer med røde flagg som krever umiddelbar henvisning.
+Inkluder: cauda equina-syndrom, frakturer, infeksjon, malignitet, nevrologiske utfall.
+Vis korrekt identifisering og håndtering av hvert rødt flagg.`,
+
+  soap_notes: `Generer komplette SOAP-notater for kiropraktisk behandling.
+S: Subjektiv (pasientens beskrivelse), O: Objektiv (funn ved undersøkelse),
+A: Analyse (diagnose/vurdering), P: Plan (behandling og oppfølging).
+Bruk norsk medisinsk terminologi.`,
+
+  letters: `Generer kliniske brev på norsk: henvisningsbrev til spesialist, epikriser,
+forsikringsrapporter, og studieattester. Bruk formelt medisinsk språk og inkluder
+relevante kliniske funn og diagnoser.`,
+
+  differential_diagnosis: `Generer differensialdiagnostiske vurderinger for vanlige kiropraktiske presentasjoner.
+Inkluder muskel-skjelett, nevrologiske, og viscerale differensialdiagnoser.
+Vis systematisk utredning og begrunnelse for valgt diagnose.`,
+
+  treatment_plans: `Generer behandlingsplaner for vanlige kiropraktiske tilstander.
+Inkluder: behandlingsteknikker, frekvens, prognostiske faktorer, hjemmeøvelser,
+og kriterier for henvisning. Bruk evidensbaserte anbefalinger.`,
+
+  patient_communication: `Generer eksempler på pasientkommunikasjon på norsk: forklaringer av diagnoser,
+behandlingsalternativer, prognoser, og egenbehandlingsråd.
+Bruk pasientvennlig språk uten unødvendig medisinsk sjargong.`,
+
+  quick_fields: `Generer korte kliniske autofyll-tekster for hurtigfelter i journal:
+ROM-verdier, ortopediske tester (positive/negative), nevrologiske funn,
+palpasjonsfunn, og behandlingsteknikker. Korte, presise formuleringer.`,
+};
+
+/**
+ * Generate targeted training data using Claude for a specific category.
+ * @param {string} category - Category key from CATEGORY_PROMPTS
+ * @param {number} count - Number of examples to generate
+ * @returns {Array} Generated training examples
+ */
+export async function generateTargetedData(category, count = 10) {
+  const { ClaudeProvider } = await import('./providers/claudeProvider.js');
+  const { ensureCompliance } = await import('./complianceValidator.js');
+  const { query: dbQuery } = await import('../config/database.js');
+
+  const categoryPrompt = CATEGORY_PROMPTS[category];
+  if (!categoryPrompt) {
+    throw new Error(
+      `Unknown category: ${category}. Valid: ${Object.keys(CATEGORY_PROMPTS).join(', ')}`
+    );
+  }
+
+  const claudeProvider = new ClaudeProvider();
+  const generated = [];
+  const errors = [];
+
+  for (let i = 0; i < count; i++) {
+    try {
+      const prompt = `${categoryPrompt}\n\nGenerer ETT klinisk eksempel i JSON-format:\n{\n  "instruction": "Kort instruksjon for oppgaven",\n  "input": "Klinisk scenario/kontekst",\n  "output": "Forventet korrekt svar",\n  "quality_score": 0.85\n}\n\nSvar KUN med JSON-objektet, ingen annen tekst. Eksempel nr ${i + 1} av ${count}.`;
+
+      const result = await claudeProvider.generate(prompt, categoryPrompt, {
+        maxTokens: 1000,
+        temperature: 0.7,
+        taskType: 'clinical_reasoning',
+      });
+
+      // Parse the JSON response
+      const jsonMatch = result.text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        errors.push({ index: i, error: 'No JSON found in response' });
+        continue;
+      }
+
+      const parsed = JSON.parse(jsonMatch[0]);
+      if (!parsed.instruction || !parsed.output) {
+        errors.push({ index: i, error: 'Missing required fields (instruction, output)' });
+        continue;
+      }
+
+      // Validate compliance — refuse data with PII
+      const instructionCheck = ensureCompliance(parsed.instruction);
+      const inputCheck = ensureCompliance(parsed.input || '');
+      const outputCheck = ensureCompliance(parsed.output);
+
+      const example = {
+        source: 'claude_generated',
+        category,
+        instruction: instructionCheck.text,
+        input: inputCheck.text || null,
+        output: outputCheck.text,
+        quality_score: Math.min(1, Math.max(0, parseFloat(parsed.quality_score) || 0.8)),
+        approved: false,
+      };
+
+      // Store in database
+      await dbQuery(
+        `INSERT INTO ai_training_data (source, category, instruction, input, output, quality_score, approved)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [
+          example.source,
+          example.category,
+          example.instruction,
+          example.input,
+          example.output,
+          example.quality_score,
+          example.approved,
+        ]
+      );
+
+      generated.push(example);
+    } catch (error) {
+      errors.push({ index: i, error: error.message });
+      logger.warn(
+        `Failed to generate targeted data (${category}, ${i + 1}/${count}):`,
+        error.message
+      );
+    }
+  }
+
+  logger.info('Generated targeted training data', {
+    category,
+    requested: count,
+    generated: generated.length,
+    errors: errors.length,
+  });
+
+  return { generated, errors, category, requested: count };
+}
+
 export default {
   getStatus,
   getTrainingData,
@@ -308,4 +441,5 @@ export default {
   backup,
   restore,
   testModel,
+  generateTargetedData,
 };

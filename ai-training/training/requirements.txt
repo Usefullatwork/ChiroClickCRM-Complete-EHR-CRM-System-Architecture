@@ -27,6 +27,9 @@ xformers>=0.0.26
 rouge-score>=0.1.2
 nltk>=3.8.0
 
+# Claude API (for training data generation & knowledge distillation)
+anthropic>=0.39.0
+
 # GGUF conversion
 # llama-cpp-python>=0.2.0  # Optional: for manual GGUF conversion
 
