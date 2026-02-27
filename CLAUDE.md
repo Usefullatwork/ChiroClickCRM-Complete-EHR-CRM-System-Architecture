@@ -179,6 +179,155 @@ RAG_ENABLED=true
 OLLAMA_BASE_URL=http://localhost:11434
 ```
 
+## Claude API Integration (2026-02-27)
+
+### Architecture Overview
+
+The AI layer uses a **provider abstraction** so all existing `ai.js` exports (13 functions) remain unchanged.
+
+```
+Request → ai.js (unchanged API) → getAIProvider()
+  → Factory selects mode:
+    ├─ disabled   → OllamaProvider only (default)
+    ├─ fallback   → Ollama primary, Claude secondary
+    ├─ preferred  → Claude primary, Ollama secondary
+    └─ claude_only → ClaudeProvider only
+
+  FallbackProvider wraps primary + secondary:
+    1. Budget check (canSpend?)
+    2. Try primary provider
+    3. On failure → automatic failover to secondary
+    4. Log usage to ai_api_usage table
+```
+
+Key files:
+
+- `src/services/providers/aiProviderFactory.js` — Factory modes + `FallbackProvider` class
+- `src/services/providers/claudeProvider.js` — Anthropic SDK wrapper, model mapping, prompt caching
+- `src/services/providers/ollamaProvider.js` — Ollama HTTP client (extracted from `ai.js`)
+- `src/services/providers/budgetTracker.js` — Cost tracking, daily/monthly spend limits
+
+### Environment Configuration
+
+| Variable                    | Default             | Description                                           |
+| --------------------------- | ------------------- | ----------------------------------------------------- |
+| `CLAUDE_FALLBACK_MODE`      | `disabled`          | `disabled` / `fallback` / `preferred` / `claude_only` |
+| `CLAUDE_API_KEY`            | (none)              | Anthropic SDK key; required for any non-disabled mode |
+| `CLAUDE_MODEL`              | `claude-sonnet-4-6` | Override default model mapping                        |
+| `CLAUDE_DAILY_BUDGET_USD`   | `10`                | Hard daily spend cap (USD)                            |
+| `CLAUDE_MONTHLY_BUDGET_USD` | `200`               | Hard monthly spend cap (USD)                          |
+
+Without `CLAUDE_API_KEY`, the factory falls back to `disabled` regardless of `CLAUDE_FALLBACK_MODE`.
+
+### Model Mapping
+
+`CLAUDE_MODEL_MAP` in `claudeProvider.js` maps Ollama model names to Claude equivalents:
+
+| Task                | Ollama Model Pattern | Claude Model        |
+| ------------------- | -------------------- | ------------------- |
+| SOAP / letters      | `chiro-no*`          | `claude-sonnet-4-6` |
+| Norwegian           | `chiro-norwegian*`   | `claude-sonnet-4-6` |
+| Red flags / medical | `chiro-medical*`     | `claude-sonnet-4-6` |
+| Autocomplete        | `chiro-fast*`        | `claude-haiku-4-5`  |
+| Default (no match)  | —                    | `claude-sonnet-4-6` |
+
+### New Services
+
+| Service               | File                               | Lines | Provider                 | Key Exports                                                                         |
+| --------------------- | ---------------------------------- | ----- | ------------------------ | ----------------------------------------------------------------------------------- |
+| Extended Thinking     | `services/extendedThinking.js`     | 141   | Claude                   | `analyzeWithThinking()`, `differentialDiagnosis()`, `analyzeRedFlagsWithThinking()` |
+| Structured Extraction | `services/structuredExtraction.js` | 184   | Claude (tool_use)        | `extractSOAP()`, `extractDiagnoses()`                                               |
+| Clinical Vision       | `services/clinicalVision.js`       | 112   | Claude (vision)          | `analyzeImage()` — X-ray, MRI, posture, general                                     |
+| Batch Processor       | `services/batchProcessor.js`       | 125   | Claude (Batch API)       | `createBatch()`, `getBatchStatus/Results()`, `scoreTrainingData()`                  |
+| Clinical Orchestrator | `services/clinicalOrchestrator.js` | 187   | Factory (multi-provider) | `orchestrate()` — safety → parallel → synthesis pipeline                            |
+| Clinical Evals        | `services/clinicalEvals.js`        | 283   | Ollama + Claude          | `runComparison()`, `runEvalBatch()` — A/B model grading                             |
+| Compliance Validator  | `services/complianceValidator.js`  | 131   | None (utility)           | `redactPII()`, `validateForCloudAPI()`, `ensureCompliance()`                        |
+
+Provider files (in `services/providers/`):
+
+| File                   | Lines | Purpose                                    |
+| ---------------------- | ----- | ------------------------------------------ |
+| `claudeProvider.js`    | 302   | SDK wrapper, model mapping, prompt caching |
+| `aiProviderFactory.js` | 175   | Factory modes, FallbackProvider class      |
+| `budgetTracker.js`     | 215   | Cost tracking, daily/monthly limits        |
+| `ollamaProvider.js`    | 204   | Ollama HTTP client (extracted from ai.js)  |
+
+### New API Endpoints
+
+**AI routes** (`routes/ai.js`, requires ADMIN or PRACTITIONER):
+
+| Method | Path                            | Purpose                                                  |
+| ------ | ------------------------------- | -------------------------------------------------------- |
+| POST   | `/api/v1/ai/extended-analysis`  | Extended thinking for differential diagnosis / red flags |
+| POST   | `/api/v1/ai/analyze-image`      | Clinical image analysis (vision)                         |
+| POST   | `/api/v1/ai/extract-structured` | SOAP / diagnosis JSON extraction (tool_use)              |
+
+**Cost analytics** (`routes/aiCost.js`, ADMIN only):
+
+| Method | Path                        | Purpose                               |
+| ------ | --------------------------- | ------------------------------------- |
+| GET    | `/api/v1/ai-cost/budget`    | Current daily/monthly spend vs limits |
+| GET    | `/api/v1/ai-cost/by-task`   | Cost breakdown by task type           |
+| GET    | `/api/v1/ai-cost/cache`     | Prompt cache hit rates                |
+| GET    | `/api/v1/ai-cost/trend`     | Daily cost trend (`?days=30`)         |
+| GET    | `/api/v1/ai-cost/providers` | Ollama vs Claude comparison           |
+
+**Batch processing** (`routes/batch.js`, ADMIN only):
+
+| Method | Path                             | Purpose                 |
+| ------ | -------------------------------- | ----------------------- |
+| POST   | `/api/v1/batch`                  | Create batch job        |
+| GET    | `/api/v1/batch`                  | List batches            |
+| GET    | `/api/v1/batch/:batchId`         | Get batch status        |
+| GET    | `/api/v1/batch/:batchId/results` | Get batch results       |
+| POST   | `/api/v1/batch/:batchId/cancel`  | Cancel batch            |
+| POST   | `/api/v1/batch/score-training`   | Score training examples |
+
+### Cost Model
+
+| Model               | Input/MTok | Output/MTok | Cache Read      | Cache Create          |
+| ------------------- | ---------- | ----------- | --------------- | --------------------- |
+| `claude-sonnet-4-6` | $3.00      | $15.00      | $0.30 (90% off) | $3.75 (25% surcharge) |
+| `claude-haiku-4-5`  | $0.80      | $4.00       | $0.08           | $1.00                 |
+
+- **Budget enforcement**: Pre-flight `canSpend()` check before every Claude call; auto-resets daily/monthly
+- **Prompt caching**: System prompts >500 chars get `cache_control: ephemeral`; safety task types always cached
+- **Batch API**: 50% cost reduction for async bulk processing (training scoring, daily summaries)
+
+### Database — `ai_api_usage` Table
+
+Tracks every Claude/Ollama API call. Used by `budgetTracker.js` (cost enforcement) and `aiCost.js` controller (analytics).
+
+Key columns: `provider`, `model`, `input_tokens`, `output_tokens`, `cache_read_tokens`, `cache_creation_tokens`, `cost_usd`, `task_type`, `duration_ms`, `organization_id`
+
+BudgetTracker gracefully degrades to in-memory tracking if the table doesn't exist yet.
+
+### Testing
+
+**186 tests** across **13 test files**:
+
+- Provider tests (4 files, 76 tests): `tests/services/providers/{claudeProvider,aiProviderFactory,budgetTracker,ollamaProvider}.test.js`
+- Service tests (8 files, 101 tests): `tests/services/{extendedThinking,structuredExtraction,clinicalVision,batchProcessor,clinicalOrchestrator,clinicalEvals,complianceValidator,aiCost}.test.js`
+- RAG contextual tests (1 file, 9 tests): `tests/services/rag.contextual.test.js`
+
+Run command:
+
+```bash
+cd backend && npm test -- --testPathPattern="providers|aiCost|clinicalEvals|extendedThinking|structuredExtraction|clinicalVision|batchProcessor|clinicalOrchestrator|complianceValidator|rag.contextual" --no-coverage
+```
+
+Mock pattern: `jest.unstable_mockModule('@anthropic-ai/sdk', ...)` with plain function factories (`resetMocks: true` in jest config).
+
+### Troubleshooting
+
+| Symptom                            | Cause                       | Fix                                                                 |
+| ---------------------------------- | --------------------------- | ------------------------------------------------------------------- |
+| "CLAUDE_API_KEY not set"           | No API key configured       | Degrades gracefully — Ollama serves all requests                    |
+| Budget exceeded (requests blocked) | Daily/monthly limit hit     | Check `/api/v1/ai-cost/budget`; resets automatically next day/month |
+| Provider failover logged           | Primary provider timed out  | Normal behavior — check `provider.getStatus()` for details          |
+| ESM test import errors             | Running `npx jest` directly | Must use `npm test` (configures ESM loader via jest.config)         |
+| `CLAUDE_FALLBACK_MODE` ignored     | Missing `CLAUDE_API_KEY`    | Factory falls back to `disabled` mode without a valid key           |
+
 ## AI Training Pipeline (2026-01-29)
 
 ### Training Scripts
