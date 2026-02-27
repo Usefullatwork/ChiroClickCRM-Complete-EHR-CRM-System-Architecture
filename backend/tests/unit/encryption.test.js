@@ -87,18 +87,26 @@ describe('Encryption Utilities', () => {
       expect(() => decrypt('no:colon:multiple')).toThrow(); // Too many parts
     });
 
-    test('should throw error for corrupted ciphertext', () => {
+    test('should not decrypt corrupted ciphertext to original value', () => {
       const original = 'test';
       const encrypted = encrypt(original);
 
       // Corrupt the ciphertext by flipping a character at a known position
-      // Split into IV and ciphertext, then alter the first byte of ciphertext
       const parts = encrypted.split(':');
       const ct = parts[1];
       const flipped = ct[0] === 'f' ? '0' : 'f';
       const corrupted = parts[0] + ':' + flipped + ct.slice(1);
 
-      expect(() => decrypt(corrupted)).toThrow();
+      // AES-CBC without auth tag: corrupted data either causes a padding
+      // error (throws) or decrypts to garbled output — both are acceptable
+      let result;
+      try {
+        result = decrypt(corrupted);
+      } catch {
+        return; // Threw — corruption detected via invalid padding
+      }
+      // If it didn't throw, the decrypted output must differ from original
+      expect(result).not.toBe(original);
     });
   });
 
