@@ -22,7 +22,9 @@ const ANALYSIS_TYPES = {
 
 async function getClient() {
   const apiKey = process.env.CLAUDE_API_KEY;
-  if (!apiKey) throw new Error('Clinical vision requires CLAUDE_API_KEY');
+  if (!apiKey) {
+    throw new Error('Clinical vision requires CLAUDE_API_KEY');
+  }
   if (!Anthropic) {
     const sdk = await import('@anthropic-ai/sdk');
     Anthropic = sdk.default || sdk.Anthropic;
@@ -66,7 +68,9 @@ export async function analyzeImage(imageData, options = {}) {
     'Du er en erfaren klinisk radiolog/kiropraktor. Analyser medisinske bilder og gi strukturerte, klinisk relevante funn. Skriv alltid pa norsk bokmal. VIKTIG: Angi alltid at endelig tolkning ma bekreftes av kvalifisert helsepersonell.';
 
   let prompt = ANALYSIS_TYPES[analysisType] || ANALYSIS_TYPES.general;
-  if (additionalContext) prompt += `\n\nTilleggsinformasjon: ${additionalContext}`;
+  if (additionalContext) {
+    prompt += `\n\nTilleggsinformasjon: ${additionalContext}`;
+  }
 
   logger.debug('Clinical vision analysis', { analysisType, model, mediaType });
 

@@ -46,7 +46,10 @@ const isCorruptionError = (error) => {
   const name = (error?.name || '').toLowerCase();
 
   // WASM RuntimeError (abort signal from the WASM module)
-  if (name === 'runtimeerror' || error instanceof WebAssembly?.RuntimeError) {
+  if (
+    name === 'runtimeerror' ||
+    (typeof WebAssembly !== 'undefined' && error instanceof WebAssembly.RuntimeError)
+  ) {
     return true;
   }
 

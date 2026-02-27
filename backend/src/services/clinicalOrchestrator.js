@@ -146,9 +146,13 @@ async function runAssessment(provider, name, prompt, options) {
 function parseSafetyResult(text) {
   const upperText = text.toUpperCase();
   let riskLevel = 'LOW';
-  if (upperText.includes('KRITISK') || upperText.includes('CRITICAL')) riskLevel = 'CRITICAL';
-  else if (upperText.includes('HØY') || upperText.includes('HIGH')) riskLevel = 'HIGH';
-  else if (upperText.includes('MODERAT') || upperText.includes('MODERATE')) riskLevel = 'MODERATE';
+  if (upperText.includes('KRITISK') || upperText.includes('CRITICAL')) {
+    riskLevel = 'CRITICAL';
+  } else if (upperText.includes('HØY') || upperText.includes('HIGH')) {
+    riskLevel = 'HIGH';
+  } else if (upperText.includes('MODERAT') || upperText.includes('MODERATE')) {
+    riskLevel = 'MODERATE';
+  }
 
   return {
     riskLevel,
@@ -177,9 +181,15 @@ function buildLetterPrompt(soapData, patientData) {
 
 function buildSynthesisPrompt(safety, results, language) {
   const parts = ['Syntetiser følgende kliniske vurderinger til et sammenhengende sammendrag:\n'];
-  if (safety) parts.push(`Sikkerhetsvurdering: ${safety.riskLevel}`);
-  if (results.clinical) parts.push(`\nKlinisk sammendrag:\n${results.clinical.text}`);
-  if (results.differential) parts.push(`\nDifferensialdiagnose:\n${results.differential.text}`);
+  if (safety) {
+    parts.push(`Sikkerhetsvurdering: ${safety.riskLevel}`);
+  }
+  if (results.clinical) {
+    parts.push(`\nKlinisk sammendrag:\n${results.clinical.text}`);
+  }
+  if (results.differential) {
+    parts.push(`\nDifferensialdiagnose:\n${results.differential.text}`);
+  }
   parts.push(`\nSkriv på ${language === 'en' ? 'engelsk' : 'norsk bokmål'}.`);
   return parts.join('\n');
 }

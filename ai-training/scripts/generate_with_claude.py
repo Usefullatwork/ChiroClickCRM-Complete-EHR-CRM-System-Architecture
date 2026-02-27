@@ -34,16 +34,13 @@ GAP_REPORT = AI_TRAINING_DIR / 'evaluation' / 'gap-analysis.json'
 OUTPUT_DIR = AI_TRAINING_DIR / 'data' / 'claude-generated'
 
 # ============================================================
-# GDPR: PII detection — refuse to process real patient data
+# Import shared Claude utilities
 # ============================================================
 
-FNUMMER_PATTERN = re.compile(r'\b\d{6}\s?\d{5}\b')
-
-
-def check_pii(text):
-    """Refuse to process data containing fødselsnummer patterns."""
-    if text and FNUMMER_PATTERN.search(text):
-        raise ValueError("PII detected (fødselsnummer). Refusing to process.")
+from claude_utils import (
+    get_client, check_pii, cached_message, extract_text, extract_thinking,
+    structured_generate, TRAINING_EXAMPLE_TOOL, CLINICAL_GRADING_TOOL,
+)
 
 
 # ============================================================
@@ -229,102 +226,229 @@ CATEGORY_PROMPTS = {
 
 
 # ============================================================
-# Claude API
+# Weak categories that get evaluator-optimizer loop
 # ============================================================
 
-def get_claude_client():
-    """Initialize Claude client."""
-    try:
-        import anthropic
-    except ImportError:
-        import subprocess
-        subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'anthropic', '-q'])
-        import anthropic
+WEAK_CATEGORY_THRESHOLD = 70  # Categories below this % get eval-optimizer loop
+MAX_EVAL_RETRIES = 2  # Max regeneration attempts for weak category examples
 
-    api_key = os.environ.get('ANTHROPIC_API_KEY')
-    if not api_key:
-        print('  ERROR: ANTHROPIC_API_KEY not set')
-        sys.exit(1)
-    return anthropic.Anthropic(api_key=api_key)
+
+# ============================================================
+# Claude API — Enhanced with tool_use + eval-optimizer
+# ============================================================
+
+def generate_structured_example(client, category, system_prompt, user_prompt):
+    """Generate a single structured training example using tool_use.
+
+    Returns a validated dict or None. Uses TRAINING_EXAMPLE_TOOL to guarantee
+    JSON schema compliance — no regex parsing needed.
+    """
+    result = structured_generate(
+        client, system_prompt, user_prompt,
+        TRAINING_EXAMPLE_TOOL, max_tokens=2048, temperature=0.7,
+    )
+
+    if not result:
+        return None
+
+    return validate_example(result, category)
+
+
+def generate_with_thinking(client, category, system_prompt, user_prompt):
+    """Generate a training example using extended thinking for complex categories.
+
+    Extended thinking forces Claude to reason through clinical logic before
+    outputting the result. The thinking chain is stored as bonus training data.
+
+    Used for: diagnosis_codes (ICPC-2 reasoning), red_flags (safety reasoning).
+    """
+    response = cached_message(
+        client, system_prompt, user_prompt,
+        max_tokens=4096, temperature=1.0,  # thinking requires temperature=1.0
+        thinking={'type': 'enabled', 'budget_tokens': 1500},
+    )
+
+    text = extract_text(response)
+    thinking = extract_thinking(response)
+
+    # Parse the structured output from text (thinking mode can't use tool_use)
+    example = parse_example_from_text(text, category)
+    if example and thinking:
+        example['_thinking_chain'] = thinking[:1000]  # Store for analysis
+
+    return example
+
+
+def grade_example(client, example, category):
+    """Grade a generated example using Claude as evaluator.
+
+    Returns quality score 1-5, or None on failure.
+    """
+    grade_prompt = (
+        f"Vurder kvaliteten på dette treningseksempelet for kategori '{category}':\n\n"
+        f"Instruksjon: {example['instruction']}\n"
+        f"Input: {example.get('input', '')}\n"
+        f"Output: {example['output'][:500]}\n\n"
+        "Vurder: klinisk nøyaktighet, fullstendighet, norsk kvalitet, "
+        "og relevans for kiropraktikk."
+    )
+
+    result = structured_generate(
+        client,
+        "Du er en klinisk kvalitetsvurdering-ekspert for AI-treningsdata.",
+        grade_prompt,
+        {
+            'name': 'quality_grade',
+            'description': 'Grade a training example quality',
+            'input_schema': {
+                'type': 'object',
+                'properties': {
+                    'score': {'type': 'integer', 'minimum': 1, 'maximum': 5},
+                    'feedback': {'type': 'string'},
+                },
+                'required': ['score', 'feedback'],
+            },
+        },
+        model='claude-haiku-4-5',  # Cost-efficient for grading
+        max_tokens=512,
+    )
+
+    if result:
+        return result.get('score'), result.get('feedback', '')
+    return None, None
 
 
 def generate_batch(client, category, count, gap_cases=None):
-    """Generate a batch of training examples for a category using Claude."""
+    """Generate a batch of training examples for a category.
+
+    Enhanced with:
+    - Structured tool_use for guaranteed JSON schema
+    - Evaluator-optimizer loop for weak categories (score < 4 → regenerate)
+    - Extended thinking for diagnosis_codes and red_flags
+    - Prompt caching on category system prompts
+    """
     config = CATEGORY_PROMPTS.get(category)
     if not config:
         print(f'  WARNING: Unknown category "{category}", skipping')
         return []
 
     system_prompt = config['system']
-    user_prompt = config['template'].format(count=count)
+    base_template = config['template']
 
-    # Add gap-specific context if available
+    # Build gap context suffix
+    gap_suffix = ''
     if gap_cases:
         failing_ids = [c['id'] for c in gap_cases[:10]]
         gap_types = {}
         for c in gap_cases:
             for gt in c.get('gap_types', []):
                 gap_types[gt] = gap_types.get(gt, 0) + 1
-
-        user_prompt += (
+        gap_suffix = (
             f"\n\nKONTEKST: Den lokale modellen feiler på disse sakene:\n"
             f"  IDs: {', '.join(failing_ids)}\n"
             f"  Feiltyper: {json.dumps(gap_types, ensure_ascii=False)}\n"
             f"Generer eksempler som spesifikt adresserer disse svakhetene."
         )
 
+    # Determine if this is a weak category needing eval-optimizer
+    use_thinking = category in ('diagnosis_codes', 'red_flags')
+    use_eval_loop = category in ('diagnosis_codes', 'red_flags', 'letters')
+
     print(f'  Generating {count} examples for {category}...')
+    if use_thinking:
+        print(f'    (using extended thinking for deeper clinical reasoning)')
+    if use_eval_loop:
+        print(f'    (with evaluator-optimizer loop, max {MAX_EVAL_RETRIES} retries)')
+
     start = time.time()
+    examples = []
 
-    try:
-        response = client.messages.create(
-            model='claude-sonnet-4-6',
-            max_tokens=4096,
-            system=system_prompt,
-            messages=[{'role': 'user', 'content': user_prompt}],
-            temperature=0.7,
-        )
-        elapsed = round(time.time() - start, 1)
-        text = ''.join(b.text for b in response.content if b.type == 'text')
-    except Exception as e:
-        print(f'  ERROR generating {category}: {e}')
-        return []
+    for i in range(count):
+        # Build per-example prompt (varied to increase diversity)
+        user_prompt = base_template.format(count=1) + gap_suffix
+        user_prompt += f"\n\nGenerer eksempel {i + 1} av {count}. Varier fra tidligere eksempler."
 
-    # Parse JSON array from response
-    examples = parse_examples(text, category)
+        attempt = 0
+        best_example = None
+        best_score = 0
+
+        while attempt <= (MAX_EVAL_RETRIES if use_eval_loop else 0):
+            try:
+                if use_thinking and attempt == 0:
+                    example = generate_with_thinking(client, category, system_prompt, user_prompt)
+                else:
+                    example = generate_structured_example(client, category, system_prompt, user_prompt)
+            except Exception as e:
+                print(f'    ERROR generating example {i + 1}: {e}')
+                break
+
+            if not example:
+                attempt += 1
+                continue
+
+            # Evaluate quality if using eval loop
+            if use_eval_loop and attempt < MAX_EVAL_RETRIES:
+                score, feedback = grade_example(client, example, category)
+                if score and score >= 4:
+                    best_example = example
+                    best_score = score
+                    break
+                elif score and score > best_score:
+                    best_example = example
+                    best_score = score
+                # Regenerate with feedback
+                if feedback:
+                    user_prompt += f"\n\nFORBEDRINGSFORSLAG: {feedback}"
+                attempt += 1
+            else:
+                best_example = example
+                break
+
+        if best_example:
+            if best_score > 0:
+                best_example['quality_score'] = best_score
+            examples.append(best_example)
+
+        # Progress indicator every 10 examples
+        if (i + 1) % 10 == 0:
+            elapsed = round(time.time() - start, 1)
+            print(f'    {i + 1}/{count} generated ({elapsed}s)')
+
+    elapsed = round(time.time() - start, 1)
     print(f'  Generated {len(examples)} examples in {elapsed}s')
     return examples
 
 
-def parse_examples(text, category):
-    """Parse Claude's response into training examples."""
-    examples = []
+def parse_example_from_text(text, category):
+    """Parse a training example from free-text response (fallback for thinking mode).
 
-    # Try to find JSON array
-    json_match = re.search(r'\[[\s\S]*\]', text)
+    Thinking mode can't use tool_use, so we parse JSON from text.
+    """
+    # Try to find JSON object
+    json_match = re.search(r'\{[\s\S]*?\}', text)
     if json_match:
         try:
-            raw = json.loads(json_match.group())
-            if isinstance(raw, list):
-                for item in raw:
-                    example = validate_example(item, category)
-                    if example:
-                        examples.append(example)
-                return examples
+            item = json.loads(json_match.group())
+            return validate_example(item, category)
         except json.JSONDecodeError:
             pass
 
-    # Fallback: try to find individual JSON objects
-    for match in re.finditer(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', text):
-        try:
-            item = json.loads(match.group())
-            example = validate_example(item, category)
-            if example:
-                examples.append(example)
-        except (json.JSONDecodeError, ValueError):
-            continue
+    # Fallback: construct from text structure
+    # Look for instruction/output patterns
+    instruction_match = re.search(r'"instruction"\s*:\s*"([^"]+)"', text)
+    output_match = re.search(r'"output"\s*:\s*"([^"]+)"', text)
 
-    return examples
+    if instruction_match and output_match:
+        return validate_example({
+            'instruction': instruction_match.group(1),
+            'input': '',
+            'output': output_match.group(1),
+            'category': category,
+            'quality_self_score': 3,
+            'keywords_included': [],
+        }, category)
+
+    return None
 
 
 def validate_example(item, category):
@@ -335,7 +459,9 @@ def validate_example(item, category):
     instruction = item.get('instruction', '').strip()
     output = item.get('output', '').strip()
 
-    if not instruction or not output:
+    if not instruction or len(instruction) < 10:
+        return None
+    if not output or len(output) < 20:
         return None
 
     # PII check
@@ -346,8 +472,8 @@ def validate_example(item, category):
     except ValueError:
         return None
 
-    # Quality score
-    quality = item.get('quality_score', 3)
+    # Quality score (from tool_use field or legacy field)
+    quality = item.get('quality_self_score', item.get('quality_score', 3))
     if isinstance(quality, str):
         try:
             quality = int(quality)
@@ -367,6 +493,7 @@ def validate_example(item, category):
         'category': category,
         'quality_score': quality,
         'source': 'claude_generated',
+        'keywords_included': item.get('keywords_included', []),
     }
 
 
@@ -488,7 +615,7 @@ def main():
         return
 
     # Generate
-    client = get_claude_client()
+    client = get_client()
     all_examples = []
 
     for cat, plan in generation_plan.items():

@@ -12,7 +12,9 @@ let Anthropic = null;
 
 async function getClient() {
   const apiKey = process.env.CLAUDE_API_KEY;
-  if (!apiKey) throw new Error('Batch processing requires CLAUDE_API_KEY');
+  if (!apiKey) {
+    throw new Error('Batch processing requires CLAUDE_API_KEY');
+  }
   if (!Anthropic) {
     const sdk = await import('@anthropic-ai/sdk');
     Anthropic = sdk.default || sdk.Anthropic;

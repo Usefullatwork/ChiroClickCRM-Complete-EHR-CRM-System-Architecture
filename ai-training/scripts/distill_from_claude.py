@@ -36,23 +36,21 @@ AI_TRAINING_DIR = SCRIPT_DIR.parent
 EVAL_DIR = AI_TRAINING_DIR / 'evaluation'
 BENCHMARK_FILE = EVAL_DIR / 'benchmark_cases.jsonl'
 OUTPUT_DIR = AI_TRAINING_DIR / 'data' / 'distilled'
+REFERENCE_FILE = AI_TRAINING_DIR / 'data' / 'reference' / 'clinical_reference.jsonl'
 
 # Import evaluation functions
 sys.path.insert(0, str(EVAL_DIR))
 from evaluate import evaluate_case, SYNONYMS
 
 # ============================================================
-# GDPR: PII safety
+# Import shared Claude utilities
 # ============================================================
 
-FNUMMER_PATTERN = re.compile(r'\b\d{6}\s?\d{5}\b')
+from claude_utils import (
+    get_client, check_pii, cached_message, extract_text, extract_thinking,
+)
+
 NORWEGIAN_CHARS = set('æøåÆØÅ')
-
-
-def check_pii(text):
-    """Refuse to process data containing fødselsnummer patterns."""
-    if text and FNUMMER_PATTERN.search(text):
-        raise ValueError("PII detected. Refusing to process.")
 
 
 def norwegian_char_rate(text):
@@ -106,36 +104,105 @@ CATEGORY_SYSTEM_MAP = {
 
 
 # ============================================================
-# Claude Distillation
+# Clinical Reference Data (for citations in complex cases)
 # ============================================================
 
-def get_claude_client():
-    """Initialize Anthropic client."""
-    try:
-        import anthropic
-    except ImportError:
-        import subprocess
-        subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'anthropic', '-q'])
-        import anthropic
-
-    api_key = os.environ.get('ANTHROPIC_API_KEY')
-    if not api_key:
-        print('  ERROR: ANTHROPIC_API_KEY not set')
-        sys.exit(1)
-    return anthropic.Anthropic(api_key=api_key)
+_reference_data = None
 
 
-def distill_case(client, case):
+def load_reference_data():
+    """Load clinical reference data for use as citation sources."""
+    global _reference_data
+    if _reference_data is not None:
+        return _reference_data
+
+    _reference_data = {}
+    if REFERENCE_FILE.exists():
+        with open(REFERENCE_FILE, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    entry = json.loads(line)
+                    ref_type = entry.get('type', '')
+                    code = entry.get('code', entry.get('name', ''))
+                    _reference_data[f"{ref_type}:{code}"] = entry
+                except json.JSONDecodeError:
+                    continue
+        print(f'  Loaded {len(_reference_data)} clinical reference entries')
+    else:
+        print(f'  No clinical reference file found at {REFERENCE_FILE}')
+
+    return _reference_data
+
+
+def get_reference_context(case):
+    """Build reference document context for a case based on its category.
+
+    Returns a string with relevant ICPC-2 codes or red flag definitions
+    for use as grounding context in distillation.
+    """
+    refs = load_reference_data()
+    if not refs:
+        return ''
+
+    category = case.get('category', '')
+    prompt_lower = case.get('prompt', '').lower()
+    relevant = []
+
+    if category == 'diagnosis_codes':
+        # Include relevant ICPC-2 code definitions
+        for key, entry in refs.items():
+            if entry.get('type') == 'icpc2':
+                code = entry.get('code', '')
+                if code.lower() in prompt_lower or entry.get('name_no', '').lower() in prompt_lower:
+                    relevant.append(f"  {code}: {entry.get('name_no', '')} — {entry.get('description', '')}")
+        if not relevant:
+            # Include common MSK codes as context
+            for key, entry in refs.items():
+                if entry.get('type') == 'icpc2' and entry.get('chapter') == 'L':
+                    relevant.append(f"  {entry['code']}: {entry.get('name_no', '')}")
+                    if len(relevant) >= 10:
+                        break
+
+    elif category == 'red_flags':
+        # Include relevant red flag criteria
+        for key, entry in refs.items():
+            if entry.get('type') == 'red_flag':
+                relevant.append(f"  {entry.get('name', '')}: {entry.get('criteria', '')}")
+
+    if relevant:
+        return "\n\nREFERANSEDOKUMENT:\n" + "\n".join(relevant[:15])
+    return ''
+
+
+# ============================================================
+# Claude Distillation — Enhanced with thinking + citations
+# ============================================================
+
+# Categories that benefit from extended thinking
+THINKING_CATEGORIES = {'diagnosis_codes', 'red_flags'}
+
+
+def distill_case(client, case, use_thinking=False):
     """Send a benchmark case to Claude and capture the response.
+
+    Enhanced with:
+    - Prompt caching on system prompts (90% input cost savings on repeated prompts)
+    - Extended thinking for complex clinical cases (diagnosis_codes, red_flags)
+    - Reference document context for medical grounding
 
     Uses the EXACT system prompt from the benchmark case (matching what the
     local model sees during evaluation) to ensure the distilled response
     is scored the same way.
     """
     prompt = case.get('prompt', '')
+    category = case.get('category', '')
+
     # Use the benchmark's own system prompt, or fall back to category default
     system_prompt = case.get('system_prompt') or CATEGORY_SYSTEM_MAP.get(
-        case.get('category', ''), MODEL_SYSTEM_PROMPTS['default']
+        category, MODEL_SYSTEM_PROMPTS['default']
     )
     max_tokens = case.get('max_tokens', 500)
 
@@ -143,18 +210,38 @@ def distill_case(client, case):
     check_pii(prompt)
     check_pii(system_prompt)
 
+    # Add reference context for grounding
+    ref_context = get_reference_context(case)
+    user_content = prompt
+    if ref_context:
+        user_content = prompt + ref_context
+
     try:
-        response = client.messages.create(
-            model='claude-sonnet-4-6',
-            max_tokens=max_tokens,
-            system=system_prompt,
-            messages=[{'role': 'user', 'content': prompt}],
-            temperature=0.3,
+        # Use extended thinking for complex clinical categories
+        should_think = use_thinking and category in THINKING_CATEGORIES
+        extra_kwargs = {}
+        if should_think:
+            extra_kwargs['thinking'] = {'type': 'enabled', 'budget_tokens': 2000}
+            # Extended thinking requires temperature=1.0
+            temperature = 1.0
+            # Need more output tokens for thinking + response
+            max_tokens = max(max_tokens, 1024)
+        else:
+            temperature = 0.3
+
+        response = cached_message(
+            client, system_prompt, user_content,
+            max_tokens=max_tokens, temperature=temperature,
+            **extra_kwargs,
         )
-        text = ''.join(b.text for b in response.content if b.type == 'text')
-        return text, None
+
+        text = extract_text(response)
+        thinking = extract_thinking(response) if should_think else None
+
+        return text, None, thinking
+
     except Exception as e:
-        return None, str(e)
+        return None, str(e), None
 
 
 def validate_distilled(case, response):
@@ -182,11 +269,26 @@ def validate_distilled(case, response):
     return result.get('passed', False), result
 
 
-def build_chatml_example(case, response):
-    """Convert a distilled case+response into ChatML format."""
+def build_chatml_example(case, response, thinking=None):
+    """Convert a distilled case+response into ChatML format.
+
+    If thinking is provided (from extended thinking), it's stored in metadata
+    as a reasoning chain that can be used for analysis or chain-of-thought training.
+    """
     system_prompt = case.get('system_prompt') or CATEGORY_SYSTEM_MAP.get(
         case.get('category', ''), MODEL_SYSTEM_PROMPTS['default']
     )
+
+    metadata = {
+        'category': case.get('category', 'unknown'),
+        'source': 'distilled',
+        'benchmark_id': case.get('id', ''),
+        'quality_score': 5,  # Claude outputs are high quality by definition
+    }
+
+    if thinking:
+        metadata['reasoning_chain'] = thinking[:1500]  # Truncate for storage
+        metadata['has_thinking'] = True
 
     return {
         'messages': [
@@ -194,12 +296,7 @@ def build_chatml_example(case, response):
             {'role': 'user', 'content': case['prompt']},
             {'role': 'assistant', 'content': response},
         ],
-        'metadata': {
-            'category': case.get('category', 'unknown'),
-            'source': 'distilled',
-            'benchmark_id': case.get('id', ''),
-            'quality_score': 5,  # Claude outputs are high quality by definition
-        },
+        'metadata': metadata,
     }
 
 
@@ -267,14 +364,21 @@ def load_benchmark(category_filter=None):
     return cases
 
 
-def run_distillation(client, cases, verbose=False):
-    """Distill Claude's outputs for all benchmark cases."""
+def run_distillation(client, cases, verbose=False, use_thinking=False):
+    """Distill Claude's outputs for all benchmark cases.
+
+    Enhanced with:
+    - Extended thinking for diagnosis_codes and red_flags categories
+    - Thinking chains stored in metadata for analysis
+    """
     examples = []
-    stats = {'total': 0, 'passed': 0, 'failed': 0, 'errors': 0}
+    stats = {'total': 0, 'passed': 0, 'failed': 0, 'errors': 0, 'with_thinking': 0}
     category_stats = {}
 
     total = len(cases)
     print(f'\n  Distilling {total} cases through Claude...')
+    if use_thinking:
+        print(f'  Extended thinking: enabled for {", ".join(THINKING_CATEGORIES)}')
     print(f'  {"─" * 60}')
 
     for i, case in enumerate(cases, 1):
@@ -286,8 +390,8 @@ def run_distillation(client, cases, verbose=False):
             category_stats[category] = {'total': 0, 'passed': 0}
         category_stats[category]['total'] += 1
 
-        # Distill
-        response, error = distill_case(client, case)
+        # Distill (with optional extended thinking)
+        response, error, thinking = distill_case(client, case, use_thinking=use_thinking)
 
         if error:
             stats['errors'] += 1
@@ -300,9 +404,12 @@ def run_distillation(client, cases, verbose=False):
         if passed:
             stats['passed'] += 1
             category_stats[category]['passed'] += 1
-            example = build_chatml_example(case, response)
+            example = build_chatml_example(case, response, thinking=thinking)
             examples.append(example)
-            print(f'  [{i:3d}/{total}] ✓ {case_id:<35s} ({len(response)} chars)')
+            think_marker = ' [T]' if thinking else ''
+            print(f'  [{i:3d}/{total}] ✓ {case_id:<35s} ({len(response)} chars){think_marker}')
+            if thinking:
+                stats['with_thinking'] += 1
         else:
             stats['failed'] += 1
             reason = validation if isinstance(validation, str) else 'eval_fail'
@@ -391,6 +498,8 @@ def main():
                         help='Filter to specific category')
     parser.add_argument('--no-extras', action='store_true',
                         help='Skip extra scenarios')
+    parser.add_argument('--no-thinking', action='store_true',
+                        help='Disable extended thinking for complex cases')
     parser.add_argument('--dry-run', action='store_true',
                         help='Show plan without generating')
     parser.add_argument('--verbose', '-v', action='store_true',
@@ -420,10 +529,16 @@ def main():
         print('\n  DRY RUN — no distillation performed')
         return
 
-    client = get_claude_client()
+    client = get_client()
+
+    # Pre-load clinical reference data
+    load_reference_data()
 
     # Distill benchmark cases
-    examples, stats, category_stats = run_distillation(client, cases, args.verbose)
+    use_thinking = not args.no_thinking
+    examples, stats, category_stats = run_distillation(
+        client, cases, args.verbose, use_thinking=use_thinking
+    )
 
     # Distill extra scenarios
     extra_examples = []
@@ -451,6 +566,8 @@ def main():
     print(f'  {"=" * 60}')
     print(f'  Benchmark: {stats["passed"]}/{stats["total"]} passed '
           f'({stats["failed"]} failed, {stats["errors"]} errors)')
+    if stats.get('with_thinking', 0) > 0:
+        print(f'  Thinking:  {stats["with_thinking"]} examples with reasoning chains')
     print(f'  Extra:     {len(extra_examples)} additional examples')
     print(f'  Total:     {len(examples)} distilled examples')
 

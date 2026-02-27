@@ -163,8 +163,8 @@ const AI_MODEL_LETTERS = process.env.AI_MODEL_LETTERS || null;
 
 // Smart model lifecycle: keep_alive controls how long models stay in VRAM
 // On 16GB systems, only 1 model should be resident at a time
-const KEEP_ALIVE = process.env.AI_KEEP_ALIVE || '2m'; // Unload after 2 min idle
-let currentLoadedModel = null;
+const _KEEP_ALIVE = process.env.AI_KEEP_ALIVE || '2m'; // Unload after 2 min idle
+const _currentLoadedModel = null;
 
 /**
  * A/B Testing Configuration
@@ -735,9 +735,6 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
 
   // Step 3: Generate completion via AI provider (Ollama, Claude, or fallback)
   // Provider handles retry logic, model routing, and streaming internally
-  let rawOutput;
-  let confidence;
-
   const provider = getAIProvider();
   const providerResult = await provider.generate(augmentedPrompt, effectiveSystemPrompt, {
     maxTokens,
@@ -747,10 +744,10 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
     organizationId,
   });
 
-  rawOutput = providerResult.text;
+  const rawOutput = providerResult.text;
 
   // Calculate confidence score for this response
-  confidence = calculateConfidence(rawOutput, taskType, model);
+  const confidence = calculateConfidence(rawOutput, taskType, model);
 
   // Log suggestion to ai_suggestions table (non-blocking)
   if (organizationId && taskType) {

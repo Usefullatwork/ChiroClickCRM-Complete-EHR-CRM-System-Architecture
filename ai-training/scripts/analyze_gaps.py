@@ -63,17 +63,14 @@ from evaluate import (
 )
 
 # ============================================================
-# GDPR: Refuse to process data with real PII
+# Import shared Claude utilities
 # ============================================================
 
-FNUMMER_PATTERN = re.compile(r'\b\d{6}\s?\d{5}\b')
-
-
-def check_pii(text):
-    """Check for Norwegian fødselsnummer patterns. Refuse if found."""
-    if text and FNUMMER_PATTERN.search(text):
-        raise ValueError("PII detected (fødselsnummer pattern). Refusing to process.")
-    return True
+from claude_utils import (
+    get_client, check_pii, cached_message, extract_text,
+    structured_generate, build_batch_request, submit_batch,
+    extract_batch_tool_use, CLINICAL_GRADING_TOOL,
+)
 
 
 # ============================================================
@@ -108,93 +105,106 @@ def query_ollama(model, prompt, system_prompt=None, max_tokens=500, temperature=
 
 
 def query_claude(prompt, system_prompt=None, max_tokens=500, temperature=0.3):
-    """Send prompt to Claude via Anthropic SDK, return (response, latency_ms, error)."""
-    try:
-        import anthropic
-    except ImportError:
-        import subprocess
-        subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'anthropic', '-q'])
-        import anthropic
+    """Send prompt to Claude via shared client, with prompt caching.
 
-    api_key = os.environ.get('ANTHROPIC_API_KEY')
-    if not api_key:
-        return None, 0, 'ANTHROPIC_API_KEY not set'
-
-    client = anthropic.Anthropic(api_key=api_key)
-
-    messages = [{'role': 'user', 'content': prompt}]
-    kwargs = {
-        'model': 'claude-sonnet-4-6',
-        'max_tokens': max_tokens,
-        'messages': messages,
-        'temperature': temperature,
-    }
-    if system_prompt:
-        kwargs['system'] = system_prompt
+    Returns (response_text, latency_ms, error).
+    """
+    client = get_client()
+    sys_text = system_prompt or 'Du er en klinisk assistent for kiropraktorer i Norge.'
 
     start = time.time()
     try:
-        response = client.messages.create(**kwargs)
+        response = cached_message(
+            client, sys_text, prompt,
+            max_tokens=max_tokens, temperature=temperature,
+        )
         latency_ms = round((time.time() - start) * 1000)
-        text = ''.join(b.text for b in response.content if b.type == 'text')
+        text = extract_text(response)
         return text, latency_ms, None
     except Exception as e:
         latency_ms = round((time.time() - start) * 1000)
         return None, latency_ms, str(e)
 
 
+GRADING_SYSTEM_PROMPT = (
+    "Du er en erfaren klinisk evaluator for norsk kiropraktikk-AI. "
+    "Du grader AI-generert klinisk innhold på flere dimensjoner (0-100). "
+    "Vurder klinisk nøyaktighet, dekning av nøkkelord, sikkerhet/røde flagg, "
+    "og kvalitet på norsk medisinsk terminologi. "
+    "Identifiser spesifikke svakheter (gap_types) for å målrette trening."
+)
+
+
 def grade_with_claude(prompt, ollama_output, claude_output):
-    """Use Claude to grade both outputs side-by-side on clinical quality.
+    """Use Claude to grade the Ollama output using structured tool_use.
 
-    Returns dict with svar_a (ollama) and svar_b (claude) grades.
+    Returns a structured grading dict with per-dimension scores 0-100,
+    or None if grading fails. Uses CLINICAL_GRADING_TOOL for guaranteed schema.
     """
-    try:
-        import anthropic
-    except ImportError:
-        return None
-
-    api_key = os.environ.get('ANTHROPIC_API_KEY')
-    if not api_key:
-        return None
-
-    grading_system = (
-        "Du er en erfaren klinisk evaluator. Grader AI-generert klinisk innhold "
-        "på en skala fra 1-5 for hver kategori:\n\n"
-        "1. Klinisk nøyaktighet (accuracy, 1-5)\n"
-        "2. Relevans (relevance, 1-5)\n"
-        "3. Fullstendighet (completeness, 1-5)\n"
-        "4. Språkkvalitet (language, 1-5)\n"
-        "5. Sikkerhet (safety, 1-5) — røde flagg og kontraindikasjoner\n\n"
-        "Svar BARE som JSON:\n"
-        '{"svar_a": {"accuracy": N, "relevance": N, "completeness": N, '
-        '"language": N, "safety": N, "overall": N}, '
-        '"svar_b": {"accuracy": N, "relevance": N, "completeness": N, '
-        '"language": N, "safety": N, "overall": N}, '
-        '"winner": "A"|"B"|"tie", "reasoning": "kort forklaring"}'
-    )
+    client = get_client()
 
     grading_prompt = (
         f"Klinisk prompt:\n{prompt}\n\n"
-        f"--- Svar A (Lokal modell) ---\n{ollama_output}\n\n"
-        f"--- Svar B (Claude) ---\n{claude_output}\n\n"
-        "Grader begge svar separat."
+        f"--- AI-modellens svar ---\n{ollama_output}\n\n"
+        f"--- Referansesvar (Claude) ---\n{claude_output}\n\n"
+        "Grader AI-modellens svar (IKKE referansesvaret). "
+        "Bruk clinical_grading-verktøyet."
     )
 
-    client = anthropic.Anthropic(api_key=api_key)
     try:
-        response = client.messages.create(
-            model='claude-sonnet-4-6',
-            max_tokens=1024,
-            system=grading_system,
-            messages=[{'role': 'user', 'content': grading_prompt}],
+        result = structured_generate(
+            client, GRADING_SYSTEM_PROMPT, grading_prompt,
+            CLINICAL_GRADING_TOOL, max_tokens=1024,
         )
-        text = ''.join(b.text for b in response.content if b.type == 'text')
-        json_match = re.search(r'\{[\s\S]*\}', text)
-        if json_match:
-            return json.loads(json_match.group())
+        return result
     except Exception:
-        pass
-    return None
+        return None
+
+
+def grade_batch_with_claude(cases_to_grade):
+    """Grade multiple cases using the Batch API for 50% cost savings.
+
+    Args:
+        cases_to_grade: List of dicts with 'id', 'prompt', 'ollama_output', 'claude_output'
+
+    Returns:
+        Dict mapping case_id to structured grading result.
+    """
+    if not cases_to_grade:
+        return {}
+
+    client = get_client()
+    batch_requests = []
+
+    for case in cases_to_grade:
+        user_content = (
+            f"Klinisk prompt:\n{case['prompt']}\n\n"
+            f"--- AI-modellens svar ---\n{case['ollama_output']}\n\n"
+            f"--- Referansesvar (Claude) ---\n{case['claude_output']}\n\n"
+            "Grader AI-modellens svar (IKKE referansesvaret). "
+            "Bruk clinical_grading-verktøyet."
+        )
+
+        req = build_batch_request(
+            custom_id=case['id'],
+            system_prompt=GRADING_SYSTEM_PROMPT,
+            user_content=user_content,
+            max_tokens=1024,
+            tools=[CLINICAL_GRADING_TOOL],
+            tool_choice={'type': 'tool', 'name': 'clinical_grading'},
+        )
+        batch_requests.append(req)
+
+    print(f'  Submitting {len(batch_requests)} grading requests to Batch API...')
+    results = submit_batch(client, batch_requests, poll_interval=15)
+
+    grades = {}
+    for custom_id, result in results:
+        parsed = extract_batch_tool_use(result, 'clinical_grading')
+        if parsed:
+            grades[custom_id] = parsed
+
+    return grades
 
 
 # ============================================================
@@ -263,8 +273,12 @@ def load_benchmark(category_filter=None):
     return cases
 
 
-def run_gap_analysis(model, cases, skip_claude=False, verbose=False):
-    """Run gap analysis comparing Ollama model vs Claude on all cases."""
+def run_gap_analysis(model, cases, skip_claude=False, verbose=False, batch_grade=False):
+    """Run gap analysis comparing Ollama model vs Claude on all cases.
+
+    When batch_grade=True, collects all gradable cases and submits them
+    to the Batch API for 50% cost savings on Claude grading calls.
+    """
     results = []
     categories = defaultdict(lambda: {
         'ollama_passed': 0, 'claude_passed': 0, 'total': 0,
@@ -272,9 +286,16 @@ def run_gap_analysis(model, cases, skip_claude=False, verbose=False):
         'gap_cases': [], 'gap_types': defaultdict(int),
     })
 
+    # Collect cases for batch grading (populated during loop, graded after)
+    pending_grades = []
+    # Map case_id to entry index for batch grade assignment
+    entry_index_map = {}
+
     total = len(cases)
     print(f'\n  Gap Analysis: {model} vs Claude')
     print(f'  Cases: {total}')
+    if batch_grade:
+        print(f'  Mode: Batch grading (50% cost savings)')
     print(f'  {"─" * 60}')
 
     for i, case in enumerate(cases, 1):
@@ -311,10 +332,20 @@ def run_gap_analysis(model, cases, skip_claude=False, verbose=False):
             else:
                 c_result = evaluate_case(case, c_response, c_latency)
 
-        # --- Claude Grading ---
+        # --- Claude Grading (sequential or deferred for batch) ---
         grade = None
         if o_response and c_response and not skip_claude:
-            grade = grade_with_claude(prompt, o_response, c_response)
+            if batch_grade:
+                # Defer grading — collect for batch submission
+                pending_grades.append({
+                    'id': case_id,
+                    'prompt': prompt,
+                    'ollama_output': o_response[:2000],
+                    'claude_output': c_response[:2000],
+                })
+                entry_index_map[case_id] = len(results)
+            else:
+                grade = grade_with_claude(prompt, o_response, c_response)
 
         # --- Gap Classification ---
         o_passed = o_result.get('passed', False)
@@ -378,6 +409,17 @@ def run_gap_analysis(model, cases, skip_claude=False, verbose=False):
                 entry['ollama_output_preview'] = o_response[:500]
 
         results.append(entry)
+
+    # --- Batch grading phase ---
+    if batch_grade and pending_grades:
+        print(f'\n  Running batch grading for {len(pending_grades)} cases...')
+        batch_grades = grade_batch_with_claude(pending_grades)
+        # Assign grades back to result entries
+        for case_id, grade_data in batch_grades.items():
+            idx = entry_index_map.get(case_id)
+            if idx is not None and idx < len(results):
+                results[idx]['claude_grade'] = grade_data
+        print(f'  Batch grading complete: {len(batch_grades)}/{len(pending_grades)} graded')
 
     return results, dict(categories)
 
@@ -459,6 +501,8 @@ def main():
                         help='Filter to specific category')
     parser.add_argument('--verbose', '-v', action='store_true',
                         help='Show detailed failure info')
+    parser.add_argument('--batch-grade', action='store_true',
+                        help='Use Batch API for Claude grading (50%% cost savings, async)')
     parser.add_argument('--output', default=str(OUTPUT_FILE),
                         help='Output JSON file path')
     args = parser.parse_args()
@@ -475,7 +519,7 @@ def main():
     print(f'  Loaded {len(cases)} benchmark cases')
 
     results, categories = run_gap_analysis(
-        args.model, cases, args.skip_claude, args.verbose
+        args.model, cases, args.skip_claude, args.verbose, args.batch_grade
     )
 
     report = build_report(args.model, results, categories, args.skip_claude)

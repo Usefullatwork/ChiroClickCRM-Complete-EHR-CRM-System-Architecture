@@ -65,8 +65,12 @@ class ClaudeProvider extends AIProviderBase {
    * Lazy-initialize the Anthropic client
    */
   async _getClient() {
-    if (this._client) return this._client;
-    if (!this._apiKey) return null;
+    if (this._client) {
+      return this._client;
+    }
+    if (!this._apiKey) {
+      return null;
+    }
 
     try {
       if (!Anthropic) {
@@ -257,7 +261,9 @@ class ClaudeProvider extends AIProviderBase {
    * Check if Claude API is available (has API key and SDK loads)
    */
   async isAvailable() {
-    if (!this._apiKey) return false;
+    if (!this._apiKey) {
+      return false;
+    }
     const client = await this._getClient();
     return client !== null;
   }

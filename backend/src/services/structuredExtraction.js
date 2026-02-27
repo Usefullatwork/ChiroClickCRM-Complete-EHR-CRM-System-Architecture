@@ -89,7 +89,9 @@ const DIAGNOSIS_EXTRACTION_TOOL = {
 
 async function getClient() {
   const apiKey = process.env.CLAUDE_API_KEY;
-  if (!apiKey) throw new Error('Structured extraction requires CLAUDE_API_KEY');
+  if (!apiKey) {
+    throw new Error('Structured extraction requires CLAUDE_API_KEY');
+  }
   if (!Anthropic) {
     const sdk = await import('@anthropic-ai/sdk');
     Anthropic = sdk.default || sdk.Anthropic;
@@ -123,7 +125,9 @@ export async function extractSOAP(clinicalText, options = {}) {
   });
 
   const toolBlock = response.content.find((b) => b.type === 'tool_use');
-  if (!toolBlock) throw new Error('No structured data extracted');
+  if (!toolBlock) {
+    throw new Error('No structured data extracted');
+  }
 
   logger.debug('SOAP extraction complete', { fields: Object.keys(toolBlock.input) });
 
@@ -166,7 +170,9 @@ export async function extractDiagnoses(clinicalText, availableCodes = [], option
   });
 
   const toolBlock = response.content.find((b) => b.type === 'tool_use');
-  if (!toolBlock) throw new Error('No diagnosis data extracted');
+  if (!toolBlock) {
+    throw new Error('No diagnosis data extracted');
+  }
 
   logger.debug('Diagnosis extraction complete', {
     primary: toolBlock.input.primary_diagnosis?.code,

@@ -44,7 +44,9 @@ export default function AIImageAnalysis({ onAnalyze, isLoading, result }) {
   const l = labels[language] || labels.no;
 
   const handleFile = useCallback((file) => {
-    if (!file || !file.type.startsWith('image/')) return;
+    if (!file || !file.type.startsWith('image/')) {
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (e) => {
       setPreview({ dataUrl: e.target.result, file, mediaType: file.type });
@@ -57,13 +59,17 @@ export default function AIImageAnalysis({ onAnalyze, isLoading, result }) {
       e.preventDefault();
       setDragOver(false);
       const file = e.dataTransfer?.files?.[0];
-      if (file) handleFile(file);
+      if (file) {
+        handleFile(file);
+      }
     },
     [handleFile]
   );
 
   const handleSubmit = useCallback(() => {
-    if (!preview || !onAnalyze) return;
+    if (!preview || !onAnalyze) {
+      return;
+    }
     const base64 = preview.dataUrl.split(',')[1];
     onAnalyze({ base64, mediaType: preview.mediaType, analysisType: selectedType });
   }, [preview, selectedType, onAnalyze]);

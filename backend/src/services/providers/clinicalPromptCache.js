@@ -51,7 +51,9 @@ class ClinicalPromptCache {
    */
   get(key) {
     const entry = this.registry.get(key);
-    if (!entry) return null;
+    if (!entry) {
+      return null;
+    }
     return entry.isFunction ? entry.content() : entry.content;
   }
 
@@ -63,13 +65,17 @@ class ClinicalPromptCache {
    */
   buildCacheableMessages(taskType, customSystemPrompt) {
     const keys = this._taskTypeMap.get(taskType);
-    if (!keys) return null;
+    if (!keys) {
+      return null;
+    }
 
     const messages = [];
 
     for (const key of keys) {
       const text = this.get(key);
-      if (!text) continue;
+      if (!text) {
+        continue;
+      }
 
       const entry = this.registry.get(key);
       const block = { type: 'text', text };
@@ -115,7 +121,9 @@ class ClinicalPromptCache {
       const text = entry.isFunction ? entry.content() : entry.content;
       const len = text.length;
       totalChars += len;
-      if (len >= entry.minLength) cacheableChars += len;
+      if (len >= entry.minLength) {
+        cacheableChars += len;
+      }
 
       if (!categories[entry.category]) {
         categories[entry.category] = { keys: [], totalChars: 0 };
@@ -471,30 +479,22 @@ Beskytt sensitiv medisinsk informasjon - gi kun arbeidsrelevant info.`,
     // === Reference data (dynamic) ===
     this.register(
       'icpc2_codes',
-      () => {
-        return (
-          'Tilgjengelige ICPC-2 koder:\n' +
-          Object.entries(ICPC2_CODES)
-            .map(([code, desc]) => `${code} - ${desc}`)
-            .join('\n')
-        );
-      },
+      () =>
+        `Tilgjengelige ICPC-2 koder:\n${Object.entries(ICPC2_CODES)
+          .map(([code, desc]) => `${code} - ${desc}`)
+          .join('\n')}`,
       { category: 'reference', priority: 20, minLength: 100 }
     );
 
     this.register(
       'red_flag_rules',
-      () => {
-        return (
-          'Røde flagg-kategorier:\n' +
-          Object.entries(RED_FLAG_CATEGORIES)
-            .map(
-              ([key, cat]) =>
-                `${cat.code} - ${cat.name_no} (${cat.severity}) → ${cat.action} innen ${cat.timeframe}`
-            )
-            .join('\n')
-        );
-      },
+      () =>
+        `Røde flagg-kategorier:\n${Object.entries(RED_FLAG_CATEGORIES)
+          .map(
+            ([_key, cat]) =>
+              `${cat.code} - ${cat.name_no} (${cat.severity}) → ${cat.action} innen ${cat.timeframe}`
+          )
+          .join('\n')}`,
       { category: 'reference', priority: 20, minLength: 100 }
     );
   }

@@ -60,7 +60,9 @@ class FallbackProvider {
 
       return result;
     } catch (primaryError) {
-      if (!this.secondary) throw primaryError;
+      if (!this.secondary) {
+        throw primaryError;
+      }
 
       logger.warn(
         `Primary provider (${this.primary.name}) failed, falling back to ${this.secondary.name}`,

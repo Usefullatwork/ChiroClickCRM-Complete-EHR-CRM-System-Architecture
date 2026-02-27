@@ -41,7 +41,9 @@ class BudgetTracker {
    * Initialize from database (call once at startup)
    */
   async init() {
-    if (this._initialized) return;
+    if (this._initialized) {
+      return;
+    }
     try {
       await this._loadFromDB();
       this._initialized = true;

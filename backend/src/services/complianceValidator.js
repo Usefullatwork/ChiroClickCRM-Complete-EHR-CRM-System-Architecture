@@ -45,8 +45,9 @@ const CLINICAL_DISCLAIMER = {
  * Returns { cleanText, redacted, redactedItems }
  */
 export function redactPII(text) {
-  if (!text || typeof text !== 'string')
+  if (!text || typeof text !== 'string') {
     return { cleanText: text, redacted: false, redactedItems: [] };
+  }
 
   let cleanText = text;
   const redactedItems = [];
@@ -97,7 +98,9 @@ export function validateForCloudAPI(text) {
  * Add required disclaimer to AI-generated response
  */
 export function addDisclaimer(text, language = 'no') {
-  if (!text) return text;
+  if (!text) {
+    return text;
+  }
   const disclaimer = CLINICAL_DISCLAIMER[language] || CLINICAL_DISCLAIMER.no;
   return `${text}\n\n---\n${disclaimer}`;
 }
@@ -106,7 +109,11 @@ export function addDisclaimer(text, language = 'no') {
  * Full compliance pipeline: validate → redact → return clean text
  */
 export function ensureCompliance(text, options = {}) {
-  const { autoRedact = true, requireDisclaimer = false, language = 'no' } = options;
+  const {
+    autoRedact = true,
+    requireDisclaimer: _requireDisclaimer = false,
+    language: _language = 'no',
+  } = options;
 
   const validation = validateForCloudAPI(text);
 

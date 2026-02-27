@@ -4,8 +4,7 @@
  */
 
 import { Router } from 'express';
-import { requireAuth, requireOrganization } from '../middleware/auth.js';
-import { requireRole } from '../middleware/auth.js';
+import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
 import * as aiCostController from '../controllers/aiCost.js';
 
 const router = Router();

@@ -48,7 +48,7 @@ export default function AICostDashboard() {
   const [budget, setBudget] = useState(null);
   const [costByTask, setCostByTask] = useState([]);
   const [cacheMetrics, setCacheMetrics] = useState([]);
-  const [trend, setTrend] = useState([]);
+  const [_trend, setTrend] = useState([]);
   const [providers, setProviders] = useState([]);
   const [loading, setLoading] = useState(true);
   const { language } = useTranslation();
@@ -112,11 +112,21 @@ export default function AICostDashboard() {
         fetchJSON('/trend?days=30'),
         fetchJSON('/providers'),
       ]);
-      if (b) setBudget(b);
-      if (c) setCostByTask(c);
-      if (ca) setCacheMetrics(ca);
-      if (t) setTrend(t);
-      if (p) setProviders(p);
+      if (b) {
+        setBudget(b);
+      }
+      if (c) {
+        setCostByTask(c);
+      }
+      if (ca) {
+        setCacheMetrics(ca);
+      }
+      if (t) {
+        setTrend(t);
+      }
+      if (p) {
+        setProviders(p);
+      }
     } catch (err) {
       // Silent fail — dashboard shows "no data"
     }

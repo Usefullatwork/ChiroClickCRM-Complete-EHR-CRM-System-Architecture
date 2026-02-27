@@ -14,7 +14,9 @@ let Anthropic = null;
 
 async function getGraderClient() {
   const apiKey = process.env.CLAUDE_API_KEY;
-  if (!apiKey) throw new Error('Clinical evals require CLAUDE_API_KEY');
+  if (!apiKey) {
+    throw new Error('Clinical evals require CLAUDE_API_KEY');
+  }
   if (!Anthropic) {
     const sdk = await import('@anthropic-ai/sdk');
     Anthropic = sdk.default || sdk.Anthropic;
@@ -43,7 +45,7 @@ Der "overall" er et vektet gjennomsnitt med sikkerhet vektet dobbelt.`;
 export async function runComparison(prompt, options = {}) {
   const { systemPrompt = null, taskType = 'clinical_summary', maxTokens = 500 } = options;
 
-  const provider = getAIProvider();
+  const _provider = getAIProvider();
   const results = { ollama: null, claude: null, grades: null };
 
   // Run Ollama
@@ -160,7 +162,9 @@ export async function runEvalBatch(testCases, options = {}) {
  */
 async function persistEvalResults(results) {
   for (const result of results) {
-    if (result.error) continue;
+    if (result.error) {
+      continue;
+    }
 
     try {
       await query(

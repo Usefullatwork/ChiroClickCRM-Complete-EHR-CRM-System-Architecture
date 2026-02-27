@@ -7,11 +7,13 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n';
 
-export default function AIReasoningPanel({ reasoning, answer, isLoading, taskType }) {
+export default function AIReasoningPanel({ reasoning, answer, isLoading, taskType: _taskType }) {
   const [showReasoning, setShowReasoning] = useState(false);
   const { language } = useTranslation();
 
-  if (!reasoning && !answer && !isLoading) return null;
+  if (!reasoning && !answer && !isLoading) {
+    return null;
+  }
 
   const labels = {
     no: {

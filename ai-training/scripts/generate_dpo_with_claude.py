@@ -37,16 +37,12 @@ BENCHMARK_FILE = EVAL_DIR / 'benchmark_cases.jsonl'
 OUTPUT_DIR = AI_TRAINING_DIR / 'data' / 'dpo'
 
 # ============================================================
-# GDPR: PII safety
+# Import shared Claude utilities
 # ============================================================
 
-FNUMMER_PATTERN = re.compile(r'\b\d{6}\s?\d{5}\b')
-
-
-def check_pii(text):
-    """Refuse to process data containing fødselsnummer patterns."""
-    if text and FNUMMER_PATTERN.search(text):
-        raise ValueError("PII detected (fødselsnummer). Refusing to process.")
+from claude_utils import (
+    get_client, check_pii, cached_message, extract_text,
+)
 
 
 # ============================================================
@@ -95,60 +91,43 @@ REJECTION_TEMPLATES = {
 
 
 # ============================================================
-# Claude API
+# Claude API — Enhanced with prompt caching
 # ============================================================
 
-def get_claude_client():
-    """Initialize Claude client."""
-    try:
-        import anthropic
-    except ImportError:
-        import subprocess
-        subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'anthropic', '-q'])
-        import anthropic
-
-    api_key = os.environ.get('ANTHROPIC_API_KEY')
-    if not api_key:
-        print('  ERROR: ANTHROPIC_API_KEY not set')
-        sys.exit(1)
-    return anthropic.Anthropic(api_key=api_key)
-
-
 def generate_chosen(client, prompt, system_prompt=None, max_tokens=500):
-    """Generate a high-quality 'chosen' response using Claude."""
+    """Generate a high-quality 'chosen' response using Claude with prompt caching.
+
+    The CHOSEN_SYSTEM prompt is cached across all calls (90% input cost savings).
+    """
     system = CHOSEN_SYSTEM
     if system_prompt:
         system = f"{system_prompt}\n\n{CHOSEN_SYSTEM}"
 
     try:
-        response = client.messages.create(
-            model='claude-sonnet-4-6',
-            max_tokens=max_tokens,
-            system=system,
-            messages=[{'role': 'user', 'content': prompt}],
-            temperature=0.3,
+        response = cached_message(
+            client, system, prompt,
+            max_tokens=max_tokens, temperature=0.3,
         )
-        return ''.join(b.text for b in response.content if b.type == 'text')
+        return extract_text(response)
     except Exception as e:
         print(f'  ERROR generating chosen: {e}')
         return None
 
 
 def generate_rejected(client, prompt, gap_type, system_prompt=None, max_tokens=500):
-    """Generate a 'rejected' response mimicking common local model errors."""
-    rejection_instruction = REJECTION_TEMPLATES.get(gap_type, REJECTION_TEMPLATES['partial_quality'])
+    """Generate a 'rejected' response mimicking common local model errors.
 
-    system = f"{system_prompt or ''}\n\nINSTRUKSJON FOR KVALITET: {rejection_instruction}"
+    Uses prompt caching on the rejection template system prompt.
+    """
+    rejection_instruction = REJECTION_TEMPLATES.get(gap_type, REJECTION_TEMPLATES['partial_quality'])
+    system = f"{system_prompt or ''}\n\nINSTRUKSJON FOR KVALITET: {rejection_instruction}".strip()
 
     try:
-        response = client.messages.create(
-            model='claude-sonnet-4-6',
-            max_tokens=max_tokens,
-            system=system.strip(),
-            messages=[{'role': 'user', 'content': prompt}],
-            temperature=0.7,
+        response = cached_message(
+            client, system, prompt,
+            max_tokens=max_tokens, temperature=0.7,
         )
-        return ''.join(b.text for b in response.content if b.type == 'text')
+        return extract_text(response)
     except Exception as e:
         print(f'  ERROR generating rejected: {e}')
         return None
@@ -177,8 +156,27 @@ def load_gap_report(path):
 
 
 def build_dpo_pair(prompt, system_prompt, chosen, rejected, category, gap_type):
-    """Build a DPO training pair in ChatML format."""
+    """Build a DPO training pair in ChatML format with validation.
+
+    Validates that chosen and rejected are non-empty and different,
+    and that no PII is present in any field.
+    """
     system = system_prompt or 'Du er en klinisk assistent for kiropraktorer i Norge.'
+
+    # Validation: ensure pair quality
+    if not chosen or not rejected:
+        return None
+    if len(chosen.strip()) < 20 or len(rejected.strip()) < 20:
+        return None
+    # Chosen and rejected should be meaningfully different
+    if chosen.strip() == rejected.strip():
+        return None
+    # PII check on generated content
+    try:
+        check_pii(chosen)
+        check_pii(rejected)
+    except ValueError:
+        return None
 
     return {
         'prompt': f'<|im_start|>system\n{system}<|im_end|>\n<|im_start|>user\n{prompt}<|im_end|>\n<|im_start|>assistant\n',
@@ -254,12 +252,14 @@ def generate_from_gap_cases(client, gap_report, benchmark_cases, max_pairs):
             print(f'  [{i}/{total}] SKIP {case_id} — failed to generate rejected')
             continue
 
-        # Build DPO pair
+        # Build DPO pair (with validation)
         pair = build_dpo_pair(prompt, system_prompt, chosen, rejected, category, primary_gap)
+        if not pair:
+            print(f'  [{i:3d}/{total}] ✗ {case_id:<35s} SKIP: validation failed')
+            continue
         pairs.append(pair)
 
-        status_char = '✓'
-        print(f'  [{i:3d}/{total}] {status_char} {case_id:<35s} gap={primary_gap}')
+        print(f'  [{i:3d}/{total}] ✓ {case_id:<35s} gap={primary_gap}')
 
         # Rate limiting
         if i % 5 == 0:
@@ -304,7 +304,8 @@ def generate_synthetic_dpo(client, benchmark_cases, count_per_category):
                 continue
 
             pair = build_dpo_pair(prompt, system_prompt, chosen, rejected, cat, gap_type)
-            pairs.append(pair)
+            if pair:
+                pairs.append(pair)
 
         time.sleep(0.5)
 
@@ -355,7 +356,7 @@ def main():
         print('\n  DRY RUN — no pairs generated')
         return
 
-    client = get_claude_client()
+    client = get_client()
     all_pairs = []
 
     # Generate from gap cases

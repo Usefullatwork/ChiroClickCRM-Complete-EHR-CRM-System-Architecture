@@ -22,6 +22,7 @@ Output:
 import argparse
 import hashlib
 import json
+import math
 import os
 import random
 import re
@@ -44,15 +45,13 @@ DPO_DIR = DATA_DIR / 'dpo'
 NORWEGIAN_CHARS = set('æøåÆØÅ')
 
 # ============================================================
-# GDPR: PII safety check
+# Import shared Claude utilities
 # ============================================================
 
-FNUMMER_PATTERN = re.compile(r'\b\d{6}\s?\d{5}\b')
-
-
-def has_pii(text):
-    """Check if text contains fødselsnummer patterns."""
-    return bool(text and FNUMMER_PATTERN.search(text))
+from claude_utils import (
+    has_pii, get_client, build_batch_request, submit_batch,
+    extract_batch_tool_use, QUALITY_JUDGE_TOOL,
+)
 
 
 # ============================================================

@@ -29,7 +29,9 @@ export async function analyzeWithThinking(prompt, options = {}) {
   } = options;
 
   const apiKey = process.env.CLAUDE_API_KEY;
-  if (!apiKey) throw new Error('Extended thinking requires CLAUDE_API_KEY');
+  if (!apiKey) {
+    throw new Error('Extended thinking requires CLAUDE_API_KEY');
+  }
 
   if (!Anthropic) {
     const sdk = await import('@anthropic-ai/sdk');
@@ -51,8 +53,12 @@ export async function analyzeWithThinking(prompt, options = {}) {
   let reasoning = '';
   let answer = '';
   for (const block of response.content) {
-    if (block.type === 'thinking') reasoning = block.thinking;
-    if (block.type === 'text') answer += block.text;
+    if (block.type === 'thinking') {
+      reasoning = block.thinking;
+    }
+    if (block.type === 'text') {
+      answer += block.text;
+    }
   }
 
   logger.debug('Extended thinking complete', {
@@ -115,11 +121,21 @@ export async function analyzeRedFlagsWithThinking(soapData, patientData = {}) {
  */
 function buildDifferentialPrompt(soapData, patientData) {
   const parts = ['Utfor en differensialdiagnose basert pa folgende kliniske data:\n'];
-  if (patientData.age) parts.push(`Alder: ${patientData.age}`);
-  if (patientData.gender) parts.push(`Kjonn: ${patientData.gender}`);
-  if (soapData.subjective) parts.push(`\nSubjektivt:\n${soapData.subjective}`);
-  if (soapData.objective) parts.push(`\nObjektivt:\n${soapData.objective}`);
-  if (soapData.assessment) parts.push(`\nVurdering:\n${soapData.assessment}`);
+  if (patientData.age) {
+    parts.push(`Alder: ${patientData.age}`);
+  }
+  if (patientData.gender) {
+    parts.push(`Kjonn: ${patientData.gender}`);
+  }
+  if (soapData.subjective) {
+    parts.push(`\nSubjektivt:\n${soapData.subjective}`);
+  }
+  if (soapData.objective) {
+    parts.push(`\nObjektivt:\n${soapData.objective}`);
+  }
+  if (soapData.assessment) {
+    parts.push(`\nVurdering:\n${soapData.assessment}`);
+  }
   parts.push(
     '\nList de mest sannsynlige diagnosene rangert etter sannsynlighet. Inkluder ICPC-2 koder der mulig. Forklar resonneringen for hver diagnose.'
   );
@@ -131,9 +147,15 @@ function buildDifferentialPrompt(soapData, patientData) {
  */
 function buildRedFlagPrompt(soapData, patientData) {
   const parts = ['Analyser folgende kliniske data for rode flagg (red flags):\n'];
-  if (patientData.age) parts.push(`Alder: ${patientData.age}`);
-  if (soapData.subjective) parts.push(`\nSubjektivt:\n${soapData.subjective}`);
-  if (soapData.objective) parts.push(`\nObjektivt:\n${soapData.objective}`);
+  if (patientData.age) {
+    parts.push(`Alder: ${patientData.age}`);
+  }
+  if (soapData.subjective) {
+    parts.push(`\nSubjektivt:\n${soapData.subjective}`);
+  }
+  if (soapData.objective) {
+    parts.push(`\nObjektivt:\n${soapData.objective}`);
+  }
   parts.push(
     '\nVurder risiko for: nevrologiske utfall, cauda equina, fraktur, infeksjon, malignitet, vaskulaere hendelser. Angi risikoniva (LAV/MODERAT/HOY/KRITISK) for hvert flagg.'
   );
