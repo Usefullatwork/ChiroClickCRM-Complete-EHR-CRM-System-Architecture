@@ -117,12 +117,12 @@ test.describe('Dashboard Revenue Stats', () => {
     await authenticatedPage.goto('/');
     await authenticatedPage.waitForSelector('[data-testid="dashboard-title"]', { timeout: 15000 });
 
-    // Revenue stat card should be one of the 4 dashboard stat cards
+    // Revenue stat card should be one of the 5 dashboard stat cards
     const statCards = authenticatedPage.locator('[data-testid="dashboard-stat-card"]');
     await expect(statCards.first()).toBeVisible({ timeout: 15000 });
 
     const count = await statCards.count();
-    expect(count).toBe(4);
+    expect(count).toBe(5);
 
     // One of the cards should show revenue info (contains "kr")
     // The revenue card always shows "0 kr" or "Xk kr"

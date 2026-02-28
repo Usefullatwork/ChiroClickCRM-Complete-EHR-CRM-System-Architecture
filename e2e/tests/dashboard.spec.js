@@ -21,7 +21,7 @@ test.describe('Dashboard', () => {
     await expect(statCards.first()).toBeVisible({ timeout: 15000 });
 
     const count = await statCards.count();
-    expect(count).toBe(4);
+    expect(count).toBe(5);
   });
 
   test('should display todays schedule chart area', async ({ authenticatedPage }) => {

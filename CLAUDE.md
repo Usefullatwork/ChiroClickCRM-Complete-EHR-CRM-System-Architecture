@@ -75,8 +75,8 @@ Completed the final 3/12 Healthcare UX Implementation Plan features. Extracted a
 
 ### Current Test Counts
 
-- Frontend: **589 tests** (36 suites) — all pass
-- Backend: 1794 tests (68 suites, 59 pass — 9 PGlite/Ollama-dependent failures)
+- Frontend: **941 tests** (43 suites) — all pass
+- Backend: **2035 tests** (84 suites, all pass)
 - E2E: 11 Playwright spec files
 
 ---
