@@ -154,7 +154,7 @@ describe('OllamaProvider', () => {
       expect(mockPost).toHaveBeenCalledTimes(2); // initial + 1 retry
     });
 
-    it('should default to chiro-no model when none specified', async () => {
+    it('should default to chiro-no-sft-dpo-v5 model when none specified', async () => {
       mockPost.mockResolvedValueOnce({
         data: { response: 'output', total_duration: 1000000000 },
       });
@@ -162,7 +162,7 @@ describe('OllamaProvider', () => {
       await provider.generate('prompt', null, {});
 
       const payload = mockPost.mock.calls[0][1];
-      expect(payload.model).toBe('chiro-no');
+      expect(payload.model).toBe('chiro-no-sft-dpo-v5');
     });
   });
 

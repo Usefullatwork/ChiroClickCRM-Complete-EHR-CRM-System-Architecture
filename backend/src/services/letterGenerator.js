@@ -9,7 +9,7 @@ import logger from '../utils/logger.js';
 import { query } from '../config/database.js';
 
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
-const AI_MODEL = process.env.AI_MODEL || 'llama3.1';
+const AI_MODEL = process.env.AI_MODEL || 'chiro-no-sft-dpo-v5';
 
 // =============================================================================
 // LETTER TYPE DEFINITIONS

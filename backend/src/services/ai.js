@@ -148,7 +148,7 @@ const checkGuardrailsForTask = (taskType, skipGuardrails = false) => {
 };
 
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
-const AI_MODEL = process.env.AI_MODEL || 'chiro-no'; // Default: chiro-no (Qwen2.5-7B)
+const AI_MODEL = process.env.AI_MODEL || 'chiro-no-sft-dpo-v5'; // Default: SFT+DPO merged (Qwen2.5-7B, 77% eval)
 const AI_ENABLED = process.env.AI_ENABLED !== 'false'; // Default: true unless explicitly disabled
 const GUARDRAILS_ENABLED = process.env.GUARDRAILS_ENABLED !== 'false'; // Default: true
 const RAG_ENABLED = process.env.RAG_ENABLED !== 'false'; // Default: true
@@ -177,25 +177,10 @@ const _currentLoadedModel = null;
  * Override via env vars: AB_SPLIT_NORWEGIAN=50 (sends 50% to LoRA)
  */
 const AB_SPLIT_CONFIG = {
-  'chiro-norwegian': {
-    loraModel: 'chiro-norwegian-lora-v2',
-    loraPercent: parseInt(process.env.AB_SPLIT_NORWEGIAN || '0', 10),
-    enabled: process.env.AB_SPLIT_NORWEGIAN !== undefined,
-  },
-  'chiro-no': {
-    loraModel: 'chiro-no-lora-v2',
+  'chiro-no-sft-dpo-v5': {
+    loraModel: 'chiro-no-lora-v5',
     loraPercent: parseInt(process.env.AB_SPLIT_NO || '0', 10),
     enabled: process.env.AB_SPLIT_NO !== undefined,
-  },
-  'chiro-medical': {
-    loraModel: 'chiro-medical-lora',
-    loraPercent: parseInt(process.env.AB_SPLIT_MEDICAL || '0', 10),
-    enabled: process.env.AB_SPLIT_MEDICAL !== undefined,
-  },
-  'chiro-fast': {
-    loraModel: 'chiro-fast-lora',
-    loraPercent: parseInt(process.env.AB_SPLIT_FAST || '0', 10),
-    enabled: process.env.AB_SPLIT_FAST !== undefined,
   },
 };
 
@@ -238,15 +223,30 @@ const MODEL_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
  * Base models are vanilla Qwen2.5; LoRA variants are fine-tuned on clinical data
  */
 const MODEL_CONFIG = {
-  'chiro-no': {
-    name: 'chiro-no',
-    base: 'Qwen2.5-7B-Instruct',
-    description: 'Primary clinical documentation model',
-    size: '~4.5GB',
+  // === Primary model: SFT+DPO merged (best quality, 77% eval) ===
+  'chiro-no-sft-dpo-v5': {
+    name: 'chiro-no-sft-dpo-v5',
+    base: 'Qwen2.5-7B-Instruct + SFT + DPO',
+    description: 'SFT+DPO merged clinical model (77% eval, Q8_0 GGUF)',
+    size: '~8.1GB',
     maxTokens: 4096,
     temperature: 0.3,
-    baseline: '56%',
+    evalScore: '77%',
+    fallbackModel: 'chiro-no-lora-v5',
   },
+
+  // === SFT-only fallback (for A/B testing) ===
+  'chiro-no-lora-v5': {
+    name: 'chiro-no-lora-v5',
+    base: 'Qwen2.5-7B-Instruct + LoRA v5',
+    description: 'SFT-only v5 clinical model (72% eval, ADAPTER method)',
+    size: '~4.8GB',
+    maxTokens: 4096,
+    temperature: 0.3,
+    evalScore: '72%',
+  },
+
+  // === Specialized models ===
   'chiro-fast': {
     name: 'chiro-fast',
     base: 'Qwen2.5-1.5B-Instruct',
@@ -255,15 +255,6 @@ const MODEL_CONFIG = {
     maxTokens: 2048,
     temperature: 0.5,
     baseline: '48%',
-  },
-  'chiro-norwegian': {
-    name: 'chiro-norwegian',
-    base: 'Qwen2.5-7B-Instruct',
-    description: 'Norwegian language specialist',
-    size: '~4.5GB',
-    maxTokens: 4096,
-    temperature: 0.3,
-    baseline: '44%',
   },
   'chiro-medical': {
     name: 'chiro-medical',
@@ -274,112 +265,51 @@ const MODEL_CONFIG = {
     temperature: 0.2,
     baseline: '54%',
   },
-
-  // LoRA fine-tuned variants (deployed to Ollama)
-  // All use same Qwen2.5 base as above, fine-tuned on 12K+ clinical examples
-  'chiro-fast-lora': {
-    name: 'chiro-fast-lora',
-    base: 'Qwen2.5-1.5B-Instruct + LoRA',
-    description: 'LoRA-tuned fast model for autocomplete',
-    size: '~3.1GB',
-    maxTokens: 2048,
-    temperature: 0.5,
-    fallbackModel: 'chiro-fast',
-  },
-  'chiro-medical-lora': {
-    name: 'chiro-medical-lora',
-    base: 'Qwen2.5-3B-Instruct + LoRA',
-    description: 'LoRA-tuned medical model for safety analysis',
-    size: '~6.2GB',
-    maxTokens: 2048,
-    temperature: 0.2,
-    fallbackModel: 'chiro-medical',
-  },
-  'chiro-norwegian-lora': {
-    name: 'chiro-norwegian-lora',
-    base: 'Qwen2.5-7B-Instruct + LoRA',
-    description: 'LoRA-tuned for Norwegian clinical documentation (v1)',
-    size: '~14.2GB',
-    maxTokens: 4096,
-    temperature: 0.3,
-    fallbackModel: 'chiro-norwegian',
-  },
-  'chiro-no-lora': {
-    name: 'chiro-no-lora',
-    base: 'Qwen2.5-7B-Instruct + LoRA',
-    description: 'LoRA-tuned default clinical model (v1)',
-    size: '~15GB',
-    maxTokens: 4096,
-    temperature: 0.2,
-    fallbackModel: 'chiro-no',
-  },
-
-  // v2 LoRA models — ADAPTER deployment (4.8GB, 3.5s load)
-  'chiro-no-lora-v2': {
-    name: 'chiro-no-lora-v2',
-    base: 'Qwen2.5-7B-Instruct + LoRA v2',
-    description: 'LoRA v2 clinical model (58.6% eval, ADAPTER method)',
-    size: '~4.8GB',
-    maxTokens: 4096,
-    temperature: 0.3,
-    fallbackModel: 'chiro-no-lora',
-    evalScore: '58.6%',
-  },
-  'chiro-norwegian-lora-v2': {
-    name: 'chiro-norwegian-lora-v2',
-    base: 'Qwen2.5-7B-Instruct + LoRA v2',
-    description: 'LoRA v2 Norwegian specialist (ADAPTER method)',
-    size: '~4.8GB',
-    maxTokens: 4096,
-    temperature: 0.3,
-    fallbackModel: 'chiro-norwegian-lora',
-  },
 };
 
 /**
  * Task-based model routing
  * Routes different clinical tasks to the most appropriate specialized model
  *
- * Routing strategy (v4 split — clinical vs communication):
- * - SOAP, letters, reports, red flags → chiro-no-lora-v4 (best clinical quality)
- * - SMS/communication → chiro-no-lora-v2 (concise, length-appropriate)
- * - Norwegian text generation → chiro-norwegian-lora-v2
- * - Medical reasoning → chiro-medical (Qwen2.5-3B)
- * - Fast completions → chiro-fast (Qwen2.5-1.5B)
+ * Routing strategy (v5 SFT+DPO — unified primary model):
+ * - All clinical tasks → chiro-no-sft-dpo-v5 (77% eval, best across categories)
+ *   Norwegian +20%, SOAP +10%, Comms +12.5%, Red flags +7.7% vs SFT-only
+ * - Medical reasoning → chiro-medical (Qwen2.5-3B, specialized)
+ * - Fast completions → chiro-fast (Qwen2.5-1.5B, low latency)
  */
 const MODEL_ROUTING = {
-  // SOAP & clinical documentation → v4 (90% pass rate, +10% vs v2)
-  soap_notes: 'chiro-no-lora-v4',
-  clinical_summary: 'chiro-no-lora-v4',
-  journal_organization: 'chiro-no-lora-v4',
-  diagnosis_suggestion: 'chiro-no-lora-v4',
-  sick_leave: 'chiro-no-lora-v4',
+  // SOAP & clinical documentation → SFT+DPO v5 (100% SOAP, 77% overall)
+  soap_notes: 'chiro-no-sft-dpo-v5',
+  clinical_summary: 'chiro-no-sft-dpo-v5',
+  journal_organization: 'chiro-no-sft-dpo-v5',
+  diagnosis_suggestion: 'chiro-no-sft-dpo-v5',
+  sick_leave: 'chiro-no-sft-dpo-v5',
 
-  // Fast autocomplete → chiro-fast ORIGINAL (LoRA hurts small models)
+  // Fast autocomplete → chiro-fast (1.5B, low latency)
   autocomplete: 'chiro-fast',
   spell_check: 'chiro-fast',
   abbreviation: 'chiro-fast',
   quick_suggestion: 'chiro-fast',
 
-  // Letters & reports → v4 (85.7% pass rate, +14% vs v2)
-  referral_letter: 'chiro-no-lora-v4',
-  report_writing: 'chiro-no-lora-v4',
+  // Letters & reports → SFT+DPO v5
+  referral_letter: 'chiro-no-sft-dpo-v5',
+  report_writing: 'chiro-no-sft-dpo-v5',
 
-  // Communication (SMS) → v2 (81.2% pass rate, concise output)
-  patient_communication: 'chiro-no-lora-v2',
-  patient_education: 'chiro-no-lora-v2',
-  consent_form: 'chiro-no-lora-v2',
+  // Communication → SFT+DPO v5 (75% comms, +12.5% vs SFT-only)
+  patient_communication: 'chiro-no-sft-dpo-v5',
+  patient_education: 'chiro-no-sft-dpo-v5',
+  consent_form: 'chiro-no-sft-dpo-v5',
 
-  // Norwegian language specialist
-  norwegian_text: 'chiro-norwegian-lora-v2',
+  // Norwegian → SFT+DPO v5 (93.3% Norwegian, +20% vs SFT-only)
+  norwegian_text: 'chiro-no-sft-dpo-v5',
 
-  // Safety & red flags → v4 for analysis, chiro-medical for reasoning
-  red_flag_analysis: 'chiro-no-lora-v4',
+  // Safety & red flags → SFT+DPO v5 for analysis, chiro-medical for reasoning
+  red_flag_analysis: 'chiro-no-sft-dpo-v5',
   differential_diagnosis: 'chiro-medical',
-  treatment_safety: 'chiro-no-lora-v4',
+  treatment_safety: 'chiro-no-sft-dpo-v5',
   clinical_reasoning: 'chiro-medical',
   medication_interaction: 'chiro-medical',
-  contraindication_check: 'chiro-no-lora-v4',
+  contraindication_check: 'chiro-no-sft-dpo-v5',
 };
 
 /**
@@ -514,8 +444,8 @@ const calculateConfidence = (response, taskType, modelName) => {
     factors.push('very_short');
   }
 
-  // Factor 2: Task-model alignment (strip LoRA suffixes for matching)
-  const baseModel = modelName?.replace(/-lora(-v\d+)?$/, '') || '';
+  // Factor 2: Task-model alignment (strip LoRA/SFT-DPO suffixes for matching)
+  const baseModel = modelName?.replace(/-(lora|sft-dpo)(-v\d+)?$/, '') || '';
   const modelTaskFit = {
     'chiro-medical': ['differential_diagnosis', 'clinical_reasoning', 'medication_interaction'],
     'chiro-norwegian': ['norwegian_text'],
@@ -628,7 +558,7 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
     : { model: AI_MODEL, abVariant: null };
   const model = modelResult.model;
   const abVariant = modelResult.abVariant;
-  const modelConfig = MODEL_CONFIG[model] || MODEL_CONFIG['chiro-no'];
+  const modelConfig = MODEL_CONFIG[model] || MODEL_CONFIG['chiro-no-sft-dpo-v5'];
   const effectiveTemperature = temperature ?? modelConfig.temperature ?? 0.3;
 
   // Step 0: Check if guardrails are required and available for this task
@@ -1630,16 +1560,7 @@ export const getAIStatus = async () => {
     };
   }
 
-  const expectedModels = [
-    'chiro-no',
-    'chiro-fast',
-    'chiro-norwegian',
-    'chiro-medical',
-    'chiro-fast-lora',
-    'chiro-medical-lora',
-    'chiro-norwegian-lora',
-    'chiro-no-lora',
-  ];
+  const expectedModels = ['chiro-no-sft-dpo-v5', 'chiro-no-lora-v5', 'chiro-fast', 'chiro-medical'];
 
   // Get guardrails and RAG status
   const guardrailsStatus = guardrailsService
@@ -1724,7 +1645,7 @@ export const getModelForField = async (fieldType) => {
     const result = await getModelForTask(taskType);
     return result.model;
   }
-  return AI_MODEL || 'chiro-no';
+  return AI_MODEL || 'chiro-no-sft-dpo-v5';
 };
 
 /**
