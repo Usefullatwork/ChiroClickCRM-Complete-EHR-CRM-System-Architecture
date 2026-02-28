@@ -57,6 +57,8 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/__tests__/setup.js',
     include: ['src/**/*.{test,spec}.{js,jsx,ts,tsx}'],
+    pool: 'forks',
+    teardownTimeout: 5000,
     coverage: {
       reporter: ['text', 'json', 'html'],
       exclude: ['node_modules/', 'src/__tests__/'],

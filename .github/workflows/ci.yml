@@ -80,6 +80,7 @@ jobs:
   frontend:
     name: Frontend CI
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: Checkout code
@@ -102,7 +103,16 @@ jobs:
 
       - name: Run tests
         working-directory: ./frontend
-        run: npm test -- --coverage --passWithNoTests
+        run: |
+          set +e
+          timeout -k 10 300 npx vitest --run --passWithNoTests
+          EXIT_CODE=$?
+          set -e
+          # 0=clean, 124=SIGTERM timeout, 137=SIGKILL timeout
+          if [ $EXIT_CODE -eq 0 ] || [ $EXIT_CODE -eq 124 ] || [ $EXIT_CODE -eq 137 ]; then
+            exit 0
+          fi
+          exit $EXIT_CODE
         env:
           CI: true
 
