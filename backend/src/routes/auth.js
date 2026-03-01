@@ -155,6 +155,39 @@ router.post('/skip-setup', loginLimiter, async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /auth/reset-setup:
+ *   post:
+ *     summary: Reset first-run setup status (dev/test only)
+ *     tags: [Auth]
+ *     security: []
+ *     responses:
+ *       200:
+ *         description: Setup status reset
+ *       403:
+ *         description: Not available in production
+ */
+router.post('/reset-setup', async (_req, res) => {
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(403).json({
+      error: 'Forbidden',
+      message: 'This endpoint is not available in production',
+    });
+  }
+
+  try {
+    await authService.resetSetup();
+    res.json({ message: 'Setup status reset' });
+  } catch (error) {
+    logger.error('Reset setup error:', error);
+    res.status(500).json({
+      error: 'Reset Failed',
+      message: error.message,
+    });
+  }
+});
+
 // =============================================================================
 // STANDARD AUTH ENDPOINTS
 // =============================================================================

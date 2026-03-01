@@ -58,8 +58,15 @@ const Setup = ({ onComplete }) => {
       }
       if (!config.userPassword) {
         newErrors.userPassword = 'Passord er påkrevd';
-      } else if (config.userPassword.length < 8) {
-        newErrors.userPassword = 'Passord må være minst 8 tegn';
+      } else {
+        const pwdErrors = [];
+        if (config.userPassword.length < 8) pwdErrors.push('minst 8 tegn');
+        if (!/[a-z]/.test(config.userPassword)) pwdErrors.push('minst én liten bokstav (a-z)');
+        if (!/[A-Z]/.test(config.userPassword)) pwdErrors.push('minst én stor bokstav (A-Z)');
+        if (!/[0-9]/.test(config.userPassword)) pwdErrors.push('minst ett tall (0-9)');
+        if (pwdErrors.length > 0) {
+          newErrors.userPassword = `Passord må inneholde: ${pwdErrors.join(', ')}`;
+        }
       }
     }
 

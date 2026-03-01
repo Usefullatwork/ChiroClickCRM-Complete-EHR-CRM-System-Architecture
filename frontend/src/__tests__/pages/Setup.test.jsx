@@ -158,7 +158,91 @@ describe('Setup Wizard', () => {
     });
     fireEvent.click(screen.getByText('Neste'));
 
-    expect(screen.getByText('Passord må være minst 8 tegn')).toBeInTheDocument();
+    expect(screen.getByText(/Passord må inneholde:.*minst 8 tegn/)).toBeInTheDocument();
+  });
+
+  it('should reject password without uppercase letter', () => {
+    renderSetup();
+    fireEvent.click(screen.getByText('Neste'));
+    fireEvent.change(screen.getByPlaceholderText('Min Kiropraktorklinikk'), {
+      target: { value: 'Test' },
+    });
+    fireEvent.click(screen.getByText('Neste'));
+
+    fireEvent.change(screen.getByPlaceholderText('Ola Nordmann'), { target: { value: 'Test' } });
+    fireEvent.change(screen.getByPlaceholderText('ola@klinikken.no'), {
+      target: { value: 'test@test.com' },
+    });
+    fireEvent.change(screen.getByPlaceholderText('Minst 8 tegn'), {
+      target: { value: 'abcdefg1' },
+    });
+    fireEvent.click(screen.getByText('Neste'));
+
+    expect(screen.getByText(/stor bokstav/)).toBeInTheDocument();
+  });
+
+  it('should reject password without lowercase letter', () => {
+    renderSetup();
+    fireEvent.click(screen.getByText('Neste'));
+    fireEvent.change(screen.getByPlaceholderText('Min Kiropraktorklinikk'), {
+      target: { value: 'Test' },
+    });
+    fireEvent.click(screen.getByText('Neste'));
+
+    fireEvent.change(screen.getByPlaceholderText('Ola Nordmann'), { target: { value: 'Test' } });
+    fireEvent.change(screen.getByPlaceholderText('ola@klinikken.no'), {
+      target: { value: 'test@test.com' },
+    });
+    fireEvent.change(screen.getByPlaceholderText('Minst 8 tegn'), {
+      target: { value: 'ABCDEFG1' },
+    });
+    fireEvent.click(screen.getByText('Neste'));
+
+    expect(screen.getByText(/liten bokstav/)).toBeInTheDocument();
+  });
+
+  it('should reject password without a number', () => {
+    renderSetup();
+    fireEvent.click(screen.getByText('Neste'));
+    fireEvent.change(screen.getByPlaceholderText('Min Kiropraktorklinikk'), {
+      target: { value: 'Test' },
+    });
+    fireEvent.click(screen.getByText('Neste'));
+
+    fireEvent.change(screen.getByPlaceholderText('Ola Nordmann'), { target: { value: 'Test' } });
+    fireEvent.change(screen.getByPlaceholderText('ola@klinikken.no'), {
+      target: { value: 'test@test.com' },
+    });
+    fireEvent.change(screen.getByPlaceholderText('Minst 8 tegn'), {
+      target: { value: 'Abcdefgh' },
+    });
+    fireEvent.click(screen.getByText('Neste'));
+
+    expect(screen.getByText(/minst ett tall/)).toBeInTheDocument();
+  });
+
+  it('should advance to step 3 with a valid password', () => {
+    renderSetup();
+    // Mock Ollama status check (triggered when entering AI step)
+    global.fetch.mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+
+    fireEvent.click(screen.getByText('Neste'));
+    fireEvent.change(screen.getByPlaceholderText('Min Kiropraktorklinikk'), {
+      target: { value: 'Test' },
+    });
+    fireEvent.click(screen.getByText('Neste'));
+
+    fireEvent.change(screen.getByPlaceholderText('Ola Nordmann'), { target: { value: 'Test' } });
+    fireEvent.change(screen.getByPlaceholderText('ola@klinikken.no'), {
+      target: { value: 'test@test.com' },
+    });
+    fireEvent.change(screen.getByPlaceholderText('Minst 8 tegn'), {
+      target: { value: 'SecurePass1' },
+    });
+    fireEvent.click(screen.getByText('Neste'));
+
+    // Should be on AI step (step 3)
+    expect(screen.getByText('AI-assistent')).toBeInTheDocument();
   });
 
   // ===========================================================================

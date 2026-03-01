@@ -187,4 +187,82 @@ describe('Setup API Integration Tests', () => {
       expect(response.body.error).toBe('Setup Already Complete');
     });
   });
+
+  // ===========================================================================
+  // POST /reset-setup
+  // ===========================================================================
+
+  describe('POST /api/v1/auth/reset-setup', () => {
+    it('should reset setup status back to needsSetup: true', async () => {
+      // First mark setup as complete
+      await db.query(
+        `UPDATE organizations
+         SET settings = COALESCE(settings, '{}'::jsonb) || '{"setup_complete": "true"}'::jsonb
+         WHERE id = $1`,
+        [DESKTOP_ORG_ID]
+      );
+
+      // Verify it's complete
+      const before = await request(app).get('/api/v1/auth/setup-status').expect(200);
+      expect(before.body.needsSetup).toBe(false);
+
+      // Reset
+      const response = await request(app).post('/api/v1/auth/reset-setup').expect(200);
+      expect(response.body.message).toBe('Setup status reset');
+
+      // Verify it's back to needing setup
+      const after = await request(app).get('/api/v1/auth/setup-status').expect(200);
+      expect(after.body.needsSetup).toBe(true);
+    });
+  });
+
+  // ===========================================================================
+  // Full Setup Chain
+  // ===========================================================================
+
+  describe('Full setup chain', () => {
+    it('should complete setup and authenticate in one flow', async () => {
+      // 1. Verify setup is needed
+      const statusBefore = await request(app).get('/api/v1/auth/setup-status').expect(200);
+      expect(statusBefore.body.needsSetup).toBe(true);
+
+      // 2. Run setup with valid data
+      const uniqueEmail = `chain${Date.now()}@test.com`;
+      const setupRes = await request(app)
+        .post('/api/v1/auth/setup')
+        .send({
+          clinicName: 'Chain Test Klinikk',
+          clinicAddress: 'Kjedeveien 1',
+          clinicPhone: '+47 99887766',
+          orgNumber: '987654321',
+          userName: 'Chain Tester',
+          userEmail: uniqueEmail,
+          userPassword: 'ChainPass123!',
+          installAI: false,
+        })
+        .expect(200);
+
+      expect(setupRes.body.message).toBe('Setup completed successfully');
+      expect(setupRes.body.user.role).toBe('ADMIN');
+
+      // Extract session cookie
+      const cookies = setupRes.headers['set-cookie'];
+      expect(cookies).toBeDefined();
+      const sessionCookie = cookies[0].split(';')[0]; // "session=xxx"
+
+      // 3. Verify setup is no longer needed
+      const statusAfter = await request(app).get('/api/v1/auth/setup-status').expect(200);
+      expect(statusAfter.body.needsSetup).toBe(false);
+
+      // 4. Verify the session cookie works with GET /auth/me
+      const meRes = await request(app)
+        .get('/api/v1/auth/me')
+        .set('Cookie', sessionCookie)
+        .expect(200);
+
+      expect(meRes.body.user).toBeDefined();
+      expect(meRes.body.user.email).toBe(uniqueEmail);
+      expect(meRes.body.user.role).toBe('ADMIN');
+    });
+  });
 });

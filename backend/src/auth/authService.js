@@ -380,6 +380,20 @@ export const getSetupStatus = async () => {
 };
 
 /**
+ * Reset setup status (dev/test only)
+ * Removes setup_complete flag so the wizard can be re-run
+ */
+export const resetSetup = async () => {
+  await query(
+    `UPDATE organizations
+     SET settings = COALESCE(settings, '{}'::jsonb) - 'setup_complete'
+     WHERE id = $1`,
+    [DESKTOP_ORG_ID]
+  );
+  logger.info('Setup status reset');
+};
+
+/**
  * Mark setup as complete without changing any data (skip)
  */
 export const skipSetup = async () => {
@@ -501,6 +515,7 @@ export default {
   verifyEmail,
   resendVerification,
   getSetupStatus,
+  resetSetup,
   skipSetup,
   setupFirstRun,
 };
