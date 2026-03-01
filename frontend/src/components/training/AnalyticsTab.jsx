@@ -5,7 +5,17 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Download, AlertCircle, BarChart3, TrendingUp, Target, Activity } from 'lucide-react';
+import {
+  Download,
+  AlertCircle,
+  BarChart3,
+  TrendingUp,
+  Target,
+  Activity,
+  FlaskConical,
+  DollarSign,
+  Database,
+} from 'lucide-react';
 import {
   BarChart,
   Bar,
@@ -21,7 +31,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { trainingAPI } from '../../services/api';
+import { trainingAPI, aiAPI } from '../../services/api';
 
 const CHART_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
@@ -94,10 +104,47 @@ export default function AnalyticsTab() {
     },
   });
 
+  const aiStatusQuery = useQuery({
+    queryKey: ['ai-status-ab'],
+    queryFn: async () => {
+      const res = await aiAPI.getStatus();
+      return res.data;
+    },
+    staleTime: 60000,
+  });
+
+  const costQuery = useQuery({
+    queryKey: ['analytics-cost', dateRange],
+    queryFn: async () => {
+      const res = await trainingAPI.getCostPerSuggestion(getDateParams());
+      return res.data.data;
+    },
+  });
+
+  const providerQuery = useQuery({
+    queryKey: ['analytics-provider', dateRange],
+    queryFn: async () => {
+      const res = await trainingAPI.getProviderValue(getDateParams());
+      return res.data.data;
+    },
+  });
+
+  const cacheQuery = useQuery({
+    queryKey: ['analytics-cache', dateRange],
+    queryFn: async () => {
+      const res = await trainingAPI.getCacheTrends(getDateParams());
+      return res.data.data;
+    },
+  });
+
   const comparison = comparisonQuery.data || [];
   const usage = usageQuery.data || { daily: [], taskTypes: [] };
   const redFlag = redFlagQuery.data || { summary: {}, trend: [] };
   const suggestions = suggestionsQuery.data || [];
+  const abTesting = aiStatusQuery.data?.abTesting || {};
+  const costData = costQuery.data || [];
+  const providerData = providerQuery.data || [];
+  const cacheData = cacheQuery.data || [];
 
   const exportSuggestionsCSV = () => {
     if (!suggestions.length) {
@@ -470,6 +517,205 @@ export default function AnalyticsTab() {
               </tbody>
             </table>
           </div>
+        )}
+      </div>
+
+      {/* A/B Testing Controls */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+          <FlaskConical className="w-5 h-5" />
+          A/B-testing konfigurasjon
+        </h2>
+        {Object.keys(abTesting).length === 0 ? (
+          <p className="text-gray-500 text-sm">
+            Ingen A/B-tester konfigurert. Sett miljovariabler som AB_SPLIT_V6=50 for a aktivere.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {Object.entries(abTesting).map(([model, config]) => (
+              <div
+                key={model}
+                className={`border rounded-lg p-4 ${config.enabled ? 'border-teal-300 bg-teal-50' : 'border-gray-200'}`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-mono text-sm font-medium">{model}</span>
+                  <span
+                    className={`px-2 py-0.5 rounded text-xs font-medium ${config.enabled ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-500'}`}
+                  >
+                    {config.enabled ? 'Aktiv' : 'Inaktiv'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
+                  <div>
+                    Modell B: <span className="font-mono">{config.loraModel}</span>
+                  </div>
+                  <div>
+                    Fordeling:{' '}
+                    <span className="font-medium">
+                      {100 - config.loraPercent}% / {config.loraPercent}%
+                    </span>
+                  </div>
+                </div>
+                {config.enabled && (
+                  <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-teal-600 h-2 rounded-full"
+                      style={{ width: `${100 - config.loraPercent}%` }}
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {comparison.length >= 2 && (
+              <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-800 font-medium mb-1">Signifikansindikator</p>
+                {comparison.every((c) => parseInt(c.total_feedback) >= 30) ? (
+                  <p className="text-xs text-green-700">
+                    Tilstrekkelig data for sammenligning (
+                    {comparison.map((c) => c.total_feedback).join(' / ')} tilbakemeldinger)
+                  </p>
+                ) : (
+                  <p className="text-xs text-amber-700">
+                    Utilstrekkelig data — trenger minst 30 tilbakemeldinger per modell (na:{' '}
+                    {comparison.map((c) => c.total_feedback).join(' / ')})
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Cost per Suggestion */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+          <DollarSign className="w-5 h-5" />
+          Kostnad per forslag
+        </h2>
+        {costData.length === 0 ? (
+          <p className="text-gray-500 text-sm">Ingen kostnadsdata tilgjengelig.</p>
+        ) : (
+          <div className="space-y-2">
+            {costData.map((item) => {
+              const maxCost = Math.max(
+                ...costData.map((d) => parseFloat(d.avg_cost_usd) || 0),
+                0.01
+              );
+              const barWidth = ((parseFloat(item.avg_cost_usd) || 0) / maxCost) * 100;
+              return (
+                <div key={item.task_type} className="flex items-center gap-3">
+                  <span className="text-sm text-gray-600 w-36 shrink-0">{item.task_type}</span>
+                  <div className="flex-1 bg-gray-100 rounded-full h-5 relative">
+                    <div
+                      className="bg-blue-500 h-5 rounded-full"
+                      style={{ width: `${Math.max(barWidth, 2)}%` }}
+                    />
+                  </div>
+                  <span className="text-sm font-mono text-gray-700 w-24 text-right">
+                    ${parseFloat(item.avg_cost_usd || 0).toFixed(4)}
+                  </span>
+                  <span className="text-xs text-gray-400 w-16 text-right">{item.count} stk</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Provider Value Comparison */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+          <BarChart3 className="w-5 h-5" />
+          Leverandorsammenligning
+        </h2>
+        {providerData.length === 0 ? (
+          <p className="text-gray-500 text-sm">Ingen leverandordata tilgjengelig.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead>
+                <tr className="border-b bg-gray-50">
+                  <th className="text-left py-3 px-4 font-medium text-gray-600">Leverandor</th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600">Forslag</th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600">Gj.sn. latens</th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600">Godkjent %</th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600">Total kostnad</th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600">
+                    Kostnad/forslag
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {providerData.map((p) => (
+                  <tr key={p.provider} className="border-b hover:bg-gray-50">
+                    <td className="py-3 px-4 font-medium capitalize">{p.provider}</td>
+                    <td className="py-3 px-4 text-right">{p.total_suggestions}</td>
+                    <td className="py-3 px-4 text-right text-gray-600">
+                      {p.avg_latency_ms ? `${p.avg_latency_ms}ms` : '-'}
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      {p.approval_rate ? `${p.approval_rate}%` : '-'}
+                    </td>
+                    <td className="py-3 px-4 text-right font-mono">
+                      ${parseFloat(p.total_cost_usd || 0).toFixed(2)}
+                    </td>
+                    <td className="py-3 px-4 text-right font-mono">
+                      ${parseFloat(p.cost_per_suggestion || 0).toFixed(4)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Cache Trends */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+          <Database className="w-5 h-5" />
+          Cache-trender
+        </h2>
+        {cacheData.length === 0 ? (
+          <p className="text-gray-500 text-sm">Ingen cache-data tilgjengelig.</p>
+        ) : (
+          <ResponsiveContainer width="100%" height={250}>
+            <LineChart data={[...cacheData].reverse()}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="date"
+                tickFormatter={(d) =>
+                  new Date(d).toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' })
+                }
+              />
+              <YAxis />
+              <Tooltip
+                labelFormatter={(d) => new Date(d).toLocaleDateString('nb-NO')}
+                formatter={(value, name) => {
+                  if (name === 'Cache-treffrate') return `${value}%`;
+                  return value;
+                }}
+              />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="cache_hit_rate"
+                name="Cache-treffrate"
+                stroke="#10b981"
+                strokeWidth={2}
+                dot={false}
+              />
+              <Line
+                type="monotone"
+                dataKey="total_requests"
+                name="Totale forsporsler"
+                stroke="#3b82f6"
+                strokeWidth={2}
+                dot={false}
+              />
+            </LineChart>
+          </ResponsiveContainer>
         )}
       </div>
     </div>

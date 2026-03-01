@@ -177,6 +177,11 @@ const _currentLoadedModel = null;
  * Override via env vars: AB_SPLIT_NORWEGIAN=50 (sends 50% to LoRA)
  */
 const AB_SPLIT_CONFIG = {
+  'chiro-no-sft-dpo-v6': {
+    loraModel: 'chiro-no-sft-dpo-v5',
+    loraPercent: parseInt(process.env.AB_SPLIT_V6 || '0', 10),
+    enabled: process.env.AB_SPLIT_V6 !== undefined,
+  },
   'chiro-no-sft-dpo-v5': {
     loraModel: 'chiro-no-lora-v5',
     loraPercent: parseInt(process.env.AB_SPLIT_NO || '0', 10),

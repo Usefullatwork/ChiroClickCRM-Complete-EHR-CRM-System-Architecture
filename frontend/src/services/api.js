@@ -810,6 +810,10 @@ export const trainingAPI = {
   getAnalyticsSuggestions: (params) => apiClient.get('/training/analytics/suggestions', { params }),
   getAnalyticsRedFlags: (params) => apiClient.get('/training/analytics/red-flags', { params }),
   getAnalyticsComparison: (params) => apiClient.get('/training/analytics/comparison', { params }),
+  getCostPerSuggestion: (params) =>
+    apiClient.get('/training/analytics/cost-per-suggestion', { params }),
+  getProviderValue: (params) => apiClient.get('/training/analytics/provider-value', { params }),
+  getCacheTrends: (params) => apiClient.get('/training/analytics/cache-trends', { params }),
 };
 
 // AI Service
