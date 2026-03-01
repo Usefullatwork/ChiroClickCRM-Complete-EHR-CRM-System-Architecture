@@ -20,6 +20,7 @@ let bulkCommunicationService = null;
 let communicationsService = null;
 let smartSchedulerService = null;
 let recallEngine = null;
+let reportService = null;
 
 // Track running jobs to prevent overlap
 const runningJobs = new Map();
@@ -78,6 +79,13 @@ const loadServices = async () => {
     logger.info('Recall Engine service loaded');
   } catch (e) {
     logger.warn('Recall Engine service not available:', e.message);
+  }
+
+  try {
+    reportService = await import('../services/reportService.js');
+    logger.info('Report service loaded');
+  } catch (e) {
+    logger.warn('Report service not available:', e.message);
   }
 };
 
@@ -403,6 +411,27 @@ const processRecallSchedules = async () => {
     return result;
   } catch (error) {
     logger.error('Error processing recall schedules:', error);
+    throw error;
+  }
+};
+
+/**
+ * Send weekly AI analytics digest report
+ * WEEKLY: Monday at 07:00 Europe/Oslo
+ */
+const sendWeeklyAIDigest = async () => {
+  if (!reportService) {
+    logger.debug('Report service not available');
+    return { skipped: true, reason: 'service_not_available' };
+  }
+
+  try {
+    logger.info('Sending weekly AI analytics digest...');
+    const result = await reportService.generateWeeklyAIDigest();
+    logger.info('Weekly AI digest complete:', { totalSuggestions: result.stats.totalSuggestions });
+    return result.stats;
+  } catch (error) {
+    logger.error('Error sending weekly AI digest:', error);
     throw error;
   }
 };
@@ -809,6 +838,22 @@ export const initializeScheduler = async () => {
     lastStatus: null,
   });
 
+  // Weekly AI analytics digest - Monday at 07:00
+  const digestJob = cron.schedule(
+    '0 7 * * 1',
+    () => {
+      executeJob('sendWeeklyAIDigest', sendWeeklyAIDigest, 120000);
+    },
+    { timezone: TIMEZONE }
+  );
+  scheduledJobs.set('sendWeeklyAIDigest', {
+    job: digestJob,
+    description: 'Send weekly AI analytics digest email',
+    schedule: '0 7 * * 1',
+    lastRun: null,
+    lastStatus: null,
+  });
+
   // =====================================================
   // MONTHLY JOBS
   // =====================================================
@@ -902,6 +947,7 @@ export const runJob = async (jobName) => {
     processRecallSchedules,
     sendAppointmentReminders,
     processSmartScheduledComms,
+    sendWeeklyAIDigest,
     cleanupOldLogs,
     backupTrainingData,
     healthCheck,

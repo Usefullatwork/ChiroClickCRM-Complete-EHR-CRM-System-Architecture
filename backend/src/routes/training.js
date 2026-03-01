@@ -17,6 +17,8 @@ import {
   analyticsQuerySchema,
 } from '../validators/training.validators.js';
 import { exportTrainingData, getExportStats } from '../services/trainingExport.js';
+import { generateWeeklyAIDigest } from '../services/reportService.js';
+import logger from '../utils/logger.js';
 
 const router = express.Router();
 
@@ -626,6 +628,38 @@ router.get(
   validate(analyticsQuerySchema),
   aiAnalyticsController.getCacheTrends
 );
+
+/**
+ * @swagger
+ * /training/analytics/send-report:
+ *   post:
+ *     summary: Manually trigger the weekly AI analytics digest
+ *     description: Generates and sends the same report that runs automatically every Monday at 07:00. Returns the report HTML for preview.
+ *     tags: [Training]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Report generated and sent (or logged if SMTP not configured)
+ *       403:
+ *         description: Admin only
+ */
+router.post('/analytics/send-report', requireRole(['ADMIN']), async (req, res) => {
+  try {
+    const result = await generateWeeklyAIDigest();
+    res.json({
+      success: true,
+      message: 'Ukentlig AI-rapport generert',
+      data: {
+        stats: result.stats,
+        html: result.html,
+      },
+    });
+  } catch (error) {
+    logger.error('Error generating AI digest report:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
 
 // ============================================================================
 // DATA CURATION ENDPOINTS
