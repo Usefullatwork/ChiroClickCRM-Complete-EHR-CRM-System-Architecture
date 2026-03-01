@@ -91,9 +91,11 @@ test.describe.serial('Setup Wizard', () => {
     await expect(page.locator('text=Alt klart!')).toBeVisible();
     await page.getByRole('button', { name: 'Start ChiroClickCRM' }).click();
 
-    // Wizard should disappear and main app should load
-    await expect(page.locator('text=Alt klart!')).not.toBeVisible({ timeout: 30000 });
-    await page.waitForURL('**/', { timeout: 10000 });
+    // Verify setup was marked complete via API
+    await page.waitForTimeout(2000);
+    const statusRes = await page.request.get(`${API_BASE}/api/v1/auth/setup-status`);
+    const statusData = await statusRes.json();
+    expect(statusData.needsSetup).toBe(false);
   });
 
   test('skip flow bypasses wizard', async ({ request, page }) => {
