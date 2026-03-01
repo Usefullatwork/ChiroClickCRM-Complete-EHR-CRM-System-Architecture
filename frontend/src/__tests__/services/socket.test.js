@@ -3,7 +3,7 @@
  * Tests for WebSocket singleton, hooks (useSocketEvent, useSocketStatus, useOnlineUsers)
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
 // Mock socket.io-client
