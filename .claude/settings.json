@@ -36,6 +36,7 @@
       "Bash(cat *)",
       "Bash(pwd*)",
       "Bash(npm list*)",
+      "Bash(npm audit*)",
       "Bash(npm run swagger*)",
       "Bash(cd backend && npm run swagger*)",
       "Bash(cd backend && npm start*)",
@@ -53,7 +54,8 @@
       "Bash(lsof *)",
       "Bash(kill *)",
       "Bash(date *)",
-      "Bash(wc *)"
+      "Bash(wc *)",
+      "Bash(npx prettier *)"
     ],
     "deny": [
       "Bash(git push --force*)",
@@ -64,7 +66,46 @@
       "Bash(git clean*)",
       "Bash(git checkout . *)",
       "Bash(drop database*)",
-      "Bash(DROP DATABASE*)"
+      "Bash(DROP DATABASE*)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ \"$(git branch --show-current)\" != \"main\" ] || echo '{\"decision\":\"block\",\"reason\":\"Cannot edit directly on main branch. Create a feature branch first.\"}'",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [[ \"$CLAUDE_TOOL_INPUT_FILE_PATH\" =~ \\.(js|jsx|ts|tsx)$ ]]; then npx prettier --write \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>/dev/null; fi",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [[ \"$CLAUDE_TOOL_INPUT_FILE_PATH\" =~ \\.(js|jsx|ts|tsx)$ ]]; then grep -n 'console\\.log' \"$CLAUDE_TOOL_INPUT_FILE_PATH\" && echo '{\"systemMessage\":\"WARNING: console.log detected in file. Remove before committing — PHI leak risk in healthcare code.\"}' || true; fi",
+            "timeout": 5
+          }
+        ]
+      }
     ]
   }
 }
