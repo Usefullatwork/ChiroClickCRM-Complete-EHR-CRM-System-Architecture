@@ -6,7 +6,12 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import AnatomyViewer, { VIEW_MODES } from '../../components/anatomy/AnatomyViewer';
+import AnatomyViewer, {
+  VIEW_MODES,
+  ExaminationAnatomyViewer,
+  TreatmentAnatomyViewer,
+  QuickPalpationViewer,
+} from '../../components/anatomy/AnatomyViewer';
 
 // Mock the API
 vi.mock('../../services/api', () => ({
@@ -514,6 +519,122 @@ describe('AnatomyViewer Component', () => {
       await waitFor(() => {
         expect(spineTemplatesAPI.getGrouped).toHaveBeenCalled();
       });
+    });
+  });
+
+  // ============================================================================
+  // COMBINED MODE NARRATIVE FOOTER
+  // ============================================================================
+
+  describe('Combined Mode Narrative Footer', () => {
+    it('should render narrative footer with spine and body findings in COMBINED mode', async () => {
+      render(
+        <AnatomyViewer
+          initialMode={VIEW_MODES.COMBINED}
+          spineFindings={{
+            C2: { vertebra: 'C2', type: 'restriction' },
+            T4: { vertebra: 'T4', type: 'fixation' },
+          }}
+          bodyRegions={['neck', 'shoulder']}
+          showNarrative={true}
+        />,
+        { wrapper: createWrapper() }
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('Sammendrag av funn:')).toBeInTheDocument();
+      });
+
+      expect(screen.getByText(/Spinalfunn:/)).toBeInTheDocument();
+      expect(screen.getByText(/C2 \(restriction\)/)).toBeInTheDocument();
+      expect(screen.getByText(/T4 \(fixation\)/)).toBeInTheDocument();
+      expect(screen.getByText(/Smerteområder:/)).toBeInTheDocument();
+      expect(screen.getByText(/neck, shoulder/)).toBeInTheDocument();
+    });
+
+    it('should not render narrative footer in non-COMBINED mode', async () => {
+      render(
+        <AnatomyViewer
+          initialMode={VIEW_MODES.SPINE_2D}
+          spineFindings={{ C2: { vertebra: 'C2', type: 'restriction' } }}
+          bodyRegions={['neck']}
+          showNarrative={true}
+        />,
+        { wrapper: createWrapper() }
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('Anatomisk Visualisering')).toBeInTheDocument();
+      });
+
+      expect(screen.queryByText('Sammendrag av funn:')).not.toBeInTheDocument();
+    });
+
+    it('should not render narrative footer when showNarrative is false', async () => {
+      render(
+        <AnatomyViewer
+          initialMode={VIEW_MODES.COMBINED}
+          spineFindings={{ C2: { vertebra: 'C2', type: 'restriction' } }}
+          bodyRegions={['neck']}
+          showNarrative={false}
+        />,
+        { wrapper: createWrapper() }
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('Anatomisk Visualisering')).toBeInTheDocument();
+      });
+
+      expect(screen.queryByText('Sammendrag av funn:')).not.toBeInTheDocument();
+    });
+  });
+
+  // ============================================================================
+  // PRESET EXPORTS
+  // ============================================================================
+
+  describe('Preset Exports', () => {
+    it('should render ExaminationAnatomyViewer with correct allowed modes', async () => {
+      render(<ExaminationAnatomyViewer />, { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        expect(screen.getByText('Anatomisk Visualisering')).toBeInTheDocument();
+      });
+
+      // Should show SPINE_2D, SPINE_3D, BODY_2D but NOT COMBINED
+      expect(screen.getByTitle('SVG ryggraddiagram')).toBeInTheDocument();
+      expect(screen.getByTitle('3D interaktiv modell')).toBeInTheDocument();
+      expect(screen.getByTitle('Kroppskart for smertelokalisering')).toBeInTheDocument();
+      expect(screen.queryByTitle('Ryggrad og kropp side om side')).not.toBeInTheDocument();
+    });
+
+    it('should render TreatmentAnatomyViewer with spine-only modes', async () => {
+      render(<TreatmentAnatomyViewer />, { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        expect(screen.getByText('Anatomisk Visualisering')).toBeInTheDocument();
+      });
+
+      // Should show SPINE_2D and SPINE_3D only
+      expect(screen.getByTitle('SVG ryggraddiagram')).toBeInTheDocument();
+      expect(screen.getByTitle('3D interaktiv modell')).toBeInTheDocument();
+      expect(screen.queryByTitle('Kroppskart for smertelokalisering')).not.toBeInTheDocument();
+      expect(screen.queryByTitle('Ryggrad og kropp side om side')).not.toBeInTheDocument();
+    });
+
+    it('should render QuickPalpationViewer in compact mode without mode switching', async () => {
+      render(<QuickPalpationViewer />, { wrapper: createWrapper() });
+
+      await waitFor(() => {
+        // Compact mode does not show the full heading
+        expect(screen.queryByText('Anatomisk Visualisering')).not.toBeInTheDocument();
+        // Should render the compact spine diagram
+        expect(screen.getByTestId('compact-spine-diagram')).toBeInTheDocument();
+      });
+
+      // No mode switch buttons should be visible (allowModeSwitch=false)
+      expect(screen.queryByTitle('SVG ryggraddiagram')).not.toBeInTheDocument();
+      expect(screen.queryByTitle('3D interaktiv modell')).not.toBeInTheDocument();
     });
   });
 });
