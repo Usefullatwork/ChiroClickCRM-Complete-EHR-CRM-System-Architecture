@@ -8,10 +8,11 @@ import { Activity, Target, Settings } from 'lucide-react';
 import EnhancedClinicalTextarea from '../clinical/EnhancedClinicalTextarea';
 import SALTBanner from '../clinical/SALTBanner';
 import AITextarea from '../clinical/AITextarea';
-import BodyChartPanel from '../examination/BodyChartPanel';
-import AnatomicalBodyChart from '../examination/AnatomicalBodyChart';
-import ActivatorMethodPanel from '../examination/ActivatorMethodPanel';
-import FacialLinesChart from '../examination/FacialLinesChart';
+// Lazy-load visual notation panels (only one rendered at a time based on clinicalPrefs)
+const BodyChartPanel = lazy(() => import('../examination/BodyChartPanel'));
+const AnatomicalBodyChart = lazy(() => import('../examination/AnatomicalBodyChart'));
+const ActivatorMethodPanel = lazy(() => import('../examination/ActivatorMethodPanel'));
+const FacialLinesChart = lazy(() => import('../examination/FacialLinesChart'));
 import { DiagnosisPanel } from './DiagnosisPanel';
 import { TaksterPanel } from './TaksterPanel';
 
@@ -450,58 +451,60 @@ export function SOAPNoteForm({
 
         {/* Treatment Performed - Conditional Rendering Based on Notation Method */}
         {isVisualNotation ? (
-          <div className="border border-slate-200 rounded-lg overflow-hidden">
-            {currentNotationMethod.id === 'body_chart' && (
-              <BodyChartPanel
-                value={notationData}
-                onChange={setNotationData}
-                onGenerateNarrative={(narrative) => {
-                  setNotationNarrative(narrative);
-                  updateField('plan', 'treatment', narrative);
-                }}
-                lang={clinicalLang}
-                readOnly={isSigned}
-              />
-            )}
-            {currentNotationMethod.id === 'anatomical_chart' && (
-              <AnatomicalBodyChart
-                value={notationData}
-                onChange={setNotationData}
-                onGenerateNarrative={(narrative) => {
-                  setNotationNarrative(narrative);
-                  updateField('plan', 'treatment', narrative);
-                }}
-                lang={clinicalLang}
-                showDermatomes={clinicalPrefs.showDermatomes}
-                showTriggerPoints={clinicalPrefs.showTriggerPoints}
-                readOnly={isSigned}
-              />
-            )}
-            {currentNotationMethod.id === 'activator_protocol' && (
-              <ActivatorMethodPanel
-                value={notationData}
-                onChange={setNotationData}
-                onGenerateNarrative={(narrative) => {
-                  setNotationNarrative(narrative);
-                  updateField('plan', 'treatment', narrative);
-                }}
-                lang={clinicalLang}
-                readOnly={isSigned}
-              />
-            )}
-            {currentNotationMethod.id === 'facial_lines' && (
-              <FacialLinesChart
-                value={notationData}
-                onChange={setNotationData}
-                onGenerateNarrative={(narrative) => {
-                  setNotationNarrative(narrative);
-                  updateField('plan', 'treatment', narrative);
-                }}
-                lang={clinicalLang}
-                readOnly={isSigned}
-              />
-            )}
-          </div>
+          <Suspense fallback={<div className="animate-pulse h-64 bg-gray-100 rounded" />}>
+            <div className="border border-slate-200 rounded-lg overflow-hidden">
+              {currentNotationMethod.id === 'body_chart' && (
+                <BodyChartPanel
+                  value={notationData}
+                  onChange={setNotationData}
+                  onGenerateNarrative={(narrative) => {
+                    setNotationNarrative(narrative);
+                    updateField('plan', 'treatment', narrative);
+                  }}
+                  lang={clinicalLang}
+                  readOnly={isSigned}
+                />
+              )}
+              {currentNotationMethod.id === 'anatomical_chart' && (
+                <AnatomicalBodyChart
+                  value={notationData}
+                  onChange={setNotationData}
+                  onGenerateNarrative={(narrative) => {
+                    setNotationNarrative(narrative);
+                    updateField('plan', 'treatment', narrative);
+                  }}
+                  lang={clinicalLang}
+                  showDermatomes={clinicalPrefs.showDermatomes}
+                  showTriggerPoints={clinicalPrefs.showTriggerPoints}
+                  readOnly={isSigned}
+                />
+              )}
+              {currentNotationMethod.id === 'activator_protocol' && (
+                <ActivatorMethodPanel
+                  value={notationData}
+                  onChange={setNotationData}
+                  onGenerateNarrative={(narrative) => {
+                    setNotationNarrative(narrative);
+                    updateField('plan', 'treatment', narrative);
+                  }}
+                  lang={clinicalLang}
+                  readOnly={isSigned}
+                />
+              )}
+              {currentNotationMethod.id === 'facial_lines' && (
+                <FacialLinesChart
+                  value={notationData}
+                  onChange={setNotationData}
+                  onGenerateNarrative={(narrative) => {
+                    setNotationNarrative(narrative);
+                    updateField('plan', 'treatment', narrative);
+                  }}
+                  lang={clinicalLang}
+                  readOnly={isSigned}
+                />
+              )}
+            </div>
+          </Suspense>
         ) : (
           <EnhancedClinicalTextarea
             value={encounterData.plan.treatment}

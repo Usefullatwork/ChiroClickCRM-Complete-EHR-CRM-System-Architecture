@@ -23,8 +23,7 @@ import TreatmentPlanTracker, { VisitCounter } from '../components/assessment/Tre
 import SALTButton from '../components/assessment/SALTButton';
 import { ComplianceIndicator } from '../components/assessment/ComplianceEngine';
 import { AIStatusIndicator } from '../components/assessment/AISettings';
-import OutcomeAssessment from '../components/assessment/OutcomeAssessment';
-
+const OutcomeAssessment = lazy(() => import('../components/assessment/OutcomeAssessment'));
 const TemplatePicker = lazy(() => import('../components/TemplatePicker'));
 
 // Lazy-load modal-only components (shown conditionally via state flags)
