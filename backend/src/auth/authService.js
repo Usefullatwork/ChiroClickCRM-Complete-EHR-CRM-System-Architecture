@@ -9,7 +9,7 @@ import {
   verifyPassword,
   generateToken,
   hashToken,
-  validatePasswordStrength
+  validatePasswordStrength,
 } from './password.js';
 import { createSession, invalidateSession, invalidateAllUserSessions } from './sessions.js';
 import logger from '../utils/logger.js';
@@ -27,7 +27,7 @@ export const registerUser = async (userData) => {
     lastName,
     organizationId,
     role = 'PRACTITIONER',
-    hprNumber = null
+    hprNumber = null,
   } = userData;
 
   // Validate password strength
@@ -63,7 +63,16 @@ export const registerUser = async (userData) => {
       is_active
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, false, true)
     RETURNING id, organization_id, email, first_name, last_name, role, email_verified`,
-    [organizationId, email.toLowerCase(), passwordHash, firstName, lastName, role, hprNumber, emailVerifyToken]
+    [
+      organizationId,
+      email.toLowerCase(),
+      passwordHash,
+      firstName,
+      lastName,
+      role,
+      hprNumber,
+      emailVerifyToken,
+    ]
   );
 
   const user = result.rows[0];
@@ -80,10 +89,10 @@ export const registerUser = async (userData) => {
       firstName: user.first_name,
       lastName: user.last_name,
       role: user.role,
-      emailVerified: user.email_verified
+      emailVerified: user.email_verified,
     },
     session,
-    emailVerifyToken // Return for sending verification email
+    emailVerifyToken, // Return for sending verification email
   };
 };
 
@@ -114,9 +123,7 @@ export const loginWithPassword = async (email, password, metadata = {}) => {
 
   // Check if account is locked
   if (user.locked_until && new Date(user.locked_until) > new Date()) {
-    const remainingMinutes = Math.ceil(
-      (new Date(user.locked_until) - new Date()) / 1000 / 60
-    );
+    const remainingMinutes = Math.ceil((new Date(user.locked_until) - new Date()) / 1000 / 60);
     throw new Error(`Account is locked. Try again in ${remainingMinutes} minutes`);
   }
 
@@ -154,9 +161,9 @@ export const loginWithPassword = async (email, password, metadata = {}) => {
       firstName: user.first_name,
       lastName: user.last_name,
       role: user.role,
-      emailVerified: user.email_verified
+      emailVerified: user.email_verified,
     },
-    session
+    session,
   };
 };
 
@@ -208,7 +215,7 @@ export const requestPasswordReset = async (email) => {
   return {
     token,
     email: user.email,
-    firstName: user.first_name
+    firstName: user.first_name,
   };
 };
 
@@ -267,10 +274,7 @@ export const resetPassword = async (token, newPassword) => {
  */
 export const changePassword = async (userId, currentPassword, newPassword) => {
   // Get current password hash
-  const result = await query(
-    'SELECT password_hash FROM users WHERE id = $1',
-    [userId]
-  );
+  const result = await query('SELECT password_hash FROM users WHERE id = $1', [userId]);
 
   if (result.rows.length === 0) {
     throw new Error('User not found');
@@ -350,6 +354,142 @@ export const resendVerification = async (userId) => {
   return token;
 };
 
+// Desktop mode constants
+const DESKTOP_ORG_ID = 'a0000000-0000-0000-0000-000000000001';
+const DESKTOP_USER_ID = 'b0000000-0000-0000-0000-000000000099';
+
+/**
+ * Check if first-run setup is needed
+ * @returns {Promise<boolean>} true if setup has NOT been completed
+ */
+export const getSetupStatus = async () => {
+  try {
+    const result = await query(
+      `SELECT settings->>'setup_complete' as setup_complete
+       FROM organizations WHERE id = $1`,
+      [DESKTOP_ORG_ID]
+    );
+    if (result.rows.length === 0) {
+      return true;
+    }
+    return result.rows[0].setup_complete !== 'true';
+  } catch {
+    // If table/column doesn't exist yet, setup is needed
+    return true;
+  }
+};
+
+/**
+ * Mark setup as complete without changing any data (skip)
+ */
+export const skipSetup = async () => {
+  await query(
+    `UPDATE organizations
+     SET settings = COALESCE(settings, '{}'::jsonb) || '{"setup_complete": "true"}'::jsonb
+     WHERE id = $1`,
+    [DESKTOP_ORG_ID]
+  );
+  logger.info('First-run setup skipped');
+};
+
+/**
+ * First-run setup: configure the demo org and desktop user
+ * @param {object} data - Setup configuration
+ * @returns {Promise<{ user: object, session: object, organizationId: string }>}
+ */
+export const setupFirstRun = async (data) => {
+  const {
+    clinicName,
+    clinicAddress = '',
+    clinicPhone = '',
+    orgNumber = '',
+    userName,
+    userEmail,
+    userPassword,
+    installAI = true,
+  } = data;
+
+  // Validate required fields
+  if (!clinicName?.trim()) {
+    throw new Error('Clinic name is required');
+  }
+  if (!userName?.trim()) {
+    throw new Error('User name is required');
+  }
+  if (!userEmail?.trim()) {
+    throw new Error('Email is required');
+  }
+  if (!userPassword) {
+    throw new Error('Password is required');
+  }
+
+  // Validate password strength
+  const passwordValidation = validatePasswordStrength(userPassword);
+  if (!passwordValidation.valid) {
+    throw new Error(`Password requirements not met: ${passwordValidation.errors.join(', ')}`);
+  }
+
+  // Hash password
+  const passwordHash = await hashPassword(userPassword);
+
+  // Split userName into first/last
+  const nameParts = userName.trim().split(/\s+/);
+  const firstName = nameParts[0];
+  const lastName = nameParts.slice(1).join(' ') || firstName;
+
+  // Update the demo organization (address is JSONB in schema)
+  await query(
+    `UPDATE organizations
+     SET name = $1,
+         address = $2::jsonb,
+         phone = $3,
+         org_number = $4,
+         settings = COALESCE(settings, '{}'::jsonb) || $5::jsonb
+     WHERE id = $6`,
+    [
+      clinicName.trim(),
+      JSON.stringify({ street: clinicAddress.trim() }),
+      clinicPhone.trim(),
+      orgNumber.trim(),
+      JSON.stringify({ setup_complete: 'true', ai_enabled: installAI }),
+      DESKTOP_ORG_ID,
+    ]
+  );
+
+  // Upsert the desktop user
+  await query(
+    `UPDATE users
+     SET email = $1,
+         password_hash = $2,
+         first_name = $3,
+         last_name = $4,
+         role = 'ADMIN',
+         is_active = true,
+         email_verified = true
+     WHERE id = $5`,
+    [userEmail.toLowerCase().trim(), passwordHash, firstName, lastName, DESKTOP_USER_ID]
+  );
+
+  // Create session
+  const session = await createSession(DESKTOP_USER_ID);
+
+  logger.info(`First-run setup completed: ${clinicName} / ${userEmail}`);
+
+  return {
+    user: {
+      id: DESKTOP_USER_ID,
+      organizationId: DESKTOP_ORG_ID,
+      email: userEmail.toLowerCase().trim(),
+      firstName,
+      lastName,
+      role: 'ADMIN',
+      emailVerified: true,
+    },
+    session,
+    organizationId: DESKTOP_ORG_ID,
+  };
+};
+
 export default {
   registerUser,
   loginWithPassword,
@@ -359,5 +499,8 @@ export default {
   resetPassword,
   changePassword,
   verifyEmail,
-  resendVerification
+  resendVerification,
+  getSetupStatus,
+  skipSetup,
+  setupFirstRun,
 };

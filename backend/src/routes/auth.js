@@ -23,6 +23,142 @@ import logger from '../utils/logger.js';
 
 const router = express.Router();
 
+// =============================================================================
+// SETUP ENDPOINTS (unauthenticated, for first-run wizard)
+// =============================================================================
+
+/**
+ * @swagger
+ * /auth/setup-status:
+ *   get:
+ *     summary: Check if first-run setup is needed
+ *     tags: [Auth]
+ *     security: []
+ *     responses:
+ *       200:
+ *         description: Setup status
+ */
+router.get('/setup-status', async (_req, res) => {
+  try {
+    const needsSetup = await authService.getSetupStatus();
+    res.json({ needsSetup });
+  } catch (error) {
+    logger.error('Setup status check error:', error);
+    res.json({ needsSetup: true });
+  }
+});
+
+/**
+ * @swagger
+ * /auth/setup:
+ *   post:
+ *     summary: First-run setup — configure clinic and admin user
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [clinicName, userName, userEmail, userPassword]
+ *             properties:
+ *               clinicName:
+ *                 type: string
+ *               clinicAddress:
+ *                 type: string
+ *               clinicPhone:
+ *                 type: string
+ *               orgNumber:
+ *                 type: string
+ *               userName:
+ *                 type: string
+ *               userEmail:
+ *                 type: string
+ *               userPassword:
+ *                 type: string
+ *               installAI:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: Setup completed
+ *       400:
+ *         description: Validation error
+ *       403:
+ *         description: Setup already completed
+ */
+router.post('/setup', loginLimiter, async (req, res) => {
+  try {
+    // Guard against re-run
+    const needsSetup = await authService.getSetupStatus();
+    if (!needsSetup) {
+      return res.status(403).json({
+        error: 'Setup Already Complete',
+        message: 'First-run setup has already been completed',
+      });
+    }
+
+    const result = await authService.setupFirstRun(req.body);
+
+    // Set session cookie (same pattern as /login)
+    res.cookie('session', result.session.sessionId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      expires: result.session.expiresAt,
+    });
+
+    res.json({
+      message: 'Setup completed successfully',
+      user: result.user,
+    });
+  } catch (error) {
+    logger.error('Setup error:', error);
+    res.status(400).json({
+      error: 'Setup Failed',
+      message: error.message,
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /auth/skip-setup:
+ *   post:
+ *     summary: Skip first-run setup (mark as complete without changes)
+ *     tags: [Auth]
+ *     security: []
+ *     responses:
+ *       200:
+ *         description: Setup skipped
+ *       403:
+ *         description: Setup already completed
+ */
+router.post('/skip-setup', loginLimiter, async (req, res) => {
+  try {
+    const needsSetup = await authService.getSetupStatus();
+    if (!needsSetup) {
+      return res.status(403).json({
+        error: 'Setup Already Complete',
+        message: 'First-run setup has already been completed',
+      });
+    }
+
+    await authService.skipSetup();
+    res.json({ message: 'Setup skipped' });
+  } catch (error) {
+    logger.error('Skip setup error:', error);
+    res.status(500).json({
+      error: 'Skip Failed',
+      message: error.message,
+    });
+  }
+});
+
+// =============================================================================
+// STANDARD AUTH ENDPOINTS
+// =============================================================================
+
 /**
  * @swagger
  * /auth/register:

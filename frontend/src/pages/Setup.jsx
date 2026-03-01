@@ -5,6 +5,7 @@
  */
 
 import { useState } from 'react';
+import { getApiBaseUrl } from '../services/api';
 
 const STEPS = ['Velkommen', 'Klinikk', 'Brukerkonto', 'AI-modeller', 'Ferdig'];
 
@@ -20,32 +21,126 @@ const Setup = ({ onComplete }) => {
     userPassword: '',
     installAI: true,
   });
+  const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+  const [ollamaStatus, setOllamaStatus] = useState(null); // null | 'checking' | 'online' | 'offline'
 
   const updateConfig = (field, value) => {
     setConfig((prev) => ({ ...prev, [field]: value }));
+    // Clear field error on change
+    if (errors[field]) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
+    }
   };
 
-  const nextStep = () => setStep((prev) => Math.min(prev + 1, STEPS.length - 1));
+  const validateStep = (stepIndex) => {
+    const newErrors = {};
+
+    if (stepIndex === 1) {
+      if (!config.clinicName.trim()) {
+        newErrors.clinicName = 'Klinikknavn er påkrevd';
+      }
+    }
+
+    if (stepIndex === 2) {
+      if (!config.userName.trim()) {
+        newErrors.userName = 'Navn er påkrevd';
+      }
+      if (!config.userEmail.trim()) {
+        newErrors.userEmail = 'E-post er påkrevd';
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(config.userEmail)) {
+        newErrors.userEmail = 'Ugyldig e-postadresse';
+      }
+      if (!config.userPassword) {
+        newErrors.userPassword = 'Passord er påkrevd';
+      } else if (config.userPassword.length < 8) {
+        newErrors.userPassword = 'Passord må være minst 8 tegn';
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const nextStep = () => {
+    if (!validateStep(step)) {
+      return;
+    }
+
+    const nextIndex = Math.min(step + 1, STEPS.length - 1);
+    setStep(nextIndex);
+
+    // Check Ollama status when entering AI step
+    if (nextIndex === 3 && ollamaStatus === null) {
+      checkOllama();
+    }
+  };
+
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 0));
 
-  const handleFinish = async () => {
+  const checkOllama = async () => {
+    setOllamaStatus('checking');
     try {
-      // Create organization and admin user
-      const response = await fetch('/api/v1/auth/setup', {
+      const res = await fetch(`${getApiBaseUrl()}/api/v1/training/status`, {
+        credentials: 'include',
+      });
+      setOllamaStatus(res.ok ? 'online' : 'offline');
+    } catch {
+      setOllamaStatus('offline');
+    }
+  };
+
+  const handleSkip = async () => {
+    setSubmitting(true);
+    setSubmitError('');
+    try {
+      await fetch(`${getApiBaseUrl()}/api/v1/auth/skip-setup`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      onComplete?.();
+    } catch {
+      // Even if skip fails, let user through
+      onComplete?.();
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleFinish = async () => {
+    setSubmitting(true);
+    setSubmitError('');
+    try {
+      const response = await fetch(`${getApiBaseUrl()}/api/v1/auth/setup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(config),
       });
 
       if (response.ok) {
-        localStorage.setItem('chiroclickcrm_setup_complete', 'true');
         onComplete?.();
+      } else {
+        const data = await response.json().catch(() => ({}));
+        setSubmitError(data.message || 'Oppsettet feilet. Prøv igjen.');
       }
-    } catch (error) {
-      // Setup endpoint may not exist yet - just complete anyway
-      localStorage.setItem('chiroclickcrm_setup_complete', 'true');
-      onComplete?.();
+    } catch {
+      setSubmitError('Kunne ikke koble til serveren. Er backend-serveren startet?');
+    } finally {
+      setSubmitting(false);
     }
+  };
+
+  const FieldError = ({ field }) => {
+    if (!errors[field]) {
+      return null;
+    }
+    return <p className="text-red-500 text-sm mt-1">{errors[field]}</p>;
   };
 
   return (
@@ -56,7 +151,7 @@ const Setup = ({ onComplete }) => {
           {STEPS.map((s, i) => (
             <div
               key={s}
-              className={`flex-1 h-2 rounded-full ${i <= step ? 'bg-teal-500' : 'bg-gray-200 dark:bg-gray-600'}`}
+              className={`flex-1 h-2 rounded-full transition-colors ${i <= step ? 'bg-teal-500' : 'bg-gray-200 dark:bg-gray-600'}`}
             />
           ))}
         </div>
@@ -89,9 +184,10 @@ const Setup = ({ onComplete }) => {
                   type="text"
                   value={config.clinicName}
                   onChange={(e) => updateConfig('clinicName', e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2"
+                  className={`w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:text-white ${errors.clinicName ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                   placeholder="Min Kiropraktorklinikk"
                 />
+                <FieldError field="clinicName" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -148,9 +244,10 @@ const Setup = ({ onComplete }) => {
                   type="text"
                   value={config.userName}
                   onChange={(e) => updateConfig('userName', e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2"
+                  className={`w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:text-white ${errors.userName ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                   placeholder="Ola Nordmann"
                 />
+                <FieldError field="userName" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -160,9 +257,10 @@ const Setup = ({ onComplete }) => {
                   type="email"
                   value={config.userEmail}
                   onChange={(e) => updateConfig('userEmail', e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2"
+                  className={`w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:text-white ${errors.userEmail ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                   placeholder="ola@klinikken.no"
                 />
+                <FieldError field="userEmail" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -172,9 +270,10 @@ const Setup = ({ onComplete }) => {
                   type="password"
                   value={config.userPassword}
                   onChange={(e) => updateConfig('userPassword', e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2"
+                  className={`w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:text-white ${errors.userPassword ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                   placeholder="Minst 8 tegn"
                 />
+                <FieldError field="userPassword" />
               </div>
             </div>
           </div>
@@ -189,6 +288,28 @@ const Setup = ({ onComplete }) => {
             <p className="text-gray-600 dark:text-gray-300 mb-4">
               ChiroClickCRM bruker lokale AI-modeller via Ollama for klinisk dokumentasjon.
             </p>
+
+            {/* Ollama status indicator */}
+            <div className="mb-4 flex items-center gap-2 text-sm">
+              <span
+                className={`inline-block w-2.5 h-2.5 rounded-full ${
+                  ollamaStatus === 'online'
+                    ? 'bg-green-500'
+                    : ollamaStatus === 'offline'
+                      ? 'bg-red-500'
+                      : ollamaStatus === 'checking'
+                        ? 'bg-yellow-400 animate-pulse'
+                        : 'bg-gray-400'
+                }`}
+              />
+              <span className="text-gray-600 dark:text-gray-300">
+                {ollamaStatus === 'online' && 'Ollama kjører'}
+                {ollamaStatus === 'offline' && 'Ollama ikke funnet — installer fra ollama.com'}
+                {ollamaStatus === 'checking' && 'Sjekker Ollama-tilkobling...'}
+                {ollamaStatus === null && 'Ollama-status ukjent'}
+              </span>
+            </div>
+
             <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-4">
               <label className="flex items-center gap-3">
                 <input
@@ -198,21 +319,22 @@ const Setup = ({ onComplete }) => {
                   className="w-5 h-5 rounded border-gray-300 text-teal-600"
                 />
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-white">Installer AI-modeller</p>
+                  <p className="font-medium text-gray-900 dark:text-white">Aktiver AI-funksjoner</p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Krever ~14 GB diskplass og Ollama installert
+                    Krever Ollama installert (ollama.com)
                   </p>
                 </div>
               </label>
             </div>
             {config.installAI && (
               <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                <p>Modeller som installeres:</p>
+                <p>AI-modeller som brukes:</p>
                 <ul className="list-disc list-inside space-y-1">
-                  <li>chiro-no (Mistral 7B) - Klinisk dokumentasjon</li>
-                  <li>chiro-fast (Llama 3.2 3B) - Autofullføring</li>
-                  <li>chiro-norwegian (NorwAI-Mistral-7B) - Norsk språk</li>
-                  <li>chiro-medical (MedGemma 4B) - Klinisk sikkerhet</li>
+                  <li>
+                    chiro-no-sft-dpo-v6 (Qwen2.5-7B, ~8 GB) — Klinisk dokumentasjon, SOAP, brev
+                  </li>
+                  <li>chiro-fast (Qwen2.5-1.5B, ~1 GB) — Autofullføring</li>
+                  <li>chiro-medical (Qwen2.5-3B, ~2 GB) — Klinisk sikkerhet og røde flagg</li>
                 </ul>
               </div>
             )}
@@ -222,26 +344,36 @@ const Setup = ({ onComplete }) => {
         {/* Step 4: Done */}
         {step === 4 && (
           <div className="text-center">
-            <div className="text-5xl mb-4">&#10003;</div>
+            <div className="text-5xl mb-4 text-teal-600">&#10003;</div>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Alt klart!</h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
+            <p className="text-gray-600 dark:text-gray-300 mb-2">
               ChiroClickCRM er konfigurert og klar til bruk.
             </p>
+            {submitError && <p className="text-red-500 text-sm mb-4">{submitError}</p>}
           </div>
         )}
 
         {/* Navigation */}
-        <div className="flex justify-between mt-8">
-          {step > 0 ? (
-            <button
-              onClick={prevStep}
-              className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900"
-            >
-              Tilbake
-            </button>
-          ) : (
-            <div />
-          )}
+        <div className="flex justify-between items-center mt-8">
+          <div>
+            {step > 0 ? (
+              <button
+                onClick={prevStep}
+                disabled={submitting}
+                className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 disabled:opacity-50"
+              >
+                Tilbake
+              </button>
+            ) : (
+              <button
+                onClick={handleSkip}
+                disabled={submitting}
+                className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50"
+              >
+                Hopp over oppsett
+              </button>
+            )}
+          </div>
 
           {step < STEPS.length - 1 ? (
             <button
@@ -253,8 +385,12 @@ const Setup = ({ onComplete }) => {
           ) : (
             <button
               onClick={handleFinish}
-              className="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
+              disabled={submitting}
+              className="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50 flex items-center gap-2"
             >
+              {submitting && (
+                <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+              )}
               Start ChiroClickCRM
             </button>
           )}
