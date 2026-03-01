@@ -693,7 +693,9 @@ export default function AnalyticsTab() {
               <Tooltip
                 labelFormatter={(d) => new Date(d).toLocaleDateString('nb-NO')}
                 formatter={(value, name) => {
-                  if (name === 'Cache-treffrate') return `${value}%`;
+                  if (name === 'Cache-treffrate') {
+                    return `${value}%`;
+                  }
                   return value;
                 }}
               />
