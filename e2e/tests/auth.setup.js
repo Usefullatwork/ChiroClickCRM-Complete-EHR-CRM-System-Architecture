@@ -10,6 +10,9 @@ const API_BASE = process.env.PLAYWRIGHT_API_URL || 'http://localhost:3000';
 const APP_BASE = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173';
 
 setup('authenticate', async ({ page }) => {
+  // Skip setup wizard so tests land on the dashboard, not the wizard
+  await page.request.post(`${API_BASE}/api/v1/auth/skip-setup`).catch(() => {});
+
   // Login via real backend API
   const response = await page.request.post(`${API_BASE}/api/v1/auth/login`, {
     data: {
