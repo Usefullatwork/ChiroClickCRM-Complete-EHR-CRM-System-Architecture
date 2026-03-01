@@ -1,5 +1,84 @@
 # ChiroClick CRM - Claude Code Memory
 
+## Overnight Cleanup Sprint (2026-03-01)
+
+4 parallel agent streams executed in isolated git worktrees. All verified, pushed.
+
+### Stream A: Bundle Splitting (commit fff9e37)
+
+Converted 5 eagerly-imported components to `React.lazy()` with `<Suspense>` fallbacks:
+
+| File                        | Component            | Chunk Before  | After                        | Savings    |
+| --------------------------- | -------------------- | ------------- | ---------------------------- | ---------- |
+| `SOAPNoteForm.jsx`          | AnatomicalBodyChart  | —             | 61.77 KB (new)               | —          |
+| `SOAPNoteForm.jsx`          | FacialLinesChart     | —             | 26.36 KB (new)               | —          |
+| `SOAPNoteForm.jsx`          | BodyChartPanel       | —             | 14.80 KB (new)               | —          |
+| `SOAPNoteForm.jsx`          | ActivatorMethodPanel | —             | 15.41 KB (new)               | —          |
+| `EasyAssessment.jsx`        | OutcomeAssessment    | —             | (merged into existing chunk) | —          |
+| **ClinicalEncounter chunk** |                      | **226.66 KB** | **111.70 KB**                | **-50.7%** |
+| **EasyAssessment chunk**    |                      | **133.55 KB** | **122.11 KB**                | **-8.6%**  |
+
+**Pattern:** Components behind user interaction gates (tab switches, modal opens, panel toggles) are ideal `React.lazy()` candidates. Wrap with `<Suspense fallback={<div className="animate-pulse h-64 bg-gray-100 rounded" />}>`.
+
+### Stream B: Test Coverage (commit 47fb129)
+
++33 tests (941 → 974 frontend tests, 44 suites):
+
+| File                                | Tests Added | Coverage                                                                                    |
+| ----------------------------------- | ----------- | ------------------------------------------------------------------------------------------- |
+| `AnatomyViewer.test.jsx` (expanded) | +9          | COMBINED mode narrative, preset exports (Examination/Treatment/QuickPalpation)              |
+| `MuscleMap.test.jsx` (expanded)     | +9          | SVG click add/remove, label toggle, view switch, finding type, filter groups                |
+| `socket.test.js` (NEW)              | +20         | connectSocket, disconnectSocket, getSocket, useSocketEvent, useSocketStatus, useOnlineUsers |
+
+**Backend diagnostics:** 13/20 queries profiled (11 index scan, 2 seq scan on small tables), smoke-test 3/3 pass.
+
+### Stream C: AI Integration Polish (commit d17862d)
+
+**Model refs updated:**
+
+- Default model: `chiro-no-sft-dpo-v6` (Qwen2.5-7B, ~8GB, SFT+DPO v6)
+- Fallback: `chiro-no-sft-dpo-v5`
+- Removed stale `chiro-no`, `chiro-norwegian` entries
+- Kept `chiro-fast`, `chiro-medical`
+
+**3 API methods wired in `api.js` → `trainingAPI`:**
+
+- `getCostPerSuggestion` → `/training/analytics/cost-per-suggestion`
+- `getProviderValue` → `/training/analytics/provider-value`
+- `getCacheTrends` → `/training/analytics/cache-trends`
+
+**AB_SPLIT_CONFIG updated in `ai.js`:**
+
+- Added v6 entry: Model A = `chiro-no-sft-dpo-v6`, Model B = `chiro-no-sft-dpo-v5`, env var `AB_SPLIT_V6`
+
+**AnalyticsTab.jsx enhanced (+255 lines):**
+
+- A/B Testing Controls: active splits, progress bars, significance indicator (<30 feedbacks warning)
+- Cost per Suggestion: div-based bar chart by task type
+- Provider Value Comparison: table (provider, suggestions, latency, approval rate, cost)
+- Cache Trends: Recharts LineChart (hit rate + total requests over time)
+
+### Stream D: Weekly AI Digest Report (commit 8f85bff)
+
+**New file: `backend/src/services/reportService.js` (~300 lines)**
+
+- `generateWeeklyAIDigest()` — queries `ai_suggestions` + `ai_api_usage`, formats HTML email in Norwegian
+- Graceful degradation: logs stats to console when SMTP not configured
+- Sends to `ADMIN_EMAIL` or `SMTP_FROM_EMAIL`
+
+**Scheduler:** `cron.schedule('0 7 * * 1', ...)` — Monday 07:00 Europe/Oslo, 120s timeout
+
+**Manual trigger:** `POST /training/analytics/send-report` (admin only, returns `{ stats, html }` for preview)
+
+### Verification
+
+- Frontend build: clean (6.86s)
+- Frontend tests: 44 suites, 974 tests, 0 failures
+- Backend tests: 84 suites, 2,035 tests, 0 failures
+- All 4 commits pushed to origin/main
+
+---
+
 ## Healthcare UX Feature Sprint (2026-02-22)
 
 ### Text Expansion & AI Ghost Text (commits 654954c, 424c6d0)
@@ -75,7 +154,7 @@ Completed the final 3/12 Healthcare UX Implementation Plan features. Extracted a
 
 ### Current Test Counts
 
-- Frontend: **941 tests** (43 suites) — all pass
+- Frontend: **974 tests** (44 suites) — all pass
 - Backend: **2035 tests** (84 suites, all pass)
 - E2E: 11 Playwright spec files
 
