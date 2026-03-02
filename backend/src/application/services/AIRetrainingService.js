@@ -259,7 +259,7 @@ class AIRetrainingService {
     const modelfile = `
 FROM ${baseModel}
 
-# ChiroClickCRM Fine-tuned Model
+# ChiroClickEHR Fine-tuned Model
 # Version: ${modelVersion}
 # Training examples: ${trainingData.count}
 # Generated: ${new Date().toISOString()}

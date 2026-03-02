@@ -1,5 +1,5 @@
 /**
- * FHIR R4 Adapters for ChiroClickCRM
+ * FHIR R4 Adapters for ChiroClickEHR
  * Converts internal data structures to/from FHIR R4 standard
  *
  * Norway-specific:
@@ -86,7 +86,7 @@ export const patientToFHIR = (patient) => {
   // Add internal ID
   fhirPatient.identifier.push({
     use: 'usual',
-    system: 'urn:chiroclickcrm:patient-id',
+    system: 'urn:chiroclickehr:patient-id',
     value: patient.id,
   });
 
@@ -374,7 +374,7 @@ export const practitionerToFHIR = (practitioner) => ({
     },
     {
       use: 'usual',
-      system: 'urn:chiroclickcrm:practitioner-id',
+      system: 'urn:chiroclickehr:practitioner-id',
       value: practitioner.id,
     },
   ],
