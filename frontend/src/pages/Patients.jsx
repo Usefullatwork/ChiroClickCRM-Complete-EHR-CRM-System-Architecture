@@ -1,9 +1,21 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { patientsAPI } from '../services/api';
 import { formatDate, formatPhone, calculateAge } from '../lib/utils';
-import { Search, Plus, Download, Upload, X, Loader2, UserPlus } from 'lucide-react';
+import {
+  Search,
+  Plus,
+  Download,
+  Upload,
+  X,
+  Loader2,
+  UserPlus,
+  Phone,
+  MessageSquare,
+  Calendar,
+  FileText,
+} from 'lucide-react';
 import { useTranslation } from '../i18n';
 import { PatientsTableSkeleton } from '../components/ui/Skeleton';
 import EmptyState from '../components/ui/EmptyState';
@@ -42,6 +54,9 @@ export default function Patients() {
     sortOrder: 'asc',
   });
   const [page, setPage] = useState(1);
+  const [focusedRow, setFocusedRow] = useState(-1);
+  const tableBodyRef = useRef(null);
+  const searchInputRef = useRef(null);
   const limit = 20;
 
   // Debounce search input with searching indicator
@@ -72,6 +87,50 @@ export default function Patients() {
 
   const patients = data?.data?.patients || [];
   const pagination = data?.data?.pagination || { page: 1, pages: 1, total: 0 };
+
+  // Sort: red-flag patients (with red_flags field non-empty) to top
+  const sortedPatients = [...patients].sort((a, b) => {
+    const aHasFlags = a.red_flags && a.red_flags.length > 0;
+    const bHasFlags = b.red_flags && b.red_flags.length > 0;
+    if (aHasFlags && !bHasFlags) return -1;
+    if (!aHasFlags && bHasFlags) return 1;
+    return 0;
+  });
+
+  // Keyboard navigation for the table
+  const handleTableKeyDown = useCallback(
+    (e) => {
+      // Skip if focus is inside the search input
+      if (searchInputRef.current && searchInputRef.current.contains(document.activeElement)) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setFocusedRow((prev) => Math.min(prev + 1, sortedPatients.length - 1));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setFocusedRow((prev) => Math.max(prev - 1, 0));
+      } else if (e.key === 'Enter' && focusedRow >= 0 && focusedRow < sortedPatients.length) {
+        e.preventDefault();
+        navigate(`/patients/${sortedPatients[focusedRow].id}`);
+      }
+    },
+    [sortedPatients, focusedRow, navigate]
+  );
+
+  useEffect(() => {
+    const tbody = tableBodyRef.current;
+    if (!tbody) return;
+    const table = tbody.closest('table');
+    if (!table) return;
+
+    table.addEventListener('keydown', handleTableKeyDown);
+    return () => table.removeEventListener('keydown', handleTableKeyDown);
+  }, [handleTableKeyDown]);
+
+  // Reset focused row when patients change
+  useEffect(() => {
+    setFocusedRow(-1);
+  }, [debouncedSearch, page, filters]);
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -198,6 +257,7 @@ export default function Patients() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             )}
             <input
+              ref={searchInputRef}
               type="text"
               placeholder={t('searchPatients')}
               data-testid="patients-search-input"
@@ -307,7 +367,11 @@ export default function Patients() {
             data-testid="patients-list"
             className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-soft-sm overflow-hidden"
           >
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <table
+              className="min-w-full divide-y divide-gray-200 dark:divide-gray-700"
+              tabIndex={0}
+              role="grid"
+            >
               <thead className="bg-gray-50 dark:bg-gray-900/50">
                 <tr>
                   <th
@@ -345,77 +409,138 @@ export default function Patients() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-700/50">
-                {patients.map((patient) => (
-                  <tr
-                    key={patient.id}
-                    data-testid="patient-row"
-                    className="hover:bg-gray-50 dark:hover:bg-gray-750 cursor-pointer transition-colors"
-                    onClick={() => navigate(`/patients/${patient.id}`)}
-                  >
-                    <td className="px-5 py-3.5 whitespace-nowrap">
-                      <div className="flex items-center gap-3">
-                        {/* Risk indicator dot */}
-                        <span
-                          className={`w-2 h-2 rounded-full ${getRiskDot(patient)} flex-shrink-0`}
-                          title={patient.status}
-                        />
-                        <div className="flex-shrink-0 h-9 w-9 rounded-full bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center">
-                          <span className="text-teal-700 dark:text-teal-300 text-xs font-semibold">
-                            {patient.first_name?.[0]}
-                            {patient.last_name?.[0]}
-                          </span>
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                            {patient.first_name} {patient.last_name}
-                          </div>
-                          <div className="text-xs text-gray-400">{patient.solvit_id}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3.5 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
-                      {calculateAge(patient.date_of_birth) || '-'}
-                    </td>
-                    <td className="px-5 py-3.5 whitespace-nowrap">
-                      <div className="text-sm text-gray-700 dark:text-gray-200 truncate max-w-[200px]">
-                        {patient.email || '-'}
-                      </div>
-                      <div className="text-xs text-gray-400">{formatPhone(patient.phone)}</div>
-                    </td>
-                    <td className="px-5 py-3.5 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
-                      {formatDate(patient.last_visit_date)}
-                    </td>
-                    <td className="px-5 py-3.5 whitespace-nowrap">
-                      <span className="text-sm text-gray-700 dark:text-gray-200">
-                        {patient.total_visits || 0}
-                      </span>
-                      {patient.upcoming_appointments > 0 && (
-                        <span className="ml-1.5 text-xs bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 px-1.5 py-0.5 rounded">
-                          +{patient.upcoming_appointments}
-                        </span>
+              <tbody
+                ref={tableBodyRef}
+                className="divide-y divide-gray-100 dark:divide-gray-700/50"
+              >
+                {sortedPatients.map((patient, index) => {
+                  const hasRedFlags = patient.red_flags && patient.red_flags.length > 0;
+                  const prevHasRedFlags =
+                    index > 0 &&
+                    sortedPatients[index - 1].red_flags &&
+                    sortedPatients[index - 1].red_flags.length > 0;
+                  const showSeparator = !hasRedFlags && prevHasRedFlags;
+                  const isFocused = focusedRow === index;
+
+                  return (
+                    <React.Fragment key={patient.id}>
+                      {/* Red-flag / non-red-flag separator */}
+                      {showSeparator && (
+                        <tr aria-hidden="true">
+                          <td colSpan="7" className="px-0 py-0">
+                            <div className="border-t-2 border-gray-200 dark:border-gray-600" />
+                          </td>
+                        </tr>
                       )}
-                    </td>
-                    <td className="px-5 py-3.5 whitespace-nowrap">
-                      <StatusBadge
-                        status={patient.status?.toLowerCase() || 'active'}
-                        label={patient.status}
-                        size="xs"
-                      />
-                    </td>
-                    <td className="px-5 py-3.5 whitespace-nowrap text-right">
-                      <button
-                        className="text-xs font-medium text-teal-600 dark:text-teal-400 hover:text-teal-700 px-2 py-1 rounded hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/patients/${patient.id}/encounter`);
-                        }}
+                      <tr
+                        data-testid="patient-row"
+                        className={`group hover:bg-gray-50 dark:hover:bg-gray-750 cursor-pointer transition-colors ${isFocused ? 'ring-2 ring-teal-500 ring-inset' : ''}`}
+                        aria-selected={isFocused}
+                        onClick={() => navigate(`/patients/${patient.id}`)}
                       >
-                        {t('newVisit')}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                        <td className="px-5 py-3.5 whitespace-nowrap">
+                          <div className="flex items-center gap-3">
+                            {/* Risk indicator dot */}
+                            <span
+                              className={`w-2 h-2 rounded-full ${getRiskDot(patient)} flex-shrink-0`}
+                              title={patient.status}
+                            />
+                            <div className="flex-shrink-0 h-9 w-9 rounded-full bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center">
+                              <span className="text-teal-700 dark:text-teal-300 text-xs font-semibold">
+                                {patient.first_name?.[0]}
+                                {patient.last_name?.[0]}
+                              </span>
+                            </div>
+                            <div className="min-w-0">
+                              <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                {patient.first_name} {patient.last_name}
+                                {hasRedFlags && (
+                                  <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                                    !
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-xs text-gray-400">{patient.solvit_id}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-5 py-3.5 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                          {calculateAge(patient.date_of_birth) || '-'}
+                        </td>
+                        <td className="px-5 py-3.5 whitespace-nowrap">
+                          <div className="text-sm text-gray-700 dark:text-gray-200 truncate max-w-[200px]">
+                            {patient.email || '-'}
+                          </div>
+                          <div className="text-xs text-gray-400">{formatPhone(patient.phone)}</div>
+                        </td>
+                        <td className="px-5 py-3.5 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                          {formatDate(patient.last_visit_date)}
+                        </td>
+                        <td className="px-5 py-3.5 whitespace-nowrap">
+                          <span className="text-sm text-gray-700 dark:text-gray-200">
+                            {patient.total_visits || 0}
+                          </span>
+                          {patient.upcoming_appointments > 0 && (
+                            <span className="ml-1.5 text-xs bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 px-1.5 py-0.5 rounded">
+                              +{patient.upcoming_appointments}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-5 py-3.5 whitespace-nowrap">
+                          <StatusBadge
+                            status={patient.status?.toLowerCase() || 'active'}
+                            label={patient.status}
+                            size="xs"
+                          />
+                        </td>
+                        <td className="px-5 py-3.5 whitespace-nowrap text-right">
+                          <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              title={t('phone')}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.location.href = `tel:${patient.phone}`;
+                              }}
+                              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-teal-600"
+                            >
+                              <Phone className="w-4 h-4" />
+                            </button>
+                            <button
+                              title="SMS"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/communications?patient=${patient.id}&type=sms`);
+                              }}
+                              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-teal-600"
+                            >
+                              <MessageSquare className="w-4 h-4" />
+                            </button>
+                            <button
+                              title={t('appointments')}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/calendar?patient=${patient.id}`);
+                              }}
+                              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-teal-600"
+                            >
+                              <Calendar className="w-4 h-4" />
+                            </button>
+                            <button
+                              title={t('newVisit')}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/patients/${patient.id}/encounter`);
+                              }}
+                              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-teal-600"
+                            >
+                              <FileText className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    </React.Fragment>
+                  );
+                })}
               </tbody>
             </table>
           </div>

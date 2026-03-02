@@ -18,6 +18,7 @@ import { communicationsAPI, patientsAPI } from '../services/api';
 import { formatPhone } from '../lib/utils';
 import { useTranslation, formatDate } from '../i18n';
 import toast from '../utils/toast';
+import CommunicationThread from '../components/communications/CommunicationThread';
 
 import logger from '../utils/logger';
 export default function Communications() {
@@ -32,6 +33,7 @@ export default function Communications() {
   const [showPatientSearch, setShowPatientSearch] = useState(false);
   const [copied, setCopied] = useState(false);
   const [historyFilter, setHistoryFilter] = useState('');
+  const [viewMode, setViewMode] = useState('flat');
 
   // Fetch templates
   const { data: templatesResponse } = useQuery({
@@ -408,92 +410,120 @@ export default function Communications() {
       {/* History Tab */}
       {activeTab === 'history' && (
         <div className="bg-white rounded-lg border border-gray-200">
-          {/* Filter */}
+          {/* Filter + View Toggle */}
           <div className="px-6 py-4 border-b border-gray-200">
-            <div className="flex items-center gap-4">
-              <Filter className="w-5 h-5 text-gray-400" />
-              <select
-                value={historyFilter}
-                onChange={(e) => setHistoryFilter(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">{t('allMessages')}</option>
-                <option value="SMS">{t('smsOnly')}</option>
-                <option value="EMAIL">{t('emailOnly')}</option>
-              </select>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Filter className="w-5 h-5 text-gray-400" />
+                <select
+                  value={historyFilter}
+                  onChange={(e) => setHistoryFilter(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">{t('allMessages')}</option>
+                  <option value="SMS">{t('smsOnly')}</option>
+                  <option value="EMAIL">{t('emailOnly')}</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5">
+                <button
+                  onClick={() => setViewMode('flat')}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                    viewMode === 'flat'
+                      ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  }`}
+                >
+                  Flat
+                </button>
+                <button
+                  onClick={() => setViewMode('thread')}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                    viewMode === 'thread'
+                      ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  }`}
+                >
+                  Per pasient
+                </button>
+              </div>
             </div>
           </div>
 
           {/* History List */}
-          <div className="divide-y divide-gray-100">
-            {historyLoading ? (
-              <div className="px-6 py-12 text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="text-sm text-gray-500 mt-3">{t('loadingHistory')}</p>
-              </div>
-            ) : history.length > 0 ? (
-              history.map((comm) => (
-                <div key={comm.id} className="px-6 py-4 hover:bg-gray-50">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3 flex-1">
-                      <div
-                        className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                          comm.type === 'SMS' ? 'bg-purple-50' : 'bg-blue-50'
-                        }`}
-                      >
-                        {comm.type === 'SMS' ? (
-                          <Smartphone className="w-5 h-5 text-purple-600" />
-                        ) : (
-                          <Mail className="w-5 h-5 text-blue-600" />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-gray-900">
-                            {comm.patient_name}
-                          </span>
-                          <span
-                            className={`px-2 py-0.5 text-xs font-medium rounded ${
-                              comm.type === 'SMS'
-                                ? 'bg-purple-100 text-purple-700'
-                                : 'bg-blue-100 text-blue-700'
-                            }`}
-                          >
-                            {comm.type}
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-600 mt-1">{comm.message}</p>
-                        <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                          <span>
-                            {formatDate(comm.created_at, lang, {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </span>
-                          {comm.template_name && (
-                            <span>
-                              {t('templateLabel')}: {comm.template_name}
-                            </span>
+          {historyLoading ? (
+            <div className="px-6 py-12 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="text-sm text-gray-500 mt-3">{t('loadingHistory')}</p>
+            </div>
+          ) : viewMode === 'thread' ? (
+            <CommunicationThread communications={history} />
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {history.length > 0 ? (
+                history.map((comm) => (
+                  <div key={comm.id} className="px-6 py-4 hover:bg-gray-50">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3 flex-1">
+                        <div
+                          className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                            comm.type === 'SMS' ? 'bg-purple-50' : 'bg-blue-50'
+                          }`}
+                        >
+                          {comm.type === 'SMS' ? (
+                            <Smartphone className="w-5 h-5 text-purple-600" />
+                          ) : (
+                            <Mail className="w-5 h-5 text-blue-600" />
                           )}
-                          <span>
-                            {t('byLabel')}: {comm.sent_by_name || t('system')}
-                          </span>
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-gray-900">
+                              {comm.patient_name}
+                            </span>
+                            <span
+                              className={`px-2 py-0.5 text-xs font-medium rounded ${
+                                comm.type === 'SMS'
+                                  ? 'bg-purple-100 text-purple-700'
+                                  : 'bg-blue-100 text-blue-700'
+                              }`}
+                            >
+                              {comm.type}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600 mt-1">{comm.message}</p>
+                          <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                            <span>
+                              {formatDate(comm.created_at, lang, {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </span>
+                            {comm.template_name && (
+                              <span>
+                                {t('templateLabel')}: {comm.template_name}
+                              </span>
+                            )}
+                            <span>
+                              {t('byLabel')}: {comm.sent_by_name || t('system')}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
+                ))
+              ) : (
+                <div className="px-6 py-12 text-center">
+                  <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-sm text-gray-500">{t('noMessagesSent')}</p>
                 </div>
-              ))
-            ) : (
-              <div className="px-6 py-12 text-center">
-                <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm text-gray-500">{t('noMessagesSent')}</p>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

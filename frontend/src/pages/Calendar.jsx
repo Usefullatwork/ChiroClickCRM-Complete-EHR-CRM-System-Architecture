@@ -44,6 +44,7 @@ export default function Calendar() {
   const [view, setView] = useState('month'); // 'month' or 'week' or 'day'
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [colorMode, setColorMode] = useState('status'); // 'status' or 'type'
 
   // Fetch appointments for the current month
   const { data: appointmentsData, isLoading } = useQuery({
@@ -128,6 +129,26 @@ export default function Calendar() {
     }
   };
 
+  const getTypeColor = (type) => {
+    const colors = {
+      NEW_PATIENT:
+        'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400',
+      FOLLOW_UP:
+        'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400',
+      EMERGENCY: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400',
+      SPECIAL:
+        'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400',
+    };
+    return (
+      colors[type] ||
+      'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-400'
+    );
+  };
+
+  const getAppointmentColor = (apt) => {
+    return colorMode === 'type' ? getTypeColor(apt.appointment_type) : getStatusColor(apt.status);
+  };
+
   const getStatusIcon = (status) => {
     switch (status) {
       case 'CONFIRMED':
@@ -198,6 +219,30 @@ export default function Calendar() {
             <option value="COMPLETED">{t('completed')}</option>
             <option value="NO_SHOW">{t('noShow')}</option>
           </select>
+
+          {/* Color Mode Toggle */}
+          <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5">
+            <button
+              onClick={() => setColorMode('status')}
+              className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
+                colorMode === 'status'
+                  ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-gray-100'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Status
+            </button>
+            <button
+              onClick={() => setColorMode('type')}
+              className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
+                colorMode === 'type'
+                  ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-gray-100'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              {t('type') || 'Type'}
+            </button>
+          </div>
 
           <button
             onClick={() => navigate('/appointments/new')}
@@ -295,7 +340,7 @@ export default function Calendar() {
                     {dayAppointments.slice(0, 3).map((apt) => (
                       <div
                         key={apt.id}
-                        className={`text-xs px-1.5 py-0.5 rounded border truncate ${getStatusColor(apt.status)}`}
+                        className={`text-xs px-1.5 py-0.5 rounded border truncate ${getAppointmentColor(apt)}`}
                         onClick={(e) => {
                           e.stopPropagation();
                           navigate(`/appointments/${apt.id}`);
@@ -349,7 +394,7 @@ export default function Calendar() {
                       <div
                         key={apt.id}
                         onClick={() => navigate(`/appointments/${apt.id}`)}
-                        className={`p-2 rounded border cursor-pointer ${getStatusColor(apt.status)}`}
+                        className={`p-2 rounded border cursor-pointer ${getAppointmentColor(apt)}`}
                       >
                         <div className="flex items-center gap-1 text-xs font-semibold mb-1">
                           {getStatusIcon(apt.status)}
@@ -396,7 +441,7 @@ export default function Calendar() {
                 {getAppointmentsForDate(selectedDate).map((apt) => (
                   <div
                     key={apt.id}
-                    className={`p-4 rounded-lg border-2 ${getStatusColor(apt.status)}`}
+                    className={`p-4 rounded-lg border-2 ${getAppointmentColor(apt)}`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">

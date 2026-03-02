@@ -77,6 +77,9 @@ export const dashboard = {
     loadAnalyticsError: 'Could not load analytics data. Please try again.',
     exportError: 'Could not export data. Please try again.',
     vsLastMonthShort: 'vs last month',
+    rebookingRate: 'Rebooking Rate',
+    availableCapacity: 'Available Capacity',
+    slotsToday: 'available slots today',
   },
   no: {
     title: 'Dashbord',
@@ -156,5 +159,8 @@ export const dashboard = {
     loadAnalyticsError: 'Kunne ikke laste analysedata. Vennligst prøv igjen.',
     exportError: 'Kunne ikke eksportere data. Vennligst prøv igjen.',
     vsLastMonthShort: 'vs forrige mnd',
+    rebookingRate: 'Gjenbookingsrate',
+    availableCapacity: 'Ledig kapasitet',
+    slotsToday: 'ledige timer i dag',
   },
 };

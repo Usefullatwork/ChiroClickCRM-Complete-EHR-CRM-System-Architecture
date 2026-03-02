@@ -21,6 +21,8 @@ import {
   Activity,
   UserPlus,
   Search,
+  RefreshCcw,
+  CalendarClock,
 } from 'lucide-react';
 import { dashboardAPI, appointmentsAPI, followUpsAPI } from '../services/api';
 import {
@@ -301,9 +303,9 @@ export default function Dashboard() {
 
       {/* ── Stat Cards (5-column grid) ─────────────────────── */}
       {statsLoading ? (
-        <StatsGridSkeleton count={5} className="" />
+        <StatsGridSkeleton count={7} className="" />
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4">
           {statCards.map((stat) => (
             <StatCard
               key={stat.label}
@@ -316,6 +318,43 @@ export default function Dashboard() {
               trendLabel={stat.trendLabel}
             />
           ))}
+
+          {/* Rebooking Rate */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {t('rebookingRate', 'Gjenbookingsrate')}
+                </p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                  {stats?.rebooking_rate != null ? `${stats.rebooking_rate}%` : '—'}
+                </p>
+              </div>
+              <div className="w-10 h-10 rounded-lg bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center">
+                <RefreshCcw className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+              </div>
+            </div>
+          </div>
+
+          {/* Available Capacity */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {t('availableCapacity', 'Ledig kapasitet')}
+                </p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                  {stats?.available_slots != null ? stats.available_slots : '—'}
+                </p>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {t('slotsToday', 'ledige timer i dag')}
+                </p>
+              </div>
+              <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
+                <CalendarClock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
