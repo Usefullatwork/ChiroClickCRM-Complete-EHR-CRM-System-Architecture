@@ -513,6 +513,13 @@ if (process.env.NODE_ENV !== 'test') {
       }
     });
     server.on('error', (e) => {
+      if (e.code === 'EADDRINUSE') {
+        logger.error(
+          `Port ${PORT} is already in use. Kill the stale process or use a different port.`,
+          { port: PORT, code: e.code }
+        );
+        process.exit(1);
+      }
       logger.error('Server error:', e);
     });
   } catch (err) {

@@ -100,6 +100,15 @@ echo [1/4] Skipping Ollama AI (disabled)
 goto START_BACKEND
 
 :START_BACKEND
+:: Clean up stale processes on required ports
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3000 ^| findstr LISTENING 2^>nul') do (
+    echo  Killed stale process on port 3000 (PID: %%a)
+    taskkill /PID %%a /F >nul 2>&1
+)
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr :5173 ^| findstr LISTENING 2^>nul') do (
+    echo  Killed stale process on port 5173 (PID: %%a)
+    taskkill /PID %%a /F >nul 2>&1
+)
 :: Backup PGlite database before starting
 if exist "%~dp0data\pglite\PG_VERSION" (
     echo.
