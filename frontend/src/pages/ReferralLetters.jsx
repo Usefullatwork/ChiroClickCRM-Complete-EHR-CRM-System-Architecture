@@ -40,7 +40,7 @@ export default function ReferralLetters() {
         id: patientId,
         name: 'Demo Pasient',
         dateOfBirth: '1985-03-15',
-        personalNumber: '15038512345',
+        personalNumber: '01010100000',
         address: 'Testveien 1, 0123 Oslo',
       }
     : null;

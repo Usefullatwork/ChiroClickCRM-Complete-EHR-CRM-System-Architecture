@@ -463,7 +463,7 @@ export const generatePatientTemplate = async () => {
     'First Name': 'Ola',
     'Last Name': 'Nordmann',
     'Date of Birth': '1980-01-15',
-    'National ID': '15018012345',
+    'National ID': '01010100000',
     Phone: '98765432',
     Email: 'ola@example.com',
     'Address Street': 'Storgata 1',

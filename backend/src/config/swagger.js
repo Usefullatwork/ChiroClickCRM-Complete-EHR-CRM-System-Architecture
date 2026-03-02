@@ -73,7 +73,7 @@ export const swaggerOptions = {
               type: 'string',
               pattern: '^\\d{11}$',
               description: 'Norwegian fødselsnummer (11 digits)',
-              example: '15058512345',
+              example: '01010100000',
             },
             email: {
               type: 'string',
