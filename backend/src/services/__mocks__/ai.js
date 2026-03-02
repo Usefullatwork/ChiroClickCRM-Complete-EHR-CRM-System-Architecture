@@ -66,12 +66,12 @@ export const getAIStatus = jest.fn().mockResolvedValue({
   provider: 'ollama',
   available: false,
   enabled: false,
-  model: 'chiro-no',
+  model: 'chiro-no-sft-dpo-v5',
   message: 'AI is disabled via AI_ENABLED=false',
 });
 
 export const getModelForTask = jest.fn().mockResolvedValue({
-  model: 'chiro-no',
+  model: 'chiro-no-sft-dpo-v5',
   abVariant: null,
 });
 
@@ -98,7 +98,7 @@ export const calculateConfidence = jest.fn().mockReturnValue({
   level: 'medium',
 });
 
-export const getModelForField = jest.fn().mockResolvedValue('chiro-no');
+export const getModelForField = jest.fn().mockResolvedValue('chiro-no-sft-dpo-v5');
 
 export const buildFieldPrompt = jest.fn().mockReturnValue('');
 

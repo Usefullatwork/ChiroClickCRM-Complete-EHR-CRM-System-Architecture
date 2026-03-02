@@ -533,7 +533,7 @@ ${
         SELECT value FROM system_config WHERE key = 'active_ai_model'
       `);
 
-      const modelVersion = result.rows[0]?.value || 'chiro-no';
+      const modelVersion = result.rows[0]?.value || 'chiro-no-sft-dpo-v5';
 
       // Get model details from Ollama
       const response = await fetch(`${OLLAMA_HOST}/api/show`, {

@@ -18,7 +18,7 @@ const AI_TRAINING_DIR = path.join(PROJECT_ROOT, 'ai-training');
 const MODELS_CACHE_DIR = path.join(AI_TRAINING_DIR, 'models-cache');
 const _SCRIPTS_DIR = path.join(PROJECT_ROOT, 'scripts');
 
-const MODEL_NAMES = ['chiro-no', 'chiro-fast', 'chiro-norwegian', 'chiro-medical'];
+const MODEL_NAMES = ['chiro-no-sft-dpo-v5', 'chiro-no-lora-v5', 'chiro-fast', 'chiro-medical'];
 
 /**
  * Check if Ollama is running and get model status

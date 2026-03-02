@@ -50,6 +50,15 @@ export default defineConfig({
       testMatch: /.*\.setup\.js/,
     },
 
+    // Setup wizard (no auth state, no dependencies — runs on fresh app)
+    {
+      name: 'setup-wizard',
+      testMatch: /setup-wizard\.spec\.js/,
+      use: {
+        ...devices['Desktop Chrome'],
+      },
+    },
+
     // Desktop browsers
     {
       name: 'chromium',

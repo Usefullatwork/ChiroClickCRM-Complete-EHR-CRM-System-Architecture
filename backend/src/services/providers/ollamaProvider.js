@@ -33,7 +33,7 @@ class OllamaProvider extends AIProviderBase {
    */
   async generate(prompt, systemPrompt = null, options = {}) {
     const { maxTokens = 500, temperature = 0.3, model } = options;
-    const selectedModel = model || process.env.AI_MODEL || 'chiro-no';
+    const selectedModel = model || process.env.AI_MODEL || 'chiro-no-sft-dpo-v5';
 
     const ollamaPayload = {
       model: selectedModel,
@@ -118,7 +118,7 @@ class OllamaProvider extends AIProviderBase {
    * Writes SSE chunks directly to the Express response
    */
   async generateStream(model, prompt, res) {
-    const selectedModel = model || process.env.AI_MODEL || 'chiro-no';
+    const selectedModel = model || process.env.AI_MODEL || 'chiro-no-sft-dpo-v5';
 
     try {
       const response = await this._breaker.execute(() =>
@@ -185,7 +185,7 @@ class OllamaProvider extends AIProviderBase {
       return {
         provider: 'ollama',
         available: true,
-        model: process.env.AI_MODEL || 'chiro-no',
+        model: process.env.AI_MODEL || 'chiro-no-sft-dpo-v5',
         models,
         message: `Ollama running with ${models.length} models`,
       };
@@ -193,7 +193,7 @@ class OllamaProvider extends AIProviderBase {
       return {
         provider: 'ollama',
         available: false,
-        model: process.env.AI_MODEL || 'chiro-no',
+        model: process.env.AI_MODEL || 'chiro-no-sft-dpo-v5',
         message: `Ollama unavailable: ${error.message}`,
       };
     }

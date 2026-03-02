@@ -205,25 +205,25 @@ export const notifyWaitlistPatients = async (clinicId, slotInfo) => {
  * Get CRM overview dashboard
  */
 export const getCRMOverview = async (clinicId) => {
-  // Run queries in parallel
+  // Run queries in parallel with fallbacks for missing tables
   const [leads, lifecycle, referrals, nps, waitlist] = await Promise.all([
     query(
       `SELECT COUNT(*) FILTER (WHERE status = 'NEW') as new_leads FROM leads WHERE organization_id = $1`,
       [clinicId]
-    ),
+    ).catch(() => ({ rows: [{ new_leads: 0 }] })),
     query(
       `SELECT lifecycle_stage, COUNT(*) as count FROM patients WHERE organization_id = $1 GROUP BY lifecycle_stage`,
       [clinicId]
-    ),
+    ).catch(() => ({ rows: [] })),
     query(
       `SELECT COUNT(*) FILTER (WHERE status = 'PENDING') as pending FROM referrals WHERE organization_id = $1`,
       [clinicId]
-    ),
-    getNPSStats(clinicId, '30d'),
+    ).catch(() => ({ rows: [{ pending: 0 }] })),
+    getNPSStats(clinicId, '30d').catch(() => ({ nps: 0 })),
     query(
       `SELECT COUNT(*) as count FROM waitlist WHERE organization_id = $1 AND status = 'ACTIVE'`,
       [clinicId]
-    ),
+    ).catch(() => ({ rows: [{ count: 0 }] })),
   ]);
 
   const lifecycleMap = {};

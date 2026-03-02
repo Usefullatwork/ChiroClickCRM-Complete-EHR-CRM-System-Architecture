@@ -22,7 +22,7 @@ import {
   logBPPVTreatmentSchema,
   getPatientHistorySchema,
 } from '../validators/neuroexam.validators.js';
-import { pool } from '../config/database.js';
+import { query as dbQuery, getClient, pool } from '../config/database.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 
@@ -108,7 +108,7 @@ router.get(
       queryText += ` ORDER BY ne.exam_date DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
       params.push(parseInt(limit), parseInt(offset));
 
-      const result = await pool.query(queryText, params);
+      const result = await dbQuery(queryText, params);
 
       res.json({
         data: result.rows,
@@ -155,7 +155,7 @@ router.get(
     try {
       const { examId } = req.params;
 
-      const result = await pool.query(
+      const result = await dbQuery(
         `
         SELECT
           ne.*,
@@ -175,7 +175,7 @@ router.get(
       }
 
       // Get detailed test results
-      const testResults = await pool.query(
+      const testResults = await dbQuery(
         `
         SELECT * FROM neuro_exam_test_results
         WHERE examination_id = $1
@@ -185,7 +185,7 @@ router.get(
       );
 
       // Get vestibular findings if present
-      const vestibularFindings = await pool.query(
+      const vestibularFindings = await dbQuery(
         `
         SELECT * FROM vestibular_findings
         WHERE examination_id = $1
@@ -253,7 +253,7 @@ router.post(
   requireRole(['ADMIN', 'PRACTITIONER']),
   validate(createNeuroexamSchema),
   async (req, res) => {
-    const client = await pool.connect();
+    const client = await getClient();
 
     try {
       const {
@@ -409,7 +409,7 @@ router.put(
   requireRole(['ADMIN', 'PRACTITIONER']),
   validate(updateNeuroexamSchema),
   async (req, res) => {
-    const client = await pool.connect();
+    const client = await getClient();
 
     try {
       const { examId } = req.params;
@@ -555,7 +555,7 @@ router.post(
       const { examId } = req.params;
       const { narrativeText } = req.body;
 
-      const result = await pool.query(
+      const result = await dbQuery(
         `
         UPDATE neurological_examinations SET
           status = 'COMPLETED',
@@ -629,7 +629,7 @@ router.post(
       const { examId } = req.params;
       const { specialty, urgency, _notes } = req.body;
 
-      const result = await pool.query(
+      const result = await dbQuery(
         `
         UPDATE neurological_examinations SET
           referral_specialty = $1,
@@ -726,7 +726,7 @@ router.post(
         notes,
       } = req.body;
 
-      const result = await pool.query(
+      const result = await dbQuery(
         `
         INSERT INTO bppv_treatments (
           examination_id,
@@ -789,7 +789,7 @@ router.post(
  */
 router.get('/alerts/red-flags', requireAuth, requireOrganization, async (req, res) => {
   try {
-    const result = await pool.query(
+    const result = await dbQuery(
       `
         SELECT * FROM neuro_red_flag_alerts
         WHERE organization_id = $1
@@ -836,7 +836,7 @@ router.get(
     try {
       const { patientId } = req.params;
 
-      const result = await pool.query(
+      const result = await dbQuery(
         `
         SELECT
           ne.id,
@@ -859,7 +859,7 @@ router.get(
       );
 
       // Get BPPV treatment history
-      const bppvHistory = await pool.query(
+      const bppvHistory = await dbQuery(
         `
         SELECT * FROM bppv_treatment_outcomes
         WHERE patient_id = $1

@@ -266,11 +266,10 @@ describe('ClaudeProvider', () => {
   describe('CLAUDE_MODEL_MAP', () => {
     it('should map chiro-fast to haiku', () => {
       expect(CLAUDE_MODEL_MAP['chiro-fast']).toBe('claude-haiku-4-5');
-      expect(CLAUDE_MODEL_MAP['chiro-fast-lora']).toBe('claude-haiku-4-5');
     });
 
     it('should map clinical models to sonnet', () => {
-      expect(CLAUDE_MODEL_MAP['chiro-no-lora-v4']).toBe('claude-sonnet-4-6');
+      expect(CLAUDE_MODEL_MAP['chiro-no-sft-dpo-v5']).toBe('claude-sonnet-4-6');
       expect(CLAUDE_MODEL_MAP['chiro-medical']).toBe('claude-sonnet-4-6');
       expect(CLAUDE_MODEL_MAP['chiro-norwegian-lora-v2']).toBe('claude-sonnet-4-6');
     });

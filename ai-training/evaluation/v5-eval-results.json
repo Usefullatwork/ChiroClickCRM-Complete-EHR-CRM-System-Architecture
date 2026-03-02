@@ -1,0 +1,75 @@
+{
+  "model": "chiro-no-lora-v5",
+  "date": "2026-02-28",
+  "training": {
+    "base_model": "Qwen/Qwen2.5-7B-Instruct",
+    "method": "LoRA (r=16, alpha=16)",
+    "train_examples": 9593,
+    "val_examples": 1195,
+    "dpo_pairs": 335,
+    "new_data": "74 Claude-Code-generated targeted examples (39 diagnosis + 35 other)",
+    "epochs": 1,
+    "steps": 1200,
+    "train_loss": 1.248,
+    "eval_loss": 1.01,
+    "token_accuracy": 0.758,
+    "training_time_minutes": 541,
+    "peak_vram_gb": 15.38,
+    "adapter_size_mb": 161
+  },
+  "evaluation": {
+    "benchmark_cases": 100,
+    "runs": [
+      {
+        "run": 1,
+        "pass_rate": 71,
+        "avg_partial_score": 91.9,
+        "avg_latency_ms": 2816,
+        "note": "First run, model cold"
+      },
+      {
+        "run": 2,
+        "pass_rate": 79,
+        "avg_partial_score": 93.2,
+        "avg_latency_ms": 11865,
+        "note": "Head-to-head comparison run"
+      }
+    ],
+    "best_pass_rate": 79,
+    "avg_pass_rate": 75.0,
+    "categories": {
+      "soap_notes": { "pass_rate": 100.0, "cases": 10, "avg_score": 99.2 },
+      "norwegian_language": {
+        "pass_rate": 93.3,
+        "cases": 15,
+        "avg_score": 97.0
+      },
+      "red_flags": { "pass_rate": 88.5, "cases": 26, "avg_score": 94.8 },
+      "quick_fields": { "pass_rate": 83.3, "cases": 6, "avg_score": 92.5 },
+      "letters": { "pass_rate": 71.4, "cases": 7, "avg_score": 95.5 },
+      "communication": { "pass_rate": 62.5, "cases": 16, "avg_score": 91.1 },
+      "diagnosis_codes": { "pass_rate": 60.0, "cases": 20, "avg_score": 83.3 }
+    }
+  },
+  "comparison_vs_v4": {
+    "note": "Head-to-head comparison (same run, same GPU state)",
+    "v5_pass_rate": 79,
+    "v4_pass_rate": 78,
+    "delta": "+1.0%",
+    "improvements": {
+      "red_flags": "+19.3% (88.5% vs 69.2%)",
+      "letters": "+14.3% (71.4% vs 57.1%)"
+    },
+    "regressions": {
+      "communication": "-12.5% (62.5% vs 75.0%)",
+      "diagnosis_codes": "-10.0% (60.0% vs 70.0%)",
+      "norwegian_language": "-6.7% (93.3% vs 100.0%)"
+    },
+    "stable": {
+      "soap_notes": "100% = 100%",
+      "quick_fields": "83.3% = 83.3%"
+    },
+    "latency": "v5 ~4x slower (11.8s vs 3.0s) due to 2x larger adapter (161MB vs 80MB)"
+  },
+  "conclusion": "v5 is roughly equivalent to v4 overall (79% vs 78%) but with a different profile: much stronger on safety/red-flags (+19.3%) and letters (+14.3%), but weaker on communication (-12.5%) and diagnosis codes (-10%). For a clinical system, the red flags improvement is the most valuable trade-off. Latency regression needs investigation (possibly adapter quantization)."
+}

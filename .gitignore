@@ -89,3 +89,8 @@ cookies.txt
 ai-training/ml-env/
 ai-training/models/
 ai-training/data/processed/
+
+# Weekly sweep reports (generated, not tracked)
+reports/weekly/*.md
+reports/weekly/*.log
+.claude/settings.local.json

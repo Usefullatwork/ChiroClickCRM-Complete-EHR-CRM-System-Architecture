@@ -16,7 +16,7 @@ const execAsync = promisify(exec);
 
 const TRAINING_DIR = process.env.TRAINING_DATA_DIR || './training_data';
 const MODELS_DIR = process.env.MODELS_DIR || './models';
-const BASE_MODEL = process.env.AI_MODEL || 'gemini-3-pro-preview:7b';
+const BASE_MODEL = process.env.AI_MODEL || 'chiro-no-sft-dpo-v5';
 
 /**
  * Ensure directories exist

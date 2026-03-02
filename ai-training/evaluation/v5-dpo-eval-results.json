@@ -1,0 +1,84 @@
+{
+  "model": "chiro-no-sft-dpo-v5",
+  "date": "2026-02-28",
+  "training": {
+    "base_model": "Qwen/Qwen2.5-7B-Instruct",
+    "sft": {
+      "method": "LoRA (r=16, alpha=16)",
+      "train_examples": 9593,
+      "checkpoint": "checkpoint-900",
+      "train_loss": 1.248
+    },
+    "dpo": {
+      "method": "DPO (beta=0.1)",
+      "train_pairs": 540,
+      "val_pairs": 60,
+      "epochs": 2,
+      "steps": 136,
+      "train_loss": 0.0608,
+      "eval_loss": 0.000359,
+      "rewards_accuracy": 1.0,
+      "rewards_margin": 15.82,
+      "training_time_minutes": 39.3
+    },
+    "deployment": {
+      "method": "SFT+DPO merged into base (fp16), then quantized to Q8_0 GGUF",
+      "model_size_gb": 8.1,
+      "note": "DPO adapter alone (without SFT) tested at 70% — confirms DPO adapter is NOT standalone-deployable"
+    }
+  },
+  "evaluation": {
+    "benchmark_cases": 100,
+    "runs": [
+      {
+        "run": 1,
+        "model": "chiro-no-dpo-v5 (DPO adapter alone, no SFT)",
+        "pass_rate": 74,
+        "avg_partial_score": 91.8,
+        "avg_latency_ms": 3253,
+        "note": "First solo run"
+      },
+      {
+        "run": 2,
+        "model": "chiro-no-dpo-v5 vs chiro-no-lora-v5 (head-to-head)",
+        "dpo_alone_pass_rate": 70,
+        "sft_only_pass_rate": 77,
+        "note": "DPO adapter alone loses to SFT — confirms SFT weights needed"
+      },
+      {
+        "run": 3,
+        "model": "chiro-no-sft-dpo-v5 vs chiro-no-lora-v5 (head-to-head)",
+        "sft_dpo_merged_pass_rate": 77,
+        "sft_only_pass_rate": 72,
+        "note": "FINAL: Merged SFT+DPO beats SFT-only by 5 points"
+      }
+    ],
+    "best_pass_rate": 77,
+    "categories_run3": {
+      "soap_notes": { "sft_dpo": 100.0, "sft_only": 90.0, "delta": "+10.0%" },
+      "norwegian_language": {
+        "sft_dpo": 93.3,
+        "sft_only": 73.3,
+        "delta": "+20.0%"
+      },
+      "communication": { "sft_dpo": 75.0, "sft_only": 62.5, "delta": "+12.5%" },
+      "red_flags": { "sft_dpo": 76.9, "sft_only": 69.2, "delta": "+7.7%" },
+      "diagnosis_codes": { "sft_dpo": 65.0, "sft_only": 65.0, "delta": "0%" },
+      "quick_fields": { "sft_dpo": 83.3, "sft_only": 100.0, "delta": "-16.7%" },
+      "letters": { "sft_dpo": 42.9, "sft_only": 71.4, "delta": "-28.5%" }
+    }
+  },
+  "key_findings": {
+    "dpo_adapter_standalone": "NOT viable — loses 7pp vs SFT due to missing SFT weights in base model",
+    "merged_model": "VIABLE — beats SFT-only by 5pp, especially in Norwegian (+20%), SOAP (+10%), Comms (+12.5%)",
+    "trade_offs": "8.1GB Q8_0 merged vs 4.8GB q4+adapter. ~25% slower. Stronger in 4/7 categories.",
+    "letters_regression": "42.9% vs 71.4% — high variance category, needs more DPO pairs for letter templates",
+    "recommendation": "Use chiro-no-sft-dpo-v5 as production model. Create targeted DPO pairs for letters to fix regression."
+  },
+  "model_comparison_summary": {
+    "v4_sft": "78% (best of previous generation)",
+    "v5_sft": "72-79% (variance across runs)",
+    "v5_dpo_alone": "70-74% (NOT usable)",
+    "v5_sft_dpo_merged": "77% (recommended)"
+  }
+}

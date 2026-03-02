@@ -10,6 +10,20 @@ import { aiAPI, clinicalSettingsAPI } from '../services/api';
 
 const AI_MODELS = [
   {
+    id: 'chiro-no-sft-dpo-v6',
+    name: 'Chiro v6 (Standard)',
+    base: 'Qwen2.5-7B',
+    purpose: 'Generell bruk (SFT+DPO v6)',
+    size: '~8GB',
+  },
+  {
+    id: 'chiro-no-sft-dpo-v5',
+    name: 'Chiro v5 (Forrige)',
+    base: 'Qwen2.5-7B',
+    purpose: 'Generell bruk (SFT+DPO v5)',
+    size: '~8GB',
+  },
+  {
     id: 'chiro-fast',
     name: 'Chiro Fast',
     base: 'Qwen2.5-1.5B',
@@ -22,20 +36,6 @@ const AI_MODELS = [
     base: 'Qwen2.5-3B',
     purpose: 'Klinisk resonnement',
     size: '~2GB',
-  },
-  {
-    id: 'chiro-norwegian',
-    name: 'Chiro Norwegian',
-    base: 'Qwen2.5-7B',
-    purpose: 'Norsk språk',
-    size: '~4GB',
-  },
-  {
-    id: 'chiro-no',
-    name: 'Chiro Default',
-    base: 'Qwen2.5-7B',
-    purpose: 'Generell bruk',
-    size: '~4GB',
   },
 ];
 
@@ -50,7 +50,7 @@ const DEFAULT_FEATURES = {
 
 const AISettings = () => {
   const queryClient = useQueryClient();
-  const [selectedModel, setSelectedModel] = useState('chiro-no');
+  const [selectedModel, setSelectedModel] = useState('chiro-no-sft-dpo-v6');
   const [features, setFeatures] = useState(DEFAULT_FEATURES);
   const [testResult, setTestResult] = useState(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);

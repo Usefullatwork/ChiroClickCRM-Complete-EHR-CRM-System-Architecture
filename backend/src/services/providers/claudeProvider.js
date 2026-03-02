@@ -20,7 +20,11 @@ let Anthropic = null;
  * Sonnet for quality tasks, Haiku for speed-sensitive tasks
  */
 const CLAUDE_MODEL_MAP = {
-  // Clinical documentation — needs quality
+  // SFT+DPO merged model (v5) — primary clinical model
+  'chiro-no-sft-dpo-v5': 'claude-sonnet-4-6',
+  'chiro-no-lora-v5': 'claude-sonnet-4-6',
+
+  // Legacy clinical models (for backwards compatibility)
   'chiro-no-lora-v4': 'claude-sonnet-4-6',
   'chiro-no-lora-v2': 'claude-sonnet-4-6',
   'chiro-no-lora': 'claude-sonnet-4-6',
@@ -28,15 +32,12 @@ const CLAUDE_MODEL_MAP = {
 
   // Norwegian specialist — needs quality
   'chiro-norwegian-lora-v2': 'claude-sonnet-4-6',
-  'chiro-norwegian-lora': 'claude-sonnet-4-6',
   'chiro-norwegian': 'claude-sonnet-4-6',
 
   // Medical reasoning — needs quality
-  'chiro-medical-lora': 'claude-sonnet-4-6',
   'chiro-medical': 'claude-sonnet-4-6',
 
   // Fast autocomplete — use Haiku for speed
-  'chiro-fast-lora': 'claude-haiku-4-5',
   'chiro-fast': 'claude-haiku-4-5',
 };
 

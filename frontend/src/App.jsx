@@ -45,6 +45,9 @@ const PatientLogin = lazy(() => import('./pages/portal/PatientLogin'));
 // Kiosk (full-screen, no auth)
 const Kiosk = lazy(() => import('./pages/Kiosk'));
 
+// First-run setup wizard
+const Setup = lazy(() => import('./pages/Setup'));
+
 // Page loader component for Suspense fallback
 function PageLoader() {
   const { t } = useTranslation('common');
@@ -67,14 +70,32 @@ function PageLoader() {
 
 function App() {
   const [isAuthReady, setIsAuthReady] = useState(false);
+  const [needsSetup, setNeedsSetup] = useState(false);
   const { showHelp, setShowHelp } = useGlobalKeyboardShortcuts();
   const { t } = useTranslation('navigation');
 
-  // Auto-login on startup
+  // Auto-login on startup (checks setup status first)
   useEffect(() => {
     const DESKTOP_ORG_ID = 'a0000000-0000-0000-0000-000000000001';
 
     const autoLogin = async () => {
+      // Check if first-run setup is needed
+      try {
+        const setupRes = await fetch(`${getApiBaseUrl()}/api/v1/auth/setup-status`, {
+          credentials: 'include',
+        });
+        if (setupRes.ok) {
+          const setupData = await setupRes.json();
+          if (setupData.needsSetup) {
+            setNeedsSetup(true);
+            setIsAuthReady(true);
+            return;
+          }
+        }
+      } catch {
+        // Backend may not be ready yet — continue with normal flow
+      }
+
       try {
         // Check if already logged in
         const checkRes = await fetch(`${getApiBaseUrl()}/api/v1/auth/me`, {
@@ -88,7 +109,7 @@ function App() {
           setIsAuthReady(true);
           return;
         }
-      } catch (err) {
+      } catch {
         // Not logged in via session
       }
 
@@ -100,8 +121,24 @@ function App() {
     autoLogin();
   }, []);
 
+  const handleSetupComplete = () => {
+    setNeedsSetup(false);
+    // Reload to re-run autoLogin with fresh session
+    window.location.reload();
+  };
+
   if (!isAuthReady) {
     return <PageLoader />;
+  }
+
+  if (needsSetup) {
+    return (
+      <ErrorBoundary>
+        <Suspense fallback={<PageLoader />}>
+          <Setup onComplete={handleSetupComplete} />
+        </Suspense>
+      </ErrorBoundary>
+    );
   }
 
   return (
