@@ -145,7 +145,7 @@ export default function Communications() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-6 max-w-7xl mx-auto" data-testid="communications-page">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">{t('title')}</h1>
@@ -309,6 +309,7 @@ export default function Communications() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder={messageType === 'sms' ? t('typeMessageSms') : t('typeMessageEmail')}
+                data-testid="communications-message-input"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                 rows={messageType === 'sms' ? 6 : 10}
               />
@@ -357,6 +358,7 @@ export default function Communications() {
                 <button
                   onClick={handleSend}
                   disabled={!selectedPatient || !message.trim() || sendMutation.isLoading}
+                  data-testid="communications-send-btn"
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Send className="w-4 h-4" />
@@ -418,6 +420,7 @@ export default function Communications() {
                 <select
                   value={historyFilter}
                   onChange={(e) => setHistoryFilter(e.target.value)}
+                  data-testid="communications-history-filter"
                   className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">{t('allMessages')}</option>
@@ -434,7 +437,7 @@ export default function Communications() {
                       : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                   }`}
                 >
-                  Flat
+                  {t('flatView', 'Flat')}
                 </button>
                 <button
                   onClick={() => setViewMode('thread')}
@@ -444,7 +447,7 @@ export default function Communications() {
                       : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                   }`}
                 >
-                  Per pasient
+                  {t('byPatient', 'Per pasient')}
                 </button>
               </div>
             </div>

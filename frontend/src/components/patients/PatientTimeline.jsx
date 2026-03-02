@@ -1,12 +1,7 @@
 import { useState, useMemo } from 'react';
 import { FileText, MessageSquare, Filter, CheckCircle } from 'lucide-react';
 import { formatDate } from '../../lib/utils';
-
-const FILTER_OPTIONS = [
-  { key: 'all', label: 'Alle' },
-  { key: 'journals', label: 'Journaler' },
-  { key: 'communications', label: 'Kommunikasjon' },
-];
+import { useTranslation } from '../../i18n';
 
 function TimelineEntry({ entry, patientId, onNavigate }) {
   const isEncounter = entry.type === 'encounter';
@@ -66,14 +61,21 @@ function TimelineEntry({ entry, patientId, onNavigate }) {
 }
 
 export default function PatientTimeline({ patientId, encounters = [], onNavigate }) {
+  const { t } = useTranslation('patients');
   const [activeFilter, setActiveFilter] = useState('all');
+
+  const FILTER_OPTIONS = [
+    { key: 'all', label: t('filterAll', 'Alle') },
+    { key: 'journals', label: t('filterJournals', 'Journaler') },
+    { key: 'communications', label: t('filterCommunications', 'Kommunikasjon') },
+  ];
 
   // Merge encounters (and future communications) into a unified timeline
   const timelineItems = useMemo(() => {
     const items = encounters.map((enc) => ({
       id: enc.id,
       type: 'encounter',
-      title: enc.encounter_type || 'Konsultasjon',
+      title: enc.encounter_type || t('consultation', 'Konsultasjon'),
       date: enc.encounter_date,
       brief: enc.chief_complaint || enc.subjective?.slice(0, 80) || null,
       signed: !!enc.signed_at,
@@ -100,7 +102,7 @@ export default function PatientTimeline({ patientId, encounters = [], onNavigate
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
           <Filter className="w-4 h-4" />
-          Tidslinje
+          {t('timeline', 'Tidslinje')}
         </h3>
         <div className="flex gap-1">
           {FILTER_OPTIONS.map((opt) => (
@@ -123,7 +125,9 @@ export default function PatientTimeline({ patientId, encounters = [], onNavigate
 
       {/* Timeline */}
       {filteredItems.length === 0 ? (
-        <p className="text-center text-sm text-gray-400 dark:text-gray-500 py-8">Ingen hendelser</p>
+        <p className="text-center text-sm text-gray-400 dark:text-gray-500 py-8">
+          {t('noEvents', 'Ingen hendelser')}
+        </p>
       ) : (
         <div className="relative">
           {/* Vertical timeline line */}

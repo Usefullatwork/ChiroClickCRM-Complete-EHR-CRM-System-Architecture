@@ -9,10 +9,10 @@ const CHANNEL_ICONS = {
 };
 
 const STATUS_STYLES = {
-  sent: 'bg-green-100 text-green-700',
-  delivered: 'bg-blue-100 text-blue-700',
-  failed: 'bg-red-100 text-red-700',
-  pending: 'bg-yellow-100 text-yellow-700',
+  sent: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  delivered: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  failed: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
 };
 
 function PatientGroup({ patientName, messages, lang }) {
@@ -62,7 +62,8 @@ function PatientGroup({ patientName, messages, lang }) {
           {messages.map((comm) => {
             const ChannelIcon = CHANNEL_ICONS[comm.type] || MessageSquare;
             const statusClass =
-              STATUS_STYLES[(comm.status || '').toLowerCase()] || 'bg-gray-100 text-gray-700';
+              STATUS_STYLES[(comm.status || '').toLowerCase()] ||
+              'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400';
             const date = comm.created_at || comm.sent_at;
 
             return (
@@ -82,10 +83,10 @@ function PatientGroup({ patientName, messages, lang }) {
                   <ChannelIcon
                     className={`w-3.5 h-3.5 ${
                       comm.type === 'SMS'
-                        ? 'text-purple-600'
+                        ? 'text-purple-600 dark:text-purple-400'
                         : comm.type === 'EMAIL'
-                          ? 'text-blue-600'
-                          : 'text-gray-600'
+                          ? 'text-blue-600 dark:text-blue-400'
+                          : 'text-gray-600 dark:text-gray-400'
                     }`}
                   />
                 </div>
@@ -149,7 +150,7 @@ export default function CommunicationThread({ communications }) {
     return (
       <div className="px-6 py-12 text-center">
         <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-        <p className="text-sm text-gray-500">Ingen meldinger funnet</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Ingen meldinger funnet</p>
       </div>
     );
   }

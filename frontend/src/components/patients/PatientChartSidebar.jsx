@@ -128,7 +128,7 @@ export default function PatientChartSidebar({
             </div>
             <ul className="space-y-0.5">
               {patient.red_flags.map((flag, i) => (
-                <li key={i} className="text-xs text-red-600 dark:text-red-300 pl-5">
+                <li key={flag || i} className="text-xs text-red-600 dark:text-red-300 pl-5">
                   {flag}
                 </li>
               ))}

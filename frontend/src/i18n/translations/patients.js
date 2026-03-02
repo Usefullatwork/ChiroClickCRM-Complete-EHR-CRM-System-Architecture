@@ -96,6 +96,12 @@ export const patients = {
     treatmentNotesPlaceholder: 'Any notes about treatment preferences...',
     recentVisits: 'Recent Visits',
     noVisitsRecorded: 'No visits recorded',
+    // PatientTimeline
+    filterAll: 'All',
+    filterJournals: 'Journals',
+    filterCommunications: 'Communications',
+    consultation: 'Consultation',
+    noEvents: 'No events',
   },
   no: {
     title: 'Pasienter',
@@ -194,5 +200,11 @@ export const patients = {
     treatmentNotesPlaceholder: 'Eventuelle notater om behandlingspreferanser...',
     recentVisits: 'Siste konsultasjoner',
     noVisitsRecorded: 'Ingen konsultasjoner registrert',
+    // PatientTimeline
+    filterAll: 'Alle',
+    filterJournals: 'Journaler',
+    filterCommunications: 'Kommunikasjon',
+    consultation: 'Konsultasjon',
+    noEvents: 'Ingen hendelser',
   },
 };

@@ -144,7 +144,7 @@ export default function CommandPalette({ isOpen, onClose }) {
         navigate(item.data.path);
       }
     },
-    [navigate, onClose]
+    [navigate, onClose, allItems]
   );
 
   const handleKeyDown = useCallback(
@@ -158,6 +158,8 @@ export default function CommandPalette({ isOpen, onClose }) {
       } else if (e.key === 'Enter' && allItems[activeIndex]) {
         e.preventDefault();
         selectItem(allItems[activeIndex]);
+      } else if (e.key === 'Tab') {
+        e.preventDefault();
       } else if (e.key === 'Escape') {
         e.preventDefault();
         onClose();
@@ -220,9 +222,11 @@ export default function CommandPalette({ isOpen, onClose }) {
           {(patients.length > 0 || loading) && (
             <div>
               <div className="px-4 py-1.5 text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Pasienter
+                {t('patientsSection', 'Pasienter')}
               </div>
-              {loading && <div className="px-4 py-2 text-sm text-gray-400">Soker...</div>}
+              {loading && (
+                <div className="px-4 py-2 text-sm text-gray-400">{t('searching', 'Soker...')}</div>
+              )}
               {patients.map((p) => {
                 const idx = getIdx();
                 const name = `${p.first_name} ${p.last_name}`;
@@ -247,9 +251,15 @@ export default function CommandPalette({ isOpen, onClose }) {
                         <HighlightText text={name} query={query} />
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400">
-                        {age != null && <span>{age} ar</span>}
+                        {age != null && (
+                          <span>
+                            {age} {t('years', 'ar')}
+                          </span>
+                        )}
                         {p.last_visit_date && (
-                          <span className="ml-2">Sist: {formatDate(p.last_visit_date)}</span>
+                          <span className="ml-2">
+                            {t('lastVisitPrefix', 'Sist:')} {formatDate(p.last_visit_date)}
+                          </span>
                         )}
                       </div>
                     </div>
@@ -263,7 +273,7 @@ export default function CommandPalette({ isOpen, onClose }) {
           {filteredNav.length > 0 && (
             <div>
               <div className="px-4 py-1.5 text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Navigasjon
+                {t('navigationSection', 'Navigasjon')}
               </div>
               {filteredNav.map((item) => {
                 const idx = getIdx();
@@ -294,7 +304,7 @@ export default function CommandPalette({ isOpen, onClose }) {
           {filteredActions.length > 0 && (
             <div>
               <div className="px-4 py-1.5 text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Handlinger
+                {t('actionsSection', 'Handlinger')}
               </div>
               {filteredActions.map((item) => {
                 const idx = getIdx();
@@ -324,7 +334,7 @@ export default function CommandPalette({ isOpen, onClose }) {
           {/* Empty state */}
           {!loading && query.length >= 2 && allItems.length === 0 && (
             <div className="px-4 py-6 text-center text-sm text-gray-400">
-              Ingen resultater for &laquo;{query}&raquo;
+              {t('noResultsFor', 'Ingen resultater for')} &laquo;{query}&raquo;
             </div>
           )}
         </div>

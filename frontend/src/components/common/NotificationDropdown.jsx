@@ -29,22 +29,28 @@ const TYPE_ICONS = {
   SYSTEM_ERROR: AlertTriangle,
 };
 
-function formatTimeAgo(dateStr) {
+const TIME_UNITS = {
+  en: { s: 's ago', m: 'm ago', h: 'h ago', d: 'd ago' },
+  no: { s: 's siden', m: 'm siden', h: 't siden', d: 'd siden' },
+};
+
+function formatTimeAgo(dateStr, lang = 'no') {
+  const units = TIME_UNITS[lang] || TIME_UNITS.no;
   const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
-  if (seconds < 60) return `${seconds}s siden`;
+  if (seconds < 60) return `${seconds}${units.s}`;
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m siden`;
+  if (minutes < 60) return `${minutes}${units.m}`;
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}t siden`;
+  if (hours < 24) return `${hours}${units.h}`;
   const days = Math.floor(hours / 24);
-  return `${days}d siden`;
+  return `${days}${units.d}`;
 }
 
 export default function NotificationDropdown() {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   const queryClient = useQueryClient();
-  const { t } = useTranslation('common');
+  const { t, lang } = useTranslation('common');
 
   // Click-outside detection
   useEffect(() => {
@@ -153,7 +159,7 @@ export default function NotificationDropdown() {
                         </p>
                       )}
                       <p className="text-[10px] text-gray-400 mt-1">
-                        {formatTimeAgo(n.created_at)}
+                        {formatTimeAgo(n.created_at, lang)}
                       </p>
                     </div>
                     {!n.read && (

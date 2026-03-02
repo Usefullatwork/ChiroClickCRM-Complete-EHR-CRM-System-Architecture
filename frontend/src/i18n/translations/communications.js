@@ -51,7 +51,8 @@ export const communications = {
     copyToClipboard: 'Copy to Clipboard',
     logMessage: 'Log Message',
     logging: 'Logging...',
-    smsNote: 'Note: Messages are logged in the system. Copy and send manually via your SMS provider.',
+    smsNote:
+      'Note: Messages are logged in the system. Copy and send manually via your SMS provider.',
     messageTemplates: 'Message Templates',
     noTemplates: 'No templates available',
     allMessages: 'All Messages',
@@ -66,6 +67,8 @@ export const communications = {
     logFailed: 'Failed to log {type}',
     selectPatientWarning: 'Please select a patient',
     enterMessageWarning: 'Please enter a message',
+    byPatient: 'By patient',
+    flatView: 'Flat',
   },
   no: {
     title: 'Kommunikasjon',
@@ -134,5 +137,7 @@ export const communications = {
     logFailed: 'Kunne ikke logge {type}',
     selectPatientWarning: 'Vennligst velg en pasient',
     enterMessageWarning: 'Vennligst skriv en melding',
-  }
-}
+    byPatient: 'Per pasient',
+    flatView: 'Flat',
+  },
+};
