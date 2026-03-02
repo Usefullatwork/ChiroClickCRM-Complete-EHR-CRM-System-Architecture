@@ -79,14 +79,15 @@ const CORE_NAV = [
 
 // Admin items separated visually
 const ADMIN_NAV = [
-  { key: 'crm', href: '/crm', icon: HeartHandshake },
+  { key: 'templates', href: '/templates', icon: BookOpen },
   { key: 'macros', href: '/macros', icon: Zap },
+  { key: 'crm', href: '/crm', icon: HeartHandshake },
   { key: 'aiTraining', href: '/training', icon: Brain },
   { key: 'settings', href: '/settings', icon: Settings },
 ];
 
 // Hidden from sidebar, accessible via command palette:
-// appointments, kpi, templates, import, auditLogs
+// appointments, kpi, import, auditLogs
 
 function NavItem({ item, isActive, onClick, t }) {
   const active = isActive(item.href);
@@ -145,7 +146,7 @@ export default function DashboardLayout() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       {/* Mobile top bar */}
       <div className="md:hidden sticky top-0 z-30 flex items-center justify-between px-4 h-14 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <h1 className="text-lg font-semibold text-gray-900 dark:text-white">ChiroClickCRM</h1>
+        <h1 className="text-lg font-semibold text-gray-900 dark:text-white">ChiroClickEHR</h1>
         <div className="flex items-center gap-1">
           <button
             onClick={() => setCommandPaletteOpen(true)}
@@ -186,7 +187,7 @@ export default function DashboardLayout() {
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between px-4 py-4 border-b border-gray-200 dark:border-gray-700">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">ChiroClickCRM</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">ChiroClickEHR</h2>
               {organization && (
                 <p className="text-xs text-gray-500 dark:text-gray-200 mt-0.5">
                   {organization.name}
@@ -215,7 +216,7 @@ export default function DashboardLayout() {
               ))}
             </ul>
             <div className="my-3 mx-3 border-t border-gray-200 dark:border-gray-700" />
-            <p className="px-3 mb-1 text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+            <p className="px-3 mb-1 text-[10px] font-semibold text-gray-400 dark:text-gray-300 uppercase tracking-wider">
               Admin
             </p>
             <ul className="space-y-1">
@@ -262,7 +263,7 @@ export default function DashboardLayout() {
         <div className="flex flex-col h-full">
           {/* Logo & Organization */}
           <div className="px-4 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">ChiroClickCRM</h1>
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">ChiroClickEHR</h1>
             {organization && (
               <p className="text-xs text-gray-500 dark:text-gray-200 mt-1">{organization.name}</p>
             )}
@@ -278,7 +279,7 @@ export default function DashboardLayout() {
 
             {/* Admin separator */}
             <div className="my-3 mx-3 border-t border-gray-200 dark:border-gray-700" />
-            <p className="px-3 mb-1 text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+            <p className="px-3 mb-1 text-[10px] font-semibold text-gray-400 dark:text-gray-300 uppercase tracking-wider">
               Admin
             </p>
             <ul className="space-y-0.5">
@@ -334,7 +335,7 @@ export default function DashboardLayout() {
         >
           <Search className="w-4 h-4" />
           <span>{t('searchPlaceholder', 'Sok...')}</span>
-          <kbd className="ml-4 px-1.5 py-0.5 text-[10px] font-medium text-gray-400 bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded">
+          <kbd className="ml-4 px-1.5 py-0.5 text-[10px] font-medium text-gray-400 dark:text-gray-300 bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded">
             Ctrl+K
           </kbd>
         </button>

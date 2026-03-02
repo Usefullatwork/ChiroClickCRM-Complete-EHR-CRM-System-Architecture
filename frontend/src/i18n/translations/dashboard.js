@@ -80,6 +80,9 @@ export const dashboard = {
     rebookingRate: 'Rebooking Rate',
     availableCapacity: 'Available Capacity',
     slotsToday: 'available slots today',
+    unsignedNotes: 'Unsigned notes',
+    unsignedNotesToday: 'Unsigned today',
+    moreStats: 'More statistics',
   },
   no: {
     title: 'Dashbord',
@@ -162,5 +165,8 @@ export const dashboard = {
     rebookingRate: 'Gjenbookingsrate',
     availableCapacity: 'Ledig kapasitet',
     slotsToday: 'ledige timer i dag',
+    unsignedNotes: 'Usignerte journaler',
+    unsignedNotesToday: 'Usignerte i dag',
+    moreStats: 'Mer statistikk',
   },
 };

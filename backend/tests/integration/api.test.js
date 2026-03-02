@@ -102,7 +102,7 @@ describe('API Integration Tests', () => {
       const response = await request(app).get('/api/v1');
 
       expect(response.status).toBe(200);
-      expect(response.body.message).toBe('ChiroClickCRM API');
+      expect(response.body.message).toBe('ChiroClickEHR API');
       expect(response.body.version).toBe('v1');
       expect(response.body.endpoints).toBeDefined();
     });

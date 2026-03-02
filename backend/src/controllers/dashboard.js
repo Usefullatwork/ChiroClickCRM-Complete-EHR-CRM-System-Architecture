@@ -67,11 +67,67 @@ export const getDashboardStats = async (req, res) => {
       monthRevenueResult = { rows: [{ revenue: 0 }] };
     }
 
+    // Get rebooking rate: % of completed appointments (last 30 days) where patient has a future appointment
+    let rebooking_rate = null;
+    try {
+      const rebookingResult = await query(
+        `SELECT
+           COUNT(*) FILTER (WHERE EXISTS (
+             SELECT 1 FROM appointments future
+             WHERE future.patient_id = a.patient_id
+               AND future.organization_id = a.organization_id
+               AND future.start_time > a.end_time
+               AND future.status NOT IN ('CANCELLED', 'NO_SHOW')
+           ))::numeric as rebooked,
+           COUNT(*)::numeric as total
+         FROM appointments a
+         WHERE a.organization_id = $1
+           AND a.status = 'COMPLETED'
+           AND a.start_time >= CURRENT_DATE - INTERVAL '30 days'`,
+        [organizationId]
+      );
+      const { rebooked, total } = rebookingResult.rows[0];
+      if (parseFloat(total) > 0) {
+        rebooking_rate = Math.round((parseFloat(rebooked) / parseFloat(total)) * 100);
+      }
+    } catch (e) {
+      // Table/column may not exist yet
+    }
+
+    // Get available slots today (assume 16 slots/day: 8 hours * 2 per hour)
+    let available_slots = null;
+    try {
+      const todayBooked = parseInt(todayAppointmentsResult.rows[0].count);
+      const dailyCapacity = 16;
+      available_slots = Math.max(0, dailyCapacity - todayBooked);
+    } catch (e) {
+      // Fallback
+    }
+
+    // Get unsigned encounters created today
+    let unsignedNotesToday = 0;
+    try {
+      const unsignedResult = await query(
+        `SELECT COUNT(*) as count
+         FROM clinical_encounters
+         WHERE organization_id = $1
+           AND signed_at IS NULL
+           AND created_at >= CURRENT_DATE`,
+        [organizationId]
+      );
+      unsignedNotesToday = parseInt(unsignedResult.rows[0].count);
+    } catch (e) {
+      // Table/column may not exist yet
+    }
+
     const stats = {
       todayAppointments: parseInt(todayAppointmentsResult.rows[0].count),
       activePatients: parseInt(activePatientsResult.rows[0].count),
       pendingFollowUps: parseInt(pendingFollowUpsResult.rows[0].count),
       monthRevenue: parseFloat(monthRevenueResult.rows[0].revenue),
+      rebooking_rate,
+      available_slots,
+      unsignedNotesToday,
     };
 
     res.json({
