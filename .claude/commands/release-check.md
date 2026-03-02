@@ -1,16 +1,30 @@
 ---
-name: release-check
-description: Pre-release compliance gate. Run before any deployment to verify healthcare compliance, PHI safety, and test status.
+description: Pre-release compliance gate. Run before any push to production. Blocks release if CRITICAL issues found.
 ---
 
-Run a pre-release compliance check for ChiroClickCRM. Execute these steps in order:
+Run a full pre-release check:
 
-1. **Run all tests** — `cd backend && npm test` and `cd frontend && npx vitest --run`
-2. **Check for console.log** — Grep all backend/src and frontend/src for console.log (PHI leak risk)
-3. **Check npm audit** — `npm audit --audit-level=high`
-4. **Verify auth middleware** — Grep patient/encounter/appointment routes for requireAuth
-5. **Verify audit logging** — Check POST/PUT/PATCH/DELETE handlers on patient routes for logAudit calls
-6. **Check for http:// URLs** — Grep config files for http:// (must be https://)
-7. **Run lint** — `npm run lint`
+1. Run ALL tests (backend, frontend, E2E) — ALL must pass
+2. Run compliance-scanner agent on the entire codebase
+3. Run phi-check skill
+4. Run `npm audit` on both backend and frontend
+5. Check git status for uncommitted changes
+6. Verify CLAUDE.md is up to date
 
-Report: PASS/FAIL for each step. Block release if any CRITICAL items fail.
+If ANY CRITICAL finding exists, output:
+
+```
+RELEASE BLOCKED
+Reason: [specific critical finding]
+Fix required before release.
+```
+
+If all clear, output:
+
+```
+RELEASE APPROVED
+Tests: backend X/Y, frontend X/Y, E2E X/Y
+Security: No critical vulnerabilities
+Compliance: No critical violations
+PHI: No leaks detected
+```

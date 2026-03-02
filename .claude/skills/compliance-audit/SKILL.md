@@ -1,49 +1,67 @@
 ---
 name: compliance-audit
-description: Full Norwegian healthcare compliance checklist. Use when preparing for release, conducting periodic reviews, or when asked about compliance status. Activates for Normen, GDPR, HelseID, WCAG, or regulatory compliance questions.
-allowed-tools: Read, Grep, Glob, Bash(npm run test *), Bash(npx playwright test *)
+description: Full Norwegian healthcare compliance audit. Activates when discussing Normen, GDPR, HelseID, WCAG, regulatory compliance, release preparation, or security review. Run before any production release.
+allowed-tools: Read, Grep, Glob, Bash(npm run test *), Bash(npx vitest *), Bash(npx playwright *)
 ---
 
-# Norwegian Healthcare Compliance Audit Checklist
+# Norwegian Healthcare Compliance Audit
 
-## Normen v7.0 Requirements
+Run each section. Report PASS or FAIL with evidence.
 
-- [ ] Role-based access control on all patient data endpoints
-- [ ] Strong authentication (security level 4 for health data access)
-- [ ] All patient data access logged (who, when, what, action)
-- [ ] Patients can see who accessed their records (audit trail query)
-- [ ] TLS on all communications (no http:// anywhere)
-- [ ] Data encrypted at rest in database
-- [ ] Periodic access control review capability
+## 1. Normen v7.0 — Informasjonssikkerhet
 
-## GDPR / Personvernforordningen
+- [ ] Role-based access control on ALL patient data endpoints
+- [ ] Authentication required for ALL non-public routes
+- [ ] ALL patient data access logged (read AND write) with: userId, timestamp, action, resourceId, patientId, ipAddress
+- [ ] TLS everywhere (no http:// in config, no unencrypted connections)
+- [ ] Session management: secure cookies, httpOnly, sameSite, expiration
+- [ ] Error messages in production: generic only, no stack traces, no patient data
 
-- [ ] Legal basis documented for each data processing activity
-- [ ] Consent management with explicit opt-in for non-treatment processing
-- [ ] Consent withdrawal mechanism exists and works
-- [ ] Data minimization: only necessary fields queried and returned
-- [ ] Right to access: patient can export their data
-- [ ] Right to correction: patient data can be corrected with audit trail
-- [ ] Data Protection Impact Assessment documented
+### Scan Commands
 
-## HelseID Integration (if applicable)
+```bash
+# Routes without auth middleware
+grep -rn 'router\.\(get\|post\|put\|patch\|delete\)' backend/src/routes/ | grep -v 'authenticate\|authMiddleware\|requireAuth'
 
-- [ ] PKCE with S256 code challenge method
-- [ ] Pushed Authorization Requests (PAR) enabled
-- [ ] Client authentication via private_key_jwt (NOT client_secret)
-- [ ] DPoP or mTLS for sender-constrained tokens
-- [ ] JWT signing with RS256 or stronger
-- [ ] No http:// redirect URIs
-- [ ] Security level 4 validated in middleware
+# Missing audit logging on mutations
+grep -rn 'router\.\(post\|put\|patch\|delete\)' backend/src/routes/patient*.js backend/src/routes/journal*.js backend/src/routes/appointment*.js | grep -v 'audit'
+```
 
-## WCAG 2.1 AA (required by Norwegian law for both public and private sector)
+## 2. GDPR / Personvernforordningen
 
+- [ ] Consent management: explicit opt-in mechanism exists
+- [ ] Consent withdrawal: mechanism exists and actually deletes/anonymizes
+- [ ] Data minimization: API responses filter fields per purpose
+- [ ] Right to access: patient data export endpoint exists
+- [ ] Right to correction: patient data update with audit trail
+- [ ] Right to deletion: patient data deletion/anonymization endpoint
+- [ ] Data processing register: documented legal basis per data type
+
+## 3. WCAG 2.1 AA (Norwegian law — universell utforming)
+
+- [ ] HTML lang="nb" on root element
 - [ ] All images have alt text
-- [ ] HTML lang attribute set to "nb" (Norwegian Bokmal)
-- [ ] All form inputs have associated labels
-- [ ] Color contrast minimum 4.5:1 for text
+- [ ] All form inputs have associated <label> elements
+- [ ] Color contrast >= 4.5:1 for normal text, >= 3:1 for large text
 - [ ] All functionality accessible via keyboard
-- [ ] Skip navigation links present
-- [ ] Error messages programmatically associated with form fields
+- [ ] Focus indicators visible on interactive elements
+- [ ] Error messages programmatically linked to form fields (aria-describedby)
 
-Run each section, report pass/fail with evidence, and list specific violations.
+### Scan Commands
+
+```bash
+# Check for lang attribute
+grep -rn 'lang=' frontend/src/index.html frontend/index.html
+
+# Form inputs without labels
+grep -rn '<input' frontend/src/ --include='*.jsx' --include='*.tsx' | grep -v 'label\|aria-label\|aria-labelledby'
+```
+
+## 4. ICPC-2 Validation
+
+- [ ] ICPC-2 codes match pattern: [A-Z][0-9]{2} (e.g., L86, N99)
+- [ ] Only valid chapter letters used: A,B,D,F,H,K,L,N,P,R,S,T,U,W,X,Y,Z
+- [ ] Code descriptions match Helsedirektoratet's official Norwegian translations
+- [ ] L-chapter (musculoskeletal) and N-chapter (neurological) are primary for chiropractic
+
+## OUTPUT: Checklist with PASS/FAIL, evidence for failures, and specific fix instructions.

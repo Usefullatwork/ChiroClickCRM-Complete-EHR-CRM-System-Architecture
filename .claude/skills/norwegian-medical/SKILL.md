@@ -1,38 +1,58 @@
 ---
 name: norwegian-medical
-description: Guides Norwegian Bokmal medical content writing for patient-facing UI. Auto-activates when writing or editing Norwegian text strings, patient communications, UI labels for healthcare features, consent forms, or medical terminology in the interface.
+description: Norwegian Bokmål medical content standards. Auto-activates when writing or editing Norwegian UI text, patient communications, consent forms, error messages, medical terminology, SOAP notes, or any patient-facing strings.
 ---
 
-# Norwegian Medical Content Standards
+# Norwegian Medical Content Standards for ChiroClickCRM
 
 ## Language Rules
 
-- All patient-facing text in Norwegian Bokmal (nb-NO), never Nynorsk unless specifically requested
-- Use "du/deg" (informal) for patient-facing text, not "De/Dem" (formal)
-- Medical terms: Use Norwegian equivalents when clear, with Latin/English in parentheses for clinical terms
-  - "Diagnose" not "diagnosis", "Konsultasjon" not "consultation"
-  - "Ryggsmerte" (back pain), "Nakkeproblemer" (neck problems)
-- ICPC-2 code descriptions should match Helsedirektoratet's official Norwegian translations
-
-## Chiropractic-Specific Terminology (Norwegian)
-
-- Kiropraktor (chiropractor), Kiropraktikk (chiropractic)
-- Behandling (treatment), Undersokelse (examination)
-- Pasientjournal (patient record), Timebestilling (appointment booking)
-- Henvisning (referral), Epikrise (discharge summary)
-- Rontgen (X-ray), MR (MRI)
-
-## Accessibility in Norwegian UI
-
-- All form labels must be descriptive in Norwegian
-- Error messages must explain the problem AND how to fix it, in Norwegian
+- ALL patient-facing text in Norwegian Bokmål (nb-NO)
+- Use "du/deg" (informal), not "De/Dem" (formal)
 - Date format: DD.MM.YYYY (Norwegian standard)
-- Time format: HH:MM (24-hour)
-- Currency: NOK with Norwegian formatting (1 234,50)
+- Time format: HH:MM (24-hour clock)
+- Currency: NOK with Norwegian formatting (1 234,50 kr)
+- Decimal separator: comma (,) not period (.)
 
-## Consent Text Requirements
+## Chiropractic Terminology
 
-- Consent forms must explain purpose in plain Norwegian (klarsprak)
-- Must include: what data is collected, why, how long stored, patient rights
-- Must have explicit opt-in (not pre-checked boxes)
-- Reference: Datatilsynet's guidance on valid consent
+| Norwegian      | English                | Context            |
+| -------------- | ---------------------- | ------------------ |
+| Kiropraktor    | Chiropractor           | Professional title |
+| Behandling     | Treatment              | Clinical           |
+| Undersøkelse   | Examination            | Clinical           |
+| Pasientjournal | Patient record         | Legal term         |
+| Timebestilling | Appointment booking    | UI                 |
+| Henvisning     | Referral               | To/from GP         |
+| Epikrise       | Discharge summary      | To GP              |
+| Sykemelding    | Sick leave certificate | NAV integration    |
+| Røntgen        | X-ray                  | Imaging            |
+| Diagnose       | Diagnosis              | ICPC-2             |
+| Konsultasjon   | Consultation           | Billing            |
+| Egenandel      | Co-payment             | Billing            |
+| Frikort        | Exemption card         | HELFO              |
+
+## SOAP Note Labels (Norwegian)
+
+- **S** — Subjektiv (pasientens beskrivelse)
+- **O** — Objektiv (kliniske funn)
+- **A** — Analyse/Vurdering (diagnose, ICPC-2 kode)
+- **P** — Plan (behandlingsplan, oppfølging)
+
+## Error Messages Pattern
+
+Always explain the problem AND the fix:
+
+- "Passord må inneholde: minst 8 tegn, minst én stor bokstav (A-Z), minst ett tall (0-9)"
+- NOT: "Ugyldig passord"
+
+## Consent Text (Datatilsynet requirements)
+
+Must include in plain Norwegian (klarspråk):
+
+1. Hva slags opplysninger som samles inn
+2. Formålet med behandlingen
+3. Hvor lenge opplysningene lagres
+4. Hvem som har tilgang
+5. Pasientens rettigheter (innsyn, retting, sletting)
+6. Kontaktinformasjon for personvernombud

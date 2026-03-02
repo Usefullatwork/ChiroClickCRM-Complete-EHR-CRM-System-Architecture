@@ -1,31 +1,31 @@
 ---
 name: phi-check
-description: Detects Protected Health Information leaks in code. Auto-activates when reviewing code that handles patient data, fødselsnummer, diagnoses, medical records, or health information. Use when checking for PHI exposure in logs, API responses, or error messages.
-allowed-tools: Read, Grep, Glob
+description: Detects Protected Health Information leaks in code. Auto-activates when reviewing code that handles patient data, fødselsnummer, diagnoses, medical records, journal entries, or health information.
 ---
 
 # PHI Leak Detection for Norwegian Healthcare
 
-## Norwegian PHI Identifiers to Detect
+## Norwegian PHI Identifiers
 
 - **Fødselsnummer**: 11 digits (DDMMYYIIIKK). Regex: `/\b\d{11}\b/`
-- **D-nummer**: First digit is 4-7 (temporary residents)
-- **H-nummer**: Third digit is 4-7 (emergency IDs)
+- **D-nummer**: First digit 4-7 (foreign residents)
+- **H-nummer**: Third digit 4-7 (emergency IDs)
 - **HPR-nummer**: 7-9 digit health personnel registry number
 
-## Scan Patterns
+## Scan Commands
 
-1. Search all `.js`, `.ts`, `.jsx`, `.tsx` files for:
-   - `console.log` or `logger.*` calls containing patient/health variable references
-   - Error handlers that pass raw error objects to responses (may contain patient data in message)
-   - API responses returning patient objects without field filtering
-   - URL construction with patient identifiers as query parameters
-   - Fødselsnummer patterns in non-test source files
+```bash
+# Find 11-digit patterns in source files (not tests, not node_modules)
+grep -rn '\b[0-9]\{11\}\b' --include='*.js' --include='*.jsx' --include='*.ts' --include='*.tsx' --exclude-dir=node_modules --exclude-dir=__tests__ --exclude-dir=dist .
 
-2. Check Express middleware chain for patient routes:
-   - Verify sanitization middleware exists before response
-   - Verify error handling middleware strips sensitive data in production
+# Find console.log with patient-related variables
+grep -rn 'console\.log.*\(.*\(patient\|pasient\|fødsel\|diagnos\|journal\|icpc\)' --include='*.js' --include='*.jsx' --exclude-dir=node_modules .
 
-## Report Format
+# Find SELECT * on patient tables
+grep -rn 'SELECT \*.*FROM.*\(patient\|appointment\|journal\|diagnos\|audit\)' --include='*.js' --exclude-dir=node_modules .
 
-List each finding with file path, line number, the problematic code, and specific fix.
+# Find patient data in URL construction
+grep -rn '\(req\.params\|req\.query\).*\(fødsel\|patient_id\|pasient\)' --include='*.js' --exclude-dir=node_modules .
+```
+
+Report every finding with file, line, code snippet, severity, and fix.

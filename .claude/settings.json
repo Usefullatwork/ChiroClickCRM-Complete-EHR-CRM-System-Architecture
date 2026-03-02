@@ -55,7 +55,13 @@
       "Bash(kill *)",
       "Bash(date *)",
       "Bash(wc *)",
-      "Bash(npx prettier *)"
+      "Bash(npx prettier *)",
+      "Bash(npm run *)",
+      "Bash(npx vitest *)",
+      "Bash(npx playwright *)",
+      "Bash(node -e *)",
+      "Bash(find *)",
+      "Bash(grep *)"
     ],
     "deny": [
       "Bash(git push --force*)",
@@ -79,7 +85,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "[ \"$(git branch --show-current)\" != \"main\" ] || echo '{\"decision\":\"block\",\"reason\":\"Cannot edit directly on main branch. Create a feature branch first.\"}'",
+            "command": "BRANCH=$(git branch --show-current 2>/dev/null); if [ \"$BRANCH\" = \"main\" ] && [ \"$CLAUDE_TOOL_INPUT_FILE_PATH\" != \"CLAUDE.md\" ]; then echo '{\"decision\":\"block\",\"reason\":\"Cannot edit directly on main branch. Create a feature branch first: git checkout -b feature/your-change\"}'; fi",
             "timeout": 5
           }
         ]
@@ -91,7 +97,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if [[ \"$CLAUDE_TOOL_INPUT_FILE_PATH\" =~ \\.(js|jsx|ts|tsx)$ ]]; then npx prettier --write \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>/dev/null; fi",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT_FILE_PATH\" | grep -qE '\\.(js|jsx|ts|tsx)$'; then npx prettier --write \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>/dev/null; fi",
             "timeout": 10
           }
         ]
@@ -101,7 +107,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if [[ \"$CLAUDE_TOOL_INPUT_FILE_PATH\" =~ \\.(js|jsx|ts|tsx)$ ]]; then grep -n 'console\\.log' \"$CLAUDE_TOOL_INPUT_FILE_PATH\" && echo '{\"systemMessage\":\"WARNING: console.log detected in file. Remove before committing — PHI leak risk in healthcare code.\"}' || true; fi",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT_FILE_PATH\" | grep -qE '\\.(js|jsx|ts|tsx)$'; then HITS=$(grep -n 'console\\.log' \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>/dev/null); if [ -n \"$HITS\" ]; then echo \"{\\\"systemMessage\\\":\\\"HEALTHCARE VIOLATION: console.log detected. PHI leak risk under Normen 5.4.4 and GDPR Art.9. Lines: $(echo $HITS | head -3)\\\"}\"; fi; fi",
             "timeout": 5
           }
         ]
