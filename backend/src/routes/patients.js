@@ -146,6 +146,27 @@ router.get(
 
 /**
  * @swagger
+ * /patients/export/vcf:
+ *   get:
+ *     summary: Export active patient contacts as VCF file
+ *     tags: [Patients]
+ *     description: Generates a multi-contact .vcf (vCard) file with patient names and phone numbers only. No health data is included. GDPR-compliant — only name + mobile number.
+ *     responses:
+ *       200:
+ *         description: VCF file download
+ *         content:
+ *           text/vcard:
+ *             schema:
+ *               type: string
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Insufficient role
+ */
+router.get('/export/vcf', requireRole(['ADMIN', 'PRACTITIONER']), patientController.exportVcf);
+
+/**
+ * @swagger
  * /patients/{id}:
  *   get:
  *     summary: Get patient by ID
@@ -190,6 +211,27 @@ router.get(
   validate(getPatientStatisticsSchema),
   patientController.getPatientStatistics
 );
+
+/**
+ * @swagger
+ * /patients/{id}/vcf:
+ *   get:
+ *     summary: Export single patient contact as VCF
+ *     tags: [Patients]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Single-contact VCF file
+ *       404:
+ *         description: Patient not found
+ */
+router.get('/:id/vcf', requireRole(['ADMIN', 'PRACTITIONER']), patientController.exportSingleVcf);
 
 /**
  * @swagger

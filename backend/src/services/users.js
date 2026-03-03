@@ -165,7 +165,10 @@ export const updateUser = async (organizationId, userId, updateData) => {
     'phone',
     'status',
     'preferences',
+    'notification_preferences',
   ];
+
+  const jsonbFields = ['preferences', 'notification_preferences'];
 
   const updates = [];
   const params = [userId, organizationId];
@@ -173,7 +176,7 @@ export const updateUser = async (organizationId, userId, updateData) => {
 
   for (const [key, value] of Object.entries(updateData)) {
     if (allowedFields.includes(key) && value !== undefined) {
-      if (key === 'preferences') {
+      if (jsonbFields.includes(key)) {
         updates.push(`${key} = $${paramIndex}::jsonb`);
         params.push(JSON.stringify(value));
       } else {

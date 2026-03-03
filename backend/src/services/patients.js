@@ -771,6 +771,24 @@ export const getPatientsNeedingFollowUp = async (organizationId, daysInactive = 
   }
 };
 
+/**
+ * Get active patients with phone numbers for VCF export.
+ * Only returns first_name, last_name, phone — no health data.
+ */
+export const getActiveContactsForExport = async (organizationId) => {
+  const result = await query(
+    `SELECT first_name, last_name, phone
+     FROM patients
+     WHERE organization_id = $1
+       AND status = 'ACTIVE'
+       AND phone IS NOT NULL
+       AND phone != ''
+     ORDER BY last_name, first_name`,
+    [organizationId]
+  );
+  return result.rows;
+};
+
 export default {
   getAllPatients,
   getPatientById,
@@ -781,4 +799,5 @@ export default {
   advancedSearchPatients,
   getPatientStatistics,
   getPatientsNeedingFollowUp,
+  getActiveContactsForExport,
 };

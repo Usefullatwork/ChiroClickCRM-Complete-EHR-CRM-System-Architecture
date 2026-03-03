@@ -351,6 +351,103 @@ export const getPatientsNeedingFollowUp = async (req, res) => {
   }
 };
 
+/**
+ * Export active patient contacts as VCF (vCard) file
+ * GET /api/v1/patients/export/vcf
+ * Only exports name + phone. No health data. GDPR-compliant.
+ */
+export const exportVcf = async (req, res) => {
+  try {
+    const { organizationId, user } = req;
+
+    const result = await patientService.getActiveContactsForExport(organizationId);
+    const contacts = result || [];
+
+    const vcfLines = [];
+    for (const contact of contacts) {
+      const firstName = (contact.first_name || '').trim();
+      const lastName = (contact.last_name || '').trim();
+      const phone = (contact.phone || '').trim();
+      if (!firstName && !lastName) continue;
+      if (!phone) continue;
+
+      vcfLines.push('BEGIN:VCARD');
+      vcfLines.push('VERSION:3.0');
+      vcfLines.push(`N:${lastName};${firstName};;;`);
+      vcfLines.push(`FN:${firstName} ${lastName}`.trim());
+      vcfLines.push(`TEL;TYPE=CELL:${phone}`);
+      vcfLines.push('END:VCARD');
+    }
+
+    const vcfContent = vcfLines.join('\r\n');
+
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'EXPORT',
+      resourceType: 'PATIENT',
+      resourceId: null,
+      details: `Contact export (VCF) — ${contacts.length} contacts`,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
+    res.setHeader('Content-Type', 'text/vcard; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="kontakter.vcf"');
+    res.send(vcfContent);
+  } catch (error) {
+    logger.error('Error in exportVcf controller:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: 'Failed to export contacts',
+    });
+  }
+};
+
+/**
+ * Export a single patient contact as VCF
+ * GET /api/v1/patients/:id/vcf
+ */
+export const exportSingleVcf = async (req, res) => {
+  try {
+    const { organizationId, user } = req;
+    const { id } = req.params;
+
+    const patient = await patientService.getPatientById(organizationId, id);
+    if (!patient) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+
+    const firstName = (patient.first_name || '').trim();
+    const lastName = (patient.last_name || '').trim();
+    const phone = (patient.phone || '').trim();
+
+    const vcfLines = [
+      'BEGIN:VCARD',
+      'VERSION:3.0',
+      `N:${lastName};${firstName};;;`,
+      `FN:${firstName} ${lastName}`.trim(),
+    ];
+    if (phone) vcfLines.push(`TEL;TYPE=CELL:${phone}`);
+    vcfLines.push('END:VCARD');
+
+    const vcfContent = vcfLines.join('\r\n');
+    const filename = `${firstName}_${lastName}`.replace(/\s+/g, '_') || 'kontakt';
+
+    res.setHeader('Content-Type', 'text/vcard; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}.vcf"`);
+    res.send(vcfContent);
+  } catch (error) {
+    logger.error('Error in exportSingleVcf controller:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: 'Failed to export contact',
+    });
+  }
+};
+
 export default {
   getPatients,
   getPatient,
@@ -361,4 +458,6 @@ export default {
   advancedSearchPatients,
   getPatientStatistics,
   getPatientsNeedingFollowUp,
+  exportVcf,
+  exportSingleVcf,
 };
